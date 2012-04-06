@@ -4,13 +4,16 @@ module CustomSeleniumRspecMatchers
     def initialize(class_name)
       @class_name = class_name
     end
+
     def matches?(element)
       @element = element
       !!@element.attribute('class').match(@class_name)
     end
+
     def failure_message
       "expected #{@element.inspect} to have class #{@class_name}, actual class names: #{@element.attribute('class')}"
     end
+
     def negative_failure_message
       "expected #{@element.inspect} to not have class #{@class_name}, actual class names: #{@element.attribute('class')}"
     end
@@ -24,13 +27,20 @@ module CustomSeleniumRspecMatchers
     def initialize(text)
       @text = text
     end
+
     def matches?(element)
       @element = element
-      !!@element.text.include?(@text)
+      if (@element.instance_of? String)
+        @element.include?(@text)
+      else
+        @element.text.include?(@text)
+      end
     end
+
     def failure_message
       "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element.text}"
     end
+
     def negative_failure_message
       "expected #{@element.inspect} text to NOT include #{@text}, actual text was: #{@element.text}"
     end

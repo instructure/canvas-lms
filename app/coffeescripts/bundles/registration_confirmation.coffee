@@ -33,12 +33,11 @@ require [
 
     if $where_to_log_in.length
       $('#merge_if_clicked').click ->
-        $merge_link.trigger('click', true)
+        window.location = $merge_link.attr "href"
 
-      $merge_link.click (event, useNative) ->
-        unless useNative
-          event.preventDefault()
-          showPane $where_to_log_in
+      $merge_link.click (event) ->
+        event.preventDefault()
+        showPane $where_to_log_in
 
     $registration_form.find(":text:first").focus().select()
     $registration_form.submit (event) ->

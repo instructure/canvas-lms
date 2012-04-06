@@ -106,15 +106,23 @@ describe PseudonymSessionsController do
       response.should render_template('pseudonym_sessions/new')
     end
 
-    it "should warn for deprecated trust method" do
+    it "should redirect for deprecated trust method" do
       account = Account.create!
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account)
       HostUrl.stubs(:context_host).with(Account.default).returns('www.example.com')
-      HostUrl.expects(:context_host).with(account).returns('somewhere.else.com')
+      HostUrl.expects(:context_host).with(account).returns('somewhere.else.com').at_least_once
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
-      response.should redirect_to(dashboard_url(:login_success => 1))
-      flash[:notice].should be_blank
-      flash[:error].should == 'In the future, please login at somewhere.else.com.'
+      response.should be_redirect
+      response.location.should match /somewhere\.else\.com\/login/
+      response.location.should match /wrong_domain\=1/
+      response.location.should match /pseudonym_session%5Bunique_id%5D=jt%40instructure.com/
+
+      LoadAccount.stubs(:default_domain_root_account).returns(account)
+      get 'new', :wrong_domain => '1'
+      response.should be_success
+      # don't use flash; it will pull it out of session, and mark it as used, removing
+      # this flash which doesn't persist
+      session[:flash][:scary_warning].should == 'From now on, you will need to login at somewhere.else.com.'
     end
   end
 

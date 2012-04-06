@@ -1,8 +1,13 @@
 <%
-# TODO: I am assuming that any new submission or grading will touch the course (or the user) so that will make this cache work,
-# if not we need to cache smarter. -RS
+# This is rendered both on the dashboard and on the course homepage. On the
+# dashboard, contexts is nil, and so the cache is only based on the user, which
+# does not get touched when an assignment needs_grading count changes. So for
+# the dashboard, we expire after 3 minutes. On the course page, contexts is the
+# course, which does get touched, and so the cache expiration works.
+#
 # BTW if you add a new thing here, it probably needs adding to the /users/self/todo API
-cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
+cache_opts = (contexts.present? ? {} : { :expires_in => 3.minutes })
+cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) do
  show_context = !contexts || contexts.length > 1
  visible_limit = 5
  needs_grading = @current_user ? @current_user.assignments_needing_grading(:contexts => contexts, :limit => 100) : []

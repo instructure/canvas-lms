@@ -137,7 +137,8 @@ class EnrollmentsApiController < ApplicationController
     enrollments = Api.paginate(
       enrollments,
       self, send("api_v1_#{endpoint_scope}_enrollments_path"))
-    render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, [:user]) }
+    includes = [:user] + Array(params[:include])
+    render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, includes) }
   end
 
   # @API

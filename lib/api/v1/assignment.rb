@@ -54,11 +54,18 @@ module Api::V1::Assignment
       end
     end
 
-    hash['rubric'] = assignment.rubric.data.map do |row|
-      row_hash = row.slice(:id, :points, :description, :long_description)
-      row_hash["ratings"] = row[:ratings].map { |c| c.slice(:id, :points, :description) }
-      row_hash
-    end if assignment.rubric
+    if assignment.rubric
+      rubric = assignment.rubric
+      hash['rubric'] = rubric.data.map do |row|
+        row_hash = row.slice(:id, :points, :description, :long_description)
+        row_hash["ratings"] = row[:ratings].map { |c| c.slice(:id, :points, :description) }
+        row_hash
+      end
+      hash['rubric_settings'] = {
+        'points_possible' => rubric.points_possible,
+        'free_form_criterion_comments' => !!rubric.free_form_criterion_comments,
+      }
+    end
 
     if assignment.discussion_topic
       hash['discussion_topic'] = discussion_topic_api_json(assignment.discussion_topic, assignment.discussion_topic.context, user, session)

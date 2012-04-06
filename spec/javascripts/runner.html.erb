@@ -62,12 +62,6 @@
           location: 'vendor/jqueryui'
         },
         {
-          name: 'specs',
-          location: '../../spec/javascripts',
-          main: 'support/specs',
-          lib: './'
-        },
-        {
           name: 'helpers',
           location: '../../spec/javascripts/helpers',
           main: 'helpers',
@@ -78,7 +72,11 @@
           location: '../../spec/javascripts/support',
           main: 'support',
           lib: './'
-        }
+        },
+        {
+          name: 'spec',
+          location: '../../spec'
+        },
       ]
     };
   </script>
@@ -86,7 +84,7 @@
   <script>
     // don't run specs until they are all loaded
     stop();
-    require(['specs'], function() {
+    require(<%= Dir["spec/javascripts/**/*Spec.js"].map{ |file| file.sub(/\.js$/, '') }.inspect %>, function() {
       // run specs once they've all loaded
       start();
     });

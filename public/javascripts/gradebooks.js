@@ -23,6 +23,7 @@ define([
   'datagrid',
   'compiled/grade_calculator',
   'str/htmlEscape',
+  'vendor/underscore',
   'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
   'jquery.dropdownList' /* dropdownList */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
@@ -39,7 +40,7 @@ define([
   'vendor/jquery.store' /* /\$\.store/ */,
   'jqueryui/position' /* /\.position\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function(INST, I18n, $, datagrid, GradeCalculator, htmlEscape) {
+], function(INST, I18n, $, datagrid, GradeCalculator, htmlEscape, _) {
 
   var grading_scheme = window.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
@@ -546,24 +547,36 @@ define([
                 for(var idx in students_hash) {
                   students.push(students_hash[idx]);
                 }
+
+                var hasSubmission = true;
+                if (!data.submission_types || data.submission_types.match(/none|on_paper/)) {
+                  hasSubmission = false;
+                }
+                var options = [
+                  {text: I18n.t('students_who.havent_submitted_yet', "Haven't submitted yet")},
+                  {text: I18n.t("students_who.havent_been_graded", "Haven't been graded")},
+                  {text: I18n.t('students_who.scored_less_than', "Scored less than"), cutoff: true},
+                  {text: I18n.t('students_who.scored_more_than', "Scored more than"), cutoff: true}
+                ];
+                if (!hasSubmission) {
+                  options.splice(0, 1)
+                }
                 
                 window.messageStudents({
-                  options: [
-                    {text: I18n.t('students_who.havent_submitted_yet', "Haven't submitted yet")},
-                    {text: I18n.t('students_who.scored_less_than', "Scored less than"), cutoff: true},
-                    {text: I18n.t('students_who.scored_more_than', "Scored more than"), cutoff: true}
-                  ],
+                  options: options,
                   title: title,
                   points_possible: data.points_possible,
                   students: students,
                   callback: function(selected, cutoff, students) {
                     students = $.grep(students, function($student, idx) {
                       var student = $student.user_data;
-                      if(selected == I18n.t('not_submitted_yet', "Haven't submitted yet")) {
+                      if(selected == I18n.t('students_who.not_submitted_yet', "Haven't submitted yet")) {
                         return !student.submitted_at;
-                      } else if(selected == I18n.t('scored_less_than', "Scored less than")) {
+                      } else if (selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")) {
+                        return student.score === null;
+                      } else if(selected == I18n.t('students_who.scored_less_than', "Scored less than")) {
                         return student.score != null && student.score !== "" && cutoff != null && student.score < cutoff;
-                      } else if(selected == I18n.t('scored_more_than', "Scored more than")) {
+                      } else if(selected == I18n.t('students_who.scored_more_than', "Scored more than")) {
                         return student.score != null && student.score !== "" && cutoff != null && student.score > cutoff;
                       }
                     });

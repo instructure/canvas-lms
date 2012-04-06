@@ -64,7 +64,8 @@ group :sqlite do
 end
 
 group :test do
-  gem 'barista',        '1.2.1'
+  gem 'coffee-script'
+  gem 'coffee-script-source',  '1.1.2' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel_tests-instructure', '0.6.19'
   gem 'mocha',        '0.10.0'
@@ -77,8 +78,8 @@ group :test do
 end
 
 group :development do
-  gem 'barista',        '1.2.1'
-  gem 'coffee-script-source',  '1.1.2' #pinned just so everyone's compiled output matches
+  gem 'coffee-script'
+  gem 'coffee-script-source',  '1.1.2' #pinned so everyone's compiled output matches
   gem 'ruby-debug',   '0.10.4'
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'

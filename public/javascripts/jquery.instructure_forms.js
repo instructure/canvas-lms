@@ -147,10 +147,11 @@ define([
           asset_string: options.asset_string,
           intent: options.intent,
           folder_id: $.isFunction(options.folder_id) ? (options.folder_id.call($form)) : options.folder_id,
-          file_elements: $form.find("input[type='file']"),
+          file_elements: $form.find("input[type='file']:visible"),
           url: (options.upload_only ? null : action),
           uploadDataUrl: options.uploadDataUrl,
-          formData: options.postFormData ? formData : null,
+          formData: formData,
+          formDataTarget: options.formDataTarget,
           success: options.success,
           error: options.error
         });
@@ -324,6 +325,9 @@ define([
     });
   }
   $.ajaxFileUpload = function(options) {
+    if(!options.data.authenticity_token) {
+      options.data.authenticity_token = ENV.AUTHENTICITY_TOKEN
+    }
     $.toMultipartForm(options.data, function(params) {
       $.sendFormAsBinary({
         url: options.url,

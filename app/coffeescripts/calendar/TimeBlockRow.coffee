@@ -67,7 +67,7 @@ define [
           valid = false
           @inputs.end_time.$el
             .addClass('error')
-            .errorBox(I18n.t 'ends_in_past_error', 'You cannot create an appontment slot that ends in the past')
+            .errorBox(I18n.t 'ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
         # make sure start is before end
         if @inputs.start_time.val && @inputs.end_time.val
           testDate = @validDate() || 'Today'

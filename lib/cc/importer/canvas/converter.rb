@@ -47,7 +47,7 @@ module CC::Importer::Canvas
       @course[:external_tools] = convert_blti_links
       @course[:file_map] = create_file_map
       package_course_files
-      convert_quizzes
+      convert_quizzes if Qti.qti_enabled?
       
       #close up shop
       save_to_file

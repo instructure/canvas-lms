@@ -12,7 +12,15 @@ require [
       @$holder = $('<table />').appendTo(document.body)
       @timeBlockList = new TimeBlockList(@$holder)
 
+      # fakeTimer'd because the tests with failed validations add an error box
+      # that is faded in. if we don't tick past the fade-in, other unrelated
+      # tests that use fake timers fail.
+      @clock = sinon.useFakeTimers((new Date()).valueOf())
+
     teardown: ->
+      # tick past any remaining errorBox fade-ins
+      @clock.tick 250
+      @clock.restore()
       @$holder.detach()
 
   test "should init properly", ->

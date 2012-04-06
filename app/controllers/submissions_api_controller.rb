@@ -157,6 +157,32 @@ class SubmissionsApiController < ApplicationController
 
   # @API
   #
+  # Upload a file to a submission.
+  #
+  # This API endpoint is the first step in uploading a file to a submission as a student.
+  # See the {file:file_uploads.html File Upload Documentation} for details on the file upload workflow.
+  #
+  # The final step of the file upload workflow will return the attachment data,
+  # including the new file id. The caller can then POST to submit the
+  # +online_upload+ assignment with these file ids.
+  #
+  def create_file
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @user = get_user_considering_section(params[:user_id])
+    permission = @assignment.submission_types.include?("online_upload") ? :submit : :nothing
+    # rationale for allowing other user ids at all: eventually, you'll be able
+    # to use this api for uploading an attachment to a submission comment.
+    # teachers will be able to do that for any submission they can grade, so
+    # they need to be able to specify the target user.
+    permission = :nothing if @user != @current_user
+    # we don't check quota when uploading a file for assignment submission
+    if authorized_action(@assignment, @current_user, permission)
+      api_attachment_preflight(@user, request, :check_quota => false)
+    end
+  end
+
+  # @API
+  #
   # Comment on and/or update the grading for a student's assignment submission.
   # If any submission or rubric_assessment arguments are provided, the user
   # must have permission to manage grades in the appropriate context (course or

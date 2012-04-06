@@ -202,7 +202,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_materialized_view
-    materialized_view # kick off building of the view
+    # kick off building of the view
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view
   end
 
   # If no join record exists, assume all discussion enrties are unread, and
@@ -832,12 +833,12 @@ class DiscussionTopic < ActiveRecord::Base
   #
   # if a new message is posted, it won't appear in this view until the job to
   # update it completes. so this view is eventually consistent.
-  def materialized_view
-    DiscussionTopic::MaterializedView.materialized_view_for(self)
+  def materialized_view(opts = {})
+    DiscussionTopic::MaterializedView.materialized_view_for(self, opts)
   end
 
   # synchronously create/update the materialized view
   def create_materialized_view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later
   end
 end

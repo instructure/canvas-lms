@@ -38,12 +38,12 @@ module Multipart
     def to_multipart
       #return "Content-Disposition: form-data; name=\"#{CGI::escape(k)}\"; filename=\"#{filename}\"\r\n" + "Content-Transfer-Encoding: binary\r\n" + "Content-Type: #{MIME::Types.type_for(@filename)}\r\n\r\n" + content + "\r\n "
       # Don't escape mine
-      return "Content-Disposition: form-data; name=\"#{k}\"; filename=\"#{filename}\"\r\n" + "Content-Transfer-Encoding: binary\r\n" + "Content-Type: #{MIME::Types.type_for(@filename)}\r\n\r\n" + content + "\r\n"
+      return "Content-Disposition: form-data; name=\"#{k}\"; filename=\"#{filename}\"\r\n" + "Content-Transfer-Encoding: binary\r\n" + "Content-Type: #{MIME::Types.type_for(@filename).first}\r\n\r\n" + content + "\r\n"
     end
   end
   class MultipartPost
     BOUNDARY = AutoHandle.generate('canvas-rules', 15)
-    HEADER = {"Content-type" => "multipart/form-data, boundary=" + BOUNDARY + " "}
+    HEADER = {"Content-type" => "multipart/form-data, boundary=" + BOUNDARY}
 
     def prepare_query (params, field_priority=[])
       fp = []

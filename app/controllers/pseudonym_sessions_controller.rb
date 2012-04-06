@@ -31,6 +31,10 @@ class PseudonymSessionsController < ApplicationController
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
 
+    if params[:wrong_domain] == '1'
+      flash.now[:scary_warning] = t 'warnings.wrong_login_spot', "From now on, you will need to login at %{domain}.", :domain => HostUrl.context_host(@domain_root_account)
+    end
+
     session[:expected_user_id] = params[:expected_user_id].to_i
     session[:confirm] = params[:confirm]
     session[:enrollment] = params[:enrollment]
@@ -89,7 +93,7 @@ class PseudonymSessionsController < ApplicationController
     elsif @is_saml && !params[:no_auto]
       initiate_saml_login(request.env['canvas.account_domain'])
     else
-      flash[:delegated_message] = session.delete :delegated_message
+      flash[:delegated_message] = session.delete :delegated_message if session[:delegated_message]
       maybe_render_mobile_login
     end
   end
@@ -105,6 +109,7 @@ class PseudonymSessionsController < ApplicationController
       }
       render :template => 'pseudonym_sessions/mobile_login', :layout => false, :status => status
     else
+      @request = request
       render :action => 'new', :status => status
     end
   end
@@ -133,7 +138,7 @@ class PseudonymSessionsController < ApplicationController
         # prefer a pseudonym from Site Admin if possible, otherwise just choose one
         valid_alternative = valid_alternatives.find {|p| p.account_id == Account.site_admin.id } || valid_alternatives.first
         if (!@domain_root_account.trusted_account_ids.include?(valid_alternative.account_id))
-          flash[:error] = t 'warnings.wrong_login_spot', "In the future, please login at %{domain}.", :domain => HostUrl.context_host(valid_alternative.account)
+          return redirect_to login_url(:host => HostUrl.context_host(valid_alternative.account), :wrong_domain => 1, :pseudonym_session => { :unique_id => valid_alternative.unique_id })
         end
         @pseudonym_session = PseudonymSession.new(valid_alternative, params[:pseudonym_session][:remember_me] == "1")
         @pseudonym_session.save

@@ -37,6 +37,7 @@ module CC
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |mods_node|
         @course.context_modules.active.each do |cm|
+          next unless export_object?(cm)
           mod_migration_id = CCHelper.create_key(cm)
           # context modules are in order and a pre-req can only reference
           # a previous module, so just adding as we go is okay

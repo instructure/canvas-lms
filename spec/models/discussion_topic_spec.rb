@@ -688,6 +688,7 @@ describe DiscussionTopic do
   context "materialized view" do
     before do
       topic_with_nested_replies
+      run_transaction_commit_callbacks
     end
 
     it "should return nil if the view has not been built yet, and schedule a job" do
@@ -700,13 +701,14 @@ describe DiscussionTopic do
     it "should return the materialized view if it's up to date" do
       run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
       view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
-      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array]
+      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, "[]"]
     end
 
     it "should update the materialized view on new entry" do
       run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
       Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
       @topic.reply_from(:user => @user, :text => "ohai")
+      run_transaction_commit_callbacks
       Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
     end
 
@@ -715,6 +717,7 @@ describe DiscussionTopic do
       run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
       Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
       reply.update_attributes(:message => "i got that wrong before")
+      run_transaction_commit_callbacks
       Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
     end
   end

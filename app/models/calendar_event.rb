@@ -20,8 +20,9 @@ require 'date'
 
 class CalendarEvent < ActiveRecord::Base
   include CopyAuthorizedLinks
+  include TextHelper
   attr_accessible :title, :description, :start_at, :end_at, :location_name,
-      :location_address, :time_zone_edited, :cancel_reason
+      :location_address, :time_zone_edited, :cancel_reason, :participants_per_appointment
   attr_accessor :cancel_reason
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
@@ -285,7 +286,7 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       raise ReservationError, "participant has met per-participant limit" if context.max_appointments_per_participant && context.reservations_for(participant).size >= context.max_appointments_per_participant
-      raise ReservationError, "all slots filled" if context.participants_per_appointment && child_events.size >= context.participants_per_appointment
+      raise ReservationError, "all slots filled" if participants_per_appointment && child_events.size >= participants_per_appointment
       raise ReservationError, "participant has already reserved this appointment" if child_events_for(participant).present?
 
       event = child_events.build
@@ -304,6 +305,26 @@ class CalendarEvent < ActiveRecord::Base
 
   def child_events_for(participant)
     child_events.select{ |e| e.has_asset?(participant) }
+  end
+
+  def participants_per_appointment
+    if override_participants_per_appointment?
+      read_attribute(:participants_per_appointment)
+    else
+      context.is_a?(AppointmentGroup) ? context.participants_per_appointment : nil
+    end
+  end
+
+  def participants_per_appointment=(limit)
+    # if the given limit is the same as the context's limit, we should not override
+    if limit == context.participants_per_appointment && override_participants_per_appointment?
+      self.override_participants_per_appointment = false
+      write_attribute(:participants_per_appointment, nil)
+    else
+      write_attribute(:participants_per_appointment, limit)
+      self.override_participants_per_appointment = true
+    end
+    limit
   end
 
   def update_matching_days=(update)
@@ -350,7 +371,7 @@ class CalendarEvent < ActiveRecord::Base
       event.end.ical_params = {"VALUE"=>["DATE"]}
     end
     event.summary = self.title
-    event.description = self.description
+    event.description = strip_tags(self.description).strip
     event.location = loc_string
     event.dtstamp = self.updated_at.utc_datetime if self.updated_at
     event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
@@ -383,11 +404,12 @@ class CalendarEvent < ActiveRecord::Base
     return existing if existing && !options[:overwrite]
     dup ||= CalendarEvent.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id].include?(k.to_sym) }.each do |key, val|
+    self.attributes.delete_if{|k,v| %w(id participants_per_appointment).include?(k) }.each do |key, val|
       dup.send("#{key}=", val)
     end
     dup.context = context
     dup.description = context.migrate_content_links(self.description, self.context) if options[:migrate]
+    dup.write_attribute :participants_per_appointment, read_attribute(:participants_per_appointment)
     context.log_merge_result("Calendar Event \"#{self.title}\" created")
     context.may_have_links_to_migrate(dup)
     dup.updated_at = Time.now

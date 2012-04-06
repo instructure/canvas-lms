@@ -204,7 +204,8 @@ class LearningOutcome < ActiveRecord::Base
     item.description = hash[:description]
     
     if hash[:ratings]
-      item.data = {:rubric_criterion=>{:ratings=>hash[:ratings]}}
+      item.data = {:rubric_criterion=>{}}
+      item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
       item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
       item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
       item.data[:rubric_criterion][:description] = item.short_description || item.description

@@ -52,7 +52,7 @@ describe "gradebooks" do
   end
 
   it "should handle multiple enrollments" do
-    @course.student_enrollments.create!(:user => @student1, :course_section => @section2)
+    @course.enroll_student(@student1, :section => @section2, :allow_multiple_enrollments => true)
 
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
@@ -84,13 +84,23 @@ describe "gradebooks" do
 
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
-    ff('img.turnitin:visible').size.should eql 2
+    ffj('img.turnitin:visible').size.should eql 2
 
     # now create a ton of students so that the data loads via ajax
     100.times { |i| student_in_course(:active_all => true, :name => "other guy #{i}") }
 
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
-    ff('img.turnitin:visible').size.should eql 2
+    ffj('img.turnitin:visible').size.should eql 2
+  end
+
+  it "should include student view student for grading" do
+    @fake_student = @course.student_view_student
+    @fake_submission = @assignment.submit_homework(@fake_student, :body => 'fake student submission')
+
+    get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
+
+    f("#student_#{@fake_student.id} .display_name").should include_text @fake_student.sortable_name
   end
 end

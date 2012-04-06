@@ -155,14 +155,14 @@ describe "gradebook2" do
 
       #first assignment data
       @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 100)
-      @assignment = assignment_model({
-                                         :course => @course,
-                                         :name => 'first assignment',
-                                         :due_at => nil,
-                                         :points_possible => ASSIGNMENT_1_POINTS,
-                                         :submission_types => 'online_text_entry',
-                                         :assignment_group => @group
-                                     })
+      @first_assignment = assignment_model({
+        :course => @course,
+        :name => 'first assignment',
+        :due_at => nil,
+        :points_possible => ASSIGNMENT_1_POINTS,
+        :submission_types => 'online_text_entry',
+        :assignment_group => @group
+      })
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
@@ -179,13 +179,13 @@ describe "gradebook2" do
 
       #second assignment data
       @second_assignment = assignment_model({
-                                                :course => @course,
-                                                :name => 'second assignment',
-                                                :due_at => nil,
-                                                :points_possible => ASSIGNMENT_2_POINTS,
-                                                :submission_types => 'online_text_entry',
-                                                :assignment_group => @group
-                                            })
+        :course => @course,
+        :name => 'second assignment',
+        :due_at => nil,
+        :points_possible => ASSIGNMENT_2_POINTS,
+        :submission_types => 'online_text_entry',
+        :assignment_group => @group
+      })
       @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
 
       #student 1 submission for assignment 2
@@ -201,29 +201,30 @@ describe "gradebook2" do
       #third assignment data
       due_date = Time.now + 1.days
       @third_assignment = assignment_model({
-                                               :course => @course,
-                                               :name => 'assignment three',
-                                               :due_at => due_date,
-                                               :points_possible => ASSIGNMENT_3_POINTS,
-                                               :submission_types => 'online_text_entry',
-                                               :assignment_group => @group
-                                           })
+        :course => @course,
+        :name => 'assignment three',
+        :due_at => due_date,
+        :points_possible => ASSIGNMENT_3_POINTS,
+        :submission_types => 'online_text_entry',
+        :assignment_group => @group
+      })
       @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
 
       #attendance assignment
       @attendance_assignment = assignment_model({
-                                                    :course => @course,
-                                                    :name => 'attendance assignment',
-                                                    :title => 'attendance assignment',
-                                                    :due_at => nil,
-                                                    :points_possible => ATTENDANCE_POINTS,
-                                                    :submission_types => 'attendance',
-                                                    :assignment_group => @group,
-                                                })
+        :course => @course,
+        :name => 'attendance assignment',
+        :title => 'attendance assignment',
+        :due_at => nil,
+        :points_possible => ATTENDANCE_POINTS,
+        :submission_types => 'attendance',
+        :assignment_group => @group,
+      })
 
-      @ungraded_assignment = @course.assignments.create! :title => 'not-graded assignment',
-                                                         :submission_types => 'not_graded',
-                                                         :assignment_group => @group
+      @ungraded_assignment = @course.assignments.create!(
+        :title => 'not-graded assignment',
+        :submission_types => 'not_graded',
+        :assignment_group => @group)
     end
 
     it "should minimize a column and remember it" do
@@ -256,6 +257,27 @@ describe "gradebook2" do
       driver.find_element(:css, '#gradebook_grid .slick-header').should_not include_text(@ungraded_assignment.title)
     end
 
+    it "should notify user that no updates are made if default grade assignment doesn't change anything" do
+      get "/courses/#{@course.id}/gradebook2"
+
+      ##
+      # borrowed this code from set_default_grade method. not calling it directly because
+      # we need to assert the content of the alert box.
+      open_assignment_options(0)
+      driver.find_element(:css, '#ui-menu-1-3').click
+      dialog = find_with_jquery('.ui-dialog:visible')
+      dialog_form = dialog.find_element(:css, '.ui-dialog-content')
+      driver.find_element(:css, '.grading_value').send_keys(5)
+      dialog_form.submit
+      keep_trying_until do
+        driver.switch_to.alert.should_not be_nil
+        driver.switch_to.alert.text.should eql 'None to Update'
+        driver.switch_to.alert.dismiss
+        true
+      end
+      driver.switch_to.default_content
+    end
+
     it "should validate correct number of students showing up in gradebook" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
@@ -277,6 +299,24 @@ describe "gradebook2" do
 
       dom_names = driver.find_elements(:css, '.student-name').map(&:text)
       dom_names.should == [STUDENT_NAME_1, STUDENT_NAME_2]
+    end
+  
+    it "should not show student avatars until they are enabled" do
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      driver.find_elements(:css, '.student-name').length.should == 2
+      driver.find_elements(:css, '.avatar img').length.should == 0
+  
+      @account = Account.default
+      @account.enable_service(:avatars)
+      @account.save!
+      @account.service_enabled?(:avatars).should be_true
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      
+      driver.find_elements(:css, '.student-name').length.should == 2
+      driver.find_elements(:css, '.avatar img').length.should == 2
     end
 
     it "should link to a student's grades page" do
@@ -594,20 +634,39 @@ describe "gradebook2" do
       end
     end
 
-    it "should validate send a message to students who option" do
-      message_text = "This is a message"
+    describe "message students who" do
+      it "should send messages" do
+        message_text = "This is a message"
 
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-
-      open_assignment_options(2)
-      driver.find_element(:css, '#ui-menu-1-2').click
-      expect {
-        message_form = driver.find_element(:css, '#message_assignment_recipients')
-        message_form.find_element(:css, '#body').send_keys(message_text)
-        message_form.submit
+        get "/courses/#{@course.id}/gradebook2"
         wait_for_ajaximations
-      }.to change(ConversationMessage, :count).by(2)
+
+        open_assignment_options(2)
+        driver.find_element(:css, '#ui-menu-1-2').click
+        expect {
+          message_form = driver.find_element(:css, '#message_assignment_recipients')
+          message_form.find_element(:css, '#body').send_keys(message_text)
+          message_form.submit
+          wait_for_ajax_requests
+        }.to change(ConversationMessage, :count).by(2)
+      end
+
+      it "should have a 'Haven't been graded' option" do
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        # set grade for first student, 3rd assignment
+        edit_grade(driver.find_element(:css, '#gradebook_grid [row="0"] .l2'), 0)
+        open_assignment_options(2)
+
+        # expect dialog to show 1 fewer student with the "Haven't been graded" option
+        driver.find_element(:css, '#ui-menu-1-2').click
+        find_all_with_jquery('.student_list li:visible').size.should eql 2
+        # select option
+        select = driver.find_element(:css, '#message_assignment_recipients select.message_types')
+        select.click
+        select.all(:tag_name => 'option').find {|o| o.text == "Haven't been graded"}.click
+        find_all_with_jquery('.student_list li:visible').size.should eql 1
+      end
     end
 
     it "should validate curving grades option" do
@@ -631,7 +690,7 @@ describe "gradebook2" do
     end
 
     it "should handle multiple enrollments correctly" do
-      @course.student_enrollments.create!(:user => @student_1, :course_section => @other_section)
+      @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
@@ -699,6 +758,16 @@ describe "gradebook2" do
         driver.find_element(:css, gradebook_row_1).should be_displayed
         validate_cell_text(driver.find_element(:css, "#{gradebook_row_1} .r2"), '-')
       end
+    end
+
+    it "should include student view student for grading" do
+      @fake_student = @course.student_view_student
+      @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      ff('.student-name').map(&:text).join(" ").should match @fake_student.name
     end
   end
 

@@ -17,9 +17,11 @@ class ActiveRecord::Base
   end
 
   def opaque_identifier(column)
-    str = send(column).to_s
-    raise "Empty value" if str.blank?
-    Canvas::Security.hmac_sha1(str)
+    self.shard.activate do
+      str = send(column).to_s
+      raise "Empty value" if str.blank?
+      Canvas::Security.hmac_sha1(str, self.shard.settings[:encryption_key])
+    end
   end
 
   def self.maximum_text_length
@@ -230,15 +232,20 @@ class ActiveRecord::Base
     value = '%' + value unless options[:type] == :right
     value += '%' unless options[:type] == :left
 
-    cols = case connection.adapter_name
+    cols = args.map{ |col| like_condition(col) }
+    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
+  end
+
+  def self.like_condition(value, pattern = '?', downcase = true)
+    case connection.adapter_name
       when 'SQLite'
         # sqlite is always case-insensitive, and you must specify the escape char
-        args.map{|col| "#{col} LIKE ? ESCAPE '\\'"}
+        "#{value} LIKE #{pattern} ESCAPE '\\'"
       else
         # postgres is always case-sensitive (mysql depends on the collation)
-        args.map{|col| "LOWER(#{col}) LIKE ?"}
+        value = "LOWER(#{value})" if downcase
+        "#{value} LIKE #{pattern}"
     end
-    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
   end
 
   def self.case_insensitive(col)
@@ -657,6 +664,47 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
     # columns are functionally dependent on
     Array(columns.first).join(", ")
   end
+
+  def after_transaction_commit(&block)
+    if open_transactions == 0
+      block.call
+    else
+      @after_transaction_commit ||= []
+      @after_transaction_commit << block
+    end
+  end
+
+  def after_transaction_commit_callbacks
+    @after_transaction_commit || []
+  end
+
+  # the alias_method_chain needs to happen in the subclass, since they all
+  # override commit_db_transaction
+  def commit_db_transaction_with_callbacks
+    commit_db_transaction_without_callbacks
+    return unless @after_transaction_commit
+    # the callback could trigger a new transaction on this connection,
+    # and leaving the callbacks in @after_transaction_commit could put us in an
+    # infinite loop.
+    # so we store off the callbacks to a local var here.
+    callbacks = @after_transaction_commit
+    @after_transaction_commit = []
+    callbacks.each { |cb| cb.call() }
+  ensure
+    @after_transaction_commit = [] if @after_transaction_commit
+  end
+
+  def rollback_db_transaction_with_callbacks
+    rollback_db_transaction_without_callbacks
+    @after_transaction_commit = [] if @after_transaction_commit
+  end
+end
+
+if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
+  ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
+    alias_method_chain :commit_db_transaction, :callbacks
+    alias_method_chain :rollback_db_transaction, :callbacks
+  end
 end
 
 if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
@@ -669,6 +717,9 @@ if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
           super
       end
     end
+
+    alias_method_chain :commit_db_transaction, :callbacks
+    alias_method_chain :rollback_db_transaction, :callbacks
   end
 end
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
@@ -689,6 +740,9 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       # specify all columns for postgres
       columns.flatten.join(', ')
     end
+
+    alias_method_chain :commit_db_transaction, :callbacks
+    alias_method_chain :rollback_db_transaction, :callbacks
   end
 end
 

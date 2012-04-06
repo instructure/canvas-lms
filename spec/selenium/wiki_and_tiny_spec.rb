@@ -259,4 +259,50 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         :border => 0
     )
   end
+
+  context "auto link plugin" do
+
+    web_address = "www.google.com"
+
+    def add_text_to_tiny(text)
+      driver.find_element(:css, '.wiki_switch_views_link').click
+      clear_wiki_rce
+      driver.find_element(:css, '.wiki_switch_views_link').click
+      type_in_tiny('#wiki_page_body', text)
+      in_frame "wiki_page_body_ifr" do
+        driver.find_element(:id, 'tinymce').send_keys(:return)
+        driver.find_element(:id, 'tinymce').should include_text(text)
+      end
+    end
+
+    def save_wiki
+      driver.find_element(:id, 'wiki_page_submit').click
+      wait_for_ajax_requests
+      get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
+      wait_for_ajax_requests
+    end
+
+    def validate_link
+      in_frame "wiki_page_body_ifr" do
+        link = driver.find_element(:css, '#tinymce a')
+        link.attribute('href').should == 'http://www.google.com/'
+      end
+    end
+
+    before(:each) do
+      get "/courses/#{@course.id}/wiki"
+      wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
+    end
+
+    it "should type a web address and validate auto link plugin is working correctly" do
+      add_text_to_tiny(web_address)
+      validate_link
+    end
+
+    it "should type a web address link, save it, and validate auto link plugin worked correctly" do
+      add_text_to_tiny(web_address)
+      save_wiki
+      validate_link
+    end
+  end
 end

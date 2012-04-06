@@ -507,14 +507,6 @@
 /*
  * instructure tweaks
  */
-@font-face {
-  font-family: Symbola;
-  src: url(/font/Symbola.eot);
-  src: local("Symbola Regular"), local("Symbola"),
-    url(/font/Symbola.ttf) format("truetype"),
-    url(/font/Symbola.otf) format("opentype"),
-    url(/font/Symbola.svg#webfont7MzkO3xs) format("svg");
-}
 .mathquill-toolbar-panes {
   background: #ccc url(/images/tinybg.png) repeat-x top left;
 }
@@ -528,3 +520,5 @@
 .mathquill-editable .textarea textarea {
   z-index: inherit; /* so that jquery modal dialogs don't cancel its events */
 }
+
+/* the @font-face for symbola is in instructure_equation/editor_plugin.js */

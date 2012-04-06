@@ -47,6 +47,15 @@ describe ProfileController do
       @cc2.reload.position.should == 1
       @cc.reload.position.should == 2
     end
+
+    it "should not allow a student view student profile to be edited" do
+      course_with_teacher_logged_in(:active_all => true)
+      @fake_student = @course.student_view_student
+      session[:become_user_id] = @fake_student.id
+
+      put 'update', :user_id => @fake_student.id
+      assert_unauthorized
+    end
   end
 
   describe "GET 'communication'" do

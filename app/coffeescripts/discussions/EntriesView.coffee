@@ -64,10 +64,23 @@ define [
       @collectionView = new EntryCollectionView
         $el: @$el
         collection: @collection
-        showReplyButton: true
+        showReplyButton: ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
       @collection.reset entries
-      MarkAsReadWatcher.init()
+      @updateFromNewEntries()
       @setUnreadEntries()
+      MarkAsReadWatcher.init()
+
+    updateFromNewEntries: ->
+      newEntries = @model.get 'new_entries'
+      _.each newEntries, (entry) =>
+        view = EntryView.instances[entry.id]
+        if view
+          # update
+          view.model.set entry
+        else
+          # create
+          view = EntryView.instances[entry.parent_id] or this
+          view.collection.add entry
 
     ##
     # We don't get the unread state with the initial models, but we do get

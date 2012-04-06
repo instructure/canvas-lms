@@ -47,7 +47,7 @@ define [
       assignmentRubricDialog.initTriggers()
       @disableNextUnread()
 
-      @$el.toggleClass 'directed-discussion', !ENV.DISCUSSION.THREADED
+      @$el.toggleClass 'side_comment_discussion', !ENV.DISCUSSION.THREADED
 
     ##
     # Cache all the elements reused in the class
@@ -127,8 +127,8 @@ define [
       event.preventDefault()
       unless @reply?
         @reply = new Reply this, topLevel: true, added: @initEntries
-        @reply.on 'edit', => @$addRootReply.hide()
-        @reply.on 'hide', => @$addRootReply.show()
+        @reply.on 'edit', => @$addRootReply?.hide()
+        @reply.on 'hide', => @$addRootReply?.show()
       @model.set 'notification', ''
       @reply.edit()
 
@@ -179,7 +179,7 @@ define [
 
     addRootReply: (event) ->
       $el = @$ event.currentTarget
-      target = $('#discussion_topic')
+      target = $('#discussion_topic .discussion-reply-form')
       @addReply event
-      $('html, body').animate scrollTop: target.offset().top
+      $('html, body').animate scrollTop: target.offset().top - 100
 

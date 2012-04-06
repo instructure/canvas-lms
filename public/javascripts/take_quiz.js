@@ -19,6 +19,7 @@ define([
   'i18n!quizzes.take_quiz',
   'jquery' /* $ */,
   'quiz_timing',
+  'compiled/behaviors/autoBlurActiveInput',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
@@ -29,7 +30,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(I18n, $, timing) {
+], function(I18n, $, timing, autoBlurActiveInput) {
 
   var lastAnswerSelected = null;
   var quizSubmission = (function() {
@@ -191,6 +192,7 @@ define([
 
   $(function() {
     $.scrollSidebar();
+    autoBlurActiveInput();
 
     if($("#preview_mode_link").length == 0) {
       window.onbeforeunload = function() {
@@ -265,35 +267,24 @@ define([
           quizSubmission.updateSubmission();
         }
       })
-      .delegate(":text,textarea", 'change blur', function(event, update) {
+      .delegate(":text,textarea", 'change', function(event, update) {
+        var $this = $(this);
+        if ($this.hasClass('numerical_question_input')) {
+          var val = parseFloat($this.val());
+          $this.val(isNaN(val) ? "" : val.toFixed(4));
+        }
         if (update !== false) {
           quizSubmission.updateSubmission();
         }
       })
       .delegate(".numerical_question_input", {
         keyup: function(event) {
-          if (event.which == 13) {
-            // don't do anything special if user hits enter
-            return;
-          }
-
-          var string = String.fromCharCode(event.charCode || event.keyCode);
-          if(event.charCode == 0 || string == "-" || string == "." || string == "0" || parseInt(string, 10)) {
-            $(this).triggerHandler('focus');
-          } else {
+          var val = $(this).val();
+          if (val === '' || !isNaN(parseFloat(val))) {
+            $(this).triggerHandler('focus'); // makes the errorBox go away
+          } else{
             $(this).errorBox(I18n.t('errors.only_numerical_values', "only numerical values are accepted"));
-            event.preventDefault();
-            event.stopPropagation();
           }
-        },
-        'change blur': function() {
-          var val = parseFloat($(this).val());
-          if (isNaN(val)){
-            val = "";
-          } else {
-            val = val.toFixed(4);
-          }
-          $(this).val(val);
         }
       })
       .delegate(".flag_question", 'click', function() {
@@ -308,7 +299,7 @@ define([
 
         if (tagName == "TEXTAREA") {
           val = $this.editorBox('get_code');
-        } else if (tagName == "TEXTAREA" || tagName == "SELECT" || $this.attr('type') == "text") {
+        } else if (tagName == "SELECT" || $this.attr('type') == "text") {
           val = $this.val();
         } else {
           $this.parents(".question").find(".question_input").each(function() {

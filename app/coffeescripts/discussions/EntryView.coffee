@@ -10,12 +10,13 @@ define [
   'compiled/discussions/EntryEditor'
   'compiled/discussions/MarkAsReadWatcher'
   'str/htmlEscape'
+  'vendor/jquery.ba-tinypubsub'
   'compiled/jquery.kylemenu'
 
   # entry_with_replies partials
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], (require, I18n, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, Reply, EntryEditor, MarkAsReadWatcher, htmlEscape) ->
+], (require, I18n, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, Reply, EntryEditor, MarkAsReadWatcher, htmlEscape, {publish}) ->
 
   # save memory
   noop = ->
@@ -84,6 +85,10 @@ define [
       @$el.html entryWithRepliesTemplate @model.toJSON()
       @$el.attr 'data-id', @model.get 'id'
       @$el.attr 'id', @model.cid
+
+      # enhance the media_comments in the message
+      publish('userContent/change')
+
       super
 
     openMenu: (event, $el) ->

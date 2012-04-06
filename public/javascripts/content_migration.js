@@ -116,7 +116,7 @@ $(function(){
       context_code: $("#current_context_code").text(),
       upload_only: true,
       uploadDataUrl: $migration_form.attr('action'),
-      postFormData: true
+      formDataTarget: 'uploadDataUrl'
     },
     processData: function(data) {
       if($export_file_enabled.val() != '1'){
