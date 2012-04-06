@@ -38,11 +38,11 @@ class ErrorsController < ApplicationController
       @reports = @reports.scoped(:conditions => { :category => params[:category] })
     end
 
-    @reports = @reports.all(:limit => PER_PAGE, :offset => ((params[:page]-1)*PER_PAGE), :order => 'id DESC')
+    @reports = @reports.paginate(:per_page => PER_PAGE, :page => params[:page], :order => 'id DESC')
   end
+
   def show
-    @reports = WillPaginate::Collection.new(1, 1, 1)
-    @reports.replace([ErrorReport.find(params[:id])])
+    @reports = [ErrorReport.find(params[:id])]
     render :action => 'index'
   end
 end
