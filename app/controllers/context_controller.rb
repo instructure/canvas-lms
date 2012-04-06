@@ -142,6 +142,10 @@ class ContextController < ApplicationController
   # session. see lib/user_content.rb and the user_content calls throughout the
   # views.
   def object_snippet
+    if HostUrl.has_file_host? && !HostUrl.is_file_host?(request.host_with_port)
+      return render(:nothing => true, :status => 400)
+    end
+
     @snippet = params[:object_data] || ""
     hmac = Canvas::Security.hmac_sha1(@snippet)
 
