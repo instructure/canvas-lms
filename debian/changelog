@@ -1,3 +1,109 @@
+canvas-lms (2012.04.14.07) testing; urgency=low
+
+  * Package ref: 25f1934ca2c0c76386434fe5cbf41c6a5ec480ca
+  *
+  * [+8d28b9b] separate require_pseudonym from require_user; closes #7718
+  * [+a9526cd] support for deferred delayed job creation, refs #7277
+  * [+83fbaa6] auto-unarchive when sending direct messages, fixes #5366
+  * [+7fa514f] create messages with the user/cc, not the default shard
+  * [+0082d12] spec: fix selenium grades_spec intermittent failure
+  * [+38b761c] fix self signup help dialog account level fixes #7778
+  * [+c0f7383] get rid of barista since we do our on cs generation
+  * [+2371823] simple ui for site admins to debug message sending
+  * [+0a4bae9] use global ids for message reply to addresses fixes #7723
+  * [+a516c8d] allow for specifying a build pattern when executing parallel specs
+  * [+c4c53a3] spec: use fj for find_with_jquery in selenium tests
+  * [+9db55ea] spec: add selenium spec to scheduler file
+  * [+49ed24c] do LTI tool stuff relative to the tool's shard refs #6886
+  * [+4e98b66] grades page works with multiple enrollments; fixes #7614
+  * [+1b540ba] add auto link plugin to tinyMCE
+  * [+3239192] spec: admin manage groups selenium tests
+  * [+e0d3bdc] Make "message students who haven't submitted" less confusing
+  * [+16c5f91] notify user that default grade change doesn't change anything.
+  * [+dd8fe9e] underscore needed to be loaded by use!, fixes selenium
+  * [+b66e3aa] don't block rendering tinymce skin while loading simbola font
+  * [+1834401] file upload api, refs #7775
+  * [+4da8dc2] file upload api for courses, users, and groups
+  * [+b8262b0] fix logging of jobs with a % in them
+  * [+3c68044] run delayed jobs and guard with script/server in dev
+  * [+755dc78] fix typo in error message
+  * [+fbf9aab] support "self" as a user id in some routes
+  * [+aba524e] fix js:test for OSX, plugins, and dynamic manifest
+  * [+ae00592] prevent page jump when canceling a reply
+  * [+c55a027] collapse side comment form, add root scroll
+  * [+fd4ed9a] moved attach button to the right
+  * [+14710e0] enhance user content (media_comments) with less delay
+  * [+892033c] link directly to speedgrader from discussion reply
+  * [+6b5f44f] trigger userContent change without killing ie8
+  * [+a8b2450] run periodic jobs for all shards fixes #7722
+  * [+3eea039] fix image urls in common cartridge qti imports
+  * [+806f147] cancel button when editing an entry
+  * [+bca927f] fix the student_id replacement on the speedgrader link in discussions
+  * [+b5641d1] don't mark as read if an entry is collapsed
+  * [+b7049f5] fix speedgrader buttons for discussion in a group
+  * [+d7e3d5e] refactor ReportSnapshot refs #7721
+  * [+dd8c72a] fix regression from AMD commit
+  * [+fa6f37f] shortcut for common event.preventDefault pattern
+  * [+7496a23] auto-wrap long words (e.g. urls), fixes #7658
+  * [+fa4c4a7] don't serialize full AR objects in job names
+  * [+62b9ed4] require a logged-in user when backing up a quiz
+  * [+51da3f3] stop displaying new media comment as modal. fixes #7794
+  * [+ceb27ff] expire dashboard todo list after 3 minutes; refs #7753
+  * [+0d7aa87] next step of scary warning for users logging in at wrong domain
+  * [+ce6593d] fix time race condition in spec
+  * [+a2818dd] optionally include entries not in the view yet in /view response
+  * [+17589df] right padding in side_comment discussions
+  * [+ada5067] add api to return user's pseudonyms across all accounts. fixes #7946
+  * [+d5b724e] fix site admins masquerading as teachers fixes #7954
+  * [+07b9bae] return rubric points total with rubric response, fixes #7149
+  * [+b57732d] add or edit new entries in discussions
+  * [+729bd31] write running spec name to Rails log
+  * [+f6192f0] plumb current host to files_host calls
+  * [+864f185] mark as read fixes
+  * [+363dd41] anchored plugin assets
+  * [+fb8493d] hide "add reply to topic" for closed discussions
+  * [+5a09641] fix posting to post-first discussions
+  * [+551b000] fix showing discussion entries without users; fixes #7976
+  * [+9e93e80] update the topic materialized view after the entry save transaction commits
+  * [+89c1a5f] always search for deprecated api key usage on the default shard
+  * [+03424c9] use ids relative to the default shard for strands refs #6886
+  * [+e51ffb9] show the quiz question title on the quiz statistics page
+  * [+d536bb8] add public_description to course model. fixes #7761
+  * [+549beb7] strip html from .ics descriptions, fixes #7365
+  * [+59c4bd0] fix selecting a login when a single user is found fixes #7900
+  * [+33b350b] exclude soft concluded courses from dropdown fixes #7536
+  * [+11ff6d2] max width on avatar pics
+  * [+4e5cf14] faster bulk message sending, refs #7277
+  * [+c31ea9d] fix multiple selection qti question
+  * [+974bd63] don't break when "take quiz" is double-clicked
+  * [+5f8ea33] calendar2: fix 'more options' links
+  * [+6442743] make appointment event edit dialog less ugly
+  * [+68a6f64] spec: detect when ajax requests will never time out due to a js error
+  * [+6a82ae0] see file/folder name on hover, fixes: #7770
+  * [+c0334ed] fix quiz issues around rich text and numerical inputs, fixes #7475
+  * [+0f32c1d] avatars in gradebook2
+  * [+506ec04] save attachments before message creation, fixes #7229
+  * [+f4bfd58] change string wording in notification.rb
+  * [+ed55881] use built-in authlogic password generation closes #8002
+  * [+37a65ce] allow selective course exports
+  * [+a942ede] convert course copy to use export/import functionality
+  * [+567eb8b] re-add selective course copy options
+  * [+df532a4] remove unneeded selection options when choosing migration content
+  * [+0c964bc] student view; closes #6995
+  * [+9c7d84e] appointment groups: allow limiting max appts per participant
+  * [+4be0268] scheduler: allow teachers to cancel student appointments
+  * [+beb70eb] scheduler: per-appointment participant limit
+  * [+4fd4b60] show teacher's comments in rubric for students, fixes #7291
+  * [+bb1e77c] fix conversation merge issue, fixes #7801
+  * [+9e48dda] fix attachment migration for mysql, make it nicer for all dbs
+  * [+de8bc1c] filter conversations while masquerading, fixes #7634
+  * [+55de28c] redirect to the correct domain when logging in where they shouldn't
+  * [+9c9488b] revert authenticity_token data for file uploads
+  * [+0c70776] remove modal backdrop from media upload window.
+  * [+25f1934] fix enrollment effective_start/end_at
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 06 Apr 2012 16:45:44 -0600
+
 canvas-lms (2012.03.31.11) testing; urgency=low
 
   * Package ref: a4d6770d8ee645928feb0cce042209372f5d472b
