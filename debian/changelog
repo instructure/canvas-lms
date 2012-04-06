@@ -1,3 +1,11 @@
+canvas-lms (2012.03.31.22) stable; urgency=low
+
+  * Package ref: 08b3dfdbbfc96f1ecbefcb102657b9736e16d8fa
+  *
+  * [+08b3dfd] revert authenticity_token data for file uploads
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 06 Apr 2012 12:32:22 -0600
+
 canvas-lms (2012.03.31.21) stable; urgency=low
 
   * Package ref: 13bfb823b393fee77b266ac7c2325fe3200cfab8
