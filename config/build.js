@@ -20,7 +20,6 @@
   // paths we have set up (matches require onfig in application.html.erb)
   paths: {
     common: 'compiled/bundles/common',
-    jquery: 'vendor/jquery-1.6.4',
     jqueryui: 'vendor/jqueryui',
     uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4',
     use: 'vendor/use'
@@ -52,7 +51,7 @@
         'i18n',
         'str/escapeRegex',
         'vendor/date',
-        'vendor/jquery-1.6.4',
+        'jquery',
         'str/pluralize',
         'INST',
         'str/htmlEscape',

@@ -4,7 +4,7 @@ define [
   'jst/mute_dialog'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
-  'jquery.instructure_jquery_patches' # dialog
+  'jqueryui/dialog'
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, $, mute_dialog_template) ->
 

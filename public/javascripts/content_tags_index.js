@@ -19,7 +19,7 @@ define([
   'i18n!content_tags',
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange */,
   'jquery.loadingImg' /* loadingImage */,

@@ -23,7 +23,7 @@ define([
   'str/htmlEscape',
   'jquery.instructure_date_and_time' /* parseFromISO, dateString, timeString, date_field, time_field, datetime_field, /\.timepicker/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, showIf */,
   'jquery.keycodes' /* keycodes */,

@@ -7,7 +7,7 @@ define [
   'compiled/calendar/MessageParticipantsDialog'
   'jst/calendar/deleteItem'
   'jquery.instructure_date_and_time'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'vendor/jquery.spin'

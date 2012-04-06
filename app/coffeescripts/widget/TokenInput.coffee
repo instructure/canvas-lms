@@ -19,7 +19,6 @@
 define [
   'jquery'
   'compiled/widget/TokenSelector'
-  'jquery.instructure_jquery_patches'
   'jquery.instructure_misc_plugins'
 ], ($, TokenSelector) ->
 

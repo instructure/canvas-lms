@@ -31,7 +31,7 @@ define([
   'jquery.google-analytics' /* trackEvent */,
   'jquery.instructure_date_and_time' /* parseFromISO, dateString */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* uniqueId, replaceTags, /\$\.uniq/, /\$\.store/, youTubeID */,
   'jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */,
   'jquery.keycodes' /* keycodes */,

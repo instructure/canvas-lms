@@ -3,7 +3,7 @@ define [
   'jst/AssignmentGroupWeightsDialog'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
 ], ($, assignmentGroupWeightsDialogTemplate) -> class AssignmentGroupWeightsDialog

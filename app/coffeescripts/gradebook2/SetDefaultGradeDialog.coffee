@@ -5,7 +5,7 @@ define [
   'underscore'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'compiled/jquery/fixDialogButtons'

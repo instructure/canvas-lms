@@ -28,7 +28,7 @@ define([
   'jquery.dropdownList' /* dropdownList */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, /\$\.uniq/, /\$\.size/, /\$\.store/ */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,

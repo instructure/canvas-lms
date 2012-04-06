@@ -25,7 +25,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseDateTime, formatDateTime, parseFromISO, dateString, datepicker, date_field, time_field, datetime_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, hideErrors */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.disabled/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* encodeToHex, decodeFromHex, replaceTags, /\$\.store/ */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,

@@ -27,7 +27,7 @@ define([
   'jquery.ajaxJSON' /* getJSON, ajaxJSONFiles, ajaxJSON */,
   'jquery.doc_previews' /* loadDocPreview */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, /\$\.store/ */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
   'jquery.keycodes' /* keycodes */,

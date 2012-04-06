@@ -12,7 +12,7 @@ define [
   'compiled/fn/preventDefault'
 
   'jquery.instructure_misc_helpers'
-  'jquery.instructure_jquery_patches' # dialog
+  'jqueryui/dialog'
   'jquery.disableWhileLoading'
 ], (I18n, helpDialogTemplate, INST, htmlEscape, preventDefault) ->
 

@@ -21,7 +21,7 @@ define([
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* $ */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */
+  'jqueryui/dialog'
 ], function(INST, I18n, $) {
 
   function getTld(hostname){

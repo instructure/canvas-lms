@@ -26,7 +26,7 @@ define [
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'jquery.disableWhileLoading'
   'jquery.rails_flash_notifications'

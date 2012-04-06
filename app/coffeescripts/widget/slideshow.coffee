@@ -2,7 +2,7 @@ define [
   'i18n!slideshow'
   'jquery'
   'str/htmlEscape'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
 ], (I18n, $, htmlEscape) ->
 

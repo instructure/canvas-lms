@@ -3,7 +3,7 @@ define([
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* fillFormData, getFormData */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* ifExists, .dim, undim, confirmDelete */,
   'jquery.rails_flash_notifications' /* flashError */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,

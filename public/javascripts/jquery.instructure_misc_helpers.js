@@ -23,7 +23,7 @@ define([
   'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSuggestion */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/, windowScrollTop */,
+  'jqueryui/dialog',
   'vendor/jquery.ba-throttle-debounce' /* throttle */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.store' /* /\$\.store/ */

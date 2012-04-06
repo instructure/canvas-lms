@@ -21,7 +21,7 @@ define([
   'jquery' /* $ */,
   'str/htmlEscape',
   'jquery.instructure_date_and_time' /* parseFromISO */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */
+  'jqueryui/dialog'
 ], function(INST, I18n, $, htmlEscape) {
 
   INST.lockExplanation = function(data, type) {

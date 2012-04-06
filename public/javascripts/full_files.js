@@ -27,7 +27,7 @@ define([
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData, fillFormData, formErrors */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,

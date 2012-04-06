@@ -11,8 +11,7 @@
  *	jquery.ui.core.js
  */
 define([
-  'jquery',
-  'jquery.instructure_jquery_patches' /* /\.disabled/, /\.scrollTop/ */
+  'jquery'
 ], function( $, undefined ) {
 
 $.extend($.ui, { datepicker: { version: "@VERSION" } });

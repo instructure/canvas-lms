@@ -20,7 +20,7 @@ define([
   'jquery' /* $ */,
   'str/htmlEscape',
   'jquery.instructure_forms' /* fillFormData */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/, windowScrollTop */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* truncateText */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,

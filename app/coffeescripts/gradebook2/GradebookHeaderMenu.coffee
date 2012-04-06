@@ -10,7 +10,7 @@ define [
   'jst/re_upload_submissions_form'
   'underscore'
   'jquery.instructure_forms'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.kylemenu'

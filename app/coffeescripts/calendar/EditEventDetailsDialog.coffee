@@ -8,7 +8,7 @@ define [
   'compiled/calendar/EditApptCalendarEventDialog'
   'compiled/calendar/EditAppointmentGroupDetails'
   'jst/calendar/editEvent'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jqueryui/tabs'
 ], ($, I18n, _, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDialog, EditAppointmentGroupDetails, editEventTemplate) ->
 

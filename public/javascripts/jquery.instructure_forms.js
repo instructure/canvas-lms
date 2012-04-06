@@ -23,7 +23,6 @@ define([
   'jquery.disableWhileLoading' /* disableWhileLoading */,
   'jquery.google-analytics' /* trackEvent */,
   'jquery.instructure_date_and_time' /* date_field, time_field, datetime_field */,
-  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
   'jquery.instructure_misc_helpers' /* uniqueId, /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.log\(/ */,
   'jquery.rails_flash_notifications' /* flashError */,
