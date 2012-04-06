@@ -781,10 +781,27 @@ class Enrollment < ActiveRecord::Base
   end
 
   def effective_start_at
-    self.enrollment_dates.map(&:first).compact.min
+    # try and use the enrollment dates logic first, since it knows about
+    # overrides, etc. but if it doesn't find anything, start guessing by
+    # looking at the enrollment, section, course, then term. if we still didn't
+    # find it, fall back to the section or course creation date.
+    enrollment_dates.map(&:first).compact.min ||
+    start_at ||
+    course_section && course_section.start_at ||
+    course.start_at ||
+    course.enrollment_term && course.enrollment_term.start_at ||
+    course_section && course_section.created_at ||
+    course.created_at
   end
 
   def effective_end_at
-    self.enrollment_dates.map(&:last).compact.max
+    # try and use the enrollment dates logic first, since it knows about
+    # overrides, etc. but if it doesn't find anything, start guessing by
+    # looking at the enrollment, section, course, then term.
+    enrollment_dates.map(&:last).compact.max ||
+    end_at ||
+    course_section && course_section.end_at ||
+    course.conclude_at ||
+    course.enrollment_term && course.enrollment_term.end_at
   end
 end

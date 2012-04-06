@@ -1176,13 +1176,10 @@ describe Enrollment do
       course_with_student(:active_all => true)
       (@term = @course.enrollment_term).should_not be_nil
       (@section = @enrollment.course_section).should_not be_nil
-      @section.restrict_enrollments_to_section_dates = true
-      @course.restrict_enrollments_to_course_dates = true
 
-      # 6 different possible times, make sure they're distinct
+      # 7 different possible times, make sure they're distinct
+      @enrollment_date_start_at = 7.days.ago
       @enrollment.start_at = 6.days.ago
-      @enrollment.end_at = 1.day.from_now
-      @enrollment.save!
       @section.start_at = 5.days.ago
       @course.start_at = 4.days.ago
       @term.start_at = 3.days.ago
@@ -1190,29 +1187,45 @@ describe Enrollment do
       @course.created_at = 1.days.ago
     end
 
-    it "should follow chain of fallbacks in correct order" do
+    it "should utilize to enrollment_dates if it has a value" do
+      @enrollment.stubs(:enrollment_dates).returns([[@enrollment_date_start_at, nil]])
+      @enrollment.effective_start_at.should == @enrollment_date_start_at
+    end
+
+    it "should use earliest value from enrollment_dates if it has multiple" do
+      @enrollment.stubs(:enrollment_dates).returns([[@enrollment.start_at, nil], [@enrollment_date_start_at, nil]])
+      @enrollment.effective_start_at.should == @enrollment_date_start_at
+    end
+
+    it "should follow chain of fallbacks in correct order if no enrollment_dates" do
+      @enrollment.stubs(:enrollment_dates).returns([[nil, Time.now]])
+
       # start peeling away things from most preferred to least preferred to
       # test fallback chain
       @enrollment.effective_start_at.should == @enrollment.start_at
       @enrollment.start_at = nil
       @enrollment.effective_start_at.should == @section.start_at
       @section.start_at = nil
-      @section.restrict_enrollments_to_section_dates = false
       @enrollment.effective_start_at.should == @course.start_at
       @course.start_at = nil
-      @course.restrict_enrollments_to_course_dates = false
       @enrollment.effective_start_at.should == @term.start_at
+      @term.start_at = nil
+      @enrollment.effective_start_at.should == @section.created_at
+      @section.created_at = nil
+      @enrollment.effective_start_at.should == @course.created_at
+      @course.created_at = nil
+      @enrollment.effective_start_at.should be_nil
     end
 
     it "should not explode when missing section or term" do
       @enrollment.course_section = nil
-      @section.restrict_enrollments_to_section_dates = false
       @course.enrollment_term = nil
       @enrollment.effective_start_at.should == @enrollment.start_at
       @enrollment.start_at = nil
       @enrollment.effective_start_at.should == @course.start_at
       @course.start_at = nil
-      @course.restrict_enrollments_to_course_dates = false
+      @enrollment.effective_start_at.should == @course.created_at
+      @course.created_at = nil
       @enrollment.effective_start_at.should be_nil
     end
   end
@@ -1222,28 +1235,36 @@ describe Enrollment do
       course_with_student(:active_all => true)
       (@term = @course.enrollment_term).should_not be_nil
       (@section = @enrollment.course_section).should_not be_nil
-      @section.restrict_enrollments_to_section_dates = true
-      @course.restrict_enrollments_to_course_dates = true
 
-      # 4 different possible times, make sure they're distinct
-      @enrollment.start_at = 1.day.ago
-      @enrollment.end_at = 4.minutes.ago
-      @section.end_at = 3.minutes.ago
-      @course.conclude_at = 2.minutes.ago
-      @term.end_at = 1.minutes.ago
+      # 5 different possible times, make sure they're distinct
+      @enrollment_date_end_at = 1.days.ago
+      @enrollment.end_at = 2.days.ago
+      @section.end_at = 3.days.ago
+      @course.conclude_at = 4.days.ago
+      @term.end_at = 5.days.ago
     end
 
-    it "should follow chain of fallbacks in correct order" do
+    it "should utilize to enrollment_dates if it has a value" do
+      @enrollment.stubs(:enrollment_dates).returns([[nil, @enrollment_date_end_at]])
+      @enrollment.effective_end_at.should == @enrollment_date_end_at
+    end
+
+    it "should use earliest value from enrollment_dates if it has multiple" do
+      @enrollment.stubs(:enrollment_dates).returns([[nil, @enrollment.end_at], [nil, @enrollment_date_end_at]])
+      @enrollment.effective_end_at.should == @enrollment_date_end_at
+    end
+
+    it "should follow chain of fallbacks in correct order if no enrollment_dates" do
+      @enrollment.stubs(:enrollment_dates).returns([[nil, nil]])
+
       # start peeling away things from most preferred to least preferred to
       # test fallback chain
       @enrollment.effective_end_at.should == @enrollment.end_at
       @enrollment.end_at = nil
       @enrollment.effective_end_at.should == @section.end_at
       @section.end_at = nil
-      @section.restrict_enrollments_to_section_dates = false
       @enrollment.effective_end_at.should == @course.conclude_at
       @course.conclude_at = nil
-      @course.restrict_enrollments_to_course_dates = false
       @enrollment.effective_end_at.should == @term.end_at
       @term.end_at = nil
       @enrollment.effective_end_at.should be_nil
