@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/conversations_common')
 
 describe "conversations context filtering" do
+  it_should_behave_like "in-process server selenium tests"
   it_should_behave_like "conversations selenium tests"
 
   before (:each) do
@@ -56,8 +57,8 @@ describe "conversations context filtering" do
 
   it "should let you browse for filters" do
     new_conversation
-    @browser = f("#context_tags_filter .browser:visible")
-    @input = f("#context_tags_filter input:visible")
+    @browser = fj("#context_tags_filter .browser:visible")
+    @input = fj("#context_tags_filter input:visible")
     browse_menu
 
     menu.should eql ["that course", "the course", "the group"]

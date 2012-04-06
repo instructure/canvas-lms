@@ -1,5 +1,5 @@
 define [
-  'specs/helpers/testTemplate'
+  'helpers/testTemplate'
   'compiled/Template'
 ], (_,Template) ->
 

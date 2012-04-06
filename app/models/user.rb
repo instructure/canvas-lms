@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -36,12 +36,12 @@ class User < ActiveRecord::Base
   has_one :communication_channel, :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available'))", :order => 'enrollments.created_at'
+  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment'))) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available'))", :order => 'enrollments.created_at'
   has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')))", :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment')) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )
+           :conditions => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment'))) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )
                            OR
-                           ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type = 'TeacherEnrollment' or enrollments.type = 'TaEnrollment' or enrollments.type = 'DesignerEnrollment'))) )"
+                           ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')))) )"
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments, :uniq => true
@@ -115,6 +115,7 @@ class User < ActiveRecord::Base
   has_many :favorites
   has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
   has_many :zip_file_imports, :as => :context
+  has_many :messages
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
@@ -305,6 +306,9 @@ class User < ActiveRecord::Base
           user ||= User.find(user_id)
           account_ids_with_depth = user.calculate_account_associations(account_chain_cache)
         end
+
+        # we don't want student view students to have account associations.
+        next if user && user.fake_student?
 
         account_ids_with_depth.each do |account_id, depth|
           key = [user_id, account_id]
@@ -878,7 +882,7 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar
+    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages
 
     given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
@@ -925,6 +929,8 @@ class User < ActiveRecord::Base
 
   def can_masquerade?(masquerader, account)
     return true if self == masquerader
+    # student view should only ever have enrollments in a single course
+    return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, nil, :use_student_view) }
     return false unless
         account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
     account_users = account.all_account_users_for(self)
@@ -1151,7 +1157,7 @@ class User < ActiveRecord::Base
     return ["urn:lti:sysrole:ims/lis/None"] if memberships.empty?
     memberships.map{|membership|
       case membership
-      when StudentEnrollment
+      when StudentEnrollment, StudentViewEnrollment
         'Learner'
       when TeacherEnrollment
         'Instructor'
@@ -1459,15 +1465,17 @@ class User < ActiveRecord::Base
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil)
     res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key) do
-      send(association).distinct_on(["courses.id"],
-        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-        :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}"
-      )
+      courses = send(association).distinct_on(["courses.id"],
+        :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+        :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
+      soft_concluded = Enrollment.find(:all, :conditions => { :id => courses.map{ |course| course.primary_enrollment_id } }).select{ |e| e.completed? }.map{ |e| e.id }
+      courses.reject! { |course| soft_concluded.include?(course.primary_enrollment_id.to_i) }
+      courses
     end.dup
     if association == :current_and_invited_courses
       if enrollment_uuid && pending_course = Course.find(:first,
-          :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-          :joins => :enrollments, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state='invited'", enrollment_uuid])
+        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+        :joins => :enrollments, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state='invited'", enrollment_uuid])
         res << pending_course
         res.uniq!
       end
@@ -1696,7 +1704,7 @@ class User < ActiveRecord::Base
   def appointment_context_codes
     ret = {:primary => [], :secondary => []}
     cached_current_enrollments.each do |e|
-      next unless e.is_a?(StudentEnrollment) && e.active?
+      next unless e.student? && e.active?
       ret[:primary] << "course_#{e.course_id}"
       ret[:secondary] << "course_section_#{e.course_section_id}"
     end
@@ -1721,11 +1729,11 @@ class User < ActiveRecord::Base
   memoize :manageable_appointment_context_codes
 
   def conversation_context_codes
-    e = enrollment_visibility
-    (e[:full_course_ids] + e[:section_id_hash].keys + e[:restricted_course_hash].keys).uniq.
-      map{ |id| "course_#{id}" } +
-    current_groups.
-      map{ |g| "group_#{g.id}"}
+    Rails.cache.fetch([self, 'conversation_context_codes'].cache_key, :expires_in => 1.day) do
+      courses.map{ |c| "course_#{c.id}" } + 
+      concluded_courses.map{ |c| "course_#{c.id}" } + 
+      current_groups.map{ |g| "group_#{g.id}"}
+    end
   end
   memoize :conversation_context_codes
 
@@ -1750,9 +1758,17 @@ class User < ActiveRecord::Base
   end
 
   def profile_pics_folder
-    folder = self.active_folders.find_by_name(Folder::PROFILE_PICS_FOLDER_NAME)
+    initialize_default_folder(Folder::PROFILE_PICS_FOLDER_NAME)
+  end
+
+  def conversation_attachments_folder
+    initialize_default_folder(Folder::CONVERSATION_ATTACHMENTS_FOLDER_NAME)
+  end
+
+  def initialize_default_folder(name)
+    folder = self.active_folders.find_by_name(name)
     unless folder
-      folder = self.folders.create!(:name => Folder::PROFILE_PICS_FOLDER_NAME,
+      folder = self.folders.create!(:name => name,
         :parent_folder => Folder.root_folders(self).find {|f| f.name == Folder::MY_FILES_FOLDER_NAME })
     end
     folder
@@ -1825,7 +1841,7 @@ class User < ActiveRecord::Base
   end
 
   def enrollment_visibility
-    Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.day) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
@@ -1849,12 +1865,12 @@ class User < ActiveRecord::Base
         end
         base_conditions = messageable_enrollment_clause
         base_conditions << " AND " << messageable_enrollment_user_clause
-        user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).count("DISTINCT user_id")
+        user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").count("DISTINCT user_id")
 
         sections = course.sections_visible_to(self)
         if sections.size > 1
           sections.each{ |section| section_user_counts[section.id] = 0 }
-          connection.select_all("SELECT course_section_id, COUNT(DISTINCT user_id) AS user_count FROM courses, enrollments WHERE (#{base_conditions}) AND course_section_id IN (#{sections.map(&:id).join(', ')}) AND courses.id = #{course.id} GROUP BY course_section_id").each do |row|
+          connection.select_all("SELECT course_section_id, COUNT(DISTINCT user_id) AS user_count FROM courses, enrollments WHERE (#{base_conditions}) AND course_section_id IN (#{sections.map(&:id).join(', ')}) AND courses.id = #{course.id} AND enrollments.type != 'StudentViewEnrollment' GROUP BY course_section_id").each do |row|
             section_user_counts[row["course_section_id"].to_i] = row["user_count"].to_i
           end
         end
@@ -1875,7 +1891,7 @@ class User < ActiveRecord::Base
   end
 
   def visible_group_ids
-    Rails.cache.fetch([self, 'messageable_groups'].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'messageable_groups'].cache_key, :expires_in => 1.day) do
       (courses + concluded_courses.recently_ended).inject(self.current_groups) { |groups, course|
         groups | course.groups.active
       }.map(&:id)
@@ -1884,7 +1900,7 @@ class User < ActiveRecord::Base
   memoize :visible_group_ids
 
   def group_membership_visibility
-    Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.day) do
       course_visibility = enrollment_visibility
       own_group_ids = current_groups.map(&:id)
 
@@ -1919,6 +1935,10 @@ class User < ActiveRecord::Base
   MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
   MESSAGEABLE_USER_CONTEXT_REGEX = /\A(course|section|group)_(\d+)(_([a-z]+))?\z/
   def messageable_users(options = {})
+    # if :ids is specified but empty (different than just not specified), don't
+    # bother doing a query that's guaranteed to return no results.
+    return [] if options[:ids] && options[:ids].empty?
+
     course_hash = enrollment_visibility
     full_course_ids = course_hash[:full_course_ids]
     restricted_course_hash = course_hash[:restricted_course_hash]
@@ -1930,7 +1950,7 @@ class User < ActiveRecord::Base
     account_ids = []
 
     limited_id = {}
-    enrollment_type_sql = nil
+    enrollment_type_sql = " AND enrollments.type != 'StudentViewEnrollment'"
     include_concluded_students = true
 
     if options[:context]
@@ -1941,9 +1961,9 @@ class User < ActiveRecord::Base
         enrollment_type = $4
         if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
           if enrollment_type == 'admins'
-            enrollment_type_sql = " AND enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
+            enrollment_type_sql += " AND enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
           else
-            enrollment_type_sql = " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
+            enrollment_type_sql += " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
           end
         end
       end
@@ -1966,12 +1986,8 @@ class User < ActiveRecord::Base
       account_ids &= options[:account_ids] if options[:account_ids]
     end
 
-    # if :ids is specified but empty (different than just not specified), don't
-    # bother doing a query that's guaranteed to return no results.
-    return [] if options[:ids] && options[:ids].empty?
-
     user_conditions = []
-    user_conditions << [messageable_user_clause] unless options[:skip_visibility_checks] && options[:ids]
+    user_conditions << messageable_user_clause unless options[:skip_visibility_checks] && options[:ids]
     user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
     user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
@@ -2171,7 +2187,7 @@ class User < ActiveRecord::Base
     return @menu_courses if @menu_courses
     favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid)
     return (@menu_courses = favorites) if favorites.length > 0
-    @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid)[0..11]
+    @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
   end
 
   def user_can_edit_name?
@@ -2243,5 +2259,9 @@ class User < ActiveRecord::Base
       admin.account_user_registration!
     end
     admin
+  end
+
+  def fake_student?
+    self.preferences[:fake_student] && !!self.enrollments.find(:first, :conditions => {:type => "StudentViewEnrollment"})
   end
 end

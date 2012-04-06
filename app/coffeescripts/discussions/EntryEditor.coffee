@@ -19,19 +19,36 @@ define [
     # @param {EntryView} view
     constructor: (@view) ->
       super @view.$('.message:first')
+      @cancelButton = @createCancelButton()
+      @done.addClass 'small-button'
 
     ##
     # Extends EditorToggle::display to save the model's message.
     #
+    # @param {Bool} opts.cancel - doesn't submit
     # @api public
-    display: ->
+    display: (opts)->
       super
-      @view.model.save
-        messageNotification: I18n.t('saving', 'Saving...')
-        message: @content
-      ,
-        success: @onSaveSuccess
-        error: @onSaveError
+      @cancelButton.detach()
+      if opts?.cancel isnt true
+        @view.model.save
+          messageNotification: I18n.t('saving', 'Saving...')
+          message: @content
+        ,
+          success: @onSaveSuccess
+          error: @onSaveError
+
+    createCancelButton: ->
+      $('<a/>')
+        .html(I18n.t('cancel', 'Cancel'))
+        .attr('href', 'javascript:')
+        .addClass('cancel_button')
+        .click => @display cancel: true
+
+    edit: ->
+      super
+      @cancelButton.insertAfter @done
+
     ##
     # Overrides EditorToggle::getContent to get the content from the model
     # rather than the HTML of the element. This is because `enhanceUserContent`
@@ -53,7 +70,6 @@ define [
     #
     # @api private
     onSaveError: =>
-      console.log 'error'
       @view.model.set
         messageNotification: I18n.t('save_failed', 'Failed to save, please try again later')
       @edit()

@@ -33,12 +33,9 @@ shared_examples_for "file uploads selenium tests" do
 
     filename, fullpath, data = get_file("testfile5.zip")
 
-    driver.find_element(:css, '#choose_migration_system').
-        find_element(:css, 'option[value="common_cartridge_importer"]').click
-    driver.find_element(:css, '#config_options').
-        find_element(:name, 'export_file').send_keys(fullpath)
-    driver.find_element(:css, '#config_options').
-        find_element(:css, '.submit_button').click
+    click_option('#choose_migration_system', 'common_cartridge_importer', :value)
+    driver.find_element(:css, '#config_options').find_element(:name, 'export_file').send_keys(fullpath)
+    driver.find_element(:css, '#config_options').find_element(:css, '.submit_button').click
     wait_for_ajax_requests
     keep_trying_until { driver.find_element(:id, 'file_uploaded').should be_displayed }
 

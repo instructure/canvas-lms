@@ -96,7 +96,7 @@ class SisBatch < ActiveRecord::Base
     self.workflow_state = "failed"
     self.save
   end
-  handle_asynchronously :process, :strand => proc { |sis_batch| "sis_batch:account:#{sis_batch.account_id}" }, :priority => Delayed::LOW_PRIORITY
+  handle_asynchronously :process, :strand => proc { |sis_batch| Shard.default.activate { "sis_batch:account:#{sis_batch.account_id}" } }, :priority => Delayed::LOW_PRIORITY
 
   named_scope :needs_processing, :conditions => { :workflow_state => 'created' }, :order => :created_at
 

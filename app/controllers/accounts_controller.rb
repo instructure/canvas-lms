@@ -19,6 +19,8 @@
 # @API Accounts
 class AccountsController < ApplicationController
   before_filter :require_user, :only => [:index]
+  before_filter :reject_student_view_student
+  before_filter :require_pseudonym, :only => [:index]
   before_filter :get_context
 
   include Api::V1::Account
@@ -224,13 +226,13 @@ class AccountsController < ApplicationController
       if @account.grants_right?(@current_user, nil, :read_roster)
         @recently_logged_users = @account.all_users.recently_logged_in[0,25]
       end
-      @counts_report = ReportSnapshot.get_account_details_by_type_and_id('counts_detailed', @account.id)
+      @counts_report = @account.report_snapshots.detailed.last.try(:data)
     end
   end
   
   def statistics_graph
     if authorized_action(@account, @current_user, :view_statistics)
-      @items = ReportSnapshot.get_account_detail_over_time('counts_progressive_detailed', @account.id, params[:attribute])
+      @items = @account.report_snapshots.progressive.last.try(:report_value_over_time, params[:attribute])
       respond_to do |format|
         format.json { render :json => @items.to_json }
         format.csv { 

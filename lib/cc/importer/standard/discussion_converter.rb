@@ -55,27 +55,5 @@ module CC::Importer::Standard
       topics
     end
 
-    def replace_urls(html)
-      return "" if html.blank?
-      
-      doc = Nokogiri::HTML(html || "")
-      attrs = ['rel', 'href', 'src', 'data', 'value']
-      doc.search("*").each do |node|
-        attrs.each do |attr|
-          if node[attr]
-            val = URI.unescape(node[attr])
-            begin
-              if ImportedHtmlConverter.relative_url?(val)
-                node[attr] = URI::escape(get_canvas_att_replacement_url(val))
-              end
-            rescue URI::InvalidURIError
-              Rails.logger.warn "attempting to translate invalid url: #{val}"
-            end
-          end
-        end
-      end
-      doc.at_css('body').inner_html
-    end
-
   end
 end

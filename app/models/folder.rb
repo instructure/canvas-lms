@@ -23,6 +23,7 @@ class Folder < ActiveRecord::Base
   ROOT_FOLDER_NAME = "course files"
   PROFILE_PICS_FOLDER_NAME = "profile pictures"
   MY_FILES_FOLDER_NAME = "my files"
+  CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
 
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item

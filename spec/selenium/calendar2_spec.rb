@@ -36,6 +36,7 @@ describe "calendar2" do
 
   def create_assignment_event(assignment_title, should_add_date = false)
     middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
+    find_middle_day.click
     edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_dialog.find_element(:css, '.edit_assignment_option').click
@@ -216,9 +217,18 @@ describe "calendar2" do
 
         driver.find_element(:css, '.fc-event').click
         find_with_jquery('.popover-links-holder:visible').should_not be_nil
-        driver.find_element(:css, '.event-details-links .edit_event_link').click
-        link = driver.find_element(:css, '#edit_calendar_event_form .more_options_link')
-        link["href"].should =~ %r{calendar_events/\d+/edit$}
+        f('.event-details-links .edit_event_link').click
+        expect_new_page_load { f('#edit_calendar_event_form .more_options_link').click }
+        f('#breadcrumbs').text.should include 'Calendar Events'
+      end
+
+      it "more options link on assignments should go to assignment edit page" do
+        get "/calendar2"
+        create_assignment_event('super big assignment')
+        f('.fc-event.assignment').click
+        f('.edit_event_link').click
+        expect_new_page_load { f('.more_options_link').click }
+        f('h2.title').text.should include "super big assignment"
       end
 
       it "editing an existing assignment should select the correct assignment group" do

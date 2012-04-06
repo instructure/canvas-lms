@@ -16,6 +16,7 @@ define [
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
+  'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_jquery_patches'
@@ -108,8 +109,9 @@ define [
         if @sections_enabled
           sectionNames = $.toSentence((@sections[sectionId].name for sectionId in student.sections).sort())
         student.display_name = rowStudentNameTemplate
-          studentName: student.name
-          studentGradesUrl: student.enrollment.grades.html_url
+          avatar_image_url: student.avatar_url
+          display_name: student.name
+          url: student.enrollment.grades.html_url
           sectionNames: sectionNames
 
         # fill in dummy submissions, so there's something there even if the
@@ -513,6 +515,8 @@ define [
       $widthTester = $('<span style="padding:10px" />').appendTo('#content')
       testWidth = (text, minWidth) -> Math.max($widthTester.text(text).outerWidth(), minWidth)
 
+      # I would like to make this width a little larger, but there's a dependency somewhere else that
+      # I can't find and if I change it, the layout gets messed up.
       @parentColumns = [{
         id: 'student'
         name: I18n.t 'student_name', 'Student Name'

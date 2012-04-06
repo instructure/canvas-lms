@@ -192,7 +192,10 @@ ActionController::Routing::Routes.draw do |map|
     add_zip_file_imports(course)
     course.import_quizzes 'imports/quizzes', :controller => 'content_imports', :action => 'quizzes'
     course.import_content 'imports/content', :controller => 'content_imports', :action => 'content'
-    course.import_copy 'imports/copy', :controller => 'content_imports', :action => 'copy_course', :conditions => {:method => :get}
+    course.import_choose_course 'imports/choose_course', :controller => 'content_imports', :action => 'choose_course', :conditions => {:method => :get}
+    course.import_choose_content 'imports/choose_content', :controller => 'content_imports', :action => 'choose_content', :conditions => {:method => :get}
+    course.import_copy_course_checklist 'imports/copy_course_checklist', :controller => 'content_imports', :action => 'copy_course_checklist', :conditions => {:method => :get}
+    course.import_copy_course_finish 'imports/copy_course_finish', :controller => 'content_imports', :action => 'copy_course_finish', :conditions => {:method => :get}
     course.import_migrate 'imports/migrate', :controller => 'content_imports', :action => 'migrate_content'
     course.import_upload 'imports/upload', :controller => 'content_imports', :action => 'migrate_content_upload'
     course.import_s3_success 'imports/s3_success', :controller => 'content_imports', :action => 'migrate_content_s3_success'
@@ -313,6 +316,8 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :user_lists, :only => :create
     course.reset 'reset', :controller => 'courses', :action => 'reset_content', :conditions => {:method => :post}
     course.resources :alerts
+    course.student_view 'student_view', :controller => 'courses', :action => 'student_view', :conditions => {:method => :post}
+    course.student_view 'student_view', :controller => 'courses', :action => 'leave_student_view', :conditions => {:method => :delete}
   end
 
   map.resources :page_views, :only => [:update,:index]
@@ -516,6 +521,7 @@ ActionController::Routing::Routes.draw do |map|
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
+    user.resources :messages, :only => [:index]
   end
   map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
@@ -648,6 +654,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
+      courses.post 'courses/:course_id/files', :action => :create_file
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
@@ -666,20 +673,16 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :submissions_api) do |submissions|
-      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions', :action => :index, :path_name => 'course_assignment_submissions'
-      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions', :action => :index, :path_name => 'section_assignment_submissions'
-
-      submissions.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
-      submissions.get 'sections/:section_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'section_student_submissions'
-
-      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show, :path_name => "course_assignment_submission"
-      submissions.get 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :show, :path_name => "section_assignment_submission"
-
-      submissions.post 'courses/:course_id/assignments/:assignment_id/submissions', :action => :create, :controller => :submissions
-      submissions.post 'sections/:section_id/assignments/:assignment_id/submissions', :action => :create, :controller => :submissions
-
-      submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'course_assignment_submission'
-      submissions.put 'sections/:section_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'section_assignment_submission'
+      def submissions_api(submissions, context)
+        submissions.get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :index, :path_name => "#{context}_assignment_submissions"
+        submissions.get "#{context.pluralize}/:#{context}_id/students/submissions", :controller => :submissions_api, :action => :for_students, :path_name => "#{context}_student_submissions"
+        submissions.get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:id", :action => :show, :path_name => "#{context}_assignment_submission"
+        submissions.post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :create, :controller => :submissions
+        submissions.post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/files", :action => :create_file
+        submissions.put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:id", :action => :update, :path_name => "#{context}_assignment_submission"
+      end
+      submissions_api(submissions, "course")
+      submissions_api(submissions, "section")
     end
 
     api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index, :path_name => 'course_assignment_groups'
@@ -738,10 +741,12 @@ ActionController::Routing::Routes.draw do |map|
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
 
       users.put 'users/:id', :action => :update
+      users.post 'users/:user_id/files', :action => :create_file
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
-      pseudonyms.get 'accounts/:account_id/logins', :action => :index, :path_name => 'pseudonyms'
+      pseudonyms.get 'accounts/:account_id/logins', :action => :index, :path_name => 'account_pseudonyms'
+      pseudonyms.get 'users/:user_id/logins', :action => :index, :path_name => 'user_pseudonyms'
       pseudonyms.post 'accounts/:account_id/logins', :action => :create
       pseudonyms.put 'accounts/:account_id/logins/:id', :action => :update
     end
@@ -795,16 +800,29 @@ ActionController::Routing::Routes.draw do |map|
       events.post 'calendar_events/:id/reservations/:participant_id', :action => :reserve, :path_name => 'calendar_event_reserve'
     end
 
-    api.with_options(:controller => :appointment_groups) do |groups|
-      groups.get 'appointment_groups', :action => :index, :path_name => 'appointment_groups'
-      groups.post 'appointment_groups', :action => :create
-      groups.get 'appointment_groups/:id', :action => :show, :path_name => 'appointment_group'
-      groups.put 'appointment_groups/:id', :action => :update
-      groups.delete 'appointment_groups/:id', :action => :destroy
-      groups.get 'appointment_groups/:id/users', :action => :users, :path_name => 'appointment_group_users'
-      groups.get 'appointment_groups/:id/groups', :action => :groups, :path_name => 'appointment_group_groups'
+    api.with_options(:controller => :appointment_groups) do |appt_groups|
+      appt_groups.get 'appointment_groups', :action => :index, :path_name => 'appointment_groups'
+      appt_groups.post 'appointment_groups', :action => :create
+      appt_groups.get 'appointment_groups/:id', :action => :show, :path_name => 'appointment_group'
+      appt_groups.put 'appointment_groups/:id', :action => :update
+      appt_groups.delete 'appointment_groups/:id', :action => :destroy
+      appt_groups.get 'appointment_groups/:id/users', :action => :users, :path_name => 'appointment_group_users'
+      appt_groups.get 'appointment_groups/:id/groups', :action => :groups, :path_name => 'appointment_group_groups'
     end
+
+    api.with_options(:controller => :groups) do |groups|
+      groups.post 'groups/:group_id/files', :action => :create_file
+    end
+
+    api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
+    api.get 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
   end
+
+  # this is not a "normal" api endpoint in the sense that it is not documented
+  # or called directly, it's used as the redirect in the file upload process
+  # for local files. it also doesn't use the normal oauth authentication
+  # system, so we can't put it in the api uri namespace.
+  map.api_v1_files_create 'files_api', :controller => 'files', :action => 'api_create', :conditions => { :method => :post }
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
   map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }

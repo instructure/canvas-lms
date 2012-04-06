@@ -79,6 +79,8 @@ module CC::Importer::Canvas
     def run_qti_converter(qti_folder)
       # convert to 2.1
       @dest_dir_2_1 = File.join(qti_folder, "qti_2_1")
+      return unless File.exists?(qti_folder)
+
       command = Qti.get_conversion_command(@dest_dir_2_1, qti_folder)
       logger.debug "Running migration command: #{command}"
       python_std_out = `#{command}`

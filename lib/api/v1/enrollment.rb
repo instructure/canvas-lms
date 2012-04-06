@@ -14,7 +14,8 @@ module Api::V1::Enrollment
         }
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
-      json[:user] = user_json(enrollment.user, user, session) if includes.include?(:user)
+      user_includes = includes.include?('avatar_url') ? ['avatar_url'] : []
+      json[:user] = user_json(enrollment.user, user, session, user_includes) if includes.include?(:user)
     end
   end
 end

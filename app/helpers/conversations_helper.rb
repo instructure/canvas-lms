@@ -7,7 +7,7 @@ module ConversationsHelper
       hash["#{$1}s".to_sym][$2.to_i] = []
       hash
     end
-    if audience.size == 1
+    if audience.size == 1 && include_private_conversation_enrollments
       audience.first.common_courses.each do |id, enrollments|
         result[:courses][id] = enrollments if result[:courses][id]
       end
@@ -18,8 +18,7 @@ module ConversationsHelper
     result
   end
 
-  def avatar_url_for(conversation)
-    participants = conversation.participants
+  def avatar_url_for(conversation, participants = conversation.participants)
     if participants.size == 1
       avatar_url_for_user(participants.first)
     elsif participants.size == 2

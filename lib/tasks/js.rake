@@ -8,7 +8,8 @@ namespace :js do
       Rake::Task['js:generate'].invoke
     end
     puts "--> executing phantomjs tests"
-    phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js spec/javascripts/runner.html`
+    `erb spec/javascripts/runner.html.erb > spec/javascripts/runner.html`
+    phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html`
     exit_status = $?.exitstatus
     puts phantomjs_output
     raise "PhantomJS tests failed" if exit_status != 0
@@ -35,8 +36,13 @@ namespace :js do
     # files that don't map to any source file anymore
     FileUtils.rm_rf('public/javascripts/compiled')
     FileUtils.rm_rf('public/javascripts/jst')
-    FileUtils.rm_rf('public/plugins/*/javascripts/compiled')
-    FileUtils.rm_rf('public/plugins/*/javascripts/jst')
+    Dir.glob('spec/javascripts/**/*Spec.js') do |compiled_spec|
+      FileUtils.rm_f(compiled_spec)
+    end
+    Dir.glob('public/plugins/*/javascripts') do |plugin_dir|
+      FileUtils.rm_rf(plugin_dir + '/compiled')
+      FileUtils.rm_rf(plugin_dir + '/javascripts/jst')
+    end
 
     puts "--> Pre-compiling all handlebars templates"
     Rake::Task['jst:compile'].invoke

@@ -29,6 +29,7 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
+  before_filter :reject_student_view_student, :require_pseudonym, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
   before_filter :require_open_registration, :only => [:new, :create]
 
   def grades
@@ -47,7 +48,9 @@ class UsersController < ApplicationController
       end
       #@prior_enrollments.concat @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
 
-      @student_enrollments = @current_enrollments.select{|e| e.is_a?(StudentEnrollment) }
+      @student_enrollments = @current_enrollments.
+        select{ |e| e.student? }.
+        inject({}){ |hash, e| hash[e.course] = e; hash }
 
       @observer_enrollments = @current_enrollments.select{|e| e.is_a?(ObserverEnrollment) && e.associated_user_id }
       @observed_enrollments = []
@@ -56,14 +59,16 @@ class UsersController < ApplicationController
       end
       @observed_enrollments = @observed_enrollments.uniq.compact
 
-      if @current_enrollments.length + @observed_enrollments.length == 1# && @prior_enrollments.empty?
+      @teacher_enrollments = @current_enrollments.select{|e| e.instructor? }
+
+      if @student_enrollments.length + @teacher_enrollments.length + @observed_enrollments.length == 1# && @prior_enrollments.empty?
         redirect_to course_grades_url(@current_enrollments.first.course_id)
         return
       end
-      Enrollment.send(:preload_associations, @observed_enrollments, :course)
 
-      @teacher_enrollments = @current_enrollments.select{|e| e.instructor? }
+      Enrollment.send(:preload_associations, @observed_enrollments, :course)
       #Enrollment.send(:preload_associations, @prior_enrollments, :course)
+
       @course_grade_summaries = {}
       @teacher_enrollments.each do |enrollment|
         @course_grade_summaries[enrollment.course_id] = Rails.cache.fetch(['computed_avg_grade_for', enrollment.course].cache_key) do
@@ -408,6 +413,25 @@ class UsersController < ApplicationController
     render :json => { :hidden => true }
   end
 
+  # @API
+  #
+  # Upload a file to the user's personal files section.
+  #
+  # This API endpoint is the first step in uploading a file to a user's files.
+  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # the file upload workflow.
+  #
+  # Note that typically users will only be able to upload files to their
+  # own files section. Passing a user_id of +self+ is an easy shortcut
+  # to specify the current user.
+  def create_file
+    @user = api_find(User, params[:user_id])
+    @attachment = Attachment.new(:context => @user)
+    if authorized_action(@attachment, @current_user, :create)
+      api_attachment_preflight(@current_user, request)
+    end
+  end
+
   def close_notification
     @current_user.close_announcement(AccountNotification.find(params[:id]))
     render :json => @current_user.to_json
@@ -462,7 +486,7 @@ class UsersController < ApplicationController
   def show
     get_context
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-    @user = params[:id] ? User.find(params[:id]) : @current_user
+    @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
     if current_user_is_site_admin? || authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? profile_path : user_path(@user) )
       @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC', :per_page => 50

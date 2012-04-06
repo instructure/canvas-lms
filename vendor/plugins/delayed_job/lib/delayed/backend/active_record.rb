@@ -173,6 +173,13 @@ module Delayed
           end
         end
 
+        def create_and_lock!(worker)
+          raise "job already exists" unless new_record?
+          self.locked_at = Delayed::Job.db_time_now
+          self.locked_by = worker
+          save!
+        end
+
         def fail!
           attrs = self.attributes
           attrs['original_id'] = attrs.delete('id')

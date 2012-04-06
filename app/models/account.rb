@@ -33,7 +33,7 @@ class Account < ActiveRecord::Base
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
-  has_many :enrollments, :foreign_key => 'root_account_id'
+  has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
   has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
   has_many :account_users, :dependent => :destroy
@@ -85,6 +85,7 @@ class Account < ActiveRecord::Base
   has_many :alerts, :as => :context, :include => :criteria
   has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
   has_many :user_account_associations
+  has_many :report_snapshots
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
@@ -429,7 +430,7 @@ class Account < ActiveRecord::Base
   def add_account_membership_type(type)
     types = account_membership_types
     types += type.split(",")
-    self.membership_types  = types.join(',')
+    self.membership_types = types.join(',')
     self.save
   end
   
@@ -492,6 +493,7 @@ class Account < ActiveRecord::Base
     RoleOverride.permissions.each do |permission, details|
       given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
       can permission
+      can :create_courses if permission == :manage_courses
 
       next unless details[:account_only]
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|

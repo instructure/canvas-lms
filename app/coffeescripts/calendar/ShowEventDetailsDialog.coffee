@@ -7,11 +7,12 @@ define [
   'jst/calendar/eventDetails'
   'jst/calendar/deleteItem'
   'jst/calendar/reservationOverLimitDialog'
+  'use!underscore'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
-], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog) ->
+], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, _) ->
 
   class ShowEventDetailsDialog
     constructor: (event) ->
@@ -46,19 +47,27 @@ define [
     reserveErrorCB: (data) =>
       for error in data when error.message is 'participant has met per-participant limit'
         errorHandled = true
+        error.reschedulable = error.reservations.length == 1
         $dialog = $(reservationOverLimitDialog(error)).dialog
           resizable: false
           width: 450
-          buttons: [
-            text: I18n.t 'reschedule', 'Reschedule'
-            'class': 'ui-button-primary'
-            click: =>
-              $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
-                $dialog.dialog('close')
-          ,
-            text: I18n.t 'do_nothing', 'Do Nothing'
-            click: -> $dialog.dialog('close')
-          ]
+          buttons: if error.reschedulable
+                     [
+                       text: I18n.t 'reschedule', 'Reschedule'
+                       'class': 'ui-button-primary'
+                       click: =>
+                         $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
+                           $dialog.dialog('close')
+                     ,
+                       text: I18n.t 'do_nothing', 'Do Nothing'
+                       click: -> $dialog.dialog('close')
+                     ]
+                   else
+                     [
+                       text: I18n.t 'ok', 'OK'
+                       click: -> $dialog.dialog('close')
+                     ]
+
       unless errorHandled
         alert "Could not reserve event: #{data}"
         $.publish "CommonEvent/eventSaveFailed", @event
@@ -78,6 +87,35 @@ define [
           @deleteEvent(e)
           return
 
+    cancelAppointment: ($appt) =>
+      url = $appt.data('url')
+      event = _.detect @event.calendarEvent.child_events, (e) -> e.url == url
+      $("<div/>").confirmDelete
+        url: url
+        message: $ deleteItemTemplate(message: I18n.t(
+          'cancel_appointment'
+          'Are you sure you want to cancel your appointment with %{name}?'
+          name: event.user?.short_name or event.group.name)
+        )
+        dialog:
+          title: I18n.t('confirm_removal', "Confirm Removal")
+          width: '400px'
+          resizable: false
+        prepareData: ($dialog) => {cancel_reason: $dialog.find('#cancel_reason').val() }
+        success: =>
+          @event.object.child_events = _(@event.object.child_events).reject (e) ->
+            e.url == $appt.data('url')
+          $appt.remove()
+
+          # this is a little funky, but we want to remove the parent (time
+          # slot) event from the calendar when there are no attendees, *unless*
+          # we are in scheduler view
+          in_scheduler = $('#scheduler').prop('checked')
+          appointments = @event.calendarEvent.child_events
+          if not in_scheduler and appointments.length == 0
+            $.publish "CommonEvent/eventDeleted", @event
+            @popover.hide()
+
     show: (jsEvent) =>
       params = $.extend true, {}, @event,
         can_reserve: @event.object?.reserve_url
@@ -92,14 +130,15 @@ define [
           params.can_reserve = false
 
         for e in @event.object.child_events
+          reservation =
+            id: e.user?.id or e.group.id
+            name: e.user?.short_name or e.group.name
+            event_url: e.url
+          (params.reservations ?= []).push reservation
           if e.user
-            (params.reserved_users ?= []).push
-              id: e.user.id
-              name: e.user.short_name
+            (params.reserved_users ?= []).push reservation
           if e.group
-            (params.reserved_groups ?= []).push
-              id: e.group.id
-              name: e.group.name
+            (params.reserved_groups ?= []).push reservation
 
       if @event.object?.available_slots == 0
         params.can_reserve = false
@@ -124,6 +163,11 @@ define [
       @popover.el.find(".unreserve_event_link").click (e) =>
         e.preventDefault()
         @unreserveEvent()
+
+      @popover.el.find(".cancel_appointment_link").click (e) =>
+        e.preventDefault()
+        $appt = $(e.target).closest('li')
+        @cancelAppointment($appt)
 
       # @popover.dialog 'option',
       #   width: if @event.description?.length > 2000 then Math.max($(window).width() - 300, 450) else 450

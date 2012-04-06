@@ -73,7 +73,7 @@ define [
         return @poll() if not @initialDelay
       else
         @nextInterval = parseInt(@nextInterval * @backoffFactor)
-      return @stop() if @attempts > @maxAttempts
+      return @stop() if @attempts >= @maxAttempts
 
       @running = setTimeout @poll, @nextInterval
 

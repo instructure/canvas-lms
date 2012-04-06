@@ -62,8 +62,9 @@ module Api::V1::CalendarEvent
         hash['reserved'] = event.child_events_for(participant).present?
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, participant)
       end
-      if context.participants_per_appointment
-        hash["available_slots"] = [event.context.participants_per_appointment - hash["child_events_count"], 0].max
+      if participant_limit = event.participants_per_appointment
+        hash["available_slots"] = [participant_limit - hash["child_events_count"], 0].max
+        hash["participants_per_appointment"] = participant_limit
       end
     end
     can_read_child_events = include.include?('child_events') && event.grants_right?(user, session, :read_child_events)

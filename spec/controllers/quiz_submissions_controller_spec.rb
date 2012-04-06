@@ -59,7 +59,30 @@ describe QuizSubmissionsController do
       assert_unauthorized
     end
   end
-end
-  
 
-  
+  describe "PUT 'backup'" do
+    it "should require authentication" do
+      course_with_student(:active_all => true)
+      quiz_model(:course => @course)
+      @qs = @quiz.generate_submission(@student, false)
+      QuizSubmission.update_all({ :updated_at => 1.hour.ago }, { :id => @qs.id })
+
+      put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test'
+      response.status.to_i.should == 401
+
+      @qs.reload.submission_data[:a].should be_nil
+    end
+
+    it "should backup to the user's quiz submission" do
+      course_with_student_logged_in(:active_all => true)
+      quiz_model(:course => @course)
+      @qs = @quiz.generate_submission(@student, false)
+      QuizSubmission.update_all({ :updated_at => 1.hour.ago }, { :id => @qs.id })
+
+      put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test'
+      response.should be_success
+
+      @qs.reload.submission_data[:a].should == 'test'
+    end
+  end
+end

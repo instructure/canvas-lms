@@ -18,11 +18,10 @@
 
 class Conversation < ActiveRecord::Base
   include SimpleTags
+  include ModelCache
+  cacheable_by :id, :private_hash
 
   has_many :conversation_participants, :dependent => :destroy
-  has_many :subscribed_conversation_participants,
-           :conditions => "subscribed",
-           :class_name => 'ConversationParticipant'
   has_many :conversation_messages, :order => "created_at DESC, id DESC", :dependent => :delete_all
 
   # see also User#messageable_users
@@ -31,12 +30,6 @@ class Conversation < ActiveRecord::Base
     :source => :user,
     :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups",
     :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
-  has_many :subscribed_participants,
-    :through => :subscribed_conversation_participants,
-    :source => :user,
-    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups",
-    :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
-  has_many :attachments, :through => :conversation_messages
 
   attr_accessible
 
@@ -44,8 +37,12 @@ class Conversation < ActiveRecord::Base
     private_hash.present?
   end
 
+  def self.find_all_private_conversations(user_id, other_user_ids)
+    find_all_by_private_hash(other_user_ids.map{ |id| private_hash_for([user_id, id])})
+  end
+
   def self.private_hash_for(user_ids)
-    Digest::SHA1.hexdigest(user_ids.sort.join(','))
+    Digest::SHA1.hexdigest(user_ids.uniq.sort.join(','))
   end
 
   def self.initiate(user_ids, private)
@@ -106,7 +103,7 @@ class Conversation < ActiveRecord::Base
     if message
       add_message_to_participants(message, options) # make sure it gets re-added
     else
-      message = add_message(asset.user, '', options.merge(:asset => asset, :update_participants => false))
+      message = add_message(asset.user, '', options.merge(:asset => asset, :update_participants => false, :root_account_id => asset.context.try(:root_account_id)))
     end
     if (data = asset.conversation_message_data).present?
       message.created_at = data[:created_at]
@@ -116,7 +113,7 @@ class Conversation < ActiveRecord::Base
     end
 
     if options[:update_participants]
-      update_participants message, options.merge(:skip_attachments_and_media_comments => true)
+      update_participants message, options
     else
       conversation_participants.each{ |cp| cp.update_cached_data!(options.merge(:set_last_message_at => false)) }
     end
@@ -183,14 +180,20 @@ class Conversation < ActiveRecord::Base
       # all specified (or implicit) tags, regardless of visibility to individual participants
       new_tags = options[:tags] ? options[:tags] & current_context_strings(1) : []
       new_tags = current_context_strings if new_tags.blank? && tags.empty? # i.e. we're creating the first message and there are no tags yet
-      update_attribute :tags, tags | new_tags if new_tags.present?
+      self.tags |= new_tags if new_tags.present?
+      self.root_account_ids |= [options[:root_account_id]] if options[:root_account_id].present?
+      save! if new_tags.present? || root_account_ids_changed?
 
       message = conversation_messages.build
       message.author_id = current_user.id
       message.body = body
       message.generated = options[:generated]
-      message.context = options[:context]
+      if options[:root_account_id]
+        message.context_type = 'Account'
+        message.context_id = options[:root_account_id]
+      end
       message.asset = options[:asset]
+      message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
       if options[:forwarded_message_ids].present?
         messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
         conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
@@ -199,6 +202,8 @@ class Conversation < ActiveRecord::Base
         # TODO: optimize me
         message.forwarded_message_ids = messages.map(&:id).join(',')
       end
+      # so we can take advantage of other preloaded associations
+      ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
       message.save!
 
       yield message if block_given?
@@ -221,11 +226,12 @@ class Conversation < ActiveRecord::Base
       cps = cps.scoped(:conditions => ["id NOT IN (?)", skip_ids]) if skip_ids.present?
     end
 
-    cps.update_all("message_count = message_count + 1") unless options[:generated]
+    ConversationParticipant.update_all("message_count = message_count + 1", ["id IN (?)", cps.map(&:id)]) unless options[:generated]
 
     all_new_tags = options[:tags] || []
     message_data = []
-    cps.all(:include => [:user]).each do |cp|
+    ConversationMessage.preload_latest(cps) if private? && !all_new_tags.present?
+    cps.each do |cp|
       next unless cp.user
       new_tags, message_tags = infer_new_tags_for(cp, all_new_tags)
       cp.update_attribute :tags, cp.tags | new_tags if new_tags.present?
@@ -257,7 +263,7 @@ class Conversation < ActiveRecord::Base
     message_tags = if private?
       if new_tags.present?
         new_tags
-      elsif last_message = cp.messages.human.first
+      elsif cp.message_count > 0 and last_message = cp.last_message
         last_message.tags
       end
     end
@@ -300,11 +306,11 @@ class Conversation < ActiveRecord::Base
       maybe_update_timestamp('last_authored_at', message.created_at, ["user_id = ?", message.author_id]),
       maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
     ]
+    updates << "workflow_state = CASE WHEN workflow_state = 'archived' THEN 'read' ELSE workflow_state END" if update_for_skips
     conversation_participants.update_all(updates.join(", "), ["user_id IN (?)", skip_ids])
-    return if options[:skip_attachments_and_media_comments]
 
     updated = false
-    if message.attachments.present?
+    if message.attachment_ids.present?
       self.has_attachments = true
       conversation_participants.update_all({:has_attachments => true}, "NOT has_attachments")
       updated = true
@@ -315,6 +321,11 @@ class Conversation < ActiveRecord::Base
       updated = true
     end
     self.save if updated
+  end
+
+  def subscribed_participants
+    ConversationParticipant.send(:preload_associations, conversation_participants, :user) unless ModelCache[:users]
+    conversation_participants.select(&:subscribed?).map(&:user).compact
   end
 
   def reply_from(opts)
@@ -415,15 +426,44 @@ class Conversation < ActiveRecord::Base
     end
   end
 
+  def root_account_ids
+    (read_attribute(:root_account_ids) || '').split(',').map(&:to_i)
+  end
+
+  def root_account_ids=(ids)
+    # ids must be sorted for the scope to work
+    write_attribute(:root_account_ids, ids.sort.join(','))
+  end
+
+  # rails' has_many-:through preloading doesn't preserve :select or :order
+  # options, so we roll our own that does (plus we do it in one query so we
+  # don't load conversation_participants into memory)
+  def self.preload_participants(conversations)
+    user_map = User.find_by_sql(sanitize_sql([<<-SQL, conversations.map(&:id)])).group_by(&:conversation_id)
+      SELECT #{reflections[:participants].options[:select]}, conversation_id
+      FROM users, conversation_participants
+      WHERE users.id = conversation_participants.user_id
+        AND conversation_id IN (?)
+      ORDER BY #{reflections[:participants].options[:order]}
+    SQL
+    conversations.each do |conversation|
+      send :add_preloaded_records_to_collection, [conversation], :participants, user_map[conversation.id.to_s] 
+    end
+  end
+
   protected
 
   # contexts currently shared by > 50% of participants
   # note that these may not all be relevant for a specific participant, so
   # they should be and-ed with User#conversation_context_codes
   # returns best matches first
-  def current_context_strings(threshold = conversation_participants.all.size / 2)
-    return [] if private? && conversation_participants.size == 1
-    conversation_participants.inject([]){ |ary, cp|
+  def current_context_strings(threshold = nil)
+    participants = conversation_participants.to_a
+    return [] if private? && participants.size == 1
+
+    threshold ||= participants.size / 2
+
+    participants.inject([]){ |ary, cp|
       cp.user ? ary.concat(cp.user.conversation_context_codes) : ary
     }.sort.inject({}){ |hash, str|
       hash[str] = (hash[str] || 0) + 1

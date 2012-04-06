@@ -1,4 +1,4 @@
-<% if message_count < 3 && @current_pseudonym && @current_pseudonym.login_count < 10 && @current_user && !@current_user.used_feature?(:cc_prefs) %>
+<% if message_count < 3 && @current_pseudonym && @current_pseudonym.login_count < 10 && @current_user && !@current_user.fake_student? && !@current_user.used_feature?(:cc_prefs) %>
   <div class="communication_message dashboard_notification">
     <div class="header">
       <div class="header_title">

@@ -1,7 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/conversations_common')
 
-describe "conversations attachments" do
+shared_examples_for "conversations attachments selenium tests" do
+  it_should_behave_like "forked server selenium tests"
   it_should_behave_like "conversations selenium tests"
 
   it "should be able to add an attachment to the message form" do
@@ -55,6 +56,22 @@ describe "conversations attachments" do
     file.read.should match data
   end
 
+  it "should save just one attachment when sending a bulk private message" do
+    student_in_course
+    @course.enroll_user(User.create(:name => "student1"))
+    @course.enroll_user(User.create(:name => "student2"))
+    @course.enroll_user(User.create(:name => "student3"))
+
+    filename, fullpath, data = get_file("testfile1.txt")
+    new_conversation
+    add_recipient("student1")
+    add_recipient("student2")
+    add_recipient("student3")
+    expect {
+      submit_message_form(:attachments => [fullpath], :add_recipient => false, :group_conversation => false)
+    }.to change(Attachment, :count).by(1)
+  end
+
   it "should save attachments on new messages on existing conversations" do
     student_in_course
     filename, fullpath, data = get_file("testfile1.txt")
@@ -80,5 +97,25 @@ describe "conversations attachments" do
     find_all_with_jquery("#{message} .message_attachments li").size.should == 2
     find_with_jquery("#{message} .message_attachments li:first a .title").text.should == file1[0]
     find_with_jquery("#{message} .message_attachments li:last a .title").text.should == file2[0]
+  end
+end
+
+describe "conversations attachments local tests" do
+  it_should_behave_like "conversations attachments selenium tests"
+  prepend_before (:each) do
+    Setting.set("file_storage_test_override", "local")
+  end
+  prepend_before (:all) do
+    Setting.set("file_storage_test_override", "local")
+  end
+end
+
+describe "conversations attachments S3 tests" do
+  it_should_behave_like "conversations attachments selenium tests"
+  prepend_before (:each) do
+    Setting.set("file_storage_test_override", "s3")
+  end
+  prepend_before (:all) do
+    Setting.set("file_storage_test_override", "s3")
   end
 end

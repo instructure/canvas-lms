@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/conversations_common')
 
 describe "conversations" do
+  it_should_behave_like "in-process server selenium tests"
   it_should_behave_like "conversations selenium tests"
 
   it "should not allow double form submissions" do
@@ -19,6 +20,7 @@ describe "conversations" do
       name_input.send_keys(:return)
       f('#body').send_keys(new_message)
       5.times { f('#create_message_form button[type=submit]').click }
+      keep_trying_until{ f('#create_message_form textarea').enabled? }
     }.to change(ConversationMessage, :count).by(1)
   end
 

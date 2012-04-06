@@ -208,5 +208,18 @@ namespace :parallel do
     test_files.map! { |f| "#{Rails.root}/#{f}" }
     Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
   end
+
+  task :pattern, :count, :file_pattern do |t, args|
+    require "parallel_tests"
+    count = args[:count]
+    file_pattern = args[:file_pattern]
+    if count.nil? || file_pattern.nil?
+      raise "Must specify a thread count and file pattern"
+    end
+    test_files = FileList[file_pattern]
+    test_files.map! { |f| "#{Rails.root}/#{f}" }
+    Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
+  end
 end
+
 end

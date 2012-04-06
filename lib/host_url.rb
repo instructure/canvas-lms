@@ -49,7 +49,7 @@ class HostUrl
       res
     end
     
-    def file_host(account)
+    def file_host(account, current_host = nil)
       return @@file_host if @@file_host
       res = nil
       res = @@file_host = domain_config[:files_domain] if domain_config.has_key?(:files_domain)

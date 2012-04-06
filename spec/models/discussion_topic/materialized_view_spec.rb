@@ -30,7 +30,7 @@ describe DiscussionTopic::MaterializedView do
 
   describe ".materialized_view_for" do
     it "should build the intial empty view synchronously" do
-      DiscussionTopic::MaterializedView.materialized_view_for(@topic).should == ["[]", [], []]
+      DiscussionTopic::MaterializedView.materialized_view_for(@topic).should == ["[]", [], [], "[]"]
     end
 
     it "should return nil and schedule a job if no view" do
@@ -40,7 +40,7 @@ describe DiscussionTopic::MaterializedView do
     end
 
     it "should return the view if it exists but is out of date" do
-      @view.update_materialized_view
+      @view.update_materialized_view_without_send_later
       DiscussionTopic::MaterializedView.materialized_view_for(@topic).should be_present
       reply = @topic.reply_from(:user => @user, :text => "new message!")
       Delayed::Job.delete_all
@@ -50,7 +50,7 @@ describe DiscussionTopic::MaterializedView do
       # since the view was out of date, it's returned but a job is queued
       Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
       # after updating, the view should include the new entry
-      @view.update_materialized_view
+      @view.update_materialized_view_without_send_later
       json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       json.should be_present
       entries.should be_include(reply.id)
@@ -59,9 +59,9 @@ describe DiscussionTopic::MaterializedView do
 
   it "should build a materialized view of the structure, participants and entry ids" do
     view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
-    view.update_materialized_view
+    view.update_materialized_view_without_send_later
     structure, participant_ids, entry_ids = @topic.materialized_view
-    view.materialized_view_json.should == [structure, participant_ids, entry_ids]
+    view.materialized_view_json.should == [structure, participant_ids, entry_ids, "[]"]
     participant_ids.sort.should == [@student.id, @teacher.id].sort
     entry_ids.sort.should == @topic.discussion_entries.map(&:id).sort
     json = JSON.parse(structure)

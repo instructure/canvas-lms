@@ -8,7 +8,7 @@
 <div style="padding: 0 20px;" id="stats">
 <h2><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h2>
 
-<% active_students = @context.participating_students.enrolled_before(@range_end).length %>
+<% active_students = @context.participating_students.scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").enrolled_before(@range_end).length %>
 <% inactive_students = @context.student_enrollments.before(@range_end).select{|e| e.invited? }.length %>
 
 <% total_topics = @context.discussion_topics.active.before(@range_end).count %>

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,10 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Groups
+#
+# API for accessing group information.
 class GroupsController < ApplicationController
   before_filter :get_context
   before_filter :require_context, :only => [:create_category, :delete_category]
   before_filter :get_group_as_context, :only => [:show]
+
+  include Api::V1::Attachment
 
   def context_group_members
     @group = @context
@@ -285,6 +290,24 @@ class GroupsController < ApplicationController
       { :id => group_id, :new_members => new_members.map{ |m| m.user.group_member_json(@context) } }
     end
     render :json => json
+  end
+
+  # @API
+  #
+  # Upload a file to the group.
+  #
+  # This API endpoint is the first step in uploading a file to a group.
+  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # the file upload workflow.
+  #
+  # Only those with the "Manage Files" permission on a group can upload files
+  # to the group. By default, this is anybody participating in the
+  # group, or any admin over the group.
+  def create_file
+    @attachment = Attachment.new(:context => @context)
+    if authorized_action(@attachment, @current_user, :create)
+      api_attachment_preflight(@context, request)
+    end
   end
 
   protected

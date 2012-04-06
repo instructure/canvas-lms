@@ -255,6 +255,21 @@ describe "dashboard" do
 
       driver.find_element(:id, 'no_topics_message').should include_text('No Recent Messages')
     end
+
+    it "should validate the functionality of soft concluded courses in dropdown" do
+      course_with_student(:active_all => true, :course_name => "a_soft_concluded_course", :user => @user)
+      c1 = @course
+      c1.conclude_at = 1.week.ago
+      c1.start_at = 1.month.ago
+      c1.restrict_enrollments_to_course_dates = true
+      c1.save!
+      get "/"
+
+      driver.action.move_to(driver.find_element(:id, 'courses_menu_item')).perform
+      course_menu = driver.find_element(:id, 'menu_enrollments')
+      course_menu.should be_displayed
+      course_menu.should_not include_text(c1.name)
+    end
   end
 
   context "as a teacher" do
@@ -263,25 +278,17 @@ describe "dashboard" do
       course_with_teacher_logged_in(:active_cc => true)
     end
 
-    it "should validate the functionality of soft concluded courses" do
-      pending('bug 7536 - When a course is soft concluded, it should no longer be in the courses drop down as an active course') do
-        start_time = Time.now - 5.days
-        end_time = Time.now - 1.day
-        term = EnrollmentTerm.new(:name => "Super Term", :start_at => start_time, :end_at => end_time)
-        term.root_account_id = @course.root_account_id
-        term.save!
-        @course.update_attributes!(:enrollment_term => term, :start_at => start_time, :conclude_at => end_time)
-        @course.reload
-        get "/"
+    it "should validate the functionality of soft concluded courses on courses page" do
+      term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
+      term.root_account_id = @course.root_account_id
+      term.save!
+      c1 = @course
+      c1.name = 'a_soft_concluded_course'
+      c1.update_attributes!(:enrollment_term => term)
+      c1.reload
 
-        driver.action.move_to(driver.find_element(:id, 'courses_menu_item')).perform
-        course_menu = driver.find_element(:id, 'menu_enrollments')
-        course_menu.should be_displayed
-        course_menu.should_not include_text(@course.name)
-
-        get "/courses"
-        driver.find_element(:css, '.past_enrollments').should include_text(@course.name)
-      end
+      get "/courses"
+      driver.find_element(:css, '.past_enrollments').should include_text(c1.name)
     end
 
     it "should display assignment to grade in to do list and assignments menu for a teacher" do

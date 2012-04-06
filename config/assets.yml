@@ -21,17 +21,25 @@ css_compressor_options:
   #     stylesheets:
   #       ...
   #
-  # in this document. additionally, rescope the bundles defined from public/
-  # (in the context of the plugin) to public/plugins/<plugin>/ (in the context
-  # of canvas-lms). so e.g. the bundle element
+  # in this document. additionally, rescope bundle elements defined under public/
+  # (in the context of the plugin) as follows:
   #
-  # public/stylesheets/compiled/foo.css
+  #  * public/stylesheets/compiled -> public/stylesheets/compiled/plugins/<plugin>
+  #  * public/* -> public/plugins/<plugin>/*
   #
-  # from the myplugin plugin will become
+  # i.e. public/x becomes public/plugins/myplugin/x with the exception of
+  # compiled stylesheets, where compass throws them in the more specific
+  # public/stylesheets/compiled/plugins/myplugin/
   #
-  # public/stylesheets/compiled/plugins/myplugin/foo.css
+  # to prevent this translation on a bundle element -- to request an element
+  # from canvas-lms in your bundle, for example -- prefix it with "~:". this
+  # prefix will be removed but no other changes made.
   #
-  # in the data structure mentioned above
+  # similarly, a prefix of "otherplugin:" just as without a prefix, but the
+  # rescoping will target "otherplugin" rather than "myplugin". this is useful
+  # if myplugin can rely on otherplugin being installed and wishes to reuse
+  # some of the assets from otherplugin.
+  #
   plugin_assets = {}
   Dir.glob('vendor/plugins/*/config/assets.yml').each do |asset_file|
     plugin = asset_file.gsub(%r{^vendor/plugins/(.*)/config/assets\.yml$}, '\\1')
@@ -42,10 +50,13 @@ css_compressor_options:
         # that we can detect and translate that namespace into an anchor in
         # post-processing.
         bundles["plugins/#{plugin}/#{type}/#{bundle}"] = bundles.delete(bundle).
-          map { |entry| entry.gsub(
-            %r{^public/stylesheets/compiled/},
-            "public/stylesheets/compiled/plugins/#{plugin}/")
-          }
+          map do |entry|
+            entry.gsub(%r{^public/stylesheets/compiled/}, "~:public/stylesheets/compiled/plugins/#{plugin}/").
+                  gsub(%r{^public/}, "~:public/plugins/#{plugin}/").
+                  gsub(%r{^(\w+):public/stylesheets/compiled/}, "~:public/stylesheets/compiled/plugins/\\1/").
+                  gsub(%r{^(\w+):public/}, "~:public/plugins/\\1/").
+                  gsub(%r{^~:}, '')
+          end
       end
     end
     plugin_assets[plugin] = assets
@@ -202,6 +213,8 @@ stylesheets:
     - public/javascripts/vendor/slickgrid/slick.grid.css
   sub_accounts:
     - public/stylesheets/compiled/sub_accounts.css
+  user_grades:
+    - public/stylesheets/compiled/user_grades.css
   user_logins:
     - public/stylesheets/compiled/user_logins.css
   account_settings:
@@ -215,8 +228,8 @@ stylesheets:
   alerts:
     - public/stylesheets/compiled/alerts.css
   tinymce:
-    - public/stylesheets/static/mathquill.css
     - public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css
     - public/stylesheets/compiled/tiny_like_ck_with_external_tools.css
     - public/javascripts/tinymce/jscripts/tiny_mce/plugins/inlinepopups/skins/clearlooks2/window.css
+    - public/stylesheets/static/mathquill.css
   <%= anchors["stylesheets"].map{ |(bundle,anchor)| "#{bundle}: *#{anchor}" }.join("\n  ") %>

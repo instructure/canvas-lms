@@ -30,28 +30,26 @@
           <td>{{{description}}}</td>
         </tr>
       {{/if}}
-      {{#if reserved_users}}
+      {{#if reservations}}
         <tr>
           <th scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
           <td>
-            <ul>
-              {{#each reserved_users}}
-                <!-- TODO: put avatar images here if enabled -->
-                <li>{{name}}</li>
-              {{/each}}
-            </ul>
-          </td>
-        </tr>
-      {{/if}}
-      {{#if reserved_groups}}
-        <tr>
-          <th scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
-          <td>
-            <ul>
-              {{#each reserved_groups}}
-                <li>{{name}}</li>
-              {{/each}}
-            </ul>
+            {{#if can_edit}}
+              <ul id="attendees">
+                {{#each reservations}}
+                  <li data-url="{{event_url}}">
+                    <div class="ellipsis">{{name}}</div>
+                    <a href="javascript:void(0)" class="cancel_appointment_link"></a>
+                  </li>
+                {{/each}}
+              </ul>
+            {{else}}
+              <ul>
+                {{#each reservations}}
+                  <li>{{name}}</li>
+                {{/each}}
+              </ul>
+            {{/if}}
           </td>
         </tr>
       {{/if}}

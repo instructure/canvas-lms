@@ -208,44 +208,67 @@ describe "quizzes" do
 
   it "should indicate when it was last saved" do
     skip_if_ie('Out of memory')
-    @context = @course
-    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-    q = quiz_model
-    a = AssessmentQuestion.create!
-    b = AssessmentQuestion.create!
-    bank.assessment_questions << a
-    bank.assessment_questions << b
-    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
-    q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
-    q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+    take_quiz do
+      indicator = driver.find_element(:css, '#last_saved_indicator')
+  
+      indicator.text.should == 'Not saved'
+      driver.find_element(:css, 'input[type=radio]').click
+  
+      # too fast, this always fails
+      #indicator.text.should == 'Saving...'
+  
+      wait_for_ajax_requests
+      indicator.text.should match(/^Saved at \d+:\d+(pm|am)$/)
+    end
+  end
 
-    q.generate_quiz_data
-    q.save!
-    get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
-    driver.find_element(:css, '.publish_quiz_button')
+  it "should validate numerical input data" do
+    skip_if_ie('Out of memory')
+    @quiz = quiz_with_new_questions do |bank, quiz|
+      aq = AssessmentQuestion.create!
+      bank.assessment_questions << aq
+      quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
+    end
+    take_quiz do
+      input = f('.numerical_question_input')
 
-    get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
-    expect_new_page_load {
-      driver.find_element(:link_text, 'Take the Quiz').click
-    }
+      input.click
+      input.send_keys('asdf')
+      error_displayed?.should be_true
+      input.send_keys(:tab)
+      keep_trying_until{ !error_displayed? }
+      # gets cleared out since it's not valid
+      input[:value].should be_blank
 
-    # sleep because display is updated on timer, not ajax callback
-    sleep 1
-    indicator = driver.find_element(:css, '#last_saved_indicator')
+      input.click
+      input.send_keys('1')
+      error_displayed?.should be_false
+      input.send_keys(:tab)
+      input[:value].should eql "1.0000"
+    end
+  end
 
-    indicator.text.should == 'Not saved'
-    driver.find_element(:css, 'input[type=radio]').click
-
-    # too fast, this always fails
-    #indicator.text.should == 'Saving...'
-
-    wait_for_ajax_requests
-    indicator.text.should match(/^Saved at \d+:\d+(pm|am)$/)
-
-    #This step is to prevent selenium from freezing when the dialog appears when leaving the page
-    driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
-    confirm_dialog = driver.switch_to.alert
-    confirm_dialog.accept
+  it "should mark questions as answered when the window loses focus" do
+    skip_if_ie('Out of memory')
+    @quiz = quiz_with_new_questions do |bank, quiz|
+      aq1 = AssessmentQuestion.create!
+      aq2 = AssessmentQuestion.create!
+      bank.assessment_questions << aq1
+      bank.assessment_questions << aq2
+      quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq1)
+      quiz.quiz_questions.create!(:question_data => {:name => "essay", 'question_type' => 'essay_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq2)
+    end
+    take_quiz do
+      wait_for_tiny f('.essay_question textarea.question_input')
+      input = f('.numerical_question_input')
+      input.click
+      input.send_keys('1')
+      in_frame f('.essay_question iframe')[:id] do
+        f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
+      end
+      ff('#question_list .answered').size.should eql 1
+      input[:value].should eql "1.0000"
+    end
   end
 
   it "should display quiz statistics" do

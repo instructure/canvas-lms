@@ -62,9 +62,11 @@ define [
       clearInterval @positionInterval
       $(window).unbind 'click', @outsideClickHandler
 
+    ignoreOutsideClickSelector: '.ui-dialog'
+
     # uses a fat arrow so that it has a unique guid per-instance for jquery event unbinding
     outsideClickHandler: (event) =>
-      unless $(event.target).closest(@el.add(@trigger)).length
+      unless $(event.target).closest(@el.add(@trigger).add(@ignoreOutsideClickSelector)).length
         @hide()
 
     position: =>
