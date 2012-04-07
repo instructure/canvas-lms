@@ -308,7 +308,14 @@ class ContextExternalTool < ActiveRecord::Base
         context = nil
       end
     end
-    return nil if contexts.empty?
+
+    # Always use the preferred tool if it's valid and has a resource_selection configuration.
+    # If it didn't have resource_selection then a change in the URL would have been done manually,
+    # and there's no reason to assume a different URL was intended. With a resource_selection 
+    # insertion, there's a stronger chance that a different URL was intended.
+    preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
+    return preferred_tool if preferred_tool && preferred_tool.settings[:resource_selection]
+    
     contexts.each do |context|
       res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.url && tool.matches_url?(url) }
       return res if res

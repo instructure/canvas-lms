@@ -1,3 +1,5 @@
+<p>consumer key: <span id="consumer_key"><%= params[:oauth_consumer_key] %></span></p>
+
 <% if params[:selection_directive] == 'embed_content' %>
   <a id="image_link" class="link" href="<%= @return_url %>?embed_type=image&url=/images/delete.png&width=16&height=16&alt=delete">image embed</a>
   <br/>
