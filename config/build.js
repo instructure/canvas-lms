@@ -74,7 +74,6 @@
         'translations/scribd',
         'i18n!scribd',
         'vendor/scribd.view',
-        'vendor/jquery.ba-throttle-debounce',
         'vendor/jquery.store',
         'jquery.dropdownList',
         'vendor/jqueryui/progressbar',

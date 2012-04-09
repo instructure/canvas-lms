@@ -24,6 +24,9 @@ describe "courses" do
       wait_for_animations # we need to give the wizard a chance to pop up
       wizard_box = driver.find_element(:id, "wizard_box")
       wizard_box.displayed?.should be_false
+
+      # un-remember the setting
+      driver.execute_script "$.store.clear()"
     end
 
     it "should open and close wizard after initial close" do

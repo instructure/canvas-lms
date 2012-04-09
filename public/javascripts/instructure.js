@@ -44,7 +44,6 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
   'vendor/jquery.store' /* /\$\.store/ */,
-  'vendor/jquery.ba-throttle-debounce' /* debounce */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
