@@ -29,18 +29,6 @@ define([
   'vendor/jquery.store' /* /\$\.store/ */
 ], function(INST, I18n, $, _, htmlEscape) {
 
-  // Generate a unique integer id (unique within the entire window).
-  // Useful for temporary DOM ids.
-  // if you pass it a prefix (because all dom ids have to have a alphabetic prefix) it will 
-  // make sure that there is no other element on the page with that id.
-  var idCounter = 10001;
-  $.uniqueId = function(prefix){
-    do {
-      var id = (prefix || '') + idCounter++;
-    } while (prefix && $('#' + id).length);
-    return id;
-  };
-
   // Return the first value which passes a truth test
   $.detect = function(collection, callback) {
     var result;

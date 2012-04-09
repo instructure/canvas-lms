@@ -21,6 +21,7 @@ define([
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* $ */,
+  'underscore',
   'str/htmlEscape',
   'wikiSidebar',
   'instructure_helper',
@@ -32,7 +33,7 @@ define([
   'jquery.instructure_date_and_time' /* parseFromISO, dateString */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* uniqueId, replaceTags, /\$\.uniq/, /\$\.store/, youTubeID */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.uniq/, /\$\.store/, youTubeID */,
   'jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
@@ -49,7 +50,7 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'vendor/scribd.view' /* scribd */
-], function(ENV, INST, I18n, $, htmlEscape, wikiSidebar) {
+], function(ENV, INST, I18n, $, _, htmlEscape, wikiSidebar) {
 
   // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
   var CSRFProtection =  function(xhr) {
@@ -541,7 +542,7 @@ define([
       var $reply = $message.find(".reply_message").hide();
       var $response = $message.find(".communication_sub_message.blank").clone(true).removeClass('blank');
       $reply.before($response.show());
-      var id = $.uniqueId("textarea_");
+      var id = _.uniqueId("textarea_");
       $response.find("textarea.rich_text").attr('id', id);
       $(document).triggerHandler('richTextStart', $("#" + id));
       $response.find("textarea:first").focus().select();

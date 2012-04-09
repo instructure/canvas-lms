@@ -19,13 +19,14 @@ define([
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
+  'underscore',
   'vendor/scribd.view' /* scribd */,
   'str/htmlEscape' /* htmlEscape, /\$\.h/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.google-analytics' /* trackEvent */,
-  'jquery.instructure_misc_helpers' /* uniqueId, /\$\.uniq/, capitalize */,
+  'jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */,
   'jquery.loadingImg' /* loadingImage */
-], function(INST, I18n, $, scribd, htmlEscape) {
+], function(INST, I18n, $, _, scribd, htmlEscape) {
 
   // first element in array is if scribd can handle it, second is if google can.
   var previewableMimeTypes = {
@@ -54,11 +55,11 @@ define([
       "application/vnd.ms-powerpoint":                                             [1, 1]
 
   };
-  
+
   $.filePreviewsEnabled = function(){
     return !(INST.disableScribdPreviews && INST.disableGooglePreviews);
   }
-  
+
   // check to see if a file of a certan mimeType is previewable inline in the browser by either scribd or googleDocs
   // ex: $.isPreviewable("application/mspowerpoint")  -> true
   //     $.isPreviewable("application/rtf", 'google') -> false
@@ -68,18 +69,18 @@ define([
       (!INST['disable' + $.capitalize(service) + 'Previews'] && previewableMimeTypes[mimeType][{scribd: 0, google: 1}[service]])
     );
   };
-  
+
   $.fn.loadDocPreview = function(options) {
     // if it is a scribd doc and flash is available
     var flashVersion = swfobject.getFlashPlayerVersion(),
         hasGoodEnoughFlash = flashVersion && flashVersion.major > 9;
-    
+
     return this.each(function(){
       var $this = $(this),
           opts = $.extend({
             height: '400px'
           }, $this.data(), options);
-          
+
       function tellAppIViewedThisInline(serviceUsed){
         // if I have a url to ping back to the app that I viewed this file inline, ping it.
         if (opts.attachment_view_inline_ping_url) {
@@ -87,14 +88,14 @@ define([
           $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts));
         }
       }
-      
+
       // if doc is scribdable, and the browser can show it.
       if (!INST.disableScribdPreviews && opts.scribd_doc_id && opts.scribd_access_key && hasGoodEnoughFlash && scribd) {
         var scribdDoc = scribd.Document.getDoc( opts.scribd_doc_id, opts.scribd_access_key ),
             id = $this.attr('id'),
             // see http://www.scribd.com/developers/api?method_name=Javascript+API for an explaination of these options
-            scribdParams = $.extend({ 
-              'jsapi_version': 1, 
+            scribdParams = $.extend({
+              'jsapi_version': 1,
               'disable_related_docs': true, //Disables the related documents tab in List Mode.
               'auto_size' : false, //When false, this parameter forces Scribd Reader to use the provided width and height rather than using a width multiplier of 85/110.
               'height' : opts.height,
@@ -102,7 +103,7 @@ define([
             }, opts.scribdParams);
 
         if (!id) {
-          id = $.uniqueId("scribd_preview_");
+          id = _.uniqueId("scribd_preview_");
           $this.attr('id', id);
         }
         $.each(scribdParams, function(key, value){
@@ -121,7 +122,7 @@ define([
         this.childNodes[0].keyboardShortcutDown = this.childNodes[0].keyboardShortcutUp = function(){};
 
         tellAppIViewedThisInline('scribd');
-      } else if (!INST.disableGooglePreviews && (!opts.mimeType || $.isPreviewable(opts.mimeType, 'google')) && opts.attachment_id || opts.public_url){ 
+      } else if (!INST.disableGooglePreviews && (!opts.mimeType || $.isPreviewable(opts.mimeType, 'google')) && opts.attachment_id || opts.public_url){
         // else if it's something google docs preview can handle and we can get a public url to this document.
         function loadGooglePreview(){
           // this handles both ssl and plain http.
@@ -138,7 +139,7 @@ define([
               }
             });
         }
-        if (opts.public_url) { 
+        if (opts.public_url) {
           loadGooglePreview()
         } else if (opts.attachment_id) {
           var url = '/files/'+opts.attachment_id+'/public_url.json';
