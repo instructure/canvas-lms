@@ -194,13 +194,6 @@ define([
     }
   };
 
-  $.keys = function(object){
-    var results = [];
-    for (var property in object)
-      results.push(property);
-    return results;
-  };
-
   $.underscore = function(string) {
     return (string || "").replace(/([A-Z])/g, "_$1").replace(/^_/, "").toLowerCase();
   };
