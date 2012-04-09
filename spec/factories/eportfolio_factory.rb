@@ -17,10 +17,10 @@
 #
 
 def eportfolio_model(opts={})
-  user = opts[:user] ? opts[:user] : user_model
-  @eportfolio = Eportfolio.create(:user => user)
+  opts[:user]= user_model if opts[:user].nil?
+  @eportfolio = Eportfolio.create(opts)
   @eportfolio_category = @eportfolio.eportfolio_categories.create!(:name => "category")
-  
+
   @eportfolio_entry = EportfolioEntry.new(:name => "page")
   @eportfolio_entry.eportfolio = @eportfolio
   @eportfolio_entry.eportfolio_category = @eportfolio_category
