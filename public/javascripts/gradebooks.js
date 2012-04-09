@@ -20,16 +20,17 @@ define([
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
+  'underscore',
+  'compiled/userSettings',
   'datagrid',
   'compiled/grade_calculator',
   'str/htmlEscape',
-  'underscore',
   'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
   'jquery.dropdownList' /* dropdownList */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.size/, /\$\.store/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.size/ */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
@@ -37,10 +38,9 @@ define([
   'message_students' /* messageStudents */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.store' /* /\$\.store/ */,
   'jqueryui/position' /* /\.position\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function(INST, I18n, $, datagrid, GradeCalculator, htmlEscape, _) {
+], function(INST, I18n, $, _, userSettings, datagrid, GradeCalculator, htmlEscape) {
 
   var grading_scheme = window.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
@@ -67,8 +67,8 @@ define([
   var possibleSections = {},
       $courseSections  = $(".outer_student_name .course_section"),
       contextId = $("#current_context_code").text().split("_")[1],
-      sectionToShow = $.store.userGet("grading_show_only_section" + contextId);
-      
+      sectionToShow = userSettings.contextGet('grading_show_only_section');
+
   $courseSections.each(function(){
     possibleSections[$(this).data('course_section_id')] = $(this).attr('title'); 
   }); 
@@ -100,7 +100,7 @@ define([
     });
     if (!atLeastOnePersonExistsInThisSection) {
       alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
-      $.store.userRemove("grading_show_only_section"+contextId);
+      userSettings.contextRemove('grading_show_only_section');
       window.location.reload();
     }
   }
@@ -820,7 +820,7 @@ define([
           object_data.grid = true;
           $(document).fragmentChange(fragmentCallback);
           $(document).fragmentChange();
-          var columns = $.grep(($.store.userGet('hidden_columns_' + context_code) || '').split(/,/), function(e) { return e; });
+          var columns = $.grep((userSettings.contextGet('hidden_columns') || []), function(e) { return e; });
           var columns_to_hide = [];
           
           if(columns.length) {
@@ -828,7 +828,7 @@ define([
               columns_to_hide.push(this);
             });
           }
-          if($.store.userGet('show_attendance_' + context_code) != 'true') {
+          if (!userSettings.contextGet('show_attendance')) {
             $(".cell.assignment_name.attendance").each(function() {
               columns_to_hide.push(this);
             });
@@ -884,12 +884,14 @@ define([
         toggle: function(column, show) {
           var $cell = datagrid.cells[0 + ',' + column];
           var id = $cell.children('.assignment_header').attr('id');
-          var columns = $.grep(($.store.userGet('hidden_columns_' + context_code) || '').split(/,/), function(e) { return e && (!show || e != id); });
+          var columns = $.grep((userSettings.contextGet('hidden_columns') || []), function(e) {
+            return e && (!show || e != id);
+          });
           if(!show) {
             columns.push(id);
           }
           columns = $.uniq(columns);
-          $.store.userSet('hidden_columns_' + context_code, columns.join(','));
+          userSettings.contextSet('hidden_columns', columns);
         }
       });
     };
@@ -1241,7 +1243,7 @@ define([
           };
           dialogData['buttons'][I18n.t('buttons.change_section', 'Change Section')] = function() {
             var val = $("#section_to_show_dialog select").val();
-            $.store[val == "all" ? 'userRemove' : 'userSet']("grading_show_only_section"+contextId, val);
+            userSettings[val == "all" ? 'contextRemove' : 'contextSet']('grading_show_only_section', val);
             window.location.reload();
           };
           var $dialog = $("#section_to_show_dialog").dialog(dialogData);

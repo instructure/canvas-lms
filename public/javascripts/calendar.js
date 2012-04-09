@@ -20,25 +20,25 @@ define([
   'INST' /* INST */,
   'i18n!calendars',
   'jquery' /* $ */,
+  'compiled/userSettings',
   'calendar_move' /* calendarMonths */,
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseDateTime, formatDateTime, parseFromISO, dateString, datepicker, date_field, time_field, datetime_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, hideErrors */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* encodeToHex, decodeFromHex, replaceTags, /\$\.store/ */,
+  'jquery.instructure_misc_helpers' /* encodeToHex, decodeFromHex, replaceTags */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.rails_flash_notifications' /* flashMessage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.store' /* /\$\.store/ */,
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(INST, I18n, $, calendarMonths) {
+], function(INST, I18n, $, userSettings, calendarMonths) {
 
   window.calendar = {
     viewItem: function(context_string, item_id, item_type) {
@@ -1205,7 +1205,7 @@ define([
           var code = $(this).attr('id').substring(6);
           only_contexts.push(code);
         });
-        $.store.userSet('checked_calendar_codes', only_contexts.join(","));
+        userSettings.set('checked_calendar_codes', only_contexts);
       }
     }, 1000);
     $(".group_reference_checkbox").bind('change click', function() {
@@ -1535,16 +1535,15 @@ define([
         $(document).triggerHandler('event_tab_select', ui.index);
         $(ui.panel).find("select.context_id").triggerHandler('change');
       });
-    var storedCodes = $.store.userGet('checked_calendar_codes');
-    if(storedCodes) {
-      var codes = storedCodes.split(/,/);
+    var storedCodes = userSettings.get('checked_calendar_codes');
+    if (storedCodes) {
       var found = 0;
-      for(var idx in codes) {
-        var $item = $("#group_" + codes[idx]);
+      for (var idx in storedCodes) {
+        var $item = $("#group_" + storedCodes[idx]);
         $item.attr('checked', true);
         if($item.length > 0) { found++; }
       }
-      if(found == 0) {
+      if (found == 0) {
         $(".group_reference .group_reference_checkbox:lt(10)").each(function() {
           $(this).attr('checked', true);
         });

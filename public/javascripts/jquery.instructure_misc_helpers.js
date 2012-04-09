@@ -25,8 +25,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSuggestion */,
   'jqueryui/dialog',
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.store' /* /\$\.store/ */
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(INST, I18n, $, _, htmlEscape) {
 
   // Return the first value which passes a truth test
@@ -476,26 +475,6 @@ define([
 
   $.capitalize = function(string) {
     return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
-  };
-
-  var storage_user_id;
-  function getUser() {
-    if ( !storage_user_id ) {
-      storage_user_id = $.trim($("#identity .user_id").text());
-    }
-    return storage_user_id;
-  };
-
-  $.store.userGet = function(key) {
-    return $.store.get("_" + getUser() + "_" + key);
-  };
-
-  $.store.userSet = function(key, value) {
-    return $.store.set("_" + getUser() + "_" + key, value);
-  };
-
-  $.store.userRemove = function(key, value) {
-    return $.store.remove("_" + getUser() + "_" + key, value);
   };
 
   INST.youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/;

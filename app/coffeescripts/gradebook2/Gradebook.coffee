@@ -5,6 +5,7 @@ define [
   'jquery'
   'underscore'
   'compiled/grade_calculator'
+  'compiled/userSettings'
   'vendor/spin'
   'compiled/multi_grid'
   'compiled/SubmissionDetailsDialog'
@@ -24,13 +25,12 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
-  'vendor/jquery.store'
   'jqueryui/mouse'
   'jqueryui/position'
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
     columnWidths =
@@ -46,14 +46,14 @@ define [
 
     constructor: (@options) ->
       @chunk_start = 0
-      @students    = {}
-      @rows        = []
+      @students = {}
+      @rows = []
       @studentsPage = 1
-      @sortFn      = (student) -> student.sortable_name
-      @assignmentsToHide = ($.store.userGet("hidden_columns_#{@options.context_code}") || '').split(',')
-      @sectionToShow = Number($.store.userGet("grading_show_only_section#{@options.context_id}")) || undefined
-      @show_attendance = $.store.userGet("show_attendance_#{@options.context_code}") == 'true'
-      @include_ungraded_assignments = $.store.userGet("include_ungraded_assignments_#{@options.context_code}") == 'true'
+      @sortFn = (student) -> student.sortable_name
+      @assignmentsToHide = userSettings.contextGet('hidden_columns') || []
+      @sectionToShow = userSettings.contextGet 'grading_show_only_section'
+      @show_attendance = userSettings.contextGet 'show_attendance'
+      @include_ungraded_assignments = userSettings.contextGet 'include_ungraded_assignments'
       $.subscribe 'assignment_group_weights_changed', @buildRows
       $.subscribe 'assignment_muting_toggled', @handleAssignmentMutingChange
       $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
@@ -139,13 +139,13 @@ define [
         @$columnArrangementTogglers.each ->
           $(this).closest('li').showIf $(this).data('arrangeColumnsBy') isnt newThingToArrangeBy
         @_sortColumnsBy = newThingToArrangeBy
-        $.store[ if newThingToArrangeBy is 'due_date' then 'userSet' else 'userRemove']("sort_grade_colums_by_#{@options.context_id}", newThingToArrangeBy)
+        userSettings[ if newThingToArrangeBy is 'due_date' then 'contextSet' else 'contextRemove']('sort_grade_colums_by', newThingToArrangeBy)
         columns = @gradeGrid.getColumns()
         columns.sort @columnSortFn
         @gradeGrid.setColumns(columns)
         @fixColumnReordering()
         @buildRows()
-      @_sortColumnsBy ||= $.store.userGet("sort_grade_colums_by_#{@options.context_id}") || 'assignment_group'
+      @_sortColumnsBy ||= userSettings.contextGet('sort_grade_colums_by') || 'assignment_group'
 
     columnSortFn: (a,b) =>
       return -1 if b.type is 'total_grade'
@@ -346,7 +346,7 @@ define [
       columnDef.minimized = true
       @$grid.find(".l#{colIndex}").add($columnHeader).addClass('minimized')
       @assignmentsToHide.push(columnDef.id)
-      $.store.userSet("hidden_columns_#{@options.context_code}", _.uniq(@assignmentsToHide).join(','))
+      userSettings.contextSet('hidden_columns', _.uniq(@assignmentsToHide))
 
     unminimizeColumn: ($columnHeader) =>
       colIndex = $columnHeader.index()
@@ -358,7 +358,7 @@ define [
       @$grid.find(".l#{colIndex}").add($columnHeader).removeClass('minimized')
       $columnHeader.find('.slick-column-name').html(columnDef.name)
       @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
-      $.store.userSet("hidden_columns_#{@options.context_code}", _.uniq(@assignmentsToHide).join(','))
+      userSettings.contextSet('hidden_columns', _.uniq(@assignmentsToHide))
 
     hoverMinimizedCell: (event) =>
       $hoveredCell = $(event.currentTarget)
@@ -459,7 +459,7 @@ define [
           buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
         $sectionToShowMenu.bind 'menuselect', (event, ui) =>
           @sectionToShow = Number($sectionToShowMenu.find('[aria-checked="true"] input[name="section_to_show_radio"]').val()) || undefined
-          $.store[ if @sectionToShow then 'userSet' else 'userRemove']("grading_show_only_section#{@options.context_id}", @sectionToShow)
+          userSettings[ if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
           updateSectionBeingShownText()
           @buildRows()
 
@@ -467,7 +467,7 @@ define [
       $.each ['show_attendance', 'include_ungraded_assignments'], (i, setting) =>
         $settingsMenu.find("##{setting}").prop('checked', @[setting]).change (event) =>
           @[setting] = $(event.target).is(':checked')
-          $.store.userSet "#{setting}_#{@options.context_code}", (''+@[setting])
+          userSettings.contextSet setting, @[setting]
           @gradeGrid.setColumns @getVisibleGradeGridColumns() if setting is 'show_attendance'
           @buildRows()
 

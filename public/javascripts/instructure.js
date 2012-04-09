@@ -22,6 +22,7 @@ define([
   'i18n!instructure',
   'jquery' /* $ */,
   'underscore',
+  'compiled/userSettings',
   'str/htmlEscape',
   'wikiSidebar',
   'instructure_helper',
@@ -33,7 +34,7 @@ define([
   'jquery.instructure_date_and_time' /* parseFromISO, dateString */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.store/, youTubeID */,
+  'jquery.instructure_misc_helpers' /* replaceTags, youTubeID */,
   'jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
@@ -44,13 +45,12 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
-  'vendor/jquery.store' /* /\$\.store/ */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'vendor/scribd.view' /* scribd */
-], function(ENV, INST, I18n, $, _, htmlEscape, wikiSidebar) {
+], function(ENV, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
 
   // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
   var CSRFProtection =  function(xhr) {
@@ -926,7 +926,7 @@ define([
     var pathname = window.location.pathname;
     $(".close_wizard_link").click(function(event) {
       event.preventDefault();
-      $.store.userSet('hide_wizard_' + pathname, true);
+      userSettings.set('hide_wizard_' + pathname, true);
       $wizard_box.slideUp('fast', function() {
         $(".wizard_popup_link").slideDown('fast');
         setWizardSpacerBoxDispay('hide');
@@ -979,7 +979,7 @@ define([
         $details.hide().fadeIn('fast');
       });
       setTimeout(function() {
-        if(!$.store.userGet('hide_wizard_' + pathname)) {
+        if(!userSettings.get('hide_wizard_' + pathname)) {
           $(".wizard_popup_link.auto_open:first").click();
         }
       }, 500);

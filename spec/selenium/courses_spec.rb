@@ -26,7 +26,7 @@ describe "courses" do
       wizard_box.displayed?.should be_false
 
       # un-remember the setting
-      driver.execute_script "$.store.clear()"
+      driver.execute_script "localStorage.clear()"
     end
 
     it "should open and close wizard after initial close" do

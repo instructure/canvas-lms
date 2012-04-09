@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'compiled/userSettings'
   'jst/calendar/contextList'
   'jst/calendar/undatedEvents'
   'compiled/calendar/commonEventFactory'
@@ -8,8 +9,7 @@ define [
   'compiled/jquery.kylemenu'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-  'vendor/jquery.store'
-], ($, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
+], ($, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
 
   class VisibleContextManager
     constructor: (contexts, selectedContexts, @$holder) ->
@@ -17,11 +17,10 @@ define [
                $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
              catch e
                {}
-      savedContexts = $.store.userGet('checked_calendar_codes')
 
       @contexts   = fragmentData.show.split(',') if fragmentData.show
-      @contexts or= selectedContexts if selectedContexts
-      @contexts or= savedContexts.split(',') if savedContexts
+      @contexts or= selectedContexts
+      @contexts or= userSettings.get('checked_calendar_codes')
       @contexts or= (c.asset_string for c in contexts[0...10])
 
       @notify()

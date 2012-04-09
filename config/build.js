@@ -96,7 +96,6 @@
         'translations/scribd',
         'i18n!scribd',
         'vendor/scribd.view',
-        'vendor/jquery.store',
         'jquery.dropdownList',
         'vendor/jqueryui/progressbar',
         'translations/media_comments',
