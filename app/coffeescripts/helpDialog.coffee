@@ -1,12 +1,13 @@
 # also requires
 # jquery.formSubmit
-# $.detect from jquery_misc_helpers
 # jqueryui dialog
 # jquery disableWhileLoading
 
 define [
   'i18n!help_dialog'
   'jst/helpDialog'
+  'jquery'
+  'use!underscore'
   'INST'
   'str/htmlEscape'
   'compiled/fn/preventDefault'
@@ -14,7 +15,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jqueryui/dialog'
   'jquery.disableWhileLoading'
-], (I18n, helpDialogTemplate, INST, htmlEscape, preventDefault) ->
+], (I18n, helpDialogTemplate, $, _, INST, htmlEscape, preventDefault) ->
 
   helpDialog =
     defaultLinks: [
@@ -55,7 +56,7 @@ define [
       @helpLinksDfd = $.getJSON('/help_links').done (links) =>
         # only show the links that are available to the roles of this user
         links = $.grep @defaultLinks.concat(links), (link) ->
-          $.detect link.available_to, (role) ->
+          _.detect link.available_to, (role) ->
             role is 'user' or
             (ENV.current_user_roles and role in ENV.current_user_roles)
         locals =

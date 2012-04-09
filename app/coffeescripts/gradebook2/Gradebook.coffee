@@ -3,6 +3,7 @@ define [
   'i18n!gradebook2'
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
+  'use!underscore'
   'compiled/grade_calculator'
   'vendor/spin'
   'compiled/multi_grid'
@@ -29,7 +30,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (I18n, GRADEBOOK_TRANSLATIONS, $, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
     columnWidths =
@@ -472,7 +473,7 @@ define [
           @buildRows()
 
       # don't show the "show attendance" link in the dropdown if there's no attendance assignments
-      unless ($.detect @gradeGrid.getColumns(), -> this.object?.submission_types == "attendance")
+      unless (_.detect @gradeGrid.getColumns(), (col) -> col.object?.submission_types == "attendance")
         $settingsMenu.find('#show_attendance').hide()
 
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
