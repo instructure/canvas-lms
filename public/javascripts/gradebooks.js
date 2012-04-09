@@ -29,7 +29,7 @@ define([
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.uniq/, /\$\.size/, /\$\.store/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.size/, /\$\.store/ */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
@@ -962,7 +962,7 @@ define([
             }
             object_data.student_submissions_count = object_data.student_submissions_count || 0;
             object_data.student_submissions_count = object_data.student_submissions_count + (clump_size || 1);
-            user_ids = $.uniq(user_ids);
+            user_ids = _.uniq(user_ids);
             for(var idx in user_ids) {
               $(".table_entry.student_" + user_ids[idx]).css('visibility', '');
             }

@@ -347,7 +347,7 @@ define [
       columnDef.minimized = true
       @$grid.find(".l#{colIndex}").add($columnHeader).addClass('minimized')
       @assignmentsToHide.push(columnDef.id)
-      $.store.userSet("hidden_columns_#{@options.context_code}", $.uniq(@assignmentsToHide).join(','))
+      $.store.userSet("hidden_columns_#{@options.context_code}", _.uniq(@assignmentsToHide).join(','))
 
     unminimizeColumn: ($columnHeader) =>
       colIndex = $columnHeader.index()
@@ -359,7 +359,7 @@ define [
       @$grid.find(".l#{colIndex}").add($columnHeader).removeClass('minimized')
       $columnHeader.find('.slick-column-name').html(columnDef.name)
       @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
-      $.store.userSet("hidden_columns_#{@options.context_code}", $.uniq(@assignmentsToHide).join(','))
+      $.store.userSet("hidden_columns_#{@options.context_code}", _.uniq(@assignmentsToHide).join(','))
 
     hoverMinimizedCell: (event) =>
       $hoveredCell = $(event.currentTarget)

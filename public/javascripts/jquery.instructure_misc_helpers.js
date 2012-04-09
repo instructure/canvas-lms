@@ -239,18 +239,6 @@ define([
     }
   };
 
-  $.uniq = function(array) {
-    var result = [];
-    var hash = {};
-    for(var idx in array) {
-      if(!hash[array[idx]]) {
-        hash[array[idx]] = true;
-        result.push(array[idx]);
-      }
-    }
-    return result;
-  };
-
   $.getUserServices = function(service_types, success, error) {
     if(!$.isArray(service_types)) { service_types = [service_types]; }
     var url = "/services?service_types=" + service_types.join(",");

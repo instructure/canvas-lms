@@ -33,7 +33,7 @@ define([
   'jquery.instructure_date_and_time' /* parseFromISO, dateString */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.uniq/, /\$\.store/, youTubeID */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.store/, youTubeID */,
   'jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
@@ -86,7 +86,7 @@ define([
       if (_earlyClick.clicks) {
         // wait to fire the "click" events till after all of the event hanlders loaded at dom ready are initialized
         setTimeout(function(){
-          $.each($.uniq(_earlyClick.clicks), function() {
+          $.each(_.uniq(_earlyClick.clicks), function() {
             // cant use .triggerHandler because it will not bubble,
             // but we do want to preventDefault, so this is what we have to do
             var event = $.Event('click');
