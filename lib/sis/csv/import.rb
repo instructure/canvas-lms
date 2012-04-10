@@ -109,8 +109,8 @@ module SIS
           @csvs[importer].reject! do |csv|
             begin
               rows = 0
-              FasterCSV.open(csv[:fullpath], "rb", BaseImporter::PARSE_ARGS) do |csv|
-                rows += 1 while csv.shift
+              FasterCSV.open(csv[:fullpath], "rb", BaseImporter::PARSE_ARGS) do |faster_csv|
+                rows += 1 while faster_csv.shift
               end
               @rows[importer] += rows
               @total_rows += rows
