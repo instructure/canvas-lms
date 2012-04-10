@@ -278,8 +278,6 @@ class ContentZipper
     end
   end
   
-  protected
-
   # make a tmp directory and yield a filename under that directory to the block
   # given. the tmp directory is deleted when the block returns.
   def make_zip_tmpdir(filename)

@@ -48,7 +48,7 @@ class ContentExportsController < ApplicationController
       export.course = @context
       export.user = @current_user
       export.workflow_state = 'created'
-      export.export_type = 'common_cartridge'
+      export.export_type = ContentExport::COMMON_CARTRIDGE
       export.progress = 0
       if export.save
         export.export_course

@@ -26,6 +26,11 @@ class ContentExport < ActiveRecord::Base
   has_a_broadcast_policy
   serialize :settings
   attr_accessible
+
+  #export types
+  COMMON_CARTRIDGE = 'common_cartridge'
+  COURSE_COPY = 'course_copy'
+  QTI = 'qti'
   
   workflow do
     state :created
@@ -74,11 +79,11 @@ class ContentExport < ActiveRecord::Base
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
   def for_course_copy?
-    self.settings[:for_course_copy]
+    self.export_type == COURSE_COPY
   end
 
-  def for_course_copy=(val)
-    self.settings[:for_course_copy] = val
+  def qti_export?
+    self.export_type == QTI
   end
   
   def error_message

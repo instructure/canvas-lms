@@ -52,6 +52,9 @@ module CCHelper
   # imsqti_xmlv1p2/imscc_xmlv1p2/assessment
   # imsqti_xmlv1p2/imscc_xmlv1p2/question-bank
   # imsbasiclti_xmlv1p0
+
+  # QTI-only export
+  QTI_ASSESSMENT_TYPE = 'imsqti_xmlv1p2'
   
   # substitution tokens
   OBJECT_TOKEN = "$CANVAS_OBJECT_REFERENCE$"
@@ -126,6 +129,7 @@ module CCHelper
   require 'set'
   class HtmlContentExporter
     attr_reader :used_media_objects, :media_object_flavor, :media_object_infos
+    attr_accessor :referenced_files
 
     def initialize(course, user, opts = {})
       @media_object_flavor = opts[:media_object_flavor]
@@ -134,6 +138,8 @@ module CCHelper
       @rewriter = UserContent::HtmlRewriter.new(course, user)
       @course = course
       @user = user
+      @track_referenced_files = opts[:track_referenced_files]
+      @referenced_files = []
 
       @rewriter.set_handler('file_contents') do |match|
         match.url.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
@@ -142,6 +148,7 @@ module CCHelper
         obj = match.obj_class.find_by_id(match.obj_id)
         next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
         folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+        @referenced_files << obj.id if @track_referenced_files
         # for files, turn it into a relative link by path, rather than by file id
         # we retain the file query string parameters
         "#{folder}/#{URI.escape(obj.display_name)}#{CCHelper.file_query_string(match.rest)}"

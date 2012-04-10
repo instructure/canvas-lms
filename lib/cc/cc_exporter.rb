@@ -34,6 +34,7 @@ module CC
       @migration_config = Setting.from_config('external_migration')
       @migration_config ||= {:keep_after_complete => false}
       @for_course_copy = opts[:for_course_copy]
+      @qti_only_export = @content_export && @content_export.qti_export?
     end
 
     def self.export(content_export, opts={})
@@ -45,7 +46,11 @@ module CC
       begin
         create_export_dir
         create_zip_file
-        @manifest = Manifest.new(self)
+        if @qti_only_export
+          @manifest = CC::QTI::QTIManifest.new(self)
+        else
+          @manifest = Manifest.new(self)
+        end
         @manifest.create_document
         @manifest.close
         copy_all_to_zip

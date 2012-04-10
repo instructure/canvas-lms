@@ -301,7 +301,7 @@ class ContentMigration < ActiveRecord::Base
       ce.content_migration = self
       ce.selected_content = copy_options
       ce.course = self.source_course
-      ce.for_course_copy = true
+      ce.export_type = ContentExport::COURSE_COPY
       ce.user = self.user
       ce.save!
       self.content_export = ce
