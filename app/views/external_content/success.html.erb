@@ -9,7 +9,7 @@ require([
 ], function($) {
 
   var data = <%= raw((@retrieved_data || {}).to_json) %>;
-  var callback = '<%= params[:service] %>';
+  var callback = <%= raw params[:service].to_json %>;
   var parentWindow = window.parent;
   while(parentWindow && parentWindow.parent != parentWindow && !parentWindow[callback]) {
     parentWindow = parentWindow.parent;

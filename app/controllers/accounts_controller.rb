@@ -20,7 +20,6 @@
 class AccountsController < ApplicationController
   before_filter :require_user, :only => [:index]
   before_filter :reject_student_view_student
-  before_filter :require_pseudonym, :only => [:index]
   before_filter :get_context
 
   include Api::V1::Account

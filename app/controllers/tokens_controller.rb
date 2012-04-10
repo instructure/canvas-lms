@@ -1,6 +1,5 @@
 class TokensController < ApplicationController
   before_filter :require_user
-  before_filter :require_pseudonym
   before_filter { |c| c.active_tab = "profile" }
   
   def create

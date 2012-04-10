@@ -369,7 +369,7 @@ define([
       month = parseInt($month.find(".month_number").text(), 10);
       year = parseInt($month.find(".year_number").text(), 10);
     }
-    var url = monthDataURL.replace('%25m', month).replace('%25y', year).replace(/&amp;/g, '&')
+    var url = "/calendar?" + $.param({ month: month, year: year });
     var requestUrl = url + (include_undated == false ? "" : "&include_undated=1");
     var contexts_to_load = [];
     if(!calendarMonthDataCache[url]) {
@@ -1200,7 +1200,6 @@ define([
     setInterval(function() {
       if(logCheckedContexts.log) {
         logCheckedContexts.log = false;
-        var url = monthDataURL.replace('%25m', 0).replace('%25y', 0).replace(/&amp;/g, '&')
         var only_contexts = [];
         $(".calendar_links .group_reference_checkbox:checked").each(function() {
           var code = $(this).attr('id').substring(6);
