@@ -785,6 +785,7 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
       tabs = []
+      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if manage_settings
     else
