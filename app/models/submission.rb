@@ -204,7 +204,7 @@ class Submission < ActiveRecord::Base
   def check_turnitin_status(asset_string, attempt=1)
     self.turnitin_data ||= {}
     data = self.turnitin_data[asset_string]
-    return unless data
+    return unless data && data[:object_id]
     if !data[:similarity_score] && attempt < 10
       turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
       res = turnitin.generateReport(self, asset_string)
@@ -267,18 +267,39 @@ class Submission < ActiveRecord::Base
     return unless self.context.turnitin_settings
     turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
     self.turnitin_data ||= {}
-    submission_response = []
-    if turnitin.createOrUpdateAssignment(self.assignment)
-      enrollment_response = turnitin.enrollStudent(self.context, self.user) # TODO: track this elsewhere so we don't have to do the API call on every submission
-      if enrollment_response
-        submission_response = turnitin.submitPaper(self)
+
+    # 1. Make sure the assignment exists
+    assign_status = self.assignment.create_in_turnitin
+    unless assign_status
+      send_at(5.minutes.from_now, :submit_to_turnitin, attempt + 1) if attempt < 5
+      return false
+    end
+
+    # 2. Make sure the user is enrolled
+    # TODO: track this elsewhere so we don't have to do the API call on every submission
+    enroll_status = turnitin.enrollStudent(self.context, self.user)
+    unless enroll_status
+      send_at(5.minutes.from_now, :submit_to_turnitin, attempt + 1) if attempt < 5
+      return false
+    end
+
+    # 3. Submit the file(s)
+    submission_response = turnitin.submitPaper(self)
+    submission_response.each do |asset_string, response|
+      if self.turnitin_data[asset_string] != response
+        self.turnitin_data[asset_string] = response
+        self.turnitin_data_changed!
+        self.send_at(5.minutes.from_now, :check_turnitin_status, asset_string) if response[:object_id]
       end
     end
-    if submission_response.empty?
+    self.save
+    submit_status = submission_response.present? && submission_response.values.all?{ |v| v[:object_id] }
+    unless submit_status
       send_at(5.minutes.from_now, :submit_to_turnitin, attempt + 1) if attempt < 5
-    else
-      true
+      return false
     end
+
+    true
   end
   
   def turnitinable?

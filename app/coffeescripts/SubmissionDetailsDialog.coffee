@@ -58,8 +58,9 @@ define [
           comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}?fallback=#{encodeURIComponent(urlPrefix+'/images/messages/avatar-50.png')}"
         for attachment in submission.attachments || []
           if turnitinDataForThisAttachment = submission.turnitin_data?["attachment_#{attachment.id}"]
-            attachment.turnitinUrl = "#{@options.context_url}/assignments/#{@assignment.id}/submissions/#{@student.id}/turnitin/attachment_#{attachment.id}"
-            attachment.turnitin_data = turnitinDataForThisAttachment
+            if turnitinDataForThisAttachment["similarity_score"]
+              attachment.turnitinUrl = "#{@options.context_url}/assignments/#{@assignment.id}/submissions/#{@student.id}/turnitin/attachment_#{attachment.id}"
+              attachment.turnitin_data = turnitinDataForThisAttachment
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()

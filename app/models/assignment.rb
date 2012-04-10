@@ -181,45 +181,39 @@ class Assignment < ActiveRecord::Base
     true
   end
 
+  def create_in_turnitin
+    return false unless self.context.turnitin_settings
+    return true if self.turnitin_settings[:current]
+    turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
+    res = turnitin.createOrUpdateAssignment(self, self.turnitin_settings)
+
+    unless read_attribute(:turnitin_settings)
+      self.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
+    end
+
+    if res[:assignment_id]
+      self.turnitin_settings[:created] = true
+      self.turnitin_settings[:current] = true
+      self.turnitin_settings.delete(:error)
+    else
+      self.turnitin_settings[:error] = res
+    end
+    self.save
+    return self.turnitin_settings[:current]
+  end
+
   def turnitin_settings
-    read_attribute(:turnitin_settings) || default_turnitin_settings
+    read_attribute(:turnitin_settings) || Turnitin::Client.default_assignment_turnitin_settings
   end
 
   def turnitin_settings=(settings)
-    unless settings.nil?
-      settings = settings.dup
-      settings.delete_if { |key, value| !default_turnitin_settings.has_key?(key.to_sym) }
-      settings[:created] = turnitin_settings[:created] if turnitin_settings[:created]
-
-      settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date'].include?(settings[:originality_report_visibility])
-
-      [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
-        settings[key] = '0' unless settings[key] == '1'
-      end
-
-      exclude_value = settings[:exclude_value].to_i
-      settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
-      settings[:exclude_value] = case settings[:exclude_type]
-        when '0': ''
-        when '1': [exclude_value, 1].max.to_s
-        when '2': (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+    settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+    unless settings.blank?
+      [:created, :error].each do |key|
+        settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
       end
     end
-
     write_attribute :turnitin_settings, settings
-  end
-
-  def default_turnitin_settings
-    {
-      :originality_report_visibility => 'immediate',
-      :s_paper_check => '1',
-      :internet_check => '1',
-      :journal_check => '1',
-      :exclude_biblio => '1',
-      :exclude_quoted => '1',
-      :exclude_type => '0',
-      :exclude_value => ''
-    }
   end
 
   def default_values

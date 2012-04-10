@@ -1514,14 +1514,14 @@ describe Assignment do
 
     it "should persist :created across changes" do
       assignment = assignment_model
-      assignment.turnitin_settings = assignment.default_turnitin_settings
+      assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
       assignment.save
       assignment.turnitin_settings[:created] = true
       assignment.save
       assignment.reload
       assignment.turnitin_settings[:created].should be_true
 
-      assignment.turnitin_settings = assignment.default_turnitin_settings.merge(:s_paper_check => '0')
+      assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings.merge(:s_paper_check => '0')
       assignment.save
       assignment.reload
       assignment.turnitin_settings[:created].should be_true
@@ -1529,14 +1529,14 @@ describe Assignment do
 
     it "should clear out :current" do
       assignment = assignment_model
-      assignment.turnitin_settings = assignment.default_turnitin_settings
+      assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
       assignment.save
       assignment.turnitin_settings[:current] = true
       assignment.save
       assignment.reload
       assignment.turnitin_settings[:current].should be_true
 
-      assignment.turnitin_settings = assignment.default_turnitin_settings.merge(:s_paper_check => '0')
+      assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings.merge(:s_paper_check => '0')
       assignment.save
       assignment.reload
       assignment.turnitin_settings[:current].should be_nil
