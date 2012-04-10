@@ -88,7 +88,6 @@ describe "discussions" do
         @attachment.content_type = 'image/png'
         @attachment.save!
       end
-
       get "/courses/#{@course.id}/discussion_topics"
 
       # go to Images tab to trigger pageless for .image_list
@@ -192,11 +191,13 @@ describe "discussions" do
       edit_text = 'title edited'
       create_and_go_to_topic
       expect_new_page_load { click_topic_option('#discussion_topic', '#ui-menu-0-0') }
-      replace_content(f('#discussion_topic_title'), edit_text)
-      type_in_tiny(".topic_content", ' new message')
-      f('.submit_button').click
       wait_for_ajaximations
-      f('.discussion_topic').should include_text(edit_text)
+      d_title= keep_trying_until {f("#discussion_topic_title")}
+      replace_content(d_title, edit_text)
+      type_in_tiny("textarea", 'other message')
+      f(".add_topic_form_new button[type=submit]").click
+      wait_for_ajaximations
+      f(".discussion_topic").should include_text(edit_text)
     end
 
     it "should validate the deletion of a discussion" do
