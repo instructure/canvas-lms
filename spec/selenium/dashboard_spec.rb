@@ -218,6 +218,27 @@ describe "dashboard" do
       driver.find_element(:css, 'div.events_list .event a').should include_text(@event.title)
     end
 
+    it "should display quiz submissions with essay questions as submitted in coming up list" do
+      quiz_with_graded_submission([:question_data => {:id => 31, 
+                                                      :name => "Quiz Essay Question 1", 
+                                                      :question_type => 'essay_question', 
+                                                      :question_text => 'qq1', 
+                                                      :points_possible => 10}],
+                                  {:user => @student, :course => @course}) do
+        {
+          "question_31"   => "<p>abeawebawebae</p>", 
+          "question_text" => "qq1"
+        }
+      end
+
+      @assignment.due_at = Time.now.utc + 1.week
+      @assignment.save!
+
+      get "/"
+      driver.execute_script("$('.events_list .event .tooltip_wrap, .events_list .event .tooltip_text').css('visibility', 'visible')")
+      f('.events_list .event .tooltip_wrap').should include_text 'submitted'
+    end
+
     it "should add comment to announcement" do
       @context = @course
       announcement_model({:title => "hey all read this k", :message => "announcement"})
