@@ -9,17 +9,21 @@
   end
 
   cache(['recent_event_render', submission || 'no_submission', recent_event || 'blank_event', Time.zone.utc_offset, recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades), recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)].cache_key) do 
-    set_icon_data(:context => @context, :contexts => @contexts, :current_user => @current_user, :recent_event => recent_event, :submission => submission)
+    icon_explanation, icon_class = icon_data(:context => @context, 
+                                             :contexts => @contexts, 
+                                             :current_user => @current_user, 
+                                             :recent_event => recent_event, 
+                                             :submission => submission)
   %>
 <li style="<%= hidden if is_hidden %>" class="event">
-  <a class="<%= @icon_class %> tooltip" href="<%= recent_event_url(recent_event) %>">
+  <a class="<%= icon_class %> tooltip" href="<%= recent_event_url(recent_event) %>">
     <span class="tooltip_wrap">
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
         <% if recent_event.is_a?(Assignment) %>
           <span style="display: block;">due: <%= datetime_string(recent_event.due_at) %></span>
-          <% if @icon_explanation %>
-            <span style="display: block; font-style: italic;"><%= @icon_explanation %></span>
+          <% if icon_explanation %>
+            <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
           <% end %>
           <% if recent_event.points_possible %>
             <span style="display: block;"><%= t 'submission_score', %{%{score} *out of %{points_possible}*},

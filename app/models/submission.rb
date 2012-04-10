@@ -646,12 +646,10 @@ class Submission < ActiveRecord::Base
 
   def readable_state
     case workflow_state
-    when 'submitted'
+    when 'submitted', 'pending_review'
       t 'state.submitted', 'submitted'
     when 'unsubmitted'
       t 'state.unsubmitted', 'unsubmitted'
-    when 'pending_review'
-      t 'state.pending_review', 'pending review'
     when 'graded'
       t 'state.graded', 'graded'
     end
@@ -896,10 +894,6 @@ class Submission < ActiveRecord::Base
   
   def current_submission_graded?
     self.graded? && (!self.submitted_at || (self.graded_at && self.graded_at >= self.submitted_at))
-  end
-  
-  def submitted_or_graded?
-    self.submitted? || self.graded?
   end
   
   def context(user=nil)

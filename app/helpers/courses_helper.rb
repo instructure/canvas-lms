@@ -17,17 +17,15 @@
 #
 
 module CoursesHelper
-  def set_icon_data(opts = {})
+  def icon_data(opts = {})
     context      = opts[:context]
     contexts     = opts[:contexts]
     current_user = opts[:current_user]
     recent_event = opts[:recent_event]
     submission   = opts[:submission]
+    student_only = opts[:student_only]
 
-    unless recent_event.is_a?(Assignment)
-      @icon_explanation, @icon_class = [nil, "calendar"]
-      return
-    end
+    return [nil, "calendar"] unless recent_event.is_a?(Assignment)
 
     # because this happens in a sidebar, the context may be wrong. check and fix
     # it if that's the case.
@@ -36,9 +34,9 @@ module CoursesHelper
 
     icon_data = [nil, 'icon-grading-gray']
     if can_do(context, current_user, :participate_as_student)
-      icon_data = submission && submission.submitted_or_graded? ? [submission.readable_state, 'icon-grading'] : [t('#courses.recent_event.not_submitted', 'not submitted'), "icon-grading-gray"]
+      icon_data = submission && submission.workflow_state != 'unsubmitted' ? [submission.readable_state, 'icon-grading'] : [t('#courses.recent_event.not_submitted', 'not submitted'), "icon-grading-gray"]
       icon_data[0] = nil if !recent_event.expects_submission?
-    elsif can_do(context, current_user, :manage_grades)
+    elsif !student_only && can_do(context, current_user, :manage_grades)
       # no submissions
       if !recent_event.has_submitted_submissions?
         icon_data = [t('#courses.recent_event.no_submissions', 'no submissions'), "icon-grading-gray"]
@@ -54,7 +52,7 @@ module CoursesHelper
       end
     end
 
-    @icon_explanation, @icon_class = icon_data
+    icon_data
   end
 
   def recent_event_url(recent_event)
