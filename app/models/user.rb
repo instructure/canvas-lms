@@ -913,7 +913,8 @@ class User < ActiveRecord::Base
     given do |user|
       user && (
         # or, if the user we are given is an admin in one of this user's accounts
-        (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_students) })
+        Account.site_admin.grants_right?(user, :manage_students) ||
+        self.associated_accounts.any? {|a| a.grants_right?(user, nil, :manage_students) }
       )
     end
     can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :read
@@ -921,7 +922,8 @@ class User < ActiveRecord::Base
     given do |user|
       user && (
         # or, if the user we are given is an admin in one of this user's accounts
-        (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) })
+        Account.site_admin.grants_right?(user, :manage_user_logins) ||
+        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) }
       )
     end
     can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :read

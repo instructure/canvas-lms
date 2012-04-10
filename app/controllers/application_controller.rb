@@ -162,7 +162,7 @@ class ApplicationController < ActionController::Base
   end
   
   def user_url(*opts)
-    opts[0] == @current_user && !current_user_is_site_admin? && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
+    opts[0] == @current_user && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
       profile_url :
       super
   end
@@ -1055,7 +1055,7 @@ class ApplicationController < ActionController::Base
       elsif feature == :lockdown_browser
         Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
       else
-        !Rails.env.production? || (@current_user && current_user_is_site_admin?)
+        false
       end
     end
   end
@@ -1092,33 +1092,14 @@ class ApplicationController < ActionController::Base
     require_account_management(true)
   end
 
-  # This before_filter can be used to limit access to only site admins.
-  # This checks if the user is an admin of the 'Site Admin' account, and has the
-  # site_admin permission.
-  def require_site_admin
-    require_site_admin_with_permission(:site_admin)
-  end
-
   def require_site_admin_with_permission(permission)
-    unless current_user_is_site_admin?(permission)
+    unless Account.site_admin.grants_right?(@current_user, permission)
       flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
       store_location
       redirect_to @current_user ? root_url : login_url
       return false
     end
   end
-
-  # This checks if the user is an admin of the 'Site Admin' account, and has the
-  # specified permission.
-  def current_user_is_site_admin?(permission = :site_admin)
-    user_is_site_admin?(@current_user, permission)
-  end
-  helper_method :current_user_is_site_admin?
-
-  def user_is_site_admin?(user, permission = :site_admin)
-    Account.site_admin.grants_right?(user, session, permission)
-  end
-  helper_method :user_is_site_admin?
 
   def page_views_enabled?
     PageView.page_views_enabled?

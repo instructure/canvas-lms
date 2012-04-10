@@ -536,11 +536,7 @@ class Account < ActiveRecord::Base
     self.deleted_at = Time.now
     save!
   end
-  
-  def self.site_admin_user?(user, permission = :site_admin)
-    !!(user && Account.site_admin.grants_right?(user, permission))
-  end
-  
+
   def to_atom
     Atom::Entry.new do |entry|
       entry.title     = self.name

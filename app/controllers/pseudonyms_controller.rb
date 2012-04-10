@@ -163,7 +163,7 @@ class PseudonymsController < ApplicationController
       )
     else
       account_id = params[:pseudonym].delete(:account_id)
-      if current_user_is_site_admin?(:manage_user_logins)
+      if Account.site_admin.grants_right?(@current_user, :manage_user_logins)
         params[:pseudonym][:account] = Account.root_accounts.find(account_id)
       else
         params[:pseudonym][:account] = @domain_root_account

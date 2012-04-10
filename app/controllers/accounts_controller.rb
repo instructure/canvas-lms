@@ -102,7 +102,7 @@ class AccountsController < ApplicationController
           end
           params[:account].delete :services
         end
-        if current_user_is_site_admin?
+        if Account.site_admin.grants_right?(@current_user, :manage_site_settings)
           @account.enable_user_notes = enable_user_notes if enable_user_notes
           @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
           if params[:account][:settings]
