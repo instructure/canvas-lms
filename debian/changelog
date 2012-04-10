@@ -1,3 +1,21 @@
+canvas-lms (2012.04.14.09) testing; urgency=low
+
+  * Package ref: c6fc0e149ddee04b66c746a1e757f074eec45a96
+  *
+  * [+8040f42] allow student view student to upload files; fixes #7938
+  * [+701313c] re-combine require_user and require_pseudonym
+  * [+9dbd3b4] fix pretending for preferred search method creating users with invalid emails
+  * [+27877a8] disallow object_snippet calls on non-safefiles domains
+  * [+b78ce5b] use will_pagniate helper for error reports rendering
+  * [+ccea5dd] make migration pgbouncer-friendly, move to delayed job
+  * [+634481b] remove non-functioning model_key code from assignments controller
+  * [+6479b38] properly js escape the service param to external_content
+  * [+6ceb28a] change ajax url for calendar1 month data
+  * [+fa2c942] fix the course sections api, fixes #8108
+  * [+c6fc0e1] allow student view student to use unpublished courses; fixes #8100
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 10 Apr 2012 14:02:14 -0600
+
 canvas-lms (2012.04.14.07) testing; urgency=low
 
   * Package ref: 25f1934ca2c0c76386434fe5cbf41c6a5ec480ca
