@@ -19,8 +19,7 @@
 class ContextController < ApplicationController
   before_filter :require_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
-  before_filter :reject_student_view_student, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
-  before_filter :require_pseudonym, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
+  before_filter :reject_student_view_student, :only => [:inbox, :inbox_item, :discussion_replies]
   protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
 
   def create_media_object
@@ -143,6 +142,10 @@ class ContextController < ApplicationController
   # session. see lib/user_content.rb and the user_content calls throughout the
   # views.
   def object_snippet
+    if HostUrl.has_file_host? && !HostUrl.is_file_host?(request.host_with_port)
+      return render(:nothing => true, :status => 400)
+    end
+
     @snippet = params[:object_data] || ""
     hmac = Canvas::Security.hmac_sha1(@snippet)
 

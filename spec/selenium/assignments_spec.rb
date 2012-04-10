@@ -247,6 +247,30 @@ describe "assignments" do
       @course.student_view_student.submissions.count.should == 1
       f('#sidebar_content .details').should include_text "Turned In!"
     end
+
+    it "should allow a student view student to submit file upload assignments" do
+      @assignment = @course.assignments.create(
+        :title => 'Cool Assignment',
+        :points_possible => 10,
+        :submission_types => "online_upload",
+        :due_at => Time.now.utc + 2.days)
+
+      enter_student_view
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      f('.submit_assignment_link').click
+
+      filename, fullpath, data = get_file("testfile1.txt")
+      f('.submission_attachment input').send_keys(fullpath)
+      f('#submit_file_button').click
+      wait_for_ajax_requests
+      wait_for_dom_ready
+
+      keep_trying_until {
+        f('.details .header').should include_text "Turned In!"
+        f('.details .file-big').should include_text "testfile1"
+      }
+    end
   end
 
   context "as a student" do

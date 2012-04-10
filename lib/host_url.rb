@@ -80,5 +80,9 @@ class HostUrl
       safer_host = file_host(Account.default)
       safer_host != default_host && domain == safer_host
     end
+
+    def has_file_host?
+      default_host != file_host(Account.default)
+    end
   end
 end

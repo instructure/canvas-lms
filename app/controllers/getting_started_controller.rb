@@ -19,7 +19,6 @@
 class GettingStartedController < ApplicationController
 
   before_filter :require_user
-  before_filter :require_pseudonym
   before_filter :require_course_creation_auth, :except => [:teacherless]
   before_filter :set_course, :except => [:teacherless]
   

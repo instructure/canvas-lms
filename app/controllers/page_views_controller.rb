@@ -19,7 +19,6 @@
 # @API Users
 class PageViewsController < ApplicationController
   before_filter :require_user, :only => [:index]
-  before_filter :require_pseudonym, :only => [:index]
 
   def update
     render :json => {:ok => true}
