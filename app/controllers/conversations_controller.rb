@@ -725,7 +725,7 @@ class ConversationsController < ApplicationController
   end
 
   def load_all_contexts
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user], :expires_in => 10.minutes) do
+    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user].cache_key, :expires_in => 10.minutes) do
       contexts = {:courses => {}, :groups => {}, :sections => {}}
 
       term_for_course = lambda do |course|
