@@ -112,20 +112,21 @@ describe CoursesController, :type => :integration do
           'account_id' => @account.id,
           'offer'      => true,
           'course'     => {
-            'name'                            => 'Test Course',
-            'course_code'                     => 'Test Course',
-            'start_at'                        => '2011-01-01T00:00:00-0700',
-            'conclude_at'                     => '2011-05-01T00:00:00-0700',
-            'publish_grades_immediately'      => true,
-            'is_public'                       => true,
-            'allow_student_assignment_edits'  => true,
-            'allow_wiki_comments'             => true,
-            'allow_student_forum_attachments' => true,
-            'open_enrollment'                 => true,
-            'self_enrollment'                 => true,
-            'license'                         => 'Creative Commons',
-            'sis_course_id'                   => '12345',
-            'public_description'              => 'Nature is lethal but it doesn\'t hold a candle to man.'
+            'name'                                 => 'Test Course',
+            'course_code'                          => 'Test Course',
+            'start_at'                             => '2011-01-01T00:00:00-0700',
+            'conclude_at'                          => '2011-05-01T00:00:00-0700',
+            'publish_grades_immediately'           => true,
+            'is_public'                            => true,
+            'allow_student_assignment_edits'       => true,
+            'allow_wiki_comments'                  => true,
+            'allow_student_forum_attachments'      => true,
+            'open_enrollment'                      => true,
+            'self_enrollment'                      => true,
+            'restrict_enrollments_to_course_dates' => true,
+            'license'                              => 'Creative Commons',
+            'sis_course_id'                        => '12345',
+            'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.'
           }
         }
         course_response = post_params['course'].merge({
@@ -139,7 +140,8 @@ describe CoursesController, :type => :integration do
         [:name, :course_code, :start_at, :conclude_at, :publish_grades_immediately,
         :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
         :open_enrollment, :self_enrollment, :license, :sis_course_id,
-        :allow_student_forum_attachments, :public_description].each do |attr|
+        :allow_student_forum_attachments, :public_description,
+        :restrict_enrollments_to_course_dates].each do |attr|
           [:start_at, :conclude_at].include?(attr) ?
             new_course.send(attr).should == Time.parse(post_params['course'][attr.to_s]) :
             new_course.send(attr).should == post_params['course'][attr.to_s]
