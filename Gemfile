@@ -69,7 +69,7 @@ end
 
 group :test do
   gem 'coffee-script'
-  gem 'coffee-script-source',  '1.1.2' #pinned so everyone's compiled output matches
+  gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
   gem 'parallelized_specs', '0.0.8'
@@ -84,7 +84,7 @@ end
 
 group :development do
   gem 'coffee-script'
-  gem 'coffee-script-source',  '1.1.2' #pinned so everyone's compiled output matches
+  gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'parallel',     '0.5.16'
   gem 'ruby-debug',   '0.10.4'
   gem 'ruby_parser', '2.0.6'
