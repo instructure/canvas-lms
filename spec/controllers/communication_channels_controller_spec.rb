@@ -127,6 +127,23 @@ describe CommunicationChannelsController do
         @cc.should be_active
       end
 
+      it "should properly validate pseudonym for a pre-registered user" do
+        user_with_pseudonym(:password => :autogenerate, :username => 'user')
+        @user.should be_pre_registered
+        get 'confirm', :nonce => @cc.confirmation_code
+        response.should render_template('confirm')
+        assigns[:pseudonym].should == @pseudonym
+        assigns[:merge_opportunities].should == []
+        @user.reload
+        @user.should_not be_registered
+
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1
+        response.should render_template('confirm')
+        assigns[:pseudonym].account_id.should_not be_nil
+        @user.reload
+        @user.should_not be_registered
+      end
+
       it "should not forget the account when registering for a non-default account" do
         @account = Account.create!
         @course = Course.create!(:account => @account) { |c| c.workflow_state = 'available' }
