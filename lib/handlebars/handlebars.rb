@@ -17,9 +17,20 @@ class Handlebars
     #   plugin (string) - Optional plugin to which the files belong. Will be
     #     used in scoping the generated module names. If absent, but a file is
     #     visibly under a plugin, the plugin for that file will be inferred.
-    def compile(root_path, compiled_path, plugin=nil)
-      files = Dir["#{root_path}/**/**.handlebars"]
-      files.each { |file| compile_file file, root_path, compiled_path, plugin }
+    #
+    # OR an array of such
+    def compile(*args)
+      require 'parallel'
+      unless args.first.is_a? Array
+        args = [args]
+      end
+      files = []
+      args.each do |(root_path, compiled_path, plugin)|
+        files.concat(Dir["#{root_path}/**/**.handlebars"].map { |file| [file, root_path, compiled_path, plugin] })
+      end
+      Parallel.each(files, :in_threads => Parallel.processor_count) do |file|
+        compile_file *file
+      end
     end
 
     # Compiles a single file into a destination directory.

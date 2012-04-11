@@ -5,12 +5,14 @@ namespace :jst do
   task :compile do
     require 'config/initializers/plugin_symlinks'
 
-    Handlebars.compile 'app/views/jst', 'public/javascripts/jst'
+    all_paths = []
+    all_paths <<  ['app/views/jst', 'public/javascripts/jst']
     Dir[Rails.root+'app/views/jst/plugins/*'].each do |input_path|
       plugin = input_path.sub(%r{.*app/views/jst/plugins/}, '')
       output_path = "public/plugins/#{plugin}/javascripts/jst"
-      Handlebars.compile input_path, output_path, plugin
+      all_paths << [input_path, output_path, plugin]
     end
+    Handlebars.compile *all_paths
   end
 end
 

@@ -63,20 +63,34 @@ module Guard
           Formatter.info(message, :reset => true)
         end
 
+        require 'parallel'
+        require 'lib/canvas/coffee_script'
         def compile_files(files, watchers, options)
           errors        = []
           changed_files = []
           directories   = detect_nested_directories(watchers, files, options)
 
-          directories.each do |directory, scripts|
-            scripts.each do |file|
-              begin
-                content = compile(file, options)
-                changed_files << write_javascript_file(content, file, directory, options)
-              rescue Exception => e
-                error_message = file + ': ' + e.message.to_s
-                errors << error_message
-                Formatter.error(error_message)
+          if Canvas::CoffeeScript.coffee_script_binary_is_available?
+            Parallel.each(directories.map, :in_threads => Parallel.processor_count) do |(directory, scripts)|
+              FileUtils.mkdir_p(File.expand_path(directory)) if !File.directory?(directory) && !options[:noop]
+              system('coffee', '-c', '-o', directory, *scripts)
+              if $?.exitstatus != 0
+                Formatter.error("Unable to compile coffeescripts in #{directory}")
+              else
+                changed_files.concat(scripts.map { |script| File.join(directory, File.basename(script.gsub(/(js\.coffee|coffee)$/, 'js'))) })
+              end
+            end
+          else
+            directories.each do |directory, scripts|
+              Parallel.each(scripts, :in_threads => Parallel.processor_count) do |file|
+                begin
+                  content = compile(file, options)
+                  changed_files << write_javascript_file(content, file, directory, options)
+                rescue Exception => e
+                  error_message = file + ': ' + e.message.to_s
+                  errors << error_message
+                  Formatter.error(error_message)
+                end
               end
             end
           end
