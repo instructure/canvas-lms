@@ -152,6 +152,9 @@ class ContentExport < ActiveRecord::Base
   
   named_scope :active, {:conditions => ['workflow_state != ?', 'deleted']}
   named_scope :not_for_copy, {:conditions => ['workflow_state != ?', 'exported_for_course_copy']}
+  named_scope :common_cartridge, {:conditions => ['export_type == ?', COMMON_CARTRIDGE]}
+  named_scope :qti, {:conditions => ['export_type == ?', QTI]}
+  named_scope :course_copy, {:conditions => ['export_type == ?', COURSE_COPY]}
   named_scope :running, {:conditions => ['workflow_state IN (?)', ['created', 'exporting']]}
 
   private

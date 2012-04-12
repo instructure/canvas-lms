@@ -1,12 +1,12 @@
-<% add_crumb t('crumbs.course_exports', "Course Exports") %>
-<% content_for :page_title do %><%= t :page_title, "Course Exports" %><% end %>
+<% add_crumb t('crumbs.course_exports', "Content Exports") %>
+<% content_for :page_title do %><%= t :page_title, "Content Exports" %><% end %>
 
 <% content_for :page_header do %>
-    <h1><%= t :page_title, "Course Exports" %></h1>
+    <h1><%= t :page_title, "Content Exports" %></h1>
 <% end %>
 
 <div>
-  <h2><%= t :page_title, "Course Exports" %></h2>
+  <h2><%= t :page_title, "Content Exports" %></h2>
   
   <div class="export_messages" style="<%= hidden %>">
     <div class="ui-state-error error_message"></div>
@@ -17,9 +17,15 @@
       <% unless export.running? %>
         <% if export.workflow_state == 'exported' #&& export.attachment %>
           <p>
-            <%= t 'links.download', "Course Export from %{date}: *Click here to download*",
-                    :date => "<span class=\"created_at time_ago_date\">#{datetime_string export.created_at}</span>".html_safe,
-                    :wrapper => link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
+            <% if export.export_type == 'common_cartridge' %>
+              <%= t 'links.download', "Course Export from %{date}: *Click here to download*",
+                      :date => "<span class=\"created_at time_ago_date\">#{datetime_string export.created_at}</span>".html_safe,
+                      :wrapper => link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
+            <% else %>
+              <%= t 'links.download_qti', "QTI Export from %{date}: *Click here to download*",
+                      :date => "<span class=\"created_at time_ago_date\">#{datetime_string export.created_at}</span>".html_safe,
+                      :wrapper => link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
+            <% end %>
           </p>
         <% end %>
       <% end %>
@@ -28,8 +34,22 @@
 
   <div class="form" style="<%= hidden if @current_export_id %>">
     <% form_tag course_content_exports_path(@context.id), :id => "exporter_form" do %>
-      <div style="float: left; margin-left: 5px;">
-        <button type="submit" class="submit_button button big-button"><%= t 'buttons.create', "Create a Course Export" %></button>
+      <fieldset>
+        <legend><%= t :export_type, "Export Type" %></legend>
+        <div>
+          <input type="radio" name="export_type" value="common_cartridge" id="cc_export_radio" checked>
+          <label for="cc_export_radio">Course</label>
+        </div>
+        <div>
+          <input type="radio" name="export_type" value="qti" id="qti_export_radio">
+          <label for="qti_export_radio">Quiz</label>
+          <div id="quiz_selection" style="display:none;">
+            <%= render :partial => 'quiz_export_checklist' %>
+          </div>
+        </div>
+      </fieldset>
+      <div>
+        <button type="submit" class="submit_button button big-button"><%= t 'buttons.create', "Create Export" %></button>
       </div>
       <div class="clear"></div>
     <% end %>

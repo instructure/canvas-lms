@@ -57,18 +57,6 @@ describe "courses" do
       checklist_button.should be_displayed
     end
 
-    it "should allow content export downloads" do
-      course_with_teacher_logged_in
-      get "/courses/#{@course.id}/content_exports"
-      driver.find_element(:css, "button.submit_button").click
-      Delayed::Job.last(:conditions => {:tag => 'ContentExport#export_course_without_send_later'})
-      export = keep_trying_until { ContentExport.last }
-      export.export_course_without_send_later
-      new_download_link = keep_trying_until { driver.find_element(:css, "div#exports a") }
-      url = new_download_link.attribute 'href'
-      url.should match(%r{/files/\d+/download\?verifier=})
-    end
-
     context "course copy" do
       def course_copy_helper
         course_with_teacher_logged_in

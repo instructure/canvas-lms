@@ -954,7 +954,7 @@ describe "security" do
         html.css('.section .files').should_not be_empty
         response.body.should_not match /Copy this Course/
         response.body.should_not match /Import Content into this Course/
-        response.body.should match /Export this Course/
+        response.body.should match /Export Course Content/
         response.body.should_not match /Delete this Course/
         response.body.should_not match /End this Course/
         html.css('#course_account_id').should be_empty
@@ -972,7 +972,7 @@ describe "security" do
         response.should be_success
         response.body.should match /Copy this Course/
         response.body.should_not match /Import Content into this Course/
-        response.body.should match /Export this Course/
+        response.body.should match /Export Course Content/
         response.body.should match /Delete this Course/
         html = Nokogiri::HTML(response.body)
         html.css('#course_account_id').should_not be_empty

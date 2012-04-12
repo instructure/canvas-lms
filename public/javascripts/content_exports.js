@@ -26,9 +26,11 @@ define([
 $(document).ready(function(event) {
   var state = 'nothing';
   var current_id = null;
+  var $quiz_selection = $('#quiz_selection'),
+      $exporter_form = $('#exporter_form');
 
   function startPoll() {
-    $("#exporter_form").html(I18n.t('messages.processing', "Processing") + "<div style='font-size: 0.8em;'>" + I18n.t('messages.this_may_take_a_bit', "this may take a bit...") + "</div>")
+    $exporter_form.html(I18n.t('messages.processing', "Processing") + "<div style='font-size: 0.8em;'>" + I18n.t('messages.this_may_take_a_bit', "this may take a bit...") + "</div>")
        .attr('disabled', true);
     $(".instruction").hide();
     $(".progress_bar_holder").slideDown();
@@ -61,15 +63,15 @@ $(document).ready(function(event) {
           $(".export_progress").progressbar('option', 'value', progress);
         }
         if(content_export.workflow_state == 'exported') {
-          $("#exporter_form").hide();
+          $exporter_form.hide();
           $(".export_progress").progressbar('option', 'value', 100);
-          $(".progress_message").html("The course has been exported.");
-          $("#exports").append('<p>' + I18n.t('labels.new_course_export', "New Course Export:") + ' <a href="' + content_export.download_url + '">' + I18n.t('links.download_plain', "Click here to download") + '</a> </p>')
+          $(".progress_message").html("Your content has been exported.");
+          $("#exports").append('<p>' + I18n.t('labels.new_export', "New Export:") + ' <a href="' + content_export.download_url + '">' + I18n.t('links.download_plain', "Click here to download") + '</a> </p>')
         } else if(content_export.workflow_state == 'failed') {
           code = "content_export_" + content_export.id;
           $(".progress_bar_holder").hide();
-          $("#exporter_form").hide();
-          var message = I18n.t('errors.error', "There was an error exporting your course.  Please notify your system administrator and give them the following export identifier: \"%{code}\"", {code: code});
+          $exporter_form.hide();
+          var message = I18n.t('errors.error', "There was an error exporting your content.  Please notify your system administrator and give them the following export identifier: \"%{code}\"", {code: code});
           $(".export_messages .error_message").html(message);
           $(".export_messages").show();
         } else {
@@ -89,7 +91,7 @@ $(document).ready(function(event) {
     setTimeout(tick, 1000)
   }
 
-  $("#exporter_form").formSubmit({
+  $exporter_form.formSubmit({
    success: function(data) {
      if(data && data.content_export) {
        current_id = data.content_export.id
@@ -103,6 +105,24 @@ $(document).ready(function(event) {
    error: function(data) {
      $(this).find(".submit_button").attr('disabled', false).text(I18n.t('buttons.process', "Process Data"));
    }
+  });
+
+  $exporter_form.delegate('.copy_all', 'click', function() {
+    $('.quiz_item').prop('checked', $(this).prop('checked'));
+  });
+
+  $exporter_form.delegate('.quiz_item', 'click', function() {
+    if( !$(this).prop('checked') ){
+      $('.copy_all').prop('checked', false);
+    }
+  });
+
+  $exporter_form.delegate('input[name=export_type]', 'click', function() {
+    if( $(this).val() === 'qti' ) {
+      $quiz_selection.show();
+    } else {
+      $quiz_selection.hide();
+    }
   });
 
   function check_if_exporting() {

@@ -48,7 +48,12 @@ class ContentExportsController < ApplicationController
       export.course = @context
       export.user = @current_user
       export.workflow_state = 'created'
-      export.export_type = ContentExport::COMMON_CARTRIDGE
+      if params[:export_type] == 'qti'
+        export.export_type = ContentExport::QTI
+        export.selected_content = params[:copy]
+      else
+        export.export_type = ContentExport::COMMON_CARTRIDGE
+      end
       export.progress = 0
       if export.save
         export.export_course
