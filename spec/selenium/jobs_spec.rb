@@ -20,6 +20,7 @@ describe "jobs ui" do
 
     it "should not action if no rows are selected" do
       get "/jobs"
+      wait_for_ajax_requests
       f("#hold-jobs").click
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.accept
@@ -28,6 +29,7 @@ describe "jobs ui" do
 
     it "should confirm that all rows were selected" do
       get "/jobs"
+      wait_for_ajax_requests
       f("#select-all-jobs").click
       f("#hold-jobs").click
       driver.switch_to.alert.should_not be_nil
