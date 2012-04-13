@@ -166,15 +166,26 @@ describe CalendarEvent do
       g2 = @course.appointment_groups.create(:title => "foo", :sub_context_code => @course.default_section.asset_string)
       g2.publish!
       a2 = g2.appointments.create.reserve_for(@student, @student)
+      pe = @course.calendar_events.create!
+      section = @course.default_section
+      se = pe.child_events.build
+      se.context = section
+      se.save!
 
       CalendarEvent.for_user_and_context_codes(@student, [@student.asset_string]).sort_by(&:id).
         should eql [@e2] # none of the appointments even though they technically are on the user
 
+      CalendarEvent.for_user_and_context_codes(@student, [section.asset_string]).sort_by(&:id).
+        should eql [] # none of the appointments even though they technically are on the section
+
       CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string, @student.asset_string]).sort_by(&:id).
-        should eql [@e1, @e2, a1, a2]
+        should eql [@e1, @e2, a1, a2, pe]
 
       CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).sort_by(&:id).
-        should eql [@e1, a1, a2]
+        should eql [@e1, a1, a2, pe]
+
+      CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string], [section.asset_string]).sort_by(&:id).
+        should eql [@e1, a1, a2, pe, se]
     end
   end
 
@@ -488,45 +499,10 @@ describe CalendarEvent do
   end
 
   context "child_events" do
-    it "should copy all attributes when creating a locked child event" do
-      calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
-      child = @event.child_events.build
-      child.context = user
-      child.workflow_state = :locked
-      child.save!
-      child.start_at.should eql @event.start_at
-      child.title.should eql @event.title
-    end
-
-    it "should update locked child events whenever the parent is updated" do
-      calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
-      child = @event.child_events.build
-      child.context = user
-      child.workflow_state = :locked
-      child.save!
-
-      @event.title = 'asdf'
-      @event.save!
-      child.reload.title.should eql 'asdf'
-    end
-
-    it "should disregard attempted changes to locked attributes" do
-      calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
-      child = @event.child_events.build
-      child.context = user
-      child.workflow_state = :locked
-      child.save!
-
-      child.title = 'asdf'
-      child.save!
-      child.title.should eql 'some event'
-    end
-
     it "should delete child events when deleting the parent" do
       calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
       child = @event.child_events.build
       child.context = user
-      child.workflow_state = :locked
       child.save!
 
       @event.destroy
@@ -535,18 +511,196 @@ describe CalendarEvent do
       child.reload.should be_deleted
     end
 
-    it "should unlock events when the last child is deleted" do
-      calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
-      @event.workflow_state = :locked
-      @event.save!
-      child = @event.child_events.build
-      child.context = user
-      child.workflow_state = :locked
-      child.save!
+    context "bulk updating" do
+      before do
+        course_with_teacher
+      end
 
-      child.destroy
-      @event.reload.should be_active
-      child.reload.should be_deleted
+      it "should validate child events" do
+        lambda {
+          @course.calendar_events.create! :title => "ohai",
+            :child_event_data => [
+              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string}
+            ]
+        }.should raise_error(/Can't update child events unless an updating_user is set/)
+
+        lambda {
+          event = @course.calendar_events.build :title => "ohai",
+            :child_event_data => [
+              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => "invalid_1"}
+            ]
+          event.updating_user = @user
+          event.save!
+        }.should raise_error(/Invalid child event context/)
+
+        lambda {
+          event = @course.calendar_events.build :title => "ohai",
+            :child_event_data => [
+              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => CourseSection.create.asset_string}
+            ]
+          event.updating_user = @user
+          event.save!
+        }.should raise_error(/Invalid child event context/)
+
+        lambda {
+          event = @course.calendar_events.build :title => "ohai",
+            :child_event_data => [
+              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
+              {:start_at => "2012-01-01 13:00:00", :end_at => "2012-01-01 14:00:00", :context_code => @course.default_section.asset_string}
+            ]
+          event.updating_user = @user
+          event.save!
+        }.should raise_error(/Duplicate child event contexts/)
+      end
+
+      it "should create child events" do
+        s2 = @course.course_sections.create!
+        e1 = @course.calendar_events.build :title => "ohai",
+          :child_event_data => [
+            {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
+            {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string},
+          ]
+        e1.updating_user = @user
+        e1.save!
+
+        e1.reload
+        events = e1.child_events.sort_by(&:id)
+        events.map(&:context_code).should eql [@course.default_section.asset_string, s2.asset_string]
+        events.map(&:effective_context_code).uniq.should eql [@course.asset_string]
+        e1.start_at.should eql events.first.start_at
+        e1.end_at.should eql events.last.end_at
+      end
+
+      it "should update child events" do
+        s2 = @course.course_sections.create!
+        s3 = @course.course_sections.create!
+        e1 = @course.calendar_events.build :title => "ohai",
+          :child_event_data => [
+            {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
+            {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string},
+          ]
+        e1.updating_user = @user
+        e1.save!
+        e1.reload
+        events1 = e1.child_events.sort_by(&:id)
+
+        e1.update_attributes :child_event_data => [
+            {:start_at => "2012-01-01 13:00:00", :end_at => "2012-01-01 14:00:00", :context_code => @course.default_section.asset_string},
+            {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s3.asset_string},
+          ]
+        e1.reload
+        events2 = e1.child_events.sort_by(&:id)
+        events2.size.should eql 2
+
+        events1.first.reload.should eql events2.first
+        events1.last.reload.should be_deleted
+      end
+
+      it "should delete all child events" do
+        s2 = @course.course_sections.create!
+        s3 = @course.course_sections.create!
+        e1 = @course.calendar_events.build :title => "ohai",
+          :child_event_data => [
+            {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
+            {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string},
+          ]
+        e1.updating_user = @user
+        e1.save!
+        e1.reload
+        e1.update_attributes :remove_child_events => true
+        e1.child_events.reload.should be_empty
+      end
+    end
+
+    context "cascading" do
+      it "should copy cascaded attributes when creating a child event" do
+        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        child = @event.child_events.build
+        child.context = user
+        child.save!
+        child.start_at.should be_nil
+        child.title.should eql @event.title
+      end
+  
+      it "should update cascaded attributes on the child events whenever the parent is updated" do
+        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        child = @event.child_events.build
+        child.context = user
+        child.save!
+        child.reload
+        orig_start_at = child.start_at
+  
+        @event.title = 'asdf'
+        @event.start_at = Time.now.utc
+        @event.save!
+        child.reload.title.should eql 'asdf'
+        child.start_at.should eql orig_start_at
+      end
+  
+      it "should disregard attempted changes to cascaded attributes" do
+        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        child = @event.child_events.build
+        child.context = user
+        child.save!
+        child.reload
+        orig_start_at = child.start_at
+
+        child.title = 'asdf'
+        child.start_at = Time.now.utc
+        child.save!
+        child.title.should eql 'some event'
+        child.start_at.should_not eql orig_start_at
+      end
+    end
+
+    context "locking" do
+      it "should copy all attributes when creating a locked child event" do
+        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        child = @event.child_events.build
+        child.context = user
+        child.workflow_state = :locked
+        child.save!
+        child.start_at.should eql @event.start_at
+        child.title.should eql @event.title
+      end
+  
+      it "should update locked child events whenever the parent is updated" do
+        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        child = @event.child_events.build
+        child.context = user
+        child.workflow_state = :locked
+        child.save!
+  
+        @event.title = 'asdf'
+        @event.save!
+        child.reload.title.should eql 'asdf'
+      end
+  
+      it "should disregard attempted changes to locked attributes" do
+        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        child = @event.child_events.build
+        child.context = user
+        child.workflow_state = :locked
+        child.save!
+  
+        child.title = 'asdf'
+        child.save!
+        child.title.should eql 'some event'
+      end
+  
+      it "should unlock events when the last child is deleted" do
+        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        @event.workflow_state = :locked
+        @event.save!
+        child = @event.child_events.build
+        child.context = user
+        child.workflow_state = :locked
+        child.save!
+  
+        child.destroy
+        @event.reload.should be_active
+        child.reload.should be_deleted
+      end
     end
   end
 end

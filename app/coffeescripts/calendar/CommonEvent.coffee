@@ -22,7 +22,7 @@ define [
       @object?.appointment_group_url
 
     contextCode: () =>
-      @object?.context_code || @contextInfo?.asset_string
+      @object?.effective_context_code || @object?.context_code || @contextInfo?.asset_string
 
     isUndated: () =>
       @start == null
