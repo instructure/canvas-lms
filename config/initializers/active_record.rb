@@ -37,18 +37,25 @@ class ActiveRecord::Base
   end
 
   def self.find_by_asset_string(string, asset_types)
-    code = string.split("_")
-    id = code.pop
-    code.join("_").classify.constantize.find(id) rescue nil
+    find_all_by_asset_string([string], asset_types)[0]
+  end
+
+  def self.find_all_by_asset_string(strings, asset_types=nil)
+    # TODO: start checking asset_types, if provided
+    strings.map{ |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
+      result.concat((klass.constantize.find_all_by_id(id_pairs.map(&:last)) rescue []))
+    end
   end
 
   # takes an asset string list, like "course_5,user_7" and turns it into an
   # array of [class_name, id] like [ ["Course", 5], ["User", 7] ]
   def self.parse_asset_string_list(asset_string_list)
-    asset_string_list.to_s.split(",").map do |str|
-      code = str.split("_", 2)
-      [code.first.classify, code.last.to_i]
-    end
+    asset_string_list.to_s.split(",").map { |str| parse_asset_string(str) }
+  end
+
+  def self.parse_asset_string(str)
+    code = str.split(/_(\d+)\z/)
+    [code.first.classify, code.last.to_i]
   end
 
   def self.initialize_by_asset_string(string, asset_types)

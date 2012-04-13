@@ -11,7 +11,7 @@ define [
       obj.allPossibleContexts = contexts
       return obj
 
-    context_code = data.context_code || data.assignment?.context_code || data.calendar_event?.context_code
+    context_code = data.effective_context_code || data.context_code
 
     type = null
     if data.assignment || data.assignment_group_id
@@ -20,6 +20,7 @@ define [
       type = 'calendar_event'
 
     data = data.assignment || data.calendar_event || data
+    context_code ?= data.effective_context_code || data.context_code
 
     contextInfo = null
     for context in contexts
