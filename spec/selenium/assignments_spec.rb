@@ -50,8 +50,7 @@ describe "assignments" do
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
       driver.find_element(:id, 'assignment_points_possible').send_keys('5')
-      driver.
-          find_element(:id, 'add_assignment_form').submit
+      driver.find_element(:id, 'add_assignment_form').submit
 
       #make sure assignment was added to correct assignment group
       wait_for_animations
@@ -277,14 +276,35 @@ describe "assignments" do
     DUE_DATE = Time.now.utc + 2.days
     before (:each) do
       course_with_student_logged_in
-      @assignment = @course.assignments.create(:name => 'assignment', :due_at => DUE_DATE)
+      @assignment = @course.assignments.create!(:name => 'assignment', :due_at => DUE_DATE)
+    end
+
+    it "should allow you to submit a file" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+      filename, fullpath, data = get_file("testfile1.txt")
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      f('.submission_attachment input').send_keys(fullpath)
+      f('#submission_comment').send_keys("hello comment")
+      f('#submit_file_button').click
+      wait_for_ajax_requests
+      wait_for_dom_ready
+
+      keep_trying_until {
+        f('#sidebar_content .header').should include_text "Turned In!"
+        f('.details .file-big').should include_text "testfile1"
+      }
+      @submission = @assignment.reload.submissions.find_by_user_id(@student.id)
+      @submission.submission_type.should == 'online_upload'
+      @submission.attachments.length.should == 1
+      @submission.workflow_state.should == 'submitted'
     end
 
     it "should not allow a user to submit a file-submission assignment without attaching a file" do
-      @assignment = @course.assignments.create!(
-        :name => 'test assignment',
-        :due_at => Time.now.utc + 2.days,
-        :submission_types => 'online_upload')
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
