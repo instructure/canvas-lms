@@ -94,11 +94,11 @@
     </div>
     <div class="more_options_holder">
       <% if show_course_only_options?(@context) %>
-        <div style="float: left;">
+        <div style="display:inline-block;">
           <%= check_box :discussion_topic, :delay_posting, :class => "delay_posting" %>
           <%= label :discussion_topic, :delay_posting, :en => "Delay posting this message" %>
         </div>
-        <div class="delay_posting_option" style="display: none; float: left;">
+        <div class="delay_posting_option" style="display:inline-block;">
           &nbsp;<%= t('delay_until', %{until}) %> 
           <%= text_field :discussion_topic, :delayed_post_at, :style => "width: 100px;", :class => 'datetime_field delayed_post_at_value' %>
         </div>
