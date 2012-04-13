@@ -39,7 +39,7 @@ define [
       #      click to call someMethod on an EntryView instance
       #   </div>
       #
-      'click .entry [data-event]': 'handleEntryEvent'
+      'click .entry': 'handleEntryEvent'
 
     ##
     # Initializes a new EntryView
@@ -125,16 +125,19 @@ define [
     # @api private
     handleEntryEvent: (event) ->
       # get the element and the method to call
-      el = $ event.currentTarget
+      el = $(event.target).closest '[data-event]'
+      return unless el.length
       method = el.data 'event'
 
       # get the EntryView instance ID
-      modelEl = el.parents ".#{EntryView::className}:first"
+      modelEl = $(event.currentTarget)
       id = modelEl.data 'id'
 
       # call the method from the EntryView, sets the context to the view
       # so you can access everything in the method like it was called
       # from a normal backbone event
       instance = EntryView.instances[id]
-      instance[method].call instance, event, el
+      instance[method](event, el)
 
+      # we already handled it, dont let it bubble up to the entries I am nested in
+      false
