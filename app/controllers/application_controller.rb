@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include AuthenticationMethods
   protect_from_forgery
   before_filter :load_account, :load_user
+  before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :clear_cached_contexts
   before_filter :set_page_view
@@ -109,6 +110,11 @@ class ApplicationController < ActionController::Base
 
   def set_ua_header
     headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
+  end
+
+  def set_user_id_header
+    headers['X-Canvas-User-Id'] = @current_user.global_id.to_s if @current_user
+    headers['X-Canvas-Real-User-Id'] = @real_current_user.global_id.to_s if @real_current_user
   end
 
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
