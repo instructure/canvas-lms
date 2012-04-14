@@ -40,4 +40,41 @@ describe "site-wide" do
     get "/"
     response['x-ua-compatible'].should == "IE=edge,chrome=1"
   end
+
+  context "user headers" do
+    before(:each) do
+      course_with_teacher
+      @teacher = @user
+
+      student_in_course
+      @student = @user
+      user_with_pseudonym :user => @student, :username => 'student@example.com', :password => 'password'
+      @student_pseudonym = @pseudonym
+
+      account_admin_user :account => Account.site_admin
+      @admin = @user
+      user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
+    end
+
+    it "should not set the logged in user headers when no one is logged in" do
+      get "/"
+      response['x-canvas-user-id'].should be_nil
+      response['x-canvas-real-user-id'].should be_nil
+    end
+
+    it "should set them when a user is logged in" do
+      user_session(@student, @student_pseudonym)
+      get "/"
+      response['x-canvas-user-id'].should == @student.global_id.to_s
+      response['x-canvas-real-user-id'].should be_nil
+    end
+
+    it "should set them when masquerading" do
+      user_session(@admin, @admin.pseudonyms.first)
+      post "/users/#{@student.id}/masquerade"
+      get "/"
+      response['x-canvas-user-id'].should == @student.global_id.to_s
+      response['x-canvas-real-user-id'].should == @admin.global_id.to_s
+    end
+  end
 end
