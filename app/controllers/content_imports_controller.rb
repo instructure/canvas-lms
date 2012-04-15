@@ -24,6 +24,10 @@ class ContentImportsController < ApplicationController
   
   include Api::V1::Course
 
+  COPY_TYPES = %w{assignment_groups assignments context_modules learning_outcomes
+                quizzes assessment_question_banks folders attachments wiki_pages discussion_topics
+                calendar_events context_external_tools learning_outcome_groups rubrics}
+
   def add_imports_crumb
     if @context.is_a?(Course)
       add_crumb(t('crumbs.content_imports', "Content Imports"), named_context_url(@context, :context_imports_url))
@@ -137,25 +141,14 @@ class ContentImportsController < ApplicationController
       end
     end
   end
-  
+
   def migrate_content_execute
     if authorized_action(@context, @current_user, :manage_content)
       migration_id = params[:id] || params[:copy] && params[:copy][:content_migration_id]
       @content_migration = ContentMigration.find_by_context_id_and_context_type_and_id(@context.id, @context.class.to_s, migration_id) if migration_id.present?
       @content_migration ||= ContentMigration.find_by_context_id_and_context_type(@context.id, @context.class.to_s, :order => "id DESC")
       if request.method == :post
-        if params[:items_to_copy]
-          params[:copy] ||= {}
-          params[:items_to_copy].each_pair do |key, vals|
-            params[:copy][key] ||= {}
-            if vals && ! vals.empty?
-              vals.each do |val|
-                params[:copy][key][val] = true
-              end
-            end
-          end
-          params.delete :items_to_copy
-        end
+        process_migration_params
         @content_migration.migration_settings[:migration_ids_to_import] = params
         @content_migration.save
         @content_migration.import_content
@@ -165,31 +158,52 @@ class ContentImportsController < ApplicationController
       end
     end
   end
-  
-  def copy_course
+
+  def choose_content
     if authorized_action(@context, @current_user, :manage_content)
-      if params[:import_id]
-        @import = CourseImport.for_course(@context, 'instructure_copy').find(params[:import_id])
-        @copy_context = @import.source
-        @copies = @import.added_item_codes
-        @results = @import.log
-        respond_to do |format|
-          format.html { render :action => 'copy_course_content' }
-        end
-      else
-        course_id = params[:copy] && params[:copy][:course_id].to_i
-        course_id = params[:copy][:autocomplete_course_id].to_i if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
-        @copy_context = @current_user.manageable_courses.scoped(
-          :conditions => ["id = ? AND id <> ?", course_id, @context.id],
-          :include => :enrollment_term).first if course_id
-        if !@copy_context
-          @copy_context ||= Course.find_by_id(course_id) if course_id.present?
-          @copy_context = nil if @copy_context && !@copy_context.grants_rights?(@current_user, session, :manage)
-        end
+      find_source_course
+      if @source_course
         respond_to do |format|
           format.html
         end
+      else
+        respond_to do |format|
+          flash[:notice] = t('notices.choose_a_course', "Choose a course to copy")
+          format.html { redirect_to course_import_choose_course_url(@context) }
+        end
       end
+    end
+  end
+
+  def copy_course_checklist
+    if authorized_action(@context, @current_user, :manage_content)
+      find_source_course
+      if @source_course
+        render :json => {:selection_list => render_to_string(:partial => 'copy_course_item_selection', :layout => false)}
+      else
+        render.html ""
+      end
+    end
+  end
+
+  def copy_course_finish
+    if authorized_action(@context, @current_user, :manage_content)
+      cm = ContentMigration.find_by_context_id_and_id(@context.id, params[:content_migration_id])
+      @source_course = cm.source_course
+      @copies = []
+    end
+  end
+
+  def choose_course
+    if authorized_action(@context, @current_user, :manage_content)
+    end
+  end
+
+  def find_source_course
+    if params[:source_course]
+      course_id = params[:source_course].to_i
+      @source_course = Course.find_by_id(course_id)
+      @source_course = nil if @source_course && !@source_course.grants_rights?(@current_user, session, :manage)
     end
   end
   
@@ -208,15 +222,17 @@ class ContentImportsController < ApplicationController
   # @response_field status_url The url for the course copy status API endpoint.
   #
   # @example_response
-  #   {'status':'completed', 'workflow_state':100, 'id':257, 'created_at':'2011-11-17T16:50:06Z', 'status_url':'/api/v1/courses/9457/course_copy/257'}
+  #   {'progress':100, 'workflow_state':'completed', 'id':257, 'created_at':'2011-11-17T16:50:06Z', 'status_url':'/api/v1/courses/9457/course_copy/257'}
   def copy_course_status
     if api_request?
       @context = api_find(Course, params[:course_id])
     end
     if authorized_action(@context, @current_user, :manage_content)
-      import = @context.course_imports.find(params[:id])
+      cm = ContentMigration.find_by_context_id_and_id(@context.id, params[:id])
+      raise ActiveRecord::RecordNotFound unless cm
+
       respond_to do |format|
-        format.json { render :json => copy_status_json(import, @context, @current_user, session)}
+        format.json { render :json => copy_status_json(cm, @context, @current_user, session)}
       end
     end
   end
@@ -246,41 +262,33 @@ class ContentImportsController < ApplicationController
     
     if authorized_action(@context, @current_user, :manage_content)
       if api_request?
-        @copy_context = api_find(Course, params[:source_course])
+        @source_course = api_find(Course, params[:source_course])
         copy_params = {:everything => false}
         if params[:only] && params[:except]
           render :json => {"errors"=>t('errors.no_only_and_except', 'You can not use "only" and "except" options at the same time.')}.to_json, :status => :bad_request
           return
         elsif params[:only]
-          params[:only].each {|o| copy_params["all_#{o}".to_sym] = true}
+          convert_to_table_name(params[:only]).each {|o| copy_params["all_#{o}".to_sym] = true}
         elsif params[:except]
-          Course::COPY_OPTIONS.each {|o| copy_params[o] = true}
-          params[:except].each {|o| copy_params["all_#{o}".to_sym] = false}
+          COPY_TYPES.each {|o| copy_params["all_#{o}".to_sym] = true}
+          convert_to_table_name(params[:except]).each {|o| copy_params["all_#{o}".to_sym] = false}
         else
           copy_params[:everything] = true
         end
       else
-        if params[:copy] && params[:items_to_copy]
-          params[:items_to_copy].each do |item|
-            params[:copy][item] = true
-          end
-          params.delete :items_to_copy
-        end
-        @copy_context = Course.find(params[:copy][:course_id])
+        process_migration_params
+        @source_course = Course.find(params[:source_course])
         copy_params = params[:copy]
       end
-      
+
       # make sure the user can copy from the source course
-      return render_unauthorized_action unless @copy_context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
-      
-      @import = CourseImport.create!(:import_type => "instructure_copy", :source => @copy_context, :course => @context, :parameters => copy_params)
-      @import.perform_later
-      respond_to do |format|
-        format.json { render :json => copy_status_json(@import, @context, @current_user, session) }
-      end
+      return render_unauthorized_action unless @source_course.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+      cm = ContentMigration.create!(:context => @context, :user => @current_user, :source_course => @source_course, :copy_options => copy_params)
+      cm.copy_course
+      render :json => copy_status_json(cm, @context, @current_user, session)
     end
   end
-  
+
   def review
     if authorized_action(@context, @current_user, :manage_content)
       @root_folders = Folder.root_folders(@context)
@@ -338,4 +346,32 @@ class ContentImportsController < ApplicationController
       end
     end
   end
+
+  def process_migration_params
+    if params[:items_to_copy]
+      params[:copy] ||= {}
+      params[:items_to_copy].each_pair do |key, vals|
+        params[:copy][key] ||= {}
+        if vals && !vals.empty?
+          vals.each do |val|
+            params[:copy][key][val] = true
+          end
+        end
+      end
+      params.delete :items_to_copy
+    end
+  end
+
+  SELECTION_CONVERSIONS = {
+          "external_tools" => "context_external_tools",
+          "files" => "attachments",
+          "topics" => "discussion_topics",
+          "modules" => "context_modules",
+          "outcomes" => "learning_outcomes"
+  }
+  # convert types selected in API to expected format
+  def convert_to_table_name(selections)
+    selections.map{|s| SELECTION_CONVERSIONS[s] || s}
+  end
+
 end

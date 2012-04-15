@@ -19,6 +19,7 @@
 class EportfoliosController < ApplicationController
   include EportfolioPage
   before_filter :require_user, :only => [:index, :user_index]
+  before_filter :reject_student_view_student
   
   def index
     user_index

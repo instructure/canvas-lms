@@ -998,6 +998,10 @@ define([
                 $files_structure.find(".collaboration_" + collab.id).each(function() {
                   var folder = files.itemData($(this).parent("ul").parent("li"));
                   $(this).fillTemplateData({data: {'name': data.collaboration.title}});
+
+                  // add 'title="this is the filename.txt" so you can read files/folders that have really long names
+                  if (data.collaboration.title) $(this).find('.name').attr('title', data.collaboration.title);
+
                 });
                 found = true;
               }
@@ -1010,6 +1014,10 @@ define([
               $collab.addClass('collaboration collaboration_' + collab.id + ' ' + collab.collaboration_type);
               collab.name = collab.title;
               $collab.fillTemplateData({data: collab});
+
+              // add 'title="this is the filename.txt" so you can read files/folders that have really long names
+              if (collab.title) $collab.find('.name').attr('title', collab.title);
+
               $files_structure.find("." + context_string + " .collaborations").children("ul").prepend($collab.show());
             }
           }
@@ -1035,6 +1043,10 @@ define([
                     var folder = files.itemData($(this).parent("ul").parent("li"));
                     if(folder.id == data.attachment.folder_id) {
                       $(this).fillTemplateData({data: {'name': data.attachment.display_name}});
+
+                      // add 'title="this is the filename.txt" so you can read files/folders that have really long names
+                      if (data.attachment.display_name) $(this).find('.name').attr('title', data.attachment.display_name);
+
                     } else {
                       moved = true;
                     }
@@ -1057,6 +1069,10 @@ define([
               $file.addClass(attachment.mime_class);
               attachment.name = attachment.display_name;
               $file.fillTemplateData({data: attachment});
+
+              // add 'title="this is the filename.txt" so you can read files/folders that have really long names
+              if (attachment.name) $file.find('.name').attr('title', attachment.name);
+
               $files_structure.find(".folder_" + attachment.folder_id).children("ul").append($file.show());
             }
           }
@@ -1091,7 +1107,9 @@ define([
                   folder = folder || {parent_folder_id: null};
                   if(folder.id == data.folder.parent_folder_id) {
                     if(!$(this).hasClass('context')) {
-                      $(this).children(".name").text(data.folder.name);
+                      $(this).children(".name").text(data.folder.name)
+                        // add 'title="this is the filename.txt" so you can read files/folders that have really long names
+                        .attr('title', data.folder.name);
                     }
                     if(!already_in_place) {
                       $(this).prev("li.separator").remove();

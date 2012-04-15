@@ -33,7 +33,7 @@ define([
       $.when.apply($, thingsToWaitOn).done(function() {
         var dataKey      = 'disabled_' + $.guid++,
             $disabledArea    = $this.add($this.next('.ui-dialog-buttonpane')),
-            $inputsToDisable = $disabledArea.find('*').andSelf().filter(':input').not(':disabled'),
+            $inputsToDisable = $disabledArea.find('*').andSelf().filter(':input').not(':disabled,[type=file]'),
             $foundSpinHolder = $this.find('.spin_holder'),
             $spinHolder = $foundSpinHolder.length ? $foundSpinHolder : $this,
             previousSpinHolderDisplay = $spinHolder.css('display'),

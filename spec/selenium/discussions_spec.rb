@@ -143,6 +143,26 @@ describe "discussions" do
       get_all_replies.count.should == 1
       @last_entry.find_element(:css, '.author').text.should == @user.name
     end
+
+    it "should allow student view student to read/post" do
+      enter_student_view
+      create_and_go_to_topic
+      get_all_replies.count.should == 0
+      add_reply
+      get_all_replies.count.should == 1
+    end
+
+    # note: this isn't desirable, but it's the way it is for this release
+    it "should show student view posts to teacher and other students" do
+      @fake_student = @course.student_view_student
+      @topic = @course.discussion_topics.create!
+      @entry = @topic.reply_from(:user => @fake_student, :text => 'i am a figment of your imagination')
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      get_all_replies.first.should include_text @fake_student.name
+    end
   end
 
   context "discussions as a student" do

@@ -176,7 +176,7 @@ describe AssignmentsController do
       rescue_action_in_public!
       #controller.use_rails_error_handling!
       course_with_student(:active_all => true)
-      get 'new', :course_id => @course.id, :model_key => "agwgeaweg"
+      get 'new', :course_id => @course.id
       assert_unauthorized
     end
   end

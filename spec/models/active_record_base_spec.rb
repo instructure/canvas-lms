@@ -231,4 +231,46 @@ describe ActiveRecord::Base do
       batches.should == [ ids[0,2], ids[2,2], ids[4,1] ]
     end
   end
+
+  context "after_transaction_commit" do
+    self.use_transactional_fixtures = false
+
+    it "should execute the callback immediately if not in a transaction" do
+      a = 0
+      User.connection.after_transaction_commit { a += 1 }
+      a.should == 1
+    end
+
+    it "should execute the callback after commit if in a transaction" do
+      a = 0
+      User.connection.transaction do
+        User.connection.after_transaction_commit { a += 1 }
+        a.should == 0
+      end
+      a.should == 1
+    end
+
+    it "should not execute the callbacks on rollback" do
+      a = 0
+      User.connection.transaction do
+        User.connection.after_transaction_commit { a += 1 }
+        a.should == 0
+        raise ActiveRecord::Rollback
+      end
+      a.should == 0
+      User.connection.transaction do
+        # verify that the callback gets cleared out, so this second transaction won't trigger it
+      end
+      a.should == 0
+    end
+
+    it "should avoid loops due to callbacks causing a new transaction" do
+      a = 0
+      User.connection.transaction do
+        User.connection.after_transaction_commit { User.connection.transaction { a += 1 } }
+        a.should == 0
+      end
+      a.should == 1
+    end
+  end
 end

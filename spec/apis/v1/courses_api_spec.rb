@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 class TestCourseApi
   include Api::V1::Course
@@ -123,7 +124,8 @@ describe CoursesController, :type => :integration do
             'open_enrollment'                 => true,
             'self_enrollment'                 => true,
             'license'                         => 'Creative Commons',
-            'sis_course_id'                   => '12345'
+            'sis_course_id'                   => '12345',
+            'public_description'              => 'Nature is lethal but it doesn\'t hold a candle to man.'
           }
         }
         course_response = post_params['course'].merge({
@@ -137,7 +139,7 @@ describe CoursesController, :type => :integration do
         [:name, :course_code, :start_at, :conclude_at, :publish_grades_immediately,
         :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
         :open_enrollment, :self_enrollment, :license, :sis_course_id,
-        :allow_student_forum_attachments].each do |attr|
+        :allow_student_forum_attachments, :public_description].each do |attr|
           [:start_at, :conclude_at].include?(attr) ?
             new_course.send(attr).should == Time.parse(post_params['course'][attr.to_s]) :
             new_course.send(attr).should == post_params['course'][attr.to_s]
@@ -499,6 +501,28 @@ describe CoursesController, :type => :integration do
             { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
     json['id'].should == @course1.id
   end
+
+  context "course files" do
+    it_should_behave_like "file uploads api with folders"
+
+    def preflight(preflight_params)
+      @user = @teacher
+      api_call(:post, "/api/v1/courses/#{@course.id}/files",
+        { :controller => "courses", :action => "create_file", :format => "json", :course_id => @course.to_param, },
+        preflight_params)
+    end
+
+    def context
+      @course
+    end
+
+    it "should require the correct permission to upload" do
+      @user = student_in_course(:course => @course).user
+      api_call(:post, "/api/v1/courses/#{@course.id}/files",
+        { :controller => "courses", :action => "create_file", :format => "json", :course_id => @course.to_param, },
+        { :name => 'failboat.txt' }, {}, :expected_status => 401)
+    end
+  end
 end
 
 def each_copy_option
@@ -524,7 +548,7 @@ describe ContentImportsController, :type => :integration do
     @copy_from.calendar_events.create!(:title => 'event', :description => 'hi', :start_at => 1.day.from_now)
     @copy_from.context_modules.create!(:name => "a module")
     @copy_from.quizzes.create!(:title => 'quiz')
-    LearningOutcomeGroup.default_for(@copy_from).add_item(@copy_from.learning_outcomes.create!(:short_description => 'oi'))
+    LearningOutcomeGroup.default_for(@copy_from).add_item(@copy_from.learning_outcomes.create!(:short_description => 'oi', :context => @copy_from))
     @copy_from.save
     
     course_with_teacher(:active_all => true, :name => 'whatever', :user => @user)
@@ -540,12 +564,12 @@ describe ContentImportsController, :type => :integration do
             { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
     {:source_course => from_id}.merge(options))
 
-    import = CourseImport.last(:order => :id)
+    cm = ContentMigration.last(:order => :id)
     data.should == {
-      'id' => import.id,
+      'id' => cm.id,
       'progress' => nil,
-      'status_url' => "http://www.example.com/api/v1/courses/#{@copy_to.to_param}/course_copy/#{import.id}",
-      'created_at' => import.created_at.as_json,
+      'status_url' => "http://www.example.com/api/v1/courses/#{@copy_to.to_param}/course_copy/#{cm.id}",
+      'created_at' => cm.created_at.as_json,
       'workflow_state' => 'created',
     }
 
@@ -559,7 +583,10 @@ describe ContentImportsController, :type => :integration do
     end
     
     dj.invoke_job
-    
+    cm.reload
+    cm.migration_settings[:warnings].should == nil
+    cm.content_export.error_messages.should == []
+
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
     (JSON.parse(response.body)).tap do |res|
       res['workflow_state'].should == 'completed'
@@ -592,6 +619,7 @@ describe ContentImportsController, :type => :integration do
   def check_counts(expected_count, skip = nil)
     each_copy_option do |option, association|
       next if skip && option == skip
+      next if !Qti.qti_enabled? && association == :quizzes
       @copy_to.send(association).count.should == expected_count
     end
   end
@@ -643,7 +671,7 @@ describe ContentImportsController, :type => :integration do
     run_only_copy(:course_settings)
     check_counts 0
     @copy_to.reload
-    @copy_to.syllabus_body.should == "haha"
+    @copy_to.syllabus_body.should == "<p>haha</p>"
   end
   it "should only copy wiki pages" do
     run_only_copy(:wiki_pages)
@@ -652,6 +680,7 @@ describe ContentImportsController, :type => :integration do
   end
   each_copy_option do |option, association|
     it "should only copy #{option}" do
+      pending if !Qti.qti_enabled? && association == :quizzes
       run_only_copy(option)
       @copy_to.send(association).count.should == 1
       check_counts(0, option)
@@ -676,5 +705,4 @@ describe ContentImportsController, :type => :integration do
       check_counts(1, option)
     end
   end
-  
 end

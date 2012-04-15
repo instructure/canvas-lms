@@ -68,6 +68,25 @@ describe RoleOverride do
     }.should_not raise_error
   end
 
+  describe "student view permissions" do
+    it "should mirror student permissions" do
+      permission = 'comment_on_others_submissions'
+
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      @fake_student = @course.student_view_student
+
+      @student.enrollments.first.has_permission_to?(permission.to_sym).should be_false
+      @fake_student.enrollments.first.has_permission_to?(permission.to_sym).should be_false
+
+      RoleOverride.manage_role_override(Account.default, 'StudentEnrollment', permission, :override => true)
+      RoleOverride.clear_cached_contexts
+
+      @student.enrollments.first.has_permission_to?(permission.to_sym).should be_true
+      @fake_student.enrollments.first.has_permission_to?(permission.to_sym).should be_true
+    end
+  end
+
   describe "manage_role_override" do
     before :each do
       @account = account_model(:parent_account => Account.default)

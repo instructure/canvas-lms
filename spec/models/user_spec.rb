@@ -292,6 +292,32 @@ describe User do
     user.user_account_associations(true).should == []
   end
 
+  it "should not create/update account associations for student view student" do
+    account1 = account_model
+    account2 = account_model
+    course_with_teacher(:active_all => true)
+    @fake_student = @course.student_view_student
+    @fake_student.reload.user_account_associations.should be_empty
+
+    @course.account_id = account1.id
+    @course.save!
+    @fake_student.reload.user_account_associations.should be_empty
+
+    account1.parent_account = account2
+    account1.save!
+    @fake_student.reload.user_account_associations.should be_empty
+
+    @course.complete!
+    @fake_student.reload.user_account_associations.should be_empty
+
+    @fake_student = @course.reload.student_view_student
+    @fake_student.reload.user_account_associations.should be_empty
+
+    @section2 = @course.course_sections.create!(:name => "Other Section")
+    @fake_student = @course.reload.student_view_student
+    @fake_student.reload.user_account_associations.should be_empty
+  end
+
   def create_course_with_student_and_assignment
     @course = course_model
     @course.offer!
@@ -636,6 +662,12 @@ describe User do
       @course.enroll_teacher(@admin)
       Account.default.update_attribute(:settings, {:teachers_can_create_courses => true})
       @admin.can_masquerade?(@site_admin, Account.default).should be_true
+    end
+
+    it "should allow teacher to become student view student" do
+      course_with_teacher(:active_all => true)
+      @fake_student = @course.student_view_student
+      @fake_student.can_masquerade?(@teacher, Account.default).should be_true
     end
   end
 

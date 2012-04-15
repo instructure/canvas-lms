@@ -35,7 +35,6 @@ describe CoursesController do
       assigns[:current_enrollments][0].should eql(@enrollment)
       assigns[:past_enrollments].should_not be_nil
     end
-
   end
   
   describe "GET 'settings'" do
@@ -168,6 +167,30 @@ describe CoursesController do
       get 'show', :id => @course.id
       response.status.should == '401 Unauthorized'
       assigns[:unauthorized_message].should_not be_nil
+    end
+
+    it "should allow student view student to view unpublished courses" do
+      course_with_teacher_logged_in(:active_user => true)
+      @course.should_not be_available
+      @fake_student = @course.student_view_student
+      session[:become_user_id] = @fake_student.id
+
+      get 'show', :id => @course.id
+      response.should be_success
+    end
+
+    it "should not allow student view students to view other courses" do
+      course_with_teacher_logged_in(:active_user => true)
+      @c1 = @course
+
+      course(:active_course => true)
+      @c2 = @course
+
+      @fake1 = @c1.student_view_student
+      session[:become_user_id] = @fake1.id
+
+      get 'show', :id => @c2.id
+      assert_unauthorized
     end
     
     context "show feedback for the current course only on course front page" do

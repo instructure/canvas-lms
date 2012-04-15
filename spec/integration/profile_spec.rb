@@ -42,4 +42,12 @@ describe ProfileController do
     response.should be_redirect
     u.reload.short_name.should == 'Cody'
   end
+
+  it "should not show student view student edit profile or other services options" do
+    course_with_teacher_logged_in(:active_all => true)
+    enter_student_view
+
+    get '/profile'
+    assert_unauthorized
+  end
 end

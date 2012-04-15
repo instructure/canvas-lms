@@ -7,6 +7,13 @@ describe Delayed::Worker do
   def worker_create(opts = {})
     Delayed::Worker.new(opts.merge(:max_priority => nil, :min_priority => nil, :quiet => true))
   end
+  def adjust_max_run_time(new_time)
+    old_max_run_time = Delayed::Worker.max_run_time
+    Delayed::Worker.max_run_time = new_time
+    yield
+  ensure
+    Delayed::Worker.max_run_time = old_max_run_time
+  end
 
   before(:each) do
     @worker = worker_create
@@ -19,19 +26,95 @@ describe Delayed::Worker do
 
   describe "running a job" do
     it "should fail after Worker.max_run_time" do
-      begin
-        old_max_run_time = Delayed::Worker.max_run_time
-        Delayed::Worker.max_run_time = 0.01
+      adjust_max_run_time 0.01 do
         @job = Delayed::Job.create :payload_object => LongRunningJob.new
         @worker.perform(@job)
         @job.reload.last_error.should =~ /expired/
         @job.attempts.should == 1
-      ensure
-        Delayed::Worker.max_run_time = old_max_run_time
+      end
+    end
+
+    it "should not fail when running a job with a % in the name" do
+      User.send_later(:name_parts, "Some % Name")
+      @job = Delayed::Job.last
+      @worker.perform(@job)
+    end
+  end
+
+  describe "running a batch" do
+    context "serially" do
+      it "should run each job in order" do
+        bar = "bar"
+        seq = sequence("bar")
+        bar.expects(:scan).with("b").in_sequence(seq)
+        bar.expects(:scan).with("a").in_sequence(seq)
+        bar.expects(:scan).with("r").in_sequence(seq)
+        batch = Delayed::Batch::PerformableBatch.new(:serial, [
+          { :payload_object => Delayed::PerformableMethod.new(bar, :scan, ["b"]) },
+          { :payload_object => Delayed::PerformableMethod.new(bar, :scan, ["a"]) },
+          { :payload_object => Delayed::PerformableMethod.new(bar, :scan, ["r"]) },
+        ])
+
+        batch_job = Delayed::Job.create :payload_object => batch 
+        Delayed::Stats.expects(:job_complete).times(4) # batch, plus all jobs
+        @worker.perform(batch_job).should == 3
+      end
+    
+      it "should succeed regardless of the success/failure of its component jobs" do
+        batch = Delayed::Batch::PerformableBatch.new(:serial, [
+          { :payload_object => Delayed::PerformableMethod.new("foo", :reverse, []) },
+          { :payload_object => Delayed::PerformableMethod.new(1, :/, [0]) },
+          { :payload_object => Delayed::PerformableMethod.new("bar", :scan, ["r"]) },
+        ])
+        batch_job = Delayed::Job.create :payload_object => batch
+
+        Delayed::Stats.expects(:job_complete).times(3) # batch, plus two successful jobs
+        @worker.perform(batch_job).should == 3
+
+        failed_jobs = Delayed::Job.all
+        failed_jobs.size.should eql 1
+        failed_jobs[0].payload_object.method.should eql :/
+        failed_jobs[0].last_error.should =~ /divided by 0/
+        failed_jobs[0].attempts.should == 1
+      end
+
+      it "should fail an individual job after Worker.max_run_time, but not the batch itself" do
+        adjust_max_run_time 0.01 do
+          foo = "foo"
+          foo.expects(:reverse).once
+          bar = "bar"
+          bar.expects(:scan).once
+  
+          batch = Delayed::Batch::PerformableBatch.new(:serial, [
+            { :payload_object => Delayed::PerformableMethod.new(foo, :reverse, []) },
+            { :payload_object => Delayed::PerformableMethod.new(Kernel, :sleep, [250]) },
+            { :payload_object => Delayed::PerformableMethod.new(bar, :scan, ["r"]) },
+          ])
+          batch_job = Delayed::Job.create :payload_object => batch
+          
+          Delayed::Stats.expects(:job_complete).times(3) # batch, plus two successful jobs
+          @worker.perform(batch_job).should == 3
+  
+          failed_jobs = Delayed::Job.all
+          failed_jobs.size.should eql 1
+          failed_jobs[0].last_error.should =~ /expired/
+          failed_jobs[0].attempts.should == 1
+        end
+      end
+  
+      it "should retry a failed individual job" do
+        batch = Delayed::Batch::PerformableBatch.new(:serial, [
+          { :payload_object => Delayed::PerformableMethod.new(1, :/, [0]) },
+        ])
+        batch_job = Delayed::Job.create :payload_object => batch
+
+        @worker.expects(:reschedule).once
+        Delayed::Stats.expects(:job_complete).times(1) # just the batch
+        @worker.perform(batch_job).should == 1
       end
     end
   end
-  
+
   context "worker prioritization" do
     before(:each) do
       @worker = Delayed::Worker.new(:max_priority => 5, :min_priority => -5, :quiet => true)

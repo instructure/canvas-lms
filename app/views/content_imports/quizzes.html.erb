@@ -96,7 +96,7 @@ $(document).ready(function() {
     context_code: $("#current_context_code").text(),
     upload_only: true,
     uploadDataUrl: $qti_file_import_form.attr('action'),
-    postFormData: true,
+    formDataTarget: 'uploadDataUrl',
     beforeSubmit: function(data) {
       $(this).find(".submit_button").attr('disabled', true).text(<%= jt('messages.uploading_button', "Uploading QTI File...") %>);
     },

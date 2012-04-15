@@ -291,11 +291,9 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def generate_temporary_password
-    pw = AutoHandle.generate('tmp-pw', 15)
-    self.password = pw
-    self.password_confirmation = pw
+    self.reset_password
     self.password_auto_generated = true
-    pw
+    self.password
   end
   
   def move_to_user(user, migrate=true)

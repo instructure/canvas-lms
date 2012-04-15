@@ -11,7 +11,7 @@
         <% first_column_done = true %>
         <td class="question_name" rowspan="<%= rows %>">
           <div class="question_name">
-          <%= question[:name] %>
+          <%= question[:question_name] || question[:name] %>
             <div style="float: right;" style="width: 1px; height: 100px;"></div>
             <div class="clear"></div>
           </div>

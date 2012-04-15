@@ -20,7 +20,7 @@ module CC
     class QTIGenerator
       include CC::CCHelper
       include QTIItems
-      delegate :add_error, :to => :@manifest
+      delegate :add_error, :export_object?, :to => :@manifest
 
       def initialize(manifest, resources_node, html_exporter)
         @manifest = manifest
@@ -44,6 +44,7 @@ module CC
         FileUtils::mkdir_p non_cc_folder
         
         @course.assessment_question_banks.active.each do |bank|
+          next unless export_object?(bank)
           begin
             generate_question_bank(bank)
           rescue
@@ -53,6 +54,7 @@ module CC
         end
         
         @course.quizzes.active.each do |quiz|
+          next unless export_object?(quiz) || export_object?(quiz.assignment)
           begin
             generate_quiz(quiz)
           rescue
@@ -117,6 +119,14 @@ module CC
         File.open(full_path, 'w') do |file|
           doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
           generate_bank(doc, bank, bank_mig_id)
+        end
+
+        @resources_node.resource(
+                :identifier => bank_mig_id,
+                :type => LOR,
+                :href => rel_path
+        ) do |res|
+          res.file(:href=>rel_path)
         end
       end
 

@@ -90,7 +90,10 @@ describe DiscussionTopicsController, :type => :integration do
                   "attachments"=>[{"content-type"=>"unknown/unknown",
                                    "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                                    "filename"=>"content.txt",
-                                   "display_name"=>"content.txt"}],
+                                   "display_name"=>"content.txt",
+                                   "id"=>attachment.id,
+                                   "size"=>attachment.size,
+                  }],
                   "topic_children"=>[sub.id],
                   "discussion_type" => 'side_comment',
                   "permissions" => { "attach" => true }}
@@ -156,7 +159,10 @@ describe DiscussionTopicsController, :type => :integration do
                                   [{"content-type"=>"unknown/unknown",
                                     "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                                     "filename"=>"content.txt",
-                                    "display_name"=>"content.txt"}],
+                                    "display_name"=>"content.txt",
+                                    "id" => attachment.id,
+                                    "size" => attachment.size,
+                                  }],
                           "posted_at"=>gtopic.posted_at.as_json,
                           "root_topic_id"=>nil,
                           "topic_children"=>[],
@@ -910,6 +916,7 @@ describe DiscussionTopicsController, :type => :integration do
 
       @all_entries.each &:reload
 
+      run_transaction_commit_callbacks
       job = Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}")
       job.should be_present
       run_job(job)
@@ -930,6 +937,8 @@ describe DiscussionTopicsController, :type => :integration do
         "url"=>"http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
         "filename"=>"unknown.loser",
         "display_name"=>"unknown.loser",
+        "id" => @attachment.id,
+        "size" => 100,
       }
 
       json['view'].should == [
@@ -1003,6 +1012,7 @@ describe DiscussionTopicsController, :type => :integration do
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
       @root1 = @topic.reply_from(:user => @student, :html => "root1")
 
+      run_transaction_commit_callbacks
       job = Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}")
       job.should be_present
       run_job(job)

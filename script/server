@@ -1,3 +1,26 @@
 #!/usr/bin/env ruby
 require File.expand_path('../../config/boot',  __FILE__)
+
+if RAILS_ENV == "development" # Rails.env doesn't yet work here
+  if ENV["SCRIPT_SERVER_NO_JOBS"] == "1"
+    puts "Not starting a delayed jobs worker process."
+  else
+    puts "Starting delayed jobs worker process. Pass SCRIPT_SERVER_NO_JOBS=1 to disable."
+    fork {
+      require(Rails.root+"config/environment.rb")
+      Dir.chdir(Rails.root)
+      Delayed::Pool.new(["run"]).run
+    }
+  end
+
+  if ENV["SCRIPT_SERVER_NO_GUARD"] == "1"
+    puts "Not starting guard."
+  else
+    puts "Starting guard. Pass SCRIPT_SERVER_NO_GUARD=1 to disable."
+    Thread.new {
+      `bundle exec guard`
+    }
+  end
+end
+
 require 'commands/server'

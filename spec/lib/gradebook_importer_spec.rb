@@ -77,28 +77,23 @@ describe GradebookImporter do
 
       user_with_pseudonym(:active_all => true)
       @user.pseudonym.sis_user_id = "SISUSERID"
-      student_in_course(:user => @user)
       @user.pseudonym.save!
+      student_in_course(:user => @user)
       @u2 = @user
 
       user_with_pseudonym(:active_all => true, :username => "something_that_has_not_been_taken")
       student_in_course(:user => @user)
-      @user.pseudonym.save!
       @u3 = @user
 
       user_with_pseudonym(:active_all => true, :username => "inactive_login")
       @user.pseudonym.destroy
       student_in_course(:user => @user)
-      @user.pseudonym.save!
-      @user.reload
       @u4 = @user
 
       user_with_pseudonym(:active_all => true, :username => "inactive_login")
       @user.pseudonym.destroy
       @user.pseudonyms.create!(:unique_id => 'active_login', :account => Account.default)
       student_in_course(:user => @user)
-      @user.pseudonym.save!
-      @user.reload
       @u5 = @user
 
       uploaded_csv = FasterCSV.generate do |csv|
@@ -141,8 +136,8 @@ describe GradebookImporter do
 
       user_with_pseudonym(:active_all => true)
       @user.pseudonym.sis_user_id = "0123456"
-      student_in_course(:user => @user)
       @user.pseudonym.save!
+      student_in_course(:user => @user)
       @u0 = @user
 
       # user with an sis-id that is a number
@@ -150,8 +145,6 @@ describe GradebookImporter do
       @user.pseudonym.destroy
       @user.pseudonyms.create!(:unique_id => '0231163', :account => Account.default)
       student_in_course(:user => @user)
-      @user.pseudonym.save!
-      @user.reload
       @u1 = @user
 
       uploaded_csv = FasterCSV.generate do |csv|

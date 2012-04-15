@@ -44,4 +44,11 @@ describe Delayed::PerformableMethod do
     p.args.should    == [story]
     p.perform.should == 'Epilog: Once upon...'
   end
+
+  it "should deeply de-AR-ize arguments in full name" do
+    story = Story.create :text => 'Once upon...'
+    reader = StoryReader.new
+    p = Delayed::PerformableMethod.new(reader, :read, [['arg1', story, { [:key, 1] => story }]])
+    p.full_name.should == "StoryReader#read([\"arg1\", Story.find(#{story.id}), {[:key, 1] => Story.find(#{story.id})}])"
+  end
 end

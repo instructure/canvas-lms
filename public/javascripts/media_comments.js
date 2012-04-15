@@ -426,7 +426,7 @@ define([
           title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
           width: 560,
           height: 460,
-          modal: (opts.modal == false ? false : true)
+          modal: false
         });
         $dialog.dialog('option', 'close', function() {
           $("#audio_record").before("<div id='audio_record'/>").remove();
@@ -620,7 +620,8 @@ define([
           title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
           resizable: false,
           width: 470,
-          height: 300
+          height: 300,
+          modal: false
         });
         $.ajaxJSON('/api/v1/services/kaltura_session', 'POST', {}, function(data) {
           $div.data('ks', data.ks);

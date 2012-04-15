@@ -1,0 +1,9 @@
+<div class="message">
+  <strong><%= t 'titles.to', 'To: ' %></strong><span><%= message.to %></span><br />
+  <strong><%= t 'titles.subject', 'Subject: ' %></strong><span><%= message.subject %></span><br />
+  <strong><%= t 'titles.workflow_state', 'Workflow State: ' %></strong><span><%= message.workflow_state %></span><br />
+  <strong><%= t 'titles.created_at', 'Created At: ' %></strong><span><%= message.created_at %></span><br />
+  <strong><%= t 'titles.sent_at', 'Sent at: ' %></strong><span><%=  message.sent_at %></span><br />
+  <pre><%=  message.body %></pre>
+</div>
+<hr>

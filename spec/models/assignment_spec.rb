@@ -118,9 +118,17 @@ describe Assignment do
     @assignment.needs_grading_count.should eql(1)
 
     # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
-    e2 = @course.student_enrollments.create(:user => @user, :workflow_state => 'invited', :course_section => @course.default_section)
+    section2 = @course.course_sections.create!(:name => 's2')
+    e2 = @course.enroll_student(@user, 
+                                :enrollment_state => 'invited',
+                                :section => section2,
+                                :allow_multiple_enrollments => true)
     e2.accept
-    e3 = @course.student_enrollments.create(:user => @user, :workflow_state => 'active', :course_section => @course.default_section)
+    section3 = @course.course_sections.create!(:name => 's2')
+    e3 = @course.enroll_student(@user, 
+                                :enrollment_state => 'active', 
+                                :section => section3,
+                                :allow_multiple_enrollments => true)
     @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(3)
     @assignment.reload
     @assignment.needs_grading_count.should eql(1)
@@ -861,6 +869,26 @@ describe Assignment do
       res = @assignment.to_ics
       res.match(/DTSTART;VALUE=DATE:20080903/).should_not be_nil
       res.match(/DTEND;VALUE=DATE:20080903/).should_not be_nil
+    end
+
+    it ".to_ics should return a plain-text description" do
+      assignment_model(:due_at => "Sep 3 2008 12:00am", :description => <<-HTML)
+      <p>
+        This assignment is due December 16th. Plz discuss the reading.
+        <p> </p>
+        <p> </p>
+        <p> </p>
+        <p> </p>
+        <p>Test.</p>
+      </p>
+      HTML
+      ev = @assignment.to_ics(false)
+      ev.description.should == "This assignment is due December 16th. Plz discuss the reading.
+         
+         
+         
+         
+        Test."
     end
   end
 

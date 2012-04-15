@@ -19,6 +19,7 @@
 # @API Users
 class ProfileController < ApplicationController
   before_filter :require_user
+  before_filter :reject_student_view_student
   before_filter { |c| c.active_tab = "profile" }
 
   include Api::V1::User

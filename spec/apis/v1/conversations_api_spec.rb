@@ -394,7 +394,8 @@ describe ConversationsController, :type => :integration do
 
       it "should create a conversation with forwarded messages" do
         forwarded_message = conversation(@me, :sender => @bob).messages.first
-        attachment = forwarded_message.attachments.create(:uploaded_data => stub_png_data)
+        attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :uploaded_data => stub_png_data)
+        forwarded_message.attachments << attachment
 
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -434,7 +435,7 @@ describe ConversationsController, :type => :integration do
                 "id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "attachments" => [],
                 "forwarded_messages" => [
                   {
-                    "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [{'filename' => 'test my file? hai!&.png', 'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png'}]
+                    "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [{'filename' => 'test my file? hai!&.png', 'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png', 'id' => attachment.id, 'size' => attachment.size}]
                   }
                 ]
               }
@@ -663,10 +664,9 @@ describe ConversationsController, :type => :integration do
   context "conversation" do
     it "should return the conversation" do
       conversation = conversation(@bob)
-      attachment = nil
+      attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
       media_object = nil
-      conversation.add_message("another") do |message|
-        attachment = message.attachments.create(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
+      message = conversation.add_message("another", :attachment_ids => [attachment.id]) do |message|
         media_object = MediaObject.new
         media_object.media_id = '0_12345678'
         media_object.media_type = 'audio'
@@ -675,7 +675,7 @@ describe ConversationsController, :type => :integration do
         media_object.title = "test title"
         media_object.save!
         message.media_comment = media_object
-        message.save
+        message.save!
       end
 
       conversation.reload
@@ -728,6 +728,8 @@ describe ConversationsController, :type => :integration do
                 "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                 "content-type" => "unknown/unknown",
                 "display_name" => "test.txt",
+                "id" => attachment.id,
+                "size" => attachment.size,
               }
             ]
           },

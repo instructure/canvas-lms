@@ -1,5 +1,6 @@
 require [
   'compiled/util/processItemSelections'
-  'copy_course'
+  'choose_content'
+  'choose_course'
 ]
 

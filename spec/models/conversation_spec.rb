@@ -280,29 +280,26 @@ describe Conversation do
       end
     end
 
-    it "should never change the workflow_state for the sender" do
+    it "should only ever change the workflow_state for the sender if it's archived and it's a direct message (not bulk)" do
       sender = user
       Conversation.initiate([sender.id, user.id], true).add_message(sender, 'test')
       convo = sender.conversations.first
       convo.update_attribute(:workflow_state, "unread")
-      convo.add_message('another test')
+      convo.add_message('another test', :update_for_sender => false) # as if it were a bulk private message
       convo.reload.unread?.should be_true
 
       convo.update_attribute(:workflow_state, "archived")
-      convo.add_message('one more test')
+      convo.add_message('one more test', :update_for_sender => false)
       convo.reload.archived?.should be_true
 
       convo.update_attribute(:workflow_state, "unread")
-      convo.add_message('and another test', :update_for_sender => true) # overrides subscribed-ness and updates timestamps
+      convo.add_message('and another test') # overrides subscribed-ness and updates timestamps
       convo.reload.unread?.should be_true
 
       convo.update_attribute(:workflow_state, "archived")
-      convo.add_message('last one', :update_for_sender => true)
-      convo.reload.archived?.should be_true
-
-      convo.remove_messages(:all)
-      convo.add_message('for reals', :update_for_sender => true)
-      convo.reload.archived?.should be_true
+      convo.add_message('last one')
+      convo.reload.archived?.should be_false
+      convo.reload.read?.should be_true
     end
 
     it "should not set last_message_at for the sender if the conversation is deleted and update_for_sender=false" do
@@ -759,6 +756,23 @@ describe Conversation do
         cp1.reload.tags.should eql [course1.asset_string]
         cp2.reload.tags.should eql []
       end
+    end
+  end
+
+  context "root_account_ids" do
+    it "should always be ordered" do
+      conversation = Conversation.create
+      conversation.update_attribute :root_account_ids, [3, 2, 1]
+      conversation.root_account_ids.should eql [1, 2, 3]
+    end
+
+    it "should be saved on the conversation when adding a message" do
+      u1 = user
+      u2 = user
+      conversation = Conversation.initiate([u1.id, u2.id], true)
+      conversation.add_message(u1, 'ohai', :root_account_id => 1)
+      conversation.add_message(u2, 'ohai yourself', :root_account_id => 2)
+      conversation.root_account_ids.should eql [1, 2]
     end
   end
 end

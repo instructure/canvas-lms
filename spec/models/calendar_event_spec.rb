@@ -106,6 +106,26 @@ describe CalendarEvent do
       res.match(/DTSTART;VALUE=DATE:20080903/).should_not be_nil
       res.match(/DTEND;VALUE=DATE:20080903/).should_not be_nil
     end
+
+    it ".to_ics should return a plain-text description" do
+      calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
+      <p>
+        This assignment is due December 16th. Plz discuss the reading.
+        <p> </p>
+        <p> </p>
+        <p> </p>
+        <p> </p>
+        <p>Test.</p>
+      </p>
+      HTML
+      ev = @event.to_ics(false)
+      ev.description.should == "This assignment is due December 16th. Plz discuss the reading.
+         
+         
+         
+         
+        Test."
+    end
   end
 
   context "clone_for" do
@@ -257,6 +277,55 @@ describe CalendarEvent do
       appointment.reserve_for(@student1, @student1).should_not be_nil
       appointment.reserve_for(@other_student, @other_student).should_not be_nil
       lambda { appointment.reserve_for(@unlucky_student, @unlucky_student) }.should raise_error
+    end
+
+    it "should give preference to the calendar's appointment limit" do
+      ag = AppointmentGroup.create!(
+        :title => "testing...",
+        :context => @course,
+        :participants_per_appointment => 2,
+        :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
+      )
+      ag.publish!
+      appointment = ag.appointments.first
+      appointment.participants_per_appointment = 3
+      appointment.save!
+
+      s1, s2, s3 = 3.times.map {
+        student_in_course(:course => @course, :active_all => true)
+        @user
+      }
+
+      appointment.reserve_for(@student1, @student1).should_not be_nil
+      appointment.reserve_for(s1, s1).should_not be_nil
+      appointment.reserve_for(s2, s2).should_not be_nil
+      lambda { appointment.reserve_for(s3, s3).should_not be_nil }.should raise_error
+
+      # should be able to unset the participant limit too
+      appointment.participants_per_appointment = nil
+      appointment.save!
+      appointment.reserve_for(s3, s3).should_not be_nil
+    end
+
+    it "should revert to the appointment group's participant_limit when appropriate" do
+      ag = AppointmentGroup.create!(
+        :title => "testing...",
+        :context => @course,
+        :participants_per_appointment => 2,
+        :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
+      )
+      ag.publish!
+
+      appointment = ag.appointments.first
+      appointment.participants_per_appointment = 3
+      appointment.save!
+      appointment.participants_per_appointment.should eql 3
+
+      appointment.participants_per_appointment = 2
+      appointment.save!
+      appointment.read_attribute(:participants_per_limit).should be_nil
+      appointment.override_participants_per_appointment?.should be_false
+      appointment.participants_per_appointment.should eql 2
     end
 
     it "should not let participants exceed max_appointments_per_participant" do

@@ -35,7 +35,7 @@ define [
         initialDelay: false
         # we'll abort after about 10 minutes
         baseInterval: 2000
-        maxAttempts: 11
+        maxAttempts: 12
         backoffFactor: 1.6
       loader.start()
 

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe BasicLTI do
   describe "generate_params" do
@@ -197,5 +197,28 @@ describe BasicLTI do
     hash['lis_result_sourcedid'].should == BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @user)
     hash['lis_outcome_service_url'].should == "/my/test/url"
     hash['ext_ims_lis_basic_outcome_url'].should == "/my/other/test/url"
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should roundtrip source ids from mixed shards" do
+      @shard1.activate do
+        @account = Account.create!
+        course_with_teacher(:active_all => true, :account => @account)
+        @tool = @course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
+        assignment_model(:submission_types => "external_tool", :course => @course)
+        tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
+        tag.content_type = 'ContextExternalTool'
+        tag.save!
+      end
+      user
+      @course.enroll_student(@user)
+      sourceid = BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @user)
+      course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, sourceid)
+      course.should == @course
+      assignment.should == @assignment
+      user.should == @user
+    end
   end
 end

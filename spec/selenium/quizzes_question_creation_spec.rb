@@ -507,6 +507,5 @@ describe "quizzes question creation" do
     save_question
     error_displayed?.should be_true
   end
-
 end
 

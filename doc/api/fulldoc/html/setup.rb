@@ -76,11 +76,33 @@ def generate_assets
   end
 end
 
+# we used to put .md files at just filename.html, but it turns out that
+# deep within Yard, there is hard-coded assumptions about static files
+# being named file.filename.html, so we moved them over, and this makes
+# a redirect at the old name so people's old bookmarks don't 404
+def serialize_redirect(filename)
+  path = File.join(options[:serializer].basepath, filename)
+  File.open(path, "wb") do |file|
+    file.write <<-HTML
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>#{options[:page_title]}</title>
+<meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
+<BODY>
+This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
+</BODY>
+</HTML>
+HTML
+  end
+end
 
 def serialize_static_pages
   Dir.glob("doc/api/*.md").each do |file|
     options[:file] = file
-    serialize(File.split(file).last.sub(/\..*$/, '.html'))
+    filename = File.split(file).last.sub(/\..*$/, '.html')
+    serialize("file." + filename)
+    serialize_redirect(filename)
     options.delete(:file)
   end
 end

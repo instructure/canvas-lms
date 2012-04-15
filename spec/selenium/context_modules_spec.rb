@@ -437,11 +437,10 @@ describe "context_modules" do
       @module_1.save!
       @module_2.save!
       @module_3.save!
-
-      go_to_modules
     end
 
     it "should validate that course modules show up correctly" do
+      go_to_modules
 
       context_modules = driver.find_elements(:css, '.context_module')
       #initial check to make sure everything was setup correctly
@@ -454,6 +453,8 @@ describe "context_modules" do
     end
 
     it "should move a student through context modules in sequential order" do
+      go_to_modules
+
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
       validate_context_module_status_text(0, COMPLETED_TEXT)
@@ -472,10 +473,42 @@ describe "context_modules" do
     end
 
     it "should validate that a student can't get to a locked context module" do
+      go_to_modules
+
       #sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       driver.find_element(:id, 'content').should include_text("hasn't been unlocked yet")
       driver.find_element(:id, 'module_prerequisites_list').should be_displayed
+    end
+
+    it "should allow a student view student to progress through module content" do
+      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      @fake_student = @course.student_view_student
+
+      enter_student_view
+
+      #sequential error validation
+      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
+      driver.find_element(:id, 'content').should include_text("hasn't been unlocked yet")
+      driver.find_element(:id, 'module_prerequisites_list').should be_displayed
+
+      go_to_modules
+
+      #sequential normal validation
+      navigate_to_module_item(0, @assignment_1.title)
+      validate_context_module_status_text(0, COMPLETED_TEXT)
+      validate_context_module_status_text(1, IN_PROGRESS_TEXT)
+      validate_context_module_status_text(2, LOCKED_TEXT)
+
+      navigate_to_module_item(1, @assignment_2.title)
+      validate_context_module_status_text(0, COMPLETED_TEXT)
+      validate_context_module_status_text(1, COMPLETED_TEXT)
+      validate_context_module_status_text(2, IN_PROGRESS_TEXT)
+
+      navigate_to_module_item(2, @quiz_1.title)
+      validate_context_module_status_text(0, COMPLETED_TEXT)
+      validate_context_module_status_text(1, COMPLETED_TEXT)
+      validate_context_module_status_text(2, COMPLETED_TEXT)
     end
 
     describe "sequence footer" do

@@ -32,7 +32,7 @@ describe ContentImportsController, :type => :integration do
       course_with_teacher(:active_all => true, :name => 'whatever', :user => @user)
       @copy_to = @course
       
-      post "/courses/#{@copy_to.id}/imports/copy", :copy => {:course_id => @copy_from.id, :all_assignments => 1}
+      post "/courses/#{@copy_to.id}/imports/copy", :source_course => @copy_from.id, :copy => {:all_assignments => 1}
       response.should be_success
       data = json_parse
       dj = Delayed::Job.last

@@ -320,7 +320,12 @@ class ApplicationController < ActionController::Base
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user      
         @context_membership = @context_enrollment
       elsif params[:user_id]
-        @context = User.find(params[:user_id])
+        case params[:user_id]
+        when 'self'
+          @context = @current_user
+        else
+          @context = User.find(params[:user_id])
+        end
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user
@@ -983,7 +988,7 @@ class ApplicationController < ActionController::Base
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
   def safe_domain_file_url(attachment, host=nil, verifier = nil, download = false) # TODO: generalize this
-    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
+    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default, request.host)}"
     ts, sig = @current_user && @current_user.access_verifier
 
     # add parameters so that the other domain can create a session that 
@@ -1244,5 +1249,11 @@ class ApplicationController < ActionController::Base
       @section = api_find(CourseSection, params.delete(:section_id))
       params[:course_id] = @section.course_id
     end
+  end
+
+  def reject_student_view_student
+    return unless @current_user && @current_user.fake_student?
+    @unauthorized_message ||= t('#application.errors.student_view_unauthorized', "You cannot access this functionality in student view.")
+    render_unauthorized_action(@current_user)
   end
 end

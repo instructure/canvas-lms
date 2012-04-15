@@ -9,19 +9,25 @@ describe "manage groups students" do
     course_with_teacher_logged_in
   end
 
+  it "should click on  the self signup help link " do
+    @student = @course.enroll_student(user_model(:name => "John Doe")).user
+    get "/courses/#{@course.id}/groups"
+    driver.find_element(:css, ".add_category_link").click
+    form = driver.find_element(:css, "#add_category_form")
+    form.find_element(:css, ".self_signup_help_link").click
+    driver.find_element(:id, "self_signup_help_dialog").should be_displayed
+  end
+
   it "should move students from a deleted group back to unassigned" do
     skip_if_ie("Switch to alert and accept hangs in IE")
-
-    @course.enroll_student(john = user_model(:name => "John Doe"))
+    student = groups_student_enrollment(1).last
     group_category = @course.group_categories.create(:name => "Some Category")
-    group = @course.groups.create(:name => "Group 1", :group_category => group_category)
-    group.add_user(john)
-    @course.groups.create(:name => "Group 2", :group_category => group_category)
+    group = add_groups_in_category(group_category, 1).last
+    group.add_user student
 
     get "/courses/#{@course.id}/groups"
-
     category = find_with_jquery(".group_category:visible")
-    category.find_elements(:css, ".group_blank .user_id_#{john.id}").should be_empty
+    category.find_elements(:css, ".group_blank .user_id_#{student.id}").should be_empty
 
     driver.execute_script("$('#group_#{group.id} .delete_group_link').hover().click()") #move_to occasionally breaks in the hudson build
     keep_trying_until do
@@ -30,15 +36,16 @@ describe "manage groups students" do
       true
     end
     wait_for_ajaximations
-    category.find_elements(:css, ".group_blank .user_id_#{john.id}").should_not be_empty
+    category.find_elements(:css, ".group_blank .user_id_#{student.id}").should_not be_empty
   end
 
   it "should list all sections a student belongs to" do
     @other_section = @course.course_sections.create!(:name => "Other Section")
     student_in_course(:active_all => true)
-    @course.student_enrollments.create!(:user => @student,
-                                        :workflow_state => "active",
-                                        :course_section => @other_section)
+    @course.enroll_student(@student,
+                           :enrollment_state => "active",
+                           :section => @other_section,
+                           :allow_multiple_enrollments => true)
 
     gc1 = @course.group_categories.create(:name => "Group Category 1")
 
@@ -73,9 +80,10 @@ describe "manage groups students" do
     end
 
     @other_section = @course.course_sections.create!(:name => "Other Section")
-    @course.student_enrollments.create!(:user => @student,
-                                        :workflow_state => "active",
-                                        :course_section => @other_section)
+    @course.enroll_student(@student,
+                           :enrollment_state => "active",
+                           :section => @other_section,
+                           :allow_multiple_enrollments => true)
 
     group_category = @course.group_categories.create(:name => "My Groups")
 
@@ -96,146 +104,141 @@ describe "manage groups students" do
     unassigned_div.find_elements(:css, ".student").length.should == 5
   end
 
+  it "should not include student view student in the unassigned student list at the course level" do
+    @fake_student = @course.student_view_student
+    group_category1 = @course.group_categories.create(:name => "Group Category 1")
+
+    get "/courses/#{@course.id}/groups"
+    wait_for_ajaximations
+
+    find_all_with_jquery(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+  end
+
+  it "should not include student view student in the unassigned student list at the account level" do
+    site_admin_logged_in
+    @account = Account.default
+    @fake_student = @course.student_view_student
+    group_category1 = @account.group_categories.create(:name => "Group Category 1")
+
+    get "/accounts/#{@account.id}/groups"
+    wait_for_ajaximations
+
+    find_all_with_jquery(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+  end
+
   context "dragging a user between groups" do
     # use blank as the group id for "unassigned"
-    def simulate_group_drag(user_id, from_group_id, to_group_id)
-      from_group = (from_group_id == "blank" ? ".group_blank:visible" : "#group_#{from_group_id}")
-      to_group   = (to_group_id == "blank"   ? ".group_blank:visible" : "#group_#{to_group_id}")
-      driver.execute_script(<<-SCRIPT)
-        window.contextGroups.moveToGroup(
-          $('#{from_group} .user_id_#{user_id}'),
-          $('#{to_group}'))
-      SCRIPT
-    end
-
     it "should remove a user from the old group if the category is not student organized" do
-      @course.enroll_student(john = user_model(:name => "John Doe"))
-
+      student = groups_student_enrollment(1).last
       group_category = @course.group_categories.create(:name => "Other Groups")
-
-      group1 = @course.groups.create(:name => "Group 1", :group_category => group_category)
-      group2 = @course.groups.create(:name => "Group 2", :group_category => group_category)
-
+      groups = add_groups_in_category group_category, 2
       get "/courses/#{@course.id}/groups"
-
       category = driver.find_element(:css, ".group_category")
       unassigned_div = category.find_element(:css, ".group_blank")
-      group1_div = category.find_element(:css, "#group_#{group1.id}")
-      group2_div = category.find_element(:css, "#group_#{group2.id}")
-      unassigned_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
+      group1_div = category.find_element(:css, "#group_#{groups[0].id}")
+      group2_div = category.find_element(:css, "#group_#{groups[1].id}")
+      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
 
       # from unassigned to group1
       # drag_and_drop version doesn't work for some reason
       # driver.action.drag_and_drop(john_li, group1_div).perform
-      simulate_group_drag(john.id, "blank", group1.id)
-      unassigned_div.find_elements(:css, ".user_id_#{john.id}").should be_empty
-      group1_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
+      simulate_group_drag(student.id, "blank", groups[0].id)
+      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should be_empty
+      group1_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
 
       # from group1 to group2
       # driver.action.drag_and_drop(john_li, group2_div).perform
-      simulate_group_drag(john.id, group1.id, group2.id)
-      group1_div.find_elements(:css, ".user_id_#{john.id}").should be_empty
-      group2_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
+      simulate_group_drag(student.id, groups[0].id, groups[1].id)
+      group1_div.find_elements(:css, ".user_id_#{student.id}").should be_empty
+      group2_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
 
       # from group2 to unassigned
       # driver.action.drag_and_drop(john_li, unassigned_div).perform
-      simulate_group_drag(john.id, group2.id, "blank")
-      group2_div.find_elements(:css, ".user_id_#{john.id}").should be_empty
-      unassigned_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
+      simulate_group_drag(student.id, groups[1].id, "blank")
+      group2_div.find_elements(:css, ".user_id_#{student.id}").should be_empty
+      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
     end
 
     it "should not remove a user from the old group if the category is student organized unless dragging to unassigned" do
-      @course.enroll_student(john = user_model(:name => "John Doe"))
-
+      student = groups_student_enrollment(1).last
       group_category = GroupCategory.student_organized_for(@course)
-
       @course.groups.create(:name => "Group 2", :group_category => group_category)
-      group1 = @course.groups.create(:name => "Group 1", :group_category => group_category)
-      group2 = @course.groups.create(:name => "Group 2", :group_category => group_category)
-
+      groups = add_groups_in_category group_category, 2
       get "/courses/#{@course.id}/groups"
 
       category = driver.find_element(:css, ".group_category")
       unassigned_div = category.find_element(:css, ".group_blank")
-      group1_div = category.find_element(:css, "#group_#{group1.id}")
-      group2_div = category.find_element(:css, "#group_#{group2.id}")
-      unassigned_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
+      group1_div = category.find_element(:css, "#group_#{groups[0].id}")
+      group2_div = category.find_element(:css, "#group_#{groups[1].id}")
+      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
 
       # from unassigned to group1
       # drag_and_drop version doesn't work for some reason
       # driver.action.drag_and_drop(john_li, group1_div).perform
-      simulate_group_drag(john.id, "blank", group1.id)
-      unassigned_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
-      group1_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
+      simulate_group_drag(student.id, "blank", groups[0].id)
+      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      group1_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
 
       # from group1 to group2
       # driver.action.drag_and_drop(john_li, group2_div).perform
-      simulate_group_drag(john.id, group1.id, group2.id)
-      group1_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
-      group2_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
+      simulate_group_drag(student.id, groups[0].id, groups[1].id)
+      group1_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      group2_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
 
       # from group2 to unassigned
       # driver.action.drag_and_drop(john_li, unassigned_div).perform
-      simulate_group_drag(john.id, group2.id, "blank")
-      group2_div.find_elements(:css, ".user_id_#{john.id}").should be_empty
-      unassigned_div.find_elements(:css, ".user_id_#{john.id}").should_not be_empty
+      simulate_group_drag(student.id, groups[1].id, "blank")
+      group2_div.find_elements(:css, ".user_id_#{student.id}").should be_empty
+      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
     end
 
     it "should check all user sections for a section specific group" do
       @other_section = @course.course_sections.create!(:name => "Other Section")
       @third_section = @course.course_sections.create!(:name => "Third Section")
 
-      @course.enroll_student(s1 = user_model(:name => "Student 1"))
-      @course.enroll_student(s2 = user_model(:name => "Student 2"), :section => @other_section)
-      @course.enroll_student(s3 = user_model(:name => "Student 3"), :section => @third_section)
-      @course.enroll_student(s4 = user_model(:name => "Student 4"))
-
-      @course.student_enrollments.create!(:user => s4,
-                                          :workflow_state => "active",
-                                          :course_section => @other_section)
+      students = groups_student_enrollment 4, "2" => {:section => @other_section}, "3" => {:section => @third_section}
+      @course.enroll_student(students[3],
+                             :workflow_state => "active",
+                             :section => @other_section,
+                             :allow_multiple_enrollments => true)
 
       group_category = @course.group_categories.create(:name => "Other Groups")
-      group1 = @course.groups.create(:name => "Group 1", :group_category => group_category)
-      group2 = @course.groups.create(:name => "Group 2", :group_category => group_category)
-      group3 = @course.groups.create(:name => "Group 3", :group_category => group_category)
-
+      groups = add_groups_in_category group_category, 3
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
-
       category_div = driver.find_element(:css, ".group_category")
-      group1_div = category_div.find_element(:css, "#group_#{group1.id}")
-      group2_div = category_div.find_element(:css, "#group_#{group2.id}")
-      group3_div = category_div.find_element(:css, "#group_#{group3.id}")
+      group1_div = category_div.find_element(:css, "#group_#{groups[0].id}")
+      group2_div = category_div.find_element(:css, "#group_#{groups[1].id}")
+      group3_div = category_div.find_element(:css, "#group_#{groups[2].id}")
 
       edit_category(:enable_self_signup => true, :restrict_self_signup => true)
-      simulate_group_drag(s1.id, "blank", group1.id)
-      simulate_group_drag(s2.id, "blank", group2.id)
-      simulate_group_drag(s3.id, "blank", group3.id)
+      simulate_group_drag(students[0].id, "blank", groups[0].id)
+      simulate_group_drag(students[1].id, "blank", groups[1].id)
+      simulate_group_drag(students[2].id, "blank", groups[2].id)
       wait_for_ajaximations
 
-      simulate_group_drag(s4.id, "blank", group1.id)
+      simulate_group_drag(students[3].id, "blank", groups[0].id)
       wait_for_ajaximations
 
-      group1.reload; group2.reload; group2.reload;
-      group1.users.length.should == 2
-      group2.users.length.should == 1
-      group3.users.length.should == 1
+      3.times{|i| groups[i].reload}
+      groups[0].users.length.should == 2
+      groups[1].users.length.should == 1
+      groups[2].users.length.should == 1
 
-      simulate_group_drag(s4.id, group1.id, group2.id)
+      simulate_group_drag(students[3].id, groups[0].id, groups[1].id)
       wait_for_ajaximations
 
-      group1.reload; group2.reload; group2.reload;
-      group1.users.length.should == 1
-      group2.users.length.should == 2
-      group3.users.length.should == 1
-
-      simulate_group_drag(s4.id, group2.id, group3.id)
+      3.times{|i| groups[i].reload}
+      groups[0].users.length.should == 1
+      groups[1].users.length.should == 2
+      groups[2].users.length.should == 1
+      simulate_group_drag(students[3].id, groups[1].id, groups[2].id)
       wait_for_ajaximations
 
-      group1.reload; group2.reload; group2.reload;
-      group1.users.length.should == 1
-      group2.users.length.should == 2
-      group3.users.length.should == 1
+      3.times{|i| groups[i].reload}
+      groups[0].users.length.should == 1
+      groups[1].users.length.should == 2
+      groups[2].users.length.should == 1
     end
 
     it "should prevent you from loading a paginated group list page that would be empty" do
@@ -243,12 +246,10 @@ describe "manage groups students" do
       16.times do |i|
         name = "Student %02d" % (i+1).to_s
         student_in_course(:active_all => true, :name => name)
-        @students << @student
+        @students.push @student
       end
-
       group_category = @course.group_categories.create(:name => "Existing Category")
-      group = @course.groups.create(:name => "Group 1", :group_category => group_category)
-
+      group = add_groups_in_category(group_category, 1).last
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 
@@ -270,7 +271,7 @@ describe "manage groups students" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajax_requests
-      keep_trying_until { driver.find_element(:css, '.right_side .group .user_count').text.should == '0 students' }
+      keep_trying_until { driver.find_element(:css, '.right_side .group .user_count').text.should eql '0 students' }
     end
 
     before (:each) do
@@ -315,20 +316,16 @@ describe "manage groups students" do
       assign_students = find_with_jquery("#category_#{@category.id} .assign_students_link:visible")
       assign_students.should_not be_nil
       assign_students.click
-
       # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
       lock = Mutex.new
       lock.lock
       GroupsController.before_filter { lock.lock; lock.unlock; true }
-
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       loading = find_with_jquery("#category_#{@category.id} .group_blank .loading_members:visible")
       loading.text.should == 'Assigning Students...'
-
       lock.unlock
       GroupsController.filter_chain.pop
-
       # make sure we wait before moving on
       wait_for_ajax_requests
     end
@@ -342,6 +339,49 @@ describe "manage groups students" do
     it "should give 'Students assigned to groups.' success flash otherwise" do
       assign_students(@category)
       assert_flash_notice_message /Students assigned to groups/
+    end
+  end
+
+  context "single category" do
+    before (:each) do
+      @courses_group_category = @course.group_categories.create(:name => "Existing Category")
+      groups_student_enrollment 1
+    end
+    it "should add multiple groups and be sure they are all deleted" do
+      add_groups_in_category @courses_group_category
+      get "/courses/#{@course.id}/groups"
+      delete = driver.find_element(:css, ".delete_category_link")
+      delete.click
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      wait_for_ajaximations
+      driver.find_elements(:css, ".left_side .group").should be_empty
+      @course.group_categories.all.count.should eql 0
+    end
+
+    it "should edit an individual group" do
+      get "/courses/#{@course.id}/groups"
+      group = add_group_to_category @courses_group_category, "group 1"
+      driver.find_element(:css, "#group_#{group.id}").click
+      driver.find_element(:css, "#group_#{group.id} .edit_group_link").click
+      name = "new group 1"
+      driver.find_element(:css, "#group_name").send_keys(name)
+      driver.find_element(:css, "#group_#{group.id} .button").click
+      wait_for_ajaximations
+      new_group = @course.groups.find_by_name(name)
+      group.should_not be_nil
+    end
+
+    it "should delete an individual group" do
+      get "/courses/#{@course.id}/groups"
+      group = add_group_to_category @courses_group_category, "group 1"
+      driver.find_element(:css, "#group_#{group.id}").click
+      driver.find_element(:css, "#group_#{group.id} .delete_group_link").click
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      wait_for_ajaximations
+      driver.find_elements(:css, ".left_side .group").should be_empty
+      @course.group_categories.last.groups.last.workflow_state =='deleted'
     end
   end
 end
