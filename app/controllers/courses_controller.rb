@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,7 +23,7 @@ require 'set'
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
-  before_filter :require_context, :only => [:roster, :locks, :switch_role]
+  before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file]
 
   include Api::V1::Course
 
@@ -105,6 +105,7 @@ class CoursesController < ApplicationController
   # @argument course[conclude_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   # @argument course[license] [String] [optional] The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted); 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives); 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike); 'cc_by_nc' (CC Attribution Non-Commercial); 'cc_by_nd' (CC Attribution No Derivatives); 'cc_by_sa' (CC Attribution Share Alike); 'cc_by' (CC Attribution); 'public_domain' (Public Domain).
   # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
+  # @argument course[public_description] [String] [optional] A publicly visible description of the course.
   # @argument course[allow_student_wiki_edits] [Boolean] [optional] If true, students will be able to modify the course wiki.
   # @argument course[allow_student_assignment_edits] [optional] Set to true if students should be allowed to make modifications to assignments.
   # @argument course[allow_wiki_comments] [Boolean] [optional] If true, course members will be able to comment on wiki pages.
@@ -139,7 +140,7 @@ class CoursesController < ApplicationController
             [:start_at, :conclude_at, :license, :publish_grades_immediately,
              :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
-             :root_account_id, :account_id],
+             :root_account_id, :account_id, :public_description],
              nil)
           }
         else
@@ -148,6 +149,23 @@ class CoursesController < ApplicationController
           format.json { render :json => @course.errors.to_json, :status => :bad_request }
         end
       end
+    end
+  end
+
+  # @API
+  #
+  # Upload a file to the course.
+  #
+  # This API endpoint is the first step in uploading a file to a course.
+  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # the file upload workflow.
+  #
+  # Only those with the "Manage Files" permission on a course can upload files
+  # to the course. By default, this is Teachers, TAs and Designers.
+  def create_file
+    @attachment = Attachment.new(:context => @context)
+    if authorized_action(@attachment, @current_user, :create)
+      api_attachment_preflight(@context, request)
     end
   end
 
@@ -192,6 +210,7 @@ class CoursesController < ApplicationController
   # Returns the list of sections for this course.
   #
   # @argument include[] [optional, "students"] Associations to include with the group.
+  # @argument include[] [optional, "avatar_url"] Include the avatar URLs for students returned.
   #
   # @response_field id The unique identifier for the course section.
   # @response_field name The name of the section.
@@ -218,6 +237,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       includes = Array(params[:include])
       include_students = includes.include?('students')
+      include_avatar_urls = includes.include?('avatar_url') || nil
 
       result = @context.active_course_sections.map do |section|
         res = section.as_json(:include_root => false,
@@ -231,7 +251,7 @@ class CoursesController < ApplicationController
             proxy = proxy.scoped(:include => :user)
           end
           res['students'] = proxy.all(:conditions => "type = 'StudentEnrollment'").
-            map { |e| user_json(e.user, @current_user, session) }
+            map { |e| user_json(e.user, @current_user, session, include_avatar_urls && ['avatar_url']) }
         end
         res
       end
@@ -463,7 +483,7 @@ class CoursesController < ApplicationController
     enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
     # Overwrite with the session enrollment, if one exists, and it's different than the current user's
     enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] && params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
-    # Look for enrollments to matching temporary users
+    # Look for enrollments to matching temporary users		
     enrollment ||= @current_user.temporary_invitations.find { |i| i.course_id == @context.id } if @current_user
     # Look up the explicitly provided invitation
     enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]]) unless params[:invitation].blank?
@@ -484,7 +504,7 @@ class CoursesController < ApplicationController
       e = enrollment
       session[:enrollment_uuid] = e.uuid
       session[:session_affects_permissions] = true
-      session[:enrollment_as_student] = true if e.is_a?(StudentEnrollment)
+      session[:enrollment_as_student] = true if e.student?
       session[:enrollment_uuid_course_id] = e.course_id
       @pending_enrollment = enrollment
       if @context.root_account.allow_invitation_previews?
@@ -917,7 +937,7 @@ class CoursesController < ApplicationController
       @course.workflow_state = 'claimed'
       @course.save
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
-      redirect_to course_import_copy_url(@course, 'copy[course_id]' => @context.id)
+      redirect_to course_import_choose_content_url(@course, 'source_course' => @context.id)
     end
   end
 
@@ -1033,5 +1053,22 @@ class CoursesController < ApplicationController
     @new_course = @context.reset_content
     redirect_to course_settings_path(@new_course.id)
   end
+  
+  def student_view
+    get_context
+    if authorized_action(@context, @current_user, :use_student_view)
+      @fake_student = @context.student_view_student
+      session[:become_user_id] = @fake_student.id
+      return_url = course_path(@context)
+      session[:masquerade_return_to] = nil
+      return return_to(return_url, request.referer || dashboard_url)
+    end
+  end
 
+  def leave_student_view
+    session[:become_user_id] = nil
+    return_url = session[:masquerade_return_to]
+    session[:masquerade_return_to] = nil
+    return return_to(return_url, request.referer || dashboard_url)
+  end
 end

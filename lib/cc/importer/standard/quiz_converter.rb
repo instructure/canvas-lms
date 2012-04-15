@@ -67,6 +67,18 @@ module CC::Importer::Standard
         manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
         questions = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
         prepend_id_to_questions(questions, resource_id)
+
+        #try to replace relative urls
+        questions.each do |question|
+          question[:question_text] = replace_urls(question[:question_text], resource_id) if question[:question_text]
+          question[:answers].each do |ans|
+            ans.each_pair do |key, val|
+              if key.to_s.end_with? "html"
+                ans[key] = replace_urls(val, resource_id) if ans[key]
+              end
+            end
+          end
+        end
       rescue
         add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', :file_identifier => resource_id), $!)
       end

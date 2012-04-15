@@ -64,7 +64,7 @@ define [
       @collectionView = new EntryCollectionView
         $el: @$el
         collection: @collection
-        showReplyButton: true
+        showReplyButton: ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
       @collection.reset entries
       @updateFromNewEntries()
       @setUnreadEntries()

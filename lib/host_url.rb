@@ -49,7 +49,7 @@ class HostUrl
       res
     end
     
-    def file_host(account)
+    def file_host(account, current_host = nil)
       return @@file_host if @@file_host
       res = nil
       res = @@file_host = domain_config[:files_domain] if domain_config.has_key?(:files_domain)
@@ -79,6 +79,10 @@ class HostUrl
     def is_file_host?(domain)
       safer_host = file_host(Account.default)
       safer_host != default_host && domain == safer_host
+    end
+
+    def has_file_host?
+      default_host != file_host(Account.default)
     end
   end
 end

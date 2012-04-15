@@ -65,7 +65,7 @@ window.rubricAssessment = {
         event.preventDefault();
         var $criterion = $(this).parents(".criterion"),
             comments = $criterion.getTemplateData({textValues: ['custom_rating']}).custom_rating,
-            editing = $(this).closest(".displaying").parents(".criterion").length === 0,
+            editing = $(this).closest('td').children('.editing').is(':visible'),
             data = {
               criterion_comments: comments,
               criterion_description: $criterion.find(".description:first").text()
@@ -269,6 +269,7 @@ window.rubricAssessment = {
           .find(".custom_rating").text(comments).end()
           .find(".criterion_comments").toggleClass('empty', !comments).end()
           .find(".save_custom_rating").attr('checked', false);
+        if(comments) $criterion.find('.criterion_comments').show();
         if(rating.points && !rating.ignore_for_scoring) {
           total += rating.points;
         }

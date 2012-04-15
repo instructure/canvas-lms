@@ -110,10 +110,10 @@ class SectionsController < ApplicationController
     @section = @context.course_sections.find(params[:id])
     return unless authorized_action(@section, @current_user, :read)
     add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
-    @enrollments = @section.enrollments.scoped(:conditions => { :workflow_state => 'active' }).count
-    @completed_enrollments = @section.enrollments.scoped(:conditions => { :workflow_state => 'completed' }).count
-    @pending_enrollments = @section.enrollments.scoped(:conditions => { :workflow_state => %w{invited pending} }).count
-    @student_enrollments = @section.enrollments.scoped(:conditions => { :type => 'StudentEnrollment' }).count
+    @enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => 'active' }).count
+    @completed_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => 'completed' }).count
+    @pending_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => %w{invited pending} }).count
+    @student_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :type => 'StudentEnrollment' }).count
     js_env(
       :PERMISSIONS => {
         :manage_students => @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users),
@@ -125,7 +125,7 @@ class SectionsController < ApplicationController
     @section = @context.course_sections.find(params[:id])
     if authorized_action(@section, @current_user, :delete)
       respond_to do |format|
-        if @section.enrollments.empty?
+        if @section.enrollments.not_fake.empty?
           @section.destroy
           flash[:notice] = t('section_deleted', "Course section successfully deleted!")
           format.html { redirect_to course_settings_url(@context) }

@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/conversations_common')
 
 describe "conversations recipient finder" do
+  it_should_behave_like "in-process server selenium tests"
   it_should_behave_like "conversations selenium tests"
 
   before(:each) do
@@ -243,5 +244,12 @@ describe "conversations recipient finder" do
     get "/conversations#/conversations?user_id=#{other.id}&from_conversation_id=#{c.id}"
     wait_for_ajaximations
     tokens.should eql ["other guy"]
+  end
+
+  it "should not show student view student to other students" do
+    @fake_student = @course.student_view_student
+    search(@fake_student.name) do
+      menu.should eql ["No results found"]
+    end
   end
 end

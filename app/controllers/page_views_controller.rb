@@ -19,6 +19,7 @@
 # @API Users
 class PageViewsController < ApplicationController
   before_filter :require_user, :only => [:index]
+
   def update
     render :json => {:ok => true}
     # page view update happens in log_page_view after_filter

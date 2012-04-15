@@ -9,11 +9,12 @@ define [
   'jst/helpDialog'
   'INST'
   'str/htmlEscape'
+  'compiled/fn/preventDefault'
 
   'jquery.instructure_misc_helpers'
   'jquery.instructure_jquery_patches' # dialog
   'jquery.disableWhileLoading'
-], (I18n, helpDialogTemplate, INST, htmlEscape) ->
+], (I18n, helpDialogTemplate, INST, htmlEscape, preventDefault) ->
 
   helpDialog =
     defaultLinks: [
@@ -48,9 +49,8 @@ define [
 
       @$dialog.dialog('widget').delegate 'a[href="#teacher_feedback"],
                                           a[href="#create_ticket"],
-                                          a[href="#help-dialog-options"]', 'click', (event) =>
-        event.preventDefault()
-        @switchTo $(event.currentTarget).attr('href')
+                                          a[href="#help-dialog-options"]', 'click', preventDefault ({currentTarget}) =>
+        @switchTo $(currentTarget).attr('href')
 
       @helpLinksDfd = $.getJSON('/help_links').done (links) =>
         # only show the links that are available to the roles of this user
@@ -67,7 +67,7 @@ define [
 
         @$dialog.html(helpDialogTemplate locals)
         @initTicketForm()
-        $(@).trigger('ready')
+        $(this).trigger('ready')
       @$dialog.disableWhileLoading @helpLinksDfd
       @dialogInited = true
 
@@ -106,9 +106,9 @@ define [
       @$dialog.dialog 'option', 'title', newTitle
 
     open: ->
-      @initDialog() unless @dialogInited
-      @$dialog.dialog('open')
-      @initTeacherFeedback()
+      helpDialog.initDialog() unless helpDialog.dialogInited
+      helpDialog.$dialog.dialog('open')
+      helpDialog.initTeacherFeedback()
 
     initTeacherFeedback: ->
       currentUserIsStudent = ENV.current_user_roles and 'student' in ENV.current_user_roles
@@ -121,18 +121,17 @@ define [
             .disableWhileLoading(coursesDfd)
             .formSubmit
               disableWhileLoading: true
-              required: ['recipients[]', 'body'],
+              required: ['recipients[]', 'body']
               success: =>
                 @$dialog.dialog('close')
 
-        $.when(coursesDfd, @helpLinksDfd).done (coursesDfdArgs) ->
-          options = ("<option value='course_#{c.id}_admins' #{if ENV.context_id is c.id then 'selected' else ''}>
-                      #{htmlEscape(c.name)}
-                    </option>" for c in coursesDfdArgs[0])
+        $.when(coursesDfd, @helpLinksDfd).done ([courses]) ->
+          options = $.map courses, (c) ->
+            "<option value='course_#{c.id}_admins' #{if ENV.context_id is c.id then 'selected' else ''}>
+              #{htmlEscape(c.name)}
+            </option>"
           $form.find('[name="recipients[]"]').html(options.join '')
 
     initTriggers: ->
-      $('.help_dialog_trigger').click (event) =>
-        event.preventDefault()
-        @open()
+      $('.help_dialog_trigger').click preventDefault @open
 

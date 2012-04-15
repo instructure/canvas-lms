@@ -55,6 +55,18 @@ describe "assignments" do
     response.should be_success
     Nokogiri::HTML(response.body).at_css('.graded_count').text.should match(/0 out of 1/)
   end
+
+  it "should show student view student submission as needing grading" do
+    course_with_teacher_logged_in(:active_all => true)
+    @fake_student = @course.student_view_student
+    assignment_model(:course => @course, :submission_types => 'online_text_entry', :title => 'Assignment 1')
+    @assignment.submit_homework(@fake_student, :submission_type => 'online_text_entry', :body => "my submission")
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+    response.should be_success
+    Nokogiri::HTML(response.body).at_css('.graded_count').text.should match(/0 out of 1/)
+  end
 end
 
 describe "download submissions link" do

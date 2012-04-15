@@ -45,7 +45,7 @@ define([
     }
     var attachments = [];
     var ready = function() {
-      var data = options.data;
+      var data = options.formDataTarget == 'url' ? options.formData : {};
       if(options.handle_files) {
         var result = attachments;
         if(options.single_file) {
@@ -91,7 +91,7 @@ define([
           'attachment[asset_string]': options.asset_string,
           'attachment[filename]': item.name,
           'attachment[context_code]': options.context_code
-        }, options.formData || {}), item);
+        }, options.formDataTarget == 'uploadDataUrl' ? options.formData : {}), item);
       } else {
         ready.call($this);
       }

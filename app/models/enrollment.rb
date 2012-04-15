@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -137,13 +137,18 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :all_student,
               :include => :course,
-              :conditions => "enrollments.type = 'StudentEnrollment'
+              :conditions => "(enrollments.type = 'StudentEnrollment'
                               AND enrollments.workflow_state IN ('invited', 'active', 'completed')
-                              AND courses.workflow_state IN ('available', 'completed')"
+                              AND courses.workflow_state IN ('available', 'completed')) OR
+                              (enrollments.type = 'StudentViewEnrollment'
+                              AND enrollments.workflow_state = 'active'
+                              AND courses.workflow_state != 'deleted')"
 
   named_scope :ended,
               :joins => :course,
               :conditions => "courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
+  
+  named_scope :not_fake, :conditions => "enrollments.type != 'StudentViewEnrollment'"
 
 
   READABLE_TYPES = {
@@ -151,6 +156,7 @@ class Enrollment < ActiveRecord::Base
     'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
     'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
     'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
+    'StudentViewEnrollment' => t('#enrollment.roles.student', "Student"),
     'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
   }
 
@@ -163,6 +169,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_user_account_associations_if_necessary
+    return if self.fake_student?
     if self.new_record?
       return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
@@ -302,7 +309,7 @@ class Enrollment < ActiveRecord::Base
     @long_name
   end
 
-  TYPE_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
+  TYPE_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','StudentViewEnrollment','ObserverEnrollment']
   TYPE_RANK_HASH = rank_hash(TYPE_RANK)
   def self.type_rank_sql
     # don't call rank_sql during class load
@@ -594,12 +601,16 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.typed_enrollment(type)
-    return nil unless ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].include?(type)
+    return nil unless ['StudentEnrollment', 'StudentViewEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].include?(type)
     type.constantize
   end
 
   # overridden to return true in appropriate subclasses
   def student?
+    false
+  end
+  
+  def fake_student?
     false
   end
 
@@ -770,20 +781,27 @@ class Enrollment < ActiveRecord::Base
   end
 
   def effective_start_at
-    [ start_at,
-      course_section && course_section.start_at,
-      course.start_at,
-      course.enrollment_term && course.enrollment_term.start_at,
-      course_section && course_section.created_at,
-      course.created_at
-    ].compact.first
+    # try and use the enrollment dates logic first, since it knows about
+    # overrides, etc. but if it doesn't find anything, start guessing by
+    # looking at the enrollment, section, course, then term. if we still didn't
+    # find it, fall back to the section or course creation date.
+    enrollment_dates.map(&:first).compact.min ||
+    start_at ||
+    course_section && course_section.start_at ||
+    course.start_at ||
+    course.enrollment_term && course.enrollment_term.start_at ||
+    course_section && course_section.created_at ||
+    course.created_at
   end
 
   def effective_end_at
-    [ end_at,
-      course_section && course_section.end_at,
-      course.conclude_at,
-      course.enrollment_term && course.enrollment_term.end_at
-    ].compact.first
+    # try and use the enrollment dates logic first, since it knows about
+    # overrides, etc. but if it doesn't find anything, start guessing by
+    # looking at the enrollment, section, course, then term.
+    enrollment_dates.map(&:last).compact.max ||
+    end_at ||
+    course_section && course_section.end_at ||
+    course.conclude_at ||
+    course.enrollment_term && course.enrollment_term.end_at
   end
 end

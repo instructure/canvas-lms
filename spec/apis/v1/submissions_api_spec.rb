@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe 'Submissions API', :type => :integration do
 
@@ -500,7 +501,9 @@ describe 'Submissions API', :type => :integration do
            { "content-type" => "application/loser",
              "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
              "filename" => "unknown.loser",
-             "display_name" => "unknown.loser" },
+             "display_name" => "unknown.loser",
+             "id" => sub1.attachments.first.id,
+             "size" => sub1.attachments.first.size },
          ],
         "submission_history"=>
          [{"grade"=>nil,
@@ -543,7 +546,9 @@ describe 'Submissions API', :type => :integration do
               { "content-type" => "application/loser",
                 "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
                 "filename" => "unknown.loser",
-                "display_name" => "unknown.loser" },
+                "display_name" => "unknown.loser",
+                "id" => sub1.attachments.first.id,
+                "size" => sub1.attachments.first.size },
             ],
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -599,11 +604,17 @@ describe 'Submissions API', :type => :integration do
              {"content-type" => "image/png",
               "display_name" => "ss2.png",
               "filename" => "ss2.png",
-              "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",},
+              "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",
+              "id" => sub2.attachments.first.id,
+              "size" => sub2.attachments.first.size,
+            },
              {"content-type" => "image/png",
               "display_name" => "snapshot.png",
               "filename" => "snapshot.png",
-              "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?download_frd=1&verifier=#{sub2.attachment.uuid}",},
+              "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?download_frd=1&verifier=#{sub2.attachment.uuid}",
+              "id" => sub2.attachment.id,
+              "size" => sub2.attachment.size,
+              },
             ],
            "score"=>9}],
         "attempt"=>1,
@@ -615,11 +626,17 @@ describe 'Submissions API', :type => :integration do
           {"content-type" => "image/png",
            "display_name" => "ss2.png",
            "filename" => "ss2.png",
-           "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",},
+           "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",
+              "id" => sub2.attachments.first.id,
+              "size" => sub2.attachments.first.size,
+         },
           {"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
-           "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?download_frd=1&verifier=#{sub2.attachment.uuid}",},
+           "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?download_frd=1&verifier=#{sub2.attachment.uuid}",
+           "id" => sub2.attachment.id,
+           "size" => sub2.attachment.size,
+           },
          ],
         "submission_comments"=>[],
         "score"=>9,
@@ -1555,6 +1572,30 @@ describe 'Submissions API', :type => :integration do
           'media_id' => '3232',
           'media_type' => 'audio',
         }
+      end
+    end
+
+    context "submission file uploads" do
+      before do
+        @assignment.update_attributes(:submission_types => 'online_upload')
+        @student1 = @student
+        course_with_student(:course => @course)
+        @student2 = @student
+        @user = @student1
+      end
+
+      it_should_behave_like "file uploads api"
+
+      def preflight(preflight_params)
+        api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}/files",
+          { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student1.to_param },
+          preflight_params)
+      end
+
+      it "should reject uploading files to other students' submissions" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
+                        { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student2.to_param }, {}, {}, { :expected_status => 401 })
+        json["message"].should match(/not authorized/i)
       end
     end
 

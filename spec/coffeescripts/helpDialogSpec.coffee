@@ -2,8 +2,6 @@ require [
   'compiled/helpDialog'
   'vendor/jquery.ba-tinypubsub'
   'helpers/fakeENV'
-  'helpers/ajax_mocks/help_links'
-  'helpers/ajax_mocks/api/v1/courses'
 
 ], (helpDialog)->
 
@@ -14,23 +12,39 @@ require [
     ie: true
     version: 8
 
-  module 'HelpDialog Static methods'
+  module 'HelpDialog',
 
-  test 'init', 1, ->
+    setup: ->
+      @clock = sinon.useFakeTimers()
+      @server = sinon.fakeServer.create()
+      @server.respondWith '/help_links', '[]'
+      @server.respondWith '/api/v1/courses.json', '[]'
+
+    teardown: ->
+      @server.restore()
+
+      # if we don't close it after each test, subsequent tests get messed up.
+      # additionally, closing it starts an animation, so tick past that.
+      if helpDialog.$dialog?
+        helpDialog.$dialog.dialog('close') #cleanup
+        @clock.tick 200
+      @clock.restore()
+
+      # reset the shared object
+      helpDialog.dialogInited = false
+      helpDialog.teacherFeedbackInited = false
+
+  test 'init', ->
     $tester = $('<a class="help_dialog_trigger" />').appendTo('body')
     helpDialog.initTriggers()
     $tester.click()
     ok $('.ui-dialog-content').is(':visible'), "help dialog appears when you click 'help' link"
 
-  module 'HelpDialog'
-
-  asyncTest 'teacher feedback', 1, ->
-    $(helpDialog).bind 'ready', ->
-      helpDialog.switchTo "#teacher_feedback"
-      setTimeout ->
-        ok helpDialog.$dialog.find('#teacher-feedback-body').is(':visible'), "textarea shows up"
-        helpDialog.$dialog.dialog('close') #cleanup
-        start()
-      , 101
+  test 'teacher feedback', ->
     helpDialog.open()
+    @server.respond()
 
+    helpDialog.switchTo "#teacher_feedback"
+    @clock.tick 200
+
+    ok helpDialog.$dialog.find('#teacher-feedback-body').is(':visible'), "textarea shows up"

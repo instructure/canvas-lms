@@ -27,9 +27,10 @@ describe "Standard Common Cartridge importing" do
   end
   
   it "should import webcontent" do
-    @course.attachments.count.should == 7
-    %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 802ccbaffe288c33580ae91db32764ab}.each do |mig_id|
-      @course.attachments.find_by_migration_id(mig_id).migration_id.should ==  mig_id
+    @course.attachments.count.should == 10
+    atts = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
+    atts.each do |mig_id|
+      @course.attachments.find_by_migration_id(mig_id).should_not be_nil
     end
   end
   
@@ -128,8 +129,7 @@ describe "Standard Common Cartridge importing" do
     et.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}, {:platform=>"your.lms.com", :custom_fields=>{"key"=>"value", "key2"=>"value2"}}]
     @migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.").should be_true
   end
-  
-  
+
   it "should import assessment data" do
     if Qti.qti_enabled?
       quiz = @course.quizzes.find_by_migration_id("I_00003_R")
@@ -145,6 +145,18 @@ describe "Standard Common Cartridge importing" do
       bank = @course.assessment_question_banks.find_by_migration_id("I_00004_R_QDB_1")
       bank.assessment_questions.count.should == 11
       bank.title.should == "QDB_1"
+    else
+      pending("Can't import assessment data with python QTI tool.")
+    end
+  end
+
+  it "should find update urls in questions" do
+    if Qti.qti_enabled?
+      q = @course.assessment_questions.find_by_migration_id("I_00003_R_QUE_104045")
+
+      q.question_data[:question_text].should =~ %r{/assessment_questions/#{q.id}/files/\d+/}
+      q.question_data[:answers].first[:html].should =~ %r{/assessment_questions/#{q.id}/files/\d+/}
+      q.question_data[:answers].first[:comments_html].should =~ %r{/assessment_questions/#{q.id}/files/\d+/}
     else
       pending("Can't import assessment data with python QTI tool.")
     end

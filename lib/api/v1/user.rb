@@ -25,6 +25,7 @@ module Api::V1::User
   }
 
   def user_json(user, current_user, session, includes = [], context = @context)
+    includes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
       if user_json_is_admin?(context, current_user)
         if sis_pseudonym = user.sis_pseudonym_for(@domain_root_account)

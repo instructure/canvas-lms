@@ -406,7 +406,6 @@ define([
       if (data.points_possible) { params['points_possible'] = data.points_possible; }
       if(data.assignment_group_id) { params['assignment_group_id'] = data.assignment_group_id; }
       if(data.submission_types) { params['submission_types'] = data.submission_types; }
-      params['model_key'] = Math.round(Math.random() * 999999);
       if(INST && INST.gettingStartedPage) {
         params['getting_started'] = '1';
       }

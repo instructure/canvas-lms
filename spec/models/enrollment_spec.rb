@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -298,7 +298,7 @@ describe Enrollment do
       course_with_student(:active_all => true)
       @c1 = @course
       @s2 = @course.course_sections.create!(:name => 's2')
-      @course.student_enrollments.create!(:user => @user, :course_section => @s2)
+      @course.enroll_student(@user, :section => @s2, :allow_multiple_enrollments => true)
       @user.student_enrollments(true).count.should == 2
       course_with_student(:user => @user)
       @c2 = @course
@@ -1177,16 +1177,29 @@ describe Enrollment do
       (@term = @course.enrollment_term).should_not be_nil
       (@section = @enrollment.course_section).should_not be_nil
 
-      # 6 different possible times, make sure they're distinct
-      @enrollment.start_at = 6.minutes.ago
-      @section.start_at = 5.minutes.ago
-      @course.start_at = 4.minutes.ago
-      @term.start_at = 3.minutes.ago
-      @section.created_at = 2.minutes.ago
-      @course.created_at = 1.minute.ago
+      # 7 different possible times, make sure they're distinct
+      @enrollment_date_start_at = 7.days.ago
+      @enrollment.start_at = 6.days.ago
+      @section.start_at = 5.days.ago
+      @course.start_at = 4.days.ago
+      @term.start_at = 3.days.ago
+      @section.created_at = 2.days.ago
+      @course.created_at = 1.days.ago
     end
 
-    it "should follow chain of fallbacks in correct order" do
+    it "should utilize to enrollment_dates if it has a value" do
+      @enrollment.stubs(:enrollment_dates).returns([[@enrollment_date_start_at, nil]])
+      @enrollment.effective_start_at.should == @enrollment_date_start_at
+    end
+
+    it "should use earliest value from enrollment_dates if it has multiple" do
+      @enrollment.stubs(:enrollment_dates).returns([[@enrollment.start_at, nil], [@enrollment_date_start_at, nil]])
+      @enrollment.effective_start_at.should == @enrollment_date_start_at
+    end
+
+    it "should follow chain of fallbacks in correct order if no enrollment_dates" do
+      @enrollment.stubs(:enrollment_dates).returns([[nil, Time.now]])
+
       # start peeling away things from most preferred to least preferred to
       # test fallback chain
       @enrollment.effective_start_at.should == @enrollment.start_at
@@ -1207,7 +1220,6 @@ describe Enrollment do
     it "should not explode when missing section or term" do
       @enrollment.course_section = nil
       @course.enrollment_term = nil
-
       @enrollment.effective_start_at.should == @enrollment.start_at
       @enrollment.start_at = nil
       @enrollment.effective_start_at.should == @course.start_at
@@ -1224,14 +1236,27 @@ describe Enrollment do
       (@term = @course.enrollment_term).should_not be_nil
       (@section = @enrollment.course_section).should_not be_nil
 
-      # 4 different possible times, make sure they're distinct
-      @enrollment.end_at = 4.minutes.ago
-      @section.end_at = 3.minutes.ago
-      @course.conclude_at = 2.minutes.ago
-      @term.end_at = 1.minutes.ago
+      # 5 different possible times, make sure they're distinct
+      @enrollment_date_end_at = 1.days.ago
+      @enrollment.end_at = 2.days.ago
+      @section.end_at = 3.days.ago
+      @course.conclude_at = 4.days.ago
+      @term.end_at = 5.days.ago
     end
 
-    it "should follow chain of fallbacks in correct order" do
+    it "should utilize to enrollment_dates if it has a value" do
+      @enrollment.stubs(:enrollment_dates).returns([[nil, @enrollment_date_end_at]])
+      @enrollment.effective_end_at.should == @enrollment_date_end_at
+    end
+
+    it "should use earliest value from enrollment_dates if it has multiple" do
+      @enrollment.stubs(:enrollment_dates).returns([[nil, @enrollment.end_at], [nil, @enrollment_date_end_at]])
+      @enrollment.effective_end_at.should == @enrollment_date_end_at
+    end
+
+    it "should follow chain of fallbacks in correct order if no enrollment_dates" do
+      @enrollment.stubs(:enrollment_dates).returns([[nil, nil]])
+
       # start peeling away things from most preferred to least preferred to
       # test fallback chain
       @enrollment.effective_end_at.should == @enrollment.end_at

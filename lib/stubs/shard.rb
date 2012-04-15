@@ -33,12 +33,20 @@ class Shard
     Array(yield array)
   end
 
+  def self.with_each_shard
+    yield
+  end
+
   def activate
     yield
   end
 
   def default?
     true
+  end
+
+  def settings
+    {}
   end
 
   module RSpec

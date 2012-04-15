@@ -17,7 +17,7 @@
 #
 
 def quiz_model(opts={})
-  @context ||= course_model(:reusable => true)
+  @context ||= opts.delete(:course) || course_model(:reusable => true)
   @quiz = @context.quizzes.build(valid_quiz_attributes.merge(opts))
   @quiz.published_at = Time.now
   @quiz.workflow_state = 'available'

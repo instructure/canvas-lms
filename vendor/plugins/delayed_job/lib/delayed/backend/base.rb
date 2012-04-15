@@ -15,6 +15,8 @@ module Delayed
       end
 
       module ClassMethods
+        attr_accessor :batches
+
         # Add a job to the queue
         # The first argument should be an object that respond_to?(:perform)
         # The rest should be named arguments, these keys are expected:
@@ -37,6 +39,9 @@ module Delayed
               self.clear_strand!(options[:strand])
               self.create(options)
             end
+          elsif batches && options.slice(:strand, :run_at).empty?
+            batch_enqueue_args = options.slice(:priority, :queue)
+            batches[batch_enqueue_args] << options
           else
             self.create(options)
           end
@@ -81,6 +86,7 @@ module Delayed
       end
 
       def payload_object=(object)
+        @payload_object = object
         self['handler'] = object.to_yaml
         self['tag'] = if object.respond_to?(:tag)
           object.tag
@@ -96,6 +102,10 @@ module Delayed
         Delayed::Job.in_delayed_job = true
         payload_object.perform
         Delayed::Job.in_delayed_job = false
+      end
+
+      def batch?
+        payload_object.is_a?(Delayed::Batch::PerformableBatch)
       end
 
       # Unlock this job (note: not saved to DB)

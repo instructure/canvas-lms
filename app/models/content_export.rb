@@ -21,6 +21,7 @@ class ContentExport < ActiveRecord::Base
   belongs_to :course
   belongs_to :user
   belongs_to :attachment
+  belongs_to :content_migration
   has_many :attachments, :as => :context, :dependent => :destroy
   has_a_broadcast_policy
   serialize :settings
@@ -30,6 +31,7 @@ class ContentExport < ActiveRecord::Base
     state :created
     state :exporting
     state :exported
+    state :exported_for_course_copy
     state :failed
     state :deleted
   end
@@ -48,12 +50,17 @@ class ContentExport < ActiveRecord::Base
     }
   end
   
-  def export_course
+  def export_course(opts={})
     self.workflow_state = 'exporting'
     self.save
     begin
-      if CC::CCExporter.export(self)
-        self.workflow_state = 'exported'
+      if CC::CCExporter.export(self, opts.merge({:for_course_copy => for_course_copy?}))
+        self.progress = 100
+        if for_course_copy?
+          self.workflow_state = 'exported_for_course_copy'
+        else
+          self.workflow_state = 'exported'
+        end
       else
         self.workflow_state = 'failed'
       end
@@ -65,6 +72,14 @@ class ContentExport < ActiveRecord::Base
     end
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
+  def for_course_copy?
+    self.settings[:for_course_copy]
+  end
+
+  def for_course_copy=(val)
+    self.settings[:for_course_copy] = val
+  end
   
   def error_message
     self.settings[:errors] ? self.settings[:errors].last : nil
@@ -72,6 +87,28 @@ class ContentExport < ActiveRecord::Base
   
   def error_messages
     self.settings[:errors] ||= []
+  end
+
+  def selected_content=(copy_settings)
+    self.settings[:selected_content] = copy_settings
+  end
+
+  def selected_content
+    self.settings[:selected_content]
+  end
+
+  def export_object?(obj)
+    return false unless obj
+    return true unless selected_content
+    return true if is_set?(selected_content[:everything])
+
+    asset_type = obj.class.table_name
+    return true if is_set?(selected_content["all_#{asset_type}"])
+
+    return false unless selected_content[asset_type]
+    return true if is_set?(selected_content[asset_type][CC::CCHelper.create_key(obj)])
+
+    false
   end
   
   def add_error(user_message, exception_or_info)
@@ -100,7 +137,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def settings
-    read_attribute(:settings) || write_attribute(:settings,{})
+    read_attribute(:settings) || write_attribute(:settings,{}.with_indifferent_access)
   end
   
   def fast_update_progress(val)
@@ -109,6 +146,13 @@ class ContentExport < ActiveRecord::Base
   end
   
   named_scope :active, {:conditions => ['workflow_state != ?', 'deleted']}
+  named_scope :not_for_copy, {:conditions => ['workflow_state != ?', 'exported_for_course_copy']}
   named_scope :running, {:conditions => ['workflow_state IN (?)', ['created', 'exporting']]}
+
+  private
+
+  def is_set?(option)
+    Canvas::Plugin::value_to_boolean option
+  end
   
 end

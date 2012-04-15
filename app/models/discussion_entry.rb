@@ -167,7 +167,7 @@ class DiscussionEntry < ActiveRecord::Base
   def update_discussion
     if %w(workflow_state message attachment_id editor_id).any? { |a| self.changed.include?(a) }
       self.discussion_topic.touch
-      self.discussion_topic.update_materialized_view
+      connection.after_transaction_commit { self.discussion_topic.update_materialized_view }
     end
   end
 

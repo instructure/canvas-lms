@@ -6,7 +6,7 @@ require([
 ], function($) {
 
 window.parentWindow = window.parent;
-window.callback = '<%= params[:service] %>'; // TODO: get this out of global context
+window.callback = <%= raw params[:service].to_json %>; // TODO: get this out of global context
 while(parentWindow && !parentWindow[callback]) {
   parentWindow = parentWindow.parent;
 }

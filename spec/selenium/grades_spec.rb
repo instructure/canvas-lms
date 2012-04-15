@@ -71,6 +71,23 @@ describe "grades" do
     @third_assignment = assignment_model({ :name => 'third assignment', :due_at => due_date, :course => @course })
   end
 
+  context "as a teacher" do
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    it "should be available to student view student" do
+      @fake_student = @course.student_view_student
+      @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
+      @first_assignment.grade_student(@fake_student, :grade => 8)
+
+      enter_student_view
+      get "/courses/#{@course.id}/grades"
+
+      f("#submission_#{@first_assignment.id} .grade").should include_text "8"
+    end
+  end
+
   context "as a student" do
     before(:each) do
       user_session(@student_1)
@@ -83,18 +100,19 @@ describe "grades" do
       Assignment.expects(:find_or_create_submission).once.returns(@submission)
 
       #check initial total
-      final_row = driver.find_element(:css, '#submission_final-grade')
-      final_row.find_element(:css, '.assignment_score .grade').text.should == '33.3'
+      driver.find_element(:css, '#submission_final-grade .assignment_score .grade').text.should == '33.3'
 
       #test changing existing scores
       first_row_grade = driver.find_element(:css, "#submission_#{@submission.assignment_id} .assignment_score .grade")
       first_row_grade.click
       set_value(first_row_grade.find_element(:css, 'input'), '4')
       first_row_grade.find_element(:css, 'input').send_keys(:return)
-      wait_for_ajax_requests
-      keep_trying_until { final_row.find_element(:css, '.assignment_score .grade').text.should == '40' }
 
-      wait_for_ajax_requests
+      #using find with jquery to avoid caching issues
+      keep_trying_until { 
+        wait_for_ajaximations
+        find_with_jquery('#submission_final-grade .assignment_score .grade').text.should == '40'
+      }
     end
 
     it "should display rubric on assignment" do
@@ -147,7 +165,6 @@ describe "grades" do
       #statistics_text.include?('Mean: 3.5').should be_true
       #statistics_text.include?('High: 4').should be_true
       #statistics_text.include?('Low: 3').should be_true
-
     end
   end
 

@@ -84,6 +84,9 @@ shared_examples_for "files selenium tests" do
     driver.find_element(:css, "#files_content .add_folder_form #folder_name").send_keys("my folder\n")
     wait_for_ajax_requests
     driver.find_element(:css, ".node.folder span").should have_class('ui-droppable')
+
+    # also make sure that it has a tooltip of the file name so that you can read really long names
+    f(".node.folder .name[title='my folder']").should_not be_nil
   end
 
 end

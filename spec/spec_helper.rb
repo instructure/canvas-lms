@@ -108,6 +108,7 @@ Spec::Runner.configure do |config|
     HostUrl.reset_cache!
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
+    Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -276,7 +277,7 @@ Spec::Runner.configure do |config|
   end
 
   def course_with_ta(opts={})
-    course_with_user("TAEnrollment", opts)
+    course_with_user("TaEnrollment", opts)
     @ta = @user
     @enrollment
   end
@@ -330,8 +331,17 @@ Spec::Runner.configure do |config|
   end
 
   def multiple_student_enrollment(user, section)
-    @enrollment = @course.student_enrollments.build(:user => user, :workflow_state => "active", :course_section => section)
-    @enrollment.save!
+    @enrollment = @course.enroll_student(user,
+                                         :enrollment_state => "active",
+                                         :section => section,
+                                         :allow_multiple_enrollments => true)
+  end
+
+  def enter_student_view(opts={})
+    course = opts[:course] || @course || course(opts)
+    @fake_student = course.student_view_student
+    post "/users/#{@fake_student.id}/masquerade"
+    session[:become_user_id].should == @fake_student.id.to_s
   end
 
   def group(opts={})
@@ -615,11 +625,17 @@ Spec::Runner.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection
-    ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
-    yield
+  def enable_forgery_protection(enable = nil)
+    if enable != false
+      ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
+    end
+
+    yield if block_given?
+
   ensure
-    ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
+    if enable != true
+      ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
+    end
   end
 
   def start_test_http_server(requests=1)
@@ -700,5 +716,19 @@ Spec::Runner.configure do |config|
 
   def run_job(job)
     Delayed::Worker.new.perform(job)
+  end
+
+  # send a multipart post request in an integration spec post_params is
+  # an array of [k,v] params so that the order of the params can be
+  # defined
+  def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
+    mp = Multipart::MultipartPost.new
+    query, headers = mp.prepare_query(post_params)
+    send(method, url, query, headers.merge(http_headers))
+  end
+
+  def run_transaction_commit_callbacks(conn = ActiveRecord::Base.connection)
+    conn.after_transaction_commit_callbacks.each { |cb| cb.call }
+    conn.after_transaction_commit_callbacks.clear
   end
 end

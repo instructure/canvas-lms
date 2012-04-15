@@ -27,24 +27,24 @@ describe "assignment rubrics" do
       create_assignment_with_points(initial_points)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      driver.find_element(:css, '.add_rubric_link').click
-      set_value(driver.find_element(:css, '.rubric_title input[name="title"]'), rubric_name)
+      f('.add_rubric_link').click
+      set_value(f('.rubric_title input[name="title"]'), rubric_name)
       criterion_points = find_with_jquery('.criterion_points:visible')
       set_value(criterion_points, initial_points)
       criterion_points.send_keys(:return)
       driver.find_element(:id, 'grading_rubric').click
       wait_for_ajax_requests
-      driver.find_element(:css, '#edit_rubric_form').submit
+      f('#edit_rubric_form').submit
       wait_for_ajaximations
       rubric = Rubric.last
       rubric.data.first[:points].should eql(initial_points)
       rubric.data.first[:ratings].first[:points].should eql(initial_points)
-      driver.find_element(:css, '#rubrics .rubric .rubric_title .displaying .title').should include_text(rubric_name)
+      f('#rubrics .rubric .rubric_title .displaying .title').should include_text(rubric_name)
 
       #Commented out because we still want this test to run but this is the part where the bug is
       #BUG 7193 - Rubric total overwrites assignment total despite choosing to leave them different
       #get "/courses/#{@course.id}/assignments"
-      #driver.find_element(:css, '.points_text').should include_text(initial_points.to_s)
+      #f('.points_text').should include_text(initial_points.to_s)
     end
 
     it "should carry decimal values through rubric to grading" do
@@ -70,10 +70,10 @@ describe "assignment rubrics" do
           end
       full_rubric_button.click
       find_with_jquery('#rubric_holder .criterion:visible .rating').click
-      driver.find_element(:css, '#rubric_holder .save_rubric_button').click
+      f('#rubric_holder .save_rubric_button').click
       wait_for_ajaximations
 
-      driver.find_element(:css, '#rubric_summary_container .rubric_total').text.should == '2.5'
+      f('#rubric_summary_container .rubric_total').text.should == '2.5'
     end
 
     it "should import rubric to assignment" do
@@ -84,13 +84,13 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      driver.find_element(:css, '.add_rubric_link').click
-      driver.find_element(:css, '#rubric_new .editing .find_rubric_link').click
+      f('.add_rubric_link').click
+      f('#rubric_new .editing .find_rubric_link').click
       wait_for_ajax_requests
-      driver.find_element(:css, '#rubric_dialog_'+@rubric.id.to_s+' .title').should include_text(@rubric.title)
-      driver.find_element(:css, '#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
+      f('#rubric_dialog_'+@rubric.id.to_s+' .title').should include_text(@rubric.title)
+      f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
       wait_for_ajaximations
-      driver.find_element(:css, '#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
+      f('#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
 
     end
 
@@ -98,31 +98,31 @@ describe "assignment rubrics" do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+      f("#full_assignment .points_possible").text.should == '2'
 
-      driver.find_element(:css, '.add_rubric_link').click
+      f('.add_rubric_link').click
       driver.find_element(:id, 'grading_rubric').click
       driver.find_element(:id, 'edit_rubric_form').submit
       find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
       wait_for_ajaximations
-      driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
-      driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+      f('#rubrics span .rubric_total').text.should == '5'
+      f("#full_assignment .points_possible").text.should == '2'
     end
 
     it "should adjust assignment points possible for grading rubric" do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      driver.find_element(:css, "#full_assignment .points_possible").text.should == '2'
+      f("#full_assignment .points_possible").text.should == '2'
 
-      driver.find_element(:css, '.add_rubric_link').click
+      f('.add_rubric_link').click
       driver.find_element(:id, 'grading_rubric').click
       driver.find_element(:id, 'edit_rubric_form').submit
       find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Change")').click
       wait_for_ajaximations
 
-      driver.find_element(:css, '#rubrics span .rubric_total').text.should == '5'
-      driver.find_element(:css, "#full_assignment .points_possible").text.should == '5'
+      f('#rubrics span .rubric_total').text.should == '5'
+      f("#full_assignment .points_possible").text.should == '5'
     end
 
     it "should not allow XSS attacks through rubric descriptions" do
@@ -163,17 +163,17 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
-      driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
+      f("#rubric_long_description_dialog div.displaying .long_description").
           text.should == "<b>This text should not be bold</b>"
       close_visible_dialog
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      driver.find_element(:css, ".toggle_full_rubric").click
+      f(".toggle_full_rubric").click
       wait_for_animations
-      driver.find_element(:css, '#criterion_1 .long_description_link').click
+      f('#criterion_1 .long_description_link').click
       keep_trying_until { driver.find_element(:id, 'rubric_long_description_dialog').should be_displayed }
-      driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
+      f("#rubric_long_description_dialog div.displaying .long_description").
           text.should == "<b>This text should not be bold</b>"
     end
 
@@ -191,17 +191,17 @@ describe "assignment rubrics" do
       @assignment.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-      driver.find_element(:css, '.assess_submission_link').click
-      driver.find_element(:css, '.total_points_holder .assessing').should include_text "out of 5"
-      driver.find_element(:css, "#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
-      driver.find_element(:css, '.rubric_total').should include_text "5"
-      driver.find_element(:css, '.save_rubric_button').click
+      f('.assess_submission_link').click
+      f('.total_points_holder .assessing').should include_text "out of 5"
+      f("#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
+      f('.rubric_total').should include_text "5"
+      f('.save_rubric_button').click
       wait_for_ajaximations
-      driver.find_element(:css, '.grading_value').attribute(:value).should == "5"
+      f('.grading_value').attribute(:value).should == "5"
     end
 
     def mark_rubric_for_grading(rubric, expect_confirmation)
-      driver.find_element(:css, "#rubric_#{rubric.id} .edit_rubric_link").click
+      f("#rubric_#{rubric.id} .edit_rubric_link").click
       driver.switch_to.alert.accept if expect_confirmation
       find_with_jquery(".grading_rubric_checkbox:visible").click
       find_with_jquery(".save_button:visible").click
@@ -242,9 +242,35 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      driver.find_element(:css, "#rubrics .rubric_title").text.should == "My Rubric"
-      driver.find_element(:css, ".criterion_description .long_description_link").click
-      driver.find_element(:css, ".ui-dialog div.long_description").text.should == "This is awesome."
+      f("#rubrics .rubric_title").text.should == "My Rubric"
+      f(".criterion_description .long_description_link").click
+      f(".ui-dialog div.long_description").text.should == "This is awesome."
+    end
+
+    it "should show criterion comments" do
+      # given
+      comment = 'a comment'
+      teacher_in_course(:course => @course)
+      assignment = @course.assignments.create(:name => 'assignment with rubric')
+      outcome_with_rubric
+      association = @rubric.associate_with(assignment, @course, :purpose => 'grading')
+      assessment = association.assess(:user => @student,
+                                      :assessor => @teacher,
+                                      :artifact => assignment.find_or_create_submission(@student),
+                                      :assessment => {
+                                        :assessment_type => 'grading',
+                                        :"criterion_#{@rubric.criteria_object.first.id}" => {
+                                        :points => 3,
+                                          :comments => comment,
+                                        }
+                                      })
+      # when
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+      f('a.assess_submission_link').click
+      # expect
+      ee = ff('.criterion_comments')
+      ee.first.should be_displayed
+      ee.last.should_not be_displayed
     end
   end
 
@@ -259,13 +285,13 @@ describe "assignment rubrics" do
         get "/courses/#{@course.id}/rubrics"
 
         expect {
-          driver.find_element(:css, '.add_rubric_link').click
-          replace_content(driver.find_element(:css, '.rubric_title input'), rubric_name)
+          f('.add_rubric_link').click
+          replace_content(f('.rubric_title input'), rubric_name)
           driver.find_element(:id, 'edit_rubric_form').submit
           wait_for_ajaximations
         }.to change(Rubric, :count).by(1)
         refresh_page
-        driver.find_element(:css, '#rubrics .title').text.should == rubric_name
+        f('#rubrics .title').text.should == rubric_name
       end
     end
   end

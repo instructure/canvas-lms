@@ -107,6 +107,7 @@ describe ContextController do
   describe "POST 'object_snippet'" do
     before(:each) do
       @obj = "<object data='test'></object>"
+      HostUrl.stubs(:is_file_host?).returns(true)
       @data = Base64.encode64(@obj)
       @hmac = Canvas::Security.hmac_sha1(@data)
     end

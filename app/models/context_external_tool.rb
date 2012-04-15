@@ -358,7 +358,9 @@ class ContextExternalTool < ActiveRecord::Base
     tools.each do |tool|
       if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
         item = import_from_migration(tool, migration.context)
-        migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
+        if item.consumer_key == 'fake' || item.shared_secret == 'fake'
+          migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
+        end
       end
     end
   end
@@ -410,8 +412,8 @@ class ContextExternalTool < ActiveRecord::Base
     item.url = hash[:url] unless hash[:url].blank?
     item.domain = hash[:domain] unless hash[:domain].blank?
     item.privacy_level = hash[:privacy_level] || 'name_only'
-    item.consumer_key ||= 'fake'
-    item.shared_secret ||= 'fake'
+    item.consumer_key ||= hash[:consumer_key] || 'fake'
+    item.shared_secret ||= hash[:shared_secret] || 'fake'
     item.settings = hash[:settings].with_indifferent_access if hash[:settings].is_a?(Hash)
     if hash[:custom_fields].is_a? Hash
       item.settings[:custom_fields] ||= {}
