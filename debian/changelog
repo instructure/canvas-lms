@@ -1,3 +1,102 @@
+canvas-lms (2012.04.14.12) stable; urgency=low
+
+  * Package ref: 1079bfa7fbb10241d4969cefedf422f0e86d09a6
+  *
+  * [+8d28b9b] separate require_pseudonym from require_user; closes #7718
+  * [+a9526cd] support for deferred delayed job creation, refs #7277
+  * [+83fbaa6] auto-unarchive when sending direct messages, fixes #5366
+  * [+7fa514f] create messages with the user/cc, not the default shard
+  * [+0082d12] spec: fix selenium grades_spec intermittent failure
+  * [+38b761c] fix self signup help dialog account level fixes #7778
+  * [+c0f7383] get rid of barista since we do our on cs generation
+  * [+2371823] simple ui for site admins to debug message sending
+  * [+0a4bae9] use global ids for message reply to addresses fixes #7723
+  * [+a516c8d] allow for specifying a build pattern when executing parallel specs
+  * [+c4c53a3] spec: use fj for find_with_jquery in selenium tests
+  * [+9db55ea] spec: add selenium spec to scheduler file
+  * [+49ed24c] do LTI tool stuff relative to the tool's shard refs #6886
+  * [+4e98b66] grades page works with multiple enrollments; fixes #7614
+  * [+1b540ba] add auto link plugin to tinyMCE
+  * [+3239192] spec: admin manage groups selenium tests
+  * [+e0d3bdc] Make "message students who haven't submitted" less confusing
+  * [+16c5f91] notify user that default grade change doesn't change anything.
+  * [+dd8fe9e] underscore needed to be loaded by use!, fixes selenium
+  * [+b66e3aa] don't block rendering tinymce skin while loading simbola font
+  * [+1834401] file upload api, refs #7775
+  * [+4da8dc2] file upload api for courses, users, and groups
+  * [+b8262b0] fix logging of jobs with a % in them
+  * [+3c68044] run delayed jobs and guard with script/server in dev
+  * [+755dc78] fix typo in error message
+  * [+fbf9aab] support "self" as a user id in some routes
+  * [+aba524e] fix js:test for OSX, plugins, and dynamic manifest
+  * [+a8b2450] run periodic jobs for all shards fixes #7722
+  * [+3eea039] fix image urls in common cartridge qti imports
+  * [+d7e3d5e] refactor ReportSnapshot refs #7721
+  * [+dd8c72a] fix regression from AMD commit
+  * [+fa6f37f] shortcut for common event.preventDefault pattern
+  * [+fa4c4a7] don't serialize full AR objects in job names
+  * [+62b9ed4] require a logged-in user when backing up a quiz
+  * [+51da3f3] stop displaying new media comment as modal. fixes #7794
+  * [+ce6593d] fix time race condition in spec
+  * [+ada5067] add api to return user's pseudonyms across all accounts. fixes #7946
+  * [+07b9bae] return rubric points total with rubric response, fixes #7149
+  * [+729bd31] write running spec name to Rails log
+  * [+f6192f0] plumb current host to files_host calls
+  * [+363dd41] anchored plugin assets
+  * [+fb8493d] hide "add reply to topic" for closed discussions
+  * [+9e93e80] update the topic materialized view after the entry save transaction commits
+  * [+89c1a5f] always search for deprecated api key usage on the default shard
+  * [+03424c9] use ids relative to the default shard for strands refs #6886
+  * [+e51ffb9] show the quiz question title on the quiz statistics page
+  * [+d536bb8] add public_description to course model. fixes #7761
+  * [+549beb7] strip html from .ics descriptions, fixes #7365
+  * [+59c4bd0] fix selecting a login when a single user is found fixes #7900
+  * [+33b350b] exclude soft concluded courses from dropdown fixes #7536
+  * [+11ff6d2] max width on avatar pics
+  * [+4e5cf14] faster bulk message sending, refs #7277
+  * [+c31ea9d] fix multiple selection qti question
+  * [+974bd63] don't break when "take quiz" is double-clicked
+  * [+6442743] make appointment event edit dialog less ugly
+  * [+68a6f64] spec: detect when ajax requests will never time out due to a js error
+  * [+6a82ae0] see file/folder name on hover, fixes: #7770
+  * [+c0334ed] fix quiz issues around rich text and numerical inputs, fixes #7475
+  * [+0f32c1d] avatars in gradebook2
+  * [+506ec04] save attachments before message creation, fixes #7229
+  * [+f4bfd58] change string wording in notification.rb
+  * [+ed55881] use built-in authlogic password generation closes #8002
+  * [+37a65ce] allow selective course exports
+  * [+a942ede] convert course copy to use export/import functionality
+  * [+567eb8b] re-add selective course copy options
+  * [+df532a4] remove unneeded selection options when choosing migration content
+  * [+0c964bc] student view; closes #6995
+  * [+9c7d84e] appointment groups: allow limiting max appts per participant
+  * [+4be0268] scheduler: allow teachers to cancel student appointments
+  * [+beb70eb] scheduler: per-appointment participant limit
+  * [+4fd4b60] show teacher's comments in rubric for students, fixes #7291
+  * [+9e48dda] fix attachment migration for mysql, make it nicer for all dbs
+  * [+de8bc1c] filter conversations while masquerading, fixes #7634
+  * [+55de28c] redirect to the correct domain when logging in where they shouldn't
+  * [+0c70776] remove modal backdrop from media upload window.
+  * [+25f1934] fix enrollment effective_start/end_at
+  * [+8040f42] allow student view student to upload files; fixes #7938
+  * [+701313c] re-combine require_user and require_pseudonym
+  * [+9dbd3b4] fix pretending for preferred search method creating users with invalid emails
+  * [+27877a8] disallow object_snippet calls on non-safefiles domains
+  * [+b78ce5b] use will_pagniate helper for error reports rendering
+  * [+ccea5dd] make migration pgbouncer-friendly, move to delayed job
+  * [+634481b] remove non-functioning model_key code from assignments controller
+  * [+6479b38] properly js escape the service param to external_content
+  * [+6ceb28a] change ajax url for calendar1 month data
+  * [+fa2c942] fix the course sections api, fixes #8108
+  * [+c6fc0e1] allow student view student to use unpublished courses; fixes #8100
+  * [+fe5fa66] don't use a raw array as a hash key
+  * [+d825038] make attachment data migration faster and pgbouncer-friendly
+  * [+8d56bac] allow any url for mathquill fixes #8038
+  * [+6bffca9] fix e-mail address validation failure breaking registration page
+  * [+1079bfa] send correct params on homework submission; fixes #8145
+
+ -- Brian Palmer <brianp@instructure.com>  Sun, 15 Apr 2012 12:58:11 -0600
+
 canvas-lms (2012.03.31.22) stable; urgency=low
 
   * Package ref: 08b3dfdbbfc96f1ecbefcb102657b9736e16d8fa
