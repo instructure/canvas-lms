@@ -21,11 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 
 class TestUserApi
   include Api::V1::User
-  attr_accessor :services_enabled, :context, :current_user
+  attr_accessor :services_enabled, :context, :current_user, :params, :request
   def service_enabled?(service); @services_enabled.include? service; end
-  def avatar_image_url(user_id); "avatar_image_url(#{user_id})"; end
+  def avatar_image_url(*args); "avatar_image_url(#{args.first})"; end
   def initialize
     @domain_root_account = Account.default
+    @params = {}
+    @request = OpenStruct.new
   end
 end
 
@@ -175,6 +177,10 @@ describe Api::V1::User do
 end
 
 describe "Users API", :type => :integration do
+  def avatar_url(id)
+    "http://www.example.com/images/users/#{User.avatar_key(id)}?fallback=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png"
+  end
+
   before do
     @admin = account_admin_user
     course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
@@ -196,7 +202,7 @@ describe "Users API", :type => :integration do
       'sis_user_id' => 'sis-user-id',
       'sis_login_id' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}",
+      'avatar_url' => avatar_url(@student.id),
     }
   end
 
@@ -221,7 +227,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'new guy',
       'login_id' => nil,
       'primary_email' => nil,
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(new_user.id)}",
+      'avatar_url' => avatar_url(new_user.id),
     }
 
     get("/courses/#{@course.id}/students")
@@ -237,7 +243,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'User',
       'primary_email' => 'nobody@example.com',
       'login_id' => 'nobody@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@admin.id)}",
+      'avatar_url' => avatar_url(@admin.id),
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
     }
   end
@@ -253,7 +259,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'Student',
       'primary_email' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}",
+      'avatar_url' => avatar_url(@student.id),
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
     }
   end

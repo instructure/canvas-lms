@@ -1,7 +1,8 @@
 define [
   'jquery'
+  'Backbone'
   'jst/PaginatedView'
-], ($, template) ->
+], ($, Backbone, template) ->
 
   class PaginatedView extends Backbone.View
 
@@ -11,8 +12,11 @@ define [
 
     distanceTillFetchNextPage: 100
 
-    initialize: ->
-      ret = super
+    # options
+    #   fetchOptions: options passed to the collection's fetch function
+    initialize: (options) ->
+      ret = super options
+      @fetchOptions = options.fetchOptions
       @startPaginationListener()
       @collection.on 'beforeFetchNextPage', @showPaginationLoader, this
       @collection.on 'didFetchNextPage', @hidePaginationLoader, this
@@ -51,4 +55,4 @@ define [
         @stopPaginationListener() if @collection.length
         return
       if @distanceToBottom() < @distanceTillFetchNextPage
-        @collection.fetchNextPage()
+        @collection.fetchNextPage @fetchOptions

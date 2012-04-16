@@ -23,6 +23,23 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
+  module SortableNameExtension
+    # only works with scopes i.e. named_scopes and scoped()
+    def find(*args)
+      options = args.last.is_a?(::Hash) ? args.last : {}
+      scope = scope(:find)
+      select = if options[:select]
+                 options[:select]
+               elsif scope[:select]
+                 scope[:select]
+               else
+                 "#{proxy_scope.quoted_table_name}.*"
+               end
+      options[:select] = select + ', ' + User.sortable_name_order_by_clause
+      super args.first, options
+    end
+  end
+
   include Context
   include UserFollow::FollowedItem
 
@@ -53,7 +70,7 @@ class User < ActiveRecord::Base
   has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => ENROLLMENT_CONDITIONS[:invited], :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
            :conditions => [ENROLLMENT_CONDITIONS[:active], ENROLLMENT_CONDITIONS[:invited]].join(' OR ')
-  has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]
+  has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']], :order => 'enrollments.created_at'
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => ENROLLMENT_CONDITIONS[:completed], :order => 'enrollments.created_at'
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
@@ -185,7 +202,7 @@ class User < ActiveRecord::Base
   named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
 
   def self.order_by_sortable_name
-    scoped(:order => sortable_name_order_by_clause)
+    scoped(:order => sortable_name_order_by_clause, :extend => SortableNameExtension)
   end
 
   named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at|

@@ -1135,6 +1135,7 @@ html > body .new_activity_message form textarea
 #user_list_boxes
   position: relative
   height: 152px
+  margin-top: 10px
   #user_list_textarea_container, #user_list_processing, #user_list_parsed
     height: 152px
     width: 100%
@@ -1148,15 +1149,30 @@ html > body .new_activity_message form textarea
     overflow: auto
     height: 126px
     .ui-widget
-      margin: 2px
+      margin: 0 8px 8px 0
     .person
       float: left
-      margin: 2px
+      background: #FFF
+      margin: 0 8px 8px 0
+      padding: 8px
       font-size: 11px
-      height: 33px
-      padding: 0 4px
+      height: 20px
+      -webkit-box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
+      -moz-box-shadow:    inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
+      box-shadow:         inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
+      div
+        margin: 2px 0 0 33px
       .address, .login
         font-weight: normal
+      span
+        height: 20px
+        width: 20px
+        float: left
+        background: #F7F7F7 url(/images/circle-plus.png) no-repeat center center
+      &.existing-user
+        span
+          background: #F7F7F7 url(/images/circle-check.png) no-repeat center center
+
 
 body > #ui-datepicker-div
   display: none

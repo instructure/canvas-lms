@@ -223,4 +223,3 @@ define [
       new TokenInput $(this), $.extend(true, {}, options)
 
   TokenInput
-

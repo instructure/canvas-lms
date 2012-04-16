@@ -22,6 +22,8 @@ require 'set'
 #
 # API for accessing course information.
 class CoursesController < ApplicationController
+  include SearchHelper
+
   before_filter :require_user, :only => [:index]
   before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file]
 
@@ -255,6 +257,7 @@ class CoursesController < ApplicationController
   # @argument include[] ["enrollments"] Optionally include with each Course the
   #   user's current and invited enrollments.
   # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
+  # @argument include[] ["avatar_url"] Optionally include avatar_url.
   #
   # @response_field id The unique identifier for the user.
   # @response_field name The full user name.
@@ -274,22 +277,46 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       enrollment_type = "#{params[:enrollment_type].capitalize}Enrollment" if params[:enrollment_type]
-      users = (enrollment_type ?
-               @context.users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) :
-               @context.users)
+      users = @context.users_visible_to(@current_user)
+      users = users.scoped(:order => "users.sortable_name")
+      users = users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) if enrollment_type
       if user_json_is_admin?
         users = users.scoped(:include => {:pseudonym => :communication_channel})
       end
       users = Api.paginate(users, self, api_v1_course_users_path)
       includes = Array(params[:include])
       if includes.include?('enrollments')
-        User.send(:preload_associations, users, :current_and_invited_enrollments,
+        User.send(:preload_associations, users, :not_ended_enrollments,
                   :conditions => ['enrollments.course_id = ?', @context.id])
       end
-      render :json => users.uniq.map { |u|
-        enrollments = u.current_and_invited_enrollments if includes.include?('enrollments')
+      render :json => users.map { |u|
+        enrollments = u.not_ended_enrollments if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
+    end
+  end
+
+  # @API
+  # Return information on a single user.
+  #
+  # Accepts the same include[] parameters as the :users: action, and returns a
+  # single user with the same fields as that action.
+  def user
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      users = @context.users_visible_to(@current_user)
+      users = users.scoped(:conditions => ['users.id = ?', params[:id]])
+      if user_json_is_admin?
+        users = users.scoped(:include => {:pseudonym => :communication_channel})
+      end
+      includes = Array(params[:include])
+      if includes.include?('enrollments')
+        User.send(:preload_associations, users, :not_ended_enrollments,
+                  :conditions => ['enrollments.course_id = ?', @context.id])
+      end
+      user = users.first
+      enrollments = user.not_ended_enrollments if includes.include?('enrollments')
+      render :json => user_json(user, @current_user, session, includes, @context, enrollments)
     end
   end
 
@@ -390,6 +417,30 @@ class CoursesController < ApplicationController
   def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
+      load_all_contexts
+      users_scope = @context.users_visible_to(@current_user)
+      enrollment_counts = users_scope.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id')
+      @user_counts = {
+        :student  => enrollment_counts['StudentEnrollment'] || 0,
+        :teacher  => enrollment_counts['TeacherEnrollment'] || 0,
+        :ta       => enrollment_counts['TaEnrollment'] || 0,
+        :observer => enrollment_counts['ObserverEnrollment'] || 0,
+        :designer => enrollment_counts['DesignerEnrollment'] || 0,
+        :invited  => users_scope.count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited'"])
+      }
+      js_env(:COURSE_ID => @context.id,
+             :USER_COUNTS => @user_counts,
+             :USERS_URL => "/api/v1/courses/#{ @context.id }/users",
+             :COURSE_ROOT_URL => "/courses/#{ @context.id }",
+             :SEARCH_URL => search_recipients_url,
+             :CONTEXTS => @contexts,
+             :USER_PARAMS => {:include => ['email', 'enrollments', 'locked']},
+             :PERMISSIONS => {
+               :manage_students => (@context.grants_right?(@current_user, session, :manage_students) ||
+                                    @context.grants_right?(@current_user, session, :manage_admin_users)),
+               :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
+             })
+
       @alerts = @context.alerts
       @role_types = []
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
@@ -411,8 +462,8 @@ class CoursesController < ApplicationController
   def roster
     if authorized_action(@context, @current_user, :read_roster)
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
-      @students = @context.participating_students.find(:all, :order => User.sortable_name_order_by_clause)
-      @teachers = @context.instructors.find(:all, :order => User.sortable_name_order_by_clause)
+      @students = @context.participating_students.order_by_sortable_name
+      @teachers = @context.instructors.order_by_sortable_name
       @groups = @context.groups.active
     end
   end

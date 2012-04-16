@@ -109,7 +109,8 @@ class Course < ActiveRecord::Base
   has_many :learning_outcome_groups, :as => :context
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
-  has_many :users, :through => :enrollments, :source => :user
+  has_many :users, :through => :enrollments, :source => :user, :uniq => true
+  has_many :current_users, :through => :current_enrollments, :source => :user, :uniq => true
   has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
@@ -1187,7 +1188,7 @@ class Course < ActiveRecord::Base
     # 'publish_final_grades'
 
     self.recompute_student_scores_without_send_later
-    enrollments = self.student_enrollments.not_fake.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    enrollments = self.student_enrollments.not_fake.scoped(:include => [:user, :course_section], :order => User.sortable_name_order_by_clause('users'), :extend => User::SortableNameExtension)
 
     errors = []
     posts_to_make = []
@@ -1273,7 +1274,7 @@ class Course < ActiveRecord::Base
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    student_enrollments = scope.scoped(:include => includes, :order => User.sortable_name_order_by_clause('users'), :extend => User::SortableNameExtension)
     # remove duplicate enrollments for students enrolled in multiple sections
     seen_users = []
     student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
@@ -1374,6 +1375,7 @@ class Course < ActiveRecord::Base
     enrollment_state = opts[:enrollment_state]
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
+    associated_user_id = opts[:associated_user_id]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
@@ -1381,7 +1383,9 @@ class Course < ActiveRecord::Base
     else
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
-    if opts[:allow_multiple_enrollments]
+    if opts[:allow_multiple_enrollments] && associated_user_id
+      e = self.enrollments.find_by_user_id_and_type_and_course_section_id_and_associated_user_id(user.id, type, section.id, associated_user_id)
+    elsif opts[:allow_multiple_enrollments]
       e = self.enrollments.find_by_user_id_and_type_and_course_section_id(user.id, type, section.id)
     else
       e = self.enrollments.find_by_user_id_and_type(user.id, type)
@@ -1402,6 +1406,7 @@ class Course < ActiveRecord::Base
         :workflow_state => enrollment_state, 
         :limit_privileges_to_course_section => limit_privileges_to_course_section)
     end
+    e.associated_user_id = associated_user_id
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
@@ -2405,7 +2410,19 @@ class Course < ActiveRecord::Base
       when :full then scope
       when :sections then scope.scoped(:conditions => ["enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false])
       when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
-      else scope.scoped({:conditions => "FALSE"})
+      else scope.scoped({:conditions => ["?", false]})
+    end
+  end
+
+  def users_visible_to(user, include_priors=false)
+    visibilities = section_visibilities_for(user)
+    scope = include_priors ? users : current_users
+    # See also Users#messageable_users (same logic used to get users across multiple courses)
+    case enrollment_visibility_level_for(user, visibilities)
+      when :full then scope
+      when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
+      else scope.scoped({:conditions => ["?", false]})
     end
   end
 

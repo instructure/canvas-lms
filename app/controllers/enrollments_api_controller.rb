@@ -187,7 +187,7 @@ class EnrollmentsApiController < ApplicationController
       params[:enrollment][:section] = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
     end
     user = api_find(User, params[:enrollment].delete(:user_id))
-    @enrollment = @context.enroll_user(user, type, params[:enrollment])
+    @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
       render(:json => enrollment_json(@enrollment, @current_user, session).to_json) :
       render(:json => @enrollment.errors.to_json)

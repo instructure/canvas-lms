@@ -17,7 +17,7 @@ define([
 ], function(I18n, $, _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, PaginatedList, enrollmentTemplate, sectionEnrollmentPresenter) {
 
   $(document).ready(function() {
-    var section_id = window.location.pathname.split('/')[4]
+    var section_id = window.location.pathname.split('/')[4],
         $edit_section_form = $("#edit_section_form"),
         $edit_section_link = $(".edit_section_link"),
         currentEnrollmentList   = new PaginatedList($('#current-enrollment-list'), {

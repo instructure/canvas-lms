@@ -19,6 +19,7 @@
 # includes Enrollment json helpers
 module Api::V1::User
   include Api::V1::Json
+  include AvatarHelper
 
   API_USER_JSON_OPTS = {
     :only => %w(id name email),
@@ -42,7 +43,7 @@ module Api::V1::User
         end
       end
       if service_enabled?(:avatars) && includes.include?('avatar_url')
-        json[:avatar_url] = avatar_image_url(User.avatar_key(user.id))
+        json[:avatar_url] = avatar_url_for_user(user, blank_fallback)
       end
       if enrollments
         json[:enrollments] = enrollments.map { |e| enrollment_json(e, current_user, session, includes) }

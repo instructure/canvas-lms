@@ -183,7 +183,7 @@ define [
           @renderList(@queryCache[thisQuery], options, postData)
           return
 
-        @fetchListAjaxRequests.push @load $.ajaxJSON @url, 'POST', $.extend({}, postData),
+        @fetchListAjaxRequests.push @load $.ajaxJSON @url, 'GET', $.extend({}, postData),
           (data) =>
             @queryCache[thisQuery] = data
             if JSON.stringify(@preparePost(options.data ? {})) is thisQuery # i.e. only if it hasn't subsequently changed (and thus triggered another call)
@@ -207,7 +207,7 @@ define [
             text: user.name
             data: user
 
-      @load $.ajaxJSON( @url, 'POST', { user_id: userId, from_conversation_id: fromConversationId}, success, @close )
+      @load $.ajaxJSON( @url, 'GET', { user_id: userId, from_conversation_id: fromConversationId}, success, @close )
 
     open: ->
       @$container.show()
@@ -420,7 +420,8 @@ define [
 
     preparePost: (data) ->
       postData = $.extend({}, @options.baseData ? {}, data, {search: @input.val().replace(/^\s+|\s+$/g, "")})
-      postData.exclude = @input.baseExclude.concat(if @stack.length then [] else @input.tokenValues())
+      excludes = @input.baseExclude.concat(if @stack.length then [] else @input.tokenValues())
+      postData.exclude = if postData.exclude then postData.exclude.concat excludes else excludes
       postData.context = @stack[@stack.length - 1][0].data('id') if @listExpanded()
       postData.per_page ?= @options.limiter?(level: @stack.length)
       postData

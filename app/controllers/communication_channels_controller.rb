@@ -308,7 +308,7 @@ class CommunicationChannelsController < ApplicationController
     if @enrollment && (@enrollment.invited? || @enrollment.active?)
       @enrollment.re_send_confirmation!
     else
-      @cc = @user.communication_channels.find(params[:id])
+      @cc = params[:id].present? ? @user.communication_channels.find(params[:id]) : @user.communication_channel
       @cc.send_confirmation!(@domain_root_account)
     end
     render :json => {:re_sent => true}

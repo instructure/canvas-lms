@@ -283,7 +283,7 @@ Spec::Runner.configure do |config|
   def course_with_user(enrollment_type, opts={})
     @course = opts[:course] || course(opts)
     @user = opts[:user] || user(opts)
-    @enrollment = @course.enroll_user(@user, enrollment_type)
+    @enrollment = @course.enroll_user(@user, enrollment_type, opts)
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'

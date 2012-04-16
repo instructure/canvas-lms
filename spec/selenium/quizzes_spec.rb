@@ -325,6 +325,7 @@ describe "quizzes" do
         in_frame f('.essay_question iframe')[:id] do
           f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
         end
+        wait_for_ajax_requests
         ff('#question_list .answered').size.should eql 1
         input[:value].should eql "1.0000"
       end

@@ -2556,6 +2556,11 @@ describe Course, "section_visibility" do
     it "should return user's sections if a student" do
       @course.sections_visible_to(@student1).should eql [@course.default_section]
     end
+
+    it "should return users from all sections" do
+      @course.users_visible_to(@teacher).sort_by(&:id).should eql [@teacher, @ta, @student1, @student2, @observer]
+      @course.users_visible_to(@ta).sort_by(&:id).should      eql [@teacher, @ta, @student1, @observer]
+    end
   end
 
   context "sections" do

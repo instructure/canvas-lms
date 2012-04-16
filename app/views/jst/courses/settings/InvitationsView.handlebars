@@ -1,0 +1,18 @@
+<div class="admin_enrollment_re_send">
+  {{#t "admin_invitation_unaccepted"}}{{name}} hasn't yet accepted the invitation to join the course.  The invitation was sent: {{time}}{{/t}}
+</div>
+<div class="student_enrollment_re_send">
+  {{#if course.available}}
+    {{#t "student_invitation_unaccepted_available"}}{{name}} hasn't yet accepted the invitation to join the course.  The invitation was sent: {{time}}{{/t}}
+  {{else}}
+    {{#t "student_invitation_unaccepted_unavailable"}}{{name}} was added to the course: {{time}}{{/t}}
+  {{/if}}
+  {{#unless course.available}}
+  <div class="invitations_pending_publish">
+    {{#t "invitations_pending_publish"}}Invitations aren't sent until the course is <b>published</b>{{/t}}
+  </div>
+  {{/unless}}
+</div>
+<div class="accepted_enrollment_re_send">
+  {{#t "accepted_invitation"}}{{name}} has already received and accepted the invitation to join the course, but you can still re-send the invitation if it is needed.{{/t}}
+</div>

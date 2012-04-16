@@ -12,7 +12,8 @@ ActionController::Routing::Routes.draw do |map|
   map.conversations_starred 'conversations/starred', :controller => 'conversations', :action => 'index', :redirect_scope => 'starred'
   map.conversations_sent 'conversations/sent', :controller => 'conversations', :action => 'index', :redirect_scope => 'sent'
   map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :redirect_scope => 'archived'
-  map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
+  map.connect 'conversations/find_recipients', :controller => 'search', :action => 'recipients' # use search_recipients_url instead
+  map.search_recipients 'search/recipients', :controller => 'search', :action => 'recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
   map.conversations_watched_intro 'conversations/watched_intro', :controller => 'conversations', :action => 'watched_intro', :conditions => {:method => :post}
   map.resources :conversations, :only => [:index, :show, :update, :create, :destroy] do |conversation|
@@ -660,6 +661,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
+      courses.get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.delete 'courses/:id', :action => :destroy
@@ -825,7 +827,6 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :conversations) do |conversations|
       conversations.get 'conversations', :action => :index
       conversations.post 'conversations', :action => :create
-      conversations.get 'conversations/find_recipients', :action => :find_recipients
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/:id', :action => :show
       conversations.put 'conversations/:id', :action => :update # stars, subscribed-ness, workflow_state
@@ -897,6 +898,11 @@ ActionController::Routing::Routes.draw do |map|
         items.put "collections/items/:item_id/upvotes/self", :action => :upvote
         items.delete "collections/items/:item_id/upvotes/self", :action => :remove_upvote
       end
+    end
+
+    api.with_options(:controller => :search) do |search|
+      search.get 'search/rubrics', :action => 'rubrics', :path_name => 'search_rubrics'
+      search.get 'search/recipients', :action => 'recipients', :path_name => 'search_recipients'
     end
 
     api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
