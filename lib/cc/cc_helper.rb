@@ -119,6 +119,16 @@ module CCHelper
     id = get_node_val(doc, 'html head meta[name=identifier] @content')
     get_html_title_and_body(doc) << id
   end
+
+  def get_html_title_and_body_and_meta_fields(doc)
+    meta_fields = {}
+    doc.css('html head meta').each do |meta_node|
+      if key = meta_node['name']
+        meta_fields[key] = meta_node['content']
+      end
+    end
+    get_html_title_and_body(doc) << meta_fields
+  end
   
   def get_html_title_and_body(doc)
     title = get_node_val(doc, 'html head title')
@@ -175,9 +185,13 @@ module CCHelper
 
     attr_reader :course, :user
 
-    def html_page(html, title, id = nil)
+    def html_page(html, title, meta_fields={})
       content = html_content(html)
-      meta_html = id.nil? ? "" : %{<meta name="identifier" content="#{id}"/>\n}
+      meta_html = ""
+      meta_fields.each_pair do |k, v|
+        next unless v.present?
+        meta_html += %{<meta name="#{k}" content="#{v}"/>\n}
+      end
 
       %{<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n<title>#{title}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
     end

@@ -29,9 +29,13 @@ module CC
           file_name = "#{page.url}.html"
           relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)
           path = File.join(wiki_folder, file_name)
+          meta_fields = {:identifier => migration_id}
+          meta_fields[:editing_roles] = page.editing_roles
+          meta_fields[:hide_from_students] = page.hide_from_students
+          meta_fields[:notify_of_update] = page.notify_of_update
 
           File.open(path, 'w') do |file|
-            file << @html_exporter.html_page(page.body, page.title, migration_id)
+            file << @html_exporter.html_page(page.body, page.title, meta_fields)
           end
 
           @resources.resource(

@@ -515,6 +515,9 @@ class WikiPage < ActiveRecord::Base
         item.title.splice!(0...TITLE_LENGTH) # truncate too-long titles
       end
       item.body = ImportedHtmlConverter.convert(hash[:text] || "", context)
+      item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
+      item.hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
+      item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
     else
       allow_save = false
     end

@@ -1758,9 +1758,14 @@ class Course < ActiveRecord::Base
   def import_settings_from_migration(data)
     return unless data[:course]
     settings = data[:course]
+    self.name = settings[:title] if settings[:title].present?
+    self.course_code = settings[:course_code] if settings[:course_code].present?
     self.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
     self.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
     self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
+    if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
+      self.tab_configuration = settings[:tab_configuration]
+    end
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
@@ -2126,7 +2131,7 @@ class Course < ActiveRecord::Base
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
-      :turnitin_comments, :self_enrollment, :license, :indexed, :settings ]
+      :turnitin_comments, :self_enrollment, :license, :indexed, :settings, :locale ]
   end
 
   def clone_for(account, opts={})

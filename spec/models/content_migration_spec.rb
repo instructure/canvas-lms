@@ -22,10 +22,10 @@ describe ContentMigration do
 
   context "course copy" do
     before do
-      course_with_teacher
+      course_with_teacher(:course_name => "from course")
       @copy_from = @course
 
-      course_with_teacher(:user => @user)
+      course_with_teacher(:user => @user, :course_name => "to course")
       @copy_to = @course
 
       @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
@@ -85,6 +85,18 @@ describe ContentMigration do
       new_topic.should_not be_nil
       new_topic.message.should == topic.message
       @copy_to.syllabus_body.should match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
+    end
+
+    it "should copy course attributes" do
+      @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      @copy_from.locale = "es"
+      @copy_from.save
+
+      run_course_copy
+
+      @copy_to.locale.should == 'es'
+      @copy_to.tab_configuration.should == @copy_from.tab_configuration
+      @copy_to.name.should == @copy_from.name
     end
 
     it "should copy external tools" do
