@@ -375,7 +375,8 @@ describe "Users API", :type => :integration do
             :name          => "Test User",
             :short_name    => "Test",
             :sortable_name => "User, T.",
-            :time_zone     => "Mountain Time (United States & Canada)"
+            :time_zone     => "Mountain Time (United States & Canada)",
+            :locale        => 'en'
           },
           :pseudonym => {
             :unique_id         => "test@example.com",
@@ -392,6 +393,7 @@ describe "Users API", :type => :integration do
       user.short_name.should eql "Test"
       user.sortable_name.should eql "User, T."
       user.time_zone.should eql "Mountain Time (United States & Canada)"
+      user.locale.should eql 'en'
 
       user.pseudonyms.count.should eql 1
       pseudonym = user.pseudonyms.first
@@ -405,7 +407,8 @@ describe "Users API", :type => :integration do
         "id"            => user.id,
         "sis_user_id"   => "12345",
         "login_id"      => "test@example.com",
-        "sis_login_id"  => "test@example.com"
+        "sis_login_id"  => "test@example.com",
+        "locale"        => "en"
       }
     end
 
@@ -484,7 +487,8 @@ describe "Users API", :type => :integration do
           'id' => user.id,
           'short_name' => 'Tobias',
           'login_id' => 'student@example.com',
-          'sis_login_id' => 'student@example.com'
+          'sis_login_id' => 'student@example.com',
+          'locale' => 'en'
         }
         user.time_zone.should eql 'Tijuana'
       end
