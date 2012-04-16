@@ -598,7 +598,13 @@ class UsersController < ApplicationController
         flash[:user_id] = @user.id
         flash[:pseudonym_id] = @pseudonym.id
         format.html { redirect_to registered_url }
-        format.json { api_request? ? render(:json => user_json(@user, @current_user, session)) : render(:json => data) }
+        format.json {
+          if api_request?
+            render(:json => user_json(@user, @current_user, session, %w{locale}))
+          else
+            render(:json => data)
+          end
+        }
       end
     else
       respond_to do |format|
@@ -683,6 +689,17 @@ class UsersController < ApplicationController
         end
       elsif url = avatar.try(:[], :url)
         params[:user][:avatar_image] = { :type => 'external', :url => url }
+=======
+    rename = params[:rename] || api_request?
+    if (!rename ? authorized_action(@user, @current_user, :manage) : authorized_action(@user, @current_user, :rename))
+      if rename
+        params[:default_pseudonym_id] = nil
+        managed_attributes = [:name, :short_name, :sortable_name]
+        if @user.grants_right?(@current_user, nil, :manage_user_details)
+          managed_attributes.concat([:time_zone, :locale])
+        end
+        params[:user] = params[:user].slice(*managed_attributes)
+>>>>>>> 10892f8... add locale to user create/update apis. fixes #8191
       end
     end
 
