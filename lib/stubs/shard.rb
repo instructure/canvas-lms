@@ -34,7 +34,7 @@ class Shard
   end
 
   def self.with_each_shard
-    yield
+    Array(yield)
   end
 
   def activate
