@@ -62,7 +62,8 @@ class UsersController < ApplicationController
       @teacher_enrollments = @current_enrollments.select{|e| e.instructor? }
 
       if @student_enrollments.length + @teacher_enrollments.length + @observed_enrollments.length == 1# && @prior_enrollments.empty?
-        redirect_to course_grades_url(@current_enrollments.first.course_id)
+        enrollment = @student_enrollments.first.try(:last) || @teacher_enrollments.first || @observed_enrollments.first
+        redirect_to course_grades_url(enrollment.course_id)
         return
       end
 

@@ -348,6 +348,18 @@ describe UsersController do
       teachers.should be_include(@teacher)
       teachers.should_not be_include(@designer)
     end
+
+    it "should not redirect to an observer enrollment with no observee" do
+      @course1 = course(:active_all => true)
+      @course2 = course(:active_all => true)
+      @user = user(:active_all => true)
+      @course1.enroll_user(@user, 'ObserverEnrollment').accept!
+      @course2.enroll_student(@user).accept!
+
+      user_session(@user)
+      get 'grades'
+      response.should redirect_to course_grades_url(@course2)
+    end
   end
   
   describe "GET 'avatar_image_url'" do
