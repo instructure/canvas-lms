@@ -163,6 +163,28 @@ describe "quizzes" do
 
     end
 
+    it "should update a question group" do
+      skip_if_ie('Out of memory')
+
+      get "/courses/#{@course.id}/quizzes/new"
+
+      driver.find_element(:css, '.add_question_group_link').click
+      group_form = driver.find_element(:css, '#questions .quiz_group_form')
+      group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
+      replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
+      group_form.submit
+      group_form.find_element(:css, '.group_display.name').should include_text('new group')
+      keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "3" }
+
+      group_form.find_element(:css, '.edit_group_link').click
+
+      group_form.find_element(:name, 'quiz_group[name]').send_keys('renamed')
+      replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
+      group_form.submit
+      group_form.find_element(:css, '.group_display.name').should include_text('renamed')
+      keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "2" }
+    end
+
     it "should moderate quiz" do
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
