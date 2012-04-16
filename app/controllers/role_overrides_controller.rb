@@ -19,6 +19,7 @@
 # @API Roles
 class RoleOverridesController < ApplicationController
   before_filter :require_context
+  before_filter :require_role, :only => [:add_role, :update]
 
   def index
     if authorized_action(@context, @current_user, :manage_role_overrides)
@@ -198,47 +199,28 @@ class RoleOverridesController < ApplicationController
   #     }
   #   }
   def add_role
-    if authorized_action(@context, @current_user, :manage_role_overrides)
-      role = api_request? ? params[:role] : params[:role_type]
-      unless role.present?
-        if api_request?
-          render :json => {:message => "missing required parameter 'role'"}, :status => :bad_request
-        else
-          flash[:error] = t(:update_failed_notice, "Role creation failed")
-          redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
-        end
-        return
-      end
+    return unless authorized_action(@context, @current_user, :manage_role_overrides)
 
-      if @context.account_membership_types.include?(role) || RoleOverride::RESERVED_ROLES.include?(role)
-        if api_request?
-          render :json => {:message => "role already exists"}, :status => :bad_request
-        else
-          flash[:error] = t(:update_failed_notice, "Role creation failed")
-          redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
-        end
-        return
-      end
-
-      @context.add_account_membership_type(role)
-      unless api_request?
+    if @context.account_membership_types.include?(@role) || RoleOverride::RESERVED_ROLES.include?(@role)
+      if api_request?
+        render :json => {:message => "role already exists"}, :status => :bad_request
+      else
+        flash[:error] = t(:update_failed_notice, "Role creation failed")
         redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
-        return
       end
-
-      # allow setting permissions immediately through API
-      if params[:permissions]
-        RoleOverride.manageable_permissions(@context).keys.each do |permission|
-          if settings = params[:permissions][permission]
-            override = settings[:enabled].to_i == 1 if settings[:explicit].to_i == 1 && settings[:enabled].present?
-            locked = settings[:locked].to_i == 1 if settings[:locked]
-            RoleOverride.manage_role_override(@context, role, permission.to_s, :override => override, :locked => locked)
-          end
-        end
-      end
-
-      render :json => role_json(@context, role, @current_user, session)
+      return
     end
+
+    @context.add_account_membership_type(@role)
+    unless api_request?
+      redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
+      return
+    end
+
+    # allow setting permissions immediately through API
+    set_permissions_for(@role, @context, params[:permissions])
+
+    render :json => role_json(@context, @role, @current_user, session)
   end
   
   def remove_role
@@ -249,6 +231,66 @@ class RoleOverridesController < ApplicationController
         format.json { render :json => @context.to_json(:only => [:membership_types, :id]) }
       end
     end
+  end
+
+  # @API
+  # Update permissions for an existing role.
+  #
+  # Recognized roles are:
+  # * TeacherEnrollment
+  # * StudentEnrollment
+  # * TaEnrollment
+  # * ObserverEnrollment
+  # * DesignerEnrollment
+  # * AccountAdmin
+  # * Any previously created custom admin role
+  #
+  # @argument permissions[<X>][explicit] [Optional]
+  # @argument permissions[<X>][enabled] [Optional]
+  #   These arguments are described in the documentation for the add_role method.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/:account_id/roles/TaEnrollment \ 
+  #     -X PUT \ 
+  #     -H 'Authorization: Bearer <access_token>' \ 
+  #     -F 'permissions[manage_groups][explicit]=1' \ 
+  #     -F 'permissions[manage_groups][enabled]=1' \ 
+  #     -F 'permissions[manage_groups][locked]=1' \ 
+  #     -F 'permissions[send_messages][explicit]=1' \ 
+  #     -F 'permissions[send_messages][enabled]=0'
+  #
+  # @example_response
+  #   {
+  #     "role": "TaEnrollment",
+  #     "account": {
+  #       "id": 252,
+  #       "name": "Greendale Community College",
+  #       "parent_account_id": nil,
+  #       "root_account_id": nil,
+  #       "sis_account_id": "gcc"
+  #     },
+  #     "permissions": {
+  #       "manage_groups": {
+  #         "enabled": true,
+  #         "locked": true,
+  #         "readonly": false,
+  #         "explicit": true,
+  #         "prior_default": false
+  #       },
+  #       "send_messages": {
+  #         "enabled": false,
+  #         "locked": false,
+  #         "readonly": false,
+  #         "explicit": true,
+  #         "prior_default": false
+  #       },
+  #       ...
+  #     }
+  #   }
+  def update
+    return unless authorized_action(@context, @current_user, :manage_role_overrides)
+    set_permissions_for(@role, @context, params[:permissions])
+    render :json => role_json(@context, @role, @current_user, session)
   end
 
   def create
@@ -273,4 +315,51 @@ class RoleOverridesController < ApplicationController
       redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
     end
   end
+
+  # Internal: Get role from params or return error. Used as before filter.
+  #
+  # Returns found role or false (to halt execution).
+  def require_role
+    @role = api_request? ? params[:role] : params[:role_type]
+    unless @role.present?
+      if api_request?
+        render :json => {
+          :message => "missing required parameter 'role'" },
+          :status => :bad_request
+      else
+        flash[:error] = t(:update_failed_notice, 'Role creation failed')
+        redirect_to named_context_url(@context, :context_permissions_url,
+          :account_roles => params[:account_roles])
+      end
+
+      return false
+    end
+
+    @role
+  end
+  protected :require_role
+
+  # Internal: Loop through and set permission on role given in params.
+  #
+  # role - The role to set permissions for.
+  # context - The current context.
+  # permissions - The permissions from the request params.
+  #
+  # Returns nothing.
+  def set_permissions_for(role, context, permissions)
+    return unless permissions.present?
+
+    RoleOverride.manageable_permissions(context).keys.each do |permission|
+      if settings = permissions[permission]
+        if settings[:enabled].present? && settings[:explicit].to_i == 1
+          override = settings[:enabled].to_i == 1
+        end
+        locked = settings[:locked].to_i == 1 if settings[:locked]
+
+        RoleOverride.manage_role_override(context, role, permission.to_s,
+          :override => override, :locked => locked)
+      end
+    end
+  end
+  protected :set_permissions_for
 end
