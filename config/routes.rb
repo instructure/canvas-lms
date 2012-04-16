@@ -764,6 +764,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :role_overrides) do |roles|
       roles.post 'accounts/:account_id/roles', :action => :add_role
+      roles.put 'accounts/:account_id/roles/:role', :action => :update
     end
 
     api.with_options(:controller => :admins) do |admins|

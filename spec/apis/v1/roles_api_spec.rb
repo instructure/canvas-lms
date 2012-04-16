@@ -194,4 +194,62 @@ describe "Roles API", :type => :integration do
       end
     end
   end
+
+  describe "create permission overrides" do
+    before do
+      @account = Account.default
+      @path = "/api/v1/accounts/#{@account.id}/roles/TeacherEnrollment"
+      @path_options = { :controller => 'role_overrides', :action => 'update',
+        :account_id => @account.id.to_param, :format => 'json',
+        :role => 'TeacherEnrollment' }
+      @permissions = { :permissions => {
+        :read_question_banks => { :explicit => 1, :enabled => 0,
+        :locked => 1 }}}
+    end
+
+    context "an authorized user" do
+      it "should be able to change permissions" do
+        json = api_call(:put, @path, @path_options, @permissions)
+        json['permissions']['read_question_banks'].should == {
+          'enabled'       => false,
+          'locked'        => true,
+          'readonly'      => false,
+          'prior_default' => true,
+          'explicit'      => true }
+        json['role'].should eql 'TeacherEnrollment'
+        json['account'].should == {
+          'root_account_id' => nil,
+          'name' => Account.default.name,
+          'id' => Account.default.id,
+          'parent_account_id' => nil }
+      end
+
+      it "should not be able to edit read-only permissions" do
+        json = api_call(:put, @path, @path_options, { :permission => {
+          :read_forum => { :explicit => 1, :enabled => 0 }}})
+
+        # permissions should remain unchanged
+        json['permissions']['read_forum'].should == {
+          'explicit' => false,
+          'enabled'  => true,
+          'readonly' => true,
+          'locked'   => true }
+      end
+
+      it "should be able to change permissions for account admins" do
+        json = api_call(:put, @path.sub(/TeacherEnrollment/, 'AccountAdmin'),
+          @path_options.merge(:role => 'AccountAdmin'), { :permissions => {
+          :manage_courses => { :explicit => 1, :enabled => 0 }}})
+        json['permissions']['manage_courses']['enabled'].should eql false
+      end
+    end
+
+    context "an unauthorized user" do
+      it "should return 401 unauthorized" do
+        user_with_pseudonym
+        raw_api_call(:put, @path, @path_options, @permissions)
+        response.code.should eql '401'
+      end
+    end
+  end
 end
