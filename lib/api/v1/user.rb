@@ -48,6 +48,7 @@ module Api::V1::User
         json[:enrollments] = enrollments.map { |e| enrollment_json(e, current_user, session, includes) }
       end
       json[:email] = user.email if includes.include?('email')
+      json[:locale] = user.locale if includes.include?('locale')
     end
   end
 

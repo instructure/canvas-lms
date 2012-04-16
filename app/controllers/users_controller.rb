@@ -535,6 +535,7 @@ class UsersController < ApplicationController
   # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
   # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed [here](http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone).
+  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
   # @argument pseudonym[unique_id] User's login ID.
   # @argument pseudonym[password] [Optional] User's password.
   # @argument pseudonym[sis_user_id] [Optional] [Integer] SIS ID for the user's account. To set this parameter, the caller must be able to manage SIS permissions.
@@ -596,7 +597,13 @@ class UsersController < ApplicationController
         flash[:user_id] = @user.id
         flash[:pseudonym_id] = @pseudonym.id
         format.html { redirect_to registered_url }
-        format.json { api_request? ? render(:json => user_json(@user, @current_user, session)) : render(:json => data) }
+        format.json {
+          if api_request?
+            render(:json => user_json(@user, @current_user, session, %w{locale}))
+          else
+            render(:json => data)
+          end
+        }
       end
     else
       respond_to do |format|
@@ -625,6 +632,7 @@ class UsersController < ApplicationController
   # @argument user[short_name] [Optional] User's name as it will be displayed in discussions, messages, and comments.
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
   # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
+  # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
   def update
     @user = api_request? ?
       api_find(User, params[:id]) :
@@ -634,7 +642,9 @@ class UsersController < ApplicationController
       if rename
         params[:default_pseudonym_id] = nil
         managed_attributes = [:name, :short_name, :sortable_name]
-        managed_attributes << :time_zone if @user.grants_right?(@current_user, nil, :manage_user_details)
+        if @user.grants_right?(@current_user, nil, :manage_user_details)
+          managed_attributes.concat([:time_zone, :locale])
+        end
         params[:user] = params[:user].slice(*managed_attributes)
       end
       if params[:default_pseudonym_id] && @user == @current_user
@@ -645,7 +655,9 @@ class UsersController < ApplicationController
         if @user.update_attributes(params[:user])
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
-          format.json { render :json => user_json(@user, @current_user, session, [], @current_user.pseudonym.account) }
+          format.json {
+            render :json => user_json(@user, @current_user, session, %w{locale},
+              @current_user.pseudonym.account) }
         else
           format.html { render :action => "edit" }
         end
