@@ -598,7 +598,13 @@ class UsersController < ApplicationController
         flash[:user_id] = @user.id
         flash[:pseudonym_id] = @pseudonym.id
         format.html { redirect_to registered_url }
-        format.json { api_request? ? render(:json => user_json(@user, @current_user, session)) : render(:json => data) }
+        format.json {
+          if api_request?
+            render(:json => user_json(@user, @current_user, session, %w{locale}))
+          else
+            render(:json => data)
+          end
+        }
       end
     else
       respond_to do |format|
