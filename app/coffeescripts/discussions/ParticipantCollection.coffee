@@ -1,5 +1,5 @@
 define [
-  'use!backbone'
+  'Backbone'
   'compiled/discussions/Participant'
 ], (Backbone, Participant) ->
 

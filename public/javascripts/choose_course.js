@@ -1,7 +1,7 @@
 define([
   'jquery' /* $ */,
   'i18n!content_imports',
-  'use!underscore',
+  'underscore',
   'compiled/xhr/RemoteSelect',
   'jqueryui/autocomplete' /* /\.autocomplete/ */
 ], function($, I18n, _, RemoteSelect){

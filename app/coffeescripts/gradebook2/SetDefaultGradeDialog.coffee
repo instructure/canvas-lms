@@ -2,7 +2,7 @@ define [
   'i18n!gradebook2'
   'jquery'
   'jst/SetDefaultGradeDialog'
-  'use!underscore'
+  'underscore'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
   'jquery.instructure_jquery_patches'

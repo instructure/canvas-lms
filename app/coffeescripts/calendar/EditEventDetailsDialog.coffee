@@ -1,7 +1,7 @@
 define [
   'jquery'
   'i18n!calendar'
-  'use!underscore'
+  'underscore'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/EditCalendarEventDetails'
   'compiled/calendar/EditAssignmentDetails'

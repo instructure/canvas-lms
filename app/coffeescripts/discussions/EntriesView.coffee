@@ -1,7 +1,7 @@
 define [
-  'use!underscore'
+  'underscore'
   'jquery'
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
   'compiled/discussions/EntryCollection'
   'compiled/discussions/EntryCollectionView'
   'compiled/discussions/EntryView'
