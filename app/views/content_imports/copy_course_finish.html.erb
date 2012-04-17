@@ -1,6 +1,6 @@
-<% add_crumb t('crumbs.copy_from_course', "Copy From %{course}", :course => @copy_context.name), "#{context_url(@context, :context_import_copy_url)}&import_id=#{@copy_context.id}" %>
+<% add_crumb t('crumbs.copy_from_course', "Copy From %{course}", :course => @source_course.name) %>
 <% add_crumb t('#crumbs.results', "Results") %>
-<% content_for :page_title do %><%= t :page_title, "Copy Results From %{course}", :course => @copy_context.name %><% end %>
+<% content_for :page_title do %><%= t :page_title, "Copy Results From %{course}", :course => @source_course.name %><% end %>
 
 <% content_for :stylesheets do %>
 <style>
@@ -128,22 +128,4 @@ HEREDOC
         <% end %>
       </ul>
     <% end %>
-
-  <ul class="unstyled_list" style="display: none;">
-  <% @results.each do |result| %>
-    <li><%= result %></li>
-  <% end %>
-  </ul>
 </div>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */
-], function($) {
-
-$(document).ready(function() {
-  $(".added").attr('title', <%= t('titles.just_added', "Just added to the Course").to_json.html_safe %>);
-});
-});
-</script>
-<% end %>

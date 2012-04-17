@@ -20,6 +20,7 @@ module CC
     
     def add_topics
       @course.discussion_topics.active.each do |topic|
+        next unless export_object?(topic) || export_object?(topic.assignment)
         begin
           add_topic(topic)
         rescue

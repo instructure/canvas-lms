@@ -98,12 +98,20 @@ module SeleniumTestsHelperMethods
   end
 
   # f means "find" this is a shortcut to finding elements
-  # if driver.find_element fails, then it'll try to find it with jquery
   def f(selector, scope = nil)
     begin
       (scope || driver).find_element :css, selector
     rescue
+      nil
+    end
+  end
+
+  # short for find with jquery
+  def fj(selector, scope = nil)
+    begin
       find_with_jquery selector, scope
+    rescue
+      nil
     end
   end
 
@@ -112,7 +120,16 @@ module SeleniumTestsHelperMethods
     begin
       (scope || driver).find_elements :css, selector
     rescue
+      []
+    end
+  end
+
+  # same as find with jquery but tries to find several elements instead of one
+  def ffj(selector, scope = nil)
+    begin
       find_all_with_jquery selector, scope
+    rescue
+      []
     end
   end
 
@@ -353,6 +370,13 @@ shared_examples_for "all selenium tests" do
     user_logged_in({:user => @user}.merge(opts))
   end
 
+  def enter_student_view(opts={})
+    course = opts[:course] || @course || course(opts)
+    get "/courses/#{@course.id}/settings"
+    f(".student_view_button").click
+    wait_for_dom_ready
+  end
+
   def expect_new_page_load
     driver.execute_script("INST.still_on_old_page = true;")
     yield
@@ -395,22 +419,35 @@ shared_examples_for "all selenium tests" do
   end
 
   def wait_for_ajax_requests(wait_start = 0)
-    driver.execute_async_script(<<-JS)
+    result = driver.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
-      if (typeof($) == 'undefined') {
+      if (window.wait_for_ajax_requests_hit_fallback) {
+        callback(0);
+      } else if (typeof($) == 'undefined') {
         callback(-1);
       } else {
+        var fallbackCallback = window.setTimeout(function() {
+          // technically, we should cancel the other timeouts that we've set up at this
+          // point, but we're going to be raising an exception anyway when this happens,
+          // so it's not a big deal.
+          window.wait_for_ajax_requests_hit_fallback = 1;
+          callback(-2);
+        }, 55000);
+        var doCallback = function(value) {
+          window.clearTimeout(fallbackCallback);
+          callback(value);
+        }
         var waitForAjaxStop = function(value) {
           $(document).bind('ajaxStop.canvasTestAjaxWait', function() {
             $(document).unbind('.canvasTestAjaxWait');
-            callback(value);
+            doCallback(value);
           });
         }
         if ($.active == 0) {
           // if there are no active requests, wait {wait_start}ms for one to start
           var timeout = window.setTimeout(function() {
             $(document).unbind('.canvasTestAjaxWait');
-            callback(0);
+            doCallback(0);
           }, #{wait_start});
           $(document).bind('ajaxStart.canvasTestAjaxWait', function() {
             window.clearTimeout(timeout);
@@ -421,6 +458,10 @@ shared_examples_for "all selenium tests" do
         }
       }
     JS
+    if result == -2
+      raise "Timed out waiting for ajax requests to finish. (This might mean there was a js error in an ajax callback.)"
+    end
+    result
   end
 
   def wait_for_animations(wait_start = 0)
@@ -532,6 +573,7 @@ shared_examples_for "all selenium tests" do
     saved_window_handle = driver.window_handle
     driver.switch_to.frame id
     yield
+  ensure
     driver.switch_to.window saved_window_handle
   end
 
@@ -628,10 +670,6 @@ shared_examples_for "all selenium tests" do
   def refresh_page
     driver.navigate.refresh
     wait_for_dom_ready
-  end
-
-  def type_in_tiny(selector, content)
-    driver.execute_script("$('#{selector}').editorBox('execute', 'mceInsertContent',false, '#{content}')")
   end
 
   def make_full_screen
@@ -739,7 +777,8 @@ shared_examples_for "all selenium tests" do
   ##
   # returns true if a form validation error message is visible, false otherwise
   def error_displayed?
-    f('.error_text:visible') != nil
+    # after it fades out, it's still visible, just off the screen
+    driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
   self.use_transactional_fixtures = false

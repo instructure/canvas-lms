@@ -51,6 +51,10 @@ describe "Converting D2L QTI" do
     get_question_hash(d2l_question_dir, 'long_answer').should == D2LExpected::LONG_ANSWER
   end
 
+  it "should convert an item with a response condition with no condition" do
+    get_question_hash(d2l_question_dir, 'no_condition').should == D2LExpected::NO_CONDITION
+  end
+
   it "should convert the assessment into a quiz" do
     get_quiz_data(d2l_question_dir, 'assessment').last.first.should == D2LExpected::ASSESSMENT
   end
@@ -261,5 +265,31 @@ module D2LExpected
          :question_bank_name=>"02gilback",
          :question_text=> "This a weird way to do [QUES_979782_1194494_A4749142] in the blank [QUES_979782_1194494_A4749144] ",
          :question_name=>""}
+
+  NO_CONDITION = {:question_name => "",
+                  :migration_id => "OBJ_3506477",
+                  :answers =>
+                          [{:text => "Avoid pseudo-forgetting",
+                            :migration_id => "QUES_969100_1181698_A4711381",
+                            :weight => 100},
+                           {:text => "Limit what you learn",
+                            :migration_id => "QUES_969100_1181698_A4711382",
+                            :weight => 100},
+                           {:text => "Arrive at meaningful patterns",
+                            :migration_id => "QUES_969100_1181698_A4711383",
+                            :weight => 100},
+                           {:text => "Study in long periods",
+                            :migration_id => "QUES_969100_1181698_A4711384",
+                            :weight => 0},
+                           {:text => "Use positive self-talk",
+                            :migration_id => "QUES_969100_1181698_A4711385",
+                            :weight => 100}],
+                  :correct_comments => "",
+                  :question_type => "multiple_answers_question",
+                  :question_bank_id => "SECT_3981973",
+                  :incorrect_comments => "",
+                  :points_possible => 1,
+                  :question_bank_name => "02gilback",
+                  :question_text => "<p>According to the class handout Basic Principles to Enhance Memory which of the following are effective ways to remember?</p>"}
 end
 end

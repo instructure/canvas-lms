@@ -66,22 +66,24 @@ class QuizSubmissionsController < ApplicationController
   
   def backup
     @quiz = @context.quizzes.find(params[:quiz_id])
-    preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
-    if preview || !@current_user
-      @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
-    else
-      @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id)
-    end
-
-    if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-    elsif preview || (@submission && @submission.temporary_user_code == temporary_user_code(false)) || (@submission && @submission.grants_right?(@current_user, session, :update))
-      if !@submission.completed? && !@submission.overdue?
-        @submission.backup_submission_data(params)
-        render :json => {:backup => true, :end_at => @submission && @submission.end_at}.to_json
-        return
+    if authorized_action(@quiz, @current_user, :submit)
+      preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
+      if preview
+        @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
+      else
+        @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id)
       end
+
+      if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+      elsif preview || (@submission && @submission.temporary_user_code == temporary_user_code(false)) || (@submission && @submission.grants_right?(@current_user, session, :update))
+        if !@submission.completed? && !@submission.overdue?
+          @submission.backup_submission_data(params)
+          render :json => {:backup => true, :end_at => @submission && @submission.end_at}.to_json
+          return
+        end
+      end
+      render :json => {:backup => false, :end_at => @submission && @submission.end_at}.to_json
     end
-    render :json => {:backup => false, :end_at => @submission && @submission.end_at}.to_json
   end
   
   def extensions

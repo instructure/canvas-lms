@@ -20,6 +20,8 @@ require 'set'
 module CC
   module WebResources
     def add_course_files
+      return if for_course_copy
+
       course_folder = Folder.root_folders(@course).first
       files_with_metadata = { :folders => [], :files => [] }
       @added_attachment_ids = Set.new
@@ -111,6 +113,7 @@ module CC
     end
 
     def add_media_objects(html_content_exporter)
+      return if for_course_copy
       return unless Kaltura::ClientV3.config
       client = Kaltura::ClientV3.new
       client.startSession(Kaltura::SessionType::ADMIN)

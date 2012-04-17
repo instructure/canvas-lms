@@ -1,15 +1,12 @@
-{{#with apptEvent}}
 <form action="{{calendarEvent.appointment_group_url}}" id="edit_appt_calendar_event_form">
   <p>
-    <strong>{{#t "title"}}Title:{{/t}}</strong><br>
-    {{title}}
-  </p>
-  <p>
     <strong>{{#t "description"}}Description:{{/t}}</strong><br>
-    <textarea name="description" style="width 175px; height: 75px;">{{description}}</textarea>
+    <textarea name="description">{{description}}</textarea>
   </p>
   <p>
-    <input type="submit" val="{{#t "#buttons.submit"}}Submit{{/t}}">
+    <input type="checkbox" name="max_participants_option">
+    {{#t "slot_limit"}}Limit this slot to{{/t}}
+    <input type="number" name="max_participants" class="max-participants" min="1" disabled>
+    {{#t "users"}}users.{{/t}}
   </p>
 </form>
-{{/with}}

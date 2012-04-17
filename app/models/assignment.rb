@@ -136,7 +136,7 @@ class Assignment < ActiveRecord::Base
       elsif due_at
         self.send_later_enqueue_args(:do_auto_peer_review, {
           :run_at => due_at,
-          :singleton => "assignment:auto_peer_review:#{self.id}"
+          :singleton => Shard.default.activate { "assignment:auto_peer_review:#{self.id}" }
         })
       end
     end
@@ -659,7 +659,7 @@ class Assignment < ActiveRecord::Base
       event.end.ical_params = {"VALUE"=>["DATE"]}
     end
     event.summary = self.title
-    event.description = self.description
+    event.description = strip_tags(self.description).strip
     event.location = self.location
     event.dtstamp = self.updated_at.utc_datetime if self.updated_at
     event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
@@ -977,7 +977,7 @@ class Assignment < ActiveRecord::Base
       opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
     }
     raise "Student Required" unless original_student
-    raise "User must be enrolled in the course as a student to submit homework" unless context.students.include?(original_student)
+    raise "User must be enrolled in the course as a student to submit homework" unless context.student_enrollments.find(:first, :conditions => { :user_id => original_student.id })
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)

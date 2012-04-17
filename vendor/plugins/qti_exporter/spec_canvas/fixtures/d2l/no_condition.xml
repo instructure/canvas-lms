@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item ident="OBJ_3506477" label="QUES_969100_1181698" d2l_2p0:page="4">
+        <itemmetadata>
+            <qtimetadata>
+                <qti_metadatafield>
+                    <fieldlabel>qmd_computerscored</fieldlabel>
+                    <fieldentry>yes</fieldentry>
+                </qti_metadatafield>
+                <qti_metadatafield>
+                    <fieldlabel>qmd_questiontype</fieldlabel>
+                    <fieldentry>Multi-Select</fieldentry>
+                </qti_metadatafield>
+                <qti_metadatafield>
+                    <fieldlabel>qmd_weighting</fieldlabel>
+                    <fieldentry>2.500000000</fieldentry>
+                </qti_metadatafield>
+            </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+            <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+            <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+            <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+            <flow>
+                <material>
+                    <mattext texttype="text/html">&lt;p&gt;According to the class handout Basic Principles to Enhance Memory which of the following are effective ways to remember?&lt;/p&gt;</mattext>
+                </material>
+                <response_extension>
+                    <d2l_2p0:display_style>2</d2l_2p0:display_style>
+                    <d2l_2p0:enumeration>6</d2l_2p0:enumeration>
+                    <d2l_2p0:grading_type>2</d2l_2p0:grading_type>
+                </response_extension>
+                <response_lid ident="QUES_969100_1181698_LID" rcardinality="Multiple">
+                    <render_choice shuffle="yes">
+                        <flow_label class="Block">
+                            <response_label ident="QUES_969100_1181698_A4711381">
+                                <flow_mat>
+                                    <material>
+                                        <mattext texttype="text/html">&lt;p&gt;Avoid pseudo-forgetting&lt;/p&gt;</mattext>
+                                    </material>
+                                </flow_mat>
+                            </response_label>
+                        </flow_label>
+                        <flow_label class="Block">
+                            <response_label ident="QUES_969100_1181698_A4711382">
+                                <flow_mat>
+                                    <material>
+                                        <mattext texttype="text/html">&lt;p&gt;Limit what you learn&lt;/p&gt;</mattext>
+                                    </material>
+                                </flow_mat>
+                            </response_label>
+                        </flow_label>
+                        <flow_label class="Block">
+                            <response_label ident="QUES_969100_1181698_A4711383">
+                                <flow_mat>
+                                    <material>
+                                        <mattext texttype="text/html">&lt;p&gt;Arrive at meaningful patterns&lt;/p&gt;</mattext>
+                                    </material>
+                                </flow_mat>
+                            </response_label>
+                        </flow_label>
+                        <flow_label class="Block">
+                            <response_label ident="QUES_969100_1181698_A4711384">
+                                <flow_mat>
+                                    <material>
+                                        <mattext texttype="text/html">&lt;p&gt;Study in long periods&lt;/p&gt;</mattext>
+                                    </material>
+                                </flow_mat>
+                            </response_label>
+                        </flow_label>
+                        <flow_label class="Block">
+                            <response_label ident="QUES_969100_1181698_A4711385">
+                                <flow_mat>
+                                    <material>
+                                        <mattext texttype="text/html">&lt;p&gt;Use positive self-talk&lt;/p&gt;</mattext>
+                                    </material>
+                                </flow_mat>
+                            </response_label>
+                        </flow_label>
+                    </render_choice>
+                </response_lid>
+            </flow>
+        </presentation>
+        <resprocessing>
+            <outcomes>
+                <decvar vartype="Integer" defaultval="0" varname="que_score" minvalue="0" maxvalue="100"/>
+                <decvar vartype="Integer" defaultval="0" varname="D2L_Correct" minvalue="0"/>
+                <decvar vartype="Integer" defaultval="0" varname="D2L_Incorrect" minvalue="0"/>
+            </outcomes>
+            <respcondition title="Response Condition" continue="yes">
+                <conditionvar>
+                    <varequal respident="QUES_969100_1181698_LID">QUES_969100_1181698_A4711381</varequal>
+                </conditionvar>
+                <setvar varname="D2L_Correct" action="Add">1</setvar>
+            </respcondition>
+            <respcondition title="Response Condition" continue="yes">
+                <conditionvar>
+                    <varequal respident="QUES_969100_1181698_LID">QUES_969100_1181698_A4711382</varequal>
+                </conditionvar>
+                <setvar varname="D2L_Correct" action="Add">1</setvar>
+            </respcondition>
+            <respcondition title="Response Condition" continue="yes">
+                <conditionvar>
+                    <varequal respident="QUES_969100_1181698_LID">QUES_969100_1181698_A4711383</varequal>
+                </conditionvar>
+                <setvar varname="D2L_Correct" action="Add">1</setvar>
+            </respcondition>
+            <respcondition title="Response Condition" continue="yes">
+                <conditionvar>
+                    <varequal respident="QUES_969100_1181698_LID">QUES_969100_1181698_A4711384</varequal>
+                </conditionvar>
+                <setvar varname="D2L_Incorrect" action="Add">1</setvar>
+            </respcondition>
+            <respcondition title="Response Condition" continue="yes">
+                <conditionvar>
+                    <varequal respident="QUES_969100_1181698_LID">QUES_969100_1181698_A4711385</varequal>
+                </conditionvar>
+                <setvar varname="D2L_Correct" action="Add">1</setvar>
+            </respcondition>
+            <respcondition>
+                <setvar varname="que_score" action="Set">D2L_Correct</setvar>
+            </respcondition>
+        </resprocessing>
+        <itemfeedback ident="QUES_969100_1181698_IF4711381">
+            <material>
+                <mattext texttype="text/html"/>
+            </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_969100_1181698_IF4711382">
+            <material>
+                <mattext texttype="text/html"/>
+            </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_969100_1181698_IF4711383">
+            <material>
+                <mattext texttype="text/html"/>
+            </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_969100_1181698_IF4711384">
+            <material>
+                <mattext texttype="text/html"/>
+            </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_969100_1181698_IF4711385">
+            <material>
+                <mattext texttype="text/html"/>
+            </material>
+        </itemfeedback>
+        </item>
+    </section>
+  </objectbank>
+</questestinterop>

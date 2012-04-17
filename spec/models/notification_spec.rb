@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Notification do
 
@@ -244,6 +244,20 @@ describe Notification do
       messages = @notification.create_message(@assignment, @user)
       messages.size.should == 2
       messages.map(&:to).sort.should == ['dashboard', 'value for path']
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should create the message on the user's shard" do
+        notification_set
+        @shard1.activate do
+          user_with_pseudonym(:active_all => 1)
+          messages = @notification.create_message(@assignment, @user)
+          messages.length.should >= 1
+          messages.each { |m| m.shard.should == @shard1 }
+        end
+      end
     end
   end
 

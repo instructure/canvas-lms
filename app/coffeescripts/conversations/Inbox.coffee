@@ -480,7 +480,7 @@ define [
         $n = $n.next() while $n.next() && $n.next().data(timestampKey) > lastMessageAt
       return if $n == $conversation
       if move_mode is 'immediate'
-        $conversation.detach()[if moveDirection == 'up' then 'insertBefore' else 'insertAfter']($n).scrollIntoView()
+        $conversation.detach()[if moveDirection == 'up' then 'insertBefore' else 'insertAfter']($n)
       else
         $dummy_conversation = $conversation.clone().insertAfter($conversation)
         $conversation.detach()[if moveDirection == 'up' then 'insertBefore' else 'insertAfter']($n).animate({opacity: 'toggle', height: 'toggle'}, 0)
@@ -651,21 +651,42 @@ define [
       @$form.formSubmit
         fileUpload: =>
           return @$form.find(".file_input:visible").length > 0
-        disableWhileLoading: true,
+        preparedFileUpload: true
+        context_code: "user_" + $("#identity .user_id").text()
+        folder_id: @options.FOLDER_ID
+        intent: 'message'
+        formDataTarget: 'url'
+        handle_files: (attachments, data) ->
+          data.attachment_ids = (a.attachment.id for a in attachments)
+          data
+        disableWhileLoading: true
         success: (data) =>
           data = [data] unless data.length?
           for conversation in data
             $conversation = $('#conversation_' + conversation.id)
             if $conversation.length
               @buildMessage(conversation.messages[0]).prependTo(@$messageList).slideDown 'fast' if @isSelected($conversation)
-              @updateConversation($conversation, conversation)
+              @updateConversation($conversation, conversation, if data.length == 1 then 'slide' else 'immediate')
             else if conversation[@lastMessageAtKey()]
               @addConversation(conversation)
             @setHash '#/conversations/' + conversation.id if data.length == 1
           $.flashMessage(if data.length > 1 then I18n.t('messages_sent', 'Messages Sent') else I18n.t('message_sent', 'Message Sent'))
           @resetMessageForm()
         error: (data) =>
-          @$form.find('.token_input').errorBox(I18n.t('recipient_error', 'The course or group you have selected has no valid recipients'))
+          return if data.isRejected?() # e.g. refreshed the page, thus aborting the request
+          error = data[0]
+          if error?.attribute is 'body'
+            @$form.find('#body').errorBox I18n.t('message_blank_error', 'No message was specified')
+          else
+            errorText = (if error?.attribute is 'recipients'
+              if error.message is 'blank'
+                I18n.t('recipient_blank_error', 'No recipients were specified')
+              else
+                I18n.t('recipient_error', 'The course or group you have selected has no valid recipients')
+            else
+              I18n.t('unspecified_error', 'An unexpected error occurred, please try again')
+            )
+            @$form.find('.token_input').errorBox(errorText)
           $('.error_box').filter(':visible').css('z-index', 10) # TODO: figure out why this is necessary
       @$form.click =>
         @toggleMessageActions off

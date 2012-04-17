@@ -146,7 +146,7 @@ describe CalendarEventsApiController, :type => :integration do
         json.size.should eql 2
 
         e1json = json.first
-        e1json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'child_events', 'reserve_url']).sort)
+        e1json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'participants_per_appointment', 'child_events', 'reserve_url']).sort)
         e1json['reserve_url'].should match %r{calendar_events/#{event1.id}/reservations/%7B%7B%20id%20%7D%7D}
         e1json['child_events'].size.should eql 3
         e1json['child_events'].each do |e|
@@ -155,7 +155,7 @@ describe CalendarEventsApiController, :type => :integration do
         end
 
         e2json = json.last
-        e2json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'child_events', 'reserve_url']).sort)
+        e2json.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'participants_per_appointment', 'child_events', 'reserve_url']).sort)
         e2json['reserve_url'].should match %r{calendar_events/#{event2.id}/reservations/%7B%7B%20id%20%7D%7D}
         e2json['child_events'].size.should eql 3
         e2json['child_events'].each do |e|
@@ -189,13 +189,13 @@ describe CalendarEventsApiController, :type => :integration do
                           :context_codes => [group1.asset_string, group2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
         ejson = json.first
-        ejson.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'reserved', 'reserve_url', 'available_slots']).sort)
+        ejson.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'reserved', 'reserve_url', 'available_slots', 'participants_per_appointment']).sort)
         ejson['reserve_url'].should match %r{calendar_events/#{event1.id}/reservations/#{@me.id}}
         ejson['reserved'].should be_false
         ejson['available_slots'].should eql 1
 
         ejson = json.last
-        ejson.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'reserved', 'reserve_url', 'available_slots', 'child_events']).sort)
+        ejson.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'reserved', 'reserve_url', 'available_slots', 'participants_per_appointment', 'child_events']).sort)
         ejson['reserve_url'].should match %r{calendar_events/#{event2.id}/reservations/#{g.id}}
         ejson['reserved'].should be_true
         ejson['available_slots'].should eql 3
@@ -272,7 +272,7 @@ describe CalendarEventsApiController, :type => :integration do
                           :context_codes => [ag1.asset_string, ag2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
         json.each do |e|
-          e.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'reserved', 'reserve_url', 'available_slots', 'child_events']).sort)
+          e.keys.sort.should eql((expected_fields + ['appointment_group_id', 'appointment_group_url', 'reserved', 'reserve_url', 'available_slots', 'participants_per_appointment', 'child_events']).sort)
           e['reserved'].should be_true
           e['child_events_count'].should eql 2
           e['child_events'].size.should eql 1 # can't see otherguy's stuff

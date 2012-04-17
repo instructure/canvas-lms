@@ -20,6 +20,7 @@ class ConversationParticipant < ActiveRecord::Base
   include Workflow
   include TextHelper
   include SimpleTags
+  include ModelCache
 
   belongs_to :conversation
   belongs_to :user
@@ -37,6 +38,29 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :archived, :conditions => "workflow_state = 'archived'"
   named_scope :starred, :conditions => "label = 'starred'"
   named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
+  named_scope :for_masquerading_user, lambda { |user|
+    # site admins can see everything
+    return {} if Account.site_admin.grants_right?(user, :become_user)
+
+    # we need to ensure that the user can access *all* of each conversation's
+    # accounts (and that each conversation has at least one account). so given
+    # a user who can access accounts 1-5, we construct a sql string like so:
+    #  '[1][2][3][4][5]' like '%[' || REPLACE(root_account_ids, ',', ']%[') || ']%'
+    #
+    # which when applied to a given row would be something like:
+    #  '[1][2][3][4][5]' like '%[2]%[4]%'
+    #
+    # note that we are reliant on root_account_ids always being in order. if
+    # they aren't, this scope will be totally broken (it could be written
+    # another slower way)
+    #
+    # we're also counting on conversations being in the join
+
+    own_root_account_ids = user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
+    id_string = "[" + own_root_account_ids.sort.join("][") + "]"
+    root_account_id_matcher = "'%[' || REPLACE(root_account_ids, ',', ']%[') || ']%'"
+    {:conditions => ["conversations.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string]}
+  }
 
   tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
     user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
@@ -62,6 +86,9 @@ class ConversationParticipant < ActiveRecord::Base
     sanitize_sql conditions
   end
 
+  cacheable_method :user
+  cacheable_method :conversation
+
   delegate :private?, :to => :conversation
 
   before_update :update_unread_count_for_update
@@ -72,8 +99,8 @@ class ConversationParticipant < ActiveRecord::Base
   validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})
-    latest = options[:last_message] || last_message_at && messages.human.first
-    latest_authored = options[:last_authored_message] || visible_last_authored_at && messages.human.by_user(user_id).first
+    latest = last_message
+    latest_authored = last_authored_message
     options[:include_context_info] ||= private?
     {
       :id => conversation_id,
@@ -90,24 +117,9 @@ class ConversationParticipant < ActiveRecord::Base
     }.with_indifferent_access
   end
 
-  [:attachments].each do |association|
-    class_eval <<-ASSOC
-      def #{association}
-        @#{association} ||= conversation.#{association}.scoped(:conditions => <<-SQL)
-          EXISTS (
-            SELECT 1
-            FROM conversation_message_participants
-            WHERE conversation_participant_id = \#{id}
-              AND conversation_message_id = conversation_messages.id
-          )
-          SQL
-      end
-    ASSOC
-  end
-
   def participants(options = {})
     options = {
-      :include_context_info => true,
+      :include_participant_contexts => false,
       :include_indirect_participants => false
     }.merge(options)
 
@@ -122,7 +134,7 @@ class ConversationParticipant < ActiveRecord::Base
       user_ids -= participants.map(&:id)
       participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
     end
-    return participants unless options[:include_context_info]
+    return participants unless options[:include_participant_contexts]
     # we do this to find out the contexts they share with the user
     user.messageable_users(:ids => participants.map(&:id), :skip_visibility_checks => true).each { |user|
       context_info[user.id] = user
@@ -134,8 +146,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
   memoize :participants
 
-  def properties(latest = nil)
-    latest ||= messages.human.first
+  def properties(latest = last_message)
     properties = []
     properties << :last_author if latest && latest.author_id == user_id
     properties << :attachments if has_attachments?
@@ -205,16 +216,8 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.participants.size == 2 && private?
   end
 
-  def other_participants(options={})
-    if options[:as_conversation_participants]
-      # give the option to use our notion of participants, which populates
-      # extra column re: shared courses/groups
-      self.participants.reject { |u| u.id == self.user.id }
-    else
-      # by default, use the conversations notion of participants, which is
-      # lighter weight
-      conversation.participants - [self.user]
-    end
+  def other_participants(participants=conversation.participants)
+    participants.reject { |u| u.id == self.user_id }
   end
 
   def other_participant
@@ -229,7 +232,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def update_cached_data(options = {})
     options = {:recalculate_count => true, :set_last_message_at => true, :regenerate_tags => true}.update(options)
-    if latest = messages.human.first
+    if latest = last_message
       self.tags = message_tags if options[:regenerate_tags] && private?
       self.message_count = messages.human.size if options[:recalculate_count]
       self.last_message_at = if last_message_at.nil?
@@ -244,11 +247,11 @@ class ConversationParticipant < ActiveRecord::Base
         older = times.reject!{ |t| t <= last_message_at} || []
         older.first || times.reverse.first
       end
-      self.has_attachments = attachments.size > 0
+      self.has_attachments = messages.with_attachments.size > 0
       self.has_media_objects = messages.with_media_comments.size > 0
       self.visible_last_authored_at = if latest.author_id == user_id
         latest.created_at
-      elsif latest_authored = messages.human.by_user(user_id).first
+      elsif latest_authored = last_authored_message
         latest_authored.created_at
       end
     else
@@ -286,16 +289,35 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def move_to_user(new_user)
-    conversation.conversation_messages.update_all(["author_id = ?", new_user.id], ["author_id = ?", user_id])
-    if existing = conversation.conversation_participants.find_by_user_id(new_user.id)
-      existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
-      destroy
-    else
-      update_attribute :user_id, new_user.id
+    self.class.send :with_exclusive_scope do
+      conversation.conversation_messages.update_all(["author_id = ?", new_user.id], ["author_id = ?", user_id])
+      if existing = conversation.conversation_participants.find_by_user_id(new_user.id)
+        existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
+        destroy
+      else
+        update_attribute :user_id, new_user.id
+      end
+      conversation.regenerate_private_hash! if private?
     end
-    conversation.regenerate_private_hash! if private?
   end
 
+  attr_writer :last_message
+  def last_message
+    @last_message ||= messages.human.first if last_message_at
+  end
+
+  attr_writer :last_authored_message
+  def last_authored_message
+    @last_authored_message ||= messages.human.by_user(user_id).first if visible_last_authored_at
+  end
+
+  def self.preload_latest_messages(conversations, author_id)
+    # preload last_message
+    ConversationMessage.preload_latest conversations.select(&:last_message_at)
+    # preload last_authored_message
+    ConversationMessage.preload_latest conversations.select(&:visible_last_authored_at), author_id
+  end
+  
   protected
   def message_tags
     messages.map(&:tags).inject([], &:concat).uniq

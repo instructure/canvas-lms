@@ -98,5 +98,5 @@ describe ContentImportsController, :type => :integration do
       response.flash.should == {:notice=>"There is no archive for this content migration"}
     end
   end
-  
+
 end

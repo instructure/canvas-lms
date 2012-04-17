@@ -147,7 +147,7 @@ define([
       mode : "exact",
       elements: id,
       theme : "advanced",
-      plugins: "instructure_external_tools,instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_record,instructure_equella,media,paste,table,inlinepopups",
+      plugins: "autolink,instructure_external_tools,instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_record,instructure_equella,media,paste,table,inlinepopups",
       dialog_type: 'modal',
       language_load: false,
       relative_urls: false,
@@ -217,6 +217,24 @@ define([
               $(target).attr('src', tinyMCE.activeEditor.documentBaseURI.toAbsolute(mceSrc));
             }
           });
+
+          // tiny sets a focusout event handler, which only IE supports
+          // (Chrome/Safari/Opera support DOMFocusOut, FF supports neither)
+          // we attach a blur event that does the same thing (which in turn
+          // ensures the change callback fires)
+          // this fixes FF's broken behavior (http://www.tinymce.com/develop/bugtracker_view.php?id=4004 )
+          // as well as an issue in Safari where tiny didn't register some
+          // change events if the previously focused element was a numerical
+          // quiz input (something to do with changing its value in a change
+          // handler)
+          if (!('onfocusout' in ed.contentWindow)) {
+            $(ed.contentWindow).blur(function(e) {
+              if (!ed.removed && ed.undoManager.typing) {
+                ed.undoManager.typing = false;
+                ed.undoManager.add();
+              }
+            });
+          }
 
           $("#" + ed.editorId + "_tbl").find("td.mceToolbar span.mceSeparator").parent().each(function() {
             $(this)
@@ -359,28 +377,6 @@ define([
 
 // --------------------------------------------------------------------
 
-  // these 2 variables here are to prevent infinite recursion in ie8
-  var inFocusLoop = false;
-  var inBlurLoop = false;
-  function init() {
-    // ensure that blur/change/focus events fire for the active form element
-    // when we click into or out of tiny (they don't normally, since we are
-    // technically changing windows).
-    $(window).blur(function(event) {
-      if (document.activeElement && window == event.target && !inBlurLoop) {
-        inBlurLoop = true;
-        $(document.activeElement).filter(':input').blur().change();
-        inBlurLoop = false;
-      }
-    }).focus(function(event) {
-      if (document.activeElement && window == event.target && !inFocusLoop) {
-        inFocusLoop = true;
-        $(document.activeElement).filter(':input').focus();
-        inFocusLoop = false;
-      }
-    });
-  }
-
   var editorBoxIdCounter = 1;
 
   $.fn.editorBox = function(options, more_options) {
@@ -391,7 +387,6 @@ define([
         $this.editorBox.apply($this, args);
       });
     }
-    if (editorBoxIdCounter === 1) init();
 
     var id = this.attr('id');
     if(typeof(options) == "string" && options != "create") {

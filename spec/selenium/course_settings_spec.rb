@@ -18,8 +18,8 @@ describe "course settings tests" do
       f('.find_grading_standard_link').click
       wait_for_ajaximations
 
-      f('.grading_standard_select:visible a').click
-      f('button.select_grading_standard_link:visible').click
+      fj('.grading_standard_select:visible a').click
+      fj('button.select_grading_standard_link:visible').click
       f('.done_button').click
       f('#course_form').submit
       wait_for_ajaximations
@@ -241,9 +241,15 @@ describe "course settings tests" do
       @obs.reload
       @obs.enrollments.map {|e| e.associated_user_id}.sort.should == [@students[0].id, @students[1].id]
     end
+
+    it "should not show the student view student" do
+      @fake_student = @course.student_view_student
+      get "/courses/#{@course.id}/settings#tab-users"
+      ff(".student_enrollments .user_#{@fake_student.id}").should be_empty
+    end
   end
 
-  describe "course users multiple enrollments" do
+  context "course users multiple enrollments" do
     before (:each) do
       @username = "multiple@example.com"
       add_section("Section 1")
@@ -293,6 +299,27 @@ describe "course settings tests" do
 
       driver.find_element(:css, ".user_#{@user.id}").should_not include_text(@old_section.name)
       driver.find_element(:css, ".user_#{@user.id}").should include_text(@course_section.name)
+    end
+  end
+
+  context "right sidebar" do
+    it "should allow entering student view from the right sidebar" do
+      @fake_student = @course.student_view_student
+      get "/courses/#{@course.id}/settings"
+      f(".student_view_button").click
+      wait_for_dom_ready
+      f("#identity .user_name").should include_text @fake_student.name
+      stop_link = f("#identity .stop_masquerading a")
+      stop_link.should include_text "[Leave Student View]"
+      stop_link.click
+      wait_for_dom_ready
+      f("#identity .user_name").should include_text @teacher.name
+    end
+
+    it "should not include student view student in the statistics count" do
+      @fake_student = @course.student_view_student
+      get "/courses/#{@course.id}/settings"
+      find_with_jquery('.summary tr:nth(1)').text.should match /Students:\s*None/
     end
   end
 end

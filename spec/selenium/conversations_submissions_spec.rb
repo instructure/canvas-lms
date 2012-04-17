@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/conversations_common')
 
 describe "conversations submissions" do
+  it_should_behave_like "in-process server selenium tests"
   it_should_behave_like "conversations selenium tests"
 
   it "should list submission comments in the conversation" do

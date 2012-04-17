@@ -49,4 +49,8 @@ module ContentImportsHelper
       user_content(string)
     end
   end
+
+  def mig_id(obj)
+    CC::CCHelper.create_key(obj)
+  end
 end

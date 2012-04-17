@@ -378,6 +378,13 @@ describe UserList do
       users.first.should_not == @user1
       users.first.should_not == @user2
     end
+
+    it "should not create a new user for non-matching non-email" do
+      ul = UserList.new 'jt', nil, :preferred
+      ul.addresses.should == []
+      ul.errors.should == [{:address => 'jt', :type => :pseudonym, :details => :not_found}]
+      ul.duplicate_addresses.should == []
+    end
   end
 
   context "user creation" do

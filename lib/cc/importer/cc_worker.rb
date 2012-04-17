@@ -45,7 +45,11 @@ module Canvas::Migration
           end
 
           cm.migration_settings[:worker_class] = converter_class.name
-          cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}
+          if cm.migration_settings[:migration_ids_to_import] && cm.migration_settings[:migration_ids_to_import][:copy]
+            cm.migration_settings[:migration_ids_to_import][:copy][:assessment_questions] = true
+          else
+            cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}
+          end
           cm.workflow_state = :exported
           cm.progress = 0
           cm.save

@@ -45,6 +45,10 @@ describe Pseudonym do
 
     p.account_id = 1
     p.save.should be_true
+
+    # make sure a password was generated
+    p.password.should_not be_nil
+    p.password.should_not match /tmp-pw/
   end
 
   it "should not allow active duplicates" do

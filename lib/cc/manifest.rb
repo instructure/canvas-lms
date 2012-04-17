@@ -20,7 +20,7 @@ module CC
     include CCHelper
     
     attr_accessor :exporter, :weblinks, :basic_ltis
-    delegate :add_error, :set_progress, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :for_course_copy, :to => :exporter
 
     def initialize(exporter)
       @exporter = exporter
@@ -46,7 +46,7 @@ module CC
       @document = nil
       @file
     end
-    
+
     def create_document
       @file = File.new(File.join(export_dir, MANIFEST), 'w')
       @document = Builder::XmlMarkup.new(:target=>@file, :indent=>2)

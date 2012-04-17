@@ -1,0 +1,7 @@
+<%
+  content_for :page_title, t("#titles.messages", "Messages")
+  add_crumb t("#crumbs.messages", "Messages")
+%>
+
+<%= render :partial => 'message', :collection => @messages %>
+<%= will_paginate(@messages) %>

@@ -10,23 +10,40 @@ describe "scheduler" do
     Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
   end
 
-  def create_appointment_group_manual
-    new_appointment_text = 'new appointment group'
+  def fill_out_appointment_group_form(new_appointment_text)
+    driver.find_element(:css, '.create_link').click
+    edit_form = driver.find_element(:id, 'edit_appointment_form')
+    keep_trying_until { edit_form.should be_displayed }
+    replace_content(find_with_jquery('input[name="title"]'), new_appointment_text)
+    date_field = edit_form.find_element(:css, '.date_field')
+    date_field.click
+    wait_for_animations
+    find_with_jquery('.ui-datepicker-trigger:visible').click
+    datepicker_next
+    replace_content(edit_form.find_element(:css, '.start_time'), '1')
+    replace_content(edit_form.find_element(:css, '.end_time'), '3')
+  end
+
+  def submit_appointment_group_form(publish = true)
+    save_and_publish, save = ff('.ui-dialog-buttonset .ui-button')
+    if publish
+      save_and_publish.click
+    else
+      save.click
+    end
+  end
+
+  def create_appointment_group_manual(opts = {})
+    opts = {
+      :publish => true,
+      :new_appointment_text => 'new appointment group'
+    }.with_indifferent_access.merge(opts)
+
     expect {
-      driver.find_element(:css, '.create_link').click
-      edit_form = driver.find_element(:id, 'edit_appointment_form')
-      keep_trying_until { edit_form.should be_displayed }
-      replace_content(find_with_jquery('input[name="title"]'), new_appointment_text)
-      date_field = edit_form.find_element(:css, '.date_field')
-      date_field.click
-      wait_for_animations
-      find_with_jquery('.ui-datepicker-trigger:visible').click
-      datepicker_next
-      replace_content(edit_form.find_element(:css, '.start_time'), '1')
-      replace_content(edit_form.find_element(:css, '.end_time'), '3')
-      driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+      fill_out_appointment_group_form(opts[:new_appointment_text])
+      submit_appointment_group_form(opts[:publish])
       wait_for_ajaximations
-      driver.find_element(:css, '.view_calendar_link').text.should == new_appointment_text
+      driver.find_element(:css, '.view_calendar_link').text.should == opts[:new_appointment_text]
     }.to change(AppointmentGroup, :count).by(1)
   end
 
@@ -65,28 +82,48 @@ describe "scheduler" do
   end
 
   def create_appointment_group(params={})
-    current_date = Date.today.to_s
+    tomorrow = (Date.today + 1).to_s
     default_params = {
-      :title => "new appointment group",
-      :context => @course,
-      :new_appointments => [
-        [current_date + ' 12:00:00', current_date + ' 13:00:00'],
-      ]
+        :title => "new appointment group",
+        :context => @course,
+        :new_appointments => [
+            [tomorrow + ' 12:00:00', tomorrow + ' 13:00:00'],
+        ]
     }
-    ag = @course.appointment_groups.create(default_params.merge(params))
+    ag = @course.appointment_groups.create!(default_params.merge(params))
     ag.publish!
     ag.title
   end
 
   context "as a teacher" do
 
-    before (:each) { course_with_teacher_logged_in }
+    before (:each) do
+      course_with_teacher_logged_in
+    end
 
     it "should create a new appointment group" do
       get "/calendar2"
       click_scheduler_link
 
       create_appointment_group_manual
+    end
+
+    it "should create appointment group and go back and publish it" do
+      get "/calendar2"
+      click_scheduler_link
+
+      create_appointment_group_manual(:publish => false)
+      new_appointment_group = AppointmentGroup.last
+      new_appointment_group.workflow_state.should == 'pending'
+      f('.ag-x-of-x-signed-up').should include_text('unpublished')
+      driver.action.move_to(f('.appointment-group-item')).perform
+      click_al_option('.edit_link')
+      edit_form = driver.find_element(:id, 'edit_appointment_form')
+      keep_trying_until { edit_form.should be_displayed }
+      driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+      wait_for_ajaximations
+      new_appointment_group.reload
+      new_appointment_group.workflow_state.should == 'active'
     end
 
     it "should delete an appointment group" do
@@ -202,40 +239,184 @@ describe "scheduler" do
       keep_trying_until { element_exists('.fc-event-bg').should be_false }
     end
 
+    it "should allow limiting the max appointments per participant" do
+      get "/calendar2"
+      click_scheduler_link
+      fill_out_appointment_group_form('max appointments')
+
+      # invalid max_appointments
+      max_appointments_input = f('[name="max_appointments_per_participant"]')
+      replace_content(max_appointments_input, '0')
+      submit_appointment_group_form
+      wait_for_ajaximations
+      ffj('.errorBox[id!="error_box_template"]').size.should eql 1
+
+      replace_content(max_appointments_input, 3)
+      expect {
+        submit_appointment_group_form
+        wait_for_ajaximations
+      }.to change(AppointmentGroup, :count).by 1
+
+      ag_id = f('#appointment-group-list li:last-child')['data-appointment-group-id']
+      AppointmentGroup.find(ag_id).max_appointments_per_participant.should == 3
+    end
+
+    it "should allow removing individual appointments" do
+      # user appointment group
+      create_appointment_group
+      ag = AppointmentGroup.first
+      2.times do
+        student_in_course(:course => @course, :active_all => true)
+        ag.appointments.first.reserve_for(@user, @user)
+      end
+
+      # group appointment group
+      gc = @course.group_categories.create!(:name => "Blah Groups")
+      title = create_appointment_group :sub_context_code => gc.asset_string,
+                                       :title => "group ag"
+      ag = AppointmentGroup.find_by_title(title)
+      2.times do |i|
+        student_in_course(:course => @course, :active_all => true)
+        group = Group.create! :group_category => gc,
+                              :context => @course,
+                              :name => "Group ##{i+1}"
+        group.users << @user
+        group.save!
+        ag.appointments.first.reserve_for(group, @user)
+      end
+
+      get "/calendar2"
+      click_scheduler_link
+
+      2.times do |i|
+        f(".appointment-group-item:nth-child(#{i+1}) .view_calendar_link").click
+
+        f('.fc-event').click
+        ff('#attendees li').size.should eql 2
+
+        # delete the first appointment
+        f('.cancel_appointment_link').click
+        fj('button:visible:contains(Delete)').click
+        wait_for_ajax_requests
+        ff('#attendees li').size.should eql 1
+
+        # make sure the appointment was really deleted
+        f('#refresh_calendar_link').click
+        wait_for_ajax_requests
+        f('.fc-event-time').click
+        ff('#attendees li').size.should eql 1
+
+        f('.single_item_done_button').click
+      end
+    end
+
+    def open_edit_appointment_slot_dialog
+      f('.fc-event').click
+      f('.edit_event_link').click
+    end
+
+    it "should allow me to override the participant limit on a slot-by-slot basis" do
+      create_appointment_group :participants_per_appointment => 2, :context => @course
+      get "/calendar2"
+      wait_for_ajaximations
+      click_scheduler_link
+      wait_for_ajaximations
+      click_appointment_link
+
+      open_edit_appointment_slot_dialog
+      replace_content f('[name=max_participants]'), "5"
+      fj('.ui-button:contains(Update)').click
+      wait_for_ajaximations
+
+      ag = AppointmentGroup.first
+      ag.appointments.first.participants_per_appointment.should eql 5
+      ag.participants_per_appointment.should eql 2
+
+      open_edit_appointment_slot_dialog
+      f('[name=max_participants_option]').click
+      debugger
+      fj('.ui-button:contains(Update)').click
+      wait_for_ajaximations
+
+      ag.reload
+      ag.appointments.first.participants_per_appointment.should be_nil
+    end
 
   end
 
   context "as a student" do
 
-    before (:each) { course_with_student_logged_in }
+    before (:each) do
+      course_with_student_logged_in
+    end
+
+    def reserve_appointment_manual(n)
+      driver.find_elements(:css, '.fc-event')[n].click
+      driver.find_element(:css, '.event-details .reserve_event_link').click
+      wait_for_ajax_requests
+    end
 
     it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do
+      tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 1,
                                :new_appointments => [
-                                 [Date.today.to_s + ' 12:00:00', current_date = Date.today.to_s + ' 13:00:00'],
-                                 [Date.today.to_s + ' 14:00:00', current_date = Date.today.to_s + ' 15:00:00'],
-                              ])
+                                   [tomorrow + ' 12:00:00', current_date = tomorrow + ' 13:00:00'],
+                                   [tomorrow + ' 14:00:00', current_date = tomorrow + ' 15:00:00'],
+                               ])
       get "/calendar2"
       wait_for_ajaximations
       click_scheduler_link
       click_appointment_link
 
-      # click the first calendar event to open it's popover
-      driver.find_elements(:css, '.fc-event')[0].click
-      driver.find_element(:css, '.event-details .reserve_event_link').click
-      wait_for_ajax_requests
+      reserve_appointment_manual(0)
       driver.find_element(:css, '.fc-event').should include_text "Reserved"
 
-      # now try to reserve the second appointment
-      driver.find_elements(:css, '.fc-event')[1].click
-      driver.find_element(:css, '.event-details .reserve_event_link').click
-      wait_for_ajax_requests
+      # try to reserve the second appointment
+      reserve_appointment_manual(1)
       find_with_jquery('.ui-button:contains(Reschedule)').click
       wait_for_ajax_requests
 
       event1, event2 = driver.find_elements(:css, '.fc-event')
       event1.should include_text "Available"
       event2.should include_text "Reserved"
+    end
+
+    it "should not let me book too many appointments" do
+      tomorrow = (Date.today + 1).to_s
+      create_appointment_group(:max_appointments_per_participant => 2,
+                               :new_appointments => [
+                                 [tomorrow + ' 12:00:00', current_date = tomorrow + ' 13:00:00'],
+                                 [tomorrow + ' 14:00:00', current_date = tomorrow + ' 15:00:00'],
+                                 [tomorrow + ' 16:00:00', current_date = tomorrow + ' 17:00:00'],
+        ])
+      get "/calendar2"
+      wait_for_ajaximations
+      click_scheduler_link
+      click_appointment_link
+
+      reserve_appointment_manual(0)
+      reserve_appointment_manual(1)
+      e1, e2, *rest = ff('.fc-event')
+      e1.should include_text "Reserved"
+      e2.should include_text "Reserved"
+
+      reserve_appointment_manual(2)
+      fj('.ui-button:contains("OK")').click # "can't reserve" dialog
+      f('.fc-event:nth-child(3)').should include_text "Available"
+    end
+
+    it "should not allow me to cancel reservations from the attendees list" do
+      create_appointment_group
+      ag = AppointmentGroup.first
+      ag.appointments.first.reserve_for(@user, @user)
+      get "/calendar2"
+      wait_for_ajaximations
+      click_scheduler_link
+      wait_for_ajaximations
+      click_appointment_link
+
+      fj('.fc-event:visible').click
+      ff('#reservations').size.should be_zero
     end
 
   end

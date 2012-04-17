@@ -143,6 +143,26 @@ describe "discussions" do
       get_all_replies.count.should == 1
       @last_entry.find_element(:css, '.author').text.should == @user.name
     end
+
+    it "should allow student view student to read/post" do
+      enter_student_view
+      create_and_go_to_topic
+      get_all_replies.count.should == 0
+      add_reply
+      get_all_replies.count.should == 1
+    end
+
+    # note: this isn't desirable, but it's the way it is for this release
+    it "should show student view posts to teacher and other students" do
+      @fake_student = @course.student_view_student
+      @topic = @course.discussion_topics.create!
+      @entry = @topic.reply_from(:user => @fake_student, :text => 'i am a figment of your imagination')
+      @topic.create_materialized_view
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      get_all_replies.first.should include_text @fake_student.name
+    end
   end
 
   context "discussions as a student" do
@@ -163,6 +183,29 @@ describe "discussions" do
       f('#content').should_not include_text(new_student_entry_text)
       add_reply new_student_entry_text
       f('#content').should include_text(new_student_entry_text)
+    end
+
+    it "should let students post to a post-first discussion" do
+      new_student_entry_text = 'new student entry'
+      user_session(@student)
+      @topic.require_initial_post = true
+      @topic.save
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      # shouldn't see the existing entry until after posting
+      f('#content').should_not include_text("new entry from teacher")
+      add_reply new_student_entry_text
+      # now they should see the existing entry, and their entry
+      f('#content').should include_text("new entry from teacher")
+      f('#content').should include_text(new_student_entry_text)
+    end
+
+    it "should still show entries without users" do
+      @topic.discussion_entries.create!(:user => nil, :message => 'new entry from nobody')
+      user_session(@student)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      f('#content').should include_text('new entry from nobody')
     end
 
     it "should reply as a student and validate teacher can see reply" do

@@ -26,12 +26,14 @@ describe PseudonymsController, :type => :integration do
   end
   describe "pseudonym listing" do
     before do
-      @path = "/api/v1/accounts/#{@account.id}/logins"
-      @path_options = { :controller => 'pseudonyms', :action => 'index', :format => 'json', :account_id => @account.id.to_param }
+      @account_path = "/api/v1/accounts/#{@account.id}/logins"
+      @account_path_options = { :controller => 'pseudonyms', :action => 'index', :format => 'json', :account_id => @account.id.to_param }
+      @user_path = "/api/v1/users/#{@student.id}/logins"
+      @user_path_options = { :controller => 'pseudonyms', :action => 'index', :format => 'json', :user_id => @student.id.to_param }
     end
     context "An authorized user with a valid query" do
       it "should return a list of pseudonyms" do
-        json = api_call(:get, @path, @path_options, {
+        json = api_call(:get, @account_path, @account_path_options, {
           :user => { :id => @student.id }
         })
         json.should == @student.pseudonyms.map do |p|
@@ -46,14 +48,14 @@ describe PseudonymsController, :type => :integration do
       end
       it "should return multiple pseudonyms if they exist" do
         %w{ one@example.com two@example.com }.each { |id| @student.pseudonyms.create(:unique_id => id) }
-        json = api_call(:get, @path, @path_options, {
+        json = api_call(:get, @account_path, @account_path_options, {
           :user => { :id => @student.id }
         })
         json.count.should eql 2
       end
       it "should paginate results" do
         %w{ one@example.com two@example.com }.each { |id| @student.pseudonyms.create(:unique_id => id) }
-        json = api_call(:get, "#{@path}?per_page=1", @path_options.merge({ :per_page => '1' }), {
+        json = api_call(:get, "#{@account_path}?per_page=1", @account_path_options.merge({ :per_page => '1' }), {
           :user => { :id => @student.id }
         })
         json.count.should eql 1
@@ -62,21 +64,35 @@ describe PseudonymsController, :type => :integration do
         headers[1].should match /page=1&per_page=1/ # first page
         headers[2].should match /page=2&per_page=1/ # last page
       end
+      it "should return all pseudonyms for a user" do
+        new_account = Account.create!(:name => 'Extra Account')
+        @student.pseudonyms.create!(:unique_id => 'one@example.com', :account => Account.default)
+        @student.pseudonyms.create!(:unique_id => 'two@example.com', :account => new_account)
+
+        json = api_call(:get, @user_path, @user_path_options)
+        json.count.should eql 2
+      end
     end
     context "An authorized user with an empty query" do
       it "should return an empty array" do
-        json = api_call(:get, @path, @path_options, {
+        json = api_call(:get, @account_path, @account_path_options, {
           :user => { :id => @student.id }
         })
         json.should be_empty
       end
     end
     context "An unauthorized user" do
-      it "should return 401 unauthorized" do
+      before do
         @user = user_with_pseudonym
-        raw_api_call(:get, @path, @path_options, {
+      end
+      it "should return 401 unauthorized when listing account pseudonyms" do
+        raw_api_call(:get, @account_path, @account_path_options, {
           :user => { :id => @student.id }
         })
+        response.code.should eql '401'
+      end
+      it "should return 401 unauthorized when listing user pseudonyms" do
+        raw_api_call(:get, @user_path, @user_path_options)
         response.code.should eql '401'
       end
     end

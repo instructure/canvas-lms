@@ -127,8 +127,8 @@ define [
       event.preventDefault()
       unless @reply?
         @reply = new Reply this, topLevel: true, added: @initEntries
-        @reply.on 'edit', => @$addRootReply.hide()
-        @reply.on 'hide', => @$addRootReply.show()
+        @reply.on 'edit', => @$addRootReply?.hide()
+        @reply.on 'hide', => @$addRootReply?.show()
       @model.set 'notification', ''
       @reply.edit()
 

@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "assignments" do
   it_should_behave_like "in-process server selenium tests"
 
-  context "teacher view" do
+  context "as a teacher" do
     before (:each) do
       course_with_teacher_logged_in
     end
@@ -50,8 +50,7 @@ describe "assignments" do
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
       driver.find_element(:id, 'assignment_points_possible').send_keys('5')
-      driver.
-          find_element(:id, 'add_assignment_form').submit
+      driver.find_element(:id, 'add_assignment_form').submit
 
       #make sure assignment was added to correct assignment group
       wait_for_animations
@@ -224,20 +223,88 @@ describe "assignments" do
       errorBoxes.first.text.should eql "The assignment shouldn't be locked again until after the due date"
       errorBoxes.first.should be_displayed
     end
+
+    it "should allow a student view student to view/submit assignments" do
+      @assignment = @course.assignments.create(
+        :title => 'Cool Assignment',
+        :points_possible => 10,
+        :submission_types => "online_text_entry",
+        :due_at => Time.now.utc + 2.days)
+
+      enter_student_view
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      f('.assignment .title').should include_text @assignment.title
+      f('.submit_assignment_link').click
+      assignment_form = f('#submit_online_text_entry_form')
+      wait_for_tiny(assignment_form)
+
+      type_in_tiny('#submission_body', 'my assigment submission')
+      assignment_form.submit
+      wait_for_dom_ready
+
+      @course.student_view_student.submissions.count.should == 1
+      f('#sidebar_content .details').should include_text "Turned In!"
+    end
+
+    it "should allow a student view student to submit file upload assignments" do
+      @assignment = @course.assignments.create(
+        :title => 'Cool Assignment',
+        :points_possible => 10,
+        :submission_types => "online_upload",
+        :due_at => Time.now.utc + 2.days)
+
+      enter_student_view
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      f('.submit_assignment_link').click
+
+      filename, fullpath, data = get_file("testfile1.txt")
+      f('.submission_attachment input').send_keys(fullpath)
+      f('#submit_file_button').click
+      wait_for_ajax_requests
+      wait_for_dom_ready
+
+      keep_trying_until {
+        f('.details .header').should include_text "Turned In!"
+        f('.details .file-big').should include_text "testfile1"
+      }
+    end
   end
 
-  context "student view" do
+  context "as a student" do
     DUE_DATE = Time.now.utc + 2.days
     before (:each) do
       course_with_student_logged_in
-      @assignment = @course.assignments.create(:name => 'assignment', :due_at => DUE_DATE)
+      @assignment = @course.assignments.create!(:name => 'assignment', :due_at => DUE_DATE)
+    end
+
+    it "should allow you to submit a file" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+      filename, fullpath, data = get_file("testfile1.txt")
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      f('.submission_attachment input').send_keys(fullpath)
+      f('#submission_comment').send_keys("hello comment")
+      f('#submit_file_button').click
+      wait_for_ajax_requests
+      wait_for_dom_ready
+
+      keep_trying_until {
+        f('#sidebar_content .header').should include_text "Turned In!"
+        f('.details .file-big').should include_text "testfile1"
+      }
+      @submission = @assignment.reload.submissions.find_by_user_id(@student.id)
+      @submission.submission_type.should == 'online_upload'
+      @submission.attachments.length.should == 1
+      @submission.workflow_state.should == 'submitted'
     end
 
     it "should not allow a user to submit a file-submission assignment without attaching a file" do
-      @assignment = @course.assignments.create!(
-        :name => 'test assignment',
-        :due_at => Time.now.utc + 2.days,
-        :submission_types => 'online_upload')
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 

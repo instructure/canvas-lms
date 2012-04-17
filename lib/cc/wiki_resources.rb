@@ -23,6 +23,7 @@ module CC
       FileUtils::mkdir_p wiki_folder
       
       @course.wiki.wiki_pages.active.each do |page|
+        next unless export_object?(page)
         begin
           migration_id = CCHelper.create_key(page)
           file_name = "#{page.url}.html"

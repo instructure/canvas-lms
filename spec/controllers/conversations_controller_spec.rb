@@ -114,6 +114,32 @@ describe ConversationsController do
       response.should be_success
       assigns[:filterable].should be_false
     end
+
+    it "should not allow student view student to load inbox" do
+      course_with_teacher_logged_in(:active_all => true)
+      @fake_student = @course.student_view_student
+      session[:become_user_id] = @fake_student.id
+
+      get 'index'
+      assert_unauthorized
+    end
+
+    it "should filter conversations when masquerading" do
+      a = Account.default
+      @student = user_with_pseudonym(:active_all => true)
+      course_with_student(:active_all => true, :account => a, :user => @student)
+      @student.associated_accounts << a
+      @student.initiate_conversation([user.id]).add_message('test1', :root_account_id => a.id)
+      @student.initiate_conversation([user.id]).add_message('test2') # no root account, so teacher can't see it
+
+      course_with_teacher_logged_in(:active_all => true, :account => a)
+      a.add_user(@user)
+      session[:become_user_id] = @student.id
+
+      get 'index'
+      response.should be_success
+      assigns[:conversations_json].size.should eql 1
+    end
   end
 
   describe "GET 'show'" do
@@ -452,27 +478,13 @@ describe ConversationsController do
     it "should include an attachment if one exists" do
       course_with_student
       conversation
-      @conversation.add_message('test attachment') do |message|
-        attachment_model(:filename => "somefile.doc")
-        @attachment.context = message
-        @attachment.save
-      end
+      attachment = @user.conversation_attachments_folder.attachments.create!(:filename => "somefile.doc", :context => @user, :uploaded_data => StringIO.new('test'))
+      @conversation.add_message('test attachment', :attachment_ids => [attachment.id])
       HostUrl.stubs(:context_host).returns("test.host")
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
       feed.should_not be_nil
       feed.entries.first.content.should match(/somefile\.doc/)
-    end
-
-    it "should not include deleted messages" do
-      course_with_student
-      conversation
-      @conversation.add_message('second message')
-      @conversation.remove_messages(@conversation.messages.first)
-      get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.length.should == 1
     end
   end
 end

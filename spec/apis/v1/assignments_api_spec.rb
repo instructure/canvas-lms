@@ -59,7 +59,7 @@ describe AssignmentsApiController, :type => :integration do
       @assignment.update_attribute(:submission_types, "online_upload,online_text_entry,online_url,media_recording")
 
       @rubric = rubric_model(:user => @user, :context => @course,
-                                       :data => larger_rubric_data,
+                                       :data => larger_rubric_data, :points_possible => 12,
                             :free_form_criterion_comments => true)
 
       @assignment.create_rubric_association(:rubric => @rubric, :purpose => 'grading', :use_for_grading => true)
@@ -91,6 +91,10 @@ describe AssignmentsApiController, :type => :integration do
             "media_recording"
           ],
           'html_url' => course_assignment_url(@course, @assignment),
+          'rubric_settings' => {
+            'points_possible' => 12,
+            'free_form_criterion_comments' => true,
+          },
           'rubric' => [
             {'id' => 'crit1', 'points' => 10, 'description' => 'Crit1',
               'ratings' => [

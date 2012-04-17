@@ -119,7 +119,7 @@ describe Submission do
       Time.stubs(:now).returns(new_time)
       @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
       @submission.reload
-      @submission.submitted_at.to_s(:db).should eql @submission.created_at.to_s(:db)
+      (@submission.submitted_at.to_i - @submission.created_at.to_i).abs.should < 1.minute
     end
   end
 

@@ -1,7 +1,9 @@
-<% add_crumb(@current_user.short_name, context_url(@current_user, :context_url))
-   add_crumb(t('crumbs.grades', 'Grades'), grades_path) %>
-
-<% content_for :page_title, join_title(t(:page_title, "Grades"), @current_user.name) %>
+<% 
+  content_for :page_title, join_title(t(:page_title, "Grades"), @current_user.name)
+  add_crumb(@current_user.short_name, context_url(@current_user, :context_url))
+  add_crumb(t('crumbs.grades', 'Grades'), grades_path) 
+  jammit_css :user_grades
+%>
 
 <% if false %>
 <% #TODO: implement previous courses  %>
@@ -11,62 +13,16 @@
     </div>
 <% end %>
 <% end %>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function($) {
-
-$(document).ready(function() {
-  $(".previous_courses_link").click(function(event) {
-    event.preventDefault();
-    $("#previous_courses").show();
-    $("html,body").scrollTo($("#previous_courses"));
-  });
-});
-});
-</script>
-<% end %>
 <style>
-.course_details { 
-  border-collapse: collapse;
-  min-width: 400px;
-  margin-left: 20px;
-  border-spacing: 0;
-}
-.course_details th {
-  text-align: left;
-}
-.course_details tr:hover td {
-  background-color: #eee;
-}
-.course_details td {
-  border-bottom: 1px solid #ccc;
-}
-.course_details .course {
-  font-size: 1.2em;
-  padding: 6px 50px 6px 5px;
-  vertical-align: top;
-}
-.course_details .percent {
-  text-align: right;
-  font-size: 1.2em;
-  font-weight: bold;
-  padding-right: 5px;
-}
-.course_details .report {
-  padding: 12px;
-}
 </style>
 <% unless @student_enrollments.empty? %>
 <h2><%= t('titles.current_student_courses', "Courses I'm Taking") %></h2>
-<table class="course_details">
-<% @student_enrollments.each do |enrollment| %>
+<table class="course_details student_grades">
+<% @student_enrollments.each do |course, enrollment| %>
   <tr>
-    <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= enrollment.course.name %></a></td>
+    <td class="course"><a href="<%= course_student_grades_path(course.id, enrollment.user_id) %>"><%= course.name %></a></td>
     <td class="percent">
-      <% if enrollment.course.settings[:hide_final_grade] %>
+      <% if course.settings[:hide_final_grade] %>
         --
       <% elsif enrollment.computed_current_score %>
         <%= enrollment.computed_current_score %>%
@@ -81,7 +37,7 @@ $(document).ready(function() {
 <% end %>
 <% unless @observed_enrollments.empty? %>
 <h2 style="margin-top: 20px;"><%= t('linked_student_accounts', 'Linked Student Accounts') %></h2>
-<table class="course_details">
+<table class="course_details observer_grades">
 <% @observed_enrollments.each do |enrollment| %>
   <tr>
     <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= context_user_name(nil, enrollment.user_id) %>, <%= enrollment.course.name %></a></td>
@@ -101,7 +57,7 @@ $(document).ready(function() {
 <% end %>
 <% unless @teacher_enrollments.empty? %>
 <h2 style="margin-top: 20px;"><%= t('current_teacher_courses', "Courses I'm Teaching") %></h2>
-<table class="course_details">
+<table class="course_details teacher_grades">
 <% @teacher_enrollments.each do |enrollment| %>
   <tr>
     <td class="course" style="vertical-align: middle;"><a href="<%= course_gradebook_path(enrollment.course_id) %>"><%= enrollment.course.name %></a></td>

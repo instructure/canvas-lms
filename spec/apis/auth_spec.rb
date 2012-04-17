@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe "API Authentication", :type => :integration do
 
@@ -99,6 +100,31 @@ describe "API Authentication", :type => :integration do
     response.response_code.should == 401
     post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
     response.should be_success
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should use developer key + basic auth access on the default shard from a different shard" do
+      @shard1.activate do
+        @account = Account.create!
+        # this will continue to be supported until we notify api users and explicitly phase it out
+        user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123', :account => @account)
+        course_with_teacher(:user => @user, :account => @account)
+      end
+      LoadAccount.stubs(:default_domain_root_account).returns(@account)
+
+      get "/api/v1/courses.json"
+      response.response_code.should == 401
+      get "/api/v1/courses.json?api_key=#{@key.api_key}"
+      response.response_code.should == 401
+      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
+      response.response_code.should == 401
+      get "/api/v1/courses.json", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      response.should be_success
+      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      response.should be_success
+    end
   end
 
   if Canvas.redis_enabled? # eventually we're going to have to just require redis to run the specs
@@ -371,6 +397,24 @@ describe "API Authentication", :type => :integration do
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = JSON.parse(response.body)
       json['message'].should == "Invalid access token."
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should work for an access token from a different shard with the developer key on the default shard" do
+        @shard1.activate do
+          @account = Account.create!
+          user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123', :account => @account)
+          course_with_teacher(:user => @user, :account => @account)
+          @token = @user.access_tokens.create!(:developer_key => DeveloperKey.default)
+          @token.developer_key.shard.should be_default
+        end
+        LoadAccount.stubs(:default_domain_root_account).returns(@account)
+
+        check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.token}" } }
+        JSON.parse(response.body).size.should == 1
+      end
     end
   end
 

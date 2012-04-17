@@ -20,6 +20,7 @@ module CC
     
     def add_assignments
       @course.assignments.active.no_graded_quizzes_or_topics.each do |assignment|
+        next unless export_object?(assignment)
         begin
           add_assignment(assignment)
         rescue
