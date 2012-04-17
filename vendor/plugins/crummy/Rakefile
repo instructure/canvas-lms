@@ -31,7 +31,7 @@ begin
   gem 'hanna'
   require 'hanna/rdoctask'
 rescue LoadError
-  require 'rake/rdoctask'
+  require 'rdoc/task'
 end
 desc 'Generate documentation for the crummy plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
