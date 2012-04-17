@@ -41,7 +41,7 @@ module Api::V1::CalendarEvent
     hash['effective_context_code'] = event.effective_context_code if event.effective_context_code
     hash["child_events_count"] = event.child_events.size
     hash['parent_event_id'] = event.parent_calendar_event_id
-    hash['hidden'] = (hash["child_events_count"] > 0 && !event.appointment_group)
+    hash['hidden'] = event.hidden?
 
     if include.include?('participants')
       if event.context_type == 'User'

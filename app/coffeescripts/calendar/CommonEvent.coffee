@@ -5,9 +5,10 @@ define [
 ], ($) ->
 
   class
-    constructor: (data, contextInfo) ->
+    constructor: (data, contextInfo, actualContextInfo) ->
       @eventType = 'generic'
       @contextInfo = contextInfo
+      @actualContextInfo = actualContextInfo
       @allPossibleContexts = null
       @className = []
       @object = {}

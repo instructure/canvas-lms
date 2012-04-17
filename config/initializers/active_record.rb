@@ -36,7 +36,7 @@ class ActiveRecord::Base
     255
   end
 
-  def self.find_by_asset_string(string, asset_types)
+  def self.find_by_asset_string(string, asset_types=nil)
     find_all_by_asset_string([string], asset_types)[0]
   end
 

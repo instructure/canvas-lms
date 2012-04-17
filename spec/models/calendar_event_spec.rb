@@ -179,12 +179,9 @@ describe CalendarEvent do
         should eql [] # none of the appointments even though they technically are on the section
 
       CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string, @student.asset_string]).sort_by(&:id).
-        should eql [@e1, @e2, a1, a2, pe]
+        should eql [@e1, @e2, a1, a2, pe, se]
 
       CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).sort_by(&:id).
-        should eql [@e1, a1, a2, pe]
-
-      CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string], [section.asset_string]).sort_by(&:id).
         should eql [@e1, a1, a2, pe, se]
     end
   end

@@ -3,7 +3,8 @@ define [
   'compiled/calendar/CommonEvent'
   'compiled/calendar/CommonEvent.Assignment',
   'compiled/calendar/CommonEvent.CalendarEvent'
-], ($, CommonEvent, Assignment, CalendarEvent) ->
+  'compiled/str/splitAssetString'
+], ($, CommonEvent, Assignment, CalendarEvent, splitAssetString) ->
 
   (data, contexts) ->
     if data == null
@@ -11,7 +12,8 @@ define [
       obj.allPossibleContexts = contexts
       return obj
 
-    context_code = data.effective_context_code || data.context_code
+    actualContextCode = data.context_code
+    contextCode = data.effective_context_code || actualContextCode
 
     type = null
     if data.assignment || data.assignment_group_id
@@ -20,11 +22,13 @@ define [
       type = 'calendar_event'
 
     data = data.assignment || data.calendar_event || data
-    context_code ?= data.effective_context_code || data.context_code
+    return null if data.hidden # e.g. parent event of section-level events
+    actualContextCode ?= data.context_code
+    contextCode ?= data.effective_context_code || data.context_code
 
     contextInfo = null
     for context in contexts
-      if context.asset_string == context_code
+      if context.asset_string == contextCode
         contextInfo = context
         break
 
@@ -33,10 +37,14 @@ define [
     if contextInfo == null
       return null
 
+    parts = splitAssetString(actualContextCode) if actualContextCode isnt contextCode
+    actualContextInfo = if parts and items = contextInfo[parts[0]]
+      (item for item in items when item.id is parts[1])[0]
+
     if type == 'assignment'
       obj = new Assignment(data, contextInfo)
     else
-      obj = new CalendarEvent(data, contextInfo)
+      obj = new CalendarEvent(data, contextInfo, actualContextInfo)
 
     # TODO: Improve permissions handling
     # The API is not currently telling us what permissions a user
