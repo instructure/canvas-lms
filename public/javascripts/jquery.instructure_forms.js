@@ -649,17 +649,14 @@ define([
         $form = this;
     $form.find(":input").not(":button").each(function() {
       var $input = $(this),
-          inputType = $(this).attr('type');
-      if((inputType == "radio" || inputType == 'checkbox') && !$input.attr('checked')) { return; }
+          inputType = $input.attr('type');
+      if ((inputType == "radio" || inputType == 'checkbox') && !$input.attr('checked')) return;
       var val = $input.val();
-      if($input.hasClass('suggestion_title') && $input.attr('title') == val) {
+      if ($input.hasClass('suggestion_title') && $input.attr('title') == val) {
         val = "";
-      } else if($input.hasClass('datetime_field_enabled') && $input.parent().children(".datetime_suggest").text()) {
-        if($input.parent().children('.datetime_suggest').hasClass('invalid_datetime')) {
-          val = $input.parent().children('.datetime_suggest').text();
-        } else {
-          val = $input.parent().children('.datetime_suggest').text();
-        }
+      } else if ($input.hasClass('datetime_field_enabled')) {
+        var suggestText = $input.parent().children(".datetime_suggest").text();
+        if (suggestText) val = suggestText;
       }
       try {
         if($input.data('rich_text')) {
@@ -668,8 +665,8 @@ define([
       } catch(e) {}
       var attr = $input.prop('name') || '';
       var multiValue = attr.match(/\[\]$/)
-      if(inputType == 'hidden' && !multiValue) {
-        if($form.find("[name='" + attr + "']").filter("textarea,:radio:checked,:checkbox:checked,:text,:password,select,:hidden")[0] != $input[0]) {
+      if (inputType == 'hidden' && !multiValue) {
+        if ($form.find("[name='" + attr + "']").filter("textarea,:radio:checked,:checkbox:checked,:text,:password,select,:hidden")[0] != $input[0]) {
           return;
         }
       }
