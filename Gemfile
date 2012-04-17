@@ -72,7 +72,7 @@ group :test do
   gem 'coffee-script-source',  '1.1.2' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
-  gem 'parallel_tests-instructure', '0.6.19'
+  gem 'parallelized_specs', '0.0.8'
   gem 'mocha',        '0.10.0'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'

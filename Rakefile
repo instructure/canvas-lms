@@ -9,4 +9,4 @@ require 'rdoc/task'
 
 require 'tasks/rails'
 
-begin; require 'parallel_tests/tasks'; rescue LoadError; end
+begin; require 'parallelized_specs/tasks'; rescue LoadError; end
