@@ -1,7 +1,7 @@
 define [
   'jquery'
-  'use!underscore'
-  'use!backbone'
+  'underscore'
+  'Backbone'
   'jst/ComboBox'
   'str/htmlEscape'
   'vendor/ui.selectmenu'

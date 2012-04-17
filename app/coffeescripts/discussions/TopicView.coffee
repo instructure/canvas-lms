@@ -1,6 +1,6 @@
 define [
   'i18n!discussions'
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
   'compiled/discussions/Topic'
   'compiled/discussions/EntriesView'
   'compiled/discussions/EntryView'

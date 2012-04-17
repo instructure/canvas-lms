@@ -1,7 +1,7 @@
 define [
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
   'i18n!discussions'
-  'use!underscore'
+  'underscore'
   'jquery'
   'jquery.ajaxJSON'
 ], (Backbone, I18n, _, $) ->

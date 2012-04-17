@@ -23,7 +23,7 @@ define([
   'datagrid',
   'compiled/grade_calculator',
   'str/htmlEscape',
-  'use!underscore',
+  'underscore',
   'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
   'jquery.dropdownList' /* dropdownList */,
   'jquery.instructure_date_and_time' /* parseFromISO */,

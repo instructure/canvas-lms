@@ -22,20 +22,17 @@
     common: 'compiled/bundles/common',
     jquery: 'vendor/jquery-1.6.4',
     jqueryui: 'vendor/jqueryui',
-    underscore: 'vendor/underscore',
-    backbone: 'vendor/backbone',
     uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4',
     use: 'vendor/use'
   },
 
   // non-amd shims
   use: {
-    backbone: {
-      deps: ['use!underscore', 'jquery'],
-      attach: 'Backbone'
-    },
-    underscore: {
-      attach: '_'
+    'vendor/backbone': {
+      deps: ['underscore', 'jquery'],
+      attach: function(_, $){
+        return Backbone;
+      }
     }
   },
 

@@ -33,7 +33,7 @@
 # thing.cache.set 'key', 'value'
 # thing.cache.get 'key'
 
-define ['use!underscore'], (_) ->
+define ['underscore'], (_) ->
   cache:
     prefix: ''
     store: {}

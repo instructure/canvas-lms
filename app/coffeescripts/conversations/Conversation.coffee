@@ -1,5 +1,5 @@
 define [
-  'use!backbone'
+  'Backbone'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
 ], (Backbone) ->

@@ -8,7 +8,7 @@ define [
   'compiled/gradebook2/CurveGradesDialog'
   'jst/gradebook2/GradebookHeaderMenu'
   'jst/re_upload_submissions_form'
-  'use!underscore'
+  'underscore'
   'jquery.instructure_forms'
   'jquery.instructure_jquery_patches'
   'jquery.instructure_misc_helpers'

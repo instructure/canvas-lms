@@ -1,8 +1,7 @@
 define [
   'jquery'
-  'use!underscore'
-  'compiled/backbone-ext/Backbone'
-  'compiled/util/backbone.multipart.sync'
+  'underscore'
+  'Backbone'
   'jquery.ajaxJSON'
 ], ($, _, Backbone) ->
 

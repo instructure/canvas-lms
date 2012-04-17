@@ -1,5 +1,5 @@
 # turns {'foo[bar]': 1} into {foo: {bar: 1}}
-define ['use!underscore'], (_) ->
+define ['underscore'], (_) ->
   unflatten = (obj) ->
     _(obj).reduce (newObj, val, key) ->
       keys = key.split('][')
