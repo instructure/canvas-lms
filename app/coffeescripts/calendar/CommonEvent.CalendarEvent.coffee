@@ -9,8 +9,8 @@ define [
   deleteConfirmation = I18n.t('prompts.delete_event', "Are you sure you want to delete this event?")
 
   class CalendarEvent extends CommonEvent
-    constructor: (data, contextInfo) ->
-      super data, contextInfo
+    constructor: (data, contextInfo, actualContextInfo) ->
+      super data, contextInfo, actualContextInfo
       @eventType = 'calendar_event'
       @deleteConfirmation = deleteConfirmation
       @deleteURL = contextInfo.calendar_event_url
@@ -26,6 +26,7 @@ define [
       @end = if data.end_at then $.parseFromISO(data.end_at).time else null
       @allDay = data.all_day
       @editable = true
+      @lockedTitle = @object.parent_event_id?
       @addClass "group_#{@contextCode()}"
       if @isAppointmentGroupEvent()
         @addClass "scheduler-event"
@@ -64,11 +65,8 @@ define [
     methodAndURLForSave: () ->
       if @isNewEvent()
         method = 'POST'
-        url = @contextInfo.create_calendar_event_url
+        url = '/api/v1/calendar_events'
       else
         method = 'PUT'
-        url = if @isAppointmentGroupEvent()
-                $.replaceTags @calendarEvent.url, 'id', @calendarEvent.id
-              else
-                $.replaceTags @contextInfo.calendar_event_url, 'id', @object.id
+        url = @calendarEvent.url
       [ method, url ]

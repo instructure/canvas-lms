@@ -1644,7 +1644,7 @@ class User < ActiveRecord::Base
     ev = CalendarEvent
     ev = CalendarEvent.active if !opts[:include_deleted_events]
     event_codes = context_codes + AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
-    events += ev.for_user_and_context_codes(self, event_codes).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
+    events += ev.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
     events += Assignment.active.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
     events.sort_by{|e| [e.start_at, e.title || ""] }.uniq
   end
@@ -1656,7 +1656,7 @@ class User < ActiveRecord::Base
     opts[:end_at] ||= 1.weeks.from_now
     opts[:limit] ||= 20
 
-    events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
+    events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).reject(&:hidden?)
     events += Assignment.active.for_context_codes(context_codes).due_between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).include_submitted_count
     events += AppointmentGroup.manageable_by(self, context_codes).intersecting(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
     events.sort_by{|e| [e.start_at, e.title] }.uniq.first(opts[:limit])
@@ -1668,7 +1668,7 @@ class User < ActiveRecord::Base
     return [] if (!context_codes || context_codes.empty?)
 
     undated_events = []
-    undated_events += CalendarEvent.active.for_user_and_context_codes(self, context_codes).undated.updated_after(opts[:updated_at])
+    undated_events += CalendarEvent.active.for_user_and_context_codes(self, context_codes, []).undated.updated_after(opts[:updated_at])
     undated_events += Assignment.active.for_context_codes(context_codes).undated.updated_after(opts[:updated_at]).with_just_calendar_attributes
     undated_events.sort_by{|e| e.title }
   end
@@ -1738,6 +1738,14 @@ class User < ActiveRecord::Base
     end
   end
   memoize :conversation_context_codes
+
+  def section_context_codes(context_codes)
+    course_ids = context_codes.grep(/\Acourse_\d+\z/).map{ |s| s.sub(/\Acourse_/, '').to_i }
+    return [] unless course_ids.present?
+    Course.find_all_by_id(course_ids).inject([]) do |ary, course|
+      ary.concat course.sections_visible_to(self).map(&:asset_string)
+    end
+  end
 
   def manageable_courses(include_concluded = false)
     Course.manageable_by_user(self.id, include_concluded).not_deleted

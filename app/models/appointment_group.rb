@@ -27,6 +27,7 @@ class AppointmentGroup < ActiveRecord::Base
   has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./, 'calendar_events_join.'))
   has_many :appointments_participants, :through => :_appointments, :source => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :order => :start_at
   belongs_to :context, :polymorphic => true
+  alias_method :effective_context, :context
   belongs_to :sub_context, :polymorphic => true
 
   before_validation :default_values

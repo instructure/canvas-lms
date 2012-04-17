@@ -43,6 +43,7 @@ class CalendarEvent < ActiveRecord::Base
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
+  after_save :sync_parent_event
   after_update :sync_child_events
 
   # when creating/updating a calendar_event, you can give it a list of child
@@ -83,16 +84,21 @@ class CalendarEvent < ActiveRecord::Base
         context = @child_event_contexts[data[:context_code]][0]
         event = child_events.build(:start_at => data[:start_at], :end_at => data[:end_at])
         event.context = context
+        event.skip_sync_parent_event = true
         event.save
       end
     end
     current_events.values.flatten.each(&:destroy)
-    child_events.reload
-    CalendarEvent.update_all({:start_at => child_events.map(&:start_at).min,
-                              :end_at => child_events.map(&:end_at).max
-                             }, ["id = ?", id])
-    reload
+    cache_child_event_ranges!
     @child_event_data = nil
+  end
+
+  def hidden?
+    !appointment_group && child_events.size > 0
+  end
+
+  def effective_context
+    effective_context_code && ActiveRecord::Base.find_by_asset_string(effective_context_code) || context
   end
 
   named_scope :active, :conditions => ['calendar_events.workflow_state != ?', 'deleted']
@@ -111,7 +117,7 @@ class CalendarEvent < ActiveRecord::Base
   # specified codes (e.g. using User#appointment_context_codes)
   named_scope :for_user_and_context_codes, lambda { |user, *args|
     codes = args.shift
-    section_codes = args.shift || []
+    section_codes = args.shift || user.section_context_codes(codes)
     effectively_courses_codes = [user.asset_string] + section_codes
     # the all_codes check is redundant, but makes the query more efficient
     all_codes = codes | effectively_courses_codes
@@ -215,6 +221,23 @@ class CalendarEvent < ActiveRecord::Base
     cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| send("#{attr}_changed?") }
     child_events.locked.update_all Hash[locked_changes.map{ |attr| [attr, send(attr)] }] if locked_changes.present?
     child_events.unlocked.update_all Hash[cascaded_changes.map{ |attr| [attr, send(attr)] }] if cascaded_changes.present?
+  end
+
+  attr_writer :skip_sync_parent_event
+  def sync_parent_event
+    return unless parent_event
+    return if appointment_group
+    return unless start_at_changed? || end_at_changed? || workflow_state_changed?
+    return if @skip_sync_parent_event
+    parent_event.cache_child_event_ranges!
+  end
+
+  def cache_child_event_ranges!
+    events = child_events(true)
+    CalendarEvent.update_all({:start_at => events.map(&:start_at).min,
+                              :end_at => events.map(&:end_at).max
+                             }, ["id = ?", id])
+    reload
   end
 
   workflow do
