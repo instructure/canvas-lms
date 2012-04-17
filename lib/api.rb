@@ -163,7 +163,7 @@ module Api
       links << template % [base_url, collection.previous_page, "prev"]
     end
     links << template % [base_url, 1, "first"]
-    if collection.total_pages && collection.total_pages > 1
+    if !pagination_args[:without_count] && collection.total_pages && collection.total_pages > 1
       links << template % [base_url, collection.total_pages, "last"]
     end
     controller.response.headers["Link"] = links.join(',') if links.length > 0
