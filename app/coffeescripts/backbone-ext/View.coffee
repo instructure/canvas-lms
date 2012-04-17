@@ -1,4 +1,7 @@
-define ['use!backbone', 'use!underscore'], (Backbone, _) ->
+define [
+  'use!vendor/backbone'
+  'underscore'
+], (Backbone, _) ->
 
   _.extend Backbone.View.prototype,
 

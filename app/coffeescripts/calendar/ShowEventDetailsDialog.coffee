@@ -7,7 +7,7 @@ define [
   'jst/calendar/eventDetails'
   'jst/calendar/deleteItem'
   'jst/calendar/reservationOverLimitDialog'
-  'use!underscore'
+  'underscore'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'

@@ -21,7 +21,7 @@
 # The first is a <select> element, the second is an options hash 
 
 define [
-  'use!underscore'
+  'underscore'
   'compiled/class/cache'
   'vendor/spin'
   'jst/util/select/optgroups'

@@ -51,8 +51,11 @@
 
       // non-amd shims
       use: {
-        underscore: {
-          attach: '_'
+        'vendor/backbone': {
+          deps: ['underscore', 'jquery'],
+          attach: function(_, $){
+            return Backbone;
+          }
         }
       },
 
