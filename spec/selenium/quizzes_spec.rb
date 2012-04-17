@@ -185,6 +185,39 @@ describe "quizzes" do
       keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "2" }
     end
 
+    it "should not let you exceed the question limit" do
+      skip_if_ie('Out of memory')
+
+      get "/courses/#{@course.id}/quizzes/new"
+
+      f('.add_question_group_link').click
+      group_form = f('#questions .quiz_group_form')
+      pick_count_field = group_form.find_element(:name, 'quiz_group[pick_count]')
+      pick_count = lambda do |count|
+        driver.execute_script <<-JS
+          var $pickCount = $('#questions .group_top input[name="quiz_group[pick_count]"]');
+          $pickCount.focus();
+          $pickCount[0].value = #{count.to_s.inspect};
+          $pickCount.change();
+        JS
+      end
+
+      pick_count.call('1001')
+      dismiss_alert
+      pick_count_field[:value].should eql "1"
+
+      f('.add_question_link').click # 1 total, ok
+      group_form.find_element(:css, '.edit_group_link').click
+      pick_count.call('999') # 1000 total, ok
+
+      f('.add_question_link').click # 1001 total, bad
+      dismiss_alert
+
+      pick_count.call('1000') # 1001 total, bad
+      dismiss_alert
+      pick_count_field[:value].should eql "999"
+    end
+
     it "should moderate quiz" do
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
