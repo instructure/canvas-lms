@@ -18,7 +18,7 @@ namespace :js do
   def coffee_destination(dir_or_file)
     dir_or_file.sub('app/coffeescripts', 'public/javascripts/compiled').
                 sub('spec/coffeescripts', 'spec/javascripts').
-                sub(%r{/javascripts/compiled/plugins/([^/]+)/}, '/plugins/\\1/javascripts/compiled/')
+                sub(%r{/javascripts/compiled/plugins/([^/]+)(/|$)}, '/plugins/\\1/javascripts/compiled\\2')
   end
 
   def compile_coffeescript(coffee_file)
