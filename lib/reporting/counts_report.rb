@@ -25,7 +25,7 @@ class CountsReport
   WEEKS_TO_KEEP = 52
 
   def self.process
-    self.new.process
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) { self.new.process }
   end
 
   def initialize
