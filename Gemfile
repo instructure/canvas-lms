@@ -8,7 +8,6 @@ gem 'authlogic',      '2.1.3'
 gem "aws-s3-instructure", "~> 0.6.2.1319643167",  :require => 'aws/s3'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
-gem 'compass',        '0.11.5'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'erubis',         '2.7.0'
@@ -51,6 +50,10 @@ gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 # this is only needed by jammit, but we're pinning at 0.9.4 because 0.9.5 breaks
 gem 'yui-compressor', '0.9.4'
+
+group :assets do
+  gem 'compass-rails', '1.0.1'
+end
 
 group :mysql do
   gem 'mysql',        '2.8.1'
