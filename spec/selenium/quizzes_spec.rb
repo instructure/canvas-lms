@@ -331,6 +331,61 @@ describe "quizzes" do
       end
     end
 
+    it "should mark dropdown questions as answered" do
+      skip_if_ie('Out of memory')
+      @quiz = quiz_with_new_questions do |bank, quiz|
+        aq1 = AssessmentQuestion.create!
+        aq2 = AssessmentQuestion.create!
+        bank.assessment_questions << aq1
+        bank.assessment_questions << aq2
+        q1 = quiz.quiz_questions.create!(:assessment_question => aq1)
+        q1.write_attribute :question_data, {:name => "dropdowns", :question_type => 'multiple_dropdowns_question', :answers => [{:weight => 100, :text => "orange", :blank_id => "orange", :id => 1}, {:weight => 0, :text => "rellow", :blank_id => "orange", :id => 2}, {:weight => 100, :text => "green", :blank_id => "green", :id => 3}, {:weight => 0, :text => "yellue", :blank_id => "green", :id => 4}], :question_text => "<p>multiple answers red + yellow = [orange], yellow + blue = [green]</p>", :points_possible => 1}
+        q1.save!
+        q2 = quiz.quiz_questions.create!(:assessment_question => aq2)
+        q2.write_attribute :question_data, {:name => "matching", :question_type => 'matching_question', :matches => [{:match_id => 1, :text => "north"}, {:match_id => 2, :text => "south"}, {:match_id => 3, :text => "east"}, {:match_id => 4, :text => "west"}], :answers => [{:left => "nord", :text => "nord", :right => "north", :match_id => 1}, {:left => "sud", :text => "sud", :right => "south", :match_id => 2}, {:left => "est", :text => "est", :right => "east", :match_id => 3}, {:left => "ouest", :text => "ouest", :right => "west", :match_id => 4}], :points_possible => 1}
+        q2.save!
+      end
+
+      take_quiz do
+        dropdowns = ff('a.ui-selectmenu.question_input')
+        dropdowns.size.should eql 6
+
+        # partially answer each question
+        [dropdowns.first, dropdowns.last].each do |d|
+          d.click
+          f('.ui-selectmenu-open li:nth-child(2)').click
+        end
+        # not marked as answered
+        ff('#question_list .answered').should be_empty
+
+        # fully answer each question
+        dropdowns.each do |d|
+          d.click
+          f('.ui-selectmenu-open li:nth-child(2)').click
+        end
+
+        # marked as answer
+        ff('#question_list .answered').size.should eql 2
+
+        # after reload, answers should be remembered
+        expect_new_page_load {
+          driver.find_element(:link, 'Quizzes').click
+          confirm_dialog = driver.switch_to.alert
+          confirm_dialog.accept
+          get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
+        }
+        # there's some initial setTimeout stuff that happens, so things won't
+        # be ready right when the page loads
+        keep_trying_until {
+          dropdowns = ff('a.ui-selectmenu.question_input')
+          dropdowns.size.should eql 6
+        }
+
+        dropdowns.map(&:text).should eql %w{orange green east east east east}
+        ff('#question_list .answered').size.should eql 2
+      end
+    end
+
     it "should display quiz statistics" do
       skip_if_ie('Out of memory')
       quiz_with_submission

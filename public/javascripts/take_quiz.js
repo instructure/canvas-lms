@@ -267,7 +267,7 @@ define([
           quizSubmission.updateSubmission();
         }
       })
-      .delegate(":text,textarea", 'change', function(event, update) {
+      .delegate(":text,textarea,select", 'change', function(event, update) {
         var $this = $(this);
         if ($this.hasClass('numerical_question_input')) {
           var val = parseFloat($this.val());
@@ -292,15 +292,24 @@ define([
         $question.toggleClass('marked');
         $("#list_" + $question.attr('id')).toggleClass('marked');
       })
-      .delegate(".question_input", 'change', function() {
+      .delegate(".question_input", 'change', function(event, update, changedMap) {
         var $this = $(this),
-            tagName = $(this)[0].tagName.toUpperCase(),
+            tagName = this.tagName.toUpperCase(),
+            id = $this.parents(".question").attr('id'),
             val = "";
+        if (tagName == "A") return;
+        if (changedMap) { // reduce redundant jquery lookups and other calls
+          if (changedMap[id]) return;
+          changedMap[id] = true;
+        }
 
         if (tagName == "TEXTAREA") {
           val = $this.editorBox('get_code');
-        } else if (tagName == "SELECT" || $this.attr('type') == "text") {
+        } else if ($this.attr('type') == "text") {
           val = $this.val();
+        } else if (tagName == "SELECT") {
+          var $selects = $this.parents(".question").find("select.question_input");
+          val = !$selects.filter(function() { return !$(this).val() }).length;
         } else {
           $this.parents(".question").find(".question_input").each(function() {
             if($(this).attr('checked') || $(this).attr('selected')) {
@@ -308,9 +317,9 @@ define([
             }
           });
         }
-        $("#list_" + $this.parents(".question").attr('id'))[val ? 'addClass' : 'removeClass']('answered');
+        $("#list_" + id)[val ? 'addClass' : 'removeClass']('answered');
       })
-      .find(".question_input").change();
+      .find(".question_input").trigger('change', [false, {}]);
 
 
     setInterval(function() {
