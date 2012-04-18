@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,17 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
+class AppointmentGroupContext < ActiveRecord::Base
+  belongs_to :appointment_group
+  belongs_to :context, :polymorphic => true
 
-describe 'appointment_group_deleted.sms' do
-  it "should render" do
-    user = user_model
-    appointment_group_model(:contexts => [course_model])
-    @appointment_group.cancel_reason = 'just because'
+  attr_accessible :appointment_group, :context
 
-    generate_message(:appointment_group_deleted, :sms, @appointment_group)
+  before_validation :default_values
 
-    @message.body.should include('some title')
+  def default_values
+    self.context_code ||= context_string
   end
 end

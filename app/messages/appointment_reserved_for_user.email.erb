@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.appointment_group.context) %>/appointment_groups/<%= asset.appointment_group.id %>
+  http://<%= HostUrl.context_host(asset.appointment_group.contexts.first) %>/appointment_groups/<%= asset.appointment_group.id %>
 <% end %>
 
 <% define_content :subject do %>
@@ -16,7 +16,9 @@
 <% else -%>
 <%= before_label :attendee, "Attendee" %> <%= asset.context.name %>
 <% end -%>
-<%= before_label :course, "Course" %> <%= asset.appointment_group.context.name %>
+<%= before_label :course, "Course" %> <%= asset.appointment_group.participant_type == 'Group' ?
+                                            asset.appointment_group.contexts.first.name  :
+                                            asset.appointment_group.contexts_for_user(user).map(&:name).join(", ") %>
 <% if asset.appointment_group.available_slots -%>
 <%= before_label :slots_remaining, "Available time slots" %> <%= asset.appointment_group.available_slots %>
 <% end -%>

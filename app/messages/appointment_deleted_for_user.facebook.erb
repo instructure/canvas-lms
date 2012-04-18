@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.appointment_group.context) %>/appointment_groups/<%= asset.appointment_group.id %>
+  http://<%= HostUrl.context_host(asset.appointment_group.contexts.first) %>/appointment_groups/<%= asset.appointment_group.id %>
 <% end %>
 
 <%= t :message, '%{user} canceled your time slot for "%{appointment_name}".', :user => asset.updating_user.name, :appointment_name => asset.title %><br>
@@ -12,7 +12,9 @@
 <% else -%>
 <%= before_label :attendee, "Attendee" %> <%= asset.context.name %><br>
 <% end -%>
-<%= before_label :course, "Course" %> <%= asset.appointment_group.context.name %><br>
+<%= before_label :course, "Course" %> <%= asset.appointment_group.participant_type == 'Group' ?
+                                            asset.appointment_group.contexts.first.name  :
+                                            asset.appointment_group.contexts_for_user(user).map(&:name).join(", ") %><br>
 <br>
 <b><%= before_label :cancel_reason, "Reason for canceling" %></b><br>
 <%= asset.cancel_reason || t(:no_reason_given, "none given") %><br>
