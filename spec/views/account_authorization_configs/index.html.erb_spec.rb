@@ -28,6 +28,7 @@ describe "account_authorization_configs/index" do
     assigns[:current_user] = user_model
     assigns[:saml_identifiers] = []
     assigns[:saml_authn_contexts] = []
+    assigns[:saml_login_attributes] = {}
     render 'account_authorization_configs/index'
     response.body.should match("192.168.0.1\n192.168.0.2")
   end
@@ -39,6 +40,7 @@ describe "account_authorization_configs/index" do
     assigns[:current_user] = user_model
     assigns[:saml_identifiers] = []
     assigns[:saml_authn_contexts] = []
+    assigns[:saml_login_attributes] = {}
     render 'account_authorization_configs/index'
     doc = Nokogiri::HTML(response.body)
     doc.at_css('form.ldap_form:nth(1) tr.last_timeout_failure').should be_present

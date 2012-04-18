@@ -173,7 +173,7 @@ class PseudonymSessionsController < ApplicationController
     message = session[:delegated_message]
     @pseudonym_session.destroy rescue true
 
-    if @domain_root_account.saml_authentication? and session[:name_id]
+    if @domain_root_account.saml_authentication? and session[:saml_unique_id]
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
       aac = @domain_root_account.account_authorization_config
@@ -227,14 +227,24 @@ class PseudonymSessionsController < ApplicationController
       settings = aac.saml_settings(request.host_with_port)
       response = saml_response(params[:SAMLResponse], settings)
 
-      logger.info "Attempting SAML login for #{response.name_id} in account #{@domain_root_account.id}"
+      unique_id = nil
+      if aac.login_attribute == 'nameid'
+        unique_id = response.name_id
+      elsif aac.login_attribute == 'eduPersonPrincipalName'
+        unique_id = response.saml_attributes["eduPersonPrincipalName"]
+      elsif aac.login_attribute == 'eduPersonPrincipalName_stripped'
+        unique_id = response.saml_attributes["eduPersonPrincipalName"]
+        unique_id = unique_id.split('@', 2)[0]
+      end
+
+      logger.info "Attempting SAML login for #{aac.login_attribute} #{unique_id} in account #{@domain_root_account.id}"
 
       debugging = aac.debugging? && aac.debug_get(:request_id) == response.in_response_to
       if debugging
         aac.debug_set(:debugging, t('debug.redirect_from_idp', "Recieved LoginResponse from IdP"))
         aac.debug_set(:idp_response_encoded, params[:SAMLResponse])
         aac.debug_set(:idp_response_xml_encrypted, response.xml)
-        aac.debug_set(:idp_response_xml_decrypted, response.document.to_s)
+        aac.debug_set(:idp_response_xml_decrypted, response.decrypted_document.to_s)
         aac.debug_set(:idp_in_response_to, response.in_response_to)
         aac.debug_set(:idp_login_destination, response.destination)
         aac.debug_set(:fingerprint_from_idp, response.fingerprint_from_idp)
@@ -245,8 +255,7 @@ class PseudonymSessionsController < ApplicationController
         aac.debug_set(:is_valid_login_response, 'true') if debugging
         
         if response.success_status?
-          @pseudonym = nil
-          @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(response.name_id)
+          @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(unique_id)
 
           if @pseudonym
             # We have to reset the session again here -- it's possible to do a
@@ -262,6 +271,7 @@ class PseudonymSessionsController < ApplicationController
               aac.debug_set(:logged_in_user_id, @user.id)
             end
 
+            session[:saml_unique_id] = unique_id
             session[:name_id] = response.name_id
             session[:name_qualifier] = response.name_qualifier
             session[:session_index] = response.session_index
@@ -269,11 +279,11 @@ class PseudonymSessionsController < ApplicationController
 
             successful_login(@user, @pseudonym)
           else
-            message = "Received SAML login request for unknown user: #{response.name_id}"
+            message = "Received SAML login request for unknown user: #{unique_id}"
             logger.warn message
             aac.debug_set(:canvas_login_fail_message, message) if debugging
             # the saml message has to survive a couple redirects
-            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => response.name_id
+            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => unique_id
             redirect_to :action => :destroy
           end
         elsif response.auth_failure?
