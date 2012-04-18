@@ -60,10 +60,10 @@ describe ContentMigration do
       @cm.progress.should == 100
     end
 
-    def run_course_copy
+    def run_course_copy(warnings=[])
       @cm.copy_course_without_send_later
       @cm.reload
-      @cm.warnings.should == []
+      @cm.warnings.should == warnings
       if @cm.migration_settings[:last_error]
         er = ErrorReport.last
         "#{er.message} - #{er.backtrace}".should == ""
@@ -270,6 +270,41 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
+    end
+
+    it "should export quizzes with groups that point to external banks" do
+      pending unless Qti.qti_enabled?
+      course_with_teacher(:user => @user)
+      different_course = @course
+      different_account = Account.create!
+
+      q1 = @copy_from.quizzes.create!(:title => 'quiz1')
+      bank = different_course.assessment_question_banks.create!(:title => 'bank')
+      bank2 = @copy_from.account.assessment_question_banks.create!(:title => 'bank2')
+      bank2.assessment_question_bank_users.create!(:user => @user)
+      bank3 = different_account.assessment_question_banks.create!(:title => 'bank3')
+      group = q1.quiz_groups.create!(:name => "group", :pick_count => 3, :question_points => 5.0)
+      group.assessment_question_bank = bank
+      group.save
+      group2 = q1.quiz_groups.create!(:name => "group2", :pick_count => 5, :question_points => 2.0)
+      group2.assessment_question_bank = bank2
+      group2.save
+      group3 = q1.quiz_groups.create!(:name => "group3", :pick_count => 5, :question_points => 2.0)
+      group3.assessment_question_bank = bank3
+      group3.save
+
+      run_course_copy(["User didn't have permission to reference question bank in quiz group Question Group"])
+
+      q = @copy_to.quizzes.find_by_migration_id(mig_id(q1))
+      q.should_not be_nil
+      q.quiz_groups.count.should == 3
+      g = q.quiz_groups[0]
+      g.assessment_question_bank_id.should == bank.id
+      g = q.quiz_groups[1]
+      g.assessment_question_bank_id.should == bank2.id
+      g = q.quiz_groups[2]
+      g.assessment_question_bank_id.should == nil
+
     end
 
     it "should copy a discussion topic when assignment is selected" do
