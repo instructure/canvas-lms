@@ -126,11 +126,17 @@ class AssessmentTestConverter
         if weight = get_node_att(section, 'weight','value')
           group[:question_points] = convert_weight_to_points(weight)
         end
-        if points = section.at_css('points_per_item')
-          group[:question_points] = points.text.to_f
+        if val = get_float_val(section, 'points_per_item')
+          group[:question_points] = val
         end
-        if bank_id = section.at_css('sourcebank_ref')
-          group[:question_bank_migration_id] = bank_id.text
+        if val = get_node_val(section, 'sourcebank_ref')
+          group[:question_bank_migration_id] = val
+        end
+        if val = get_node_val(section, 'sourcebank_context')
+          group[:question_bank_context] = val
+        end
+        if val = get_bool_val(section, 'sourcebank_is_external')
+          group[:question_bank_is_external] = val
         end
         group[:migration_id] = section['identifier'] && section['identifier'] != "" ? section['identifier'] : rand(100_000)
         questions_list = group[:questions]
