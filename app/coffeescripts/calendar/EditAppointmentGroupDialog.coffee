@@ -11,20 +11,20 @@ define [
     width: 'auto'
     resizable: false
     title: I18n.t('titles.edit_appointment_group', "Edit Appointment Group")
+  # this is dumb, but it prevents the columns from wrapping when
+  # the context selector drop down gets too long
+  dialog.dialog('widget').find('#edit_event').css('overflow', 'visible')
 
   class EditAppointmentGroupDialog
-    constructor: (@apptGroup, @parentCloseCB) ->
+    constructor: (@apptGroup, @contexts, @parentCloseCB) ->
       @currentContextInfo = null
-
-    contextChange: (newContext) =>
-      # TODO: update the color?
 
     closeCB: (saved) =>
       dialog.dialog('close')
       @parentCloseCB(saved)
 
     show: =>
-      @appointmentGroupsForm = new EditAppointmentGroupDetails(dialog.find(".wrapper"), @apptGroup, @contextChange, @closeCB)
+      @appointmentGroupsForm = new EditAppointmentGroupDetails(dialog.find(".wrapper"), @apptGroup, @contexts, @closeCB)
 
       buttons = if @apptGroup.workflow_state == 'active'
         [

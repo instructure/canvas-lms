@@ -319,7 +319,7 @@ describe Course do
       event2.updating_user = @teacher
       event2.save!
       event3 = event2.child_events.first
-      appointment_group = @course.appointment_groups.create
+      appointment_group = AppointmentGroup.create! :title => "ag", :contexts => [@course]
       appointment_group.publish!
       assignment = @course.assignments.create!
 
@@ -2425,7 +2425,7 @@ describe Course, "conclusions" do
   context "appointment cancelation" do
     before do
       course_with_student(:active_all => true)
-      @ag = @course.appointment_groups.create(:title => "test", :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
       @ag.appointments.each do |a|
         a.reserve_for(@user, @user)
       end
