@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2" xsi:schemaLocation="http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd">
+  <assessment ident="i666c1a05aa0d5dd9f656088bcaaab79b" title="quiz1">
+    <qtimetadata>
+      <qtimetadatafield>
+        <fieldlabel>cc_maxattempts</fieldlabel>
+        <fieldentry>1</fieldentry>
+      </qtimetadatafield>
+    </qtimetadata>
+    <section ident="root_section">
+      <section ident="i96ea64f3a1aa2fd00c72faacf0cb8ac9" title="group">
+        <selection_ordering>
+          <selection>
+            <sourcebank_ref>4259</sourcebank_ref>
+            <selection_number>3</selection_number>
+            <selection_extension>
+              <points_per_item>5</points_per_item>
+              <sourcebank_context>course_22520</sourcebank_context>
+              <sourcebank_is_external>true</sourcebank_is_external>
+            </selection_extension>
+          </selection>
+        </selection_ordering>
+      </section>
+      <section ident="ida8ce53cf0240070ce6c69c48cd588ee" title="group2">
+        <selection_ordering>
+          <selection>
+            <sourcebank_ref>4260</sourcebank_ref>
+            <selection_number>5</selection_number>
+            <selection_extension>
+              <points_per_item>2</points_per_item>
+              <sourcebank_context>account_32442</sourcebank_context>
+              <sourcebank_is_external>true</sourcebank_is_external>
+            </selection_extension>
+          </selection>
+        </selection_ordering>
+      </section>
+    </section>
+  </assessment>
+</questestinterop>

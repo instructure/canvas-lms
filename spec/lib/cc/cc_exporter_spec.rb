@@ -184,6 +184,36 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
     end
 
+    it "should export quizzes with groups that point to external banks" do
+      orig_course = @course
+      course_with_teacher(:user => @user)
+      different_course = @course
+      q1 = orig_course.quizzes.create!(:title => 'quiz1')
+      bank = different_course.assessment_question_banks.create!(:title => 'bank')
+      bank2 = orig_course.account.assessment_question_banks.create!(:title => 'bank2')
+      group = q1.quiz_groups.create!(:name => "group", :pick_count => 3, :question_points => 5.0)
+      group.assessment_question_bank = bank
+      group.save
+      group2 = q1.quiz_groups.create!(:name => "group2", :pick_count => 5, :question_points => 2.0)
+      group2.assessment_question_bank = bank2
+      group2.save
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+              :all_quizzes => "1",
+              :all_assessment_question_banks => "1",
+      }
+      @ce.save!
+
+      run_export
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(q1)}/#{mig_id(q1)}.xml"))
+      selections = doc.css('selection')
+      selections[0].at_css("sourcebank_ref").text.to_i.should == bank.id
+      selections[0].at_css("selection_extension sourcebank_context").text.should == bank.context.asset_string
+      selections[1].at_css("sourcebank_ref").text.to_i.should == bank2.id
+      selections[1].at_css("selection_extension sourcebank_context").text.should == bank2.context.asset_string
+    end
+
     it "should selectively create a quizzes-only export" do
 
       @q1 = @course.quizzes.create!(:title => 'quiz1')
