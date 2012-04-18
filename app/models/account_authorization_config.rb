@@ -25,7 +25,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
                   :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
                   :log_in_url, :log_out_url, :identifier_format,
                   :certificate_fingerprint, :entity_id, :change_password_url,
-                  :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context
+                  :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context,
+                  :login_attribute
 
   before_validation :set_saml_defaults, :if => Proc.new { |aac| aac.saml_authentication? }
   validates_presence_of :account_id
@@ -48,6 +49,14 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
     self.requested_authn_context = nil if self.requested_authn_context.blank?
+  end
+  
+  def self.saml_login_attributes
+    {
+      'NameID' => 'nameid',
+      'eduPersonPrincipalName' => 'eduPersonPrincipalName',
+      t(:saml_eppn_domain_stripped, "%{eppn} (domain stripped)", :eppn => "eduPersonPrincipalName") =>'eduPersonPrincipalName_stripped'
+    }
   end
   
   def sanitized_ldap_login(login)
@@ -95,6 +104,11 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   
   def saml_default_entity_id
     AccountAuthorizationConfig.saml_default_entity_id_for_account(self.account)
+  end
+
+  def login_attribute
+    return 'nameid' unless read_attribute(:login_attribute)
+    super
   end
 
   def saml_settings(current_host=nil)
