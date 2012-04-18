@@ -157,7 +157,7 @@ define([
         var text = xhr.responseText.replace(/(<([^>]+)>)/ig,"");
         data = { message: text };
         try {
-          data = eval("("  + xhr.responseText + ")");
+          data = $.parseJSON(xhr.responseText);
         } catch(e) { }
       }
       if(options && options.skipDefaultError) {
