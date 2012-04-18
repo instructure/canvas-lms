@@ -265,15 +265,15 @@ class ApplicationController < ActionController::Base
   end
   
   def clean_return_to(url)
-    return nil if !url
+    return nil if url.blank?
     uri = URI.parse(url)
-    url = uri.path + (uri.query ? "?#{uri.query}" : "") + (uri.fragment ? "##{uri.fragment}" : "")
+    return nil unless uri.path[0] == ?/
+    return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
   helper_method :clean_return_to
   
   def return_to(url, fallback)
-    url = fallback if url.blank?
-    url = clean_return_to(url)
+    url = clean_return_to(url) || clean_return_to(fallback)
     redirect_to url
   end
 

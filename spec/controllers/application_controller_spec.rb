@@ -43,6 +43,26 @@ describe ApplicationController do
     end
   end
 
+  describe "clean_return_to" do
+    before do
+      req = stub('request obj', :protocol => 'https://', :host_with_port => 'canvas.example.com')
+      @controller.stubs(:request).returns(req)
+    end
+
+    it "should build from a simple path" do
+      @controller.send(:clean_return_to, "/calendar").should == "https://canvas.example.com/calendar"
+    end
+
+    it "should build from a full url" do
+      # ... but always use the request host/protocol, not the given
+      @controller.send(:clean_return_to, "http://example.org/a/b?a=1&b=2#test").should == "https://canvas.example.com/a/b?a=1&b=2#test"
+    end
+
+    it "should reject disallowed paths" do
+      @controller.send(:clean_return_to, "ftp://example.com/javascript:hai").should be_nil
+    end
+  end
+
   describe "safe_domain_file_user" do
     before :each do
       # safe_domain_file_url wants to use request.protocol
