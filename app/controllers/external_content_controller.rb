@@ -82,8 +82,19 @@ class ExternalContentController < ApplicationController
     end
     render :json => @retrieved_data.to_json
   end
-  
+
+  # this is a simple LTI link selection extension example
+  # it's used by the selenium specs, and can be useful to demonstrate link
+  # selection and test configuration
   def selection_test
+    @return_url = params[:launch_presentation_return_url]
+    if @return_url
+      uri = URI.parse(@return_url)
+      @return_url = nil unless uri.is_a?(URI::HTTP)
+    end
+    if @return_url.blank?
+      render :nothing => true, :status => 400
+    end
     @headers = false
   end
   
