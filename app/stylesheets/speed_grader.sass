@@ -428,20 +428,14 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     background-position: 0 -12px
   .resubmitted &
     background-position: 0 -175px
-#grade_container
-  .turnitin_similarity_score
-    background-color: #fff
-    font-size: 0.8em
-    padding-bottom: 0
-    color: #444
-    text-decoration: none
-    margin-top: -2px
-    margin-left: 10px
-    &:hover
-      text-decoration: none
+.turnitin_info
+  margin-top: 3px
+  border-top: 1px solid #999999
+  padding: 3px 0
 #submission_details
   border-bottom: 1px solid #999999
-  padding-bottom: 3px
+  &.content_box
+    padding-top: 0
   a
     font-size: 12px
   .on_time
@@ -453,33 +447,28 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   #submission_late_notice
     color: #d12f19
     font-weight: bold
-    margin-left: 3px
   #submission_not_newest_notice
     color: #EB9A00
     font-weight: bold
-    margin-left: 3px
   select
     width: 99%
   label
     font-weight: bold
-    margin-left: 3px
   #submission_files_list
     overflow: auto
     .submission-file
       padding: 1px 16px 1px 19px
       position: relative
-      .turnitin_similarity_score
+      .turnitin_score_container
         position: absolute
         top: 0
         right: 20px
-        background-color: #fff
-        font-size: 0.7em
-        padding-bottom: 0
-        color: #444
-        text-decoration: none
-        margin-top: -2px
+      .turnitin_similarity_score
+        font-size: 9px
+        &.submission_error, &.submission_pending
+          padding: 1px
         &:hover
-          text-decoration: none
+          font-size: 0.7em
       .submission-file-download
         display: block
         +opacity(0.5)
@@ -492,8 +481,6 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         text-indent: -9999px
       &:hover
         background-color: #DCECFB
-        .turnitin_similarity_score
-          display: block
         .submission-file-download
           display: block
           +opacity(1.0)

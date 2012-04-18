@@ -159,10 +159,11 @@ module Turnitin
 
       assignment_id ?
         { :assignment_id => assignment_id } :
-        { :error_code => rcode, :error_message => rmessage }
+        { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(rcode) }
     end
     
-    def submitPaper(submission)
+    # if asset_string is passed in, only submit that attachment
+    def submitPaper(submission, asset_string=nil)
       student = submission.user
       assignment = submission.assignment
       course = assignment.context
@@ -176,11 +177,11 @@ module Turnitin
       }
       responses = {}
       if submission.submission_type == 'online_upload'
-        attachments = submission.attachments.select{ |a| a.turnitinable? }
+        attachments = submission.attachments.select{ |a| a.turnitinable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
           responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open(), :ptype => '2' }.merge!(opts))
         end
-      elsif submission.submission_type == 'online_text_entry'
+      elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
         responses[submission.asset_string] = sendRequest(:submit_paper, '2', { :ptl => assignment.title, :pdata => submission.plaintext_body, :ptype => "1" }.merge!(opts))
       else
         raise "Unsupported submission type for turnitin integration: #{submission.submission_type}"
@@ -194,7 +195,7 @@ module Turnitin
 
         responses[asset_string] = object_id ? 
                                   { :object_id => object_id } : 
-                                  { :error_code => rcode, :error_message => rmessage }
+                                  { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(:rcode) }
       end
 
       responses
@@ -381,6 +382,33 @@ module Turnitin
           Rails.logger.error(res.body)
         end
         doc
+      end
+    end
+
+    # We store the actual error message we got back from turnitin in the hash
+    # on the object, but often that message is not appropriate to show to
+    # users. So we're picking out the most common error messages we see, fixing
+    # up the wording, and then using this to display public facing error messages.
+    def public_error_message(error_code)
+      case error_code
+      when 216
+        I18n.t('turnitin.error_216', "The student limit for this account has been reached. Please contact your account administrator.")
+      when 217
+        I18n.t('turnitin.error_217', "The turnitin product for this account has expired. Please contact your sales agent to renew the turnitin product.")
+      when 414
+        I18n.t('turnitin.error_414', "The originality report for this submission is not available yet.")
+      when 415
+        I18n.t('turnitin.error_415', "The originality score for this submission is not available yet.")
+      when 1007
+        I18n.t('turnitin.error_1007', "The uploaded file is too big.")
+      when 1009
+        I18n.t('turnitin.error_1009', "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)")
+      when 1013
+        I18n.t('turnitin.error_1013', "The student submission must be more than twenty words of text in order for it to be rated by turnitin.")
+      when 1023
+        I18n.t('turnitin.error_1023', "The PDF file could not be read. Please make sure that the file is not password protected.")
+      else
+        I18n.t('turnitin.error_default', "There was an error submitting to turnitin. Please try resubmitting the file before contacting support.")
       end
     end
   end

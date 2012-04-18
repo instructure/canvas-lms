@@ -74,7 +74,7 @@
     <div class="full_height" id="width_resizer"></div>
     <div id="rightside_inner" class="full_height">
 
-      <div id="submission_details">
+      <div id="submission_details" class="content_box">
         <div id="single_submission">
           <label><%= before_label(:submitted, "Submitted") %></label>
           <span id="single_submission_submitted_at" title="<%= t('titles.on_time', "Submitted on time") %>">??/??/?? at ??:??PM</span>
@@ -92,11 +92,12 @@
           <label><%= t(:submitted_files, "Submitted Files: (click to load)") %></label>
           <div id="submission_files_list">
             <div id="submission_file_hidden"  class="submission-file" style='display:none;'>
-              <a class="turnitin_similarity_score" href="#" title="<%= t('titles.turnitin_score', "Turnitin similarity score -- more information") %>"><span class="similarity_score">10</span>%</a>
+              <span class="turnitin_score_container"></span>
               <a class="submission-file-download" title="<%= t('titles.download_file', "Download this file") %>" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}") %>"><%= t('links.download_file', "Download File") %></a>
               <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
             </div>
           </div>
+          <div class="turnitin_info_container"></div>
         </div>
       </div>
 
@@ -128,7 +129,7 @@
         <h2><%= t('headers.assessment', "Assessment") %></h2>
         <div>
           <% if can_do(@context, @current_user, :manage_grades) %>
-          <div id="grade_container"  class="content_box" style="padding-bottom: 0">
+          <div id="grade_container" class="content_box">
             <label class="bold"><%= t('labels.grade', "Grade") %>
             <%= render :partial => "grading_box_extended", :object => @assignment %>
             <% if @assignment.grading_type == "points" %>
@@ -137,11 +138,10 @@
               (<span class="score">&nbsp;</span> / <%= @assignment.points_possible %>)
             <% end %>
             </label>
-            <a href="#" class="turnitin_similarity_score" title="<%= t('titles.turnitin_score', "Turnitin similarity score -- more information") %>" target="_blank" style="display: none;">
-              <span class="similarity_score"></span>%
-            </a>
+            <span class="turnitin_score_container"></span>
             <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
-              <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
+            <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
+            <div class="turnitin_info_container"></div>
           </div>
           <% end %>
           <% if @assignment.rubric_association %>
@@ -247,7 +247,8 @@
   </div>
 </div>
 <a style="display:none;" id="assignment_submission_url" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submission_id}}") %>"></a>
-<a style="display:none;" id="assignment_submission_turnitin_url" href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
+<a style="display:none;" id="assignment_submission_turnitin_report_url" href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
+<a style="display:none;" id="assignment_submission_resubmit_to_turnitin_url" href="<%= context_url(@context, :context_assignment_submission_resubmit_to_turnitin_url, @assignment.id, "{{ user_id }}") %>"></a>
 <form id="settings_form" style="display:none; width:400px;" title="<%= t('titles.speedgrader_options', "Speedgrader Options") %>">
   <p>
     <label for="eg_sort_by"><%= t('labels.sort_by', "Sort student list") %></label>

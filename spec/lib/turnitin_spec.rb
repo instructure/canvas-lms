@@ -72,7 +72,11 @@ describe Turnitin::Client do
 
       status.should be_false
       @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({
-        :error => { :error_code => 123, :error_message => 'You cannot create this assignment right now' }
+        :error => {
+          :error_code => 123,
+          :error_message => 'You cannot create this assignment right now',
+          :public_error_message => 'There was an error submitting to turnitin. Please try resubmitting the file before contacting support.'
+        }
       })
     end
 
