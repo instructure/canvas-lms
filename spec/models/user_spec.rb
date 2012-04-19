@@ -359,15 +359,17 @@ describe User do
 
     @course6 = course(:course_name => "active but date restricted", :active_course => true)
     e = @course6.enroll_user(@user, 'StudentEnrollment')
+    e.accept!
     e.start_at = 1.day.from_now
     e.end_at = 2.days.from_now
-    e.accept!
+    e.save!
 
     @course7 = course(:course_name => "soft concluded", :active_course => true)
     e = @course7.enroll_user(@user, 'StudentEnrollment')
+    e.accept!
     e.start_at = 2.days.ago
     e.end_at = 1.day.ago
-    e.accept!
+    e.save!
 
 
     # only four, in the right order (type, then name), and with the top type per course

@@ -319,6 +319,7 @@ describe Enrollment do
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
         @enrollment.state.should eql(:invited)
+        @enrollment.state_based_on_date.should eql(:invited)
         @enrollment.accept
         @enrollment.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:active)
@@ -328,18 +329,15 @@ describe Enrollment do
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
         @enrollment.state.should eql(:invited)
-        @enrollment.accept
-        @enrollment.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:completed)
+        @enrollment.accept.should be_false
 
         @enrollment.start_at = 2.days.from_now
         @enrollment.end_at = 4.days.from_now
-        @enrollment.workflow_state = 'invited'
         @enrollment.save!
         @enrollment.state.should eql(:invited)
-        @enrollment.accept
-        @enrollment.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:inactive)
+        @enrollment.accept.should be_false
       end
 
       it "should accept into the right state based on availability dates on course_section" do
@@ -364,19 +362,16 @@ describe Enrollment do
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
         @enrollment.state.should eql(:invited)
-        @enrollment.accept
-        @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:completed)
+        @enrollment.accept.should be_false
 
         @section.start_at = 2.days.from_now
         @section.end_at = 4.days.from_now
         @section.save!
-        @enrollment.workflow_state = 'invited'
         @enrollment.save!
         @enrollment.state.should eql(:invited)
-        @enrollment.accept
-        @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:inactive)
+        @enrollment.accept.should be_false
       end
 
       it "should accept into the right state based on availability dates on course" do
@@ -407,10 +402,10 @@ describe Enrollment do
         @course.save!
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
+        @enrollment.reload
         @enrollment.state.should eql(:invited)
-        @enrollment.accept
-        @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:inactive)
+        @enrollment.accept.should be_false
       end
 
       it "should accept into the right state based on availability dates on enrollment_term" do
@@ -442,10 +437,10 @@ describe Enrollment do
         @term.save!
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
+        @enrollment.reload
         @enrollment.state.should eql(:invited)
-        @enrollment.accept
-        @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:inactive)
+        @enrollment.accept.should be_false
       end
 
       it "should accept into the right state based on availability dates on enrollment_dates_override" do
@@ -479,11 +474,12 @@ describe Enrollment do
         @override.save!
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
+        @enrollment.reload
         @enrollment.state.should eql(:invited)
-        @enrollment.accept
-        @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:inactive)
+        @enrollment.accept.should be_false
 
+        @enrollment.update_attribute(:workflow_state, 'active')
         @override.start_at = nil
         @override.end_at = nil
         @override.save!

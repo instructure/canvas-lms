@@ -398,17 +398,17 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    if state == :active
+    if [:invited, :active].include?(state)
       ranges = self.enrollment_dates
       now = Time.now
       ranges.each do |range|
         start_at, end_at = range
         # start_at <= now <= end_at, allowing for open ranges on either end
-        return :active if (start_at || now) <= now && now <= (end_at || now)
+        return state if (start_at || now) <= now && now <= (end_at || now)
       end
       # not strictly within any range
       global_start_at = ranges.map(&:first).compact.min
-      return :active unless global_start_at
+      return state unless global_start_at
       if global_start_at < Time.now
         :completed
       else
@@ -425,6 +425,10 @@ class Enrollment < ActiveRecord::Base
 
   def inactive?
     state_based_on_date == :inactive
+  end
+
+  def invited?
+    state_based_on_date == :invited
   end
 
   def completed?
