@@ -142,6 +142,7 @@ describe "courses" do
         @second_course.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
                                            :delayed_post_at => old_start + 3.days)
+        @second_course.assignments.create!(:due_at => old_start)
 
         course_copy_helper do |driver|
           f('#copy_shift_dates').click
@@ -149,10 +150,17 @@ describe "courses" do
           f('#copy_old_end_date').send_keys('Jul 11, 2012')
           replace_content(f('#copy_new_start_date'), 'Aug 5, 2012')
           f('#copy_new_end_date').send_keys('Aug 15, 2012')
+          f('.add_substitution_link').click
+          wait_for_animations
+          select = driver.find_element(:name, "copy[day_substitutions][0]")
+          option = select.find_elements(:css, 'option')[1]
+          option.click
         end
 
         new_disc = @course.discussion_topics.first
         new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+        new_asmnt = @course.assignments.first
+        new_asmnt.due_at.to_i.should == (new_start + 1.day).to_i
       end
 
       it "should copy the course" do
