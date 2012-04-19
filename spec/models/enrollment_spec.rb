@@ -1281,4 +1281,18 @@ describe Enrollment do
       @enrollment.effective_end_at.should be_nil
     end
   end
+
+  describe 'conclude' do
+    it "should remove the enrollment from User#cached_current_enrollments" do
+      enable_cache do
+        course_with_student(:active_all => 1)
+        User.update_all({:updated_at => 1.day.ago}, :id => @user.id)
+        @user.reload
+        @user.cached_current_enrollments.should == [ @enrollment ]
+        @enrollment.conclude
+        @user.reload
+        @user.cached_current_enrollments(true).should == []
+      end
+    end
+  end
 end
