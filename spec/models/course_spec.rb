@@ -98,6 +98,15 @@ describe Course do
       @course.grants_right?(@teacher, nil, :read_forum).should be_true
     end
 
+    it "should grant read_as_admin and read to date-completed teacher of unpublished course" do
+      course_with_teacher(:active_all => 1)
+      @course.update_attribute(:workflow_state, 'claimed')
+      make_date_completed
+      @course.prior_enrollments.should == []
+      @course.grants_right?(@teacher, nil, :read_as_admin).should be_true
+      @course.grants_right?(@teacher, nil, :read).should be_true
+    end
+
     it "should grant read_as_admin, read, manage, and update to date-active designer" do
       course(:active_all => 1)
       @designer = user(:active_all => 1)
@@ -121,6 +130,18 @@ describe Course do
       @course.grants_right?(@designer, nil, :read_as_admin).should be_true
       @course.grants_right?(@designer, nil, :read_roster).should be_true
       @course.grants_right?(@designer, nil, :read_prior_roster).should be_true
+    end
+
+    it "should grant read_as_admin and read to date-completed designer of unpublished course" do
+      course(:active_all => 1)
+      @designer = user(:active_all => 1)
+      @enrollment = @course.enroll_designer(@designer)
+      @enrollment.accept!
+      @course.update_attribute(:workflow_state, 'claimed')
+      make_date_completed
+      @course.prior_enrollments.should == []
+      @course.grants_right?(@designer, nil, :read_as_admin).should be_true
+      @course.grants_right?(@designer, nil, :read).should be_true
     end
 
     it "should not grant read_user_notes or view_all_grades to designer" do
