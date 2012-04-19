@@ -40,7 +40,7 @@ define ['i18n!dates'], (I18n) ->
       """
       <span class="date-range">
         <time datetime='#{startAt.time.toISOString()}'>
-          "#{startDay} at #{startAt.time_formatted}"
+          #{startDay} at #{startAt.time_formatted}
         </time>
       </span>
       """
