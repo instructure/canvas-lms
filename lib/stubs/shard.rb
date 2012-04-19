@@ -49,6 +49,12 @@ class Shard
     {}
   end
 
+  yaml_as "tag:instructure.com,2012:Shard"
+
+  def self.yaml_new(klass, tag, val)
+    default
+  end
+
   module RSpec
     def self.included(klass)
       klass.before do
