@@ -56,6 +56,26 @@ describe CoursesController do
       response.should be_success
       response.should render_template("settings")
     end
+
+    it "should give a helpful error message for students that can't access yet" do
+      course_with_student_logged_in(:active_all => true)
+      @course.workflow_state = 'claimed'
+      @course.save!
+      get 'settings', :course_id => @course.id
+      response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_reason].should == :unpublished
+      assigns[:unauthorized_message].should_not be_nil
+
+      @course.workflow_state = 'available'
+      @course.save!
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.save!
+      get 'settings', :course_id => @course.id
+      response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_reason].should == :unpublished
+      assigns[:unauthorized_message].should_not be_nil
+    end
   end
   
   describe "GET 'enrollment_invitation'" do
@@ -157,6 +177,7 @@ describe CoursesController do
       @course.save!
       get 'show', :id => @course.id
       response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
 
       @course.workflow_state = 'available'
@@ -166,6 +187,7 @@ describe CoursesController do
       @enrollment.save!
       get 'show', :id => @course.id
       response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
     end
 

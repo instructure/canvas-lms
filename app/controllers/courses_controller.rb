@@ -721,10 +721,7 @@ class CoursesController < ApplicationController
       return redirect_to course_settings_path(@context.id)
     end
 
-    enrollment = @context_enrollment || @pending_enrollment
-    start_date = enrollment.enrollment_dates.map(&:first).compact.min if enrollment && enrollment.state_based_on_date == :inactive
-    @unauthorized_message = t('unauthorized.unpublished', "This course has not been published by the instructor yet.") if enrollment && @context.claimed?
-    @unauthorized_message = t('unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now
+    @context_enrollment ||= @pending_enrollment
     if is_authorized_action?(@context, @current_user, :read)
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
         @assignments_needing_publishing = @context.assignments.active.need_publishing || []

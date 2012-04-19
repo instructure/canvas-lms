@@ -225,7 +225,7 @@ class ApplicationController < ActionController::Base
   
   def render_unauthorized_action(object=nil)
     object ||= User.new
-    object.errors.add_to_base(t "#application.errors.unauthorized", "You are not authorized to perform this action")
+    object.errors.add_to_base(t "#application.errors.unauthorized.generic", "You are not authorized to perform this action")
     respond_to do |format|
       @show_left_side = false
       clear_crumbs
@@ -233,9 +233,17 @@ class ApplicationController < ActionController::Base
       params[:format] = nil
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
-      format.html { 
+      format.html {
         store_location if request.get?
         return if !@current_user && initiate_delegated_login(request.host_with_port)
+        if @context.is_a?(Course) && @context_enrollment
+          @unauthorized_message = t('#application.errors.unauthorized.unpublished', "This course has not been published by the instructor yet.") if @context.claimed?
+
+          start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
+          @unauthorized_message = t('#application.errors.unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now.utc
+          @unauthorized_reason = :unpublished
+        end
+
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }
