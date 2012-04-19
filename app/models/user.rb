@@ -1466,12 +1466,12 @@ class User < ActiveRecord::Base
   memoize :account
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil)
-    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key) do
+    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key, :expires_in => 15.minutes) do
       courses = send(association).distinct_on(["courses.id"],
         :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
         :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
-      soft_concluded = Enrollment.find(:all, :conditions => { :id => courses.map{ |course| course.primary_enrollment_id } }).select{ |e| e.completed? }.map{ |e| e.id }
-      courses.reject! { |course| soft_concluded.include?(course.primary_enrollment_id.to_i) }
+      date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
+      courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
       courses
     end.dup
     if association == :current_and_invited_courses
