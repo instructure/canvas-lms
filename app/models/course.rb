@@ -1734,6 +1734,7 @@ class Course < ActiveRecord::Base
             event.unlock_at = shift_date(event.unlock_at, shift_options)
             event.start_at = shift_date(event.start_at, shift_options)
             event.end_at = shift_date(event.end_at, shift_options)
+            event.save!
           end
         end
 
