@@ -313,6 +313,14 @@ class ContentMigration < ActiveRecord::Base
         self.attachment = ce.attachment
         migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
         migration_settings[:migration_ids_to_import][:copy][:everything] = true
+        if copy_options[:shift_dates]
+          migration_settings[:migration_ids_to_import][:copy][:shift_dates] = copy_options[:shift_dates]
+          migration_settings[:migration_ids_to_import][:copy][:old_start_date] = copy_options[:old_start_date]
+          migration_settings[:migration_ids_to_import][:copy][:old_end_date] = copy_options[:old_end_date]
+          migration_settings[:migration_ids_to_import][:copy][:new_start_date] = copy_options[:new_start_date]
+          migration_settings[:migration_ids_to_import][:copy][:new_end_date] = copy_options[:new_end_date]
+        end
+
         self.save
         worker = Canvas::Migration::Worker::CCWorker.new
         worker.migration_id = self.id
