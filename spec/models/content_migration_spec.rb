@@ -367,6 +367,65 @@ describe ContentMigration do
       (new_assignment.due_at.to_i - (today + 1.day).to_i).abs.should < 60
     end
 
+    it "should shift dates" do
+      pending unless Qti.qti_enabled?
+      options = {
+              :everything => true,
+              :shift_dates => true,
+              :old_start_date => 'Jul 1, 2012',
+              :old_end_date => 'Jul 11, 2012',
+              :new_start_date => 'Aug 5, 2012',
+              :new_end_date => 'Aug 15, 2012'
+      }
+
+      old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
+      new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
+
+      @copy_from.assert_assignment_group
+      @copy_from.assignments.create!(:due_at => old_start + 1.day,
+                                     :unlock_at => old_start + 2.days,
+                                     :lock_at => old_start + 3.days,
+                                     :peer_reviews_due_at => old_start + 4.days
+      )
+      @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
+                                 :unlock_at => old_start + 1.days,
+                                 :lock_at => old_start + 5.days
+      )
+      @copy_from.discussion_topics.create!(:title => "some topic",
+                                           :message => "<p>some text</p>",
+                                           :delayed_post_at => old_start + 3.days)
+      cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => old_start + 1.days)
+      cm.start_at = old_start + 2.day
+      cm.end_at = old_start + 3.days
+      cm.save!
+
+      @cm.migration_settings[:migration_ids_to_import] = {
+              :copy => options
+      }
+      @cm.save!
+
+      run_course_copy
+
+      new_asmnt = @copy_to.assignments.first
+      new_asmnt.due_at.to_i.should  == (new_start + 1.day).to_i
+      new_asmnt.unlock_at.to_i.should == (new_start + 2.day).to_i
+      new_asmnt.lock_at.to_i.should == (new_start + 3.day).to_i
+      new_asmnt.peer_reviews_due_at.to_i.should == (new_start + 4.day).to_i
+
+      new_quiz = @copy_to.quizzes.first
+      new_quiz.due_at.to_i.should  == (new_start + 4.day).to_i
+      new_quiz.unlock_at.to_i.should == (new_start + 1.day).to_i
+      new_quiz.lock_at.to_i.should == (new_start + 5.day).to_i
+
+      new_disc = @copy_to.discussion_topics.first
+      new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+
+      new_mod = @copy_to.context_modules.first
+      new_mod.unlock_at.to_i.should  == (new_start + 1.day).to_i
+      new_mod.start_at.to_i.should == (new_start + 2.day).to_i
+      new_mod.end_at.to_i.should == (new_start + 3.day).to_i
+    end
+
   end
 
 end
