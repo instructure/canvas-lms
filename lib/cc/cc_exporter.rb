@@ -126,7 +126,11 @@ module CC
     end
 
     def create_zip_file
-      @zip_name = "#{@course.name.to_url}-export.#{CCHelper::CC_EXTENSION}"
+      if @qti_only_export
+        @zip_name = "#{@course.name.to_url}-quiz-export.zip"
+      else
+        @zip_name = "#{@course.name.to_url}-export.#{CCHelper::CC_EXTENSION}"
+      end
       FileUtils::mkdir_p File.join(@export_dir, ZIP_DIR)
       @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
       @zip_file = Zip::ZipFile.new(@zip_path, Zip::ZipFile::CREATE)
