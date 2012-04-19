@@ -880,7 +880,7 @@ class Course < ActiveRecord::Base
 
     # Teacher of a concluded course
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? }) }
-    can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
+    can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
 
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? }) }
     can :read_user_notes and can :view_all_grades
