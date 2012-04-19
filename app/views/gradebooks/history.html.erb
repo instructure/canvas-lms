@@ -1,4 +1,12 @@
 <% content_for :page_title do %><%= join_title t(:page_title, "Gradebook History"), @context.name %><% end %>
+<% jammit_css :gradebook_history %>
+
+<% if !@days %>
+  <%# temorary disabling of this page for large contexts %>
+  <p>
+  <%= t 'temporary_disabled', "The gradebook history page is not currently available for a course of this size." %>
+  </p>
+<% else %>
 
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
@@ -69,3 +77,4 @@
 </ul>
 <% js_bundle :gradebook_history %>
 
+<% end %>
