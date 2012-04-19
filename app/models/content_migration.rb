@@ -303,6 +303,7 @@ class ContentMigration < ActiveRecord::Base
           migration_settings[:migration_ids_to_import][:copy][:old_end_date] = copy_options[:old_end_date]
           migration_settings[:migration_ids_to_import][:copy][:new_start_date] = copy_options[:new_start_date]
           migration_settings[:migration_ids_to_import][:copy][:new_end_date] = copy_options[:new_end_date]
+          migration_settings[:migration_ids_to_import][:copy][:day_substitutions] = copy_options[:day_substitutions]
         end
 
         self.save

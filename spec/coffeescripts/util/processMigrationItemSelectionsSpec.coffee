@@ -39,7 +39,9 @@ require ['compiled/util/processMigrationItemSelections'], (processMigrationItemS
             "copy[old_start_date]": "Nov 6, 2009",
             "copy[old_end_date]": "Nov 6, 2009",
             "copy[new_start_date]": "",
-            "copy[new_end_date]": ""
+            "copy[new_end_date]": "",
+            "copy[day_substitutions][0]" : "1",
+            "copy[day_substitutions][3]" : "4"
     }
 
   test 'change hash of hashes to hash of lists', ->
@@ -74,7 +76,9 @@ require ['compiled/util/processMigrationItemSelections'], (processMigrationItemS
                         "copy[old_start_date]": "Nov 6, 2009",
                         "copy[old_end_date]": "Nov 6, 2009",
                         "copy[new_start_date]": "",
-                        "copy[new_end_date]": ""
+                        "copy[new_end_date]": "",
+                        "copy[day_substitutions][0]" : "1",
+                        "copy[day_substitutions][3]" : "4"
     }
 
   test 'remove individual selections if copy everything is selected', ->
@@ -90,7 +94,9 @@ require ['compiled/util/processMigrationItemSelections'], (processMigrationItemS
                         "copy[old_start_date]": "Nov 6, 2009",
                         "copy[old_end_date]": "Nov 6, 2009",
                         "copy[new_start_date]": "",
-                        "copy[new_end_date]": ""
+                        "copy[new_end_date]": "",
+                        "copy[day_substitutions][0]" : "1",
+                        "copy[day_substitutions][3]" : "4"
     }
     
     
