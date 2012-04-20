@@ -1,3 +1,81 @@
+canvas-lms (2012.04.28.04) testing; urgency=low
+
+  * Package ref: 0c400509df43b7f5a655718f5f2efe136b928637
+  *
+  * [-fa2c942] fix the course sections api, fixes #8108
+  * [+3b5cdfa] script/server improvements
+  * [+e5cc031] fixed bad path for json2.js
+  * [+8cd7a22] add avatars to roster pages
+  * [+956f947] spec: make scheduler spec less fragile
+  * [+c2dfe5b] avatars in SpeedGrader
+  * [+c5ad5c5] prevent intermittent selenium failures for conversation attachments
+  * [+2a85d98] fix disappearing appointment group events
+  * [+9edcf3d] gradebook2 header-column fixes
+  * [+97f6abc] users API endpoint (for course settings) #7764
+  * [+961aad6] properly handle selective external migration imports
+  * [+8e7533c] fix cancel typos refs #7949
+  * [+eaf31a6] remove invalid spanish translation key
+  * [+4dae930] spec: fix bad course import spec
+  * [+fad518c] clean up temporary tables in migrations
+  * [+3f35882] latest spin.js, fixes conversations UI glitches
+  * [+eada83c] fix caching of default account in forked selenium specs
+  * [+f1d5570] spec: fix intermittent jobs spec failures
+  * [+3a93baa] remove intermittently failing conversation attachment s3 spec
+  * [+a71075f] mod indent change from edit form keeps due-date/points; fixes #7811
+  * [+e4e34ca] ensure atom feeds have absolute urls and authors; fixes #7047
+  * [+8635407] spec: add specs for threaded discussions
+  * [+8876962] infer locale for groups based on group context; fixes #7069
+  * [+b33d606] put recompute_student_scores in a singleton by course
+  * [+dee14d0] fully unrevert using trusted_account_ids closes #7167
+  * [+b346fdb] carat location of kylemenu was too constrained
+  * [+266181f] don't cut off assignment icon
+  * [+b3e31de] get rid of serif font on left side
+  * [+2b709a3] clean up discussions side-comment styling
+  * [+ed48256] dont rely on hovering to display cog menus
+  * [+575c737] get rid of $.keys it was not being used
+  * [+127e839] remove $.size in favor of _.size
+  * [+b52a1fa] don't use a raw array as a hash key
+  * [+9d8bbb0] make attachment data migration faster and pgbouncer-friendly
+  * [+8cbd32c] limit default grades to section. fixes #7540
+  * [+832fb20] allow any url for mathquill fixes #8038
+  * [+6e17a0f] add restrict_enrollments_to_course_dates to courses create api.
+  * [+5dc6124] fix e-mail address validation failure breaking registration page
+  * [+e2c5435] spec: Making discussions spec better
+  * [+404e5d3] fix intermittently failing jobs selenium specs
+  * [+b7ef513] send correct params on homework submission; fixes #8145
+  * [+8d72f54] mark conversations attachments spec pending
+  * [+bdd8407] spec: making the eportfolios specs more robust
+  * [+f158c5e] fix catching malformed csvs beyond the first few rows
+  * [+5ea5f36] show users tab in site admin
+  * [+e100d66] fix grade redirect to ignore observer enrollments with no observees
+  * [+d36bedf] spec: more jobs specs
+  * [+5a34ab8] make a qti-only export type
+  * [+0ba05f6] ui for exporting quizzes
+  * [+df56b0d] update with_each_shard stub
+  * [+458d651] remove the generic :site_admin permission fixes #7848
+  * [+ee7ac22] properly handle some more course/wiki properties on course copy
+  * [+784b160] add rubrics to course copy options
+  * [+25725a1] parallelize build tasks
+  * [+a5e946d] moved need help? link to a more convenient place fixes #6125
+  * [+9180766] fixes #7915 adds time zone information to sis csv documentation
+  * [+aa79b8d] changed css on a couple divs fixes #7905
+  * [+74ac9f4] small text change in help dialog
+  * [+e54ab1c] fix for using coffee when compiling js
+  * [+ac7c5e5] set headers with the user id on every request
+  * [+d385661] changed css on a couple divs fixes #7905
+  * [+10411b8] pending_review show as 'submitted' in event list; fixes #7840
+  * [+b8564cf] add referenced question banks to course copy
+  * [+0f7ee75] find_ids_in_ranges helper
+  * [+7f3731f] fix date adjustment on course copy
+  * [+dca0565] don't make gradebook_history styles global
+  * [+c2209a7] avoid page_views counts for users
+  * [+b4c5f6a] capture the current shard for jobs
+  * [+186cb6f] disable gradebook history page for large courses
+  * [+14255e1] fix day substitutions when copying courses
+  * [+0c40050] change the quiz export file extension
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 20 Apr 2012 13:07:22 -0600
+
 canvas-lms (2012.04.14.09) testing; urgency=low
 
   * Package ref: c6fc0e149ddee04b66c746a1e757f074eec45a96
