@@ -90,7 +90,7 @@ body
     background-color: #e6e7e9
     border: 1px solid #b0afaf
     +border-radius(10px)
-    +box-shadow( rgba(0,0,0,0.1), 0, 0, 6px, 3px)
+    box-shadow: 0 0 6px 3px rgba(0,0,0,0.1)
     padding: 8px 0
     ul
       list-style: none
@@ -207,7 +207,7 @@ ul.messages, ul.conversations, div.conversations > ul
         display: none
         position: absolute
         +border-radius(10px)
-        +box-shadow( rgba(0,0,0,0.2), 0, 3px, 6px, 0)
+        box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2)
       ul
         padding: 0
         margin: 0
@@ -269,12 +269,12 @@ div.conversations > ul
 #messages > ul.messages
   display: none
   > li
-    +box-shadow( rgba(0,0,0,0.25), 0, 3px, 6px, 3px)
+    box-shadow: 0 3px 6px 3px rgba(0,0,0,0.25)
   > li.selected
     background-color: #e5f3ff
   > li.generated
     line-height: 1
-    +box-shadow( none )
+    box-shadow: none
     background: transparent
     padding: 0
     font-size: 0.9em
@@ -413,7 +413,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     width: 100%
     background-color: #edeef2
     z-index: 3
-    +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
+    box-shadow: 0 0 6px 3px rgba(0,0,0,0.25)
     a
       background-image: url(/images/messages/message-action-sprites.png) 
       background-repeat: no-repeat
@@ -459,7 +459,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
   position: relative
   z-index: 2
   float: left
-  +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
+  box-shadow: 0 0 6px 3px rgba(0,0,0,0.25)
   #no_messages
     position: absolute
     top: 44px
@@ -628,8 +628,6 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     span
       padding: 0 15px 0 4px
   input
-    -webkit-box-shadow: none
-    -moz-box-shadow: none
     box-shadow: none
     float: left
     border: 0
@@ -641,7 +639,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     background-position: 0 -36px
 
 .token_input.active
-  box-shadow: #68B4DF 0 0 3px 2px
+  box-shadow: 0 0 3px 2px #68B4DF
 
 .autocomplete_menu
   position: absolute
@@ -653,7 +651,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     background: #ebebeb
     border: 1px solid #999999
     +border-radius(0 0 10px 10px)
-    +box-shadow( rgba(0,0,0,0.15), 0, 0, 12px, 3px)
+    box-shadow: 0 0 12px 3px rgba(0,0,0,0.15)
     overflow: hidden
     width: 341px
     > div // gets shifted left/right as menu slides
@@ -684,7 +682,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       background: #fff
       position: relative
       z-index: 1
-      +box-shadow( rgba(0,0,0,0.1), 0, 0, 4px, 2px)
+      box-shadow: 0 0 4px 2px rgba(0,0,0,0.1)
     li.message
       line-height: 32px
       text-align: center
@@ -839,7 +837,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     border: 0
     padding: 0 0 5px 0
     margin: 0
-  +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
+  box-shadow: 0 0 6px 3px rgba(0,0,0,0.25)
 #create_message_form.new
   .audience
     display: block
