@@ -340,6 +340,7 @@ class CalendarEvent < ActiveRecord::Base
     Atom::Entry.new do |entry|
       entry.title     = t(:feed_item_title, "Calendar Event: %{event_title}", :event_title => self.title) unless opts[:include_context]
       entry.title     = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", :course_or_account_name => self.context.name, :event_title => self.title) if opts[:include_context]
+      entry.authors  << Atom::Person.new(:name => self.context.name)
       entry.updated   = self.updated_at.utc
       entry.published = self.created_at.utc
       entry.links    << Atom::Link.new(:rel => 'alternate',
@@ -419,9 +420,8 @@ class CalendarEvent < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     events = data['calendar_events'] ? data['calendar_events']: []
-    to_import = migration.to_import 'events'
     events.each do |event|
-      if event['migration_id'] && (!to_import || to_import[event['migration_id']])
+      if migration.import_object?("events", event['migration_id'])
         begin
           import_from_migration(event, migration.context)
         rescue

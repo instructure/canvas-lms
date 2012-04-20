@@ -58,7 +58,7 @@
       <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :read) %>
-      <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export', %{Export this Course}) %></a>
+      <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export_content', %{Export Course Content}) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :manage_content) %>
       <a href="<%= context_url(@context, :course_reset_url) %>" class="button button-sidebar-wide reset_course_content_button"><%= image_tag "delete.png" %><%= t('links.reset', %{Reset Course Content}) %></a>
@@ -199,7 +199,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
             <span class="course_info sis_source_id"><%= @context.sis_source_id %></span>
           </td>
       <% end %>
-      <% if current_user_is_site_admin? %>
+      <% if @current_user && Account.site_admin.account_users_for(@current_user).present? %>
         </tr><tr>
           <td><%= f.blabel :root_account_id, :en => "Root Account" %></td>
           <td><%= link_to @context.root_account.name, account_url(@context.root_account.id)  %></td>

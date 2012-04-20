@@ -389,7 +389,8 @@ $(document).ready(function() {
         asset_string: $("#submit_assignment").data('asset_string'),
         intent: "submit",
         file_elements: fileElements,
-        data: $(this).getFormData(),
+        formData: $(this).getFormData(),
+        formDataTarget: 'url',
         url: $(this).attr('action'),
         success: function(data) {
           submitting = true;

@@ -149,5 +149,18 @@ describe LocaleSelection do
       ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account).should eql('de')
       ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course).should eql('pt')
     end
+
+    it "should infer the locale of a group from the group's context" do
+      @course.update_attribute(:locale, 'es')
+      course_gc = @course.group_categories.create!(:name => "Discussion Groups")
+      course_gr = Group.create!(:name => "Group 1", :group_category => course_gc, :context => @course)
+
+      @account.update_attribute(:default_locale, 'fr')
+      account_gc = @account.group_categories.create!(:name => "Other Groups")
+      account_gr = Group.create!(:name => "Group 1", :group_category => account_gc, :context => @account)
+
+      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => account_gr).should eql('fr')
+      ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => course_gr).should eql('es')
+    end
   end
 end

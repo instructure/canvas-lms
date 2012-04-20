@@ -13,7 +13,7 @@ while(parentWindow && !parentWindow[callback]) {
 if(parentWindow[callback] && parentWindow[callback].cancel) {
   parentWindow[callback].cancel();
   setTimeout(function() {
-    $("#dialog_message").text("<%= t :popup_success, "Cancelled. This popup should close on its own..." %>");
+    $("#dialog_message").text("<%= t :popup_success, "Canceled. This popup should close on its own..." %>");
   }, 1000);
 } else {
   $("#dialog_message").text("<%= t :popup_failure, "Cannot find the parent window, you'll need to close this popup manually." %>");

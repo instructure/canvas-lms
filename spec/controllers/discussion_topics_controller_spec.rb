@@ -412,4 +412,32 @@ describe DiscussionTopicsController do
       @course.discussion_topics.should_not be_include(@topic)
     end
   end
+
+  describe "GET 'public_feed.atom'" do
+    before(:each) do
+      course_with_student(:active_all => true)
+      course_topic
+    end
+
+    it "should require authorization" do
+      get 'public_feed', :format => 'atom', :feed_code => @course.feed_code + 'x'
+      assigns[:problem].should eql("The verification code is invalid.")
+    end
+
+    it "should include absolute path for rel='self' link" do
+      get 'public_feed', :format => 'atom', :feed_code => @course.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.links.first.rel.should match(/self/)
+      feed.links.first.href.should match(/http:\/\//)
+    end
+
+    it "should include an author for each entry" do
+      get 'public_feed', :format => 'atom', :feed_code => @course.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed.should_not be_nil
+      feed.entries.should_not be_empty
+      feed.entries.all?{|e| e.authors.present?}.should be_true
+    end
+  end
 end

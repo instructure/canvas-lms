@@ -632,7 +632,7 @@ class ConversationsController < ApplicationController
     load_all_contexts
     feed = Atom::Feed.new do |f|
       f.title = t('titles.rss_feed', "Conversations Feed")
-      f.links << Atom::Link.new(:href => conversations_url)
+      f.links << Atom::Link.new(:href => conversations_url, :rel => 'self')
       f.updated = Time.now
       f.id = conversations_url
     end
@@ -725,7 +725,7 @@ class ConversationsController < ApplicationController
   end
 
   def load_all_contexts
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user], :expires_in => 10.minutes) do
+    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user].cache_key, :expires_in => 10.minutes) do
       contexts = {:courses => {}, :groups => {}, :sections => {}}
 
       term_for_course = lambda do |course|

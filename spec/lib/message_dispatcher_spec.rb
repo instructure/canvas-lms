@@ -35,7 +35,7 @@ describe 'MessageDispatcher' do
       job.run_at.should == @message.dispatch_at
     end
 
-    it "should not reschedule on cancelled Message" do
+    it "should not reschedule on canceled Message" do
       expect { MessageDispatcher.dispatch(@message) }.to change(Delayed::Job, :count).by(1)
       @message.cancel
       job = Delayed::Job.last(:order => :id)
@@ -50,7 +50,7 @@ describe 'MessageDispatcher' do
       @messages = (0...3).map { message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email') }
     end
 
-    it "should reschedule on Mailer delivery error, but not on cancelled Message" do
+    it "should reschedule on Mailer delivery error, but not on canceled Message" do
       expect { MessageDispatcher.batch_dispatch(@messages) }.to change(Delayed::Job, :count).by(1)
       job = Delayed::Job.last(:order => :id)
       @messages[0].cancel

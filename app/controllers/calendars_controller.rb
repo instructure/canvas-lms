@@ -207,7 +207,7 @@ class CalendarsController < ApplicationController
       format.atom do
         feed = Atom::Feed.new do |f|
           f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", :course_or_group_name => @context.name
-          f.links << Atom::Link.new(:href => calendar_url_for(@context))
+          f.links << Atom::Link.new(:href => calendar_url_for(@context), :rel => 'self')
           f.updated = Time.now
           f.id = calendar_url_for(@context)
         end

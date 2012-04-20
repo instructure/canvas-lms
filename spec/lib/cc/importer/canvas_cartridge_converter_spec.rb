@@ -9,8 +9,8 @@ describe "Canvas Cartridge importing" do
     @copy_to.name = "alt name"
     @copy_to.course_code = "alt name"
 
-    exporter = CC::CCExporter.new(nil, :course=>@copy_from, :user=>@from_teacher)
-    manifest = CC::Manifest.new(exporter)
+    @exporter = CC::CCExporter.new(nil, :course=>@copy_from, :user=>@from_teacher, :for_course_copy => true)
+    manifest = CC::Manifest.new(@exporter)
     @resource = CC::Resource.new(manifest, nil)
     @migration = ContentMigration.new
     @migration.context = @copy_to
@@ -41,6 +41,8 @@ describe "Canvas Cartridge importing" do
     @copy_from.turnitin_comments = "Don't plagiarize"
     @copy_from.self_enrollment = true
     @copy_from.license = "cc_by_nc_nd"
+    @copy_from.locale = "es"
+    @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
     @copy_from.save!
 
     body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
@@ -70,13 +72,14 @@ describe "Canvas Cartridge importing" do
     @copy_to.start_at.to_i.should == @copy_from.start_at.to_i
     @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
     @copy_to.storage_quota.should_not == @copy_from.storage_quota
-    @copy_to.name.should_not == @copy_from.name
-    @copy_to.course_code.should_not == @copy_from.course_code
+    @copy_to.name.should == @copy_from.name
+    @copy_to.course_code.should == @copy_from.course_code
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     atts.each do |att|
       @copy_to.send(att).should == @copy_from.send(att)
     end
+    @copy_to.tab_configuration.should == @copy_from.tab_configuration
   end
 
   it "should import assignment groups" do
@@ -159,6 +162,7 @@ describe "Canvas Cartridge importing" do
     tool2.save!
 
     #export to xml
+    @exporter.for_course_copy = false
     builder = Builder::XmlMarkup.new(:indent=>2)
     @resource.create_blti_link(tool1, builder)
     builder2 = Builder::XmlMarkup.new(:indent=>2)
@@ -563,7 +567,7 @@ describe "Canvas Cartridge importing" do
 
     #export to html file
     migration_id = CC::CCHelper.create_key(page)
-    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, migration_id)
+    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, :identifier => migration_id)
     #convert to json
     doc = Nokogiri::XML(exported_html)
     hash = @converter.convert_wiki(doc, 'some-page')
@@ -610,22 +614,29 @@ describe "Canvas Cartridge importing" do
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
       </div>}
-    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id ])
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id ], :editing_roles => "teachers", :hide_from_students => true, :notify_of_update => true)
     @copy_from.save!
     
     #export to html file
     migration_id = CC::CCHelper.create_key(page)
-    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, migration_id)
+    meta_fields = {:identifier => migration_id}
+    meta_fields[:editing_roles] = page.editing_roles
+    meta_fields[:hide_from_students] = page.hide_from_students
+    meta_fields[:notify_of_update] = page.notify_of_update
+    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, meta_fields)
     #convert to json
     doc = Nokogiri::HTML(exported_html)
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
     WikiPage.import_from_migration(hash, @copy_to)
-    
+
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
     page_2.url.should == page.url
+    page_2.editing_roles.should == page.editing_roles
+    page_2.hide_from_students.should == page.hide_from_students
+    page_2.notify_of_update.should == page.notify_of_update
     page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png" \/>/, 'png">')
   end
   
@@ -636,7 +647,7 @@ describe "Canvas Cartridge importing" do
     
     #export to html file
     migration_id = CC::CCHelper.create_key(page)
-    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, migration_id)
+    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, :identifier => migration_id)
     #convert to json
     doc = Nokogiri::HTML(exported_html)
     hash = @converter.convert_wiki(doc, 'blti-link')

@@ -15,9 +15,12 @@ define ->
 
     for own key, value of data
       if matchData = key.match(reAssetId)
-        continue if copyEverything
         assetType = matchData[1]
         assetID = matchData[2]
+        if assetType is "day_substitutions"
+          newData[key] = value
+          continue
+        continue if copyEverything
         if value is "1"
           newData.items_to_copy[assetType] ||= []
           newData.items_to_copy[assetType].push assetID

@@ -1,4 +1,4 @@
-require File.expand_path("../spec_helper", __FILE__)
+require File.expand_path("../../../../../spec/sharding_spec_helper", __FILE__)
 
 describe Delayed::Batch do
   before :each do
@@ -67,6 +67,30 @@ describe Delayed::Batch do
         "string".send_later(:gsub, /./, "!").should be_true
       }
       Delayed::Job.count.should == 2
+    end
+  end
+
+  shared_examples_for "delayed_jobs_shards" do
+    it "should keep track of the current shard on child jobs" do
+      shard = @shard1 || Shard.default
+      shard.activate do
+        Delayed::Batch.serial_batch {
+          "string".send_later(:size).should be_true
+          "string".send_later(:gsub, /./, "!").should be_true
+        }
+      end
+      job = Delayed::Job.last
+      job.current_shard.should == shard
+      job.payload_object.jobs.first.current_shard.should == shard
+    end
+  end
+
+  describe "current_shard" do
+    it_should_behave_like "delayed_jobs_shards"
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+      it_should_behave_like "delayed_jobs_shards"
     end
   end
 end

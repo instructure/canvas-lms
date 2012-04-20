@@ -111,6 +111,40 @@ module CC
         end
       end
 
+      def generate_qti_only
+        FileUtils::mkdir_p @export_dir
+
+        @course.quizzes.active.each do |quiz|
+          next unless export_object?(quiz)
+          begin
+            generate_qti_only_quiz(quiz)
+          rescue
+            title = quiz.title rescue I18n.t('unknown_quiz', "Unknown quiz")
+            add_error(I18n.t('course_exports.errors.quiz', "The quiz \"%{title}\" failed to export", :title => title), $!)
+          end
+        end
+      end
+
+      def generate_qti_only_quiz(quiz)
+        mig_id = create_key(quiz)
+        resource_dir = File.join(@export_dir, mig_id)
+        FileUtils::mkdir_p resource_dir
+
+        canvas_qti_rel_path = File.join(mig_id, mig_id + ".xml")
+        canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
+        File.open(canvas_qti_path, 'w') do |file|
+          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          generate_assessment(doc, quiz, mig_id, false)
+        end
+
+        @resources_node.resource(
+                :identifier => mig_id,
+                "type" => QTI_ASSESSMENT_TYPE
+        ) do |res|
+          res.file(:href=>canvas_qti_rel_path)
+        end
+      end
+
       def generate_question_bank(bank)
         bank_mig_id = create_key(bank)
 
@@ -255,7 +289,7 @@ module CC
         pick_count = group['pick_count'].to_i
         chosen = 0
         if group[:assessment_question_bank_id]
-          if bank = @course.assessment_question_banks.find(group[:assessment_question_bank_id])
+          if bank = @course.assessment_question_banks.find_by_id(group[:assessment_question_bank_id])
             bank.assessment_questions.each do |question|
               # try adding questions until the pick count is reached
               chosen += 1 if add_cc_question(node, question)
@@ -279,14 +313,24 @@ module CC
         ) do |section_node|
           section_node.selection_ordering do |so_node|
             so_node.selection do |sel_node|
+              is_external = false
+              bank = nil
+
               if group[:assessment_question_bank_id]
-                if bank = @course.assessment_question_banks.find(group[:assessment_question_bank_id])
+                if bank = @course.assessment_question_banks.find_by_id(group[:assessment_question_bank_id])
                   sel_node.sourcebank_ref create_key(bank)
+                elsif bank = AssessmentQuestionBank.find_by_id(group[:assessment_question_bank_id])
+                  sel_node.sourcebank_ref bank.id
+                  is_external = true
                 end
               end
               sel_node.selection_number group['pick_count']
               sel_node.selection_extension do |ext_node|
                 ext_node.points_per_item group['question_points']
+                if is_external && bank && bank.context
+                  sel_node.sourcebank_context bank.context.asset_string
+                  sel_node.sourcebank_is_external 'true'
+                end
               end
             end
           end

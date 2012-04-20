@@ -28,7 +28,7 @@ class EnrollmentsApiController < ApplicationController
   }
   @@valid_types = %w{StudentEnrollment TeacherEnrollment TaEnrollment ObserverEnrollment}
 
-  include Api::V1::Enrollment
+  include Api::V1::User
   #
   # @API
   # Depending on the URL given, return either (1) all of the enrollments in

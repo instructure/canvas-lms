@@ -112,6 +112,7 @@ class CoursesController < ApplicationController
   # @argument course[allow_student_forum_attachments] [Boolean] [optional] If true, students can attach files to forum posts.
   # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
   # @argument course[self_enrollment] [Boolean] [optional] Set to true if the course is self enrollment.
+  # @argument course[restrict_enrollments_to_course_dates] [Boolean] [optional] Set to true to restrict user enrollments to the start and end dates of the course.
   # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
   # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
   #
@@ -140,8 +141,8 @@ class CoursesController < ApplicationController
             [:start_at, :conclude_at, :license, :publish_grades_immediately,
              :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
-             :root_account_id, :account_id, :public_description],
-             nil)
+             :root_account_id, :account_id, :public_description,
+             :restrict_enrollments_to_course_dates], nil)
           }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
@@ -271,6 +272,7 @@ class CoursesController < ApplicationController
   #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null, 'sis_login_id': null },
   #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis' } ]
   def students
+    # DEPRECATED. #users should replace this in a new version of the API.
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       proxy = @context.students
@@ -281,6 +283,54 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API
+  # Returns the list of users in this course. And optionally the user's enrollments
+  #   in the course.
+  #
+  # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #   When set, only return users where the user is enrolled as this type.
+  #
+  # @argument include[] ["email"] Optional user email.
+  # @argument include[] ["enrollments"] Optionally include with each Course the
+  #   user's current and invited enrollments.
+  # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
+  #
+  # @response_field id The unique identifier for the user.
+  # @response_field name The full user name.
+  # @response_field sortable_name The sortable user name.
+  # @response_field short_name The short user name.
+  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
+  #
+  # @response_field enrollments The user's enrollments in this course.
+  #   See the API documentation for enrollment data returned; however, the user data is not included.
+  #
+  # @example_response
+  #   [ { 'id': 1, 'name': 'first user', 'sis_user_id': null, 'sis_login_id': null,
+  #       'enrollments': [ ... ] },
+  #     { 'id': 2, 'name': 'second user', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis',
+  #       'enrollments': [ ... ] }]
+  def users
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      enrollment_type = "#{params[:enrollment_type].capitalize}Enrollment" if params[:enrollment_type]
+      users = (enrollment_type ?
+               @context.users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) :
+               @context.users)
+      if user_json_is_admin?
+        users = users.scoped(:include => {:pseudonym => :communication_channel})
+      end
+      users = Api.paginate(users, self, api_v1_course_users_path)
+      includes = Array(params[:include])
+      if includes.include?('enrollments')
+        User.send(:preload_associations, users, :current_and_invited_enrollments,
+                  :conditions => ['enrollments.course_id = ?', @context.id])
+      end
+      render :json => users.uniq.map { |u|
+        enrollments = u.current_and_invited_enrollments if includes.include?('enrollments')
+        user_json(u, @current_user, session, includes, @context, enrollments)
+      }
+    end
+  end
 
   include Api::V1::StreamItem
   # @API
@@ -429,7 +479,7 @@ class CoursesController < ApplicationController
     if params[:reject]
       if @pending_enrollment.invited?
         @pending_enrollment.reject!
-        flash[:notice] = t('notices.invitation_cancelled', "Invitation cancelled.")
+        flash[:notice] = t('notices.invitation_cancelled', "Invitation canceled.")
       end
       session[:enrollment_uuid] = nil
       if @current_user
@@ -1005,9 +1055,9 @@ class CoursesController < ApplicationController
     return unless get_feed_context(:only => [:course])
     feed = Atom::Feed.new do |f|
       f.title = t('titles.rss_feed', "%{course} Feed", :course => @context.name)
-      f.links << Atom::Link.new(:href => named_context_url(@context, :context_url))
+      f.links << Atom::Link.new(:href => course_url(@context), :rel => 'self')
       f.updated = Time.now
-      f.id = named_context_url(@context, :context_url)
+      f.id = course_url(@context)
     end
     @entries = []
     @entries.concat @context.assignments.active

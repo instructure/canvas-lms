@@ -85,6 +85,25 @@ describe "Converting Canvas QTI" do
     hash.should == CanvasExpected::NUMERICAL
   end
 
+  it "should convert links to external banks" do
+    get_quiz_data(CANVAS_FIXTURE_DIR, 'external_bank')[1][0][:questions].should == [{:pick_count => 3,
+                                                                                  :questions => [],
+                                                                                  :question_points => 5,
+                                                                                  :question_type => "question_group",
+                                                                                  :migration_id => "i96ea64f3a1aa2fd00c72faacf0cb8ac9",
+                                                                                  :question_bank_context => "course_22520",
+                                                                                  :question_bank_migration_id => "4259",
+                                                                                  :question_bank_is_external => true},
+                                                                                 {:pick_count => 5,
+                                                                                  :questions => [],
+                                                                                  :question_points => 2,
+                                                                                  :question_type => "question_group",
+                                                                                  :migration_id => "ida8ce53cf0240070ce6c69c48cd588ee",
+                                                                                  :question_bank_context => "account_32442",
+                                                                                  :question_bank_migration_id => "4260",
+                                                                                  :question_bank_is_external => true}]
+  end
+
 end
 
 module CanvasExpected

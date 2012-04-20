@@ -349,9 +349,9 @@ class DiscussionTopicsController < ApplicationController
     return unless get_feed_context
     feed = Atom::Feed.new do |f|
       f.title = t :discussion_feed_title, "%{title} Discussion Feed", :title => @context.name
-      f.links << Atom::Link.new(:href => named_context_url(@context, :context_discussion_topics_url))
+      f.links << Atom::Link.new(:href => polymorphic_url([@context, :discussion_topics]), :rel => 'self')
       f.updated = Time.now
-      f.id = named_context_url(@context, :context_discussion_topics_url)
+      f.id = polymorphic_url([@context, :discussion_topics])
     end
     @entries = []
     @entries.concat @context.discussion_topics.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
