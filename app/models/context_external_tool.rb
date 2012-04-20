@@ -354,9 +354,8 @@ class ContextExternalTool < ActiveRecord::Base
   
   def self.process_migration(data, migration)
     tools = data['external_tools'] ? data['external_tools']: []
-    to_import = migration.to_import 'external_tools'
     tools.each do |tool|
-      if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
+      if migration.import_object?("external_tools", tool['migration_id'])
         item = import_from_migration(tool, migration.context)
         if item.consumer_key == 'fake' || item.shared_secret == 'fake'
           migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))

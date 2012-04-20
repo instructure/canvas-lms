@@ -497,8 +497,8 @@ class RoleOverride < ActiveRecord::Base
         :available_to => %w(AccountAdmin AccountMembership),
       },
 
-      :site_admin => {
-        :label => lambda { t('permissions.site_admin', "Use the Site Admin section and admin all other accounts") },
+      :read_messages => {
+        :label => lambda { t('permissions.read_messages', "View notifications sent to users") },
         :account_only => :site_admin,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),

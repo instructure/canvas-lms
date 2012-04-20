@@ -20,7 +20,7 @@ define [
     defaultLinks: [
       {
         available_to: ['student']
-        text: I18n.t 'instructor_question', 'Ask your instructor a question'
+        text: I18n.t 'instructor_question', 'Ask Your Instructor a Question'
         subtext: I18n.t 'instructor_question_sub', 'Questions are submitted to your instructor'
         url: '#teacher_feedback'
       },
@@ -32,7 +32,7 @@ define [
       },
       {
         available_to: ['user', 'student', 'teacher', 'admin']
-        text: I18n.t 'report_problem', 'Report a problem'
+        text: I18n.t 'report_problem', 'Report a Problem'
         subtext: I18n.t 'report_problem_sub', 'If Canvas misbehaves, tell us about it'
         url: '#create_ticket'
       }

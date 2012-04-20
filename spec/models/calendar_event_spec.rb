@@ -404,7 +404,7 @@ describe CalendarEvent do
       @appointment.should be_locked
     end
 
-    it "should unlock the appointment when the last reservation is cancelled" do
+    it "should unlock the appointment when the last reservation is canceled" do
       ag = AppointmentGroup.create(:title => "test", :context => @course, :participants_per_appointment => 2,
         :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )

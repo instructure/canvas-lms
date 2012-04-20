@@ -38,19 +38,29 @@ module CC::Importer::Canvas
     def export(to_export = SCRAPE_ALL_HASH)
       to_export = SCRAPE_ALL_HASH.merge to_export if to_export
       unzip_archive
+      set_progress(5)
       
       @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
       convert_all_course_settings
+      set_progress(10)
       @course[:wikis] = convert_wikis
+      set_progress(20)
       @course[:assignments] = convert_assignments
+      set_progress(30)
       @course[:discussion_topics] = convert_topics
+      set_progress(40)
       @course[:external_tools] = convert_blti_links
+      set_progress(50)
       @course[:file_map] = create_file_map
+      set_progress(60)
       package_course_files
+      set_progress(70)
       convert_quizzes if Qti.qti_enabled?
+      set_progress(80)
       
       #close up shop
       save_to_file
+      set_progress(90)
       delete_unzipped_archive
       @course
     end

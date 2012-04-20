@@ -2434,7 +2434,7 @@ define([
       $file.addClass('done');
       if(!$file.hasClass('errored') && !$file.hasClass('error_cancelled')) {
         $file.find(".cancel_upload_link").hide().end()
-          .find(".status").text("Cancelled");
+          .find(".status").text("Canceled");
         fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
       }
       fileUpload.swfUploadNext();

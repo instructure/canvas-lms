@@ -54,6 +54,8 @@ describe EnrollmentsApiController, :type => :integration do
           'type'                               => 'StudentEnrollment',
           'html_url'                           => course_user_url(@course, @unenrolled_user),
           'grades'                             => { 'html_url' => course_student_grades_url(@course, @unenrolled_user) },
+          'associated_user_id'                 => nil,
+          'updated_at'                         => new_enrollment.updated_at.xmlschema
         }
         new_enrollment.root_account_id.should eql @course.account.id
         new_enrollment.user_id.should eql @unenrolled_user.id
@@ -191,6 +193,8 @@ describe EnrollmentsApiController, :type => :integration do
           'type'                               => 'StudentEnrollment',
           'html_url'                           => course_user_url(@course, @unenrolled_user),
           'grades'                             => { 'html_url' => course_student_grades_url(@course, @unenrolled_user) },
+          'associated_user_id'                 => nil,
+          'updated_at'                         => new_enrollment.updated_at.xmlschema
         }
         new_enrollment.root_account_id.should eql @course.account.id
         new_enrollment.user_id.should eql @unenrolled_user.id
@@ -279,6 +283,8 @@ describe EnrollmentsApiController, :type => :integration do
             'grades' => {
               'html_url' => course_student_grades_url(e.course_id, e.user_id),
             },
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema
           }
         }
       end
@@ -324,6 +330,8 @@ describe EnrollmentsApiController, :type => :integration do
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -368,6 +376,8 @@ describe EnrollmentsApiController, :type => :integration do
             'grades' => {
               'html_url' => course_student_grades_url(e.course_id, e.user_id),
             },
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema
           }
         }
       end
@@ -413,6 +423,8 @@ describe EnrollmentsApiController, :type => :integration do
             'course_id' => e.course_id,
             'user' => user_json,
             'html_url' => course_user_url(@course, e.user),
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -460,6 +472,8 @@ describe EnrollmentsApiController, :type => :integration do
               'id' => e.user.id
             },
             'html_url' => course_user_url(@course, e.user),
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -496,6 +510,8 @@ describe EnrollmentsApiController, :type => :integration do
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),
             'grades' => { 'html_url' => course_student_grades_url(@course, e.user) },
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -525,6 +541,8 @@ describe EnrollmentsApiController, :type => :integration do
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'html_url' => course_user_url(@course, e.user),
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,

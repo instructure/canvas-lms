@@ -43,6 +43,18 @@
   </ul>
 <% end %>
 
+<% if @source_course.rubrics.active.length > 0 %>
+  <h3><%= check_box :copy, :all_rubrics, :class => "copy_all", :checked => true %><%= label :copy, :all_rubrics, image_tag('flagged_question_dim.png') + " " + t('labels.rubrics', "Rubrics for %{course}", :course => @source_course.name) %></h3>
+  <ul class="unstyled_list root_asset_list">
+    <% @source_course.rubrics.active.each do |rub| %>
+      <li>
+        <%= check_box "copy[rubrics]", mig_id(rub) %>
+        <%= label "copy[rubrics]", mig_id(rub), rub.title %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
 <% if @source_course.quizzes.active.length > 0 %>
   <h3><%= check_box :copy, :all_quizzes, :class => "copy_all", :checked => true %><%= label :copy, :all_quizzes, image_tag('quiz.png') + " " + t('labels.quizzes', "Quizzes for %{course}", :course => @source_course.name) %></h3>
   <ul class="unstyled_list root_asset_list">

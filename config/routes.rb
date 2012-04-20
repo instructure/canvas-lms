@@ -29,7 +29,7 @@ ActionController::Routing::Routes.draw do |map|
   map.registration_confirmation_deprecated 'pseudonyms/:id/register/:nonce',
     :controller => 'communication_channels', :action => 'confirm'
   map.re_send_confirmation 'confirmations/:user_id/re_send/:id',
-    :controller => 'communication_channels', :action => 're_send_confirmation'
+    :controller => 'communication_channels', :action => 're_send_confirmation', :id => nil
   map.forgot_password "forgot_password",
     :controller => 'pseudonyms', :action => 'forgot_password'
   map.confirm_change_password "pseudonyms/:pseudonym_id/change_password/:nonce",
@@ -649,6 +649,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
+      courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.delete 'courses/:id', :action => :destroy
@@ -832,7 +833,7 @@ ActionController::Routing::Routes.draw do |map|
     lti.post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
   end
 
-  map.resources :equation_images, :only => :show
+  map.equation_images 'equation_images/:id', :controller => :equation_images, :action => :show, :id => /.+/
 
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404. I'm not sure we ever actually want

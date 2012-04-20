@@ -57,6 +57,7 @@ describe ReassociateConversationAttachments do
       cm1.attachment_ids.should eql a1.id.to_s
       cm1.attachments.should eql [a1]
       a1.context.should eql u1
+      a1.folder.should eql u1.conversation_attachments_folder
 
       u2.reload
       u2.folders.map(&:name).sort.should eql ["conversation attachments", "my files"]
@@ -67,7 +68,9 @@ describe ReassociateConversationAttachments do
       cm2.attachment_ids.split(',').map(&:to_i).sort.should eql [a2.id, a3.id]
       cm2.attachments.should eql [a2, a3]
       a2.context.should eql u2
+      a2.folder.should eql u2.conversation_attachments_folder
       a3.context.should eql u2
+      a3.folder.should eql u2.conversation_attachments_folder
     end
   end
 end

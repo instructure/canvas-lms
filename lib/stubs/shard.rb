@@ -34,7 +34,7 @@ class Shard
   end
 
   def self.with_each_shard
-    yield
+    Array(yield)
   end
 
   def activate
@@ -47,6 +47,12 @@ class Shard
 
   def settings
     {}
+  end
+
+  yaml_as "tag:instructure.com,2012:Shard"
+
+  def self.yaml_new(klass, tag, val)
+    default
   end
 
   module RSpec

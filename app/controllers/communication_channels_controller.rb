@@ -53,7 +53,7 @@ class CommunicationChannelsController < ApplicationController
     if cc
       @communication_channel = cc
       @user = cc.user
-      @enrollment = @user.enrollments.find_by_uuid_and_workflow_state(params[:enrollment], 'invited') if params[:enrollment]
+      @enrollment = @user.enrollments.find_by_uuid_and_workflow_state(params[:enrollment], 'invited') if params[:enrollment].present?
       @course = @enrollment && @enrollment.course
       @root_account = @course.root_account if @course
       @root_account ||= @user.pseudonyms.first.try(:account) if @user.pre_registered?
@@ -161,6 +161,7 @@ class CommunicationChannelsController < ApplicationController
           # trick pseudonym into validating the e-mail address
           @pseudonym.account = nil
           unless @pseudonym.valid?
+            @pseudonym.account = @root_account
             return
           end
           @pseudonym.account = @root_account
@@ -214,6 +215,7 @@ class CommunicationChannelsController < ApplicationController
     end
   end
 
+  # params[:enrollment_id] is optional
   def re_send_confirmation
     @user = User.find(params[:user_id])
     @enrollment = params[:enrollment_id] && @user.enrollments.find(params[:enrollment_id])

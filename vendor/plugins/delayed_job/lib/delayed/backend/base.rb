@@ -33,6 +33,7 @@ module Delayed
           options[:payload_object] = object
           options[:queue] ||= Delayed::Worker.queue
           options[:max_attempts] ||= Delayed::Worker.max_attempts
+          options[:current_shard] = Shard.current
           if options[:singleton]
             options[:strand] = options.delete :singleton
             self.transaction do
