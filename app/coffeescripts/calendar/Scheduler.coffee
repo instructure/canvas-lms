@@ -246,5 +246,5 @@ define [
     messageLinkClick: (jsEvent) =>
       jsEvent.preventDefault()
       group = @groups?[$(jsEvent.target).closest(".appointment-group-item").data('appointment-group-id')]
-      @messageDialog = new MessageParticipantsDialog(group, @calendar.dataSource)
+      @messageDialog = new MessageParticipantsDialog(group: group, dataSource: @calendar.dataSource)
       @messageDialog.show()

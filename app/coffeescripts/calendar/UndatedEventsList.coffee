@@ -61,7 +61,7 @@ define [
       eventId = $(jsEvent.target).data('event-id')
       event = @dataSource.eventWithId(eventId)
       if event
-        (new ShowEventDetailsDialog(event)).show()
+        (new ShowEventDetailsDialog(event, @dataSource)).show()
 
     visibleContextListChanged: (list) =>
       @visibleContextList = list
