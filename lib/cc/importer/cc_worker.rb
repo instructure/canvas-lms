@@ -22,6 +22,7 @@ module Canvas::Migration
       def perform
         cm = ContentMigration.find_by_id migration_id
         begin
+          cm.fast_update_progress(1)
           settings = cm.migration_settings.clone
           settings[:content_migration_id] = migration_id
           settings[:user_id] = cm.user_id
@@ -38,10 +39,12 @@ module Canvas::Migration
           if overview_file_path
             file = File.new(overview_file_path)
             Canvas::Migration::Worker::upload_overview_file(file, cm)
+            cm.fast_update_progress(95)
           end
           if export_folder_path
             Canvas::Migration::Worker::upload_exported_data(export_folder_path, cm)
             Canvas::Migration::Worker::clear_exported_data(export_folder_path)
+            cm.fast_update_progress(100)
           end
 
           cm.migration_settings[:worker_class] = converter_class.name

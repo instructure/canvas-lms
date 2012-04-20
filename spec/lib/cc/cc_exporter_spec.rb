@@ -167,5 +167,111 @@ describe "Common Cartridge exporting" do
       doc.at_css("event[identifier=#{mig_id(@event2)}]").should be_nil
     end
 
+    it "should create a quizzes-only export" do
+
+      @q1 = @course.quizzes.create!(:title => 'quiz1')
+      @q2 = @course.quizzes.create!(:title => 'quiz2')
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+              :all_quizzes => "1",
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+      check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+    end
+
+    it "should export quizzes with groups that point to external banks" do
+      orig_course = @course
+      course_with_teacher(:user => @user)
+      different_course = @course
+      q1 = orig_course.quizzes.create!(:title => 'quiz1')
+      bank = different_course.assessment_question_banks.create!(:title => 'bank')
+      bank2 = orig_course.account.assessment_question_banks.create!(:title => 'bank2')
+      group = q1.quiz_groups.create!(:name => "group", :pick_count => 3, :question_points => 5.0)
+      group.assessment_question_bank = bank
+      group.save
+      group2 = q1.quiz_groups.create!(:name => "group2", :pick_count => 5, :question_points => 2.0)
+      group2.assessment_question_bank = bank2
+      group2.save
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+              :all_quizzes => "1",
+              :all_assessment_question_banks => "1",
+      }
+      @ce.save!
+
+      run_export
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(q1)}/#{mig_id(q1)}.xml"))
+      selections = doc.css('selection')
+      selections[0].at_css("sourcebank_ref").text.to_i.should == bank.id
+      selections[0].at_css("selection_extension sourcebank_context").text.should == bank.context.asset_string
+      selections[1].at_css("sourcebank_ref").text.to_i.should == bank2.id
+      selections[1].at_css("selection_extension sourcebank_context").text.should == bank2.context.asset_string
+    end
+
+    it "should selectively create a quizzes-only export" do
+
+      @q1 = @course.quizzes.create!(:title => 'quiz1')
+      @q2 = @course.quizzes.create!(:title => 'quiz2')
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+              :quizzes => {mig_id(@q1) => "1"},
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+      check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE, false)
+    end
+
+    it "should include any files referenced in html" do
+      @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @q1 = @course.quizzes.create(:title => 'quiz1')
+
+      qq = @q1.quiz_questions.create!
+      data = {:correct_comments => "",
+                          :question_type => "multiple_choice_question",
+                          :question_bank_name => "Quiz",
+                          :assessment_question_id => "9270",
+                          :migration_id => "QUE_1014",
+                          :incorrect_comments => "",
+                          :question_name => "test fun",
+                          :name => "test fun",
+                          :points_possible => 1,
+                          :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
+                          :answers =>
+                                  [{:migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080},
+                                   {:migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279}]}.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+              :all_quizzes => "1",
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
+      doc.at_css("presentation material mattext").text.should == "<div>Image yo: <img src=\"%24IMS_CC_FILEBASE%24/unfiled/first.png\">\n</div>"
+
+      check_resource_node(@att, CC::CCHelper::WEBCONTENT)
+      check_resource_node(@att2, CC::CCHelper::WEBCONTENT, false)
+
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(@att)}]")['href']
+      @zip_file.find_entry(path).should_not be_nil
+    end
+
   end
 end
