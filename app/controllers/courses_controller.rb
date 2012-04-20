@@ -760,7 +760,7 @@ class CoursesController < ApplicationController
         @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
       end
 
-      if @current_user and (@show_recent_feedback = (@current_user.student_enrollments.active.count > 0))
+      if @current_user and (@show_recent_feedback = @context.user_is_student?(@current_user))
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
     else
