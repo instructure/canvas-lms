@@ -1,3 +1,16 @@
+canvas-lms (2012.04.14.14) stable; urgency=low
+
+  * Package ref: 29498084b3fc6342eb622f723ef6fc7b4211c278
+  *
+  * [+77002e8] put recompute_student_scores in a singleton by course
+  * [+93e77be] capture the current shard for jobs
+  * [+6c6f225] disable gradebook history page for large courses
+  * [+a01753a] add referenced question banks to course copy
+  * [+209d225] fix date adjustment on course copy
+  * [+2949808] fix day substitutions when copying courses
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 20 Apr 2012 11:03:11 -0600
+
 canvas-lms (2012.04.14.12) stable; urgency=low
 
   * Package ref: 1079bfa7fbb10241d4969cefedf422f0e86d09a6
