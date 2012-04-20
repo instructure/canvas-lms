@@ -60,10 +60,10 @@ describe ContentMigration do
       @cm.progress.should == 100
     end
 
-    def run_course_copy
+    def run_course_copy(warnings=[])
       @cm.copy_course_without_send_later
       @cm.reload
-      @cm.warnings.should == []
+      @cm.warnings.should == warnings
       if @cm.migration_settings[:last_error]
         er = ErrorReport.last
         "#{er.message} - #{er.backtrace}".should == ""
@@ -272,6 +272,41 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
     end
 
+    it "should export quizzes with groups that point to external banks" do
+      pending unless Qti.qti_enabled?
+      course_with_teacher(:user => @user)
+      different_course = @course
+      different_account = Account.create!
+
+      q1 = @copy_from.quizzes.create!(:title => 'quiz1')
+      bank = different_course.assessment_question_banks.create!(:title => 'bank')
+      bank2 = @copy_from.account.assessment_question_banks.create!(:title => 'bank2')
+      bank2.assessment_question_bank_users.create!(:user => @user)
+      bank3 = different_account.assessment_question_banks.create!(:title => 'bank3')
+      group = q1.quiz_groups.create!(:name => "group", :pick_count => 3, :question_points => 5.0)
+      group.assessment_question_bank = bank
+      group.save
+      group2 = q1.quiz_groups.create!(:name => "group2", :pick_count => 5, :question_points => 2.0)
+      group2.assessment_question_bank = bank2
+      group2.save
+      group3 = q1.quiz_groups.create!(:name => "group3", :pick_count => 5, :question_points => 2.0)
+      group3.assessment_question_bank = bank3
+      group3.save
+
+      run_course_copy(["User didn't have permission to reference question bank in quiz group Question Group"])
+
+      q = @copy_to.quizzes.find_by_migration_id(mig_id(q1))
+      q.should_not be_nil
+      q.quiz_groups.count.should == 3
+      g = q.quiz_groups[0]
+      g.assessment_question_bank_id.should == bank.id
+      g = q.quiz_groups[1]
+      g.assessment_question_bank_id.should == bank2.id
+      g = q.quiz_groups[2]
+      g.assessment_question_bank_id.should == nil
+
+    end
+
     it "should copy a discussion topic when assignment is selected" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
@@ -330,6 +365,65 @@ describe ContentMigration do
       # new_assignment.due_at.should == today + 1.day does not work
       new_assignment.due_at.to_i.should_not == asmnt.due_at.to_i
       (new_assignment.due_at.to_i - (today + 1.day).to_i).abs.should < 60
+    end
+
+    it "should shift dates" do
+      pending unless Qti.qti_enabled?
+      options = {
+              :everything => true,
+              :shift_dates => true,
+              :old_start_date => 'Jul 1, 2012',
+              :old_end_date => 'Jul 11, 2012',
+              :new_start_date => 'Aug 5, 2012',
+              :new_end_date => 'Aug 15, 2012'
+      }
+
+      old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
+      new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
+
+      @copy_from.assert_assignment_group
+      @copy_from.assignments.create!(:due_at => old_start + 1.day,
+                                     :unlock_at => old_start + 2.days,
+                                     :lock_at => old_start + 3.days,
+                                     :peer_reviews_due_at => old_start + 4.days
+      )
+      @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
+                                 :unlock_at => old_start + 1.days,
+                                 :lock_at => old_start + 5.days
+      )
+      @copy_from.discussion_topics.create!(:title => "some topic",
+                                           :message => "<p>some text</p>",
+                                           :delayed_post_at => old_start + 3.days)
+      cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => old_start + 1.days)
+      cm.start_at = old_start + 2.day
+      cm.end_at = old_start + 3.days
+      cm.save!
+
+      @cm.migration_settings[:migration_ids_to_import] = {
+              :copy => options
+      }
+      @cm.save!
+
+      run_course_copy
+
+      new_asmnt = @copy_to.assignments.first
+      new_asmnt.due_at.to_i.should  == (new_start + 1.day).to_i
+      new_asmnt.unlock_at.to_i.should == (new_start + 2.day).to_i
+      new_asmnt.lock_at.to_i.should == (new_start + 3.day).to_i
+      new_asmnt.peer_reviews_due_at.to_i.should == (new_start + 4.day).to_i
+
+      new_quiz = @copy_to.quizzes.first
+      new_quiz.due_at.to_i.should  == (new_start + 4.day).to_i
+      new_quiz.unlock_at.to_i.should == (new_start + 1.day).to_i
+      new_quiz.lock_at.to_i.should == (new_start + 5.day).to_i
+
+      new_disc = @copy_to.discussion_topics.first
+      new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+
+      new_mod = @copy_to.context_modules.first
+      new_mod.unlock_at.to_i.should  == (new_start + 1.day).to_i
+      new_mod.start_at.to_i.should == (new_start + 2.day).to_i
+      new_mod.end_at.to_i.should == (new_start + 3.day).to_i
     end
 
   end

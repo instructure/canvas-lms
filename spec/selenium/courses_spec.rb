@@ -72,7 +72,7 @@ describe "courses" do
     context "course copy" do
       def course_copy_helper
         course_with_teacher_logged_in
-        @second_course = Course.create!(:name => 'second course')
+        @second_course ||= Course.create!(:name => 'second course')
         @second_course.offer!
         5.times do |i|
           @second_course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}")
@@ -107,18 +107,6 @@ describe "courses" do
         driver.find_element(:css, '#content form').submit
 
         yield driver if block_given?
-
-        #modify course dates
-        driver.find_element(:id, 'copy_shift_dates').click
-        #adjust start dates
-        driver.find_element(:css, '#copy_old_start_date + img').click
-        datepicker_prev
-        #adjust end dates
-        driver.find_element(:css, '#copy_old_end_date + img').click
-        datepicker_next
-        #adjust day substitutions
-        driver.find_element(:css, '.shift_dates_settings .add_substitution_link').click
-        driver.find_element(:css, '.substitutions > .substitution').should be_displayed
 
         driver.find_element(:id, 'copy_context_form').submit
         wait_for_ajaximations
@@ -155,6 +143,36 @@ describe "courses" do
           end
         end
         @course.wiki.wiki_pages.count.should == 3
+      end
+
+      it "should adjust due dates" do
+        old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
+        new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
+
+        @second_course = Course.create!(:name => 'second course')
+
+        @second_course.discussion_topics.create!(:title => "some topic",
+                                           :message => "<p>some text</p>",
+                                           :delayed_post_at => old_start + 3.days)
+        @second_course.assignments.create!(:due_at => old_start)
+
+        course_copy_helper do |driver|
+          f('#copy_shift_dates').click
+          f('#copy_old_start_date').send_keys('Jul 1, 2012')
+          f('#copy_old_end_date').send_keys('Jul 11, 2012')
+          replace_content(f('#copy_new_start_date'), 'Aug 5, 2012')
+          f('#copy_new_end_date').send_keys('Aug 15, 2012')
+          f('.add_substitution_link').click
+          wait_for_animations
+          select = driver.find_element(:name, "copy[day_substitutions][0]")
+          option = select.find_elements(:css, 'option')[1]
+          option.click
+        end
+
+        new_disc = @course.discussion_topics.first
+        new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+        new_asmnt = @course.assignments.first
+        new_asmnt.due_at.to_i.should == (new_start + 1.day).to_i
       end
 
       it "should copy the course" do

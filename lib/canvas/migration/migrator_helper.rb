@@ -91,6 +91,12 @@ module MigratorHelper
       content_migration.add_warning(user_message, exception_or_info)
     end
   end
+
+  def set_progress(progress)
+    if content_migration && content_migration.respond_to?(:fast_update_progress)
+      content_migration.fast_update_progress(progress)
+    end
+  end
   
   def logger
     Rails.logger
