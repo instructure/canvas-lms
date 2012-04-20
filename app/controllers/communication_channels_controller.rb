@@ -16,10 +16,42 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Communication Channels
+#
+# API for accessing users' email addresses, SMS phone numbers, Twitter,
+# and Facebook communication channels.
+#
+# In this API, the `:user_id` parameter can always be replaced with `self` if
+# the requesting user is asking for his/her own information.
 class CommunicationChannelsController < ApplicationController
   before_filter :require_user, :only => [:create, :destroy]
   before_filter :reject_student_view_student
-  
+
+  include Api::V1::CommunicationChannel
+
+  # @API
+  # List the communication channels for a user.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/12345/communication_channels -H 'Authorization: Bearer <ACCESS_TOKEN>'
+  #
+  # @example_response
+  #   [
+  #     { "id": 1, "address": "bieberfever@example.com", "type": "email", "position": 1, "user_id": 12345 },
+  #     { "id": 2, "address": "8018675309", "type": "sms", "position": 2, "user_id": 12345 }
+  #   ]
+  def index
+    @user = api_find(User, params[:user_id])
+    return unless authorized_action(@user, @current_user, :read)
+
+    channels = Api.paginate(@user.communication_channels.unretired, self,
+      api_v1_communication_channels_path).map do |cc|
+        communication_channel_json(cc, @current_user, session)
+      end
+
+    render :json => channels
+  end
+
   def create
     if params[:build_pseudonym]
       params[:pseudonym][:account] = @domain_root_account
