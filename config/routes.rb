@@ -794,6 +794,10 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
     end
 
+    api.with_options(:controller => :communication_channels) do |channels|
+      channels.get 'users/:user_id/communication_channels', :action => :index, :path_name => 'communication_channels'
+    end
+
     api.with_options(:controller => :services_api) do |services|
       services.get 'services/kaltura', :action => :show_kaltura_config
       services.post 'services/kaltura_session', :action => :start_kaltura_session
