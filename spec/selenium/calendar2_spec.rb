@@ -345,6 +345,7 @@ describe "calendar2" do
 
       context "event editing" do
         it "should allow editing appointment events" do
+          pending("pop-up after clicking on appointment group on sunday is cut off on the left side - refs #8290")
           create_appointment_group
           ag = AppointmentGroup.first
           student_in_course(:course => @course, :active_all => true)
