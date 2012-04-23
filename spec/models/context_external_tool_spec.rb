@@ -29,6 +29,40 @@ describe ContextExternalTool do
     @account.parent_account.should eql(@root_account)
     @account.root_account.should eql(@root_account)
   end
+  describe "url or domain validation" do
+    it "should validate with a domain setting" do
+      @tool = @course.context_external_tools.create(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.should_not be_new_record
+      @tool.errors.should be_empty
+    end
+    
+    it "should validate with a url setting" do
+      @tool = @course.context_external_tools.create(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.should_not be_new_record
+      @tool.errors.should be_empty
+    end
+    
+    it "should validate with a canvas lti extension url setting" do
+      @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.settings[:editor_button] = {
+        "icon_url"=>"http://www.example.com/favicon.ico", 
+        "text"=>"Example",
+        "url"=>"http://www.example.com", 
+        "selection_height"=>400, 
+        "selection_width"=>600
+      }
+      @tool.save
+      @tool.should_not be_new_record
+      @tool.errors.should be_empty
+    end
+    
+    it "should not validate with no domain or url setting" do
+      @tool = @course.context_external_tools.create(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.should be_new_record
+      @tool.errors['url'].should == "Either the url or domain should be set."
+      @tool.errors['domain'].should == "Either the url or domain should be set."
+    end
+  end
   describe "find_external_tool" do
     it "should match on the same domain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')

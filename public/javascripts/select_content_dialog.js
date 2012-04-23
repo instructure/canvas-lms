@@ -257,14 +257,16 @@ $(document).ready(function() {
           $select.find(".tools").empty();
           for(var idx in data) {
             var tool = data[idx];
-            var $tool = $tool_template.clone(true);
-            $tool.toggleClass('resource_selection', !!tool.resource_selection_settings);
-            $tool.fillTemplateData({
-              data: tool,
-              dataValues: ['id', 'url', 'domain', 'name']
-            });
-            $tool.data('tool', tool);
-            $select.find(".tools").append($tool.show());
+            if(tool.url || tool.domain || tool.resource_selection_settings) {
+              var $tool = $tool_template.clone(true);
+              $tool.toggleClass('resource_selection', !!tool.resource_selection_settings);
+              $tool.fillTemplateData({
+                data: tool,
+                dataValues: ['id', 'url', 'domain', 'name']
+              });
+              $tool.data('tool', tool);
+              $select.find(".tools").append($tool.show());
+            }
           }
         }, function(data) {
           $select.find(".message").text(I18n.t('errors.loading_failed', "Loading Failed"));

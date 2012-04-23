@@ -33,10 +33,13 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def url_or_domain_is_set
+    setting_types = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button]
+    # both url and domain should not be set
     if url.present? && domain.present?
       errors.add(:url, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
       errors.add(:domain, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
-    elsif url.blank? && domain.blank?
+    # url or domain (or url on canvas lti extension) is required
+    elsif url.blank? && domain.blank? && setting_types.all?{|k| !settings[k] || settings[k]['url'].blank? }
       errors.add(:url, t('url_or_domain_required', "Either the url or domain should be set."))
       errors.add(:domain, t('url_or_domain_required', "Either the url or domain should be set."))
     end
