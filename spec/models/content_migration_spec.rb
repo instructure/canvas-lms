@@ -386,6 +386,35 @@ describe ContentMigration do
       folder.reload
     end
 
+    it "items in the root folder should be in the root in the new course" do
+      att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>"
+      @copy_from.save!
+
+      run_course_copy
+
+      to_root = Folder.root_folders(@copy_to).first
+      new_attachment = @copy_to.attachments.find_by_migration_id(mig_id(att))
+      new_attachment.should_not be_nil
+      new_attachment.full_path.should == "course files/dummy.txt"
+      new_attachment.folder.should == to_root
+      puts @copy_to.syllabus_body
+      @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
+    end
+
+    it "should preserve media comment links" do
+      @copy_from.syllabus_body = <<-HTML.strip
+      <p>
+        Hello, students.<br>
+        Watch this awesome video: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+      </p>
+      HTML
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should == @copy_from.syllabus_body
+    end
+
     it "should perform day substitutions" do
       @copy_from.assert_assignment_group
       today = Time.now.utc

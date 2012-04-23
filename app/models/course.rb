@@ -1823,7 +1823,8 @@ class Course < ActiveRecord::Base
 
   def copy_attachments_from_course(course, options={})
     self.attachment_path_id_lookup = {}
-    root_folder = Folder.root_folders(self).first.name + '/'
+    root_folder = Folder.root_folders(self).first
+    root_folder_name = root_folder.name + '/'
     ce = options[:content_export]
     cm = options[:content_migration]
 
@@ -1834,8 +1835,12 @@ class Course < ActiveRecord::Base
       cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
       if !ce || ce.export_object?(file)
         new_file = file.clone_for(self)
-        self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder}/, '')] = new_file.migration_id
+        self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
         new_folder_id = merge_mapped_id(file.folder)
+
+        if file.folder && file.folder.parent_folder_id.nil?
+          new_folder_id = root_folder.id
+        end
         # make sure the file has somewhere to go
         if !new_folder_id
           # gather mapping of needed folders from old course to new course
