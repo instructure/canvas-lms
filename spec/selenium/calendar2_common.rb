@@ -21,6 +21,7 @@ shared_examples_for "calendar2 selenium tests" do
 
   def open_edit_event_dialog
     f('.fc-event').click
+    keep_trying_until { f('.edit_event_link').should be_displayed }
     f('.edit_event_link').click
   end
 end
