@@ -294,8 +294,7 @@ window.rubricAssessment = {
           .find(".criterion_points").text(rating.points).end()
           .find(".ignore_for_scoring").showIf(rating.ignore_for_scoring);
         if(rating.comments_enabled && rating.comments) {
-          var abbrev = $.truncateText(rating.comments, 50);
-          $rubricSummary.find("#criterion_" + rating.criterion_id).find(".rating_custom").show().text(abbrev);
+          $rubricSummary.find("#criterion_" + rating.criterion_id).find(".rating_custom").show().text(rating.comments);
         }
         if(rating.points && !rating.ignore_for_scoring) {
           total += rating.points;
