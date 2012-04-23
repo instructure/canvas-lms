@@ -1,3 +1,11 @@
+canvas-lms (2012.04.14.15) stable; urgency=low
+
+  * Package ref: 67d4eb6cccd8e92151ace68d85e5af4b76c073b2
+  *
+  * [+67d4eb6] limit quizzes to 1000 questions, increase key limit. fixes #8172
+
+ -- Brian Palmer <brianp@instructure.com>  Mon, 23 Apr 2012 15:53:42 -0600
+
 canvas-lms (2012.04.14.14) stable; urgency=low
 
   * Package ref: 29498084b3fc6342eb622f723ef6fc7b4211c278
