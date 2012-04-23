@@ -69,6 +69,8 @@ class ImportedHtmlConverter
             else
               node[attr] = replace_relative_file_url(rel_path, context, course_path)
             end
+          elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
+            # Course copy media reference, leave it alone
           else
             begin
               if relative_url?(node[attr])
