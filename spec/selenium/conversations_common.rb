@@ -62,8 +62,8 @@ shared_examples_for "conversations selenium tests" do
       yield
     end
 
-    @elements = prev_elements
     @level -= 1
+    @elements = @level == 1 ? nil : prev_elements
     @input.send_keys(:arrow_left) unless ffj('.autocomplete_menu:visible .list').empty?
     wait_for_animations
   end

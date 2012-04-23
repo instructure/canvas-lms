@@ -18,9 +18,12 @@
 
 define [
   'i18n!conversations'
+  'underscore'
   'str/htmlEscape'
   'compiled/conversations/introSlideshow'
   'compiled/conversations/ConversationsPane'
+  'compiled/conversations/audienceList'
+  'compiled/conversations/contextList'
   'compiled/widget/TokenInput'
   'compiled/str/TextHelper'
   'jquery.ajaxJSON'
@@ -34,7 +37,7 @@ define [
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'
   'jqueryui/position'
-], (I18n, h, introSlideshow, ConversationsPane, TokenInput, TextHelper) ->
+], (I18n, _, h, introSlideshow, ConversationsPane, audienceList, contextList, TokenInput, TextHelper) ->
 
   class
     constructor: (@options) ->
@@ -71,12 +74,10 @@ define [
       $('#action_compose_message').toggleClass 'active', newMessage
 
       if newMessage
-        @$form.find('.audience').html I18n.t('headings.new_message', 'New Message')
         @$form.addClass('new')
         @$form.find('#action_add_recipients').hide()
         @$form.attr action: '/conversations?' + $.param(@conversations?.baseData() ? {})
       else
-        @setFormAudience()
         @$form.removeClass('new')
         @$form.find('#action_add_recipients').showIf(!conversation.get('private'))
         @$form.attr action: conversation.url('add_message')
@@ -85,44 +86,48 @@ define [
       @$form.find('#user_note_info').hide().find('input').attr('checked', false)
       @$form.show().find(':input:visible:first').focus()
 
-    resetMessageForm: ->
-      @setFormAudience() if @conversations.active?
-      @$form.find('input[name!=authenticity_token], textarea').not(":checkbox").val('').change()
-      @$form.find(".attachment:visible").remove()
-      @$form.find(".media_comment").hide()
-      @$form.find("#action_media_comment").show()
+    resetMessageForm: (resetFields = true) ->
+      @$form.find('.audience').html(if c = @conversations.active()
+          @htmlAudience(c.attributes, linkToContexts: true, highlightFilters: true)
+        else
+          h(I18n.t('headings.new_message', 'New Message'))
+      )
+      if resetFields
+        @$form.find('input[name!=authenticity_token], textarea').not(":checkbox").val('').change()
+        @$form.find(".attachment:visible").remove()
+        @$form.find(".media_comment").hide()
+        @$form.find("#action_media_comment").show()
       @resize()
 
-    setFormAudience: (html=@conversations.activeAudience()) ->
-      $formAudience = @$form.find('.audience')
-      $formAudience.html html
-      # replace each <span data-url='...'>...</span> with an <a href='...'>...</a>
-      $formAudience.find('em').attr('id', 'form_contexts')
-      $context = $formAudience.find('.context')
-      for elem in $context
-        $elem = $(elem)
-        $elem.replaceWith("<a href='#{h($elem.data('url'))}'>#{$elem.html()}</a>")
+    filters: ->
+      @conversations.baseData().filter ? []
 
-    contextList: (contexts, withUrl=false, limit=2) ->
-      compare = (contextA, contextB) ->
-        strA = contextA.name.toLowerCase()
-        strB = contextB.name.toLowerCase()
-        if strA < strB then -1 else if strA > strB then 1 else 0
+    htmlAudience: (conversation, options = {}) ->
+      filters = options.filters = if options.highlightFilters then @filters() else []
+      audience = for id in conversation.audience
+        {
+          id: id
+          name: @userCache[id].name
+          activeFilter: _.include(filters, "user_#{id}")
+        }
 
-      formatContext = (context) ->
-        if withUrl and context.type is "course"
-          return "<span class='context' data-url='#{h(context.url)}'>#{h(context.name)}</span>"
-        else
-          return h(context.name)
+      ret = audienceList(audience, options)
+      if audience.length
+        ret += " <em>" + @htmlContextList(conversation.audience_contexts, options) + "</em>"
+      ret
 
-      sharedContexts = (course for id, roles of contexts.courses when course = @contexts.courses[id]).
-                 concat(group for id, roles of contexts.groups when group = @contexts.groups[id]).
-                 sort(compare)[0...limit]
-
-      $.toSentence(formatContext(context) for context in sharedContexts)
+    htmlContextList: (contexts, options = {}) ->
+      filters = options.filters ? []
+      contexts = (course for id, roles of contexts.courses when course = @contexts.courses[id]).
+           concat(group for id, roles of contexts.groups when group = @contexts.groups[id])
+      contexts = for context in contexts
+        context = _.clone(context)
+        context.activeFilter = _.include(filters, "#{context.type}_#{context.id}")
+        context
+      contextList(contexts, options)
 
     htmlNameForUser: (user, contexts = {courses: user.common_courses, groups: user.common_groups}) ->
-      h(user.name) + if contexts.courses?.length or contexts.groups?.length then " <em>" + h(@contextList(contexts)) + "</em>" else ''
+      h(user.name) + if contexts.courses?.length or contexts.groups?.length then " <em>" + @htmlContextList(contexts) + "</em>" else ''
 
     canAddNotesFor: (user) ->
       return false unless @options.NOTES_ENABLED
@@ -476,14 +481,13 @@ define [
           e.preventDefault()
           @updateHashData scope: scope
 
-      $('#conversations, #create_message_form').delegate '.audience', 'click', (e) =>
+      $('#conversations ul, #create_message_form').delegate '.audience', 'click', (e) =>
         if ($others = $(e.target).closest('span.others').find('> span')).length
           if not $(e.target).closest('span.others > span').length
             $('span.others > span').not($others).hide()
             $others.toggle()
             $others.css('left', $others.parent().position().left)
             $others.css('top', $others.parent().height() + $others.parent().position().top)
-          e.preventDefault()
           return false
 
     setScope: (scope) ->
@@ -649,7 +653,7 @@ define [
           $name.append($b, $contextInfo)
           $span = $('<span />', class: 'details')
           if data.common_courses?
-            $span.text(@contextList(courses: data.common_courses, groups: data.common_groups))
+            $span.html(@htmlContextList({courses: data.common_courses, groups: data.common_groups}, hardCutoff: 2))
           else if data.type and data.user_count?
             $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
           else if data.item_count?

@@ -23,19 +23,17 @@ define [
         noAutoLoad: true
 
       @$list.delegate '.action_mark_as_read, .action_mark_as_unread, .action_unstar, .action_star', 'click', (e) =>
-        e.preventDefault()
-        e.stopImmediatePropagation()
         @pane.action $(e.currentTarget), method: 'PUT'
+        return false
 
       @$list.delegate '.actions a', 'blur', (e) =>
         $(window).one 'keyup', (e) =>
           @app.closeMenus() if e.shiftKey
 
       @$list.delegate '.actions a', 'click', (e) =>
-        e.preventDefault()
-        e.stopImmediatePropagation()
         @pane.openConversationMenu($(e.currentTarget))
-      .focus () =>
+        return false
+      .focus (e) =>
         @pane.openConversationMenu($(e.currentTarget))
 
     baseData: ->
@@ -139,8 +137,8 @@ define [
           @app.userCache[user.id] = user
 
       if data.audience
-        data.audienceHtml = @pane.audienceFor(data)
-        @app.setFormAudience(data.audienceHtml) if @isActive(data.id)
+        data.audienceHtml = @app.htmlAudience(data, highlightFilters: true)
+        @app.resetMessageForm(false) if @isActive(data.id)
       data.lastMessage = data[@lastMessageKey()]
       data.lastMessageAt = $.friendlyDatetime($.parseFromISO(data[@lastMessageKey() + "_at"]).datetime)
       data.hideCount = data.message_count is 1

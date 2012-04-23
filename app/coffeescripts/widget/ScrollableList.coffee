@@ -36,13 +36,14 @@ define [
         @scroll(e)
       @$list = @$scroller.find('ul').eq(0)
       @$list = $('<ul>').appendTo(@$scroller) unless @$list.length
+      @$list.addClass('scrollable-list')
 
       @itemTemplate  = options.itemTemplate  ? (data) => "<li>#{data}</li>"
       @elementHeight = options.elementHeight ? @inferElementHeight()
       @fetchBuffer   = options.fetchBuffer   ? 20 # how many items to fetch on either side of the viewable pane
       @firstLoad     = true
       @load() unless options.noAutoLoad
-      @$list.delegate 'li', 'click', @clicked if @clicked
+      @$list.delegate '.scrollable-list > li', 'click', @clicked if @clicked
 
     item: (id) ->
       @ds.items[@positionFor(id)]

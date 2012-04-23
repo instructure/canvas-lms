@@ -50,33 +50,6 @@ define [
     active: ->
       @list.active
 
-    activeAudience: ->
-      @audienceFor(@list.active.attributes) if @list.active
-
-    audienceFor: (conversation, cutoff=2) ->
-      audience = conversation.audience
-
-      return "<span>#{h(I18n.t('notes_to_self', 'Monologue'))}</span>" if audience.length == 0
-      context_info = "<em>#{@app.contextList(conversation.audience_contexts, true)}</em>"
-      return "<span>#{h(@app.userCache[audience[0]].name)}</span> #{context_info}" if audience.length == 1
-
-      audience = audience[0...cutoff].concat([audience[cutoff...audience.length]]) if audience.length > cutoff
-      $.toSentence(for idOrArray in audience
-        if typeof idOrArray is 'number'
-          "<span>#{h(@app.userCache[idOrArray].name)}</span>"
-        else
-          """
-          <span class='others'>
-            #{h(I18n.t('other', 'other', count: idOrArray.length))}
-            <span>
-              <ul>
-                #{(('<li>' + h(@app.userCache[id].name) + '</li>') for id in idOrArray).join('')}
-              </ul>
-            </span>
-          </span>
-          """
-      ) + " " + context_info
-
     openConversationMenu: ($node) ->
       @app.closeMenus()
       # get elements

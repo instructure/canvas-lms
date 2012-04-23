@@ -84,8 +84,10 @@ describe "conversations context filtering" do
   it "should let you filter by a course" do
     new_conversation
     browse_menu
-    browse("the course", "Everyone") { click "Select All" }
-    submit_message_form(:add_recipient => false, :message => "asdf")
+    browse("the course", "Everyone") { click "student2" }
+    browse_menu
+    browse("that course", "Everyone") { click "student1" }
+    submit_message_form(:add_recipient => false, :message => "asdf") # tagged with both courses
 
     new_conversation(false)
     browse_menu
@@ -102,6 +104,9 @@ describe "conversations context filtering" do
       conversations.size.should eql 1
       conversations.first.find_element(:css, 'p').text.should eql 'asdf'
     }
+
+    # filtered course should be first in the audience's contexts
+    get_conversations.first.find_element(:css, '.audience em').text.should eql 'the course and that course'
   end
 
   it "should let you filter by a course that was concluded a long time ago" do
@@ -151,6 +156,9 @@ describe "conversations context filtering" do
       conversations.size.should eql 1
       conversations.first.find_element(:css, 'p').text.should eql 'asdf'
     }
+
+    # filtered student should be first in the audience
+    get_conversations.first.find_element(:css, '.audience').text.should eql 'student2 and student1 the course'
   end
 
   it "should let you filter by a group" do
