@@ -289,6 +289,27 @@ describe Course do
     users = @course.paginate_users_not_in_groups([], 1)
     users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
   end
+
+  context "events_for" do
+    it "should return appropriate events" do
+      course_with_teacher(:active_all => true)
+      event1 = @course.calendar_events.create
+      event2 = @course.calendar_events.build :child_event_data => [{:start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string}]
+      event2.updating_user = @teacher
+      event2.save!
+      event3 = event2.child_events.first
+      appointment_group = @course.appointment_groups.create
+      appointment_group.publish!
+      assignment = @course.assignments.create!
+
+      events = @course.events_for(@teacher)
+      events.should include event1
+      events.should_not include event2
+      events.should include event3
+      events.should include appointment_group
+      events.should include assignment
+    end
+  end
 end
 
 describe Course, "enroll" do
