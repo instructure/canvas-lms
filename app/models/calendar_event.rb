@@ -284,7 +284,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :new_event_created
     to { participants - [@updating_user] }
     whenever {
-      !appointment_group && context.available? && just_created
+      !appointment_group && context.available? && just_created && !hidden?
     }
 
     dispatch :event_date_changed
@@ -294,7 +294,7 @@ class CalendarEvent < ActiveRecord::Base
       context.available? && (
         changed_in_state(:active, :fields => :start_at) ||
         changed_in_state(:active, :fields => :end_at)
-      )
+      ) && !hidden?
     }
 
     dispatch :appointment_reserved_by_user

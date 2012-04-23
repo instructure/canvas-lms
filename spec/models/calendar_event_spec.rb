@@ -186,6 +186,51 @@ describe CalendarEvent do
     end
   end
 
+  context "notifications" do
+    before do
+      Notification.create(:name => 'New Event Created', :category => "TestImmediately")
+      Notification.create(:name => 'Event Date Changed', :category => "TestImmediately")
+      course_with_student(:active_all => true)
+      @teacher = user(:active_all => true)
+      @course.enroll_teacher(@teacher).accept!
+      channel = @student.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
+      channel.confirm
+    end
+
+    it "should send notifications to participants" do
+      course_with_student(:active_all => true)
+      event1 = @course.calendar_events.create!(:title => "test")
+      event1.messages_sent.should be_include("New Event Created")
+      event1.messages_sent["New Event Created"].map(&:user_id).should include(@student.id)
+
+      event1.update_attributes(:start_at => Time.now, :end_at => Time.now)
+      event1.messages_sent.should be_include("Event Date Changed")
+      event1.messages_sent["Event Date Changed"].map(&:user_id).should include(@student.id)
+
+      event2 = CalendarEvent.new(:title => "test")
+      event2.context = @course.default_section
+      event2.save!
+      event2.messages_sent.should be_include("New Event Created")
+      event2.messages_sent["New Event Created"].map(&:user_id).should include(@student.id)
+
+      event2.update_attributes(:start_at => Time.now, :end_at => Time.now)
+      event2.messages_sent.should be_include("Event Date Changed")
+      event2.messages_sent["Event Date Changed"].map(&:user_id).should include(@student.id)
+    end
+
+    it "should not send notifications to participants if hidden" do
+      course_with_student(:active_all => true)
+      event = @course.calendar_events.build(:title => "test", :child_event_data => [{:start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string}])
+      event.updating_user = @teacher
+      event.save!
+      event.messages_sent.should be_empty
+
+      #event = CalendarEvent.find(event.id)
+      event.update_attribute(:child_event_data, [{:start_at => "2012-01-02", :end_at => "2012-01-03", :context_code => @course.default_section.asset_string}])
+      event.messages_sent.should be_empty
+    end
+  end
+
   context "appointments" do
     before do
       course_with_student(:active_all => true)

@@ -49,7 +49,16 @@ class CourseSection < ActiveRecord::Base
   end
 
   def participating_students
-    course.participating_students.scoped(:conditions => {:course_section_id => self.id})
+    course.participating_students.scoped(:conditions => ["enrollments.course_section_id = ?", id])
+  end
+
+  def participants
+    participating_students + 
+    course.participating_admins.scoped(:conditions => ["enrollments.course_section_id = ? OR NOT COALESCE(enrollments.limit_privileges_to_course_section, ?)", id, false])
+  end
+
+  def available?
+    course.available?
   end
 
   def touch_all_enrollments
