@@ -1,4 +1,6 @@
 class FixUserMergeConversations < ActiveRecord::Migration
+  tag :postdeploy
+
   def self.up
     self.transactional = false
 
