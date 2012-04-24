@@ -190,9 +190,11 @@ describe ContentMigration do
       rub1 = @copy_from.rubrics.build(:title => "rub1")
       rub1.data = data
       rub1.save!
+      rub1.associate_with(@copy_from, @copy_from)
       rub2 = @copy_from.rubrics.build(:title => "rub2")
-      rub1.data = data
-      rub1.save!
+      rub2.data = data
+      rub2.save!
+      rub2.associate_with(@copy_from, @copy_from)
       default = LearningOutcomeGroup.default_for(@copy_from)
       lo = @copy_from.learning_outcomes.new
       lo.context = @copy_from
