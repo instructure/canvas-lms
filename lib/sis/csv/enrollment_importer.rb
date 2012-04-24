@@ -23,7 +23,7 @@ module SIS
     class EnrollmentImporter < BaseImporter
 
       def self.is_enrollment_csv?(row)
-        (row.header?('section_id') || row.header?('course_id')) && row.header?('user_id')
+        (row.include?('section_id') || row.include?('course_id')) && row.include?('user_id')
       end
 
       # expected columns

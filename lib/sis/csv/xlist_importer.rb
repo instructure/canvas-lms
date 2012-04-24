@@ -24,7 +24,7 @@ module SIS
     class XlistImporter < BaseImporter
     
       def self.is_xlist_csv?(row)
-        row.header?('xlist_course_id') && row.header?('section_id')
+        row.include?('xlist_course_id') && row.include?('section_id')
       end
     
       # possible columns:

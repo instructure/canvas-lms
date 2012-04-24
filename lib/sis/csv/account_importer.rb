@@ -23,7 +23,7 @@ module SIS
     class AccountImporter < BaseImporter
 
       def self.is_account_csv?(row)
-        row.header?('account_id') && row.header?('parent_account_id')
+        row.include?('account_id') && row.include?('parent_account_id')
       end
 
       # expected columns

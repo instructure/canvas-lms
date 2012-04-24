@@ -24,7 +24,7 @@ module SIS
 
       def self.is_section_csv?(row)
         #This matcher works because an enrollment doesn't have name
-        row.header?('section_id') && row.header?('name')
+        row.include?('section_id') && row.include?('name')
       end
 
       # expected columns

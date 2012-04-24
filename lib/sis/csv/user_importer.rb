@@ -23,7 +23,7 @@ module SIS
     class UserImporter < BaseImporter
 
       def self.is_user_csv?(row)
-        row.header?('user_id') && row.header?('login_id')
+        row.include?('user_id') && row.include?('login_id')
       end
 
       # expected columns:

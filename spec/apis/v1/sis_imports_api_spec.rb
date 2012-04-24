@@ -102,6 +102,7 @@ describe SisImportsApiController, :type => :integration do
     json.delete("ended_at")
     json.should == { 
           "data" => { "import_type" => "instructure_csv",
+                      "supplied_batches" => ["user"],
                       "counts" => { "abstract_courses" => 0,
                                     "courses" => 0,
                                     "sections" => 0,
