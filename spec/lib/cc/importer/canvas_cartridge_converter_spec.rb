@@ -6,6 +6,8 @@ describe "Canvas Cartridge importing" do
     @copy_from = course_model
     @from_teacher = @user
     @copy_to = course_model
+    @copy_to.conclude_at = nil
+    @copy_to.start_at = nil
     @copy_to.name = "alt name"
     @copy_to.course_code = "alt name"
 
@@ -68,12 +70,12 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
 
     #compare settings
-    @copy_to.conclude_at.to_i.should == @copy_from.conclude_at.to_i
-    @copy_to.start_at.to_i.should == @copy_from.start_at.to_i
+    @copy_to.conclude_at.should == nil
+    @copy_to.start_at.should == nil
     @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
     @copy_to.storage_quota.should_not == @copy_from.storage_quota
-    @copy_to.name.should == @copy_from.name
-    @copy_to.course_code.should == @copy_from.course_code
+    @copy_to.name.should == 'alt name'
+    @copy_to.course_code.should == 'alt name'
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     atts.each do |att|

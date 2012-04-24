@@ -96,7 +96,6 @@ describe ContentMigration do
 
       @copy_to.locale.should == 'es'
       @copy_to.tab_configuration.should == @copy_from.tab_configuration
-      @copy_to.name.should == @copy_from.name
     end
 
     it "should copy external tools" do
