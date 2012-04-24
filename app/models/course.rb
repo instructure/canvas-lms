@@ -147,7 +147,6 @@ class Course < ActiveRecord::Base
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :rubrics, :as => :context
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
-  has_many :tags, :class_name => 'ContentTag', :as => 'context', :order => 'LOWER(title)', :conditions => {:tag_type => 'default'}, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
   has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
