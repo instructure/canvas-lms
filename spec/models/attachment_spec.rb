@@ -736,6 +736,19 @@ describe Attachment do
       end
     end
   end
+
+  context "s3" do
+    it "should support setting bucket via PluginSetting" do
+      Setting.set("file_storage_test_override", "s3")
+      Attachment.stubs(:s3_config).returns({:bucket_name => 'yml_bucket'})
+      ps = PluginSetting.create!(:name => 's3', :settings => { :bucket_name => 'pluginsetting_bucket' })
+      # if the test environment isn't configured for s3, the plugin never got created,
+      # and the settings will never be considered valid
+      ps.any_instantiation.stubs(:valid_settings?).returns(true)
+      attachment_model
+      @attachment.s3_config[:bucket_name].should == 'pluginsetting_bucket'
+    end
+  end
 end
 
 def processing_model

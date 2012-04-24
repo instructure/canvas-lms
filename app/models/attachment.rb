@@ -405,7 +405,7 @@ class Attachment < ActiveRecord::Base
 
   def root_account_id
     # see note in infer_namespace below
-    splits = namespace.try(:split, /_/)
+    splits = read_attribute(:namespace).try(:split, /_/)
     return nil if splits.blank?
     if splits[1] == "localstorage"
       splits[3].to_i
@@ -582,7 +582,11 @@ class Attachment < ActiveRecord::Base
   def self.s3_config
     # Return existing value, even if nil, as long as it's defined
     return @s3_config if defined?(@s3_config)
-    @s3_config ||= YAML.load_file(RAILS_ROOT + "/config/amazon_s3.yml")[RAILS_ENV] rescue nil
+    @s3_config ||= YAML.load_file(RAILS_ROOT + "/config/amazon_s3.yml")[RAILS_ENV].symbolize_keys rescue nil
+  end
+
+  def s3_config
+    @s3_config ||= (self.class.s3_config || {}).merge(PluginSetting.settings_for_plugin('s3').symbolize_keys || {})
   end
   
   def self.file_store_config
@@ -653,6 +657,9 @@ class Attachment < ActiveRecord::Base
         :thumbnails => { :thumb => '200x50' }, 
         :thumbnail_class => 'Thumbnail'
     )
+    def bucket_name
+      s3_config[:bucket_name]
+    end
   end
 
   def content_type_with_encoding
