@@ -1,3 +1,11 @@
+canvas-lms (2012.04.14.16) stable; urgency=low
+
+  * Package ref: c471fa35b902810a21f35cb7b590558788132c78
+  *
+  * [+c471fa3] fix copying root-level course files and media object references
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 24 Apr 2012 12:14:15 -0600
+
 canvas-lms (2012.04.14.15) stable; urgency=low
 
   * Package ref: 67d4eb6cccd8e92151ace68d85e5af4b76c073b2
