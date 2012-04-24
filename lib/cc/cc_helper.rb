@@ -153,7 +153,12 @@ module CCHelper
       @referenced_files = []
 
       @rewriter.set_handler('file_contents') do |match|
-        match.url.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+        if match.url =~ %r{/media_objects/(\d_\w+)}
+          # This is a media object referencing an attachment that it shouldn't be
+          "/media_objects/#{$1}"
+        else
+          match.url.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+        end
       end
       @rewriter.set_handler('files') do |match|
         obj = match.obj_class.find_by_id(match.obj_id)
