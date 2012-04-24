@@ -429,7 +429,17 @@ describe "Canvas Cartridge importing" do
     rubric.title = "Rubric"
     rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}, {:ignore_for_scoring=>false, :mastery_points=>3, :learning_outcome_id=>lo.id, :ratings=>[{:criterion_id=>"309_343", :points=>5, :description=>"Exceeds Expectations", :id=>"309_6516", :long_description=>""}, {:criterion_id=>"309_343", :points=>0, :description=>"Does Not Meet Expectations", :id=>"309_9962", :long_description=>""}], :points=>5, :description=>"Learning Outcome", :id=>"309_343", :long_description=>"<p>Outcome</p>"}]
     rubric.save!
-    
+    rubric.associate_with(@copy_from, @copy_from)
+
+    #create a rubric in a different course to associate with
+    new_course = course_model
+    rubric2 = new_course.rubrics.build
+    rubric2.title = "Rubric from different course"
+    rubric2.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}, {:ignore_for_scoring=>false, :mastery_points=>3, :learning_outcome_id=>lo.id, :ratings=>[{:criterion_id=>"309_343", :points=>5, :description=>"Exceeds Expectations", :id=>"309_6516", :long_description=>""}, {:criterion_id=>"309_343", :points=>0, :description=>"Does Not Meet Expectations", :id=>"309_9962", :long_description=>""}], :points=>5, :description=>"Learning Outcome", :id=>"309_343", :long_description=>"<p>Outcome</p>"}]
+    rubric2.save!
+
+    assoc = RubricAssociation.create!(:context => @copy_from, :rubric => rubric2, :association => @copy_from, :title => rubric2.title, :purpose => 'bookmark')
+
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
     @resource.create_rubrics(builder)
@@ -438,15 +448,19 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_rubrics(doc)
     #import json into new course
     hash[0] = hash[0].with_indifferent_access
+    hash[1] = hash[1].with_indifferent_access
     Rubric.process_migration({'rubrics'=>hash}, @migration)
     @copy_to.save!
-  
-    @copy_to.rubric_associations.count.should == 1
+
+    @copy_to.rubric_associations.count.should == 2
     lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.should_not be_nil
     rubric_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric))
     rubric_2.title.should == rubric.title
     rubric_2.data[1][:learning_outcome_id].should == lo_2.id
+
+    rubric2_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric2))
+    rubric2_2.title.should == rubric2.title
   end
   
   it "should import modules" do 
