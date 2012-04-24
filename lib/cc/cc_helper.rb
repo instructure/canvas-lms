@@ -134,6 +134,8 @@ module CCHelper
       @rewriter = UserContent::HtmlRewriter.new(course, user)
       @course = course
       @user = user
+      @for_course_copy = opts[:for_course_copy]
+      @referenced_files = []
 
       @rewriter.set_handler('file_contents') do |match|
         match.url.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
@@ -177,7 +179,7 @@ module CCHelper
 
     def html_content(html)
       html = @rewriter.translate_content(html)
-      return html if html.blank?
+      return html if html.blank? || @for_course_copy
 
       # keep track of found media comments, and translate them into links into the files tree
       # if imported back into canvas, they'll get uploaded to the media server
