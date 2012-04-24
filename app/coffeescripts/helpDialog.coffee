@@ -7,6 +7,8 @@
 define [
   'i18n!help_dialog'
   'jst/helpDialog'
+  'jquery'
+  'underscore'
   'INST'
   'str/htmlEscape'
   'compiled/fn/preventDefault'
@@ -14,7 +16,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_jquery_patches' # dialog
   'jquery.disableWhileLoading'
-], (I18n, helpDialogTemplate, INST, htmlEscape, preventDefault) ->
+], (I18n, helpDialogTemplate, $, _, INST, htmlEscape, preventDefault) ->
 
   helpDialog =
     defaultLinks: [
