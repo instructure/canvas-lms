@@ -403,10 +403,12 @@ describe ContentMigration do
     end
 
     it "should preserve media comment links" do
+      @copy_from.media_objects.create!(:media_id => '0_12345678')
       @copy_from.syllabus_body = <<-HTML.strip
       <p>
         Hello, students.<br>
-        Watch this awesome video: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        With associated media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        Without associated media object: <a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">this is a media comment</a>
       </p>
       HTML
 

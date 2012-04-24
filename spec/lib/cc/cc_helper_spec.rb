@@ -41,6 +41,15 @@ describe CC::CCHelper do
       @exporter.media_object_infos[@obj.id][:asset][:id].should == 'one'
     end
 
+    it "should not touch media links on course copy" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy=>true)
+      orig = <<-HTML
+      <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+      HTML
+      translated = @exporter.html_content(orig)
+      translated.should == orig
+    end
+
     it "should translate media links using an alternate flavor" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
       translated = @exporter.html_content(<<-HTML)
