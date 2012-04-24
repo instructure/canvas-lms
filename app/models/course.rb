@@ -1768,10 +1768,6 @@ class Course < ActiveRecord::Base
   def import_settings_from_migration(data)
     return unless data[:course]
     settings = data[:course]
-    self.name = settings[:title] if settings[:title].present?
-    self.course_code = settings[:course_code] if settings[:course_code].present?
-    self.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
-    self.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
     self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
     if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
       self.tab_configuration = settings[:tab_configuration]
