@@ -7,7 +7,7 @@ define [
   'i18n!help_dialog'
   'jst/helpDialog'
   'jquery'
-  'use!underscore'
+  'underscore'
   'INST'
   'str/htmlEscape'
   'compiled/fn/preventDefault'

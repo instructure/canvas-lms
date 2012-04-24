@@ -3,7 +3,7 @@ define [
   'i18n!gradebook2'
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
-  'use!underscore'
+  'underscore'
   'compiled/grade_calculator'
   'vendor/spin'
   'compiled/multi_grid'
