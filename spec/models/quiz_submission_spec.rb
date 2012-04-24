@@ -541,9 +541,10 @@ describe QuizSubmission do
 
     it "should score an essay_question" do
       qd = essay_question_data
-      text = "that's too <b>dang</b> hard!"
+      text = "that's too <b>dang</b> hard! <script>alert(1)</script>"
+      sanitized = "that's too <b>dang</b> hard! alert(1)"
       QuizSubmission.score_question(qd, { "question_1" => text }).should ==
-        { :question_id => 1, :correct => "undefined", :points => 0, :text => text }
+        { :question_id => 1, :correct => "undefined", :points => 0, :text => sanitized }
 
       QuizSubmission.score_question(qd, {}).should ==
         { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
@@ -620,10 +621,8 @@ describe QuizSubmission do
         "question_1_answer_7398" => "6068",
         "question_1_answer_7399" => "6069",
       })
-      correct = user_answer.delete(:correct)
-      points = user_answer.delete(:points)
       user_answer.should == {
-        :question_id => 1, :text => "",
+        :question_id => 1, :correct => true, :points => 50, :text => "",
         :answer_7396 => "6061",
         :answer_6081 => "3855",
         :answer_4224 => "1397",
@@ -631,10 +630,6 @@ describe QuizSubmission do
         :answer_7398 => "6068",
         :answer_7399 => "6069",
       }
-      pending("floating point error") do
-        correct.should == true
-        points.should == 50.0
-      end
 
       # selected a different answer but the text of that answer was the same
       user_answer = QuizSubmission.score_question(q, {
@@ -645,10 +640,8 @@ describe QuizSubmission do
         "question_1_answer_7398" => "6068",
         "question_1_answer_7399" => "6069",
       })
-      correct = user_answer.delete(:correct)
-      points = user_answer.delete(:points)
       user_answer.should == {
-        :question_id => 1, :text => "",
+        :question_id => 1, :correct => true, :points => 50, :text => "",
         :answer_7396 => "6061",
         :answer_6081 => "3855",
         :answer_4224 => "1397",
@@ -656,23 +649,17 @@ describe QuizSubmission do
         :answer_7398 => "6068",
         :answer_7399 => "6069",
       }
-      pending("floating point error") do
-        correct.should == true
-        points.should == 50.0
-      end
 
-      # undefined
-      pending("don't treat no answer as the blank string, breaking undefined_if_blank") do
-        QuizSubmission.score_question(q, { "undefined_if_blank" => "1" }).should == {
-          :question_id => 1, :correct => "undefined", :points => 0, :text => "",
-          :answer_7396 => "",
-          :answer_6081 => "",
-          :answer_4224 => "",
-          :answer_7397 => "",
-          :answer_7398 => "",
-          :answer_7399 => "",
-        }
-      end
+      # no answer shouldn't be treated as a blank string, breaking undefined_if_blank
+      QuizSubmission.score_question(q, { "undefined_if_blank" => "1" }).should == {
+        :question_id => 1, :correct => "undefined", :points => 0, :text => "",
+        :answer_7396 => "",
+        :answer_6081 => "",
+        :answer_4224 => "",
+        :answer_7397 => "",
+        :answer_7398 => "",
+        :answer_7399 => "",
+      }
     end
 
     it "should score a numerical_question" do
@@ -707,12 +694,11 @@ describe QuizSubmission do
       QuizSubmission.score_question(qd, { :undefined_if_blank => "1" }).should == {
         :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
 
-      pending("don't treat a blank answer as 0.0") do
-        qd2 = qd.dup
-        qd2["answers"] << { "exact" => 0, "numerical_answer_type" => "exact_answer", "margin" => 0, "weight" => 100, "id" => 1234 }
-        QuizSubmission.score_question(qd2, {}).should == {
-          :question_id => 1, :correct => false, :points => 0, :text => "" }
-      end
+      # blank answer should not be treated as 0.0
+      qd2 = qd.dup
+      qd2["answers"] << { "exact" => 0, "numerical_answer_type" => "exact_answer", "margin" => 0, "weight" => 100, "id" => 1234 }
+      QuizSubmission.score_question(qd2, { "question_1" => "" }).should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "" }
     end
 
     it "should score a calculated_question" do
@@ -725,15 +711,13 @@ describe QuizSubmission do
         :question_id => 1, :correct => true, :points => 26.2, :text => "-11.68", :answer_id => 6396 }
 
       QuizSubmission.score_question(qd, { "question_1" => "-11.675" }).should == {
-        :question_id => 1, :correct => false, :points => 0, :text => "-11.675", :answer_id => 6396 }
+        :question_id => 1, :correct => false, :points => 0, :text => "-11.675" }
 
       QuizSubmission.score_question(qd, {}).should == {
-        :question_id => 1, :correct => false, :points => 0, :text => "", :answer_id => 6396 }
+        :question_id => 1, :correct => false, :points => 0, :text => "" }
 
-      pending("floating point error") do
-        QuizSubmission.score_question(qd, { "question_1" => "-11.72" }).should == {
-          :question_id => 1, :correct => true, :points => 26.2, :text => "-11.72", :answer_id => 6396 }
-      end
+      QuizSubmission.score_question(qd, { "question_1" => "-11.72" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "-11.72", :answer_id => 6396 }
     end
 
     it "should score a multiple_answers_question" do
@@ -850,9 +834,8 @@ describe QuizSubmission do
         "question_1_answer_9701" => "0",
         "question_1_answer_7381" => "1",
       })
-      user_answer.delete(:points).should == 0
       user_answer.should == {
-        :question_id => 1, :correct => false, :text => "",
+        :question_id => 1, :correct => false, :points => 0, :text => "",
         :answer_9761 => "0",
         :answer_3079 => "1",
         :answer_5194 => "0",
@@ -891,10 +874,8 @@ describe QuizSubmission do
         :answer_7381 => "0",
       }
 
-      pending("don't treat no answer as the blank string, breaking undefined_if_blank") do
-        QuizSubmission.score_question(qd, { "undefined_if_blank" => "1" }).should ==
-          { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
-      end
+      QuizSubmission.score_question(qd, { "undefined_if_blank" => "1" }).should ==
+        { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
     end
 
     it "should score a multiple_dropdowns_question" do
@@ -948,10 +929,8 @@ describe QuizSubmission do
       }
 
       user_answer = QuizSubmission.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5"=>"6994", "question_1630873_3f507e80e33ef092a02948a064433ec5"=>"7676", "question_1630873_78635a3709b540a59678c806b102d038"=>"9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab"=>"1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537"=>"4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d"=>"7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816"=>"6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840"=>"3353", "question_1630873_69d0969351d989767d7096f28daf7461"=>"3390"})
-      correct = user_answer.delete(:correct)
-      points = user_answer.delete(:points)
       user_answer.should == {
-        :question_id => 1630873, :text => "",
+        :question_id => 1630873, :correct => true, :points => 0.5, :text => "",
         :answer_for_structure1 => 4390,
         :answer_id_for_structure1 => 4390,
         :answer_for_event1 => 3390,
@@ -971,11 +950,6 @@ describe QuizSubmission do
         :answer_for_structure7 => 1121,
         :answer_id_for_structure7 => 1121,
       }
-
-      pending("floating point error") do
-        correct.should == true
-        points.should == 0.5
-      end
     end
 
     it "should score a fill_in_multiple_blanks_question" do
