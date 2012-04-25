@@ -74,6 +74,8 @@ class ImportedHtmlConverter
             end
           elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
             # Course copy media reference, leave it alone
+          elsif attr == 'src' && node['class'] && node['class'] =~ /equation_image/
+            # Equation image, leave it alone
           elsif val =~ %r{\A/assessment_questions/\d+/files/\d+}
             # The file is in the context of an AQ, leave the link alone
           elsif val =~ %r{\A/courses/\d+/files/\d+}
