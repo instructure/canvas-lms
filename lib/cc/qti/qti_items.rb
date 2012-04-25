@@ -106,8 +106,7 @@ module CC
           
           item_node.presentation do |pres_node|
             pres_node.material do |mat_node|
-              html = @html_exporter.html_content("<div>#{question['question_text']}</div>" || '')
-              mat_node.mattext html, :texttype=>'text/html'
+              html_mat_text(mat_node, "<div>#{question['question_text']}</div>", '')
             end
             presentation_options(pres_node, question)
           end # presentation
@@ -127,13 +126,11 @@ module CC
             
             itemproc_extenstion(node, question)
             
-            item_feedback(item_node, 'general_fb', question['neutral_comments']) unless question['neutral_comments'].blank?
-            item_feedback(item_node, 'correct_fb', question['correct_comments']) unless question['correct_comments'].blank?
-            item_feedback(item_node, 'general_incorrect_fb', question['incorrect_comments']) unless question['incorrect_comments'].blank?
+            item_feedback(item_node, 'general_fb', question, 'neutral_comments')
+            item_feedback(item_node, 'correct_fb', question, 'correct_comments')
+            item_feedback(item_node, 'general_incorrect_fb', question, 'incorrect_comments')
             question['answers'].each do |answer|
-              unless answer['comments'].blank?
-                item_feedback(item_node, "#{answer['id']}_fb", answer['comments'])
-              end
+              item_feedback(item_node, "#{answer['id']}_fb", answer, 'comments')
             end
           end
         end # item
@@ -171,7 +168,7 @@ module CC
                       :ident => answer['id']
               ) do |rl_node|
                 rl_node.material do |mat_node|
-                  mat_node.mattext answer['text']
+                  html_mat_text(mat_node, answer['html'], answer['text'])
                 end # mat_node
               end # rl_node
             end
@@ -183,7 +180,7 @@ module CC
         question['answers'].each do |answer|
           node.response_lid(:ident=>"response_#{answer['id']}") do |lid_node|
             lid_node.material do |mat_node|
-              mat_node.mattext answer['text']
+              html_mat_text(mat_node, answer['html'], answer['text'])
             end
             
             lid_node.render_choice do |rc_node|
@@ -230,7 +227,7 @@ module CC
               answers.each do |answer|
                 rc_node.response_label(:ident=>answer['id']) do |r_node|
                   r_node.material do |mat_node|
-                    mat_node.mattext answer['text']
+                    html_mat_text(mat_node, answer['html'], answer['text'])
                   end
                 end # r_node
               end
@@ -251,7 +248,7 @@ module CC
       ## question resprocessing methods
       
       def resprocessing(node, question)
-        if !question['neutral_comments'].blank?
+        if !question['neutral_comments'].blank? || !question['neutral_comments_html'].blank?
           other_respcondition(node, 'Yes', 'general_fb')
         end
         
@@ -280,7 +277,7 @@ module CC
           numerical_resprocessing(node, question)
         end
         
-        if !question['incorrect_comments'].blank? && !MULTI_ANSWER_TYPES.member?(question['question_type'])
+        if (!question['incorrect_comments'].blank? || !question['incorrect_comments_html'].blank?) && !MULTI_ANSWER_TYPES.member?(question['question_type'])
           other_respcondition(node, 'Yes', 'general_incorrect_fb')
         end
       end
@@ -356,7 +353,7 @@ module CC
             end #c_node
             
             res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
-            res_node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>"#{answer['id']}_fb") unless answer['comments'].blank?
+            res_node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>"#{answer['id']}_fb") unless (answer['comments'].blank? && answer['comments_html'].blank?)
             correct_feedback_ref(res_node, question)
           end #res_node
         end
@@ -380,7 +377,7 @@ module CC
             r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
           
-          unless answer['comments'].blank?
+          unless (answer['comments'].blank? && answer['comments_html'].blank?)
             node.respcondition do |r_node|
               r_node.conditionvar do |c_node|
                 c_node.not do |n_node|
@@ -428,7 +425,7 @@ module CC
       
       def answer_feedback_respconditions(node, question)
         question['answers'].each do |answer|
-          unless answer['comments'].blank?
+          unless (answer['comments'].blank? && answer['comments_html'].blank?)
             respident = 'response1'
             if MULTI_ANSWER_TYPES.member? question['question_type']
               respident = "response_#{answer['blank_id']}"
@@ -457,16 +454,17 @@ module CC
       end
       
       def correct_feedback_ref(node, question)
-        unless question['correct_comments'].blank?
+        unless question['correct_comments'].blank? && question['correct_comments_html'].blank?
           node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>'correct_fb')
         end
       end
       
-      def item_feedback(node, id, message)
+      def item_feedback(node, id, question, key)
+        return unless question[key].present? || question[key + "_html"].present?
         node.itemfeedback(:ident=>id) do |f_node|
           f_node.flow_mat do |flow_node|
-            flow_node.material do |m_node|
-              m_node.mattext(message, :texttype=>'text')
+            flow_node.material do |mat_node|
+              html_mat_text(mat_node, question[key + "_html"], question[key])
             end
           end
         end
@@ -512,6 +510,15 @@ module CC
             end
           end # calc_node
         end # ext_node
+      end
+
+      def html_mat_text(mat_node, html_val, text_val)
+        if html_val.present?
+          html = @html_exporter.html_content(html_val)
+          mat_node.mattext html, :texttype => 'text/html'
+        else
+          mat_node.mattext text_val
+        end
       end
       
     end
