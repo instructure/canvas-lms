@@ -46,7 +46,7 @@ class User < ActiveRecord::Base
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments, :uniq => true
   has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
-  has_many :concluded_courses, :source => :course, :through => :concluded_enrollments
+  has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
@@ -1753,10 +1753,11 @@ class User < ActiveRecord::Base
   memoize :manageable_appointment_context_codes
 
   def conversation_context_codes
-    Rails.cache.fetch([self, 'conversation_context_codes'].cache_key, :expires_in => 1.day) do
-      courses.map{ |c| "course_#{c.id}" } + 
-      concluded_courses.map{ |c| "course_#{c.id}" } + 
-      current_groups.map{ |g| "group_#{g.id}"}
+    Rails.cache.fetch([self, 'conversation_context_codes2'].cache_key, :expires_in => 1.day) do
+      ( courses.map{ |c| "course_#{c.id}" } +
+        concluded_courses.map{ |c| "course_#{c.id}" } +
+        current_groups.map{ |g| "group_#{g.id}"}
+      ).uniq
     end
   end
   memoize :conversation_context_codes
