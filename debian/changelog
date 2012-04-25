@@ -1,3 +1,22 @@
+canvas-lms (2012.04.28.08) testing; urgency=low
+
+  * Package ref: de068e7062e6607531fb60411889e9ee402e2088
+  *
+  * [+fb88374] update ruby-saml-mod to 0.1.8; fixes #8091
+  * [+2cf78f9] limit quizzes to 1000 questions, increase key limit. fixes #8172
+  * [+7d7897f] update last completed quiz sub. when manually scoring; fixes #7916
+  * [+1c555e8] grant read permission to teachers of date-concluded, unpublished course
+  * [+dbead31] fix copying root-level course files and media object references
+  * [+baf542a] don't alter media object links when copying course
+  * [+68d3702] copy all the rubrics when copying a course
+  * [+7d03517] section-level calendar event support (backend/api), fixes #7979
+  * [+db3e579] show section-level events in syllabus, fix notifications
+  * [+e0dc22c] section-level event support in calendar2, refs #7978
+  * [+1c1db34] add object/unflatten: {'a[b]':1} becomes {a:{b:1}}
+  * [+de068e7] New/Edit calendar event page with section support
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 25 Apr 2012 09:43:07 -0600
+
 canvas-lms (2012.04.28.04) testing; urgency=low
 
   * Package ref: 0c400509df43b7f5a655718f5f2efe136b928637
