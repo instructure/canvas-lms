@@ -173,6 +173,31 @@ describe ContentMigration do
       att2 = Attachment.create!(:filename => 'second.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
       wiki = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
       wiki2 = @copy_from.wiki.wiki_pages.create!(:title => "wiki2", :body => "ohais")
+      data = [{:points => 3,:description => "Outcome row",:id => 1,:ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}]}]
+      rub1 = @copy_from.rubrics.build(:title => "rub1")
+      rub1.data = data
+      rub1.save!
+      rub1.associate_with(@copy_from, @copy_from)
+      rub2 = @copy_from.rubrics.build(:title => "rub2")
+      rub2.data = data
+      rub2.save!
+      rub2.associate_with(@copy_from, @copy_from)
+      default = LearningOutcomeGroup.default_for(@copy_from)
+      lo = @copy_from.learning_outcomes.new
+      lo.context = @copy_from
+      lo.short_description = "outcome1"
+      lo.workflow_state = 'active'
+      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.save!
+      lo2 = @copy_from.learning_outcomes.new
+      lo2.context = @copy_from
+      lo2.short_description = "outcome1"
+      lo2.workflow_state = 'active'
+      lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo2.save!
+
+      default.add_item(lo)
+      default.add_item(lo2)
 
       # only select one of each type
       @cm.copy_options = {
@@ -180,6 +205,8 @@ describe ContentMigration do
               :context_modules => {mig_id(cm) => "1", mig_id(cm2) => "0"},
               :attachments => {mig_id(att) => "1", mig_id(att2) => "0"},
               :wiki_pages => {mig_id(wiki) => "1", mig_id(wiki2) => "0"},
+              :rubrics => {mig_id(rub1) => "1", mig_id(rub2) => "0"},
+              :learning_outcomes => {mig_id(lo) => "1", mig_id(lo2) => "0"},
       }
       @cm.save!
 
@@ -197,6 +224,12 @@ describe ContentMigration do
 
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).should_not be_nil
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki2)).should be_nil
+
+      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).should_not be_nil
+      @copy_to.rubrics.find_by_migration_id(mig_id(rub2)).should be_nil
+
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should be_nil
     end
 
     it "should copy learning outcomes into the new course" do
@@ -359,10 +392,12 @@ describe ContentMigration do
     end
 
     it "should preserve media comment links" do
+      @copy_from.media_objects.create!(:media_id => '0_12345678')
       @copy_from.syllabus_body = <<-HTML.strip
       <p>
         Hello, students.<br>
-        Watch this awesome video: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        With associated media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        Without associated media object: <a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">this is a media comment</a>
       </p>
       HTML
 
