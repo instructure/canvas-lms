@@ -18,6 +18,9 @@
 
 class ImportedHtmlConverter
   include TextHelper
+
+  CONTAINER_TYPES = ['div', 'p', 'body']
+
   def self.convert(html, context, remove_outer_nodes_if_one_child = false)
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
@@ -71,6 +74,10 @@ class ImportedHtmlConverter
             end
           elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
             # Course copy media reference, leave it alone
+          elsif val =~ %r{\A/assessment_questions/\d+/files/\d+}
+            # The file is in the context of an AQ, leave the link alone
+          elsif val =~ %r{\A/courses/\d+/files/\d+}
+            # This points to a specific file already, leave it alone
           else
             begin
               if relative_url?(node[attr])
@@ -87,7 +94,10 @@ class ImportedHtmlConverter
 
     node = doc.at_css('body')
     if remove_outer_nodes_if_one_child
-      node = node.child while node.children.size == 1 && node.child.child
+      while node.children.size == 1 && node.child.child
+        break unless CONTAINER_TYPES.member? node.child.name
+        node = node.child
+      end
     end
     node.inner_html
   rescue
