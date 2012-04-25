@@ -39,7 +39,10 @@ module CC
       @zip_file = manifest.zip_file
       # if set to "flash video", this'll export the smaller, post-conversion
       # flv files rather than the larger original files.
-      @html_exporter = CCHelper::HtmlContentExporter.new(@course, @manifest.exporter.user, :media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
+      @html_exporter = CCHelper::HtmlContentExporter.new(@course,
+                                                         @manifest.exporter.user,
+                                                         :for_course_copy => for_course_copy,
+                                                         :media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
     end
     
     def self.create_resources(manifest, manifest_node)
