@@ -1,3 +1,13 @@
+canvas-lms (2012.04.14.17) stable; urgency=low
+
+  * Package ref: 458e73cdc5a62044f095189edf2fc463dceee897
+  *
+  * [+675d25b] add rubrics to course copy options
+  * [+f2127b8] don't alter media object links when copying course
+  * [+458e73c] copy all the rubrics when copying a course
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 25 Apr 2012 14:39:44 -0600
+
 canvas-lms (2012.04.14.16) stable; urgency=low
 
   * Package ref: c471fa35b902810a21f35cb7b590558788132c78
