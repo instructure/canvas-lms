@@ -884,7 +884,7 @@ class Course < ActiveRecord::Base
     can :read and can :participate_as_student and can :read_grades
 
     # Prior users
-    given { |user| !self.deleted? && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
+    given { |user| (self.available? || self.completed?) && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
     can :read
 
     # Teacher of a concluded course
@@ -898,7 +898,7 @@ class Course < ActiveRecord::Base
     can :delete
 
     # Student of a concluded course
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
+    given { |user| (self.available? || self.completed?) && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
     can :read and can :read_grades and can :read_forum
 
     # Viewing as different role type
