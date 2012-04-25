@@ -511,10 +511,11 @@ describe ContentMigration do
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       @attachment = attachment_with_context(@copy_from)
       @attachment2 = @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-      data = {"name" => "Hi", "question_text" => <<-HTML, "answers" => [{"id" => 1}, {"id" => 2}]}
+      data = {"name" => "Hi", "question_text" => <<-HTML.strip, "answers" => [{"id" => 1}, {"id" => 2}]}
       File ref:<img src="/courses/#{@copy_from.id}/files/#{@attachment.id}/download">
       different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
       media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+      equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
       HTML
       @question = @bank.assessment_questions.create!(:question_data => data)
       @question.reload.question_data['question_text'].should =~ %r{/assessment_questions/}
