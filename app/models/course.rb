@@ -185,6 +185,16 @@ class Course < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  def events_for(user)
+    CalendarEvent.
+      active.
+      for_user_and_context_codes(user, [asset_string]).
+      all(:include => :child_events).
+      reject(&:hidden?) +
+    AppointmentGroup.manageable_by(user, [asset_string]) +
+    assignments.active
+  end
+
   def self.skip_updating_account_associations(&block)
     if @skip_updating_account_assocations
       block.call
@@ -880,7 +890,7 @@ class Course < ActiveRecord::Base
 
     # Teacher of a concluded course
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? }) }
-    can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
+    can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
 
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? }) }
     can :read_user_notes and can :view_all_grades
@@ -1823,7 +1833,8 @@ class Course < ActiveRecord::Base
 
   def copy_attachments_from_course(course, options={})
     self.attachment_path_id_lookup = {}
-    root_folder = Folder.root_folders(self).first.name + '/'
+    root_folder = Folder.root_folders(self).first
+    root_folder_name = root_folder.name + '/'
     ce = options[:content_export]
     cm = options[:content_migration]
 
@@ -1834,8 +1845,12 @@ class Course < ActiveRecord::Base
       cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
       if !ce || ce.export_object?(file)
         new_file = file.clone_for(self)
-        self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder}/, '')] = new_file.migration_id
+        self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
         new_folder_id = merge_mapped_id(file.folder)
+
+        if file.folder && file.folder.parent_folder_id.nil?
+          new_folder_id = root_folder.id
+        end
         # make sure the file has somewhere to go
         if !new_folder_id
           # gather mapping of needed folders from old course to new course

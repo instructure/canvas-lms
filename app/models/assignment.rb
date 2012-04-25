@@ -46,6 +46,7 @@ class Assignment < ActiveRecord::Base
   has_one :rubric, :through => :rubric_association
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ['enrollments.workflow_state = ?', 'active']
   belongs_to :context, :polymorphic => true
+  alias_method :effective_context, :context
   belongs_to :cloned_item
   belongs_to :grading_standard
   belongs_to :group_category

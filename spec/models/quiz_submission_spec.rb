@@ -180,7 +180,7 @@ describe QuizSubmission do
       @submission.grade.should == "5"
     end
     
-    it "it should add a version to the submission" do
+    it "should add a version to the submission" do
       @assignment.grade_student(@user, {:grade => 3})
       @submission.reload
       @submission.versions.count.should == 2
@@ -190,7 +190,23 @@ describe QuizSubmission do
       @submission.versions.count.should == 3
       @submission.score.should == 6
     end
-    
+
+    it "should only update the last completed quiz submission" do
+      @quiz_sub.score = 4.0
+      @quiz_sub.attempt = 2
+      @quiz_sub.with_versioning(true, &:save!)
+      @quiz.generate_submission(@user)
+      @assignment.grade_student(@user, {:grade => 3})
+
+      @quiz_sub.reload.score.should be_nil
+      @quiz_sub.kept_score.should == 3
+      @quiz_sub.manually_scored.should be_false
+
+      last_version = @quiz_sub.versions.current.reload.model
+      last_version.score.should == 3
+      last_version.kept_score.should == 3
+      last_version.manually_scored.should be_true
+    end
   end
 
   it "should know if it is overdue" do

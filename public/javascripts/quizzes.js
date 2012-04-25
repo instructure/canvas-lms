@@ -969,6 +969,23 @@ define([
     }
   }
 
+  var QUESTION_LIMIT = 1000;
+  function questionLimitReached(inclusiveLimit) {
+    if (!ENV.QUIZZES || !ENV.QUIZZES.QUIZ) return false; // quizzes have a limit, question banks do not
+
+    var numQuestions = $('#questions .question_holder').not('.group').length;
+    $('#questions .group_top').find('input[name="quiz_group[pick_count]"]').each(function() {
+      numQuestions += parseInt(this.value);
+    });
+    if (inclusiveLimit ? (numQuestions > QUESTION_LIMIT) : (numQuestions >= QUESTION_LIMIT)) {
+      setTimeout(function() {
+        alert(I18n.t('question_limit_reached', 'You have reached the maximum number of questions allowed for a quiz (%{count}/%{limit}).\n\nAs a workaround, consider spreading the material across multiple quizzes.', {count: numQuestions, limit: QUESTION_LIMIT}))
+      });
+      return true;
+    }
+    return false;
+  }
+
   $(document).ready(function() {
     quiz.init().updateDisplayComments();
 
@@ -1467,6 +1484,7 @@ define([
 
     $(".add_question_group_link").click(function(event) {
       event.preventDefault();
+      if (questionLimitReached()) return;
       $(".question_form .submit_button:visible,.quiz_group_form .submit_button:visible").each(function() {
         $(this).parents("form").submit();
       });
@@ -1481,6 +1499,7 @@ define([
 
     $(".add_question_link").click(function(event) {
       event.preventDefault();
+      if (questionLimitReached()) return;
       $(".question_form:visible,.group_top.editing .quiz_group_form:visible").submit();
       var $question = makeQuestion();
       if ($(this).parents(".group_top").length > 0) {
@@ -1501,6 +1520,17 @@ define([
       $question.find(".question_type").change();
       $("html,body").scrollTo({top: $question.offset().top - 10, left: 0});
       $question.find(":input:first").focus().select();
+    });
+
+    quiz.$questions.delegate('.group_top input[name="quiz_group[pick_count]"]', {
+      focus: function() {
+        $(this).data('prev-value', this.value);
+      },
+      change: function() {
+        if (questionLimitReached(true)) {
+          this.value = $(this).data('prev-value');
+        }
+      }
     });
 
     var $findBankDialog = $("#find_bank_dialog");

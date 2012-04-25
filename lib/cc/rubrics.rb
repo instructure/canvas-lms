@@ -35,8 +35,9 @@ module CC
           "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
           "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |rubrics_node|
-        @course.rubrics.active.each do |rubric|
-          next unless export_object?(rubric)
+        @course.rubric_associations.each do |assoc|
+          rubric = assoc.rubric
+          next unless rubric.active? && export_object?(rubric)
           migration_id = CCHelper.create_key(rubric)
           rubrics_node.rubric(:identifier=>migration_id) do |r_node|
             atts = [:read_only, :title, :reusable, :public, :points_possible,

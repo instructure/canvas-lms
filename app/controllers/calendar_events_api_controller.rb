@@ -30,13 +30,13 @@ class CalendarEventsApiController < ApplicationController
         send(*date_scope_and_args(:due_between))
     else
       CalendarEvent.active.
-        for_user_and_context_codes(@current_user, @context_codes).
+        for_user_and_context_codes(@current_user, @context_codes, @section_codes).
         send(*date_scope_and_args)
     end
 
     events = Api.paginate(scope.order('id'), self, api_v1_calendar_events_path(search_params))
     CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
-    render :json => events.map{ |event| event_json(event, @current_user, session, :include => ["child_events"]) }
+    render :json => events.map{ |event| event_json(event, @current_user, session) }
   end
 
   def create
@@ -55,7 +55,7 @@ class CalendarEventsApiController < ApplicationController
   def show
     get_event(true)
     if authorized_action(@event, @current_user, :read)
-      render :json => event_json(@event, @current_user, session, :include => ["child_events"])
+      render :json => event_json(@event, @current_user, session)
     end
   end
 
@@ -94,6 +94,7 @@ class CalendarEventsApiController < ApplicationController
         @event.validate_context! if @event.context.is_a?(AppointmentGroup)
         @event.updating_user = @current_user
       end
+      params[:calendar_event].delete(:context_code)
       if @event.update_attributes(params[:calendar_event])
         render :json => event_json(@event, @current_user, session)
       else
@@ -161,6 +162,10 @@ class CalendarEventsApiController < ApplicationController
 
     selected_contexts = @contexts.select{ |c| codes.include?(c.asset_string) }
     @context_codes = selected_contexts.map(&:asset_string)
+    @section_codes = selected_contexts.inject([]){ |ary, context|
+      next ary unless context.is_a?(Course)
+      ary + context.sections_visible_to(@current_user).map(&:asset_string)
+    }
 
     if @type == :event && @start_date
       # pull in reservable appointment group events, if requested

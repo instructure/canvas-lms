@@ -290,6 +290,29 @@ describe "calendar2" do
         get_header_text.should == (current_month + ' ' + Time.now.year.to_s)
       end
 
+      it "should show section-level events, but not the parent event" do
+        @course.default_section.update_attribute(:name, "default section!")
+        s2 = @course.course_sections.create!(:name => "other section!")
+        date = Date.today
+        e1 = @course.calendar_events.build :title => "ohai",
+          :child_event_data => [
+            {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string},
+            {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string},
+          ]
+        e1.updating_user = @user
+        e1.save!
+
+        get "/calendar2"
+        wait_for_ajaximations
+        events = ff('.fc-event')
+        events.size.should eql 2
+        events.first.click
+
+        details = f('.event-details-content')
+        details.should_not be_nil
+        details.text.should include(@course.default_section.name)
+      end
+
       context "event editing" do
         it "should allow editing appointment events" do
           create_appointment_group
@@ -368,6 +391,30 @@ describe "calendar2" do
           is_checked('#scheduler').should be_true
           driver.find_element(:id, 'appointment-group-list').should include_text(ag.title)
         end
+      end
+
+      it "should show section-level events for the student's section" do
+        @course.default_section.update_attribute(:name, "default section!")
+        s2 = @course.course_sections.create!(:name => "other section!")
+        date = Date.today
+        e1 = @course.calendar_events.build :title => "ohai",
+          :child_event_data => [
+            {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => s2.asset_string},
+            {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => @course.default_section.asset_string},
+          ]
+        e1.updating_user = @teacher
+        e1.save!
+
+        get "/calendar2"
+        wait_for_ajaximations
+        events = ff('.fc-event')
+        events.size.should eql 1
+        events.first.text.should include "1p"
+        events.first.click
+
+        details = f('.event-details-content')
+        details.should_not be_nil
+        details.text.should include(@course.default_section.name)
       end
     end
   end
