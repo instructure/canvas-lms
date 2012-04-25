@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop xsi:schemaLocation="http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2">
+  <objectbank ident="i35b5819e71e59e50208a2071da15dee5">
+    <qtimetadata>
+      <qtimetadatafield>
+        <fieldlabel>bank_title</fieldlabel>
+        <fieldentry>Test Bank</fieldentry>
+      </qtimetadatafield>
+    </qtimetadata>
+    <item title="test fun" ident="ie690f9d83784275a4d26a26daee5ebca">
+      <itemmetadata>
+        <qtimetadata>
+          <qtimetadatafield>
+            <fieldlabel>question_type</fieldlabel>
+            <fieldentry>multiple_choice_question</fieldentry>
+          </qtimetadatafield>
+          <qtimetadatafield>
+            <fieldlabel>points_possible</fieldlabel>
+            <fieldentry>10</fieldentry>
+          </qtimetadatafield>
+        </qtimetadata>
+      </itemmetadata>
+      <presentation>
+        <material>
+          <mattext texttype="text/html">&lt;div&gt;&lt;p&gt;&lt;strong&gt;html for fun&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;</mattext>
+        </material>
+        <response_lid rcardinality="Single" ident="response1">
+          <render_choice>
+            <response_label ident="8080">
+              <material>
+                <mattext texttype="text/html">&lt;strong&gt;html answer 1&lt;/strong&gt;</mattext>
+              </material>
+            </response_label>
+            <response_label ident="2279">
+              <material>
+                <mattext texttype="text/html">&lt;strong&gt;html answer 2&lt;/strong&gt;</mattext>
+              </material>
+            </response_label>
+          </render_choice>
+        </response_lid>
+      </presentation>
+      <resprocessing>
+        <outcomes>
+          <decvar minvalue="0" vartype="Decimal" varname="SCORE" maxvalue="100"/>
+        </outcomes>
+        <respcondition continue="Yes">
+          <conditionvar>
+            <other/>
+          </conditionvar>
+          <displayfeedback linkrefid="general_fb" feedbacktype="Response"/>
+        </respcondition>
+        <respcondition continue="Yes">
+          <conditionvar>
+            <varequal respident="response1">8080</varequal>
+          </conditionvar>
+          <displayfeedback linkrefid="8080_fb" feedbacktype="Response"/>
+        </respcondition>
+        <respcondition continue="Yes">
+          <conditionvar>
+            <varequal respident="response1">2279</varequal>
+          </conditionvar>
+          <displayfeedback linkrefid="2279_fb" feedbacktype="Response"/>
+        </respcondition>
+        <respcondition continue="No">
+          <conditionvar>
+            <varequal respident="response1">8080</varequal>
+          </conditionvar>
+          <setvar action="Set" varname="SCORE">100</setvar>
+          <displayfeedback linkrefid="correct_fb" feedbacktype="Response"/>
+        </respcondition>
+        <respcondition continue="Yes">
+          <conditionvar>
+            <other/>
+          </conditionvar>
+          <displayfeedback linkrefid="general_incorrect_fb" feedbacktype="Response"/>
+        </respcondition>
+      </resprocessing>
+      <itemfeedback ident="general_fb">
+        <flow_mat>
+          <material>
+            <mattext texttype="text/html">&lt;strong&gt;meh&lt;/strong&gt;</mattext>
+          </material>
+        </flow_mat>
+      </itemfeedback>
+      <itemfeedback ident="correct_fb">
+        <flow_mat>
+          <material>
+            <mattext texttype="text/html">&lt;strong&gt;correct&lt;/strong&gt;</mattext>
+          </material>
+        </flow_mat>
+      </itemfeedback>
+      <itemfeedback ident="general_incorrect_fb">
+        <flow_mat>
+          <material>
+            <mattext texttype="text/html">&lt;strong&gt;incorrect&lt;/strong&gt;</mattext>
+          </material>
+        </flow_mat>
+      </itemfeedback>
+      <itemfeedback ident="8080_fb">
+        <flow_mat>
+          <material>
+            <mattext texttype="text/html">&lt;i&gt;comment&lt;/i&gt;</mattext>
+          </material>
+        </flow_mat>
+      </itemfeedback>
+      <itemfeedback ident="2279_fb">
+        <flow_mat>
+          <material>
+            <mattext texttype="text/html">&lt;i&gt;comment&lt;/i&gt;</mattext>
+          </material>
+        </flow_mat>
+      </itemfeedback>
+    </item>
+  </objectbank>
+</questestinterop>

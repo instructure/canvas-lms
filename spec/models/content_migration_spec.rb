@@ -405,6 +405,7 @@ describe ContentMigration do
     end
 
     it "should preserve media comment links" do
+      pending unless Qti.qti_enabled?
       @copy_from.media_objects.create!(:media_id => '0_12345678')
       @copy_from.syllabus_body = <<-HTML.strip
       <p>
@@ -421,6 +422,7 @@ describe ContentMigration do
     end
 
     it "should perform day substitutions" do
+      pending unless Qti.qti_enabled?
       @copy_from.assert_assignment_group
       today = Time.now.utc
       asmnt = @copy_from.assignments.build
@@ -502,6 +504,77 @@ describe ContentMigration do
       new_mod.unlock_at.to_i.should  == (new_start + 1.day).to_i
       new_mod.start_at.to_i.should == (new_start + 2.day).to_i
       new_mod.end_at.to_i.should == (new_start + 3.day).to_i
+    end
+
+    it "should leave file references in AQ context as-is on copy" do
+      pending unless Qti.qti_enabled?
+      @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
+      @attachment = attachment_with_context(@copy_from)
+      @attachment2 = @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+      data = {"name" => "Hi", "question_text" => <<-HTML, "answers" => [{"id" => 1}, {"id" => 2}]}
+      File ref:<img src="/courses/#{@copy_from.id}/files/#{@attachment.id}/download">
+      different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
+      media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+      HTML
+      @question = @bank.assessment_questions.create!(:question_data => data)
+      @question.reload.question_data['question_text'].should =~ %r{/assessment_questions/}
+
+      run_course_copy
+
+      bank = @copy_to.assessment_question_banks.first
+      bank.assessment_questions.count.should == 1
+      aq = bank.assessment_questions.first
+
+      aq.question_data['question_text'].should == @question.question_data['question_text']
+    end
+
+    it "should copy all html fields in assessment questions" do
+      pending unless Qti.qti_enabled?
+      @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
+      data = {:correct_comments_html => "<strong>correct</strong>",
+                          :question_type => "multiple_choice_question",
+                          :incorrect_comments_html => "<strong>incorrect</strong>",
+                          :neutral_comments_html => "<strong>meh</strong>",
+                          :question_name => "test fun",
+                          :name => "test fun",
+                          :points_possible => 10,
+                          :question_text => "<strong>html for fun</strong>",
+                          :answers =>
+                                  [{:migration_id => "QUE_1016_A1", :html => "<strong>html answer 1</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 100, :id => 8080},
+                                   {:migration_id => "QUE_1017_A2", :html => "<strong>html answer 2</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
+      aq_from1 = @bank.assessment_questions.create!(:question_data => data)
+      data2 = data.clone
+      data2[:question_text] = "<i>matching yo</i>"
+      data2[:question_type] = 'matching_question'
+      data2[:matches] = [{:match_id=>4835, :text=>"a", :html => '<i>a</i>'},
+                        {:match_id=>6247, :text=>"b", :html => '<i>a</i>'}]
+      data2[:answers][0][:match_id] = 4835
+      data2[:answers][0][:left_html] = data2[:answers][0][:html]
+      data2[:answers][0][:right] = "a"
+      data2[:answers][1][:match_id] = 6247
+      data2[:answers][1][:right] = "b"
+      data2[:answers][1][:left_html] = data2[:answers][1][:html]
+      aq_from2 = @bank.assessment_questions.create!(:question_data => data2)
+
+      run_course_copy
+
+      aq = @copy_to.assessment_questions.find_by_migration_id(mig_id(aq_from1))
+
+      aq.question_data[:question_text].should == data[:question_text]
+      aq.question_data[:answers][0][:html].should == data[:answers][0][:html]
+      aq.question_data[:answers][0][:comments_html].should == data[:answers][0][:comments_html]
+      aq.question_data[:answers][1][:html].should == data[:answers][1][:html]
+      aq.question_data[:answers][1][:comments_html].should == data[:answers][1][:comments_html]
+      aq.question_data[:correct_comments_html].should == data[:correct_comments_html]
+      aq.question_data[:incorrect_comments_html].should == data[:incorrect_comments_html]
+      aq.question_data[:neutral_comments_html].should == data[:neutral_comments_html]
+
+      # and the matching question
+      aq = @copy_to.assessment_questions.find_by_migration_id(mig_id(aq_from2))
+      aq.question_data[:answers][0][:html].should == data2[:answers][0][:html]
+      aq.question_data[:answers][0][:left_html].should == data2[:answers][0][:left_html]
+      aq.question_data[:answers][1][:html].should == data2[:answers][1][:html]
+      aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
     end
 
   end
