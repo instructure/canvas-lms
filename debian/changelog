@@ -1,3 +1,13 @@
+canvas-lms (2012.04.14.18) stable; urgency=low
+
+  * Package ref: f8d383e066262e218663dd7326ff1d6b68a689e6
+  *
+  * [+cf85b3d] fix media object urls that point to course files
+  * [+6e6d714] copy all html properties for quizzes
+  * [+f8d383e] properly copy links to equation images
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 25 Apr 2012 16:16:09 -0600
+
 canvas-lms (2012.04.14.17) stable; urgency=low
 
   * Package ref: 458e73cdc5a62044f095189edf2fc463dceee897
