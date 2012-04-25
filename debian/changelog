@@ -1,3 +1,14 @@
+canvas-lms (2012.04.28.09) testing; urgency=low
+
+  * Package ref: 8b744cdef9e64f6073ef7f5b323824bec4b2933f
+  *
+  * [+67da406] fix media object urls that point to course files
+  * [+cd1decb] copy all html properties for quizzes
+  * [+b807bce] properly copy links to equation images
+  * [+8b744cd] drop some more really old columns
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 25 Apr 2012 16:20:06 -0600
+
 canvas-lms (2012.04.28.08) testing; urgency=low
 
   * Package ref: de068e7062e6607531fb60411889e9ee402e2088
