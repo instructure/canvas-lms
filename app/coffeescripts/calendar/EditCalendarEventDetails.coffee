@@ -16,6 +16,7 @@ define [
       @form = $(editCalendarEventTemplate({
         title: @event.title
         contexts: @event.possibleContexts()
+        lockedTitle: @event.lockedTitle
       }))
       $(selector).append @form
 
@@ -29,8 +30,6 @@ define [
       # Hide the context selector completely if this is an existing event, since it can't be changed.
       if !@event.isNewEvent()
         @form.find(".context_select").hide()
-        @form.attr('method', 'PUT')
-        @form.attr('action', $.replaceTags(@event.contextInfo.calendar_event_url, 'id', @event.object.id))
 
     contextInfoForCode: (code) ->
       for context in @event.possibleContexts()
@@ -42,6 +41,7 @@ define [
       @form.find("select.context_id").change()
 
     moreOptionsClick: (jsEvent) =>
+      return if @event.object.parent_event_id
       jsEvent.preventDefault()
       pieces = $(jsEvent.target).attr('href').split("#")
       data = $("#edit_calendar_event_form").getFormData(object_name: 'calendar_event')
@@ -69,10 +69,9 @@ define [
       # Update the edit and more option urls
       moreOptionsHref = null
       if @event.isNewEvent()
-        @form.attr('action', @currentContextInfo.create_calendar_event_url)
         moreOptionsHref = @currentContextInfo.new_calendar_event_url
       else
-        moreOptionsHref  = $.replaceTags(@currentContextInfo.calendar_event_url, 'id', @event.object.id)
+        moreOptionsHref  = $.replaceTags(@currentContextInfo.calendar_event_url, 'id', @event.object.parent_event_id ? @event.object.id)
         moreOptionsHref += '/edit'
       @form.find(".more_options_link").attr 'href', moreOptionsHref
 
@@ -130,12 +129,13 @@ define [
         end_date = null
 
       params = {
-        'calendar_event[title]': data.title
+        'calendar_event[title]': data.title ? @event.title
         'calendar_event[start_at]': if start_date then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(start_date)) else ''
         'calendar_event[end_at]': if end_date then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(end_date)) else ''
       }
 
       if @event.isNewEvent()
+        params['calendar_event[context_code]'] = data.context_code
         objectData =
           calendar_event:
             title: params['calendar_event[title]']
