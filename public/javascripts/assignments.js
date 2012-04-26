@@ -313,7 +313,7 @@ define([
     }
   };
   var assignment_sortable_options = {
-    items: '.group_assignment',
+    items: '.group_assignment:not(.frozen)',
     connectWith: '.assignment_group .assignment_list',
     handle: '.move_icon, .move',
     axis: 'y',
