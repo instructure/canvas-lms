@@ -1010,6 +1010,7 @@ class ApplicationController < ActionController::Base
     hash = params.to_json.unpack('H*').first
     "/conversations##{hash}"
   end
+  helper_method :conversations_path
   
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
