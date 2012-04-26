@@ -343,6 +343,10 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user
+      elsif params[:course_section_id]
+        params[:context_id] = params[:course_section_id]
+        params[:context_type] = "CourseSection"
+        @context = CourseSection.find(params[:course_section_id])
       elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
         @context = @current_user
         @context_membership = @context
@@ -964,6 +968,9 @@ class ApplicationController < ActionController::Base
     options[:query] ||= {}
     options[:anchor] ||= {}
     contexts_to_link_to = Array(contexts_to_link_to)
+    if event = options.delete(:event)
+      options[:query][:event_id] = event.id
+    end
     if !contexts_to_link_to.empty? && options[:anchor].is_a?(Hash)
       options[:anchor][:show] = contexts_to_link_to.collect{ |c| 
         "group_#{c.class.to_s.downcase}_#{c.id}" 

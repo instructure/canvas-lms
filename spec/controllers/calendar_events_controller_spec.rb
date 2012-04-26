@@ -39,6 +39,14 @@ describe CalendarEventsController do
       assigns[:event].should_not be_nil
       assigns[:event].should eql(@event)
     end
+
+    it "should redirect if calendar2 is enabled and the user can't edit" do
+      Account.default.update_attribute(:settings, {:enable_scheduler => true})
+      course_with_student_logged_in(:active_all => true)
+      course_event
+      get 'show', :course_id => @course.id, :id => @event.id, :format => :json
+      response.should be_redirect
+    end
   end
   
   describe "GET 'new'" do

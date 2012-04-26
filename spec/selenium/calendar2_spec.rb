@@ -11,7 +11,8 @@ describe "calendar2" do
         :description => "Test event"
     }.with_indifferent_access.merge(params)
     c = CalendarEvent.new :description => opts[:description],
-                          :start_at => opts[:start]
+                          :start_at => opts[:start],
+                          :title => opts[:title]
     c.context = opts[:context]
     c.save!
     c
@@ -336,9 +337,10 @@ describe "calendar2" do
         events.size.should eql 2
         events.first.click
 
-        details = f('.event-details-content')
+        details = f('.event-details')
         details.should_not be_nil
         details.text.should include(@course.default_section.name)
+        details.find_element(:css, '.view_event_link')[:href].should include "/calendar_events/#{e1.id}" # links to parent event
       end
 
       context "event editing" do
@@ -443,6 +445,16 @@ describe "calendar2" do
         details = f('.event-details-content')
         details.should_not be_nil
         details.text.should include(@course.default_section.name)
+      end
+
+      it "should redirect to the calendar and show the selected event" do
+        event = make_event(:context => @course, :start => 2.months.from_now, :title => "future event")
+        get "/courses/#{@course.id}/calendar_events/#{event.id}"
+        wait_for_ajaximations
+
+        popup_title = f('.details_title')
+        popup_title.should be_displayed
+        popup_title.text.should eql "future event"
       end
     end
   end

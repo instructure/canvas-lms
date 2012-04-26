@@ -574,6 +574,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.calendar 'calendar', :controller => 'calendars', :action => 'show', :conditions => { :method => :get }
   map.calendar2 'calendar2', :controller => 'calendars', :action => 'show2', :conditions => { :method => :get }
+  map.course_section_calendar_event 'course_sections/:course_section_id/calendar_events/:id', :controller => :calendar_events, :action => 'show', :conditions => { :method => :get }
   map.switch_calendar 'switch_calendar/:preferred_calendar', :controller => 'calendars', :action => 'switch_calendar', :conditions => { :method => :post }
   map.files 'files', :controller => 'files', :action => 'full_index', :conditions => { :method => :get }
   map.s3_success 'files/s3_success/:id', :controller => 'files', :action => 's3_success'
