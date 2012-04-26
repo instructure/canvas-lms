@@ -71,8 +71,7 @@ define [
       if @event.isNewEvent()
         moreOptionsHref = @currentContextInfo.new_calendar_event_url
       else
-        moreOptionsHref  = $.replaceTags(@currentContextInfo.calendar_event_url, 'id', @event.object.parent_event_id ? @event.object.id)
-        moreOptionsHref += '/edit'
+        moreOptionsHref = @event.fullDetailsURL() + '/edit'
       @form.find(".more_options_link").attr 'href', moreOptionsHref
 
     setupTimeAndDatePickers: () =>
