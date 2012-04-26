@@ -388,10 +388,7 @@ Spec::Runner.configure do |config|
     path.should eql("/?login_success=1")
   end
 
-  # The block should return the submission_data. A block is used so
-  # that we have access to the @questions variable that is created
-  # in this method
-  def quiz_with_graded_submission(questions, opts={}, &block)
+  def assignment_quiz(questions, opts={})
     course = opts[:course] || course(:active_course => true)
     user = opts[:user] || user(:active_user => true)
     course.enroll_student(user) unless user.enrollments.any?{|e| e.course_id == course.id}
@@ -404,6 +401,13 @@ Spec::Runner.configure do |config|
     @quiz.generate_quiz_data
     @quiz.workflow_state = "available"
     @quiz.save!
+  end
+
+  # The block should return the submission_data. A block is used so
+  # that we have access to the @questions variable that is created
+  # in this method
+  def quiz_with_graded_submission(questions, opts={}, &block)
+    assignment_quiz(questions, opts)
     @quiz_submission = @quiz.generate_submission(user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
