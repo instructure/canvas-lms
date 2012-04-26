@@ -745,6 +745,7 @@ describe Attachment do
       # if the test environment isn't configured for s3, the plugin never got created,
       # and the settings will never be considered valid
       ps.any_instantiation.stubs(:valid_settings?).returns(true)
+      Attachment.domain_namespace = nil
       attachment_model
       @attachment.s3_config[:bucket_name].should == 'pluginsetting_bucket'
     end
