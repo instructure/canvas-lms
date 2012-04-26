@@ -666,8 +666,8 @@ define([
     $box.find(".title").attr('href', $event.find('.title').attr('href'));
     $box.find(".view_event_link").attr('href', $event.find('.title').attr('href'));
     $box.find(".delete_event_link").attr('href', $event.find('.delete_' + data.event_type + '_link').attr('href'));
-    $box.find(".edit_event").showIf(data.can_edit);
-    $box.find(".delete_event").showIf(data.can_delete);
+    $box.find(".edit_event").showIf(data.can_edit && !data.frozen);
+    $box.find(".delete_event").showIf(data.can_delete && !data.frozen);
     var isNew = $event.attr('id') == "event_blank";
     var type_name = "Event";
     var $form = null;

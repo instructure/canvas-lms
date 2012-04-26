@@ -89,6 +89,9 @@
             <span class="assignment_assignment_group_id assignment[assignment_group_id]"><%= topic.try_rescue(:assignment).try_rescue(:assignment_group_id) || nbsp %></span>
             <span class="assignment_points_possible assignment[points_possible]"><%= topic.try_rescue(:assignment).try_rescue(:points_possible) || nbsp %></span>
             <span class="assignment_due_at assignment[due_at]"><%= datetime_string(topic.try_rescue(:assignment).try_rescue(:due_at), :long) || nbsp %></span>
+            <% if topic.try_rescue(:assignment) && topic.assignment.frozen_for_user?(@current_user)%>
+              <span class="assignment_is_frozen assignment[is_frozen]">true</span>
+            <% end %>
           </div>
         </div>
       <% end %>

@@ -194,6 +194,73 @@ describe "assignments" do
       driver.find_element(:css, 'h2.title').should include_text(assignment_name + ' edit')
     end
 
+    context "frozen assignments" do
+
+      append_before (:each) do
+        @att_map = {"lock_at" => "yes",
+                  "assignment_group" => "yes",
+                  "title" => "no",
+                  "assignment_group_id" => "yes",
+                  "submission_types" => "yes",
+                  "points_possible" => "yes",
+                  "description" => "yes",
+                  "peer_reviews" => "yes",
+                  "grading_type" => "yes"}
+        PluginSetting.stubs(:settings_for_plugin).returns(@att_map)
+
+        @asmnt = @course.assignments.create!(
+            :name => "frozen",
+            :due_at => Time.now.utc + 2.days,
+            :assignment_group => @course.assignment_groups.create!(:name => "default"),
+            :freeze_on_copy => true
+        )
+        @asmnt.copied = true
+        @asmnt.save!
+      end
+
+      def run_assignment_edit
+         orig_title = @asmnt.title
+
+        get "/courses/#{@course.id}/assignments"
+
+        expect_new_page_load { driver.find_element(:link, orig_title).click }
+        driver.find_element(:css, '.edit_full_assignment_link').click
+        driver.find_element(:css, '.more_options_link').click
+
+        yield
+
+        # title isn't locked, should allow editing
+        driver.find_element(:id, 'assignment_title').send_keys(' edit')
+
+        #save changes
+        driver.find_element(:id, 'edit_assignment_form').submit
+        wait_for_ajaximations
+        driver.find_elements(:css, '.loading_image_holder').length.should eql 0
+        driver.find_element(:css, 'h2.title').should include_text(orig_title + ' edit')
+      end
+
+      it "should respect frozen attributes for teacher" do
+        skip_if_ie('Out of memory')
+
+        run_assignment_edit do
+          f('#assignment_assignment_group_id').should be_nil
+          f('#edit_assignment_form #assignment_peer_reviews').should be_nil
+          f('#edit_assignment_form #assignment_description').should be_nil
+        end
+      end
+
+      it "should not be locked for admin" do
+        skip_if_ie('Out of memory')
+        course_with_admin_logged_in(:course => @course, :name => "admin user")
+
+        run_assignment_edit do
+          f('#assignment_assignment_group_id').should_not be_nil
+          f('#edit_assignment_form #assignment_peer_reviews').should_not be_nil
+          f('#edit_assignment_form #assignment_description').should_not be_nil
+        end
+      end
+    end
+
     it "should show a \"more errors\" errorBox if any invalid fields are hidden" do
       assignment_name = 'first test assignment'
       @group = @course.assignment_groups.create!(:name => "default")

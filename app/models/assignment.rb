@@ -32,8 +32,8 @@ class Assignment < ActiveRecord::Base
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :set_custom_field_values, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes
-  attr_accessor :original_id
+    :external_tool_tag_attributes, :freeze_on_copy
+  attr_accessor :original_id, :updating_user
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
@@ -77,6 +77,7 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :context_type
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
 
   acts_as_list :scope => :assignment_group_id
   has_a_broadcast_policy
@@ -1261,7 +1262,7 @@ class Assignment < ActiveRecord::Base
   named_scope :only_graded, :conditions => "submission_types != 'not_graded'"
 
   named_scope :with_just_calendar_attributes, lambda {
-    { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types'] - ['cloned_item_id', 'migration_id']).join(", ") }
+    { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", ") }
   }
 
   named_scope :due_between, lambda { |start, ending|
@@ -1520,6 +1521,7 @@ class Assignment < ActiveRecord::Base
     description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context)
     description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
     item.description = description
+    item.copied = true
     if !hash[:submission_types].blank?
       item.submission_types = hash[:submission_types]
     elsif ['discussion_topic'].include?(hash[:submission_format])
@@ -1595,7 +1597,7 @@ class Assignment < ActiveRecord::Base
     [:all_day, :turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
      :automatic_peer_reviews, :anonymous_peer_reviews,
      :grade_group_students_individually, :allowed_extensions, :min_score,
-     :max_score, :mastery_score, :position, :peer_review_count
+     :max_score, :mastery_score, :position, :peer_review_count, :freeze_on_copy
     ].each do |prop|
       item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
     end
@@ -1686,5 +1688,39 @@ class Assignment < ActiveRecord::Base
     }
   end
   protected :infer_comment_context_from_filename
+
+  FREEZABLE_ATTRIBUTES = %w{title description lock_at points_possible grading_type
+                            submission_types assignment_group_id allowed_extensions
+                            group_category_id notify_of_update peer_reviews workflow_state}
+  def frozen?
+    !!(self.freeze_on_copy && self.copied && PluginSetting.settings_for_plugin(:assignment_freezer))
+  end
+
+  def frozen_for_user?(user)
+    frozen? && !self.context.grants_right?(user, :manage_frozen_assignments)
+  end
+
+  def att_frozen?(att, user=nil)
+    return false unless frozen?
+    if settings = PluginSetting.settings_for_plugin(:assignment_freezer)
+      if Canvas::Plugin.value_to_boolean(settings[att.to_s])
+        if user
+          return !self.context.grants_right?(user, :manage_frozen_assignments)
+        else
+          return true
+        end
+      end
+    end
+
+    false
+  end
+
+  def frozen_atts_not_altered
+    FREEZABLE_ATTRIBUTES.each do |att|
+      if self.changes[att] && att_frozen?(att, @updating_user)
+        self.errors.add(att, t('errors.cannot_save_att', "You don't have permission to edit the locked attribute %{att_name}", :att_name => att))
+      end
+    end
+  end
 
 end

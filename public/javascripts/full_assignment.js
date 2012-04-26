@@ -78,17 +78,22 @@ define([
         $form.find("select[name='points_type']").change();
         $form.fillFormData(data, {object_name: 'assignment'});
         $assignment.find(".description, .edit_full_assignment_link").hide();
-        $form.show().find("textarea:first").editorBox();
-        if (wikiSidebar) {
-          wikiSidebar.attachToEditor($form.find("textarea:first"));
-          wikiSidebar.show();
-          $("#sidebar_content").hide();
+        $form.show();
+        if (!ENV.HIDE_DESCRIPTION){
+          $form.find("textarea:first").editorBox();
+          if (wikiSidebar) {
+            wikiSidebar.attachToEditor($form.find("textarea:first"));
+            wikiSidebar.show();
+            $("#sidebar_content").hide();
+          }
         }
         $form.find(".more_options_link").show();
         $form.find(".more_assignment_values").hide();
-        setTimeout(function(){
-          doFocus($form.find("textarea:first").attr('id'));
-        }, 500);
+        if (!ENV.HIDE_DESCRIPTION){
+          setTimeout(function(){
+            doFocus($form.find("textarea:first").attr('id'));
+          }, 500);
+        }
         if (!$form.parents(".ui-dialog").length ) {
           $("html,body").scrollTo($form);
         }

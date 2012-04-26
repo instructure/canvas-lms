@@ -602,6 +602,11 @@ class RoleOverride < ActiveRecord::Base
         :label => lambda { t('permissions.manage_sections', "Manage (create / edit / delete) course sections") },
         :true_for => %w(AccountAdmin TeacherEnrollment DesignerEnrollment),
         :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment),
+      },
+      :manage_frozen_assignments => {
+        :label => lambda { t('permissions.manage_frozen_assignment', "Manage (edit / delete) frozen assignments") },
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
       }
     })
 
