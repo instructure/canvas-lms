@@ -50,51 +50,102 @@ describe QuizSubmission do
     q.end_at.should eql original_end_at
   end
 
-  it "should not allow updating scores on an uncompleted submission" do
-    q = @quiz.quiz_submissions.create!
-    q.state.should eql(:untaken)
-    res = q.update_scores rescue false
-    res.should eql(false)
-  end
+  describe "#update_scores" do
+    before(:each) do
+      student_in_course
+      assignment_quiz([])
+      qd = multiple_choice_question_data
+      @quiz.quiz_data = [qd]
+      @quiz.points_possible = qd[:points_possible]
+      @quiz.save!
+    end
 
-  it "should allow updating scores on a completed version of a submission while the current version is in progress" do
-    course_with_student(:active_all => true)
-    @quiz = @course.quizzes.create!
-    qs = @quiz.generate_submission(@user)
-    qs.submission_data = { "foo" => "bar1" }
-    qs.grade_submission
+    it "should update scores for a completed submission" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "1658" }
+      qs.grade_submission
 
-    qs = @quiz.generate_submission(@user)
-    qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
-    qs.reload.attempt.should == 2
-    lambda {qs.update_scores}.should raise_error
-    lambda {qs.update_scores(:submission_version_number => 1) }.should_not raise_error
+      # sanity check
+      qs.reload
+      qs.score.should == 50
+      qs.kept_score.should == 50
 
-    qs.reload
-    qs.should be_untaken
-    qs.score.should be_nil
-  end
+      qs.update_scores({:fudge_points => -5, :question_score_1 => 50})
+      qs.score.should == 45
+      qs.fudge_points.should == -5
+      qs.kept_score.should == 45
+      v = qs.versions.current.model
+      v.score.should == 45
+      v.fudge_points.should == -5
+    end
 
-  it "should keep kept_score up-to-date when score changes while quiz is being re-taken" do
-    course_with_student(:active_all => true)
-    @quiz = @course.quizzes.create!(:scoring_policy => 'keep_highest')
-    qs = @quiz.generate_submission(@user)
-    qs.submission_data = { "foo" => "bar1" }
-    qs.grade_submission
-    qs.kept_score.should == 0
+    it "should not allow updating scores on an uncompleted submission" do
+      qs = @quiz.generate_submission(@student)
+      qs.should be_untaken
+      lambda { qs.update_scores }.should raise_error
+    end
 
-    qs = @quiz.generate_submission(@user)
-    qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
-    qs.reload
+    it "should update scores for a previous submission" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "2405" }
+      qs.grade_submission
 
-    qs.update_scores(:submission_version_number => 1, :fudge_points => 3)
-    qs.reload
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "8544" }
+      qs.grade_submission
 
-    qs.should be_untaken
-    # score is nil because the current attempt is still in progress
-    # but kept_score is 3 because that's the higher score of the previous attempt
-    qs.score.should be_nil
-    qs.kept_score.should == 3
+      # sanity check
+      qs.score.should == 0
+      qs.kept_score.should == 0
+      qs.versions.count.should == 2
+
+      qs.update_scores({:submission_version_number => 1, :fudge_points => 10, :question_score_1 => 0})
+      qs.score.should == 0
+      qs.kept_score.should == 10
+      qs.versions.get(1).model.score.should == 10
+      qs.versions.current.model.score.should == 0
+    end
+
+    it "should allow updating scores on a completed version of a submission while the current version is in progress" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "2405" }
+      qs.grade_submission
+
+      qs = @quiz.generate_submission(@student)
+      qs.backup_submission_data({ "question_1" => "" }) # simulate k/v pairs we store for quizzes in progress
+      qs.reload.attempt.should == 2
+
+      lambda { qs.update_scores }.should raise_error
+      lambda { qs.update_scores(:submission_version_number => 1, :fudge_points => 1, :question_score_1 => 0) }.should_not raise_error
+
+      qs.should be_untaken
+      qs.score.should be_nil
+      qs.kept_score.should == 1
+
+      v = qs.versions.current.model
+      v.score.should == 1
+      v.fudge_points.should == 1
+    end
+
+    it "should keep kept_score up-to-date when score changes while quiz is being re-taken" do
+      qs = @quiz.generate_submission(@user)
+      qs.submission_data = { "question_1" => "2405" }
+      qs.grade_submission
+      qs.kept_score.should == 0
+
+      qs = @quiz.generate_submission(@user)
+      qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
+      qs.reload
+
+      qs.update_scores(:submission_version_number => 1, :fudge_points => 3)
+      qs.reload
+
+      qs.should be_untaken
+      # score is nil because the current attempt is still in progress
+      # but kept_score is 3 because that's the higher score of the previous attempt
+      qs.score.should be_nil
+      qs.kept_score.should == 3
+    end
   end
 
   it "should not allowed grading on an already-graded submission" do
@@ -217,7 +268,6 @@ describe QuizSubmission do
 
       last_version = @quiz_sub.versions.current.reload.model
       last_version.score.should == 3
-      last_version.kept_score.should == 3
       last_version.manually_scored.should be_true
     end
   end
@@ -1092,6 +1142,97 @@ describe QuizSubmission do
       lambda {
         QuizSubmission.score_question(q, { "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "bleh" })
       }.should_not raise_error
+    end
+  end
+
+  describe "#score_to_keep" do
+    before(:each) do
+      student_in_course
+      assignment_quiz([])
+      qd = multiple_choice_question_data
+      @quiz.quiz_data = [qd]
+      @quiz.points_possible = qd[:points_possible]
+      @quiz.save!
+    end
+
+    context "keep_highest" do
+      before(:each) do
+        @quiz.scoring_policy = "keep_highest"
+        @quiz.save!
+      end
+
+      it "should be nil during first in-progress submission" do
+        qs = @quiz.generate_submission(@student)
+        qs.score_to_keep.should be_nil
+      end
+
+      it "should be the submission score for one complete submission" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs.score_to_keep.should == @quiz.points_possible
+      end
+
+      it "should be correct for multiple complete versions" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
+        qs.score_to_keep.should == @quiz.points_possible
+      end
+
+      it "should be correct for multiple versions, current version in progress" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.score_to_keep.should == @quiz.points_possible
+      end
+    end
+
+    context "keep_latest" do
+      before(:each) do
+        @quiz.scoring_policy = "keep_latest"
+        @quiz.save!
+      end
+
+      it "should be nil during first in-progress submission" do
+        qs = @quiz.generate_submission(@student)
+        qs.score_to_keep.should be_nil
+      end
+
+      it "should be the submission score for one complete submission" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs.score_to_keep.should == @quiz.points_possible
+      end
+
+      it "should be correct for multiple complete versions" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
+        qs.score_to_keep.should == 0
+      end
+
+      it "should be correct for multiple versions, current version in progress" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.score_to_keep.should == 0
+      end
     end
   end
 
