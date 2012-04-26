@@ -45,7 +45,7 @@ define [
       this
 
     destroyModel: =>
-      msg = I18n.t "confirm_delete_calendar_event", "Are you sure you wan to delete this calendar event?"
+      msg = I18n.t "confirm_delete_calendar_event", "Are you sure you want to delete this calendar event?"
       if confirm(msg)
         @$el.disableWhileLoading @model.destroy success: =>
           @redirectWithMessage I18n.t('event_deleted', "%{event_title} deleted successfully", event_title: @model.get('title'))
@@ -68,7 +68,7 @@ define [
       eventData.use_section_dates = !!eventData.use_section_dates
       _.each [eventData].concat(eventData.child_event_data), @setStartEnd
 
-      @$el.disableWhileLoading @model.save eventData, success: ->
+      @$el.disableWhileLoading @model.save eventData, success: =>
         @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully'
 
     setStartEnd: (obj) ->
