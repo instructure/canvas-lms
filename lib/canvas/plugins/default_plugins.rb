@@ -178,3 +178,25 @@ Canvas::Plugin.register('sis_import', :sis, {
                  :minimum_rows_for_parallel => 1000,
                  :queue_for_parallel_jobs => nil }
 })
+if Attachment.s3_storage?
+  Canvas::Plugin.register('s3', nil, {
+      :name => lambda { t :name, 'S3' },
+      :description => lambda { t :description, 'S3 storage for files' },
+      :website => 'http://www.instructure.com',
+      :author => 'Instructure',
+      :author_website => 'http://www.instructure.com',
+      :version => '1.0.0',
+      :settings_partial => 'plugins/s3_settings',
+      :settings => Attachment.s3_config
+  })
+end
+Canvas::Plugin.register('assignment_freezer', nil, {
+  :name => lambda{ t :name, 'Assignment Property Freezer' },
+  :description => lambda{ t :description, 'Freeze Assignment Properties on Copy' },
+  :website => 'http://www.instructure.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/assignment_freezer_settings',
+  :settings => nil
+})
