@@ -67,10 +67,10 @@ shared_examples_for "discussions selenium tests" do
 
   def click_entry_option(discussion_entry, menu_item_selector)
     li_selector = %([data-id$="#{discussion_entry.id}"])
-    f(li_selector).should be_displayed
     menu_item = keep_trying_until do
-      f(li_selector).find_element(:css, '.al-trigger').should be_displayed
-      f(li_selector).find_element(:css, '.al-trigger').click
+      fj(li_selector).should be_displayed
+      fj(li_selector).find_element(:css, '.al-trigger').should be_displayed
+      fj(li_selector).find_element(:css, '.al-trigger').click
       menu_item = f(menu_item_selector)
       menu_item.should be_displayed
       menu_item
