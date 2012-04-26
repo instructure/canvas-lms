@@ -22,13 +22,14 @@ describe ContentMigration do
 
   context "course copy" do
     before do
-      course_with_teacher(:course_name => "from course")
+      course_with_teacher(:course_name => "from course", :active_all => true)
       @copy_from = @course
 
       course_with_teacher(:user => @user, :course_name => "to course")
       @copy_to = @course
 
       @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
+      @cm.user = @user
       @cm.save!
     end
 
@@ -575,6 +576,18 @@ describe ContentMigration do
       aq.question_data[:answers][0][:left_html].should == data2[:answers][0][:left_html]
       aq.question_data[:answers][1][:html].should == data2[:answers][1][:html]
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
+    end
+
+    it "should send the correct emails" do
+      Notification.create!(:name => 'Migration Export Ready')
+      Notification.create!(:name => 'Migration Import Failed')
+      Notification.create!(:name => 'Migration Import Finished')
+
+      run_course_copy
+
+      @cm.messages_sent['Migration Export Ready'].should be_blank
+      @cm.messages_sent['Migration Import Finished'].should be_blank
+      @cm.messages_sent['Migration Import Failed'].should be_blank
     end
 
   end
