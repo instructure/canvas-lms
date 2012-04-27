@@ -1627,9 +1627,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def <=>(comparable)
-    if comparable.respond_to?(:due_at)
-      (self.due_at || Time.new) <=> (comparable.due_at || Time.new)
-    end
+      sort_key <=> comparable.sort_key
+  end
+
+  def sort_key
+    [(self.due_at || Time.parse("Jan 1 3000")), self.title]
   end
 
   def special_class; nil; end

@@ -98,10 +98,10 @@ describe "assignments" do
       due_date = Time.now.utc + 2.days
       group = @course.assignment_groups.create!(:name => "default")
       @course.assignments.create!(
-        :name => assignment_name,
-        :due_at => due_date,
-        :assignment_group => group,
-        :unlock_at => due_date - 1.day
+          :name => assignment_name,
+          :due_at => due_date,
+          :assignment_group => group,
+          :unlock_at => due_date - 1.day
       )
       @assignment = @course.assignments.last
       get "/courses/#{@course.id}/assignments"
@@ -198,14 +198,14 @@ describe "assignments" do
 
       append_before (:each) do
         @att_map = {"lock_at" => "yes",
-                  "assignment_group" => "yes",
-                  "title" => "no",
-                  "assignment_group_id" => "yes",
-                  "submission_types" => "yes",
-                  "points_possible" => "yes",
-                  "description" => "yes",
-                  "peer_reviews" => "yes",
-                  "grading_type" => "yes"}
+                    "assignment_group" => "yes",
+                    "title" => "no",
+                    "assignment_group_id" => "yes",
+                    "submission_types" => "yes",
+                    "points_possible" => "yes",
+                    "description" => "yes",
+                    "peer_reviews" => "yes",
+                    "grading_type" => "yes"}
         PluginSetting.stubs(:settings_for_plugin).returns(@att_map)
 
         @asmnt = @course.assignments.create!(
@@ -219,7 +219,7 @@ describe "assignments" do
       end
 
       def run_assignment_edit
-         orig_title = @asmnt.title
+        orig_title = @asmnt.title
 
         get "/courses/#{@course.id}/assignments"
 
@@ -293,10 +293,10 @@ describe "assignments" do
 
     it "should allow a student view student to view/submit assignments" do
       @assignment = @course.assignments.create(
-        :title => 'Cool Assignment',
-        :points_possible => 10,
-        :submission_types => "online_text_entry",
-        :due_at => Time.now.utc + 2.days)
+          :title => 'Cool Assignment',
+          :points_possible => 10,
+          :submission_types => "online_text_entry",
+          :due_at => Time.now.utc + 2.days)
 
       enter_student_view
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -316,10 +316,10 @@ describe "assignments" do
 
     it "should allow a student view student to submit file upload assignments" do
       @assignment = @course.assignments.create(
-        :title => 'Cool Assignment',
-        :points_possible => 10,
-        :submission_types => "online_upload",
-        :due_at => Time.now.utc + 2.days)
+          :title => 'Cool Assignment',
+          :points_possible => 10,
+          :submission_types => "online_upload",
+          :due_at => Time.now.utc + 2.days)
 
       enter_student_view
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -343,7 +343,24 @@ describe "assignments" do
     DUE_DATE = Time.now.utc + 2.days
     before (:each) do
       course_with_student_logged_in
-      @assignment = @course.assignments.create!(:name => 'assignment', :due_at => DUE_DATE)
+      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => DUE_DATE)
+      @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
+      @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
+      @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => DUE_DATE - 1.day)
+    end
+
+    it "should not sort undated assignments first and it should order them by title" do
+      get "/courses/#{@course.id}/assignments"
+      titles = ff('.title')
+      titles[2].text.should == @second_assignment.title
+      titles[3].text.should == @third_assignment.title
+    end
+
+    it "should order upcoming assignments starting with first due" do
+      get "/courses/#{@course.id}/assignments"
+      titles = ff('.title')
+      titles[0].text.should == @fourth_assignment.title
+      titles[1].text.should == @assignment.title
     end
 
     it "should allow you to submit a file" do
@@ -390,9 +407,9 @@ describe "assignments" do
 
     it "should expand the comments box on click" do
       @assignment = @course.assignments.create!(
-        :name => 'test assignment',
-        :due_at => Time.now.utc + 2.days,
-        :submission_types => 'online_upload')
+          :name => 'test assignment',
+          :due_at => Time.now.utc + 2.days,
+          :submission_types => 'online_upload')
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
