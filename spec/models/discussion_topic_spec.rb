@@ -264,6 +264,13 @@ describe DiscussionTopic do
       @topic.save
       subtopics.each {|st| st.reload.discussion_type.should == 'threaded' }
     end
+
+    it "should not rename the assignment to match a subtopic" do
+      topic_for_group_assignment
+      original_name = @assignment.title
+      @assignment.reload
+      @assignment.title.should == original_name
+    end
   end
 
   context "root_topic?" do

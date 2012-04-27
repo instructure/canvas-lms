@@ -140,7 +140,7 @@ class DiscussionTopic < ActiveRecord::Base
     if @old_assignment_id
       Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => @old_assignment_id, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic'})
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
-    elsif self.assignment && @saved_by != :assignment
+    elsif self.assignment && @saved_by != :assignment && !self.root_topic_id
       self.assignment.title = self.title
       self.assignment.description = self.message
       self.assignment.submission_types = "discussion_topic"
