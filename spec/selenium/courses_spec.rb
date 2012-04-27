@@ -128,7 +128,6 @@ describe "courses" do
         course_copy_helper do |driver|
           driver.find_element(:id, 'copy_everything').click
           wait_for_ajaximations
-          driver.find_element(:id, 'uncheck_everything').click
           @second_course.wiki.wiki_pages[0..2].each do |page|
             driver.find_element(:id, "copy_wiki_pages_#{CC::CCHelper.create_key(page)}").click
           end
