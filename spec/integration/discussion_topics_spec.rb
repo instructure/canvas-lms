@@ -60,4 +60,20 @@ describe "discussion_topics" do
     doc = Nokogiri::XML(response.body)
     doc.at_css('.assignment_peer_reviews_link').should_not be_nil
   end
+
+  it "should include threaded property in json" do
+    course_with_student_logged_in(:active_all => true)
+    topic1 = @course.discussion_topics.build(:title => 'a threaded discussion')
+    topic1.discussion_type = DiscussionTopic::DiscussionTypes::THREADED
+    topic1.save
+    topic2 = @course.discussion_topics.build(:title => 'a side-comment discussion')
+    topic2.discussion_type = DiscussionTopic::DiscussionTypes::SIDE_COMMENT
+    topic2.save
+    get "/courses/#{@course.id}/discussion_topics.json"
+    response.should be_success
+    JSON.parse(response.body.sub(/^while\(1\);/, '')).each do |json|
+      json["discussion_topic"]["threaded"].should be_true if json["discussion_topic"]["id"] == topic1.id
+      json["discussion_topic"]["threaded"].should be_false if json["discussion_topic"]["id"] == topic2.id
+    end
+  end
 end
