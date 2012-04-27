@@ -78,6 +78,7 @@ class DiscussionTopic < ActiveRecord::Base
   def threaded?
     self.discussion_type == DiscussionTypes::THREADED
   end
+  alias :threaded :threaded?
 
   def discussion_type
     read_attribute(:discussion_type) || DiscussionTypes::SIDE_COMMENT
