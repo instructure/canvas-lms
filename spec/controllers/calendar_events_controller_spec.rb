@@ -44,8 +44,21 @@ describe CalendarEventsController do
       Account.default.update_attribute(:settings, {:enable_scheduler => true})
       course_with_student_logged_in(:active_all => true)
       course_event
-      get 'show', :course_id => @course.id, :id => @event.id, :format => :json
+      get 'show', :course_id => @course.id, :id => @event.id
       response.should be_redirect
+      response.redirected_to.should include "include_contexts=#{@course.asset_string}"
+    end
+
+    it "should redirect to the effective calendar if calendar2 is enabled and the user can't edit" do
+      Account.default.update_attribute(:settings, {:enable_scheduler => true})
+      course_with_student_logged_in(:active_all => true)
+      parent_event = @course.calendar_events.build(:title => "something", :child_event_data => {"0" => {:start_at => Time.now, :end_at => 1.hour.from_now, :context_code => @course.default_section.asset_string}})
+      parent_event.updating_user = @teacher
+      parent_event.save!
+      event = parent_event.child_events.first
+      get 'show', :course_section_id => @course.default_section.id, :id => event.id
+      response.should be_redirect
+      response.redirected_to.should include "include_contexts=#{@course.asset_string}" # goes to course calendar
     end
   end
   

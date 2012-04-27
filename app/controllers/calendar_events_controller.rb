@@ -32,7 +32,7 @@ class CalendarEventsController < ApplicationController
     end
     if authorized_action(@event, @current_user, :read)
       if @domain_root_account.enable_scheduler? # no read-only view for calendar2
-        return redirect_to calendar_url_for(@context, :event => @event) unless @event.grants_right?(@current_user, session, :update)
+        return redirect_to calendar_url_for(@event.effective_context, :event => @event) unless @event.grants_right?(@current_user, session, :update)
       end
       log_asset_access(@event, "calendar", "calendar")
       respond_to do |format|
