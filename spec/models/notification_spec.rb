@@ -246,6 +246,18 @@ describe Notification do
       messages.map(&:to).sort.should == ['dashboard', 'value for path']
     end
 
+    it "should force certain categories to send immediately" do
+      notification_set(:notification_opts => { :name => "Thing 1", :category => 'Not Migration' })
+      @notification_policy.frequency = 'daily'
+      @notification_policy.save!
+      expect { @notification.create_message(@assignment, @user) }.to change(DelayedMessage, :count).by 1
+
+      notification_set(:notification_opts => { :name => "Thing 2", :category => 'Migration' })
+      @notification_policy.frequency = 'daily'
+      @notification_policy.save!
+      expect { @notification.create_message(@assignment, @user) }.to change(DelayedMessage, :count).by 0
+    end
+
     context "sharding" do
       it_should_behave_like "sharding"
 

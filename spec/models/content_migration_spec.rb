@@ -632,18 +632,35 @@ describe ContentMigration do
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
     end
 
-    it "should send the correct emails" do
-      Notification.create!(:name => 'Migration Export Ready')
-      Notification.create!(:name => 'Migration Import Failed')
-      Notification.create!(:name => 'Migration Import Finished')
+    context "notifications" do
+      before(:each) do
+        Notification.create!(:name => 'Migration Export Ready', :category => 'Migration')
+        Notification.create!(:name => 'Migration Import Failed', :category => 'Migration')
+        Notification.create!(:name => 'Migration Import Finished', :category => 'Migration')
+      end
 
-      run_course_copy
+      it "should send the correct emails" do
+        run_course_copy
 
-      @cm.messages_sent['Migration Export Ready'].should be_blank
-      @cm.messages_sent['Migration Import Finished'].should be_blank
-      @cm.messages_sent['Migration Import Failed'].should be_blank
+        @cm.messages_sent['Migration Export Ready'].should be_blank
+        @cm.messages_sent['Migration Import Finished'].should be_blank
+        @cm.messages_sent['Migration Import Failed'].should be_blank
+      end
+
+      it "should send notifications immediately" do
+        communication_channel_model(:user_id => @user).confirm!
+        @cm.source_course = nil # so that it's not a course copy
+        @cm.save!
+
+        @cm.workflow_state = 'exported'
+        expect { @cm.save! }.to change(DelayedMessage, :count).by 0
+        @cm.messages_sent['Migration Export Ready'].should_not be_blank
+
+        @cm.workflow_state = 'imported'
+        expect { @cm.save! }.to change(DelayedMessage, :count).by 0
+        @cm.messages_sent['Migration Import Finished'].should_not be_blank
+      end
     end
-
   end
 
   context "import_object?" do
