@@ -76,6 +76,7 @@ class CountsReport
         save_detailed_progressive(account, data)
         add_account_stats(data)
       end
+      nil
     end
     @overview[:seconds_to_process] = Time.now - start_time
 

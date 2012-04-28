@@ -240,10 +240,10 @@ class QuizSubmission < ActiveRecord::Base
     end
   end
   
-  def highest_score_so_far
+  def highest_score_so_far(exclude_version_id=nil)
     scores = []
     scores << self.score if self.score
-    scores += versions.map{|v| v.model.score || 0.0} rescue []
+    scores += versions.reject{|v| v.id == exclude_version_id}.map{|v| v.model.score || 0.0} rescue []
     scores.max
   end
   private :highest_score_so_far
@@ -251,27 +251,36 @@ class QuizSubmission < ActiveRecord::Base
   # Adjust the fudge points so that the score is the given score
   # Used when the score is explicitly set by teacher instead of auto-calculating
   def set_final_score(final_score)
-    return if final_score.blank?
+    version = self.versions.current # this gets us the most recent completed version
+    return if final_score.blank? || version.blank?
     self.manually_scored = false
     @skip_after_save_score_updates = true
-    old_fudge = self.fudge_points || 0.0
-    old_score = self.score
+    serialized_model = version.model
+    old_fudge = serialized_model.fudge_points || 0.0
+    old_score = serialized_model.score
     base_score = old_score - old_fudge
     
     new_fudge = final_score - base_score
     self.score = final_score
-    self.kept_score = final_score
+    to_be_kept_score = final_score
     self.fudge_points = new_fudge
     
-    version = self.versions.current
-    update_submission_version(version) if version
     if self.quiz && self.quiz.scoring_policy == "keep_highest"
-      if self.kept_score < highest_score_so_far
+      # exclude the score of the version we're curretly overwriting
+      if to_be_kept_score < highest_score_so_far(version.id)
         self.manually_scored = true
       end
     end
+
+    self.kept_score = to_be_kept_score
+    update_submission_version(version, [:score, :kept_score, :fudge_points, :manually_scored])
     
-    self.save
+    # we might be in the middle of a new attempt, in which case we don't want
+    # to overwrite the score and fudge points when we save
+    self.reload if !self.completed?
+
+    self.kept_score = to_be_kept_score
+    self.without_versioning(&:save)
     @skip_after_save_score_updates = false
   end
 
@@ -362,13 +371,15 @@ class QuizSubmission < ActiveRecord::Base
   # a teacher to be able to come in and update points for an already-
   # taken quiz, even if it's a prior version of the submission. Thank you
   # simply_versioned for making this possible!
-  def update_submission_version(version)
+  def update_submission_version(version, attrs)
     version_data = YAML::load(version.yaml)
-    version_data["submission_data"] = self.submission_data
+    version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
     version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now.to_s}"
-    version_data["score"] = self.score
-    version_data["fudge_points"] = self.fudge_points
-    version_data["workflow_state"] = self.workflow_state
+    version_data["score"] = self.score if attrs.include?(:score)
+    version_data["kept_score"] = self.kept_score if attrs.include?(:kept_score)
+    version_data["fudge_points"] = self.fudge_points if attrs.include?(:fudge_points)
+    version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
+    version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
     version.yaml = version_data.to_yaml
     res = version.save
     res
@@ -408,6 +419,7 @@ class QuizSubmission < ActiveRecord::Base
     data = version.model.submission_data || []
     res = []
     tally = 0
+    completed_before_changes = self.completed?
     self.workflow_state = "complete"
     self.fudge_points = params[:fudge_points].to_f if params[:fudge_points] && params[:fudge_points] != ""
     tally += self.fudge_points if self.fudge_points
@@ -434,12 +446,10 @@ class QuizSubmission < ActiveRecord::Base
     self.score = tally
     self.submission_data = res
 
-    update_submission_version(version)
+    update_submission_version(version, [:submission_data, :score, :fudge_points, :workflow_state])
     highest = highest_score_so_far
-    if version.model.attempt == self.attempt
-      self.with_versioning(false) do |s|
-        s.save
-      end
+    if version.model.attempt == self.attempt && completed_before_changes
+      self.without_versioning(&:save)
     elsif self.quiz && self.quiz.scoring_policy == 'keep_highest' && self.kept_score != highest
       self.reload
       self.kept_score = highest

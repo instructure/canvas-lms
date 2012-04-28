@@ -17,6 +17,11 @@
 <div id="gradebook_header" style="display:none;">
   <% form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
     <div class="left">
+      <% if service_enabled?(:avatars) %>
+         <div id="avatar">
+          <img src="/images/blank.png" id="avatar_image" alt=""/>
+        </div>
+      <% end %>
       <a href="#" class="prev"><%= t('links.previous', "Previous") %></a>
       <div id="combo_box_container"></div>
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
@@ -164,6 +169,7 @@
           <div id="comments">
             <div class="comment" id="comment_blank" style="display: none;">
               <a href="javascript:void 0;" class="delete_comment_link"><span class="ui-icon ui-icon-close"></span></a>
+              <img src="#" class="avatar" alt="" style="display: none;"/>
               <span class="comment"></span>
               <a href="#" class="play_comment_link media-comment" style="display:none;"><%= t('links.click_to_view', "click here to view") %></a>
               <span class="media_comment_id" style="display: none;">&nbsp;</span>

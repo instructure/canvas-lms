@@ -271,10 +271,14 @@ describe "Users API", :type => :integration do
     json.size.should == 2
     json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
     json[0]['created_at'].should be > json[1]['created_at']
+    response.headers['Link'].should match /next/
+    response.headers['Link'].should_not match /last/
     json = api_call(:get, "/api/v1/users/sis_user_id:sis-user-id/page_views?page=2",
                        { :controller => "page_views", :action => "index", :user_id => 'sis_user_id:sis-user-id', :format => 'json', :page => '2' })
     json.size.should == 1
     json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
+    response.headers['Link'].should_not match /next/
+    response.headers['Link'].should_not match /last/
   end
 
   it "shouldn't find users in other root accounts by sis id" do

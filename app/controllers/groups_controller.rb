@@ -251,9 +251,9 @@ class GroupsController < ApplicationController
     return unless get_feed_context(:only => [:group])
     feed = Atom::Feed.new do |f|
       f.title = t(:feed_title, "%{course_or_account_name} Feed", :course_or_account_name => @context.full_name)
-      f.links << Atom::Link.new(:href => named_context_url(@context, :context_url))
+      f.links << Atom::Link.new(:href => group_url(@context), :rel => 'self')
       f.updated = Time.now
-      f.id = named_context_url(@context, :context_url)
+      f.id = group_url(@context)
     end
     @entries = []
     @entries.concat @context.calendar_events.active

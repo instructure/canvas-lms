@@ -31,9 +31,15 @@
 
     $(function(){
       $('#page_view_results').pageless({
-        totalPages: <%= @page_views.total_pages %>,
+        totalPages: <%= @page_views.total_pages == 1 ? 1 : 10000 %>,
         url: <%= raw user_page_views_path(@user, :format => :html, :html_xhr => true, :per_page => @page_views.per_page).to_json %>,
         loaderMsg: <%= jt('loading_more_results', "Loading more results") %>,
+        scrape: function(data, xhr) {
+          if (!xhr.getResponseHeader('Link').match('rel="next"')) {
+            this.totalPages = 1;
+          }
+          return data;
+        },
         complete: function() {
           $(document).triggerHandler('page_views_added');
         }

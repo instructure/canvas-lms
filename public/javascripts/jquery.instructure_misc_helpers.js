@@ -194,13 +194,6 @@ define([
     }
   };
 
-  $.keys = function(object){
-    var results = [];
-    for (var property in object)
-      results.push(property);
-    return results;
-  };
-
   $.underscore = function(string) {
     return (string || "").replace(/([A-Z])/g, "_$1").replace(/^_/, "").toLowerCase();
   };
@@ -503,14 +496,6 @@ define([
       return results;
     else
       return decodeURIComponent(results[1].replace(/\+/g, " "));
-  };
-
-  // tells you how many keys are in an object, 
-  // so: $.size({})  === 0  and $.size({foo: "bar"}) === 1
-  $.size = function(object) {
-    var keyCount = 0;
-    $.each(object,function(){ keyCount++; });
-    return keyCount;
   };
 
   $.capitalize = function(string) {

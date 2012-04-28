@@ -536,11 +536,7 @@ class Account < ActiveRecord::Base
     self.deleted_at = Time.now
     save!
   end
-  
-  def self.site_admin_user?(user, permission = :site_admin)
-    !!(user && Account.site_admin.grants_right?(user, permission))
-  end
-  
+
   def to_atom
     Atom::Entry.new do |entry|
       entry.title     = self.name
@@ -638,6 +634,14 @@ class Account < ActiveRecord::Base
     unless account
       special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
       account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id) if special_account_id
+    end
+    # another process (i.e. selenium spec) may have changed the setting
+    unless account
+      special_account_id = Setting.get("#{special_account_type}_account_id", nil)
+      if special_account_id && special_account_id != @special_account_ids[special_account_type]
+        @special_account_ids[special_account_type] = special_account_id
+        account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id)
+      end
     end
     unless account
       # TODO i18n
@@ -777,6 +781,7 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
       tabs = []
+      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if manage_settings
     else

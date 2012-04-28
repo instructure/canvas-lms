@@ -652,9 +652,9 @@ describe Account do
       site_admin.add_user(@user)
 
       @shard1.activate do
-        site_admin.grants_right?(@user, nil, :site_admin).should be_true
+        site_admin.grants_right?(@user, nil, :manage_site_settings).should be_true
       end
-      site_admin.grants_right?(@user, nil, :site_admin).should be_true
+      site_admin.grants_right?(@user, nil, :manage_site_settings).should be_true
     end
   end
 

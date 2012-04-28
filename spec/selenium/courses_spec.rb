@@ -57,18 +57,6 @@ describe "courses" do
       checklist_button.should be_displayed
     end
 
-    it "should allow content export downloads" do
-      course_with_teacher_logged_in
-      get "/courses/#{@course.id}/content_exports"
-      driver.find_element(:css, "button.submit_button").click
-      Delayed::Job.last(:conditions => {:tag => 'ContentExport#export_course_without_send_later'})
-      export = keep_trying_until { ContentExport.last }
-      export.export_course_without_send_later
-      new_download_link = keep_trying_until { driver.find_element(:css, "div#exports a") }
-      url = new_download_link.attribute 'href'
-      url.should match(%r{/files/\d+/download\?verifier=})
-    end
-
     context "course copy" do
       def course_copy_helper
         course_with_teacher_logged_in
@@ -99,9 +87,9 @@ describe "courses" do
 
         select_box = driver.find_element(:id, 'copy_from_course')
         select_box.find_elements(:css, 'optgroup').length.should == 2
-        second_group = select_box.find_elements(:css, 'optgroup').last
-        second_group.find_elements(:css, 'option').length.should == 1
-        second_group.attribute('label').should == 'Test Term'
+        optgroups = select_box.find_elements(:css, 'optgroup')
+        optgroups.map{ |og| og.attribute('label') }.sort.should eql ["Default Term", "Test Term"]
+        optgroups.map{ |og| og.find_elements(:css, 'option').length }.should eql [1,1]
 
         click_option('#copy_from_course', 'second course')
         driver.find_element(:css, '#content form').submit
@@ -398,7 +386,7 @@ describe "courses" do
       get "/courses/#{@course.id}"
       driver.find_element(:css, ".reminder .reject_button").click
       driver.switch_to.alert.accept
-      assert_flash_notice_message /Invitation cancelled./
+      assert_flash_notice_message /Invitation canceled./
     end
 
     it "should validate that a user cannot see a course they are not enrolled in" do

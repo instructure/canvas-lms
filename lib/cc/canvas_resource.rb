@@ -90,6 +90,9 @@ module CC
         c.course_code @course.course_code
         c.start_at ims_datetime(@course.start_at) if @course.start_at
         c.conclude_at ims_datetime(@course.conclude_at) if @course.conclude_at
+        if for_course_copy
+          c.tab_configuration @course.tab_configuration.to_json if @course.tab_configuration.present?
+        end
         atts = Course.clonable_attributes
         atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
         atts.each do |att|

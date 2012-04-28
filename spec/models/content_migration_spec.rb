@@ -22,18 +22,20 @@ describe ContentMigration do
 
   context "course copy" do
     before do
-      course_with_teacher
+      course_with_teacher(:course_name => "from course", :active_all => true)
       @copy_from = @course
 
-      course_with_teacher(:user => @user)
+      course_with_teacher(:user => @user, :course_name => "to course")
       @copy_to = @course
 
       @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
+      @cm.user = @user
       @cm.save!
     end
 
     it "should show correct progress" do
       ce = ContentExport.new
+      ce.export_type = ContentExport::COMMON_CARTRIDGE
       ce.content_migration = @cm
       @cm.content_export = ce
       ce.save!
@@ -84,6 +86,17 @@ describe ContentMigration do
       new_topic.should_not be_nil
       new_topic.message.should == topic.message
       @copy_to.syllabus_body.should match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
+    end
+
+    it "should copy course attributes" do
+      @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      @copy_from.locale = "es"
+      @copy_from.save
+
+      run_course_copy
+
+      @copy_to.locale.should == 'es'
+      @copy_to.tab_configuration.should == @copy_from.tab_configuration
     end
 
     it "should copy external tools" do
@@ -563,6 +576,64 @@ describe ContentMigration do
       aq.question_data[:answers][0][:left_html].should == data2[:answers][0][:left_html]
       aq.question_data[:answers][1][:html].should == data2[:answers][1][:html]
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
+    end
+
+    it "should send the correct emails" do
+      Notification.create!(:name => 'Migration Export Ready')
+      Notification.create!(:name => 'Migration Import Failed')
+      Notification.create!(:name => 'Migration Import Finished')
+
+      run_course_copy
+
+      @cm.messages_sent['Migration Export Ready'].should be_blank
+      @cm.messages_sent['Migration Import Finished'].should be_blank
+      @cm.messages_sent['Migration Import Failed'].should be_blank
+    end
+
+  end
+
+  context "import_object?" do
+    before do
+      @cm = ContentMigration.new
+    end
+
+    it "should return true for everything if there are no copy options" do
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+    it "should return true for everything if 'everything' is selected" do
+      @cm.migration_ids_to_import = {:copy => {:everything => "1"}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+    it "should return true if there are no copy options" do
+      @cm.migration_ids_to_import = {:copy => {}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+    it "should return false for nil objects" do
+      @cm.import_object?("content_migrations", nil).should == false
+    end
+
+    it "should return true for all object types if the all_ option is true" do
+      @cm.migration_ids_to_import = {:copy => {:all_content_migrations => "1"}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
+    end
+
+    it "should return false for objects not selected" do
+      @cm.save!
+      @cm.migration_ids_to_import = {:copy => {:all_content_migrations => "0"}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+      @cm.migration_ids_to_import = {:copy => {:content_migrations => {}}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+      @cm.migration_ids_to_import = {:copy => {:content_migrations => {CC::CCHelper.create_key(@cm) => "0"}}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == false
+    end
+
+    it "should return true for selected objects" do
+      @cm.save!
+      @cm.migration_ids_to_import = {:copy => {:content_migrations => {CC::CCHelper.create_key(@cm) => "1"}}}
+      @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
     end
 
   end

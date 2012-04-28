@@ -13,6 +13,7 @@ class Pool
     @options = {
       :config_file => expand_rails_path("config/delayed_jobs.yml"),
       :pid_folder => expand_rails_path("tmp/pids"),
+      :tail_logs => true, # only in FG mode
     }
   end
 
@@ -34,6 +35,7 @@ class Pool
       opts.separator "\n<options>"
       opts.on("-c", "--config", "Use alternate config file (default #{options[:config_file]})") { |c| options[:config_file] = c }
       opts.on("-p", "--pid", "Use alternate folder for PID files (default #{options[:pid_folder]})") { |p| options[:pid_folder] = p }
+      opts.on("--no-tail", "Don't tail the logs (only affects non-daemon mode)") { options[:tail_logs] = false }
       opts.on_tail("-h", "--help", "Show this message") { puts opts; exit }
     end
     op.parse!(@args)
@@ -168,6 +170,7 @@ class Pool
   end
 
   def tail_rails_log
+    return if !@options[:tail_logs]
     Rails.logger.auto_flushing = true if Rails.logger.respond_to?(:auto_flushing=)
     Thread.new do
       f = File.open(Rails.configuration.log_path.presence || (Rails.root+"log/#{Rails.env}.log"), 'r')

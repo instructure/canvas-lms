@@ -183,9 +183,8 @@ class AssignmentGroup < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     groups = data['assignment_groups'] ? data['assignment_groups']: []
-    to_import = migration.to_import 'assignment_groups'
     groups.each do |group|
-      if group['migration_id'] && (!to_import || to_import[group['migration_id']])
+      if migration.import_object?("assignment_groups", group['migration_id'])
         begin
           import_from_migration(group, migration.context)
         rescue

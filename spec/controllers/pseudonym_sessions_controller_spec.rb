@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe PseudonymSessionsController do
 
@@ -71,10 +71,6 @@ describe PseudonymSessionsController do
   end
 
   context "trusted logins" do
-    before do
-      Pseudonym.stubs(:trusted_by).with(Account.default).returns(Pseudonym.scoped({}))
-    end
-
     it "should login for a pseudonym from a different account" do
       account = Account.create!
       Account.any_instance.stubs(:trusted_account_ids).returns([account.id])
@@ -106,23 +102,19 @@ describe PseudonymSessionsController do
       response.should render_template('pseudonym_sessions/new')
     end
 
-    it "should redirect for deprecated trust method" do
-      account = Account.create!
-      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account)
-      HostUrl.stubs(:context_host).with(Account.default).returns('www.example.com')
-      HostUrl.expects(:context_host).with(account).returns('somewhere.else.com').at_least_once
-      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
-      response.should be_redirect
-      response.location.should match /somewhere\.else\.com\/login/
-      response.location.should match /wrong_domain\=1/
-      response.location.should match /pseudonym_session%5Bunique_id%5D=jt%40instructure.com/
+    context "sharding" do
+      it_should_behave_like "sharding"
 
-      LoadAccount.stubs(:default_domain_root_account).returns(account)
-      get 'new', :wrong_domain => '1'
-      response.should be_success
-      # don't use flash; it will pull it out of session, and mark it as used, removing
-      # this flash which doesn't persist
-      session[:flash][:scary_warning].should == 'From now on, you will need to login at somewhere.else.com.'
+      it "should login for a user from a different shard" do
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => Account.site_admin)
+        @shard1.activate do
+          account = Account.create!
+          HostUrl.stubs(:default_domain_root_account).returns(account)
+          post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty' }
+          response.should redirect_to(dashboard_url(:login_success => 1))
+          assigns[:pseudonym].should == @pseudonym
+        end
+      end
     end
   end
 

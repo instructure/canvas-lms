@@ -53,7 +53,7 @@ define [
     newlinesToBreak : (string) ->
       new Handlebars.SafeString htmlEscape(string).replace(/\n/g, "<br />")
 
-    # runs block if all arugments are === to each other
+    # runs block if all arguments are === to each other
     # usage:
     # {{#ifEqual argument1 argument2 'a string argument' argument4}}
     #   everything was equal
@@ -65,6 +65,19 @@ define [
       for arg in args
         return inverse(this) if arg != previousArg
         previousArg = arg
+      fn(this)
+
+    # runs block if all arguments are true-ish
+    # usage:
+    # {{#ifAll arg1 arg2 arg3 arg}}
+    #   everything was true-ish
+    # {{else}}
+    #   something was false-y
+    # {{/ifEqual}}
+    ifAll: ->
+      [args..., {fn, inverse}] = arguments
+      for arg in args
+        return inverse(this) unless arg
       fn(this)
 
     eachWithIndex: (context, options) ->

@@ -31,7 +31,7 @@ describe CoursesHelper do
     describe "an assignment with no submissions" do
       it "should return a no submission tooltip if there are no submissions" do
         expects(:t).with('#courses.recent_event.no_submissions', 'no submissions').returns('no submissions')
-        call_set_icon_data("no submissions", "icon-grading-gray")
+        check_icon_data("no submissions", "icon-grading-gray")
       end
     end
 
@@ -50,14 +50,14 @@ describe CoursesHelper do
       it "should return a needs grading tooltip if assignments have been submitted that aren't graded" do
         expects(:t).with('#courses.recent_event.needs_grading', 'needs grading').returns('needs grading')
         @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry", :body => "..." })
-        call_set_icon_data("needs grading", "icon-grading-gray")
+        check_icon_data("needs grading", "icon-grading-gray")
       end
 
       it "should return a no new submissions tooltip if some assignments have been submitted and graded" do
         expects(:t).with('#courses.recent_event.no_new_submissions', 'no new submissions').returns('no new submissions')
         @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry", :body => "xyz" })
         @assignment.grade_student(@student_one, :grade => 5)
-        call_set_icon_data("no new submissions", "icon-grading-gray")
+        check_icon_data("no new submissions", "icon-grading-gray")
       end
 
       it "should return an all graded tooltip if all assignments are submitted and graded" do
@@ -66,12 +66,16 @@ describe CoursesHelper do
           @assignment.submit_homework(student, { :submission_type => "online_text_entry", :body => "bod" })
           @assignment.grade_student(student, :grade => 5)
         end
-        call_set_icon_data("all graded", "icon-grading")
+        check_icon_data("all graded", "icon-grading")
       end
     end
 
-    def call_set_icon_data(msg, icon)
-      set_icon_data(:context => @course, @contexts => [@course], :current_user => @teacher, :recent_event => @assignment, :submission => nil)
+    def check_icon_data(msg, icon)
+      @icon_explanation, @icon_class = icon_data(:context => @course, 
+                                                 :contexts => [@course], 
+                                                 :current_user => @teacher, 
+                                                 :recent_event => @assignment, 
+                                                 :submission => nil)
       @icon_explanation.should eql msg
       @icon_class.should eql icon
     end

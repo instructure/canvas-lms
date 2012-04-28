@@ -46,6 +46,7 @@ class Assignment < ActiveRecord::Base
   has_one :rubric, :through => :rubric_association
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ['enrollments.workflow_state = ?', 'active']
   belongs_to :context, :polymorphic => true
+  alias_method :effective_context, :context
   belongs_to :cloned_item
   belongs_to :grading_standard
   belongs_to :group_category
@@ -613,9 +614,11 @@ class Assignment < ActiveRecord::Base
 
   def to_atom(opts={})
     extend ApplicationHelper
+    author_name = self.context.present? ? self.context.name : t('atom_no_author', "No Author")
     Atom::Entry.new do |entry|
       entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", :assignment => self.title) unless opts[:include_context]
       entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", :assignment => self.title, :course => self.context.name) if opts[:include_context]
+      entry.authors  << Atom::Person.new(:name => author_name)
       entry.updated   = self.updated_at.utc
       entry.published = self.created_at.utc
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/assignments/#{self.feed_code}_#{self.due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
@@ -1045,7 +1048,7 @@ class Assignment < ActiveRecord::Base
     json
   end
 
-  def speed_grader_json(user)
+  def speed_grader_json(user, avatars=false)
     Attachment.skip_thumbnails = true
     res = as_json(
       :include => {
@@ -1054,9 +1057,10 @@ class Assignment < ActiveRecord::Base
       },
       :include_root => false
     )
+    avatar_methods = avatars ? [:avatar_path] : []
     visible_students = context.students_visible_to(user).uniq
     res[:context][:students] = visible_students.
-      map{|u| u.as_json(:include_root => false)}
+      map{|u| u.as_json(:include_root => false, :methods => avatar_methods)}
     res[:context][:active_course_sections] = context.sections_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = context.enrollments_visible_to(user).
@@ -1065,7 +1069,7 @@ class Assignment < ActiveRecord::Base
     res[:submissions] = submissions.scoped(:conditions => {:user_id => visible_students.map(&:id)}).map{|s|
       s.as_json(:include_root => false,
         :include => {
-          :submission_comments => {},
+          :submission_comments => {:methods => avatar_methods},
           :attachments => {:except => :thumbnail_url},
           :rubric_assessment => {},
         },
@@ -1486,7 +1490,7 @@ class Assignment < ActiveRecord::Base
     assignments = data['assignments'] ? data['assignments']: []
     to_import = migration.to_import 'assignments'
     assignments.each do |assign|
-      if assign['migration_id'] && (!to_import || to_import[assign['migration_id']])
+      if migration.import_object?("assignments", assign['migration_id'])
         begin
           import_from_migration(assign, migration.context)
         rescue

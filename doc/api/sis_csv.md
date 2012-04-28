@@ -17,6 +17,9 @@ the CSV as "Chevy ""The Man"" Chase".
 
 All text should be UTF-8 encoded.
 
+All timestamps are sent and returned in ISO 8601 format.  All timestamps default to UTC time zone unless specified.
+
+    YYYY-MM-DDTHH:MM:SSZ
 
 Batch Mode
 ----------
@@ -225,7 +228,7 @@ Sample:
 <pre>
 term_id,name,status,start_date,end_date
 T001,Winter2011,active,,
-T002,Spring2011,active,2010-9-03 00:00:00,2010-12-14 00:00:00
+T002,Spring2011,active,2010-9-03 00:00:00,2010-12-14 00:00:00-06:00
 T003,Fall2011,active,,
 </pre>
 
