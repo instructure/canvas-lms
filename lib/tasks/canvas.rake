@@ -117,7 +117,7 @@ namespace :canvas do
   desc "Compile javascript and css assets."
   task :compile_assets do
     threads = []
-    threads << Thread.new do
+    Thread.new do
       puts "--> Compiling static assets [css]"
       Rake::Task['css:generate'].invoke
 
@@ -126,9 +126,9 @@ namespace :canvas do
       raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
 
       puts "--> Compiled static assets [css/jammit]"
-    end
+    end.join
 
-    threads << Thread.new do
+    Thread.new do
       puts "--> Compiling static assets [javascript]"
       Rake::Task['js:generate'].invoke
 
@@ -137,12 +137,12 @@ namespace :canvas do
 
       puts "--> Optimizing JavaScript [r.js]"
       Rake::Task['js:build'].invoke
-    end
+    end.join
 
-    threads << Thread.new do
+    Thread.new do
       puts "--> Generating documentation [yardoc]"
       Rake::Task['doc:api'].invoke
-    end
+    end.join
 
     threads.each(&:join)
   end
