@@ -646,12 +646,10 @@ class Submission < ActiveRecord::Base
 
   def readable_state
     case workflow_state
-    when 'submitted'
+    when 'submitted', 'pending_review'
       t 'state.submitted', 'submitted'
     when 'unsubmitted'
       t 'state.unsubmitted', 'unsubmitted'
-    when 'pending_review'
-      t 'state.pending_review', 'pending review'
     when 'graded'
       t 'state.graded', 'graded'
     end
@@ -898,18 +896,16 @@ class Submission < ActiveRecord::Base
     self.graded? && (!self.submitted_at || (self.graded_at && self.graded_at >= self.submitted_at))
   end
   
-  def submitted_or_graded?
-    self.submitted? || self.graded?
-  end
-  
   def context(user=nil)
     self.assignment.context if self.assignment
   end
   
   def to_atom(opts={})
     prefix = self.assignment.context_prefix || ""
+    author_name = self.assignment.present? && self.assignment.context.present? ? self.assignment.context.name : t('atom_no_author', "No Author")
     Atom::Entry.new do |entry|
-      entry.title     = "#{self.user && self.user.name} -- #{self.assignment && self.assignment.title}#{", " + self.assignment.context.name if self.assignment && opts[:include_context]}"
+      entry.title     = "#{self.user && self.user.name} -- #{self.assignment && self.assignment.title}#{", " + self.assignment.context.name if opts[:include_context]}"
+      entry.authors  << Atom::Person.new(:name => author_name)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/submissions/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
@@ -940,9 +936,13 @@ class Submission < ActiveRecord::Base
   
   def self.json_serialization_full_parameters(additional_parameters={})
     additional_parameters[:comments] ||= :submission_comments
+    includes = {:attachments => {}, :quiz_submission => {}}
+    if additional_parameters[:comments]
+      includes[additional_parameters[:comments]] = additional_parameters[:avatars] ? {:methods => [:avatar_path]} : {}
+    end
     res = {
-      :methods => [:scribdable?,:conversion_status,:scribd_doc,:formatted_body,:submission_history], 
-      :include => [:attachments,additional_parameters[:comments],:quiz_submission],
+      :methods => [:scribdable?,:conversion_status,:scribd_doc,:formatted_body,:submission_history],
+      :include => includes
     }.merge(additional_parameters || {})
     if additional_parameters[:except]
       additional_parameters[:except].each do |key|

@@ -1,0 +1,85 @@
+shared_examples_for "discussions selenium tests" do
+  it_should_behave_like "in-process server selenium tests"
+
+  def create_and_go_to_topic(title = 'new topic', discussion_type = 'side-comment', is_locked = false)
+    topic = @course.discussion_topics.create!(:title => title, :discussion_type => discussion_type)
+    if is_locked
+      topic.workflow_state = 'locked'
+      topic.save!
+      topic.reload
+    end
+    get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+    wait_for_ajax_requests
+    topic
+  end
+
+  def create_discussion(discussion_name, discussion_type)
+    @course.discussion_topics.create!(:title => discussion_name, :discussion_type => discussion_type)
+  end
+
+  def edit_discussion(discussion_name, message)
+    replace_content(f('#discussion_topic_title'), discussion_name)
+    type_in_tiny 'textarea', message
+    f('.submit_button').click
+    wait_for_ajaximations
+    f('.discussion_topic .title').text.should == discussion_name
+  end
+
+  def edit_entry(entry, text)
+    click_entry_option(entry, '#ui-menu-0-1')
+    type_in_tiny 'textarea', text
+    f('.edit-html-done').click
+    wait_for_ajax_requests
+    validate_entry_text(entry, text)
+  end
+
+  def delete_entry(entry)
+    click_entry_option(entry, '#ui-menu-0-2')
+    validate_entry_text(entry, "This entry has been deleted")
+    keep_trying_until do
+      entry.save!
+      entry.reload
+      entry.workflow_state.should == 'deleted'
+    end
+  end
+
+  def add_reply(message = 'message!')
+    @last_entry ||= f('#discussion_topic')
+    @last_entry.find_element(:css, '.discussion-reply-label').click
+    type_in_tiny 'textarea', message
+    f('.discussion-reply-form').submit
+    wait_for_ajax_requests
+    id = DiscussionEntry.last.id
+    @last_entry = fj ".entry[data-id=#{id}]"
+  end
+
+  def get_all_replies
+    ff('#discussion_subentries .discussion_entry')
+  end
+
+  def validate_entry_text(discussion_entry, text)
+    li_selector = %([data-id$="#{discussion_entry.id}"])
+    keep_trying_until do
+      f(li_selector).should be_displayed
+    end
+    f(li_selector).should include_text(text)
+  end
+
+  def click_entry_option(discussion_entry, menu_item_selector)
+    li_selector = %([data-id$="#{discussion_entry.id}"])
+    f(li_selector).should be_displayed
+    f(li_selector).find_element(:css, '.al-trigger').should be_displayed
+    f(li_selector).find_element(:css, '.al-trigger').click
+    keep_trying_until do
+      f(menu_item_selector).should be_displayed
+    end
+    f(menu_item_selector).click
+  end
+
+  def click_topic_option(topic_selector, menu_item_selector)
+    topic = f(topic_selector)
+    topic.find_element(:css, '.al-trigger').click
+    f(menu_item_selector).click
+    topic
+  end
+end

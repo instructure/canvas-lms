@@ -26,6 +26,7 @@
         <xs:element name="allow_wiki_comments" type="xs:boolean" minOccurs="0"/>
         <xs:element name="self_enrollment" type="xs:boolean" minOccurs="0"/>
         <xs:element name="turnitin_comments" type="xs:string" minOccurs="0"/>
+        <xs:element name="locale" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">

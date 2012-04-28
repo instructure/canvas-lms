@@ -179,9 +179,8 @@ class Attachment < ActiveRecord::Base
   def self.process_migration(data, migration)
     attachments = data['file_map'] ? data['file_map']: {}
     # TODO i18n
-    to_import = migration.to_import 'files'
     attachments.values.each do |att|
-      if !att['is_folder'] && att['migration_id'] && (!to_import || to_import[att['migration_id']])
+      if !att['is_folder'] && migration.import_object?("files", att['migration_id'])
         begin
           import_from_migration(att, migration.context)
         rescue
@@ -855,13 +854,14 @@ class Attachment < ActiveRecord::Base
   
   def to_atom(opts={})
     Atom::Entry.new do |entry|
-      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", :course_or_group => self.context.name, :title => self.context.name) if opts[:include_context]
       entry.title     = t(:feed_title, "File: %{title}", :title => self.context.name) unless opts[:include_context]
+      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", :course_or_group => self.context.name, :title => self.context.name) if opts[:include_context]
+      entry.authors  << Atom::Person.new(:name => self.context.name)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/files/#{self.feed_code}"
       entry.links    << Atom::Link.new(:rel => 'alternate', 
-                                    :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/files/#{self.id}")
+                                       :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/files/#{self.id}")
       entry.content   = Atom::Content::Html.new("#{self.display_name}")
     end
   end

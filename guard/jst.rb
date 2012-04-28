@@ -49,7 +49,7 @@ module Guard
     #
     # Compiles templates from app/views/jst to public/javascripts/jst
     def run_on_change(paths)
-      paths.each do |path|
+      Parallel.each(paths, :in_threads => Parallel.processor_count) do |path|
         begin
           puts "Compiling: #{path}"
           Handlebars.compile_file path, 'app/views/jst', @options[:output]

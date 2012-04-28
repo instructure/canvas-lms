@@ -61,6 +61,10 @@ class CalendarsController < ApplicationController
     @manage_contexts = @contexts.select{|c| c.grants_right?(@current_user, session, :manage_calendar) }.map(&:asset_string)
     @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
     @selected_contexts = params[:include_contexts].split(",") if params[:include_contexts]
+    if params[:event_id] && (event = CalendarEvent.find_by_id(params[:event_id])) && event.start_at
+      @active_event_id = event.id
+      @view_start = event.start_at.in_time_zone.strftime("%Y-%m-%d")
+    end
     @contexts_json = @contexts.map do |context|
       info = {
         :name => context.name,
@@ -80,7 +84,7 @@ class CalendarsController < ApplicationController
         :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.scoped(:select => "id, name").map {|g| { :id => g.id, :name => g.name } } : [],
         :can_create_appointment_groups => context.respond_to?("appointment_groups") && context.appointment_groups.new.grants_right?(@current_user, session, :create),
       }
-      if info[:can_create_appointment_groups] && context.respond_to?("course_sections")
+      if context.respond_to?("course_sections")
         info[:course_sections] = context.course_sections.active.scoped(:select => "id, name").map {|cs| { :id => cs.id, :asset_string => cs.asset_string, :name => cs.name } }
       end
       if info[:can_create_appointment_groups] && context.respond_to?("group_categories")
@@ -207,7 +211,7 @@ class CalendarsController < ApplicationController
       format.atom do
         feed = Atom::Feed.new do |f|
           f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", :course_or_group_name => @context.name
-          f.links << Atom::Link.new(:href => calendar_url_for(@context))
+          f.links << Atom::Link.new(:href => calendar_url_for(@context), :rel => 'self')
           f.updated = Time.now
           f.id = calendar_url_for(@context)
         end
@@ -235,7 +239,7 @@ class CalendarsController < ApplicationController
     preferred_calendar = 'show'
     preferred_calendar = 'show2' if @domain_root_account.enable_scheduler? && !@current_user.preferences[:use_calendar1]
     if always_redirect || params[:action] != preferred_calendar
-      redirect_to({ :action => preferred_calendar, :anchor => ' ' }.merge(params.slice(:include_contexts)))
+      redirect_to({ :action => preferred_calendar, :anchor => ' ' }.merge(params.slice(:include_contexts, :event_id)))
       return false
     end
     if @domain_root_account.enable_scheduler?

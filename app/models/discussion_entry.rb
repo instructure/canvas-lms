@@ -272,6 +272,7 @@ class DiscussionEntry < ActiveRecord::Base
   named_scope :newest_first, :order => 'discussion_entries.created_at DESC'
 
   def to_atom(opts={})
+    author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")
     Atom::Entry.new do |entry|
       subject = [self.discussion_topic.title]
       subject << self.discussion_topic.context.name if opts[:include_context]
@@ -280,6 +281,7 @@ class DiscussionEntry < ActiveRecord::Base
       else
         entry.title = subject.to_sentence
       end
+      entry.authors  << Atom::Person.new(:name => author_name)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/discussion_entries/#{self.feed_code}"

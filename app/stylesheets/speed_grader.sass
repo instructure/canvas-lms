@@ -9,6 +9,9 @@
 .ui-selectmenu-menu a:focus
   :background-color inherit
   
+#speed_grader_loading
+  padding: 5px
+  font-size: 24px
 #gradebook_header
   background: url("/images/canvas/header_bg.png") repeat-x left -28px
   :border-bottom 1px solid #aaa
@@ -25,6 +28,15 @@
     &:hover, &:focus
       :text-decoration underline
       :background-color transparent
+  #avatar
+    width: 32px
+    display: block
+    float: left
+    margin-top: -3px
+    #avatar_image
+      height: 30px
+      max-width: 30px
+      padding-right: 2px
   #combo_box_container
     :color #333
     :text-align left
@@ -233,7 +245,7 @@
   z-index: 1000
   
   .content_box
-    padding-right: 18px
+    padding-right: 24px
   
   #rubric_full_resizer
     position: absolute
@@ -264,6 +276,11 @@
 
 #comments
   overflow-y: auto
+  .comment
+    .avatar
+      height: 30px
+      max-width: 30px
+        
 
 #add_a_comment
   background-color: #f0f0f0

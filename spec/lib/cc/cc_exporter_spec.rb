@@ -21,12 +21,12 @@ describe "Common Cartridge exporting" do
     ErrorReport.last.message.should == message 
   end
 
-  context "selective export" do
+  context "creating .zip exports" do
 
     before do
       course_with_teacher
       @ce = ContentExport.new
-      @ce.settings[:for_course_copy] = true
+      @ce.export_type = ContentExport::COURSE_COPY
       @ce.course = @course
       @ce.user = @user
     end

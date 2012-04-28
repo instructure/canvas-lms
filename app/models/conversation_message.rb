@@ -240,7 +240,7 @@ class ConversationMessage < ActiveRecord::Base
     if !self.attachments.empty?
       content += "<ul>"
       self.attachments.each do |attachment|
-      href = file_download_url(attachment, :verifier => attachment.uuid,
+        href = file_download_url(attachment, :verifier => attachment.uuid,
                                              :download => '1',
                                              :download_frd => '1',
                                              :host => HostUrl.context_host(self.context))

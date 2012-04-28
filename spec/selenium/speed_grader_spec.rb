@@ -308,6 +308,43 @@ describe "speedgrader" do
 
   end
 
+  it "should properly show avatar images only if avatars are enabled on the account" do
+    # enable avatars
+    @account = Account.default
+    @account.enable_service(:avatars)
+    @account.save!
+    @account.service_enabled?(:avatars).should be_true
+
+    student_submission
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_animations
+    
+    # make sure avatar shows up for current student
+    driver.find_elements(:css, "#avatar_image").length.should == 1
+    driver.find_element(:css, "#avatar_image")['src'].should_not match(/blank.png/)
+
+    #add comment
+    driver.find_element(:css, '#add_a_comment > textarea').send_keys('grader comment')
+    driver.find_element(:css, '#add_a_comment *[type="submit"]').click
+    keep_trying_until{ driver.find_element(:css, '#comments > .comment').displayed? }
+    driver.find_element(:css, '#comments > .comment').should include_text('grader comment')
+    
+    # make sure avatar shows up for user comment
+    driver.find_element(:css, "#comments > .comment .avatar").should be_displayed
+
+    # disable avatars
+    @account = Account.default
+    @account.disable_service(:avatars)
+    @account.save!
+    @account.service_enabled?(:avatars).should be_false
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_animations
+    
+    driver.find_elements(:css, "#avatar_image").length.should == 0
+    driver.find_elements(:css, "#comments > .comment .avatar").length.should == 1
+    driver.find_elements(:css, "#comments > .comment .avatar")[0]['style'].should match(/display:\s*none/)
+  end
+
   it "should not show students in other sections if visibility is limited" do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission

@@ -174,6 +174,7 @@ describe "More Standard Common Cartridge importing" do
     @migration = Object.new
     @migration.stubs(:to_import).returns(nil)
     @migration.stubs(:context).returns(@copy_to)
+    @migration.stubs(:import_object?).returns(true)
   end
 
   it "should properly handle top-level resource references" do

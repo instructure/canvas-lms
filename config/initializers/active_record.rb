@@ -36,19 +36,26 @@ class ActiveRecord::Base
     255
   end
 
-  def self.find_by_asset_string(string, asset_types)
-    code = string.split("_")
-    id = code.pop
-    code.join("_").classify.constantize.find(id) rescue nil
+  def self.find_by_asset_string(string, asset_types=nil)
+    find_all_by_asset_string([string], asset_types)[0]
+  end
+
+  def self.find_all_by_asset_string(strings, asset_types=nil)
+    # TODO: start checking asset_types, if provided
+    strings.map{ |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
+      result.concat((klass.constantize.find_all_by_id(id_pairs.map(&:last)) rescue []))
+    end
   end
 
   # takes an asset string list, like "course_5,user_7" and turns it into an
   # array of [class_name, id] like [ ["Course", 5], ["User", 7] ]
   def self.parse_asset_string_list(asset_string_list)
-    asset_string_list.to_s.split(",").map do |str|
-      code = str.split("_", 2)
-      [code.first.classify, code.last.to_i]
-    end
+    asset_string_list.to_s.split(",").map { |str| parse_asset_string(str) }
+  end
+
+  def self.parse_asset_string(str)
+    code = str.split(/_(\d+)\z/)
+    [code.first.classify, code.last.to_i]
   end
 
   def self.initialize_by_asset_string(string, asset_types)
@@ -419,7 +426,7 @@ class ActiveRecord::Base
 
   # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_batches(options = {})
-    batch_size = options.delete(:batch_size) || 1000
+    batch_size = options[:batch_size] || 1000
     ids = connection.select_values("select #{primary_key} from #{table_name} order by #{primary_key} limit #{batch_size.to_i}")
     ids = ids.map(&:to_i) unless options[:no_integer_cast]
     while ids.present?
@@ -428,6 +435,19 @@ class ActiveRecord::Base
       last_value = ids.last
       ids = connection.select_values(sanitize_sql_array(["select #{primary_key} from #{table_name} where #{primary_key} > ? order by #{primary_key} limit #{batch_size.to_i}", last_value]))
       ids = ids.map(&:to_i) unless options[:no_integer_cast]
+    end
+  end
+
+  # note this does a raw connection.select_values, so it doesn't work with scopes
+  def self.find_ids_in_ranges(options = {})
+    batch_size = options[:batch_size] || 1000
+    ids = connection.select_rows("select min(id), max(id) from (select #{primary_key} as id from #{table_name} order by #{primary_key} limit #{batch_size.to_i}) as subquery").first
+    ids = ids.map { |id| id.try(:to_i) }
+    while ids.first.present?
+      yield *ids
+      last_value = ids.last
+      ids = connection.select_rows(sanitize_sql_array(["select min(id), max(id) from (select #{primary_key} as id from #{table_name} where #{primary_key} > ? order by #{primary_key} limit #{batch_size.to_i}) as subquery", last_value])).first
+      ids = ids.map { |id| id.try(:to_i) }
     end
   end
 end

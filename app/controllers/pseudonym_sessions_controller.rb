@@ -31,10 +31,6 @@ class PseudonymSessionsController < ApplicationController
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
 
-    if params[:wrong_domain] == '1'
-      flash.now[:scary_warning] = t 'warnings.wrong_login_spot', "From now on, you will need to login at %{domain}.", :domain => HostUrl.context_host(@domain_root_account)
-    end
-
     session[:expected_user_id] = params[:expected_user_id].to_i
     session[:confirm] = params[:confirm]
     session[:enrollment] = params[:enrollment]
@@ -130,16 +126,15 @@ class PseudonymSessionsController < ApplicationController
     end
 
     if !found && params[:pseudonym_session]
-      valid_alternatives = Pseudonym.trusted_by(@domain_root_account).custom_find_by_unique_id(params[:pseudonym_session][:unique_id], :all).select {|p|
-        p.valid_arbitrary_credentials?(params[:pseudonym_session][:password])
-      }
+      valid_alternatives = Shard.partition_by_shard(@domain_root_account.trusted_account_ids) do |account_ids|
+        Pseudonym.active.by_unique_id(params[:pseudonym_session][:unique_id]).find(:all, :conditions => { :account_id => account_ids }).select { |p|
+          p.valid_arbitrary_credentials?(params[:pseudonym_session][:password])
+        }
+      end
       # only log them in if these credentials match a single user
       if valid_alternatives.map(&:user).uniq.length == 1
         # prefer a pseudonym from Site Admin if possible, otherwise just choose one
         valid_alternative = valid_alternatives.find {|p| p.account_id == Account.site_admin.id } || valid_alternatives.first
-        if (!@domain_root_account.trusted_account_ids.include?(valid_alternative.account_id))
-          return redirect_to login_url(:host => HostUrl.context_host(valid_alternative.account), :wrong_domain => 1, :pseudonym_session => { :unique_id => valid_alternative.unique_id })
-        end
         @pseudonym_session = PseudonymSession.new(valid_alternative, params[:pseudonym_session][:remember_me] == "1")
         @pseudonym_session.save
         found = true

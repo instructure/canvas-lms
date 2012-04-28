@@ -232,6 +232,20 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe "find_ids_in_ranges" do
+    it "should return ids from the table in ranges" do
+      ids = []
+      10.times { ids << User.create!().id }
+      batches = []
+      User.find_ids_in_ranges(:batch_size => 4) do |*found_ids|
+        batches << found_ids
+      end
+      batches.should == [ [ids[0], ids[3]],
+                          [ids[4], ids[7]],
+                          [ids[8], ids[9]] ]
+    end
+  end
+
   context "after_transaction_commit" do
     self.use_transactional_fixtures = false
 

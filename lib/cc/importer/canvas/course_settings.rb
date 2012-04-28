@@ -51,7 +51,7 @@ module CC::Importer::Canvas
       course[:migration_id] = get_node_att(doc, 'course',  'identifier')
 
       ['title', 'course_code', 'hashtag', 'default_wiki_editing_roles',
-       'turnitin_comments', 'default_view', 'license',
+       'turnitin_comments', 'default_view', 'license', 'locale',
        'group_weighting_scheme'].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
@@ -67,6 +67,20 @@ module CC::Importer::Canvas
       ['start_at', 'conclude_at'].each do |date_type|
         val = get_time_val(doc, date_type)
         course[date_type] = val unless val.nil?
+      end
+      if nav = get_node_val(doc, 'tab_configuration')
+        begin
+          nav = JSON.parse(nav)
+          # Validate the format a little bit
+          # Should be something like [{"id"=>0},{"id"=>5},{"id"=>4}]
+          if nav.present? && nav.is_a?(Array)
+            if nav.all?{|i|i.is_a?(Hash) && i["id"]}
+              course[:tab_configuration] = nav.reject{|i|!i["id"].is_a?(Integer)}
+            end
+          end
+        rescue
+          add_warning(I18n.t('errors.bad_navigation_config', "Invalid course tab configuration"), $!)
+        end
       end
 
       course

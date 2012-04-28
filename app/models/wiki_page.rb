@@ -327,6 +327,7 @@ class WikiPage < ActiveRecord::Base
     prefix = namespace.context_prefix || ""
     Atom::Entry.new do |entry|
       entry.title     = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", :course_or_group_name => namespace.context.name, :page_title => self.title)
+      entry.authors  << Atom::Person.new(:name => t(:atom_author, "Wiki Page"))
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
@@ -390,6 +391,7 @@ class WikiPage < ActiveRecord::Base
   def self.process_migration(data, migration)
     wikis = data['wikis'] ? data['wikis']: []
     wikis.each do |wiki|
+      next unless migration.import_object?("wikis", wiki['migration_id'])
       begin
         import_from_migration(wiki, migration.context) if wiki
       rescue
@@ -513,6 +515,9 @@ class WikiPage < ActiveRecord::Base
         item.title.splice!(0...TITLE_LENGTH) # truncate too-long titles
       end
       item.body = ImportedHtmlConverter.convert(hash[:text] || "", context)
+      item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
+      item.hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
+      item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
     else
       allow_save = false
     end

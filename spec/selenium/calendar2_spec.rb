@@ -1,11 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/calendar2_common')
 
 describe "calendar2" do
-  it_should_behave_like "in-process server selenium tests"
-
-  before (:each) do
-    Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
-  end
+  it_should_behave_like "calendar2 selenium tests"
 
   def make_event(params = {})
     opts = {
@@ -14,7 +11,8 @@ describe "calendar2" do
         :description => "Test event"
     }.with_indifferent_access.merge(params)
     c = CalendarEvent.new :description => opts[:description],
-                          :start_at => opts[:start]
+                          :start_at => opts[:start],
+                          :title => opts[:title]
     c.context = opts[:context]
     c.save!
     c
@@ -292,6 +290,51 @@ describe "calendar2" do
         driver.find_element(:css, '.fc-button-today').click
         get_header_text.should == (current_month + ' ' + Time.now.year.to_s)
       end
+
+      it "should show section-level events, but not the parent event" do
+        @course.default_section.update_attribute(:name, "default section!")
+        s2 = @course.course_sections.create!(:name => "other section!")
+        date = Date.today
+        e1 = @course.calendar_events.build :title => "ohai",
+          :child_event_data => [
+            {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string},
+            {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string},
+          ]
+        e1.updating_user = @user
+        e1.save!
+
+        get "/calendar2"
+        wait_for_ajaximations
+        events = ff('.fc-event')
+        events.size.should eql 2
+        events.first.click
+
+        details = f('.event-details')
+        details.should_not be_nil
+        details.text.should include(@course.default_section.name)
+        details.find_element(:css, '.view_event_link')[:href].should include "/calendar_events/#{e1.id}" # links to parent event
+      end
+
+      context "event editing" do
+        it "should allow editing appointment events" do
+          create_appointment_group
+          ag = AppointmentGroup.first
+          student_in_course(:course => @course, :active_all => true)
+          ag.appointments.first.reserve_for(@user, @user)
+
+          get "/calendar2"
+          wait_for_ajaximations
+
+          open_edit_event_dialog
+          description = 'description...'
+          replace_content f('[name=description]'), description
+          fj('.ui-button:contains(Update)').click
+          wait_for_ajaximations
+
+          ag.reload.appointments.first.description.should eql description
+          lambda { f('.fc-event') }.should_not raise_error
+        end
+      end
     end
 
   end
@@ -350,6 +393,40 @@ describe "calendar2" do
           is_checked('#scheduler').should be_true
           driver.find_element(:id, 'appointment-group-list').should include_text(ag.title)
         end
+      end
+
+      it "should show section-level events for the student's section" do
+        @course.default_section.update_attribute(:name, "default section!")
+        s2 = @course.course_sections.create!(:name => "other section!")
+        date = Date.today
+        e1 = @course.calendar_events.build :title => "ohai",
+          :child_event_data => [
+            {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => s2.asset_string},
+            {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => @course.default_section.asset_string},
+          ]
+        e1.updating_user = @teacher
+        e1.save!
+
+        get "/calendar2"
+        wait_for_ajaximations
+        events = ff('.fc-event')
+        events.size.should eql 1
+        events.first.text.should include "1p"
+        events.first.click
+
+        details = f('.event-details-content')
+        details.should_not be_nil
+        details.text.should include(@course.default_section.name)
+      end
+
+      it "should redirect to the calendar and show the selected event" do
+        event = make_event(:context => @course, :start => 2.months.from_now, :title => "future event")
+        get "/courses/#{@course.id}/calendar_events/#{event.id}"
+        wait_for_ajaximations
+
+        popup_title = f('.details_title')
+        popup_title.should be_displayed
+        popup_title.text.should eql "future event"
       end
     end
   end

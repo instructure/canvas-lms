@@ -111,6 +111,40 @@ module CC
         end
       end
 
+      def generate_qti_only
+        FileUtils::mkdir_p @export_dir
+
+        @course.quizzes.active.each do |quiz|
+          next unless export_object?(quiz)
+          begin
+            generate_qti_only_quiz(quiz)
+          rescue
+            title = quiz.title rescue I18n.t('unknown_quiz', "Unknown quiz")
+            add_error(I18n.t('course_exports.errors.quiz', "The quiz \"%{title}\" failed to export", :title => title), $!)
+          end
+        end
+      end
+
+      def generate_qti_only_quiz(quiz)
+        mig_id = create_key(quiz)
+        resource_dir = File.join(@export_dir, mig_id)
+        FileUtils::mkdir_p resource_dir
+
+        canvas_qti_rel_path = File.join(mig_id, mig_id + ".xml")
+        canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
+        File.open(canvas_qti_path, 'w') do |file|
+          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          generate_assessment(doc, quiz, mig_id, false)
+        end
+
+        @resources_node.resource(
+                :identifier => mig_id,
+                "type" => QTI_ASSESSMENT_TYPE
+        ) do |res|
+          res.file(:href=>canvas_qti_rel_path)
+        end
+      end
+
       def generate_question_bank(bank)
         bank_mig_id = create_key(bank)
 

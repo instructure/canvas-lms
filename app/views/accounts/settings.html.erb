@@ -157,7 +157,7 @@
           <legend><%= t(:features_title, "Features") %></legend>
           <% f.fields_for :settings do |settings| %>
             <% if @account.root_account? %>
-              <% if current_user_is_site_admin? %>
+              <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
                 <div>
                   <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
                   <%= settings.label :admins_can_change_passwords, :en => "Password setting by admins" %>

@@ -5,9 +5,10 @@ define [
 ], ($) ->
 
   class
-    constructor: (data, contextInfo) ->
+    constructor: (data, contextInfo, actualContextInfo) ->
       @eventType = 'generic'
       @contextInfo = contextInfo
+      @actualContextInfo = actualContextInfo
       @allPossibleContexts = null
       @className = []
       @object = {}
@@ -22,7 +23,7 @@ define [
       @object?.appointment_group_url
 
     contextCode: () =>
-      @object?.context_code || @contextInfo?.asset_string
+      @object?.effective_context_code || @object?.context_code || @contextInfo?.asset_string
 
     isUndated: () =>
       @start == null
