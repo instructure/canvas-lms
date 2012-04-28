@@ -1,3 +1,12 @@
+canvas-lms (2012.04.28.12) stable; urgency=low
+
+  * Package ref: 59b1b12431a2e4a5242317a276b32aa671f3aee3
+  *
+  * [+18d849d] don't fail on nil icon_explanation
+  * [+59b1b12] turn off parallel asset building
+
+ -- Brian Palmer <brianp@instructure.com>  Sat, 28 Apr 2012 08:06:13 -0600
+
 canvas-lms (2012.04.28.11) stable; urgency=low
 
   * Package ref: 44350657c3601959f17d3c024b3944e68d4e77d6
