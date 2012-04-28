@@ -34,9 +34,12 @@ module CC::Importer::Canvas
     def convert_wiki(doc, path)
       wiki = {}
       wiki_name = File.basename(path).sub(".html", '')
-      title, body, id = get_html_title_and_body_and_id(doc)
+      title, body, meta = get_html_title_and_body_and_meta_fields(doc)
       wiki[:title] = title
-      wiki[:migration_id] = id
+      wiki[:migration_id] = meta['identifier']
+      wiki[:editing_roles] = meta['editing_roles']
+      wiki[:hide_from_students] = meta['hide_from_students'] == 'true'
+      wiki[:notify_of_update] = meta['notify_of_update'] == 'true'
       wiki[:text] = body
       wiki[:url_name] = wiki_name
       wiki

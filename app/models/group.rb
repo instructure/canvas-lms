@@ -377,9 +377,8 @@ class Group < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     groups = data['groups'] ? data['groups']: []
-    to_import = migration.to_import 'groups'
     groups.each do |group|
-      if group['migration_id'] && (!to_import || to_import[group['migration_id']])
+      if migration.import_object?("groups", group['migration_id'])
         begin
           import_from_migration(group, migration.context)
         rescue

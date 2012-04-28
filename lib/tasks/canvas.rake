@@ -116,24 +116,35 @@ namespace :canvas do
 
   desc "Compile javascript and css assets."
   task :compile_assets do
-    puts "--> Compiling static assets [css]"
-    Rake::Task['css:generate'].invoke
+    threads = []
+    Thread.new do
+      puts "--> Compiling static assets [css]"
+      Rake::Task['css:generate'].invoke
 
-    puts "--> Compiling static assets [jammit]"
-    output = `bundle exec jammit 2>&1`
-    raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
+      puts "--> Compiling static assets [jammit]"
+      output = `bundle exec jammit 2>&1`
+      raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
 
-    puts "--> Compiling static assets [javascript]"
-    Rake::Task['js:generate'].invoke
+      puts "--> Compiled static assets [css/jammit]"
+    end.join
 
-    puts "--> Generating js localization bundles"
-    Rake::Task['i18n:generate_js'].invoke
+    Thread.new do
+      puts "--> Compiling static assets [javascript]"
+      Rake::Task['js:generate'].invoke
 
-    puts "--> Optimizing JavaScript [r.js]"
-    Rake::Task['js:build'].invoke
+      puts "--> Generating js localization bundles"
+      Rake::Task['i18n:generate_js'].invoke
 
-    puts "--> Generating documentation [yardoc]"
-    Rake::Task['doc:api'].invoke
+      puts "--> Optimizing JavaScript [r.js]"
+      Rake::Task['js:build'].invoke
+    end.join
+
+    Thread.new do
+      puts "--> Generating documentation [yardoc]"
+      Rake::Task['doc:api'].invoke
+    end.join
+
+    threads.each(&:join)
   end
 end
 

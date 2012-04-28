@@ -17,4 +17,5 @@ The possible `rel` values are:
 * next - link to the next page of results. None is sent if there is no next page.
 * prev - link to the previous page of results. None is sent if there is no previous page.
 * first - link to the first page of results. None is sent if there are no pages.
-* last - link to the last page of results. None is sent if there are no pages.
+* last - link to the last page of results. None is sent if there are no pages, or if it
+  would be expensive to calculate the number of pages.

@@ -39,12 +39,12 @@ define [
         $(this).find(".ui-menu-carat").remove()
         $trigger = $(this).popup("option", "trigger")
         $trigger.addClass('ui-state-active')
-        triggerWidth = $trigger.width()
+        triggerWidth = $trigger.outerWidth()
         differenceInOffset = $trigger.offset().left - $(this).offset().left
         actualOffset = event.pageX - $trigger.offset().left
         caratOffset = Math.min(
-          Math.max(20, actualOffset),
-          triggerWidth - 20
+          Math.max(6, actualOffset),
+          triggerWidth - 6
         ) + differenceInOffset
         $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(this)
 

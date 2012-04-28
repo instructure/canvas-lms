@@ -98,6 +98,15 @@ describe Course do
       @course.grants_right?(@teacher, nil, :read_forum).should be_true
     end
 
+    it "should grant read_as_admin and read to date-completed teacher of unpublished course" do
+      course_with_teacher(:active_all => 1)
+      @course.update_attribute(:workflow_state, 'claimed')
+      make_date_completed
+      @course.prior_enrollments.should == []
+      @course.grants_right?(@teacher, nil, :read_as_admin).should be_true
+      @course.grants_right?(@teacher, nil, :read).should be_true
+    end
+
     it "should grant read_as_admin, read, manage, and update to date-active designer" do
       course(:active_all => 1)
       @designer = user(:active_all => 1)
@@ -121,6 +130,18 @@ describe Course do
       @course.grants_right?(@designer, nil, :read_as_admin).should be_true
       @course.grants_right?(@designer, nil, :read_roster).should be_true
       @course.grants_right?(@designer, nil, :read_prior_roster).should be_true
+    end
+
+    it "should grant read_as_admin and read to date-completed designer of unpublished course" do
+      course(:active_all => 1)
+      @designer = user(:active_all => 1)
+      @enrollment = @course.enroll_designer(@designer)
+      @enrollment.accept!
+      @course.update_attribute(:workflow_state, 'claimed')
+      make_date_completed
+      @course.prior_enrollments.should == []
+      @course.grants_right?(@designer, nil, :read_as_admin).should be_true
+      @course.grants_right?(@designer, nil, :read).should be_true
     end
 
     it "should not grant read_user_notes or view_all_grades to designer" do
@@ -267,6 +288,27 @@ describe Course do
     @course.enroll_user(@user3)
     users = @course.paginate_users_not_in_groups([], 1)
     users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
+  end
+
+  context "events_for" do
+    it "should return appropriate events" do
+      course_with_teacher(:active_all => true)
+      event1 = @course.calendar_events.create
+      event2 = @course.calendar_events.build :child_event_data => [{:start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string}]
+      event2.updating_user = @teacher
+      event2.save!
+      event3 = event2.child_events.first
+      appointment_group = @course.appointment_groups.create
+      appointment_group.publish!
+      assignment = @course.assignments.create!
+
+      events = @course.events_for(@teacher)
+      events.should include event1
+      events.should_not include event2
+      events.should include event3
+      events.should include appointment_group
+      events.should include assignment
+    end
   end
 end
 
@@ -2359,7 +2401,7 @@ describe Course, "conclusions" do
     @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
   end
 
-  context "appointment cancellation" do
+  context "appointment cancelation" do
     before do
       course_with_student(:active_all => true)
       @ag = @course.appointment_groups.create(:title => "test", :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])

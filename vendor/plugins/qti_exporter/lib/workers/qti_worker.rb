@@ -29,7 +29,7 @@ module Canvas::Migration
             Canvas::Migration::Worker::clear_exported_data(export_folder_path)
           end
 
-          cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}.merge(cm.migration_settings[:migration_ids_to_import] || {})
+          cm.migration_settings[:migration_ids_to_import] = {:copy=>{:everything=>true}}.merge(cm.migration_settings[:migration_ids_to_import] || {})
           if path = converter.course[:files_import_root_path]
             cm.migration_settings[:files_import_root_path] = path
           end

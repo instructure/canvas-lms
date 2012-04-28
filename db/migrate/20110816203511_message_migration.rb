@@ -321,6 +321,12 @@ class MessageMigration < ActiveRecord::Migration
     remove_column :conversations, :migration_signature
     remove_column :conversations, :tmp_private_hash
     remove_column :conversation_message_participants, :unread
+
+    execute "DROP TABLE __migrated_messages"
+    execute "DROP TABLE __migrated_message_participants"
+    execute "DROP TABLE __migrated_message_participant_strings"
+    execute "DROP TABLE __existing_private_conversations"
+    execute "DROP TABLE __migrated_conversation_stats"
   end
 
   def self.down

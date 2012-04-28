@@ -19,6 +19,11 @@ module Delayed
       class Job < ::ActiveRecord::Base
         include Delayed::Backend::Base
         set_table_name :delayed_jobs
+        attr_writer :current_shard
+
+        def current_shard
+          @current_shard || Shard.default
+        end
 
         # be aware that some strand functionality is controlled by triggers on
         # the database. see

@@ -53,6 +53,15 @@ describe SIS::CSV::Import do
     importer.errors.first.last.should == "Malformed CSV"
   end
 
+  it "should error files with invalid CSV way down" do
+    lines = []
+    lines << "xlist_course_id,section_id,status"
+    lines.concat(["ABC2119_ccutrer_2012201_xlist,26076.20122"]*100)
+    lines << "ABC2119_ccutrer_2012201_xlist,\"26076.20122"
+    importer = process_csv_data(*lines)
+    importer.errors.first.last.should == "Malformed CSV"
+  end
+
   it "should work for a mass import" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",

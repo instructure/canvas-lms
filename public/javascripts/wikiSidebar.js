@@ -580,6 +580,7 @@ define([
     },
     attachToEditor: function($editor) {
       wikiSidebar.editor = $($editor);
+      return wikiSidebar;
     }
   };
 

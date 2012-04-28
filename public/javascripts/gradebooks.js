@@ -23,7 +23,7 @@ define([
   'datagrid',
   'compiled/grade_calculator',
   'str/htmlEscape',
-  'vendor/underscore',
+  'use!underscore',
   'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
   'jquery.dropdownList' /* dropdownList */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
@@ -1229,7 +1229,7 @@ define([
       });
       
       // handle showing only one section
-      if ($.size(possibleSections) > 1) {  
+      if (_.size(possibleSections) > 1) {
         var sectionToShowLabel = sectionToShow ? 
           I18n.t('showing_section', 'Showing Section: %{section}', {'section': possibleSections[sectionToShow]}) : 
           I18n.t('showing_all_sections', 'Showing All Sections');

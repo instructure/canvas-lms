@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include AuthenticationMethods
   protect_from_forgery
   before_filter :load_account, :load_user
+  before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :clear_cached_contexts
   before_filter :set_page_view
@@ -111,6 +112,11 @@ class ApplicationController < ActionController::Base
     headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
   end
 
+  def set_user_id_header
+    headers['X-Canvas-User-Id'] = @current_user.global_id.to_s if @current_user
+    headers['X-Canvas-Real-User-Id'] = @real_current_user.global_id.to_s if @real_current_user
+  end
+
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
   # see http://codetunes.com/2009/01/31/rails-222-ajax-and-respond_to/ for why
   def fix_xhr_requests
@@ -162,7 +168,7 @@ class ApplicationController < ActionController::Base
   end
   
   def user_url(*opts)
-    opts[0] == @current_user && !current_user_is_site_admin? && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
+    opts[0] == @current_user && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
       profile_url :
       super
   end
@@ -329,6 +335,10 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user
+      elsif params[:course_section_id]
+        params[:context_id] = params[:course_section_id]
+        params[:context_type] = "CourseSection"
+        @context = CourseSection.find(params[:course_section_id])
       elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
         @context = @current_user
         @context_membership = @context
@@ -950,6 +960,9 @@ class ApplicationController < ActionController::Base
     options[:query] ||= {}
     options[:anchor] ||= {}
     contexts_to_link_to = Array(contexts_to_link_to)
+    if event = options.delete(:event)
+      options[:query][:event_id] = event.id
+    end
     if !contexts_to_link_to.empty? && options[:anchor].is_a?(Hash)
       options[:anchor][:show] = contexts_to_link_to.collect{ |c| 
         "group_#{c.class.to_s.downcase}_#{c.id}" 
@@ -1055,7 +1068,7 @@ class ApplicationController < ActionController::Base
       elsif feature == :lockdown_browser
         Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
       else
-        !Rails.env.production? || (@current_user && current_user_is_site_admin?)
+        false
       end
     end
   end
@@ -1092,33 +1105,14 @@ class ApplicationController < ActionController::Base
     require_account_management(true)
   end
 
-  # This before_filter can be used to limit access to only site admins.
-  # This checks if the user is an admin of the 'Site Admin' account, and has the
-  # site_admin permission.
-  def require_site_admin
-    require_site_admin_with_permission(:site_admin)
-  end
-
   def require_site_admin_with_permission(permission)
-    unless current_user_is_site_admin?(permission)
+    unless Account.site_admin.grants_right?(@current_user, permission)
       flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
       store_location
       redirect_to @current_user ? root_url : login_url
       return false
     end
   end
-
-  # This checks if the user is an admin of the 'Site Admin' account, and has the
-  # specified permission.
-  def current_user_is_site_admin?(permission = :site_admin)
-    user_is_site_admin?(@current_user, permission)
-  end
-  helper_method :current_user_is_site_admin?
-
-  def user_is_site_admin?(user, permission = :site_admin)
-    Account.site_admin.grants_right?(user, session, permission)
-  end
-  helper_method :user_is_site_admin?
 
   def page_views_enabled?
     PageView.page_views_enabled?

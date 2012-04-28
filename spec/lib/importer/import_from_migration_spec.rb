@@ -47,6 +47,7 @@ describe Course do
       :assignments => {'1865116014002' => true, '1865116155002' => true, '4407365899221' => true, '4469882339231' => true},
       :outline_folders => {'1865116206002' => true, '1865116207002' => true},
       :quizzes => {'1865116175002' => true},
+      :all_groups => true,
       :shift_dates=>"1",
       :old_start_date=>"Jan 23, 2009",
       :old_end_date=>"Apr 10, 2009",

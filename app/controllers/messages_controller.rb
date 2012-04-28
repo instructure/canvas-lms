@@ -17,7 +17,11 @@
 #
 
 class MessagesController < ApplicationController
-  before_filter :require_site_admin, :get_context
+  before_filter :require_read_messages, :get_context
+
+  def require_read_messages
+    require_site_admin_with_permission(:read_messages)
+  end
 
   def index
     @messages = @context.messages.scoped(:order => 'created_at DESC').paginate(:page => params[:page], :per_page => 20)

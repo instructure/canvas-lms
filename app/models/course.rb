@@ -185,6 +185,16 @@ class Course < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  def events_for(user)
+    CalendarEvent.
+      active.
+      for_user_and_context_codes(user, [asset_string]).
+      all(:include => :child_events).
+      reject(&:hidden?) +
+    AppointmentGroup.manageable_by(user, [asset_string]) +
+    assignments.active
+  end
+
   def self.skip_updating_account_associations(&block)
     if @skip_updating_account_assocations
       block.call
@@ -880,7 +890,7 @@ class Course < ActiveRecord::Base
 
     # Teacher of a concluded course
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? }) }
-    can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
+    can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
 
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? }) }
     can :read_user_notes and can :view_all_grades
@@ -1734,6 +1744,7 @@ class Course < ActiveRecord::Base
             event.unlock_at = shift_date(event.unlock_at, shift_options)
             event.start_at = shift_date(event.start_at, shift_options)
             event.end_at = shift_date(event.end_at, shift_options)
+            event.save!
           end
         end
 
@@ -1758,9 +1769,10 @@ class Course < ActiveRecord::Base
   def import_settings_from_migration(data)
     return unless data[:course]
     settings = data[:course]
-    self.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
-    self.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
     self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
+    if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
+      self.tab_configuration = settings[:tab_configuration]
+    end
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
@@ -1817,7 +1829,8 @@ class Course < ActiveRecord::Base
 
   def copy_attachments_from_course(course, options={})
     self.attachment_path_id_lookup = {}
-    root_folder = Folder.root_folders(self).first.name + '/'
+    root_folder = Folder.root_folders(self).first
+    root_folder_name = root_folder.name + '/'
     ce = options[:content_export]
     cm = options[:content_migration]
 
@@ -1828,8 +1841,12 @@ class Course < ActiveRecord::Base
       cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
       if !ce || ce.export_object?(file)
         new_file = file.clone_for(self)
-        self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder}/, '')] = new_file.migration_id
+        self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
         new_folder_id = merge_mapped_id(file.folder)
+
+        if file.folder && file.folder.parent_folder_id.nil?
+          new_folder_id = root_folder.id
+        end
         # make sure the file has somewhere to go
         if !new_folder_id
           # gather mapping of needed folders from old course to new course
@@ -2126,7 +2143,7 @@ class Course < ActiveRecord::Base
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
-      :turnitin_comments, :self_enrollment, :license, :indexed, :settings ]
+      :turnitin_comments, :self_enrollment, :license, :indexed, :settings, :locale ]
   end
 
   def clone_for(account, opts={})

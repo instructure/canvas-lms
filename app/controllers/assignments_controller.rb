@@ -190,8 +190,7 @@ class AssignmentsController < ApplicationController
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
       @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
       @assignment_groups = @groups
-      @events = @context.calendar_events.active.to_a
-      @events.concat @context.assignments.active.to_a
+      @events = @context.events_for(@current_user)
       @undated_events = @events.select {|e| e.start_at == nil}
       @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
       

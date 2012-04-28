@@ -179,9 +179,9 @@ class DiscussionEntriesController < ApplicationController
         format.atom {
           feed = Atom::Feed.new do |f|
             f.title = t :posts_feed_title, "%{title} Posts Feed", :title => @topic.title
-            f.links << Atom::Link.new(:href => named_context_url(@context, :context_discussion_topic_url, @topic.id))
+            f.links << Atom::Link.new(:href => polymorphic_url([@context, @topic]), :rel => 'self')
             f.updated = Time.now
-            f.id = named_context_url(@context, :context_discussion_topic_url, @topic.id)
+            f.id = polymorphic_url([@context, @topic])
           end
           feed.entries << @topic.to_atom
           @discussion_entries.sort_by{|e| e.updated_at}.each do |e|
@@ -196,7 +196,7 @@ class DiscussionEntriesController < ApplicationController
           channel = RSS::Rss::Channel.new
           channel.title = t :podcast_feed_title, "%{title} Posts Podcast Feed", :title => @topic.title
           channel.description = t :podcast_description, "Any media files linked from or embedded within entries in the topic \"%{title}\" will appear in this feed.", :title => @topic.title
-          channel.link = named_context_url(@context, :context_discussion_topic_url, @topic.id)
+          channel.link = polymorphic_url([@context, @topic])
           channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
           elements = Announcement.podcast_elements(@entries, @context)
           elements.each do |item|

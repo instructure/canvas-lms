@@ -222,7 +222,23 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def to_import(val)
-    migration_settings[:migration_ids_to_import][:copy][val] rescue nil
+    migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && migration_settings[:migration_ids_to_import][:copy][val]
+  end
+
+  def import_object?(asset_type, mig_id)
+    return false unless mig_id
+    return true unless migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && migration_settings[:migration_ids_to_import][:copy].length > 0
+    return true if is_set?(to_import(:everything))
+
+    return true if is_set?(to_import("all_#{asset_type}"))
+
+    return false unless to_import(asset_type)
+
+    is_set?(to_import(asset_type)[mig_id])
+  end
+
+  def is_set?(option)
+    Canvas::Plugin::value_to_boolean option
   end
 
   def import_content
@@ -278,6 +294,7 @@ class ContentMigration < ActiveRecord::Base
   def copy_course
     self.workflow_state = :pre_processing
     self.progress = 0
+    self.migration_settings[:skip_import_notification] = true
     self.save
 
     begin
@@ -285,7 +302,7 @@ class ContentMigration < ActiveRecord::Base
       ce.content_migration = self
       ce.selected_content = copy_options
       ce.course = self.source_course
-      ce.for_course_copy = true
+      ce.export_type = ContentExport::COURSE_COPY
       ce.user = self.user
       ce.save!
       self.content_export = ce
@@ -295,6 +312,17 @@ class ContentMigration < ActiveRecord::Base
       if ce.workflow_state == 'exported_for_course_copy'
         # use the exported attachment as the import archive
         self.attachment = ce.attachment
+        migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
+        migration_settings[:migration_ids_to_import][:copy][:everything] = true
+        if copy_options[:shift_dates]
+          migration_settings[:migration_ids_to_import][:copy][:shift_dates] = copy_options[:shift_dates]
+          migration_settings[:migration_ids_to_import][:copy][:old_start_date] = copy_options[:old_start_date]
+          migration_settings[:migration_ids_to_import][:copy][:old_end_date] = copy_options[:old_end_date]
+          migration_settings[:migration_ids_to_import][:copy][:new_start_date] = copy_options[:new_start_date]
+          migration_settings[:migration_ids_to_import][:copy][:new_end_date] = copy_options[:new_end_date]
+          migration_settings[:migration_ids_to_import][:copy][:day_substitutions] = copy_options[:day_substitutions]
+        end
+
         self.save
         worker = Canvas::Migration::Worker::CCWorker.new
         worker.migration_id = self.id

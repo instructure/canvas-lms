@@ -71,7 +71,7 @@ describe Message do
     end
 
     describe "#deliver" do
-      it "should not deliver if cancelled" do
+      it "should not deliver if canceled" do
         message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
         @message.cancel
         @message.expects(:deliver_via_email).never

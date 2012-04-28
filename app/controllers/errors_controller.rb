@@ -38,7 +38,7 @@ class ErrorsController < ApplicationController
       @reports = @reports.scoped(:conditions => { :category => params[:category] })
     end
 
-    @reports = @reports.paginate(:per_page => PER_PAGE, :page => params[:page], :order => 'id DESC')
+    @reports = @reports.paginate(:per_page => PER_PAGE, :page => params[:page], :order => 'id DESC', :without_count => true)
   end
 
   def show

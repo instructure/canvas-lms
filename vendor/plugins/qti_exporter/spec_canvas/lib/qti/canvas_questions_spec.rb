@@ -85,6 +85,54 @@ describe "Converting Canvas QTI" do
     hash.should == CanvasExpected::NUMERICAL
   end
 
+  it "should get html properties" do
+    get_question_hash(CANVAS_FIXTURE_DIR, 'multiple_choice_html').should == {:neutral_comments => "meh",
+                                                                             :migration_id => "ie690f9d83784275a4d26a26daee5ebca",
+                                                                             :correct_comments_html => "<strong>correct</strong>",
+                                                                             :answers =>
+                                                                                     [{:migration_id => "RESPONSE_8080",
+                                                                                       :text => "html answer 1",
+                                                                                       :weight => 100,
+                                                                                       :html => "<strong>html answer 1</strong>",
+                                                                                       :comments_html => "<i>comment</i>",
+                                                                                       :comments => "comment"},
+                                                                                      {:migration_id => "RESPONSE_2279",
+                                                                                       :text => "html answer 2",
+                                                                                       :weight => 0,
+                                                                                       :html => "<strong>html answer 2</strong>",
+                                                                                       :comments_html => "<i>comment</i>",
+                                                                                       :comments => "comment"}],
+                                                                             :incorrect_comments => "incorrect",
+                                                                             :incorrect_comments_html => "<strong>incorrect</strong>",
+                                                                             :question_name => "test fun",
+                                                                             :neutral_comments_html => "<strong>meh</strong>",
+                                                                             :question_bank_name => "Test Bank",
+                                                                             :question_type => "multiple_choice_question",
+                                                                             :points_possible => 10,
+                                                                             :correct_comments => "correct",
+                                                                             :question_text => "<div><p><strong>html for fun</strong></p></div>",
+                                                                             :question_bank_id => "i35b5819e71e59e50208a2071da15dee5"}
+  end
+
+  it "should convert links to external banks" do
+    get_quiz_data(CANVAS_FIXTURE_DIR, 'external_bank')[1][0][:questions].should == [{:pick_count => 3,
+                                                                                  :questions => [],
+                                                                                  :question_points => 5,
+                                                                                  :question_type => "question_group",
+                                                                                  :migration_id => "i96ea64f3a1aa2fd00c72faacf0cb8ac9",
+                                                                                  :question_bank_context => "course_22520",
+                                                                                  :question_bank_migration_id => "4259",
+                                                                                  :question_bank_is_external => true},
+                                                                                 {:pick_count => 5,
+                                                                                  :questions => [],
+                                                                                  :question_points => 2,
+                                                                                  :question_type => "question_group",
+                                                                                  :migration_id => "ida8ce53cf0240070ce6c69c48cd588ee",
+                                                                                  :question_bank_context => "account_32442",
+                                                                                  :question_bank_migration_id => "4260",
+                                                                                  :question_bank_is_external => true}]
+  end
+
 end
 
 module CanvasExpected

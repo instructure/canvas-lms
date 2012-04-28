@@ -569,6 +569,14 @@ shared_examples_for "all selenium tests" do
     JS
   end
 
+  def dismiss_alert
+    keep_trying_until do
+      alert = driver.switch_to.alert
+      alert.dismiss
+      true
+    end
+  end
+
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
     driver.switch_to.frame id
@@ -824,7 +832,8 @@ end
     "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
     "attachments.zip" => File.read(File.dirname(__FILE__) + "/../fixtures/attachments.zip"),
     "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'),
-    "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
+    "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip'),
+    "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip')
   }
 
   def get_file(filename, data = nil)

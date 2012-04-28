@@ -1085,10 +1085,9 @@ class Quiz < ActiveRecord::Base
 
   def self.process_migration(data, migration, question_data)
     assessments = data['assessments'] ? data['assessments']['assessments'] : []
-    to_import = migration.to_import 'quizzes'
     assessments.each do |assessment|
       migration_id = assessment['migration_id'] || assessment['assessment_id']
-      if migration_id && (!to_import || to_import[migration_id])
+      if migration.import_object?("quizzes", migration_id)
         allow_update = false
         # allow update if we find an existing item based on this migration setting
         if item_id = migration.migration_settings[:quiz_id_to_update]
@@ -1099,6 +1098,7 @@ class Quiz < ActiveRecord::Base
           end
         end
         begin
+          assessment[:migration] = migration
           Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
         rescue
           migration.add_warning(t('warnings.import_from_migration_failed', "Couldn't import the quiz \"%{quiz_title}\"", :quiz_title => assessment[:title]), $!)
@@ -1157,7 +1157,7 @@ class Quiz < ActiveRecord::Base
               QuizQuestion.import_from_migration(aq, context, item)
             end
           when "question_group"
-            QuizGroup.import_from_migration(question, context, item, question_data, i + 1)
+            QuizGroup.import_from_migration(question, context, item, question_data, i + 1, hash[:migration])
           when "text_only_question"
             qq = item.quiz_questions.new
             qq.question_data = question
