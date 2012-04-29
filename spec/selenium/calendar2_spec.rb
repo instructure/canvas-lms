@@ -230,7 +230,7 @@ describe "calendar2" do
       end
 
       it "should let me message students who have signed up for an appointment" do
-        date = (Date.today + 7).to_s
+        date = Date.today.to_s
         create_appointment_group :new_appointments => [
           ["#{date} 12:00:00", "#{date} 13:00:00"],
           ["#{date} 13:00:00", "#{date} 14:00:00"],
@@ -345,7 +345,6 @@ describe "calendar2" do
 
       context "event editing" do
         it "should allow editing appointment events" do
-          pending("pop-up after clicking on appointment group on sunday is cut off on the left side - refs #8290")
           create_appointment_group
           ag = AppointmentGroup.first
           student_in_course(:course => @course, :active_all => true)

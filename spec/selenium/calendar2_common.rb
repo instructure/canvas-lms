@@ -6,7 +6,7 @@ shared_examples_for "calendar2 selenium tests" do
   end
 
   def create_appointment_group(params={})
-    tomorrow = (Date.today + 1).to_s
+    tomorrow = Date.today.to_s
     default_params = {
         :title => "new appointment group",
         :context => @course,
