@@ -982,9 +982,6 @@ class CoursesController < ApplicationController
       args[:abstract_course] = @context.abstract_course
       args[:account] = account
       @course = @context.account.courses.new
-      @context.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
-        @course.send("#{attr}=", @context.send(attr))
-      end
       @course.attributes = args
       @course.workflow_state = 'claimed'
       @course.save

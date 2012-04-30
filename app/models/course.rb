@@ -1712,7 +1712,7 @@ class Course < ActiveRecord::Base
     CalendarEvent.process_migration(data, migration);migration.fast_update_progress(90)
     WikiPage.process_migration_course_outline(data, migration);migration.fast_update_progress(95)
 
-    if !migration.copy_options || migration.copy_options[:everything] || migration.copy_options[:all_course_settings]
+    if !migration.copy_options || migration.is_set?(migration.copy_options[:everything]) || migration.is_set?(migration.copy_options[:all_course_settings])
       import_settings_from_migration(data); migration.fast_update_progress(96)
     end
 
