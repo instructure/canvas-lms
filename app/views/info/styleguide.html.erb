@@ -1,4 +1,30 @@
+<style>
+  /* don't ever do inline styles, or inline stylesheets like this */
+  .demo-icons {
+    display: inline-block;
+    margin: 4px;
+    width: 200px;
+  }
+</style>
+
+
 <div class="container v-gutter">
+
+  <h2 class="v-gutter">Forms?!</h2>
+  <div class="row-fluid">
+    <form class="form-vertical">
+      <fieldset>
+        <legend>Legend text</legend>
+        <div class="control-group">
+          <label class="control-label" for="input01">Text input</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" id="input01">
+            <p class="help-block">Supporting help text</p>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
 
   <h2>Grid</h2>
   <p>Regular bootstrap 12 column grid. Use <code>.spanX</code> to have an element span 'X' number of columns.</p>
@@ -20,7 +46,9 @@
     <div class="span4">
       <h2>Content Box with Toolbar</h2>
       <div class="content-box border border-trbl border-round">
-        <header class="toolbar">Toolbar</header>
+        <div class="toolbar">
+          <h2 class="header">Toolbar Header</h2>
+        </div>
         <p>
           The first element of a this content box is a <code>.toolbar</code>.
         </p>
@@ -107,11 +135,105 @@
     </div>
   </div>
 
+  <h2 class="v-gutter">Stacked Tabs</h2>
+  <div class="row">
+    <div class="span4">
+      <ul class="nav nav-tabs nav-stacked">
+        <li><a href="#">Start a course</a>
+        <li><a href="#">Find people on Canvas</a>
+        <li><a href="#">Start a community</a>
+      </ul>
+    </div>
+  </div>
+
   <h2 class="v-gutter"></h2>
   <div class="row-fluid">
     <div class="span4">span 2</div>
     <div class="span8">span 8</div>
   </div>
+
+  <h2 class="v-gutter">Icons</h2>
+  <span class="demo-icons"><i class="icon-stats"></i> icon-stats</span>
+  <span class="demo-icons"><i class="icon-paperclip"></i> icon-paperclip</span>
+  <span class="demo-icons"><i class="icon-media"></i> icon-media</span>
+  <span class="demo-icons"><i class="icon-address-book"></i> icon-address-book</span>
+  <span class="demo-icons"><i class="icon-announcement"></i> icon-announcement</span>
+  <span class="demo-icons"><i class="icon-reset"></i> icon-reset</span>
+  <span class="demo-icons"><i class="icon-analytics"></i> icon-analytics</span>
+  <span class="demo-icons"><i class="icon-student-view"></i> icon-student-view</span>
+  <span class="demo-icons"><i class="icon-calendar-day"></i> icon-calendar-day</span>
+  <span class="demo-icons"><i class="icon-trash"></i> icon-trash</span>
+  <span class="demo-icons"><i class="icon-speed-grader"></i> icon-speed-grader</span>
+  <span class="demo-icons"><i class="icon-copy-course"></i> icon-copy-course</span>
+  <span class="demo-icons"><i class="icon-import-content"></i> icon-import-content</span>
+  <span class="demo-icons"><i class="icon-export-content"></i> icon-export-content</span>
+  <span class="demo-icons"><i class="icon-discussion"></i> icon-discussion</span>
+  <span class="demo-icons"><i class="icon-peer-review"></i> icon-peer-review</span>
+  <span class="demo-icons"><i class="icon-discussion-reply"></i> icon-discussion-reply</span>
+  <span class="demo-icons"><i class="icon-discussion-new"></i> icon-discussion-new</span>
+  <span class="demo-icons"><i class="icon-edit"></i> icon-edit</span>
+  <span class="demo-icons"><i class="icon-home"></i> icon-home</span>
+  <span class="demo-icons"><i class="icon-settings"></i> icon-settings</span>
+  <span class="demo-icons"><i class="icon-compose"></i> icon-compose</span>
+  <span class="demo-icons"><i class="icon-flag"></i> icon-flag</span>
+  <span class="demo-icons"><i class="icon-video"></i> icon-video</span>
+  <span class="demo-icons"><i class="icon-audio"></i> icon-audio</span>
+  <span class="demo-icons"><i class="icon-outdent"></i> icon-outdent</span>
+  <span class="demo-icons"><i class="icon-outdent2"></i> icon-outdent2</span>
+  <span class="demo-icons"><i class="icon-indent"></i> icon-indent</span>
+  <span class="demo-icons"><i class="icon-forward"></i> icon-forward</span>
+  <span class="demo-icons"><i class="icon-warning"></i> icon-warning</span>
+  <span class="demo-icons"><i class="icon-filmstrip"></i> icon-filmstrip</span>
+  <span class="demo-icons"><i class="icon-rubric"></i> icon-rubric</span>
+  <span class="demo-icons"><i class="icon-check-plus"></i> icon-check-plus</span>
+  <span class="demo-icons"><i class="icon-rss"></i> icon-rss</span>
+  <span class="demo-icons"><i class="icon-rss-add"></i> icon-rss-add</span>
+  <span class="demo-icons"><i class="icon-quiz"></i> icon-quiz</span>
+  <span class="demo-icons"><i class="icon-question"></i> icon-question</span>
+  <span class="demo-icons"><i class="icon-drop-down"></i> icon-drop-down</span>
+  <span class="demo-icons"><i class="icon-minimize"></i> icon-minimize</span>
+  <span class="demo-icons"><i class="icon-end"></i> icon-end</span>
+  <span class="demo-icons"><i class="icon-add"></i> icon-add</span>
+  <span class="demo-icons"><i class="icon-info"></i> icon-info</span>
+  <span class="demo-icons"><i class="icon-check"></i> icon-check</span>
+  <span class="demo-icons"><i class="icon-clock"></i> icon-clock</span>
+  <span class="demo-icons"><i class="icon-calendar-month"></i> icon-calendar-month</span>
+  <span class="demo-icons"><i class="icon-x"></i> icon-x</span>
+  <span class="demo-icons"><i class="icon-refresh"></i> icon-refresh</span>
+  <span class="demo-icons"><i class="icon-off"></i> icon-off</span>
+  <span class="demo-icons"><i class="icon-updown"></i> icon-updown</span>
+  <span class="demo-icons"><i class="icon-user-add"></i> icon-user-add</span>
+  <span class="demo-icons"><i class="icon-group"></i> icon-group</span>
+  <span class="demo-icons"><i class="icon-star"></i> icon-star</span>
+  <span class="demo-icons"><i class="icon-replied"></i> icon-replied</span>
+  <span class="demo-icons"><i class="icon-hour-glass"></i> icon-hour-glass</span>
+  <span class="demo-icons"><i class="icon-assignment"></i> icon-assignment</span>
+  <span class="demo-icons"><i class="icon-message"></i> icon-message</span>
+  <span class="demo-icons"><i class="icon-note-dark"></i> icon-note-dark</span>
+  <span class="demo-icons"><i class="icon-note-light"></i> icon-note-light</span>
+  <span class="demo-icons"><i class="icon-tag"></i> icon-tag</span>
+  <span class="demo-icons"><i class="icon-next-unread"></i> icon-next-unread</span>
+  <span class="demo-icons"><i class="icon-search"></i> icon-search</span>
+  <span class="demo-icons"><i class="icon-lock"></i> icon-lock</span>
+  <span class="demo-icons"><i class="icon-unlock"></i> icon-unlock</span>
+  <span class="demo-icons"><i class="icon-rubric-dark"></i> icon-rubric-dark</span>
+  <span class="demo-icons"><i class="icon-folder"></i> icon-folder</span>
+  <span class="demo-icons"><i class="icon-toggle-right"></i> icon-toggle-right</span>
+  <span class="demo-icons"><i class="icon-toggle-left"></i> icon-toggle-left</span>
+  <span class="demo-icons"><i class="icon-link"></i> icon-link</span>
+  <span class="demo-icons"><i class="icon-lti"></i> icon-lti</span>
+  <span class="demo-icons"><i class="icon-text"></i> icon-text</span>
+  <span class="demo-icons"><i class="icon-timer"></i> icon-timer</span>
+  <span class="demo-icons"><i class="icon-pin"></i> icon-pin</span>
+  <span class="demo-icons"><i class="icon-like"></i> icon-like</span>
+  <span class="demo-icons"><i class="icon-collection-save"></i> icon-collection-save</span>
+  <span class="demo-icons"><i class="icon-collection"></i> icon-collection</span>
+  <span class="demo-icons"><i class="icon-group-new"></i> icon-group-new</span>
+  <span class="demo-icons"><i class="icon-group-new-dark"></i> icon-group-new-dark</span>
+
+  <h1 class="v-gutter">TODO</h1>
+  <h2>`input.wide, textarea.wide`</h2>
+  <h2>`.triangle-box, .triangle-box-with-header`</h2>
 
 </div>
 

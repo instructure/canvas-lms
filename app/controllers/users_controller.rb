@@ -24,6 +24,8 @@
 # `users/:user_id/page_views` can be accessed as `users/self/page_views` to
 # access the current user's page views.
 class UsersController < ApplicationController
+
+
   include GoogleDocs
   include Twitter
   include LinkedIn
@@ -217,6 +219,11 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    if @domain_root_account.show_new_dashboard?
+      @use_new_styles = true
+      return render :action => :new_user_dashboard
+    end
+
     get_context
 
     # dont show crubms on dashboard because it does not make sense to have a breadcrumb

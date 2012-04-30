@@ -22,8 +22,8 @@ define [
     ##
     # Extends render to add support for chid views and element filtering
     render: (opts = {}) ->
-      @renderViews() if @options.views
       @filter() unless opts.noFilter is true
+      @renderViews() if @options.views
       this
 
     ##
@@ -48,9 +48,7 @@ define [
     # @api private
     renderView: (view, className) =>
       target = @$('.' + className).first()
-      view.$el = target
-      view.el = target[0]
-      view.delegateEvents()
+      view.setElement target
       view.render()
 
     ##
@@ -64,7 +62,7 @@ define [
     createBinding: (index, el) ->
       $el = $ el
       attribute = $el.data 'bind'
-      @model.bind "change:#{attribute}", (model, value) =>
+      @model.on "change:#{attribute}", (model, value) =>
         $el.html value
 
     #_createBehavior: (index, el) ->

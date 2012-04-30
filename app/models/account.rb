@@ -147,6 +147,17 @@ class Account < ActiveRecord::Base
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true, :default => false
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
+  add_setting :enable_new_dashboard, :boolean => true, :root_only => true, :default => false
+
+  ##
+  # Determines if the user gets the new dashboard or not
+  # We will eventually need to check more than this when people
+  # opt in to the canvas network / dashboard etc.
+  #
+  # Eventually we will remove this check and give everybody the new dashboard
+  def show_new_dashboard?
+    self.enable_new_dashboard?
+  end
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -175,7 +186,7 @@ class Account < ActiveRecord::Base
     end
     settings
   end
-  
+
   def ip_filters=(params)
     filters = {}
     require 'ipaddr'

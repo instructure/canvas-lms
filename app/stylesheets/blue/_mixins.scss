@@ -1,5 +1,14 @@
+@import '../bootstrap/bootstrap/variables';
+@import '../bootstrap/bootstrap/mixins';
+@import 'variables';
+
 @mixin bevelText {
   text-shadow: 0 1px 1px rgba(255,255,255,.75);
+}
+
+@mixin content-callout {
+  @include gradient-vertical(lighten($contentCalloutColor, 4%), $contentCalloutColor);
+  color: $blueDark;
 }
 
 

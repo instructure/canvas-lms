@@ -4,8 +4,11 @@
   color: inherit;
 }
 
-.box-shadow {
-  @include box-shadow(0 2px 4px rgba(0,0,0,.25))
+.nav-tabs.nav-stacked {
+  background: $lightBackground;
 }
 
+h1, h2, h3 {
+  color: $black;
+}
 
