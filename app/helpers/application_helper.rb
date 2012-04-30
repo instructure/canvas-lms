@@ -350,6 +350,14 @@ module ApplicationHelper
     end
   end
 
+  def include_common_stylesheet
+    if @use_new_styles
+      include_stylesheets :new_common, :media => "all"
+    else
+      include_stylesheets :common, :media => "all"
+    end
+  end
+
   def section_tabs
     @section_tabs ||= begin
       if @context

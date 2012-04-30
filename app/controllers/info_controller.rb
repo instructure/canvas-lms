@@ -20,7 +20,7 @@ class InfoController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => :record_error
   skip_before_filter :load_account, :only => :health_check
   skip_before_filter :load_user, :only => [:health_check, :help_links]
-  
+
   def message_redirect
     m = Message.find_by_id(params[:id])
     if m && m.url
@@ -85,4 +85,11 @@ class InfoController < ApplicationController
       format.json { render :json => { :status => 'canvas ok' } }
     end
   end
+
+  ##
+  # Visit /styleguide to see all the CSS components for building pages.
+  def styleguide
+    @use_new_styles = true
+  end
+
 end

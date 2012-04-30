@@ -1,0 +1,117 @@
+<div class="container v-gutter">
+
+  <h2>Grid</h2>
+  <p>Regular bootstrap 12 column grid. Use <code>.spanX</code> to have an element span 'X' number of columns.</p>
+  <div class="row">
+    <div class="span2"><div class="content-box border border-trbl"><p>span 2</p></div></div>
+    <div class="span2"><div class="content-box border border-trbl"><p>span 2</p></div></div>
+    <div class="span8"><div class="content-box border border-trbl"><p>span 8</p></div></div>
+  </div>
+
+  <div class="row v-gutter">
+    <div class="span4">
+      <h2>Content Box</h2>
+      <div class="content-box">
+        <p>The <code>content-box</code> doesn't do much on its own, sets a background color and some padding for direct children.</p>
+        <p>The borders aren't defined because border logic varies so much between designs. Use the border classes to define them.</p>
+      </div>
+    </div>
+
+    <div class="span4">
+      <h2>Content Box with Toolbar</h2>
+      <div class="content-box border border-trbl border-round">
+        <header class="toolbar">Toolbar</header>
+        <p>
+          The first element of a this content box is a <code>.toolbar</code>.
+        </p>
+        <p>
+          It also has the classes <code>border border-trbl border-round</code> to make the borders.
+        </p>
+      </div>
+    </div>
+
+    <div class="span4">
+      <h2>Content Callout</h2>
+      <div class="content-callout content-box border border-trbl">
+        <p><code>.content-callout</code> will change the background color for elements that need to be called out</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row v-gutter">
+    <div class="span4">
+      <h2>List View</h2>
+      <div class="list-view border border-trbl" style="height: 200px">
+        <header>header</header>
+        <ul>
+          <li><a href="#">list item</a>
+          <li><a href="#">list item</a>
+        </ul>
+        <ul>
+          <li><a href="#">no header list item</a>
+          <li><a href="#">list item</a>
+        </ul>
+        <header>Foo bar</header>
+        <ul>
+          <% 20.times do |i| %>
+            <li><a href="#">Item <%= i + 1 %></a>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <div class="span4">
+      <h2>Nav Links</h2>
+      <p>A list of links with minimal styling</p>
+      <ul class="nav nav-links">
+        <li><a class="active" href="#">One</a>
+        <li><a href="#">Two</a>
+        <li><a href="#">Three</a>
+      </ul>
+    </div>
+
+    <div class="span4">
+      <h2>Vertical Gutter</h2>
+      <p>We've added <code>v-gutter</code> and <code>v-gutter-large</code> classes to add some vertical margin to an element equal to the grid's gutters (and * 1.5 for large).</p>
+    </div>
+  </div>
+
+  <h2>ImageBlock</h2>
+  <div class="row">
+    <div class="span6">
+      <div class="image-block">
+        <a href="#" class="image-block-image"><img class="border-round box-shadow" src="http://www.gravatar.com/avatar/749001c9fe6927c4b069a45c2a3d68f7?s=100"></a>
+        <div class="image-block-content">
+          <div class="content-box border border-trbl border-round">
+            <p>Image blocks float an image (or any content) to the left and keep the content from wrapping beneath it.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="span4 offset2">
+      <div class="image-block">
+        <a href="#" class="image-block-image"><img src="http://www.gravatar.com/avatar/749001c9fe6927c4b069a45c2a3d68f7?s=100"></a>
+        <div class="image-block-content">
+          <p>Can you nest image blocks? Fer sure.</p>
+          <p>You can totally nest them like a champion for as long as you like, image-block don't care.</p>
+          <div class="image-block">
+            <a href="#" class="image-block-image"><img src="http://www.gravatar.com/avatar/749001c9fe6927c4b069a45c2a3d68f7?s=50"></a>
+            <div class="image-block-content">
+              <p>You can totally nest them like a champion.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="v-gutter"></h2>
+  <div class="row-fluid">
+    <div class="span4">span 2</div>
+    <div class="span8">span 8</div>
+  </div>
+
+</div>
+
