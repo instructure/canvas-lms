@@ -105,16 +105,16 @@ describe ContentZipper do
         names = []
         @attachment.reload
         Zip::ZipFile.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
-        names
+        names.sort
       end
 
       context "in a private course" do
         it "should give logged in students some files" do
-          zipped_files_for_user(@user).should == ['visible.png', 'visible/sub-vis.png']
+          zipped_files_for_user(@user).should == ['visible.png', 'visible/sub-vis.png'].sort
         end
 
         it "should give logged in teachers all files" do
-          zipped_files_for_user(@teacher).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"]
+          zipped_files_for_user(@teacher).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
 
         it "should give logged out people no files" do
@@ -122,7 +122,7 @@ describe ContentZipper do
         end
         
         it "should give all files if check_user=false" do
-          zipped_files_for_user(nil, false).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"]
+          zipped_files_for_user(nil, false).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
       end
 
@@ -133,19 +133,19 @@ describe ContentZipper do
         end
 
         it "should give logged in students some files" do
-          zipped_files_for_user(@user).should == ['visible.png', 'visible/sub-vis.png']
+          zipped_files_for_user(@user).should == ['visible.png', 'visible/sub-vis.png'].sort
         end
 
         it "should give logged in teachers all files" do
-          zipped_files_for_user(@teacher).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"]
+          zipped_files_for_user(@teacher).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
 
         it "should give logged out people the same thing as students" do
-          zipped_files_for_user(nil).should == ['visible.png', 'visible/sub-vis.png']
+          zipped_files_for_user(nil).should == ['visible.png', 'visible/sub-vis.png'].sort
         end
 
         it "should give all files if check_user=false" do
-          zipped_files_for_user(nil, false).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"]
+          zipped_files_for_user(nil, false).should == ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
       end
     end
@@ -160,6 +160,22 @@ describe ContentZipper do
       attachment.save!
       ContentZipper.process_attachment(attachment, @user)
       attachment.workflow_state.should == 'zipped'
+    end
+
+    it "should use the display name" do
+      course_with_student(:active_all => true)
+      folder = Folder.root_folders(@course).first
+      attachment_model(:uploaded_data => stub_png_data('hidden.png'), :content_type => 'image/png', :folder => folder, :display_name => 'otherfile.png')
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user_id = @user.id
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = folder
+      attachment.save!
+      ContentZipper.process_attachment(attachment, @user)
+      attachment.reload
+      names = []
+      Zip::ZipFile.foreach(attachment.full_filename) {|f| names << f.name if f.file? }
+      names.should == ['otherfile.png']
     end
   end
 end
