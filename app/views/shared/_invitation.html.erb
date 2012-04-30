@@ -6,7 +6,7 @@
       mt :body_ta, "You've been invited to join %{course} as a **TA** for the user account **%{email_address}**.", :course => invitation.long_name, :email_address => invitation.user.email
     when 'ObserverEnrollment'
       mt :body_observer, "You've been invited to join %{course} as an **observer** for the user account **%{email_address}**.", :course => invitation.long_name, :email_address => invitation.user.email
-    when 'CourseDesignerEnrollment'
+    when 'DesignerEnrollment'
       mt :body_designer, "You've been invited to join %{course} as a **designer** for the user account **%{email_address}**.", :course => invitation.long_name, :email_address => invitation.user.email
     else
       mt :body_student, "You've been invited to join %{course} as a **student** for the user account **%{email_address}**.", :course => invitation.long_name, :email_address => invitation.user.email
