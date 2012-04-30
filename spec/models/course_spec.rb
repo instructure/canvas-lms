@@ -180,6 +180,13 @@ describe Course do
       @course.grants_right?(:read, @student).should be_false
     end
 
+    it "should not grant read to soft-inactive teachers" do
+      course_with_teacher(:active_user => 1)
+      @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
+      @enrollment.update_attribute(:workflow_state, 'active')
+      @enrollment.state_based_on_date.should == :inactive
+      @course.grants_right?(:read, @teacher).should be_false
+    end
   end
 
   it "should clear content when resetting" do

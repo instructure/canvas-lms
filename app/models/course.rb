@@ -889,10 +889,10 @@ class Course < ActiveRecord::Base
     can :read
 
     # Teacher of a concluded course
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? }) }
+    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.completed? }) }
     can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
 
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? }) }
+    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? && e.completed? }) }
     can :read_user_notes and can :view_all_grades
 
     given { |user| !self.deleted? && !self.sis_source_id && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.state_based_on_date == :completed })}
