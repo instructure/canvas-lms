@@ -765,6 +765,17 @@ class Quiz < ActiveRecord::Base
     dup.clone_updated = true
     dup
   end
+
+  def submissions_for_statistics(include_all_versions=true)
+    for_users = self.context.students.map(&:id)
+    self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
+      map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
+      flatten.
+      compact.
+      select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
+      sort_by(&:updated_at).
+      reverse
+  end
   
   def statistics_csv(options={})
     options ||= {}
@@ -774,12 +785,7 @@ class Quiz < ActiveRecord::Base
     columns << t('statistics.csv_columns.submitted', 'submitted')
     columns << t('statistics.csv_columns.attempt', 'attempt') if options[:include_all_versions]
     first_question_index = columns.length
-    submissions = self.quiz_submissions.scoped(:include => (options[:include_all_versions] ? [:versions] : [])).select { |s| self.context.students.map(&:id).include?(s.user_id) }
-    if options[:include_all_versions]
-      submissions = submissions.map(&:submitted_versions).flatten
-    end
-    submissions = submissions.select{|s| s.completed? && s.submission_data.is_a?(Array) }
-    submissions = submissions.sort_by(&:updated_at).reverse
+    submissions = submissions_for_statistics(options[:include_all_versions])
     found_question_ids = {}
     quiz_datas = [quiz_data] + submissions.map(&:quiz_data)
     quiz_datas.each do |quiz_data|
@@ -863,12 +869,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def statistics(include_all_versions=true)
-    submissions = self.quiz_submissions.scoped(:include => (include_all_versions ? [:versions] : [])).select{|s| self.context.students.map(&:id).include?(s.user_id) }
-    if include_all_versions
-      submissions = submissions.map(&:submitted_versions).flatten
-    end
-    submissions = submissions.select{|s| s.completed? && s.submission_data.is_a?(Array) }
-    submissions = submissions.sort_by(&:updated_at).reverse
+    submissions = submissions_for_statistics(include_all_versions)
     questions = (self.quiz_data || []).map{|q| q[:questions] ? q[:questions] : [q] }.flatten
     stats = {}
     found_ids = {}

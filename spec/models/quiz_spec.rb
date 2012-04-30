@@ -505,41 +505,57 @@ describe Quiz do
       stats[:submission_score_stdev].should be_close(Math::sqrt(4 + 2.0/9), 0.0000000001)
     end
 
-    context 'csv' do
-      it 'should include previous versions even if the current version is incomplete' do
-        q = @course.quizzes.create!
-        q.quiz_questions.create!(:question_data => { :name => "test 1" })
-        q.generate_quiz_data
-        @user1 = User.create! :name => "some_user 1"
-        student_in_course :course => @course, :user => @user1
-        sub = q.generate_submission(@user1)
-        sub.workflow_state = 'complete'
-        sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => -1 }]
-        sub.with_versioning(true, &:save!)
-        sub = q.generate_submission(@user1)
-        sub.save!
+    it "should use the last completed submission, even if the current submission is in progress" do
+      student_in_course(:active_all => true)
+      q = @course.quizzes.create!
+      q.quiz_questions.create!(:question_data => { :name => "test 1" })
+      q.generate_quiz_data
+      q.save!
 
-        stats = FasterCSV.parse(q.statistics_csv(:include_all_versions => true))
+      # one complete submission
+      qs = q.generate_submission(@student)
+      qs.grade_submission
+
+      # and one in progress
+      qs = q.generate_submission(@student)
+
+      stats = q.statistics(false)
+      stats[:submission_count].should == 1
+    end
+
+    context 'csv' do
+      before(:each) do
+        student_in_course(:active_all => true)
+        @quiz = @course.quizzes.create!
+        @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })
+        @quiz.generate_quiz_data
+        @quiz.save!
+      end
+
+      it 'should include previous versions even if the current version is incomplete' do
+        # one complete submission
+        qs = @quiz.generate_submission(@student)
+        qs.grade_submission
+
+        # and one in progress
+        @quiz.generate_submission(@student)
+
+        stats = FasterCSV.parse(@quiz.statistics_csv(:include_all_versions => true))
+        # format for row is row_name, '', data1, data2, ...
         stats.first.length.should == 3
       end
 
-      it 'should not include previous versions even if not asked' do
-        q = @course.quizzes.create!
-        q.quiz_questions.create!(:question_data => { :name => "test 1" })
-        q.generate_quiz_data
-        @user1 = User.create! :name => "some_user 1"
-        student_in_course :course => @course, :user => @user1
-        sub = q.generate_submission(@user1)
-        sub.workflow_state = 'complete'
-        sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => -1 }]
-        sub.with_versioning(true, &:save!)
-        sub = q.generate_submission(@user1)
-        sub.save!
+      it 'should not include previous versions by default' do
+        # two complete submissions
+        qs = @quiz.generate_submission(@student)
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.grade_submission
 
-        stats = FasterCSV.parse(q.statistics_csv)
-        stats.first.length.should == 2
+        stats = FasterCSV.parse(@quiz.statistics_csv)
+        # format for row is row_name, '', data1, data2, ...
+        stats.first.length.should == 3
       end
-
     end
   end
 

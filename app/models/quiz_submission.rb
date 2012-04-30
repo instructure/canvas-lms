@@ -346,6 +346,10 @@ class QuizSubmission < ActiveRecord::Base
     res << self if self.completed?
     res
   end
+
+  def latest_submitted_version
+    self.submitted_versions.last
+  end
   
   def attempts_left
     return -1 if self.quiz.allowed_attempts < 0
