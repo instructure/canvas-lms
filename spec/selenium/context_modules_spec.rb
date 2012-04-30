@@ -181,6 +181,63 @@ describe "context_modules" do
       driver.find_element(:css, '.context_module > .header').should include_text(edit_text)
     end
 
+    it "should add and remove completion criteria" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+
+      # add completion criterion
+      context_module = f('.context_module')
+      driver.action.move_to(context_module).perform
+      f('.edit_module_link').click
+      f('.ui-dialog').should be_displayed
+      edit_form = driver.find_element(:id, 'add_context_module_form')
+      f('.add_completion_criterion_link', edit_form).click
+      wait_for_ajaximations
+      click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
+      click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
+      edit_form.submit
+      edit_form.should_not be_displayed
+      wait_for_ajax_requests
+
+      # verify it was added
+      @course.reload
+      smodule = @course.context_modules.first
+      smodule.should_not be_nil
+      smodule.completion_requirements.should_not be_empty
+      smodule.completion_requirements[0][:type].should == 'must_submit'
+
+      # delete the criterion, then cancel the form
+      driver.action.move_to(context_module).perform
+      f('.edit_module_link').click
+      f('.ui-dialog').should be_displayed
+      edit_form = driver.find_element(:id, 'add_context_module_form')
+      f('.completion_entry .delete_criterion_link', edit_form).click
+      wait_for_ajaximations
+      f('.cancel_button', edit_form).click
+      wait_for_ajaximations
+
+      # now delete the criterion frd
+      # (if the previous step did even though it shouldn't have, this will error)
+      driver.action.move_to(context_module).perform
+      f('.edit_module_link').click
+      f('.ui-dialog').should be_displayed
+      edit_form = driver.find_element(:id, 'add_context_module_form')
+      f('.completion_entry .delete_criterion_link', edit_form).click
+      wait_for_ajaximations
+      edit_form.submit
+      wait_for_ajax_requests
+
+      # verify it's gone
+      @course.reload
+      @course.context_modules.first.completion_requirements.should == []
+
+      # and also make sure the form remembers that it's gone (#8329)
+      driver.action.move_to(context_module).perform
+      f('.edit_module_link').click
+      f('.ui-dialog').should be_displayed
+      edit_form = driver.find_element(:id, 'add_context_module_form')
+      ff('.completion_entry .delete_criterion_link', edit_form).should be_empty
+    end
+
     it "should delete a module item" do
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       driver.execute_script("$('.context_module_item').addClass('context_module_item_hover')")

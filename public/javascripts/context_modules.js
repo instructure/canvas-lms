@@ -761,7 +761,8 @@ define([
         .removeClass('max_score_requirement')
         .removeClass('must_view_requirement')
         .removeClass('must_submit_requirement')
-        .removeClass('must_contribute_requirement');
+        .removeClass('must_contribute_requirement')
+        .find('.criterion').removeClass('defined');
       for(var idx in data.context_module.completion_requirements) {
         var req = data.context_module.completion_requirements[idx];
         req.criterion_type = req.type;
