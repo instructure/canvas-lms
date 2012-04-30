@@ -205,7 +205,7 @@ describe Course do
     @new_course = @course.reset_content
 
     @course.reload
-    @course.stuck_sis_fields.should == [].to_set
+    @course.stuck_sis_fields.should == [:workflow_state].to_set
     @course.course_sections.should be_empty
     @course.students.should be_empty
     @course.sis_source_id.should be_nil
@@ -239,7 +239,7 @@ describe Course do
     @new_course = @course.reset_content
 
     @course.reload
-    @course.stuck_sis_fields.should == [:name].to_set
+    @course.stuck_sis_fields.should == [:workflow_state, :name].to_set
     @course.sis_source_id.should be_nil
 
     @new_course.reload
