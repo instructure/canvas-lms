@@ -1,4 +1,5 @@
 .border {
+  border-width: 0px;
   border-style: solid;
   border-color: $borderColor;
 }
@@ -22,6 +23,10 @@
   border-left-size: 1px;
 }
 
+.border-tl {
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
 .border-b {
   border-bottom-width: 1px;
 }

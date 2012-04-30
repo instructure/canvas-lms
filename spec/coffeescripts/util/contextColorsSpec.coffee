@@ -13,7 +13,7 @@ define [
   # Point is to see if the algorithm appears random.
   # Uncomment for the fun
   test 'manually sanity check', ->
-    for i in [0..1000] ->
+    for i in [0..1000]
       d = $('<div/>')
       rgb = contextColors.codeToRGBs "course_#{i}"
       hue = contextColors.codeToHue "course_#{i}"
@@ -28,7 +28,7 @@ define [
         width: 5
         height: 5
         position: 'absolute'
-        top: hue + 200
+        top: hue + 500
         left: i
 
       $fixtures.append d

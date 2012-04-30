@@ -1,0 +1,173 @@
+@import 'centeredHeader';
+@import 'blue/variables';
+@import 'blue/mixins';
+
+// Can remove this when we upgrade to bootstrap 2.0.3
+$boxSizingBaseLineHeight: $baseLineHeight + 8;
+.quickStartBar {
+  textarea {
+    @include box-sizing(border-box);
+  }
+  input[type=text] {
+    @include box-sizing(border-box);
+    height: $boxSizingBaseLineHeight;
+  }
+}
+
+// kill bootstrap styles
+.newItemForm {
+  margin-bottom: 0;
+}
+
+.quickStartBar {
+  font-size: 14px;
+  font-weight: bold;
+  min-height: 118px;
+
+  /* hide box-shadow */
+  overflow: hidden;
+}
+
+.quickStartBar .pick-an-item {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background: #fff;
+}
+
+/* kill bootstrap stuff */
+.quickStartBar .nav {
+  margin: 0;
+  border: none;
+}
+
+/* kill bootstrap stuff */
+.quickStartBar .nav > li > a {
+  line-height: 22px;
+  font-size: 12px;
+  color: #8d8d8d;
+  border: none; 
+}
+
+/* kill bootstrap stuff */
+.quickStartBar .nav > li > a:hover,
+.quickStartBar .nav > li > a.active {
+  border: none;
+  background: inherit;
+  color: $black;
+}
+
+.quickStartBar .new-text {
+  font-size: 16px;
+  display: block;
+  padding: 4px 4px 4px 43px;
+  color: #000;
+}
+
+/* override default datetime_suggest styles */
+.quickStartBar .datetime_suggest {
+  display: inline;
+  margin-left: 10px;
+  font-weight: normal;
+  color: $blueGray;
+}
+
+.quickStartBar [class*=icon-], .quickStartBar [class^=icon-] {
+  margin-right: 5px;
+}
+
+.quickStartBar {
+  &.not-expanded input, &.not-expanded textarea {
+    // too much space under when not expanded
+    margin-bottom: 0;
+  }
+}
+
+.not-expanded .expander textarea {
+  height: $boxSizingBaseLineHeight;
+  overflow: hidden;
+}
+
+.expandee {
+  display: none;
+}
+
+.expanded .expandee {
+  display: block;
+}
+
+.activityFeed {
+  margin-top: 30px;
+  display: table;
+  width: 100%;
+}
+
+.activityFeedItem {
+  margin-bottom: 10px;
+}
+
+.activityFeedItem .image-block-image {
+  margin-top: 8px;
+  margin-right: 20px;
+}
+
+.activityFeedItemsList {
+  list-style: none;
+  margin: 0;
+  padding: 24px;
+}
+
+.activityFeedFilter {
+  // table-cell so it can share a bottom border with
+  // .activityFeedItems
+  display: table-cell;
+  vertical-align: top;
+  width: 25%;
+  height: 100%;
+}
+
+.activityFeedItems {
+  display: table-cell;
+  vertical-align: top;
+  width: 75%;
+  height: 100%;
+  position: relative;
+
+  // push content down since we pull the toolbar up
+  padding-top: 60px;
+
+  // pull the feed toolbar up to give staggered look
+  .activityFeedItemsToolbar {
+    position: absolute;
+    top: -10px;
+    left: -1px;
+    right: -1px;
+    height: 40px;
+    border-color: $borderColor;
+  }
+}
+
+.drawerClosed {
+  .activityFeedFilter {
+    display: none;
+  }
+  .activityFeedItems {
+    width: 100%;
+  }
+}
+
+.activityFeedFilter > * {
+  border-right: none;
+}
+
+.activityFeedItemsFilter {
+  float: right;
+  margin-top: 18px;
+}
+
+.dashboardActions {
+  margin-top: 13px;
+}
+
+.icon-drawer-toggle {
+  cursor: pointer;
+}

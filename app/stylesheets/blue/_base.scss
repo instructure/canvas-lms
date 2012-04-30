@@ -8,3 +8,35 @@ body {
   display: none;
 }
 
+#content {
+  min-height: 400px;
+}
+
+#footer {
+  margin-top: 40px;
+}
+
+.dateFieldContainer {
+  position: relative;
+
+  .ui-datepicker-trigger {
+    position: absolute;
+    left: 138px;
+    top: 5px;
+  }
+
+  .dateField {
+    padding-right: 20px;
+    width: 160px;
+  }
+}
+
+.button-wide {
+  width: 100%;
+  text-align: center !important;
+}
+
+.hidden {
+  display: none;
+}
+
