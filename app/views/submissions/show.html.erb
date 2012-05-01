@@ -142,7 +142,12 @@
           <button type="button" class="button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
           <div class="comment_list" style="padding: 10px; clear:right;">
             <% unless can_do(@submission, @current_user, :read_grade) %>
-              <i><%= t('only_see_your_own_comments', "You may not see all comments right now because the assignment is currently being graded, or you are reviewing your peer's assignment") %></i><br/><br/>
+              <% if @assignment.muted? %>
+                <i><%= t('only_see_your_own_comments_muted', "You may not see all comments right now because the assignment is currently being graded") %></i>
+              <% else %>
+                <i><%= t('only_see_your_own_comments_peer', "As a peer reviewing student, you will only see comments written by you.") %></i><
+              <% end %>
+              <br/><br/>
             <% end %>
             <% @submission.visible_submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
