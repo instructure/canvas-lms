@@ -22,6 +22,10 @@ class QuizzesController < ApplicationController
   before_filter { |c| c.active_tab = "quizzes" }
   before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only]
 
+  # The number of questions that can display "details". After this number, the "Show details" option is disabled
+  # and the data is not even loaded.
+  QUIZ_QUESTIONS_DETAIL_LIMIT = 25
+
   def index
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_QUIZZES)

@@ -295,14 +295,24 @@ $(document).ready(function() {
   <textarea style="display: block; width: 100%; margin: 0px auto; height: 125px;" id="quiz_description"><%= @quiz.description %></textarea>
 </div>
 <div style="display: none; margin-bottom: 5px;" id="show_question_details_wrap">
-  <input type="checkbox" id="show_question_details"/><label for="show_question_details"> <%= t('labels.show_question_details', "Show Question Details") %></label>
+  <input type="checkbox" id="show_question_details"
+         <%= "disabled='disabled'" if @quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
+  />
+  <label for="show_question_details"> <%= t('labels.show_question_details', "Show Question Details") %></label>
+  <br/>
+  <% if @quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
+  <span id='question-detail-disabled' class='hint'>
+    <%= t('hints.question_detail_disabled', 'NOTE: Question details not available when more than %{question_count}.',
+          :question_count => QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT) %>
+  </span>
+  <% end %>
 </div>
 <div id="questions" class="question_editing brief">
   <% @quiz.root_entries.each do |question| %>
     <% if question[:entry_type] == "quiz_group" %>
       <%= render :partial => "quizzes/question_group", :object => question %>
     <% else %>
-      <%= render :partial => (@quiz.quiz_questions.count > 25 ? "quizzes/question_teaser" : "quizzes/display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
+      <%= render :partial => (@quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT ? "quizzes/question_teaser" : "quizzes/display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
     <% end %>
   <% end %>
 </div>
