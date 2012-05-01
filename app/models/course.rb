@@ -2210,7 +2210,8 @@ class Course < ActiveRecord::Base
       end
     end
 
-    new_time = ActiveSupport::TimeWithZone.new(Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)), Time.zone) - Time.zone.utc_offset
+    new_time = Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)).in_time_zone
+    new_time -= new_time.utc_offset
     log_merge_result("Events for #{old_date.to_s} moved to #{new_date.to_s}")
     new_time
   end

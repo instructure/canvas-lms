@@ -506,6 +506,60 @@ describe ContentMigration do
       new_mod.end_at.to_i.should == (new_start + 3.day).to_i
     end
 
+    it "should copy time correctly across daylight savings shift MST to MDT" do
+      Time.use_zone('America/Denver') do
+        asmnt = @copy_from.assignments.new
+        asmnt.title = "Nothing Assignment"
+        asmnt.description = 'oi'
+        asmnt.due_at = Time.zone.at(1325876400) # Fri, 06 Jan 2012 12:00:00 MST -07:00
+        asmnt.save!
+
+        @cm.migration_settings[:migration_ids_to_import] = {
+                :copy => {
+                        :everything => true,
+                        :shift_dates => true,
+                        :old_start_date => 'Jan 1, 2012',
+                        :old_end_date => 'Jan 15, 2012',
+                        :new_start_date => 'Jun 2, 2012',
+                        :new_end_date => 'Jun 16, 2012'
+                }
+        }
+        @cm.save!
+
+        run_course_copy
+
+        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
+        asmnt_2.due_at.to_i.should == Time.zone.at(1339178400).to_i # Fri, 08 Jun 2012 12:00:00 MDT -06:00
+      end
+    end
+
+    it "should copy time correctly across daylight savings shift MDT to MST" do
+      Time.use_zone('America/Denver') do
+        asmnt = @copy_from.assignments.new
+        asmnt.title = "Nothing Assignment"
+        asmnt.description = 'oi'
+        asmnt.due_at = Time.zone.at(1339178400) # Fri, 08 Jun 2012 12:00:00 MDT -06:00
+        asmnt.save!
+
+        @cm.migration_settings[:migration_ids_to_import] = {
+                :copy => {
+                        :everything => true,
+                        :shift_dates => true,
+                        :old_start_date => 'Jun 2, 2012',
+                        :old_end_date => 'Jun 16, 2012',
+                        :new_start_date => 'Jan 4, 2013',
+                        :new_end_date => 'Jan 18, 2013'
+                }
+        }
+        @cm.save!
+
+        run_course_copy
+
+        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
+        asmnt_2.due_at.to_i.should == Time.zone.at(1357326000).to_i # Fri, 04 Jan 2013 12:00:00 MST -07:00
+      end
+    end
+
     it "should leave file references in AQ context as-is on copy" do
       pending unless Qti.qti_enabled?
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
