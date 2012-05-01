@@ -645,7 +645,9 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
-    WikiPage.import_from_migration(hash, @copy_to)
+    WikiPage.process_migration({'wikis' => [hash, nil]}, @migration)
+
+    ErrorReport.last.message.should =~ /nil wiki/
 
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
