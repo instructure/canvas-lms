@@ -57,11 +57,11 @@
             :user_name => @user.name, :user_email => @user.email,
             :pending_other_user_name => @pending_other_user.name, :pending_other_user_email => @pending_other_user.email) %>
       <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @pending_other_user} %>
-      <a class="button" style="width: 6em;" href="<%= user_admin_merge_url(@user.id, :new_user_id => @pending_other_user.id) %>"><%= t('prepare_to_merge', "Prepare to Merge Users") %></a>
+      <a class="button" id="prepare_to_merge" style="width: 6em;" href="<%= user_admin_merge_url(@user.id, :new_user_id => @pending_other_user.id) %>"><%= t('prepare_to_merge', "Prepare to Merge Users") %></a>
       <span style="font-size: 0.8em; padding-left: 50px;">
-        <a class="button" style="width: 6em;" href="<%= user_admin_merge_url(@pending_other_user.id, :pending_user_id => @user.id) %>"><%= t('switch_user_positions', "Switch User Positions") %></a>
-        <a class="button" style="width: 13em;" href="<%= user_admin_merge_url(@user.id, :clear => 1) %>"><%= t('merge_somone_else', 'Merge Someone Else With %{user_name}', :user_name => @user.name) %></a>
-        <a class="button" style="width: 13em;" href="<%= user_admin_merge_url(@pending_other_user.id, :clear => 1) %>"><%= t('merge_somone_else', 'Merge Someone Else With %{user_name}', :user_name => @pending_other_user.name) %></a>
+        <a class="button" id="switch_user_positions" style="width: 6em;" href="<%= user_admin_merge_url(@pending_other_user.id, :pending_user_id => @user.id) %>"><%= t('switch_user_positions', "Switch User Positions") %></a>
+        <a class="button merge_with_other" style="width: 13em;" href="<%= user_admin_merge_url(@user.id, :clear => 1) %>"><%= t('merge_somone_else', 'Merge Someone Else With %{user_name}', :user_name => @user.name) %></a>
+        <a class="button merge_with_other" style="width: 13em;" href="<%= user_admin_merge_url(@pending_other_user.id, :clear => 1) %>"><%= t('merge_somone_else', 'Merge Someone Else With %{user_name}', :user_name => @pending_other_user.name) %></a>
       </span>
     <% else %>
       <p><%= t('merge_user_initial_instructions', "You've selected to merge the user, %{user_name} (%{user_email}) with another account.
