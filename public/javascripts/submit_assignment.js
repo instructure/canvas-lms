@@ -68,8 +68,9 @@ define([
         var fileElements = $(this).find('input[type=file]:visible').filter(function() {
           return $(this).val() !== '';
         });
+        var uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val();
         // warn user if they haven't uploaded any files
-        if (fileElements.length === 0) {
+        if (fileElements.length === 0 && uploadedAttachmentIds === '') {
           $.flashError(I18n.t('#errors.no_attached_file', 'You must attach at least one file to this assignment'));
           $(this).find('button[type=submit]')
             .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
