@@ -454,6 +454,29 @@ describe "assignments" do
       driver.find_element(:css, ".details").text.should_not =~ /comment after muting/
     end
 
+    it "should show as not turned in when submission was auto created in speedgrader" do
+      # given
+      @assignment.update_attributes(:submission_types => "online_text_entry")
+      @assignment.grade_student(@student, :grade => "0")
+      # when
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      # expect
+      f('#sidebar_content .details').should include_text "Not Turned In!"
+      f('#sidebar_content a.submit_assignment_link').text.should == "Submit Assignment"
+    end
+
+    it "should not show as turned in or not turned in when assignment doesn't expect a submission" do
+      # given
+      @assignment.update_attributes(:submission_types => "on_paper")
+      @assignment.grade_student(@student, :grade => "0")
+      # when
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      # expect
+      f('#sidebar_content .details').should_not include_text "Turned In!"
+      f('#sidebar_content .details').should_not include_text "Not Turned In!"
+      f('#sidebar_content a.submit_assignment_link').should be_nil
+    end
+
     it "should submit an assignment and validate confirmation information" do
       pending "BUG 6783 - Coming Up assignments update error" do
         @assignment.update_attributes(:submission_types => 'online_url')

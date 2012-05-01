@@ -1,7 +1,15 @@
 <% cache(['submission_sidebar_render', @current_user_submission, Time.zone.utc_offset].cache_key) do %>
 <div class="details">
   <h3 style="margin: 0;"><%= t 'titles.submission', "Submission" %></h3>
-  <div class="header" style="font-weight: bold; font-size: 1.2em;"><%= image_tag "graded.png" %> <%= t 'titles.submission_turned_in', "Turned In!" %></div>
+  <% if @assignment.expects_submission? %>
+    <div class="header" style="margin-top:2px; font-weight: bold; font-size: 1.2em;">
+      <% if @current_user_submission.has_submission? %>
+        <%= image_tag "graded.png" %> <%= t 'titles.submission_turned_in', "Turned In!" %>
+      <% else %>
+        <%= image_tag "not_graded.png" %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
+      <% end %>
+    </div>
+  <% end %>
   <div style="padding-left: 5px;">
     <span style="<%= "color: #800; font-weight: bold;" if @current_user_submission.late? %>">
       <% if @current_user_submission.late? %>
@@ -67,8 +75,10 @@
   </div>
 </div>
 <% end %>
-<% if can_do(@assignment, @current_user, :submit) %>
+<% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
   <div class="rs-margin-lr">
-    <a href="#" class="submit_assignment_link resubmit_link add <%= 'late' if @current_user_submission && @current_user_submission.late? %>"><%= t 'links.resubmit', "Re-submit Assignment" %></a><br/>
+    <a href="#" class="submit_assignment_link resubmit_link add <%= 'late' if @current_user_submission && @current_user_submission.late? %>">
+      <%= @current_user_submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
+    </a><br/>
   </div>
 <% end %>

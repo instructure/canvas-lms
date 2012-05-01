@@ -73,8 +73,10 @@
     <% if can_do(@context, @current_user, :grade) %>
       <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;"><%= t('speedgrader', 'SpeedGrader™') %></a>
     <% end %>
-    <% if can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
-      <span style="padding-left: 10px;"><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="add" ><%= t('resubmit', 'Re-Submit Assignment') %></a></span>
+    <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
+      <span style="padding-left: 10px;"><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="add" >
+        <%= @submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
+      </a></span>
     <% end %>
     <% if @assessment_request %>
       <div class="assessment_request_completed_message" style="<%= hidden unless @assessment_request.completed? %>">
