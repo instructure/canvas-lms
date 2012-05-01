@@ -90,36 +90,85 @@ describe ActiveRecord::Base do
     it "should run twice if it gets a UniqueConstraintViolation" do
       Submission.create!(:user => @user, :assignment => @assignment)
       tries = 0
-      User.unique_constraint_retry do
-        tries += 1
-        User.create!
-        Submission.create!(:user => @user, :assignment => @assignment)
-      end
+      lambda{
+        User.unique_constraint_retry do
+          tries += 1
+          User.create!
+          Submission.create!(:user => @user, :assignment => @assignment)
+        end
+      }.should raise_error # we don't catch the error the second time 
       Submission.count.should eql 1
       tries.should eql 2
       User.count.should eql @orig_user_count
     end
 
-    it "should not cause outer transactions to roll back" do
+    it "should not cause outer transactions to roll back if the second attempt succeeds" do
       Submission.create!(:user => @user, :assignment => @assignment)
+      tries = 0
       User.transaction do
         User.create!
         User.unique_constraint_retry do
+          tries += 1
           User.create!
-          Submission.create!(:user => @user, :assignment => @assignment)
+          Submission.create!(:user => @user, :assignment => @assignment) if tries == 1
         end
         User.create!
       end
       Submission.count.should eql 1
-      User.count.should eql @orig_user_count + 2
+      User.count.should eql @orig_user_count + 3
     end
 
     it "should not eat other ActiveRecord::StatementInvalid exceptions" do
-      lambda { User.unique_constraint_retry { User.connection.execute "this is not valid sql" } }.should raise_error(ActiveRecord::StatementInvalid)
+      tries = 0
+      lambda {
+        User.unique_constraint_retry {
+          tries += 1
+          User.connection.execute "this is not valid sql"
+        }
+      }.should raise_error(ActiveRecord::StatementInvalid)
+      tries.should eql 1
     end
 
     it "should not eat any other exceptions" do
-      lambda { User.unique_constraint_retry { raise "oh crap" } }.should raise_error
+      tries = 0
+      lambda {
+        User.unique_constraint_retry {
+          tries += 1
+          raise "oh crap"
+        }
+      }.should raise_error
+      tries.should eql 1
+    end
+  end
+
+  # see config/initializers/rails_patches.rb
+  context "query cache" do
+    it "should clear the query cache on a successful insert" do
+      User.create
+      User.cache do
+        User.first
+        query_cache = User.connection.instance_variable_get(:@query_cache)
+        keys = query_cache.keys
+        keys.should be_present
+
+        User.create!
+        (query_cache.keys & keys).should eql []
+      end
+    end
+
+    it "should clear the query cache on an unsuccessful insert" do
+      u = User.create
+      User.cache do
+        User.first
+        query_cache = User.connection.instance_variable_get(:@query_cache)
+        keys = query_cache.keys
+        keys.should be_present
+
+        u2 = User.new
+        u2.id = u.id
+        lambda{ u2.save! }.should raise_error(ActiveRecord::Base::UniqueConstraintViolation)
+        (query_cache.keys & keys).should eql []
+      end
     end
   end
 

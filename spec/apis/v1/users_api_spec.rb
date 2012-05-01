@@ -178,7 +178,6 @@ describe "Users API", :type => :integration do
   before do
     @admin = account_admin_user
     course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
-    @student = @user
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
     @user = @admin
     Account.default.tap { |a| a.enable_service(:avatars) }.save
@@ -199,6 +198,12 @@ describe "Users API", :type => :integration do
       'login_id' => 'pvuser@example.com',
       'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}",
     }
+  end
+
+  it "should return another user's avatars, if allowed" do
+    json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
+                    :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
+    json.map{ |j| j['type'] }.sort.should eql ['gravatar', 'no_pic']
   end
 
   it "should return user info for users with no pseudonym" do
@@ -253,10 +258,25 @@ describe "Users API", :type => :integration do
     }
   end
 
+  it "should return this user's avatars, if allowed" do
+    @user = @student
+    json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
+                    :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
+    json.map{ |j| j['type'] }.sort.should eql ['gravatar', 'no_pic']
+  end
+
   it "shouldn't return disallowed profiles" do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
              :controller => "profile", :action => "show", :user_id => @admin.to_param, :format => 'json')
+    response.status.should == "401 Unauthorized"
+    JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
+  end
+
+  it "shouldn't return disallowed avatars" do
+    @user = @student
+    raw_api_call(:get, "/api/v1/users/#{@admin.id}/avatars",
+                 :controller => "profile", :action => "profile_pics", :user_id => @admin.to_param, :format => 'json')
     response.status.should == "401 Unauthorized"
     JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
@@ -355,7 +375,8 @@ describe "Users API", :type => :integration do
             :name          => "Test User",
             :short_name    => "Test",
             :sortable_name => "User, T.",
-            :time_zone     => "Mountain Time (United States & Canada)"
+            :time_zone     => "Mountain Time (United States & Canada)",
+            :locale        => 'en'
           },
           :pseudonym => {
             :unique_id         => "test@example.com",
@@ -372,6 +393,7 @@ describe "Users API", :type => :integration do
       user.short_name.should eql "Test"
       user.sortable_name.should eql "User, T."
       user.time_zone.should eql "Mountain Time (United States & Canada)"
+      user.locale.should eql 'en'
 
       user.pseudonyms.count.should eql 1
       pseudonym = user.pseudonyms.first
@@ -385,7 +407,8 @@ describe "Users API", :type => :integration do
         "id"            => user.id,
         "sis_user_id"   => "12345",
         "login_id"      => "test@example.com",
-        "sis_login_id"  => "test@example.com"
+        "sis_login_id"  => "test@example.com",
+        "locale"        => "en"
       }
     end
 
@@ -451,10 +474,12 @@ describe "Users API", :type => :integration do
             :name => 'Tobias Funke',
             :short_name => 'Tobias',
             :sortable_name => 'Funke, Tobias',
-            :time_zone => 'America/Juneau'
+            :time_zone => 'Tijuana',
+            :locale => 'en'
           }
         })
         user = User.find(json['id'])
+        avatar_url = json.delete("avatar_url")
         json.should == {
           'name' => 'Tobias Funke',
           'sortable_name' => 'Funke, Tobias',
@@ -462,9 +487,65 @@ describe "Users API", :type => :integration do
           'id' => user.id,
           'short_name' => 'Tobias',
           'login_id' => 'student@example.com',
-          'sis_login_id' => 'student@example.com'
+          'sis_login_id' => 'student@example.com',
+          'locale' => 'en'
         }
-        user.time_zone.should eql 'America/Juneau'
+        user.time_zone.should eql 'Tijuana'
+      end
+
+      it "should update the user's avatar with a token" do
+        json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
+                        :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
+        to_set = json.first
+
+        @student.avatar_image_source.should_not eql to_set['type']
+        json = api_call(:put, @path, @path_options, {
+          :user => {
+            :avatar => {
+              :token => to_set['token']
+            }
+          }
+        })
+        user = User.find(json['id'])
+        user.avatar_image_source.should eql to_set['type']
+        user.avatar_state.should eql :approved
+      end
+
+      it "should re-lock the avatar after being updated by an admin" do
+        json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
+                        :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
+        to_set = json.first
+
+        old_source = to_set['type'] == 'gravatar' ? 'twitter' : 'gravatar'
+        @student.avatar_image_source = old_source
+        @student.avatar_state = 'locked'
+        @student.save!
+
+        @student.avatar_image_source.should_not eql to_set['type']
+        json = api_call(:put, @path, @path_options, {
+          :user => {
+            :avatar => {
+              :token => to_set['token']
+            }
+          }
+        })
+        user = User.find(json['id'])
+        user.avatar_image_source.should eql to_set['type']
+        user.avatar_state.should eql :locked
+      end
+
+      it "should allow the user's avatar to be set to an external url" do
+        url_to_set = 'http://www.instructure.example.com/image.jpg'
+        json = api_call(:put, @path, @path_options, {
+          :user => {
+            :avatar => {
+              :url => url_to_set
+            }
+          }
+        })
+        user = User.find(json['id'])
+        user.avatar_image_source.should eql 'external'
+        user.avatar_image_url.should eql url_to_set
       end
     end
 

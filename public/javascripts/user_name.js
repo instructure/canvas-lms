@@ -21,7 +21,7 @@ define([
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.templateData' /* fillTemplateData */
 ], function(I18n, $) {
 $(document).ready(function() {

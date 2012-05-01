@@ -109,7 +109,7 @@
         max_to_show = 8
         assignment_sets = {
           :needing_submitting => t('menu.assignments_needing_submitting', "To Turn In"),
-          :needing_grading    => t('menu.assignments_needing_grading', "Needing Grading"),
+          :needing_grading    => t('menu.assignments_needing_grading', "To Grade"),
           :recently_graded    => t('menu.assignments_recently_graded', "Recently Graded")
         }
         total_shown = 0
@@ -264,20 +264,16 @@
     baseUrl: '<%= js_base_url %>',
     paths: {
       common: 'compiled/bundles/common',
-      jquery: 'vendor/jquery-1.6.4',
       jqueryui: 'vendor/jqueryui',
-      underscore: 'vendor/underscore',
-      backbone: 'vendor/backbone',
       uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4',
       use: 'vendor/use'
     },
     use: {
-      backbone: {
-        deps: ['use!underscore', 'jquery'],
-        attach: 'Backbone'
-      },
-      underscore: {
-        attach: '_'
+      'vendor/backbone': {
+        deps: ['underscore', 'jquery'],
+        attach: function(_, $){
+          return Backbone;
+        }
       }
     }
   };

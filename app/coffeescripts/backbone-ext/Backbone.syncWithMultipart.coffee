@@ -1,6 +1,6 @@
 define [
-  'compiled/backbone-ext/Backbone'
-  'use!underscore'
+  'use!vendor/backbone'
+  'underscore'
 ], (Backbone, _) ->
 
   Backbone.syncWithoutMultipart = Backbone.sync
@@ -60,6 +60,6 @@ define [
 
   Backbone.sync = (method, model, options) ->
     if options?.multipart
-      Backbone.syncWithMultipart(method, model, options)
+      Backbone.syncWithMultipart.apply this, arguments
     else
-      Backbone.syncWithoutMultipart(method, model, options)
+      Backbone.syncWithoutMultipart.apply this, arguments

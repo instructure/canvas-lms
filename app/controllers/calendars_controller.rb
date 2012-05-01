@@ -61,6 +61,10 @@ class CalendarsController < ApplicationController
     @manage_contexts = @contexts.select{|c| c.grants_right?(@current_user, session, :manage_calendar) }.map(&:asset_string)
     @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
     @selected_contexts = params[:include_contexts].split(",") if params[:include_contexts]
+    if params[:event_id] && (event = CalendarEvent.find_by_id(params[:event_id])) && event.start_at
+      @active_event_id = event.id
+      @view_start = event.start_at.in_time_zone.strftime("%Y-%m-%d")
+    end
     @contexts_json = @contexts.map do |context|
       info = {
         :name => context.name,
@@ -235,7 +239,7 @@ class CalendarsController < ApplicationController
     preferred_calendar = 'show'
     preferred_calendar = 'show2' if @domain_root_account.enable_scheduler? && !@current_user.preferences[:use_calendar1]
     if always_redirect || params[:action] != preferred_calendar
-      redirect_to({ :action => preferred_calendar, :anchor => ' ' }.merge(params.slice(:include_contexts)))
+      redirect_to({ :action => preferred_calendar, :anchor => ' ' }.merge(params.slice(:include_contexts, :event_id)))
       return false
     end
     if @domain_root_account.enable_scheduler?

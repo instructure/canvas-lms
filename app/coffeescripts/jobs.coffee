@@ -3,7 +3,7 @@ define [
   'jquery'
   'vendor/slickgrid'
   'jquery.ajaxJSON'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
 ], (I18n, $, Slick) ->
 
   class FlavorGrid

@@ -5,7 +5,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* date_field */,
   'jquery.instructure_forms' /* formSubmit */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* .dim, showIf */,
   'jquery.rails_flash_notifications' /* flashError */,
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
@@ -96,6 +96,7 @@ define([
           itemSelectionsFetchDfd = itemSelectionsFetchDfd || $.ajaxJSON(url, 'GET', {}, function (data) {
             if (data) {
               $itemSelectionsDiv.find('.content_list').html(data.selection_list);
+              checkEverything(false);
             }
           });
           $itemSelectionsDiv.show().disableWhileLoading(itemSelectionsFetchDfd);

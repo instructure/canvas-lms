@@ -28,7 +28,7 @@ describe AppointmentGroup do
       AppointmentGroup.new(
         :title => "test",
         :context => @course,
-        :sub_context_code => CourseSection.create.asset_string
+        :sub_context_codes => [CourseSection.create.asset_string]
       ).should_not be_valid
     end
 
@@ -36,7 +36,7 @@ describe AppointmentGroup do
       AppointmentGroup.new(
         :title => "test",
         :context => @course,
-        :sub_context_code => GroupCategory.create.asset_string
+        :sub_context_codes => [GroupCategory.create.asset_string]
       ).should_not be_valid
     end
 
@@ -44,10 +44,10 @@ describe AppointmentGroup do
       group = AppointmentGroup.new(
         :title => "test",
         :context => @course,
-        :sub_context_code => Account.create.asset_string
+        :sub_context_codes => [Account.create.asset_string]
       )
       group.should be_valid
-      group.sub_context_code.should be_nil
+      group.sub_context_codes.should be_empty
     end
   end
 
@@ -88,10 +88,20 @@ describe AppointmentGroup do
   end
 
   context "permissions" do
+    def student_in_section(section)
+      @user = user
+      enrollment = @course.enroll_user(@user, 'StudentEnrollment', :section => section)
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @user
+    end
+
     before do
       course_with_teacher(:active_all => true)
       @teacher = @user
-      other_section = @course.course_sections.create!
+      section1 = @course.default_section
+      section2 = @course.course_sections.create!
+      section3 = @course.course_sections.create!
       other_course = Course.create!
       gc = @course.group_categories.create!
       @user_group = @course.groups.create!(:group_category => gc)
@@ -100,22 +110,30 @@ describe AppointmentGroup do
       @student = @user
       @user_group.users << @user
 
+      @student_in_section2 = student_in_section(section2)
+      @student_in_section3 = student_in_section(section3)
+
       user(:active_all => true)
-      @course.enroll_user(@user, 'TaEnrollment', :section => other_section, :limit_privileges_to_course_section => true).accept!
+      @course.enroll_user(@user, 'TaEnrollment', :section => section2, :limit_privileges_to_course_section => true).accept!
       @ta = @user
 
       @g1 = AppointmentGroup.create(:title => "test", :context => @course)
       @g1.publish!
       @g2 = AppointmentGroup.create(:title => "test", :context => @course)
-      @g3 = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_code => @course.default_section.asset_string)
+      @g3 = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_codes => [@course.default_section.asset_string])
       @g3.publish!
-      @g4 = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_code => gc.asset_string)
+      @g4 = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_codes => [gc.asset_string])
       @g4.publish!
-      @g5 = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_code => other_section.asset_string)
+      @g5 = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_codes => [section2.asset_string])
       @g5.publish!
       @g6 = AppointmentGroup.create(:title => "test", :context => other_course)
       @g6.publish!
-      @groups = [@g1, @g2, @g3, @g4, @g5]
+
+      # multiple sub_contexts
+      @g7 = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_codes => [@course.default_section.asset_string, section2.asset_string])
+      @g7.publish!
+
+      @groups = [@g1, @g2, @g3, @g4, @g5, @g7]
     end
 
     it "should return only appointment groups that are reservable for the user" do
@@ -137,7 +155,7 @@ describe AppointmentGroup do
 
       # student can reserve course-level ones, as well as section-specific ones
       visible_groups = AppointmentGroup.reservable_by(@student).sort_by(&:id)
-      visible_groups.should eql [@g1, @g3, @g4]
+      visible_groups.should eql [@g1, @g3, @g4, @g7]
       @g1.grants_right?(@student, nil, :reserve).should be_true
       @g2.grants_right?(@student, nil, :reserve).should be_false # not active yet
       @g2.eligible_participant?(@student).should be_true # though an admin could reserve on his behalf
@@ -148,29 +166,34 @@ describe AppointmentGroup do
       @user_group.should eql(@g4.participant_for(@student))
       @g5.grants_right?(@student, nil, :reserve).should be_false
       @g6.grants_right?(@student, nil, :reserve).should be_false
+      @g7.grants_right?(@student, nil, :reserve).should be_true
+      @g7.grants_right?(@student_in_section2, nil, :reserve).should be_true
+      @g7.grants_right?(@student_in_section3, nil, :reserve).should be_false
     end
 
 
     it "should return only appointment groups that are manageable by the user" do
       # teacher can manage everything in the course
       visible_groups = AppointmentGroup.manageable_by(@teacher).sort_by(&:id)
-      visible_groups.should eql [@g1, @g2, @g3, @g4, @g5]
+      visible_groups.should eql [@g1, @g2, @g3, @g4, @g5, @g7]
       @g1.grants_right?(@teacher, nil, :manage).should be_true
       @g2.grants_right?(@teacher, nil, :manage).should be_true
       @g3.grants_right?(@teacher, nil, :manage).should be_true
       @g4.grants_right?(@teacher, nil, :manage).should be_true
       @g5.grants_right?(@teacher, nil, :manage).should be_true
       @g6.grants_right?(@teacher, nil, :manage).should be_false
+      @g7.grants_right?(@teacher, nil, :manage).should be_true
 
       # ta can only manage stuff in section
       visible_groups = AppointmentGroup.manageable_by(@ta).sort_by(&:id)
-      visible_groups.should eql [@g5]
+      visible_groups.should eql [@g5, @g7]
       @g1.grants_right?(@ta, nil, :manage).should be_false
       @g2.grants_right?(@ta, nil, :manage).should be_false
       @g3.grants_right?(@ta, nil, :manage).should be_false
       @g4.grants_right?(@ta, nil, :manage).should be_false
       @g5.grants_right?(@ta, nil, :manage).should be_true
       @g6.grants_right?(@ta, nil, :manage).should be_false
+      @g7.grants_right?(@ta, nil, :manage).should be_true
 
       # student can't manage anything
       visible_groups = AppointmentGroup.manageable_by(@student).sort_by(&:id)
@@ -308,6 +331,60 @@ describe AppointmentGroup do
         enrollment.conclude
         @ag.reload.available_slots.should eql 4
       end
+    end
+  end
+
+  context "possible_participants" do
+    before do
+      course_with_teacher(:active_all => true)
+      @teacher = @user
+
+      @users, @sections = [], []
+      2.times do
+        @sections << section = @course.course_sections.create!
+        enrollment = student_in_course(:active_all => true)
+        @enrollment.course_section = section
+        @enrollment.save!
+        @users << @user
+      end
+
+      @group1 = group(:name => "group1", :group_context => @course)
+      @group1.participating_users << @users.last
+      @group1.save!
+      @gc = @group1.group_category
+      @group2 = @gc.groups.create!(:name => "group2")
+
+      @ag = @course.appointment_groups.create(:title => "test", :participants_per_appointment => 2, :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+    end
+
+    it "should return possible participants" do
+      @ag.possible_participants.should eql @users
+    end
+
+    it "should respect course_section sub_contexts" do
+      @ag.appointment_group_sub_contexts.create! :sub_context => @sections.first
+      @ag.possible_participants.should eql [@users.first]
+    end
+
+    it "should respect group sub_contexts" do
+      @ag.appointment_group_sub_contexts.create! :sub_context => @gc
+      @ag.possible_participants.should eql [@group1, @group2]
+      @ag.possible_users.should eql [@users.last]
+    end
+
+    it "should allow filtering on registration status" do
+      @ag.appointments.first.reserve_for(@users.first, @users.first)
+      @ag.possible_participants.should eql @users
+      @ag.possible_participants('registered').should eql [@users.first]
+      @ag.possible_participants('unregistered').should eql [@users.last]
+    end
+
+    it "should allow filtering on registration status (for groups)" do
+      @ag.appointment_group_sub_contexts.create! :sub_context => @gc, :sub_context_code => @gc.asset_string
+      @ag.appointments.first.reserve_for(@group1, @users.first)
+      @ag.possible_participants.should eql [@group1, @group2]
+      @ag.possible_participants('registered').should eql [@group1]
+      @ag.possible_participants('unregistered').should eql [@group2]
     end
   end
 end

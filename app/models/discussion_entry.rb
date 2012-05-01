@@ -27,7 +27,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
-  has_many :discussion_entry_participants, :dependent => :destroy
+  has_many :discussion_entry_participants
   belongs_to :discussion_topic, :touch => true
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id

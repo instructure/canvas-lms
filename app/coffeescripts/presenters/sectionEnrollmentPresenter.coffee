@@ -24,7 +24,7 @@
 
 define [
   'i18n!section',
-  'use!underscore',
+  'underscore',
   'compiled/str/underscore'
 ], (I18n, _, toUnderscore) ->
 

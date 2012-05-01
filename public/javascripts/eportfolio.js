@@ -31,7 +31,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,

@@ -294,6 +294,7 @@ class ContentMigration < ActiveRecord::Base
   def copy_course
     self.workflow_state = :pre_processing
     self.progress = 0
+    self.migration_settings[:skip_import_notification] = true
     self.save
 
     begin

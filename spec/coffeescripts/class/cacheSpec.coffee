@@ -1,5 +1,5 @@
 define [
-  'use!underscore'
+  'underscore'
   'compiled/class/cache'
 ], (_, cache) ->
 

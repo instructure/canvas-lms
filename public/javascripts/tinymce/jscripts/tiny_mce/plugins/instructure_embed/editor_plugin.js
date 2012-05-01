@@ -24,7 +24,7 @@ define([
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
-  'jquery.instructure_jquery_patches',
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers'
 ], function(tinymce, I18n, $, htmlEscape) {
 

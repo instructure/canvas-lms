@@ -20,7 +20,6 @@ define([
   'INST' /* INST */,
   'jquery' /* $ */,
   'ajax_errors' /* INST.log_error */,
-  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.scrollToVisible' /* scrollToVisible */,

@@ -1,10 +1,3 @@
-String.class_eval do
-  def to_json_with_html_safety(*args)
-    to_json_without_html_safety(*args).gsub(/<|>/) { |m| m == '<' ? '\\u003C' : '\\u003E' }
-  end
-  alias_method_chain :to_json, :html_safety
-end
-
 # JSON::Ext overwrites Rails' implemenation of these.
 # And does dumb stuff instantiating a state object and temp buffer and crap
 # which is really slow if you have 50,000 nil values.

@@ -357,6 +357,21 @@ describe User do
     @course5 = course(:course_name => "invited")
     @course5.enroll_user(@user, 'TeacherEnrollment')
 
+    @course6 = course(:course_name => "active but date restricted", :active_course => true)
+    e = @course6.enroll_user(@user, 'StudentEnrollment')
+    e.accept!
+    e.start_at = 1.day.from_now
+    e.end_at = 2.days.from_now
+    e.save!
+
+    @course7 = course(:course_name => "soft concluded", :active_course => true)
+    e = @course7.enroll_user(@user, 'StudentEnrollment')
+    e.accept!
+    e.start_at = 2.days.ago
+    e.end_at = 1.day.ago
+    e.save!
+
+
     # only four, in the right order (type, then name), and with the top type per course
     @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
       [@course5.id, 'TeacherEnrollment'],
@@ -1044,9 +1059,16 @@ describe User do
       @user.avatar_image_url.should be_nil
     end
 
+    it "should allow external url's to be assigned" do
+      user_model
+      @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.example.com/image.jpg' }
+      @user.save!
+      @user.reload.avatar_image_url.should == 'http://www.example.com/image.jpg'
+    end
+
     it "should return a useful avatar_fallback_url" do
       User.avatar_fallback_url.should ==
-        "https://#{HostUrl.default_host}/images/no_pic.gif"
+        "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath").should ==
         "https://#{HostUrl.default_host}/somepath"
       User.avatar_fallback_url("//somedomain/path").should ==
@@ -1054,7 +1076,7 @@ describe User do
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
       User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :scheme => "http")).should ==
-        "http://foo/images/no_pic.gif"
+        "http://foo/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :scheme => "https")).should ==
         "https://bar/somepath"
       User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==

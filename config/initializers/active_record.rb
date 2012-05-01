@@ -415,13 +415,9 @@ class ActiveRecord::Base
     # (savepoint) ensures we don't mess up things for the outer transaction.
     # useful for possible race conditions where we don't want to take a lock
     # (e.g. when we create a submission).
-    2.times do
-      begin
-        transaction(:requires_new => true) { yield }
-        break
-      rescue UniqueConstraintViolation
-      end
-    end
+    transaction(:requires_new => true) { uncached { yield } }
+  rescue UniqueConstraintViolation
+    transaction(:requires_new => true) { uncached { yield } }
   end
 
   # note this does a raw connection.select_values, so it doesn't work with scopes

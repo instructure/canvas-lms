@@ -178,17 +178,17 @@ describe UsersController do
     it "should maintain protocol and domain name in gravatar redirect fallback" do
       enable_cache do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/no_pic.gif")}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
 
         get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/images/no_pic.gif")}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/images/messages/avatar-50.png")}"
       end
     end
 
     it "should return different urls for different fallbacks" do
       enable_cache do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/no_pic.gif")}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI.escape("/my/custom/fallback/url.png")}"
         response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/my/custom/fallback/url.png")}"
@@ -204,7 +204,7 @@ describe UsersController do
         orig_size = data.size
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/no_pic.gif")}"
+        response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
 
         get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=/my/custom/fallback/url.png"
         response.should redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/my/custom/fallback/url.png")}"

@@ -1,5 +1,5 @@
 define [
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
   'compiled/discussions/EntryView'
   'jst/discussions/EntryCollectionView'
 ], (Backbone, EntryView, entryCollectionViewTemplate) ->

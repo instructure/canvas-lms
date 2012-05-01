@@ -79,10 +79,12 @@ class CalendarEvent < ActiveRecord::Base
     current_events = child_events.group_by{ |e| e[:context_code] }
     @child_event_data.each do |data|
       if event = current_events.delete(data[:context_code]) and event = event[0]
+        event.updating_user = @updating_user
         event.update_attributes(:start_at => data[:start_at], :end_at => data[:end_at])
       else
         context = @child_event_contexts[data[:context_code]][0]
         event = child_events.build(:start_at => data[:start_at], :end_at => data[:end_at])
+        event.updating_user = @updating_user
         event.context = context
         event.skip_sync_parent_event = true
         event.save

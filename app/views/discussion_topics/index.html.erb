@@ -48,7 +48,7 @@
     $(function(){
       $('#topic_list').pageless({
         totalPages: <%= @topics.total_pages %>,
-        url: "<%= context_url(@context, :context_discussion_topics_url, :format => :json, :only_discussion_topics => params[:only_discussion_topics]) %>",
+        url: <%= raw context_url(@context, :context_discussion_topics_url, :format => :json, :only_discussion_topics => params[:only_discussion_topics]).to_json %>,
         loaderMsg: <%= jt("#discussion_topics.loading_results", "Loading more results") %>,
         scrape: function(data) {
           if(typeof(data) == 'string') {

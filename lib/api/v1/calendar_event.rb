@@ -103,7 +103,7 @@ module Api::V1::CalendarEvent
     @user_json_is_admin = nil # when returning multiple groups, @current_user may be admin over some contexts but not others. so we need to recheck
 
     include = options[:include] || []
-    hash = api_json(group, user, session, :only => %w{id context_code created_at description end_at location_address location_name max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at sub_context_code title updated_at workflow_state participant_visibility})
+    hash = api_json(group, user, session, :only => %w{id context_code created_at description end_at location_address location_name max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility}, :methods => :sub_context_codes)
     hash['requiring_action'] = group.requiring_action?(user)
     if group.new_appointments.present?
       hash['new_appointments'] = group.new_appointments.map{ |event| calendar_event_json(event, user, session, :skip_details => true, :appointment_group_id => group.id) }

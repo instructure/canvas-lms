@@ -7,7 +7,7 @@ define [
   'compiled/calendar/MessageParticipantsDialog'
   'jst/calendar/deleteItem'
   'jquery.instructure_date_and_time'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'vendor/jquery.spin'
@@ -41,6 +41,7 @@ define [
 
       group = {
         contexts: @calendar.contexts
+        sub_context_codes: []
       }
 
       @createDialog = new EditAppointmentGroupDialog(group, @dialogCloseCB)
@@ -246,5 +247,5 @@ define [
     messageLinkClick: (jsEvent) =>
       jsEvent.preventDefault()
       group = @groups?[$(jsEvent.target).closest(".appointment-group-item").data('appointment-group-id')]
-      @messageDialog = new MessageParticipantsDialog(group, @calendar.dataSource)
+      @messageDialog = new MessageParticipantsDialog(group: group, dataSource: @calendar.dataSource)
       @messageDialog.show()

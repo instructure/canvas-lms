@@ -1,7 +1,6 @@
 define [
   'INST'
   'jquery'
-  'jquery.instructure_misc_helpers'
 ], (INST, $) ->
 
   class GradeCalculator
@@ -29,7 +28,12 @@ define [
       sum = { submissions: [], score: 0, possible: 0, submission_count: 0 }
       for assignment in group.assignments
         data = { score: 0, possible: 0, percent: 0, drop: false, submitted: false }
-        submission = $.detect(submissions, -> this.assignment_id == assignment.id)
+
+        submission = null
+        for s in submissions when s.assignment_id == assignment.id
+          submission = s
+          break
+
         submission ?= { score: null }
         submission.assignment_group_id = group.id
         submission.points_possible ?= assignment.points_possible

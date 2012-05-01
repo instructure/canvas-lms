@@ -253,7 +253,37 @@ class Quiz < ActiveRecord::Base
     end
   end
   protected :update_assignment
-  
+
+  ##
+  # when a quiz is updated, this method should be called to update the end_at
+  # of all open quiz submissions. this ensures that students who are taking the
+  # quiz when the time_limit is updated get the additional time added.
+  def update_quiz_submission_end_at_times
+    new_end_at = time_limit * 60.0
+
+    update_sql = case ActiveRecord::Base.connection.adapter_name.downcase
+                 when /postgres/
+                   "started_at + INTERVAL '+? seconds'"
+                 when /mysql/
+                   "started_at + INTERVAL ? SECOND"
+                 when /sqlite/
+                   "DATETIME(started_at, '+? seconds')"
+                 end
+
+    # only update quiz submissions that:
+    # 1. belong to this quiz;
+    # 2. haven't been started; and
+    # 3. won't lose time through this change.
+    where_clause = <<-END
+      quiz_id = ? AND
+      started_at IS NOT NULL AND
+      finished_at IS NULL AND
+      #{update_sql} > end_at
+    END
+
+    QuizSubmission.update_all(["end_at = #{update_sql}", new_end_at], [where_clause, self.id, new_end_at]);
+  end
+
   workflow do
     state :created do
       event :did_edit, :transitions_to => :edited

@@ -1,13 +1,10 @@
-require 'compass'
-require 'compass/commands'
-
 namespace :css do
   desc "Compile css assets."
   task :generate do
     require 'config/initializers/plugin_symlinks'
-
-    # initialize compass if it hasn't been yet
-    Compass::AppIntegration::Rails.initialize! unless Compass::AppIntegration::Rails.booted?
+    require 'action_controller'
+    require 'compass-rails'
+    require 'compass/commands'
 
     # build the list of files ourselves so that we get it to follow symlinks
     sass_path = File.expand_path(Compass.configuration.sass_path)

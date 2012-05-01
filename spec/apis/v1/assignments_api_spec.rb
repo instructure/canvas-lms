@@ -218,6 +218,31 @@ describe AssignmentsApiController, :type => :integration do
     a.get_custom_field_value('test_custom').true?.should == true
   end
 
+  it "should not allow updating an assignment via the API if it is locked" do
+    course_with_teacher(:active_all => true)
+    @group = @course.assignment_groups.create!({:name => "some group"})
+    PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}) #enable plugin
+    @assignment = @course.assignments.create!(:title => "some assignment", :freeze_on_copy => true)
+    @assignment.copied = true
+    @assignment.save!
+
+    raw_api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+          { :controller => 'assignments_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s },
+          { :assignment => { 'name' => 'new name'}})
+
+    response.code.should eql '400'
+    json = JSON.parse(response.body)
+
+    json.should == {
+      'message' => 'You cannot edit a frozen assignment.'
+    }
+
+    a = @course.assignments.first
+    a.title.should == "some assignment"
+  end
+
   it "should return the discussion topic url" do
     course_with_teacher(:active_all => true)
     @context = @course

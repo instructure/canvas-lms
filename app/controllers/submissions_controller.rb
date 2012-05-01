@@ -334,6 +334,21 @@ class SubmissionsController < ApplicationController
       end
     end
   end
+
+  def resubmit_to_turnitin
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      @assignment = @context.assignments.active.find(params[:assignment_id])
+      @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
+      @submission.resubmit_to_turnitin
+      respond_to do |format|
+        format.html { 
+          flash[:notice] = t('resubmitted_to_turnitin', "Successfully resubmitted to turnitin.")
+          redirect_to named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
+        }
+        format.json { render :nothing => true, :status => :no_content }
+      end
+    end
+  end
   
   def update
     @assignment = @context.assignments.active.find(params[:assignment_id])

@@ -198,7 +198,7 @@ describe "scheduler" do
       student2.conversations.first.messages.size.should eql 6 # unregistered/all * 2 + registered/all (ug1)
       student3.conversations.first.messages.size.should eql 6 # unregistered/all * 3
       student4.conversations.first.messages.size.should eql 4 # unregistered/all * 2 (not in any group)
-      student5.conversations.first.messages.size.should eql 4 # unregistered/all * 2 (not in default section)
+      student5.conversations.first.messages.size.should eql 2 # unregistered/all * 1 (doesn't meet any sub_context criteria)
     end
 
     it "should validate the appointment group shows up on the calendar" do
@@ -255,7 +255,7 @@ describe "scheduler" do
 
       # group appointment group
       gc = @course.group_categories.create!(:name => "Blah Groups")
-      title = create_appointment_group :sub_context_code => gc.asset_string,
+      title = create_appointment_group :sub_context_codes => [gc.asset_string],
                                        :title => "group ag"
       ag = AppointmentGroup.find_by_title(title)
       2.times do |i|

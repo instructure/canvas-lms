@@ -163,7 +163,7 @@ describe CalendarEvent do
       g1 = @course.appointment_groups.create(:title => "foo")
       g1.publish!
       a1 = g1.appointments.create.reserve_for(@student, @student)
-      g2 = @course.appointment_groups.create(:title => "foo", :sub_context_code => @course.default_section.asset_string)
+      g2 = @course.appointment_groups.create(:title => "foo", :sub_context_codes => [@course.default_section.asset_string])
       g2.publish!
       a2 = g2.appointments.create.reserve_for(@student, @student)
       pe = @course.calendar_events.create!
@@ -199,23 +199,45 @@ describe CalendarEvent do
 
     it "should send notifications to participants" do
       course_with_student(:active_all => true)
-      event1 = @course.calendar_events.create!(:title => "test")
+      event1 = @course.calendar_events.build(:title => "test")
+      event1.updating_user = @teacher
+      event1.save!
       event1.messages_sent.should be_include("New Event Created")
-      event1.messages_sent["New Event Created"].map(&:user_id).should include(@student.id)
+      users = event1.messages_sent["New Event Created"].map(&:user_id)
+      users.should include(@student.id)
+      users.should_not include(@teacher.id)
+      event1.messages_sent["New Event Created"].each do |message|
+        message.url.should include "/courses/#{@course.id}/calendar_events/#{event1.id}"
+      end
 
       event1.update_attributes(:start_at => Time.now, :end_at => Time.now)
       event1.messages_sent.should be_include("Event Date Changed")
-      event1.messages_sent["Event Date Changed"].map(&:user_id).should include(@student.id)
+      users = event1.messages_sent["Event Date Changed"].map(&:user_id)
+      users.should include(@student.id)
+      users.should_not include(@teacher.id)
+      event1.messages_sent["Event Date Changed"].each do |message|
+        message.url.should include "/courses/#{@course.id}/calendar_events/#{event1.id}"
+      end
 
-      event2 = CalendarEvent.new(:title => "test")
-      event2.context = @course.default_section
+      event2 = @course.default_section.calendar_events.build(:title => "test")
+      event2.updating_user = @teacher
       event2.save!
       event2.messages_sent.should be_include("New Event Created")
-      event2.messages_sent["New Event Created"].map(&:user_id).should include(@student.id)
+      users = event1.messages_sent["New Event Created"].map(&:user_id)
+      users.should include(@student.id)
+      users.should_not include(@teacher.id)
+      event2.messages_sent["New Event Created"].each do |message|
+        message.url.should include "/course_sections/#{@course.default_section.id}/calendar_events/#{event2.id}"
+      end
 
       event2.update_attributes(:start_at => Time.now, :end_at => Time.now)
       event2.messages_sent.should be_include("Event Date Changed")
-      event2.messages_sent["Event Date Changed"].map(&:user_id).should include(@student.id)
+      users = event1.messages_sent["Event Date Changed"].map(&:user_id)
+      users.should include(@student.id)
+      users.should_not include(@teacher.id)
+      event2.messages_sent["Event Date Changed"].each do |message|
+        message.url.should include "/course_sections/#{@course.default_section.id}/calendar_events/#{event2.id}"
+      end
     end
 
     it "should not send notifications to participants if hidden" do
@@ -225,7 +247,6 @@ describe CalendarEvent do
       event.save!
       event.messages_sent.should be_empty
 
-      #event = CalendarEvent.find(event.id)
       event.update_attribute(:child_event_data, [{:start_at => "2012-01-02", :end_at => "2012-01-03", :context_code => @course.default_section.asset_string}])
       event.messages_sent.should be_empty
     end
@@ -259,7 +280,7 @@ describe CalendarEvent do
         @group = c1.groups.create(:context => @course)
         @group.users << @student1 << @student2
 
-        @ag2 = AppointmentGroup.create!(:title => "test", :context => @course, :sub_context_code => c1.asset_string)
+        @ag2 = AppointmentGroup.create!(:title => "test", :context => @course, :sub_context_codes => [c1.asset_string])
         @ag2.publish!
         @appointment2 = @ag2.appointments.create(:start_at => '2012-01-01 12:00:00', :end_at => '2012-01-01 13:00:00')
 
@@ -424,7 +445,7 @@ describe CalendarEvent do
       c2 = @course.group_categories.create
       g2 = c2.groups.create(:context => @course)
 
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_code => c1.asset_string,
+      ag = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_codes => [c1.asset_string],
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
       )
       appointment = ag.appointments.first

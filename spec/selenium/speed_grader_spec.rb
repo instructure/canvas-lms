@@ -574,4 +574,95 @@ describe "speedgrader" do
 
     driver.find_elements(:css, "#students_selectmenu option").length.should == 1
   end
+
+  context "turnitin" do
+    before(:each) do
+      @assignment.turnitin_enabled = true
+      @assignment.save!
+    end
+
+    def set_turnitin_asset(asset, asset_data)
+      @submission.turnitin_data ||= {}
+      @submission.turnitin_data[asset.asset_string] = asset_data
+      @submission.turnitin_data_changed!
+      @submission.save!
+    end
+
+    it "should display a pending icon if submission status is pending" do
+      student_submission
+      set_turnitin_asset(@submission, { :status => 'pending' })
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      turnitin_icon = f('#grade_container .submission_pending')
+      turnitin_icon.should_not be_nil
+      turnitin_icon.click
+      wait_for_animations
+      f('#grade_container .turnitin_info').should_not be_nil
+    end
+
+    it "should display a score if submission has a similarity score" do
+      student_submission
+      set_turnitin_asset(@submission, { :similarity_score => 96, :state => 'failure', :status => 'scored' })
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      f('#grade_container .turnitin_similarity_score').should include_text "96%"
+    end
+
+    it "should display an error icon if submission status is error" do
+      student_submission
+      set_turnitin_asset(@submission, { :status => 'error' })
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      turnitin_icon = f('#grade_container .submission_error')
+      turnitin_icon.should_not be_nil
+      turnitin_icon.click
+      wait_for_animations
+      f('#grade_container .turnitin_info').should_not be_nil
+      f('#grade_container .turnitin_resubmit_button').should_not be_nil
+    end
+
+    it "should show turnitin score for attached files" do
+      @user = user_with_pseudonym({:active_user => true, :username => 'student@example.com', :password => 'qwerty'})
+      attachment1 = @user.attachments.new :filename => "homework1.doc"
+      attachment1.content_type = "application/msword"
+      attachment1.size = 10093
+      attachment1.save!
+      attachment2 = @user.attachments.new :filename => "homework2.doc"
+      attachment2.content_type = "application/msword"
+      attachment2.size = 10093
+      attachment2.save!
+
+      student_submission({ :user => @user, :submission_type => :online_upload, :attachments => [attachment1, attachment2] })
+      set_turnitin_asset(attachment1, { :similarity_score => 96, :state => 'failure', :status => 'scored' })
+      set_turnitin_asset(attachment2, { :status => 'pending' })
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      ff('#submission_files_list .turnitin_similarity_score').map(&:text).join.should match /96%/
+      f('#submission_files_list .submission_pending').should_not be_nil
+    end
+
+    it "should sucessfully schedule resubmit when button is clicked" do
+      student_submission
+      set_turnitin_asset(@submission, { :status => 'error' })
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      f('#grade_container .submission_error').click
+      wait_for_animations
+      f('#grade_container .turnitin_resubmit_button').click
+      wait_for_dom_ready
+      wait_for_ajaximations
+      Delayed::Job.find_by_tag('Submission#submit_to_turnitin').should_not be_nil
+      f('#grade_container .submission_pending').should_not be_nil
+    end
+  end
 end

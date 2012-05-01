@@ -19,7 +19,7 @@
 define([
   'compiled/editor/stocktiny',
   'jquery',
-  'jquery.instructure_jquery_patches',
+  'jqueryui/dialog',
   'mathquill'
 ], function(tinymce, $) {
 
