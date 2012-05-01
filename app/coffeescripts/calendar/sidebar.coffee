@@ -91,5 +91,5 @@ define [
         new EditEventDetailsDialog(event).show()
         # TODO, codesmell: we should get rid of these next 2 lines and let EditEventDetailsDialog
         # take care of that behaviour
-        $('select[class="context_id"]').val context
+        $('select[class="context_id"]').val(context).triggerHandler('change')
         $('a[href="#edit_assignment_form"]').click() if action == 'add_assignment'
