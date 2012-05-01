@@ -1,3 +1,117 @@
+canvas-lms (2012.05.12.02) testing; urgency=low
+
+  * Package ref: f82226a914e539ef2facfcccb9bc6962496f4222
+  *
+  * [-fb88374] update ruby-saml-mod to 0.1.8; fixes #8091
+  * [+cba905f] enable forgery protection for all selenium specs
+  * [+6a680cf] spec: fix threaded discussions intermittent failure
+  * [+6eca3d2] spec: gradebook2 split and refactoring
+  * [+c884390] don't show resume quiz button when quiz is locked fixes #6692
+  * [+b6b60c8] get rid of rdoctask deprecation warnings
+  * [+42f0b97] pass host not account domain to context_host refs #6859
+  * [+92b3509] update compass to 0.12.1 (via compass-rails 1.0.1)
+  * [+3f4fb02] support listing multiple domains in saml metadata fixes #6859
+  * [+f7a1426] don't use eval in error handler
+  * [+b9e014c] notifications: allow including extra data for messages
+  * [+d8db0f2] add locale to user create/update apis. fixes #8191
+  * [+45e0720] spec: put these specs in the Canvas.redis_enabled? block
+  * [+436aadb] add pseudonym delete api. fixes #7156
+  * [+7084e35] touch the user when hard concluding fixes #7516
+  * [+5fe5ca1] silence warnings from rake 0.9 in production
+  * [+2cb3d39] use a slave db if available for CountsReport
+  * [+6627d12] conversations refactor part 2, ajax loading, fixes #7062
+  * [+f11af16] protect clean_return_to against malicious urls
+  * [+71604c5] sanitize some usage of params in app/views/
+  * [+7c67df9] keep all the stuff below tinymce in viewport
+  * [+a7ab344] don't cut off tooltip dates, fixes #4103
+  * [+55629dd] add enrollment conclude and delete apis. fixes #7183.
+  * [+40527a3] include plugins and jobs tabs in the site admin account
+  * [+95c33eb] upgrade underscore to 1.3.3
+  * [+507334f] get rid of extra quotes on event details popover
+  * [+4fb39b4] add role overrides api. fixes #8190.
+  * [+df50cf5] friendlierize unauthorized error message for unpublished courses
+  * [+15b49f8] don't include date-restricted inactive enrollment in courses menu
+  * [+22e83aa] spec: jobs spec and spec_helper clean-up
+  * [+0a6a5ca] clean up redundant logic in getFormData
+  * [+24aee05] add max-width to select element fixes #8061
+  * [+3252ed4] ComboBox widget
+  * [+1088a1c] store calendar event response date in understood format
+  * [+2d6ef11] show recent feedback to student of specified course; fixes #8270
+  * [+c40436b] upgrade 'use!' plugin
+  * [+f7c1caa] organize backbone code and don't make people think about 'use!'
+  * [+b46872e] automatically handle dates from api in backbone
+  * [+9ff0b56] move ConnectionSpecification environment stuff to its own file
+  * [+e54d9db] spec calendar2 refactoring for intermittent failures
+  * [+90318ab] using custom parallelized specs gem for rspec tests
+  * [+eff884c] fix question group bug in development/test mode
+  * [+38c8ea0] normalize box-shadow usage in css/sass/scss
+  * [+a8e9853] pass host_with_port to files_host
+  * [+73666d9] change default avatar pic from nothing to silhouette if enabled
+  * [+ad8f17d] oauth2 confirmation screen, closes #7762
+  * [+2d84a02] don't truncate actual string fixes #4862
+  * [+fed4bfe] change "Needing Grading" to "To Grade"
+  * [+a4b3f14] spec: quiz question scoring specs
+  * [+605231a] upgrade jquery to 1.7.2
+  * [+7e11d86] remove $.detect in favor of _.detect
+  * [+92415ce] upgrade coffee-script-source gem version
+  * [+0951a0c] message timeslot participants
+  * [+48e1129] tag a few data migrations as postdeploy
+  * [+6fa111a] fix 2 things that were still trying to use 'use!' plugin
+  * [+7ab81e4] change tool load order to let courses override accounts
+  * [+ffa0f2f] upgrade Mailman gem to 0.5.0
+  * [+f6e0ae4] abstracted finding discussion participants
+  * [+6f0c52e] include patch when you require 'jqueryui/draggable'
+  * [+b2f176b] spec: fix intermittent jobs spec failure
+  * [+2c73f85] add behavior for link removing el from dom & db
+  * [+08d8fb5] handle appendMenuTo option better in KyleMenus
+  * [+f1505f0] store turnitin failures; fixes #7686; refs #7981
+  * [+a419a64] allow teachers to resubmit to turnitin; closes #7981
+  * [+4259e04] remove unused tags associations
+  * [+6d05e53] allow specifying s3 bucket with PluginSetting
+  * [+ea2e704] select for update in the postgresql job delete trigger
+  * [+59d6a9a] refactor and bug fixes for QuizQuestion.score_question
+  * [+48837d8] show all tagged contexts, put filtered items first. fixes #7122
+  * [+76afad7] correctly track dropdown answers, fixes #8156
+  * [+1b1dd74] renamed specs so they run on hudson
+  * [+5a9379d] remove $.throttle/debounce in favor of _.throttle
+  * [+56184d8] don't copy name, course code, and start/end dates on course copy
+  * [+834f53d] fix module loading for QuizQuestion::UserAnswer
+  * [+43f3304] only send conference invitations to active members fixes #5290
+  * [+e8d5c5b] apply date restrictions to invited enrollments
+  * [+3491380] don't give concluded students access to unpublished courses
+  * [+7ffb148] spec: attachment s3 spec with left over domain_namespace
+  * [+2a2f276] fix redirect issue, i18n typo
+  * [+897531c] fix calendar event linking issues, fixes #8337, #8338, #8339
+  * [+979d775] give students taking a quiz time extensions. fixes #8195
+  * [+a56a413] spec: fix intermittent discussions spec failure
+  * [+98fe5ee] enable assignment properties to be locked
+  * [+2292f80] label intermittently failing discussion specs as pending
+  * [+c9025f3] don't send import-related emails when copying course
+  * [+b2a8838] use built-in escape_html_entities_in_json support
+  * [+9cd67f2] user avatar api; refs #7763
+  * [+c92dd54] redirect to correct calendar for section-level events, fixes #8363
+  * [+59b43fa] add start_at and end_at to course api json. fixes #7261
+  * [+b010e64] link to message a user from profile page, fixes #8073
+  * [+b0178fe] add new 'external' avatar image type; closes #7763
+  * [+6416844] allow assigning section-subsets to appointment group
+  * [+8dcb29d] flag intermittently failing selenium scheduler bug as pending
+  * [+27645ca] uncheck all individual items by default on course copy
+  * [+5485783] fix duplicate key issue and general query cache/insert bug, fixes #7983
+  * [+f63d6a4] don't fail the page view batch if one row fails
+  * [+2e70fc8] fix some timezone handling in archaic date.js
+  * [+525e554] upgrade required version of rack to 1.1.3
+  * [+fce8b3e] don't let popovers escape the window
+  * [+d899984] spec: fix users/show.html.erb_spec
+  * [+c1d13ac] update CouseDesignerEnrollment to DesignerEnrollment
+  * [+7285a70] fix incorrect conversation tags, fixes #8274
+  * [+649e9a2] properley handle query string params on translate links
+  * [+81593a3] don't fail content import with nil wiki page
+  * [+b760e0c] improve quiz grading while new version in progress
+  * [+e7882aa] update ruby-saml-mod and libxml gems
+  * [+f82226a] allow saml configurations to use the eppn
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 01 May 2012 09:21:17 -0600
+
 canvas-lms (2012.04.28.09) testing; urgency=low
 
   * Package ref: 8b744cdef9e64f6073ef7f5b323824bec4b2933f
