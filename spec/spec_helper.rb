@@ -391,7 +391,7 @@ Spec::Runner.configure do |config|
   def assignment_quiz(questions, opts={})
     course = opts[:course] || course(:active_course => true)
     user = opts[:user] || user(:active_user => true)
-    course.enroll_student(user) unless user.enrollments.any?{|e| e.course_id == course.id}
+    course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any?{|e| e.course_id == course.id}
     @assignment = course.assignments.create(:title => "Test Assignment")
     @assignment.workflow_state = "available"
     @assignment.submission_types = "online_quiz"
@@ -408,7 +408,7 @@ Spec::Runner.configure do |config|
   # in this method
   def quiz_with_graded_submission(questions, opts={}, &block)
     assignment_quiz(questions, opts)
-    @quiz_submission = @quiz.generate_submission(user)
+    @quiz_submission = @quiz.generate_submission(@user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
     @quiz_submission.grade_submission

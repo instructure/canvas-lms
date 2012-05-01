@@ -83,7 +83,8 @@ class Submission < ActiveRecord::Base
         AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
       )
     )
-    SQL
+  SQL
+
   def self.needs_grading_conditions(prefix = nil)
     conditions = needs_grading.proxy_options[:conditions].gsub(/\s+/, ' ')
     conditions.gsub!("submissions.", prefix + ".") if prefix
@@ -107,22 +108,25 @@ class Submission < ActiveRecord::Base
   after_save :update_admins_if_just_submitted
   after_save :update_quiz_submission
 
-  trigger.after(:update) do |t|
-    t.where('(#{Submission.needs_grading_conditions("OLD")}) <> (#{Submission.needs_grading_conditions("NEW")})') do
-      <<-SQL
+  def self.needs_grading_trigger_sql
+    <<-SQL
       UPDATE assignments
-      SET needs_grading_count = needs_grading_count + CASE WHEN (#{needs_grading_conditions('NEW')}) THEN 1 ELSE -1 END
-      WHERE id = NEW.assignment_id;
-      SQL
+      SET needs_grading_count = needs_grading_count + %s
+      WHERE id = NEW.assignment_id
+        AND context_type = 'Course'
+        AND #{Enrollment.active_student_subselect("user_id = NEW.user_id AND course_id = assignments.context_id")};
+    SQL
+  end
+
+  trigger.after(:insert) do |t|
+    t.where("#{needs_grading_conditions("NEW")}") do
+      needs_grading_trigger_sql % 1
     end
   end
-  trigger.after(:insert) do |t|
-    t.where('#{Submission.needs_grading_conditions("NEW")}') do
-      <<-SQL
-      UPDATE assignments
-      SET needs_grading_count = needs_grading_count + 1
-      WHERE id = NEW.assignment_id;
-      SQL
+
+  trigger.after(:update) do |t|
+    t.where("(#{needs_grading_conditions("NEW")}) <> (#{needs_grading_conditions("OLD")})") do
+      needs_grading_trigger_sql % "CASE WHEN (#{needs_grading_conditions('NEW')}) THEN 1 ELSE -1 END"
     end
   end
   

@@ -97,53 +97,75 @@ describe Assignment do
     @submission.graded_at.should_not eql original_graded_at
   end
 
-  it "should update needs_grading_count when submissions transition state" do
-    setup_assignment_with_homework
-    @assignment.needs_grading_count.should eql(1)
-    @assignment.grade_student(@user, :grade => "0")
-    @assignment.reload
-    @assignment.needs_grading_count.should eql(0)
-  end
+  context "needs_grading_count" do
+    it "should update when submissions transition state" do
+      setup_assignment_with_homework
+      @assignment.needs_grading_count.should eql(1)
+      @assignment.grade_student(@user, :grade => "0")
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+    end
+  
+    it "should not update when non-student submissions transition state" do
+      assignment_model
+      s = Assignment.find_or_create_submission(@assignment.id, @teacher.id)
+      s.submission_type = 'online_quiz'
+      s.workflow_state = 'submitted'
+      s.save!
+      @assignment.needs_grading_count.should eql(0)
+      s.workflow_state = 'graded'
+      s.save!
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+    end
+  
+    it "should update when enrollment changes" do
+      setup_assignment_with_homework
+      @assignment.needs_grading_count.should eql(1)
+      @course.enrollments.find_by_user_id(@user.id).destroy
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+      e = @course.enroll_student(@user)
+      e.invite
+      e.accept
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(1)
+  
+      # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
+      section2 = @course.course_sections.create!(:name => 's2')
+      e2 = @course.enroll_student(@user, 
+                                  :enrollment_state => 'invited',
+                                  :section => section2,
+                                  :allow_multiple_enrollments => true)
+      e2.accept
+      section3 = @course.course_sections.create!(:name => 's2')
+      e3 = @course.enroll_student(@user, 
+                                  :enrollment_state => 'active', 
+                                  :section => section3,
+                                  :allow_multiple_enrollments => true)
+      @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(3)
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(1)
+  
+      # and as long as one enrollment is still active, the count should not change
+      e2.destroy
+      e3.complete
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(1)
+  
+      # ok, now gone for good
+      e.destroy
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+      @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(0)
 
-  it "should update needs_grading_count when enrollment changes" do
-    setup_assignment_with_homework
-    @assignment.needs_grading_count.should eql(1)
-    @course.enrollments.find_by_user_id(@user.id).destroy
-    @assignment.reload
-    @assignment.needs_grading_count.should eql(0)
-    e = @course.enroll_student(@user)
-    e.invite
-    e.accept
-    @assignment.reload
-    @assignment.needs_grading_count.should eql(1)
-
-    # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
-    section2 = @course.course_sections.create!(:name => 's2')
-    e2 = @course.enroll_student(@user, 
-                                :enrollment_state => 'invited',
-                                :section => section2,
-                                :allow_multiple_enrollments => true)
-    e2.accept
-    section3 = @course.course_sections.create!(:name => 's2')
-    e3 = @course.enroll_student(@user, 
-                                :enrollment_state => 'active', 
-                                :section => section3,
-                                :allow_multiple_enrollments => true)
-    @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(3)
-    @assignment.reload
-    @assignment.needs_grading_count.should eql(1)
-
-    # and as long as one enrollment is still active, the count should not change
-    e2.destroy
-    e3.complete
-    @assignment.reload
-    @assignment.needs_grading_count.should eql(1)
-
-    # ok, now gone for good
-    e.destroy
-    @assignment.reload
-    @assignment.needs_grading_count.should eql(0)
-    @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(0)
+      # enroll the user as a teacher, it should have no effect
+      e4 = @course.enroll_teacher(@user)
+      e4.accept
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+      @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(1)
+    end
   end
 
   it "should preserve pass/fail with zero points possible" do

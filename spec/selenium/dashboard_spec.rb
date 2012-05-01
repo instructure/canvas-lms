@@ -343,7 +343,7 @@ describe "dashboard" do
 
     it "should show submitted essay quizzes in the todo list" do
       quiz_title = 'new quiz'
-      student_in_course
+      student_in_course(:active_all => true)
       q = @course.quizzes.create!(:title => quiz_title)
       q.quiz_questions.create!(:question_data => {:id => 31, :name => "Quiz Essay Question 1", :question_type => 'essay_question', :question_text => 'qq1', :points_possible => 10})
       q.generate_quiz_data
