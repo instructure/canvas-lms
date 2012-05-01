@@ -1,3 +1,11 @@
+canvas-lms (2012.04.28.13) stable; urgency=low
+
+  * Package ref: 7d0ff5cc4d7f11913299948bd30bb2a4ac3379a9
+  *
+  * [+7d0ff5c] don't fail content import with nil wiki page
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 01 May 2012 09:11:01 -0600
+
 canvas-lms (2012.04.28.12) stable; urgency=low
 
   * Package ref: 59b1b12431a2e4a5242317a276b32aa671f3aee3
