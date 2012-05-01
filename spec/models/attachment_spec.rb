@@ -677,6 +677,16 @@ describe Attachment do
       @a.namespace = "_localstorage_/#{@account.file_namespace}"
       @a.root_account_id.should == @account.id
     end
+
+    it "should immediately infer the namespace if not yet set" do
+      Attachment.domain_namespace = nil
+      @a = Attachment.new(:context => @course)
+      @a.should be_new_record
+      @a.read_attribute(:namespace).should be_nil
+      @a.namespace.should_not be_nil
+      @a.read_attribute(:namespace).should_not be_nil
+      @a.root_account_id.should == @account.id
+    end
   end
 
   context "encoding detection" do
