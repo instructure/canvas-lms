@@ -84,23 +84,29 @@ describe "conversations context filtering" do
   it "should let you filter by a course" do
     new_conversation
     browse_menu
-    browse("the course", "Everyone") { click "Select All" }
-    submit_message_form(:add_recipient => false, :message => "asdf")
+    browse("the course", "Everyone") { click "student2" }
+    browse_menu
+    browse("that course", "Everyone") { click "student1" }
+    submit_message_form(:add_recipient => false, :message => "asdf") # tagged with both courses
 
     new_conversation(false)
     browse_menu
     browse("that course", "Everyone") { click "Select All" }
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
-    find_all_with_jquery('#conversations > ul > li:visible').size.should eql 2
+    get_conversations.size.should eql 2
 
     @input = find_with_jquery("#context_tags_filter input:visible")
     search("the course", "context_tags") { browse("the course") { click("the course") } }
 
-    keep_trying_until { driver.find_element(:id, "create_message_form") }
-    conversations = find_all_with_jquery('#conversations > ul > li:visible')
-    conversations.size.should eql 1
-    conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    keep_trying_until {
+      conversations = get_conversations
+      conversations.size.should eql 1
+      conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    }
+
+    # filtered course should be first in the audience's contexts
+    get_conversations.first.find_element(:css, '.audience em').text.should eql 'the course and that course'
   end
 
   it "should let you filter by a course that was concluded a long time ago" do
@@ -114,7 +120,7 @@ describe "conversations context filtering" do
     browse("that course", "Everyone") { click "Select All" }
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
-    find_all_with_jquery('#conversations > ul > li:visible').size.should eql 2
+    get_conversations.size.should eql 2
 
     @course1.complete!
     @course1.update_attribute :conclude_at, 1.year.ago
@@ -124,10 +130,11 @@ describe "conversations context filtering" do
     @input = find_with_jquery("#context_tags_filter input:visible")
     search("the course", "context_tags") { browse("the course") { click("the course") } }
 
-    keep_trying_until { driver.find_element(:id, "create_message_form") }
-    conversations = find_all_with_jquery('#conversations > ul > li:visible')
-    conversations.size.should eql 1
-    conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    keep_trying_until {
+      conversations = get_conversations
+      conversations.size.should eql 1
+      conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    }
   end
 
   it "should let you filter by a user" do
@@ -144,10 +151,14 @@ describe "conversations context filtering" do
     @input = find_with_jquery("#context_tags_filter input:visible")
     search("student2", "context_tags") { click("student2") }
 
-    keep_trying_until { driver.find_element(:id, "create_message_form") }
-    conversations = find_all_with_jquery('#conversations > ul > li:visible')
-    conversations.size.should eql 1
-    conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    keep_trying_until {
+      conversations = get_conversations
+      conversations.size.should eql 1
+      conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+    }
+
+    # filtered student should be first in the audience
+    get_conversations.first.find_element(:css, '.audience').text.should eql 'student2 and student1 the course'
   end
 
   it "should let you filter by a group" do
@@ -168,10 +179,11 @@ describe "conversations context filtering" do
       browse("the group") { click("the group") }
     }
 
-    keep_trying_until { driver.find_element(:id, "create_message_form") }
-    conversations = find_all_with_jquery('#conversations > ul > li:visible')
-    conversations.size.should eql 1
-    conversations.first.find_element(:css, 'p').text.should eql 'qwerty'
+    keep_trying_until {
+      conversations = get_conversations
+      conversations.size.should eql 1
+      conversations.first.find_element(:css, 'p').text.should eql 'qwerty'
+    }
   end
 
   it "should show the term name by the course" do

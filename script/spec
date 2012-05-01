@@ -7,7 +7,4 @@ else
   require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unless defined?(RAILS_ROOT)
 end
 require 'spec/autorun'
-require 'parallel_specs/spec_error_logger'
-require 'parallel_specs/spec_error_count_logger'
-require 'parallel_specs/spec_start_finish_logger'
 exit ::Spec::Runner::CommandLine.run

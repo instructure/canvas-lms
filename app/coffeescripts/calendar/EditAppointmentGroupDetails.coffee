@@ -4,10 +4,11 @@ define [
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editAppointmentGroup'
   'jst/calendar/genericSelect'
+  'jst/calendar/sectionCheckboxes'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], ($, I18n, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate) ->
+], ($, I18n, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate) ->
 
   class EditAppointmentGroupDetails
     constructor: (selector, @apptGroup, @contextChangeCB, @closeCB) ->
@@ -29,17 +30,13 @@ define [
         @form.find("select.context_id").change()
 
         @form.find(".group_category").attr('disabled', true)
-        @form.find(".course_section").attr('disabled', true)
+        @form.find('input[name="section_ids[]"]').attr('disabled', true)
         @form.find(".group-signup-checkbox").attr('disabled', true)
         if @apptGroup.participant_type == 'Group'
           @form.find(".group-signup-checkbox").prop('checked', true)
-          @form.find(".group_category").val(@apptGroup.sub_context_code)
+          @form.find(".group_category").val(@apptGroup.sub_context_codes[0])
         else
           @form.find(".group-signup-checkbox").prop('checked', false)
-          if @apptGroup.sub_context_code
-            @form.find(".course_section").val(@apptGroup.sub_context_code)
-          else
-            @form.find(".course_section").val("all")
       else
         @form.attr('action', @currentContextInfo.create_appointment_group_url)
 
@@ -143,9 +140,9 @@ define [
         params['appointment_group[context_code]'] = data.context_code
 
         if data.use_group_signup == '1' && data.group_category_id
-          params['appointment_group[sub_context_code]'] = data.group_category_id
-        else if data.section_id && data.section_id != 'all'
-          params['appointment_group[sub_context_code]'] = data.section_id
+          params['appointment_group[sub_context_codes]'] = [data.group_category_id]
+        else if data['section_ids[]']?.length > 0
+          params['appointment_group[sub_context_codes]'] = data['section_ids[]']
 
         # TODO: Provide UI for specifying this
         params['appointment_group[min_appointments_per_participant]'] = 1
@@ -166,11 +163,10 @@ define [
 
       # Update the sections and groups lists in the scheduler
       if @currentContextInfo.course_sections
-        sectionsInfo =
-          cssClass: 'course_section'
-          name: 'section_id'
-          collection: [ { id: 'all', name: "All Sections"} ].concat @currentContextInfo.course_sections
-        @form.find(".section_select").html(genericSelectTemplate(sectionsInfo))
+        for courseSection in @currentContextInfo.course_sections
+          courseSection.selected = courseSection.asset_string in this.apptGroup.sub_context_codes
+        sectionsInfo = { sections: @currentContextInfo.course_sections }
+        @form.find('.section_select').html(sectionCheckboxesTemplate(sectionsInfo))
 
       if !@currentContextInfo.group_categories || @currentContextInfo.group_categories.length == 0
         @form.find(".group-signup-checkbox").attr('disabled', true).prop('checked', false).change()

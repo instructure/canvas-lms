@@ -33,6 +33,7 @@ class CourseSection < ActiveRecord::Base
   has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment')"
   has_many :users, :through => :enrollments
   has_many :course_account_associations
+  has_many :calendar_events, :as => :context
 
   before_validation :infer_defaults, :verify_unique_sis_source_id
   validates_presence_of :course_id

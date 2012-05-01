@@ -23,7 +23,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* /\$\.underscore/ */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,

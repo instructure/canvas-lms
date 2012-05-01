@@ -808,6 +808,11 @@ shared_examples_for "all selenium tests" do
   append_before (:all) do
     $selenium_driver ||= setup_selenium
     default_url_options[:host] = $app_host_and_port
+    enable_forgery_protection(true)
+  end
+
+  append_after(:all) do
+    enable_forgery_protection(false)
   end
 
   append_before (:all) do

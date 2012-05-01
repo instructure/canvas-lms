@@ -211,13 +211,23 @@ class QuizSubmission < ActiveRecord::Base
       if self.submission_data && self.submission_data.is_a?(Hash)
         self.grade_submission
       end
-      self.kept_score = self.score
-      if self.quiz && self.quiz.scoring_policy == "keep_highest"
-        self.kept_score = highest_score_so_far
-      end
+      self.kept_score = score_to_keep
     end
   end
-  
+
+  # self.kept_score is basically a cached version of this computed property. it
+  # is not cleared when a new quiz_submission version is created and it should
+  # always be current.  it only really makes sense on the current object, and
+  # so we do not bother updating kept_score in previous versions when they are
+  # updated. 
+  def score_to_keep
+    if self.quiz && self.quiz.scoring_policy == "keep_highest"
+      highest_score_so_far
+    else # keep_latest
+      latest_score
+    end
+  end
+
   def update_assignment_submission
     return if self.manually_scored || @skip_after_save_score_updates
     
@@ -239,14 +249,29 @@ class QuizSubmission < ActiveRecord::Base
       s.save!
     end
   end
-  
+
   def highest_score_so_far(exclude_version_id=nil)
     scores = []
     scores << self.score if self.score
-    scores += versions.reject{|v| v.id == exclude_version_id}.map{|v| v.model.score || 0.0} rescue []
+    scores += versions.reload.reject{|v| v.id == exclude_version_id}.map{|v| v.model.score || 0.0} rescue []
     scores.max
   end
   private :highest_score_so_far
+
+  def latest_score
+    # the current model's score is the latest, unless the quiz is currently in
+    # progress, in which case it is nil
+    s = self.score
+
+    # otherwise, try to be the latest version's score, if possible
+    if s.nil?
+      v = versions.reload.current
+      s = v.model.score if v.present?
+    end
+
+    s
+  end
+  private :latest_score
   
   # Adjust the fudge points so that the score is the given score
   # Used when the score is explicitly set by teacher instead of auto-calculating
@@ -272,8 +297,7 @@ class QuizSubmission < ActiveRecord::Base
       end
     end
 
-    self.kept_score = to_be_kept_score
-    update_submission_version(version, [:score, :kept_score, :fudge_points, :manually_scored])
+    update_submission_version(version, [:score, :fudge_points, :manually_scored])
     
     # we might be in the middle of a new attempt, in which case we don't want
     # to overwrite the score and fudge points when we save
@@ -376,7 +400,6 @@ class QuizSubmission < ActiveRecord::Base
     version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
     version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now.to_s}"
     version_data["score"] = self.score if attrs.include?(:score)
-    version_data["kept_score"] = self.kept_score if attrs.include?(:kept_score)
     version_data["fudge_points"] = self.fudge_points if attrs.include?(:fudge_points)
     version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
     version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
@@ -446,15 +469,36 @@ class QuizSubmission < ActiveRecord::Base
     self.score = tally
     self.submission_data = res
 
+    # the interaction in here is messy
+
+    # first we update the version we've been modifying, so that all versions are current.
     update_submission_version(version, [:submission_data, :score, :fudge_points, :workflow_state])
-    highest = highest_score_so_far
+
     if version.model.attempt == self.attempt && completed_before_changes
       self.without_versioning(&:save)
-    elsif self.quiz && self.quiz.scoring_policy == 'keep_highest' && self.kept_score != highest
+    else
       self.reload
-      self.kept_score = highest
+
+      # score_to_keep should work regardless of the current model workflow_state and score 
+      # (ie even if the current model is an in-progress submission)
+      self.kept_score = score_to_keep
+
+      # if the current version is completed, then the normal save callbacks
+      # will handle updating the submission. otherwise we need to set its score
+      # here so that when it is touched by the association, it does not try to
+      # sync an old score back to this quiz_submission
+      if !self.completed? && self.submission
+        s = self.submission
+        s.score = self.kept_score
+        s.grade_matches_current_submission = true
+        s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.kept_score}, time: #{Time.now.to_s}"
+        s.saved_by = :quiz_submission
+        s.save!
+      end
+
       self.without_versioning(&:save)
     end
+    self.reload
     self.context_module_action
     track_outcomes(version.model.attempt)
     true
@@ -474,179 +518,18 @@ class QuizSubmission < ActiveRecord::Base
     # added or the question answer they selected goes away, then the
     # the teacher gets the added burden of going back and manually assigning
     # scores for these questions per student.
-    undefined_if_blank = params[:undefined_if_blank]
-    answer_text = params["question_#{q[:id]}"] rescue ""
-    user_answer = {}
-    user_answer[:text] = answer_text || ""
-    user_answer[:question_id] = q[:id]
-    user_answer[:points] = 0
-    user_answer[:correct] = false
-    question_type = q[:question_type]
-    q[:points_possible] = q[:points_possible].to_f
-    if question_type == "multiple_choice_question" || question_type == "true_false_question" || question_type == "missing_word_question"
-      q[:answers].each do |answer|
-        if answer[:id] == answer_text.to_i
-          user_answer[:answer_id] = answer[:id]
-          user_answer[:correct] = answer[:weight] == 100
-          user_answer[:points] = q[:points_possible]
-        end
-      end
-      user_answer[:correct] = "undefined" if answer_text == nil && undefined_if_blank
-    elsif question_type == "short_answer_question"
-      answers = q[:answers].sort_by{|a| a[:weight] || 0}
-      match = false
-      answers.each do |answer|
-        if (answer[:text] || "").strip.downcase == CGI::escapeHTML(answer_text || "").strip.downcase && !match
-          match = true
-          user_answer[:answer_id] = answer[:id]
-          user_answer[:correct] = true
-          user_answer[:points] = q[:points_possible]
-        end
-      end
-      user_answer[:correct] = "undefined" if answer_text == nil && undefined_if_blank
-    elsif question_type == "essay_question" 
-      config = Instructure::SanitizeField::SANITIZE
-      user_answer[:text] = Sanitize.clean(user_answer[:text] || "", config)
-      user_answer[:correct] = "undefined"
-    elsif question_type == "text_only_question"
-      user_answer[:correct] = "no_score"
-    elsif question_type == "matching_question"
-      user_answer[:points] = 0
-      found_match = false
-      q[:answers].each do |answer|
-        answer_match = params["question_#{q[:id]}_answer_#{answer[:id]}"].to_s rescue ""
-        found_match = true if answer_match != nil
-        found_matched = q[:answers].find{|a| a[:match_id].to_i == answer_match.to_i}
-        if found_matched == answer || (found_matched && found_matched[:right] && found_matched[:right] == answer[:right])
-          user_answer[:points] += (q[:points_possible].to_f / q[:answers].length.to_f) rescue 0
-          answer_match = answer[:match_id].to_s
-        end
-        user_answer["answer_#{answer[:id]}".to_sym] = answer_match
-      end
-      if q[:allow_partial_credit] == false && user_answer[:points] < q[:points_possible].to_f
-        user_answer[:points] = 0
-      end
-      user_answer[:correct] = "partial"
-      user_answer[:correct] = false if user_answer[:points] == 0
-      user_answer[:correct] = true if user_answer[:points] == q[:points_possible]
-      user_answer[:correct] = "undefined" if !found_match && undefined_if_blank
-    elsif question_type == "numerical_question"
-      answer_number = answer_text.to_f
-      answers = q[:answers].sort_by{|a| a[:weight] || 0}
-      match = false
-      answers.each do |answer|
-        if !match
-          if answer[:numerical_answer_type] == "exact_answer"
-            match = true if answer_number >= answer[:exact] - answer[:margin] && answer_number <= answer[:exact] + answer[:margin]
-          else
-            match = true if answer_number >= answer[:start] && answer_number <= answer[:end]
-          end
-          if match
-            user_answer[:answer_id] = answer[:id]
-            user_answer[:correct] = true
-            user_answer[:points] = q[:points_possible]
-          end
-        end
-      end
-      user_answer[:correct] = "undefined" if answer_text == nil && undefined_if_blank
-    elsif question_type == "calculated_question"
-      answer_number = answer_text.to_f
-      val = q[:answers].first[:answer].to_f rescue 0
-      margin = q[:answer_tolerance].to_f
-      min = val - margin
-      max = val + margin
-      user_answer[:answer_id] = q[:answers].first[:id]
-      if answer_number >= min && answer_number <= max
-        user_answer[:correct] = true
-        user_answer[:points] = q[:points_possible]
-      end
-    elsif question_type == "multiple_answers_question"
-      correct_sequence = ""
-      user_sequence = ""
-      found_any = false
-      user_answer[:points] = 0
-      n_correct = q[:answers].select{|a| a[:weight] == 100}.length
-      n_correct = 1 if n_correct == 0
-      q[:answers].each do |answer|
-        response = params["question_#{q[:id]}_answer_#{answer[:id]}"] rescue ""
-        response ||= ""
-        found_any = true if response != nil
-        user_answer["answer_#{answer[:id]}".to_sym] = response
-        correct = nil
-        # Total possible is divided by the number of correct answers.
-        # For every correct answer they correctly select, they get partial
-        # points.  For every correct answer they don't select, do nothing.  
-        # For every incorrect answer that they select, dock them partial
-        # points.
-        correct = true if answer[:weight] == 100 && response == "1"
-        correct = false if answer[:weight] != 100 && response == "1"
-        if correct == true
-          user_answer[:points] += (q[:points_possible].to_f / n_correct.to_f) rescue 0
-        elsif correct == false
-          dock = (q[:incorrect_dock] || (q[:points_possible].to_f / n_correct.to_f)).to_f rescue 0.0
-          user_answer[:points] -= dock
-        end
-        correct_sequence = correct_sequence + (answer[:weight] == 100 ? "1" : "0")
-        user_sequence = user_sequence + (response == "1" ? "1" : "0")
-      end
-      # even if they only selected wrong answers, they can't score less than 0
-      user_answer[:points] = [user_answer[:points], 0].max
-      if correct_sequence == user_sequence
-        user_answer[:points] = q[:points_possible]
-      end
-      if q[:allow_partial_credit] == false && user_answer[:points] < q[:points_possible].to_f
-        user_answer[:points] = 0
-      end
-      user_answer[:correct] = "partial"
-      user_answer[:correct] = false if user_answer[:points] == 0
-      user_answer[:correct] = true if user_answer[:points] == q[:points_possible]
-      user_answer[:correct] = "undefined" if !found_any && undefined_if_blank
-    elsif question_type == "multiple_dropdowns_question"
-      chosen_answers = {}
-      variables = q[:answers].map{|a| a[:blank_id] }.uniq
-      variables.each do |variable|
-        variable_id = AssessmentQuestion.variable_id(variable)
-        response = (params["question_#{q[:id]}_#{variable_id}"] rescue nil).to_i
-        chosen_answer = q[:answers].detect{|answer| answer[:blank_id] == variable && answer[:id] == response.to_i }
-        chosen_answers[variable] = chosen_answer
-      end
-      answer_tally = 0
-      chosen_answers.each do |variable, answer|
-        answer_tally += q[:points_possible].to_f / variables.length.to_f if answer && answer[:weight] == 100 && !variables.empty?
-        user_answer["answer_for_#{variable}".to_sym] = answer[:id] rescue nil
-        user_answer["answer_id_for_#{variable}".to_sym] = answer[:id] rescue nil
-      end
-      user_answer[:points] = answer_tally
-      user_answer[:correct] = true if answer_tally == q[:points_possible]
-      user_answer[:correct] = "partial" if answer_tally > 0 && answer_tally < q[:points_possible]
-    elsif question_type == "fill_in_multiple_blanks_question"
-      chosen_answers = {}
-      variables = q[:answers].map{|a| a[:blank_id] }.uniq
-      variables.each do |variable|
-        variable_id = AssessmentQuestion.variable_id(variable)
-        response = params["question_#{q[:id]}_#{variable_id}"]
-        response ||= ""
-        chosen_answer = q[:answers].detect{|answer| answer[:blank_id] == variable && (answer[:text] || "").strip.downcase == response.strip.downcase }
-        chosen_answers[variable] = chosen_answer || {:text => response, :weight => 0}
-      end
-      answer_tally = 0
-      chosen_answers.each do |variable, answer|
-        answer_tally += 1 if answer[:weight] == 100 && !variables.empty?
-        user_answer["answer_for_#{variable}".to_sym] = answer[:text] rescue nil
-        user_answer["answer_id_for_#{variable}".to_sym] = answer[:id] rescue nil
-      end
-      if !variables.empty?
-        user_answer[:points] = (answer_tally / variables.length.to_f) * q[:points_possible].to_f
-      end
-      user_answer[:correct] = true if answer_tally == variables.length.to_i
-      user_answer[:correct] = "partial" if answer_tally > 0 && answer_tally < variables.length.to_i
-    else
-    end
-    user_answer[:points] = 0.0 unless user_answer[:correct]
-    user_answer[:points] = (user_answer[:points] * 100.0).round.to_f / 100.0
-    user_answer
+    qq = QuizQuestion::Base.from_question_data(q)
+    user_answer = qq.score_question(params)
+    result = {
+      :correct => user_answer.correctness,
+      :points => user_answer.score,
+      :question_id => user_answer.question_id,
+    }
+    result[:answer_id] = user_answer.answer_id if user_answer.answer_id
+    result.merge!(user_answer.answer_details)
+    return result
   end
-  
+
   named_scope :before, lambda{|date|
     {:conditions => ['quiz_submissions.created_at < ?', date]}
   }

@@ -159,6 +159,27 @@ describe Course do
       @course.grants_right?(@student, nil, :read_grades).should be_true
       @course.grants_right?(@student, nil, :read_forum).should be_true
     end
+
+    it "should not grant read to completed students of an unpublished course" do
+      course_with_student(:active_user => 1)
+      @course.should be_created
+      @enrollment.update_attribute(:workflow_state, 'completed')
+      @enrollment.should be_completed
+      @course.grants_right?(:read, @student).should be_false
+    end
+
+    it "should not grant read to soft-completed students of an unpublished course" do
+      course_with_student(:active_user => 1)
+      @course.restrict_enrollments_to_course_dates = true
+      @course.start_at = 4.days.ago
+      @course.conclude_at = 2.days.ago
+      @course.save!
+      @course.should be_created
+      @enrollment.update_attribute(:workflow_state, 'active')
+      @enrollment.state_based_on_date.should == :completed
+      @course.grants_right?(:read, @student).should be_false
+    end
+
   end
 
   it "should clear content when resetting" do

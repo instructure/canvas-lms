@@ -20,7 +20,7 @@ define([
   'jquery' /* $ */,
   'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */,
   'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,

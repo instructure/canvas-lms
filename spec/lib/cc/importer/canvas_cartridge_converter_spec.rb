@@ -6,6 +6,8 @@ describe "Canvas Cartridge importing" do
     @copy_from = course_model
     @from_teacher = @user
     @copy_to = course_model
+    @copy_to.conclude_at = nil
+    @copy_to.start_at = nil
     @copy_to.name = "alt name"
     @copy_to.course_code = "alt name"
 
@@ -68,12 +70,12 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
 
     #compare settings
-    @copy_to.conclude_at.to_i.should == @copy_from.conclude_at.to_i
-    @copy_to.start_at.to_i.should == @copy_from.start_at.to_i
+    @copy_to.conclude_at.should == nil
+    @copy_to.start_at.should == nil
     @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
     @copy_to.storage_quota.should_not == @copy_from.storage_quota
-    @copy_to.name.should == @copy_from.name
-    @copy_to.course_code.should == @copy_from.course_code
+    @copy_to.name.should == 'alt name'
+    @copy_to.course_code.should == 'alt name'
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     atts.each do |att|
@@ -643,7 +645,9 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
-    WikiPage.import_from_migration(hash, @copy_to)
+    WikiPage.process_migration({'wikis' => [hash, nil]}, @migration)
+
+    ErrorReport.last.message.should =~ /nil wiki/
 
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
@@ -697,6 +701,7 @@ describe "Canvas Cartridge importing" do
     asmnt.peer_reviews = true
     asmnt.anonymous_peer_reviews = true
     asmnt.peer_review_count = 37
+    asmnt.freeze_on_copy = true
     asmnt.save!
 
     #export to xml/html
@@ -730,6 +735,8 @@ describe "Canvas Cartridge importing" do
     asmnt_2.mastery_score.should be_nil
     asmnt_2.max_score.should be_nil
     asmnt_2.min_score.should be_nil
+    asmnt_2.freeze_on_copy.should == true
+    asmnt_2.copied.should == true
   end
   
   it "should import external tool assignments" do

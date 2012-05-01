@@ -36,8 +36,7 @@ define([
   'jquery',
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                         // tiny can require it themselves
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
-  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
+  'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,

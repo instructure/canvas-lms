@@ -1,7 +1,7 @@
 define [
   'jquery'
   'jst/AssignmentDetailsDialog'
-  'jquery.instructure_jquery_patches' # dialog
+  'jqueryui/dialog'
 ], ($, assignmentDetailsDialogTemplate) ->
 
   class AssignmentDetailsDialog

@@ -387,6 +387,7 @@ class QuizzesController < ApplicationController
         end
         if res
           @quiz.reload
+          @quiz.update_quiz_submission_end_at_times if params[:quiz][:time_limit].present?
           flash[:notice] = t('notices.quiz_updated', "Quiz successfully updated")
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
           format.json {render :json =>  @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})}

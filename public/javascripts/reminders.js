@@ -17,7 +17,7 @@
  */
 define([
   'jquery' /* $ */,
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_plugins' /* confirmDelete */
 ], function($) {
 

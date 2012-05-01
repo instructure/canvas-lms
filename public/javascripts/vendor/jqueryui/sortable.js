@@ -16,8 +16,7 @@ define([
   'jquery',
   'jqueryui/core',
   'jqueryui/mouse',
-  'jqueryui/widget',
-  'jquery.instructure_jquery_patches' /* /\.disabled/, /\.scrollTop/ */
+  'jqueryui/widget'
 ], function( $, _core, _mouse, _widget, undefined ) {
 
 $.widget("ui.sortable", $.ui.mouse, {

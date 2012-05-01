@@ -28,7 +28,8 @@ class ConversationsController < ApplicationController
   before_filter :reject_student_view_student
   before_filter :set_avatar_size
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
-  before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
+  before_filter :load_all_contexts, :except => [:public_feed]
+  before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
   add_crumb(proc { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
@@ -42,9 +43,20 @@ class ConversationsController < ApplicationController
   #   The default behavior is to return all non-archived conversations (i.e.
   #   read and unread).
   #
+  # @argument filter [optional, course_id|group_id|user_id]
+  #   When set, only return conversations for the specified course, group
+  #   or user. The id should be prefixed with its type, e.g. "user_123" or
+  #   "course_456"
+  #
   # @argument interleave_submissions Boolean, default false. If true, the
   #   message_count will also include these submission-based messages in the
   #   total. See the show action for more information.
+  #
+  # @argument include_all_conversation_ids Boolean, default false. If true,
+  #   the top-level element of the response will be an object rather than
+  #   an array, and will have the keys "conversations" which will contain the
+  #   paged conversation data, and "conversation_ids" which will contain the
+  #   ids of all conversations under this scope/filter in the same order.
   #
   # @response_field id The unique identifier for the conversation.
   # @response_field workflow_state The current state of the conversation
@@ -73,6 +85,12 @@ class ConversationsController < ApplicationController
   #   (custom, individual or group avatar, depending on audience)
   # @response_field participants Array of users (id, name) participating in
   #   the conversation. Includes current user.
+  # @response_field visible Boolean, indicates whether the conversation is
+  #   visible under the current scope and filter. This attribute is always
+  #   true in the index API response, and is primarily useful in create/update
+  #   responses so that you can know if the record should be displayed in
+  #   the UI. The default scope is assumed, unless a scope or filter is passed
+  #   to the create/update API call.
   #
   # @example_response
   #   [
@@ -90,81 +108,32 @@ class ConversationsController < ApplicationController
   #       "audience_contexts": {"courses": {"1": ["StudentEnrollment"]}, "groups": {}},
   #       "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
   #       "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}]
+  #       "visible": true
   #     }
   #   ]
   def index
-    @page_max = params[:per_page] = 25 if params[:format] != 'json'
-    conversations_scope = case params[:scope]
-      when 'unread'
-        @view_name = I18n.t('index.inbox_views.unread', 'Unread')
-        @no_messages = I18n.t('no_unread_messages', 'You have no unread messages')
-        @current_user.conversations.unread
-      when 'starred'
-        @view_name = I18n.t('index.inbox_views.starred', 'Starred')
-        @no_messages = I18n.t('no_starred_messages', 'You have no starred messages')
-        @current_user.conversations.starred
-      when 'sent'
-        @view_name = I18n.t('index.inbox_views.sent', 'Sent')
-        @no_messages = I18n.t('no_sent_messages', 'You have no sent messages')
-        @current_user.all_conversations.sent
-      when 'archived'
-        @view_name = I18n.t('index.inbox_views.archived', 'Archived')
-        @no_messages = I18n.t('no_archived_messages', 'You have no archived messages')
-        @disallow_messages = true
-        @current_user.conversations.archived
-      else
-        @scope = :inbox
-        @view_name = I18n.t('index.inbox_views.inbox', 'Inbox')
-        @no_messages = I18n.t('no_messages', 'You have no messages')
-        @current_user.conversations.default
-    end
-    conversations_scope = conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
-    @scope ||= params[:scope].to_sym
-    base_scope = conversations_scope
-    if params[:filter]
-      if params[:filter] =~ /\A(course|group)_(\d+)\z/
-        if context = @contexts[$1.pluralize.to_sym][$2.to_i]
-          @filter = {:id => params[:filter], :name => context[:name]}
-        end
-      elsif params[:filter] =~ /\Auser_(\d+)\z/
-        if user = @current_user.messageable_users(:ids => [$1]).first
-          @filter = {:id => params[:filter], :name => user.name}
-        end
+    if request.format == :json
+      conversations = Api.paginate(@conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
+      # optimize loading the most recent messages for each conversation into a single query
+      ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
+      @conversations_json = conversations.map{ |c| jsonify_conversation(c, :include_participant_avatars => false, :include_participant_contexts => false, :visible => true) }
+  
+      if params[:include_all_conversation_ids]
+        @conversations_json = {:conversations => @conversations_json, :conversation_ids => @conversations_scope.conversation_ids}
       end
-      if @filter
-        conversations_scope = conversations_scope.tagged(params[:filter])
-        @no_messages += " (#{@filter[:name]})"
-      end
-    end
-
-    @conversations_count = conversations_scope.count
-    conversations = Api.paginate(conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
-    # optimize loading the most recent messages for each conversation into a single query
-    ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
-    @conversations_json = conversations.map{ |c| jsonify_conversation(c, :include_participant_avatars => false, :include_participant_contexts => false) }
-    respond_to do |format|
-      format.html {
-        # TODO: remove this in a subsequent release, since everything will be
-        # filterable once the data migration has run
-        @filterable = (base_scope.scoped(:conditions => "conversations.tags IS NULL").size == 0)
-
-        notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
-        can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
-        js_env(:CONVERSATIONS => {
-          :USER => jsonify_users([@current_user], :include_participant_contexts => false).first,
-          :CONTEXTS => @contexts,
-          :INITIAL_CONVERSATIONS => @conversations_json,
-          :CONVERSATIONS_COUNT => @conversations_count,
-          :CONVERSATIONS_PER_PAGE => @page_max,
-          :SCOPE => @scope,
-          :NOTES_ENABLED => notes_enabled,
-          :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
-          :INITIAL_FILTER => @filter,
-          :SHOW_INTRO => !@current_user.watched_conversations_intro?,
-          :FOLDER_ID => @current_user.conversation_attachments_folder.id
-        })
-      }
-      format.json { render :json => @conversations_json }
+      render :json => @conversations_json
+    else
+      return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
+      notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
+      can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
+      js_env(:CONVERSATIONS => {
+        :USER => jsonify_users([@current_user], :include_participant_contexts => false).first,
+        :CONTEXTS => @contexts,
+        :NOTES_ENABLED => notes_enabled,
+        :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
+        :SHOW_INTRO => !@current_user.watched_conversations_intro?,
+        :FOLDER_ID => @current_user.conversation_attachments_folder.id
+      })
     end
   end
 
@@ -188,6 +157,12 @@ class ConversationsController < ApplicationController
   #   be associated with this message.
   # @argument media_comment_type ["audio"|"video"] Type of the associated
   #   media file
+  # @argument scope [optional, "unread"|"starred"|"archived"]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the index API action
+  # @argument filter [optional, course_id|group_id|user_id]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the index API action
   def create
     return render_error('recipients', 'blank') if params[:recipients].blank?
     return render_error('recipients', 'invalid') if @recipients.blank?
@@ -213,7 +188,8 @@ class ConversationsController < ApplicationController
         conversations = ConversationParticipant.find(:all, :conditions => {:id => conversations.map(&:id)}, :include => [:conversation], :order => "visible_last_authored_at DESC, last_message_at DESC, id DESC")
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
-        render :json => conversations.map{ |c| jsonify_conversation(c, :include_participant_avatars => false, :include_participant_contexts => false) }
+        visibility_map = infer_visibility(*conversations)
+        render :json => conversations.map{ |c| jsonify_conversation(c, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }
       else
         @conversation = @current_user.initiate_conversation(recipient_ids)
         message = create_message_on_conversation(@conversation)
@@ -240,6 +216,12 @@ class ConversationsController < ApplicationController
   #   with other messages. The submission details (comments, assignment, etc.)
   #   will be stored as the submission property on the message. Note that if
   #   set, the message_count will also include these messages in the total.
+  # @argument scope [optional, "unread"|"starred"|"archived"]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the index API action
+  # @argument filter [optional, course_id|group_id|user_id]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the index API action
   #
   # @response_field participants Array of relevant users. Includes current
   #   user. If there are forwarded messages in this conversation, the authors
@@ -313,7 +295,16 @@ class ConversationsController < ApplicationController
   #     "submissions": []
   #   }
   def show
-    return redirect_to "/conversations/#/conversations/#{@conversation.conversation_id}" + (params[:message] ? '?message=' + URI.encode(params[:message], Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")) : '') unless request.xhr? || params[:format] == 'json'
+    unless request.xhr? || params[:format] == 'json'
+      scope = if @conversation.archived?
+        'archived'
+      elsif @conversation.visible_last_authored_at && !@conversation.last_message_at
+        'sent'
+      else
+        'default'
+      end
+      return redirect_to conversations_path(:scope => scope, :id => @conversation.conversation_id, :message => params[:message])
+    end
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread?
     messages = @conversation.messages
@@ -334,13 +325,15 @@ class ConversationsController < ApplicationController
   # @API
   # Updates attributes for a single conversation.
   #
-  # Response includes only a subset of the fields that are present in the
-  # list/index/show actions: id, workflow_state, last_message, last_message_at
-  # message_count, subscribed, private, starred, properties
-  #
   # @argument conversation[workflow_state] ["read"|"unread"|"archived"] Change the state of this conversation
   # @argument conversation[subscribed] [true|false] Toggle the current user's subscription to the conversation (only valid for group conversations). If unsubscribed, the user will still have access to the latest messages, but the conversation won't be automatically flagged as unread, nor will it jump to the top of the inbox.
   # @argument conversation[starred] [true|false] Toggle the starred state of the current user's view of the conversation.
+  # @argument scope [optional, "unread"|"starred"|"archived"]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the index API action
+  # @argument filter [optional, course_id|group_id|user_id]
+  #   Used when generating "visible" in the API response. See the explanation
+  #   under the index API action
   #
   # @example_response
   #   {
@@ -352,11 +345,15 @@ class ConversationsController < ApplicationController
   #     "subscribed": true,
   #     "private": true,
   #     "starred": false,
-  #     "properties": ["attachments"]
+  #     "properties": ["attachments"],
+  #     "audience": [2],
+  #     "audience_contexts": {"courses": {"1": []}, "groups": {}},
+  #     "avatar_url": "https://canvas.instructure.com/images/messages/avatar-50.png",
+  #     "participants": [{"id": 1, "name": "Joe TA"}]
   #   }
   def update
     if @conversation.update_attributes(params[:conversation])
-      render :json => @conversation
+      render :json => jsonify_conversation(@conversation)
     else
       render :json => @conversation.errors, :status => :bad_request
     end
@@ -389,7 +386,7 @@ class ConversationsController < ApplicationController
   #   }
   def destroy
     @conversation.remove_messages(:all)
-    render :json => @conversation
+    render :json => jsonify_conversation(@conversation, :visible => false)
   end
 
   # @API
@@ -695,6 +692,42 @@ class ConversationsController < ApplicationController
 
   private
 
+  def infer_scope
+    @conversations_scope = case params[:scope]
+      when 'unread'
+        @current_user.conversations.unread
+      when 'starred'
+        @current_user.conversations.starred
+      when 'sent'
+        @current_user.all_conversations.sent
+      when 'archived'
+        @current_user.conversations.archived
+      else
+        params[:scope] = 'inbox'
+        @current_user.conversations.default
+    end
+
+    filters = Array(params[:filter]).compact
+    @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
+    @conversations_scope = @conversations_scope.tagged(*filters) if filters.present?
+  end
+
+  def infer_visibility(*conversations)
+    infer_scope unless @conversations_scope
+
+    result = Hash.new(false)
+    visible_conversations = @conversations_scope.find(:all,
+      :select => "conversation_id",
+      :conditions => {:conversation_id => conversations.map(&:conversation_id)}
+    )
+    visible_conversations.each { |c| result[c.conversation_id] = true }
+    if conversations.size == 1
+      result[conversations.first.conversation_id]
+    else
+      result
+    end
+  end
+
   def set_avatar_size
     @avatar_size = params[:avatar_size].to_i
     @avatar_size = 50 unless [32, 50].include?(@avatar_size)
@@ -951,8 +984,9 @@ class ConversationsController < ApplicationController
     end
     result[:audience] = audience.map(&:id)
     result[:audience_contexts] = contexts_for(audience, conversation.context_tags)
-    result[:avatar_url] = avatar_url_for(conversation, participants)
+    result[:avatar_url] = avatar_url_for(conversation, explicit_participants)
     result[:participants] = jsonify_users(participants, options)
+    result[:visible] = options.key?(:visible) ? options[:visible] : infer_visibility(conversation)
     result
   end
 

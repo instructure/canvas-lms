@@ -147,7 +147,6 @@ class Course < ActiveRecord::Base
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :rubrics, :as => :context
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
-  has_many :tags, :class_name => 'ContentTag', :as => 'context', :order => 'LOWER(title)', :conditions => {:tag_type => 'default'}, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
   has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
@@ -885,7 +884,7 @@ class Course < ActiveRecord::Base
     can :read and can :participate_as_student and can :read_grades
 
     # Prior users
-    given { |user| !self.deleted? && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
+    given { |user| (self.available? || self.completed?) && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
     can :read
 
     # Teacher of a concluded course
@@ -899,7 +898,7 @@ class Course < ActiveRecord::Base
     can :delete
 
     # Student of a concluded course
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
+    given { |user| (self.available? || self.completed?) && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
     can :read and can :read_grades and can :read_forum
 
     # Viewing as different role type
@@ -1769,10 +1768,6 @@ class Course < ActiveRecord::Base
   def import_settings_from_migration(data)
     return unless data[:course]
     settings = data[:course]
-    self.name = settings[:title] if settings[:title].present?
-    self.course_code = settings[:course_code] if settings[:course_code].present?
-    self.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
-    self.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
     self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
     if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
       self.tab_configuration = settings[:tab_configuration]

@@ -233,6 +233,7 @@
                 url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @student.id, file.asset_string)
               end
             end
+            turnitin = nil unless turnitin.try(:[], :state)
           end
         %>
         <a class="tooltip" title="<%= t('titles.turnitin_score', "Turnitin similarity score -- more information") %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank">

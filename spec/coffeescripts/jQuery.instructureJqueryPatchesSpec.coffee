@@ -1,7 +1,5 @@
-define [
-  'jquery'
-  'jquery.instructure_jquery_patches'
-], (jQuery) ->
+define ['jquery'], (jQuery) ->
+
   module 'instructure jquery patches'
 
   test 'parseJSON', ->

@@ -151,9 +151,9 @@ module ApplicationHelper
 
   def avatar_image(user_id, height=50)
     if session["reported_#{user_id}"]
-      image_tag "no_pic.gif"
+      image_tag "messages/avatar-50.png"
     else
-      image_tag(avatar_image_url(User.avatar_key(user_id || 0)), :style => "height: #{height}px; max-width: #{height}px;", :alt => '')
+      image_tag(avatar_image_url(User.avatar_key(user_id || 0), :bust => Time.now.to_i), :style => "height: #{height}px; max-width: #{height}px;", :alt => '')
     end
   end
 
@@ -205,7 +205,7 @@ module ApplicationHelper
   end
 
   def message_user_path(user)
-    conversations_path + "#/conversations?user_id=#{user.id}"
+    conversations_path(:user_id => user.id)
   end
 
   def hidden(include_style=false)

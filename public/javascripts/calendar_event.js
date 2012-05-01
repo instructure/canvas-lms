@@ -60,7 +60,6 @@ $(function($) {
       data.description = "";
     }
     data.start_date = data.start_at_date_string;
-    data.start_date = $("#full_calendar_event .start_at_date_string").attr('title');
     data.start_time = data.start_at_time_string;
     data.end_time = data.end_at_time_string;
     if (data.all_day == 'true') {
@@ -129,7 +128,7 @@ $(function($) {
       var calendar_event = data.calendar_event,
           start_at       = $.parseFromISO(calendar_event.start_at),
           end_at         = $.parseFromISO(calendar_event.end_at),
-          parsedDate     = Date.parse(calendar_event.all_day_date);
+          parsedDate     = Date.parse(calendar_event.all_day_date).toString("MMM dd, yyyy");
 
       
       calendar_event.start_at_date_string = start_at.date_formatted;
@@ -146,7 +145,6 @@ $(function($) {
           data: calendar_event,
           htmlValues: ['description']
         });
-      $full_calendar_event_holder.find(".start_at_date_string").attr('title', calendar_event.start_at_date_string);
       $(this).find("textarea").editorBox('set_code', calendar_event.description);
       var month = null, year = null;
       if (calendar_event.start_at) {

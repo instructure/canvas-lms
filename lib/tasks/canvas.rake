@@ -10,7 +10,6 @@ def check_syntax(files)
     ./public/javascripts/jquery-1.4.js
     ./public/javascripts/jquery.ba-hashchange.js
     ./public/javascripts/jquery-ui-1.8.js
-    ./public/javascripts/jquery.ba-throttle-debounce.js
     ./public/javascripts/scribd.view.js
     ./public/javascripts/swfobject/swfobject.js
     ./public/javascripts/ui.selectmenu.js

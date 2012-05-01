@@ -3,7 +3,7 @@ define [
   'i18n!calendar'
   'compiled/calendar/EditAppointmentGroupDetails'
   'jst/calendar/editAppointmentGroup'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
 ], ($, I18n, EditAppointmentGroupDetails, editAppointmentGroupTemplate) ->
 
   dialog = $('<div id="edit_event"><div class="wrapper"></div>').appendTo('body').dialog

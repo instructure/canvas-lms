@@ -119,6 +119,7 @@ class GroupMembership < ActiveRecord::Base
     state :rejected
     state :deleted
   end
+  alias_method :active?, :accepted?
   
   def self.serialization_excludes; [:uuid]; end
 

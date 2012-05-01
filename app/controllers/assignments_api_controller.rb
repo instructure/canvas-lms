@@ -185,16 +185,20 @@ class AssignmentsApiController < ApplicationController
     @assignment = @context.assignments.find(params[:id])
 
     if authorized_action(@assignment, @current_user, :update_content)
-      if custom_vals = params[:assignment][:set_custom_field_values]
-        @assignment.set_custom_field_values = custom_vals
-      end
-
-      if @assignment.update_attributes(assignment_params)
-        render :json => assignment_json(@assignment, @current_user, session, [], @context.user_is_teacher?(@current_user)).to_json, :status => 201
+      if @assignment.frozen?
+        render :json => {:message => t('errors.no_edit_frozen', "You cannot edit a frozen assignment.")}.to_json, :status => 400
       else
-        # TODO: we don't really have a strategy in the API yet for returning
-        # errors.
-        render :json => 'error'.to_json, :status => 400
+        if custom_vals = params[:assignment][:set_custom_field_values]
+          @assignment.set_custom_field_values = custom_vals
+        end
+
+        if @assignment.update_attributes(assignment_params)
+          render :json => assignment_json(@assignment, @current_user, session, [], @context.user_is_teacher?(@current_user)).to_json, :status => 201
+        else
+          # TODO: we don't really have a strategy in the API yet for returning
+          # errors.
+          render :json => 'error'.to_json, :status => 400
+        end
       end
     end
   end

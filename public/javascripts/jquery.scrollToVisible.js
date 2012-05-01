@@ -21,7 +21,6 @@
 
 define([
   'jquery' /* $ */,
-  'jquery.instructure_jquery_patches' /* /\.scrollTop/, windowScrollTop */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function($) {
 

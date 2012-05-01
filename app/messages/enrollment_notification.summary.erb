@@ -14,7 +14,7 @@
       t :body_ta, "You've been enrolled in the course, %{course}, as a TA.", :course => asset.course.name
     when 'ObserverEnrollment'
       t :body_observer, "You've been enrolled in the course, %{course}, as an observer.", :course => asset.course.name
-    when 'CourseDesignerEnrollment'
+    when 'DesignerEnrollment'
       t :body_designer, "You've been enrolled in the course, %{course}, as a designer.", :course => asset.course.name
     else
       t :body_student, "You've been enrolled in the course, %{course}, as a student.", :course => asset.course.name

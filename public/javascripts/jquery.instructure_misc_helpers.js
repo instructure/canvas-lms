@@ -20,14 +20,14 @@ define([
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* $ */,
+  'underscore',
   'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSuggestion */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/, windowScrollTop */,
-  'vendor/jquery.ba-throttle-debounce' /* throttle */,
+  'jqueryui/dialog',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.store' /* /\$\.store/ */
-], function(INST, I18n, $, htmlEscape) {
+], function(INST, I18n, $, _, htmlEscape) {
 
   // Generate a unique integer id (unique within the entire window).
   // Useful for temporary DOM ids.
@@ -186,7 +186,7 @@ define([
           $body.toggleClass('with-sidebar-pinned-to-bottom');
         }
       }
-      var throttledOnScroll = $.throttle(50, onScroll);
+      var throttledOnScroll = _.throttle(onScroll, 50);
       throttledOnScroll();
       $window.scroll(throttledOnScroll);
       setInterval(throttledOnScroll, 1000);

@@ -8,10 +8,12 @@
 <% cache(['assignment_render', assignment || context.asset_string, Time.zone.utc_offset].cache_key, :expires_in => (tomorrow_at_midnight - Time.zone.now).to_i) do %>
 <% assignment_url = context_url(context, :context_assignment_url, assignment_id) %>
 <% submission_url = context_url(context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}") %>
-<div class=" group_assignment <%= 'points_uneditable' if assignment && assignment.points_uneditable? %> assignment_<%= assignment ? assignment.id : "blank" %> <%= "muted" if assignment && assignment.muted? %>" id="assignment_<%= assignment ? assignment.id : "blank" %>" style="<%= hidden unless assignment %>">
+<div class=" group_assignment <%= 'frozen' if assignment && assignment.att_frozen?(:assignment_group_id, @current_user) %> <%= 'points_uneditable' if assignment && assignment.points_uneditable? %> assignment_<%= assignment ? assignment.id : "blank" %> <%= "muted" if assignment && assignment.muted? %>" id="assignment_<%= assignment ? assignment.id : "blank" %>" style="<%= hidden unless assignment %>">
   <div class="content">
     <div class="move data">
-      <%= image_tag 'move.png', :alt => t('alts.move', "Move"), :class => "move_icon", :title => t('titles.sort_or_move', "Sort Assignments or Move to Another Group"), :style => "margin-top: 3px;" %>
+      <% if assignment && !assignment.att_frozen?(:assignment_group_id, @current_user) %>
+        <%= image_tag 'move.png', :alt => t('alts.move', "Move"), :class => "move_icon", :title => t('titles.sort_or_move', "Sort Assignments or Move to Another Group"), :style => "margin-top: 3px;" %>
+      <% end %>
     </div>
     <div class="data assignment_title ellipsis">
       <a href="<%= assignment_url %>" class="title" title="<%= assignment.try_rescue(:title) %>"><%= assignment.try_rescue(:title) %> <%= image_tag("sound_mute.png", :title => t(:student_mute_notification, "Instructor is working on grades")) if assignment && assignment.muted? %></a>
@@ -47,12 +49,14 @@
       <a href="<%= assignment_url %>" class="preview_assignment_link no-hover" style="<%= hidden unless false %>">
         <%= image_tag 'preview.png', :alt => "Preview", :title => t('links.preview_assignment', "Preview Assignment"), :style => "display: none;" %>
       </a>
-      <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
-        <%= image_tag 'edit.png', :alt => "Edit", :title => t('links.edit_assignment', "Edit Assignment") %>
-      </a>
-      <a href="<%= assignment_url %>" rel="nofollow" class="delete_assignment_link no-hover">
-        <%= image_tag 'delete.png', :alt => "Delete", :title => t('links.delete_assignment', "Delete Assignment") %>
-      </a>
+      <% if assignment && !assignment.frozen_for_user?(@current_user) %>
+        <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
+          <%= image_tag 'edit.png', :alt => "Edit", :title => t('links.edit_assignment', "Edit Assignment") %>
+        </a>
+        <a href="<%= assignment_url %>" rel="nofollow" class="delete_assignment_link no-hover">
+          <%= image_tag 'delete.png', :alt => "Delete", :title => t('links.delete_assignment', "Delete Assignment") %>
+        </a>
+      <% end %>
     </div>
     <div class="clear"></div>
   </div>

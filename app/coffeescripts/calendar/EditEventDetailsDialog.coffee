@@ -1,14 +1,14 @@
 define [
   'jquery'
   'i18n!calendar'
-  'use!underscore'
+  'underscore'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/EditCalendarEventDetails'
   'compiled/calendar/EditAssignmentDetails'
   'compiled/calendar/EditApptCalendarEventDialog'
   'compiled/calendar/EditAppointmentGroupDetails'
   'jst/calendar/editEvent'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jqueryui/tabs'
 ], ($, I18n, _, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDialog, EditAppointmentGroupDetails, editEventTemplate) ->
 

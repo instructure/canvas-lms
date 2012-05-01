@@ -7,15 +7,19 @@ define [
   'jst/calendar/eventDetails'
   'jst/calendar/deleteItem'
   'jst/calendar/reservationOverLimitDialog'
-  'use!underscore'
+  'compiled/calendar/MessageParticipantsDialog'
+  'compiled/fn/preventDefault'
+  'underscore'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
-], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, _) ->
+], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _) ->
+
+  destroyArguments = (fn) => -> fn.apply(this, [])
 
   class ShowEventDetailsDialog
-    constructor: (event) ->
+    constructor: (event, @dataSource) ->
       @event = event
       @contexts = event.contexts
 
@@ -81,7 +85,7 @@ define [
       $.publish "CommonEvent/eventSaving", @event
       $.ajaxJSON @event.object.reserve_url, 'POST', params, @reserveSuccessCB, @reserveErrorCB
 
-    unreserveEvent: () =>
+    unreserveEvent: =>
       for e in @event.childEvents
         if e.object?.own_reservation
           @deleteEvent(e)
@@ -148,26 +152,17 @@ define [
 
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
 
-      @popover.el.find(".edit_event_link").click (e) =>
-        e.preventDefault()
-        @showEditDialog()
+      @popover.el.find(".edit_event_link").click preventDefault @showEditDialog
 
-      @popover.el.find(".delete_event_link").click (e) =>
-        e.preventDefault()
-        @deleteEvent()
+      @popover.el.find(".delete_event_link").click preventDefault destroyArguments @deleteEvent
 
-      @popover.el.find(".reserve_event_link").click (e) =>
-        e.preventDefault()
-        @reserveEvent()
+      @popover.el.find(".reserve_event_link").click preventDefault destroyArguments @reserveEvent
 
-      @popover.el.find(".unreserve_event_link").click (e) =>
-        e.preventDefault()
-        @unreserveEvent()
+      @popover.el.find(".unreserve_event_link").click preventDefault @unreserveEvent
 
-      @popover.el.find(".cancel_appointment_link").click (e) =>
-        e.preventDefault()
+      @popover.el.find(".cancel_appointment_link").click preventDefault (e) =>
         $appt = $(e.target).closest('li')
         @cancelAppointment($appt)
 
-      # @popover.dialog 'option',
-      #   width: if @event.description?.length > 2000 then Math.max($(window).width() - 300, 450) else 450
+      @popover.el.find('.message_students').click preventDefault =>
+        new MessageParticipantsDialog(timeslot: @event.calendarEvent).show()

@@ -46,6 +46,13 @@
         </td>
       </tr>
       <tr>
+        <td><%= f.blabel :login_attribute, :en => "Login Attribute" %></td>
+        <td class="nobr">
+          <%= f.select :login_attribute, @saml_login_attributes, {}, {:class => "auth_form"} %>
+          <span class="auth_info login_attribute"><%= @saml_login_attributes.invert[@account_config.login_attribute] %></span>
+        </td>
+      </tr>
+      <tr>
         <td><%= f.blabel :identifier_format, :en => "Identifier Format" %></td>
         <td class="nobr">
           <%= f.select :identifier_format, @saml_identifiers, {}, {:class => "auth_form"} %>

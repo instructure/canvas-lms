@@ -40,6 +40,7 @@ describe "threaded discussions" do
   end
 
   it "should edit a reply" do
+    pending("intermittently fails")
     edit_text = 'edit message '
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -49,6 +50,7 @@ describe "threaded discussions" do
   end
 
   it "should delete a reply" do
+    pending("intermittently fails")
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests

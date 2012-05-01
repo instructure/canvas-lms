@@ -111,6 +111,16 @@ response:
 The app can then extract the code, and use it along with the
 client_id and client_secret to obtain the final access_key.
 
+If the user doesn't accept the request for access, or if another error
+occurs, Canvas redirects back to your request\_uri with an `error`
+parameter, rather than a `code` parameter, in the query string.
+
+<div class="method_details">
+<h3>http://www.example.com/oauth2response?error=access_denied</h3>
+</div>
+
+`access_denied` is the only currently implemented error code.
+
 ### Step 3: Exchange the code for the final access token
 
 <div class="method_details">
@@ -225,6 +235,16 @@ At this point the app should notice that the URL of the webview has
 changed to contain <code>code=&lt;code&gt;</code> somewhere in the query
 string. The app can then extract the code, and use it along with the
 client_id and client_secret to obtain the final access_key.
+
+If the user doesn't accept the request for access, or if another error
+occurs, Canvas will add an `error`
+parameter, rather than a `code` parameter, to the query string.
+
+<div class="method_details">
+<h3>/login/oauth2/auth?error=access_denied</h3>
+</div>
+
+`access_denied` is the only currently implemented error code.
 
 ### Step 3: Exchange the code for the final access token
 

@@ -4,7 +4,7 @@ define [
   'jst/CurveGradesDialog'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'compiled/jquery/fixDialogButtons'
   'vendor/jquery.ba-tinypubsub'

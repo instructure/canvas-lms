@@ -91,7 +91,10 @@
               <li>
                 <div class="ui-listview-text ui-listview-right">
                   <% if can_do(@submission, @current_user, :view_turnitin_report) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
-                    <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
+                    <span class="turnitin_score_container">
+                      <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
+                      <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>
+                    </span>
                   <% end %>
                   <span><%= number_to_human_size(attachment.size) %></span>
                 </div>
@@ -113,7 +116,7 @@
     require([
       'jquery',
       'vendor/swfobject/swfobject',
-      'jquery.instructure_jquery_patches', // .dialog patch
+      'jqueryui/dialog',
       'jquery.doc_previews' // loadDocPreview
     ], function($, swfobject, _docPreviews) {
       $(document).ready(function(){

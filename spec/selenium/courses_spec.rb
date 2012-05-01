@@ -24,6 +24,9 @@ describe "courses" do
       wait_for_animations # we need to give the wizard a chance to pop up
       wizard_box = driver.find_element(:id, "wizard_box")
       wizard_box.displayed?.should be_false
+
+      # un-remember the setting
+      driver.execute_script "$.store.clear()"
     end
 
     it "should open and close wizard after initial close" do
@@ -125,7 +128,6 @@ describe "courses" do
         course_copy_helper do |driver|
           driver.find_element(:id, 'copy_everything').click
           wait_for_ajaximations
-          driver.find_element(:id, 'uncheck_everything').click
           @second_course.wiki.wiki_pages[0..2].each do |page|
             driver.find_element(:id, "copy_wiki_pages_#{CC::CCHelper.create_key(page)}").click
           end

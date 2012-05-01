@@ -26,6 +26,7 @@ class TestCourseApi
 end
 
 describe Api::V1::Course do
+
   before do
     @test_api = TestCourseApi.new
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
@@ -63,7 +64,10 @@ end
 
 describe CoursesController, :type => :integration do
   USER_API_FIELDS = %w(id name sortable_name short_name)
+
   before do
+    Course.any_instance.stubs(:start_at).returns nil
+    Course.any_instance.stubs(:end_at).returns nil
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
     @me = @user
     @course1 = @course
@@ -85,6 +89,8 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'start_at' => nil,
+        'end_at' => nil
       },
       {
         'id' => @course2.id,
@@ -94,6 +100,8 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+        'start_at' => nil,
+        'end_at' => nil
       },
     ]
   end
@@ -101,6 +109,7 @@ describe CoursesController, :type => :integration do
   describe "course creation" do
     context "an account admin" do
       before do
+        Course.any_instance.unstub(:start_at, :end_at)
         @account = Account.default
         account_admin_user
         @resource_path = "/api/v1/accounts/#{@account.id}/courses"
@@ -115,7 +124,7 @@ describe CoursesController, :type => :integration do
             'name'                                 => 'Test Course',
             'course_code'                          => 'Test Course',
             'start_at'                             => '2011-01-01T00:00:00-0700',
-            'conclude_at'                          => '2011-05-01T00:00:00-0700',
+            'end_at'                               => '2011-05-01T00:00:00-0700',
             'publish_grades_immediately'           => true,
             'is_public'                            => true,
             'allow_student_assignment_edits'       => true,
@@ -133,16 +142,16 @@ describe CoursesController, :type => :integration do
           'account_id' => @account.id,
           'root_account_id' => @account.id,
           'start_at' => '2011-01-01T07:00:00Z',
-          'conclude_at' => '2011-05-01T07:00:00Z'
+          'end_at' => '2011-05-01T07:00:00Z'
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
-        [:name, :course_code, :start_at, :conclude_at, :publish_grades_immediately,
+        [:name, :course_code, :start_at, :end_at, :publish_grades_immediately,
         :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
         :open_enrollment, :self_enrollment, :license, :sis_course_id,
         :allow_student_forum_attachments, :public_description,
         :restrict_enrollments_to_course_dates].each do |attr|
-          [:start_at, :conclude_at].include?(attr) ?
+          [:start_at, :end_at].include?(attr) ?
             new_course.send(attr).should == Time.parse(post_params['course'][attr.to_s]) :
             new_course.send(attr).should == post_params['course'][attr.to_s]
         end
@@ -252,6 +261,8 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'start_at' => nil,
+        'end_at' => nil
       },
       {
         'id' => @course2.id,
@@ -264,6 +275,8 @@ describe CoursesController, :type => :integration do
                            'computed_final_grade' => expected_final_grade}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+        'start_at' => nil,
+        'end_at' => nil
       },
     ]
   end
@@ -286,6 +299,8 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'start_at' => nil,
+        'end_at' => nil
       },
       {
         'id' => @course2.id,
@@ -295,7 +310,9 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
-      },
+        'start_at' => nil,
+        'end_at' => nil
+      }
     ]
   end
 
@@ -311,7 +328,9 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
-      },
+        'start_at' => nil,
+        'end_at' => nil
+      }
     ]
   end
 
@@ -638,6 +657,8 @@ describe CoursesController, :type => :integration do
         'needs_grading_count' => 1,
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'start_at' => nil,
+        'end_at' => nil
       },
     ]
   end
@@ -657,6 +678,8 @@ describe CoursesController, :type => :integration do
         'syllabus_body' => @course1.syllabus_body,
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'start_at' => nil,
+        'end_at' => nil
       },
     ]
   end

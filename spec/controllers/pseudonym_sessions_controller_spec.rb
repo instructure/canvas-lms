@@ -160,7 +160,7 @@ describe PseudonymSessionsController do
       controller.request.env['canvas.domain_root_account'] = account1
       get 'saml_consume', :SAMLResponse => "foo"
       response.should redirect_to(dashboard_url(:login_success => 1))
-      session[:name_id].should == unique_id
+      session[:saml_unique_id].should == unique_id
       Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
@@ -173,10 +173,81 @@ describe PseudonymSessionsController do
       controller.request.env['canvas.domain_root_account'] = account2
       get 'saml_consume', :SAMLResponse => "bar"
       response.should redirect_to(dashboard_url(:login_success => 1))
-      session[:name_id].should == unique_id
+      session[:saml_unique_id].should == unique_id
       Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
 
       Setting.set_config("saml", nil)
+    end
+
+    context "login attributes" do
+      before(:each) do
+        Setting.set_config("saml", {})
+        @unique_id = 'foo'
+
+        @account = account_with_saml
+        @user = user_with_pseudonym({:active_all => true, :username => @unique_id})
+        @pseudonym.account = @account
+        @pseudonym.save!
+
+        @aac = @account.account_authorization_config
+      end
+
+      it "should use the eduPersonPrincipalName attribute with the domain stripped" do
+        @aac.login_attribute = 'eduPersonPrincipalName_stripped'
+        @aac.save
+
+        controller.stubs(:saml_response).returns(
+          stub('response', :is_valid? => true, :success_status? => true, :name_id => nil, :name_qualifier => nil, :session_index => nil,
+            :saml_attributes => {
+              'eduPersonPrincipalName' => "#{@unique_id}@example.edu"
+            })
+        )
+
+        controller.request.env['canvas.domain_root_account'] = @account
+        get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
+        response.should redirect_to(courses_url)
+        session[:saml_unique_id].should == @unique_id
+      end
+
+      it "should use the NameID if no login attribute is specified" do
+        @aac.login_attribute = nil
+        @aac.save
+
+        controller.stubs(:saml_response).returns(
+          stub('response', :is_valid? => true, :success_status? => true, :name_id => @unique_id, :name_qualifier => nil, :session_index => nil)
+        )
+
+        controller.request.env['canvas.domain_root_account'] = @account
+        get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
+        response.should redirect_to(courses_url)
+        session[:saml_unique_id].should == @unique_id
+      end
+    end
+    
+    it "should use the eppn saml attribute if configured" do
+      Setting.set_config("saml", {})
+      unique_id = 'foo'
+
+      account = account_with_saml
+      @aac = @account.account_authorization_config
+      @aac.login_attribute = 'eduPersonPrincipalName_stripped'
+      @aac.save
+
+      user = user_with_pseudonym({:active_all => true, :username => unique_id})
+      @pseudonym.account = account
+      @pseudonym.save!
+
+      controller.stubs(:saml_response).returns(
+        stub('response', :is_valid? => true, :success_status? => true, :name_id => nil, :name_qualifier => nil, :session_index => nil,
+          :saml_attributes => {
+            'eduPersonPrincipalName' => "#{unique_id}@example.edu"
+          })
+      )
+
+      controller.request.env['canvas.domain_root_account'] = account
+      get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
+      response.should redirect_to(courses_url)
+      session[:saml_unique_id].should == unique_id
     end
 
     it "should redirect to RelayState relative urls" do
@@ -195,7 +266,7 @@ describe PseudonymSessionsController do
       controller.request.env['canvas.domain_root_account'] = account
       get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
       response.should redirect_to(courses_url)
-      session[:name_id].should == unique_id
+      session[:saml_unique_id].should == unique_id
     end
   end
 

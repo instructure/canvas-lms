@@ -25,7 +25,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
                   :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
                   :log_in_url, :log_out_url, :identifier_format,
                   :certificate_fingerprint, :entity_id, :change_password_url,
-                  :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context
+                  :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context,
+                  :login_attribute
 
   before_validation :set_saml_defaults, :if => Proc.new { |aac| aac.saml_authentication? }
   validates_presence_of :account_id
@@ -48,6 +49,14 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
     self.requested_authn_context = nil if self.requested_authn_context.blank?
+  end
+  
+  def self.saml_login_attributes
+    {
+      'NameID' => 'nameid',
+      'eduPersonPrincipalName' => 'eduPersonPrincipalName',
+      t(:saml_eppn_domain_stripped, "%{eppn} (domain stripped)", :eppn => "eduPersonPrincipalName") =>'eduPersonPrincipalName_stripped'
+    }
   end
   
   def sanitized_ldap_login(login)
@@ -97,11 +106,16 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     AccountAuthorizationConfig.saml_default_entity_id_for_account(self.account)
   end
 
-  def saml_settings(preferred_account_domain=nil)
+  def login_attribute
+    return 'nameid' unless read_attribute(:login_attribute)
+    super
+  end
+
+  def saml_settings(current_host=nil)
     return nil unless self.auth_type == 'saml'
 
     unless @saml_settings
-      @saml_settings = AccountAuthorizationConfig.saml_settings_for_account(self.account, preferred_account_domain)
+      @saml_settings = AccountAuthorizationConfig.saml_settings_for_account(self.account, current_host)
 
       @saml_settings.idp_sso_target_url = self.log_in_url
       @saml_settings.idp_slo_target_url = self.log_out_url
@@ -113,19 +127,14 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     @saml_settings
   end
   
-  def self.saml_settings_for_account(account, preferred_account_domain=nil)
+  def self.saml_settings_for_account(account, current_host=nil)
     app_config = Setting.from_config('saml') || {}
-    domain = HostUrl.context_host(account, preferred_account_domain)
+    domains = HostUrl.context_hosts(account, current_host)
     
     settings = Onelogin::Saml::Settings.new
-    if ENV['RAILS_ENV'] == 'development'
-      # if you set the domain to go to your local box in /etc/hosts you can test saml
-      settings.assertion_consumer_service_url = "http://#{domain}/saml_consume"
-      settings.sp_slo_url = "http://#{domain}/saml_logout"
-    else
-      settings.assertion_consumer_service_url = "https://#{domain}/saml_consume"
-      settings.sp_slo_url = "https://#{domain}/saml_logout"
-    end
+    protocol = Rails.env.development? ? 'http' : 'https'
+    settings.sp_slo_url = "#{protocol}://#{domains.first}/saml_logout"
+    settings.assertion_consumer_service_url = domains.map { |domain| "#{protocol}://#{domain}/saml_consume" }
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
     

@@ -225,7 +225,7 @@ class ApplicationController < ActionController::Base
   
   def render_unauthorized_action(object=nil)
     object ||= User.new
-    object.errors.add_to_base(t "#application.errors.unauthorized", "You are not authorized to perform this action")
+    object.errors.add_to_base(t "#application.errors.unauthorized.generic", "You are not authorized to perform this action")
     respond_to do |format|
       @show_left_side = false
       clear_crumbs
@@ -233,9 +233,17 @@ class ApplicationController < ActionController::Base
       params[:format] = nil
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
-      format.html { 
+      format.html {
         store_location if request.get?
-        return if !@current_user && initiate_delegated_login(request.env['canvas.account_domain'])
+        return if !@current_user && initiate_delegated_login(request.host_with_port)
+        if @context.is_a?(Course) && @context_enrollment
+          @unauthorized_message = t('#application.errors.unauthorized.unpublished', "This course has not been published by the instructor yet.") if @context.claimed?
+
+          start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
+          @unauthorized_message = t('#application.errors.unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now.utc
+          @unauthorized_reason = :unpublished
+        end
+
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }
@@ -265,15 +273,15 @@ class ApplicationController < ActionController::Base
   end
   
   def clean_return_to(url)
-    return nil if !url
+    return nil if url.blank?
     uri = URI.parse(url)
-    url = uri.path + (uri.query ? "?#{uri.query}" : "") + (uri.fragment ? "##{uri.fragment}" : "")
+    return nil unless uri.path[0] == ?/
+    return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
   helper_method :clean_return_to
   
   def return_to(url, fallback)
-    url = fallback if url.blank?
-    url = clean_return_to(url)
+    url = clean_return_to(url) || clean_return_to(fallback)
     redirect_to url
   end
 
@@ -335,6 +343,10 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user
+      elsif params[:course_section_id]
+        params[:context_id] = params[:course_section_id]
+        params[:context_type] = "CourseSection"
+        @context = CourseSection.find(params[:course_section_id])
       elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
         @context = @current_user
         @context_membership = @context
@@ -956,6 +968,9 @@ class ApplicationController < ActionController::Base
     options[:query] ||= {}
     options[:anchor] ||= {}
     contexts_to_link_to = Array(contexts_to_link_to)
+    if event = options.delete(:event)
+      options[:query][:event_id] = event.id
+    end
     if !contexts_to_link_to.empty? && options[:anchor].is_a?(Hash)
       options[:anchor][:show] = contexts_to_link_to.collect{ |c| 
         "group_#{c.class.to_s.downcase}_#{c.id}" 
@@ -990,6 +1005,12 @@ class ApplicationController < ActionController::Base
     )
   end
   helper_method :calendar_url_for, :files_url_for
+
+  def conversations_path(params={})
+    hash = params.to_json.unpack('H*').first
+    "/conversations##{hash}"
+  end
+  helper_method :conversations_path
   
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
@@ -1242,5 +1263,10 @@ class ApplicationController < ActionController::Base
     return unless @current_user && @current_user.fake_student?
     @unauthorized_message ||= t('#application.errors.student_view_unauthorized', "You cannot access this functionality in student view.")
     render_unauthorized_action(@current_user)
+  end
+
+  def set_site_admin_context
+    @context = Account.site_admin
+    add_crumb t('#crumbs.site_admin', "Site Admin"), url_for(Account.site_admin)
   end
 end

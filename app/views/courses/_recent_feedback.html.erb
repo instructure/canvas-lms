@@ -24,7 +24,7 @@
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
         <% if recent_feedback.workflow_state != 'unsubmitted' %>
-          <span style="display: block;"><%= before_label(icon_explanation.capitalize) %> 
+          <span style="display: block;"><%= before_label(icon_explanation.try(:capitalize)) %> 
             <% if recent_feedback.workflow_state == 'graded' %>
               <span style="font-size: 0.8em;"><%= datetime_string(recent_feedback.graded_at) %></span>
             <% else %>
@@ -35,7 +35,7 @@
             <span style="display: block; font-style: italic;"><%= t('not_graded', %{not graded}) %></span>
           <% end %>
         <% else %>
-          <span style="display: block; font-style: italic;"><%= icon_explanation.capitalize %></span>
+          <span style="display: block; font-style: italic;"><%= icon_explanation.try(:capitalize) %></span>
           <span style="display: block;"><%= before_label('due_date', %{Due}) %> <span style="font-size: 0.8em;"><%= datetime_string(assignment.due_at) %></span></span>
         <% end %>
         <% if assignment.points_possible %>

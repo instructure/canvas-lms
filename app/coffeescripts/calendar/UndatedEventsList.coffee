@@ -3,7 +3,7 @@ define [
   'jst/calendar/undatedEvents'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/ShowEventDetailsDialog'
-  'instructure-jquery.ui.draggable-patch'
+  'jqueryui/draggable'
   'jquery.disableWhileLoading'
   'vendor/jquery.ba-tinypubsub'
 ], ($, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
@@ -61,7 +61,7 @@ define [
       eventId = $(jsEvent.target).data('event-id')
       event = @dataSource.eventWithId(eventId)
       if event
-        (new ShowEventDetailsDialog(event)).show()
+        (new ShowEventDetailsDialog(event, @dataSource)).show()
 
     visibleContextListChanged: (list) =>
       @visibleContextList = list

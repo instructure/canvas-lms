@@ -1,6 +1,7 @@
 define [
   'i18n!discussions'
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
+  'underscore'
   'compiled/discussions/Topic'
   'compiled/discussions/EntriesView'
   'compiled/discussions/EntryView'
@@ -10,7 +11,7 @@ define [
   'compiled/util/wikiSidebarWithMultipleEditors'
   'jquery.instructure_misc_helpers' #scrollSidebar
 
-], (I18n, Backbone, Topic, EntriesView, EntryView, replyTemplate, Reply, assignmentRubricDialog) ->
+], (I18n, Backbone, _, Topic, EntriesView, EntryView, replyTemplate, Reply, assignmentRubricDialog) ->
 
   ##
   # View that considers the enter ERB template, not just the JS
@@ -76,9 +77,7 @@ define [
         @setNextUnread unread_entries
         @cacheElements()
 
-      # TODO get rid of this global, used
-      window.DISCUSSION = @discussion
-      true
+      @trigger 'initEntries', this
 
     ##
     # Updates the unread count on the top of the page

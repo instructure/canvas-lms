@@ -51,7 +51,7 @@ define [
       if @isAppointmentGroupEvent()
         return null
 
-      $.replaceTags(@contextInfo.calendar_event_url, 'id', @calendarEvent.id)
+      $.replaceTags(@contextInfo.calendar_event_url, 'id', @calendarEvent.parent_event_id ? @calendarEvent.id)
 
     displayTimeString: () ->
       semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)

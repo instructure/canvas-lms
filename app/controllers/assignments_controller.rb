@@ -281,6 +281,7 @@ class AssignmentsController < ApplicationController
         params[:assignment] = p
       else
         params[:assignment] ||= {}
+        @assignment.updating_user = @current_user
         if params[:assignment][:default_grade]
           params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")
           @assignment.set_default_grade(params[:assignment])

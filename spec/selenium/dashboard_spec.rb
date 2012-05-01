@@ -327,7 +327,7 @@ describe "dashboard" do
       #verify assignment is in drop down
       assignment_menu = driver.find_element(:id, 'assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
-      assignment_menu.should include_text("Needing Grading")
+      assignment_menu.should include_text("To Grade")
       assignment_menu.should include_text(assignment.title)
     end
 

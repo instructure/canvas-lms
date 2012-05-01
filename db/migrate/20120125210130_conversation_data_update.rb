@@ -1,4 +1,6 @@
 class ConversationDataUpdate < ActiveRecord::Migration
+  tag :postdeploy
+
   def self.up
     SubmissionComment.connection.select_all("SELECT DISTINCT submission_id AS id FROM submission_comments WHERE NOT hidden").
     map{ |r| r["id"] }.each_slice(1000) do |ids|

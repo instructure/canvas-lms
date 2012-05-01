@@ -175,6 +175,17 @@ describe "discussions" do
       get_all_replies.count.should == 1
     end
 
+    it "should validate editing a discussion" do
+      edit_text = 'title edited'
+      create_and_go_to_topic
+      expect_new_page_load { click_topic_option('#discussion_topic', '#ui-menu-0-0') }
+      replace_content(f('#discussion_topic_title'), edit_text)
+      type_in_tiny(".topic_content", ' new message')
+      f('.submit_button').click
+      wait_for_ajaximations
+      f('.discussion_topic').should include_text(edit_text)
+    end
+
     # note: this isn't desirable, but it's the way it is for this release
     it "should show student view posts to teacher and other students" do
       @fake_student = @course.student_view_student
@@ -256,8 +267,10 @@ describe "discussions" do
       f('#content').should_not include_text("new entry from teacher")
       add_reply new_student_entry_text
       # now they should see the existing entry, and their entry
-      f('#content').should include_text("new entry from teacher")
-      f('#content').should include_text(new_student_entry_text)
+      entries = get_all_replies
+      entries.length.should == 2
+      entries[0].should include_text("new entry from teacher")
+      entries[1].should include_text(new_student_entry_text)
     end
 
     it "should still show entries without users" do
@@ -313,6 +326,7 @@ describe "discussions" do
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
+        wait_for_js
 
         edit_entry(entry, edit_text)
       end

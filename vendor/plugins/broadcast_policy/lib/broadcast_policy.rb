@@ -92,10 +92,14 @@ module Instructure #:nodoc:
         self.current_notification.context = block
       end
 
+      def data(&block)
+        self.current_notification.data = block
+      end
+
     end
 
     class NotificationPolicy
-      attr_accessor :dispatch, :to, :whenever, :context
+      attr_accessor :dispatch, :to, :whenever, :context, :data
 
       def initialize(dispatch)
         self.dispatch = dispatch
@@ -153,13 +157,20 @@ module Instructure #:nodoc:
           return false
         end
 
+        begin
+          data = record.instance_eval &self.data if self.data
+        rescue
+          record.messages_failed[self.dispatch] = "Error thrown attempting to get data."
+          return false
+        end
+
         n = DelayedNotification.send_later_if_production_enqueue_args(
           :process,
           { :priority => Delayed::LOW_PRIORITY },
-          record, notification, (to_list || []).compact.map(&:asset_string), asset_context)
+          record, notification, (to_list || []).compact.map(&:asset_string), asset_context, data)
         n ||= DelayedNotification.new(:asset => record, :notification => notification,
                                       :recipient_keys => (to_list || []).compact.map(&:asset_string),
-                                      :asset_context => asset_context)
+                                      :asset_context => asset_context, :data => data)
         if Rails.env.test?
           record.messages_sent[self.dispatch] = n.is_a?(DelayedNotification) ? n.process : n
         end
