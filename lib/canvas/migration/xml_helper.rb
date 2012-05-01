@@ -20,7 +20,7 @@ module Canvas::Migration
 module XMLHelper
   def convert_to_timestamp(string)
     return nil if string.nil? or string == ""
-    Time.parse(string).to_i * 1000 rescue nil
+    Time.use_zone("UTC"){Time.zone.parse(string).to_i * 1000} rescue nil
   end
 
   def get_node_att(node, selector, attribute, default=nil)
