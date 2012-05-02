@@ -245,6 +245,71 @@ describe ContentMigration do
       @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should be_nil
     end
 
+    it "should re-copy deleted items" do
+      dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      cm = @copy_from.context_modules.create!(:name => "some module")
+      att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+      wiki = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      quiz = @copy_from.quizzes.create! if Qti.qti_enabled?
+      ag = @copy_from.assignment_groups.create!(:name => 'empty group')
+      asmnt = @copy_from.assignments.create!(:title => "some assignment")
+      cal = @copy_from.calendar_events.create!(:title => "haha", :description => "oi")
+      tool = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+      tool.workflow_state = 'public'
+      tool.save
+      data = [{:points => 3,:description => "Outcome row",:id => 1,:ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}]}]
+      rub1 = @copy_from.rubrics.build(:title => "rub1")
+      rub1.data = data
+      rub1.save!
+      rub1.associate_with(@copy_from, @copy_from)
+      default = LearningOutcomeGroup.default_for(@copy_from)
+      lo = @copy_from.learning_outcomes.new
+      lo.context = @copy_from
+      lo.short_description = "outcome1"
+      lo.workflow_state = 'active'
+      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.save!
+      default.add_item(lo)
+      gs = @copy_from.grading_standards.new
+      gs.title = "Standard eh"
+      gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
+      gs.save!
+
+      run_course_copy
+
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).destroy
+      @copy_to.context_modules.find_by_migration_id(mig_id(cm)).destroy
+      @copy_to.attachments.find_by_migration_id(mig_id(att)).destroy
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).destroy
+      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).destroy
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).destroy
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).destroy if Qti.qti_enabled?
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).destroy
+      @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).destroy
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).destroy
+      @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).destroy
+      @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).destroy
+
+      @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
+      @cm.user = @user
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).workflow_state.should == 'active'
+      @copy_to.context_modules.find_by_migration_id(mig_id(cm)).workflow_state.should == 'active'
+      @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
+      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).workflow_state.should == 'active'
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'
+      @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).workflow_state.should == 'available'
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).workflow_state.should == 'available'
+      @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).workflow_state.should == 'active'
+      @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).workflow_state.should == 'active'
+    end
+
     it "should copy learning outcomes into the new course" do
       lo = @copy_from.learning_outcomes.new
       lo.context = @copy_from
@@ -400,7 +465,6 @@ describe ContentMigration do
       new_attachment.should_not be_nil
       new_attachment.full_path.should == "course files/dummy.txt"
       new_attachment.folder.should == to_root
-      puts @copy_to.syllabus_body
       @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
     end
 

@@ -282,6 +282,7 @@ class Rubric < ActiveRecord::Base
     item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
     item ||= self.new(:context => context)
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'active' if item.deleted?
     item.title = hash[:title]
     item.description = hash[:description]
     item.points_possible = hash[:points_possible].to_f
