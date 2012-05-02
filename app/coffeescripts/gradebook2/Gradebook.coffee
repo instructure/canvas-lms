@@ -216,7 +216,6 @@ define [
           break
         params =
           student_ids: (student.id for student in students)
-          assignment_ids: (id for id, assignment of @assignments)
           response_fields: ['user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission']
         $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
         @chunk_start += @options.chunk_size
