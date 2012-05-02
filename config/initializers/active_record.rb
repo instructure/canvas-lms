@@ -255,8 +255,22 @@ class ActiveRecord::Base
     end
   end
 
-  def self.case_insensitive(col)
-    ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql' ? "LOWER(#{col})" : col
+  def self.best_unicode_collation_key(col)
+    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+      # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
+      # Postgres just defers to the C library which is different for each platform. The best
+      # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
+      # If that extension isn't around, casting to a bytea sucks for international characters,
+      # but at least it's consistent, and orders commas before letters so you don't end up with
+      # Johnson, Bob sorting before Johns, Jimmy
+      @collkey ||= connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i
+      @collkey == 0 ? "CAST(LOWER(#{col}) AS bytea)" : "collkey(#{col}, 'root', true, 2, true)"
+    else
+      # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
+      # SQLite can have custom collations inserted, but probably not worth the effort
+      # since no one will actually use SQLite in a production install of Canvas)
+      col
+    end
   end
 
   class DynamicFinderTypeError < Exception; end

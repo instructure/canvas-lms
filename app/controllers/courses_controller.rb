@@ -287,7 +287,7 @@ class CoursesController < ApplicationController
     # DEPRECATED. #users should replace this in a new version of the API.
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      proxy = @context.students
+      proxy = @context.students.order_by_sortable_name
       if user_json_is_admin?
         proxy = proxy.scoped(:include => :pseudonyms)
       end

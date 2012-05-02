@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
   # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
     col = table ? "#{table}.sortable_name" : 'sortable_name'
-    case_insensitive(col)
+    best_unicode_collation_key(col)
   end
 
   include Context
@@ -161,7 +161,9 @@ class User < ActiveRecord::Base
 
   named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
 
-  named_scope :order_by_sortable_name, :order => User.sortable_name_order_by_clause
+  def self.order_by_sortable_name
+    scoped(:order => sortable_name_order_by_clause)
+  end
 
   named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at|
     ids_string = course_ids.join(",")

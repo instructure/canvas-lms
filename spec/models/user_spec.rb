@@ -1593,4 +1593,12 @@ describe User do
       User.user_id_from_avatar_key("-159135").should == nil
     end
   end
+
+  describe "order_by_sortable_name" do
+    it "should sort lexicographically" do
+      User.create!(:name => "John Johnson")
+      User.create!(:name => "John John")
+      User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
+    end
+  end
 end

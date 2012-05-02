@@ -426,7 +426,7 @@ class QuizzesController < ApplicationController
 
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
-      @all_students = @context.students
+      @all_students = @context.students.order_by_sortable_name
       if @quiz.survey? && @quiz.anonymous_submissions
         @students = @all_students.paginate(:per_page => 50, :page => params[:page], :order => :uuid)
       else
