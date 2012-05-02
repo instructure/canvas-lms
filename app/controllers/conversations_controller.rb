@@ -950,21 +950,35 @@ class ConversationsController < ApplicationController
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
-    message = conversation.add_message(params[:body], :attachment_ids => params[:attachment_ids], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :root_account_id => @domain_root_account.id, :tags => @tags) do |m|
-      media_id = params[:media_comment_id]
-      media_type = params[:media_comment_type]
-      if media_id.present? && media_type.present?
-        media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
-        if media_comment
-          media_comment.context = @current_user
-          media_comment.save
-          m.media_comment = media_comment
-          m.save
-        end
-      end
-    end
+    message = conversation.add_message(
+                params[:body],
+                :attachment_ids => params[:attachment_ids],
+                :forwarded_message_ids => params[:forwarded_message_ids],
+                :update_for_sender => update_for_sender,
+                :root_account_id => @domain_root_account.id,
+                :tags => @tags,
+                :media_comment => infer_media_comment
+              )
     message.generate_user_note if params[:user_note]
     message
+  end
+
+  def infer_media_comment
+    media_id = params[:media_comment_id]
+    media_type = params[:media_comment_type]
+    if media_id.present? && media_type.present?
+      media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
+      unless media_comment
+        media_comment ||= MediaObject.new
+        media_comment.media_type = media_type
+        media_comment.media_id = media_id
+        media_comment.root_account_id = @domain_root_account.id
+        media_comment.user = @current_user
+      end
+      media_comment.context = @current_user
+      media_comment.save
+      media_comment
+    end
   end
 
   def jsonify_conversation(conversation, options = {})
