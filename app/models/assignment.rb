@@ -1512,6 +1512,7 @@ class Assignment < ActiveRecord::Base
     item ||= context.assignments.new #new(:context => context)
     item.title = hash[:title]
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'available' if item.deleted?
     if hash[:instructions_in_html] == false
       self.extend TextHelper
     end

@@ -534,6 +534,7 @@ class CalendarEvent < ActiveRecord::Base
     item ||= context.calendar_events.new
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'active' if item.deleted?
     item.title = hash[:title] || hash[:name]
     description = ImportedHtmlConverter.convert(hash[:description] || "", context)
     if hash[:attachment_type] == 'external_url'
