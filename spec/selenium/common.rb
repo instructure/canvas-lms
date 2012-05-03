@@ -869,6 +869,14 @@ end
     pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
   end
 
+  # for when you have something like a textarea's value and you want to match it's contents
+  # against a css selector.
+  # usage:
+  # find_css_in_string(some_textarea[:value], '.some_selector').should_not be_empty
+  def find_css_in_string(string_of_html, css_selector)
+    driver.execute_script("return $('<div />').append('#{string_of_html}').find('#{css_selector}')")
+  end
+
   shared_examples_for "in-process server selenium tests" do
     it_should_behave_like "all selenium tests"
     prepend_before (:all) do

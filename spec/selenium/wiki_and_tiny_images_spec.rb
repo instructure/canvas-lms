@@ -137,7 +137,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
       root_folders.first.find_elements(:css, '.file.image').length.should == 3
       @image_list.find_elements(:css, 'img.img').length.should == 3
-      wiki_page_body[:value].should match(/a class="instructure_file_link/)
+      find_css_in_string(wiki_page_body[:value], '.instructure_file_link').should_not be_empty
     end
 
     it "should show uploaded images in image list and add the image to the rce" do
