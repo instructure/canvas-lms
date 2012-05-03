@@ -1,3 +1,13 @@
+canvas-lms (2012.04.28.16) stable; urgency=low
+
+  * Package ref: 3c09dff2930aa360621a2dae8510f7320a4ebac4
+  *
+  * [+cfa5092] uncheck all individual items by default on course copy
+  * [+b4ad9d4] fix horizontal scrollbar in firefox 12, fixes #8352
+  * [+3c09dff] only load the necessary columns for calculating distributions
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 03 May 2012 12:50:36 -0600
+
 canvas-lms (2012.04.28.13) stable; urgency=low
 
   * Package ref: 7d0ff5cc4d7f11913299948bd30bb2a4ac3379a9
