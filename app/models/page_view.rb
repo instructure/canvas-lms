@@ -36,6 +36,7 @@ class PageView < ActiveRecord::Base
       :conditions => { :account_id => account.self_and_all_sub_accounts }
     }
   }
+  named_scope :by_created_at, :order => 'created_at DESC'
 
   attr_accessor :generated_by_hand
   attr_accessor :is_update
