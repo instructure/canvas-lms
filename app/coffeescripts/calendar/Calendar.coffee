@@ -219,7 +219,7 @@ define [
 
     eventAfterRender: (event, element, view) =>
       if event.eventType == 'assignment' && event.isDueAtMidnight()
-        element.find('.fc-event-time').text '12a'
+        element.find('.fc-event-time').remove()
       if event.eventType == 'assignment' && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
