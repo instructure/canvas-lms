@@ -1627,11 +1627,12 @@ class Assignment < ActiveRecord::Base
   end
 
   def <=>(comparable)
-      sort_key <=> comparable.sort_key
+    sort_key <=> comparable.sort_key
   end
 
   def sort_key
-    [(self.due_at || Time.parse("Jan 1 3000")), self.title]
+    # undated assignments go last
+    [due_at ? 0 : 1, due_at || 0, title]
   end
 
   def special_class; nil; end
