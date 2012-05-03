@@ -712,6 +712,10 @@ shared_examples_for "all selenium tests" do
     el.send_keys(value)
   end
 
+  def submit_form(form_css)
+    f(form_css + ' button[type="submit"]').click
+  end
+
   def check_image(element)
     require 'open-uri'
     element.should be_displayed
@@ -838,7 +842,8 @@ end
     "attachments.zip" => File.read(File.dirname(__FILE__) + "/../fixtures/attachments.zip"),
     "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'),
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip'),
-    "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip')
+    "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip'),
+    "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip')
   }
 
   def get_file(filename, data = nil)

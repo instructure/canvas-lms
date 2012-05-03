@@ -55,7 +55,7 @@
       <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.copy', %{Copy this Course}) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :manage_content, :manage_files, :manage_quizzes) %>
-      <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
+      <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide import_content"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :read) %>
       <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export_content', %{Export Course Content}) %></a>
