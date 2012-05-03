@@ -26,7 +26,7 @@ class DiscussionTopicsApiController < ApplicationController
   before_filter :require_topic
   before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread]
 
-  # @API
+  # @API Get the full topic
   # Return a cached structure of the discussion topic, containing all entries,
   # their authors, and their message bodies.
   #
@@ -91,7 +91,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Post an entry
   # Create a new entry in a discussion topic. Returns a json representation of
   # the created entry (see documentation for 'entries' method) on success.
   #
@@ -114,7 +114,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API List topic entries
   # Retrieve the (paginated) top-level entries in a discussion topic.
   #
   # May require (depending on the topic) that the user has posted in the topic.
@@ -196,7 +196,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Post a reply
   # Add a reply to an entry in a discussion topic. Returns a json
   # representation of the created reply (see documentation for 'replies'
   # method) on success.
@@ -225,7 +225,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API List entry replies
   # Retrieve the (paginated) replies to a top-level entry in a discussion
   # topic.
   #
@@ -273,7 +273,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API List entries
   # Retrieve a paginated list of discussion entries, given a list of ids.
   #
   # May require (depending on the topic) that the user has posted in the topic.
@@ -318,7 +318,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Mark topic as read
   # Mark the initial text of the discussion topic as read.
   #
   # No request fields are necessary.
@@ -329,13 +329,13 @@ class DiscussionTopicsApiController < ApplicationController
   #
   #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \ 
   #        -X PUT \ 
-  #        -H "Authorization: Bearer <token>"
+  #        -H "Authorization: Bearer <token>" \ 
   #        -H "Content-Length: 0"
   def mark_topic_read
     change_topic_read_state("read")
   end
 
-  # @API
+  # @API Mark topic as unread
   # Mark the initial text of the discussion topic as unread.
   #
   # No request fields are necessary.
@@ -351,7 +351,7 @@ class DiscussionTopicsApiController < ApplicationController
     change_topic_read_state("unread")
   end
 
-  # @API
+  # @API Mark all entries as read
   # Mark the discussion topic and all its entries as read.
   #
   # No request fields are necessary.
@@ -371,7 +371,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Mark all entries as unread
   # Mark the discussion topic and all its entries as unread.
   #
   # No request fields are necessary.
@@ -390,7 +390,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Mark entry as read
   # Mark a discussion entry as read.
   #
   # No request fields are necessary.
@@ -407,7 +407,7 @@ class DiscussionTopicsApiController < ApplicationController
     change_entry_read_state("read")
   end
 
-  # @API
+  # @API Mark entry as unread
   # Mark a discussion entry as unread.
   #
   # No request fields are necessary.

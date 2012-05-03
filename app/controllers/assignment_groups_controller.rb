@@ -24,7 +24,7 @@ class AssignmentGroupsController < ApplicationController
 
   include Api::V1::Assignment
 
-  # @API
+  # @API List assignment groups
   # Returns the list of assignment groups for the current context. The returned
   # groups are sorted by their position field.
   #

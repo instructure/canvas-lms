@@ -27,7 +27,7 @@ class CoursesController < ApplicationController
 
   include Api::V1::Course
 
-  # @API
+  # @API List your courses
   # Returns the list of active courses for the current user.
   #
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
@@ -95,7 +95,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API Create a new course
   # Create a new course
   #
   # @argument account_id [Integer] The unique ID of the account to create to course under.
@@ -164,7 +164,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API Upload a file
   #
   # Upload a file to the course.
   #
@@ -218,7 +218,7 @@ class CoursesController < ApplicationController
 
   include Api::V1::User
 
-  # @API
+  # @API List course sections
   # Returns the list of sections for this course.
   #
   # @argument include[] [optional, "students"] Associations to include with the group.
@@ -272,7 +272,8 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API List students
+  #
   # Returns the list of students enrolled in this course.
   #
   # @response_field id The unique identifier for the student.
@@ -294,9 +295,9 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API List users
   # Returns the list of users in this course. And optionally the user's enrollments
-  #   in the course.
+  # in the course.
   #
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
@@ -344,7 +345,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::StreamItem
-  # @API
+  # @API Course activity stream
   # Returns the current user's course-specific activity stream.
   #
   # For full documentation, see the API documentation for the user activity
@@ -357,7 +358,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::TodoItem
-  # @API
+  # @API Course TODO items
   # Returns the current user's course-specific todo items.
   #
   # For full documentation, see the API documentation for the user todo items, in the user api.
@@ -370,7 +371,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API Conclude a course
   # Delete or conclude an existing course
   #
   # @argument event [String] ["delete"|"conclude"] The action to take on the course. available options are 'delete' and 'conclude.'
@@ -691,7 +692,7 @@ class CoursesController < ApplicationController
   end
   protected :check_unknown_user
 
-  # @API
+  # @API Get a single course
   # Return information on a single course.
   #
   # Accepts the same include[] parameters as the list action, and returns a

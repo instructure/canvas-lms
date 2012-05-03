@@ -30,7 +30,7 @@ class SubmissionsApiController < ApplicationController
 
   include Api::V1::Submission
 
-  # @API
+  # @API List assignment submissions
   #
   # Get all existing submissions for an assignment.
   #
@@ -62,7 +62,7 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API List submissions for multiple assignments
   #
   # Get all existing submissions for a given set of students and assignments.
   #
@@ -83,7 +83,7 @@ class SubmissionsApiController < ApplicationController
   #     [
   #       {
   #         "user_id": 1,
-  #         "submissions: [
+  #         "submissions": [
   #           { "assignment_id": 100, grade: 5, ... },
   #           { "assignment_id": 101, grade: 6, ... }
   #         ]
@@ -139,7 +139,7 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Get a single submission
   #
   # Get a single submission, based on user id.
   #
@@ -155,7 +155,7 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Upload a file
   #
   # Upload a file to a submission.
   #
@@ -181,7 +181,7 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Grade a submission
   #
   # Comment on and/or update the grading for a student's assignment submission.
   # If any submission or rubric_assessment arguments are provided, the user
@@ -213,6 +213,7 @@ class SubmissionsApiController < ApplicationController
   #   rubric_assessment[criterion_id][comments]:: Comments to add for this row.
   #
   #   For example, if the assignment rubric is (in JSON format):
+  #     !!!javascript
   #     [
   #       {
   #         'id': 'crit1',

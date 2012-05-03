@@ -11,7 +11,7 @@
       <% unless @no_names %>
         <span class='name'><%= h name %></span>
       <% end %>
-      <% if !text.empty? %>
+      <% if text && !text.empty? %>
         <%= htmlify_line(text) %>
       <% end %>
     </li>

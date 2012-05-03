@@ -27,7 +27,7 @@ class DiscussionTopicsController < ApplicationController
 
   include Api::V1::DiscussionTopics
 
-  # @API
+  # @API List discussion topics
   #
   # Returns the list of discussion topics for this course.
   #

@@ -29,7 +29,8 @@ class AccountAuthorizationConfigsController < ApplicationController
     @saml_authn_contexts = [["No Value", nil]] + Onelogin::Saml::AuthnContexts::ALL_CONTEXTS.sort
   end
 
-  # @API
+  # @API Configure external authentication (SSO)
+  #
   # Set the external account authentication service(s) for the account.
   # Services may be CAS, SAML, or LDAP.
   #
@@ -112,8 +113,8 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # - auth_filter
   #
-  #   LDAP search filter. Use \{{login}} as a placeholder for the username
-  #   supplied by the user. For example: "(sAMAccountName=\{{login}})".
+  #   LDAP search filter. Use !{{login}} as a placeholder for the username
+  #   supplied by the user. For example: "(sAMAccountName=!{{login}})".
   #
   # - auth_username
   #

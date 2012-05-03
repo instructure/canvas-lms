@@ -23,7 +23,8 @@ class AdminsController < ApplicationController
 
   include Api::V1::Admin
 
-  # @API
+  # @API Make an account admin
+  #
   # Flag an existing user as an admin within the account.
   #
   # @argument user_id The id of the user to promote.

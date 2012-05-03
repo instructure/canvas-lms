@@ -25,7 +25,7 @@ class PageViewsController < ApplicationController
     # page view update happens in log_page_view after_filter
   end
 
-  # @API
+  # @API List user page views
   # Return the user's page view history in json format, similar to the
   # available CSV download. Pagination is used as described in API basics
   # section. Page views are returned in descending order, newest to oldest.

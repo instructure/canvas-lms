@@ -17,12 +17,20 @@
 #
 
 def init
+  get_routes
   sections :header, [:method_signature, T('docstring')]
-  @controller = object.parent.path.underscore.sub("_controller", '')
-  @action = object.path.sub(/^.*#/, '')
-  @routes = ApiRouteSet.apis.first.api_methods_for_controller_and_action(@controller, @action)
 end
 
 def header
+  get_routes
+  @subtopic = (object.tag('subtopic') || object.parent.tag('API')).text
+  route = @routes.first
+  @method_link = "method.#{route.requirements[:controller]}.#{route.requirements[:action]}"
   erb(:header)
+end
+
+def get_routes
+  @controller = object.parent.path.underscore.sub("_controller", '')
+  @action = object.path.sub(/^.*#/, '')
+  @routes = ApiRouteSet.apis.first.api_methods_for_controller_and_action(@controller, @action)
 end
