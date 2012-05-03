@@ -34,7 +34,7 @@ class ConversationsController < ApplicationController
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
   add_crumb(proc { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
-  # @API
+  # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
   #
   # @argument scope [optional, "unread"|"starred"|"archived"]
@@ -137,7 +137,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Create a conversation
   # Create a new conversation with one or more recipients. If there is already
   # an existing private conversation with the given recipients, it will be
   # reused.
@@ -206,7 +206,7 @@ class ConversationsController < ApplicationController
       :status => :bad_request
   end
 
-  # @API
+  # @API Get a single conversation
   # Returns information for a single conversation. Response includes all
   # fields that are present in the list/index action, as well as messages,
   # submissions, and extended participant information.
@@ -322,7 +322,7 @@ class ConversationsController < ApplicationController
                                          :submissions => submissions)
   end
 
-  # @API
+  # @API Edit a conversation
   # Updates attributes for a single conversation.
   #
   # @argument conversation[workflow_state] ["read"|"unread"|"archived"] Change the state of this conversation
@@ -359,14 +359,14 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Mark all as read
   # Mark all conversations as read.
   def mark_all_as_read
     @current_user.mark_all_conversations_as_read!
     render :json => {}
   end
 
-  # @API
+  # @API Delete a conversation
   # Delete this conversation and its messages. Note that this only deletes
   # this user's view of the conversation.
   #
@@ -389,7 +389,7 @@ class ConversationsController < ApplicationController
     render :json => jsonify_conversation(@conversation, :visible => false)
   end
 
-  # @API
+  # @API Add recipients
   # Add recipients to an existing group conversation. Response is similar to
   # the GET/show action, except that omits submissions and only includes the
   # latest message (e.g. "joe was added to the conversation by bob")
@@ -437,7 +437,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Add a message
   # Add a message to an existing conversation. Response is similar to the
   # GET/show action, except that omits submissions and only includes the
   # latest message (i.e. what we just sent)
@@ -491,7 +491,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Delete a message
   # Delete messages from this conversation. Note that this only affects this user's view of the conversation.
   # If all messages are deleted, the conversation will be as well (equivalent to DELETE)
   #
@@ -520,7 +520,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Find recipients
   # Find valid recipients (users, courses and groups) that the current user
   # can send messages to.
   #

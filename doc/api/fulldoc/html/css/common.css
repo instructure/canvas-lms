@@ -13,13 +13,13 @@ body {
   max-width: 800px;
 }
 #header {
-  background-color: #c0d9ca;
+  background-color: #6A7177;
   padding: 4px 0;
   border-bottom: 1px #aaa solid;
 }
 #header a {
   text-decoration: none;
-  color: #747575;
+  color: #eee;
 }
 
 #header h1 {
@@ -85,6 +85,9 @@ h2 {
 .method_details_list h2 {
 }
 
+.syntaxhighlighter .line code { white-space: nowrap; }
+.syntaxhighlighter { overflow: auto; }
+
 .method_details h3 {
   font-size: 14px;
   font-weight: normal;
@@ -96,10 +99,10 @@ h2 {
   border-radius: 3px;
 }
 
-h3 .defined-in {
+h2 .defined-in {
   float:right;
   font-size:10px;
-  padding-top:3px;
+  padding-top:10px;
   opacity:0.7;
 }
 
@@ -155,7 +158,30 @@ table.tool tr td:last-child {
 
 pre.code {
   padding: 15px;
-  background-color:#ddd;
   border: 1px solid black;
   overflow: scroll;
+}
+
+div.syntaxhighlighter {
+  padding: 15px;
+  border: 1px solid black;
+}
+
+table#quicklinks {
+  width: 100%;
+}
+table#quicklinks tr {
+  border: 1px solid black;
+}
+table#quicklinks td a {
+  padding: 6px;
+}
+table#quicklinks th {
+  font-weight: bold;
+  padding: 12px;
+}
+
+h2.api_method_name a {
+  text-decoration: none;
+  color: black;
 }

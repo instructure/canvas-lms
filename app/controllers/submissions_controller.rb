@@ -131,7 +131,7 @@ class SubmissionsController < ApplicationController
     "media_recording" => ["media_comment_id", "media_comment_type"],
   }
 
-  # @API
+  # @API Submit an assignment
   #
   # Make a submission for an assignment. You must be enrolled as a student in
   # the course/section to do this.

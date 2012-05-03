@@ -39,6 +39,13 @@ def init
 
   options.delete(:objects)
 
+  options[:all_resources] = true
+  options[:object] = "all_resources.html"
+  Templates::Engine.with_serializer("all_resources.html", options[:serializer]) do
+    T('layout').run(options)
+  end
+  options.delete(:all_resources)
+
   options[:resources].each do |resource, controllers|
     serialize_resource(resource, controllers)
   end
@@ -71,7 +78,10 @@ def asset(path, content)
 end
 
 def generate_assets
-  %w( css/common.css ).each do |file|
+  require 'pathname'
+  asset_root = Pathname.new(File.dirname(__FILE__))
+  (Dir[asset_root + "css/**/*.css"] + Dir[asset_root + "js/**/*.js"]).each do |file|
+    file = Pathname.new(file).relative_path_from(asset_root).to_s
     asset(file, file(file, true))
   end
 end

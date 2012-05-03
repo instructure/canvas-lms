@@ -1,4 +1,10 @@
 <div class="service">
-  <h1><%= @resource %> API</h1>
+  <% if @resource %>
+    <h1><%= @resource %> API</h1>
+  <% else %>
+    <h1>All API Resources</h1>
+  <% end %>
+  <table id='quicklinks'>
+  </table>
   <%= yieldall %>
 </div>

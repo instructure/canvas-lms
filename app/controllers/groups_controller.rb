@@ -292,7 +292,7 @@ class GroupsController < ApplicationController
     render :json => json
   end
 
-  # @API
+  # @API Upload a file
   #
   # Upload a file to the group.
   #

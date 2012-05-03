@@ -29,8 +29,7 @@ class EnrollmentsApiController < ApplicationController
   @@valid_types = %w{StudentEnrollment TeacherEnrollment TaEnrollment ObserverEnrollment}
 
   include Api::V1::User
-  #
-  # @API
+  # @API List enrollments
   # Depending on the URL given, return either (1) all of the enrollments in
   # a course, (2) all of the enrollments in a section or (3) all of a user's
   # enrollments. This includes student, teacher, TA, and observer enrollments.
@@ -141,7 +140,7 @@ class EnrollmentsApiController < ApplicationController
     render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, includes) }
   end
 
-  # @API
+  # @API Enroll a user
   # Create a new user enrollment for a course or section.
   #
   # @argument enrollment[user_id] [String] The ID of the user to be enrolled in the course.
@@ -179,7 +178,7 @@ class EnrollmentsApiController < ApplicationController
       render(:json => @enrollment.errors.to_json)
   end
 
-  # @API
+  # @API Conclude an enrollment
   # Delete or conclude an enrollment.
   #
   # @argument task [conclude|delete] [String] The action to take on the enrollment.

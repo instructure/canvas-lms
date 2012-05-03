@@ -72,7 +72,7 @@ class DiscussionEntriesController < ApplicationController
 
   include Api::V1::DiscussionTopics
 
-  # @API
+  # @API Update an entry
   # Update an existing discussion entry.
   #
   # The entry must have been created by the current user, or the current user
@@ -126,7 +126,7 @@ class DiscussionEntriesController < ApplicationController
     end
   end
 
-  # @API
+  # @API Delete an entry
   # Delete a discussion entry.
   #
   # The entry must have been created by the current user, or the current user

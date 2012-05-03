@@ -1,3 +1,10 @@
 <div class="method_details <%= @index == 0 ? 'first' : '' %>">
+  <h2 class='api_method_name' name='<%= @method_link %>' data-subtopic='<%= @subtopic %>'>
+    <a name='<%= @method_link %>' href='#<%= @method_link %>'>
+      <%= object.tag("API").try(:text) %>
+    </a>
+    <% route = @routes.first %>
+    <span class='defined-in'><a href="https://github.com/instructure/canvas-lms/blob/master/app/controllers/<%= route.requirements[:controller] %>_controller.rb"><%= "#{route.requirements[:controller].camelize}Controller\##{route.requirements[:action]}" %></a></span>
+  </h2>
   <%= yieldall %>
 </div>

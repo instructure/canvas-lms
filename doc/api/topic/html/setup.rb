@@ -17,8 +17,13 @@
 #
 
 def init
-  sections :header, [:topic_doc, :method_details_list, [T('method_details')]]
-  @resource = object
+  if options[:all_resources]
+    options[:controllers] = options[:resources].map { |r,c| c }.flatten
+    sections :header, :method_details_list, [T('method_details')]
+  else
+    sections :header, [:topic_doc, :method_details_list, [T('method_details')]]
+    @resource = object
+  end
 end
 
 def method_details_list
@@ -29,5 +34,6 @@ end
 
 def topic_doc
   @docstring = options[:controllers].map { |c| c.docstring }.join("\n\n")
+  def @object.source_type; nil; end
   htmlify(@docstring.strip, :markdown)
 end

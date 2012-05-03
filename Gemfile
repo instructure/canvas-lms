@@ -79,7 +79,7 @@ group :test do
   gem 'rspec-rails',  '1.3.4'
   gem 'selenium-webdriver', '2.19.0'
   gem 'webrat',       '0.7.3'
-  gem 'yard',         '0.7.2'
+  gem 'yard',         '0.8.0'
 end
 
 group :development do

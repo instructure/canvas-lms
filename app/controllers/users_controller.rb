@@ -153,7 +153,7 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API
+  # @API List users
   # Retrieve the list of users associated with this account.
   #
   # @example_response
@@ -235,13 +235,14 @@ class UsersController < ApplicationController
 
   include Api::V1::StreamItem
 
-  # @API
+  # @API List the activity stream
   # Returns the current user's global activity stream.
   #
   # The response is currently hard-coded to the last 2 weeks or 21 total items.
   #
   # There are many types of objects that can be returned in the activity
   # stream. All object types have the same basic set of shared attributes:
+  #   !!!javascript
   #   {
   #     'created_at': '2011-07-13T09:12:00Z',
   #     'updated_at': '2011-07-25T08:52:41Z',
@@ -258,34 +259,39 @@ class UsersController < ApplicationController
   #
   # DiscussionTopic:
   #
+  #   !!!javascript
   #   {
   #     'type': 'DiscussionTopic',
   #     'discussion_topic_id': 1234,
   #     'total_root_discussion_entries': 5,
-  #     'require_initial_post' => true,
-  #     'user_has_posted' => true,
+  #     'require_initial_post': true,
+  #     'user_has_posted': true,
   #     'root_discussion_entries': {
   #       ...
   #     }
   #   }
+  #
   # For DiscussionTopic, the message is truncated at 4kb.
   #
   # Announcement:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Announcement',
   #     'announcement_id': 1234,
   #     'total_root_discussion_entries': 5,
-  #     'require_initial_post' => true,
-  #     'user_has_posted' => null,
+  #     'require_initial_post': true,
+  #     'user_has_posted': null,
   #     'root_discussion_entries': {
   #       ...
   #     }
   #   }
+  #
   # For Announcement, the message is truncated at 4kb.
   #
   # Conversation:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Conversation',
   #     'conversation_id': 1234,
@@ -295,6 +301,7 @@ class UsersController < ApplicationController
   #
   # Message:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Message',
   #     'message_id': 1234,
@@ -303,6 +310,7 @@ class UsersController < ApplicationController
   #
   # Submission:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Submission',
   #     'grade': '12',
@@ -316,6 +324,7 @@ class UsersController < ApplicationController
   #
   # Conference:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Conference',
   #     'web_conference_id': 1234
@@ -323,6 +332,7 @@ class UsersController < ApplicationController
   #
   # Collaboration:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Collaboration',
   #     'collaboration_id': 1234
@@ -356,7 +366,7 @@ class UsersController < ApplicationController
   end
 
   include Api::V1::TodoItem
-  # @API
+  # @API List the TODO items
   # Returns the current user's list of todo items, as seen on the user dashboard.
   #
   # There is a limit to the number of items returned.
@@ -414,7 +424,7 @@ class UsersController < ApplicationController
     render :json => { :hidden => true }
   end
 
-  # @API
+  # @API Upload a file
   #
   # Upload a file to the user's personal files section.
   #
@@ -529,7 +539,8 @@ class UsersController < ApplicationController
 
   include Api::V1::User
   include Api::V1::Avatar
-  # @API
+
+  # @API Create a user
   # Create and return a new user and pseudonym for an account.
   #
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
@@ -627,7 +638,7 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API
+  # @API Edit a user
   # Modify an existing user. To modify a user's login, see the documentation for logins.
   #
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.

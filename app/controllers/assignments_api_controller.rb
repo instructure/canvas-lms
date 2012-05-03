@@ -24,7 +24,7 @@ class AssignmentsApiController < ApplicationController
 
   include Api::V1::Assignment
 
-  # @API
+  # @API List assignments
   # Returns the list of assignments for the current context.
   #
   # @response_field id The unique identifier for the assignment.
@@ -135,7 +135,7 @@ class AssignmentsApiController < ApplicationController
 
   ALLOWED_FIELDS = %w(name position points_possible grading_type due_at)
 
-  # @API
+  # @API Create an assignment
   # Create a new assignment for this course. The assignment is created in the
   # active state.
   #
@@ -173,7 +173,7 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Edit an assignment
   # Modify an existing assignment. See the documentation for assignment
   # creation.
   def update
