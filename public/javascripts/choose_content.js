@@ -96,6 +96,7 @@ define([
           itemSelectionsFetchDfd = itemSelectionsFetchDfd || $.ajaxJSON(url, 'GET', {}, function (data) {
             if (data) {
               $itemSelectionsDiv.find('.content_list').html(data.selection_list);
+              checkEverything(false);
             }
           });
           $itemSelectionsDiv.show().disableWhileLoading(itemSelectionsFetchDfd);
