@@ -1,12 +1,10 @@
-/* just require all the "vanilla" js and return the object they define */
+// add any plugins to slickgrid here, make sure to add a
+// shim for AMD compat in the require config
 define([
-  'jquery',
-  'order!vendor/slickgrid/lib/jquery.event.drag-2.0.min',
-  'order!vendor/slickgrid/slick.core',
-  'order!vendor/slickgrid/slick.grid',
-  'order!vendor/slickgrid/slick.editors',
-  'order!vendor/slickgrid/plugins/slick.rowselectionmodel'
-], function($) {
-  return window.Slick;
+  'use!vendor/slickgrid/slick.grid',
+  'use!vendor/slickgrid/slick.editors',
+  'use!vendor/slickgrid/plugins/slick.rowselectionmodel'
+], function(Slick) {
+  return Slick;
 });
 
