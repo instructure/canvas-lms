@@ -679,7 +679,16 @@ describe "Canvas Cartridge importing" do
     page_2.body.should match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
   end
   
-  it "should import assignments" do 
+  it "should import assignments" do
+     PluginSetting.stubs(:settings_for_plugin).returns({"lock_at" => "yes",
+                  "assignment_group" => "yes",
+                  "title" => "yes",
+                  "assignment_group_id" => "yes",
+                  "submission_types" => "yes",
+                  "points_possible" => "yes",
+                  "description" => "yes",
+                  "grading_type" => "yes"})
+
     body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
 <div>
   <div><img src="http://www.instructure.com/images/header-logo.png"></div>

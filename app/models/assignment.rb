@@ -33,7 +33,7 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :set_custom_field_values, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy
-  attr_accessor :original_id, :updating_user
+  attr_accessor :original_id, :updating_user, :copying
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
@@ -1521,6 +1521,7 @@ class Assignment < ActiveRecord::Base
     description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
     item.description = description
     item.copied = true
+    item.copying = true
     if !hash[:submission_types].blank?
       item.submission_types = hash[:submission_types]
     elsif ['discussion_topic'].include?(hash[:submission_format])
@@ -1718,6 +1719,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def frozen_atts_not_altered
+    return if self.copying
     FREEZABLE_ATTRIBUTES.each do |att|
       if self.changes[att] && att_frozen?(att, @updating_user)
         self.errors.add(att, t('errors.cannot_save_att', "You don't have permission to edit the locked attribute %{att_name}", :att_name => att))
