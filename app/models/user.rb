@@ -116,6 +116,8 @@ class User < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :messages
 
+  has_many :collections, :as => :context
+
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
 

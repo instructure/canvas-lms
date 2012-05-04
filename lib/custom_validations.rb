@@ -21,21 +21,27 @@ module CustomValidations
   module ClassMethods
 
     def validates_as_url(*fields)
-      fields.each do |field|
-        validates_each(field.to_sym, :allow_nil => true) do |record, attr, value|
-          begin
-            value = value.strip
-            raise ArgumentError if value.empty?
+      validates_each(fields, :allow_nil => true) do |record, attr, value|
+        begin
+          value = value.strip
+          raise ArgumentError if value.empty?
+          uri = URI.parse(value)
+          unless uri.scheme
+            value = "http://#{value}"
             uri = URI.parse(value)
-            unless uri.scheme
-              value = "http://#{value}"
-              uri = URI.parse(value)
-            end
-            raise ArgumentError unless uri.host && %w(http https).include?(uri.scheme.downcase)
-            record.url = value
-          rescue URI::InvalidURIError, ArgumentError
-            record.errors.add attr, 'is not a valid URL'
           end
+          raise ArgumentError unless uri.host && %w(http https).include?(uri.scheme.downcase)
+          record.send("#{attr}=", value)
+        rescue URI::InvalidURIError, ArgumentError
+          record.errors.add attr, 'is not a valid URL'
+        end
+      end
+    end
+
+    def validates_as_readonly(*fields)
+      validates_each(fields) do |record, attr, value|
+        if !record.new_record? && record.send("#{attr}_changed?")
+          record.errors.add attr, "cannot be changed"
         end
       end
     end

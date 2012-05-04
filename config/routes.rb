@@ -829,6 +829,16 @@ ActionController::Routing::Routes.draw do |map|
       groups.post 'groups/:group_id/files', :action => :create_file
     end
 
+    api.with_options(:controller => :collections) do |collections|
+      collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_"
+
+      collections.with_options(:controller => :collection_items) do |items|
+        items.resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items
+        items.put "collections/:collection_id/items/:item_id/upvote", :action => :upvote
+        items.delete "collections/:collection_id/items/:item_id/upvote", :action => :remove_upvote
+      end
+    end
+
     api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
     api.get 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
   end
