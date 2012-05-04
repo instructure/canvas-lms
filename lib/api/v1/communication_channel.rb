@@ -21,7 +21,7 @@ module Api::V1::CommunicationChannel
 
   # Internal: The attributes returned by communication_channel_json.
   JSON_OPTS = {
-    :only => %w{ id path path_type position user_id } }
+    :only => %w{ id path path_type position workflow_state user_id } }
 
   # Public: Given a communication channel, return it in an API-friendly format.
   #
@@ -35,6 +35,7 @@ module Api::V1::CommunicationChannel
   #   :type (path_type)
   #   :position
   #   :user_id
+  #   :workflow_state
   def communication_channel_json(channel, current_user, session)
     api_json(channel, current_user, session, JSON_OPTS).tap do |json|
       # Rename attributes for mass-consumption
