@@ -68,7 +68,7 @@ describe "profile" do
       driver.find_element(:css, '#communication_channels a[href="#register_email_address"]').click
       form = driver.find_element(:id, "register_email_address")
       test_email = 'nobody+1234@example.com'
-      form.find_element(:id, 'pseudonym_unique_id').send_keys(test_email)
+      form.find_element(:id, 'communication_channel_address').send_keys(test_email)
       form.find_element(:id, 'register_email_address').submit
 
       confirmation_dialog = driver.find_element(:id, "confirm_email_channel")

@@ -41,6 +41,7 @@ describe 'CommunicationChannels API', :type => :integration do
           'address'  => cc.path,
           'type'     => cc.path_type,
           'position' => cc.position,
+          'workflow_state' => 'unconfirmed',
           'user_id'  => cc.user_id }]
       end
     end
@@ -58,6 +59,96 @@ describe 'CommunicationChannels API', :type => :integration do
         @user = @teacher
 
         raw_api_call(:get, @path, @path_options)
+        response.code.should eql '401'
+      end
+    end
+  end
+
+  describe 'create' do
+    before do
+      @someone    = user_with_pseudonym
+      @admin      = user_with_pseudonym
+      @site_admin = user_with_pseudonym
+
+      Account.site_admin.add_user(@site_admin)
+      Account.default.add_user(@admin)
+
+      @path = "/api/v1/users/#{@someone.id}/communication_channels"
+      @path_options = { :controller => 'communication_channels',
+        :action => 'create', :format => 'json',
+        :user_id => @someone.id.to_param, }
+      @post_params = { :communication_channel => {
+        :address => 'new+api@example.com', :type => 'email' }}
+    end
+
+    it 'should be able to create new channels' do
+      json = api_call(:post, @path, @path_options, @post_params.merge({
+        :skip_confirmation => 1 }))
+
+      @channel = CommunicationChannel.find(json['id'])
+
+      json.should == {
+        'id' => @channel.id,
+        'address' => 'new+api@example.com',
+        'type' => 'email',
+        'workflow_state' => 'active',
+        'user_id' => @someone.id,
+        'position' => 2
+      }
+    end
+
+    context 'a site admin' do
+      before { @user = @site_admin }
+
+      it 'should be able to auto-validate new channels' do
+        json = api_call(:post, @path, @path_options, @post_params.merge({
+          :skip_confirmation => 1 }))
+
+        @channel = CommunicationChannel.find(json['id'])
+        @channel.should be_active
+      end
+    end
+
+    context 'an account admin' do
+      before { @user = @admin }
+
+      it 'should be able to create new channels for other users' do
+        json = api_call(:post, @path, @path_options, @post_params)
+
+        @channel = CommunicationChannel.find(json['id'])
+
+        json.should == {
+          'id' => @channel.id,
+          'address' => 'new+api@example.com',
+          'type' => 'email',
+          'workflow_state' => 'unconfirmed',
+          'user_id' => @someone.id,
+          'position' => 2
+        }
+      end
+
+      it 'should not be able to auto-validate channels' do
+        json = api_call(:post, @path, @path_options, @post_params.merge({
+          :skip_confirmation => 1 }))
+
+        @channel = CommunicationChannel.find(json['id'])
+        @channel.should be_unconfirmed
+      end
+    end
+
+    context 'a user' do
+      before { @user = @someone }
+
+      it 'should be able to create its own channels' do
+        expect {
+          api_call(:post, @path, @path_options, @post_params)
+        }.to change(CommunicationChannel, :count).by(1)
+      end
+
+      it 'should not be able to create channels for others' do
+        raw_api_call(:post, "/api/v1/users/#{@admin.id}/communication_channels",
+          @path_options.merge(:user_id => @admin.to_param), @post_params)
+
         response.code.should eql '401'
       end
     end
