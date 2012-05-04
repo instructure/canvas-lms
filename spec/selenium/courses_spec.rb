@@ -62,7 +62,7 @@ describe "courses" do
 
     context "course copy" do
       def course_copy_helper
-        course_with_teacher_logged_in
+        course_with_teacher_logged_in unless @course
         @second_course ||= Course.create!(:name => 'second course')
         @second_course.offer!
         5.times do |i|
@@ -146,12 +146,17 @@ describe "courses" do
                                            :delayed_post_at => old_start + 3.days)
         @second_course.assignments.create!(:due_at => old_start)
 
+        # Set the start/end dates to test that they are auto-filled on the copy content page
+        @second_course.start_at = DateTime.parse("01 Jul 2012")
+        @second_course.conclude_at = DateTime.parse("11 Jul 2012")
+        @second_course.save!
+        course_with_teacher_logged_in
+        @course.start_at = DateTime.parse("05 Aug 2012")
+        @course.conclude_at = DateTime.parse("15 Aug 2012")
+        @course.save!
+
         course_copy_helper do |driver|
           f('#copy_shift_dates').click
-          f('#copy_old_start_date').send_keys('Jul 1, 2012')
-          f('#copy_old_end_date').send_keys('Jul 11, 2012')
-          replace_content(f('#copy_new_start_date'), 'Aug 5, 2012')
-          f('#copy_new_end_date').send_keys('Aug 15, 2012')
           f('.add_substitution_link').click
           wait_for_animations
           select = driver.find_element(:name, "copy[day_substitutions][0]")
