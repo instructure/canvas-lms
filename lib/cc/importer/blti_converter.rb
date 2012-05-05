@@ -79,11 +79,15 @@ module CC::Importer
           tool[:domain] = ext[:custom_fields].delete 'domain'
           tool[:consumer_key] = ext[:custom_fields].delete 'consumer_key'
           tool[:shared_secret] = ext[:custom_fields].delete 'shared_secret'
-
+          tool[:tool_id] = ext[:custom_fields].delete 'tool_id'
           tool[:settings] = ext[:custom_fields]
         else
           tool[:extensions] << ext
         end
+      end
+      if icon = get_node_val(doc, "#{blti}|icon")
+        tool[:settings] ||= {}
+        tool[:settings][:icon_url] = icon
       end
       tool
     end

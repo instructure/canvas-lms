@@ -21,6 +21,7 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :account
   has_many :page_views
   has_many :access_tokens
+  has_many :context_external_tools, :primary_key => 'tool_id', :foreign_key => 'tool_id'
 
   attr_accessible :api_key, :name, :user, :account
   

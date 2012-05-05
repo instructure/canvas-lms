@@ -7,7 +7,7 @@ class ContextExternalTool < ActiveRecord::Base
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button,
-                  :config_type, :config_url, :config_xml
+                  :config_type, :config_url, :config_xml, :tool_id
   validates_presence_of :name
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
@@ -197,6 +197,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings.delete(:account_navigation) if settings[:account_navigation] && (!settings[:account_navigation][:url])
     settings.delete(:resource_selection) if settings[:resource_selection] && (!settings[:resource_selection][:url] || !settings[:resource_selection][:selection_width] || !settings[:resource_selection][:selection_height])
     settings.delete(:editor_button) if settings[:editor_button] && (!settings[:editor_button][:url] || !settings[:editor_button][:icon_url])
+    settings[:icon_url] ||= settings[:editor_button][:icon_url] if settings[:editor_button] && settings[:editor_button][:icon_url]
     [:resource_selection, :editor_button].each do |type|
       if settings[type]
         settings[type][:selection_width] = settings[type][:selection_width].to_i
@@ -413,6 +414,7 @@ class ContextExternalTool < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.name = hash[:title]
     item.description = hash[:description]
+    item.tool_id = hash[:tool_id]
     item.url = hash[:url] unless hash[:url].blank?
     item.domain = hash[:domain] unless hash[:domain].blank?
     item.privacy_level = hash[:privacy_level] || 'name_only'

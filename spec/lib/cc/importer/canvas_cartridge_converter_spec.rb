@@ -146,12 +146,14 @@ describe "Canvas Cartridge importing" do
     tool1.privacy_level = 'name_only'
     tool1.consumer_key = 'haha'
     tool1.shared_secret = "don't share me"
+    tool1.tool_id = "test_tool"
     tool1.settings[:custom_fields] = {"key1" => "value1", "key2" => "value2"}
     tool1.settings[:user_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
     tool1.settings[:course_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra'}
     tool1.settings[:account_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
     tool1.settings[:resource_selection] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:editor_button] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra'}
+    tool1.settings[:icon_url] = "http://www.example.com/favicon.ico"
     tool1.save!
     tool2 = @copy_from.context_external_tools.new
     tool2.domain = 'example.com'
@@ -190,6 +192,8 @@ describe "Canvas Cartridge importing" do
     t1.domain.should == nil
     t1.consumer_key.should == 'fake'
     t1.shared_secret.should == 'fake'
+    t1.tool_id.should == 'test_tool'
+    t1.settings[:icon_url].should == 'http://www.example.com/favicon.ico'
     [:user_navigation, :course_navigation, :account_navigation].each do |type|
       t1.settings[type][:url].should == "http://www.example.com"
       t1.settings[type][:text].should == "hello"
@@ -228,6 +232,8 @@ describe "Canvas Cartridge importing" do
     t2.workflow_state.should == tool2.workflow_state
     t2.consumer_key.should == 'fake'
     t2.shared_secret.should == 'fake'
+    t2.tool_id.should be_nil
+    t2.settings[:icon_url].should be_nil
     t2.settings[:user_navigation].should be_nil
     t2.settings[:course_navigation].should be_nil
     t2.settings[:account_navigation].should be_nil

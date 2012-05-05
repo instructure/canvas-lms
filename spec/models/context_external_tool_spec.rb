@@ -335,6 +335,21 @@ describe ContextExternalTool do
       tool.has_editor_button.should be_true
     end
 
+    it "should allow setting tool_id and icon_url" do
+      tool = new_external_tool
+      tool.tool_id = "new_tool"
+      tool.settings[:icon_url] = "http://www.example.com/favicon.ico"
+      tool.save
+      tool.tool_id.should == "new_tool"
+      tool.settings[:icon_url].should == "http://www.example.com/favicon.ico"
+    end
+    
+    it "should use editor button's icon_url if none is set on the tool" do
+      tool = new_external_tool
+      tool.settings = {:editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com/favicon.ico", :selection_width => 100, :selection_height => 100}}
+      tool.save
+      tool.settings[:icon_url].should == "http://www.example.com/favicon.ico"
+    end
   end
 
   describe "standardize_url" do
