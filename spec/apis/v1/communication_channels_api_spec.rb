@@ -153,4 +153,59 @@ describe 'CommunicationChannels API', :type => :integration do
       end
     end
   end
+
+  describe 'destroy' do
+    before do
+      @someone = user_with_pseudonym
+      @admin   = user_with_pseudonym
+      @channel = @someone.communication_channel
+
+      Account.default.add_user(@admin)
+
+      @path = "/api/v1/users/#{@someone.id}/communication_channels/#{@channel.id}"
+      @path_options = { :controller => 'communication_channels',
+        :action => 'destroy', :user_id => @someone.to_param, :format => 'json',
+        :id => @channel.to_param }
+    end
+
+    context 'an admin' do
+      it "should be able to delete others' channels" do
+        json = api_call(:delete, @path, @path_options)
+
+        json.should == {
+          'position' => 1,
+          'address' => 'nobody@example.com',
+          'id' => @channel.id,
+          'workflow_state' => 'retired',
+          'user_id' => @someone.id,
+          'type' => 'email'
+        }
+      end
+    end
+
+    context 'a user' do
+      before { @user = @someone }
+
+      it 'should be able to delete its own channels' do
+        json = api_call(:delete, @path, @path_options)
+
+        json.should == {
+          'position' => 1,
+          'address' => 'nobody@example.com',
+          'id' => @channel.id,
+          'workflow_state' => 'retired',
+          'user_id' => @someone.id,
+          'type' => 'email'
+        }
+      end
+
+      it "should not be able to delete others' channels" do
+        @channel = @admin.communication_channel
+        raw_api_call(:delete, "/api/v1/users/#{@admin.id}/communication_channels/#{@channel.id}",
+          @path_options.merge(:user_id => @admin.to_param, :id => @channel.to_param))
+
+        response.code.should eql '401'
+      end
+    end
+  end
 end
