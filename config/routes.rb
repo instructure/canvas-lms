@@ -797,6 +797,7 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :communication_channels) do |channels|
       channels.get 'users/:user_id/communication_channels', :action => :index, :path_name => 'communication_channels'
       channels.post 'users/:user_id/communication_channels', :action => :create
+      channels.delete 'users/:user_id/communication_channels/:id', :action => :destroy
     end
 
     api.with_options(:controller => :services_api) do |services|

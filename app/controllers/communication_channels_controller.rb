@@ -79,9 +79,8 @@ class CommunicationChannelsController < ApplicationController
   #   }
   def create
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
-    unless @user.grants_right?(@current_user, session, :manage_user_details) || @current_user == @user
-      return render_unauthorized_action
-    end
+
+    return render_unauthorized_action unless has_api_permissions?
 
     params.delete(:build_pseudonym) if api_request?
 
@@ -310,14 +309,44 @@ class CommunicationChannelsController < ApplicationController
     render :json => {:re_sent => true}
   end
 
+  # @API Delete a communication channel.
+  # Delete an existing communication channel.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/5/communication_channels/3
+  #     -H 'Authorization: Bearer <ACCESS_TOKEN>
+  #     -X DELETE
+  #
+  # @example_response
+  #   {
+  #     "id": 3,
+  #     "address": "new@example.com",
+  #     "type": "email",
+  #     "workflow_state": "deleted",
+  #     "user_id": 5,
+  #     "position": 2
+  #   }
   def destroy
-    @cc = @current_user.communication_channels.find_by_id(params[:id]) if params[:id]
-    if !@cc || @cc.destroy
-      @current_user.touch
-      render :json => @cc.to_json
+    @user = api_request? ? api_find(User, params[:user_id]) : @current_user
+    @cc   = @user.communication_channels.find(params[:id]) if params[:id]
+
+    return render_unauthorized_action unless has_api_permissions?
+
+    if @cc.nil? || @cc.destroy
+      @user.touch
+      if api_request?
+        render :json => communication_channel_json(@cc, @current_user, session)
+      else
+        render :json => @cc.as_json
+      end
     else
       render :json => @cc.errors.to_json, :status => :bad_request
     end
   end
-  
+
+  protected
+  def has_api_permissions?
+    @user == @current_user ||
+      @user.grants_right?(@current_user, session, :manage_user_details)
+  end
 end
