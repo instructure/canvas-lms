@@ -437,6 +437,23 @@ describe ContentMigration do
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
     end
 
+    it "should still associate rubrics and assignments" do
+      rubric = @copy_from.rubrics.new
+      rubric.title = "Rubric"
+      rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
+      rubric.save!
+
+      assignment = @copy_from.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
+      rubric.associate_with(assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+
+      run_course_copy
+
+      rub = @copy_to.rubrics.find_by_migration_id(mig_id(rubric))
+      rub.should_not be_nil
+      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(assignment))
+      asmnt2.rubric.id.should == rub.id
+    end
+
     it "should assign the correct parent folder when the parent folder has already been created" do
       folder = Folder.root_folders(@copy_from).first
       folder = folder.sub_folders.create!(:context => @copy_from, :name => 'folder_1')
