@@ -1,4 +1,4 @@
-class DelayedJobsDeleteTriggerLockForUpdate < ActiveRecord::Migration
+class DelayedJobsDeleteTriggerRevertLock < ActiveRecord::Migration
   tag :predeploy
 
   def self.connection
@@ -10,7 +10,7 @@ class DelayedJobsDeleteTriggerLockForUpdate < ActiveRecord::Migration
       execute(<<-CODE)
       CREATE OR REPLACE FUNCTION delayed_jobs_after_delete_row_tr_fn () RETURNS trigger AS $$
       BEGIN
-        UPDATE delayed_jobs SET next_in_strand = 't' WHERE id = (SELECT id FROM delayed_jobs j2 WHERE j2.strand = OLD.strand ORDER BY j2.strand, j2.id ASC LIMIT 1 FOR UPDATE);
+        UPDATE delayed_jobs SET next_in_strand = 't' WHERE id = (SELECT id FROM delayed_jobs j2 WHERE j2.strand = OLD.strand ORDER BY j2.strand, j2.id ASC LIMIT 1);
         RETURN OLD;
       END;
       $$ LANGUAGE plpgsql;

@@ -405,13 +405,17 @@ class Attachment < ActiveRecord::Base
 
   def root_account_id
     # see note in infer_namespace below
-    splits = read_attribute(:namespace).try(:split, /_/)
+    splits = namespace.try(:split, /_/)
     return nil if splits.blank?
     if splits[1] == "localstorage"
       splits[3].to_i
     else
       splits[1].to_i
     end
+  end
+
+  def namespace
+    read_attribute(:namespace) || write_attribute(:namespace, infer_namespace)
   end
 
   def infer_namespace
