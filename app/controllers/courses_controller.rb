@@ -513,9 +513,10 @@ class CoursesController < ApplicationController
           @pending_enrollment = nil
           return false
         end
-      elsif !@current_user && @pending_enrollment.user.registered?
+      elsif !@current_user && @pending_enrollment.user.registered? || !@pending_enrollment.user.email_channel
         session[:return_to] = course_url(@context.id)
         flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
+        return redirect_to login_url(:re_login => 1) if @current_user
         redirect_to login_url
       else
         # defer to CommunicationChannelsController#confirm for the logic of merging users
