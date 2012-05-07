@@ -165,6 +165,48 @@ describe "courses" do
         new_asmnt.due_at.to_i.should == (new_start + 1.day).to_i
       end
 
+      it "should not copy course settings if not checked (through course 'importing')" do
+
+        @second_course = Course.create!(:name => 'second course')
+        @second_course.syllabus_body = "<p>haha</p>"
+        @second_course.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+        @second_course.default_view = 'modules'
+
+        course_copy_helper do |driver|
+          driver.find_element(:id, 'copy_everything').click
+          wait_for_ajaximations
+        end
+
+        @course.syllabus_body.should == nil
+        @course.tab_configuration.should == []
+        @course.default_view.should == 'feed'
+      end
+
+      it "should copy the course (through course 'copying')" do
+        course_with_teacher_logged_in
+        @course.syllabus_body = "<p>haha</p>"
+        @course.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+        @course.default_view = 'modules'
+        @course.wiki.wiki_pages.create!(:title => "hi", :body => "Whatever")
+        @course.save!
+
+        get "/courses/#{@course.id}/copy"
+        expect_new_page_load { driver.find_element(:css, "div#content form").submit }
+        driver.find_element(:id, 'copy_everything').click
+        wait_for_ajaximations
+        driver.find_element(:id, 'copy_context_form').submit
+        wait_for_ajaximations
+
+        keep_trying_until { ContentMigration.last.copy_course_without_send_later }
+
+        keep_trying_until { driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
+
+        @new_course = Course.last(:order => :id)
+        @new_course.syllabus_body.should == nil
+        @new_course.tab_configuration.should == []
+        @new_course.default_view.should == 'feed'
+      end
+
       it "should copy the course" do
         enable_cache do
           course_with_teacher_logged_in
