@@ -1,3 +1,18 @@
+canvas-lms (2012.05.12.07) testing; urgency=low
+
+  * Package ref: cbcbacd897c0eed7167e9d65d68336212b97c2e8
+  *
+  * [+cdbcd73] infer attachment namespace on-demand
+  * [+7be61c0] fix horizontal scrollbar in firefox 12, fixes #8352
+  * [+8ce8758] correctly copy dates across daylight savings shifts
+  * [+0fdae87] don't copy course setting if not selected
+  * [+50f4b36] only load the necessary columns for calculating distributions
+  * [+7e98ed4] update ruby saml gem
+  * [+a33f346] handle redis failure on forking reconnect
+  * [+cbcbacd] migration to revert DelayedJobsDeleteTriggerLockForUpdate
+
+ -- Brian Palmer <brianp@instructure.com>  Sun, 06 May 2012 19:34:45 -0600
+
 canvas-lms (2012.05.12.02) testing; urgency=low
 
   * Package ref: f82226a914e539ef2facfcccb9bc6962496f4222
