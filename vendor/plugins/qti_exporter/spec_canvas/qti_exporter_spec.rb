@@ -120,7 +120,7 @@ describe Qti::Converter do
     quiz = @course.quizzes.last
     quiz.should be_present
     quiz.quiz_questions.size.should == 9
-    match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id])
+    match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id prepped_for_import])
   end
 
   def match_ignoring(a, b, ignoring = [])
