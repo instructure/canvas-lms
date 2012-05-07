@@ -59,7 +59,8 @@ class ContentExport < ActiveRecord::Base
     self.workflow_state = 'exporting'
     self.save
     begin
-      if CC::CCExporter.export(self, opts.merge({:for_course_copy => for_course_copy?}))
+      @cc_exporter = CC::CCExporter.new(self, opts.merge({:for_course_copy => for_course_copy?}))
+      if @cc_exporter.export
         self.progress = 100
         if for_course_copy?
           self.workflow_state = 'exported_for_course_copy'
@@ -77,6 +78,10 @@ class ContentExport < ActiveRecord::Base
     end
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
+  def referenced_files
+    @cc_exporter ? @cc_exporter.referenced_files : {}
+  end
 
   def for_course_copy?
     self.export_type == COURSE_COPY
