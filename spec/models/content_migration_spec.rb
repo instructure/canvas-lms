@@ -298,6 +298,7 @@ describe ContentMigration do
 
       @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).workflow_state.should == 'active'
       @copy_to.context_modules.find_by_migration_id(mig_id(cm)).workflow_state.should == 'active'
+      @copy_to.attachments.count.should == 1
       @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).workflow_state.should == 'active'

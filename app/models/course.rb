@@ -1840,7 +1840,7 @@ class Course < ActiveRecord::Base
     attachments.each_with_index do |file, i|
       cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
       if !ce || ce.export_object?(file)
-        new_file = file.clone_for(self)
+        new_file = file.clone_for(self, nil, :overwrite => true)
         self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
         new_folder_id = merge_mapped_id(file.folder)
 
