@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe NotificationPolicy do
   it "should create a new instance given valid attributes" do
-    NotificationPolicy.create!(notification_policy_valid_attributes)
+    notification_policy_model
   end
   
   it "should default broadcast to true" do
@@ -101,13 +101,13 @@ describe NotificationPolicy do
   context "named scopes" do
     it "should have a named scope for users" do
       user_with_pseudonym(:active_all => 1)
-      notification_policy_model(:communication_channel_id => @cc.id)
+      notification_policy_model(:communication_channel => @cc)
       NotificationPolicy.for(@user).should eql([@notification_policy])
     end
 
     it "should have a named scope for notifications" do
       notification_model
-      notification_policy_model(:notification_id => @notification.id)
+      notification_policy_model(:notification => @notification)
       NotificationPolicy.for(@notification).should eql([@notification_policy])
     end
     
@@ -161,8 +161,8 @@ describe NotificationPolicy do
       NotificationPolicy.delete_all
       
       trifecta_opts = {
-        :communication_channel_id => @communication_channel.id,
-        :notification_id => @notification.id
+        :communication_channel => @communication_channel,
+        :notification => @notification
       }
       
       n1 = notification_policy_model
@@ -218,6 +218,7 @@ describe NotificationPolicy, "communication_preference" do
   end
 
   it "should use the users default communication channel if one isn't given" do
+    @notification_policy.stubs(:communication_channel).returns(nil)
     @notification_policy.communication_preference.should eql(@cc1)
   end
   

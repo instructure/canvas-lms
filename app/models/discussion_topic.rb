@@ -729,11 +729,6 @@ class DiscussionTopic < ActiveRecord::Base
     context.migration_results << "" if hash[:peer_rating_type] && hash[:peer_rating_types] != "none" if context.respond_to?(:migration_results)
     context.migration_results << "" if hash[:peer_rating_type] && hash[:peer_rating_types] != "none" if context.respond_to?(:migration_results)
     hash[:messages] ||= hash[:posts]
-    if !hash[:skip_replies] and item.discussion_entries.count == 0
-      (hash[:messages] || hash[:posts] || []).each do |message|
-        DiscussionEntry.import_from_migration(message, context, nil, item, item)
-      end
-    end
     context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items
     item
   end

@@ -68,11 +68,7 @@ describe Course do
     topic = course.discussion_topics.find_by_migration_id("1865116155002")
     topic.should_not be_nil
     topic.assignment.should_not be_nil
-    topic.discussion_entries.length.should eql(1)
-    entry = topic.discussion_entries.find_by_migration_id("1865129749002")
-    entry.should_not be_nil
-    entry.message.should eql("Hello, my name is The Hamburgler.<br/><br/>-The, Yes \"The\" Hamburgler.")
-    
+
     # quizzes
     course.quizzes.length.should eql(1)
     quiz = course.quizzes.first

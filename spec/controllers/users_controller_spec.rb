@@ -52,7 +52,7 @@ describe UsersController do
   it "should not include deleted courses in manageable courses" do
     course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
     course1 = @course
-    course1.destroy!
+    course1.destroy
     course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
     course2 = @course
 

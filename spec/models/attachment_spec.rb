@@ -741,6 +741,8 @@ describe Attachment do
       @attachment.should be_scribdable
       Attachment.clear_cached_mime_ids
       @shard1.activate do
+        # need to create a context on this shard
+        @context = course_model(:account => Account.create!)
         attachment_model(:content_type => 'pdf')
         @attachment.should be_scribdable
       end

@@ -801,7 +801,7 @@ shared_examples_for "all selenium tests" do
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     end
-    ALL_MODELS.each { |m| truncate_table(m) }
+    truncate_all_tables
   end
 
   append_before (:each) do

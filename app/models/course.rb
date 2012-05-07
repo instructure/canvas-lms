@@ -158,7 +158,7 @@ class Course < ActiveRecord::Base
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
   has_many :role_overrides, :as => :context
-  has_many :content_migrations
+  has_many :content_migrations, :foreign_key => :context_id
   has_many :content_exports
   has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria

@@ -259,17 +259,18 @@ describe User do
   it "should support incrementally adding to account associations" do
     user = User.create!
     user.user_account_associations.should == []
+    account1, account2, account3 = Account.create!, Account.create!, Account.create!
 
     sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {1 => 0})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.should == [{1 => 0}]
+    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account1.id => 0})
+    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.should == [{account1.id => 0}]
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {2 => 1})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{1 => 0}, {2 => 1}].sort(&sort_account_associations)
+    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account2.id => 1})
+    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 1}].sort(&sort_account_associations)
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {3 => 1, 1 => 2, 2 => 0})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{1 => 0}, {2 => 0}, {3 => 1}].sort(&sort_account_associations)
+    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account3.id => 1, account1.id => 2, account2.id => 0})
+    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 0}, {account3.id => 1}].sort(&sort_account_associations)
   end
 
   it "should not have account associations for creation_pending or deleted" do

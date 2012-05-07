@@ -17,13 +17,9 @@
 #
 
 def notification_policy_model(opts={})
+  opts = opts.dup
+  opts[:notification] ||= Notification.create!
+  opts[:communication_channel] ||= CommunicationChannel.create!(:path => 'notification_policy@example.com')
   @notification_policy = factory_with_protected_attributes(NotificationPolicy,
-    notification_policy_valid_attributes.merge(opts))
-end
-
-def notification_policy_valid_attributes
-  {
-    :notification_id => 1,
-    :communication_channel_id => 1
-  }
+    opts)
 end
