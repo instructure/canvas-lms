@@ -543,6 +543,8 @@ class AssessmentQuestion < ActiveRecord::Base
         answer[field] = ImportedHtmlConverter.convert(answer[field], context, true) if answer[field].present?
       end
     end if hash[:answers]
+    hash[:prepped_for_import] = true
+    hash
   end
   
   named_scope :active, lambda {
