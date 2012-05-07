@@ -16,15 +16,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-describe "context/dashboard_topic" do
-  it "should not show the author for nil user_id" do
-    render :partial => "context/dashboard_topic", :locals =>
-        { :dashboard_topic => OpenObject.new({:root_discussion_entries => nil,
-                                              :created_at => Time.now.utc, :user_id => nil})}
-    response.should_not be_nil
-    response.body.should_not match /Author/
+describe StreamItem do
+  it "should not infer a user_id for DiscussionTopic" do
+    user
+    context = Course.create!
+    dt = DiscussionTopic.create!(:context => context)
+    dt.generate_stream_items([@user])
+    si = @user.stream_item_instances.first.stream_item
+    data = si.stream_data(@user.id)
+    data.type.should == 'DiscussionTopic'
+    data.user_id.should be_nil
   end
 end

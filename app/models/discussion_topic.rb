@@ -26,7 +26,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded, :discussion_type
+    :require_initial_post, :threaded, :discussion_type, :context
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'

@@ -30,7 +30,7 @@ class StreamItem < ActiveRecord::Base
   def stream_data(viewing_user_id)
     res = data.is_a?(OpenObject) ? data : OpenObject.new
     res.assert_hash_data
-    res.user_id ||= viewing_user_id
+    res.user_id ||= viewing_user_id unless res.type == 'DiscussionTopic'
     post_process(res, viewing_user_id)
   end
   
