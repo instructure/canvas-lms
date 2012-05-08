@@ -115,11 +115,11 @@ class QuizGroup < ActiveRecord::Base
         if qq[:assessment_question_migration_id]
           if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
             qq['assessment_question_id'] = aq['assessment_question_id']
-            AssessmentQuestion.prep_for_import(qq, context)
-            QuizQuestion.import_from_migration(qq, context, quiz, item)
+            aq_hash = AssessmentQuestion.prep_for_import(qq, context)
+            QuizQuestion.import_from_migration(aq_hash, context, quiz, item)
           else
-            AssessmentQuestion.import_from_migration(qq, context)
-            QuizQuestion.import_from_migration(qq, context, quiz, item)
+            aq_hash = AssessmentQuestion.import_from_migration(qq, context)
+            QuizQuestion.import_from_migration(aq_hash, context, quiz, item)
           end
         end
       elsif aq = question_data[:aq_data][question[:migration_id]]
