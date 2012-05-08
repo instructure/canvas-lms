@@ -25,6 +25,10 @@ class ImportedHtmlConverter
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
     course_path = "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
+    for_course_copy = false
+    if context.respond_to?(:content_migration) && context.content_migration && context.content_migration.for_course_copy?
+      for_course_copy = true
+    end
     doc.search("*").each do |node|
       attrs.each do |attr|
         if node[attr]
@@ -80,6 +84,9 @@ class ImportedHtmlConverter
             # The file is in the context of an AQ, leave the link alone
           elsif val =~ %r{\A/courses/\d+/files/\d+}
             # This points to a specific file already, leave it alone
+          elsif for_course_copy
+            # For course copies don't try to fix relative urls. Any url we can
+            # correctly alter was changed during the 'export' step
           else
             begin
               if relative_url?(node[attr])
