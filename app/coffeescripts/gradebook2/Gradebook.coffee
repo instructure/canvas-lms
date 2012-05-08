@@ -302,11 +302,12 @@ define [
       if student.loaded
         finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
         submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
-        result = INST.GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
+        result = GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
         for group in result.group_sums
           student["assignment_group_#{group.group.id}"] = group[finalOrCurrent]
+          for submissionData in group[finalOrCurrent].submissions
+            submissionData.submission.drop = submissionData.drop
         student["total_grade"] = result[finalOrCurrent]
-
 
     highlightColumn: (columnIndexOrEvent) =>
       if isNaN(columnIndexOrEvent)
