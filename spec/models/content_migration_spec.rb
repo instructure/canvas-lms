@@ -438,20 +438,42 @@ describe ContentMigration do
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
     end
 
-    it "should still associate rubrics and assignments" do
-      rubric = @copy_from.rubrics.new
-      rubric.title = "Rubric"
-      rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
-      rubric.save!
+    def create_rubric_asmnt
+      @rubric = @copy_from.rubrics.new
+      @rubric.title = "Rubric"
+      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
+      @rubric.save!
 
-      assignment = @copy_from.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
-      rubric.associate_with(assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+      @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)
+      assoc = @rubric.associate_with(@assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+      assoc.hide_score_total = true
+      assoc.use_for_grading = true
+      assoc.save!
+    end
 
+    it "should still associate rubrics and assignments and copy rubric association properties" do
+      create_rubric_asmnt
       run_course_copy
 
-      rub = @copy_to.rubrics.find_by_migration_id(mig_id(rubric))
+      rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
       rub.should_not be_nil
-      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(assignment))
+      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      asmnt2.rubric.id.should == rub.id
+      asmnt2.rubric_association.use_for_grading.should == true
+      asmnt2.rubric_association.hide_score_total.should == true
+    end
+
+    it "should copy rubrics associated with assignments when rubric isn't selected" do
+      create_rubric_asmnt
+      @cm.copy_options = {
+              :assignments => {mig_id(@assignment) => "1"},
+      }
+      @cm.save!
+      run_course_copy
+
+      rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
+      rub.should_not be_nil
+      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
       asmnt2.rubric.id.should == rub.id
     end
 

@@ -1569,7 +1569,12 @@ class Assignment < ActiveRecord::Base
     new_record = item.new_record?
     if hash[:rubric_migration_id]
       rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id])
-      rubric.associate_with(item, context, :purpose => 'grading') if rubric
+      if rubric
+        assoc = rubric.associate_with(item, context, :purpose => 'grading')
+        assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
+        assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
+        assoc.save
+      end
     end
     if hash[:grading_standard_migration_id]
       gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])
