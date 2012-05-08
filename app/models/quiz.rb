@@ -766,6 +766,13 @@ class Quiz < ActiveRecord::Base
     dup
   end
 
+  def strip_html_answers(question)
+    return if !question || !question[:answers] || !(%w(multiple_choice_question multiple_answers_question).include? question[:question_type])
+    for answer in question[:answers] do
+      answer[:text] = strip_tags(answer[:html]) if answer[:html] && !answer[:html].empty? && (!answer[:text] || answer[:text].empty?)
+    end
+  end
+
   def submissions_for_statistics(include_all_versions=true)
     for_users = self.context.students.map(&:id)
     self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
@@ -820,7 +827,8 @@ class Quiz < ActiveRecord::Base
           row << ''
           next
         end
-        answer_item = question && question[:answers].detect{|a| a[:id].to_s == answer[:text] }
+        strip_html_answers(question)
+        answer_item = question && question[:answers].detect{|a| a[:id] == answer[:answer_id]}
         answer_item ||= answer
         if question[:question_type] == 'fill_in_multiple_blanks_question'
           blank_ids = question[:answers].map{|a| a[:blank_id] }.uniq
@@ -898,8 +906,8 @@ class Quiz < ActiveRecord::Base
       points = answers.map{|a| a[:points] }.sum
       score_counter << points
       stats[:submission_score_tally] += points
-      stats[:submission_incorrect_tally] += answers.select{|a| a[:correct] == false }.length
-      stats[:submission_correct_tally] += answers.select{|a| a[:correct] == true }.length
+      stats[:submission_incorrect_tally] += answers.count{|a| a[:correct] == false }
+      stats[:submission_correct_tally] += answers.count{|a| a[:correct] == true }
       stats[:submission_duration_tally] += ((sub.finished_at - sub.started_at).to_i rescue 30)
       sub.quiz_data.each do |question|
         question_ids << question[:id]
@@ -942,6 +950,7 @@ class Quiz < ActiveRecord::Base
       answer[:user_ids] = []
       answer
     }
+    strip_html_answers(res)
     res[:multiple_responses] = true if question[:question_type] == 'calculated_question'
     if question[:question_type] == 'numerical_question'
       res[:answers].each do |answer|
@@ -983,7 +992,7 @@ class Quiz < ActiveRecord::Base
     end
     submissions.each do |submission|
       answers = submission.submission_data || []
-      response = answers.select{|a| a[:question_id] == question[:id] }.first
+      response = answers.detect{|a| a[:question_id] == question[:id] }
       if response
         res[:responses] += 1
         res[:response_values] << response[:text]

@@ -557,6 +557,45 @@ describe Quiz do
         stats.first.length.should == 3
       end
     end
+
+    it 'should strip tags from html multiple-choice/multiple-answers' do
+      student_in_course(:active_all => true)
+      q = @course.quizzes.create!(:title => "new quiz")
+      q.quiz_questions.create!(:question_data => {:name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}}})
+      q.quiz_questions.create!(:question_data => {:name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => {'answer_0' => {'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => 'lolrus', 'answer_weight' => '100'}}})
+      q.generate_quiz_data
+      q.save
+      qs = q.generate_submission(@student)
+      qs.submission_data = {
+          "question_#{q.quiz_data[0][:id]}" => "#{q.quiz_data[0][:answers][0][:id]}",
+          "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
+          "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
+      }
+      qs.grade_submission
+
+      # visual statistics
+      stats = q.statistics
+      stats[:questions].length.should == 2
+      stats[:questions][0].length.should == 2
+      stats[:questions][0][0].should == "question"
+      stats[:questions][0][1][:answers].length.should == 2
+      stats[:questions][0][1][:answers][0][:responses].should == 1
+      stats[:questions][0][1][:answers][0][:text].should == "zero"
+      stats[:questions][0][1][:answers][1][:responses].should == 0
+      stats[:questions][0][1][:answers][1][:text].should == "one"
+      stats[:questions][1].length.should == 2
+      stats[:questions][1][0].should == "question"
+      stats[:questions][1][1][:answers].length.should == 2
+      stats[:questions][1][1][:answers][0][:responses].should == 1
+      stats[:questions][1][1][:answers][0][:text].should == "lolcats"
+      stats[:questions][1][1][:answers][1][:responses].should == 1
+      stats[:questions][1][1][:answers][1][:text].should == "lolrus"
+
+      # csv statistics
+      stats = FasterCSV.parse(q.statistics_csv)
+      stats[3][2].should == "zero"
+      stats[5][2].should == "lolcats,lolrus"
+    end
   end
 
   context "clone_for" do
