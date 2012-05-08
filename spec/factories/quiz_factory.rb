@@ -45,7 +45,8 @@ def quiz_with_submission(complete_quiz = true)
   @quiz
   @qsub = @quiz.find_or_create_submission(@student)
   @qsub.quiz_data = test_data
-  @qsub.submission_data = [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}]
+  @qsub.submission_data = complete_quiz ? [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}] : test_data.first
+  # {"context_id"=>"3", "text_after_answers"=>"", "context_type"=>"Course", "attempt"=>1, "user_id"=>"3", "controller"=>"quiz_submissions", "cnt"=>1, "course_id"=>"3", "quiz_id"=>"6", "question_text"=>"<p>true?</p>"}
   @qsub.workflow_state = 'complete' if complete_quiz
   @qsub.with_versioning(true) do
     @qsub.save!

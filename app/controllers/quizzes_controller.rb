@@ -37,7 +37,13 @@ class QuizzesController < ApplicationController
       @surveys = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
       @submissions_hash = {}
       @submissions_hash
-      @current_user.quiz_submissions.each{|s| @submissions_hash[s.quiz_id] = s } if @current_user
+      @current_user && @current_user.quiz_submissions.each do |s|
+        if s.needs_grading?
+          s.grade_submission(:finished_at => s.end_at)
+          s.reload
+        end
+        @submissions_hash[s.quiz_id] = s
+      end
       log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
     end
   end
