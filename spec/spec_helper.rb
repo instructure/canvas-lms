@@ -417,6 +417,7 @@ Spec::Runner.configure do |config|
     @quiz = Quiz.find_by_assignment_id(@assignment.id)
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
+    @quiz.published_at = Time.now
     @quiz.workflow_state = "available"
     @quiz.save!
   end

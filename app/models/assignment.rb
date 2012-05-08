@@ -1318,6 +1318,11 @@ class Assignment < ActiveRecord::Base
     {:conditions => ['assignments.created_at < ?', date]}
   }
 
+  named_scope :not_locked, lambda {
+    {:conditions => ['(assignments.unlock_at IS NULL OR assignments.unlock_at < :now) AND (assignments.lock_at IS NULL OR assignments.lock_at > :now)',
+                     {:now => Time.zone.now}]}
+  }
+
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?
   end

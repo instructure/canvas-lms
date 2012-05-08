@@ -1489,6 +1489,51 @@ describe User do
       end
     end
   end
+
+  describe "assignments_needing_submitting" do
+    # NOTE: More thorough testing of the Assignment#not_locked named scope is in assignment_spec.rb
+    context "locked assignments" do
+      before :each do
+        course_with_student_logged_in(:active_all => true)
+        assignment_quiz([], :course => @course, :user => @user)
+        # Setup default values for tests (leave unsaved for easy changes)
+        @quiz.unlock_at = nil
+        @quiz.lock_at = nil
+        @quiz.due_at = 2.days.from_now
+      end
+      it "should include assignments with no locks" do
+        @quiz.save!
+        list = @student.assignments_needing_submitting(:contexts => [@course])
+        list.size.should eql 1
+        list.first.title.should eql 'Test Assignment'
+      end
+      it "should include assignments with unlock_at in the past" do
+        @quiz.unlock_at = 1.hour.ago
+        @quiz.save!
+        list = @student.assignments_needing_submitting(:contexts => [@course])
+        list.size.should eql 1
+        list.first.title.should eql 'Test Assignment'
+      end
+      it "should include assignments with lock_at in the future" do
+        @quiz.lock_at = 1.hour.from_now
+        @quiz.save!
+        list = @student.assignments_needing_submitting(:contexts => [@course])
+        list.size.should eql 1
+        list.first.title.should eql 'Test Assignment'
+      end
+      it "should not include assignments where unlock_at is in future" do
+        @quiz.unlock_at = 1.hour.from_now
+        @quiz.save!
+        @student.assignments_needing_submitting(:contexts => [@course]).count.should == 0
+      end
+      it "should not include assignments where lock_at is in past" do
+        @quiz.lock_at = 1.hour.ago
+        @quiz.save!
+        @student.assignments_needing_submitting(:contexts => [@course]).count.should == 0
+      end
+    end
+  end
+
   describe "avatar_key" do
     it "should return a valid avatar key for a valid user id" do
       User.avatar_key(1).should == "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"

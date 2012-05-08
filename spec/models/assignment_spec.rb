@@ -1715,6 +1715,55 @@ describe Assignment do
     end
 
   end
+
+  context "not_locked named_scope" do
+    before :each do
+      course_with_student_logged_in(:active_all => true)
+      assignment_quiz([], :course => @course, :user => @user)
+      # Setup default values for tests (leave unsaved for easy changes)
+      @quiz.unlock_at = nil
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+    end
+    it "should include assignments with no locks" do
+      @quiz.save!
+      list = Assignment.not_locked.all
+      list.size.should eql 1
+      list.first.title.should eql 'Test Assignment'
+    end
+    it "should include assignments with unlock_at in the past" do
+      @quiz.unlock_at = 1.day.ago
+      @quiz.save!
+      list = Assignment.not_locked.all
+      list.size.should eql 1
+      list.first.title.should eql 'Test Assignment'
+    end
+    it "should include assignments where lock_at is future" do
+      @quiz.lock_at = 1.day.from_now
+      @quiz.save!
+      list = Assignment.not_locked.all
+      list.size.should eql 1
+      list.first.title.should eql 'Test Assignment'
+    end
+    it "should include assignments where unlock_at is in the past and lock_at is future" do
+      @quiz.unlock_at = 1.day.ago
+      @quiz.lock_at = 1.day.from_now
+      @quiz.save!
+      list = Assignment.not_locked.all
+      list.size.should eql 1
+      list.first.title.should eql 'Test Assignment'
+    end
+    it "should not include assignments where unlock_at is in future" do
+      @quiz.unlock_at = 1.hour.from_now
+      @quiz.save!
+      Assignment.not_locked.count.should == 0
+    end
+    it "should not include assignments where lock_at is in past" do
+      @quiz.lock_at = 1.hours.ago
+      @quiz.save!
+      Assignment.not_locked.count.should == 0
+    end
+  end
 end
 
 def setup_assignment_with_group
