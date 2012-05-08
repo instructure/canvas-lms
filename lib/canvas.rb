@@ -54,7 +54,9 @@ module Canvas
   def self.reconnect_redis
     @redis = nil
     if Rails.cache && Rails.cache.respond_to?(:reconnect)
-      Rails.cache.reconnect
+      Canvas::Redis.handle_redis_failure(nil) do
+        Rails.cache.reconnect
+      end
     end
   end
 
