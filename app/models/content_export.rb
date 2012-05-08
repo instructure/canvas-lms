@@ -45,13 +45,13 @@ class ContentExport < ActiveRecord::Base
     p.dispatch :content_export_finished
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:exported)
+      record.changed_state(:exported) && self.content_migration.blank?
     }
     
     p.dispatch :content_export_failed
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:failed)
+      record.changed_state(:failed) && self.content_migration.blank?
     }
   end
   

@@ -195,7 +195,7 @@ namespace :db do
       There was a problem importing <%= asset.migration_settings[:course_name] %> into <%= asset.context.name %>.  Please notify your system administrator, and give them the following error code: "ContentMigration:<%= asset.id %>:<%= asset.progress %>".
     }
     
-    create_notification 'ContentExport', 'Other', 0,
+    create_notification 'ContentExport', 'Migration', 0,
     'http://<%= HostUrl.default_host %>', %{
       Content Export Finished
 
@@ -206,7 +206,7 @@ namespace :db do
       Your course export for "<%= asset.context.name %>" has finished.
     }
     
-    create_notification 'ContentExport', 'Other', 0,
+    create_notification 'ContentExport', 'Migration', 0,
     'http://<%= HostUrl.default_host %>', %{
       Content Export Failed
 
