@@ -47,7 +47,9 @@ module Twitter
   
   def twitter_get_access_token(oauth_request, oauth_verifier)
     consumer = twitter_consumer
-    request_token = session.delete(:oauth_twitter_request_token)
+    request_token = OAuth::RequestToken.new(consumer,
+                                            session.delete(:oauth_twitter_request_token_token),
+                                            session.delete(:oauth_twitter_request_token_secret))
     access_token = request_token.get_access_token(:oauth_verifier => oauth_verifier)
     service_user_id, service_user_name = twitter_get_service_user(access_token)
     session[:oauth_twitter_access_token_token] = access_token.token
@@ -70,7 +72,8 @@ module Twitter
   def twitter_request_token_url(return_to)
     consumer = twitter_consumer
     request_token = consumer.get_request_token(:oauth_callback => oauth_success_url(:service => 'twitter'))
-    session[:oauth_twitter_request_token] = request_token
+    session[:oauth_twitter_request_token_token] = request_token.token
+    session[:oauth_twitter_request_token_secret] = request_token.secret
     OauthRequest.create(
       :service => 'twitter',
       :token => request_token.token,

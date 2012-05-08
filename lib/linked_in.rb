@@ -60,7 +60,9 @@ module LinkedIn
   
   def linked_in_get_access_token(oauth_request, oauth_verifier)
     consumer = linked_in_consumer
-    request_token = session.delete(:oauth_linked_in_request_token)
+    request_token = OAuth::RequestToken.new(consumer,
+                                            session.delete(:oauth_linked_in_request_token_token),
+                                            session.delete(:oauth_linked_in_request_token_secret))
     access_token = request_token.get_access_token(:oauth_verifier => oauth_verifier)
     service_user_id, service_user_name, service_user_url = linked_in_get_service_user(access_token)
     session[:oauth_linked_in_access_token_token] = access_token.token
@@ -84,7 +86,8 @@ module LinkedIn
   def linked_in_request_token_url(return_to)
     consumer = linked_in_consumer
     request_token = consumer.get_request_token(:oauth_callback => oauth_success_url(:service => 'linked_in'))
-    session[:oauth_linked_in_request_token] = request_token
+    session[:oauth_linked_in_request_token_token] = request_token.token
+    session[:oauth_linked_in_request_token_secret] = request_token.secret
     OauthRequest.create(
       :service => 'linked_in',
       :token => request_token.token,
