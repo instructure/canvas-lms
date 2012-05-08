@@ -1,3 +1,13 @@
+canvas-lms (2012.04.28.18) stable; urgency=low
+
+  * Package ref: ba7db2ed0591b7b34098e29bc4fa154da7636995
+  *
+  * [+2c589b0] don't copy course setting if not selected
+  * [+8efa6f8] handle redis failure on forking reconnect
+  * [+ba7db2e] correctly prepare quiz questions when copying course
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 08 May 2012 11:18:05 -0600
+
 canvas-lms (2012.04.28.16) stable; urgency=low
 
   * Package ref: 3c09dff2930aa360621a2dae8510f7320a4ebac4
