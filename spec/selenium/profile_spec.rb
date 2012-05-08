@@ -290,19 +290,21 @@ shared_examples_for "profile pictures selenium tests" do
     a = Account.default
     a.enable_service('avatars')
     a.save!
+    IMAGE_SRC = ''
 
     get "/profile"
-    keep_trying_until { driver.find_element(:css, ".profile_pic_link.none") }.click
-    dialog = driver.find_element(:id, "profile_pic_dialog")
+    keep_trying_until { f(".profile_pic_link") }.click
+    dialog = f("#profile_pic_dialog")
+    dialog.should be_displayed
     dialog.find_elements(:css, ".profile_pic_list span.img").length.should == 2
     dialog.find_element(:css, ".add_pic_link").click
     filename, fullpath, data = get_file("graded.png")
     dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-
     # Make ajax request slow down to verify transitional state
     FilesController.before_filter { sleep 5; true }
 
     driver.find_element(:id, 'add_pic_form').submit
+
     new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
     new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
     spans = dialog.find_elements(:css, ".profile_pic_list span.img")
@@ -312,11 +314,16 @@ shared_examples_for "profile pictures selenium tests" do
 
     keep_trying_until do
       spans.last.attribute('class') =~ /selected/
-      new_image.attribute('src').should =~ %r{/images/thumbnails/}
+      IMAGE_SRC = new_image.attribute('src')
+      IMAGE_SRC.should =~ %r{/images/thumbnails/}
+      new_image.attribute('alt').should =~ /graded/
     end
-    dialog.find_element(:css, 'button.select_button').click
-    keep_trying_until { driver.find_element(:css, '.profile_pic_link img').attribute('src') =~ %r{/images/thumbnails/} }
-
+    dialog.find_element(:css, '.select_button').click
+    wait_for_ajaximations
+    keep_trying_until do
+      profile_pic = f('.profile_pic_link img')
+      profile_pic.attribute('src').should == IMAGE_SRC
+   end
     Attachment.last.folder.should == @user.profile_pics_folder
   end
 end
