@@ -29,6 +29,7 @@ def valid_collaboration_attributes
     :collaboration_type => "value for collaboration_type",
     :document_id => "document:dc3pjs4r_3hhc6fvcc",
     :user_id => User.create!.id,
+    :context => @course || course_model,
     :url => "value for url",
     :data => %{<?xml version="1.0" encoding="UTF-8"?>
     <entry xmlns="http://www.w3.org/2005/Atom" xmlns:ns1="http://schemas.google.com/g/2005" xmlns:ns2="http://schemas.google.com/docs/2007">

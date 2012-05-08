@@ -253,6 +253,7 @@ class UsersController < ApplicationController
   #     'context_type': 'course', // course|group
   #     'course_id': 1,
   #     'group_id': null,
+  #     'html_url': "http://..." // URL to the Canvas web UI for this stream item
   #   }
   #
   # In addition, each item type has its own set of attributes available.

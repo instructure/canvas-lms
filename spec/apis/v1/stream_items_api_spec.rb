@@ -64,6 +64,7 @@ describe UsersController, :type => :integration do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'require_initial_post' => true,
       'user_has_posted' => true,
+      'html_url' => "http://www.example.com/courses/#{@context.id}/discussion_topics/#{@topic.id}",
 
       'total_root_discussion_entries' => 1,
       'root_discussion_entries' => [
@@ -127,6 +128,7 @@ describe UsersController, :type => :integration do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'require_initial_post' => nil,
       'user_has_posted' => nil,
+      'html_url' => "http://www.example.com/courses/#{@context.id}/announcements/#{@a.id}",
 
       'total_root_discussion_entries' => 1,
       'root_discussion_entries' => [
@@ -156,6 +158,7 @@ describe UsersController, :type => :integration do
       'message' => nil,
 
       'private' => false,
+      'html_url' => "http://www.example.com/conversations/#{@conversation.id}",
 
       'participant_count' => 2
     }
@@ -176,6 +179,7 @@ describe UsersController, :type => :integration do
 
       'notification_category' => 'TestImmediately',
       'url' => nil,
+      'html_url' => nil,
     }]
   end
 
@@ -199,6 +203,7 @@ describe UsersController, :type => :integration do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
       'score' => 12,
+      'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
 
       'assignment' => {
         'title' => 'assignment 1',
@@ -242,6 +247,7 @@ describe UsersController, :type => :integration do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => nil,
       'score' => nil,
+      'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
 
       'assignment' => {
         'title' => 'assignment 1',
@@ -283,6 +289,7 @@ describe UsersController, :type => :integration do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
       'score' => 12,
+      'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
 
       'assignment' => {
         'title' => 'assignment 1',
@@ -317,6 +324,9 @@ describe UsersController, :type => :integration do
       'title' => "hey",
       'message' => nil,
       'type' => 'Collaboration',
+      'context_type' => 'Course',
+      'course_id' => @course.id,
+      'html_url' => "http://www.example.com/courses/#{@course.id}/collaborations/#{@collaboration.id}",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
     }]
@@ -326,7 +336,7 @@ describe UsersController, :type => :integration do
     WebConference.stubs(:plugins).returns(
         [OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}, :valid_settings? => true, :enabled? => true),]
     )
-    @conference = BigBlueButtonConference.create!(:title => 'myconf', :user => @user, :description => 'mydesc', :conference_type => 'big_blue_button')
+    @conference = BigBlueButtonConference.create!(:title => 'myconf', :user => @user, :description => 'mydesc', :conference_type => 'big_blue_button', :context => @course)
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     json.should == [{
@@ -335,6 +345,9 @@ describe UsersController, :type => :integration do
       'title' => "myconf",
       'type' => 'WebConference',
       'message' => 'mydesc',
+      'context_type' => 'Course',
+      'course_id' => @course.id,
+      'html_url' => "http://www.example.com/courses/#{@course.id}/conferences/#{@conference.id}",
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
     }]
