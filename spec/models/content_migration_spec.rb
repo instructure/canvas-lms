@@ -702,6 +702,8 @@ describe ContentMigration do
       different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
       media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
       equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
+      link to some other course: <a href="/courses/#{@copy_from.id + @copy_to.id}">Cool Course</a>
+      canvas image: <img style="max-width: 723px;" src="/images/preview.png" alt="">
       HTML
       @question = @bank.assessment_questions.create!(:question_data => data)
       @question.reload.question_data['question_text'].should =~ %r{/assessment_questions/}
