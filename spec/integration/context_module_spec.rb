@@ -90,7 +90,7 @@ describe ContextModule do
   end
   
   describe "progressing before job is run" do
-    def progression_testing
+    def progression_testing(progress_by_item_link)
       enable_cache do
         @is_attachment = false
         course_with_student_logged_in(:active_all => true)
@@ -126,7 +126,11 @@ describe ContextModule do
         p1.requirements_met = [{:type=>"min_score", :min_score=>"1", :max_score=>nil, :id=>@quiz.id}]
         p1.save!
     
-        get "/courses/#{@course.id}/modules/items/#{@tag2.id}"
+        next_link = progress_by_item_link ? 
+          "/courses/#{@course.id}/modules/items/#{@tag2.id}" :
+          "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
+
+        get next_link
         response.should be_redirect
         response.location.ends_with?(@test_url).should be_true
             
@@ -142,46 +146,54 @@ describe ContextModule do
     end
     
     it "should progress to assignment" do
-      progression_testing do |content|
-        asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
-        @test_url = "/courses/#{@course.id}/assignments/#{asmnt.id}"
-        @tag2 = @mod2.add_item(:type => 'assignment', :id => asmnt.id)
+      [true, false].each do |progress_type|
+        progression_testing(progress_type) do |content|
+          asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
+          @test_url = "/courses/#{@course.id}/assignments/#{asmnt.id}"
+          @tag2 = @mod2.add_item(:type => 'assignment', :id => asmnt.id)
+        end
       end
     end
     
     it "should progress to discussion topic" do
-      progression_testing do |content|
-        discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
-        @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
-        @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
+      [true, false].each do |progress_type|
+        progression_testing(progress_type) do |content|
+          discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
+          @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
+          @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
+        end
       end
     end
     
     it "should progress to a quiz" do
-      progression_testing do |content|
-        quiz = @course.quizzes.create!(:title => "quiz", :description => content)
-        @test_url = "/courses/#{@course.id}/quizzes/#{quiz.id}"
-        @tag2 = @mod2.add_item(:type => 'quiz', :id => quiz.id)
+      [true, false].each do |progress_type|
+        progression_testing(progress_type) do |content|
+          quiz = @course.quizzes.create!(:title => "quiz", :description => content)
+          @test_url = "/courses/#{@course.id}/quizzes/#{quiz.id}"
+          @tag2 = @mod2.add_item(:type => 'quiz', :id => quiz.id)
+        end
       end
     end
     
     it "should progress to a wiki page" do
-      progression_testing do |content|
-        page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
-        @test_url = "/courses/#{@course.id}/wiki/#{page.url}"
-        @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
+      [true, false].each do |progress_type|
+        progression_testing(progress_type) do |content|
+          page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
+          @test_url = "/courses/#{@course.id}/wiki/#{page.url}"
+          @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
+        end
       end
     end
     
     it "should progress to an attachment" do
-      progression_testing do |content|
-        @is_attachment = true
-        att = Attachment.create!(:filename => 'test.html', :display_name => "test.html", :uploaded_data => StringIO.new(content), :folder => Folder.unfiled_folder(@course), :context => @course)
-        @test_url = "/courses/#{@course.id}/files/#{att.id}"
-        @tag2 = @mod2.add_item(:type => 'attachment', :id => att.id)
+      [true, false].each do |progress_type|
+        progression_testing(progress_type) do |content|
+          @is_attachment = true
+          att = Attachment.create!(:filename => 'test.html', :display_name => "test.html", :uploaded_data => StringIO.new(content), :folder => Folder.unfiled_folder(@course), :context => @course)
+          @test_url = "/courses/#{@course.id}/files/#{att.id}"
+          @tag2 = @mod2.add_item(:type => 'attachment', :id => att.id)
+        end
       end
     end
-    
   end
-  
 end
