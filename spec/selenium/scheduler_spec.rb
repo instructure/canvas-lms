@@ -9,9 +9,11 @@ describe "scheduler" do
 
   def fill_out_appointment_group_form(new_appointment_text)
     driver.find_element(:css, '.create_link').click
-    edit_form = driver.find_element(:id, 'edit_appointment_form')
+    edit_form = f('#edit_appointment_form')
     keep_trying_until { edit_form.should be_displayed }
     replace_content(find_with_jquery('input[name="title"]'), new_appointment_text)
+    f('.ag_contexts_selector').click
+    f('[name="context_codes[]"]').click
     date_field = edit_form.find_element(:css, '.date_field')
     date_field.click
     wait_for_animations
@@ -300,7 +302,7 @@ describe "scheduler" do
     end
 
     it "should allow me to override the participant limit on a slot-by-slot basis" do
-      create_appointment_group :participants_per_appointment => 2, :context => @course
+      create_appointment_group :participants_per_appointment => 2
       get "/calendar2"
       wait_for_ajaximations
       click_scheduler_link
@@ -325,6 +327,36 @@ describe "scheduler" do
       ag.appointments.first.participants_per_appointment.should be_nil
     end
 
+    it "should allow me to create a course with multiple contexts" do
+      course1 = @course
+      course_with_teacher(:user => @teacher, :active_all => true)
+      get "/calendar2"
+      click_scheduler_link
+      fill_out_appointment_group_form('multiple contexts')
+      course_box = f("[value=#{@course.asset_string}]")
+      course_box.click
+      ff('.ag_sections_toggle').last.click
+
+      # sections should get checked by their parent
+      section_box = f("[value=#{@course.course_sections.first.asset_string}]")
+      section_box[:checked].should be_true
+
+      # unchecking all sections should uncheck their parent
+      section_box.click
+      course_box[:checked].should be_false
+
+      # checking all sections should check parent
+      section_box.click
+      course_box[:checked].should be_true
+
+      driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+      wait_for_ajaximations
+      ag = AppointmentGroup.first
+      ag.contexts.should include course1
+      ag.contexts.should include @course
+      ag.sub_contexts.should eql []
+    end
+
   end
 
   context "as a student" do
@@ -337,6 +369,22 @@ describe "scheduler" do
       driver.find_elements(:css, '.fc-event')[n].click
       driver.find_element(:css, '.event-details .reserve_event_link').click
       wait_for_ajax_requests
+    end
+
+    it "should let me reserve appointment groups for contexts I am in" do
+      my_course = @course
+      course_with_student(:active_all => true)
+      other_course = @course
+
+      create_appointment_group(:contexts => [other_course, my_course])
+
+      get "/calendar2"
+      click_scheduler_link
+      wait_for_ajaximations
+      click_appointment_link
+
+      reserve_appointment_manual(0)
+      driver.find_element(:css, '.fc-event').should include_text "Reserved"
     end
 
     it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do

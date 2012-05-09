@@ -1,9 +1,9 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.context) %>/appointment_groups/<%= asset.id %>
+  http://<%= HostUrl.context_host(asset.contexts.first) %>/appointment_groups/<%= asset.id %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t('subject', 'Appointment "%{appointment_name}" is available for signup (%{course})', :appointment_name => asset.title, :course => asset.context.name) %>
+  <%= t('subject', 'Appointment "%{appointment_name}" is available for signup (%{course})', :appointment_name => asset.title, :course => asset.contexts_for_user(user).map(&:name).join(", ")) %>
 <% end %>
 
 <%= t :message, 'Time slots for "%{appointment_name}" are now available for signup (%{dates}).', :appointment_name => asset.title, :dates => date_string(asset.start_at, asset.end_at, :no_words) %>

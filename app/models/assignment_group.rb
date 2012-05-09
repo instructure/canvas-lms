@@ -202,6 +202,7 @@ class AssignmentGroup < ActiveRecord::Base
     item ||= context.assignment_groups.new
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'available' if item.deleted?
     item.name = hash[:title]
     item.position = hash[:position].to_i if hash[:position] && hash[:position].to_i > 0
     item.group_weight = hash[:group_weight] if hash[:group_weight]

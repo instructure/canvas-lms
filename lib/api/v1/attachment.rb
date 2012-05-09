@@ -21,7 +21,8 @@ module Api::V1::Attachment
 
   def attachment_json(attachment, url_options = {}, options = {})
     url = if options[:thumbnail_url]
-      attachment.thumbnail_url
+      # this thumbnail url is a route that redirects to local/s3 appropriately
+      thumbnail_image_url(attachment.id, attachment.uuid)
     else
       file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
     end

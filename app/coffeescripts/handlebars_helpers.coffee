@@ -2,12 +2,13 @@ define [
   'vendor/handlebars.vm'
   'i18nObj'
   'jquery'
+  'underscore'
   'str/htmlEscape'
   'compiled/util/semanticDateRange'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (Handlebars, I18n, $, htmlEscape, semanticDateRange) ->
+], (Handlebars, I18n, $, _, htmlEscape, semanticDateRange) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (key, defaultValue, options) ->
@@ -129,5 +130,10 @@ define [
     #
     eachProp: (context, options) ->
       (options.fn(property: prop, value: context[prop]) for prop of context).join ''
+
+    # evaluates the block for each item in context and passes the result to $.toSentence
+    toSentence: (context, options) ->
+      results = _.map(context, (c) -> options.fn(c))
+      $.toSentence(results)
   }
   return Handlebars

@@ -1680,7 +1680,9 @@ class User < ActiveRecord::Base
 
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).reject(&:hidden?)
     events += Assignment.active.for_context_codes(context_codes).due_between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).include_submitted_count
-    events += AppointmentGroup.manageable_by(self, context_codes).intersecting(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
+    appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
+    appointment_groups.each { |ag| ag.context = ag.contexts_for_user(self).first }
+    events += appointment_groups
     events.sort_by{|e| [e.start_at, e.title] }.uniq.first(opts[:limit])
   end
 

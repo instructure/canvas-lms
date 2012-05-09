@@ -18,7 +18,10 @@
 module CC
   module Rubrics
     def create_rubrics(document=nil)
-      return nil unless @course.rubrics.active.count > 0
+      return nil unless @course.rubric_associations.count > 0
+
+      # There can be multiple rubric associations to the same rubric, only export each rubric once
+      imported_rubrics = {}
       
       if document
         rubrics_file = nil
@@ -37,7 +40,9 @@ module CC
       ) do |rubrics_node|
         @course.rubric_associations.each do |assoc|
           rubric = assoc.rubric
-          next unless rubric.active? && export_object?(rubric)
+          next if rubric.nil? || !rubric.active? || !export_object?(rubric) || imported_rubrics[rubric.id]
+          imported_rubrics[rubric.id] = true
+
           migration_id = CCHelper.create_key(rubric)
           rubrics_node.rubric(:identifier=>migration_id) do |r_node|
             atts = [:read_only, :title, :reusable, :public, :points_possible,

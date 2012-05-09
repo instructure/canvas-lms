@@ -137,7 +137,7 @@
 
         <% if @topic.external_feed %>
           <div class="discussion-fyi">
-            <%= t 'retrieved_from_feed', 'Retrieved from %{feed}', :feed => link_to(topic.external_feed.display_name, topic.external_feed.url) %>
+            <%= t 'retrieved_from_feed', 'Retrieved from %{feed}', :feed => link_to(@topic.external_feed.display_name, @topic.external_feed.url) %>
           </div>
         <% end %>
 
