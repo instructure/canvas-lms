@@ -793,15 +793,13 @@ shared_examples_for "all selenium tests" do
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
-  self.use_transactional_fixtures = false
-
   append_after(:each) do
     begin
       wait_for_ajax_requests
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     end
-    truncate_all_tables
+    truncate_all_tables unless self.use_transactional_fixtures
   end
 
   append_before (:each) do
@@ -892,10 +890,16 @@ end
       HostUrl.stubs(:default_host).returns($app_host_and_port)
       HostUrl.stubs(:file_host).returns($app_host_and_port)
     end
+    before do
+      conn = ActiveRecord::Base.connection
+      ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(conn)
+    end
   end
 
   shared_examples_for "forked server selenium tests" do
     it_should_behave_like "all selenium tests"
+    self.use_transactional_fixtures = false
+
     prepend_before (:all) do
       $in_proc_webserver_shutdown.try(:call)
       $in_proc_webserver_shutdown = nil
