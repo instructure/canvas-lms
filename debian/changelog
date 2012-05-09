@@ -1,3 +1,12 @@
+canvas-lms (2012.05.12.11) testing; urgency=low
+
+  * Package ref: a7813fce3cd44c5264a613d41beb312e24dfa3c7
+  *
+  * [+86ab84f] copy attachments referenced in html content when copying course
+  * [+a7813fc] don't try to fix relative urls on import step of course copy
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 09 May 2012 14:32:15 -0600
+
 canvas-lms (2012.05.12.10) testing; urgency=low
 
   * Package ref: 50ce9f6404a075d5019d00d25a66a86d1eb33391
