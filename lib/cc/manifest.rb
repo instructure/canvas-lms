@@ -26,6 +26,7 @@ module CC
       @exporter = exporter
       @file = nil
       @document = nil
+      @resource = nil
       @weblinks = []
     end
     
@@ -72,7 +73,7 @@ module CC
         set_progress(10)
 
         begin
-          Resource.create_resources(self, manifest_node)
+          @resource = Resource.create_resources(self, manifest_node)
         rescue
           add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
         end
@@ -85,6 +86,10 @@ module CC
           @document.comment! error.first
         end
       end
+    end
+
+    def referenced_files
+      @resource ? @resource.referenced_files : {}
     end
 
     def create_metadata(md)
