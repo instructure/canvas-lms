@@ -236,8 +236,6 @@ module Api
         thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host)
         node['poster'] = thumbnail
         node['data-media_comment_type'] = 'video'
-        node['width'] = '550'
-        node['height'] = '448'
       end
 
       node['preload'] = 'none'

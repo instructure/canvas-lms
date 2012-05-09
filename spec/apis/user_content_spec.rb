@@ -62,6 +62,10 @@ describe UserContent, :type => :integration do
     video['poster'].should match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
     video['src'].should match(%r{http://www.example.com/courses/#{@course.id}/media_download})
     video['src'].should match(%r{entryId=qwerty})
+    # we leave width/height out of it, since browsers tend to have good
+    # defaults and it makes it easier to set via client css rules
+    video['width'].should be_nil
+    video['height'].should be_nil
   end
 
   it "should translate media comment audio tags" do
