@@ -10,18 +10,6 @@ define [
     constructor: (@context) ->
       @state  = 'off'
       @locked = false
-      @sectionsLocked = false
-
-      pubsubHelper = (fn) =>
-        (sender) =>
-          return if sender is this
-          fn.apply(this)
-
-      $.subscribe '/contextSelector/disable', pubsubHelper(@disable)
-      $.subscribe '/contextSelector/enable', pubsubHelper(@enable)
-      $.subscribe '/contextSelector/uncheck', pubsubHelper(=> @setState('off'))
-
-      $.subscribe '/contextSelector/lockSections', @lockSections
 
     render: ($list) ->
       @$listItem = $(contextSelectorItemTemplate(@context))
@@ -55,12 +43,9 @@ define [
           @$contentCheckbox.prop('checked', checked)
           @$contentCheckbox.prop('indeterminate', false)
           @$sectionCheckboxes.prop('checked', checked)
-          $.publish("/contextSelector/enable", [this])
         when 'partial'
           @$contentCheckbox.prop('checked', true)
           @$contentCheckbox.prop('indeterminate', true)
-          $.publish('/contextSelector/disable', [this])
-          $.publish('/contextSelector/uncheck', [this])
 
       $.publish('/contextSelector/changed')
 
@@ -80,22 +65,9 @@ define [
     disableSections: ->
       @$sectionCheckboxes.prop('disabled', true)
 
-    enable: ->
-      unless @locked
-        @$contentCheckbox.prop('disabled', false)
-        @enableSections()
-
-    enableSections: ->
-      unless @lockedSections
-        @$sectionCheckboxes.prop('disabled', false)
-
     lock: ->
       @locked = true
       @disable()
-      $.publish('/contextSelector/lockSections')
-
-    lockSections: =>
-      @lockedSections = true
       @disableSections()
 
     isChecked: -> @state != 'off'
@@ -110,6 +82,7 @@ define [
   class ContextSelector
     constructor: (selector, @apptGroup, @contexts, contextsChangedCB, closeCB) ->
       @$menu = $(selector).html contextSelectorTemplate()
+
       $contextsList = @$menu.find('.ag-contexts')
 
       $.subscribe('/contextSelector/changed', => contextsChangedCB @selectedContexts(), @selectedSections())
@@ -120,19 +93,26 @@ define [
         item.render($contextsList)
         @contextSelectorItems[item.context.asset_string] = item
 
+      for contextCode in @apptGroup.context_codes when @contextSelectorItems[contextCode]
+        @contextSelectorItems[contextCode].setState('on')
+        @contextSelectorItems[contextCode].lock()
+
       if @apptGroup.sub_context_codes.length > 0
-        # if you choose sub_contexts when creating an appointment
-        # group, the appointment group is locked down
-        # TODO: be smarter about this
-        for subContextCode in @apptGroup.sub_context_codes
-          $("[value='#{subContextCode}']").prop('checked', true)
+        if @apptGroup.sub_context_codes[0].match /^group_category_/
           for c, item of @contextSelectorItems
+            item.lock()
+        else
+          contextsBySubContext = {}
+          for c in @contexts
+            for section in c.course_sections
+              contextsBySubContext[section.asset_string] = c.asset_string
+
+          for subContextCode in @apptGroup.sub_context_codes
+            $("[value='#{subContextCode}']").prop('checked', true)
+            context = contextsBySubContext[subContextCode]
+            item = @contextSelectorItems[context]
             item.sectionChange()
             item.lock()
-      else
-        for contextCode in @apptGroup.context_codes
-          @contextSelectorItems[contextCode].setState('on')
-          @contextSelectorItems[contextCode].lock()
 
       $('.ag_contexts_done').click preventDefault closeCB
 
@@ -145,10 +125,6 @@ define [
                   .map(    (c) -> c.context.asset_string)
                   .value()
 
-      numPartials = _.filter(contexts, (c) -> c.state == 'partial')
-      if numPartials > 1 or numPartials == 1 and contexts.length > 1
-        throw "invalid state"
-
       contexts
 
     selectedSections: ->
@@ -156,7 +132,7 @@ define [
                   .values()
                   .map(   (c)  -> c.sections())
                   .reject((ss) -> ss.length == 0)
+                  .flatten()
                   .value()
 
-      throw "invalid state" if sections.length > 1
-      sections[0]
+      sections

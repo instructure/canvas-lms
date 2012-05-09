@@ -277,7 +277,7 @@ describe CalendarEventsApiController, :type => :integration do
         othergroup.users << otherguy
         @me.reload
 
-        ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [course1, course2])
+        ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [course1])
         ag2.publish!
         event2 = ag2.appointments.first
         my_group_appointment = event2.reserve_for(mygroup, @me)

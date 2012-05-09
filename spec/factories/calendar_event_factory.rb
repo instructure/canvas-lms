@@ -32,6 +32,7 @@ def appointment_participant_model(opts={})
   end
   parent_event = opts.delete(:parent_event) || appointment_model(opts)
   parent_event.context.publish! unless opts[:no_publish]
+  @appointment_group.reload #why!?
   updating_user = opts.delete(:updating_user) || user_model
   @event = parent_event.reserve_for(participant, updating_user)
 end
