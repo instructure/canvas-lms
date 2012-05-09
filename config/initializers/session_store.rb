@@ -6,12 +6,18 @@
 # no regular words or you'll be exposed to dictionary attacks.
 config = {
   :key           => '_normandy_session',
-  :session_store => :active_record_store,
+  :session_store => :encrypted_cookie_store,
   :secret        => (Setting.get_or_set("session_secret_key",
-      ActiveSupport::SecureRandom.hex(64)) rescue ActiveSupport::SecureRandom.hex(64)),
+      ActiveSupport::SecureRandom.hex(64)) rescue ActiveSupport::SecureRandom.hex(64))
 }.merge((Setting.from_config("session_store") || {}).symbolize_keys)
 
-config[:expires] = nil # we always want the cookie to have session expiry
+# :expire_after is the "true" option, and :expires is a legacy option, but is applied
+# to the cookie after :expire_after is, so by setting it to nil, we force the lesser
+# of session expiration or expire_after for stores that have a way to expire sessions
+# outside of the cookie (ActiveRecord::CookieStore+periodic job, MemCacheStore,
+# RedisSessionStore, and EncryptedCookieStore)
+config[:expire_after] ||= 1.day
+config[:expires] = nil
 session_store = config.delete(:session_store).to_sym
 
 case session_store
