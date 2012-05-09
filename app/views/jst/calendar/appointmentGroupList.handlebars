@@ -32,9 +32,9 @@
         {{/if}}
 
         <h3><a class="view_calendar_link" href="#">{{title}}</a></h3>
-        {{#if context}}
-          <div class='ag-context'><a href="{{context.url}}">{{context.name}}</a></div>
-        {{/if}}
+        <div class='ag-context'>
+          {{#toSentence contexts}}<a href="{{url}}">{{name}}</a>{{/toSentence}}
+        </div>
         {{#if location_name}}
           <div class="ag-location">
             <strong>{{#t "location"}}Location:{{/t}}</strong>

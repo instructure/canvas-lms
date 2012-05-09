@@ -162,7 +162,8 @@ class Course < ActiveRecord::Base
   has_many :content_exports
   has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria
-  has_many :appointment_groups, :as => :context
+  has_many :appointment_group_contexts, :as => :context
+  has_many :appointment_groups, :through => :appointment_group_contexts
   has_many :appointment_participants, :class_name => 'CalendarEvent', :foreign_key => :effective_context_code, :primary_key => :asset_string, :conditions => "workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL"
   attr_accessor :import_source
   has_many :zip_file_imports, :as => :context

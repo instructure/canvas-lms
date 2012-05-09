@@ -40,16 +40,18 @@ define([
         $images = $('img.pending'),
         image,
         $image,
+        associatedUrl,
         count = 0;
     for (var i = 0, l = data.length; i < l; i++) {
       image = data[i];
-      if (!image.pending) loadedImages[image.url] = true;
+      if (!image.pending) loadedImages[image.token] = image.url;
     }
     $images.each(function() {
       $image = $(this);
-      if (loadedImages[$image.data('eventual_src')]) {
+      associatedUrl = loadedImages[$image.data('token')]
+      if (associatedUrl != null) {
         $image.removeClass('pending');
-        $image.attr('src', $image.data('eventual_src'));
+        $image.attr('src', associatedUrl);
         count++;
       }
     });
@@ -364,7 +366,6 @@ define([
         var $img = $span.find('img');
 
         $img
-          .data('eventual_src', attachment.thumbnail_url)
           .data('type', 'attachment')
           .data('token', data.avatar.token)
           .attr('alt', attachment.display_name);
@@ -455,7 +456,6 @@ define([
               $img
                 .addClass('pending')
                 .attr('src', '/images/ajax-loader.gif')
-                .data('eventual_src', image.url)
                 .data('token', image.token);
               pollThumbnails = true;
             } else {

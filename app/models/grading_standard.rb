@@ -225,6 +225,7 @@ class GradingStandard < ActiveRecord::Base
     item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
     item ||= context.grading_standards.new
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'active' if item.deleted?
     item.title = hash[:title]
     begin
       item.data = self.upgrade_data(JSON.parse(hash[:data]), hash[:version] || 1)

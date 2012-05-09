@@ -125,7 +125,13 @@ class CalendarEvent < ActiveRecord::Base
     all_codes = codes | effectively_courses_codes
     group_codes = codes.grep(/\Aappointment_group_\d+\z/)
     codes -= group_codes
-    {:conditions => [<<-SQL, all_codes, codes, group_codes, effectively_courses_codes, codes]}
+
+    codes_conditions = codes.map { |code|
+      wildcard(quoted_table_name + '.effective_context_code', code, :delimiter => ',')
+    }.join(" OR ")
+    codes_conditions = self.connection.quote(false) if codes_conditions.blank?
+
+    {:conditions => [<<-SQL, all_codes, codes, group_codes, effectively_courses_codes]}
       calendar_events.context_code IN (?)
       AND (
         ( -- explicit contexts (e.g. course_123)
@@ -137,7 +143,7 @@ class CalendarEvent < ActiveRecord::Base
         )
         OR ( -- own appointment_participants, or section events in the course
           calendar_events.context_code IN (?)
-          AND calendar_events.effective_context_code IN (?)
+          AND (#{codes_conditions})
         )
       )
     SQL
@@ -186,13 +192,13 @@ class CalendarEvent < ActiveRecord::Base
 
     if parent_event
       self.effective_context_code = if appointment_group # appointment participant
-        appointment_group.context_code if appointment_group.participant_type == 'User'
-      else # e.g. section-level event
-        parent_event.context_code
-      end
+                                      appointment_group.appointment_group_contexts.map(&:context_code).join(',') if appointment_group.participant_type == 'User' 
+                                    else # e.g. section-level event
+                                      parent_event.context_code
+                                    end
       (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each{ |attr| send("#{attr}=", parent_event.send(attr)) }
     elsif context.is_a?(AppointmentGroup)
-      self.effective_context_code = context.context_code
+      self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
       if new_record?
         AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
         if locked?
@@ -528,6 +534,7 @@ class CalendarEvent < ActiveRecord::Base
     item ||= context.calendar_events.new
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'active' if item.deleted?
     item.title = hash[:title] || hash[:name]
     description = ImportedHtmlConverter.convert(hash[:description] || "", context)
     if hash[:attachment_type] == 'external_url'
