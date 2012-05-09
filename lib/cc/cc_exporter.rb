@@ -79,6 +79,10 @@ module CC
       end
       true
     end
+
+    def referenced_files
+      @manifest ? @manifest.referenced_files : {}
+    end
     
     def set_progress(progress)
       @content_export.fast_update_progress(progress) if @content_export  

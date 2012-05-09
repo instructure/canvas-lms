@@ -502,6 +502,34 @@ describe ContentMigration do
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.gsub("/courses/#{@copy_from.id}/file_contents/course%20files",'')
     end
 
+    it "should included implied files for course exports" do
+      att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att3 = Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('3333'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+
+      asmnt_des = %{<a href="/courses/%s/files/%s/preview">First file</a>}
+      wiki_body = %{<img src="/courses/%s/files/%s/preview">}
+      asmnt = @copy_from.assignments.create!(:points_possible => 40, :grading_type => 'points', :description=>(asmnt_des % [@copy_from.id, att.id]), :title => "assignment")
+      wiki = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => (wiki_body % [@copy_from.id, att2.id]))
+
+      # don't mark the attachments
+      @cm.copy_options = {
+              :wiki_pages => {mig_id(wiki) => "1"},
+              :assignments => {mig_id(asmnt) => "1"},
+      }
+      @cm.save!
+      run_course_copy
+
+      @copy_to.attachments.count.should == 2
+      att_2 = @copy_to.attachments.find_by_migration_id(mig_id(att))
+      att_2.should_not be_nil
+      att2_2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
+      att2_2.should_not be_nil
+
+      @copy_to.assignments.first.description.should == asmnt_des % [@copy_to.id, att_2.id]
+      @copy_to.wiki.wiki_pages.first.body.should == wiki_body % [@copy_to.id, att2_2.id]
+    end
+
     it "should perform day substitutions" do
       pending unless Qti.qti_enabled?
       @copy_from.assert_assignment_group
@@ -651,6 +679,8 @@ describe ContentMigration do
       different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
       media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
       equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
+      link to some other course: <a href="/courses/#{@copy_from.id + @copy_to.id}">Cool Course</a>
+      canvas image: <img style="max-width: 723px;" src="/images/preview.png" alt="">
       HTML
       @question = @bank.assessment_questions.create!(:question_data => data)
       @question.reload.question_data['question_text'].should =~ %r{/assessment_questions/}
