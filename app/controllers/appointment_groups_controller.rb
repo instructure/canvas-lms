@@ -56,6 +56,7 @@ class AppointmentGroupsController < ApplicationController
     publish = params[:appointment_group].delete(:publish) == '1'
     params[:appointment_group][:contexts] = contexts
     @group = AppointmentGroup.new(params[:appointment_group])
+    @group.update_contexts_and_sub_contexts
     if authorized_action(@group, @current_user, :manage)
       if @group.save
         @group.publish! if publish
