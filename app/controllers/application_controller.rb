@@ -841,8 +841,8 @@ class ApplicationController < ActionController::Base
     session[:claimed_course_uuids] ||= []
     session[:claimed_course_uuids] << course.uuid
     session[:claimed_course_uuids].uniq!
-    session[:claim_course_uuid] = nil
-    session[:course_uuid] = nil
+    session.delete(:claim_course_uuid)
+    session.delete(:course_uuid)
   end
 
   # Had to overwrite this method so we can say you don't need to have an

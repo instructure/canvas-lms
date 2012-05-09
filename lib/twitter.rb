@@ -63,8 +63,8 @@ module Twitter
         :service_user_id => service_user_id,
         :service_user_name => service_user_name
       )
-      session[:oauth_twitter_access_token_token] = nil
-      session[:oauth_twitter_access_token_secret] = nil
+      session.delete(:oauth_twitter_access_token_token)
+      session.delete(:oauth_twitter_access_token_secret)
     end
     access_token
   end

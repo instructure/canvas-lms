@@ -123,7 +123,7 @@ class QuizzesController < ApplicationController
 
       @question_count = @quiz.question_count
       if session[:quiz_id] == @quiz.id && !request.xhr?
-        session[:quiz_id] = nil
+        session.delete(:quiz_id)
       end
       @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked = @locked_reason && !@quiz.grants_right?(@current_user, session, :update)

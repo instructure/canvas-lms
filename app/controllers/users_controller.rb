@@ -206,12 +206,12 @@ class UsersController < ApplicationController
     return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
     if request.post?
       if @user == @real_current_user
-        session[:become_user_id] = nil
+        session.delete(:become_user_id)
       else
         session[:become_user_id] = params[:user_id]
       end
       return_url = session[:masquerade_return_to]
-      session[:masquerade_return_to] = nil
+      session.delete(:masquerade_return_to)
       return return_to(return_url, request.referer || dashboard_url)
     end
   end
@@ -790,7 +790,7 @@ class UsersController < ApplicationController
     if @user_about_to_go_away && @user_that_will_still_be_around && @user_about_to_go_away.id.to_s == params[:user_id]
       @user_about_to_go_away.move_to_user(@user_that_will_still_be_around)
       @user_that_will_still_be_around.touch
-      session[:merge_user_uuid] = nil
+      session.delete(:merge_user_uuid)
       flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
     else
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
@@ -818,7 +818,7 @@ class UsersController < ApplicationController
       if @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
         session[:merge_user_id] = @user.id
         session[:merge_user_uuid] = @user.uuid
-        session[:pending_user_id] = nil
+        session.delete(:pending_user_id)
       else
         @other_user = nil
       end

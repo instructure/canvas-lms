@@ -66,15 +66,14 @@ module GoogleDocs
         :service_user_name => service_user_name
       )
       oauth_request.destroy
-      session[:oauth_gdocs_access_token_token] = nil
-      session[:oauth_gdocs_access_token_secret] = nil
+      session.delete(:oauth_gdocs_access_token_token)
+      session.delete(:oauth_gdocs_access_token_secret)
     end
     access_token
   end
 
   def google_docs_request_token_url(return_to)
     consumer = google_consumer
-    session[:oauth_gdocs_user_secret] = AutoHandle.generate(nil, 16)
     request_token = consumer.get_request_token({ :oauth_callback => oauth_success_url(:service => 'google_docs')}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"})
     session[:oauth_google_docs_request_token_token] = request_token.token
     session[:oauth_google_docs_request_token_secret] = request_token.secret
@@ -82,7 +81,7 @@ module GoogleDocs
       :service => 'google_docs',
       :token => request_token.token,
       :secret => request_token.secret,
-      :user_secret => session[:oauth_gdocs_user_secret],
+      :user_secret => AutoHandle.generate(nil, 16),
       :return_url => return_to,
       :user => @current_user,
       :original_host_with_port => request.host_with_port

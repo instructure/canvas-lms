@@ -1,5 +1,5 @@
 <% if session[:from_pilot]
-  session[:from_pilot] = nil
+  session.delete(:from_pilot)
   @from_pilot = true
   flash[:notice] = t 'notices.redirected_from_pilot', "You've been redirected to the new version of Instructure Canvas.  Welcome!"
 end %>
@@ -8,12 +8,12 @@ end %>
     <div id="flash_notice_message" class="<%= 'long_show' if @from_pilot %>" style="<%= "display: none;" if !flash[:notice] && !flash[:html_notice] %>">
       <a href="#" class="close-link"><%= t 'links.close', "close" %></a>
       <%= flash[:html_notice] ? raw(flash[:html_notice]) : flash[:notice] %>
-      <% flash[:notice] = nil; flash[:html_notice] = nil %>
+      <% flash.delete(:notice); flash.delete(:html_notice) %>
     </div>
     <div id="flash_error_message" style="<%= "display: none;" if !flash[:error] %>">
       <a href="#" class="close-link"><%= t 'links.close', "close" %></a>
       <%= flash[:error]%>
-      <% flash[:error] = nil %>
+      <% flash.delete(:error) %>
     </div>
   </div>
 </div>

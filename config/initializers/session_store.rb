@@ -28,3 +28,10 @@ end
 
 ActionController::Base.session = config
 ActionController::Base.session_store = session_store
+
+ActionController::Flash::FlashHash.class_eval do
+  def store(session, key = "flash")
+    return session.delete(key) if self.empty?
+    session[key] = self
+  end
+end
