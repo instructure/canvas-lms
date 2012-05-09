@@ -1181,7 +1181,7 @@ class Course < ActiveRecord::Base
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym)
     enrollment_ids = []
     res = FasterCSV.generate do |csv|
-      row = ["publisher_id", "publisher_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score"]
+      row = ["publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score"]
       row << "grade" if self.grading_standard_enabled?
       csv << row
       enrollments.each do |enrollment|
@@ -1190,9 +1190,11 @@ class Course < ActiveRecord::Base
         pseudonym_sis_ids = enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).map{|p| p.sis_user_id}
         pseudonym_sis_ids = [nil] if pseudonym_sis_ids.empty?
         pseudonym_sis_ids.each do |pseudonym_sis_id|
-          row = [publishing_user.try(:id), publishing_pseudonym.try(:sis_user_id), enrollment.course_section.id,
-              enrollment.course_section.sis_source_id, enrollment.user.id, pseudonym_sis_id, enrollment.id,
-              enrollment.workflow_state, enrollment.computed_final_score]
+          row = [publishing_user.try(:id), publishing_pseudonym.try(:sis_user_id),
+                 enrollment.course.id, enrollment.course.sis_source_id,
+                 enrollment.course_section.id, enrollment.course_section.sis_source_id,
+                 enrollment.user.id, pseudonym_sis_id, enrollment.id,
+                 enrollment.workflow_state, enrollment.computed_final_score]
           row << enrollment.computed_final_grade if self.grading_standard_enabled?
           csv << row
         end
