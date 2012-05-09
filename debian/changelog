@@ -1,3 +1,15 @@
+canvas-lms (2012.05.12.10) testing; urgency=low
+
+  * Package ref: 50ce9f6404a075d5019d00d25a66a86d1eb33391
+  *
+  * [+12d23a6] fix avatar image uploads to non-local storage; fixes #8447
+  * [+668b0bf] undelete course objects on course copy
+  * [+ee5f51e] fix rubric copying/exporting
+  * [+8829e41] fix page error on discussion announcement, fixes #8292
+  * [+50ce9f6] multiple contexts per appointment group
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 09 May 2012 14:17:51 -0600
+
 canvas-lms (2012.05.12.07) testing; urgency=low
 
   * Package ref: cbcbacd897c0eed7167e9d65d68336212b97c2e8
