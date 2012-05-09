@@ -196,6 +196,24 @@ describe ContentMigration do
       rub2.save!
       rub2.associate_with(@copy_from, @copy_from)
       default = LearningOutcomeGroup.default_for(@copy_from)
+      log = @copy_from.learning_outcome_groups.new
+      log.context = @copy_from
+      log.title = "outcome group"
+      log.description = "<p>Groupage</p>"
+      log.save!
+      default.add_item(log)
+      log2 = @copy_from.learning_outcome_groups.new
+      log2.context = @copy_from
+      log2.title = "empty group"
+      log2.description = "<p>Groupage</p>"
+      log2.save!
+      default.add_item(log2)
+      log3 = @copy_from.learning_outcome_groups.new
+      log3.context = @copy_from
+      log3.title = "empty group"
+      log3.description = "<p>Groupage</p>"
+      log3.save!
+      default.add_item(log3)
       lo = @copy_from.learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
@@ -204,13 +222,20 @@ describe ContentMigration do
       lo.save!
       lo2 = @copy_from.learning_outcomes.new
       lo2.context = @copy_from
-      lo2.short_description = "outcome1"
+      lo2.short_description = "outcome2"
       lo2.workflow_state = 'active'
       lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo2.save!
+      lo3 = @copy_from.learning_outcomes.new
+      lo3.context = @copy_from
+      lo3.short_description = "outcome3"
+      lo3.workflow_state = 'active'
+      lo3.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo3.save!
 
       default.add_item(lo)
-      default.add_item(lo2)
+      log.add_item(lo2)
+      default.add_item(lo3)
 
       # only select one of each type
       @cm.copy_options = {
@@ -219,7 +244,8 @@ describe ContentMigration do
               :attachments => {mig_id(att) => "1", mig_id(att2) => "0"},
               :wiki_pages => {mig_id(wiki) => "1", mig_id(wiki2) => "0"},
               :rubrics => {mig_id(rub1) => "1", mig_id(rub2) => "0"},
-              :learning_outcomes => {mig_id(lo) => "1", mig_id(lo2) => "0"},
+              :learning_outcomes => {mig_id(lo) => "1", mig_id(lo2) => "1", mig_id(lo3) => "0"},
+              :learning_outcome_groups => {mig_id(log) => "0", mig_id(log2) => "1", mig_id(log3) => "0"},
       }
       @cm.save!
 
@@ -242,7 +268,12 @@ describe ContentMigration do
       @copy_to.rubrics.find_by_migration_id(mig_id(rub2)).should be_nil
 
       @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should be_nil
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should_not be_nil
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo3)).should be_nil
+
+      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
+      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log2)).should_not be_nil
+      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log3)).should be_nil
     end
 
     it "should re-copy deleted items" do
