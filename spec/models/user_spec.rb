@@ -1087,6 +1087,35 @@ describe User do
       User.avatar_fallback_url('%{fallback}').should ==
         '%{fallback}'
     end
+
+    describe "#clear_avatar_image_url_with_uuid" do
+      before :each do
+        user_model
+        @user.avatar_image_url = '1234567890ABCDEF'
+        @user.save!
+      end
+      it "should raise ArgumentError when uuid nil or blank" do
+        lambda { @user.clear_avatar_image_url_with_uuid(nil) }.should  raise_error(ArgumentError, "'uuid' is required and cannot be blank")
+        lambda { @user.clear_avatar_image_url_with_uuid('') }.should raise_error(ArgumentError, "'uuid' is required and cannot be blank")
+        lambda { @user.clear_avatar_image_url_with_uuid('  ') }.should raise_error(ArgumentError, "'uuid' is required and cannot be blank")
+      end
+      it "should clear avatar_image_url when uuid matches" do
+        @user.clear_avatar_image_url_with_uuid('1234567890ABCDEF')
+        @user.avatar_image_url.should be_nil
+        @user.changed?.should == false   # should be saved
+      end
+      it "should not clear avatar_image_url when no match" do
+        @user.clear_avatar_image_url_with_uuid('NonMatchingText')
+        @user.avatar_image_url.should == '1234567890ABCDEF'
+      end
+      it "should not error when avatar_image_url is nil" do
+        @user.avatar_image_url = nil
+        @user.save!
+        #
+        lambda { @user.clear_avatar_image_url_with_uuid('something') }.should_not raise_error
+        @user.avatar_image_url.should be_nil
+      end
+    end
   end
 
   it "should find sections for course" do

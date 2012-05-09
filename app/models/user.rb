@@ -1233,6 +1233,18 @@ class User < ActiveRecord::Base
       avatar_fallback_url(default_avatar_fallback, request)
     end
   end
+
+  # Clear the avatar_image_url attribute and save it if the URL contains the given uuid.
+  #
+  # ==== Arguments
+  # * <tt>uuid</tt> - The Attachment#uuid value for the file. Used as part of the url identifier.
+  def clear_avatar_image_url_with_uuid(uuid)
+    raise ArgumentError, "'uuid' is required and cannot be blank" if uuid.blank?
+    if self.avatar_image_url.to_s.match(/#{uuid}/)
+      self.avatar_image_url = nil
+      self.save
+    end
+  end
   
   named_scope :with_avatar_state, lambda{|state|
     if state == 'any'

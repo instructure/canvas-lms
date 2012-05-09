@@ -1064,7 +1064,11 @@ class Attachment < ActiveRecord::Base
   named_scope :to_be_zipped, lambda{
     {:conditions => ['attachments.workflow_state = ? AND attachments.scribd_attempts < ?', 'to_be_zipped', 10], :order => 'created_at' }
   }
-  
+
+  named_scope :active, lambda {
+    { :conditions => ['attachments.file_state != ?', 'deleted'] }
+  }
+
   alias_method :destroy!, :destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
@@ -1075,6 +1079,9 @@ class Attachment < ActiveRecord::Base
     ContentTag.delete_for(self)
     MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:attachment_id => self.id}) if self.id && delete_media_object
     save!
+    # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
+    # then clear the avatar_image_url value.
+    self.context.clear_avatar_image_url_with_uuid(self.uuid) if self.context_type == 'User' && self.uuid.present?
   end
   
   def restore
