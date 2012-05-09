@@ -807,6 +807,7 @@ shared_examples_for "all selenium tests" do
   append_before (:each) do
     driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
+    EncryptedCookieStore.any_instance.stubs(:secret).returns(ActiveSupport::SecureRandom.hex(64))
   end
 
   append_before (:all) do
@@ -888,8 +889,8 @@ end
       $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
     end
     before do
-      HostUrl.default_host = $app_host_and_port
-      HostUrl.file_host = $app_host_and_port
+      HostUrl.stubs(:default_host).returns($app_host_and_port)
+      HostUrl.stubs(:file_host).returns($app_host_and_port)
     end
   end
 
