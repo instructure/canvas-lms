@@ -584,6 +584,66 @@ describe ContentMigration do
       @copy_to.wiki.wiki_pages.first.body.should == wiki_body % [@copy_to.id, att2_2.id]
     end
 
+    it "should include implied objects for context modules" do
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+      mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+      page2 = @copy_from.wiki.wiki_pages.create!(:title => "some page 2")
+      mod1.add_item({:id => page.id, :type => 'wiki_page'})
+      att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      mod1.add_item({:id => att.id, :type => 'attachment'})
+      mod1.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
+      mod1.add_item :type => 'context_module_sub_header', :title => "Sub Header"
+      tool = @copy_from.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      tool2 = @copy_from.context_external_tools.create!(:name => "b", :url => "http://www.instructure.com", :consumer_key => '12345', :shared_secret => 'secret')
+      mod1.add_item :type => 'context_external_tool', :id => tool.id, :url => tool.url
+      topic = @copy_from.discussion_topics.create!(:title => "topic")
+      topic2 = @copy_from.discussion_topics.create!(:title => "topic2")
+      mod1.add_item :type => 'discussion_topic', :id => topic.id
+      quiz = @copy_from.quizzes.create!(:title => 'quiz')
+      quiz2 = @copy_from.quizzes.create!(:title => 'quiz2')
+      mod1.add_item :type => 'quiz', :id => quiz.id
+      mod1.save!
+
+      mod2 = @copy_from.context_modules.create!(:name => "not copied")
+      asmnt2 = @copy_from.assignments.create!(:title => "some assignment again")
+      mod2.add_item({:id => asmnt2.id, :type => 'assignment', :indent => 1})
+      mod2.save!
+
+      @cm.copy_options = {
+                      :context_modules => {mig_id(mod1) => "1", mig_id(mod2) => "0"},
+              }
+      @cm.save!
+
+      run_course_copy
+
+      mod1_copy = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+      mod1_copy.should_not be_nil
+      if Qti.qti_enabled?
+        mod1_copy.content_tags.count.should == 8
+      else
+        mod1_copy.content_tags.count.should == 7
+      end
+
+
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt1)).should_not be_nil
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page)).should_not be_nil
+      @copy_to.attachments.find_by_migration_id(mig_id(att)).should_not be_nil
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).should_not be_nil
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).should_not be_nil if Qti.qti_enabled?
+
+      @copy_to.context_modules.find_by_migration_id(mig_id(mod2)).should be_nil
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt2)).should be_nil
+      @copy_to.attachments.find_by_migration_id(mig_id(att2)).should be_nil
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page2)).should be_nil
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool2)).should be_nil
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic2)).should be_nil
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz2)).should be_nil
+    end
+
     it "should perform day substitutions" do
       pending unless Qti.qti_enabled?
       @copy_from.assert_assignment_group
