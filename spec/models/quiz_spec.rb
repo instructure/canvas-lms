@@ -556,6 +556,33 @@ describe Quiz do
         # format for row is row_name, '', data1, data2, ...
         stats.first.length.should == 3
       end
+
+      it 'should deal with incomplete fill-in-multiple-blanks questions' do
+        @quiz.quiz_questions.create!(:question_data => { :name => "test 2",
+          :question_type => 'fill_in_multiple_blanks_question',
+          :question_text => "[ans0]",
+          :answers =>
+            {'answer_0' => {'answer_text' => 'foo', 'blank_id' => 'ans0', 'answer_weight' => '100'}}})
+        @quiz.quiz_questions.create!(:question_data => { :name => "test 3",
+          :question_type => 'fill_in_multiple_blanks_question',
+          :question_text => "[ans0] [ans1]",
+          :answers =>
+             {'answer_0' => {'answer_text' => 'bar', 'blank_id' => 'ans0', 'answer_weight' => '100'},
+              'answer_1' => {'answer_text' => 'baz', 'blank_id' => 'ans1', 'answer_weight' => '100'}}})
+        @quiz.generate_quiz_data
+        @quiz.save!
+        @quiz.quiz_questions.size.should == 3
+        qs = @quiz.generate_submission(@student)
+        # submission will not answer question 2 and will partially answer question 3
+        qs.submission_data = {
+            "question_#{@quiz.quiz_questions[2].id}_#{AssessmentQuestion.variable_id('ans1')}" => 'baz'
+        }
+        qs.grade_submission
+        stats = FasterCSV.parse(@quiz.statistics_csv)
+        stats.size.should == 12 # 3 questions * 2 lines + six more (name, id, submitted, correct, incorrect, score)
+        stats[7].size.should == 3
+        stats[7][2].should == ',baz'
+      end
     end
 
     it 'should strip tags from html multiple-choice/multiple-answers' do

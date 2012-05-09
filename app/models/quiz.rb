@@ -769,7 +769,7 @@ class Quiz < ActiveRecord::Base
   def strip_html_answers(question)
     return if !question || !question[:answers] || !(%w(multiple_choice_question multiple_answers_question).include? question[:question_type])
     for answer in question[:answers] do
-      answer[:text] = strip_tags(answer[:html]) if answer[:html] && !answer[:html].empty? && (!answer[:text] || answer[:text].empty?)
+      answer[:text] = strip_tags(answer[:html]) if !answer[:html].blank? && answer[:text].blank?
     end
   end
 
@@ -832,7 +832,7 @@ class Quiz < ActiveRecord::Base
         answer_item ||= answer
         if question[:question_type] == 'fill_in_multiple_blanks_question'
           blank_ids = question[:answers].map{|a| a[:blank_id] }.uniq
-          row << blank_ids.map{|blank_id| answer["answer_for_#{blank_id}".to_sym].gsub(/,/, '\,') }.join(',')
+          row << blank_ids.map{|blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.compact.join(',')
         elsif question[:question_type] == 'multiple_answers_question'
           row << question[:answers].map{|a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.compact.join(',')
         elsif question[:question_type] == 'multiple_dropdowns_question'
