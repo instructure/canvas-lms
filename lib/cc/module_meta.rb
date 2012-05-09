@@ -68,6 +68,9 @@ module CC
                 ct_migration_id = CCHelper.create_key(ct)
                 ct_id_map[ct.id] = ct_migration_id
                 items_node.item(:identifier=>ct_migration_id) do |item_node|
+                  unless ['ContextModuleSubHeader', 'ExternalUrl'].member? ct.content_type
+                    add_item_to_export(ct.content)
+                  end
                   item_node.content_type ct.content_type
                   item_node.title ct.title
                   item_node.identifierref CCHelper.create_key(ct.content_or_self) unless ct.content_type == 'ContextModuleSubHeader'

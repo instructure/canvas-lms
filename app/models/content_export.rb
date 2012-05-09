@@ -104,12 +104,12 @@ class ContentExport < ActiveRecord::Base
   end
 
   def selected_content
-    self.settings[:selected_content]
+    self.settings[:selected_content] ||= {}
   end
 
   def export_object?(obj)
     return false unless obj
-    return true unless selected_content
+    return true unless selected_content.present?
     return true if is_set?(selected_content[:everything])
 
     asset_type = obj.class.table_name
@@ -119,6 +119,13 @@ class ContentExport < ActiveRecord::Base
     return true if is_set?(selected_content[asset_type][CC::CCHelper.create_key(obj)])
 
     false
+  end
+
+  def add_item_to_export(obj)
+    return unless obj && obj.class.respond_to?(:table_name)
+    asset_type = obj.class.table_name
+    selected_content[asset_type] ||= {}
+    selected_content[asset_type][CC::CCHelper.create_key(obj)] = true
   end
   
   def add_error(user_message, exception_or_info)
