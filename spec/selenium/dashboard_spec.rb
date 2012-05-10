@@ -27,7 +27,7 @@ describe "dashboard" do
       get url
       find_all_with_jquery("div.communication_message.announcement").size.should == 0
 
-      @user.stream_items.size.should == 0
+      @user.recent_stream_items.size.should == 0
       items.first.reload.hidden.should == true
     end
 

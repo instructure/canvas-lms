@@ -53,7 +53,7 @@
       <div class="clear"></div>
     </div>
   </div>
-  <%= render :partial => 'cc_prefs', :locals => {:message_count => ((@current_user && @current_user.stream_items) || []).length} %>
+  <%= render :partial => 'cc_prefs', :locals => {:message_count => ((@current_user && @current_user.recent_stream_items) || []).length} %>
 <% else %>
   <% pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).select { |e| e.invited? } %>
   <% if pending_invitations.empty? %>
@@ -100,7 +100,7 @@
   <% end %>
 
   <% cache([@current_user, 'recent_messages'], :expires_in => 3.minutes) do %>
-    <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.stream_items) || []), :locals => {:show_context => true} %>
+    <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.recent_stream_items) || []), :locals => {:show_context => true} %>
   <% end %>
 <% end %>
 </div>

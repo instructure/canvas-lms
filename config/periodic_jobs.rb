@@ -59,10 +59,7 @@ end
 
 Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
   Shard.with_each_shard do
-    # we pass false for the touch_users argument, on the assumption that these
-    # stream items that we delete aren't visible on the user's dashboard anymore
-    # anyway, so there's no need to invalidate all the caches.
-    StreamItem.destroy_stream_items(4.weeks.ago, false)
+    StreamItem.destroy_stream_items_using_setting
   end
 end
 

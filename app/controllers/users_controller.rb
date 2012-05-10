@@ -236,9 +236,7 @@ class UsersController < ApplicationController
   include Api::V1::StreamItem
 
   # @API List the activity stream
-  # Returns the current user's global activity stream.
-  #
-  # The response is currently hard-coded to the last 2 weeks or 21 total items.
+  # Returns the current user's global activity stream, paginated.
   #
   # There are many types of objects that can be returned in the activity
   # stream. All object types have the same basic set of shared attributes:
@@ -339,8 +337,12 @@ class UsersController < ApplicationController
   #     'collaboration_id': 1234
   #   }
   def activity_stream
+    # for backwards compatibility, since this api used to be hard-coded to return 21 items
+    params[:per_page] ||= 21
+
     if @current_user
-      render :json => @current_user.stream_items.map { |i| stream_item_json(i, @current_user.id) }
+      scope = @current_user.visible_stream_items
+      render :json => Api.paginate(scope, self, api_v1_user_activity_stream_url).map { |i| stream_item_json(i, @current_user.id) }
     else
       render_unauthorized_action
     end

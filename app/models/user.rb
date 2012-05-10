@@ -1646,11 +1646,9 @@ class User < ActiveRecord::Base
   end
   memoize :recent_feedback
 
-  alias_method :stream_items_simple, :stream_items
-  def stream_items(opts={})
-    opts[:start_at] ||= 2.weeks.ago
+  def visible_stream_items(opts={})
+    items = stream_items.scoped(:conditions => { 'stream_item_instances.hidden' => false }, :order => 'stream_item_instances.id desc')
 
-    items = stream_items_simple.scoped(:conditions => { 'stream_item_instances.hidden' => false })
     # dont make the query do an stream_items.context_code IN
     # ('course_20033','course_20237','course_20247' ...) if they dont pass any
     # contexts, just assume it wants any context code.
@@ -1661,18 +1659,13 @@ class User < ActiveRecord::Base
       items = items.scoped(:conditions => ['stream_item_instances.context_code in (?)', setup_context_lookups(opts[:contexts])])
     end
 
-    if opts[:before_id]
-      items = items.scoped(:conditions => ['id < ?', opts[:before_id]], :limit => 21)
-    else
-      items = items.scoped(:limit => 21)
-    end
-
-    # next line does 2 things,
-    # 1. forces the query to be run, so that we dont send one query for the count and one for the actual dataset.
-    # 2. make sure that we always return an array and not nil
-    items.all(:order => 'stream_item_instances.id desc')
+    items
   end
-  memoize :stream_items
+
+  def recent_stream_items(opts={})
+    visible_stream_items(opts).scoped(:limit => 21).all
+  end
+  memoize :recent_stream_items
 
   def calendar_events_for_calendar(opts={})
     opts = opts.dup
