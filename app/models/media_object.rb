@@ -77,7 +77,7 @@ class MediaObject < ActiveRecord::Base
           res = client.bulkUploadGet(bulk_upload_id)
         end
       else
-        MediaObject.send_at(1.minute.from_now, :refresh_media_files, res[:id], attachments.map(&:id), root_account_id)
+        MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], attachments.map(&:id), root_account_id)
       end
     end
 
@@ -92,7 +92,7 @@ class MediaObject < ActiveRecord::Base
     client.startSession(Kaltura::SessionType::ADMIN)
     res = client.bulkUploadCsv(csv)
     if !res[:ready]
-      MediaObject.send_at(1.minute.from_now, :refresh_media_files, res[:id], [], root_account_id)
+      MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], [], root_account_id)
     else
       build_media_objects(res, root_account_id)
     end
@@ -145,7 +145,7 @@ class MediaObject < ActiveRecord::Base
     if !res[:ready]
       if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
         wait_period = Setting.get('media_object_bulk_refresh_wait_period', '30').to_i
-        MediaObject.send_at(wait_period.minutes.from_now, :refresh_media_files, bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
+        MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => wait_period.minutes.from_now, :priority => Delayed::LOW_PRIORITY}, bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
       else
         # if it fails, then the attachment should no longer consider itself kalturable
         Attachment.update_all({:media_entry_id => nil}, "id IN (#{attachment_ids.join(",")}) OR root_attachment_id IN (#{attachment_ids.join(",")})") unless attachment_ids.empty?
