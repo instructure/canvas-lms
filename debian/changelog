@@ -1,3 +1,13 @@
+canvas-lms (2012.05.12.12) testing; urgency=low
+
+  * Package ref: d74259871c1232a8e9b9474011c885a4fd34f4b9
+  *
+  * [+4fad045] correctly prepare quiz questions when copying course
+  * [+ec63101] allow frozen assignments to be copied by any user
+  * [+d742598] select for update in the postgresql job delete trigger
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 10 May 2012 12:59:50 -0600
+
 canvas-lms (2012.05.12.11) testing; urgency=low
 
   * Package ref: a7813fce3cd44c5264a613d41beb312e24dfa3c7
