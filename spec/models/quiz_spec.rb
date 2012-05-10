@@ -372,33 +372,51 @@ describe Quiz do
     data[2][:answers].should_not be_nil
   end
   
-  it "should generate a valid submission for a given user" do
-    u = User.create!(:name => "some user")
-    q = @course.quizzes.create!(:title => "some quiz")
-    q = @course.quizzes.create!(:title => "new quiz")
-    g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
-    q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 2", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 3", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 4", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 5", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 6", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 7", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 8", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 9", })
-    q.quiz_questions.create!(:question_data => { :name => "test 10", })
-    q.quiz_data.should be_nil
-    q.generate_quiz_data
-    q.save
-    
-    s = q.generate_submission(u)
-    s.state.should eql(:untaken)
-    s.attempt.should eql(1)
-    s.quiz_data.should_not be_nil
-    s.quiz_version.should eql(q.version_number)
-    s.finished_at.should be_nil
-    s.submission_data.should eql({})
-    
+  context "#generate_submission" do
+
+    it "should generate a valid submission for a given user" do
+      u = User.create!(:name => "some user")
+      q = @course.quizzes.create!(:title => "some quiz")
+      q = @course.quizzes.create!(:title => "new quiz")
+      g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
+      q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
+      q.quiz_questions.create!(:question_data => { :name => "test 2", }, :quiz_group => g)
+      q.quiz_questions.create!(:question_data => { :name => "test 3", }, :quiz_group => g)
+      q.quiz_questions.create!(:question_data => { :name => "test 4", }, :quiz_group => g)
+      q.quiz_questions.create!(:question_data => { :name => "test 5", }, :quiz_group => g)
+      q.quiz_questions.create!(:question_data => { :name => "test 6", }, :quiz_group => g)
+      q.quiz_questions.create!(:question_data => { :name => "test 7", }, :quiz_group => g)
+      q.quiz_questions.create!(:question_data => { :name => "test 8", }, :quiz_group => g)
+      q.quiz_questions.create!(:question_data => { :name => "test 9", })
+      q.quiz_questions.create!(:question_data => { :name => "test 10", })
+      q.quiz_data.should be_nil
+      q.generate_quiz_data
+      q.save
+      
+      s = q.generate_submission(u)
+      s.state.should eql(:untaken)
+      s.attempt.should eql(1)
+      s.quiz_data.should_not be_nil
+      s.quiz_version.should eql(q.version_number)
+      s.finished_at.should be_nil
+      s.submission_data.should eql({})
+      
+    end
+
+    it "sets end_at to lock_at when end_at is nil or after lock_at" do
+      lock_at = 1.minute.from_now
+      u = User.create!(:name => "some user")
+      q = @course.quizzes.create!(:title => "some quiz", :lock_at => lock_at)
+      # [nil, after lock_at]
+      [1.minute.ago, 2.minutes.from_now].each do |due_at|
+        q.due_at = due_at
+        # when
+        s = q.generate_submission(u)
+        # expect
+        s.end_at.should == lock_at
+      end
+    end
+
   end
   
   it "should return a default title if the quiz is untitled" do
