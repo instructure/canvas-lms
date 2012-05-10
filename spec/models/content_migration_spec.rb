@@ -415,6 +415,35 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
     end
 
+    it "should copy quizzes as published if they were published before" do
+      pending unless Qti.qti_enabled?
+      g = @copy_from.assignment_groups.create!(:name => "new group")
+      asmnt_unpub = @copy_from.quizzes.create!(:title => "asmnt unpub", :quiz_type => "assignment", :assignment_group_id => g.id)
+      asmnt_pub = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => g.id)
+      asmnt_pub.workflow_state = 'available'
+      asmnt_pub.save!
+      graded_survey_unpub = @copy_from.quizzes.create!(:title => "graded survey unpub", :quiz_type => "graded_survey", :assignment_group_id => g.id)
+      graded_survey_pub = @copy_from.quizzes.create(:title => "grade survey pub", :quiz_type => "graded_survey", :assignment_group_id => g.id)
+      graded_survey_pub.workflow_state = 'available'
+      graded_survey_pub.save!
+      survey_unpub = @copy_from.quizzes.create!(:title => "survey unpub", :quiz_type => "survey")
+      survey_pub = @copy_from.quizzes.create(:title => "survey pub", :quiz_type => "survey")
+      survey_pub.workflow_state = 'available'
+      survey_pub.save!
+      practice_unpub = @copy_from.quizzes.create!(:title => "practice unpub", :quiz_type => "practice_quiz")
+      practice_pub = @copy_from.quizzes.create(:title => "practice pub", :quiz_type => "practice_quiz")
+      practice_pub.workflow_state = 'available'
+      practice_pub.save!
+
+      run_course_copy
+
+      [asmnt_unpub, asmnt_pub, graded_survey_unpub, graded_survey_pub, survey_pub, survey_unpub, practice_unpub, practice_pub].each do |orig|
+        q = @copy_to.quizzes.find_by_migration_id(mig_id(orig))
+        "#{q.title} - #{q.workflow_state}".should == "#{orig.title} - #{orig.workflow_state}" # titles in there to help identify what type failed
+        q.quiz_type.should == orig.quiz_type
+      end
+    end
+
     it "should export quizzes with groups that point to external banks" do
       pending unless Qti.qti_enabled?
       course_with_teacher(:user => @user)

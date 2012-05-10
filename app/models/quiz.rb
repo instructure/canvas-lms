@@ -1228,7 +1228,9 @@ class Quiz < ActiveRecord::Base
     elsif !item.assignment && grading = hash[:grading]
       # The actual assignment will be created when the quiz is published
       item.quiz_type = 'assignment'
-      hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id] 
+      hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
+    elsif hash[:available]
+      item.workflow_state = 'available'
     end
     
     if hash[:assignment_group_migration_id]
