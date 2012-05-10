@@ -23,7 +23,7 @@ module Canvas::Migration
 module Worker
   
   def self.get_converter(settings)
-    PackageIdentifier.new(settings).get_converter
+    Canvas::Migration::PackageIdentifier.new(settings).get_converter
   end
   
   def self.upload_overview_file(file, content_migration)
