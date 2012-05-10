@@ -137,6 +137,9 @@ class QuizQuestion < ActiveRecord::Base
   end
 
   def self.import_from_migration(hash, context, quiz=nil, quiz_group=nil)
+    unless hash[:prepped_for_import]
+      AssessmentQuestion.prep_for_import(hash, context)
+    end
     question_data = self.connection.quote hash.to_yaml
     query = "INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)"
     aq_id = hash['assessment_question_id'] ? hash['assessment_question_id'] : 'NULL'
