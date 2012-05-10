@@ -72,7 +72,7 @@ def truncate_all_tables
     if connection.adapter_name == "PostgreSQL"
       connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")
     else
-      truncate_table(model)
+      models.each { |model| truncate_table(model) }
     end
   end
 end
