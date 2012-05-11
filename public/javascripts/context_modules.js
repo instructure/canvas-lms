@@ -261,10 +261,13 @@ define([
         data.type = data.type || data['item[type]'] || $.underscore(data.content_type);
         data.title = data.title || data['item[title]'];
         data.new_tab = data.new_tab ? '1' : '0';
-        if(data.id != 'new') {
-          $("#context_module_item_" + data.id).remove();
+        var $item, $olditem = (data.id != 'new') ? $("#context_module_item_" + data.id) : [];
+        if($olditem.length) {
+          $item = $olditem.clone(true).removeAttr('id');
+          $olditem.remove();
+        } else {
+          $item = $("#context_module_item_blank").clone(true).removeAttr('id');
         }
-        var $item = $("#context_module_item_blank").clone(true).removeAttr('id');
         $item.addClass(data.type + "_" + data.id);
         $item.addClass(data.type);
         $item.fillTemplateData({
