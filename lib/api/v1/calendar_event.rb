@@ -37,8 +37,20 @@ module Api::V1::CalendarEvent
     participant = nil
 
     hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title description location_address location_name workflow_state))
-    hash['context_code'] = event.context_code
-    hash['effective_context_code'] = event.effective_context_code if event.effective_context_code
+
+    appointment_group_id = (options[:appointment_group_id] || event.appointment_group.try(:id))
+
+    if event.effective_context_code
+      if appointment_group_id
+        codes_for_user = AppointmentGroup.find(appointment_group_id).contexts_for_user(user).map(&:asset_string)
+        hash['context_code'] = (event.effective_context_code.split(',') & codes_for_user).first
+        hash['effective_context_code'] = hash['context_code']
+      else
+        hash['effective_context_code'] = event.effective_context_code
+      end
+    end
+    hash['context_code'] ||= event.context_code
+
     hash["child_events_count"] = event.child_events.size
     hash['parent_event_id'] = event.parent_calendar_event_id
     hash['hidden'] = event.hidden?
@@ -50,7 +62,7 @@ module Api::V1::CalendarEvent
         hash['group'] = group_json(event.context, user, session, :include => ['users'])
       end
     end
-    if appointment_group_id = (options[:appointment_group_id] || event.appointment_group.try(:id))
+    if appointment_group_id
       hash['appointment_group_id'] = appointment_group_id
       hash['appointment_group_url'] = api_v1_appointment_group_url(appointment_group_id)
       if options[:current_participant] && event.has_asset?(options[:current_participant])
@@ -99,11 +111,12 @@ module Api::V1::CalendarEvent
 
   def appointment_group_json(group, user, session, options={})
     orig_context = @context
-    @context = group.context
+    @context = group.contexts_for_user(user).first
     @user_json_is_admin = nil # when returning multiple groups, @current_user may be admin over some contexts but not others. so we need to recheck
 
     include = options[:include] || []
-    hash = api_json(group, user, session, :only => %w{id context_code created_at description end_at location_address location_name max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at sub_context_code title updated_at workflow_state participant_visibility})
+    hash = api_json(group, user, session, :only => %w{id created_at description end_at location_address location_name max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility}, :methods => :sub_context_codes)
+    hash['context_codes'] = group.context_codes_for_user(user)
     hash['requiring_action'] = group.requiring_action?(user)
     if group.new_appointments.present?
       hash['new_appointments'] = group.new_appointments.map{ |event| calendar_event_json(event, user, session, :skip_details => true, :appointment_group_id => group.id) }

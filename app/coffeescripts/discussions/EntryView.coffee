@@ -1,7 +1,8 @@
 define [
   'require'
   'i18n!discussions.entry'
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
+  'underscore'
   'compiled/discussions/EntryCollection'
   'jst/discussions/_entry_content'
   'jst/discussions/_deleted_entry'
@@ -16,7 +17,7 @@ define [
   # entry_with_replies partials
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], (require, I18n, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, Reply, EntryEditor, MarkAsReadWatcher, htmlEscape, {publish}) ->
+], (require, I18n, Backbone, _, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, Reply, EntryEditor, MarkAsReadWatcher, htmlEscape, {publish}) ->
 
   # save memory
   noop = ->

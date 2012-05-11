@@ -1,7 +1,7 @@
 define [
   'jquery'
-  'use!underscore'
-  'compiled/backbone-ext/Backbone'
+  'underscore'
+  'Backbone'
   'compiled/str/splitAssetString'
 ], ($, _, Backbone, splitAssetString) ->
 
@@ -12,9 +12,8 @@ define [
     dateAttributes: ['created_at', 'end_at', 'start_at', 'updated_at']
 
     _filterAttributes: (obj) ->
-      filtered = {}
-      filtered[attr] = obj[attr] for attr in ['start_at', 'end_at', 'title',
-                                              'description', 'context_code']
+      filtered = _(obj).pick 'start_at', 'end_at', 'title',
+                             'description', 'context_code'
       if obj.use_section_dates && obj.child_event_data
         filtered.child_event_data = _.chain(obj.child_event_data)
           .compact()

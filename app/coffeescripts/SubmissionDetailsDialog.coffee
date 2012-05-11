@@ -1,14 +1,16 @@
 define [
+  'i18n!submission_details_dialog'
   'jquery'
   'jst/SubmissionDetailsDialog'
   'jst/_submission_detail' # a partial needed by the SubmissionDetailsDialog template
+  'jst/_turnitinScore' # a partial needed by the submission_detail partial
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
-], ($, submissionDetailsDialog) ->
+], (I18n, $, submissionDetailsDialog) ->
 
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
@@ -58,8 +60,12 @@ define [
           comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}?fallback=#{encodeURIComponent(urlPrefix+'/images/messages/avatar-50.png')}"
         for attachment in submission.attachments || []
           if turnitinDataForThisAttachment = submission.turnitin_data?["attachment_#{attachment.id}"]
-            attachment.turnitinUrl = "#{@options.context_url}/assignments/#{@assignment.id}/submissions/#{@student.id}/turnitin/attachment_#{attachment.id}"
-            attachment.turnitin_data = turnitinDataForThisAttachment
+            if turnitinDataForThisAttachment["similarity_score"]
+              attachment.turnitin_data = turnitinDataForThisAttachment
+              attachment.turnitin_data.state = "#{turnitinDataForThisAttachment.state || 'no'}_score"
+              attachment.turnitin_data.score = "#{turnitinDataForThisAttachment.similarity_score}%"
+              attachment.turnitin_data.reportUrl = "#{@options.context_url}/assignments/#{@assignment.id}/submissions/#{@student.id}/turnitin/attachment_#{attachment.id}"
+              attachment.turnitin_data.tooltip = I18n.t('turnitin.tooltip.score', 'Turnitin Similarity Score - See detailed report')
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()

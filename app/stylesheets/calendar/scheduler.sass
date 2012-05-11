@@ -41,10 +41,11 @@ button.single_item_done_button
     margin: 10px
 .unpublished-ag
   background-color: #f2f2f2
+.ag-context
+  margin-bottom: 10px
+  color: #666
 .ag-context a
   color: #666
-  margin-bottom: 10px
-  display: block
 .ag-x-of-x-signed-up
   font-size: 11px
 
@@ -107,8 +108,52 @@ button.single_item_done_button
   td
     vertical-align: top
 
-  .context_id, .section_select select, .group_select select
+  .context_id, .group_select select
     width: 150px
+
+  .section_select ul
+    list-style-type: none
+    margin: 0
+    padding: 0
+
+  .section_select li
+    list-style-type: none
+    margin: 0
+    padding: 0
+
+.ag_contexts_selector
+  width: 225px
+.ag-menu-container
+  position: relative
+.ag_contexts_menu
+  position: absolute
+  width: 223px
+  background: white
+  border: 1px solid #b6b6b6
+  margin-top: -3px
+  padding-bottom: 5px
+.ag-contexts
+  +reset_list
+  max-height: 150px
+  overflow-y: auto
+.ag_sections
+  +reset_list
+  padding-left: 35px
+.ag_sections_toggle
+  display: block
+  width: 16px
+  height: 16px
+  float: left
+  background-image: url(/images/jqueryui/icon_sprite.png)
+  background-position: -16px -80px
+.ag-sections-expanded
+  background-position: 0px -64px
+
+.ag_contexts_done
+  float: right
+
+.hidden
+  display: none
 
 .delete-block-link
   +accessible_text_replacement
@@ -140,6 +185,15 @@ button.single_item_done_button
   list-style-type: none
   padding: 0
   margin: 0 0 .5em
+
+.context_id
+  max-width: 200px
+
+.select-calendar-container
+  margin: 0 0 1.5em
+
+.group-signup
+  margin: 0 0 1.5em
 
 #message_participants_form
   padding: 10px

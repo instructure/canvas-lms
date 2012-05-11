@@ -49,7 +49,7 @@ describe PageView do
       PageView.new { |p| p.send(:attributes=, { :user_id => 7, :url => "http://test.one/", :session_id => "phony", :context_id => 1, :context_type => 'Course', :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdefg", :interaction_seconds => 5 }, false) }.store
       PageView.count.should == 0
       Setting.set('page_view_queue_batch_size', '2')
-      PageView.expects(:transaction).times(5).yields # 5 times, because 2 outermost transactions, then rails starts a "transaction" for each save (which runs as a no-op, since we're already in a transaction)
+      PageView.expects(:transaction).at_least(5).yields # 5 times, because 2 outermost transactions, then rails starts a "transaction" for each save (which runs as a no-op, since we're already in a transaction)
       PageView.process_cache_queue
       PageView.count.should == 3
     end
@@ -61,6 +61,22 @@ describe PageView do
       PageView.count.should == 1
       PageView.first.attributes.except('created_at', 'updated_at').should == @page_view.attributes.except('created_at', 'updated_at')
       Canvas::Redis.reset_redis_failure
+    end
+
+    describe "batch transaction" do
+      self.use_transactional_fixtures = false
+      it "should not fail the batch if one row fails" do
+        expect {
+          PageView.transaction do
+            PageView.process_cache_queue_item('request_id' => '1234')
+            PageView.process_cache_queue_item('request_id' => '1234')
+          end
+        }.to change(PageView, :count).by(1)
+      end
+
+      after do
+        PageView.delete_all
+      end
     end
 
     describe "active user counts" do

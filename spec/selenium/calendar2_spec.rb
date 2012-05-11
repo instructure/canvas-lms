@@ -229,6 +229,34 @@ describe "calendar2" do
         f('h2.title').text.should include "super big assignment"
       end
 
+      it "should let me message students who have signed up for an appointment" do
+        date = Date.today.to_s
+        create_appointment_group :new_appointments => [
+          ["#{date} 12:00:00", "#{date} 13:00:00"],
+          ["#{date} 13:00:00", "#{date} 14:00:00"],
+        ]
+        student1, student2 = 2.times.map do
+          student_in_course :course => @course, :active_all => true
+          @student
+        end
+        app1, app2 = AppointmentGroup.first.appointments
+        app1.reserve_for(student1, student1)
+        app2.reserve_for(student2, student2)
+
+        get '/calendar2'
+        wait_for_ajaximations
+        f('.fc-event').click
+        f('.message_students').click
+        wait_for_ajaximations
+        ff(".participant_list input").size.should eql 1
+        set_value f('textarea[name="body"]'), 'hello'
+        fj('.ui-button:contains(Send)').click
+        wait_for_ajaximations
+
+        student1.conversations.first.messages.size.should eql 1
+        student2.conversations.should be_empty
+      end
+
       it "editing an existing assignment should select the correct assignment group" do
         group1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
         group2 = @course.assignment_groups.create!(:name => "Assignment Group 2")

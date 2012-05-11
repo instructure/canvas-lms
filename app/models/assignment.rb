@@ -32,8 +32,8 @@ class Assignment < ActiveRecord::Base
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :set_custom_field_values, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes
-  attr_accessor :original_id
+    :external_tool_tag_attributes, :freeze_on_copy
+  attr_accessor :original_id, :updating_user, :copying
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
@@ -46,7 +46,6 @@ class Assignment < ActiveRecord::Base
   has_one :rubric, :through => :rubric_association
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ['enrollments.workflow_state = ?', 'active']
   belongs_to :context, :polymorphic => true
-  alias_method :effective_context, :context
   belongs_to :cloned_item
   belongs_to :grading_standard
   belongs_to :group_category
@@ -77,6 +76,7 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :context_type
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
 
   acts_as_list :scope => :assignment_group_id
   has_a_broadcast_policy
@@ -181,45 +181,39 @@ class Assignment < ActiveRecord::Base
     true
   end
 
+  def create_in_turnitin
+    return false unless self.context.turnitin_settings
+    return true if self.turnitin_settings[:current]
+    turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
+    res = turnitin.createOrUpdateAssignment(self, self.turnitin_settings)
+
+    unless read_attribute(:turnitin_settings)
+      self.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
+    end
+
+    if res[:assignment_id]
+      self.turnitin_settings[:created] = true
+      self.turnitin_settings[:current] = true
+      self.turnitin_settings.delete(:error)
+    else
+      self.turnitin_settings[:error] = res
+    end
+    self.save
+    return self.turnitin_settings[:current]
+  end
+
   def turnitin_settings
-    read_attribute(:turnitin_settings) || default_turnitin_settings
+    read_attribute(:turnitin_settings) || Turnitin::Client.default_assignment_turnitin_settings
   end
 
   def turnitin_settings=(settings)
-    unless settings.nil?
-      settings = settings.dup
-      settings.delete_if { |key, value| !default_turnitin_settings.has_key?(key.to_sym) }
-      settings[:created] = turnitin_settings[:created] if turnitin_settings[:created]
-
-      settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date'].include?(settings[:originality_report_visibility])
-
-      [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
-        settings[key] = '0' unless settings[key] == '1'
-      end
-
-      exclude_value = settings[:exclude_value].to_i
-      settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
-      settings[:exclude_value] = case settings[:exclude_type]
-        when '0': ''
-        when '1': [exclude_value, 1].max.to_s
-        when '2': (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+    settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+    unless settings.blank?
+      [:created, :error].each do |key|
+        settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
       end
     end
-
     write_attribute :turnitin_settings, settings
-  end
-
-  def default_turnitin_settings
-    {
-      :originality_report_visibility => 'immediate',
-      :s_paper_check => '1',
-      :internet_check => '1',
-      :journal_check => '1',
-      :exclude_biblio => '1',
-      :exclude_quoted => '1',
-      :exclude_type => '0',
-      :exclude_value => ''
-    }
   end
 
   def default_values
@@ -1267,7 +1261,7 @@ class Assignment < ActiveRecord::Base
   named_scope :only_graded, :conditions => "submission_types != 'not_graded'"
 
   named_scope :with_just_calendar_attributes, lambda {
-    { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types'] - ['cloned_item_id', 'migration_id']).join(", ") }
+    { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", ") }
   }
 
   named_scope :due_between, lambda { |start, ending|
@@ -1518,6 +1512,7 @@ class Assignment < ActiveRecord::Base
     item ||= context.assignments.new #new(:context => context)
     item.title = hash[:title]
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'available' if item.deleted?
     if hash[:instructions_in_html] == false
       self.extend TextHelper
     end
@@ -1526,6 +1521,8 @@ class Assignment < ActiveRecord::Base
     description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context)
     description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
     item.description = description
+    item.copied = true
+    item.copying = true
     if !hash[:submission_types].blank?
       item.submission_types = hash[:submission_types]
     elsif ['discussion_topic'].include?(hash[:submission_format])
@@ -1601,7 +1598,7 @@ class Assignment < ActiveRecord::Base
     [:all_day, :turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
      :automatic_peer_reviews, :anonymous_peer_reviews,
      :grade_group_students_individually, :allowed_extensions, :min_score,
-     :max_score, :mastery_score, :position, :peer_review_count
+     :max_score, :mastery_score, :position, :peer_review_count, :freeze_on_copy
     ].each do |prop|
       item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
     end
@@ -1692,5 +1689,40 @@ class Assignment < ActiveRecord::Base
     }
   end
   protected :infer_comment_context_from_filename
+
+  FREEZABLE_ATTRIBUTES = %w{title description lock_at points_possible grading_type
+                            submission_types assignment_group_id allowed_extensions
+                            group_category_id notify_of_update peer_reviews workflow_state}
+  def frozen?
+    !!(self.freeze_on_copy && self.copied && PluginSetting.settings_for_plugin(:assignment_freezer))
+  end
+
+  def frozen_for_user?(user)
+    frozen? && !self.context.grants_right?(user, :manage_frozen_assignments)
+  end
+
+  def att_frozen?(att, user=nil)
+    return false unless frozen?
+    if settings = PluginSetting.settings_for_plugin(:assignment_freezer)
+      if Canvas::Plugin.value_to_boolean(settings[att.to_s])
+        if user
+          return !self.context.grants_right?(user, :manage_frozen_assignments)
+        else
+          return true
+        end
+      end
+    end
+
+    false
+  end
+
+  def frozen_atts_not_altered
+    return if self.copying
+    FREEZABLE_ATTRIBUTES.each do |att|
+      if self.changes[att] && att_frozen?(att, @updating_user)
+        self.errors.add(att, t('errors.cannot_save_att', "You don't have permission to edit the locked attribute %{att_name}", :att_name => att))
+      end
+    end
+  end
 
 end

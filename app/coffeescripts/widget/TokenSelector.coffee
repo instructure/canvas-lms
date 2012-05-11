@@ -19,7 +19,6 @@
 define [
   'jquery'
   'jquery.ajaxJSON'
-  'jquery.instructure_jquery_patches'
   'jquery.instructure_misc_helpers'
   'jquery.disableWhileLoading'
   'compiled/jquery/scrollIntoView'

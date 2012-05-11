@@ -4,7 +4,7 @@ define([
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit, fillFormData */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,

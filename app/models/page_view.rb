@@ -167,9 +167,15 @@ class PageView < ActiveRecord::Base
       json = redis.lpop(self.cache_queue_name)
       break unless json
       attrs = JSON.parse(json)
+      self.process_cache_queue_item(attrs)
+    end
+  end
+
+  def self.process_cache_queue_item(attrs)
+    self.transaction(:requires_new => true) do
       if attrs['is_update']
         page_view = self.find_by_request_id(attrs['request_id'])
-        next unless page_view
+        return unless page_view
         page_view.do_update(attrs)
         page_view.save
       else
@@ -177,6 +183,7 @@ class PageView < ActiveRecord::Base
         self.create { |p| p.send(:attributes=, attrs, false) }
       end
     end
+  rescue ActiveRecord::StatementInvalid => e
   end
 
   def self.user_count_bucket_for_time(time)

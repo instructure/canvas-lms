@@ -6,21 +6,16 @@ describe "conversations" do
   it_should_behave_like "conversations selenium tests"
 
   it "should not allow double form submissions" do
-    student_name = 'student1'
     new_message = 'new conversation message'
-    @s1 = User.create(:name => student_name)
+    @s1 = User.create(:name => 'student1')
     @course.enroll_user(@s1)
-    get '/conversations'
+    new_conversation
+    add_recipient("student1")
 
     expect {
-      name_input = f('#create_message_form .token_input input')
-      name_input.send_keys(student_name)
-      wait_for_ajaximations
-      wait_for_ajaximations
-      name_input.send_keys(:return)
       f('#body').send_keys(new_message)
       5.times { f('#create_message_form button[type=submit]').click }
-      keep_trying_until{ f('#create_message_form textarea').enabled? }
+      keep_trying_until{ get_conversations.size == 1 }
     }.to change(ConversationMessage, :count).by(1)
   end
 
@@ -31,7 +26,7 @@ describe "conversations" do
       num.times { conversation(@me, user) }
       get "/conversations"
       keep_trying_until do
-        elements = find_all_with_jquery("#conversations > ul > li:visible")
+        elements = get_conversations
         elements.last.location_once_scrolled_into_view
         elements.size.should == num
       end
@@ -41,8 +36,7 @@ describe "conversations" do
       enable_cache do
         @me = @user
         5.times { conversation(@me, user).update_attribute(:workflow_state, 'unread') }
-        get '/conversations'
-        driver.find_element(:css, '.conversations li:first-child').click
+        get_messages # loads the page, clicks the first conversation
         get '/conversations'
         driver.find_element(:css, '.unread-messages-count').text.should eql '4'
       end
@@ -141,7 +135,7 @@ describe "conversations" do
       @course.enroll_user(@s1)
       @course.enroll_user(@s2)
 
-      get "/conversations"
+      new_conversation
 
       add_recipient("student1")
       add_recipient("student2")
@@ -153,9 +147,7 @@ describe "conversations" do
       assert_flash_notice_message /Messages Sent/
 
       # no conversations should show up in the conversation list
-      conversations = driver.find_elements(:css, "#conversations > ul > li")
-      conversations.size.should == 1
-      conversations.first["id"].should == "conversations_loader"
+      get_conversations(false).should be_empty
     end
   end
 end

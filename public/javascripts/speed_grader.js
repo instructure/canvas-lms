@@ -22,12 +22,14 @@ define([
   'jquery' /* $ */,
   'str/htmlEscape',
   'rubric_assessment',
+  'jst/_turnitinInfo',
+  'jst/_turnitinScore',
   'ajax_errors' /* INST.log_error */,
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* getJSON, ajaxJSONFiles, ajaxJSON */,
   'jquery.doc_previews' /* loadDocPreview */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, /\$\.store/ */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
   'jquery.keycodes' /* keycodes */,
@@ -44,7 +46,7 @@ define([
   'vendor/scribd.view' /* scribd */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(INST, I18n, $, htmlEscape, rubricAssessment) {
+], function(INST, I18n, $, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -108,6 +110,8 @@ define([
       $submission_file_hidden = $("#submission_file_hidden").removeAttr('id').detach(),
       $submission_to_view = $("#submission_to_view"),
       $assignment_submission_url = $("#assignment_submission_url"),
+      $assignment_submission_turnitin_report_url = $("#assignment_submission_turnitin_report_url"),
+      $assignment_submission_resubmit_to_turnitin_url = $("#assignment_submission_resubmit_to_turnitin_url"),
       $rubric_full = $("#rubric_full"),
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
       $mute_link = $('#mute_link'),
@@ -948,7 +952,7 @@ define([
         if (!this.currentStudent || (this.currentStudent.id != student.id)) {
           $selectmenu.change();
         }
-        if(student.avatar_path) { 
+        if (student.avatar_path) { 
           // If there's any kind of delay in loading the user's avatar, it's
           // better to show a blank image than the previous student's image.
           $new_image = $avatar_image.clone();
@@ -979,6 +983,59 @@ define([
       this.refreshFullRubric();
     },
 
+    populateTurnitin: function(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent) {
+      var $turnitinSimilarityScore = null;
+
+      // build up new values based on this asset
+      if (turnitinAsset.status == 'scored' || (turnitinAsset.status == null && turnitinAsset.similarity_score != null)) {
+        $turnitinScoreContainer.html(turnitinScoreTemplate({
+          state: (turnitinAsset.state || 'no') + '_score',
+          reportUrl: $.replaceTags($assignment_submission_turnitin_report_url.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
+          tooltip: I18n.t('turnitin.tooltip.score', 'Turnitin Similarity Score - See detailed report'),
+          score: turnitinAsset.similarity_score + '%'
+        }));
+      } else if (turnitinAsset.status) {
+        // status == 'error' or status == 'pending'
+        var pendingTooltip = I18n.t('turnitin.tooltip.pending', 'Turnitin Similarity Score - Submission pending'),
+            errorTooltip = I18n.t('turnitin.tooltip.error', 'Turnitin Similarity Score - See submission error details');
+        $turnitinSimilarityScore = $(turnitinScoreTemplate({
+          state: 'submission_' + turnitinAsset.status,
+          reportUrl: '#',
+          tooltip: (turnitinAsset.status == 'error' ? errorTooltip : pendingTooltip),
+          icon: '/images/turnitin_submission_' + turnitinAsset.status + '.png'
+        }));
+        $turnitinScoreContainer.append($turnitinSimilarityScore);
+        $turnitinSimilarityScore.click(function(event) {
+          event.preventDefault();
+          $turnitinInfoContainer.find('.turnitin_'+assetString).slideToggle();
+        });
+
+        var defaultInfoMessage = I18n.t('turnitin.info_message', 
+                                        'This file is still being processed by turnitin. Please check back later to see the score'),
+            defaultErrorMessage = I18n.t('turnitin.error_message', 
+                                         'There was an error submitting to turnitin. Please try resubmitting the file before contacting support');
+        var $turnitinInfo = $(turnitinInfoTemplate({
+          assetString: assetString,
+          message: (turnitinAsset.status == 'error' ? (turnitinAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),
+          showResubmit: turnitinAsset.status == 'error' && isMostRecent
+        }));
+        $turnitinInfoContainer.append($turnitinInfo);
+
+        if (turnitinAsset.status == 'error' && isMostRecent) {
+          var resubmitUrl = $.replaceTags($assignment_submission_resubmit_to_turnitin_url.attr('href'), { user_id: submission.user_id });
+          $turnitinInfo.find('.turnitin_resubmit_button').click(function(event) {
+            event.preventDefault();
+            $(this).attr('disabled', true)
+              .text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
+
+            $.ajaxJSON(resubmitUrl, "POST", {}, function() {
+              window.location.reload();
+            });
+          });
+        }
+      }
+    },
+
     handleSubmissionSelectionChange: function(){
       try {
         var submissionToViewVal = $submission_to_view.filter(":visible").val(),
@@ -987,6 +1044,10 @@ define([
                                     this.currentStudent.submission &&
                                     this.currentStudent.submission.currentSelectedIndex ) 
                                   || 0,
+            isMostRecent = this.currentStudent &&
+                           this.currentStudent.submission &&
+                           this.currentStudent.submission.submission_history &&
+                           this.currentStudent.submission.submission_history.length - 1 === currentSelectedIndex,
             submission  = this.currentStudent &&
                           this.currentStudent.submission &&
                           this.currentStudent.submission.submission_history &&
@@ -1000,19 +1061,21 @@ define([
             browserableAttachments = [];
 
         $single_submission_submitted_at.html(submittedAt && submittedAt.datetime_formatted);
-        var turnitin = submission.turnitin_data && submission.turnitin_data['submission_' + submission.id];
-        var turnitin_url = "#";
-        if(turnitin) {
-          turnitin_url = $.replaceTags($.replaceTags($("#assignment_submission_turnitin_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'submission_' + submission.id);
+
+        var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
+            $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
+            assetString = 'submission_' + submission.id,
+            turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
+        // There might be a previous submission that was text_entry, but the
+        // current submission is an upload. The turnitin asset for the text
+        // entry would still exist
+        if (turnitinAsset && submission.submission_type == 'online_text_entry') {
+          EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
         }
-        $grade_container.find(".turnitin_similarity_score")
-          .css('display', (turnitin && turnitin.similarity_score != null) ? '' : 'none')
-          .attr('href', turnitin_url)
-          .attr('class', 'turnitin_similarity_score ' + ((turnitin && turnitin.state) || 'no') + '_score')
-          .find(".similarity_score").text((turnitin && turnitin.similarity_score) || "--");
 
         //handle the files
         $submission_files_list.empty();
+        $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
         $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
           if (attachment.scribd_doc && attachment.scribd_doc.created) {
@@ -1021,17 +1084,11 @@ define([
           if (broswerableCssClasses.test(attachment.mime_class)) {
             browserableAttachments.push(attachment);
           }
-          var turnitin = submission.turnitin_data && submission.turnitin_data['attachment_' + attachment.id];
-          var turnitin_url = "#";
-          if(turnitin) {
-            turnitin_url = $.replaceTags($.replaceTags($("#assignment_submission_turnitin_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'attachment_' + attachment.id);
-          }
-          $submission_file_hidden.clone(true).fillTemplateData({
+          $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
             data: {
               submissionId: submission.user_id,
               attachmentId: attachment.id,
-              display_name: attachment.display_name,
-              similarity_score: turnitin && turnitin.similarity_score
+              display_name: attachment.display_name
             },
             hrefValues: ['submissionId', 'attachmentId']
           }).appendTo($submission_files_list)
@@ -1043,12 +1100,6 @@ define([
                 EG.loadAttachmentInline($(this).data('attachment'));
               })
             .end()
-            .find('a.turnitin_similarity_score')
-              .attr('href', turnitin_url)
-              .attr('class', 'turnitin_similarity_score ' + ((turnitin && turnitin.state) || 'no') + '_score')
-              .attr('target', '_blank')
-              .css('display', (turnitin && turnitin.similarity_score != null) ? '' : 'none')
-            .end()
             .find('a.submission-file-download')
               .bind('dragstart', function(event){
                 // check that event dataTransfer exists
@@ -1058,6 +1109,12 @@ define([
               })
             .end()
             .show();
+          $turnitinScoreContainer = $submission_file.find(".turnitin_score_container");
+          assetString = 'attachment_' + attachment.id;
+          turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
+          if (turnitinAsset) {
+            EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
+          }
         });
 
         $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
@@ -1122,13 +1179,11 @@ define([
       if (this.currentStudent.submission && this.currentStudent.submission.submitted_at) {
         this.refreshSubmissionsToView();
         $submission_details.show();
-        this.handleSubmissionSelectionChange();
       }
       else { //there's no submission
-        this.loadAttachmentInline();
         $submission_details.hide();
       }
-      this.resizeFullHeight();
+      this.handleSubmissionSelectionChange();
     },
 
     updateStatsInHeader: function(){
@@ -1170,7 +1225,7 @@ define([
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
-          $this_student_has_a_submission.show()
+          $this_student_has_a_submission.show();
       } else {
         $iframe_holder.empty();
 

@@ -10,7 +10,6 @@ def check_syntax(files)
     ./public/javascripts/jquery-1.4.js
     ./public/javascripts/jquery.ba-hashchange.js
     ./public/javascripts/jquery-ui-1.8.js
-    ./public/javascripts/jquery.ba-throttle-debounce.js
     ./public/javascripts/scribd.view.js
     ./public/javascripts/swfobject/swfobject.js
     ./public/javascripts/ui.selectmenu.js
@@ -117,7 +116,7 @@ namespace :canvas do
   desc "Compile javascript and css assets."
   task :compile_assets do
     threads = []
-    Thread.new do
+    threads << Thread.new do
       puts "--> Compiling static assets [css]"
       Rake::Task['css:generate'].invoke
 
@@ -126,9 +125,9 @@ namespace :canvas do
       raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
 
       puts "--> Compiled static assets [css/jammit]"
-    end.join
+    end
 
-    Thread.new do
+    threads << Thread.new do
       puts "--> Compiling static assets [javascript]"
       Rake::Task['js:generate'].invoke
 
@@ -137,12 +136,12 @@ namespace :canvas do
 
       puts "--> Optimizing JavaScript [r.js]"
       Rake::Task['js:build'].invoke
-    end.join
+    end
 
-    Thread.new do
+    threads << Thread.new do
       puts "--> Generating documentation [yardoc]"
       Rake::Task['doc:api'].invoke
-    end.join
+    end
 
     threads.each(&:join)
   end

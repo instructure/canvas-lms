@@ -120,7 +120,7 @@ describe CalendarEventsApiController, :type => :integration do
 
     context 'appointments' do
       it 'should include appointments for teachers (with participant info)' do
-        ag1 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+        ag1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         event1 = ag1.appointments.first
         student_ids = []
         3.times {
@@ -129,7 +129,7 @@ describe CalendarEventsApiController, :type => :integration do
         }
 
         cat = @course.group_categories.create
-        ag2 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :sub_context_code => cat.asset_string, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+        ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         event2 = ag2.appointments.first
         group_ids = []
         group_student_ids = []
@@ -172,13 +172,13 @@ describe CalendarEventsApiController, :type => :integration do
         @teacher = @course.admins.first
 
         student_in_course :course => @course, :user => @me, :active_all => true
-        group1 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+        group1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         group1.publish!
         event1 = group1.appointments.first
         3.times { event1.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher) }
 
         cat = @course.group_categories.create
-        group2 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :sub_context_code => cat.asset_string, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+        group2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         group2.publish!
         event2 = group2.appointments.first
         g = cat.groups.create(:context => @course)
@@ -208,7 +208,7 @@ describe CalendarEventsApiController, :type => :integration do
         @teacher = @course.admins.first
 
         student_in_course :course => @course, :user => @me, :active_all => true
-        group = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :participant_visibility => 'private', :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+        group = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :participant_visibility => 'private', :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         group.publish!
         event = group.appointments.first
         event.reserve_for(@me, @teacher)
@@ -231,7 +231,7 @@ describe CalendarEventsApiController, :type => :integration do
         @teacher = @course.admins.first
 
         student_in_course :course => @course, :user => @me, :active_all => true
-        group = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :participant_visibility => 'protected', :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+        group = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :participant_visibility => 'protected', :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         group.publish!
         event = group.appointments.first
         event.reserve_for(@me, @teacher)
@@ -257,8 +257,15 @@ describe CalendarEventsApiController, :type => :integration do
         @teacher = @course.admins.first
         student_in_course :course => @course, :user => @me, :active_all => true
         otherguy = student_in_course(:course => @course, :active_all => true).user
-        ag1 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+
+        course1 = @course
+        course_with_teacher(:user => @teacher, :active_all => true)
+        course2, @course = @course, course1
+
+        ag1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [course2])
         ag1.publish!
+        ag1.contexts = [course1, course2]
+        ag1.save!
         event1 = ag1.appointments.first
         my_personal_appointment = event1.reserve_for(@me, @me)
         event1.reserve_for(otherguy, otherguy)
@@ -269,7 +276,8 @@ describe CalendarEventsApiController, :type => :integration do
         othergroup = cat.groups.create(:context => @course)
         othergroup.users << otherguy
         @me.reload
-        ag2 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :sub_context_code => cat.asset_string, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+
+        ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [course1, course2])
         ag2.publish!
         event2 = ag2.appointments.first
         my_group_appointment = event2.reserve_for(mygroup, @me)
@@ -322,7 +330,7 @@ describe CalendarEventsApiController, :type => :integration do
 
           student_in_course(:course => @course, :user => (@other_guy = user), :active_all => true)
 
-          @ag1 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00", "2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
+          @ag1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00", "2012-01-01 13:00:00", "2012-01-01 14:00:00"]], :contexts => [@course])
           @ag1.publish!
           @event1 = @ag1.appointments.first
           @event2 = @ag1.appointments.last
@@ -333,7 +341,7 @@ describe CalendarEventsApiController, :type => :integration do
           @group.users << @other_guy
           @other_group = cat.groups.create(:context => @course)
           @me.reload
-          @ag2 = @course.appointment_groups.create(:title => "something", :participants_per_appointment => 4, :sub_context_code => cat.asset_string, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+          @ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
           @ag2.publish!
           @event3 = @ag2.appointments.first
 

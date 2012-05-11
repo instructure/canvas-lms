@@ -674,6 +674,7 @@ class ContextModule < ActiveRecord::Base
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.name = hash[:title] || hash[:description]
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'active' if item.deleted?
     item.position = hash[:position] || hash[:order]
     item.context = context
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]

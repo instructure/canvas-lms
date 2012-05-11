@@ -98,7 +98,7 @@ Which is you?", :count => @merge_opportunities.length %>
     <div class="disambiguation_box"<%= ' style="display: none;"'.html_safe if params[:register] %>>
       <p class="modal-box-content"><%= mt 'details.account_needed', "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account.", :course => @course.name %></p>
       <div class="button_box">
-        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @account_domain), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="button"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
+        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="button"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
         <a href="#" class="button" id="register"><%= t 'buttons.create_account', 'Create My Account' %></a>
       </div>
     </div>

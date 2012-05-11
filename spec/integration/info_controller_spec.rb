@@ -27,7 +27,7 @@ describe InfoController do
         get "/images/users/#{@user.id}"
         response.should be_redirect
         response['Location'].should match(%r{gravatar})
-        response['Location'].should match(%r{no_pic})
+        response['Location'].should match(%r{avatar-50})
 
         @user.avatar_image = { 'type' => 'attachment', 'url' => '/images/thumbnails/blah' }
         @user.save!

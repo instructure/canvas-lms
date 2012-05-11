@@ -21,11 +21,11 @@ define([
   'i18n!assignments',
   'jquery' /* $ */,
   'str/htmlEscape',
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formSuggestion */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.disabled/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
@@ -313,7 +313,7 @@ define([
     }
   };
   var assignment_sortable_options = {
-    items: '.group_assignment',
+    items: '.group_assignment:not(.frozen)',
     connectWith: '.assignment_group .assignment_list',
     handle: '.move_icon, .move',
     axis: 'y',

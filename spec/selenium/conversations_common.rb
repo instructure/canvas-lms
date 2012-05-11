@@ -15,7 +15,7 @@ shared_examples_for "conversations selenium tests" do
   def new_conversation(reload=true)
     if reload
       get "/conversations"
-      keep_trying_until { driver.find_element(:id, "create_message_form") }
+      keep_trying_until { fj("#create_message_form:visible") }
     else
       driver.find_element(:id, "action_compose_message").click
     end
@@ -62,8 +62,8 @@ shared_examples_for "conversations selenium tests" do
       yield
     end
 
-    @elements = prev_elements
     @level -= 1
+    @elements = @level == 1 ? nil : prev_elements
     @input.send_keys(:arrow_left) unless ffj('.autocomplete_menu:visible .list').empty?
     wait_for_animations
   end
@@ -166,20 +166,31 @@ shared_examples_for "conversations selenium tests" do
     end
   end
 
-  def get_messages
-    get "/conversations"
+  def get_messages(load_convo = true, keep_trying = true)
+    if load_convo
+      get "/conversations"
+      get_conversations.first.click
+    end
     elements = nil
     keep_trying_until {
-      elements = find_all_with_jquery("#conversations > ul > li:visible")
-      elements.size == 1
+      elements = ff("div#messages ul.messages > li")
+      elements.size > 0
     }
-    elements.first.click
-    wait_for_ajaximations
-    driver.find_elements(:css, "div#messages ul.messages > li")
+    elements
+  end
+
+  def get_conversations(keep_trying = true)
+    elements = nil
+    keep_trying_until {
+      elements = driver.execute_script("return $('#conversations .conversations > ul > li').not('.scrollable-list-item-loading,.scrollable-list-item-deleting,.scrollable-list-item-moving').toArray();")
+      return elements unless keep_trying
+      elements.size > 0
+    }
+    elements
   end
 
   def delete_selected_messages(confirm_conversation_deleted = true)
-    orig_size = find_all_with_jquery("#conversations > ul > li:visible").size
+    orig_size = get_conversations.size
 
     wait_for_animations
     delete = driver.find_element(:id, 'action_delete')
@@ -189,8 +200,13 @@ shared_examples_for "conversations selenium tests" do
 
     if confirm_conversation_deleted
       keep_trying_until {
-        find_all_with_jquery("#conversations > ul > li:visible").size.should eql(orig_size - 1)
+        get_conversations(false).size.should eql(orig_size - 1)
       }
     end
+  end
+
+  def conversations_path(params={})
+    hash = params.to_json.unpack('H*').first
+    "/conversations##{hash}"
   end
 end

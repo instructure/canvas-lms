@@ -20,7 +20,7 @@ define([
   'i18n!message_students',
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* showIf */
 ], function(I18n, $) {
 

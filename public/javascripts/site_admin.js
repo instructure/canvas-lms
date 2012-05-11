@@ -19,7 +19,7 @@ define([
   'i18n!site_admin',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags */
 ], function(I18n, $) {
 

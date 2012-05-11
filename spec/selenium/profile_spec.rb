@@ -124,40 +124,6 @@ describe "profile" do
       end
     end
 
-    it "should successfully upload profile pictures" do
-      a = Account.default
-      a.enable_service('avatars')
-      a.save!
-
-      get "/profile"
-      keep_trying_until { driver.find_element(:css, ".profile_pic_link.none") }.click
-      dialog = driver.find_element(:id, "profile_pic_dialog")
-      dialog.find_elements(:css, ".profile_pic_list span.img").length.should == 2
-      dialog.find_element(:css, ".add_pic_link").click
-      filename, fullpath, data = get_file("graded.png")
-      dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-
-      # Make ajax request slow down to verify transitional state
-      FilesController.before_filter { sleep 5; true }
-
-      driver.find_element(:id, 'add_pic_form').submit
-      new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
-      new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
-      spans = dialog.find_elements(:css, ".profile_pic_list span.img")
-      spans.length.should == 3
-
-      FilesController.filter_chain.pop
-
-      keep_trying_until do
-        spans.last.attribute('class') =~ /selected/
-        new_image.attribute('src').should =~ %r{/images/thumbnails/}
-      end
-      dialog.find_element(:css, 'button.select_button').click
-      keep_trying_until { driver.find_element(:css, '.profile_pic_link img').attribute('src') =~ %r{/images/thumbnails/} }
-
-      Attachment.last.folder.should == @user.profile_pics_folder
-    end
-
     it "should display file uploader link on files page" do
       get "/profile"
       expect_new_page_load { driver.find_element(:css, '#left-side .files').click }
@@ -316,3 +282,58 @@ describe "profile" do
   end
 end
 
+shared_examples_for "profile pictures selenium tests" do
+  it_should_behave_like "forked server selenium tests"
+
+  it "should successfully upload profile pictures" do
+    course_with_teacher_logged_in
+    a = Account.default
+    a.enable_service('avatars')
+    a.save!
+
+    get "/profile"
+    keep_trying_until { driver.find_element(:css, ".profile_pic_link.none") }.click
+    dialog = driver.find_element(:id, "profile_pic_dialog")
+    dialog.find_elements(:css, ".profile_pic_list span.img").length.should == 2
+    dialog.find_element(:css, ".add_pic_link").click
+    filename, fullpath, data = get_file("graded.png")
+    dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
+
+    # Make ajax request slow down to verify transitional state
+    FilesController.before_filter { sleep 5; true }
+
+    driver.find_element(:id, 'add_pic_form').submit
+    new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
+    new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
+    spans = dialog.find_elements(:css, ".profile_pic_list span.img")
+    spans.length.should == 3
+
+    FilesController.filter_chain.pop
+
+    keep_trying_until do
+      spans.last.attribute('class') =~ /selected/
+      new_image.attribute('src').should =~ %r{/images/thumbnails/}
+    end
+    dialog.find_element(:css, 'button.select_button').click
+    keep_trying_until { driver.find_element(:css, '.profile_pic_link img').attribute('src') =~ %r{/images/thumbnails/} }
+
+    Attachment.last.folder.should == @user.profile_pics_folder
+  end
+end
+
+describe "profile pictures local tests" do
+  it_should_behave_like "profile pictures selenium tests"
+  prepend_before(:each) do
+    Setting.set("file_storage_test_override", "local")
+  end
+end
+
+describe "profile pictures s3 tests" do
+  it_should_behave_like "profile pictures selenium tests"
+  prepend_before(:each) {
+    Setting.set("file_storage_test_override", "s3")
+  }
+  prepend_before(:all) {
+    Setting.set("file_storage_test_override", "s3")
+  }
+end

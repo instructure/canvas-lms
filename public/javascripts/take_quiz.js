@@ -23,7 +23,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.rails_flash_notifications' /* flashMessage */,
   'compiled/tinymce',
@@ -78,10 +78,23 @@ define([
             setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
           }
           if(data && data.end_at) {
-            quizSubmission.end_at.text(data.end_at);
+            var endAtFromServer     = Date.parse(data.end_at),
+                submissionEndAt     = Date.parse(quizSubmission.end_at.text()),
+                serverEndAtTime     = endAtFromServer.getTime(),
+                submissionEndAtTime = submissionEndAt.getTime();
+
             quizSubmission.referenceDate = null;
-            if(data.end_at > quizSubmission.end_at.text()) {
-              $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt'));
+
+            // if the new end_at from the server is different than our current end_at, then notify
+            // the user that their time limit's changed and let updateTime do the rest.
+            if (serverEndAtTime !== submissionEndAtTime) {
+              serverEndAtTime > submissionEndAtTime ?
+                $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt')) :
+                $.flashMessage(I18n.t('notices.less_time', 'Your time for this quiz has been reduced.'));
+
+              quizSubmission.end_at.text(data.end_at);
+              endAtText   = data.end_at;
+              endAtParsed = new Date(data.end_at);
             }
           }
         }, function() {
@@ -267,7 +280,7 @@ define([
           quizSubmission.updateSubmission();
         }
       })
-      .delegate(":text,textarea", 'change', function(event, update) {
+      .delegate(":text,textarea,select", 'change', function(event, update) {
         var $this = $(this);
         if ($this.hasClass('numerical_question_input')) {
           var val = parseFloat($this.val());
@@ -292,15 +305,24 @@ define([
         $question.toggleClass('marked');
         $("#list_" + $question.attr('id')).toggleClass('marked');
       })
-      .delegate(".question_input", 'change', function() {
+      .delegate(".question_input", 'change', function(event, update, changedMap) {
         var $this = $(this),
-            tagName = $(this)[0].tagName.toUpperCase(),
+            tagName = this.tagName.toUpperCase(),
+            id = $this.parents(".question").attr('id'),
             val = "";
+        if (tagName == "A") return;
+        if (changedMap) { // reduce redundant jquery lookups and other calls
+          if (changedMap[id]) return;
+          changedMap[id] = true;
+        }
 
         if (tagName == "TEXTAREA") {
           val = $this.editorBox('get_code');
-        } else if (tagName == "SELECT" || $this.attr('type') == "text") {
+        } else if ($this.attr('type') == "text") {
           val = $this.val();
+        } else if (tagName == "SELECT") {
+          var $selects = $this.parents(".question").find("select.question_input");
+          val = !$selects.filter(function() { return !$(this).val() }).length;
         } else {
           $this.parents(".question").find(".question_input").each(function() {
             if($(this).attr('checked') || $(this).attr('selected')) {
@@ -308,9 +330,9 @@ define([
             }
           });
         }
-        $("#list_" + $this.parents(".question").attr('id'))[val ? 'addClass' : 'removeClass']('answered');
+        $("#list_" + id)[val ? 'addClass' : 'removeClass']('answered');
       })
-      .find(".question_input").change();
+      .find(".question_input").trigger('change', [false, {}]);
 
 
     setInterval(function() {

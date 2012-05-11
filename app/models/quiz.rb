@@ -253,7 +253,37 @@ class Quiz < ActiveRecord::Base
     end
   end
   protected :update_assignment
-  
+
+  ##
+  # when a quiz is updated, this method should be called to update the end_at
+  # of all open quiz submissions. this ensures that students who are taking the
+  # quiz when the time_limit is updated get the additional time added.
+  def update_quiz_submission_end_at_times
+    new_end_at = time_limit * 60.0
+
+    update_sql = case ActiveRecord::Base.connection.adapter_name.downcase
+                 when /postgres/
+                   "started_at + INTERVAL '+? seconds'"
+                 when /mysql/
+                   "started_at + INTERVAL ? SECOND"
+                 when /sqlite/
+                   "DATETIME(started_at, '+? seconds')"
+                 end
+
+    # only update quiz submissions that:
+    # 1. belong to this quiz;
+    # 2. haven't been started; and
+    # 3. won't lose time through this change.
+    where_clause = <<-END
+      quiz_id = ? AND
+      started_at IS NOT NULL AND
+      finished_at IS NULL AND
+      #{update_sql} > end_at
+    END
+
+    QuizSubmission.update_all(["end_at = #{update_sql}", new_end_at], [where_clause, self.id, new_end_at]);
+  end
+
   workflow do
     state :created do
       event :did_edit, :transitions_to => :edited
@@ -1114,7 +1144,13 @@ class Quiz < ActiveRecord::Base
     # there might not be an import id if it's just a text-only type...
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id]) if hash[:id]
     item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    return if item && !allow_update
+    if item && !allow_update
+      if item.deleted?
+        item.workflow_state = hash[:available] ? 'available' : 'created'
+        item.save
+      end
+      return
+    end
     item ||= context.quizzes.new
 
     hash[:due_at] ||= hash[:due_date]
@@ -1124,7 +1160,7 @@ class Quiz < ActiveRecord::Base
     item.due_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
     item.description = ImportedHtmlConverter.convert(hash[:description], context)
-    [:migration_id, :title, :allowed_attempts, :time_limit, 
+    [:migration_id, :title, :allowed_attempts, :time_limit,
      :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
      :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
      :require_lockdown_browser_for_results, :anonymous_submissions, 

@@ -160,10 +160,13 @@ describe CalendarEvent do
     it "should return events implicitly tied to the contexts (via effective_context_string)" do
       @teacher = user
       @course.enroll_teacher(@teacher).accept!
-      g1 = @course.appointment_groups.create(:title => "foo")
+      course1 = @course
+      course_with_teacher(@teacher)
+      course2, @course = @course, course1
+      g1 = AppointmentGroup.create(:title => "foo", :contexts => [course1, course2])
       g1.publish!
       a1 = g1.appointments.create.reserve_for(@student, @student)
-      g2 = @course.appointment_groups.create(:title => "foo", :sub_context_code => @course.default_section.asset_string)
+      g2 = AppointmentGroup.create(:title => "foo", :contexts => [@course], :sub_context_codes => [@course.default_section.asset_string])
       g2.publish!
       a2 = g2.appointments.create.reserve_for(@student, @student)
       pe = @course.calendar_events.create!
@@ -258,7 +261,7 @@ describe CalendarEvent do
       @student1 = @user
       @other_section = @course.course_sections.create!
       @other_course = Course.create!
-      @ag = AppointmentGroup.create(:title => "test", :context => @course)
+      @ag = AppointmentGroup.create(:title => "test", :contexts => [@course])
       @ag.publish!
       @appointment = @ag.appointments.create(:start_at => '2012-01-01 12:00:00', :end_at => '2012-01-01 13:00:00')
     end
@@ -280,7 +283,7 @@ describe CalendarEvent do
         @group = c1.groups.create(:context => @course)
         @group.users << @student1 << @student2
 
-        @ag2 = AppointmentGroup.create!(:title => "test", :context => @course, :sub_context_code => c1.asset_string)
+        @ag2 = AppointmentGroup.create!(:title => "test", :contexts => [@course], :sub_context_codes => [c1.asset_string])
         @ag2.publish!
         @appointment2 = @ag2.appointments.create(:start_at => '2012-01-01 12:00:00', :end_at => '2012-01-01 13:00:00')
 
@@ -337,7 +340,7 @@ describe CalendarEvent do
     end
 
     it "should allow multiple participants in an appointment, up to the limit" do
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :participants_per_appointment => 2,
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2,
         :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
       ag.publish!
@@ -356,7 +359,7 @@ describe CalendarEvent do
     it "should give preference to the calendar's appointment limit" do
       ag = AppointmentGroup.create!(
         :title => "testing...",
-        :context => @course,
+        :contexts => [@course],
         :participants_per_appointment => 2,
         :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
@@ -384,7 +387,7 @@ describe CalendarEvent do
     it "should revert to the appointment group's participant_limit when appropriate" do
       ag = AppointmentGroup.create!(
         :title => "testing...",
-        :context => @course,
+        :contexts => [@course],
         :participants_per_appointment => 2,
         :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
@@ -403,7 +406,7 @@ describe CalendarEvent do
     end
 
     it "should not let participants exceed max_appointments_per_participant" do
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :max_appointments_per_participant => 1,
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :max_appointments_per_participant => 1,
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'], ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
       ag.publish!
@@ -415,7 +418,7 @@ describe CalendarEvent do
     end
 
     it "should cancel existing reservations if cancel_existing = true" do
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :max_appointments_per_participant => 1,
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :max_appointments_per_participant => 1,
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'], ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
       ag.publish!
@@ -428,7 +431,7 @@ describe CalendarEvent do
     end
 
     it "should enforce the section" do
-      ag = AppointmentGroup.create(:title => "test", :context => @course.course_sections.create,
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course.course_sections.create],
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
       )
       ag.publish!
@@ -445,7 +448,7 @@ describe CalendarEvent do
       c2 = @course.group_categories.create
       g2 = c2.groups.create(:context => @course)
 
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :sub_context_code => c1.asset_string,
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :sub_context_codes => [c1.asset_string],
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
       )
       appointment = ag.appointments.first
@@ -479,7 +482,7 @@ describe CalendarEvent do
     end
 
     it "should unlock the appointment when the last reservation is canceled" do
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :participants_per_appointment => 2,
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2,
         :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
       appointment = ag.appointments.first
@@ -497,7 +500,7 @@ describe CalendarEvent do
     end
 
     it "should copy the group attributes to the initial appointments" do
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :description => "hello\nworld",
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :description => "hello\nworld",
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
       )
       e = ag.appointments.first
@@ -524,7 +527,7 @@ describe CalendarEvent do
     end
 
     it "should copy the group attributes to subsequent appointments" do
-      ag = AppointmentGroup.create(:title => "test", :context => @course)
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course])
       ag.update_attributes(
         :title => 'haha',
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
@@ -540,7 +543,7 @@ describe CalendarEvent do
     end
 
     it "should allow a user to re-reserve a slot after canceling" do
-      ag = AppointmentGroup.create(:title => "test", :context => @course, :participants_per_appointment => 1,
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 1,
         :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
       appointment = ag.appointments.first

@@ -22,7 +22,7 @@ define([
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, getUserServices, findLinkForService */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.keycodes' /* keycodes */,

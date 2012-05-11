@@ -1,4 +1,4 @@
-define ['use!backbone', 'i18n!discussions.participant'], (Backbone, I18n) ->
+define ['Backbone', 'i18n!discussions.participant'], (Backbone, I18n) ->
 
   class Participant extends Backbone.Model
 

@@ -8,34 +8,21 @@
       <b>{{#t "location"}}Location{{/t}}</b><br />
       <input type="text" name="location" style="width: 190px" value="{{appointment_group.location_name}}">
     </p>
-    <p>
+    <div class="select-calendar-container">
       <b>{{#t "calendar"}}Calendar{{/t}}</b><br />
-      <select name="context_code" class="context_id">
-        {{#each contexts}}
-          {{#if can_create_appointment_groups}}
-            <option value="{{asset_string}}">{{name}}</option>
-          {{/if}}
-        {{/each}}
-      </select>
-    </p>
+      <button class="button ag_contexts_selector"></button>
+      <div class="ag-menu-container"></div>
+    </div>
     <p>
       <input type="checkbox" class="group-signup-checkbox" id="group-signup-checkbox" name="use_group_signup" value="1" {{#ifEqual participant_type "Group"}}checked{{/ifEqual}}>
       <label for="group-signup-checkbox">Have students sign up in groups.</label>
     </p>
-    <p>
-      <div class="section-signup">
-        <b>{{#t "course_section"}}Limit Signups to{{/t}}</b><br />
-        <div class="section_select">
-          <select name="section_id"></select>
-        </div>
+    <div class="group-signup" style="display: none">
+      <b>{{#t "group_category"}}Group Category{{/t}}</b><br />
+      <div class="group_select">
+        <select name="group_category_id"></select>
       </div>
-      <div class="group-signup" style="display: none">
-        <b>{{#t "group_category"}}Group Category{{/t}}</b><br />
-        <div class="group_select">
-          <select name="group_category_id"></select>
-        </div>
-      </div>
-    </p>
+    </div>
   </div>
   <div class="right-column-wrapper">
     <div class="time-block-list-wrapper">

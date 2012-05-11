@@ -102,7 +102,7 @@ class CoursesController < ApplicationController
   # @argument course[name] [String] [optional] The name of the course. If omitted, the course will be named "Unnamed Course."
   # @argument course[course_code] [String] [optional] The course code for the course.
   # @argument course[start_at] [Datetime] [optional] Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
-  # @argument course[conclude_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  # @argument course[end_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   # @argument course[license] [String] [optional] The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted); 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives); 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike); 'cc_by_nc' (CC Attribution Non-Commercial); 'cc_by_nd' (CC Attribution No Derivatives); 'cc_by_sa' (CC Attribution Share Alike); 'cc_by' (CC Attribution); 'public_domain' (Public Domain).
   # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
   # @argument course[public_description] [String] [optional] A publicly visible description of the course.
@@ -128,6 +128,17 @@ class CoursesController < ApplicationController
       end
 
       sis_course_id = params[:course].delete(:sis_course_id)
+
+      # accept end_at as an alias for conclude_at. continue to accept
+      # conclude_at for legacy support, and return conclude_at only if
+      # the user uses that name.
+      course_end = if params[:course][:end_at].present?
+                     params[:course][:conclude_at] = params[:course].delete(:end_at)
+                     :end_at
+                   else
+                     :conclude_at
+                   end
+
       @course = (@sub_account || @account).courses.build(params[:course])
       @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
       @course.offer if api_request? and params[:offer].present?
@@ -138,7 +149,7 @@ class CoursesController < ApplicationController
             @course,
             @current_user,
             session,
-            [:start_at, :conclude_at, :license, :publish_grades_immediately,
+            [:start_at, course_end, :license, :publish_grades_immediately,
              :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
@@ -721,10 +732,7 @@ class CoursesController < ApplicationController
       return redirect_to course_settings_path(@context.id)
     end
 
-    enrollment = @context_enrollment || @pending_enrollment
-    start_date = enrollment.enrollment_dates.map(&:first).compact.min if enrollment && enrollment.state_based_on_date == :inactive
-    @unauthorized_message = t('unauthorized.unpublished', "This course has not been published by the instructor yet.") if enrollment && @context.claimed?
-    @unauthorized_message = t('unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now
+    @context_enrollment ||= @pending_enrollment
     if is_authorized_action?(@context, @current_user, :read)
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
         @assignments_needing_publishing = @context.assignments.active.need_publishing || []
@@ -763,7 +771,7 @@ class CoursesController < ApplicationController
         @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
       end
 
-      if @current_user and (@show_recent_feedback = (@current_user.student_enrollments.active.count > 0))
+      if @current_user and (@show_recent_feedback = @context.user_is_student?(@current_user))
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
     else
@@ -805,9 +813,7 @@ class CoursesController < ApplicationController
   def conclude_user
     get_context
     @enrollment = @context.enrollments.find(params[:id])
-    can_remove = @enrollment.is_a?(StudentEnrollment) && @context.grants_right?(@current_user, session, :manage_students)
-    can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
-    if can_remove
+    if @enrollment.can_be_concluded_by(@current_user, @context, session)
       respond_to do |format|
         if @enrollment.conclude
           format.json { render :json => @enrollment.to_json }
@@ -858,11 +864,7 @@ class CoursesController < ApplicationController
   def unenroll_user
     get_context
     @enrollment = @context.enrollments.find(params[:id])
-    can_remove = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
-    can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
-    # Teachers can't unenroll themselves unless they could re-add themselves by using account permissions
-    can_remove &&= @enrollment.user_id != @current_user.id || @context.account.grants_right?(@current_user, session, :manage_admin_users)
-    if can_remove
+    if @enrollment.can_be_deleted_by(@current_user, @context, session)
       respond_to do |format|
         if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
           format.json { render :json => @enrollment.to_json }

@@ -147,7 +147,6 @@ class Course < ActiveRecord::Base
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :rubrics, :as => :context
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
-  has_many :tags, :class_name => 'ContentTag', :as => 'context', :order => 'LOWER(title)', :conditions => {:tag_type => 'default'}, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
   has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
@@ -163,7 +162,8 @@ class Course < ActiveRecord::Base
   has_many :content_exports
   has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria
-  has_many :appointment_groups, :as => :context
+  has_many :appointment_group_contexts, :as => :context
+  has_many :appointment_groups, :through => :appointment_group_contexts
   has_many :appointment_participants, :class_name => 'CalendarEvent', :foreign_key => :effective_context_code, :primary_key => :asset_string, :conditions => "workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL"
   attr_accessor :import_source
   has_many :zip_file_imports, :as => :context
@@ -885,7 +885,7 @@ class Course < ActiveRecord::Base
     can :read and can :participate_as_student and can :read_grades
 
     # Prior users
-    given { |user| !self.deleted? && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
+    given { |user| (self.available? || self.completed?) && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
     can :read
 
     # Teacher of a concluded course
@@ -899,7 +899,7 @@ class Course < ActiveRecord::Base
     can :delete
 
     # Student of a concluded course
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
+    given { |user| (self.available? || self.completed?) && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
     can :read and can :read_grades and can :read_forum
 
     # Viewing as different role type
@@ -2210,7 +2210,8 @@ class Course < ActiveRecord::Base
       end
     end
 
-    new_time = ActiveSupport::TimeWithZone.new(Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)), Time.zone) - Time.zone.utc_offset
+    new_time = Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)).in_time_zone
+    new_time -= new_time.utc_offset
     log_merge_result("Events for #{old_date.to_s} moved to #{new_date.to_s}")
     new_time
   end

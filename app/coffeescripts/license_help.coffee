@@ -19,7 +19,7 @@
 define [
   'i18n!license_help'
   'jquery'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'jquery.loadingImg'
 ], (I18n, $) ->

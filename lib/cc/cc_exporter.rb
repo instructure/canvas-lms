@@ -20,7 +20,7 @@ module CC
     ZIP_DIR = 'zip_dir'
     
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy
-    delegate :add_error, :to => :@content_export, :allow_nil => true
+    delegate :add_error, :add_item_to_export, :to => :@content_export, :allow_nil => true
 
     def initialize(content_export, opts={})
       @content_export = content_export
@@ -78,6 +78,10 @@ module CC
         end
       end
       true
+    end
+
+    def referenced_files
+      @manifest ? @manifest.referenced_files : {}
     end
     
     def set_progress(progress)

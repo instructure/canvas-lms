@@ -1,5 +1,5 @@
 define [
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
   'compiled/util/BackoffPoller'
 ], (Backbone, BackoffPoller) ->
 

@@ -20,7 +20,7 @@ define([
   'i18n!quizzes.show',
   'jquery' /* $ */,
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'message_students' /* messageStudents */

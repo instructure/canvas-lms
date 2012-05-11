@@ -50,7 +50,7 @@ button.button, a.button
   overflow: visible
   +border-radius(3px)
   border: 1px solid
-  box-shadow: 1px, 1px, 1px rgba(0, 0, 0, 0.15)
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15)
   background: url(/images/button_bg.png) 0px 0px repeat-x !important
   color: #555 !important
   border-color: #b6b6b6
@@ -79,7 +79,7 @@ button.button-icons-only
     background: url(/images/button_bg.png) 0px 0px repeat-x !important
     color: #313131
     border-color: #9d9d9d
-    box-shadow: rgba(0, 0, 0, 0.3) 0 0 6px
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3)
   &:active
     background: url(/images/button_bg.png) 0px bottom repeat-x !important
     color: #4f4f4f
@@ -198,8 +198,7 @@ button.disabled, a.disabled
     border-right: 1px solid #bbb
     border-bottom: 1px solid #bfbfbf
     cursor: default
-    -webkit-box-shadow: none
-    -moz-box-shadow: none
+    box-shadow: none
 a.button-secondary,
 button.button-secondary
   &, &:hover, &:active, &:focus
@@ -212,8 +211,7 @@ button.button-secondary
     display: inline-block
     cursor: pointer
     color: #D15545 !important
-    -webkit-box-shadow: none
-    -moz-box-shadow: none 
+    box-shadow: none
     +border-radius(0)
 
   &:hover, &:active, &:focus

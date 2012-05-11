@@ -44,7 +44,7 @@
               t :enrolled_as_limited_ta, "enrolled as a TA with section-only access"
             when 'ObserverEnrollment'
               t :enrolled_as_limited_observer, "enrolled as an observer with section-only access"
-            when 'CourseDesignerEnrollment'
+            when 'DesignerEnrollment'
               t :enrolled_as_limited_designer, "enrolled as a designer with section-only access"
             else
               t :enrolled_as_limited_student, "enrolled as a student with section-only access"
@@ -57,7 +57,7 @@
               t :enrolled_as_ta, "enrolled as a TA"
             when 'ObserverEnrollment'
               t :enrolled_as_observer, "enrolled as an observer"
-            when 'CourseDesignerEnrollment'
+            when 'DesignerEnrollment'
               t :enrolled_as_designer, "enrolled as a designer"
             else
               t :enrolled_as_student, "enrolled as a student"

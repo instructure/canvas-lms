@@ -20,7 +20,7 @@ define([
   'i18n!shared.aligned_outcomes',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.disabled/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */

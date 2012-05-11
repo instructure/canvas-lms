@@ -200,6 +200,7 @@ class LearningOutcome < ActiveRecord::Base
     item ||= context.learning_outcomes.new
     item.context = context
     item.migration_id = hash[:migration_id]
+    item.workflow_state = 'active' if item.deleted?
     item.short_description = hash[:title]
     item.description = hash[:description]
     
