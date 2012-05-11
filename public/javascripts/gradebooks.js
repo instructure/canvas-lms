@@ -1605,8 +1605,6 @@ define([
     
     url = $.replaceTags(url, 'assignment_id', submission.assignment_id);
     url = $.replaceTags(url, 'user_id', submission.user_id);
-    re = new RegExp('("|%22)' + submission.user_id + '("|%22)');
-    url = url.replace(re, submission.user_id);
     $view.append($("#submission_view_image").clone(true).removeAttr('id'));
     $view.append($(" <a href='" + url + "'>" + I18n.t('links.submission_details', "Submission Details") + "</a>"));
 
@@ -1653,7 +1651,7 @@ define([
         var url = $("#gradebook_urls .view_online_text_entry_url").attr('href');
         url = $.replaceTags(url, "assignment_id", submission.assignment_id);
         url = $.replaceTags(url, "user_id", submission.user_id);
-        $type.append(" <a href='" + url + "' target='_new'>" + I18n.t('links.view_submission', "View Submission") + "</a>");
+        $type.append(" <a href='" + url + "' target='_new' class='view_submission_link'>" + I18n.t('links.view_submission', "View Submission") + "</a>");
       }
     } else if(submission.quiz_submission) {
       var url = $("#gradebook_urls .view_quiz_url").attr('href');
@@ -1666,22 +1664,6 @@ define([
         $type.append($("#submission_quiz_image").clone().removeAttr('id'));
         $type.append(" <a href='" + url + "' target='_new'>" + I18n.t('links.view_quiz', "View this Quiz") + "</a>");
       }
-    } else if(submission.submission_type == "online_text_entry") {
-      var url = $("#gradebook_urls .view_online_text_entry_url").attr('href');
-      url = $.replaceTags(url, "assignment_id", submission.assignment_id);
-      url = $.replaceTags(url, "user_id", submission.user_id);
-      var turnitin = submission.turnitin_data && submission.turnitin_data['submission_' + submission.id];
-      if(turnitin) {
-        var turnitin_url = $.replaceTags($.replaceTags($.replaceTags($(".turnitin_report_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'submission_' + submission.id), 'assignment_id', submission.assignment_id);
-        var $link = $("<a/>");
-        $link.attr('href', turnitin_url).addClass('turnitin_similarity_score').addClass(((turnitin && turnitin.state) || 'no') + '_score');
-        $link.attr('title', I18n.t('titles.turnitin_score', 'Turnitin similarity score -- more information'));
-        $link.attr('target', '_blank');
-        $link.text(turnitin.similarity_score + "%");
-        $type.append($link);
-      }
-      $type.append($("#submission_" + submission.submission_type + "_image").clone().removeAttr('id'));
-      $type.append(" <a href='" + url + "' target='_new'>" + I18n.t('links.view_submission', "View Submission") + "</a>");
     }
 
     $submission_information

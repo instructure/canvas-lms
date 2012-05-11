@@ -181,7 +181,7 @@
     <%= image_tag "media_comment.gif", :id => "submission_media_comment_image", :alt => t('titles.media', "Media Comment Submission"), :title => t('titles.media', "Media Comment Submission"), :class => "submission_icon" %>
     <%= image_tag "quiz.png", :id => "submission_quiz_image", :alt => t('title.quiz', "Quiz Submission"), :title => t('title.quiz', "Quiz Submission"), :class => "submission_icon" %>
     <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}", :download => "{{ attachment_id }}") %>" class="view_online_upload_url">&nbsp;</a>
-    <a href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => "{{ assignment_id }}", :anchor => {:student_id => "{{ user_id }}"}.to_json) %>" class="view_online_text_entry_url view_online_submission_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => "{{ assignment_id }}", :anchor => '{"student_id":{{ user_id }}}') %>" class="view_online_text_entry_url view_online_submission_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_quiz_history_url, "{{ quiz_id }}", :user_id => "{{user_id}}") %>" class="view_quiz_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}") %>?zip=1" class="download_assignment_submissions_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_gradebook_url) %>.csv" class="gradebook_csv_url">&nbsp;</a>
