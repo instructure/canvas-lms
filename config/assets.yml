@@ -61,7 +61,7 @@ css_compressor_options:
     end
     plugin_assets[plugin] = assets
   end
-  subdoc = YAML.dump('plugins' => plugin_assets).gsub(/^--- \n/, '')
+  subdoc = YAML.dump('plugins' => plugin_assets).gsub(/^---\s?\n/, '')
 
   # add anchors to the various bundles in the imported plugin asset definitions.
   # these bundles will be included in the known bundle types below with a

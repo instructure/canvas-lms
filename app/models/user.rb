@@ -803,7 +803,7 @@ class User < ActiveRecord::Base
     end
     updates['submission_comments'] = 'author_id'
     updates['conversation_messages'] = 'author_id'
-    updates = updates.map
+    updates = updates.to_a
     updates << ['enrollments', 'associated_user_id']
     updates.each do |table, column|
       begin

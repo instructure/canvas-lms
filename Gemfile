@@ -20,7 +20,6 @@ if !ONE_NINE
 end
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
 gem 'highline',       '1.6.1'
-gem 'hpricot',        '0.8.2'
 gem 'i18n',           '0.6.0'
 gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.0'
@@ -40,7 +39,9 @@ gem 'rack',           '1.1.3'
 gem 'rake',           '< 0.10'
 gem 'rdoc',           '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
-gem 'rbx-require-relative', '0.0.5'
+if !ONE_NINE
+  gem 'rbx-require-relative', '0.0.5'
+end
 gem 'rdiscount',      '1.6.8'
 gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
@@ -96,7 +97,9 @@ group :development do
   gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'parallel',     '0.5.16'
   if ONE_NINE
-    gem 'ruby-debug19', '0.11.6'
+    # ruby-debug is broken in 1.9.3:
+    # http://blog.wyeworks.com/2011/11/1/ruby-1-9-3-and-ruby-debug
+    # gem 'ruby-debug19', '0.11.6'
   else
     gem 'ruby-debug',   '0.10.4'
   end

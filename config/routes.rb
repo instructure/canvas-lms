@@ -478,7 +478,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.menu_courses 'menu_courses', :controller => 'users', :action => 'menu_courses'
   map.all_menu_courses 'all_menu_courses', :controller => 'users', :action => 'all_menu_courses'
-  map.resources :favorites, :only => [:create, :destroy], :collection => 'reset'
+  map.resources :favorites, :only => [:create, :destroy]
 
   map.grades "grades", :controller => "users", :action => "grades"
 

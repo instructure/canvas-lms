@@ -1786,6 +1786,23 @@ describe Course, 'grade_publishing' do
   end
 
   context 'integration suite' do
+    def verify_post_matches(post_lines, expected_post_lines)
+      # first lines should match
+      post_lines[0].should == expected_post_lines[0]
+
+      # now extract the headers
+      post_headers = post_lines[1..post_lines.index("")]
+      expected_post_headers = expected_post_lines[1..expected_post_lines.index("")]
+      if RUBY_VERSION >= "1.9."
+        expected_post_headers << "User-Agent: Ruby"
+      end
+      post_headers.sort.should == expected_post_headers.sort
+
+      # now check payload
+      post_lines[post_lines.index(""),-1].should ==
+        expected_post_lines[expected_post_lines.index(""),-1]
+    end
+    
     def quick_sanity_check(user)
       Course.valid_grade_export_types["test_export"] = {
           :name => "test export",
@@ -1811,12 +1828,12 @@ describe Course, 'grade_publishing' do
       @course.grading_standard_id = 0
       @course.publish_final_grades(user)
       server_thread.join
-      post_lines.should == [
+      verify_post_matches(post_lines, [
           "POST /endpoint HTTP/1.1",
           "Accept: */*",
           "Content-Type: application/jtmimetype",
           "",
-          "test-jt-data"]
+          "test-jt-data"])
     end
 
     it 'should pass a quick sanity check' do
@@ -1868,13 +1885,13 @@ describe Course, 'grade_publishing' do
       @course.grading_standard_id = 0
       @course.publish_final_grades(@user)
       server_thread.join
-      post_lines.should == [
+      verify_post_matches(post_lines, [
           "POST /endpoint HTTP/1.1",
           "Accept: */*",
           "Content-Type: text/csv",
           "",
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
-          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"]
+          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"])
     end
 
     it 'should publish grades' do
@@ -1983,7 +2000,7 @@ describe Course, 'grade_publishing' do
 
       @course.publish_final_grades(teacher.user)
       server_thread.join
-      post_lines.should == [
+      verify_post_matches(post_lines, [
           "POST /endpoint HTTP/1.1",
           "Accept: */*",
           "Content-Type: text/csv",
@@ -1995,7 +2012,8 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"]
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"])
+
       @course.grading_standard_id = 0
       @course.save
       server, server_thread, post_lines = start_test_http_server
@@ -2005,7 +2023,7 @@ describe Course, 'grade_publishing' do
       @ps.save!
       @course.publish_final_grades(teacher.user)
       server_thread.join
-      post_lines.should == [
+      verify_post_matches(post_lines, [
           "POST /endpoint HTTP/1.1",
           "Accept: */*",
           "Content-Type: text/csv",
@@ -2017,7 +2035,7 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"]
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"])
       admin = user_model
       server, server_thread, post_lines = start_test_http_server
       @ps.posted_settings = @plugin.default_settings.merge({
@@ -2026,7 +2044,7 @@ describe Course, 'grade_publishing' do
       @ps.save!
       @course.publish_final_grades(admin)
       server_thread.join
-      post_lines.should == [
+      verify_post_matches(post_lines, [
           "POST /endpoint HTTP/1.1",
           "Accept: */*",
           "Content-Type: text/csv",
@@ -2038,7 +2056,7 @@ describe Course, 'grade_publishing' do
           "#{admin.id},,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"]
+          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"])
     end
 
   end

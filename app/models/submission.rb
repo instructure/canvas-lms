@@ -163,9 +163,9 @@ class Submission < ActiveRecord::Base
       turnitin_data &&
       (assignment.cached_context_grants_right?(user, session, :manage_grades) ||
         case assignment.turnitin_settings[:originality_report_visibility]
-          when 'immediate': true
-          when 'after_grading': current_submission_graded?
-          when 'after_due_date': assignment.due_at && assignment.due_at < Time.now.utc
+          when 'immediate'; true
+          when 'after_grading'; current_submission_graded?
+          when 'after_due_date'; assignment.due_at && assignment.due_at < Time.now.utc
         end
       )
     }

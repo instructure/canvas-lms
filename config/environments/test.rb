@@ -7,7 +7,12 @@
 config.cache_classes = true
 
 # Log error messages when you accidentally call methods on nil.
-config.whiny_nils = true
+if RUBY_VERSION >= "1.9."
+  # in 1.9, whiny_nils causes a huge performance penalty on tests for some reason
+  config.whiny_nils = false
+else
+  config.whiny_nils = true
+end
 
 # Show full error reports and disable caching
 config.action_controller.consider_all_requests_local = true

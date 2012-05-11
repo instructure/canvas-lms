@@ -1323,9 +1323,9 @@ describe User do
     it "should return active pseudonyms only" do
       course :active_all => true, :account => Account.default
       u = User.create!
-      u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'deleted'; x.sis_user_id = "user2"; x.save!}
+      u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'deleted'; x.sis_user_id = "user2" }
       u.sis_pseudonym_for(@course).should be_nil
-      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user1"; x.save!}
+      @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user1" }
       u.sis_pseudonym_for(@course).should == @p
     end
 
@@ -1333,18 +1333,18 @@ describe User do
       course :active_all => true, :account => Account.default
       other_account = account_model
       u = User.create!
-      u.pseudonyms.new(:account => other_account, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user1"; x.save!}
+      u.pseudonyms.create!(:account => other_account, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user1" }
       u.sis_pseudonym_for(@course).should be_nil
-      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user2"; x.save!}
+      @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user2" }
       u.sis_pseudonym_for(@course).should == @p
     end
 
     it "should return pseudonyms with a sis id only" do
       course :active_all => true, :account => Account.default
       u = User.create!
-      u.pseudonyms.new(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.save!}
+      u.pseudonyms.create!(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active' }
       u.sis_pseudonym_for(@course).should be_nil
-      @p = u.pseudonyms.new(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf").tap{|x| x.workflow_state = 'active'; x.sis_user_id = "user2"; x.save!}
+      @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user2" }
       u.sis_pseudonym_for(@course).should == @p
     end
 
