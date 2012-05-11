@@ -16,8 +16,7 @@ define([
   'jquery',
   'jqueryui/core',
   'jqueryui/mouse',
-  'jqueryui/widget',
-  'jquery.instructure_jquery_patches' /* /\.disabled/ */
+  'jqueryui/widget'
 ], function( $, undefined ) {
 
 

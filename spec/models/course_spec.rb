@@ -159,6 +159,27 @@ describe Course do
       @course.grants_right?(@student, nil, :read_grades).should be_true
       @course.grants_right?(@student, nil, :read_forum).should be_true
     end
+
+    it "should not grant read to completed students of an unpublished course" do
+      course_with_student(:active_user => 1)
+      @course.should be_created
+      @enrollment.update_attribute(:workflow_state, 'completed')
+      @enrollment.should be_completed
+      @course.grants_right?(:read, @student).should be_false
+    end
+
+    it "should not grant read to soft-completed students of an unpublished course" do
+      course_with_student(:active_user => 1)
+      @course.restrict_enrollments_to_course_dates = true
+      @course.start_at = 4.days.ago
+      @course.conclude_at = 2.days.ago
+      @course.save!
+      @course.should be_created
+      @enrollment.update_attribute(:workflow_state, 'active')
+      @enrollment.state_based_on_date.should == :completed
+      @course.grants_right?(:read, @student).should be_false
+    end
+
   end
 
   it "should clear content when resetting" do
@@ -298,7 +319,7 @@ describe Course do
       event2.updating_user = @teacher
       event2.save!
       event3 = event2.child_events.first
-      appointment_group = @course.appointment_groups.create
+      appointment_group = AppointmentGroup.create! :title => "ag", :contexts => [@course]
       appointment_group.publish!
       assignment = @course.assignments.create!
 
@@ -623,99 +644,6 @@ describe Course, "gradebook_to_csv" do
       rows[5][2].should be_nil
       rows[5][3].should be_nil
     end
-end
-
-describe Course, "merge_into" do
-  it "should merge in another course" do
-    @c = Course.create!(:name => "some course")
-    @c.wiki.wiki_pages.length.should == 1
-    @c2 = Course.create!(:name => "another course")
-    g = @c2.assignment_groups.create!(:name => "some group")
-    due = Time.parse("Jan 1 2000 5:00pm")
-    @c2.assignments.create!(:title => "some assignment", :assignment_group => g, :due_at => due)
-    @c2.wiki.wiki_pages.create!(:title => "some page")
-    @c2.quizzes.create!(:title => "some quiz")
-    @c.assignments.length.should eql(0)
-    @c.merge_in(@c2, :everything => true)
-    @c.reload
-    @c.assignment_groups.length.should eql(1)
-    @c.assignment_groups.last.name.should eql(@c2.assignment_groups.last.name)
-    @c.assignment_groups.last.should_not eql(@c2.assignment_groups.last)
-    @c.assignments.length.should eql(1)
-    @c.assignments.last.title.should eql(@c2.assignments.last.title)
-    @c.assignments.last.should_not eql(@c2.assignments.last)
-    @c.assignments.last.due_at.should eql(@c2.assignments.last.due_at)
-    @c.wiki.wiki_pages.length.should eql(2)
-    @c.wiki.wiki_pages.map(&:title).include?(@c2.wiki.wiki_pages.last.title).should be_true
-    @c.wiki.wiki_pages.first.should_not eql(@c2.wiki.wiki_pages.last)
-    @c.wiki.wiki_pages.last.should_not eql(@c2.wiki.wiki_pages.last)
-    @c.quizzes.length.should eql(1)
-    @c.quizzes.last.title.should eql(@c2.quizzes.last.title)
-    @c.quizzes.last.should_not eql(@c2.quizzes.last)
-  end
-  
-  it "should update due dates for date changes" do
-    new_start = Date.parse("Jun 1 2000")
-    new_end = Date.parse("Sep 1 2000")
-    @c = Course.create!(:name => "some course", :start_at => new_start, :conclude_at => new_end)
-    @c2 = Course.create!(:name => "another course", :start_at => Date.parse("Jan 1 2000"), :conclude_at => Date.parse("Mar 1 2000"))
-    g = @c2.assignment_groups.create!(:name => "some group")
-    @c2.assignments.create!(:title => "some assignment", :assignment_group => g, :due_at => Time.parse("Jan 3 2000 5:00pm"))
-    @c.assignments.length.should eql(0)
-    @c2.calendar_events.create!(:title => "some event", :start_at => Time.parse("Jan 11 2000 3:00pm"), :end_at => Time.parse("Jan 11 2000 4:00pm"))
-    @c.calendar_events.length.should eql(0)
-    @c.merge_in(@c2, :everything => true, :shift_dates => true)
-    @c.reload
-    @c.assignments.length.should eql(1)
-    @c.assignments.last.title.should eql(@c2.assignments.last.title)
-    @c.assignments.last.should_not eql(@c2.assignments.last)
-    @c.assignments.last.due_at.should > new_start
-    @c.assignments.last.due_at.should < new_end
-    @c.assignments.last.due_at.hour.should eql(@c2.assignments.last.due_at.hour)
-    @c.calendar_events.length.should eql(1)
-    @c.calendar_events.last.title.should eql(@c2.calendar_events.last.title)
-    @c.calendar_events.last.should_not eql(@c2.calendar_events.last)
-    @c.calendar_events.last.start_at.should > new_start
-    @c.calendar_events.last.start_at.should < new_end
-    @c.calendar_events.last.start_at.hour.should eql(@c2.calendar_events.last.start_at.hour)
-    @c.calendar_events.last.end_at.should > new_start
-    @c.calendar_events.last.end_at.should < new_end
-    @c.calendar_events.last.end_at.hour.should eql(@c2.calendar_events.last.end_at.hour)
-  end
-  
-  it "should match times for changing due dates in a different time zone" do
-    Time.zone = "Mountain Time (US & Canada)"
-    new_start = Date.parse("Jun 1 2000")
-    new_end = Date.parse("Sep 1 2000")
-    @c = Course.create!(:name => "some course", :start_at => new_start, :conclude_at => new_end)
-    @c2 = Course.create!(:name => "another course", :start_at => Date.parse("Jan 1 2000"), :conclude_at => Date.parse("Mar 1 2000"))
-    g = @c2.assignment_groups.create!(:name => "some group")
-    @c2.assignments.create!(:title => "some assignment", :assignment_group => g, :due_at => Time.parse("Jan 3 2000 5:00pm"))
-    @c.assignments.length.should eql(0)
-    @c2.calendar_events.create!(:title => "some event", :start_at => Time.parse("Jan 11 2000 3:00pm"), :end_at => Time.parse("Jan 11 2000 4:00pm"))
-    @c.calendar_events.length.should eql(0)
-    @c.merge_in(@c2, :everything => true, :shift_dates => true)
-    @c.reload
-    @c.assignments.length.should eql(1)
-    @c.assignments.last.title.should eql(@c2.assignments.last.title)
-    @c.assignments.last.should_not eql(@c2.assignments.last)
-    @c.assignments.last.due_at.should > new_start
-    @c.assignments.last.due_at.should < new_end
-    @c.assignments.last.due_at.wday.should eql(@c2.assignments.last.due_at.wday)
-    @c.assignments.last.due_at.utc.hour.should eql(@c2.assignments.last.due_at.utc.hour)
-    @c.calendar_events.length.should eql(1)
-    @c.calendar_events.last.title.should eql(@c2.calendar_events.last.title)
-    @c.calendar_events.last.should_not eql(@c2.calendar_events.last)
-    @c.calendar_events.last.start_at.should > new_start
-    @c.calendar_events.last.start_at.should < new_end
-    @c.calendar_events.last.start_at.wday.should eql(@c2.calendar_events.last.start_at.wday)
-    @c.calendar_events.last.start_at.utc.hour.should eql(@c2.calendar_events.last.start_at.utc.hour)
-    @c.calendar_events.last.end_at.should > new_start
-    @c.calendar_events.last.end_at.should < new_end
-    @c.calendar_events.last.end_at.wday.should eql(@c2.calendar_events.last.end_at.wday)
-    @c.calendar_events.last.end_at.utc.hour.should eql(@c2.calendar_events.last.end_at.utc.hour)
-    Time.zone = nil
-  end
 end
 
 describe Course, "update_account_associations" do
@@ -2404,7 +2332,7 @@ describe Course, "conclusions" do
   context "appointment cancelation" do
     before do
       course_with_student(:active_all => true)
-      @ag = @course.appointment_groups.create(:title => "test", :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
       @ag.appointments.each do |a|
         a.reserve_for(@user, @user)
       end

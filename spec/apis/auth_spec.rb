@@ -32,76 +32,6 @@ describe "API Authentication", :type => :integration do
     ActionController::Base.consider_all_requests_local = true
   end
 
-  it "should require a valid client id" do
-    get "/login/oauth2/auth", :response_type => 'code', :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
-    response.should be_client_error
-  end
-
-  it "should require a valid code to get an access_token" do
-    post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => 'asdf'
-    response.should be_client_error
-  end
-
-  it "should continue to allow developer key + basic auth access" do
-    # this will continue to be supported until we notify api users and explicitly phase it out
-    user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
-    course_with_teacher(:user => @user)
-
-    get "/api/v1/courses.json"
-    response.response_code.should == 401
-    get "/api/v1/courses.json?api_key=#{@key.api_key}"
-    response.response_code.should == 401
-    get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
-    response.response_code.should == 401
-    get "/api/v1/courses.json", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-    response.should be_success
-    get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-    response.should be_success
-    reset!
-
-    # don't need developer key when we have an actual application session
-    post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
-    response.should redirect_to("http://www.example.com/?login_success=1")
-    get "/api/v1/courses.json", {}
-    response.should be_success
-    # because this is a normal application session, the response is prepended
-    # with our anti-csrf measure
-    json = response.body
-    json.should match(%r{^while\(1\);})
-    JSON.parse(json.sub(%r{^while\(1\);}, '')).size.should == 1
-    reset!
-
-    post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
-    response.response_code.should == 401
-    post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-    response.response_code.should == 401
-    post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-    response.should be_success
-    @course.assignments.count.should == 1
-    @course.assignments.first.title.should == 'test assignment'
-    @course.assignments.first.points_possible.should == 5.3
-    # still need an authenticity token for posts when they have an actual application session
-    reset!
-    post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
-    post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => 'asdf' }
-    response.response_code.should == 401
-    $now = true
-    post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => session[:_csrf_token] }
-    response.should be_success
-    @course.assignments.count.should == 2
-
-    # don't allow replacing the authenticity token with api_key unless basic auth is given
-    reset!
-    post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
-    post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
-    response.response_code.should == 401
-    # the basic auth has to be correct, too
-    post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
-    response.response_code.should == 401
-    post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-    response.should be_success
-  end
-
   context "sharding" do
     it_should_behave_like "sharding"
 
@@ -129,6 +59,76 @@ describe "API Authentication", :type => :integration do
 
   if Canvas.redis_enabled? # eventually we're going to have to just require redis to run the specs
 
+    it "should require a valid client id" do
+      get "/login/oauth2/auth", :response_type => 'code', :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+      response.should be_client_error
+    end
+
+    it "should require a valid code to get an access_token" do
+      post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => 'asdf'
+      response.should be_client_error
+    end
+
+    it "should continue to allow developer key + basic auth access" do
+      # this will continue to be supported until we notify api users and explicitly phase it out
+      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+      course_with_teacher(:user => @user)
+
+      get "/api/v1/courses.json"
+      response.response_code.should == 401
+      get "/api/v1/courses.json?api_key=#{@key.api_key}"
+      response.response_code.should == 401
+      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
+      response.response_code.should == 401
+      get "/api/v1/courses.json", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      response.should be_success
+      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      response.should be_success
+      reset!
+
+      # don't need developer key when we have an actual application session
+      post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+      response.should redirect_to("http://www.example.com/?login_success=1")
+      get "/api/v1/courses.json", {}
+      response.should be_success
+      # because this is a normal application session, the response is prepended
+      # with our anti-csrf measure
+      json = response.body
+      json.should match(%r{^while\(1\);})
+      JSON.parse(json.sub(%r{^while\(1\);}, '')).size.should == 1
+      reset!
+
+      post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
+      response.response_code.should == 401
+      post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      response.response_code.should == 401
+      post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      response.should be_success
+      @course.assignments.count.should == 1
+      @course.assignments.first.title.should == 'test assignment'
+      @course.assignments.first.points_possible.should == 5.3
+      # still need an authenticity token for posts when they have an actual application session
+      reset!
+      post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+      post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => 'asdf' }
+      response.response_code.should == 401
+      $now = true
+      post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => session[:_csrf_token] }
+      response.should be_success
+      @course.assignments.count.should == 2
+
+      # don't allow replacing the authenticity token with api_key unless basic auth is given
+      reset!
+      post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+      post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
+      response.response_code.should == 401
+      # the basic auth has to be correct, too
+      post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
+      response.response_code.should == 401
+      post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      response.should be_success
+    end
+
     describe "oauth2 native app flow" do
       def flow(opts = {})
         enable_forgery_protection do
@@ -137,20 +137,21 @@ describe "API Authentication", :type => :integration do
 
           # step 1
           get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
-          response.should redirect_to(login_url(:re_login => true))
+          response.should redirect_to(login_url)
 
           yield
 
-          # step 2
+          # step 3
           response.should be_redirect
-          response['Location'].should match(%r{/login/oauth2/auth?})
+          response['Location'].should match(%r{/login/oauth2/confirm$})
+          get response['Location']
+          response.should render_template("pseudonym_sessions/oauth2_confirm")
+          post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+
+          response.should be_redirect
+          response['Location'].should match(%r{/login/oauth2/auth\?})
           code = response['Location'].match(/code=([^\?&]+)/)[1]
           code.should be_present
-
-          # make sure the user is now logged out, or the app also has full access to their session
-          get '/'
-          response.should be_redirect
-          response['Location'].should == 'http://www.example.com/login'
 
           # we have the code, we can close the browser session
           if opts[:basic_auth]
@@ -241,9 +242,43 @@ describe "API Authentication", :type => :integration do
 
           get '/login', :ticket => 'ST-abcd'
           response.should be_redirect
-          response['Location'].should match(%r{/login/oauth2/auth\?code=})
-          session.should be_blank
         end
+      end
+
+      it "should not require logging in again, or log out afterwards" do
+        course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
+        get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/confirm$})
+        get response['Location']
+        response.should render_template("pseudonym_sessions/oauth2_confirm")
+        post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/auth\?})
+        code = response['Location'].match(/code=([^\?&]+)/)[1]
+        code.should be_present
+        get response['Location']
+        response.should be_success
+        # verify we're still logged in
+        get "/courses/#{@course.id}"
+        response.should be_success
+      end
+
+      it "should redirect with access_denied if the user doesn't accept" do
+        course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
+        get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/confirm$})
+        get response['Location']
+        response.should render_template("pseudonym_sessions/oauth2_confirm")
+        get "/login/oauth2/deny"
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/auth\?})
+        error = response['Location'].match(%r{error=([^\?&]+)})[1]
+        error.should == "access_denied"
+        response['Location'].should_not match(%r{code=})
+        get response['Location']
+        response.should be_success
       end
 
       it "should allow http basic auth for the app auth" do
@@ -257,7 +292,7 @@ describe "API Authentication", :type => :integration do
       it "should require the correct client secret" do
         # step 1
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
-        response.should redirect_to(login_url(:re_login => true))
+        response.should redirect_to(login_url)
 
         get response['Location']
         response.should be_success
@@ -268,7 +303,9 @@ describe "API Authentication", :type => :integration do
 
         # step 2
         response.should be_redirect
-        response['Location'].should match(%r{/login/oauth2/auth?})
+        response['Location'].should match(%r{/login/oauth2/confirm$})
+        post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+
         code = response['Location'].match(/code=([^\?&]+)/)[1]
         code.should be_present
 
@@ -304,11 +341,16 @@ describe "API Authentication", :type => :integration do
             @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
 
             get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/my_uri"
-            response.should redirect_to(login_url(:re_login => true))
+            response.should redirect_to(login_url)
 
             get response['Location']
             response.should be_success
             post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
+
+            response.should be_redirect
+            response['Location'].should match(%r{/login/oauth2/confirm$})
+            get response['Location']
+            post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
 
             response.should be_redirect
             response['Location'].should match(%r{http://www.example.com/my_uri?})

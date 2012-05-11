@@ -54,7 +54,6 @@ class Group < ActiveRecord::Base
   has_many :active_default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages, :conditions => ['wiki_pages.workflow_state = ?', 'active']
   has_many :wiki_namespaces, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :dependent => :destroy
-  has_many :tags, :class_name => 'ContentTag', :as => 'context', :order => 'LOWER(title)', :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
   has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy

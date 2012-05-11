@@ -35,7 +35,9 @@
           <span style="display: block;"><%= datetime_string(recent_event.start_at, :event, recent_event.end_at) %></span>
         <% end %>
         <% if show_context %>
-          <span style="display: block; font-size: 0.8em;"><%= recent_event.effective_context.short_name %></span>
+          <span style="display: block; font-size: 0.8em;">
+            <%= recent_event.is_a?(CalendarEvent) ? recent_event.effective_context.short_name : recent_event.context.short_name %>
+          </span>
         <% end %>
       </span>
     </span>

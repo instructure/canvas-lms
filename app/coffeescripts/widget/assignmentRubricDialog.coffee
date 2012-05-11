@@ -1,7 +1,7 @@
 define [
   'i18n!rubrics'
   'jquery'
-  'jquery.instructure_jquery_patches' # dialog
+  'jqueryui/dialog'
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, $) ->
 

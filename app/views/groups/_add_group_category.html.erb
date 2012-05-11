@@ -3,7 +3,7 @@
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */
+  'jqueryui/dialog'
 ], function(I18n, $) {
   window.addGroupCategory = function(callback) {
     $("#add_category_form").dialog('close').dialog({

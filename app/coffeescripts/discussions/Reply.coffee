@@ -1,6 +1,6 @@
 define [
-  'compiled/backbone-ext/Backbone'
-  'use!underscore'
+  'Backbone'
+  'underscore'
   'i18n!discussions.reply'
   'jquery'
   'compiled/discussions/Entry'

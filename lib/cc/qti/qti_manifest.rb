@@ -22,6 +22,7 @@ module QTI
     
     attr_accessor :exporter
     delegate :add_error, :set_progress, :export_object?, :qti_export?, :course, :to => :exporter
+    delegate :referenced_files, :to => :@html_exporter
 
     def initialize(exporter)
       @exporter = exporter
@@ -77,7 +78,7 @@ module QTI
           set_progress(60)
 
           zipper = ContentZipper.new(:check_user => false)
-          @html_exporter.referenced_files.each do |file_id|
+          @html_exporter.referenced_files.keys.each do |file_id|
             att = course.attachments.find_by_id(file_id)
             next unless att
 

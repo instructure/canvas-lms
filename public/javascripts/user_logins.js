@@ -20,7 +20,7 @@ define([
   'i18n!user_logins',
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */
 ], function(I18n, $) {

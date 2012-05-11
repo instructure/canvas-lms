@@ -2,7 +2,7 @@ define([
   'i18n!find_outcome',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* truncateText */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */
 ], function(I18n, $) {

@@ -156,7 +156,10 @@ class Notification < ActiveRecord::Base
     current_locale = I18n.locale
 
     tos = tos.flatten.compact.uniq
-    options = tos.delete_at(tos.length - 1) if tos.last.is_a? Hash
+    if tos.last.is_a? Hash
+      options = tos.delete_at(tos.length - 1)
+      data = options.delete(:data)
+    end
     @delayed_messages_to_save = []
     recipient_ids = []
     recipients = []
@@ -224,6 +227,7 @@ class Notification < ActiveRecord::Base
         message.asset_context = options[:asset_context] || asset.context(user) rescue asset
         message.notification_category = self.category
         message.delay_for = self.delay_for if self.delay_for 
+        message.data = data if data
         message.parse!
         # keep track of new messages added for caching so we don't
         # have to re-look it up

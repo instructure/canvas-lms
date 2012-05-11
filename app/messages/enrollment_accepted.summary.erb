@@ -14,7 +14,7 @@
       t :body_ta, "%{user} just accepted their invitation to participate in the course, %{course}, as a TA.", :user => asset.user.name, :course => asset.course.name
     when 'ObserverEnrollment'
       t :body_observer, "%{user} just accepted their invitation to participate in the course, %{course}, as an observer.", :user => asset.user.name, :course => asset.course.name
-    when 'CourseDesignerEnrollment'
+    when 'DesignerEnrollment'
       t :body_designer, "%{user} justed accept their invitation to participate in the course, %{course}, as a designer.", :user => asset.user.name, :course => asset.course.name
     else
       t :body_student, "%{user} just accepted their invitation to participate in the course, %{course}, as a student.", :user => asset.user.name, :course => asset.course.name

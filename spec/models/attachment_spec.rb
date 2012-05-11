@@ -677,6 +677,16 @@ describe Attachment do
       @a.namespace = "_localstorage_/#{@account.file_namespace}"
       @a.root_account_id.should == @account.id
     end
+
+    it "should immediately infer the namespace if not yet set" do
+      Attachment.domain_namespace = nil
+      @a = Attachment.new(:context => @course)
+      @a.should be_new_record
+      @a.read_attribute(:namespace).should be_nil
+      @a.namespace.should_not be_nil
+      @a.read_attribute(:namespace).should_not be_nil
+      @a.root_account_id.should == @account.id
+    end
   end
 
   context "encoding detection" do
@@ -734,6 +744,20 @@ describe Attachment do
         attachment_model(:content_type => 'pdf')
         @attachment.should be_scribdable
       end
+    end
+  end
+
+  context "s3" do
+    it "should support setting bucket via PluginSetting" do
+      Setting.set("file_storage_test_override", "s3")
+      Attachment.stubs(:s3_config).returns({:bucket_name => 'yml_bucket'})
+      ps = PluginSetting.create!(:name => 's3', :settings => { :bucket_name => 'pluginsetting_bucket' })
+      # if the test environment isn't configured for s3, the plugin never got created,
+      # and the settings will never be considered valid
+      ps.any_instantiation.stubs(:valid_settings?).returns(true)
+      Attachment.domain_namespace = nil
+      attachment_model
+      @attachment.s3_config[:bucket_name].should == 'pluginsetting_bucket'
     end
   end
 end

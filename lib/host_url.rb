@@ -36,10 +36,14 @@ class HostUrl
       @@domain_config
     end
 
-    def context_host(context=nil, preferred_account_domain=nil)
+    def context_host(context=nil, current_host=nil)
       default_host
     end
-    
+
+    def context_hosts(context=nil, current_host=nil)
+      Array(context_host(context, current_host))
+    end
+
     def default_host
       if !@@default_host
         @@default_host = domain_config[:domain] if domain_config.has_key?(:domain)

@@ -23,7 +23,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, formErrors, errorBox */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData */,
@@ -33,23 +33,25 @@ define([
   var $profile_table = $(".profile_table"),
       $update_profile_form = $("#update_profile_form"),
       $default_email_id = $("#default_email_id"),
-      profile_pics_url = $(".profile_pics_url").attr('href');
+      profile_pics_url = '/api/v1/users/self/avatars';
 
   var thumbnailPoller = new BackoffPoller(profile_pics_url, function(data) {
     var loadedImages = {},
         $images = $('img.pending'),
         image,
         $image,
+        associatedUrl,
         count = 0;
     for (var i = 0, l = data.length; i < l; i++) {
       image = data[i];
-      if (!image.pending) loadedImages[image.url] = true;
+      if (!image.pending) loadedImages[image.token] = image.url;
     }
     $images.each(function() {
       $image = $(this);
-      if (loadedImages[$image.data('eventual_src')]) {
+      associatedUrl = loadedImages[$image.data('token')]
+      if (associatedUrl != null) {
         $image.removeClass('pending');
-        $image.attr('src', $image.data('eventual_src'));
+        $image.attr('src', associatedUrl);
         count++;
       }
     });
@@ -338,6 +340,7 @@ define([
   });
   $("#add_pic_form").formSubmit({
     fileUpload: true,
+
     beforeSubmit: function() {
       $(this).find("button").attr('disabled', true).text(I18n.t('buttons.adding_file', "Adding File..."));
       var $span = $("<span class='img'><img/></span>");
@@ -347,23 +350,34 @@ define([
       $("#profile_pic_dialog .profile_pic_list div").before($span);
       return $span;
     },
+
     success: function(data, $span) {
-      $(this).find("button").attr('disabled', false).text(I18n.t('buttons.add_file', "Add File"));
-      $("#add_pic_form").slideToggle();
-      var attachment = data.attachment;
+      var attachment = data.attachment,
+          avatar     = data.avatar,
+          addPicForm = $('#add_pic_form')
+
+      $(this).find('button')
+        .prop('disabled', false)
+        .text(I18n.t('buttons.add_file', 'Add File'));
+
+      addPicForm.slideToggle();
+
       if ($span) {
-        var $img = $span.find("img");
-        $img.data('eventual_src', '/images/thumbnails/' + attachment.id + '/' + attachment.uuid);
-        $img.attr('data-type', 'attachment');
-        $img.attr('alt', attachment.display_name);
+        var $img = $span.find('img');
+
+        $img
+          .data('type', 'attachment')
+          .data('token', data.avatar.token)
+          .attr('alt', attachment.display_name);
+
         $img[0].onerror = function() {
           $img.attr('src', '/images/dotted_pic.png');
         }
-        thumbnailPoller.start().then(function() {
-          $img.click();
-        });
+
+        thumbnailPoller.start().then(function() { $img.click(); });
       }
     },
+
     error: function(data, $span) {
       $(this).find("button").attr('disabled', false).text(I18n.t('errors.adding_file_failed', "Adding File Failed"));
       if ($span) {
@@ -371,43 +385,61 @@ define([
       }
     }
   });
+
   $("#profile_pic_dialog .cancel_button").click(function() {
     $("#profile_pic_dialog").dialog('close');
   });
+
   $("#profile_pic_dialog .select_button").click(function() {
-    var url = $("#update_profile_form").attr('action');
-    var $dialog = $("#profile_pic_dialog");
-    $dialog.find("button").attr('disabled', true).filter(".select_button").text(I18n.t('buttons.selecting_image', "Selecting Image..."));
-    var $img = $("#profile_pic_dialog .profile_pic_list .img.selected img");
-    if($img.length == 0) {
-      return;
-    }
-    var src = $img.attr('src');
-    var data = {
-      'user[avatar_image][url]': src,
-      'user[avatar_image][type]': $img.attr('data-type')
-    };
-    $.ajaxJSON(url, 'PUT', data, function(data) {
-      $dialog.find("button").attr('disabled', false).filter(".select_button").text(I18n.t('buttons.select_image', "Select Image"));
-      var user = data.user;
-      if(user.avatar_url == '/images/no_pic.gif') {
+    var url = '/api/v1/users/self',
+        $dialog = $('#profile_pic_dialog'),
+        $buttons = $dialog.find('button'),
+        $img = $('#profile_pic_dialog .profile_pic_list .img.selected img'),
+        data = { 'user[avatar][token]': $img.data('token') }
+
+    $buttons
+      .prop('disabled', true)
+      .filter('.select_button')
+      .text(I18n.t('buttons.selecting_image', 'Selecting Image...'));
+
+    if ($img.length === 0) { return; }
+
+    $.ajaxJSON(url, 'PUT', data, function(user) {
+      // on success
+      var profilePicLink = $('.profile_pic_link img'),
+          newSrc = $('#profile_pic_dialog .img.selected img').attr('src');
+
+      $buttons
+        .prop('disabled', false)
+        .filter('.select_button')
+        .text(I18n.t('buttons.select_image', 'Select Image'));
+
+      if (user.avatar_url === '/images/no_pic.gif') {
         user.avatar_url = '/images/dotted_pic.png';
       }
-      $(".profile_pic_link img").attr('src', user.avatar_url);
+
+      profilePicLink.attr('src', newSrc);
       $dialog.dialog('close');
-    }, function(data) {
-      $dialog.find("button").attr('disabled', false).filter(".select_button").text(I18n.t('errors.selecting_image_failed', "Selecting Image Failed, please try again"));
+    }, function(response) {
+      // on error
+      $buttons
+        .prop('disabled', false)
+        .filter('.select_button')
+        .text(I18n.t('errors.selecting_image_failed', 'Selecting image failed, please try again'));
     });
   });
+
   $(".profile_pic_link").click(function(event) {
     event.preventDefault();
     var $dialog = $("#profile_pic_dialog");
     $dialog.find(".img.selected").removeClass('selected');
-    $dialog.find(".select_button").attr('disabled', true);
+    $dialog.find(".select_button").prop('disabled', true);
+
     if($(this).hasClass('locked')) {
       alert(I18n.t('alerts.profile_picture_locked', "Your profile picture has been locked by an administrator, and cannot be changed."));
       return;
     }
+
     if(!$dialog.hasClass('loaded')) {
       $dialog.find(".profile_pic_list h3").text(I18n.t('headers.loading_images', "Loading Images..."));
       $.ajaxJSON(profile_pics_url, 'GET', {}, function(data) {
@@ -416,20 +448,27 @@ define([
           $dialog.find(".profile_pic_list h3").remove();
           var pollThumbnails = false;
           for(var idx in data) {
-            var image = data[idx];
-            var $span = $("<span class='img'><img/></span>");
-            $img = $span.find("img");
+            var image = data[idx],
+                $span = $('<span />', { 'class': 'img' }),
+                $img  = $('<img />').appendTo($span);
+
             if (image.pending) {
-              $img.addClass('pending');
-              $img.attr('src', '/images/ajax-loader.gif');
-              $img.data('eventual_src', image.url);
+              $img
+                .addClass('pending')
+                .attr('src', '/images/ajax-loader.gif')
+                .data('token', image.token);
               pollThumbnails = true;
             } else {
-              $img.attr('src', image.url);
+              $img
+                .attr('src', image.url)
+                .data('token', image.token);
             }
-            $img.attr('alt', image.alt || image.type);
-            $img.attr('title', image.alt || image.type);
-            $img.attr('data-type', image.type);
+            $img
+              .data('token', image.token)
+              .attr('alt', image.display_name || image.type)
+              .attr('title', image.display_name || image.type)
+              .attr('data-type', image.type);
+
             $img[0].onerror = function() {
               $span.remove();
             }

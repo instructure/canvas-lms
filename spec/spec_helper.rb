@@ -28,12 +28,15 @@ require File.dirname(__FILE__) + '/mocha_extensions'
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
 ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
-      Dir["#{RAILS_ROOT}/app/models/*", "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"].collect { |file|
-        model = File.basename(file, ".*").camelize.constantize
-        next unless model < ActiveRecord::Base
-        model
-      }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || model == Tableless }
+    Dir["#{RAILS_ROOT}/app/models/*", "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"].collect { |file|
+      model = File.basename(file, ".*").camelize.constantize
+      next unless model < ActiveRecord::Base
+      model
+    }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || model == Tableless }
 ALL_MODELS << Version
+ALL_MODELS << Delayed::Backend::ActiveRecord::Job::Failed
+ALL_MODELS << Delayed::Backend::ActiveRecord::Job
+
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -44,15 +47,15 @@ end
 
 def truncate_table(model)
   case model.connection.adapter_name
-  when "SQLite"
-    model.delete_all
-    begin
-      model.connection.execute("delete from sqlite_sequence where name='#{model.connection.quote_table_name(model.table_name)}';")
-      model.connection.execute("insert into sqlite_sequence (name, seq) values ('#{model.connection.quote_table_name(model.table_name)}', #{rand(100)});")
-    rescue
-    end
-  else
-    model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
+    when "SQLite"
+      model.delete_all
+      begin
+        model.connection.execute("delete from sqlite_sequence where name='#{model.connection.quote_table_name(model.table_name)}';")
+        model.connection.execute("insert into sqlite_sequence (name, seq) values ('#{model.connection.quote_table_name(model.table_name)}', #{rand(100)});")
+      rescue
+      end
+    else
+      model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
   end
 end
 
@@ -345,10 +348,11 @@ Spec::Runner.configure do |config|
   end
 
   def group(opts={})
+    opts.delete(:active_all)
     if opts[:group_context]
-      @group = opts[:group_context].groups.create!
+      @group = opts.delete(:group_context).groups.create! opts
     else
-      @group = Group.create!
+      @group = Group.create! opts
     end
   end
 
@@ -378,16 +382,13 @@ Spec::Runner.configure do |config|
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
     post_via_redirect "/login",
-      "pseudonym_session[unique_id]" => username,
-      "pseudonym_session[password]" => password
+                      "pseudonym_session[unique_id]" => username,
+                      "pseudonym_session[password]" => password
     assert_response :success
     path.should eql("/?login_success=1")
   end
 
-  # The block should return the submission_data. A block is used so
-  # that we have access to the @questions variable that is created
-  # in this method
-  def quiz_with_graded_submission(questions, opts={}, &block)
+  def assignment_quiz(questions, opts={})
     course = opts[:course] || course(:active_course => true)
     user = opts[:user] || user(:active_user => true)
     course.enroll_student(user) unless user.enrollments.any?{|e| e.course_id == course.id}
@@ -400,6 +401,13 @@ Spec::Runner.configure do |config|
     @quiz.generate_quiz_data
     @quiz.workflow_state = "available"
     @quiz.save!
+  end
+
+  # The block should return the submission_data. A block is used so
+  # that we have access to the @questions variable that is created
+  # in this method
+  def quiz_with_graded_submission(questions, opts={}, &block)
+    assignment_quiz(questions, opts)
     @quiz_submission = @quiz.generate_submission(user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
@@ -426,32 +434,32 @@ Spec::Runner.configure do |config|
   def rubric_for_course
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [
-      {
-        :points => 3,
-        :description => "First row",
-        :long_description => "The first row in the rubric",
-        :id => 1,
-        :ratings => [
-          {
+        {
             :points => 3,
-            :description => "Rockin'",
-            :criterion_id => 1,
-            :id => 2
-          },
-          {
-            :points => 2,
-            :description => "Rockin'",
-            :criterion_id => 1,
-            :id => 3
-          },
-          {
-            :points => 0,
-            :description => "Lame",
-            :criterion_id => 1,
-            :id => 4
-          }
-        ]
-      }
+            :description => "First row",
+            :long_description => "The first row in the rubric",
+            :id => 1,
+            :ratings => [
+                {
+                    :points => 3,
+                    :description => "Rockin'",
+                    :criterion_id => 1,
+                    :id => 2
+                },
+                {
+                    :points => 2,
+                    :description => "Rockin'",
+                    :criterion_id => 1,
+                    :id => 3
+                },
+                {
+                    :points => 0,
+                    :description => "Lame",
+                    :criterion_id => 1,
+                    :id => 4
+                }
+            ]
+        }
     ]
     @rubric.save!
   end
@@ -464,47 +472,47 @@ Spec::Runner.configure do |config|
 
     @rubric = Rubric.generate(:context => @course,
                               :data => {
-      :title => 'My Rubric',
-      :hide_score_total => false,
-      :criteria => {
-        "0" => {
-          :points => 3,
-          :mastery_points => 0,
-          :description => "Outcome row",
-          :long_description => @outcome.description,
-          :ratings => {
-            "0" => {
-              :points => 3,
-              :description => "Rockin'",
-            },
-            "1" => {
-              :points => 0,
-              :description => "Lame",
-            }
-          },
-          :learning_outcome_id => @outcome.id
-        },
-        "1" => {
-          :points => 5,
-          :description => "no outcome row",
-          :long_description => 'non outcome criterion',
-          :ratings => {
-            "0" => {
-              :points => 5,
-              :description => "Amazing",
-            },
-            "1" => {
-              :points => 3,
-              :description => "not too bad",
-            },
-            "2" => {
-              :points => 0,
-              :description => "no bueno",
-            }
-          }
-        }
-      }
-    })
+                                  :title => 'My Rubric',
+                                  :hide_score_total => false,
+                                  :criteria => {
+                                      "0" => {
+                                          :points => 3,
+                                          :mastery_points => 0,
+                                          :description => "Outcome row",
+                                          :long_description => @outcome.description,
+                                          :ratings => {
+                                              "0" => {
+                                                  :points => 3,
+                                                  :description => "Rockin'",
+                                              },
+                                              "1" => {
+                                                  :points => 0,
+                                                  :description => "Lame",
+                                              }
+                                          },
+                                          :learning_outcome_id => @outcome.id
+                                      },
+                                      "1" => {
+                                          :points => 5,
+                                          :description => "no outcome row",
+                                          :long_description => 'non outcome criterion',
+                                          :ratings => {
+                                              "0" => {
+                                                  :points => 5,
+                                                  :description => "Amazing",
+                                              },
+                                              "1" => {
+                                                  :points => 3,
+                                                  :description => "not too bad",
+                                              },
+                                              "2" => {
+                                                  :points => 0,
+                                                  :description => "no bueno",
+                                              }
+                                          }
+                                      }
+                                  }
+                              })
     @rubric.instance_variable_set('@outcomes_changed', true)
     @rubric.save!
     @rubric.update_outcome_tags
@@ -512,9 +520,9 @@ Spec::Runner.configure do |config|
 
   def grading_standard_for(context)
     @standard = context.grading_standards.create!(:title => "My Grading Standard", :standard_data => {
-      "scheme_0" => {:name => "A", :value => "0.9"},
-      "scheme_1" => {:name => "B", :value => "0.8"},
-      "scheme_2" => {:name => "C", :value => "0.7"}
+        "scheme_0" => {:name => "A", :value => "0.9"},
+        "scheme_1" => {:name => "B", :value => "0.8"},
+        "scheme_2" => {:name => "C", :value => "0.7"}
     })
   end
 
@@ -553,7 +561,7 @@ Spec::Runner.configure do |config|
 
   def assert_unauthorized
     assert_status(401) #unauthorized
-#    response.headers['Status'].should eql('401 Unauthorized')
+                       #    response.headers['Status'].should eql('401 Unauthorized')
     response.should render_template("shared/unauthorized")
   end
 
@@ -669,16 +677,16 @@ Spec::Runner.configure do |config|
   def stub_kaltura
     # trick kaltura into being activated
     Kaltura::ClientV3.stubs(:config).returns({
-          'domain' => 'kaltura.example.com',
-          'resource_domain' => 'kaltura.example.com',
-          'partner_id' => '100',
-          'subpartner_id' => '10000',
-          'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-          'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-          'player_ui_conf' => '1',
-          'kcw_ui_conf' => '1',
-          'upload_ui_conf' => '1'
-    })
+                                                 'domain' => 'kaltura.example.com',
+                                                 'resource_domain' => 'kaltura.example.com',
+                                                 'partner_id' => '100',
+                                                 'subpartner_id' => '10000',
+                                                 'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+                                                 'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+                                                 'player_ui_conf' => '1',
+                                                 'kcw_ui_conf' => '1',
+                                                 'upload_ui_conf' => '1'
+                                             })
   end
 
   def attachment_obj_with_context(obj, opts={})

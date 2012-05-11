@@ -20,18 +20,18 @@ define([
  'i18n!edit_rubric',
  'jst/changePointsPossibleToMatchRubricDialog',
  'jquery' /* $ */,
+ 'underscore',
  'find_outcome',
  'jquery.ajaxJSON' /* ajaxJSON */,
  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
- 'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/, windowScrollTop */,
+ 'jqueryui/dialog',
  'jquery.instructure_misc_helpers' /* replaceTags */,
  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
  'jquery.loadingImg' /* loadingImage */,
  'jquery.templateData' /* fillTemplateData, getTemplateData */,
- 'vendor/jquery.ba-throttle-debounce' /* debounce */,
  'vendor/jquery.ba-tinypubsub',
  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, changePointsPossibleToMatchRubricDialog, $) {
+], function(I18n, changePointsPossibleToMatchRubricDialog, $, _) {
 
   var rubricEditing = {
     htmlBody: null,
@@ -376,7 +376,7 @@ define([
         .find(".custom_ratings").showIf(rubric.free_form_criterion_comments);
     }
   };
-  rubricEditing.sizeRatings = $.debounce(10, rubricEditing.originalSizeRatings);
+  rubricEditing.sizeRatings = _.debounce(rubricEditing.originalSizeRatings, 10);
 
   var round = function(number, precision) {
     precision = Math.pow(10, precision || 0).toFixed(precision < 0 ? -precision : 0);

@@ -25,8 +25,8 @@ define([
   'jquery',
   'str/htmlEscape',
   'jquery.dropdownList',
-  'jquery.instructure_jquery_patches',
   'jquery.instructure_misc_helpers',
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
 ], function(tinymce, I18n, $, htmlEscape) {
 

@@ -1,4 +1,4 @@
-define ['use!backbone', 'use!underscore'], (Backbone, _) ->
+define ['use!vendor/backbone', 'underscore'], (Backbone, _) ->
 
   _.extend Backbone.Model.prototype,
 
@@ -44,7 +44,7 @@ define ['use!backbone', 'use!underscore'], (Backbone, _) ->
     #  model.get 'occupation' #> 'programmer'
     _configureComputedAttributes: ->
       set = (methodName) => @set methodName, @[methodName]()
-	
+
       _.each @computedAttributes, (methodName) =>
         if typeof methodName is 'string'
           set methodName
@@ -54,3 +54,4 @@ define ['use!backbone', 'use!underscore'], (Backbone, _) ->
           @bind eventName, -> set methodName.name
 
   Backbone.Model
+

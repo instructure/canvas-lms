@@ -43,7 +43,7 @@ $button-text-color: #525252;
 }
 .ui-button {
   @include border-radius(10px);
-  @include box-shadow(rgba(0,0,0,0.5), 0px, 1px, 2px, 0);
+  box-shadow: 0px 1px 2px 0 rgba(0,0,0,0.5);
   border: 1px solid #bdbdbd;
   &.ui-state-hover {
     @include vertical-gradient(#ffffff, #dfdfdf);

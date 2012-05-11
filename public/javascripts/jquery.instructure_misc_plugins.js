@@ -19,7 +19,7 @@ define([
   'i18n!instructure',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.scrollToVisible' /* scrollToVisible */,
   'vendor/jquery.ba-hashchange' /* hashchange */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */

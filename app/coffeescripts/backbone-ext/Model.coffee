@@ -1,5 +1,5 @@
 define [
-  'use!backbone'
+  'use!vendor/backbone'
   'compiled/backbone-ext/Model/computedAttributes'
   'compiled/backbone-ext/Model/dateAttributes'
 ], (Backbone) ->

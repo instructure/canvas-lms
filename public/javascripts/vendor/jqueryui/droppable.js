@@ -19,7 +19,7 @@ define([
 	'jqueryui/widget',
 	'jqueryui/mouse',
 	'jqueryui/draggable',
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */
+  'jqueryui/draggable' /* /\.draggable/ */
 ], function( $, _core, _widget, _mouse, _draggable, undefined ) {
 
 $.widget("ui.droppable", {

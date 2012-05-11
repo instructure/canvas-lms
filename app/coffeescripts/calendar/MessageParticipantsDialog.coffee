@@ -1,18 +1,35 @@
 define [
+  'jquery'
+  'underscore'
   'i18n!calendar'
   'jst/calendar/messageParticipants'
   'jst/calendar/recipientList'
-], (I18n, messageParticipantsTemplate, recipientListTemplate) ->
+], ($, _, I18n, messageParticipantsTemplate, recipientListTemplate) ->
 
   class MessageParticipantsDialog
-    constructor: (@group, @dataSource) ->
-      @$form = $(messageParticipantsTemplate(@group)).submit @sendMessage
+    constructor: (@opts) ->
+      if @opts.timeslot
+        @recipients = _(@opts.timeslot.child_events).map (e) -> e.user or e.group
+        participantType = if @recipients[0].short_name == undefined then 'Group' else 'User'
 
-      @$select = @$form.find('select.message_groups')
-        .change(@loadParticipants)
-        .val('unregistered')
+        @$form = $(messageParticipantsTemplate participant_type: participantType)
+        @$form.find('select.message_groups').remove()
+      else
+        @group = @opts.group
+        @$form = $(messageParticipantsTemplate participant_type: @group.participant_type)
+        @dataSource = @opts.dataSource
+
+        @$select = @$form.find('select.message_groups')
+          .change(@loadParticipants)
+          .val('unregistered')
+
+
+      @$form.submit @sendMessage
 
       @$participantList = @$form.find('ul')
+
+      if @recipients
+        @$participantList.html recipientListTemplate(recipientType: participantType, recipients: @recipients)
 
     show: ->
       @$form.dialog
@@ -38,6 +55,8 @@ define [
         $status.spin()
 
     loadParticipants: =>
+      return if @recipients
+
       registrationStatus = @$select.val()
       @loading = true
       @participantStatus()

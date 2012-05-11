@@ -1,8 +1,8 @@
 define [
   'jquery'
-  'use!underscore'
+  'underscore'
   'i18n!calendar.edit'
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
   'jst/calendar/editCalendarEventFull'
   'wikiSidebar'
   'compiled/object/unflatten'

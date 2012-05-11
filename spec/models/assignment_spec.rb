@@ -1514,14 +1514,14 @@ describe Assignment do
 
     it "should persist :created across changes" do
       assignment = assignment_model
-      assignment.turnitin_settings = assignment.default_turnitin_settings
+      assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
       assignment.save
       assignment.turnitin_settings[:created] = true
       assignment.save
       assignment.reload
       assignment.turnitin_settings[:created].should be_true
 
-      assignment.turnitin_settings = assignment.default_turnitin_settings.merge(:s_paper_check => '0')
+      assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings.merge(:s_paper_check => '0')
       assignment.save
       assignment.reload
       assignment.turnitin_settings[:created].should be_true
@@ -1529,14 +1529,14 @@ describe Assignment do
 
     it "should clear out :current" do
       assignment = assignment_model
-      assignment.turnitin_settings = assignment.default_turnitin_settings
+      assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
       assignment.save
       assignment.turnitin_settings[:current] = true
       assignment.save
       assignment.reload
       assignment.turnitin_settings[:current].should be_true
 
-      assignment.turnitin_settings = assignment.default_turnitin_settings.merge(:s_paper_check => '0')
+      assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings.merge(:s_paper_check => '0')
       assignment.save
       assignment.reload
       assignment.turnitin_settings[:current].should be_nil
@@ -1569,6 +1569,129 @@ describe Assignment do
       })
       @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
     end
+  end
+
+  context "attribute freezing" do
+    before do
+      course
+      @asmnt = @course.assignments.create!(:title => 'lock locky')
+      @att_map = {"lock_at" => "yes",
+                  "assignment_group" => "no",
+                  "title" => "no",
+                  "assignment_group_id" => "no",
+                  "submission_types" => "yes",
+                  "points_possible" => "yes",
+                  "description" => "yes",
+                  "grading_type" => "yes"}
+    end
+
+    def stub_plugin
+      PluginSetting.stubs(:settings_for_plugin).returns(@att_map)
+    end
+
+    it "should not be frozen if not copied" do
+      stub_plugin
+      @asmnt.freeze_on_copy = true
+      @asmnt.frozen?.should == false
+      @att_map.each_key{|att| @asmnt.att_frozen?(att).should == false}
+    end
+
+    it "should not be frozen if copied but not frozen set" do
+      stub_plugin
+      @asmnt.copied = true
+      @asmnt.frozen?.should == false
+      @att_map.each_key{|att| @asmnt.att_frozen?(att).should == false}
+    end
+
+    it "should not be frozen if plugin not enabled" do
+      @asmnt.copied = true
+      @asmnt.freeze_on_copy = true
+      @asmnt.frozen?.should == false
+      @att_map.each_key{|att| @asmnt.att_frozen?(att).should == false}
+    end
+
+    context "assignments are frozen" do
+      append_before (:each) do
+        stub_plugin
+        @asmnt.copied = true
+        @asmnt.freeze_on_copy = true
+        @admin = account_admin_user(opts={})
+        teacher_in_course(:course => @course)
+      end
+
+      it "should be frozen" do
+        @asmnt.frozen?.should == true
+      end
+
+      it "should flag specific attributes as frozen for no user" do
+        @att_map.each_pair do |att, setting|
+          @asmnt.att_frozen?(att).should == (setting == "yes")
+        end
+      end
+
+      it "should flag specific attributes as frozen for teacher" do
+        @att_map.each_pair do |att, setting|
+          @asmnt.att_frozen?(att, @teacher).should == (setting == "yes")
+        end
+      end
+
+      it "should not flag attributes as frozen for admin" do
+        @att_map.each_pair do |att, setting|
+          @asmnt.att_frozen?(att, @admin).should == false
+        end
+      end
+
+      it "should be frozen for nil user" do
+        @asmnt.frozen_for_user?(nil).should == true
+      end
+
+      it "should be frozen for teacher" do
+        @asmnt.frozen_for_user?(@teacher).should == true
+      end
+
+      it "should not be frozen for admin" do
+        @asmnt.frozen_for_user?(@admin).should == false
+      end
+
+      it "should not validate if saving without user" do
+        @asmnt.description = "new description"
+        @asmnt.save
+        @asmnt.valid?.should == false
+        @asmnt.errors["description"].should == "You don't have permission to edit the locked attribute description"
+      end
+
+      it "should allow teacher to edit unlocked attributes" do
+        @asmnt.title = "new title"
+        @asmnt.updating_user = @teacher
+        @asmnt.save!
+
+        @asmnt.reload
+        @asmnt.title.should == "new title"
+      end
+
+      it "should not allow teacher to edit locked attributes" do
+        @asmnt.description = "new description"
+        @asmnt.updating_user = @teacher
+        @asmnt.save
+
+        @asmnt.valid?.should == false
+        @asmnt.errors["description"].should == "You don't have permission to edit the locked attribute description"
+
+        @asmnt.reload
+        @asmnt.description.should_not == "new title"
+      end
+
+      it "should allow admin to edit unlocked attributes" do
+        @asmnt.description = "new description"
+        @asmnt.updating_user = @admin
+        @asmnt.save!
+
+        @asmnt.reload
+        @asmnt.description.should == "new description"
+      end
+
+    end
+
   end
 end
 

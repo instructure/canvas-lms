@@ -19,7 +19,6 @@ define([
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
   'str/htmlEscape',
-  'jquery.instructure_jquery_patches' /* windowScrollTop */,
   'jquery.keycodes' /* keycodes */,
   'vendor/date' /* Date.parse, Date.UTC, Date.today */,
   'jqueryui/datepicker' /* /\.datepicker/ */,

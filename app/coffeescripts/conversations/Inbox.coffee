@@ -18,40 +18,39 @@
 
 define [
   'i18n!conversations'
-  'jquery'
+  'underscore'
   'str/htmlEscape'
   'compiled/conversations/introSlideshow'
+  'compiled/conversations/ConversationsPane'
+  'compiled/conversations/audienceList'
+  'compiled/conversations/contextList'
   'compiled/widget/TokenInput'
   'compiled/str/TextHelper'
-  'compiled/jquery/scrollIntoView'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'jquery.disableWhileLoading'
   'jquery.rails_flash_notifications'
   'media_comments'
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'
-  'vendor/jquery.pageless'
   'jqueryui/position'
-], (I18n, $, htmlEscape, introSlideshow, TokenInput, TextHelper) ->
+], (I18n, _, h, introSlideshow, ConversationsPane, audienceList, contextList, TokenInput, TextHelper) ->
 
   class
     constructor: (@options) ->
       @currentUser = @options.USER
       @contexts    = @options.CONTEXTS
-      @scope       = @options.SCOPE
       @userCache   = {}
       @userCache[@currentUser.id] = @currentUser
-      $ => @render()
+      $ @render
 
-    render: ->
+    render: =>
       @$inbox = $('#inbox')
       @minHeight = parseInt @$inbox.css('min-height').replace('px', '')
       @$conversations = $('#conversations')
-      @$conversationList = @$conversations.find("ul.conversations")
       @$messages = $('#messages')
       @$messageList = @$messages.find('ul.messages')
       @initializeHelp()
@@ -61,109 +60,100 @@ define [
       @initializeConversationActions()
       @initializeTemplates()
       @initializeTokenInputs()
-      @initializeConversationsPane(@options.INITIAL_CONVERSATIONS)
+      @initializeConversationsPane()
       @initializeAutoResize()
       @initializeHashChange()
       if @options.SHOW_INTRO
         introSlideshow()
 
     showMessageForm: ->
-      newMessage = !@$selectedConversation?
+      conversation = @conversations.active()
+      newMessage = !conversation?
       @$form.find('#recipient_info').showIf newMessage
       @$form.find('#group_conversation_info').hide()
       $('#action_compose_message').toggleClass 'active', newMessage
 
       if newMessage
-        @$form.find('.audience').html I18n.t('headings.new_message', 'New Message')
         @$form.addClass('new')
         @$form.find('#action_add_recipients').hide()
-        @$form.attr action: '/conversations'
+        @$form.attr action: '/conversations?' + $.param(@conversations?.baseData() ? {})
       else
-        @buildFormAudience()
         @$form.removeClass('new')
-        @$form.find('#action_add_recipients').showIf(!@$selectedConversation.hasClass('private'))
-        @$form.attr action: @$selectedConversation.find('a.details_link').attr('add_url')
-    
+        @$form.find('#action_add_recipients').showIf(!conversation.get('private'))
+        @$form.attr action: conversation.url('add_message')
+
       @resetMessageForm()
       @$form.find('#user_note_info').hide().find('input').attr('checked', false)
       @$form.show().find(':input:visible:first').focus()
 
-    resetMessageForm: ->
-      @buildFormAudience() if @$selectedConversation?
-      @$form.find('input[name!=authenticity_token], textarea').not(":checkbox").val('').change()
-      @$form.find(".attachment:visible").remove()
-      @$form.find(".media_comment").hide()
-      @$form.find("#action_media_comment").show()
+    resetMessageForm: (resetFields = true) ->
+      @$form.find('.audience').html(if c = @conversations.active()
+          @htmlAudience(c.attributes, linkToContexts: true, highlightFilters: true)
+        else
+          h(I18n.t('headings.new_message', 'New Message'))
+      )
+      if resetFields
+        @$form.find('input[name!=authenticity_token], textarea').not(":checkbox").val('').change()
+        @$form.find(".attachment:visible").remove()
+        @$form.find(".media_comment").hide()
+        @$form.find("#action_media_comment").show()
       @resize()
 
-    buildFormAudience: ->
-      $formAudience = @$form.find('.audience')
-      $formAudience.html @$selectedConversation.find('.audience').html()
-      # replace each <span data-url='...'>...</span> with an <a href='...'>...</a>
-      $formAudience.find('em').attr('id', 'form_contexts')
-      $context = $formAudience.find('.context')
-      for elem in $context
-        $elem = $(elem)
-        $elem.replaceWith("<a href='#{htmlEscape($elem.data('url'))}'>#{htmlEscape($elem.html())}</a>")
+    filters: ->
+      @conversations.baseData().filter ? []
 
-    parseQueryString: (queryString = window.location.search.substr(1)) ->
-      hash = {}
-      for parts in queryString.split(/\&/)
-        [key, value] = parts.split(/\=/, 2)
-        hash[decodeURIComponent(key)] = decodeURIComponent(value)
-      hash
+    htmlAudience: (conversation, options = {}) ->
+      filters = options.filters = if options.highlightFilters then @filters() else []
+      audience = for id in conversation.audience
+        {
+          id: id
+          name: @userCache[id].name
+          activeFilter: _.include(filters, "user_#{id}")
+        }
 
-    isSelected: ($conversation) ->
-      @$selectedConversation && @$selectedConversation.attr('id') == $conversation?.attr('id')
+      ret = audienceList(audience, options)
+      if audience.length
+        ret += " <em>" + @htmlContextList(conversation.audience_contexts, options) + "</em>"
+      ret
 
-    selectUnloadedConversation: (conversationId, params) ->
-      $.ajaxJSON '/conversations/' + conversationId, 'GET', {}, (data) =>
-        @addConversation data, true
-        $("#conversation_" + conversationId).hide()
-        @selectConversation $("#conversation_" + conversationId), $.extend(params, {data: data})
+    htmlContextList: (contexts, options = {}) ->
+      filters = options.filters ? []
+      contexts = (course for id, roles of contexts.courses when course = @contexts.courses[id]).
+           concat(group for id, roles of contexts.groups when group = @contexts.groups[id])
+      contexts = for context in contexts
+        context = _.clone(context)
+        context.activeFilter = _.include(filters, "#{context.type}_#{context.id}")
+        context
+      contextList(contexts, options)
 
-    noMessagesCheck: ->
-      $('#no_messages').showIf !@$conversationList.find('li:not([id=conversations_loader])').length
+    htmlNameForUser: (user, contexts = {courses: user.common_courses, groups: user.common_groups}) ->
+      h(user.name) + if contexts.courses?.length or contexts.groups?.length then " <em>" + @htmlContextList(contexts) + "</em>" else ''
 
-    selectConversation: ($conversation, params={}) ->
+    canAddNotesFor: (user) ->
+      return false unless @options.NOTES_ENABLED
+      return true if user.can_add_notes
+      for id, roles of user.common_courses
+        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.can_add_notes)
+      false
+
+    loadConversation: (conversation, $node, cb) ->
       @toggleMessageActions(off)
-
-      if @isSelected($conversation)
-        @$selectedConversation.removeClass 'inactive'
-        @$messageList.find('li.selected').removeClass 'selected'
-        return
-
       @$messageList.removeClass('private').hide().html ''
       @$messageList.addClass('private') if $conversation?.hasClass('private')
+      @showMessageForm()
 
-      if @$selectedConversation
-        @$selectedConversation.removeClass 'selected inactive'
-        if @scope == 'unread'
-          @$selectedConversation.fadeOut 'fast', (e) =>
-            $(e.currentTarget).remove()
-            @noMessagesCheck()
-        @$selectedConversation = null
-      if $conversation
-        @$selectedConversation = $conversation.addClass('selected')
-
-      if @$selectedConversation || $('#action_compose_message').length
-        @showMessageForm()
-        @$form.find('#body').val(params.message) if params.message
-      else
-        @$form.parent().hide()
-
-      if @$selectedConversation
-        @$selectedConversation.scrollIntoView()
-      else
+      params = @currentHashData()
+      @$form.find('#body').val(params.message) if params.message
+      unless conversation?
         if params.user_id
           $('#from_conversation_id').val(params.from_conversation_id)
           $('#recipients').data('token_input').selector.addByUserId(params.user_id, params.from_conversation_id)
-        return
+        return cb()
 
-      $c = @$selectedConversation
-
-      completion = (data) =>
-        return unless @isSelected($c)
+      url = conversation.url()
+      @$messageList.show().disableWhileLoading $.ajaxJSON url, 'GET', {}, (data) =>
+        @conversations.updateItems [data]
+        return unless @conversations.isActive(data.id)
         for user in data.participants when !@userCache[user.id]?.avatar_url
           @userCache[user.id] = user
           user.htmlName = @htmlNameForUser(user)
@@ -173,43 +163,14 @@ define [
         @$messages.show()
         @$messageList.append @buildMessage(message) for message in data.messages
         @$messageList.show()
-        if @$selectedConversation.hasClass 'unread'
-          # we've already done this server-side
-          @setConversationState @$selectedConversation, 'read'
+        cb()
 
-      if params.data
-        completion params.data
-      else
-        url = @$selectedConversation.find('a.details_link').attr('href')
-        @$messageList.show().disableWhileLoading $.ajaxJSON(url, 'GET', {}, completion)
+    deselectMessages: ->
+      @$messageList.find('li.selected').removeClass 'selected'
 
-    contextList: (contexts, withUrl=false, limit=2) ->
-      compare = (contextA, contextB) ->
-        strA = contextA.name.toLowerCase()
-        strB = contextB.name.toLowerCase()
-        if strA < strB then -1 else if strA > strB then 1 else 0
-
-      formatContext = (context) ->
-        if withUrl and context.type is "course"
-          return "<span class='context' data-url='#{htmlEscape(context.url)}'>#{htmlEscape(context.name)}</span>"
-        else
-          return htmlEscape(context.name)
-
-      sharedContexts = (course for id, roles of contexts.courses when course = @contexts.courses[id]).
-                 concat(group for id, roles of contexts.groups when group = @contexts.groups[id]).
-                 sort(compare)[0...limit]
-
-      $.toSentence(formatContext(context) for context in sharedContexts)
-
-    htmlNameForUser: (user, contexts = {courses: user.common_courses, groups: user.common_groups}) ->
-      htmlEscape(user.name) + if contexts.courses?.length or contexts.groups?.length then " <em>" + htmlEscape(@contextList(contexts)) + "</em>" else ''
-
-    canAddNotesFor: (user) ->
-      return false unless @options.NOTES_ENABLED
-      return true if user.can_add_notes
-      for id, roles of user.common_courses
-        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.can_add_notes)
-      false
+    addMessage: (message) ->
+      @toggleMessageActions(off)
+      @buildMessage(message).prependTo(@$messageList).slideDown 'fast'
 
     buildMessage: (data) ->
       return @buildSubmission(data) if data.submission
@@ -228,7 +189,7 @@ define [
         $message.prepend $('<img />').attr('src', avatar).addClass('avatar')
       user.htmlName ?= @htmlNameForUser(user) if user
       userName = user?.name ? I18n.t('unknown_user', 'Unknown user')
-      $message.find('.audience').html user?.htmlName || htmlEscape(userName)
+      $message.find('.audience').html user?.htmlName || h(userName)
       $message.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
       $message.find('p').html TextHelper.formatMessage(data.body)
       $message.find("a.show_quoted_text_link").click (e) =>
@@ -243,7 +204,7 @@ define [
       pmUrl = $.replaceTags $pmAction.attr('href'),
         user_id: data.author_id
         user_name: encodeURIComponent(userName)
-        from_conversation_id: @$selectedConversation.data('id')
+        from_conversation_id: @conversations.active?().id
       $pmAction.attr('href', pmUrl).click (e) =>
         e.stopPropagation()
       if data.forwarded_messages?.length
@@ -267,15 +228,15 @@ define [
 
     buildMediaObject: (blank, data) ->
       $mediaObject = blank.clone(true).attr('id', 'media_comment_' + data.media_id)
-      $mediaObject.find('span.title').html htmlEscape(data.display_name)
-      $mediaObject.find('span.media_comment_id').html htmlEscape(data.media_id)
+      $mediaObject.find('span.title').html h(data.display_name)
+      $mediaObject.find('span.media_comment_id').html h(data.media_id)
       $mediaObject.find('.instructure_inline_media_comment').data('media_comment_type', data.media_type)
       $mediaObject
 
     buildAttachment: (blank, data) ->
       $attachment = blank.clone(true).attr('id', 'attachment_' + data.id)
       $attachment.data('id', data.id)
-      $attachment.find('span.title').html htmlEscape(data.display_name)
+      $attachment.find('span.title').html h(data.display_name)
       $link = $attachment.find('a')
       $link.attr('href', data.url)
       $link.click (e) =>
@@ -293,13 +254,13 @@ define [
       user = @userCache[data.user_id]
       user.htmlName ?= @htmlNameForUser(user) if user
       userName = user?.name ? I18n.t('unknown_user', 'Unknown user')
-      $header.find('.title').html htmlEscape(data.assignment.name)
+      $header.find('.title').html h(data.assignment.name)
       $header.find('span.date').text(if data.submitted_at
         $.parseFromISO(data.submitted_at).datetime_formatted
       else
         I18n.t('not_applicable', 'N/A')
       )
-      $header.find('.audience').html user?.htmlName || htmlEscape(userName)
+      $header.find('.audience').html user?.htmlName || h(userName)
       if data.score && data.assignment.points_possible
         score = "#{data.score} / #{data.assignment.points_possible}"
       else
@@ -322,7 +283,7 @@ define [
       if index > initiallyShown
         $inlineMore = $moreLink.clone(true)
         $inlineMore.find('.hidden').text(index - initiallyShown)
-        $inlineMore.attr('title', htmlEscape(I18n.t('titles.expand_inline', "Show more comments")))
+        $inlineMore.attr('title', h(I18n.t('titles.expand_inline', "Show more comments")))
         $inlineMore.click (e) =>
           $target = $(e.currentTarget)
           $submission = $target.closest('.submission')
@@ -335,7 +296,7 @@ define [
       if data.submission_comments.length > index
         $moreLink.find('a').attr('href', href).attr('target', '_blank')
         $moreLink.find('.hidden').text(data.submission_comments.length - index)
-        $moreLink.attr('title', htmlEscape(I18n.t('titles.view_submission', "Open submission in new window.")))
+        $moreLink.attr('title', h(I18n.t('titles.view_submission', "Open submission in new window.")))
         $moreLink.hide() if data.submission_comments.length > initiallyShown
         $ul.append $moreLink
       $submission
@@ -347,250 +308,10 @@ define [
         $comment.prepend $('<img />').attr('src', avatar).addClass('avatar')
       user.htmlName ?= @htmlNameForUser(user) if user
       userName = user?.name ? I18n.t('unknown_user', 'Unknown user')
-      $comment.find('.audience').html user?.htmlName || htmlEscape(userName)
+      $comment.find('.audience').html user?.htmlName || h(userName)
       $comment.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
-      $comment.find('p').html htmlEscape(data.comment).replace(/\n/g, '<br />')
+      $comment.find('p').html h(data.comment).replace(/\n/g, '<br />')
       $comment
-
-    inboxActionUrlFor: ($action, $conversation) ->
-      $.replaceTags $action.attr('href'), 'id', $conversation.data('id')
-
-    inboxAction: ($action, options) ->
-      $loadingNode = options.loadingNode ? $action.closest('ul.conversations li')
-      $loadingNode = $('#conversation_actions').data('selectedConversation') unless $loadingNode.length
-      defaults =
-        loadingNode: $loadingNode
-        url: @inboxActionUrlFor($action, $loadingNode)
-        method: 'POST'
-        data: {}
-      options = $.extend(defaults, options)
-
-      return unless options.before?(options.loadingNode, options) ? true
-      ajaxRequest = $.ajaxJSON options.url, options.method, options.data
-        , (data) =>
-          options.success?(options.loadingNode, data)
-        , (data) =>
-          options.error?(options.loadingNode, data)
-      options.loadingNode?.disableWhileLoading(ajaxRequest)
-
-    addConversation: (data, append) ->
-      $('#no_messages').hide()
-      $conversation = $("#conversation_" + data.id)
-      if $conversation.length
-        $conversation.show()
-      else
-        $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id)
-      $conversation.data('id', data.id)
-      if data.avatar_url
-        $conversation.prepend $('<img />').attr('src', data.avatar_url).addClass('avatar')
-      $conversation[if append then 'appendTo' else 'prependTo'](@$conversationList).click (e) =>
-        e.preventDefault()
-        @setHash '#/conversations/' + $(e.currentTarget).data('id')
-      @updateConversation($conversation, data, null)
-      $conversation.hide().slideDown('fast') unless append
-      @$conversationList.append $("#conversations_loader")
-      $conversation
-
-    htmlAudienceForConversation: (conversation, cutoff=2) ->
-      audience = conversation.audience
-
-      return "<span>#{htmlEscape(I18n.t('notes_to_self', 'Monologue'))}</span>" if audience.length == 0
-      context_info = "<em>#{@contextList(conversation.audience_contexts, true)}</em>"
-      return "<span>#{htmlEscape(@userCache[audience[0]].name)}</span> #{context_info}" if audience.length == 1
-
-      audience = audience[0...cutoff].concat([audience[cutoff...audience.length]]) if audience.length > cutoff
-      $.toSentence(for idOrArray in audience
-        if typeof idOrArray is 'number'
-          "<span>#{htmlEscape(@userCache[idOrArray].name)}</span>"
-        else
-          """
-          <span class='others'>
-            #{htmlEscape(I18n.t('other', "other", count: idOrArray.length))}
-            <span>
-              <ul>
-                #{("<li>#{htmlEscape(@userCache[id].name)}</li>" for id in idOrArray).join('')}
-              </ul>
-            </span>
-          </span>
-          """
-      ) + " " + context_info
-
-    lastMessageKey: ->
-      if @scope is 'sent'
-        'last_authored_message'
-      else
-        'last_message'
-
-    lastMessageAtKey: ->
-      "#{@lastMessageKey()}_at"
-
-    updateConversation: ($conversation, data, move_mode='slide') ->
-      timestampKey = @lastMessageAtKey()
-      # just in case the conversation changed underneath us (e.g. someone sent
-      # a message to an archived conversation, thus un-archiving it)
-      if not data[timestampKey]
-        return @removeConversation($conversation)
-
-      @toggleMessageActions(off)
-
-      $a = $conversation.find('a.details_link')
-      $a.attr 'href', $.replaceTags($a.attr('href'), 'id', data.id)
-      $a.attr 'add_url', $.replaceTags($a.attr('add_url'), 'id', data.id)
-      if data.participants
-        for user in data.participants when !@userCache[user.id]
-          @userCache[user.id] = user
-
-      if data.audience
-        $conversation.data('audience', data.audience.concat([@currentUser.id]))
-        $conversation.find('.audience').html @htmlAudienceForConversation(data)
-        @buildFormAudience() if @isSelected($conversation)
-      $conversation.find('.actions a').click (e) =>
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        @closeMenus()
-        @openConversationMenu($(e.currentTarget))
-      .focus () =>
-        @closeMenus()
-        @openConversationMenu($(e.currentTarget))
-
-      if data.message_count?
-        $conversation.find('.count').text data.message_count
-        $conversation.find('.count').showIf data.message_count > 1
-      $conversation.find('span.date').text $.friendlyDatetime($.parseFromISO(data[timestampKey]).datetime)
-      moveDirection = if $conversation.data(timestampKey) > data[timestampKey] then 'down' else 'up'
-      $conversation.data timestampKey, data[timestampKey]
-      $conversation.data 'starred', data.starred
-      $p = $conversation.find('p')
-      $p.text data[@lastMessageKey()]
-      ($conversation.addClass(property) for property in data.properties) if data.properties.length
-      $conversation.addClass('private') if data['private']
-      $conversation.addClass('starred') if data.starred
-      $conversation.addClass('unsubscribed') unless data.subscribed
-      @setConversationState $conversation, data.workflow_state
-      @repositionConversation($conversation, moveDirection, move_mode) if move_mode
-
-    repositionConversation: ($conversation, moveDirection, move_mode) ->
-      $conversation.show()
-      timestampKey = @lastMessageAtKey()
-      lastMessageAt = $conversation.data(timestampKey)
-      $n = $conversation
-      if moveDirection == 'up'
-        $n = $n.prev() while $n.prev() && $n.prev().data(timestampKey) < lastMessageAt
-      else
-        $n = $n.next() while $n.next() && $n.next().data(timestampKey) > lastMessageAt
-      return if $n == $conversation
-      if move_mode is 'immediate'
-        $conversation.detach()[if moveDirection == 'up' then 'insertBefore' else 'insertAfter']($n)
-      else
-        $dummy_conversation = $conversation.clone().insertAfter($conversation)
-        $conversation.detach()[if moveDirection == 'up' then 'insertBefore' else 'insertAfter']($n).animate({opacity: 'toggle', height: 'toggle'}, 0)
-        $dummy_conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, =>
-          $dummy_conversation.remove()
-        $conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, =>
-          $conversation.scrollIntoView()
-
-    removeConversation: ($conversation) ->
-      deselect = @isSelected($conversation)
-      $conversation.fadeOut 'fast', =>
-        $conversation.remove()
-        @noMessagesCheck()
-        @setHash '' if deselect
-
-    setConversationState: ($conversation, state) ->
-      $conversation.removeClass('read unread archived').addClass state
-
-    openConversationMenu: ($node) ->
-      # get elements
-      elements =
-        node         : $node
-        container    : $('#conversation_actions')
-        conversation : $node.closest 'li'
-        parent       : $node.parent()
-        lists        : $('#conversation_actions ul')
-        listElements : $('#conversation_actions li')
-        focusable    : $('a, input, select, textarea')
-        actions      :
-          markAsRead   : $('#action_mark_as_read').parent()
-          markAsUnread : $('#action_mark_as_unread').parent()
-          unstar       : $('#action_unstar').parent()
-          star         : $('#action_star').parent()
-          unsubscribe  : $('#action_unsubscribe').parent()
-          subscribe    : $('#action_subscribe').parent()
-          forward      : $('#action_forward').parent()
-          archive      : $('#action_archive').parent()
-          unarchive    : $('#action_unarchive').parent()
-          delete       : $('#action_delete').parent()
-          deleteAll    : $('#action_delete_all').parent()
-
-      @activeActionMenu = elements.node
-
-      # add selected classes
-      elements.parent.addClass 'selected'
-      elements.container.addClass 'selected'
-      elements.conversation.addClass 'menu_active'
-
-      $container    = elements.container
-      $conversation = elements.conversation
-
-      # prep action container
-      elements.container.data 'selectedConversation', elements.conversation
-      elements.lists.removeClass('first last').hide()
-      elements.listElements.hide()
-
-      # show/hide relevant links
-      elements.actions.markAsRead.show() if elements.conversation.hasClass 'unread'
-      elements.actions.markAsUnread.show() if elements.conversation.hasClass 'read'
-
-      if elements.conversation.hasClass 'starred'
-        elements.actions.unstar.show()
-      else
-        elements.actions.star.show()
-
-      if elements.conversation.hasClass('private')
-        elements.actions.subscribe.hide()
-        elements.actions.unsubscribe.hide()
-      else
-        elements.actions.unsubscribe.show() unless elements.conversation.hasClass 'unsubscribed'
-        elements.actions.subscribe.show() if elements.conversation.hasClass 'unsubscribed'
-
-      elements.actions.forward.show()
-      elements.actions.delete.show()
-      elements.actions.deleteAll.show()
-      if @scope is 'archived' then elements.actions.unarchive.show() else elements.actions.archive.show()
-
-      $(window).one 'keydown', (e) =>
-        return if e.keyCode isnt 9 or e.shiftKey
-
-        elements.focusable.one 'focus.actions_menu', (e) =>
-          @nextElement = $(e.target)
-          elements.focusable.unbind '.actions_menu'
-          elements.container.find('a:visible:first').focus()
-
-          elements.container.find('a:visible:first').bind 'blur.actions_menu', (e), =>
-            $(window).one 'keyup', (e) =>
-              actionMenuActive = elements.container.find('a:focus').length
-              unless actionMenuActive
-                elements.container.find('a.visible').unbind '.actions_menu'
-                @activeActionMenu.focus()
-          elements.container.find('a:visible:last').bind 'blur.actions_menu', (e), =>
-            $(window).one 'keyup', (e) =>
-              actionMenuActive = elements.container.find('a:focus').length
-              unless actionMenuActive
-                elements.container.find('a.visible').unbind '.actions_menu'
-                @nextElement.focus()
-                @closeMenus()
-
-      elements.container.find('li[style*="list-item"]').parent().show()
-      elements.groups = elements.container.find('ul[style*="block"]')
-      if elements.groups.length
-        elements.groups.first().addClass 'first'
-        elements.groups.last().addClass 'last'
-
-      offset = elements.node.offset()
-      elements.container.css {
-        left: (offset.left + (elements.node.width() / 2) - elements.container.offsetParent().offset().left - (elements.container.width() / 2)),
-        top : (offset.top + (elements.node.height() * 0.9) - elements.container.offsetParent().offset().top)
-      }
 
     closeMenus: () ->
       $('#actions .menus > li, #conversation_actions, #conversations .actions').removeClass('selected')
@@ -605,13 +326,17 @@ define [
         offset = -($div.outerWidth() / 2) if offset < -($div.outerWidth() / 2)
         $div.css 'margin-left', offset + 'px'
 
-    resize: ->
-      availableHeight = $(window).height() - $('#header').outerHeight(true) - ($('#wrapper-container').outerHeight(true) - $('#wrapper-container').height()) - ($('#main').outerHeight(true) - $('#main').height()) - $('#breadcrumbs').outerHeight(true) - $('#footer').outerHeight(true)
-      availableHeight = @minHeight if availableHeight < @minHeight
-      $(document.body).toggleClass('too_small', availableHeight <= @minHeight)
-      @$inbox.height(availableHeight)
-      @$messageList.height(availableHeight - @$form.outerHeight(true))
-      @$conversationList.height(availableHeight - $('#actions').outerHeight(true))
+    resize: (delay=0) ->
+      clearTimeout @resizeCb if @resizeCb
+      @resizeCb = setTimeout =>
+        delete @resizeCb
+        availableHeight = $(window).height() - $('#header').outerHeight(true) - ($('#wrapper-container').outerHeight(true) - $('#wrapper-container').height()) - ($('#main').outerHeight(true) - $('#main').height()) - $('#breadcrumbs').outerHeight(true) - $('#footer').outerHeight(true)
+        availableHeight = @minHeight if availableHeight < @minHeight
+        $(document.body).toggleClass('too_small', availableHeight <= @minHeight)
+        @$inbox.height(availableHeight)
+        @$messageList.height(availableHeight - @$form.outerHeight(true))
+        @conversations.resize(availableHeight)
+      , delay
 
     toggleMessageActions: (state) ->
       if state?
@@ -623,8 +348,10 @@ define [
       if state then $("#message_actions").slideDown(100) else $("#message_actions").slideUp(100)
       @$form[if state then 'addClass' else 'removeClass']('disabled')
 
-    setHash: (hash) ->
-      if hash isnt location.hash
+    updateHashData: (changes) ->
+      data = $.extend(@currentHashData(), changes)
+      hash = $.encodeToHex(JSON.stringify(data))
+      if hash isnt location.hash.substring(1)
         location.hash = hash
         $(document).triggerHandler('document_fragment_change', hash)
 
@@ -662,15 +389,16 @@ define [
         disableWhileLoading: true
         success: (data) =>
           data = [data] unless data.length?
-          for conversation in data
-            $conversation = $('#conversation_' + conversation.id)
-            if $conversation.length
-              @buildMessage(conversation.messages[0]).prependTo(@$messageList).slideDown 'fast' if @isSelected($conversation)
-              @updateConversation($conversation, conversation, if data.length == 1 then 'slide' else 'immediate')
-            else if conversation[@lastMessageAtKey()]
-              @addConversation(conversation)
-            @setHash '#/conversations/' + conversation.id if data.length == 1
-          $.flashMessage(if data.length > 1 then I18n.t('messages_sent', 'Messages Sent') else I18n.t('message_sent', 'Message Sent'))
+          @conversations.updateItems data
+          if data.length == 1
+            conversation = data[0]
+            if @conversations.isActive(conversation.id)
+              @buildMessage(conversation.messages[0]).prependTo(@$messageList).slideDown 'fast'
+            if conversation.visible
+              @updateHashData id: conversation.id
+            $.flashMessage I18n.t('message_sent', 'Message Sent')
+          else
+            $.flashMessage I18n.t('messages_sent', 'Messages Sent')
           @resetMessageForm()
         error: (data) =>
           return if data.isRejected?() # e.g. refreshed the page, thus aborting the request
@@ -699,7 +427,7 @@ define [
         disableWhileLoading: true,
         success: (data) =>
           @buildMessage(data.messages[0]).prependTo(@$messageList).slideDown 'fast'
-          @updateConversation(@$selectedConversation, data)
+          @conversations.updateItems [data]
           @resetMessageForm()
           @$addForm.dialog('close')
         error: (data) =>
@@ -713,13 +441,8 @@ define [
         disableWhileLoading: true,
         success: (data) =>
           conversation = data[0]
-          $conversation = $('#conversation_' + conversation.id)
-          if $conversation.length
-            @buildMessage(conversation.messages[0]).prependTo(@$messageList).slideDown 'fast' if @isSelected($conversation)
-            @updateConversation($conversation, conversation)
-          else
-            @addConversation(conversation)
-          @setHash '#/conversations/' + conversation.id
+          @conversations.updateItems [conversation]
+          @updateHashData id: conversation.id
           @resetMessageForm()
           @$forwardForm.dialog('close')
         error: (data) =>
@@ -734,7 +457,6 @@ define [
         else
           $message = $(e.target).closest('#messages > ul > li')
           unless $message.hasClass('generated')
-            @$selectedConversation?.addClass('inactive')
             $message.toggleClass('selected')
             $message.find('> :checkbox').attr('checked', $message.hasClass('selected'))
           @toggleMessageActions()
@@ -751,14 +473,30 @@ define [
           $('span.others > span').hide()
         @closeMenus() unless $(e.target).closest(".menus > li, #conversation_actions, #conversations .actions").length
 
-      $('#menu_views').parent().find('li a').click (e) =>
+      @$menuViews = $('#menu_views')
+      @$menuViewsList = @$menuViews.parent()
+      @$menuViewsList.find('li a').click (e) =>
         @closeMenus()
-        @lockUntilUserInput()
-        $('#menu_views').text $(e.currentTarget).text()
+        if scope = $(e.target).closest('li').data('scope')
+          e.preventDefault()
+          @updateHashData scope: scope
 
-      @$conversations.delegate '.actions a', 'blur', (e) =>
-        $(window).one 'keyup', (e) =>
-          @closeMenus() if e.shiftKey #or $('#conversation_actions a:focus').length == 0
+      $('#conversations ul, #create_message_form').delegate '.audience', 'click', (e) =>
+        if ($others = $(e.target).closest('span.others').find('> span')).length
+          if not $(e.target).closest('span.others > span').length
+            $('span.others > span').not($others).hide()
+            $others.toggle()
+            $others.css('left', $others.parent().position().left)
+            $others.css('top', $others.parent().height() + $others.parent().position().top)
+          return false
+
+    setScope: (scope) ->
+      $items = @$menuViewsList.find('li')
+      $items.removeClass('checked')
+      $item = $items.filter("[data-scope=#{scope}]")
+      $item = $items.filter("[data-scope=inbox]") unless $item.length
+      $item.addClass('checked')
+      @$menuViews.text $item.text()
 
     initializeMessageActions: ->
       $('#message_actions').find('a').click (e) =>
@@ -767,110 +505,9 @@ define [
       $('#cancel_bulk_message_action').click =>
         @toggleMessageActions off
 
-    initializeConversationActions: ->
-      $('#conversation_actions').find('li a').click (e) =>
-        e.preventDefault()
-        @closeMenus()
-
-      $('.action_mark_as_read').click (e) =>
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        @inboxAction $(e.currentTarget),
-          method: 'PUT'
-          before: ($node) =>
-            @setConversationState $node, 'read' unless @scope == 'unread'
-            true
-          success: ($node) =>
-            @removeConversation $node if @scope == 'unread'
-          error: ($node) =>
-            @setConversationState $node 'unread' unless @scope == 'unread'
-
-      $('.action_mark_as_unread').click (e) =>
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        @inboxAction $(e.currentTarget),
-          method: 'PUT'
-          before: ($node) => @setConversationState $node, 'unread'
-          error: ($node) => @setConversationState $node, 'read'
-
-      $('.action_unstar').click (e) =>
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        starred = null
-        @inboxAction $(e.currentTarget),
-          method: 'PUT'
-          before: ($node) =>
-            starred = $node.data('starred')
-            $node.removeClass('starred') if starred
-            starred
-          success: ($node, data) =>
-            @updateConversation($node, data)
-            @removeConversation $node if @scope == 'starred'
-          error: ($node) =>
-            $node.addClass('starred')
-
-      $('.action_star').click (e) =>
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        starred = null
-        @inboxAction $(e.currentTarget),
-          method: 'PUT'
-          before: ($node, options) =>
-            starred = $node.data('starred')
-            if !starred
-              $node.addClass('starred')
-            !starred
-          success: ($node, data) =>
-            @updateConversation($node, data)
-          error: ($node) =>
-            $node.removeClass('starred')
-
-      $('#action_add_recipients').click (e) =>
-        e.preventDefault()
-        @$addForm
-          .attr('action', @inboxActionUrlFor($(e.currentTarget), @$selectedConversation))
-          .dialog('close').dialog
-            width: 420
-            title: I18n.t('title.add_recipients', 'Add Recipients')
-            buttons: [
-              {
-                text: I18n.t('buttons.add_people', 'Add People')
-                click: => @$addForm.submit()
-              }
-              {
-                text: I18n.t('#buttons.cancel', 'Cancel')
-                click: => @$addForm.dialog('close')
-              }
-            ]
-            open: =>
-              tokenInput = $('#add_recipients').data('token_input')
-              tokenInput.baseExclude = @$selectedConversation.data('audience')
-              @$addForm.find("input[name!=authenticity_token]").val('').change()
-            close: =>
-              $('#add_recipients').data('token_input').input.blur()
-
-      $('#action_subscribe').click (e) =>
-        @inboxAction $(e.currentTarget),
-          method: 'PUT'
-          data: {subscribed: 1}
-          success: ($node) => $node.removeClass 'unsubscribed'
-
-      $('#action_unsubscribe').click (e) =>
-        @inboxAction $(e.currentTarget),
-          method: 'PUT'
-          data: {subscribed: 0}
-          success: ($node) => $node.addClass 'unsubscribed'
-
-      $('#action_archive, #action_unarchive').click (e) =>
-        @inboxAction $(e.currentTarget),
-          method: 'PUT'
-          success: ($node) => @removeConversation($node)
-
-      $('#action_delete_all').click (e) =>
-        if confirm I18n.t('confirm.delete_conversation', "Are you sure you want to delete your copy of this conversation? This action cannot be undone.")
-          @inboxAction $(e.currentTarget), { method: 'DELETE', success: ($node) => @removeConversation($node) }
-
       $('#action_delete').click (e) =>
+        active = @conversations.active()
+        return unless active?
         $selectedMessages = @$messageList.find('.selected')
         message = if $selectedMessages.length > 1
           I18n.t('confirm.delete_messages', "Are you sure you want to delete your copy of these messages? This action cannot be undone.")
@@ -878,25 +515,14 @@ define [
           I18n.t('confirm.delete_message', "Are you sure you want to delete your copy of this message? This action cannot be undone.")
         if confirm message
           $selectedMessages.fadeOut 'fast'
-          @inboxAction $(e.currentTarget),
-            loadingNode: @$selectedConversation
+          @conversations.action $(e.currentTarget),
+            conversationId: active.id
             data: {remove: ($(message).data('id') for message in $selectedMessages)}
-            success: ($node, data) =>
-              # TODO: once we've got infinite scroll hooked up, we should
-              # have the response tell us the number of messages still in
-              # the conversation, and key off of that to know if we should
-              # delete the conversation (or possibly reload its messages)
-              ignoreList = '.selected, .generated'
-              ignoreList += ', .other' if @scope is 'sent' # once there are no more messages by self, hide the conversation
-              if @$messageList.find('> li').not(ignoreList).length
-                $selectedMessages.remove()
-                @updateConversation($node, data)
-              else
-                @removeConversation($node)
-            error: =>
-              $selectedMessages.show()
+            success: => @toggleMessageActions(off)
+            error: => $selectedMessages.show()
 
       $('#action_forward').click (e) =>
+        return unless @conversations.active()?
         @$forwardForm.find("input[name!=authenticity_token], textarea").val('').change()
         $preview = @$forwardForm.find('ul.messages').first()
         $preview.html('')
@@ -925,20 +551,43 @@ define [
               click: -> $(this).dialog('close')
             }
           ]
+          open: =>
+            @$forwardForm.attr action: '/conversations?' + $.param(@conversations.baseData())
           close: =>
-            $('#forward_recipients').data('token_input').input.blur()
+            $('#forward_recipients').data('token_input').$input.blur()
+
+
+    initializeConversationActions: ->
+      $('#action_compose_message').click (e) =>
+        e.preventDefault()
+        @updateHashData id: null
+
+      $('#action_add_recipients').click (e) =>
+        e.preventDefault()
+        return unless @conversations.active()?
+        @$addForm
+          .attr('action', @conversations.actionUrlFor($(e.currentTarget)))
+          .dialog('close').dialog
+            width: 420
+            title: I18n.t('title.add_recipients', 'Add Recipients')
+            buttons: [
+              {
+                text: I18n.t('buttons.add_people', 'Add People')
+                click: => @$addForm.submit()
+              }
+              {
+                text: I18n.t('#buttons.cancel', 'Cancel')
+                click: => @$addForm.dialog('close')
+              }
+            ]
+            open: =>
+              tokenInput = $('#add_recipients').data('token_input')
+              tokenInput.baseExclude = @conversations.active().get('audience')
+              @$addForm.find("input[name!=authenticity_token]").val('').change()
+            close: =>
+              $('#add_recipients').data('token_input').$input.blur()
 
     initializeTemplates: ->
-      $('#conversation_blank .audience, #create_message_form .audience').click (e) =>
-        if ($others = $(e.target).closest('span.others').find('> span')).length
-          if not $(e.target).closest('span.others > span').length
-            $('span.others > span').not($others).hide()
-            $others.toggle()
-            $others.css('left', $others.parent().position().left)
-            $others.css('top', $others.parent().height() + $others.parent().position().top)
-          e.preventDefault()
-          return false
-
       nextAttachmentIndex = 0
       $('#action_add_attachment').click (e) =>
         e.preventDefault()
@@ -989,20 +638,6 @@ define [
         $('<span />', class: 'context_info').text("(#{contextInfo})")
       else
         ''
-
-    # a little gimmick until we implement real ajax loading for filters. we
-    # disable the inbox when a filter is changed (via dropdown or search).
-    # that way it's more obvious stuff is loading and the user doesn't try
-    # to do something else only to have the page change underneath them
-    lockUntilUserInput: ->
-      setTimeout =>
-        @$inbox.disableWhileLoading @untilUserInput()
-
-    untilUserInput: ->
-      d = $.Deferred()
-      $('body').one 'keydown click', d.resolve
-      d.promise()
-
     initializeTokenInputs: ->
       buildPopulator = (pOptions={}) =>
         (selector, $node, data, options={}) =>
@@ -1018,7 +653,7 @@ define [
           $name.append($b, $contextInfo)
           $span = $('<span />', class: 'details')
           if data.common_courses?
-            $span.text(@contextList(courses: data.common_courses, groups: data.common_groups))
+            $span.html(@htmlContextList({courses: data.common_courses, groups: data.common_groups}, hardCutoff: 2))
           else if data.type and data.user_count?
             $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
           else if data.item_count?
@@ -1120,6 +755,7 @@ define [
           @$form.find('#user_note_info').showIf((user = @userCache[tokens[0]]) and @canAddNotesFor(user))
         @resize()
 
+      @filterNameMap = {}
       $('#context_tags').tokenInput
         placeholder: placeholderText
         added: (data, $token, newToken) =>
@@ -1160,61 +796,32 @@ define [
               types: ['context']
       filterInput = $('#context_tags').data('token_input')
       filterInput.change = (tokenValues) =>
-        if @currentFilter isnt tokenValues[0]
-          # TODO: fragment hash fu + ajax
-          newUrl = location.href.replace(/[\?#].*|/g, '')
-          newUrl += '?filter=' + tokenValues[0] if tokenValues[0]
-          filterInput.$input.blur()
-          @lockUntilUserInput()
-          location.href = newUrl
-      if filter = @options.INITIAL_FILTER
-        @currentFilter = filter.id
-        filterInput.addToken
-          value: filter.id
-          text: filter.name
-          data: $.extend(true, {}, filter)
+        filters = for pair in filterInput.tokenPairs()
+          @filterNameMap[pair[0]] = pair[1]
+          pair[0]
+        @updateHashData filter: filters
 
-    initializeConversationsPane: (conversations) ->
-      for conversation in conversations
-        @addConversation conversation, true
-      @noMessagesCheck()
-
-      setTimeout () =>
-        @$conversationList.pageless
-          totalPages: Math.ceil(@options.CONVERSATIONS_COUNT / @options.CONVERSATIONS_PER_PAGE)
-          container: @$conversationList
-          params:
-            format: 'json'
-            per_page: @options.CONVERSATIONS_PER_PAGE
-          loader: $("#conversations_loader")
-          scrape: (data) =>
-            if typeof(data) == 'string'
-              try
-                data = $.parseJSON(data) || []
-              catch error
-                data = []
-              for conversation in data
-                @addConversation conversation, true
-            @$conversationList.append $("#conversations_loader")
-            false
-        , 1
+    initializeConversationsPane: () ->
+      @conversations = new ConversationsPane this, @$conversations
 
     initializeAutoResize: ->
-      $(window).resize => @resize()
-      setTimeout => @resize()
+      $(window).resize => @resize(50)
+      @resize()
+
+    currentHashData: ->
+      try
+        data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
+      catch e
+        data = {}
+      data
 
     initializeHashChange: ->
       $(window).bind 'hashchange', =>
         hash = location.hash
-        if match = hash.match(/^#\/conversations\/(\d+)(\?(.*))?/)
-          params = if match[3] then @parseQueryString(match[3]) else {}
-          if ($c = $('#conversation_' + match[1])) and $c.length
-            @selectConversation($c, params)
-          else
-            @selectUnloadedConversation(match[1], params)
-        else
-          params = {}
-          if match = hash.match(/^#\/conversations\?(.*)$/)
-            params = @parseQueryString(match[1])
-          @selectConversation(null, params)
+        data = @currentHashData()
+        if data.filter
+          data.filter = (id for id in data.filter when @filterNameMap[id])
+          return @updateHashData(filter: null) if not data.filter.length
+        @setScope(data.scope)
+        @conversations.updateView(data)
       .triggerHandler('hashchange')

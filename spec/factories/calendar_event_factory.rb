@@ -47,9 +47,9 @@ end
 def appointment_group_model(opts={})
   @course ||= opts.delete(:course) || course_model
   if sub_context = opts.delete(:sub_context)
-    opts[:sub_context_code] = sub_context.asset_string
+    opts[:sub_context_codes] = [sub_context.asset_string]
   end
-  @appointment_group = @course.appointment_groups.create!(valid_appointment_group_attributes.merge(opts))
+  @appointment_group = AppointmentGroup.create!(valid_appointment_group_attributes.merge(opts))
   @appointment_group
 end
 
@@ -61,6 +61,7 @@ end
 
 def valid_appointment_group_attributes
   {
-    :title => "some title"
+    :title => "some title",
+    :contexts => [@course]
   }
 end

@@ -59,7 +59,8 @@ class ContentExport < ActiveRecord::Base
     self.workflow_state = 'exporting'
     self.save
     begin
-      if CC::CCExporter.export(self, opts.merge({:for_course_copy => for_course_copy?}))
+      @cc_exporter = CC::CCExporter.new(self, opts.merge({:for_course_copy => for_course_copy?}))
+      if @cc_exporter.export
         self.progress = 100
         if for_course_copy?
           self.workflow_state = 'exported_for_course_copy'
@@ -77,6 +78,10 @@ class ContentExport < ActiveRecord::Base
     end
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
+  def referenced_files
+    @cc_exporter ? @cc_exporter.referenced_files : {}
+  end
 
   def for_course_copy?
     self.export_type == COURSE_COPY
@@ -99,12 +104,12 @@ class ContentExport < ActiveRecord::Base
   end
 
   def selected_content
-    self.settings[:selected_content]
+    self.settings[:selected_content] ||= {}
   end
 
   def export_object?(obj)
     return false unless obj
-    return true unless selected_content
+    return true unless selected_content.present?
     return true if is_set?(selected_content[:everything])
 
     asset_type = obj.class.table_name
@@ -114,6 +119,13 @@ class ContentExport < ActiveRecord::Base
     return true if is_set?(selected_content[asset_type][CC::CCHelper.create_key(obj)])
 
     false
+  end
+
+  def add_item_to_export(obj)
+    return unless obj && obj.class.respond_to?(:table_name)
+    asset_type = obj.class.table_name
+    selected_content[asset_type] ||= {}
+    selected_content[asset_type][CC::CCHelper.create_key(obj)] = true
   end
   
   def add_error(user_message, exception_or_info)

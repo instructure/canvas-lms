@@ -53,7 +53,10 @@
 
         <% if can_do(@submission, @current_user, :view_turnitin_report) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) && turnitin_score[:similarity_score] %>
-            <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
+            <span class="turnitin_score_container">
+              <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
+              <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>
+            </span>
           <% end %>
         <% end %>
       <% end %>

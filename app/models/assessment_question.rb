@@ -77,7 +77,7 @@ class AssessmentQuestion < ActiveRecord::Base
     
     # This either matches the id from a url like: /courses/15395/files/11454/download
     # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg
-    regex = Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"]*))})
+    regex = Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"?]*))(?:\\?([^'"]*))?})
     file_substitutions = {}
     
     deep_translate = lambda do |obj|
@@ -106,7 +106,8 @@ class AssessmentQuestion < ActiveRecord::Base
             file_substitutions[id_or_path] = new_file
           end
           if sub = file_substitutions[id_or_path]
-            "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}"
+            query_rest = $3 ? "&#{$3}" : ''
+            "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}#{query_rest}"
           else
             match
           end

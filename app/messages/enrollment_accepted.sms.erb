@@ -6,7 +6,7 @@
       t :body_ta, "%{user} accepted the TA invitation for the course, %{course}", :user => asset.user.name, :course => asset.course.name
     when 'ObserverEnrollment'
       t :body_observer, "%{user} accepted the observer invitation for the course, %{course}", :user => asset.user.name, :course => asset.course.name
-    when 'CourseDesignerEnrollment'
+    when 'DesignerEnrollment'
       t :body_designer, "%{user} accepted the designer invitation for the course, %{course}", :user => asset.user.name, :course => asset.course.name
     else
       t :body_student, "%{user} accepted the student invitation for the course, %{course}", :user => asset.user.name, :course => asset.course.name

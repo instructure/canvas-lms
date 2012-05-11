@@ -20,7 +20,6 @@ class AppointmentGroupsController < ApplicationController
   include Api::V1::CalendarEvent
 
   before_filter :require_user
-  before_filter :get_context, :only => :create
   before_filter :get_appointment_group, :only => [:show, :update, :destroy, :users, :groups]
 
   def calendar_fragment(opts)
@@ -51,8 +50,12 @@ class AppointmentGroupsController < ApplicationController
   end
 
   def create
+    contexts = get_contexts
+    raise ActiveRecord::RecordNotFound unless contexts.present?
+
     publish = params[:appointment_group].delete(:publish) == '1'
-    @group = @context.appointment_groups.build(params[:appointment_group])
+    params[:appointment_group][:contexts] = contexts
+    @group = AppointmentGroup.new(params[:appointment_group])
     if authorized_action(@group, @current_user, :manage)
       if @group.save
         @group.publish! if publish
@@ -75,6 +78,8 @@ class AppointmentGroupsController < ApplicationController
   end
 
   def update
+    contexts = get_contexts
+    @group.contexts = contexts if contexts
     if authorized_action(@group, @current_user, :update)
       publish = params[:appointment_group].delete(:publish) == "1"
       if @group.update_attributes(params[:appointment_group])
@@ -119,13 +124,18 @@ class AppointmentGroupsController < ApplicationController
     end
   end
 
-  def get_context
-    @context = Context.find_by_asset_string(params[:appointment_group].delete(:context_code)) if params[:appointment_group] && params[:appointment_group][:context_code]
-    raise ActiveRecord::RecordNotFound unless @context
+  def get_contexts
+    if params[:appointment_group] && params[:appointment_group][:context_codes]
+      context_codes = params[:appointment_group].delete(:context_codes)
+      contexts = context_codes.map do |code|
+        Context.find_by_asset_string(code)
+      end
+    end
+    contexts
   end
 
   def get_appointment_group
     @group = AppointmentGroup.find(params[:id].to_i)
-    @context = @group.context
+    @context = @group.contexts_for_user(@current_user).first # FIXME?
   end
 end

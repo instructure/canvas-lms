@@ -46,7 +46,7 @@ class User < ActiveRecord::Base
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments, :uniq => true
   has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
-  has_many :concluded_courses, :source => :course, :through => :concluded_enrollments
+  has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
@@ -67,7 +67,6 @@ class User < ActiveRecord::Base
   has_many :pseudonyms, :order => 'position', :dependent => :destroy
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
   has_one :pseudonym, :conditions => ['pseudonyms.workflow_state != ?', 'deleted'], :order => 'position'
-  has_many :tags, :class_name => 'ContentTag', :as => 'context', :order => 'LOWER(title)', :dependent => :destroy
   has_many :attachments, :as => 'context', :dependent => :destroy
   has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
@@ -882,7 +881,10 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages
+    can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar
+
+    given { |user| user == self && user.user_can_edit_name? }
+    can :rename
 
     given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
@@ -917,7 +919,7 @@ class User < ActiveRecord::Base
         self.associated_accounts.any? {|a| a.grants_right?(user, nil, :manage_students) }
       )
     end
-    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :read
+    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read
 
     given do |user|
       user && (
@@ -1044,22 +1046,36 @@ class User < ActiveRecord::Base
     "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
   end
 
+  # Public: Set a user's avatar image. This is a convenience method that sets
+  #   the avatar_image_source, avatar_image_url, avatar_updated_at, and
+  #   avatar_state on the user model.
+  #
+  # val - A hash of options used to configure the avatar.
+  #       :type - The type of avatar. Should be 'facebook,' 'gravatar,'
+  #         'twitter,' 'linked_in,' 'external,' or 'attachment.'
+  #       :url - The URL of the gravatar. Used for types 'external' and
+  #         'attachment.'
+  #
+  # Returns nothing if avatar is set; false if avatar is locked.
   def avatar_image=(val)
     return false if avatar_state == :locked
-    val ||= {}
 
-    # clear out the old avatar first, in case of failure to get new avatar
-    self.avatar_image_url = nil
+    # Clear out the old avatar first, in case of failure to get new avatar.
+    # The order of these attributes is standard throughout the method.
     self.avatar_image_source = 'no_pic'
-    self.avatar_image_updated_at = Time.now
+    self.avatar_image_url = nil
+    self.avatar_image_updated_at = Time.zone.now
     self.avatar_state = 'approved'
+
+    # Return here if we're passed a nil val or any non-hash val (both of which
+    # will just nil the user's avatar).
+    return unless val.is_a?(Hash)
 
     if val['type'] == 'facebook'
       # TODO: support this
     elsif val['type'] == 'gravatar'
       self.avatar_image_source = 'gravatar'
       self.avatar_image_url = nil
-      self.avatar_image_updated_at = Time.now
       self.avatar_state = 'submitted'
     elsif val['type'] == 'twitter'
       twitter = self.user_services.for_service('twitter').first rescue nil
@@ -1069,7 +1085,6 @@ class User < ActiveRecord::Base
         if data
           self.avatar_image_source = 'twitter'
           self.avatar_image_url = data['profile_image_url_https'] || self.avatar_image_url
-          self.avatar_image_updated_at = Time.now
           self.avatar_state = 'submitted'
         end
       end
@@ -1079,16 +1094,18 @@ class User < ActiveRecord::Base
         self.extend LinkedIn
         profile = linked_in_profile
         if profile
-          self.avatar_image_url = profile['picture_url']
           self.avatar_image_source = 'linked_in'
-          self.avatar_image_updated_at = Time.now
+          self.avatar_image_url = profile['picture_url']
           self.avatar_state = 'submitted'
         end
       end
-    elsif val['type'] == 'attachment' && val['url'] && val['url'].match(/\A\/images\/thumbnails\//)
+    elsif val['type'] == 'external'
+      self.avatar_image_source = 'external'
       self.avatar_image_url = val['url']
+      self.avatar_state = 'submitted'
+    elsif val['type'] == 'attachment' && val['url']
       self.avatar_image_source = 'attachment'
-      self.avatar_image_updated_at = Time.now
+      self.avatar_image_url = val['url']
       self.avatar_state = 'submitted'
     end
   end
@@ -1117,7 +1134,7 @@ class User < ActiveRecord::Base
         self.avatar_image_source = 'no_pic'
         self.avatar_image_updated_at = Time.now
       end
-      write_attribute(:avatar_state, val)
+      write_attribute(:avatar_state, val.to_s)
     end
   end
 
@@ -1195,15 +1212,20 @@ class User < ActiveRecord::Base
   end
   
   def self.default_avatar_fallback
-    "/images/no_pic.gif"
+    "/images/messages/avatar-50.png"
   end
 
   def self.avatar_fallback_url(fallback=nil, request=nil)
     return fallback if fallback == '%{fallback}'
     if fallback and uri = URI.parse(fallback) rescue nil
       uri.scheme ||= request ? request.scheme : "https"
-      uri.host ||= request ? request.host : HostUrl.default_host.split(/:/)[0]
-      uri.port ||= request.port if request && ![80, 443].include?(request.port)
+      if request && !uri.host
+        uri.host = request.host
+        uri.port = request.port if ![80, 443].include?(request.port)
+      elsif !uri.host
+        uri.host = HostUrl.default_host.split(/:/)[0]
+        uri.port = HostUrl.default_host.split(/:/)[1]
+      end
       uri.to_s
     else
       avatar_fallback_url(default_avatar_fallback, request)
@@ -1466,12 +1488,12 @@ class User < ActiveRecord::Base
   memoize :account
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil)
-    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key) do
+    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key, :expires_in => 15.minutes) do
       courses = send(association).distinct_on(["courses.id"],
         :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
         :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
-      soft_concluded = Enrollment.find(:all, :conditions => { :id => courses.map{ |course| course.primary_enrollment_id } }).select{ |e| e.completed? }.map{ |e| e.id }
-      courses.reject! { |course| soft_concluded.include?(course.primary_enrollment_id.to_i) }
+      date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
+      courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
       courses
     end.dup
     if association == :current_and_invited_courses
@@ -1658,7 +1680,9 @@ class User < ActiveRecord::Base
 
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).reject(&:hidden?)
     events += Assignment.active.for_context_codes(context_codes).due_between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).include_submitted_count
-    events += AppointmentGroup.manageable_by(self, context_codes).intersecting(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
+    appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
+    appointment_groups.each { |ag| ag.context = ag.contexts_for_user(self).first }
+    events += appointment_groups
     events.sort_by{|e| [e.start_at, e.title] }.uniq.first(opts[:limit])
   end
 
@@ -1731,10 +1755,11 @@ class User < ActiveRecord::Base
   memoize :manageable_appointment_context_codes
 
   def conversation_context_codes
-    Rails.cache.fetch([self, 'conversation_context_codes'].cache_key, :expires_in => 1.day) do
-      courses.map{ |c| "course_#{c.id}" } + 
-      concluded_courses.map{ |c| "course_#{c.id}" } + 
-      current_groups.map{ |g| "group_#{g.id}"}
+    Rails.cache.fetch([self, 'conversation_context_codes2'].cache_key, :expires_in => 1.day) do
+      ( courses.map{ |c| "course_#{c.id}" } +
+        concluded_courses.map{ |c| "course_#{c.id}" } +
+        current_groups.map{ |g| "group_#{g.id}"}
+      ).uniq
     end
   end
   memoize :conversation_context_codes

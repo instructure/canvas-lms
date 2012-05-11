@@ -18,7 +18,6 @@
 define([
   'i18n!dashboard',
   'jquery' /* $ */,
-  'jquery.instructure_jquery_patches' /* windowScrollTop */,
   'jquery.instructure_misc_plugins' /* showIf */
 ], function(I18n, $) {
 

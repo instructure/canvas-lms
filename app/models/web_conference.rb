@@ -19,7 +19,7 @@
 class WebConference < ActiveRecord::Base
   include SendToStream
   include TextHelper
-  attr_accessible :title, :duration, :description, :conference_type, :user, :user_settings
+  attr_accessible :title, :duration, :description, :conference_type, :user, :user_settings, :context
   attr_readonly :context_id, :context_type
   belongs_to :context, :polymorphic => true
   has_many :web_conference_participants
@@ -150,7 +150,7 @@ class WebConference < ActiveRecord::Base
   
   set_broadcast_policy do |p|
     p.dispatch :web_conference_invitation
-    p.to { @new_participants }
+    p.to { @new_participants.select { |p| context.membership_for_user(p).active? } }
     p.whenever { |record| 
       @new_participants && !@new_participants.empty?
     }

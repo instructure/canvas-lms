@@ -87,5 +87,27 @@ describe "calendar" do
       driver.find_element(:css, "##{date_holder_id} #event_assignment_#{first_assignment.id}").should be_displayed
       driver.find_element(:css, "##{date_holder_id} #event_assignment_#{second_assignment.id}").should_not be_displayed
     end
+
+    it "should allow editing event details repeatedly" do
+      calendar_event_model(:title => "ev", :start_at => "2012-04-02")
+      @event.all_day.should be_true
+
+      get "/courses/#{@course.id}/calendar_events/#{@event.id}"
+      f("a.edit_calendar_event_link").click
+      replace_content(f("input#calendar_event_title"), "edit1")
+      f("form#edit_calendar_event_form button[type=submit]").click
+      wait_for_ajax_requests
+
+      f("a.edit_calendar_event_link").click
+      replace_content(f("input[name=start_date]"), "2012-04-05")
+      replace_content(f("input#calendar_event_title"), "edit2")
+      f("form#edit_calendar_event_form button[type=submit]").click
+      wait_for_ajax_requests
+
+      @event.reload
+      @event.title.should == "edit2"
+      @event.all_day.should be_true
+      @event.start_at.should == Time.zone.parse("2012-04-05")
+    end
   end
 end

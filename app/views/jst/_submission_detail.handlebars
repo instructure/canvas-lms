@@ -8,8 +8,10 @@
       <div>
         {{#each attachments}}
           <div class="submisison-attachment">
-            {{#if turnitinUrl}}
-              <a class="turnitin_similarity_score" href="{{turnitinUrl}}" target="_blank" title="{{#t "titles.turnitin_score"}}Turnitin similarity score -- more information{{/t}}"><span class="similarity_score">{{turnitin_data.similarity_score}}</span>%</a>
+            {{#if turnitin_data.reportUrl}}
+              {{#with turnitin_data}}
+                <span class="turnitin_score_container">{{> turnitinScore}}</span>
+              {{/with}}
             {{/if}}
             <a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a>
           </div>

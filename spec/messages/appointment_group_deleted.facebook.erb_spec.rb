@@ -21,11 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'appointment_group_deleted.facebook' do
   it "should render" do
-    user = user_model
-    appointment_group_model(:context => course_model)
+    student_in_course(:active_all => true)
+    appointment_group_model(:contexts => [@course])
     @appointment_group.cancel_reason = 'just because'
 
-    generate_message(:appointment_group_deleted, :facebook, @appointment_group)
+    generate_message(:appointment_group_deleted, :facebook, @appointment_group, :user => @user)
 
     @message.body.should include('some title')
     @message.body.should include('just because')

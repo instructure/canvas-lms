@@ -21,11 +21,11 @@ define([
   'i18n!calendars',
   'jquery' /* $ */,
   'calendar_move' /* calendarMonths */,
-  'instructure-jquery.ui.draggable-patch' /* /\.draggable/ */,
+  'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseDateTime, formatDateTime, parseFromISO, dateString, datepicker, date_field, time_field, datetime_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, hideErrors */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.disabled/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* encodeToHex, decodeFromHex, replaceTags, /\$\.store/ */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
@@ -666,8 +666,8 @@ define([
     $box.find(".title").attr('href', $event.find('.title').attr('href'));
     $box.find(".view_event_link").attr('href', $event.find('.title').attr('href'));
     $box.find(".delete_event_link").attr('href', $event.find('.delete_' + data.event_type + '_link').attr('href'));
-    $box.find(".edit_event").showIf(data.can_edit);
-    $box.find(".delete_event").showIf(data.can_delete);
+    $box.find(".edit_event").showIf(data.can_edit && !data.frozen);
+    $box.find(".delete_event").showIf(data.can_delete && !data.frozen);
     var isNew = $event.attr('id') == "event_blank";
     var type_name = "Event";
     var $form = null;

@@ -127,4 +127,14 @@ module QuizzesHelper
 
     res.gsub /\{\{question_[^}]+\}\}/, ""
   end
+
+  def multiple_dropdowns_question(options)
+    question = hash_get(options, :question)
+    answers  = hash_get(options, :answers)
+    res      = user_content hash_get(question, :question_text)
+    res.gsub %r{<select.*?name=['"](question_.*?)['"].*?>.*?</select>} do |match|
+      a = hash_get(answers, $1)
+      match.sub(%r{(<option.*?value=['"]#{ERB::Util.h(a)}['"])}, '\\1 selected')
+    end
+  end
 end

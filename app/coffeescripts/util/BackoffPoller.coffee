@@ -1,9 +1,3 @@
-###
-js!requires:
-  - vendor/jquery-1.6.4.js
-  - jQuery.ajaxJSON
-###
-
 # AJAX Backoff poller
 #
 # Repeatedly do a given AJAX call until a condition is met or the max number

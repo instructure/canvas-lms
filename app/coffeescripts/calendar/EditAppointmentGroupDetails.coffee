@@ -1,25 +1,34 @@
 define [
   'jquery'
+  'underscore'
   'i18n!EditAppointmentGroupDetails'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editAppointmentGroup'
   'jst/calendar/genericSelect'
+  'jst/calendar/sectionCheckboxes'
+  'compiled/calendar/ContextSelector'
+  'compiled/fn/preventDefault'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], ($, I18n, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate) ->
+], ($, _, I18n, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
 
   class EditAppointmentGroupDetails
-    constructor: (selector, @apptGroup, @contextChangeCB, @closeCB) ->
+    constructor: (selector, @apptGroup, @contexts, @closeCB) ->
       @currentContextInfo = null
+
       $(selector).html editAppointmentGroupTemplate({
         title: @apptGroup.title
-        contexts: @apptGroup.contexts
+        contexts: @contexts
         appointment_group: @apptGroup
       })
+
+      @contextsHash = {}
+      @contextsHash[c.asset_string] = c for c in @contexts
+
       @form = $(selector).find("form")
 
-      @form.find("select.context_id").change(@contextChange).change()
+      @contextSelector = new ContextSelector('.ag-menu-container', @apptGroup, @contexts, @contextsChanged, @toggleContextsMenu)
 
       if @apptGroup.id
         @form.attr('action', @apptGroup.url)
@@ -28,20 +37,17 @@ define [
         @form.find(".context_id").val(@apptGroup.context_code).attr('disabled', true)
         @form.find("select.context_id").change()
 
-        @form.find(".group_category").attr('disabled', true)
-        @form.find(".course_section").attr('disabled', true)
-        @form.find(".group-signup-checkbox").attr('disabled', true)
+        @disableGroups()
         if @apptGroup.participant_type == 'Group'
           @form.find(".group-signup-checkbox").prop('checked', true)
-          @form.find(".group_category").val(@apptGroup.sub_context_code)
+          @form.find(".group_category").val(@apptGroup.sub_context_codes[0])
         else
           @form.find(".group-signup-checkbox").prop('checked', false)
-          if @apptGroup.sub_context_code
-            @form.find(".course_section").val(@apptGroup.sub_context_code)
-          else
-            @form.find(".course_section").val("all")
       else
-        @form.attr('action', @currentContextInfo.create_appointment_group_url)
+        # FIXME: put this url in ENV json or something
+        @form.attr('action', '/api/v1/appointment_groups')
+
+      @form.find('.ag_contexts_selector').click preventDefault @toggleContextsMenu
 
       timeBlocks = ([appt.start, appt.end, true] for appt in @apptGroup.appointmentEvents || [] )
       @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks)
@@ -57,7 +63,6 @@ define [
         checked = !!jsEvent.target.checked
         @form.find('.per_appointment_groups_label').toggle(checked)
         @form.find('.per_appointment_users_label').toggle(!checked)
-        @form.find(".section-signup").toggle(!checked)
         @form.find(".group-signup").toggle(checked)
       @form.find(".group-signup-checkbox").change()
 
@@ -88,12 +93,6 @@ define [
 
       if @apptGroup.workflow_state == 'active'
         @form.find("#appointment-blocks-active-button").attr('disabled', true).prop('checked', true)
-
-    contextInfoForCode: (code) ->
-      for context in @apptGroup.contexts
-        if context.asset_string == code
-          return context
-      return null
 
     saveWithoutPublishingClick: (jsEvent) =>
       jsEvent.preventDefault()
@@ -139,13 +138,23 @@ define [
 
       params['appointment_group[participant_visibility]'] = if data.participant_visibility == '1' then 'protected' else 'private'
 
-      if create
-        params['appointment_group[context_code]'] = data.context_code
+      # get the context/section info from @contextSelector instead
+      delete data['context_codes[]']
+      delete data['sections[]']
 
+      contextCodes = @contextSelector.selectedContexts()
+      if contextCodes.length == 0
+        $('.ag_contexts_selector').errorBox(I18n.t 'context_required', 'You need to select a calendar')
+        return
+      else
+        params['appointment_group[context_codes]'] = contextCodes
+
+      if create
         if data.use_group_signup == '1' && data.group_category_id
-          params['appointment_group[sub_context_code]'] = data.group_category_id
-        else if data.section_id && data.section_id != 'all'
-          params['appointment_group[sub_context_code]'] = data.section_id
+          params['appointment_group[sub_context_codes]'] = [data.group_category_id]
+        else
+          sections = @contextSelector.selectedSections()
+          params['appointment_group[sub_context_codes]'] = sections if sections
 
         # TODO: Provide UI for specifying this
         params['appointment_group[min_appointments_per_participant]'] = 1
@@ -158,32 +167,47 @@ define [
       deferred = $.ajaxJSON @form.attr('action'), method, params, onSuccess, onError
       @form.disableWhileLoading(deferred)
 
-    contextChange: (jsEvent) =>
-      context = $(jsEvent.target).val()
-      @currentContextInfo = @contextInfoForCode(context)
-      @apptGroup.contextInfo = @currentContextInfo
-      if @currentContextInfo == null then return
+    contextsChanged: (contextCodes, sectionCodes) =>
+      # dropdown text
+      if sectionCodes
+        sectionCode = sectionCodes[0]
+        section = _.chain(@contexts)
+                   .pluck('course_sections')
+                   .flatten()
+                   .find((s) -> s.asset_string == sectionCode)
+                   .value()
+        text = section.name
+        if sectionCodes.length > 1
+          text += I18n.t('and_n_sectionCodes', ' and %{n} others', n: sectionCodes.length - 1)
+        @form.find('.ag_contexts_selector').text(text)
+      else if contextCodes.length > 0
+        contextCode = contextCodes[0]
+        text = @contextsHash[contextCode].name
+        if contextCodes.length > 1
+          text += I18n.t('and_n_contexts', ' and %{n} others', n: contextCodes.length - 1)
+        @form.find('.ag_contexts_selector').text(text)
+      else
+        @form.find('.ag_contexts_selector').text(I18n.t 'select_calendars', 'Select Calendars')
 
-      # Update the sections and groups lists in the scheduler
-      if @currentContextInfo.course_sections
-        sectionsInfo =
-          cssClass: 'course_section'
-          name: 'section_id'
-          collection: [ { id: 'all', name: "All Sections"} ].concat @currentContextInfo.course_sections
-        @form.find(".section_select").html(genericSelectTemplate(sectionsInfo))
+      # group selector
+      context = @contextsHash[contextCodes[0]]
+      if contextCodes.length == 1 and not sectionCodes and context.group_categories?.length > 0
+        @enableGroups(context)
+      else
+        @disableGroups()
 
-      if !@currentContextInfo.group_categories || @currentContextInfo.group_categories.length == 0
-        @form.find(".group-signup-checkbox").attr('disabled', true).prop('checked', false).change()
-      else if @currentContextInfo.group_categories
-        @form.find(".group-signup-checkbox").attr('disabled', false)
-        groupsInfo =
-          cssClass: 'group_category'
-          name: 'group_category_id'
-          collection: @currentContextInfo.group_categories
-        @form.find(".group_select").html(genericSelectTemplate(groupsInfo))
+    disableGroups: ->
+      @form.find(".group-signup-checkbox").attr('disabled', true)
+      @form.find("group-signup").hide()
 
-      @contextChangeCB(context)
+    enableGroups: (contextInfo) ->
+      @form.find(".group-signup-checkbox").attr('disabled', false)
+      groupsInfo =
+        cssClass: 'group_category'
+        name: 'group_category_id'
+        collection: contextInfo.group_categories
+      @form.find(".group_select").html(genericSelectTemplate(groupsInfo))
+      @form.find("group-signup").show()
 
-      # Update the edit and more options links with the new context, if this is a new group
-      if !@apptGroup.id
-        @form.attr('action', @currentContextInfo.create_appointment_group_url)
+    toggleContextsMenu: (jsEvent) =>
+      $('.ag_contexts_menu').toggleClass('hidden')

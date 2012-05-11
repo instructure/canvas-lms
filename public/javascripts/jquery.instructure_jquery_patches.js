@@ -15,17 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-define([
-  'jquery' /* jQuery, $ */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/dialog'
-], function($) {
+define(['vendor/jquery-1.7.2'], function($) {
 
-  // have UI dialogs default to modal:true
-  $.widget('instructure.dialog', $.ui.dialog, { options: {modal: true} });
-
-  // This is so that if you disable an element, that it also gives it the class disabled.  
-  // that way you can add css classes for our friend IE6. so rather than using selector:disabled, 
+  // This is so that if you disable an element, that it also gives it the class disabled.
+  // that way you can add css classes for our friend IE6. so rather than using selector:disabled,
   // you can do selector.disabled.
   // works on both $(elem).attr('disabled', ...) AND $(elem).prop('disabled', ...)
   $.each([ "prop", "attr" ], function(i, propOrAttr ) {
@@ -33,13 +26,13 @@ define([
     $[propOrAttr+'Hooks'].disabled = $.extend( $[propOrAttr+'Hooks'].disabled, {
       set: function( elem, value, name ) {
         $(elem).toggleClass('disabled', !!value);
-  
+
         // have to replicate wat jQuery's boolHook does because once you define your own hook
         // for an attribute/property it wont fall back to boolHook. and it is not exposed externally.
         elem[value ? 'setAttribute' : 'removeAttribute' ]('disabled', 'disabled');
         if ( 'disabled' in elem ) {
           // Only set the IDL specifically if it already exists on the element
-          // ie for an <input> but not a <div> 
+          // ie for an <input> but not a <div>
           elem.disabled = !!value;
         }
         return value;
@@ -93,5 +86,5 @@ define([
     return ($.browser.safari ? $("body") : $("html")).scrollTop();
   };
 
-
+  return $;
 });

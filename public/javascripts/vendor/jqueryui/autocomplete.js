@@ -16,8 +16,7 @@ define([
 	'jquery',
 	'jqueryui/core',
 	'jqueryui/widget',
-	'jqueryui/position',
-  'jquery.instructure_jquery_patches' /* /\.disabled/, /\.scrollTop/ */
+	'jqueryui/position'
 ], function( $, _core, _widget, _position, undefined ) {
 
 // used to prevent race conditions with remote data sources

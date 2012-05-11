@@ -52,6 +52,23 @@ describe AssessmentQuestion do
     @question.reload.question_data['question_text'].should == "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
 
+  it "should handle existing query string parameters" do
+    course
+    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+
+    @attachment = attachment_with_context(@course)
+    @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+    data = {'name' => "Hi",
+            'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg?wrap=1'>",
+            'answers' => [{'id' => 1}, {'id' => 2}]}
+    @question = @bank.assessment_questions.create!(:question_data => data)
+
+    @attachment.reload.cloned_item.attachments.length.should == 2
+    @clone = @attachment.cloned_item.attachments.last
+
+    @question.reload.question_data['question_text'].should == "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}&wrap=1'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}&wrap=1'>"
+  end
+
   it "should translate multiple links in same body" do
     course
     @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
