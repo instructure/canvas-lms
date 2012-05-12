@@ -54,8 +54,6 @@ class CountsReport
         data[:name] = account.name
         data[:external_status] = account.external_status
         data[:last_activity] = activity
-        data[:page_views_in_last_week] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", account.id, @yesterday - 1.week, @yesterday])
-        data[:page_views_in_last_month] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", account.id, @yesterday - 1.month, @yesterday])
 
         course_ids = get_course_ids(account)
 
@@ -140,7 +138,6 @@ class CountsReport
     if cumulative[:monthly].last and cumulative[:monthly].last[:year] == month[:year] and cumulative[:monthly].last[:month] == month[:month]
       cumulative[:monthly].pop 
     end
-    month[:page_views] = totals[:page_views_in_last_month]
     cumulative[:monthly] << month
     while cumulative[:monthly].length > MONTHS_TO_KEEP
       cumulative[:monthly].shift
@@ -151,7 +148,6 @@ class CountsReport
     if cumulative[:weekly].last and cumulative[:weekly].last[:year] == week[:year] and cumulative[:weekly].last[:week] == week[:week]
       cumulative[:weekly].pop 
     end
-    week[:page_views] = totals[:page_views_in_last_week]
     cumulative[:weekly] << week
     while cumulative[:weekly].length > WEEKS_TO_KEEP
       cumulative[:weekly].shift
@@ -168,8 +164,6 @@ class CountsReport
     to[:files_size] = from[:files_size]
     to[:media_files] = from[:media_files]
     to[:media_files_size] = from[:media_files_size]
-    to[:page_views_in_last_week] = from[:page_views_in_last_week]
-    to[:page_views_in_last_month] = from[:page_views_in_last_month]
   end
 
   def add_account_stats(account)
@@ -186,8 +180,6 @@ class CountsReport
     @overview[account[:external_status]][:media_files] += account[:media_files]
     @overview[account[:external_status]][:media_files_size] += account[:media_files_size]
     @overview[account[:external_status]][:users] += account[:users]
-    @overview[account[:external_status]][:page_views_in_last_week] += account[:page_views_in_last_week]
-    @overview[account[:external_status]][:page_views_in_last_month] += account[:page_views_in_last_month]
 
     @overview[:totals][:institutions] += 1
     @overview[:totals][:courses] += account[:courses]
@@ -198,8 +190,6 @@ class CountsReport
     @overview[:totals][:media_files] += account[:media_files]
     @overview[:totals][:media_files_size] += account[:media_files_size]
     @overview[:totals][:users] += account[:users]
-    @overview[:totals][:page_views_in_last_week] += account[:page_views_in_last_week]
-    @overview[:totals][:page_views_in_last_month] += account[:page_views_in_last_month]
   end
 
   def self.last_activity(account_id)
@@ -231,8 +221,6 @@ class CountsReport
       :files_size=>0,
       :media_files=>0,
       :media_files_size=>0,
-      :page_views_in_last_week=>0,
-      :page_views_in_last_month=>0
     }
   end
 
