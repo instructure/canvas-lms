@@ -1,3 +1,11 @@
+canvas-lms (2012.05.12.15) stable; urgency=low
+
+  * Package ref: 9c36bd3f428e2d564710652a1ac44acdf2203229
+  *
+  * [+9c36bd3] remove page views from the counts report
+
+ -- Brian Palmer <brianp@instructure.com>  Fri, 11 May 2012 18:04:33 -0600
+
 canvas-lms (2012.05.12.13) stable; urgency=low
 
   * Package ref: 786862a9f3538e4cce2be892df21e4dbaa2c532f
