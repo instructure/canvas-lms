@@ -97,9 +97,7 @@ group :development do
   gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'parallel',     '0.5.16'
   if ONE_NINE
-    # ruby-debug is broken in 1.9.3:
-    # http://blog.wyeworks.com/2011/11/1/ruby-1-9-3-and-ruby-debug
-    # gem 'ruby-debug19', '0.11.6'
+    gem 'debugger',     '1.1.3'
   else
     gem 'ruby-debug',   '0.10.4'
   end
