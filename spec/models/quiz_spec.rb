@@ -61,12 +61,12 @@ describe Quiz do
   
   it "should set the due date time correctly" do
     time_string = "Dec 30, 2011 12:00 pm"
-    expected = "Fri Dec 30 19:00:00 UTC 2011"
+    expected = "2011-12-30 19:00:00 #{Time.now.utc.strftime("%Z")}"
     Time.zone = "Mountain Time (US & Canada)"
     quiz = @course.quizzes.create(:title => "sad quiz", :due_at => time_string, :lock_at => time_string, :unlock_at => time_string)
-    quiz.due_at.utc.to_s.should == expected
-    quiz.lock_at.utc.to_s.should == expected
-    quiz.unlock_at.utc.to_s.should == expected
+    quiz.due_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z").should == expected
+    quiz.lock_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z").should == expected
+    quiz.unlock_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z").should == expected
     Time.zone = nil
   end
 
