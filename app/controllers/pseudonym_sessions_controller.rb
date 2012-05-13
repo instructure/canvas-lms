@@ -223,6 +223,13 @@ class PseudonymSessionsController < ApplicationController
 
   def saml_consume
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
+      # Break up the SAMLResponse into chunks for logging (a truncated version was probably already
+      # logged with the request when using syslog)
+      chunks = params[:SAMLResponse].scan(/.{1,1024}/)
+      chunks.each_with_index do |chunk, idx|
+        logger.info "SAMLResponse[#{idx+1}/#{chunks.length}] #{chunk}"
+      end
+
       aac = @domain_root_account.account_authorization_config
       settings = aac.saml_settings(request.host_with_port)
       response = saml_response(params[:SAMLResponse], settings)
