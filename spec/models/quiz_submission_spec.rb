@@ -1104,6 +1104,15 @@ describe QuizSubmission do
           :answer_id_for_myblank => nil, }
     end
 
+    it "should score an unknown question type" do
+      # if a question with an invalid type makes it into the quiz data, we
+      # score it as always 0 out of points_possible, rather than raise an error
+      qd = {"name"=>"Question 1", "question_type"=>"Error", "assessment_question_id"=>nil, "migration_id"=>"i1234", "id"=>2, "points_possible"=>5.35, "question_name"=>"Question 1", "qti_error"=>"There was an error exporting an assessment question - No question type used when trying to parse a qti question", "question_text"=>"test1", "answers"=>[], "assessment_question_migration_id"=>"i1234"}.with_indifferent_access
+      user_answer = QuizSubmission.score_question(qd, {})
+      user_answer.should ==
+        { :question_id => 2, :correct => false, :points => 0, :text => "", }
+    end
+
     it "should not escape user responses in fimb questions" do
       course_with_student(:active_all => true)
       q = {:neutral_comments=>"",
