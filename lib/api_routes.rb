@@ -30,6 +30,7 @@ YARD::Tags::Library.define_tag("API response field", :response_field)
 YARD::Tags::Library.define_tag("API example request", :example_request)
 YARD::Tags::Library.define_tag("API example response", :example_response)
 YARD::Tags::Library.define_tag("API subtopic", :subtopic)
+YARD::Tags::Library.define_tag("API resource is Beta", :beta)
 
 module YARD::Templates::Helpers
   module BaseHelper

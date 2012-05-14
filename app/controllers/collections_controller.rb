@@ -18,6 +18,8 @@
 
 # @API Collections
 #
+# @beta
+#
 # Collections are buckets of content that can be used to organize links to
 # helpful resources. For instance, a user could create a collection storing a
 # set of links to various web sites containing potential discussion questions.

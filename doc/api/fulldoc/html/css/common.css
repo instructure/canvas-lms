@@ -38,6 +38,12 @@ h2 {
   font-size: 1.4em;
   margin-top: 30px;
 }
+h3.beta {
+  border: 1px solid black;
+  background-color: #E5E8FF;
+  text-align: center;
+  padding: 6px;
+}
 
 #sidebar {
   background-color: #F2F5F7;

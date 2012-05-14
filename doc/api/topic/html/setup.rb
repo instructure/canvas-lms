@@ -23,6 +23,7 @@ def init
   else
     sections :header, [:topic_doc, :method_details_list, [T('method_details')]]
     @resource = object
+    @beta = options[:controllers].any? { |c| c.tag('beta') }
   end
 end
 
