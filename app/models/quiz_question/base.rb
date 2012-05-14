@@ -21,7 +21,7 @@ class QuizQuestion::Base
   def self.from_question_data(data)
     type_name = data[:question_type]
     klass = question_types[type_name]
-    raise("unknown quiz question type: #{type_name}") unless klass
+    klass ||= QuizQuestion::UnknownQuestion
     klass.new(data)
   end
 
