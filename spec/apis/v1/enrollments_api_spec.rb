@@ -612,8 +612,8 @@ describe EnrollmentsApiController, :type => :integration do
         # set up some enrollments that shouldn't be returned by the api
         request_user = @user
         @new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
-        @course.enroll_user(@new_user, 'TaEnrollment', 'active')
-        @course.enroll_user(@new_user, 'ObserverEnrollment', 'active')
+        @course.enroll_user(@new_user, 'TaEnrollment', :enrollment_state => 'active')
+        @course.enroll_user(@new_user, 'ObserverEnrollment', :enrollment_state => 'active')
         @user = request_user
         json = api_call(:get, "#{@path}?type[]=StudentEnrollment&type[]=TeacherEnrollment", @params.merge(:type => %w{StudentEnrollment TeacherEnrollment}))
         json.should == (@course.student_enrollments + @course.teacher_enrollments).map { |e|
