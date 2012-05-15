@@ -32,6 +32,8 @@ define([
   'jqueryui/tabs' /* /\.tabs/ */
 ], function(I18n, $) {
 
+  window.submissionAttachmentIndex = -1;
+
   $(document).ready(function() {
     var submitting = false,
         submissionForm = $('.submit_assignment_form');
@@ -193,7 +195,6 @@ define([
       checkAllowUploadSubmit();
     });
   });
-  window.submissionAttachmentIndex = -1;
 
   $(document).ready(function() {
     $("#google_docs_tree").instTree({
