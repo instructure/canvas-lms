@@ -3,6 +3,5 @@
    next if route_path =~ /\.json$/ %>
 <h3>
   <%= route.conditions[:method].to_s.upcase %> <%= route_path %>
-  <span class='defined-in'><a href="https://github.com/instructure/canvas-lms/blob/master/app/controllers/<%= route.requirements[:controller] %>_controller.rb"><%= "#{route.requirements[:controller].camelize}Controller\##{route.requirements[:action]}" %></a></span>
 </h3>
 <% end %>

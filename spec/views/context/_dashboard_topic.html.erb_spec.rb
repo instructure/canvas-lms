@@ -20,10 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "context/dashboard_topic" do
-  it "should render" do
+  it "should not show the author for nil user_id" do
     render :partial => "context/dashboard_topic", :locals =>
         { :dashboard_topic => OpenObject.new({:root_discussion_entries => nil,
-                                              :created_at => Time.now.utc})}
+                                              :created_at => Time.now.utc, :user_id => nil})}
     response.should_not be_nil
+    response.body.should_not match /Author/
   end
 end

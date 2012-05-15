@@ -478,7 +478,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.menu_courses 'menu_courses', :controller => 'users', :action => 'menu_courses'
   map.all_menu_courses 'all_menu_courses', :controller => 'users', :action => 'all_menu_courses'
-  map.resources :favorites, :only => [:create, :destroy], :collection => 'reset'
+  map.resources :favorites, :only => [:create, :destroy]
 
   map.grades "grades", :controller => "users", :action => "grades"
 
@@ -794,6 +794,12 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
     end
 
+    api.with_options(:controller => :communication_channels) do |channels|
+      channels.get 'users/:user_id/communication_channels', :action => :index, :path_name => 'communication_channels'
+      channels.post 'users/:user_id/communication_channels', :action => :create
+      channels.delete 'users/:user_id/communication_channels/:id', :action => :destroy
+    end
+
     api.with_options(:controller => :services_api) do |services|
       services.get 'services/kaltura', :action => :show_kaltura_config
       services.post 'services/kaltura_session', :action => :start_kaltura_session
@@ -821,6 +827,16 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :groups) do |groups|
       groups.post 'groups/:group_id/files', :action => :create_file
+    end
+
+    api.with_options(:controller => :collections) do |collections|
+      collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_"
+
+      collections.with_options(:controller => :collection_items) do |items|
+        items.resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items
+        items.put "collections/:collection_id/items/:item_id/upvote", :action => :upvote
+        items.delete "collections/:collection_id/items/:item_id/upvote", :action => :remove_upvote
+      end
     end
 
     api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'

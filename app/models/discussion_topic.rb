@@ -26,7 +26,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded, :discussion_type
+    :require_initial_post, :threaded, :discussion_type, :context
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -140,7 +140,7 @@ class DiscussionTopic < ActiveRecord::Base
     if @old_assignment_id
       Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => @old_assignment_id, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic'})
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
-    elsif self.assignment && @saved_by != :assignment
+    elsif self.assignment && @saved_by != :assignment && !self.root_topic_id
       self.assignment.title = self.title
       self.assignment.description = self.message
       self.assignment.submission_types = "discussion_topic"
@@ -729,11 +729,6 @@ class DiscussionTopic < ActiveRecord::Base
     context.migration_results << "" if hash[:peer_rating_type] && hash[:peer_rating_types] != "none" if context.respond_to?(:migration_results)
     context.migration_results << "" if hash[:peer_rating_type] && hash[:peer_rating_types] != "none" if context.respond_to?(:migration_results)
     hash[:messages] ||= hash[:posts]
-    if !hash[:skip_replies] and item.discussion_entries.count == 0
-      (hash[:messages] || hash[:posts] || []).each do |message|
-        DiscussionEntry.import_from_migration(message, context, nil, item, item)
-      end
-    end
     context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items
     item
   end

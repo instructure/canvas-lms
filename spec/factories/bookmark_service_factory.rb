@@ -22,7 +22,7 @@ end
 
 def valid_bookmark_service_attributes
   {
-    :user_id => 1,
+    :user_id => User.create!.id,
     :token => 'value for token',
     :secret => 'value for secret', 
     :protocol => 'value for protocol',

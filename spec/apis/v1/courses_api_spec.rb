@@ -641,9 +641,9 @@ describe CoursesController, :type => :integration do
   it "should return the needs_grading_count for all assignments" do
     @group = @course1.assignment_groups.create!({:name => "some group"})
     @assignment = @course1.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
-    sub = @assignment.find_or_create_submission(@user)
-    sub.workflow_state = 'submitted'
-    update_with_protected_attributes!(sub, { :body => 'test!', 'submission_type' => 'online_text_entry' })
+    student_in_course(:course => @course1, :active_all => true)
+    @assignment.submit_homework(@user, :body => 'test!', 'submission_type' => 'online_text_entry')
+    @user = @me
 
     json = api_call(:get, "/api/v1/courses.json?enrollment_type=teacher&include[]=needs_grading_count",
             { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_type => 'teacher', :include=>["needs_grading_count"] })

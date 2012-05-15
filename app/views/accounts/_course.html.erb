@@ -10,9 +10,10 @@
     <% if course %>
     <div class="details ellipsis">
       <div>
-        <% if course.course_code != course.name %>
-          <span style="padding-right: 30px;"><%= course.course_code %></span>
-        <% end %>
+        <span style="padding-right: 30px;">
+          <%= show_code_and_term_for(course) %>
+        </span>
+
         <% if course.respond_to?(:sis_source_id) && course.sis_source_id %>
           <%= before_label(t(:sis_id_label, "SIS ID")) %> <%= course.sis_source_id %>
         <% end %>

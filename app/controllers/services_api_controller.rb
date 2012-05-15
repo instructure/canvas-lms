@@ -19,7 +19,7 @@
 # @API Services
 class ServicesApiController < ApplicationController
   
-  # @API
+  # @API Get Kaltura config
   # Return the config information for the Kaltura plugin in json format.
   #
   # @response_field enabled Enabled state of the Kaltura plugin
@@ -60,7 +60,7 @@ class ServicesApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Start Kaltura session
   # Start a new Kaltura session, so that new media can be recorded and uploaded
   # to this Canvas instance's Kaltura instance.
   #

@@ -25,21 +25,8 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSuggestion */,
   'jqueryui/dialog',
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.store' /* /\$\.store/ */
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(INST, I18n, $, _, htmlEscape) {
-
-  // Generate a unique integer id (unique within the entire window).
-  // Useful for temporary DOM ids.
-  // if you pass it a prefix (because all dom ids have to have a alphabetic prefix) it will 
-  // make sure that there is no other element on the page with that id.
-  var idCounter = 10001;
-  $.uniqueId = function(prefix){
-    do {
-      var id = (prefix || '') + idCounter++;
-    } while (prefix && $('#' + id).length);
-    return id;
-  };
 
   // Return the first value which passes a truth test
   $.detect = function(collection, callback) {
@@ -249,18 +236,6 @@ define([
     } else {
       return (Math.round(10.0 * bytes / factor / factor) / 10.0) + "MB";
     }
-  };
-
-  $.uniq = function(array) {
-    var result = [];
-    var hash = {};
-    for(var idx in array) {
-      if(!hash[array[idx]]) {
-        hash[array[idx]] = true;
-        result.push(array[idx]);
-      }
-    }
-    return result;
   };
 
   $.getUserServices = function(service_types, success, error) {
@@ -500,26 +475,6 @@ define([
 
   $.capitalize = function(string) {
     return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
-  };
-
-  var storage_user_id;
-  function getUser() {
-    if ( !storage_user_id ) {
-      storage_user_id = $.trim($("#identity .user_id").text());
-    }
-    return storage_user_id;
-  };
-
-  $.store.userGet = function(key) {
-    return $.store.get("_" + getUser() + "_" + key);
-  };
-
-  $.store.userSet = function(key, value) {
-    return $.store.set("_" + getUser() + "_" + key, value);
-  };
-
-  $.store.userRemove = function(key, value) {
-    return $.store.remove("_" + getUser() + "_" + key, value);
   };
 
   INST.youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/;

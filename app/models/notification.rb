@@ -122,7 +122,7 @@ class Notification < ActiveRecord::Base
       policies << fallback_policy
     end
 
-    return false if (!opts[:fallback_channel] && cc && !cc.active?) || policies.empty? || self.registration?
+    return false if (!opts[:fallback_channel] && cc && !cc.active?) || policies.empty? || !self.summarizable?
 
     policies.inject([]) do |list, policy|
       message = Message.new(
@@ -198,11 +198,11 @@ class Notification < ActiveRecord::Base
       
       # For non-essential messages, check if too many have gone out, and if so
       # send this message as a daily summary message instead of immediate.
-      too_many_and_summarizable = user && self.summarizable? && too_many_messages?(user)
+      should_summarize = user && self.summarizable? && too_many_messages?(user)
       channels = CommunicationChannel.find_all_for(user, self, cc)
       fallback_channel = channels.sort_by{|c| c.path_type }.first
-      record_delayed_messages((options || {}).merge(:user => user, :communication_channel => cc, :asset => asset, :fallback_channel => too_many_and_summarizable ? channels.first : nil))
-      if too_many_and_summarizable
+      record_delayed_messages((options || {}).merge(:user => user, :communication_channel => cc, :asset => asset, :fallback_channel => should_summarize ? channels.first : nil))
+      if should_summarize
         channels = channels.select{|cc| cc.path_type != 'email' && cc.path_type != 'sms' }
       end
       channels << "dashboard" if self.dashboard? && self.show_in_feed?
@@ -340,13 +340,17 @@ class Notification < ActiveRecord::Base
   def registration?
     return self.category == "Registration"
   end
+
+  def migration?
+    return self.category == "Migration"
+  end
   
   def summarizable?
-    return !self.registration?
+    return !self.registration? && !self.migration?
   end
   
   def dashboard?
-    return self.category != "Registration" && self.category != "Summaries"
+    return ["Migration", "Registration", "Summaries"].include?(self.category) == false
   end
   
   def category_slug
@@ -361,7 +365,7 @@ class Notification < ActiveRecord::Base
     Notification.find(:all).each do |n|
       if !seen_types[n.category] && (user.nil? || n.relevant_to_user?(user))
         seen_types[n.category] = true
-        res << n if n.category && n.category != "Registration" && n.category != 'Summaries'
+        res << n if n.category && n.dashboard?
       end
     end
     res.sort_by{|n| n.category == "Other" ? "zzzz" : n.category }
@@ -404,6 +408,8 @@ class Notification < ActiveRecord::Base
     when 'Other'
       'daily'
     when 'Registration'
+      'immediately'
+    when 'Migration'
       'immediately'
     when 'Submission Comment'
       'daily'
@@ -518,6 +524,7 @@ class Notification < ActiveRecord::Base
     t 'categories.membership_update', 'Membership Update'
     t 'categories.other', 'Other'
     t 'categories.registration', 'Registration'
+    t 'categories.migration', 'Migration'
     t 'categories.reminder', 'Reminder'
     t 'categories.submission_comment', 'Submission Comment'
   end

@@ -58,10 +58,11 @@ module CC
 
     def process_outcome_group_content(node, group)
       group.sorted_content.each do |item|
-        next unless export_object?(item)
         if item.is_a? LearningOutcome
+          next unless export_object?(item)
           process_learning_outcome(node, item)
         else
+          next unless export_object?(item) || item.sorted_content.any?{|i| export_object?(i)}
           process_outcome_group(node, item)
         end
       end

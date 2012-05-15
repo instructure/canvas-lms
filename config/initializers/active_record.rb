@@ -320,7 +320,7 @@ class ActiveRecord::Base
     native = (connection.adapter_name == 'PostgreSQL')
     options[:select] = "DISTINCT ON (#{Array(columns).join(', ')}) " + (options[:select] || '*') if native
     raise "can't use limit with distinct on" if options[:limit] # while it's possible, it would be gross for non-native, so we don't allow it
-    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{columns.map{ |c| Regexp.escape(c) }.join(' (asc|desc)?,')}/i
+    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{Array(columns).map{ |c| Regexp.escape(c) }.join(' (asc|desc)?,')}/i
 
     result = find(:all, options)
 
@@ -502,6 +502,25 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
         value.to_s.gsub(/[\n\r\t\\]/){ |c| hash[c] }
       end
     end
+
+    def supports_delayed_constraint_validation?
+      postgresql_version >= 90100
+    end
+
+    def add_foreign_key_with_delayed_validation(from_table, to_table, options = {})
+      raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && options[:delay_validation]
+
+      options.delete(:delay_validation) unless supports_delayed_constraint_validation?
+      options[:options] = 'NOT VALID' if options[:delay_validation]
+
+      column  = options[:column] || "#{to_table.to_s.singularize}_id"
+      foreign_key_name = foreign_key_name(from_table, column, options)
+
+      add_foreign_key_without_delayed_validation(from_table, to_table, options)
+
+      execute("ALTER TABLE #{quote_table_name(from_table)} VALIDATE CONSTRAINT #{quote_column_name(foreign_key_name)}") if options[:delay_validation]
+    end
+    alias_method_chain :add_foreign_key, :delayed_validation
   end
 end
 

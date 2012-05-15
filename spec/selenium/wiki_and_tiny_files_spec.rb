@@ -21,7 +21,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       driver.find_element(:id, 'tinymce').should include_text('txt')
     end
     driver.find_element(:css, '.wiki_switch_views_link').click
-    wiki_page_body.attribute('value').should match(/class="instructure_file_link/)
+    find_css_in_string(wiki_page_body[:value], '.instructure_file_link').should_not be_empty
 
     driver.find_element(:id, 'wiki_page_submit').click
     wait_for_ajax_requests

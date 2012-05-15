@@ -135,7 +135,6 @@
             </div>
             <table>
               <tbody id="ip_filters">
-              
                 <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
                   <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
                     <td><%= before_label(t(:ip_filter_name_label, "Name")) %></td>
@@ -429,28 +428,29 @@
   <% if @account.root_account? %>
     <div id="tab-announcements">
       <h2><%= t(:global_announcements_title, "Global Announcements") %></h2>
-      <%= mt(:global_announcements_description,
-      "Global announcements are a way for you to post sticky messages on the dashboard " +
-      "of all users in your account.  They will appear on each user's " +
-      "dashboard for the given time period or until the user clicks the " +
-      "\"close\" link to ignore the alert. **These announcements should be " +
-      "used sparingly.**") %>
+      <p>
+        <%= mt(:global_announcements_description,
+        "Global announcements are a way for you to post sticky messages on the dashboard " +
+        "of all users in your account.  They will appear on each user's " +
+        "dashboard for the given time period or until the user clicks the " +
+        "\"close\"(×) link to ignore the alert. **These announcements should be " +
+        "used sparingly.**") %>
+      </p>
       <ul class="announcements_list unstyled_list">
         <% @announcements.each do |announcement| %>
-          <li>
+          <li class="alert">
+            <% if can_do(@account, @current_user, :manage_alerts) %>
+              <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="delete_notification_link close" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>">×</a>
+            <% end %>
             <div class="subject">
               <%= image_tag("#{announcement.icon}.png") %><%= announcement.subject %>
             </div>
-            <% if can_do(@account, @current_user, :manage_alerts) %>
-              <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="delete_notification_link" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>"><%= image_tag "delete_circle.png" %></a>
-            <% end %>
-            <div class="clear"></div>
-            <div class="dates">
-              <span style="padding-right: 10px;">
+            <div>
+              <span>
                 <%= t(:alert_timespan, "from %{start_at} to %{end_at}",
                       :start_at => datetime_string(announcement.start_at),
                       :end_at => datetime_string(announcement.end_at)) %>
-              </span>
+              </span>&nbsp;&nbsp;
               <%= link_to(context_user_name(@account, announcement.user_id), user_path(announcement.user_id)) %>
             </div>
             <div class="message user_content">
@@ -460,16 +460,20 @@
         <% end %>
       </ul>
       <% if can_do(@account, @current_user, :manage_alerts) %>
-        <a href="#" class="button add_notification_link"><%= image_tag "add.png" %><%= t(:add_announcement_link, "Add a New Announcement") %></a>
-        <% form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none; margin-top: 10px;'} do |f| %>
+        <a href="#" class="button element_toggler" role="button" data-hide-while-target-shown="true" aria-controls="add_notification_form"><%= image_tag "add.png" %><%= t(:add_announcement_link, "Add a New Announcement") %></a>
+        <% form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none;', :class => 'well', :role => "region" } do |f| %>
           <table class="formtable">
             <tr>
               <td><%= f.blabel :subject, :en => "Subject" %></td>
               <td><%= f.text_field :subject %></td>
             </tr><tr>
-              <td>
-                <%= f.blabel :account_notification_icon, :en => "Icon" %>
-              </td>
+              <td><%= f.blabel :start_at, :en => "Starts" %></td>
+              <td><%= f.text_field :start_at, :class => 'datetime_field' %></td>
+            </tr><tr>
+              <td><%= f.blabel :end_at, :en => "Ends" %></td>
+              <td><%= f.text_field :end_at, :class => 'datetime_field' %></td>
+            </tr><tr>
+              <td><%= f.blabel :account_notification_icon, :en => "Icon" %></td>
               <td>
                 <select id="account_notification_icon" name="account_notification[icon]">
                   <option value="warning" class="warning"><%= t(:alert_icon_warning_option, "warning") %></option>
@@ -480,22 +484,16 @@
                 </select>
               </td>
             </tr><tr>
-              <td><%= f.blabel :start_at, :en => "Starts" %></td>
-              <td><%= f.text_field :start_at, :class => 'datetime_field', :style => 'width: 120px;' %></td>
-            </tr><tr>
-              <td><%= f.blabel :end_at, :en => "Ends" %></td>
-              <td><%= f.text_field :end_at, :class => 'datetime_field', :style => 'width: 120px;' %></td>
-            </tr><tr>
               <td><%= f.blabel :message, :en => "Message" %></td>
-              <td><%= f.text_area :message, :class => 'alert_message', :style => "width: 400px; height: 100px;" %></td>
-            </tr><tr>
-              <td colspan="2">
-                <div class="button-container">
-                  <button type="submit" class="button"><%= t(:add_announcement_button, "Add Announcement") %></button>
-                </div>
-              </td>
             </tr>
           </table>
+          <div>
+            <%= f.text_area :message, :class => 'alert_message', :style => "height: 100px;" %>
+          </div>
+          <div class="button-container">
+            <button type="submit" class="button"><%= image_tag "add.png" %> <%= t(:add_announcement_button, "Add Announcement") %></button>
+            <button type="button" class="element_toggler button-secondary" aria-controls="add_notification_form"><%= t('#buttons.cancel', %{Cancel}) %></button>
+          </div>
         <% end %>
       <% end %>
     </div>

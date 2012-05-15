@@ -30,4 +30,10 @@ module AccountsHelper
     return '' unless batch.data && batch.data[:counts]
     render :partial => 'accounts/sis_batch_counts', :object => batch
   end
+
+  def show_code_and_term_for(course)
+    show_term = course.enrollment_term && !course.enrollment_term.default_term?
+    show_code = course.course_code != course.name
+    "#{course.course_code if show_code}#{', ' if show_term && show_code}#{course.enrollment_term.name if show_term}"
+  end
 end

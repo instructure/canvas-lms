@@ -23,7 +23,7 @@ module SIS
     class GradePublishingResultsImporter < BaseImporter
 
       def self.is_grade_publishing_results_csv?(row)
-        row.header?('enrollment_id') && row.header?('grade_publishing_status')
+        row.include?('enrollment_id') && row.include?('grade_publishing_status')
       end
 
       # expected columns

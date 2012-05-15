@@ -41,7 +41,7 @@ describe "navigation" do
     # order of tests assumes alphabetical order of list
     list[4].text.should match /Summer Term/m # course 3, Summer Term
     list[3].text.should match /Spring Term/m # course 3, Spring Term
-    list[2].text.should_not match /Term/ # don't show term cause it doesn't have a name collision
+    list[2].text.should match /Spring Term/ # don't show term cause it doesn't have a name collision
     list[1].text.should_not match /Term/ # don't show term cause it's the default term
     list[0].text.should_not match /Term/ # "
   end

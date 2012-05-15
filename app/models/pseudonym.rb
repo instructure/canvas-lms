@@ -26,8 +26,6 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :user
   has_many :communication_channels, :order => 'position'
   belongs_to :communication_channel
-  has_many :group_memberships
-  has_many :groups, :through => :group_memberships
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   validates_length_of :unique_id, :maximum => maximum_string_length
   validates_presence_of :account_id, :user_id

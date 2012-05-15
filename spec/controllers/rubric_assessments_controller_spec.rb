@@ -91,14 +91,14 @@ describe RubricAssessmentsController do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
-      @assessment_request = @rubric_association.invite_assessors(@user, "bob@example.com", @rubric_association.association).first
+      @assessment_request = @rubric_association.invite_assessors(@user, "bob@example.com", @rubric_association.association.submission_for_student(@user)).first
       post 'remind', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id
       assert_unauthorized
     end
     it "should send reminder" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
-      @assessment_request = @rubric_association.invite_assessors(@user, "bob@example.com", @rubric_association.association).first
+      @assessment_request = @rubric_association.invite_assessors(@user, "bob@example.com", @rubric_association.association.submission_for_student(@user)).first
       post 'remind', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id
       assigns[:request].should_not be_nil
       assigns[:request].should eql(@assessment_request)
@@ -109,13 +109,13 @@ describe RubricAssessmentsController do
   describe "POST 'invite'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      rubric_association_model(:user => @user, :context => @course)
+      rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
       post 'invite', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:assessor_email => "bob@example.com"}
       assert_unauthorized
     end
     it "should send invitation" do
       course_with_teacher_logged_in(:active_all => true)
-      rubric_association_model(:user => @user, :context => @course)
+      rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
       post 'invite', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:assessor_email => "bob@example.com"}
       assigns[:assessment_request].should_not be_nil
     end

@@ -25,7 +25,7 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :assessment_request
   belongs_to :context, :polymorphic => true
   has_many :associated_attachments, :class_name => 'Attachment', :as => :context
-  has_many :submission_comment_participants
+  has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
   # too bad, this wont work.
   # has_many :comments_in_group, :class_name => "SubmissionComment", :foreign_key => "group_comment_id", :primary_key => "group_comment_id", :dependent => :destroy, :conditions => lambda{|sc| "id !=#{sc.id}"}

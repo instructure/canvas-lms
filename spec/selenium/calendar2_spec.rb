@@ -406,21 +406,20 @@ describe "calendar2" do
       end
 
       it "should validate appointment group popup link functionality" do
-        pending("bug 6986 - clicking on the name of an appointment group in a popup should take user to scheduler") do
-          ag = create_appointment_group
-          ag.appointments.first.reserve_for @student, @me
-          @user = @me
-          get "/calendar2"
-          wait_for_ajaximations
+        create_appointment_group
+        ag = AppointmentGroup.first
+        ag.appointments.first.reserve_for @student, @me
+        @user = @me
+        get "/calendar2"
+        wait_for_ajaximations
 
-          driver.find_element(:css, '.fc-event-title').click
-          popover = driver.find_element(:id, "popover-0")
-          popover.should be_displayed
-          expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
-          wait_for_ajaximations
-          is_checked('#scheduler').should be_true
-          driver.find_element(:id, 'appointment-group-list').should include_text(ag.title)
-        end
+        driver.find_element(:css, '.fc-event-title').click
+        popover = driver.find_element(:id, "popover-0")
+        popover.should be_displayed
+        expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
+        wait_for_ajaximations
+        is_checked('#scheduler').should be_true
+        driver.find_element(:id, 'appointment-group-list').should include_text(ag.title)
       end
 
       it "should show section-level events for the student's section" do

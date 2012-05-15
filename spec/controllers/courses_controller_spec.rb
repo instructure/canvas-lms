@@ -154,6 +154,16 @@ describe CoursesController do
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @e2.uuid
       response.should redirect_to(registration_confirmation_url(:nonce => @pseudonym.communication_channel.confirmation_code, :enrollment => @e2.uuid))
     end
+
+    it "should ask user to login if logged-in user does not match enrollment user, and enrollment user doesn't have an e-mail" do
+      user
+      @user.register!
+      @u2 = @user
+      course_with_student_logged_in(:active_course => true, :active_user => true)
+      @e2 = @course.enroll_user(@u2)
+      post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @e2.uuid
+      response.should redirect_to(login_url(:re_login => 1))
+    end
   end
   
   describe "GET 'show'" do

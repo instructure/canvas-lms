@@ -196,6 +196,24 @@ describe ContentMigration do
       rub2.save!
       rub2.associate_with(@copy_from, @copy_from)
       default = LearningOutcomeGroup.default_for(@copy_from)
+      log = @copy_from.learning_outcome_groups.new
+      log.context = @copy_from
+      log.title = "outcome group"
+      log.description = "<p>Groupage</p>"
+      log.save!
+      default.add_item(log)
+      log2 = @copy_from.learning_outcome_groups.new
+      log2.context = @copy_from
+      log2.title = "empty group"
+      log2.description = "<p>Groupage</p>"
+      log2.save!
+      default.add_item(log2)
+      log3 = @copy_from.learning_outcome_groups.new
+      log3.context = @copy_from
+      log3.title = "empty group"
+      log3.description = "<p>Groupage</p>"
+      log3.save!
+      default.add_item(log3)
       lo = @copy_from.learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
@@ -204,13 +222,20 @@ describe ContentMigration do
       lo.save!
       lo2 = @copy_from.learning_outcomes.new
       lo2.context = @copy_from
-      lo2.short_description = "outcome1"
+      lo2.short_description = "outcome2"
       lo2.workflow_state = 'active'
       lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo2.save!
+      lo3 = @copy_from.learning_outcomes.new
+      lo3.context = @copy_from
+      lo3.short_description = "outcome3"
+      lo3.workflow_state = 'active'
+      lo3.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo3.save!
 
       default.add_item(lo)
-      default.add_item(lo2)
+      log.add_item(lo2)
+      default.add_item(lo3)
 
       # only select one of each type
       @cm.copy_options = {
@@ -219,7 +244,8 @@ describe ContentMigration do
               :attachments => {mig_id(att) => "1", mig_id(att2) => "0"},
               :wiki_pages => {mig_id(wiki) => "1", mig_id(wiki2) => "0"},
               :rubrics => {mig_id(rub1) => "1", mig_id(rub2) => "0"},
-              :learning_outcomes => {mig_id(lo) => "1", mig_id(lo2) => "0"},
+              :learning_outcomes => {mig_id(lo) => "1", mig_id(lo2) => "1", mig_id(lo3) => "0"},
+              :learning_outcome_groups => {mig_id(log) => "0", mig_id(log2) => "1", mig_id(log3) => "0"},
       }
       @cm.save!
 
@@ -242,7 +268,12 @@ describe ContentMigration do
       @copy_to.rubrics.find_by_migration_id(mig_id(rub2)).should be_nil
 
       @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should be_nil
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should_not be_nil
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo3)).should be_nil
+
+      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
+      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log2)).should_not be_nil
+      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log3)).should be_nil
     end
 
     it "should re-copy deleted items" do
@@ -298,6 +329,7 @@ describe ContentMigration do
 
       @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).workflow_state.should == 'active'
       @copy_to.context_modules.find_by_migration_id(mig_id(cm)).workflow_state.should == 'active'
+      @copy_to.attachments.count.should == 1
       @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).workflow_state.should == 'active'
@@ -383,6 +415,35 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
     end
 
+    it "should copy quizzes as published if they were published before" do
+      pending unless Qti.qti_enabled?
+      g = @copy_from.assignment_groups.create!(:name => "new group")
+      asmnt_unpub = @copy_from.quizzes.create!(:title => "asmnt unpub", :quiz_type => "assignment", :assignment_group_id => g.id)
+      asmnt_pub = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => g.id)
+      asmnt_pub.workflow_state = 'available'
+      asmnt_pub.save!
+      graded_survey_unpub = @copy_from.quizzes.create!(:title => "graded survey unpub", :quiz_type => "graded_survey", :assignment_group_id => g.id)
+      graded_survey_pub = @copy_from.quizzes.create(:title => "grade survey pub", :quiz_type => "graded_survey", :assignment_group_id => g.id)
+      graded_survey_pub.workflow_state = 'available'
+      graded_survey_pub.save!
+      survey_unpub = @copy_from.quizzes.create!(:title => "survey unpub", :quiz_type => "survey")
+      survey_pub = @copy_from.quizzes.create(:title => "survey pub", :quiz_type => "survey")
+      survey_pub.workflow_state = 'available'
+      survey_pub.save!
+      practice_unpub = @copy_from.quizzes.create!(:title => "practice unpub", :quiz_type => "practice_quiz")
+      practice_pub = @copy_from.quizzes.create(:title => "practice pub", :quiz_type => "practice_quiz")
+      practice_pub.workflow_state = 'available'
+      practice_pub.save!
+
+      run_course_copy
+
+      [asmnt_unpub, asmnt_pub, graded_survey_unpub, graded_survey_pub, survey_pub, survey_unpub, practice_unpub, practice_pub].each do |orig|
+        q = @copy_to.quizzes.find_by_migration_id(mig_id(orig))
+        "#{q.title} - #{q.workflow_state}".should == "#{orig.title} - #{orig.workflow_state}" # titles in there to help identify what type failed
+        q.quiz_type.should == orig.quiz_type
+      end
+    end
+
     it "should export quizzes with groups that point to external banks" do
       pending unless Qti.qti_enabled?
       course_with_teacher(:user => @user)
@@ -437,20 +498,42 @@ describe ContentMigration do
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
     end
 
-    it "should still associate rubrics and assignments" do
-      rubric = @copy_from.rubrics.new
-      rubric.title = "Rubric"
-      rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
-      rubric.save!
+    def create_rubric_asmnt
+      @rubric = @copy_from.rubrics.new
+      @rubric.title = "Rubric"
+      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
+      @rubric.save!
 
-      assignment = @copy_from.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
-      rubric.associate_with(assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+      @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)
+      assoc = @rubric.associate_with(@assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+      assoc.hide_score_total = true
+      assoc.use_for_grading = true
+      assoc.save!
+    end
 
+    it "should still associate rubrics and assignments and copy rubric association properties" do
+      create_rubric_asmnt
       run_course_copy
 
-      rub = @copy_to.rubrics.find_by_migration_id(mig_id(rubric))
+      rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
       rub.should_not be_nil
-      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(assignment))
+      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      asmnt2.rubric.id.should == rub.id
+      asmnt2.rubric_association.use_for_grading.should == true
+      asmnt2.rubric_association.hide_score_total.should == true
+    end
+
+    it "should copy rubrics associated with assignments when rubric isn't selected" do
+      create_rubric_asmnt
+      @cm.copy_options = {
+              :assignments => {mig_id(@assignment) => "1"},
+      }
+      @cm.save!
+      run_course_copy
+
+      rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
+      rub.should_not be_nil
+      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
       asmnt2.rubric.id.should == rub.id
     end
 
@@ -528,6 +611,66 @@ describe ContentMigration do
 
       @copy_to.assignments.first.description.should == asmnt_des % [@copy_to.id, att_2.id]
       @copy_to.wiki.wiki_pages.first.body.should == wiki_body % [@copy_to.id, att2_2.id]
+    end
+
+    it "should include implied objects for context modules" do
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+      mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+      page2 = @copy_from.wiki.wiki_pages.create!(:title => "some page 2")
+      mod1.add_item({:id => page.id, :type => 'wiki_page'})
+      att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      mod1.add_item({:id => att.id, :type => 'attachment'})
+      mod1.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
+      mod1.add_item :type => 'context_module_sub_header', :title => "Sub Header"
+      tool = @copy_from.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      tool2 = @copy_from.context_external_tools.create!(:name => "b", :url => "http://www.instructure.com", :consumer_key => '12345', :shared_secret => 'secret')
+      mod1.add_item :type => 'context_external_tool', :id => tool.id, :url => tool.url
+      topic = @copy_from.discussion_topics.create!(:title => "topic")
+      topic2 = @copy_from.discussion_topics.create!(:title => "topic2")
+      mod1.add_item :type => 'discussion_topic', :id => topic.id
+      quiz = @copy_from.quizzes.create!(:title => 'quiz')
+      quiz2 = @copy_from.quizzes.create!(:title => 'quiz2')
+      mod1.add_item :type => 'quiz', :id => quiz.id
+      mod1.save!
+
+      mod2 = @copy_from.context_modules.create!(:name => "not copied")
+      asmnt2 = @copy_from.assignments.create!(:title => "some assignment again")
+      mod2.add_item({:id => asmnt2.id, :type => 'assignment', :indent => 1})
+      mod2.save!
+
+      @cm.copy_options = {
+                      :context_modules => {mig_id(mod1) => "1", mig_id(mod2) => "0"},
+              }
+      @cm.save!
+
+      run_course_copy
+
+      mod1_copy = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+      mod1_copy.should_not be_nil
+      if Qti.qti_enabled?
+        mod1_copy.content_tags.count.should == 8
+      else
+        mod1_copy.content_tags.count.should == 7
+      end
+
+
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt1)).should_not be_nil
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page)).should_not be_nil
+      @copy_to.attachments.find_by_migration_id(mig_id(att)).should_not be_nil
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).should_not be_nil
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).should_not be_nil if Qti.qti_enabled?
+
+      @copy_to.context_modules.find_by_migration_id(mig_id(mod2)).should be_nil
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt2)).should be_nil
+      @copy_to.attachments.find_by_migration_id(mig_id(att2)).should be_nil
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page2)).should be_nil
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool2)).should be_nil
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic2)).should be_nil
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz2)).should be_nil
     end
 
     it "should perform day substitutions" do
@@ -783,18 +926,35 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
     end
 
-    it "should send the correct emails" do
-      Notification.create!(:name => 'Migration Export Ready')
-      Notification.create!(:name => 'Migration Import Failed')
-      Notification.create!(:name => 'Migration Import Finished')
+    context "notifications" do
+      before(:each) do
+        Notification.create!(:name => 'Migration Export Ready', :category => 'Migration')
+        Notification.create!(:name => 'Migration Import Failed', :category => 'Migration')
+        Notification.create!(:name => 'Migration Import Finished', :category => 'Migration')
+      end
 
-      run_course_copy
+      it "should send the correct emails" do
+        run_course_copy
 
-      @cm.messages_sent['Migration Export Ready'].should be_blank
-      @cm.messages_sent['Migration Import Finished'].should be_blank
-      @cm.messages_sent['Migration Import Failed'].should be_blank
+        @cm.messages_sent['Migration Export Ready'].should be_blank
+        @cm.messages_sent['Migration Import Finished'].should be_blank
+        @cm.messages_sent['Migration Import Failed'].should be_blank
+      end
+
+      it "should send notifications immediately" do
+        communication_channel_model(:user_id => @user).confirm!
+        @cm.source_course = nil # so that it's not a course copy
+        @cm.save!
+
+        @cm.workflow_state = 'exported'
+        expect { @cm.save! }.to change(DelayedMessage, :count).by 0
+        @cm.messages_sent['Migration Export Ready'].should_not be_blank
+
+        @cm.workflow_state = 'imported'
+        expect { @cm.save! }.to change(DelayedMessage, :count).by 0
+        @cm.messages_sent['Migration Import Finished'].should_not be_blank
+      end
     end
-
   end
 
   context "import_object?" do

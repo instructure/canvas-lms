@@ -5,9 +5,9 @@
       <div style="margin-bottom: 5px;"><%= t 'labels.dates_range', "%{course} dates range", :course => %{<strong class="course_name">#{@source_course.name}</strong>}.html_safe %></div>
       <% ot 'from_to', "*from* %{start_date} **to** %{end_date}",
             :start_date => capture { %>
-        <div style="float: left;"><%= text_field :copy, :old_start_date, :value => "", :class => "date_field", :style => "width: 120px;" %></div>
+        <div style="float: left;"><%= text_field :copy, :old_start_date, :value => date_string(@source_course.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
       <% }, :end_date => capture { %>
-        <div style="float: left;"><%= text_field :copy, :old_end_date, :value => "", :class => "date_field", :style => "width: 120px;" %></div>
+        <div style="float: left;"><%= text_field :copy, :old_end_date, :value => date_string(@source_course.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
       <% }, :wrapper => { '*' => '<div style="float: left; margin-left: 10px;">\1&nbsp;</div>',
         '**' => '<div style="float: left;">&nbsp;\1&nbsp;</div>' } %>
       <div class="clear"></div>

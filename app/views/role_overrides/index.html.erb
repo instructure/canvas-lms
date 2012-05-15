@@ -70,7 +70,7 @@
       <% if @managing_account_roles %>
         <a href="<%= context_url(@context, :context_permissions_url) %>"><%= t 'links.manage_course_roles', "Manage Course-Level Roles" %></a>
       <% else %>
-        <a href="<%= context_url(@context, :context_permissions_url, :account_roles => 1) %>"><%= t 'links.manage_accoiunt_roles', "Manage Account-Level Roles" %></a>
+        <a id="course_level_roles" href="<%= context_url(@context, :context_permissions_url, :account_roles => 1) %>"><%= t 'links.manage_accoiunt_roles', "Manage Account-Level Roles" %></a>
       <% end %>
     <% end %>
   </div>
@@ -93,11 +93,11 @@
       <% end %>
       <tr>
         <td colspan="2" style="padding: 2px 3px;">
-          <% form_tag(context_url(@context, :add_role_context_permissions_url)) do %>
+          <%form_tag(context_url(@context, :add_role_context_permissions_url)) do %>
             <input type="hidden" name="account_roles" value="1"/>
             <%= before_label :new_role_type, "New Role Type" %>
-            <input type="text" name="role_type"/>
-            <button class="button" type="submit"><%= image_tag "add.png" %> <%= t '#buttons.add', "Add" %></button>
+            <input class= "add_new_role" type="text" name="role_type"/>
+            <button  id="add_new_role_button" class="button" type="submit"><%= image_tag "add.png" %> <%= t '#buttons.add', "Add" %></button>
           <% end %>
         </td>
       </tr>
@@ -143,7 +143,7 @@
       </tbody>
     </table>
     <div class="button-container">
-      <button type="submit" class="button"><%= t 'buttons.save', "Save Changes" %></button>
+      <button type="submit" class="save_permissions_changes button"><%= t 'buttons.save', "Save Changes" %></button>
       <a class="cancel_button button-secondary" href="<%= url_for(:back) %>"><%= t '#buttons.cancel', "Cancel" %></a>
     </div>
   <% end -%>

@@ -145,6 +145,31 @@ namespace :canvas do
 
     threads.each(&:join)
   end
+
+  desc "Check static assets and generate api documentation."
+     task :check_static_assets do
+       threads = []
+       threads << Thread.new do
+         puts "--> JS tests"
+         Rake::Task['js:test'].invoke
+       end
+
+       threads << Thread.new do
+         puts "--> i18n check"
+         Rake::Task['i18n:check'].invoke
+       end
+
+       threads << Thread.new do
+         puts "--> Check syntax"
+         Rake::Task['canvas:check_syntax'].invoke
+       end
+
+       threads << Thread.new do
+         puts "--> Generating API documentation"
+         Rake::Task['doc:api'].invoke
+       end
+     threads.each(&:join)
+   end
 end
 
 namespace :db do

@@ -73,6 +73,27 @@ class ApiRouteSet
     route(:delete, path, opts)
   end
 
+  def resources(resource_name, opts = {}, &block)
+    resource_name = resource_name.to_s
+    path_prefix = opts.delete :path_prefix
+    path_prefix << "/" if path_prefix
+
+    name_prefix = opts.delete :name_prefix
+
+    only, except = opts.delete(:only), opts.delete(:except)
+    def maybe_action(only, except, action)
+      if (!only || only.include?(action)) && (!except || !except.include?(action))
+        yield
+      end
+    end
+
+    maybe_action(only, except, :index) { get "#{path_prefix}#{resource_name}", opts.merge(:action => :index, :path_name => "#{name_prefix}#{resource_name}") }
+    maybe_action(only, except, :show) { get "#{path_prefix}#{resource_name}/:#{resource_name.singularize}_id", opts.merge(:action => :show, :path_name => "#{name_prefix}#{resource_name.singularize}") }
+    maybe_action(only, except, :create) { post "#{path_prefix}#{resource_name}", opts.merge(:action => :create, :path_name => "#{name_prefix}#{resource_name}") }
+    maybe_action(only, except, :update) { put "#{path_prefix}#{resource_name}/:#{resource_name.singularize}_id", opts.merge(:action => :update) }
+    maybe_action(only, except, :destroy) { delete "#{path_prefix}#{resource_name}/:#{resource_name.singularize}_id", opts.merge(:action => :destroy) }
+  end
+
   def mapper_prefix
     ""
   end

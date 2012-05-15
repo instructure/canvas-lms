@@ -72,11 +72,18 @@ describe DelayedMessage do
     # }
     
     it "should have a scope to order the messages by a field" do
-      (1..3).inject([]) {|list, e| list << notification_policy_model}
-      id1 = delayed_message_model(:notification_policy_id => 3).id
-      id2 = delayed_message_model(:notification_policy_id => 2).id
-      id3 = delayed_message_model(:notification_policy_id => 1).id
-      DelayedMessage.by(:notification_policy_id).map(&:id).should eql([id3, id2, id1])
+      notification = Notification.create!
+      cc = CommunicationChannel.create!(:path => 'path@example.com')
+      nps = (1..3).inject([]) do |list, e|
+        list << cc.notification_policies.create!(:notification => notification)
+      end
+      dms = nps.map do |np|
+        DelayedMessage.create!(:notification => notification,
+                               :notification_policy => np,
+                               :context => cc,
+                               :communication_channel => cc)
+      end
+      DelayedMessage.by(:notification_policy_id).map(&:id).should eql(dms.map(&:id).sort)
     end
     
     it "should have a scope to filter by the state" do

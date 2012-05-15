@@ -377,6 +377,7 @@ shared_examples_for 'a backend' do
       job.payload_object.should == Delayed::Periodic.scheduled['my SimpleJob']
       job.run_at.should >= audit_started
       job.run_at.should <= @backend.db_time_now + 6.minutes
+      job.strand.should == job.tag
     end
 
     it "should schedule jobs if there are only failed jobs on the queue" do
@@ -414,7 +415,7 @@ shared_examples_for 'a backend' do
     it "should schedule the next job run after performing" do
       Delayed::Periodic.perform_audit!
       job = @backend.first
-      job.invoke_job
+      run_job(job)
       job.destroy
 
       @backend.count.should == 2
@@ -425,6 +426,19 @@ shared_examples_for 'a backend' do
       next_scheduled.tag.should == 'periodic: my SimpleJob'
       next_scheduled.payload_object.should be_is_a(Delayed::Periodic)
       next_scheduled.run_at.utc.to_i.should >= Time.now.utc.to_i
+    end
+
+    it "should not schedule the next job if a duplicate exists" do
+      Delayed::Periodic.perform_audit!
+      Delayed::Periodic.scheduled['my SimpleJob'].enqueue()
+      Delayed::Job.count(:conditions => {:tag => 'periodic: my SimpleJob'}).should == 2
+      # there's a duplicate, so running this job will delete the dup and
+      # re-schedule
+      run_job(Delayed::Job.first(:conditions => {:tag => 'periodic: my SimpleJob'}))
+      Delayed::Job.count(:conditions => {:tag => 'periodic: my SimpleJob'}).should == 1
+      # no more duplicate, so it should re-enqueue as normal
+      run_job(Delayed::Job.first(:conditions => {:tag => 'periodic: my SimpleJob'}))
+      Delayed::Job.count(:conditions => {:tag => 'periodic: my SimpleJob'}).should == 1
     end
 
     it "should reject duplicate named jobs" do

@@ -1,7 +1,6 @@
 class ContextExternalTool < ActiveRecord::Base
   include Workflow
   has_many :content_tags, :as => :content
-  has_many :assignments
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 

@@ -37,7 +37,6 @@ define([
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                         // tiny can require it themselves
   'jqueryui/draggable' /* /\.draggable/ */,
-  'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.ba-tinypubsub',
@@ -620,7 +619,7 @@ define([
     if(options.image) {
       classes += "instructure_image_thumbnail ";
     }
-    classes = $.uniq(classes.split(/\s+/)).join(" ")
+    classes = $.unique(classes.split(/\s+/)).join(" ");
     var selectionText = "";
     if(enableBookmarking && this.data('last_bookmark')) {
       tinyMCE.get(id).selection.moveToBookmark(this.data('last_bookmark'));

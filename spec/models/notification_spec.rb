@@ -246,6 +246,18 @@ describe Notification do
       messages.map(&:to).sort.should == ['dashboard', 'value for path']
     end
 
+    it "should force certain categories to send immediately" do
+      notification_set(:notification_opts => { :name => "Thing 1", :category => 'Not Migration' })
+      @notification_policy.frequency = 'daily'
+      @notification_policy.save!
+      expect { @notification.create_message(@assignment, @user) }.to change(DelayedMessage, :count).by 1
+
+      notification_set(:notification_opts => { :name => "Thing 2", :category => 'Migration' })
+      @notification_policy.frequency = 'daily'
+      @notification_policy.save!
+      expect { @notification.create_message(@assignment, @user) }.to change(DelayedMessage, :count).by 0
+    end
+
     context "sharding" do
       it_should_behave_like "sharding"
 
@@ -304,8 +316,8 @@ describe Notification do
         NotificationPolicy.delete_all
 
         @trifecta_opts = {
-          :communication_channel_id => @communication_channel.id,
-          :notification_id => @notification.id
+          :communication_channel => @communication_channel,
+          :notification => @notification
         }
       end
         
@@ -378,8 +390,8 @@ def notification_set(opts={})
   user_model({:workflow_state => 'registered'}.merge(user_opts))
   communication_channel_model(:user_id => @user).confirm!
   notification_policy_model(
-    :notification_id => @notification.id, 
-    :communication_channel_id => @communication_channel.id
+    :notification => @notification,
+    :communication_channel => @communication_channel
   )
   @notification.reload
 end
@@ -389,9 +401,8 @@ def create_user_with_cc(opts={})
   user_model(opts)
 
   if @notification
-    notification_policy_model(:notification_id => @notification.id)
     communication_channel_model
-    @communication_channel.notification_policies << @notification_policy
+    @communication_channel.notification_policies.create!(:notification => @notification)
   else
     communication_channel_model
   end

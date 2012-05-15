@@ -40,7 +40,12 @@ module CC
       ) do |rubrics_node|
         @course.rubric_associations.each do |assoc|
           rubric = assoc.rubric
-          next if rubric.nil? || !rubric.active? || !export_object?(rubric) || imported_rubrics[rubric.id]
+          next if rubric.nil? || !rubric.active? || imported_rubrics[rubric.id]
+          if !export_object?(rubric)
+            if assoc.association_type != "Assignment" || !export_object?(assoc.association)
+              next
+            end
+          end
           imported_rubrics[rubric.id] = true
 
           migration_id = CCHelper.create_key(rubric)

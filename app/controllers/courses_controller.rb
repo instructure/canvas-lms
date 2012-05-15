@@ -27,7 +27,7 @@ class CoursesController < ApplicationController
 
   include Api::V1::Course
 
-  # @API
+  # @API List your courses
   # Returns the list of active courses for the current user.
   #
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
@@ -95,7 +95,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API Create a new course
   # Create a new course
   #
   # @argument account_id [Integer] The unique ID of the account to create to course under.
@@ -164,7 +164,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API Upload a file
   #
   # Upload a file to the course.
   #
@@ -218,7 +218,7 @@ class CoursesController < ApplicationController
 
   include Api::V1::User
 
-  # @API
+  # @API List course sections
   # Returns the list of sections for this course.
   #
   # @argument include[] [optional, "students"] Associations to include with the group.
@@ -272,7 +272,8 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API List students
+  #
   # Returns the list of students enrolled in this course.
   #
   # @response_field id The unique identifier for the student.
@@ -294,9 +295,9 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API List users
   # Returns the list of users in this course. And optionally the user's enrollments
-  #   in the course.
+  # in the course.
   #
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
@@ -344,7 +345,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::StreamItem
-  # @API
+  # @API Course activity stream
   # Returns the current user's course-specific activity stream.
   #
   # For full documentation, see the API documentation for the user activity
@@ -357,7 +358,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::TodoItem
-  # @API
+  # @API Course TODO items
   # Returns the current user's course-specific todo items.
   #
   # For full documentation, see the API documentation for the user todo items, in the user api.
@@ -370,7 +371,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API
+  # @API Conclude a course
   # Delete or conclude an existing course
   #
   # @argument event [String] ["delete"|"conclude"] The action to take on the course. available options are 'delete' and 'conclude.'
@@ -492,7 +493,7 @@ class CoursesController < ApplicationController
         @pending_enrollment.reject!
         flash[:notice] = t('notices.invitation_cancelled', "Invitation canceled.")
       end
-      session[:enrollment_uuid] = nil
+      session.delete(:enrollment_uuid)
       if @current_user
         redirect_to dashboard_url
       else
@@ -512,9 +513,10 @@ class CoursesController < ApplicationController
           @pending_enrollment = nil
           return false
         end
-      elsif !@current_user && @pending_enrollment.user.registered?
+      elsif !@current_user && @pending_enrollment.user.registered? || !@pending_enrollment.user.email_channel
         session[:return_to] = course_url(@context.id)
         flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
+        return redirect_to login_url(:re_login => 1) if @current_user
         redirect_to login_url
       else
         # defer to CommunicationChannelsController#confirm for the logic of merging users
@@ -582,9 +584,9 @@ class CoursesController < ApplicationController
         e.accept!
         flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       end
-      session[:accepted_enrollment_uuid] = nil
-      session[:enrollment_uuid_course_id] = nil
-      session[:enrollment_uuid] = nil if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
+      session.delete(:accepted_enrollment_uuid)
+      session.delete(:enrollment_uuid_course_id)
+      session.delete(:enrollment_uuid) if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
     end
     false
   end
@@ -674,7 +676,7 @@ class CoursesController < ApplicationController
     store_location if @context.created?
     if session[:saved_course_uuid] == @context.uuid
       @context_just_saved = true
-      session[:saved_course_uuid] = nil
+      session.delete(:saved_course_uuid)
     end
     return unless session[:claimed_course_uuids] && session[:claimed_enrollment_uuids]
     if session[:claimed_course_uuids].include?(@context.uuid)
@@ -691,7 +693,7 @@ class CoursesController < ApplicationController
   end
   protected :check_unknown_user
 
-  # @API
+  # @API Get a single course
   # Return information on a single course.
   #
   # Accepts the same include[] parameters as the list action, and returns a
@@ -786,7 +788,7 @@ class CoursesController < ApplicationController
     @enrollments = @context.enrollments.scoped({:conditions => ['workflow_state = ?', 'active']}).for_user(@current_user)
     @enrollment = @enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.first
     if params[:role] == 'revert'
-      session["role_course_#{@context.id}"] = nil
+      session.delete("role_course_#{@context.id}")
       flash[:notice] = t('notices.role_restored', "Your default role and permissions have been restored")
     elsif (@enrollment && @enrollment.can_switch_to?(params[:role])) || @context.grants_right?(@current_user, session, :manage_admin_users)
       @temp_enrollment = Enrollment.typed_enrollment(params[:role]).new rescue nil
@@ -1109,15 +1111,15 @@ class CoursesController < ApplicationController
       @fake_student = @context.student_view_student
       session[:become_user_id] = @fake_student.id
       return_url = course_path(@context)
-      session[:masquerade_return_to] = nil
+      session.delete(:masquerade_return_to)
       return return_to(return_url, request.referer || dashboard_url)
     end
   end
 
   def leave_student_view
-    session[:become_user_id] = nil
+    session.delete(:become_user_id)
     return_url = session[:masquerade_return_to]
-    session[:masquerade_return_to] = nil
+    session.delete(:masquerade_return_to)
     return return_to(return_url, request.referer || dashboard_url)
   end
 end

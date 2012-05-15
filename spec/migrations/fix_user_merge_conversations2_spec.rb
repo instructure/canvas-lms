@@ -22,6 +22,7 @@ require 'db/migrate/20120404230916_fix_user_merge_conversations2.rb'
 describe FixUserMergeConversations2 do
   describe "up" do
     it "should work" do
+      pending("can't create the bad state anymore due to foreign keys preventing it")
       u1 = user
       u2 = user
       u3 = user

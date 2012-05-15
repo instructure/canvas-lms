@@ -22,7 +22,7 @@ module SIS
   module CSV
     class GroupMembershipImporter < BaseImporter
       def self.is_group_membership_csv?(row)
-        row.header?('group_id') && row.header?('user_id')
+        row.include?('group_id') && row.include?('user_id')
       end
 
       # expected columns

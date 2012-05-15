@@ -54,15 +54,32 @@ def truncate_table(model)
         model.connection.execute("insert into sqlite_sequence (name, seq) values ('#{model.connection.quote_table_name(model.table_name)}', #{rand(100)});")
       rescue
       end
+    when "PostgreSQL"
+      begin
+        old_proc = model.connection.raw_connection.set_notice_processor {}
+        model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)} CASCADE")
+      ensure
+        model.connection.raw_connection.set_notice_processor(&old_proc)
+      end
     else
       model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
   end
 end
 
+def truncate_all_tables
+  models_by_connection = ALL_MODELS.group_by { |m| m.connection }
+  models_by_connection.each do |connection, models|
+    if connection.adapter_name == "PostgreSQL"
+      connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")
+    else
+      models.each { |model| truncate_table(model) }
+    end
+  end
+end
+
 # wipe out the test db, in case some non-transactional tests crapped out before
 # cleaning up after themselves
-ALL_MODELS.each { |m| truncate_table(m) }
-
+truncate_all_tables
 
 # Make AR not puke if MySQL auto-commits the transaction
 class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter
@@ -111,6 +128,7 @@ Spec::Runner.configure do |config|
     HostUrl.reset_cache!
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
+    Attachment.clear_cached_mime_ids
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
   end
 
@@ -391,7 +409,7 @@ Spec::Runner.configure do |config|
   def assignment_quiz(questions, opts={})
     course = opts[:course] || course(:active_course => true)
     user = opts[:user] || user(:active_user => true)
-    course.enroll_student(user) unless user.enrollments.any?{|e| e.course_id == course.id}
+    course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any?{|e| e.course_id == course.id}
     @assignment = course.assignments.create(:title => "Test Assignment")
     @assignment.workflow_state = "available"
     @assignment.submission_types = "online_quiz"
@@ -399,6 +417,7 @@ Spec::Runner.configure do |config|
     @quiz = Quiz.find_by_assignment_id(@assignment.id)
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
+    @quiz.published_at = Time.now
     @quiz.workflow_state = "available"
     @quiz.save!
   end
@@ -408,7 +427,7 @@ Spec::Runner.configure do |config|
   # in this method
   def quiz_with_graded_submission(questions, opts={}, &block)
     assignment_quiz(questions, opts)
-    @quiz_submission = @quiz.generate_submission(user)
+    @quiz_submission = @quiz.generate_submission(@user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
     @quiz_submission.grade_submission

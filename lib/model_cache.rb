@@ -118,7 +118,7 @@ module ModelCache
     orig_method = "super"
     alias_method = nil
 
-    if (options[:type] == :instance ? klass.instance_methods : klass.methods).include?(method.to_s)
+    if (options[:type] == :instance ? klass.instance_methods : klass.methods).map(&:to_s).include?(method.to_s)
       orig_method = "#{method}_without_cache(*args)"
       alias_method = "alias_method_chain #{method.inspect}, :cache"
       method = "#{method}_with_cache"
@@ -130,7 +130,7 @@ module ModelCache
     expected_args = options[:key_method] ? 0 : 1
     maybe_reset = "cache[#{key_value}] = #{orig_method} if args.size > #{expected_args}"
 
-    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<-CODE)
+    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<-CODE, __FILE__, __LINE__+1)
       def #{method}(*args)
         if cache = ModelCache[#{options[:cache_name].inspect}] and cache = cache[#{options[:key_lookup].inspect}]
           #{maybe_reset}

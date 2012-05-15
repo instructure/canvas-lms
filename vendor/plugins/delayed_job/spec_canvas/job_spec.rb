@@ -30,4 +30,13 @@ describe Delayed::Job do
     proc { Delayed::Job.find(job_id) }.should raise_error(ActiveRecord::RecordNotFound)
     Delayed::Job.count.should == 0
   end
+
+  it "should use the optimized path for psql" do
+    if Delayed::Job.connection.adapter_name == 'PostgreSQL'
+      job = @backend.create(:payload_object => SimpleJob.new)
+      Delayed::Job.expects(:find_available).never
+      Delayed::Job.expects(:lock_exclusively!).never
+      Delayed::Job.get_and_lock_next_available('test1', 1).should == job
+    end
+  end
 end

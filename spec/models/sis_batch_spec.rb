@@ -222,5 +222,60 @@ s2,test_1,section2,active},
         :batch_mode => false)
       @c1.reload.should be_available
     end
+
+    it "should only do batch mode removals for supplied data types" do
+      @term = @account.enrollment_terms.first
+      @term.update_attribute(:sis_source_id, 'term_1')
+      @previous_batch = SisBatch.create!
+
+      process_csv_data(
+          [
+          %{user_id,login_id,status
+          user_1,user_1,active},
+          %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,active},
+          %{section_id,course_id,name,status
+          section_1,course_1,section_1,active},
+          %{section_id,user_id,role,status
+          section_1,user_1,student,active}
+          ])
+
+      @user = Pseudonym.find_by_sis_user_id('user_1').user
+      @section = CourseSection.find_by_sis_source_id('section_1')
+      @course = @section.course
+      @enrollment1 = @course.student_enrollments.find_by_user_id(@user.id)
+
+      @user.should be_registered
+      @section.should be_active
+      @course.should be_claimed
+      @enrollment1.should be_active
+
+      # only supply enrollments; course and section are left alone
+      process_csv_data(
+          [%{section_id,user_id,role,status
+          section_1,user_1,teacher,active}],
+          :batch_mode => true, :batch_mode_term => @term)
+
+      @user.reload.should be_registered
+      @section.reload.should be_active
+      @course.reload.should be_claimed
+      @enrollment1.reload.should be_deleted
+      @enrollment2 = @course.teacher_enrollments.find_by_user_id(@user.id)
+      @enrollment2.should be_active
+
+      # only supply sections; course left alone
+      process_csv_data(
+          [%{section_id,course_id,name}],
+          :batch_mode => true, :batch_mode_term => @term)
+      @user.reload.should be_registered
+      @section.reload.should be_deleted
+      @course.reload.should be_claimed
+
+      # only supply courses
+      process_csv_data(
+          %{course_id,short_name,long_name,term_id},
+          :batch_mode => true, :batch_mode_term => @term)
+      @course.reload.should be_deleted
+    end
   end
 end

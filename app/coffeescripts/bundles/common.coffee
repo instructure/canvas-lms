@@ -17,6 +17,7 @@ require [
   'page_views'
   'compiled/license_help'
   'compiled/behaviors/ujsLinks'
+  'compiled/behaviors/elementToggler'
 
   # other stuff several bundles use
   'media_comments'

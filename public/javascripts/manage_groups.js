@@ -18,6 +18,7 @@
 define([
   'i18n!groups',
   'jquery' /* $ */,
+  'underscore',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
@@ -30,7 +31,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $) {
+], function(I18n, $, _) {
 
   window.contextGroups = {
     autoLoadGroupThreshold: 15,
@@ -38,12 +39,8 @@ define([
 
     populateUserElement: function($user, data) {
       if (data.sections) {
-        data.section_id = data.sections.map(function(s) {
-          return s.section_id;
-        }).join(",");
-        data.section_code = data.sections.map(function(s) {
-          return s.section_code;
-        }).join(", ");
+        data.section_id = _(data.sections).pluck('section_id').join(",");
+        data.section_code = _(data.sections).pluck('section_code').join(", ");
       }
 
       $user.removeClass('user_template');

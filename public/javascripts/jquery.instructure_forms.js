@@ -19,16 +19,17 @@ define([
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
+  'underscore',
   'jquery.ajaxJSON' /* ajaxJSONPreparedFiles, ajaxJSON */,
   'jquery.disableWhileLoading' /* disableWhileLoading */,
   'jquery.google-analytics' /* trackEvent */,
   'jquery.instructure_date_and_time' /* date_field, time_field, datetime_field */,
-  'jquery.instructure_misc_helpers' /* uniqueId, /\$\.uniq/ */,
+  'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.log\(/ */,
   'jquery.rails_flash_notifications' /* flashError */,
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(INST, I18n, $) {
+], function(INST, I18n, $, _) {
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -199,7 +200,7 @@ define([
           });
         });
       } else if(doUploadFile) {
-        var id            = $.uniqueId(formId + "_"),
+        var id            = _.uniqueId(formId + "_"),
             $frame        = $("<div style='display: none;' id='box_" + id + "'><form id='form_" + id + "'></form><iframe id='frame_" + id + "' name='frame_" + id + "' src='about:blank' onload='$(\"#frame_" + id + "\").triggerHandler(\"form_response_loaded\");'></iframe>")
                                 .appendTo("body").find("#frame_" + id),
             $frameForm    = $(this),
@@ -444,7 +445,7 @@ define([
   };
 
   $.toMultipartForm = function(params, callback) {
-    var boundary = "-----AaB03x" + $.uniqueId(),
+    var boundary = "-----AaB03x" + _.uniqueId(),
         result = {content_type: "multipart/form-data; boundary=" + boundary},
         body = "--" + boundary + "\r\n",
         paramsList = [],
@@ -495,7 +496,7 @@ define([
         value = value[0];
       }
       if(window.FileList && (value instanceof FileList)) {
-        var innerBoundary = "-----BbC04y" + $.uniqueId(),
+        var innerBoundary = "-----BbC04y" + _.uniqueId(),
             fileList = [];
         body += "Content-Disposition: form-data; name=\"" + sanitizeQuotedString(name) + "\r\n" +
                 "Content-Type: multipart/mixed; boundary=" + innerBoundary + "\r\n\r\n";

@@ -142,24 +142,26 @@ define([
       }
       return this;
     };
+
     var thumbnailsQueued = [];
     var thumbnailing = false;
     var nextThumbnail = function() {
+      if (!thumbnailsQueued.length) return; // shortcut if there's no work to do
       thumbnailing = true;
-      for(var idx = 0; idx < 30; idx++) {
-        var thumbnail = thumbnailsQueued.shift();
-        if(thumbnail) {
-          var $elem = thumbnail.elem;
-          var size = thumbnail.size;
-          $elem.createMediaCommentThumbnail(thumbnail);
+      var iterations = Math.min(thumbnailsQueued.length, 30),
+          thumbnail;
+      for (var idx = 0; idx < iterations; idx++) {
+        if (thumbnail = thumbnailsQueued.shift()) {
+          thumbnail.elem.createMediaCommentThumbnail(thumbnail);
         }
       }
-      if(thumbnailsQueued.length > 0) {
+      if (thumbnailsQueued.length > 0) {
         setTimeout(nextThumbnail, 500);
       } else {
         thumbnailing = false;
       }
-    }
+    };
+
     $.fn.mediaCommentThumbnail = function(size, keepOriginalText) {
       $(this).each(function() {
         thumbnailsQueued.push({size: size, elem: $(this), keepOriginalText: keepOriginalText});

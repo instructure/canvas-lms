@@ -323,7 +323,7 @@
     <% if user_answer %>
       <div class="user_points" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
         <% if editable %>
-          <input type="text" class="question_input" name="question_score_<%= hash_get(question, :id) %>" style="width: 30px; font-size: 1.2em;" value="<%= hash_get(user_answer, :correct) == "undefined" ? "--" : hash_get(user_answer, :points) %>"/>
+          <input type="text" class="question_input" name="question_score_<%= hash_get(question, :id) %>" style="width: 30px; font-size: 1.2em;" value="<%= hash_get(user_answer, :correct) == "undefined" ? "--" : hash_get(user_answer, :points) %>"  autocomplete='off'/>
         <% else %>
           <% if hash_get(user_answer, :correct) == "undefined" %>
            --
