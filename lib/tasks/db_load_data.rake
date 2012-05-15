@@ -162,7 +162,7 @@ namespace :db do
       Report generation failed
     }
     
-    create_notification 'ContentMigration', 'Other', 0,
+    create_notification 'ContentMigration', 'Migration', 0,
     'http://<%= HostUrl.default_host %>', %{
       Migration Export Ready
 
@@ -173,7 +173,7 @@ namespace :db do
       The extraction process for the course, <%= asset.migration_settings[:course_name] %>, has completed.  To finish importing content into <%= asset.context.name %> you'll need to click the following link:
     }
     
-    create_notification 'ContentMigration', 'Other', 0,
+    create_notification 'ContentMigration', 'Migration', 0,
     'http://<%= HostUrl.default_host %>', %{
       Migration Import Finished
 
@@ -184,7 +184,7 @@ namespace :db do
       Importing <%= asset.migration_settings[:course_name] %> into <%= asset.context.name %> has finished.
     }
       
-    create_notification 'ContentMigration', 'Other', 0,
+    create_notification 'ContentMigration', 'Migration', 0,
     'http://<%= HostUrl.default_host %>', %{
       Migration Import Failed
 
@@ -195,7 +195,7 @@ namespace :db do
       There was a problem importing <%= asset.migration_settings[:course_name] %> into <%= asset.context.name %>.  Please notify your system administrator, and give them the following error code: "ContentMigration:<%= asset.id %>:<%= asset.progress %>".
     }
     
-    create_notification 'ContentExport', 'Other', 0,
+    create_notification 'ContentExport', 'Migration', 0,
     'http://<%= HostUrl.default_host %>', %{
       Content Export Finished
 
@@ -206,7 +206,7 @@ namespace :db do
       Your course export for "<%= asset.context.name %>" has finished.
     }
     
-    create_notification 'ContentExport', 'Other', 0,
+    create_notification 'ContentExport', 'Migration', 0,
     'http://<%= HostUrl.default_host %>', %{
       Content Export Failed
 

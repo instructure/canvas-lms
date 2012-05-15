@@ -103,6 +103,18 @@ define([
       }
     }
 
+    // if an assignment is both a discussion assignment and a group assignment then peer reviews
+    // should not be allowed, so disable the checkbox and have it hide the extra peer review settings.
+    function togglePeerReviewAvailability(){
+      var $peerReviewsCheckbox = $edit_assignment_form.find("#assignment_peer_reviews"),
+          disablePeerReview = ($edit_assignment_form.find(".assignment_type").val() === 'discussion_topic') &&
+                              ($edit_assignment_form.find("#assignment_group_assignment").prop('checked'));
+      if (disablePeerReview) {
+        $peerReviewsCheckbox.prop('checked', false).change();
+      }
+      $peerReviewsCheckbox.prop('disabled', disablePeerReview);
+    }
+
     if(wikiSidebar) {
       wikiSidebar.init();
     }
@@ -133,6 +145,7 @@ define([
         // show the selector immediately
         $("#edit_external_tool_url").click();
       }
+      togglePeerReviewAvailability();
     }).triggerHandler('change');
     $edit_assignment_form.find(".points_possible").change(function(event) {
       var points = parseFloat($(this).val());
@@ -368,6 +381,7 @@ define([
       if(!$(this).attr('checked')) {
         $("#assignment_group_category").val("");
       }
+      togglePeerReviewAvailability();
     }).change();
     $("#assignment_turnitin_enabled").change(function() {
       $("#assignment_turnitin_settings").showIf($(this).attr('checked'));

@@ -28,7 +28,7 @@ class SisImportsApiController < ApplicationController
     raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
   end
 
-  # @API
+  # @API Import SIS data
   #
   # Import SIS data into Canvas. Must be on a root account with SIS imports
   # enabled.
@@ -158,7 +158,7 @@ class SisImportsApiController < ApplicationController
     end
   end
 
-  # @API
+  # @API Get SIS import status
   #
   # Get the status of an already created SIS import.
   def show

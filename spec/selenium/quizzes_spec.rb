@@ -499,7 +499,7 @@ describe "quizzes" do
   context "as a student" do
     before (:each) do
       course_with_student_logged_in
-      quiz_with_submission(false)
+      @qsub = quiz_with_submission(false)
     end
 
     context "resume functionality" do
@@ -534,6 +534,14 @@ describe "quizzes" do
           update_quiz_lock(Time.now - 5.minutes, nil)
           get "/courses/#{@course.id}/quizzes"
           f('.description').should_not include_text('Resume Quiz')
+        end
+
+        it "should grade any submission that needs grading" do
+          @qsub.end_at = Time.now - 5.minutes
+          @qsub.save!
+          get "/courses/#{@course.id}/quizzes"
+          f('.description').should_not include_text('Resume Quiz')
+          f('.description').should include_text('0 out of')
         end
       end
 

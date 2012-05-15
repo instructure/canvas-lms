@@ -207,7 +207,7 @@ class ContentImportsController < ApplicationController
     end
   end
   
-  # @API
+  # @API Get course copy status
   #
   # Retrieve the status of a course copy
   #
@@ -238,7 +238,7 @@ class ContentImportsController < ApplicationController
   end
   
   
-  # @API
+  # @API Copy course content
   #
   # Copies content from one course into another. The default is to copy all course
   # content. You can control specific types to copy by using either the 'except' option

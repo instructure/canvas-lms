@@ -498,4 +498,22 @@ describe SIS::CSV::CourseImporter do
       Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
     end
   end
+
+  it "should make workflow_state sticky" do
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    course = Course.find_by_sis_source_id("test_1")
+    course.should be_claimed
+    course.process_event('offer')
+    course.complete
+    course.should be_completed
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+    )
+    course.reload
+    course.should be_completed
+  end
 end

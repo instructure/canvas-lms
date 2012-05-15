@@ -47,11 +47,10 @@ define [
       if @calendarEvent.end_at then $.parseFromISO(@calendarEvent.end_at).time else null
 
     fullDetailsURL: () ->
-      # We don't support full details links to placeholder events
       if @isAppointmentGroupEvent()
-        return null
-
-      $.replaceTags(@contextInfo.calendar_event_url, 'id', @calendarEvent.parent_event_id ? @calendarEvent.id)
+        "/appointment_groups/#{@object.appointment_group_id}"
+      else
+        $.replaceTags(@contextInfo.calendar_event_url, 'id', @calendarEvent.parent_event_id ? @calendarEvent.id)
 
     displayTimeString: () ->
       semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)

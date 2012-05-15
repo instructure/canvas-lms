@@ -20,6 +20,7 @@ define([
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
+  'compiled/userSettings',
   'str/htmlEscape',
   'rubric_assessment',
   'jst/_turnitinInfo',
@@ -30,7 +31,7 @@ define([
   'jquery.doc_previews' /* loadDocPreview */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.store/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
@@ -42,11 +43,10 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.spin' /* /\.spin/ */,
-  'vendor/jquery.store' /* /\$\.store/ */,
   'vendor/scribd.view' /* scribd */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(INST, I18n, $, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(INST, I18n, $, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -152,10 +152,10 @@ define([
         return rubricAssessment.user_id === student.id;
       });
     });
-    
+
     // handle showing students only in a certain section.
-    // the sectionToShow will be remembered for a given user in a given browser across all assignments in this course 
-    sectionToShow = Number($.store.userGet("grading_show_only_section"+jsonData.context_id));
+    // the sectionToShow will be remembered for a given user in a given browser across all assignments in this course
+    sectionToShow = userSettings.contextGet('grading_show_only_section');
     if (sectionToShow) {
       var tempArray  = $.grep(jsonData.studentsWithSubmissions, function(student, i){
         return $.inArray(sectionToShow, student.section_ids) != -1;
@@ -164,7 +164,7 @@ define([
         jsonData.studentsWithSubmissions = tempArray;
       } else {
         alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
-        $.store.userRemove("grading_show_only_section"+jsonData.context_id);
+        userSettings.contextRemove('grading_show_only_section');
         window.location.reload();
       }
     }
@@ -172,7 +172,7 @@ define([
     //by defaut the list is sorted alphbetically by student last name so we dont have to do any more work here, 
     // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
     var hideStudentNames;
-    if ($.store.userGet("eg_hide_student_names") == "true") {
+    if (userSettings.get("eg_hide_student_names")) {
       hideStudentNames = true;
     }
     if(hideStudentNames) {
@@ -180,12 +180,12 @@ define([
         return ((a && a.submission && a.submission.id) || Number.MAX_VALUE) - 
                ((b && b.submission && b.submission.id) || Number.MAX_VALUE);
       });          
-    } else if ($.store.userGet("eg_sort_by") == "submitted_at") {
+    } else if (userSettings.get("eg_sort_by") == "submitted_at") {
       jsonData.studentsWithSubmissions.sort(function(a,b){
         return ((a && a.submission && a.submission.submitted_at && $.parseFromISO(a.submission.submitted_at).timestamp) || Number.MAX_VALUE) - 
                ((b && b.submission && b.submission.submitted_at && $.parseFromISO(b.submission.submitted_at).timestamp) || Number.MAX_VALUE);
-      });          
-    } else if ($.store.userGet("eg_sort_by") == "submission_status") {
+      });
+    } else if (userSettings.get("eg_sort_by") == "submission_status") {
       jsonData.studentsWithSubmissions.sort(function(a,b) {
         var states = {
           "not_graded": 1,
@@ -225,8 +225,8 @@ define([
   
   function initDropdown(){
     var hideStudentNames;
-    
-    if ($.store.userGet("eg_hide_student_names") == "true" || window.anonymousAssignment) {
+
+    if (userSettings.get("eg_hide_student_names") || window.anonymousAssignment) {
       hideStudentNames = true;
     }
     $("#hide_student_names").attr('checked', hideStudentNames);
@@ -277,7 +277,7 @@ define([
         .hide()
         .menu()
         .delegate('a', 'click mousedown', function(){
-          $.store[$(this).data('section-id') == 'all' ? 'userRemove' : 'userSet']("grading_show_only_section"+jsonData.context_id, $(this).data('section-id'));
+          userSettings[$(this).data('section-id') == 'all' ? 'contextRemove' : 'contextSet']('grading_show_only_section', $(this).data('section-id'));
           window.location.reload();
         });
       
@@ -381,8 +381,8 @@ define([
     },
 
     submitForm: function(e){
-      $.store.userSet('eg_sort_by', $('#eg_sort_by').val());
-      $.store.userSet('eg_hide_student_names', $("#hide_student_names").prop('checked').toString());
+      userSettings.set('eg_sort_by', $('#eg_sort_by').val());
+      userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked').toString());
       $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
       window.location.reload();
       return false;
@@ -846,7 +846,7 @@ define([
       initKeyCodes();
 
       $window.bind('hashchange', EG.handleFragmentChange);
-      $('#eg_sort_by').val($.store.userGet('eg_sort_by'));
+      $('#eg_sort_by').val(userSettings.get('eg_sort_by'));
       $('#submit_same_score').click(function(e) {
         EG.handleGradeSubmit();
         e.preventDefault();

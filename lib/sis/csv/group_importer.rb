@@ -23,7 +23,7 @@ module SIS
     # note these are account-level groups, not course groups
     class GroupImporter < BaseImporter
       def self.is_group_csv?(row)
-        row.header?('group_id') && row.header?('name')
+        row.include?('group_id') && row.include?('name')
       end
 
       # expected columns

@@ -240,13 +240,15 @@ describe ExternalToolsController, :type => :integration do
     hash.delete "created_at"
     hash.delete "updated_at"
     hash.delete "id"
-    hash.each_pair do |key, val|    
+    hash.keys.each do |key|
+      val = hash[key]
       next unless val.is_a?(Hash)
       val.each_pair do |sub_key, sub_val|
         hash["#{key}[#{sub_key}]"] = sub_val
       end
       hash.delete key
     end
+    hash
   end
   
   def example_json(et=nil)

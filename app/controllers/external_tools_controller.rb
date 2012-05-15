@@ -23,7 +23,7 @@ class ExternalToolsController < ApplicationController
   before_filter :require_context, :require_user
   include Api::V1::ExternalTools
 
-  # @API
+  # @API List external tools
   # Returns the paginated list of external tools for the current context.
   # See the get request docs for a single tool for a list of properties on an external tool.
   #
@@ -103,7 +103,7 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Get a single external tool
   # Returns the specified external tool.
   #
   # @response_field id The unique identifier for the tool
@@ -189,7 +189,7 @@ class ExternalToolsController < ApplicationController
   end
   protected :render_tool
 
-  # @API
+  # @API Create an external tool
   # Create an external tool in the specified course/account.
   # The created tool will be returned, see the "show" endpoint for an example.
   #
@@ -277,7 +277,7 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Edit an external tool
   # Update the specified external tool. Uses same parameters as create
   #
   # @example_request

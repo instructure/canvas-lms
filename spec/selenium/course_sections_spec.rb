@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "course settings tests" do
+describe "course sections" do
   it_should_behave_like "in-process server selenium tests"
 
   def add_enrollment(enrollment_state, section)

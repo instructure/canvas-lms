@@ -712,6 +712,10 @@ shared_examples_for "all selenium tests" do
     el.send_keys(value)
   end
 
+  def submit_form(form_css)
+    f(form_css + ' button[type="submit"]').click
+  end
+
   def check_image(element)
     require 'open-uri'
     element.should be_displayed
@@ -797,7 +801,7 @@ shared_examples_for "all selenium tests" do
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     end
-    ALL_MODELS.each { |m| truncate_table(m) }
+    truncate_all_tables
   end
 
   append_before (:each) do
@@ -838,7 +842,8 @@ end
     "attachments.zip" => File.read(File.dirname(__FILE__) + "/../fixtures/attachments.zip"),
     "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'),
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip'),
-    "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip')
+    "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip'),
+    "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip')
   }
 
   def get_file(filename, data = nil)
@@ -867,6 +872,14 @@ end
 
   def skip_if_ie(additional_error_text)
     pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
+  end
+
+  # for when you have something like a textarea's value and you want to match it's contents
+  # against a css selector.
+  # usage:
+  # find_css_in_string(some_textarea[:value], '.some_selector').should_not be_empty
+  def find_css_in_string(string_of_html, css_selector)
+    driver.execute_script("return $('<div />').append('#{string_of_html}').find('#{css_selector}')")
   end
 
   shared_examples_for "in-process server selenium tests" do

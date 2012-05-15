@@ -361,6 +361,12 @@ define([
       });
     }, 1000);
 
+    // Suppress "<ENTER>" key from submitting a form when clicked inside a text input.
+    $("#submit_quiz_form input[type=text]").keypress(function(e){
+      if (e.keyCode == 13)
+        return false;
+    });
+
     $("#submit_quiz_form").submit(function(event) {
       $(".question_holder textarea.question_input").each(function() { $(this).change(); });
       unanswered = $("#question_list .list_question:not(.answered)").length;

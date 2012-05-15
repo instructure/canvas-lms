@@ -5,9 +5,9 @@
   <% if @just_viewing_one_course %>
   <div id="groups_for_student" style="display: none;">
     <h2><%= t 'titles.course_assignments', "Course Assignments" %></h2>
-    <%= render :partial => "shared/assignment_group", 
-               :collection => @groups, 
-               :locals => { 
+    <%= render :partial => "shared/assignment_group",
+               :collection => @groups,
+               :locals => {
                  :skip_assignments => true,
                  :multiple_groups  => @groups.length > 1
                } %>
@@ -22,10 +22,10 @@
        ].each do |group| %>
     <div style="margin-bottom: 25px; <%= hidden if !group[:variable] || group[:variable].empty? %>" class="assignment_list <%= 'show_context' unless @just_viewing_one_course %>">
       <h2><%= group[:label] %></h2>
-      <%= render :partial    => "shared/assignment", 
-                 :collection => group[:variable], 
+      <%= render :partial    => "shared/assignment",
+                 :collection => group[:variable],
                  :locals     => {
-                   :submissions_hash => @submissions_hash, 
+                   :submissions_hash => @submissions_hash,
                    :assignment_count => group[:variable].length
                  } %>
     </div>
@@ -98,7 +98,7 @@ $(document).ready(function() {
       }
     }
   }
-  
+
   // TODO i18n
   <%= jt('#assignments.percent_of_final_grade', '%{percent} of final grade', '{percent: 0}') %>;
   $("#groups_for_student .assignment_group") //.find(".more_info_link").show().end()

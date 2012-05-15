@@ -64,7 +64,7 @@ class GettingStartedController < ApplicationController
   def finalize
     session[:saved_course_uuid] = @context.uuid
     session[:claim_course_uuid] = @context.uuid
-    session[:course_uuid] = nil
+    session.delete(:course_uuid)
     if @current_user
       redirect_to course_url(@context)
     else
@@ -90,7 +90,7 @@ class GettingStartedController < ApplicationController
   # Sets the @context and session[:course_uuid] for every method in this controller
   def set_course
     # create_unique finds or creates, but always returns a context
-    session[:course_uuid] = nil if params[:fresh]
+    session.delete(:course_uuid) if params[:fresh]
     # TODO i18n
     @context = Course.create_unique(session[:course_uuid], session[:course_creation_account_id] || @domain_root_account.manually_created_courses_account.id, @domain_root_account.id)
     if session[:course_uuid] != @context.uuid && @current_user

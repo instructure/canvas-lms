@@ -189,7 +189,7 @@ module AuthenticationMethods
 
   def redirect_back_or_default(default)
     redirect_to(session[:return_to] || default)
-    session[:return_to] = nil
+    session.delete(:return_to)
   end
   protected :redirect_back_or_default
 

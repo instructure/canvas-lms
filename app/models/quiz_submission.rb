@@ -322,7 +322,7 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def extendable?
-    !!(untaken? && end_at && end_at + 1.hour > Time.now.utc)
+    !!(untaken? && quiz.time_limit && end_at && end_at.utc + 1.hour > Time.now.utc)
   end
   
   protected :update_assignment_submission
@@ -345,6 +345,10 @@ class QuizSubmission < ActiveRecord::Base
     end
     res << self if self.completed?
     res
+  end
+
+  def latest_submitted_version
+    self.submitted_versions.last
   end
   
   def attempts_left

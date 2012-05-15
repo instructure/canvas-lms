@@ -22,6 +22,10 @@ class QuizzesController < ApplicationController
   before_filter { |c| c.active_tab = "quizzes" }
   before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only]
 
+  # The number of questions that can display "details". After this number, the "Show details" option is disabled
+  # and the data is not even loaded.
+  QUIZ_QUESTIONS_DETAIL_LIMIT = 25
+
   def index
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
@@ -33,7 +37,13 @@ class QuizzesController < ApplicationController
       @surveys = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
       @submissions_hash = {}
       @submissions_hash
-      @current_user.quiz_submissions.each{|s| @submissions_hash[s.quiz_id] = s } if @current_user
+      @current_user && @current_user.quiz_submissions.each do |s|
+        if s.needs_grading?
+          s.grade_submission(:finished_at => s.end_at)
+          s.reload
+        end
+        @submissions_hash[s.quiz_id] = s
+      end
       log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
     end
   end
@@ -119,7 +129,7 @@ class QuizzesController < ApplicationController
 
       @question_count = @quiz.question_count
       if session[:quiz_id] == @quiz.id && !request.xhr?
-        session[:quiz_id] = nil
+        session.delete(:quiz_id)
       end
       @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked = @locked_reason && !@quiz.grants_right?(@current_user, session, :update)

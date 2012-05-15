@@ -16,33 +16,113 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Communication Channels
+#
+# API for accessing users' email addresses, SMS phone numbers, Twitter,
+# and Facebook communication channels.
+#
+# In this API, the `:user_id` parameter can always be replaced with `self` if
+# the requesting user is asking for his/her own information.
 class CommunicationChannelsController < ApplicationController
   before_filter :require_user, :only => [:create, :destroy]
   before_filter :reject_student_view_student
-  
+
+  include Api::V1::CommunicationChannel
+
+  # @API
+  # List the communication channels for a user.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/12345/communication_channels -H 'Authorization: Bearer <ACCESS_TOKEN>'
+  #
+  # @example_response
+  #   [
+  #     { "id": 1, "address": "bieberfever@example.com", "type": "email", "position": 1, "user_id": 12345 },
+  #     { "id": 2, "address": "8018675309", "type": "sms", "position": 2, "user_id": 12345 }
+  #   ]
+  def index
+    @user = api_find(User, params[:user_id])
+    return unless authorized_action(@user, @current_user, :read)
+
+    channels = Api.paginate(@user.communication_channels.unretired, self,
+      api_v1_communication_channels_path).map do |cc|
+        communication_channel_json(cc, @current_user, session)
+      end
+
+    render :json => channels
+  end
+
+  # @API Create a new communication channel.
+  #
+  # @argument communication_channel[address] An email address or SMS number.
+  # @argument communication_channel[type] [email|sms] The type of communication channel.
+  # @argument skip_confirmation [Optional] Only valid for site admins making requests; If '1', the
+  # channel is automatically validated and no confirmation email or SMS is sent. Otherwise, the user must
+  # respond to a confirmation message to confirm the channel.
+  #
+  # @example_request
+  #
+  #   curl https://<canvas>/api/v1/users/1/communication_channels \ 
+  #     -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
+  #     -d 'communication_channel[address]=new@example.com' \ 
+  #     -d 'communication_channel[type]=email' \ 
+  #
+  # @example_response
+  #
+  #   {
+  #     "id": 2,
+  #     "address": "new@example.com",
+  #     "type": "email",
+  #     "workflow_state": "unconfirmed",
+  #     "user_id": 1,
+  #     "position": 2
+  #   }
   def create
+    @user = api_request? ? api_find(User, params[:user_id]) : @current_user
+
+    return render_unauthorized_action unless has_api_permissions?
+
+    params.delete(:build_pseudonym) if api_request?
+
+    skip_confirmation = params[:skip_confirmation].present? &&
+      Account.site_admin.grants_right?(@current_user, :manage_students)
+
+    # If a new pseudonym is requested, build (but don't save) a pseudonym to ensure
+    # that the unique_id is valid. The pseudonym will be created on approval of the
+    # communication channel.
     if params[:build_pseudonym]
-      params[:pseudonym][:account] = @domain_root_account
-      @pseudonym = @current_user.pseudonyms.build(params[:pseudonym])
+      @pseudonym = @domain_root_account.pseudonyms.build(:user => @user,
+        :unique_id => params[:communication_channel][:address])
       @pseudonym.generate_temporary_password
-      return render :json => @pseudonym.errors.to_json, :status => :bad_request unless @pseudonym.valid?
-    end
-    @cc = @current_user.communication_channels.by_path(params[:pseudonym][:unique_id]).find_by_path_type(params[:path_type])
-    @cc ||= @current_user.communication_channels.build(:path => params[:pseudonym][:unique_id], :path_type => params[:path_type])
-    if (!@cc.new_record? && !@cc.retired?)
-      @cc.errors.add(:path, "unique!")
-      return render :json => @cc.errors.to_json, :status => :bad_request
+
+      unless @pseudonym.valid?
+        return render :json => @pseudonym.errors.as_json, :status => :bad_request
+      end
     end
 
-    @cc.user = @current_user
-    @cc.workflow_state = 'unconfirmed'
-    @cc.build_pseudonym_on_confirm = params[:build_pseudonym] == '1'
+    # Find or create the communication channel.
+    @cc = @user.communication_channels.by_path(params[:communication_channel][:address]).
+      find_by_path_type(params[:communication_channel][:type])
+    @cc ||= @user.communication_channels.build(:path => params[:communication_channel][:address],
+      :path_type => params[:communication_channel][:type])
+
+    if (!@cc.new_record? && !@cc.retired?)
+      @cc.errors.add(:path, 'unique!')
+      return render :json => @cc.errors.as_json, :status => :bad_request
+    end
+
+    @cc.user = @user
+    @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed'
+    @cc.build_pseudonym_on_confirm = params[:build_pseudonym].to_i > 0
+
+    # Save channel and return response
     if @cc.save
-      @cc.send_confirmation!(@domain_root_account)
-      flash[:notice] = "Contact method registered!"
-      render :json => @cc.to_json(:only => [:id, :user_id, :path, :path_type])
+      @cc.send_confirmation!(@domain_root_account) unless skip_confirmation
+
+      flash[:notice] = t('profile.notices.contact_registered', 'Contact method registered!')
+      render :json => communication_channel_json(@cc, @current_user, session)
     else
-      render :json => @cc.errors.to_json, :status => :bad_request
+      render :json => @cc.errors.as_json, :status => :bad_request
     end
   end
 
@@ -229,14 +309,44 @@ class CommunicationChannelsController < ApplicationController
     render :json => {:re_sent => true}
   end
 
+  # @API Delete a communication channel.
+  # Delete an existing communication channel.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/5/communication_channels/3
+  #     -H 'Authorization: Bearer <ACCESS_TOKEN>
+  #     -X DELETE
+  #
+  # @example_response
+  #   {
+  #     "id": 3,
+  #     "address": "new@example.com",
+  #     "type": "email",
+  #     "workflow_state": "deleted",
+  #     "user_id": 5,
+  #     "position": 2
+  #   }
   def destroy
-    @cc = @current_user.communication_channels.find_by_id(params[:id]) if params[:id]
-    if !@cc || @cc.destroy
-      @current_user.touch
-      render :json => @cc.to_json
+    @user = api_request? ? api_find(User, params[:user_id]) : @current_user
+    @cc   = @user.communication_channels.find(params[:id]) if params[:id]
+
+    return render_unauthorized_action unless has_api_permissions?
+
+    if @cc.nil? || @cc.destroy
+      @user.touch
+      if api_request?
+        render :json => communication_channel_json(@cc, @current_user, session)
+      else
+        render :json => @cc.as_json
+      end
     else
       render :json => @cc.errors.to_json, :status => :bad_request
     end
   end
-  
+
+  protected
+  def has_api_permissions?
+    @user == @current_user ||
+      @user.grants_right?(@current_user, session, :manage_user_details)
+  end
 end

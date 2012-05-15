@@ -107,16 +107,31 @@ module Delayed
                                              queue = nil,
                                              min_priority = nil,
                                              max_priority = nil)
-          @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
-          loop do
-            jobs = Rails.logger.silence do
-              find_available(worker_name, @batch_size, max_run_time, queue, min_priority, max_priority)
+
+          min_priority ||= Delayed::MIN_PRIORITY
+          max_priority ||= Delayed::MAX_PRIORITY
+
+          if connection.adapter_name == 'PostgreSQL' && Setting.get_cached('delayed_jobs_db_fn_pop', 'true') == 'true'
+            # note postgresql is optimized to use this db function, and doesn't
+            # use find_available, lock_exclusively and friends
+            #
+            # the reason we do a subselect here is that pop_from_delayed_jobs
+            # is a volatile function (we can't mark it as stable because it
+            # does a FOR UPDATE, which postgresql won't allow in a stable fn)
+            #
+            # so without the subselect, it'd evaluate the function once for every row in delayed_jobs
+            job = self.first(:conditions => ["id = (select pop_from_delayed_jobs(?, ?, ?, ?, ?))", worker_name, queue, min_priority, max_priority, db_time_now])
+            return job
+          else
+            @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+            loop do
+              jobs = find_available(worker_name, @batch_size, max_run_time, queue, min_priority, max_priority)
+              return nil if jobs.empty?
+              job = jobs.detect do |job|
+                job.lock_exclusively!(max_run_time, worker_name)
+              end
+              return job if job
             end
-            return nil if jobs.empty?
-            job = jobs.detect do |job|
-              job.lock_exclusively!(max_run_time, worker_name)
-            end
-            return job if job
           end
         end
 
@@ -161,9 +176,7 @@ module Delayed
         def lock_exclusively!(max_run_time, worker)
           now = self.class.db_time_now
           # We don't own this job so we will update the locked_by name and the locked_at
-          affected_rows = Rails.logger.silence do
-            self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and locked_at is null and run_at <= ?", id, now])
-          end
+          affected_rows = self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and locked_at is null and run_at <= ?", id, now])
           if affected_rows == 1
             self.locked_at    = now
             self.locked_by    = worker

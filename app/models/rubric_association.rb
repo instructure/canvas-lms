@@ -37,6 +37,7 @@ class RubricAssociation < ActiveRecord::Base
   before_save :update_assignment_points
   before_save :update_values
   after_create :update_rubric
+  after_create :link_to_assessments
   before_save :update_old_rubric
   after_destroy :update_rubric
   after_save :assert_uniqueness
@@ -139,7 +140,7 @@ class RubricAssociation < ActiveRecord::Base
   protected :update_values
   
   attr_accessor :assessing_user_id
-  
+
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
     can :update and can :delete and can :manage and can :assess
@@ -201,7 +202,23 @@ class RubricAssociation < ActiveRecord::Base
     end
   end
   protected :update_rubric
-  
+
+  # Link the rubric association to any existing assessment_requests (i.e. peer-reviews) that haven't been completed and
+  # aren't currently linked to a rubric association. This routine is needed when an assignment is completed and
+  # submissions were already sent when peer-review links and a *then* a rubric is created.
+  def link_to_assessments
+    # Go up to the assignment and loop through all submissions.
+    # Update each submission's assessment_requests with a link to this rubric association
+    # but only if not already associated and the assessment is incomplete.
+    if self.association_id
+      self.association.submissions.each do |sub|
+        sub.assessment_requests.incomplete.update_all(['rubric_association_id = ?', self.id],
+                                                      'rubric_association_id IS NULL')
+      end
+    end
+  end
+  protected :link_to_assessments
+
   def unsubmitted_users
     self.context.students - self.rubric_assessments.map{|a| a.user} - self.assessment_requests.map{|a| a.user}
   end

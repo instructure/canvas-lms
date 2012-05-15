@@ -194,6 +194,7 @@ class Conversation < ActiveRecord::Base
       end
       message.asset = options[:asset]
       message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
+      message.media_comment = options[:media_comment] if options[:media_comment].present?
       if options[:forwarded_message_ids].present?
         messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
         conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
@@ -205,8 +206,6 @@ class Conversation < ActiveRecord::Base
       # so we can take advantage of other preloaded associations
       ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
       message.save!
-
-      yield message if block_given?
 
       add_message_to_participants(message, options.merge(:tags => new_tags, :new_message => true))
       if options[:update_participants]

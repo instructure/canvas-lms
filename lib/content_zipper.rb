@@ -306,7 +306,7 @@ class ContentZipper
       callback.call(attachment, folder_names) if callback
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
-      path = folder_names.empty? ? attachment.filename : File.join(folder_names, attachment.unencoded_filename)
+      path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
       @files_added = false unless add_attachment_to_zip(attachment, zipfile, path)
     end
     folder.active_sub_folders.select{|f| !@check_user || f.grants_right?(@user, nil, :read_contents)}.each do |sub_folder|

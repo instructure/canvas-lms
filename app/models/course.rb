@@ -158,7 +158,7 @@ class Course < ActiveRecord::Base
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
   has_many :role_overrides, :as => :context
-  has_many :content_migrations
+  has_many :content_migrations, :foreign_key => :context_id
   has_many :content_exports
   has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria
@@ -181,7 +181,7 @@ class Course < ActiveRecord::Base
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
 
   include StickySisFields
-  are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates, :enrollment_term_id
+  are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates, :enrollment_term_id, :workflow_state
 
   has_a_broadcast_policy
 
@@ -889,10 +889,10 @@ class Course < ActiveRecord::Base
     can :read
 
     # Teacher of a concluded course
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? }) }
+    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.completed? }) }
     can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
 
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? }) }
+    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? && e.completed? }) }
     can :read_user_notes and can :view_all_grades
 
     given { |user| !self.deleted? && !self.sis_source_id && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.state_based_on_date == :completed })}
@@ -1181,7 +1181,7 @@ class Course < ActiveRecord::Base
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym)
     enrollment_ids = []
     res = FasterCSV.generate do |csv|
-      row = ["publisher_id", "publisher_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score"]
+      row = ["publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score"]
       row << "grade" if self.grading_standard_enabled?
       csv << row
       enrollments.each do |enrollment|
@@ -1190,9 +1190,11 @@ class Course < ActiveRecord::Base
         pseudonym_sis_ids = enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).map{|p| p.sis_user_id}
         pseudonym_sis_ids = [nil] if pseudonym_sis_ids.empty?
         pseudonym_sis_ids.each do |pseudonym_sis_id|
-          row = [publishing_user.try(:id), publishing_pseudonym.try(:sis_user_id), enrollment.course_section.id,
-              enrollment.course_section.sis_source_id, enrollment.user.id, pseudonym_sis_id, enrollment.id,
-              enrollment.workflow_state, enrollment.computed_final_score]
+          row = [publishing_user.try(:id), publishing_pseudonym.try(:sis_user_id),
+                 enrollment.course.id, enrollment.course.sis_source_id,
+                 enrollment.course_section.id, enrollment.course_section.sis_source_id,
+                 enrollment.user.id, pseudonym_sis_id, enrollment.id,
+                 enrollment.workflow_state, enrollment.computed_final_score]
           row << enrollment.computed_final_grade if self.grading_standard_enabled?
           csv << row
         end
@@ -1840,7 +1842,7 @@ class Course < ActiveRecord::Base
     attachments.each_with_index do |file, i|
       cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
       if !ce || ce.export_object?(file)
-        new_file = file.clone_for(self)
+        new_file = file.clone_for(self, nil, :overwrite => true)
         self.attachment_path_id_lookup[new_file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
         new_folder_id = merge_mapped_id(file.folder)
 

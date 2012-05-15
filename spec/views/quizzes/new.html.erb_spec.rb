@@ -20,6 +20,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/quizzes/new" do
+  def course_quiz(active=false)
+    @quiz = @course.quizzes.create
+    @quiz.workflow_state = "available" if active
+    @quiz.save!
+    @quiz
+  end
+
+  def quiz_question
+    @quiz.quiz_questions.create
+  end
+
   it "should render" do
     course_with_student
     view_context
@@ -27,5 +38,26 @@ describe "/quizzes/new" do
     render "quizzes/new"
     response.should_not be_nil
   end
+
+  context "with course and quiz" do
+    before :each do
+      course_with_teacher_logged_in(:active_all => true)
+      @quiz = course_quiz
+      assigns[:quiz] = @quiz
+      view_context
+    end
+    it "should not display 'NOTE:' message when questions within limit" do
+      QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT.times { quiz_question }
+      render 'quizzes/new'
+      response.should_not contain('NOTE: Question details not available when more than')
+    end
+
+    it "should explain why 'Show Question Details' is disabled" do
+      (QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT+1).times { quiz_question }
+      render 'quizzes/new'
+      response.should contain('NOTE: Question details not available when more than')
+    end
+  end
+
 end
 

@@ -25,7 +25,7 @@ class PageViewsController < ApplicationController
     # page view update happens in log_page_view after_filter
   end
 
-  # @API
+  # @API List user page views
   # Return the user's page view history in json format, similar to the
   # available CSV download. Pagination is used as described in API basics
   # section. Page views are returned in descending order, newest to oldest.
@@ -39,7 +39,7 @@ class PageViewsController < ApplicationController
   def index
     @user = api_find(User, params[:user_id])
     if authorized_action(@user, @current_user, :view_statistics)
-      @page_views = Api.paginate(@user.page_views, self, api_v1_user_page_views_path(:user => @user), :order => 'created_at DESC', :without_count => :true)
+      @page_views = Api.paginate(@user.page_views, self, api_v1_user_page_views_path(:user_id => @user), :order => 'created_at DESC', :without_count => :true)
       respond_to do |format|
         format.html do
           if params[:html_xhr]
@@ -59,7 +59,7 @@ class PageViewsController < ApplicationController
         format.csv {
           cancel_cache_buster
           send_data(
-            @user.page_views.scoped(:limit=>params[:report_count] || 300).to_a.to_csv, 
+            @user.page_views.by_created_at.scoped(:limit=>params[:report_count] || 300).to_a.to_csv,
             :type => "text/csv", 
             :filename => t(:download_filename, "Pageviews For %{user}", :user => @user.name.to_s.gsub(/ /, "_")) + '.csv', 
             :disposition => "attachment"

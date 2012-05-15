@@ -1318,6 +1318,11 @@ class Assignment < ActiveRecord::Base
     {:conditions => ['assignments.created_at < ?', date]}
   }
 
+  named_scope :not_locked, lambda {
+    {:conditions => ['(assignments.unlock_at IS NULL OR assignments.unlock_at < :now) AND (assignments.lock_at IS NULL OR assignments.lock_at > :now)',
+                     {:now => Time.zone.now}]}
+  }
+
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?
   end
@@ -1569,7 +1574,12 @@ class Assignment < ActiveRecord::Base
     new_record = item.new_record?
     if hash[:rubric_migration_id]
       rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id])
-      rubric.associate_with(item, context, :purpose => 'grading') if rubric
+      if rubric
+        assoc = rubric.associate_with(item, context, :purpose => 'grading')
+        assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
+        assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
+        assoc.save
+      end
     end
     if hash[:grading_standard_migration_id]
       gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])
@@ -1629,9 +1639,12 @@ class Assignment < ActiveRecord::Base
   end
 
   def <=>(comparable)
-    if comparable.respond_to?(:due_at)
-      (self.due_at || Time.new) <=> (comparable.due_at || Time.new)
-    end
+    sort_key <=> comparable.sort_key
+  end
+
+  def sort_key
+    # undated assignments go last
+    [due_at ? 0 : 1, due_at || 0, title]
   end
 
   def special_class; nil; end

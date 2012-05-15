@@ -7,44 +7,43 @@ describe "external tool buttons" do
     course_with_teacher_logged_in
   end
 
-  def load_selection_test_tool(&block)
+  def load_selection_test_tool(element)
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.settings[:editor_button] = {
-      :url => "http://#{HostUrl.default_host}/selection_test",
-      :icon_url => "/images/add.png",
-      :text => "Selection Test"
+        :url => "http://#{HostUrl.default_host}/selection_test",
+        :icon_url => "/images/add.png",
+        :text => "Selection Test"
     }
     tool.save!
     get "/courses/#{@course.id}/discussion_topics"
 
-    driver.find_element(:css, ".add_topic_link").click
-    keep_trying_until {  driver.find_elements(:css, "#topic_content_topic_new_instructure_external_button_#{tool.id}").detect(&:displayed?) }
-    driver.find_element(:css, "#topic_content_topic_new_instructure_external_button_#{tool.id}").click
+    f(".add_topic_link").click
+    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_#{tool.id}:visible").should be_displayed }
+    f( "#topic_content_topic_new_instructure_external_button_#{tool.id}").click
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should == ""
 
-    keep_trying_until { driver.find_elements(:css, "#external_tool_button_dialog iframe").detect(&:displayed?) }
+    keep_trying_until { fj("#external_tool_button_dialog iframe:visible").should be_displayed }
 
     in_frame('external_tool_button_frame') do
-      keep_trying_until { driver.find_elements(:css, ".link").detect(&:displayed?) }
-      yield
+      keep_trying_until { fj(".link:visible").should be_displayed }
+      f(element).click
+      wait_for_ajax_requests
     end
-    keep_trying_until { !driver.find_element(:css, "#external_tool_button_dialog").displayed? }
+    wait_for_ajax_requests
+      f("#external_tool_button_dialog").should_not be_displayed
   end
 
   it "should allow inserting oembed content from external tool buttons" do
-    load_selection_test_tool do
-      driver.find_element(:css, "#oembed_link").click
-    end
+    load_selection_test_tool("#oembed_link")
+
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should match(/ZB8T0193/)
   end
 
   it "should allow inserting basic lti links from external tool buttons" do
     skip_if_ie("IE hangs")
-    load_selection_test_tool do
-      driver.find_element(:css, "#basic_lti_link").click
-    end
+    load_selection_test_tool("#basic_lti_link")
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should match(/example/)
     html.should match(/lti link/)
@@ -52,25 +51,19 @@ describe "external tool buttons" do
   end
 
   it "should allow inserting iframes from external tool buttons" do
-    load_selection_test_tool do
-      driver.find_element(:css, "#iframe_link").click
-    end
+    load_selection_test_tool("#iframe_link")
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should match(/iframe/)
   end
 
   it "should allow inserting images from external tool buttons" do
-    load_selection_test_tool do
-      driver.find_element(:css, "#image_link").click
-    end
+    load_selection_test_tool("#image_link")
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should match(/delete\.png/)
   end
 
   it "should allow inserting links from external tool buttons" do
-    load_selection_test_tool do
-      driver.find_element(:css, "#link_link").click
-    end
+    load_selection_test_tool("#link_link")
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should match(/delete link/)
   end
@@ -80,25 +73,25 @@ describe "external tool buttons" do
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
       tool.settings[:editor_button] = {
-        :url => "http://#{HostUrl.default_host}/selection_test",
-        :icon_url => "/images/add.png",
-        :text => "Selection Test #{i}"
+          :url => "http://#{HostUrl.default_host}/selection_test",
+          :icon_url => "/images/add.png",
+          :text => "Selection Test #{i}"
       }
       tool.save!
       tools << tool
     end
 
     get "/courses/#{@course.id}/discussion_topics"
-    driver.find_element(:css, ".add_topic_link").click
-    keep_trying_until {  driver.find_elements(:css, "#topic_content_topic_new_instructure_external_button_#{tools[0].id}").detect(&:displayed?) }
-    driver.find_element(:css, "#topic_content_topic_new_instructure_external_button_#{tools[1].id}").should be_displayed
-    driver.find_elements(:css, "#topic_content_topic_new_instructure_external_button_#{tools[2].id}").length.should == 0
-    driver.find_elements(:css, "#topic_content_topic_new_instructure_external_button_#{tools[3].id}").length.should == 0
-    driver.find_element(:css, "#topic_content_topic_new_instructure_external_button_clump").should be_displayed
-    driver.find_element(:css, "#topic_content_topic_new_instructure_external_button_clump").click
+    f(".add_topic_link").click
+    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_#{tools[0].id}:visible").should be_displayed}
+    f("#topic_content_topic_new_instructure_external_button_#{tools[1].id}").should be_displayed
+    ff("#topic_content_topic_new_instructure_external_button_#{tools[2].id}").length.should == 0
+    ff("#topic_content_topic_new_instructure_external_button_#{tools[3].id}").length.should == 0
+    f("#topic_content_topic_new_instructure_external_button_clump").should be_displayed
+    f("#topic_content_topic_new_instructure_external_button_clump").click
 
-    driver.find_element(:css, "#instructure_dropdown_list").should be_displayed
-    driver.find_elements(:css, "#instructure_dropdown_list div.option").length.should == 2
+    f("#instructure_dropdown_list").should be_displayed
+    ff("#instructure_dropdown_list div.option").length.should == 2
   end
 
   it "should load external tool if selected from the dropdown" do
@@ -106,30 +99,33 @@ describe "external tool buttons" do
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
       tool.settings[:editor_button] = {
-        :url => "http://#{HostUrl.default_host}/selection_test",
-        :icon_url => "/images/add.png",
-        :text => "Selection Test #{i}"
+          :url => "http://#{HostUrl.default_host}/selection_test",
+          :icon_url => "/images/add.png",
+          :text => "Selection Test #{i}"
       }
       tool.save!
       tools << tool
     end
 
     get "/courses/#{@course.id}/discussion_topics"
-    driver.find_element(:css, ".add_topic_link").click
-    keep_trying_until {  driver.find_elements(:css, "#topic_content_topic_new_instructure_external_button_clump").detect(&:displayed?) }
-    driver.find_element(:css, "#topic_content_topic_new_instructure_external_button_clump").click
+    f(".add_topic_link").click
+    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_clump:visible").should be_displayed}
+    f("#topic_content_topic_new_instructure_external_button_clump").click
 
-    driver.find_element(:css, "#instructure_dropdown_list").should be_displayed
-    driver.find_elements(:css, "#instructure_dropdown_list div.option").length.should == 2
-    driver.find_elements(:css, "#instructure_dropdown_list div.option").last.click
+    f("#instructure_dropdown_list").should be_displayed
+    ff("#instructure_dropdown_list div.option").length.should == 2
+    ff("#instructure_dropdown_list div.option").last.click
 
-    keep_trying_until { driver.find_elements(:css, "#external_tool_button_dialog iframe").detect(&:displayed?) }
+    keep_trying_until { fj("#external_tool_button_dialog iframe:visible").should be_displayed }
 
     in_frame('external_tool_button_frame') do
-      keep_trying_until { driver.find_elements(:css, ".link").detect(&:displayed?) }
-      driver.find_element(:css, "#oembed_link").click
+      keep_trying_until { fj(".link:visible").should be_displayed}
+      f("#oembed_link").click
+      wait_for_ajax_requests
     end
-    keep_trying_until { !driver.find_element(:css, "#external_tool_button_dialog").displayed? }
+
+    wait_for_ajax_requests
+    f("#external_tool_button_dialog").should_not be_displayed
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should match(/ZB8T0193/)
   end

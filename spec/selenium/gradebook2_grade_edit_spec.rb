@@ -75,7 +75,7 @@ describe "edititing grades" do
     # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
 
     # clear our saved settings
-    driver.execute_script '$.store.clear();'
+    driver.execute_script 'localStorage.clear();'
   end
 
   it "should validate initial grade totals are correct" do

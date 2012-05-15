@@ -55,27 +55,15 @@
     float: right
 
 .announcements_list
-  padding-left: 20px
-  li
-    padding: 5px 10px
-    margin-bottom: 5px
-    .subject
-      font-size: 1.1em
-      font-weight: bold
-      float: left
-      img
-        padding-right: 5px
-    .delete_notification_link
-      float: right
-      +opacity(0.5)
-    .dates
-      font-size: 0.8em
-      border-bottom: 1px dotted #ccc
-      margin-bottom: 5px
-    .message
-      font-size: 0.8em
-    &:hover
-      background: #eee
-      +border-radius(5px)
-      .delete_notification_link
-        +opacity(1.0)
+  .alert
+    color: #666
+  .subject
+    font-size: 13px
+    font-weight: bold
+    img
+      padding-right: 5px
+  .message
+    border-top: 1px dotted #ccc
+    margin-top: 5px
+    padding-top: 5px
+    font-size: 11px

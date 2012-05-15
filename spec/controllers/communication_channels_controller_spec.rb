@@ -23,7 +23,7 @@ describe CommunicationChannelsController do
     it "should create a new CC unconfirmed" do
       user_model
       user_session(@user)
-      post 'create', :user_id => @user.id, :pseudonym => {:unique_id => 'jt@instructure.com'}, :path_type => 'email'
+      post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email'  }
       response.should be_success
       @user.communication_channels.length.should == 1
       @user.email_channel.should be_unconfirmed
@@ -35,7 +35,7 @@ describe CommunicationChannelsController do
       cc = u.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_model
       user_session(@user)
-      post 'create', :user_id => @user.id, :pseudonym => {:unique_id => 'jt@instructure.com'}, :path_type => 'email'
+      post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
       response.should be_success
       @user.communication_channels.length.should == 1
       @user.email_channel.should_not == cc
@@ -47,7 +47,7 @@ describe CommunicationChannelsController do
       user_model
       cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired' }
       user_session(@user)
-      post 'create', :user_id => @user.id, :pseudonym => {:unique_id => 'jt@instructure.com'}, :path_type => 'email'
+      post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
       response.should be_success
       @user.communication_channels.length.should == 1
       @user.email_channel.should be_unconfirmed
@@ -59,7 +59,7 @@ describe CommunicationChannelsController do
       user_model
       cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
-      post 'create', :user_id => @user.id, :pseudonym => {:unique_id => 'jt@instructure.com'}, :path_type => 'email'
+      post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
       response.should_not be_success
     end
   end

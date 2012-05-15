@@ -34,7 +34,7 @@ class ConversationsController < ApplicationController
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
   add_crumb(proc { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
-  # @API
+  # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
   #
   # @argument scope [optional, "unread"|"starred"|"archived"]
@@ -137,7 +137,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Create a conversation
   # Create a new conversation with one or more recipients. If there is already
   # an existing private conversation with the given recipients, it will be
   # reused.
@@ -206,7 +206,7 @@ class ConversationsController < ApplicationController
       :status => :bad_request
   end
 
-  # @API
+  # @API Get a single conversation
   # Returns information for a single conversation. Response includes all
   # fields that are present in the list/index action, as well as messages,
   # submissions, and extended participant information.
@@ -322,7 +322,7 @@ class ConversationsController < ApplicationController
                                          :submissions => submissions)
   end
 
-  # @API
+  # @API Edit a conversation
   # Updates attributes for a single conversation.
   #
   # @argument conversation[workflow_state] ["read"|"unread"|"archived"] Change the state of this conversation
@@ -359,14 +359,14 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Mark all as read
   # Mark all conversations as read.
   def mark_all_as_read
     @current_user.mark_all_conversations_as_read!
     render :json => {}
   end
 
-  # @API
+  # @API Delete a conversation
   # Delete this conversation and its messages. Note that this only deletes
   # this user's view of the conversation.
   #
@@ -389,7 +389,7 @@ class ConversationsController < ApplicationController
     render :json => jsonify_conversation(@conversation, :visible => false)
   end
 
-  # @API
+  # @API Add recipients
   # Add recipients to an existing group conversation. Response is similar to
   # the GET/show action, except that omits submissions and only includes the
   # latest message (e.g. "joe was added to the conversation by bob")
@@ -437,7 +437,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Add a message
   # Add a message to an existing conversation. Response is similar to the
   # GET/show action, except that omits submissions and only includes the
   # latest message (i.e. what we just sent)
@@ -491,7 +491,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Delete a message
   # Delete messages from this conversation. Note that this only affects this user's view of the conversation.
   # If all messages are deleted, the conversation will be as well (equivalent to DELETE)
   #
@@ -520,7 +520,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Find recipients
   # Find valid recipients (users, courses and groups) that the current user
   # can send messages to.
   #
@@ -950,21 +950,35 @@ class ConversationsController < ApplicationController
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
-    message = conversation.add_message(params[:body], :attachment_ids => params[:attachment_ids], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :root_account_id => @domain_root_account.id, :tags => @tags) do |m|
-      media_id = params[:media_comment_id]
-      media_type = params[:media_comment_type]
-      if media_id.present? && media_type.present?
-        media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
-        if media_comment
-          media_comment.context = @current_user
-          media_comment.save
-          m.media_comment = media_comment
-          m.save
-        end
-      end
-    end
+    message = conversation.add_message(
+                params[:body],
+                :attachment_ids => params[:attachment_ids],
+                :forwarded_message_ids => params[:forwarded_message_ids],
+                :update_for_sender => update_for_sender,
+                :root_account_id => @domain_root_account.id,
+                :tags => @tags,
+                :media_comment => infer_media_comment
+              )
     message.generate_user_note if params[:user_note]
     message
+  end
+
+  def infer_media_comment
+    media_id = params[:media_comment_id]
+    media_type = params[:media_comment_type]
+    if media_id.present? && media_type.present?
+      media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
+      unless media_comment
+        media_comment ||= MediaObject.new
+        media_comment.media_type = media_type
+        media_comment.media_id = media_id
+        media_comment.root_account_id = @domain_root_account.id
+        media_comment.user = @current_user
+      end
+      media_comment.context = @current_user
+      media_comment.save
+      media_comment
+    end
   end
 
   def jsonify_conversation(conversation, options = {})

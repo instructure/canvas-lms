@@ -27,12 +27,7 @@ define([
       });
     });
     $(".datetime_field").datetime_field();
-    $(".add_notification_link").click(function(event) {
-      event.preventDefault();
-      $("#add_notification_form").slideToggle(function() {
-        $("#add_notification_form textarea:not(.enabled)").addClass('enabled').editorBox();
-      });
-    });
+    $("#add_notification_form textarea").editorBox().width('100%');
     $("#add_notification_form .datetime_field").bind('blur change', function() {
       var date = Date.parse($(this).val());
       if(date) {

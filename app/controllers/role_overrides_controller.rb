@@ -39,7 +39,7 @@ class RoleOverridesController < ApplicationController
   
   include Api::V1::Role
 
-  # @API
+  # @API Create an admin role
   # Create a new admin role (admin membership type).
   #
   # @argument role
@@ -233,7 +233,7 @@ class RoleOverridesController < ApplicationController
     end
   end
 
-  # @API
+  # @API Update an admin role
   # Update permissions for an existing role.
   #
   # Recognized roles are:

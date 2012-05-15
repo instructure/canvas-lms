@@ -231,7 +231,7 @@ require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* scrollSidebar, /\$\.uniq/ */,
+  'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */
 ], function(I18n, $) {
 
@@ -257,7 +257,7 @@ $(document).ready(function() {
       var question_name = $tr.find("td .question_name").text();
       ids = ids.split(",");
       var uncounted = responses - ids.length;
-      var unique_ids = $.uniq(ids);
+      var unique_ids = $.unique(ids);
       for(var idx in unique_ids) {
         var id = unique_ids[idx];
         var cnt = $.grep(ids, function(i) { return i == id; }).length;

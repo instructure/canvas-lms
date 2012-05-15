@@ -1,5 +1,4 @@
 --colour
---require spec/nested_instafail_formatter
+--require ./spec/nested_instafail_formatter.rb
 --format RSpec::NestedInstafailFormatter
 --format html:tmp/spec_html/index.html
-

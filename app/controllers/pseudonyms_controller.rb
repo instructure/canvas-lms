@@ -26,7 +26,7 @@ class PseudonymsController < ApplicationController
 
   include Api::V1::Pseudonym
 
-  # @API
+  # @API List user logins
   # Given a user ID, return that user's logins for the given account.
   #
   # @argument user[id] The ID of the user to search on.
@@ -144,7 +144,7 @@ class PseudonymsController < ApplicationController
     @pseudonym = @current_user.pseudonyms.build(:account_id => @domain_root_account.id)
   end
 
-  # @API
+  # @API Create a user login
   # Create a new login for an existing user in the given account.
   #
   # @argument user[id] The ID of the user to create the login for.
@@ -211,7 +211,7 @@ class PseudonymsController < ApplicationController
   end
   protected :get_user
 
-  # @API
+  # @API Edit a user login
   # Update an existing login for a user in the given account.
   #
   # @argument login[unique_id] The new unique ID for the login.
@@ -263,7 +263,7 @@ class PseudonymsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Delete a user login
   # Delete an existing login.
   #
   # @example_request
