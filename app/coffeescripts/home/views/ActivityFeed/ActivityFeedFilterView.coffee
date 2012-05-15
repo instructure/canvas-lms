@@ -20,10 +20,7 @@ define [
       event.preventDefault()
       $el = $ event.target
       value = $el.data 'value'
-      @filterFeed value
-
-    filterFeed: (query) ->
-      console.log "clicked: #{query}"
+      @trigger 'filter', value
 
     addCourse: (course) =>
       id = course.get 'id'

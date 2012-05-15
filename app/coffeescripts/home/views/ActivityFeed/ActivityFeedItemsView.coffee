@@ -5,11 +5,20 @@ define [
 
   class ActivityFeedItemsCollection extends Collection
     model: Model.extend()
-    url: '/api/v1/users/self/activity_stream'
+    urlKey: 'everything'
+    filter: ''
+    urls:
+      everything: '/api/v1/users/self/activity_stream'
+      course: '/api/v1/courses/:filter/activity_stream'
+    url: ->
+      @urls[@urlKey].replace /:filter/, @filter
+
+
 
   class ActivityFeedItemsView extends View
 
     initialize: ->
+      super
       @collection ?= new ActivityFeedItemsCollection
       @collection.on 'add', @addActivityFeedItem
       @collection.on 'reset', @resetActivityFeedItems
@@ -21,7 +30,21 @@ define [
       @$itemList.append view.el
 
     resetActivityFeedItems: =>
+      @$itemList.empty()
       @collection.each @addActivityFeedItem
+
+    filterByKey: (key) =>
+      filter = @parseKey key
+      @collection.urlKey = filter.type
+      @collection.filter = filter.value
+      @$itemList.html('<li>loading</li>')
+      @collection.fetch()
+
+    ##
+    # Splits something like "course:123" into {type: 'course', value: 123}
+    parseKey: (key) ->
+      matches = key.match /(.+):(.+)/
+      {type: matches[1], value: matches[2]}
 
     render: ->
       @$el.html """
