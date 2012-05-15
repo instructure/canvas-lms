@@ -2,17 +2,7 @@ class MoveContentExportNotificationsToMigrationCategory < ActiveRecord::Migratio
   tag :postdeploy
 
   def self.up
-    Notification.update_all({ :category => 'Migration' }, 
-                            { :name => ['Content Export Finished', 'Content Export Failed'] })
-      
-    # send immediate notifications only work if you DON'T have a policy for that notification
-    ids = Notification.scoped(
-      :select => :id,
-      :conditions => { :category => 'Migration' }
-    ).map(&:id)
-    if ids.present?
-      NotificationPolicy.destroy_all(:notification_id => ids)
-    end
+    DataFixup::MoveContentExportNotificationsToMigrationCategory.send_later_if_production(:run)
   end
 
   def self.down
