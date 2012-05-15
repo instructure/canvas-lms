@@ -1,3 +1,118 @@
+canvas-lms (2012.05.26.01) testing; urgency=low
+
+  * Package ref: 5b8fd5f154fc801c298e0d1e2150eb13ec4b9f89
+  *
+  * [+b1598d8] don't display un-dated assignments first fixes #7859
+  * [+3172e45] use display name for files in downloaded zips fixes #6731
+  * [+4213b79] pull submit_homework javascript out of view; refs #8145
+  * [+76f1964] spec: add qUnit spec for fixDialogButtons
+  * [+0d7e89f] markup only hide/show toggling of element/dialog
+  * [+8616fcf] add all of twitter bootstrap
+  * [+b3d86dd] use bootstrap for 'alert' style blocks
+  * [+8bd98c3] prettier notifications in discussions replies
+  * [+3bd75cd] spec: add coverage for admin merge feature
+  * [+05fa8d8] don't allow date-inactive teachers to get read-only access to courses
+  * [+e34ae57] Show term info when you show course name, fixes #6837
+  * [+565aa58] show peer reviewers their previous rubric comments fixes #7841
+  * [+69aefd2] don't rename assignment to match subtopic; fixes #7357
+  * [+5d73483] allow setting date overrides for designers fixes #8289
+  * [+ea338f1] make all css/js standalone in 500 error page, fixes: #7944
+  * [+3e535c8] spec: site_admin and external_tool modifications
+  * [+5696a08] consistency fix: minor text change in course copy
+  * [+0c620c5] don't open links in a new tab fixes #8001
+  * [+0510d80] create media object if it doesn't exist, fixes #8420
+  * [+f1e441b] use latest complete version for quiz statistics; fixes #8106
+  * [+e7f0c6b] tweak turnitin css typo
+  * [+236aa1a] remove $.uniqueId in favor of _.uniqueId
+  * [+391ba07] don't special-case click events in cog menus in discussions
+  * [+0a3008e] force content migration emails to send immediately; fixes #8318
+  * [+37c15d2] properly handle time manipulations around DST-end
+  * [+38834d4] unset deleted module requirements in DOM; fixes #8329
+  * [+8a34204] Don't show time for assignments due at midnight
+  * [+5c1a7ef] link to appointment group from calendar event popup
+  * [+4725d3a] don't allow students to edit graded discussions, fixes: #7289
+  * [+1f6e2d3] use! config'd slickgrid
+  * [+ffe2a36] add communication_channel#index api. fixes #8279.
+  * [+425cbc0] don't delete the api docs output dir on every rake run
+  * [+d8bd6bb] make canvas Y3K-compliant
+  * [+a54ad63] spec: make wiki files and images specs less brittle
+  * [+581fe43] api documentation updates
+  * [+f69a8c1] don't allow resize of textarea fixes #8458
+  * [+21a378c] spec: admin courses spec
+  * [+af39561] fix sis import of email addresses that match active and retired addresses
+  * [+50217e5] Disable "Show Question Details" when quiz has > 25 questions and show message. Fixes #7860
+  * [+7f6b72f] Minor fixes to StudentEnrollment associations.
+  * [+ba048b5] auto-fill course dates on course copy content page
+  * [+757e666] make discussions accessible, fixes #7980
+  * [+b2a05ba] remove $.uniq in favor of _.uniq or $.unique
+  * [+403696c] don't add assignment_ids to submissions api params
+  * [+0d36b31] spec: clean up / add to course copy specs
+  * [+873f374] check for existing deleted attachments when cloning
+  * [+8beb4e0] only perform batch sis removal for the types of data that were supplied
+  * [+b92c17f] don't infer the current user for nil DiscussionTopic#user in the stream
+  * [+450b8b6] testing updating parallelized_specs gem
+  * [+cb10d7b] fix group memberships not loading in ie8, fixes: #7732
+  * [+994bfeb] fix ungraded counts, fixes #7774
+  * [+4d5b72f] Link new RubricAssociation to existing assessment_requests Fixes #7837
+  * [+75c491a] spec: fix intermittent profile pic spec
+  * [+ef6801d] don't check/uncheck "notify users" on every click in IE9, fixes #8196
+  * [+eca5534] use userSettings instead of $.store.userGet
+  * [+3ab5ecf] handle duplicate periodic jobs
+  * [+264a14e] copy rubrics associated with assignment even when not selected
+  * [+b17f5a0] add CommunicationChannel#create api. refs #8280.
+  * [+ee7f9af] add canvas:check_static_assets rake task
+  * [+ae07778] include course ids in grade publishing csv fixes gh#164
+  * [+4381bc1] don't store entire OAuth request token object in session
+  * [+3a51131] selectively copy learning outcomes groups on course copy
+  * [+9a3c9c4] fix javascript check for submission file attachments; fixes #8086
+  * [+671f046] remove page views from the counts report
+  * [+038cee8] strip tags from HTML multiple-choice answers for stats fixes #8116
+  * [+d048903] add delete communication channel api action. refs #8471.
+  * [+2ef6608] allow immediate module progression from quizzes
+  * [+f58a1ae] csv stats: deal with incomplete multiple-blanks submissions
+  * [+a3eb848] Don't let browser cache user answers on quiz in text inputs. Fixes #8504
+  * [+3720aee] Order user's PageView list as CSV with most recent first. Fixes #7474
+  * [+5adc620] Prevent quiz form from submitting on ENTER in input. Fixes #8293
+  * [+0c004fc] prepare for foreign keys refs #6895
+  * [+b3bd68d] remove sizes from user content video tags in api responses
+  * [+b2befdf] optimize delayed job queue pops on psql
+  * [+3b44795] fix 'more options' url if clicked from sidebar, fixes #8335
+  * [+0ec3ed5] collections models and api
+  * [+393ba3a] make courses#workflow_state sis sticky fixes #8258
+  * [+e36108c] unambiguify reference to package identifier class
+  * [+97bbeb4] fix truncate_all_tables for non-postgres
+  * [+f6d79b6] when copying modules include all associated items
+  * [+c2fe0a9] added contextColors module
+  * [+23ceb19] actually remove stuff from sessions
+  * [+bd60d00] attachment_fu fixes for 1.9 compat
+  * [+df8b231] disallow enabling peer review on group discussion assignment, fixes: #7242
+  * [+59843ec] preserve module item attributes when indenting; fixes #8386
+  * [+72be6ba] fix immediate migration notifications
+  * [+2b5fb68] remove unwanted info in rubric comments dialog
+  * [+b3c87b3] Show assignments as not submitted when they're auto-created, fixes #7425
+  * [+d50f745] Don't display locked assignments in "To Do" area. Fixes #6610
+  * [+05ed909] make nextThumbnail a little more efficient
+  * [+647bff7] copy published state for surveys/practice quizzes
+  * [+45d6cc3] added View.mixin method
+  * [+701a50f] fix accepting invitation when logged in as a different user fixes #8358
+  * [+07a3e14] use ruby-debug19 in ruby 1.9
+  * [+5433f63] fixes for ruby 1.9.3
+  * [+3eb5c01] update ruby-saml gem
+  * [+11d0198] log the entire SAMLResponse text
+  * [+ad6c1d8] upgrade ruby-saml gem
+  * [+cd1329d] saved quiz attempts not auto-submitted at due time, fixes #7933
+  * [+54abc87] mark collections api as beta
+  * [+0f2fd5a] Spec: admin permissions, admin users
+  * [+7ecd238] 1.9.3 fixes
+  * [+8e4b59a] switch back to the master to save results of CountsReport
+  * [+dced113] return the html_url with all stream item types in the api response
+  * [+e2d6cf8] switch to debugger gem for 1.9
+  * [+6ebf3e0] upgrade ruby-saml gem
+  * [+bfd6a98] moved js out of context_modules/_content fixes #8591
+  * [+5b8fd5f] score unknown question types as 0 / points_possible
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 15 May 2012 10:23:43 -0600
+
 canvas-lms (2012.05.12.12) testing; urgency=low
 
   * Package ref: d74259871c1232a8e9b9474011c885a4fd34f4b9
