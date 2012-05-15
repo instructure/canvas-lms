@@ -43,6 +43,13 @@
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
     </td>
   </tr>
+  <tr>
+    <td><%= f.blabel :bio, :en => "Bio" %></td>
+    <td>
+      <span class="display_data"><%= @user.bio %></span>
+      <%= f.text_area :bio, :class => :edit_data, :id => 'user_bio' %>
+    </td>
+  </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
   <% if active_email_channels.length > 1 %>
     <tr>
