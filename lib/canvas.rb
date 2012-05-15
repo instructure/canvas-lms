@@ -136,4 +136,41 @@ module Canvas
     end
     @revision ||= false
   end
+
+  # protection against calling external services that could timeout or misbehave.
+  # we keep track of timeouts in redis, and if a given service times out more
+  # than X times before the redis key expires in Y seconds (reset on each
+  # failure), we stop even trying to contact the service until the Y seconds
+  # passes.
+  #
+  # if redis isn't enabled, we'll still apply the timeout, but we won't track failures.
+  #
+  # all the configurable params have service-specific Settings with fallback to
+  # generic Settings.
+  def self.timeout_protection(service_name)
+    redis_key = "service:timeouts:#{service_name}"
+    if Canvas.redis_enabled?
+      cutoff = (Setting.get_cached("service_#{service_name}_cutoff", nil) || Setting.get_cached("service_generic_cutoff", 3.to_s)).to_i
+      error_count = Canvas.redis.get(redis_key)
+      if error_count.to_i >= cutoff
+        Rails.logger.error("Skipping service call due to error count: #{service_name} #{error_count}")
+        return
+      end
+    end
+
+    timeout = (Setting.get_cached("service_#{service_name}_timeout", nil) || Setting.get_cached("service_generic_timeout", 15.seconds.to_s)).to_f
+    Timeout.timeout(timeout) do
+      yield
+    end
+  rescue Timeout::Error => e
+    ErrorReport.log_exception(:service_timeout, e)
+    if Canvas.redis_enabled?
+      error_ttl = (Setting.get_cached("service_#{service_name}_error_ttl", nil) || Setting.get_cached("service_generic_error_ttl", 1.minute.to_s)).to_i
+      Canvas.redis.pipelined do
+        Canvas.redis.incrby(redis_key, 1)
+        Canvas.redis.expire(redis_key, error_ttl)
+      end
+    end
+    return nil
+  end
 end

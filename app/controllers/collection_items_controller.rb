@@ -87,7 +87,7 @@
 #       url: "https://<canvas>/api/v1/collections/2/items/7"
 #     }
 class CollectionItemsController < ApplicationController
-  before_filter :require_collection
+  before_filter :require_collection, :except => [:link_data]
 
   include Api::V1::Collection
 
@@ -307,6 +307,23 @@ class CollectionItemsController < ApplicationController
         @upvote.destroy
       end
       render :json => { "ok" => true }
+    end
+  end
+
+  # non-api action, canvas uses this internally to pull the information about the linked url
+  # currently this uses embed.ly
+  #
+  # for apps other than canvas that create collection items, we'll still use
+  # embed.ly in the back-end to get the embed data, and an image url if none is
+  # given. but that'll happen when creating the item, rather than before.
+  def link_data
+    if @current_user
+      data = Canvas::Embedly.new(params[:url])
+      # if embedly returns any kind of error, we return a data response with
+      # all fields set to null
+      render :json => data
+    else
+      render :nothing => true, :status => :unauthorized
     end
   end
 
