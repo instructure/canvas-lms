@@ -42,15 +42,18 @@ module Api::V1::Collection
 
   def collection_items_json(items, current_user, session)
     # TODO: sharding
-    CollectionItem.send(:preload_associations, items, :collection_item_data)
+    CollectionItem.send(:preload_associations, items, { :collection_item_data => :image_attachment })
 
     CollectionItemData.load_upvoted_by_user(items.map(&:collection_item_data), current_user)
 
     items.map do |item|
       hash = api_json(item, current_user, session, API_COLLECTION_ITEM_JSON_OPTS)
       hash['url'] = api_v1_collection_item_url(item.collection, item)
-      hash['image_url'] = nil # TODO: images
-      hash.merge!(api_json(item.collection_item_data, current_user, session, API_COLLECTION_ITEM_DATA_JSON_OPTS))
+      item_data = item.collection_item_data
+      hash['image_pending'] = item_data.image_pending
+      image = item_data.image_attachment
+      hash['image_url'] = image && thumbnail_image_url(image, image.uuid)
+      hash.merge!(api_json(item_data, current_user, session, API_COLLECTION_ITEM_DATA_JSON_OPTS))
       hash
     end
   end

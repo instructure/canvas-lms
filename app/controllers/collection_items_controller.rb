@@ -37,6 +37,9 @@
 #       // The ID of the collection that this item belongs to.
 #       collection_id: 2,
 #
+#       // The ID of the user that created the collection item.
+#       user_id: 37,
+#
 #       // The type of the item.
 #       // The only type currently defined is "url", but api consumers should
 #       // expect new types to be returned in the future and handle that
@@ -67,10 +70,15 @@
 #       root_item_id: 3,
 #
 #       // An image representation of the collection item. This will be in a
-#       // common web format such as png or jpeg. The resolution may depend on
-#       // the item, but canvas will make every attempt to use a resolution
-#       // appropriate for full-size viewing.
+#       // common web format such as png or jpeg. The resolution and geometry may depend on
+#       // the item, but Canvas will attempt to make it at least 200px in one
+#       // direction when possible.
 #       image_url: "https://<canvas>/files/item_image.png",
+#
+#       // If true, the image for this item is still being processed and
+#       // image_url will be null. Check back later.
+#       // If image_url is null but image_pending is false, the item has no image.
+#       image_pending: false,
 #
 #       // The user-provided description of the item. This is plain text.
 #       description: "some block of plain text",
@@ -166,6 +174,10 @@ class CollectionItemsController < ApplicationController
   #
   # @argument description The plain-text description of the item.
   #
+  # @argument image_url The URL of the image to use for this item. If no image
+  #   url is provided, canvas will try to automatically determine an image
+  #   representation for the link.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
   #          -F link_url="http://www.google.com/" \ 
@@ -182,7 +194,8 @@ class CollectionItemsController < ApplicationController
     if authorized_action(@collection, @current_user, :update)
       item_data = CollectionItemData.data_for_url(params[:link_url] || "", @current_user)
       return render_unauthorized_action unless item_data
-      @item = @collection.collection_items.new(:collection_item_data => item_data)
+      item_data.image_url = params[:image_url] if item_data.new_record?
+      @item = @collection.collection_items.new(:collection_item_data => item_data, :user => @current_user)
       @item.attributes = params.slice(*ITEM_SETTABLE_ATTRIBUTES)
 
       if @item.errors.empty? && @item.save

@@ -22,10 +22,12 @@ class CollectionItem < ActiveRecord::Base
 
   belongs_to :collection
   belongs_to :collection_item_data
+  alias :data :collection_item_data
+  belongs_to :user
 
-  attr_accessible :collection, :collection_item_data, :description
+  attr_accessible :collection, :collection_item_data, :description, :user
 
-  validates_presence_of :collection, :collection_item_data
+  validates_presence_of :collection, :collection_item_data, :user
   validates_associated :collection_item_data
   validates_as_readonly :collection_item_data_id, :collection_id
 

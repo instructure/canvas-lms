@@ -743,7 +743,7 @@ Spec::Runner.configure do |config|
     Attachment.local_storage?.should eql(true)
   end
 
-  def run_job(job)
+  def run_job(job = Delayed::Job.last(:order => :id))
     Delayed::Worker.new.perform(job)
   end
 
