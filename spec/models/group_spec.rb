@@ -34,31 +34,33 @@ describe Group do
     @group.wiki.should eql(WikiNamespace.default_for_context(@group).wiki)
   end
   
-  it "should not be public" do
+  it "should be private by default" do
     @group.is_public.should be_false
   end
   
-  it "should find all peer groups" do
-    context = course_model
-    group_category = context.group_categories.create(:name => "worldCup")
-    other_category = context.group_categories.create(:name => "other category")
-    group1 = Group.create!(:name=>"group1", :group_category => group_category, :context => context)
-    group2 = Group.create!(:name=>"group2", :group_category => group_category, :context => context)
-    group3 = Group.create!(:name=>"group3", :group_category => group_category, :context => context)
-    group4 = Group.create!(:name=>"group4", :group_category => other_category, :context => context)
-    group1.peer_groups.length.should == 2
-    group1.peer_groups.should be_include(group2)
-    group1.peer_groups.should be_include(group3)
-    group1.peer_groups.should_not be_include(group1)
-    group1.peer_groups.should_not be_include(group4)
-  end
-  
-  it "should not find peer groups for student organized groups" do
-    context = course_model
-    group_category = GroupCategory.student_organized_for(context)
-    group1 = Group.create!(:name=>"group1", :group_category=>group_category, :context => context)
-    group2 = Group.create!(:name=>"group2", :group_category=>group_category, :context => context)
-    group1.peer_groups.should be_empty
+  context "#peer_groups" do
+    it "should find all peer groups" do
+      context = course_model
+      group_category = context.group_categories.create(:name => "worldCup")
+      other_category = context.group_categories.create(:name => "other category")
+      group1 = Group.create!(:name=>"group1", :group_category => group_category, :context => context)
+      group2 = Group.create!(:name=>"group2", :group_category => group_category, :context => context)
+      group3 = Group.create!(:name=>"group3", :group_category => group_category, :context => context)
+      group4 = Group.create!(:name=>"group4", :group_category => other_category, :context => context)
+      group1.peer_groups.length.should == 2
+      group1.peer_groups.should be_include(group2)
+      group1.peer_groups.should be_include(group3)
+      group1.peer_groups.should_not be_include(group1)
+      group1.peer_groups.should_not be_include(group4)
+    end
+    
+    it "should not find peer groups for student organized groups" do
+      context = course_model
+      group_category = GroupCategory.student_organized_for(context)
+      group1 = Group.create!(:name=>"group1", :group_category=>group_category, :context => context)
+      group2 = Group.create!(:name=>"group2", :group_category=>group_category, :context => context)
+      group1.peer_groups.should be_empty
+    end
   end
   
   context "atom" do
@@ -73,7 +75,7 @@ describe Group do
     end
   end
   
-  context "enrollment" do
+  context "add_user" do
     it "should be able to add a person to the group" do
       user_model
       pseudonym_model(:user_id => @user.id)
@@ -93,7 +95,7 @@ describe Group do
       @group.users.count.should == 1
     end
     
-    it "adding a user should remove that user from peer groups" do
+    it "should remove that user from peer groups" do
       context = course_model
       group_category = context.group_categories.create!(:name => "worldCup")
       group1 = Group.create!(:name=>"group1", :group_category=>group_category, :context => context)
@@ -108,40 +110,29 @@ describe Group do
       group1.reload
       group1.users.should_not be_include(@user)
     end
-    
-    # it "should be able to add more than one person at a time" do
-      # user_model
-      # p1 = pseudonym_model(:user_id => @user.id)
-      # u1 = p1.user
-      # user_model
-      # p2 = pseudonym_model(:user_id => @user.id)
-      # u2 = p2.user
-      # @group.add_user([u1, u2])
-      # @group.users.should be_include(u1)
-      # @group.users.should be_include(u2)
-    # end
-    
-    it "should be able to add a person as a user instead as a pseudonym" do
-      user_model
-      @group.add_user(@user)
-      @group.users.should be_include(@user)
+
+    it "should add a user at the right workflow_state by default" do
+      pending "waiting to turn off auto join functionality"
+      {
+        'invitation_only'          => 'invited',
+        'parent_context_request'   => 'requested',
+        'parent_context_auto_join' => 'accepted'
+      }.each do |join_level, workflow_state|
+        usr = user_model
+        grp = group_model(:join_level => join_level)
+        grp.add_user(usr)
+        grp.group_memberships.scoped(:conditions => { :workflow_state => workflow_state }).map(&:user_id).should be_include usr.id
+      end
     end
-    
-    it "should be able to add a person with a user id" do
-      user_model
-      @group.add_user(@user)
-      @group.users.should be_include(@user)
+
+    it "should allow specifying a workflow_state" do
+      pending "waiting to turn off auto join functionality"
+      [ 'invited', 'requested', 'accepted' ].each do |workflow_state|
+        usr = user_model
+        @group.add_user(usr, workflow_state)
+        @group.group_memberships.scoped(:conditions => { :workflow_state => workflow_state }).map(&:user_id).should be_include usr.id
+      end
     end
-    
-    # it "should be able to add a person from their communication channel" do
-      # user_model
-      # communication_channel_model
-      # @group.users.should_not be_include(@user)
-      # @cc.user.should eql(@user)
-      # @group.add_user(@user)
-      # @group.users.should be_include(@user)
-    # end
-    
   end
 
   it "should grant manage permissions for associated objects to group managers" do
@@ -204,75 +195,130 @@ describe Group do
 
   context "auto_accept?" do
     it "should be false unless join level is 'parent_context_auto_join'" do
-      course_with_teacher
-      student = user_model
-      @course.enroll_student(student)
-      @course.reload
+      course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
-      group = @course.groups.create(:group_category => group_category)
-      group.auto_accept?(student).should be_false
+      group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
+      group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
+      group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
+      [group1, group2, group3].map{|g| g.auto_accept?(@student)}.should == [true, false, false]
     end
 
-    it "should be false unless the group is student organized" do
-      course_with_teacher
-      student = user_model
-      @course.enroll_student(student)
-      @course.reload
+    it "should be false unless the group is student organized or a community" do
+      course_with_student
+      @account = @course.root_account
 
-      group_category = @course.group_categories.create(:name => "random category")
-      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
-      group.auto_accept?(student).should be_false
-    end
-
-    it "should be true otherwise" do
-      course_with_teacher
-      student = user_model
-      @course.enroll_student(student)
-      @course.reload
-
-      group_category = GroupCategory.student_organized_for(@course)
-      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
-      group.auto_accept?(student).should be_true
+      jl = 'parent_context_auto_join'
+      group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
+      group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
+      group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
+      [group1, group2, group3].map{|g| g.auto_accept?(@student)}.should == [false, true, true]
     end
   end
 
   context "allow_join_request?" do
     it "should be false unless join level is 'parent_context_auto_join' or 'parent_context_request'" do
-      course_with_teacher
-      student = user_model
-      @course.enroll_student(student)
-      @course.reload
+      course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
-      group = @course.groups.create(:group_category => group_category)
-      group.allow_join_request?(student).should be_false
+      group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
+      group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
+      group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
+      [group1, group2, group3].map{|g| g.allow_join_request?(@student)}.should == [true, true, false]
     end
 
-    it "should be false unless the group is student organized" do
-      course_with_teacher
-      student = user_model
-      @course.enroll_student(student)
-      @course.reload
+    it "should be false unless the group is student organized or a community" do
+      course_with_student
+      @account = @course.root_account
 
-      group_category = @course.group_categories.create(:name => "random category")
-      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
-      group.allow_join_request?(student).should be_false
+      jl = 'parent_context_auto_join'
+      group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
+      group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
+      group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
+      [group1, group2, group3].map{|g| g.allow_join_request?(@student)}.should == [false, true, true]
     end
+  end
 
-    it "should be true otherwise" do
-      course_with_teacher
-      student = user_model
-      @course.enroll_student(student)
-      @course.reload
+  context "allow_self_signup?" do
+    it "should follow the group category self signup option" do
+      course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
+      group_category.configure_self_signup(true, false)
+      group_category.save!
+      group1 = @course.groups.create(:group_category => group_category)
+      group1.allow_self_signup?(@student).should be_true
 
-      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
-      group.allow_join_request?(student).should be_true
+      group_category.configure_self_signup(true, true)
+      group_category.save!
+      group2 = @course.groups.create(:group_category => group_category)
+      group2.allow_self_signup?(@student).should be_true
 
-      group = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
-      group.allow_join_request?(student).should be_true
+      group_category.configure_self_signup(false, false)
+      group_category.save!
+      group3 = @course.groups.create(:group_category => group_category)
+      group3.allow_self_signup?(@student).should be_false
+    end
+
+    it "should correctly handle restricted course sections" do
+      course_with_student
+      @other_section = @course.course_sections.create!(:name => "Other Section")
+      @other_student = @course.enroll_student(user_model, {:section => @other_section}).user
+
+      group_category = GroupCategory.student_organized_for(@course)
+      group_category.configure_self_signup(true, true)
+      group_category.save!
+      group1 = @course.groups.create(:group_category => group_category)
+      group1.allow_self_signup?(@student).should be_true
+      group1.add_user(@student)
+      group1.reload
+      group1.allow_self_signup?(@other_student).should be_false
+    end
+  end
+
+  context "has_member?" do
+    it "should be true for accepted memberships, regardless of moderator flag" do
+      @user1 = user_model
+      @user2 = user_model
+      @user3 = user_model
+      @user4 = user_model
+      @user5 = user_model
+
+      @group.add_user(@user1, 'accepted')
+      @group.add_user(@user2, 'accepted')
+      @group.add_user(@user3, 'invited')
+      @group.add_user(@user4, 'requested')
+      @group.add_user(@user5, 'rejected')
+      GroupMembership.update_all({:moderator => true}, {:group_id => @group.id, :user_id => @user2.id})
+
+      @group.has_member?(@user1).should be_true
+      @group.has_member?(@user2).should be_true
+      @group.has_member?(@user3).should be_true # false when we turn auto_join off
+      @group.has_member?(@user4).should be_true # false when we turn auto_join off
+      @group.has_member?(@user5).should be_false
+    end
+  end
+
+  context "has_moderator?" do
+    it "should be true for accepted memberships, with moderator flag" do
+      @user1 = user_model
+      @user2 = user_model
+      @user3 = user_model
+      @user4 = user_model
+      @user5 = user_model
+
+      @group.add_user(@user1, 'accepted')
+      @group.add_user(@user2, 'accepted')
+      @group.add_user(@user3, 'invited')
+      @group.add_user(@user4, 'requested')
+      @group.add_user(@user5, 'rejected')
+      GroupMembership.update_all({:moderator => true}, {:group_id => @group.id, :user_id => [@user2.id, @user3.id, @user4.id, @user5.id]})
+
+      @group.has_moderator?(@user1).should be_false
+      @group.has_moderator?(@user2).should be_true
+      @group.has_moderator?(@user3).should be_true # false when we turn auto_join off
+      @group.has_moderator?(@user4).should be_true # false when we turn auto_join off
+      @group.has_moderator?(@user5).should be_false
     end
   end
 

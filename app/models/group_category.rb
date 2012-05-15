@@ -43,18 +43,23 @@ class GroupCategory < ActiveRecord::Base
       role_category_for_context('imported', context)
     end
 
+    def communities_for(context)
+      role_category_for_context('communities', context)
+    end
+
     protected
     def name_for_role(role)
       case role
       when 'student_organized' then t('group_categories.student_organized', "Student Groups")
       when 'imported'          then t('group_categories.imported', "Imported Groups")
+      when 'communities'       then t('group_categories.communities', "Communities")
       end
     end
 
     def protected_roles_for_context(context)
       case context
       when Course  then ['student_organized', 'imported']
-      when Account then ['imported']
+      when Account then ['communities', 'imported']
       else              []
       end
     end
@@ -74,12 +79,26 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  def communities?
+    self.role == 'communities'
+  end
+
   def student_organized?
     self.role == 'student_organized'
   end
 
   def protected?
     self.role.present?
+  end
+
+  def allows_multiple_memberships?
+    self.student_organized? || self.communities?
+  end
+
+  # Communities can be joined by anyone,
+  # otherwise defer to the permission on the context
+  def available_for?(user)
+    self.communities? || (self.context && self.context.grants_right?(user, :participate_in_groups))
   end
 
   # this is preferred over setting self_signup directly. know that if you set

@@ -60,6 +60,28 @@ describe GroupCategory do
     end
   end
 
+  context "communities_for" do
+    it "should be nil in courses" do
+      course_model
+      GroupCategory.communities_for(@course).should be_nil
+    end
+
+    it "should be a category belonging to the account with role 'communities'" do
+      account = Account.default
+      category = GroupCategory.communities_for(account)
+      category.should_not be_nil
+      category.role.should eql('communities')
+      category.context.should eql(account)
+    end
+
+    it "should be the the same category every time for the same account" do
+      account = Account.default
+      category1 = GroupCategory.communities_for(account)
+      category2 = GroupCategory.communities_for(account)
+      category1.id.should eql(category2.id)
+    end
+  end
+
   context "imported_for" do
     it "should be a category belonging to the account with role 'imported' in accounts" do
       account = Account.default
@@ -94,6 +116,33 @@ describe GroupCategory do
       GroupCategory.imported_for(course).should_not be_student_organized
       GroupCategory.imported_for(course).should_not be_student_organized
       course.group_categories.create(:name => 'Random Category').should_not be_student_organized
+      GroupCategory.communities_for(account).should_not be_student_organized
+    end
+  end
+
+  context 'communities?' do
+    it "should be true iff the role is 'communities', regardless of name" do
+      account = Account.default
+      course = course_model
+      GroupCategory.student_organized_for(course).should_not be_communities
+      account.group_categories.create(:name => 'Communities').should_not be_communities
+      GroupCategory.imported_for(course).should_not be_communities
+      GroupCategory.imported_for(course).should_not be_communities
+      course.group_categories.create(:name => 'Random Category').should_not be_communities
+      GroupCategory.communities_for(account).should be_communities
+    end
+  end
+
+  context 'allows_multiple_memberships?' do
+    it "should be true iff the category is student organized or communities" do
+      account = Account.default
+      course = course_model
+      GroupCategory.student_organized_for(course).allows_multiple_memberships?.should be_true
+      account.group_categories.create(:name => 'Student Groups').allows_multiple_memberships?.should be_false
+      GroupCategory.imported_for(course).allows_multiple_memberships?.should be_false
+      GroupCategory.imported_for(course).allows_multiple_memberships?.should be_false
+      course.group_categories.create(:name => 'Random Category').allows_multiple_memberships?.should be_false
+      GroupCategory.communities_for(account).allows_multiple_memberships?.should be_true
     end
   end
 
@@ -106,6 +155,7 @@ describe GroupCategory do
       GroupCategory.imported_for(course).should be_protected
       GroupCategory.imported_for(course).should be_protected
       course.group_categories.create(:name => 'Random Category').should_not be_protected
+      GroupCategory.communities_for(account).should be_protected
     end
   end
 
