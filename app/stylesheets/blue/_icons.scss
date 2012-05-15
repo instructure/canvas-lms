@@ -6,7 +6,7 @@ i[class*=icon-], i[class^=icon-] {
   background-repeat: no-repeat;
 }
 
-i[class*=icon-large], i[class^=icon-large] {
+i[class*=icon-large-], i[class^=icon-large-] {
   width: 46px;
   height: 46px;
   line-height: 46px;
@@ -29,11 +29,11 @@ i[class*=icon-large], i[class^=icon-large] {
   background-position: -248px -150px;
 }
 
-.icon-announcement {
+.icon-reset {
   background-position: -314px -150px;
 }
 
-.icon-reset {
+.icon-announcement {
   background-position: -380px -150px;
 }
 

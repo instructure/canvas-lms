@@ -28,21 +28,23 @@ define [
 
     onNavClick: (event) ->
       event.preventDefault()
-      type = $(event.target).data 'type'
+      type = $(event.currentTarget).data 'type'
       @model.set 'modelName', type
 
     onExpandClick: (event) ->
       @model.set 'expanded', true
 
     switchFormView: =>
-      modelName = @model.get('modelName')
-      viewName = capitalize(modelName) + 'View'
+      @$el.removeClass @modelName if @modelName
+      @modelName = @model.get 'modelName'
+      @$el.addClass @modelName
+      viewName = capitalize(@modelName) + 'View'
       @currentFormView?.teardown?()
       @currentFormView = @views[viewName] or= new views[viewName]
       @currentFormView.render()
       @$newItemFormContainer.empty().append @currentFormView.el
       @model.set 'expanded', false
-      @updateActiveTab modelName
+      @updateActiveTab @modelName
 
     toggleExpanded: (model, expanded) =>
       @$el.toggleClass 'expanded', expanded
@@ -77,10 +79,10 @@ define [
         </div>
 
         <div class="v-gutter">
-          <div class="container-fluid message">
+          <div class="container-fluid">
             <div class="image-block control-group">
               <div class="image-block-image">
-                <i class="item-type-image icon-large-assignment"></i>
+                <i class="item-type-image icon-large-"></i>
               </div>
 
               <div class="newItemFormContainer image-block-content triangle-box"></div>
