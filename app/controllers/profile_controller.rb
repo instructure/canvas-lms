@@ -25,6 +25,11 @@ class ProfileController < ApplicationController
   include Api::V1::User
   include Api::V1::Avatar
 
+  def show
+    @context = UserProfile.new(@current_user)
+    render :text => "new profile page", :layout => true
+  end
+
   # @API Get user profile
   # Returns user profile data, including user id, name, and profile pic.
   #
@@ -44,7 +49,7 @@ class ProfileController < ApplicationController
   #     'avatar_url': '..url..',
   #     'calendar': { 'ics' => '..url..' }
   #   }
-  def show
+  def edit
     if api_request?
       # allow querying this basic profile data for the current user, or any
       # user the current user has view_statistics access to
