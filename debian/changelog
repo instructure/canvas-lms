@@ -1,3 +1,18 @@
+canvas-lms (2012.05.12.19) stable; urgency=low
+
+  * Package ref: cf3e8f159eb29b757de6340d38f4514671d01d86
+  *
+  * [+e7050a7] update ruby-saml gem
+  * [+f915ee6] log the entire SAMLResponse text
+  * [+be6e635] upgrade ruby-saml gem
+  * [+28c34a6] set charset meta header in api documentation
+  * [+dfadb75] switch back to the master to save results of CountsReport
+  * [+e5865e3] upgrade ruby-saml gem
+  * [+c0b647d] score unknown question types as 0 / points_possible
+  * [+cf3e8f1] moved js out of context_modules/_content fixes #8591
+
+ -- Brian Palmer <brianp@instructure.com>  Tue, 15 May 2012 10:17:42 -0600
+
 canvas-lms (2012.05.12.15) stable; urgency=low
 
   * Package ref: 9c36bd3f428e2d564710652a1ac44acdf2203229
