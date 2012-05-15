@@ -61,17 +61,12 @@ describe DiscussionTopicsController, :type => :integration do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
-  it "should return discussion topic list" do
-    attachment = create_attachment(@course)
-    @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => attachment)
-    sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
-
-    json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                    {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
-
-    # get rid of random characters in podcast url
-    json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-    json.last.should ==
+  context "show topic(s)" do
+    before do
+      @attachment = create_attachment(@course)
+      @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => @attachment)
+      @sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
+      @response_json =
                  {"read_state"=>"read",
                   "unread_count"=>0,
                   "podcast_url"=>"/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
@@ -88,15 +83,35 @@ describe DiscussionTopicsController, :type => :integration do
                   "root_topic_id"=>nil,
                   "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                   "attachments"=>[{"content-type"=>"unknown/unknown",
-                                   "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
+                                   "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                                    "filename"=>"content.txt",
                                    "display_name"=>"content.txt",
-                                   "id"=>attachment.id,
-                                   "size"=>attachment.size,
+                                   "id"=>@attachment.id,
+                                   "size"=>@attachment.size,
                   }],
-                  "topic_children"=>[sub.id],
+                  "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
                   "permissions" => { "attach" => true }}
+    end
+
+    it "should return discussion topic list" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+
+      json.size.should == 2
+      # get rid of random characters in podcast url
+      json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+      json.last.should == @response_json
+    end
+
+    it "should return an individual topic" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                      {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+
+      # get rid of random characters in podcast url
+      json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+      json.should == @response_json
+    end
   end
 
   it "should translate user content in topics" do
@@ -550,6 +565,13 @@ describe DiscussionTopicsController, :type => :integration do
       raw_api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      response.status.should == '403 Forbidden'
+      response.body.should == 'require_initial_post'
+
+      raw_api_call(
+        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       response.status.should == '403 Forbidden'
       response.body.should == 'require_initial_post'

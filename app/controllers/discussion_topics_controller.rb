@@ -17,8 +17,6 @@
 #
 
 # @API Discussion Topics
-#
-# API for accessing and participating in discussion topics in groups and courses.
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
 

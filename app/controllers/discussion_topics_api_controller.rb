@@ -26,6 +26,19 @@ class DiscussionTopicsApiController < ApplicationController
   before_filter :require_topic
   before_filter :require_initial_post, :except => [:add_entry, :mark_topic_read, :mark_topic_unread]
 
+  # @API Get a single topic
+  #
+  # Returns data on an individual discussion topic. See the List action for the response formatting.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
+  #         -H 'Authorization: Bearer <token>'
+  def show
+    return unless authorized_action(@topic, @current_user, :read)
+    render :json => discussion_topics_api_json([@topic], @context, @current_user, session).first
+  end
+
   # @API Get the full topic
   # Return a cached structure of the discussion topic, containing all entries,
   # their authors, and their message bodies.
