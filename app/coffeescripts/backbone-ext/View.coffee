@@ -50,6 +50,7 @@ define [
       target = @$('.' + className).first()
       view.setElement target
       view.render()
+      @[className] ?= view
 
     ##
     # Binds a `@model` data to the element's html. Whenever the data changes
