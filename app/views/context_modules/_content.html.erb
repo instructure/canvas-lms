@@ -1,4 +1,5 @@
 <% course_home ||= false %>
+<% js_env :COLLAPSED_MODULES => @collapsed_modules %>
 <% if course_home %>
   <h2><%= @context.name %></h2>
 <% end %>
@@ -326,47 +327,7 @@ TEXT
   </div>
 </div>
 <% end %>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'context_modules' /* prerequisites, updateProgressionState */,
-  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
-  'jquery.instructure_misc_plugins' /* .dim */,
-  'jquery.keycodes' /* keycodes */
-], function($, context_modules) {
 
-$(document).ready(function() {
-  var foundExpanded = false;
-  var collapsedModules = <%= raw @collapsed_modules.to_json %>;
-  for(var idx in collapsedModules) {
-    $("#context_module_" + collapsedModules[idx]).addClass('collapsed_module');
-  }
-  var foundModules = [];
-  var $contextModules = $("#context_modules .context_module");
-  if (!$contextModules.length) {
-    $('#no_context_modules_message').show();
-  }
-  $contextModules.each(function() {
-    modules.updateProgressionState($(this));
-  });
-  $contextModules.filter(":visible").each(function() {
-    if($(this).find(".content:visible").length > 0) {
-      foundExpanded = true;
-    } else if(foundExpanded) {
-      foundModules.push($(this));
-    }
-  });
-  $("#context_modules").bind('slow_load', function() {
-    var $module = foundModules.shift();
-    if($module) {
-      $module.find(".expand_module_link:first").triggerHandler('click', true);
-    }
-  });
-});
-});
-</script>
-<% end %>
 <% content_for :keyboard_navigation do %>
   <ul class="navigation_list" tabindex="-1">
     <li>
