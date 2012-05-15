@@ -117,21 +117,32 @@ describe ConversationsController do
       assert_unauthorized
     end
 
-    it "should filter conversations when masquerading" do
-      a = Account.default
-      @student = user_with_pseudonym(:active_all => true)
-      course_with_student(:active_all => true, :account => a, :user => @student)
-      @student.associated_accounts << a
-      @student.initiate_conversation([user.id]).add_message('test1', :root_account_id => a.id)
-      @student.initiate_conversation([user.id]).add_message('test2') # no root account, so teacher can't see it
+    context "masquerading" do
+      before do
+        a = Account.default
+        @student = user_with_pseudonym(:active_all => true)
+        course_with_student(:active_all => true, :account => a, :user => @student)
+        @student.associated_accounts << a
+        @student.initiate_conversation([user.id]).add_message('test1', :root_account_id => a.id)
+        @student.initiate_conversation([user.id]).add_message('test2') # no root account, so teacher can't see it
+  
+        course_with_teacher_logged_in(:active_all => true, :account => a)
+        a.add_user(@user)
+        session[:become_user_id] = @student.id
+      end
 
-      course_with_teacher_logged_in(:active_all => true, :account => a)
-      a.add_user(@user)
-      session[:become_user_id] = @student.id
+      it "should filter conversations" do
+        get 'index', :format => 'json'
+        response.should be_success
+        assigns[:conversations_json].size.should eql 1
+      end
 
-      get 'index', :format => 'json'
-      response.should be_success
-      assigns[:conversations_json].size.should eql 1
+      it "should filter conversations when returning ids" do
+        get 'index', :format => 'json', :include_all_conversation_ids => true
+        response.should be_success
+        assigns[:conversations_json][:conversations].size.should eql 1
+        assigns[:conversations_json][:conversation_ids].size.should eql 1
+      end
     end
   end
 
