@@ -322,7 +322,8 @@ class ConversationParticipant < ActiveRecord::Base
     scope = current_scoped_methods && current_scoped_methods[:find]
     raise "conversation_ids needs to be scoped to a user" unless scope && scope[:conditions] =~ /user_id = \d+/
     scope[:order] ||= "last_message_at DESC"
-    connection.select_all("SELECT conversation_id FROM conversation_participants WHERE #{scope[:conditions]} ORDER BY #{scope[:order]}").
+    # need to join on conversations in case we use this w/ scopes like for_masquerading_user
+    connection.select_all("SELECT conversation_id FROM conversations, conversation_participants WHERE #{scope[:conditions]} AND conversations.id = conversation_participants.conversation_id ORDER BY #{scope[:order]}").
       map{ |row| row['conversation_id'].to_i }
   end
 
