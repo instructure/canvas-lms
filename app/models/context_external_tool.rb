@@ -22,6 +22,7 @@ class ContextExternalTool < ActiveRecord::Base
   workflow do
     state :anonymous
     state :name_only
+    state :email_only
     state :public
     state :deleted
   end
@@ -70,7 +71,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def privacy_level=(val)
-    if ['anonymous', 'name_only', 'public'].include?(val)
+    if ['anonymous', 'name_only', 'email_only', 'public'].include?(val)
       self.workflow_state = val
     end
   end
@@ -223,7 +224,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def include_email?
-    public?
+    email_only? || public?
   end
   
   def include_name?
