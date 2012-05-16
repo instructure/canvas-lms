@@ -115,6 +115,15 @@
   & > ul + ul {
     border-top: 1px solid $listBorderColor;
   }
+
+  a.active {
+    background-color: $activeBG;
+    border-bottom-color: lighten($borderColor, 15%);
+    border-top-color: lighten($activeBG, 2%);
+    &:hover {
+      background-color: $activeBG;
+    }
+  }
 }
 
 .nav-links {

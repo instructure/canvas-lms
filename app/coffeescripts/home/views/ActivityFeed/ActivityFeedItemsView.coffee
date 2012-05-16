@@ -42,9 +42,18 @@ define [
 
     ##
     # Splits something like "course:123" into {type: 'course', value: 123}
+    # and "everything" into {type: 'everything'}
     parseKey: (key) ->
+      filter = {}
       matches = key.match /(.+):(.+)/
-      {type: matches[1], value: matches[2]}
+
+      if matches
+        filter.type = matches[1]
+        filter.value = matches[2]
+      else
+        filter.type = key
+
+      filter
 
     render: ->
       @$el.html """
