@@ -49,7 +49,7 @@ class EportfolioEntry < ActiveRecord::Base
   protected :update_portfolio
   
   def content_sections
-    (self.content || []).map do |section|
+    (self.content.is_a?(String) && Array(self.content) || self.content || []).map do |section|
       if section.is_a?(Hash)
         section.with_indifferent_access
       else
