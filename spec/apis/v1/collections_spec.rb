@@ -166,7 +166,7 @@ describe "Collections API", :type => :integration do
         'upvote_count' => item.collection_item_data.upvote_count,
         'upvoted_by_user' => upvoted_by_user,
         'root_item_id' => item.collection_item_data.root_item_id,
-        'image_url' => item.data.image_attachment && "http://www.example.com/images/thumbnails/#{item.data.image_attachment.id}/#{item.data.image_attachment.uuid}",
+        'image_url' => item.data.image_attachment && "http://www.example.com/images/thumbnails/#{item.data.image_attachment.id}/#{item.data.image_attachment.uuid}?size=640x%3E",
         'image_pending' => item.data.image_pending,
         'description' => item.description,
         'url' => "http://www.example.com/api/v1/collections/#{item.collection_id}/items/#{item.id}",
@@ -224,25 +224,26 @@ describe "Collections API", :type => :integration do
 
           json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
           json['image_pending'].should == false
-          json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}"
+          json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}?size=640x%3E"
         end
 
         it "should clone and use the image if provided" do
+          $a = true
           json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :image_url => "http://www.example.com/my/image.png", :description => 'new item' })
           @item = CollectionItem.find(json['id'])
           @item.data.image_pending.should == true
-          @att = Attachment.new(:uploaded_data => stub_png_data)
-          CutyCapt.expects(:snapshot_attachment_for_url).with(@item.data.image_url).returns(@att)
+          http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
+          Canvas::HTTP.expects(:get).with("http://www.example.com/my/image.png").returns(http_res)
           run_job()
 
-          @att.reload.context.should == Account.default
-
           @item.reload.data.image_pending.should == false
-          @item.data.image_attachment.should == @att
+          @att = @item.data.image_attachment
+          @att.should be_present
+          @att.context.should == Account.default
 
           json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
           json['image_pending'].should == false
-          json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}"
+          json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}?size=640x%3E"
         end
       end
     end

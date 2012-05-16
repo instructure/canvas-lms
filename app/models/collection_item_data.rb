@@ -24,6 +24,7 @@ class CollectionItemData < ActiveRecord::Base
   has_many :collection_item_upvotes
 
   VALID_ITEM_TYPES = %w(url)
+  THUMBNAIL_SIZE = "640x>"
 
   validates_inclusion_of :item_type, :in => VALID_ITEM_TYPES
   validates_as_url :link_url
@@ -39,11 +40,19 @@ class CollectionItemData < ActiveRecord::Base
   end
 
   def snapshot_link_url
-    attachment = CutyCapt.snapshot_attachment_for_url(image_url.presence || link_url)
-    if attachment
+    if image_url.present?
+      attachment = Canvas::HTTP.clone_url_as_attachment(image_url)
+    else
+      attachment = CutyCapt.snapshot_attachment_for_url(link_url)
+    end
+
+    if attachment && attachment.image?
       attachment.context = Account.default # these images belong to nobody
       attachment.save!
       self.image_attachment = attachment
+
+      # we know we want this thumbnail size, so generate it now
+      attachment.create_dynamic_thumbnail(THUMBNAIL_SIZE)
     end
 
     self.image_pending = false

@@ -387,7 +387,7 @@ module Technoweenie # :nodoc:
           return nil if file_data.nil? || file_data.size == 0
           self.content_type = file_data.content_type
           self.filename     = file_data.original_filename if respond_to?(:filename)
-          unless file_data.responds_to?(:path)
+          unless file_data.respond_to?(:path)
             file_data.rewind
             self.temp_data = file_data.read
           else
