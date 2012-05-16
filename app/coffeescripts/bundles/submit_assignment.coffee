@@ -1,0 +1,1 @@
+require ['submit_assignment']
