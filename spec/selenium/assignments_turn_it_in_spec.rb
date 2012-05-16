@@ -35,6 +35,7 @@ describe "assignments turn it in" do
     driver.find_element(:id, 'settings_exclude_value_count').send_keys("5") # '' -> 5
     driver.find_element(:id, 'turnitin_settings_form').submit
     wait_for_ajaximations
+    driver.find_element(:id, 'turnitin_settings_form').should_not be_displayed
   end
 
   def expected_settings

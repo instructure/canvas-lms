@@ -136,7 +136,7 @@ define([
       event.stopPropagation();
       if(options.noSubmit) {
         if($.isFunction(options.success)) {
-          loadingPromise.resolve();
+          if (loadingPromise) loadingPromise.resolve();
           options.success.call($form, formData, submitParam);
         }
       } else if(doUploadFile && options.preparedFileUpload && options.context_code) {
