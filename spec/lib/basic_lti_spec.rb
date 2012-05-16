@@ -176,6 +176,18 @@ describe BasicLTI do
       hash['lis_person_contact_email_primary'].should be_nil
     end
     
+    it "should include email if email_only" do
+      course_with_teacher(:active_all => true)
+      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'email_only', :name => 'tool')
+      @tool.include_name?.should eql(false)
+      @tool.include_email?.should eql(true)
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
+      hash['lis_person_name_given'].should == nil
+      hash['lis_person_name_family'].should == nil
+      hash['lis_person_name_full'].should == nil
+      hash['lis_person_contact_email_primary'] = @user.email
+    end
+
     it "should include email if public" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
