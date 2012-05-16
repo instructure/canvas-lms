@@ -53,7 +53,7 @@
           <td><%= f.text_field :domain %></td>
         </tr><tr>
           <td><%= f.blabel :privacy_level, :en => "Privacy" %></td>
-          <td><%= f.select :privacy_level, [[t(:anonymous, "Anonymous"),'anonymous'],[t(:name_only, "Name Only"),'name_only'],[t(:public, "Public"),'public']] %></td>
+          <td><%= f.select :privacy_level, [[t(:anonymous, "Anonymous"),'anonymous'],[t(:name_only, "Name Only"),'name_only'],[t(:email_only, "Email Only"),'email_only'],[t(:public, "Public"),'public']] %></td>
         </tr><tr>
           <td colspan="2">
             <%= f.blabel :custom_fields_string, :en => "Custom Fields" %>
