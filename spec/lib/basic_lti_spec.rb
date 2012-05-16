@@ -118,6 +118,8 @@ describe BasicLTI do
       hash['tool_consumer_instance_guid'].should == "#{@course.root_account.opaque_identifier(:asset_string)}.#{HostUrl.context_host(@course)}"
       hash['tool_consumer_instance_name'].should == @course.root_account.name
       hash['tool_consumer_instance_contact_email'].should == HostUrl.outgoing_email_address
+      hash['tool_consumer_info_product_family_code'].should == 'canvas'
+      hash['tool_consumer_info_version'].should == 'cloud'
       hash['oauth_callback'].should == 'about:blank'
     end
     
