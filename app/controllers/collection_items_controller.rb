@@ -87,7 +87,7 @@
 #       url: "https://<canvas>/api/v1/collections/2/items/7"
 #     }
 class CollectionItemsController < ApplicationController
-  before_filter :require_collection, :except => [:link_data]
+  before_filter :require_collection, :except => [:link_data, :new]
 
   include Api::V1::Collection
 
@@ -325,6 +325,10 @@ class CollectionItemsController < ApplicationController
     else
       render :nothing => true, :status => :unauthorized
     end
+  end
+
+  def new
+    render :layout => 'bare'
   end
 
   protected

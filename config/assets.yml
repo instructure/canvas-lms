@@ -147,6 +147,8 @@ stylesheets:
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/helpDialog.css
     - public/stylesheets/compiled/print.css
+  collection_item_save:
+    - public/stylesheets/compiled/collection_item_save.css
   dashboard:
     - public/stylesheets/compiled/dashboard.css
   profile:
