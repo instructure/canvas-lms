@@ -36,8 +36,10 @@ class Enrollment < ActiveRecord::Base
   before_save :assert_section
   before_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
+  after_create :create_linked_enrollments
   after_save :clear_email_caches
   after_save :cancel_future_appointments
+  after_save :update_linked_enrollments
 
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :limit_privileges_to_course_section
 
@@ -235,6 +237,55 @@ class Enrollment < ActiveRecord::Base
     end
   end
   protected :audit_groups_for_deleted_enrollments
+
+  def observers
+    student? ? user.observers : []
+  end
+
+  def create_linked_enrollments
+    observers.each do |observer|
+      create_linked_enrollment_for(observer)
+    end
+  end
+
+  def update_linked_enrollments
+    observers.each do |observer|
+      if enrollment = linked_enrollment_for(observer)
+        enrollment.update_from(self)
+      end
+    end
+  end
+
+  def create_linked_enrollment_for(observer)
+    enrollment = linked_enrollment_for(observer) || observer.observer_enrollments.build
+    enrollment.associated_user_id = user_id
+    enrollment.update_from(self)
+  end
+
+  def linked_enrollment_for(observer)
+    # there should really only ever be one, but due to SIS or legacy data there
+    # could be multiple. we'll use the best match (based on workflow_state)
+    enrollment = observer.observer_enrollments.find :first, :conditions => {
+      :associated_user_id => user_id,
+      :course_id => course_id,
+      :course_section_id => course_section_id_was
+    }, :order => self.class.state_rank_sql
+    # we don't want to "undelete" observer enrollments that have been
+    # explicitly deleted 
+    return nil if enrollment && enrollment.deleted? && workflow_state_was != 'deleted'
+    enrollment
+  end
+
+  def update_from(other)
+    self.course_id = other.course_id
+    self.workflow_state = other.workflow_state
+    self.start_at = other.start_at
+    self.end_at = other.end_at
+    self.course_section_id = other.course_section_id
+    self.root_account_id = other.root_account_id
+    self.user.touch if workflow_state_changed?
+    save!
+  end
 
   def clear_email_caches
     if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
@@ -824,6 +875,23 @@ class Enrollment < ActiveRecord::Base
       end
     end
     return deleted
+  end
+
+  # similar to above, but used on a scope or association (e.g. User#enrollments)
+  def self.remove_duplicates!
+    scope = current_scoped_methods && current_scoped_methods[:find]
+    raise "remove_duplicates! needs to be scoped" unless scope && scope[:conditions]
+
+    where(["workflow_state NOT IN (?)", ['deleted', 'inactive', 'rejected']]).
+      group_by{ |e| [e.user_id, e.course_id, e.course_section_id, e.associated_user_id] }.
+      each do |key, enrollments|
+        next if enrollments.size == 1
+        enrollments.
+          sort_by{ |e| [e.sis_batch_id || ''] + [-e.state_sortable] }.
+          reverse.
+          slice(1, enrollments.size - 1).
+          each(&:destroy)
+      end
   end
 
   def effective_start_at

@@ -379,6 +379,10 @@ class ActiveRecord::Base
     {:order => order_by}
   }
 
+  named_scope :where, lambda { |conditions|
+    {:conditions => conditions}
+  }
+
   # set up class-specific getters/setters for a polymorphic association, e.g.
   #   belongs_to :context, :polymorphic => true, :types => [:course, :account]
   def self.belongs_to(name, options={})

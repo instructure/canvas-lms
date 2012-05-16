@@ -548,6 +548,61 @@ describe User do
       @user1.enrollments.should be_empty
     end
 
+    it "should move and uniquify observee enrollments" do
+      @user1 = user_model
+      @course1 = course(:active_all => 1)
+      @enrollment1 = @course1.enroll_user(@user1)
+      @user2 = user_model
+      @course2 = course(:active_all => 1)
+      @enrollment2 = @course1.enroll_user(@user2)
+
+      @observer1 = user_model
+      @observer2 = user_model
+      @user1.observers << @observer1 << @observer2
+      @user2.observers << @observer2
+      ObserverEnrollment.count.should eql 3
+
+      @user1.move_to_user(@user2)
+
+      @user1.observee_enrollments.should be_empty
+      @user2.observee_enrollments.size.should eql 3 # 1 deleted
+      @user2.observee_enrollments.active_or_pending.size.should eql 2
+      @observer1.observer_enrollments.active_or_pending.size.should eql 1
+      @observer2.observer_enrollments.active_or_pending.size.should eql 1
+    end
+
+    it "should move and uniquify observers" do
+      @user1 = user_model
+      @user2 = user_model
+      @observer1 = user_model
+      @observer2 = user_model
+      @user1.observers << @observer1 << @observer2
+      @user2.observers << @observer2
+
+      @user1.move_to_user(@user2)
+
+      @user1.reload
+      @user1.observers.should be_empty
+      @user2.reload
+      @user2.observers.sort_by(&:id).should eql [@observer1, @observer2]
+    end
+
+    it "should move and uniquify observed users" do
+      @user1 = user_model
+      @user2 = user_model
+      @student1 = user_model
+      @student2 = user_model
+      @user1.observed_users << @student1 << @student2
+      @user2.observed_users << @student2
+
+      @user1.move_to_user(@user2)
+
+      @user1.reload
+      @user1.observed_users.should be_empty
+      @user2.reload
+      @user2.observed_users.sort_by(&:id).should eql [@student1, @student2]
+    end
+
     it "should update account associations" do
       @account1 = account_model
       @account2 = account_model
