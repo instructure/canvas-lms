@@ -1,3 +1,15 @@
+canvas-lms (2012.05.12.20) stable; urgency=low
+
+  * Package ref: 605687c79458a2798b4b476bcc6444e0ad268467
+  *
+  * [+3f54741] pull submit_homework javascript out of view; refs #8145
+  * [+1ab3478] add extra tool information on LTI launch
+  * [+8242790] fix javascript errors on assignment submission button
+  * [+f023882] fix conversations masquerading issue, closes #8619
+  * [+605687c] add email_only option for LTI tools
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 16 May 2012 15:26:55 -0600
+
 canvas-lms (2012.05.12.19) stable; urgency=low
 
   * Package ref: cf3e8f159eb29b757de6340d38f4514671d01d86
