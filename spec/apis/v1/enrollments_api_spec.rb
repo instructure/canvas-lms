@@ -304,7 +304,7 @@ describe EnrollmentsApiController, :type => :integration do
         enrollment = @student.enrollments.first
         enrollment.course_section = @section
         enrollment.save!
-        
+
         @path = "/api/v1/sections/#{@section.id}/enrollments"
         @params = { :controller => "enrollments_api", :action => "index", :section_id => @section.id.to_param, :format => "json" }
         json = api_call(:get, @path, @params)
@@ -641,6 +641,15 @@ describe EnrollmentsApiController, :type => :integration do
           } if e.student?
           h
         }
+      end
+
+      it "should return an empty array when no user enrollments match a filter" do
+        site_admin_user(:active_all => true)
+
+        json = api_call(:get, "#{@user_path}?type[]=TeacherEnrollment",
+          @user_params.merge(:type => %w{TeacherEnrollment}))
+
+        json.should be_empty
       end
     end
   end

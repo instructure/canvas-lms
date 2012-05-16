@@ -220,6 +220,13 @@ class EnrollmentsApiController < ApplicationController
   end
 
   protected
+  # Internal: Collect course enrollments that @current_user has permissions to
+  # read.
+  #
+  # scope_arguments - A hash to be passed as :conditions to an AR scope.
+  #                   Allowed keys are any keys allowed in :conditions.
+  #
+  # Returns an ActiveRecord scope of enrollments on success, false on failure.
   def course_index_enrollments(scope_arguments)
     if authorized_action(@context, @current_user, :read_roster)
       scope_arguments[:conditions].include?(:workflow_state) ?
@@ -230,11 +237,18 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
+  # Internal: Collect user enrollments that @current_user has permissions to
+  # read.
+  #
+  # scope_arguments - A hash to be passed as :conditions to an AR scope.
+  #                   Allowed keys are any keys allowed in :conditions.
+  #
+  # Returns an ActiveRecord scope of enrollments on success, false on failure.
   def user_index_enrollments(scope_arguments)
     user = api_find(User, params[:user_id])
     # if user is requesting for themselves, just return all of their
     # enrollments without any extra checking.
-    return user.current_enrollments if user == @current_user
+    return user.current_enrollments.scoped(scope_arguments) if user == @current_user
 
     # otherwise check for read_roster rights on all of the requested
     # user's accounts
@@ -243,16 +257,15 @@ class EnrollmentsApiController < ApplicationController
       accounts
     end
 
+    # if there aren't any ids in approved_accounts, then the user doesn't have
+    # permissions.
+    render_unauthorized_action(@user) and return false if approved_accounts.empty?
+
     scope_arguments[:conditions].merge!({ 'enrollments.root_account_id' => approved_accounts })
     enrollments = scope_arguments[:conditions].include?(:workflow_state) ?
       user.enrollments.scoped(scope_arguments) :
       user.current_and_invited_enrollments.scoped(scope_arguments)
 
-    if enrollments.count == 0 && user.current_enrollments.count != 0
-      render_unauthorized_action(@user)
-      return false
-    else
-      return enrollments
-    end
+    enrollments
   end
 end
