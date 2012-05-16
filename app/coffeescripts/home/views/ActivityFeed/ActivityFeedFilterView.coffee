@@ -18,8 +18,10 @@ define [
 
     clickFilter: (event) ->
       event.preventDefault()
-      $el = $ event.target
+      $el = $ event.currentTarget
       value = $el.data 'value'
+      @$active.removeClass 'active'
+      @$active = $el.addClass 'active'
       @trigger 'filter', value
 
     addCourse: (course) =>
@@ -32,7 +34,7 @@ define [
         <header class="toolbar">&nbsp;</header>
         <div class="list-view">
           <ul class="filterList">
-            <li><a href="#" class="selected" data-value="everything">Everything</a>
+            <li><a href="#" class="active" data-value="everything">Everything</a>
           </ul>
 
           <header>Courses</header>
@@ -51,5 +53,6 @@ define [
           </ul>
         </div>
       """
+      @$active = @$ '.active'
       super
 
