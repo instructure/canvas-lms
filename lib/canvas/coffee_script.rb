@@ -8,7 +8,11 @@ class CoffeeScript
       coffee_version = `coffee -v`.strip
       coffee_is_correct_version = coffee_version.match(::CoffeeScript.version)
       unless coffee_is_correct_version
-        puts "--> WARNING #{coffee_version} != pinned coffee-script-source: #{::CoffeeScript.version}"
+        if ENV['REQUIRE_COFFEE_VERSION_MATCH'] == '1'
+          raise "coffeescript version #{coffee_version} != pinned coffee-script-source: #{::CoffeeScript.version}"
+        else
+          puts "--> WARNING #{coffee_version} != pinned coffee-script-source: #{::CoffeeScript.version}"
+        end
       end
     end
     @is_available = coffee_is_installed && coffee_is_correct_version
