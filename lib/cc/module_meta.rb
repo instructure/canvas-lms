@@ -76,6 +76,7 @@ module CC
                   item_node.identifierref CCHelper.create_key(ct.content_or_self) unless ct.content_type == 'ContextModuleSubHeader'
                   item_node.url ct.url if ["ContextExternalTool", 'ExternalUrl'].member? ct.content_type
                   item_node.position ct.position
+                  item_node.new_tab ct.new_tab
                   item_node.indent ct.indent
                 end
               end
