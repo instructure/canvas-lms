@@ -6,7 +6,13 @@ i[class*=icon-], i[class^=icon-] {
   background-repeat: no-repeat;
 }
 
-i[class*=icon-large], i[class^=icon-large] {
+.quickStartBar {
+  i[class*=icon-], i[class^=icon-] {
+    background-image: url(../../../images/blue/quickstart-icons.png);
+  }
+}
+
+i[class*=icon-large-], i[class^=icon-large-] {
   width: 46px;
   height: 46px;
   line-height: 46px;
@@ -29,11 +35,11 @@ i[class*=icon-large], i[class^=icon-large] {
   background-position: -248px -150px;
 }
 
-.icon-announcement {
+.icon-reset {
   background-position: -314px -150px;
 }
 
-.icon-reset {
+.icon-announcement {
   background-position: -380px -150px;
 }
 
@@ -319,5 +325,23 @@ i[class*=icon-large], i[class^=icon-large] {
 
 .icon-group-new-dark {
   background-position: -446px -810px;
+}
+
+.quickStartBar {
+  .icon-assignment {
+    background-position: -160px -10px;
+  }
+  .icon-discussion {
+    background-position: -72px -10px;
+  }
+  .icon-announcement {
+    background-position: -43px -10px;
+  }
+  .icon-message {
+    background-position: -12px -10px;
+  }
+  .icon-pin {
+    background-position: -102px -10px;
+  }
 }
 

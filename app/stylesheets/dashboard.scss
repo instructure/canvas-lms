@@ -171,3 +171,29 @@ $boxSizingBaseLineHeight: $baseLineHeight + 8;
 .icon-drawer-toggle {
   cursor: pointer;
 }
+
+.item-type-image {
+  background-image: url('../../../images/blue/quickstart-icons.png') !important;
+  background-repeat: no-repeat;
+}
+
+.assignment .item-type-image {
+  background-position: -285px -35px;
+}
+.discussion .item-type-image {
+  background-position: -120px -35px;
+}
+.announcement .item-type-image {
+  background-position: -65px -35px;
+}
+.message .item-type-image {
+  background-position: -10px -35px;
+}
+.pin .item-type-image {
+  background-position: -175px -35px;
+}
+.event .item-type-image {
+  background-position: -230px -35px;
+}
+
+
