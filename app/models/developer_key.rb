@@ -23,9 +23,15 @@ class DeveloperKey < ActiveRecord::Base
   has_many :access_tokens
   has_many :context_external_tools, :primary_key => 'tool_id', :foreign_key => 'tool_id'
 
-  attr_accessible :api_key, :name, :user, :account
+  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :tool_id, :email
   
   before_create :generate_api_key
+  before_save :nullify_empty_tool_id
+  
+  def nullify_empty_tool_id
+    self.tool_id = nil if tool_id.blank?
+    self.icon_url = nil if icon_url.blank?
+  end
   
   def generate_api_key(overwrite=false)
     self.api_key = AutoHandle.generate(nil, 64) if overwrite || !self.api_key
@@ -33,6 +39,10 @@ class DeveloperKey < ActiveRecord::Base
   
   def self.default
     get_special_key("User-Generated")
+  end
+  
+  def account_name
+    account.try(:name)
   end
   
   def self.get_special_key(default_key_name)

@@ -6,7 +6,12 @@
 %>
 <div id="modal-box-top"></div>
 <div id="modal-box-arbitrary-size" class="modal-box-more-padding">
-  <h2><%= @app_name %></h2>
+  <h2>
+    <% if @key.icon_url %>
+      <%= image_tag @key.icon_url, :alt => '', :class => 'icon_url' %>
+    <% end %>
+    <%= @app_name %>
+  </h2>
   <p class="modal-box-content">
   <%= mt 'details.allow_application', "%{app_name} is requesting access to your account.", :app_name => @app_name %>
     <br/><br/>

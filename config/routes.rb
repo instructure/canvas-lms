@@ -899,6 +899,14 @@ ActionController::Routing::Routes.draw do |map|
         items.delete "collections/items/:item_id/upvotes/self", :action => :remove_upvote
       end
     end
+    
+    api.with_options(:controller => :developer_keys) do |keys|
+      keys.get 'developer_keys', :action => :index
+      keys.get 'developer_keys/:id', :action => :show
+      keys.delete 'developer_keys/:id', :action => :destroy
+      keys.put 'developer_keys/:id', :action => :update
+      keys.post 'developer_keys', :action => :create
+    end
 
     api.with_options(:controller => :search) do |search|
       search.get 'search/rubrics', :action => 'rubrics', :path_name => 'search_rubrics'
@@ -959,6 +967,13 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :files do |file|
     file.download 'download', :controller => 'files', :action => 'show', :download => '1'
   end
+
+  map.resources :apps, :only => [:index, :show] do |app|
+    app.comments 'comments', :controller => 'apps', :action => 'comments', :conditions => {:method => :get}
+    app.post_comment 'comments', :controller => 'apps', :action => 'comment', :conditions => {:method => :post}
+  end
+  
+  map.resources :developer_keys, :only => [:index]
 
   map.resources :rubrics do |rubric|
     rubric.resources :rubric_assessments, :as => 'assessments'

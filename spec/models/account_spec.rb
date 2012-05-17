@@ -576,6 +576,24 @@ describe Account do
   end
 
   context "tabs_available" do
+    it "should include 'Developer Keys' for the authorized users of the site_admin account" do
+      account_admin_user(:account => Account.site_admin)
+      tabs = Account.site_admin.tabs_available(@admin)
+      tabs.map{|t| t[:id] }.should be_include(Account::TAB_DEVELOPER_KEYS)
+
+      tabs = Account.site_admin.tabs_available(nil)
+      tabs.map{|t| t[:id] }.should_not be_include(Account::TAB_DEVELOPER_KEYS)
+    end
+    
+    it "should not include 'Developer Keys' for non-site_admin accounts" do
+      @account = Account.default.sub_accounts.create!(:name => "sub-account")
+      tabs = @account.tabs_available(nil)
+      tabs.map{|t| t[:id] }.should_not be_include(Account::TAB_DEVELOPER_KEYS)
+      
+      tabs = @account.root_account.tabs_available(nil)
+      tabs.map{|t| t[:id] }.should_not be_include(Account::TAB_DEVELOPER_KEYS)
+    end
+    
     it "should not include external tools if not configured for course navigation" do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")

@@ -1,0 +1,27 @@
+<% content_for :page_title do %><%= t :title, "Developer Keys" %><% end %>
+
+<% js_bundle :developer_keys %>
+<% jammit_css :developer_keys %>
+
+<h2 style="float: left;"><%= t :developer_keys, "Developer Keys" %></h2>
+<a href="#" style='float: right;' class='button add_key'><%= image_tag "add.png" %> Add Developer Key</a>
+<div class='clear'></div>
+<table id="keys">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>User</th>
+      <th>Details</th>
+      <th>Stats</th>
+      <th>&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<div id="loading">
+  <button class='button show_all' type='button'><%= t :show_all, "Show All %{count} Keys", :count => @keys.total_entries %></button>
+  <img src="/images/ajax-loader-medium-444.gif" class="loader">
+</div>
+<div id='edit_dialog' title='<%= t :key_settings, "Key Settings" %>'>
+</div>
