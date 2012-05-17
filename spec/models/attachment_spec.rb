@@ -688,6 +688,15 @@ describe Attachment do
       @a.read_attribute(:namespace).should_not be_nil
       @a.root_account_id.should == @account.id
     end
+
+    it "should not infer the namespace if it's not a new record" do
+      Attachment.domain_namespace = nil
+      attachment_model(:context => submission_model)
+      @attachment.should_not be_new_record
+      @attachment.read_attribute(:namespace).should be_nil
+      @attachment.namespace.should be_nil
+      @attachment.read_attribute(:namespace).should be_nil
+    end
   end
 
   context "encoding detection" do
