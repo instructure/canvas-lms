@@ -840,6 +840,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :collections) do |collections|
       collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_"
+      collections.resources :collections, :path_prefix => "groups/:group_id", :name_prefix => "group_"
 
       collections.with_options(:controller => :collection_items) do |items|
         items.get "collections/:collection_id/items", :action => :index, :path_name => 'collection_items_list'

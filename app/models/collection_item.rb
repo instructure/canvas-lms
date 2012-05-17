@@ -101,10 +101,19 @@ class CollectionItem < ActiveRecord::Base
     given { |user, session| self.collection.grants_right?(user, session, :comment) }
     can :comment
 
+    given { |user, session| self.collection.grants_right?(user, session, :create) }
+    can :create
+
     given { |user, session| self.collection.grants_right?(user, session, :delete) }
     can :delete
 
     given { |user, session| self.collection.grants_right?(user, session, :update) }
     can :update
+
+    given { |user| self.user == user }
+    can :read and can :update and can :delete
+
+    given { |user| self.collection.context.respond_to?(:has_member?) && self.collection.context.has_member?(user) }
+    can :create
   end
 end

@@ -166,7 +166,7 @@ class CollectionItemsController < ApplicationController
   #     }
   def show
     find_item_and_collection
-    if authorized_action(@collection, @current_user, :read)
+    if authorized_action(@item, @current_user, :read)
       render :json => collection_items_json([@item], @current_user, session).first
     end
   end
@@ -206,11 +206,12 @@ class CollectionItemsController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   #
   def create
-    if authorized_action(@collection, @current_user, :update)
+    @item = @collection.collection_items.new(:user => @current_user)
+    if authorized_action(@item, @current_user, :create)
       item_data = CollectionItemData.data_for_url(params[:link_url] || "", @current_user)
       return render_unauthorized_action unless item_data
       item_data.image_url = params[:image_url] if item_data.new_record?
-      @item = @collection.collection_items.new(:collection_item_data => item_data, :user => @current_user)
+      @item.collection_item_data = item_data
       @item.attributes = params.slice(*ITEM_SETTABLE_ATTRIBUTES)
 
       if @item.errors.empty? && @item.save
@@ -238,7 +239,7 @@ class CollectionItemsController < ApplicationController
   #
   def update
     find_item_and_collection
-    if authorized_action(@collection, @current_user, :update)
+    if authorized_action(@item, @current_user, :update)
       if @item.update_attributes(params.slice(*ITEM_SETTABLE_ATTRIBUTES))
         render :json => collection_items_json([@item], @current_user, session).first
       else
@@ -260,7 +261,7 @@ class CollectionItemsController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   def destroy
     find_item_and_collection
-    if authorized_action(@collection, @current_user, :update)
+    if authorized_action(@item, @current_user, :delete)
       if @item.destroy
         render :json => collection_items_json([@item], @current_user, session).first
       else
@@ -296,7 +297,7 @@ class CollectionItemsController < ApplicationController
   #     }
   def upvote
     find_item_and_collection
-    if authorized_action(@collection, @current_user, :read)
+    if authorized_action(@item, @current_user, :read)
       @upvote = find_upvote
       @upvote ||= @item.collection_item_data.collection_item_upvotes.create!({ :user => @current_user })
       render :json => collection_item_upvote_json(@item, @upvote, @current_user, session)
@@ -316,7 +317,7 @@ class CollectionItemsController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   def remove_upvote
     find_item_and_collection
-    if authorized_action(@collection, @current_user, :read)
+    if authorized_action(@item, @current_user, :read)
       @upvote = find_upvote
       if @upvote
         @upvote.destroy
