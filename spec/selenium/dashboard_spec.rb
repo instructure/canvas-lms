@@ -88,7 +88,7 @@ describe "dashboard" do
       # appointment group publish and update notifications
       find_all_with_jquery("div.communication_message.message_appointment_group_#{@appointment_group.id}").size.should == 2
       # signup notification
-      find_all_with_jquery("div.communication_message.message_calendar_event_#{@event.id}").size.should == 1
+      find_all_with_jquery("div.communication_message.message_group_#{@group.id}").size.should == 1
     end
 
     it "should display assignment in to do list" do

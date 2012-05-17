@@ -29,4 +29,16 @@ describe StreamItem do
     data.type.should == 'DiscussionTopic'
     data.user_id.should be_nil
   end
+
+  it "should prefer a Context for Message stream item context" do
+    notification_model(:name => 'Assignment Created')
+    course_with_student(:active_all => true)
+    assignment_model(:course => @course)
+    item = @user.stream_items.first
+    item.data.notification_name.should == 'Assignment Created'
+    item.context_code.should == @course.asset_string
+
+    course_items = @user.recent_stream_items(:contexts => [@course])
+    course_items.should == [item]
+  end
 end

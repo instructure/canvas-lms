@@ -146,7 +146,9 @@ class StreamItem < ActiveRecord::Base
     when Message
       res = object.attributes
       res['notification_category'] = object.notification_display_category
-      if object.asset_context_type
+      if !object.context.is_a?(Context) && object.context.respond_to?(:context) && object.context.context.is_a?(Context)
+        self.context_code = object.context.context.asset_string
+      elsif object.asset_context_type
         self.context_code = "#{object.asset_context_type.underscore}_#{object.asset_context_id}"
       end
     when Submission
