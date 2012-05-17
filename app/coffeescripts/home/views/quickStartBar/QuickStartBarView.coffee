@@ -2,7 +2,8 @@ define [
   'Backbone',
   'i18n!dashboard'
   'compiled/home/views/quickStartBar/allViews'
-], ({View, Model}, I18n, views) ->
+  'compiled/util/formToJSON'
+], ({View, Model}, I18n, views, formToJSON) ->
 
 	capitalize = (str) ->
     str.replace /\b[a-z]/g, (match) -> match.toUpperCase()
@@ -19,12 +20,27 @@ define [
     events:
       'click .nav a': 'onNavClick'
       'focus .expander': 'onExpandClick'
+      'submit form': 'onFormSubmit'
 
     initialize: ->
       @model or= new QuickStartBarModel
       @model.on 'change:modelName', @switchFormView
       @model.on 'change:expanded', @toggleExpanded
       @models = {}
+
+    onFormSubmit: (event) ->
+      event.preventDefault()
+      $form = $ event.target
+      json = formToJSON $(event.target)
+      @currentFormView.onBeforeSave?()
+      @currentFormView.model.save json,
+        success: @onCurrentFormViewModelSaveSuccess
+        fail: => # TODO
+
+    onCurrentFormViewModelSaveSuccess: (model) =>
+      @model.set 'expanded', false
+      @currentFormView.render()
+      @trigger 'save'
 
     onNavClick: (event) ->
       event.preventDefault()
@@ -40,7 +56,10 @@ define [
       @$el.addClass @modelName
       viewName = capitalize(@modelName) + 'View'
       @currentFormView?.teardown?()
-      @currentFormView = @views[viewName] or= new views[viewName]
+      @currentFormView = @views[viewName] or= do =>
+        view = new views[viewName]
+        view.parentView = this
+        view
       @currentFormView.render()
       @$newItemFormContainer.empty().append @currentFormView.el
       @model.set 'expanded', false
