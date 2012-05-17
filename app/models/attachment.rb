@@ -416,7 +416,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def namespace
-    read_attribute(:namespace) || write_attribute(:namespace, infer_namespace)
+    read_attribute(:namespace) || (new_record? ? write_attribute(:namespace, infer_namespace) : nil)
   end
 
   def infer_namespace
