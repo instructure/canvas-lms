@@ -34,6 +34,25 @@ describe "course settings" do
     it "should allow selection of existing account grading standard" do
       test_select_standard_for @course.root_account
     end
+
+    it "should show the self enrollment code and url once enabled" do
+      a = Account.default
+      a.courses << @course
+      a.settings[:self_enrollment] = 'manually_created'
+      a.save!
+      get "/courses/#{@course.id}/settings"
+      f('.edit_course_link').click
+      f('.course_form_more_options_link').click
+      f('#course_self_enrollment').click
+      f('#course_form').submit
+      wait_for_ajaximations
+
+      code = @course.reload.self_enrollment_code
+      code.should_not be_nil
+      message = f('.self_enrollment_message')
+      message.text.should include(code)
+      message.text.should_not include('self_enrollment_code')
+    end
   end
 
   describe "course items" do

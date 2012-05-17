@@ -641,7 +641,7 @@ class CoursesController < ApplicationController
   
   def self_enrollment
     get_context
-    unless @context.self_enrollment && params[:self_enrollment] && params[:self_enrollment] == @context.self_enrollment_code
+    unless @context.self_enrollment && params[:self_enrollment] && @context.self_enrollment_codes.include?(params[:self_enrollment])
       return redirect_to course_url(@context)
     end
     unless @current_user || @context.root_account.open_registration?
