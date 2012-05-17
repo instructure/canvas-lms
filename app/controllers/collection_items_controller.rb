@@ -83,6 +83,12 @@
 #       // The user-provided description of the item. This is plain text.
 #       description: "some block of plain text",
 #
+#       // A snippet of HTML that can be used as an in-line preview of the
+#       // item. For example, a link to a youtube page may have an iframe inline
+#       // embed of the video.
+#       // If no preview is available, this field will be null.
+#       html_preview: "<iframe>...</iframe>",
+#
 #       // The API URL for this item. Used to clone the collection item.
 #       url: "https://<canvas>/api/v1/collections/2/items/7"
 #     }
@@ -176,7 +182,8 @@ class CollectionItemsController < ApplicationController
   #
   # @argument image_url The URL of the image to use for this item. If no image
   #   url is provided, canvas will try to automatically determine an image
-  #   representation for the link.
+  #   representation for the link. This parameter is ignored of the new item is
+  #   a clone of an existing item.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 

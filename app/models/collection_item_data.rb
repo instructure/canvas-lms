@@ -40,8 +40,14 @@ class CollectionItemData < ActiveRecord::Base
   end
 
   def snapshot_link_url
+    embedly_data = Canvas::Embedly.new(link_url)
+
+    self.html_preview = embedly_data.object_html
+
     if image_url.present?
       attachment = Canvas::HTTP.clone_url_as_attachment(image_url)
+    elsif embedly_data.images.first
+      attachment = Canvas::HTTP.clone_url_as_attachment(embedly_data.images.first.url)
     else
       attachment = CutyCapt.snapshot_attachment_for_url(link_url)
     end

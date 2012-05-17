@@ -168,6 +168,7 @@ describe "Collections API", :type => :integration do
         'root_item_id' => item.collection_item_data.root_item_id,
         'image_url' => item.data.image_attachment && "http://www.example.com/images/thumbnails/#{item.data.image_attachment.id}/#{item.data.image_attachment.uuid}?size=640x%3E",
         'image_pending' => item.data.image_pending,
+        'html_preview' => item.data.html_preview,
         'description' => item.description,
         'url' => "http://www.example.com/api/v1/collections/#{item.collection_id}/items/#{item.id}",
       }
@@ -209,7 +210,7 @@ describe "Collections API", :type => :integration do
       end
 
       describe "images" do
-        it "should take a snapshot of the link url if no image is provided" do
+        it "should take a snapshot of the link url if no image is provided and there is no embedly image" do
           json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :description => 'new item' })
           @item = CollectionItem.find(json['id'])
           @item.data.image_pending.should == true
@@ -228,7 +229,6 @@ describe "Collections API", :type => :integration do
         end
 
         it "should clone and use the image if provided" do
-          $a = true
           json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :image_url => "http://www.example.com/my/image.png", :description => 'new item' })
           @item = CollectionItem.find(json['id'])
           @item.data.image_pending.should == true
@@ -240,6 +240,27 @@ describe "Collections API", :type => :integration do
           @att = @item.data.image_attachment
           @att.should be_present
           @att.context.should == Account.default
+
+          json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
+          json['image_pending'].should == false
+          json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}?size=640x%3E"
+        end
+
+        it "should use the embedly image if no image is provided" do
+          json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :description => 'new item' })
+          @item = CollectionItem.find(json['id'])
+          @item.data.image_pending.should == true
+          Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'test', :images => [{'url' => 'http://www.example.com/image1'}], :html => "<iframe>test</iframe>"))
+          http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
+          Canvas::HTTP.expects(:get).with("http://www.example.com/image1").returns(http_res)
+          run_job()
+
+          @item.reload.data.image_pending.should == false
+          @att = @item.data.image_attachment
+          @att.should be_present
+          @att.context.should == Account.default
+
+          @item.data.html_preview.should == "<iframe>test</iframe>"
 
           json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
           json['image_pending'].should == false
