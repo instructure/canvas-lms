@@ -728,7 +728,7 @@ class Attachment < ActiveRecord::Base
   # you should be able to pass an optional width, height, and page_number/video_seconds to this method
   # can't handle arbitrary thumbnails for our attachment_fu thumbnails on s3 though, we could handle a couple *predefined* sizes though
   def thumbnail_url(options={})
-    return nil if Attachment.skip_thumbnails || !ScribdAPI.enabled?
+    return nil if Attachment.skip_thumbnails
     if self.scribd_doc #handle if it is a scribd doc, get the thumbnail from scribd's api
       self.scribd_thumbnail(options)
     elsif self.thumbnail #handle attachment_fu iamges that we have made a thubnail for on our s3
