@@ -1,3 +1,11 @@
+canvas-lms (2012.05.12.21) stable; urgency=low
+
+  * Package ref: c9dd974ee0944a5ae174aad9fef9f02c9fcde060
+  *
+  * [+c9dd974] only infer the attachment namespace for new records
+
+ -- Brian Palmer <brianp@instructure.com>  Thu, 17 May 2012 15:14:21 -0600
+
 canvas-lms (2012.05.12.20) stable; urgency=low
 
   * Package ref: 605687c79458a2798b4b476bcc6444e0ad268467
