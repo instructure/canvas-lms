@@ -662,6 +662,24 @@ describe CalendarEvent do
         events1.last.reload.should be_deleted
       end
 
+      it "should not try to migrate resources to section context" do
+        attachment_with_context(@course)
+        s2 = @course.course_sections.create!
+        e1 = @course.calendar_events.build :title => "ohai",
+                                           :description => "<img src='/courses/#{@course.id}/files/#{@attachment.id}/preview'>",
+                                           :child_event_data => [
+                                               {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
+                                               {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s2.asset_string},
+                                           ]
+        e1.updating_user = @user
+        e1.save!
+        e1.child_event_data = [
+            {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string},
+            {:start_at => "2012-01-02 22:00:00", :end_at => "2012-01-02 23:00:00", :context_code => s2.asset_string},
+        ]
+        lambda { e1.save! }.should_not raise_error
+      end
+
       it "should delete all child events" do
         s2 = @course.course_sections.create!
         s3 = @course.course_sections.create!
