@@ -408,6 +408,25 @@ describe Conversation do
   end
 
   context "context tags" do
+    context "current_context_strings" do
+      it "should not double-count duplicate enrollments" do
+        u1 = student_in_course(:active_all => true).user
+        u2 = student_in_course(:active_all => true).user
+        course1 = @course
+
+        course_with_student(:active_all => true, :user => u1)
+        course2 = @course
+        other_section = course2.course_sections.create
+        course2.enroll_student(u1, :allow_multiple_enrollments => true, :section => other_section)
+        u1.enrollments.size.should eql 3
+
+        conversation = Conversation.initiate([u1.id, u2.id], true)
+
+        conversation.current_context_strings(1).should eql [course1.asset_string]
+        u1.conversation_context_codes.sort.should eql [course1.asset_string, course2.asset_string] # just once
+      end
+    end
+
     context "initial tags" do
       it "should save all valid tags on the conversation" do # NOTE: this will change if/when we allow arbitrary tags
         u1 = student_in_course(:active_all => true).user
@@ -712,49 +731,6 @@ describe Conversation do
         @u1.conversations.first.tags.should eql [@course1.asset_string]
         @u2.conversations.first.tags.should eql [@course1.asset_string]
         broken_one.reload.tags.should eql [] # skipped
-      end
-    end
-
-    context "sanitization" do
-      it "should remove tags not shared by at least two participants" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        course1 = @course
-        course2 = course(:active_all => true)
-        course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
-        conversation = Conversation.initiate([u1.id, u2.id], true)
-        conversation.add_message(u1, 'test', :tags => [course1.asset_string])
-        message = conversation.add_message(u1, 'test')
-        # fake up the bad data
-        conversation.update_attribute :tags, [course1.asset_string, course2.asset_string]
-        cp1 = u1.conversations.first
-        cp1.update_attribute :tags, [course1.asset_string, course2.asset_string]
-        cmp1 = cp1.conversation_message_participants.find(:first, :conditions => ["conversation_message_id = ?", message.id])
-        cmp1.update_attribute :tags, [course2.asset_string]
-
-        conversation.sanitize_context_tags!.should_not be_nil
-        
-        conversation.reload.tags.should eql [course1.asset_string]
-        cp1.reload.tags.should eql [course1.asset_string]
-        cmp1.reload.tags.should eql [course1.asset_string]
-      end
-
-      it "should do nothing if the tags are already correct" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
-        course1 = @course
-        course2 = course(:active_all => true)
-        course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
-        conversation = Conversation.initiate([u1.id, u2.id], true)
-        conversation.add_message(u1, 'test', :tags => [course1.asset_string])
-        message = conversation.add_message(u1, 'test')
-        cp1 = u1.conversations.first
-        cp2 = u2.conversations.first
-        cp2.remove_messages :all
-
-        conversation.sanitize_context_tags!.should be_nil
-        cp1.reload.tags.should eql [course1.asset_string]
-        cp2.reload.tags.should eql []
       end
     end
   end

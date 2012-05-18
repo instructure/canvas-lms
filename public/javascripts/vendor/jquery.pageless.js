@@ -48,8 +48,7 @@
 // =======================================================================
 
 define([
-  'jquery' /* jQuery, $ */,
-  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */
+  'jquery' /* jQuery, $ */
 ], function($) {
 
   var FALSE = !1

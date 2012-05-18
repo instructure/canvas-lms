@@ -21,8 +21,8 @@ define([
   'compiled/editor/stocktiny',
   'jquery',
   'vendor/scribd.view',
-  'jquery.instructure_jquery_patches',
   'jquery.instructure_misc_helpers',
+  'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
 ], function(require, tinymce, $, scribd) {
 

@@ -24,6 +24,9 @@ describe "courses" do
       wait_for_animations # we need to give the wizard a chance to pop up
       wizard_box = driver.find_element(:id, "wizard_box")
       wizard_box.displayed?.should be_false
+
+      # un-remember the setting
+      driver.execute_script "$.store.clear()"
     end
 
     it "should open and close wizard after initial close" do
@@ -125,7 +128,6 @@ describe "courses" do
         course_copy_helper do |driver|
           driver.find_element(:id, 'copy_everything').click
           wait_for_ajaximations
-          driver.find_element(:id, 'uncheck_everything').click
           @second_course.wiki.wiki_pages[0..2].each do |page|
             driver.find_element(:id, "copy_wiki_pages_#{CC::CCHelper.create_key(page)}").click
           end
@@ -161,6 +163,48 @@ describe "courses" do
         new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
         new_asmnt = @course.assignments.first
         new_asmnt.due_at.to_i.should == (new_start + 1.day).to_i
+      end
+
+      it "should not copy course settings if not checked (through course 'importing')" do
+
+        @second_course = Course.create!(:name => 'second course')
+        @second_course.syllabus_body = "<p>haha</p>"
+        @second_course.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+        @second_course.default_view = 'modules'
+
+        course_copy_helper do |driver|
+          driver.find_element(:id, 'copy_everything').click
+          wait_for_ajaximations
+        end
+
+        @course.syllabus_body.should == nil
+        @course.tab_configuration.should == []
+        @course.default_view.should == 'feed'
+      end
+
+      it "should copy the course (through course 'copying')" do
+        course_with_teacher_logged_in
+        @course.syllabus_body = "<p>haha</p>"
+        @course.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+        @course.default_view = 'modules'
+        @course.wiki.wiki_pages.create!(:title => "hi", :body => "Whatever")
+        @course.save!
+
+        get "/courses/#{@course.id}/copy"
+        expect_new_page_load { driver.find_element(:css, "div#content form").submit }
+        driver.find_element(:id, 'copy_everything').click
+        wait_for_ajaximations
+        driver.find_element(:id, 'copy_context_form').submit
+        wait_for_ajaximations
+
+        keep_trying_until { ContentMigration.last.copy_course_without_send_later }
+
+        keep_trying_until { driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
+
+        @new_course = Course.last(:order => :id)
+        @new_course.syllabus_body.should == nil
+        @new_course.tab_configuration.should == []
+        @new_course.default_view.should == 'feed'
       end
 
       it "should copy the course" do

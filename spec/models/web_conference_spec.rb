@@ -268,4 +268,30 @@ describe WebConference do
       conference.should_not be_restartable
     end
   end
+
+  context "notifications" do
+    before do
+      Notification.create!(:name => 'Web Conference Invitation')
+    end
+
+    it "should send notifications" do
+      course_with_student(:active_all => 1)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :context => @course)
+      conference.add_attendee(@student)
+      conference.save!
+      conference.messages_sent['Web Conference Invitation'].should_not be_empty
+    end
+
+    it "should not send notifications to inactive users" do
+      course_with_student(:active_all => 1)
+      @course.restrict_enrollments_to_course_dates = true
+      @course.start_at = 2.days.from_now
+      @course.conclude_at = 4.days.from_now
+      @course.save!
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :context => @course)
+      conference.add_attendee(@student)
+      conference.save!
+      conference.messages_sent['Web Conference Invitation'].should be_blank
+    end
+  end
 end

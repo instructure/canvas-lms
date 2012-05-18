@@ -37,51 +37,115 @@ describe QuizSubmission do
     q.reload.quiz_points_possible.should eql 1.9
   end
 
-  it "should not allow updating scores on an uncompleted submission" do
+  it "should not lose time" do
+    @quiz.update_attribute(:time_limit, 10)
     q = @quiz.quiz_submissions.create!
-    q.state.should eql(:untaken)
-    res = q.update_scores rescue false
-    res.should eql(false)
+    q.update_attribute(:started_at, Time.now)
+    original_end_at = q.end_at
+
+    @quiz.update_attribute(:time_limit, 5)
+    @quiz.update_quiz_submission_end_at_times
+
+    q.reload
+    q.end_at.should eql original_end_at
   end
 
-  it "should allow updating scores on a completed version of a submission while the current version is in progress" do
-    course_with_student(:active_all => true)
-    @quiz = @course.quizzes.create!
-    qs = @quiz.generate_submission(@user)
-    qs.submission_data = { "foo" => "bar1" }
-    qs.grade_submission
+  describe "#update_scores" do
+    before(:each) do
+      student_in_course
+      assignment_quiz([])
+      qd = multiple_choice_question_data
+      @quiz.quiz_data = [qd]
+      @quiz.points_possible = qd[:points_possible]
+      @quiz.save!
+    end
 
-    qs = @quiz.generate_submission(@user)
-    qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
-    qs.reload.attempt.should == 2
-    lambda {qs.update_scores}.should raise_error
-    lambda {qs.update_scores(:submission_version_number => 1) }.should_not raise_error
+    it "should update scores for a completed submission" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "1658" }
+      qs.grade_submission
 
-    qs.reload
-    qs.should be_untaken
-    qs.score.should be_nil
-  end
+      # sanity check
+      qs.reload
+      qs.score.should == 50
+      qs.kept_score.should == 50
 
-  it "should keep kept_score up-to-date when score changes while quiz is being re-taken" do
-    course_with_student(:active_all => true)
-    @quiz = @course.quizzes.create!(:scoring_policy => 'keep_highest')
-    qs = @quiz.generate_submission(@user)
-    qs.submission_data = { "foo" => "bar1" }
-    qs.grade_submission
-    qs.kept_score.should == 0
+      qs.update_scores({:fudge_points => -5, :question_score_1 => 50})
+      qs.score.should == 45
+      qs.fudge_points.should == -5
+      qs.kept_score.should == 45
+      v = qs.versions.current.model
+      v.score.should == 45
+      v.fudge_points.should == -5
+    end
 
-    qs = @quiz.generate_submission(@user)
-    qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
-    qs.reload
+    it "should not allow updating scores on an uncompleted submission" do
+      qs = @quiz.generate_submission(@student)
+      qs.should be_untaken
+      lambda { qs.update_scores }.should raise_error
+    end
 
-    qs.update_scores(:submission_version_number => 1, :fudge_points => 3)
-    qs.reload
+    it "should update scores for a previous submission" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "2405" }
+      qs.grade_submission
 
-    qs.should be_untaken
-    # score is nil because the current attempt is still in progress
-    # but kept_score is 3 because that's the higher score of the previous attempt
-    qs.score.should be_nil
-    qs.kept_score.should == 3
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "8544" }
+      qs.grade_submission
+
+      # sanity check
+      qs.score.should == 0
+      qs.kept_score.should == 0
+      qs.versions.count.should == 2
+
+      qs.update_scores({:submission_version_number => 1, :fudge_points => 10, :question_score_1 => 0})
+      qs.score.should == 0
+      qs.kept_score.should == 10
+      qs.versions.get(1).model.score.should == 10
+      qs.versions.current.model.score.should == 0
+    end
+
+    it "should allow updating scores on a completed version of a submission while the current version is in progress" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "2405" }
+      qs.grade_submission
+
+      qs = @quiz.generate_submission(@student)
+      qs.backup_submission_data({ "question_1" => "" }) # simulate k/v pairs we store for quizzes in progress
+      qs.reload.attempt.should == 2
+
+      lambda { qs.update_scores }.should raise_error
+      lambda { qs.update_scores(:submission_version_number => 1, :fudge_points => 1, :question_score_1 => 0) }.should_not raise_error
+
+      qs.should be_untaken
+      qs.score.should be_nil
+      qs.kept_score.should == 1
+
+      v = qs.versions.current.model
+      v.score.should == 1
+      v.fudge_points.should == 1
+    end
+
+    it "should keep kept_score up-to-date when score changes while quiz is being re-taken" do
+      qs = @quiz.generate_submission(@user)
+      qs.submission_data = { "question_1" => "2405" }
+      qs.grade_submission
+      qs.kept_score.should == 0
+
+      qs = @quiz.generate_submission(@user)
+      qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
+      qs.reload
+
+      qs.update_scores(:submission_version_number => 1, :fudge_points => 3)
+      qs.reload
+
+      qs.should be_untaken
+      # score is nil because the current attempt is still in progress
+      # but kept_score is 3 because that's the higher score of the previous attempt
+      qs.score.should be_nil
+      qs.kept_score.should == 3
+    end
   end
 
   it "should not allowed grading on an already-graded submission" do
@@ -204,7 +268,6 @@ describe QuizSubmission do
 
       last_version = @quiz_sub.versions.current.reload.model
       last_version.score.should == 3
-      last_version.kept_score.should == 3
       last_version.manually_scored.should be_true
     end
   end
@@ -483,11 +546,477 @@ describe QuizSubmission do
       @results.last.mastery.should eql(true)
       @results.last.original_mastery.should eql(false)
     end
+  end
 
-    it "should tally up fill in multiple blanks" do
-      course_with_student(:active_all => true)
-      # @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-      q = {:position=>1, :name=>"Question 1", :correct_comments=>"", :question_type=>"fill_in_multiple_blanks_question", :assessment_question_id=>7903, :incorrect_comments=>"", :neutral_comments=>"", :id=>1, :points_possible=>50, :question_name=>"Question 1", :answers=>[{:comments=>"", :text=>"control", :weight=>100, :id=>3950, :blank_id=>"answer1"}, {:comments=>"", :text=>"controll", :weight=>100, :id=>9177, :blank_id=>"answer1"}, {:comments=>"", :text=>"patrol", :weight=>100, :id=>9181, :blank_id=>"answer2"}, {:comments=>"", :text=>"soul", :weight=>100, :id=>3733, :blank_id=>"answer3"}, {:comments=>"", :text=>"tolls", :weight=>100, :id=>9756, :blank_id=>"answer4"}, {:comments=>"", :text=>"toll", :weight=>100, :id=>7829, :blank_id=>"answer4"}, {:comments=>"", :text=>"explode", :weight=>100, :id=>3046, :blank_id=>"answer5"}, {:comments=>"", :text=>"assplode", :weight=>100, :id=>5301, :blank_id=>"answer5"}, {:comments=>"", :text=>"old", :weight=>100, :id=>3367, :blank_id=>"answer6"}], :question_text=>"<p><span>Ayo my quality [answer1], captivates your party [answer2]. </span>Your mind, body, and [answer3]. For whom the bell [answer4], let the rhythm [answer5]. Big, bad, and bold b-boys of [answer6].</p>"}
+  describe ".score_question" do
+    it "should score a multiple_choice_question" do
+      qd = multiple_choice_question_data
+      QuizSubmission.score_question(qd, { "question_1" => "1658" }).should ==
+        { :question_id => 1, :correct => true, :points => 50, :answer_id => 1658, :text => "1658" }
+
+      QuizSubmission.score_question(qd, { "question_1" => "8544" }).should ==
+        { :question_id => 1, :correct => false, :points => 0, :answer_id => 8544, :text => "8544" }
+
+      QuizSubmission.score_question(qd, { "question_1" => "5" }).should ==
+        { :question_id => 1, :correct => false, :points => 0, :text => "5" }
+
+      QuizSubmission.score_question(qd, {}).should ==
+        { :question_id => 1, :correct => false, :points => 0, :text => "" }
+
+      QuizSubmission.score_question(qd, { "undefined_if_blank" => "1" }).should ==
+        { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
+    end
+
+    it "should score a true_false_question" do
+      qd = true_false_question_data
+      QuizSubmission.score_question(qd, { "question_1" => "8950" }).should ==
+        { :question_id => 1, :correct => true, :points => 45, :answer_id => 8950, :text => "8950" }
+
+      QuizSubmission.score_question(qd, { "question_1" => "8403" }).should ==
+        { :question_id => 1, :correct => false, :points => 0, :answer_id => 8403, :text => "8403" }
+
+      QuizSubmission.score_question(qd, { "question_1" => "5" }).should ==
+        { :question_id => 1, :correct => false, :points => 0, :text => "5" }
+
+      QuizSubmission.score_question(qd, {}).should ==
+        { :question_id => 1, :correct => false, :points => 0, :text => "" }
+
+      QuizSubmission.score_question(qd, { "undefined_if_blank" => "1" }).should ==
+        { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
+    end
+
+    it "should score a short_answer_question (Fill In The Blank)" do
+      qd = short_answer_question_data
+      QuizSubmission.score_question(qd, { "question_1" => "stupid" }).should ==
+        { :question_id => 1, :correct => true, :points => 16.5, :answer_id => 7100, :text => "stupid" }
+      QuizSubmission.score_question(qd, { "question_1" => "   DUmB\n " }).should ==
+        { :question_id => 1, :correct => true, :points => 16.5, :answer_id => 2159, :text => "   DUmB\n " }
+
+      QuizSubmission.score_question(qd, { "question_1" => "short" }).should ==
+        { :question_id => 1, :correct => false, :points => 0, :text => "short" }
+
+      QuizSubmission.score_question(qd, {}).should ==
+        { :question_id => 1, :correct => false, :points => 0, :text => "" }
+
+      QuizSubmission.score_question(qd, { "undefined_if_blank" => "1" }).should ==
+        { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
+    end
+
+    it "should score an essay_question" do
+      qd = essay_question_data
+      text = "that's too <b>dang</b> hard! <script>alert(1)</script>"
+      sanitized = "that's too <b>dang</b> hard! alert(1)"
+      QuizSubmission.score_question(qd, { "question_1" => text }).should ==
+        { :question_id => 1, :correct => "undefined", :points => 0, :text => sanitized }
+
+      QuizSubmission.score_question(qd, {}).should ==
+        { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
+    end
+
+    it "should score a text_only_question" do
+      QuizSubmission.score_question(text_only_question_data, {}).should ==
+        { :question_id => 3, :correct => "no_score", :points => 0, :text => "" }
+    end
+
+    it "should score a matching_question" do
+      q = matching_question_data
+
+      # 1 wrong answer
+      user_answer = QuizSubmission.score_question(q, {
+        "question_1_answer_7396" => "3562",
+        "question_1_answer_6081" => "3855",
+        "question_1_answer_4224" => "1397",
+        "question_1_answer_7397" => "6067",
+        "question_1_answer_7398" => "6068",
+        "question_1_answer_7399" => "6069",
+      })
+      user_answer.delete(:points).should be_close(41.67, 0.01)
+      user_answer.should == {
+        :question_id => 1, :correct => "partial", :text => "",
+        :answer_7396 => "3562",
+        :answer_6081 => "3855",
+        :answer_4224 => "1397",
+        :answer_7397 => "6067",
+        :answer_7398 => "6068",
+        :answer_7399 => "6069",
+      }
+
+      # 1 wrong answer but no partial credit allowed
+      user_answer = QuizSubmission.score_question(q.merge(:allow_partial_credit => false), {
+        "question_1_answer_7396" => "3562",
+        "question_1_answer_6081" => "3855",
+        "question_1_answer_4224" => "1397",
+        "question_1_answer_7397" => "6067",
+        "question_1_answer_7398" => "6068",
+        "question_1_answer_7399" => "6069",
+      })
+      user_answer.should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "",
+        :answer_7396 => "3562",
+        :answer_6081 => "3855",
+        :answer_4224 => "1397",
+        :answer_7397 => "6067",
+        :answer_7398 => "6068",
+        :answer_7399 => "6069",
+      }
+
+      # all wrong answers
+      user_answer = QuizSubmission.score_question(q, {
+        "question_1_answer_7396" => "3562",
+        "question_1_answer_6081" => "1500",
+        "question_1_answer_4224" => "8513",
+      })
+      user_answer.should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "",
+        :answer_7396 => "3562",
+        :answer_6081 => "1500",
+        :answer_4224 => "8513",
+        :answer_7397 => "",
+        :answer_7398 => "",
+        :answer_7399 => "",
+      }
+
+      user_answer = QuizSubmission.score_question(q, {
+        "question_1_answer_7396" => "6061",
+        "question_1_answer_6081" => "3855",
+        "question_1_answer_4224" => "1397",
+        "question_1_answer_7397" => "6067",
+        "question_1_answer_7398" => "6068",
+        "question_1_answer_7399" => "6069",
+      })
+      user_answer.should == {
+        :question_id => 1, :correct => true, :points => 50, :text => "",
+        :answer_7396 => "6061",
+        :answer_6081 => "3855",
+        :answer_4224 => "1397",
+        :answer_7397 => "6067",
+        :answer_7398 => "6068",
+        :answer_7399 => "6069",
+      }
+
+      # selected a different answer but the text of that answer was the same
+      user_answer = QuizSubmission.score_question(q, {
+        "question_1_answer_7396" => "1397",
+        "question_1_answer_6081" => "3855",
+        "question_1_answer_4224" => "1397",
+        "question_1_answer_7397" => "6067",
+        "question_1_answer_7398" => "6068",
+        "question_1_answer_7399" => "6069",
+      })
+      user_answer.should == {
+        :question_id => 1, :correct => true, :points => 50, :text => "",
+        :answer_7396 => "6061",
+        :answer_6081 => "3855",
+        :answer_4224 => "1397",
+        :answer_7397 => "6067",
+        :answer_7398 => "6068",
+        :answer_7399 => "6069",
+      }
+
+      # no answer shouldn't be treated as a blank string, breaking undefined_if_blank
+      QuizSubmission.score_question(q, { "undefined_if_blank" => "1" }).should == {
+        :question_id => 1, :correct => "undefined", :points => 0, :text => "",
+        :answer_7396 => "",
+        :answer_6081 => "",
+        :answer_4224 => "",
+        :answer_7397 => "",
+        :answer_7398 => "",
+        :answer_7399 => "",
+      }
+    end
+
+    it "should score a numerical_question" do
+      qd = numerical_question_data
+
+      QuizSubmission.score_question(qd, { "question_1" => "3.2" }).should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "3.2" }
+
+      QuizSubmission.score_question(qd, { "question_1" => "4" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "4", :answer_id => 9222 }
+
+      QuizSubmission.score_question(qd, { "question_1" => "-4" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "-4", :answer_id => 997 }
+
+      QuizSubmission.score_question(qd, { "question_1" => "4.05" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "4.05", :answer_id => 9370 }
+      QuizSubmission.score_question(qd, { "question_1" => "4.10" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "4.10", :answer_id => 9370 }
+      QuizSubmission.score_question(qd, { "question_1" => "3.90" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "3.90", :answer_id => 9370 }
+
+      QuizSubmission.score_question(qd, { "question_1" => "-4.1" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "-4.1", :answer_id => 5450 }
+      QuizSubmission.score_question(qd, { "question_1" => "-3.9" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "-3.9", :answer_id => 5450 }
+      QuizSubmission.score_question(qd, { "question_1" => "-4.05" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "-4.05", :answer_id => 5450 }
+
+      QuizSubmission.score_question(qd, { "question_1" => "" }).should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "" }
+
+      QuizSubmission.score_question(qd, { :undefined_if_blank => "1" }).should == {
+        :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
+
+      # blank answer should not be treated as 0.0
+      qd2 = qd.dup
+      qd2["answers"] << { "exact" => 0, "numerical_answer_type" => "exact_answer", "margin" => 0, "weight" => 100, "id" => 1234 }
+      QuizSubmission.score_question(qd2, { "question_1" => "" }).should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "" }
+    end
+
+    it "should score a calculated_question" do
+      qd = calculated_question_data
+
+      QuizSubmission.score_question(qd, { "question_1" => "-11.7" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "-11.7", :answer_id => 6396 }
+
+      QuizSubmission.score_question(qd, { "question_1" => "-11.68" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "-11.68", :answer_id => 6396 }
+
+      QuizSubmission.score_question(qd, { "question_1" => "-11.675" }).should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "-11.675" }
+
+      QuizSubmission.score_question(qd, {}).should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "" }
+
+      QuizSubmission.score_question(qd, { "question_1" => "-11.72" }).should == {
+        :question_id => 1, :correct => true, :points => 26.2, :text => "-11.72", :answer_id => 6396 }
+    end
+
+    it "should score a multiple_answers_question" do
+      qd = multiple_answers_question_data
+
+      QuizSubmission.score_question(qd, {
+        "question_1_answer_9761" => "1",
+        "question_1_answer_3079" => "0",
+        "question_1_answer_5194" => "1",
+        "question_1_answer_166"  => "1",
+        "question_1_answer_4739" => "0",
+        "question_1_answer_2196" => "1",
+        "question_1_answer_8982" => "1",
+        "question_1_answer_9701" => "1",
+        "question_1_answer_7381" => "0",
+      }).should == {
+        :question_id => 1, :correct => true, :points => 50, :text => "",
+        :answer_9761 => "1",
+        :answer_3079 => "0",
+        :answer_5194 => "1",
+        :answer_166  => "1",
+        :answer_4739 => "0",
+        :answer_2196 => "1",
+        :answer_8982 => "1",
+        :answer_9701 => "1",
+        :answer_7381 => "0",
+      }
+
+      # partial credit
+      user_answer = QuizSubmission.score_question(qd, {
+        "question_1_answer_9761" => "1",
+        "question_1_answer_3079" => "0",
+        "question_1_answer_5194" => "1",
+        "question_1_answer_166"  => "1",
+        "question_1_answer_4739" => "1",
+        "question_1_answer_2196" => "1",
+        "question_1_answer_8982" => "1",
+        "question_1_answer_9701" => "1",
+        "question_1_answer_7381" => "0",
+      })
+      user_answer.delete(:points).should be_close(41.67, 0.01)
+      user_answer.should == {
+        :question_id => 1, :correct => "partial", :text => "",
+        :answer_9761 => "1",
+        :answer_3079 => "0",
+        :answer_5194 => "1",
+        :answer_166  => "1",
+        :answer_4739 => "1",
+        :answer_2196 => "1",
+        :answer_8982 => "1",
+        :answer_9701 => "1",
+        :answer_7381 => "0",
+      }
+
+      user_answer = QuizSubmission.score_question(qd.merge(:allow_partial_credit => false), {
+        "question_1_answer_9761" => "1",
+        "question_1_answer_3079" => "0",
+        "question_1_answer_5194" => "1",
+        "question_1_answer_166"  => "1",
+        "question_1_answer_4739" => "1",
+        "question_1_answer_2196" => "1",
+        "question_1_answer_8982" => "1",
+        "question_1_answer_9701" => "1",
+        "question_1_answer_7381" => "0",
+      })
+      user_answer.should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "",
+        :answer_9761 => "1",
+        :answer_3079 => "0",
+        :answer_5194 => "1",
+        :answer_166  => "1",
+        :answer_4739 => "1",
+        :answer_2196 => "1",
+        :answer_8982 => "1",
+        :answer_9701 => "1",
+        :answer_7381 => "0",
+      }
+
+      # checking one that shouldn't be checked, subtracts one correct answer's worth of points
+      user_answer = QuizSubmission.score_question(qd, {
+        "question_1_answer_9761" => "1",
+        "question_1_answer_3079" => "0",
+        "question_1_answer_5194" => "0",
+        "question_1_answer_166"  => "1",
+        "question_1_answer_4739" => "1",
+        "question_1_answer_2196" => "1",
+        "question_1_answer_8982" => "1",
+        "question_1_answer_9701" => "0",
+        "question_1_answer_7381" => "0",
+      })
+      user_answer.delete(:points).should be_close(25.0, 0.01)
+      user_answer.should == {
+        :question_id => 1, :correct => "partial", :text => "",
+        :answer_9761 => "1",
+        :answer_3079 => "0",
+        :answer_5194 => "0",
+        :answer_166  => "1",
+        :answer_4739 => "1",
+        :answer_2196 => "1",
+        :answer_8982 => "1",
+        :answer_9701 => "0",
+        :answer_7381 => "0",
+      }
+
+      # can't get less than 0
+      user_answer = QuizSubmission.score_question(qd, {
+        "question_1_answer_9761" => "0",
+        "question_1_answer_3079" => "1",
+        "question_1_answer_5194" => "0",
+        "question_1_answer_166"  => "0",
+        "question_1_answer_4739" => "1",
+        "question_1_answer_2196" => "1",
+        "question_1_answer_8982" => "1",
+        "question_1_answer_9701" => "0",
+        "question_1_answer_7381" => "1",
+      })
+      user_answer.should == {
+        :question_id => 1, :correct => false, :points => 0, :text => "",
+        :answer_9761 => "0",
+        :answer_3079 => "1",
+        :answer_5194 => "0",
+        :answer_166  => "0",
+        :answer_4739 => "1",
+        :answer_2196 => "1",
+        :answer_8982 => "1",
+        :answer_9701 => "0",
+        :answer_7381 => "1",
+      }
+
+      # incorrect_dock allows a different value to be subtracted on incorrect answer
+      # this isn't exposed in the UI anywhere yet, but the code supports it
+      user_answer = QuizSubmission.score_question(qd.merge(:incorrect_dock => 1.5), {
+        "question_1_answer_9761" => "1",
+        "question_1_answer_3079" => "0",
+        "question_1_answer_5194" => "0",
+        "question_1_answer_166"  => "1",
+        "question_1_answer_4739" => "1",
+        "question_1_answer_2196" => "1",
+        "question_1_answer_8982" => "1",
+        "question_1_answer_9701" => "0",
+        "question_1_answer_7381" => "0",
+      })
+      user_answer.delete(:points).should be_close(31.83, 0.01)
+      user_answer.should == {
+        :question_id => 1, :correct => "partial", :text => "",
+        :answer_9761 => "1",
+        :answer_3079 => "0",
+        :answer_5194 => "0",
+        :answer_166  => "1",
+        :answer_4739 => "1",
+        :answer_2196 => "1",
+        :answer_8982 => "1",
+        :answer_9701 => "0",
+        :answer_7381 => "0",
+      }
+
+      QuizSubmission.score_question(qd, { "undefined_if_blank" => "1" }).should ==
+        { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
+    end
+
+    it "should score a multiple_dropdowns_question" do
+      q = multiple_dropdowns_question_data
+
+      user_answer = QuizSubmission.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5"=>"6994", "question_1630873_3f507e80e33ef092a02948a064433ec5"=>"5988", "question_1630873_78635a3709b540a59678c806b102d038"=>"9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab"=>"1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537"=>"4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d"=>"7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816"=>"6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840"=>"3353", "question_1630873_69d0969351d989767d7096f28daf7461"=>"3390"})
+      user_answer.delete(:points).should be_close(0.44, 0.01)
+      user_answer.should == {
+        :question_id => 1630873, :correct => "partial", :text => "",
+        :answer_for_structure1 => 4390,
+        :answer_id_for_structure1 => 4390,
+        :answer_for_event1 => 3390,
+        :answer_id_for_event1 => 3390,
+        :answer_for_structure2 => 6955,
+        :answer_id_for_structure2 => 6955,
+        :answer_for_structure3 => 5988,
+        :answer_id_for_structure3 => 5988,
+        :answer_for_structure4 => 7604,
+        :answer_id_for_structure4 => 7604,
+        :answer_for_event2 => 3353,
+        :answer_id_for_event2 => 3353,
+        :answer_for_structure5 => 9908,
+        :answer_id_for_structure5 => 9908,
+        :answer_for_structure6 => 6994,
+        :answer_id_for_structure6 => 6994,
+        :answer_for_structure7 => 1121,
+        :answer_id_for_structure7 => 1121,
+      }
+
+      user_answer = QuizSubmission.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5"=>"1883", "question_1630873_3f507e80e33ef092a02948a064433ec5"=>"5988", "question_1630873_78635a3709b540a59678c806b102d038"=>"878", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab"=>"9570", "question_1630873_02c8346333761ffe9bbddee7b1c5a537"=>"1522", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d"=>"9532", "question_1630873_94239fc44b4f8aaf36bd3596768f4816"=>"1228", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840"=>"599", "question_1630873_69d0969351d989767d7096f28daf7461"=>"5498"})
+      user_answer.should == {
+        :question_id => 1630873, :correct => false, :points => 0, :text => "",
+        :answer_for_structure1 => 1522,
+        :answer_id_for_structure1 => 1522,
+        :answer_for_event1 => 5498,
+        :answer_id_for_event1 => 5498,
+        :answer_for_structure2 => 1228,
+        :answer_id_for_structure2 => 1228,
+        :answer_for_structure3 => 5988,
+        :answer_id_for_structure3 => 5988,
+        :answer_for_structure4 => 9532,
+        :answer_id_for_structure4 => 9532,
+        :answer_for_event2 => 599,
+        :answer_id_for_event2 => 599,
+        :answer_for_structure5 => 878,
+        :answer_id_for_structure5 => 878,
+        :answer_for_structure6 => 1883,
+        :answer_id_for_structure6 => 1883,
+        :answer_for_structure7 => 9570,
+        :answer_id_for_structure7 => 9570,
+      }
+
+      user_answer = QuizSubmission.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5"=>"6994", "question_1630873_3f507e80e33ef092a02948a064433ec5"=>"7676", "question_1630873_78635a3709b540a59678c806b102d038"=>"9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab"=>"1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537"=>"4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d"=>"7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816"=>"6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840"=>"3353", "question_1630873_69d0969351d989767d7096f28daf7461"=>"3390"})
+      user_answer.should == {
+        :question_id => 1630873, :correct => true, :points => 0.5, :text => "",
+        :answer_for_structure1 => 4390,
+        :answer_id_for_structure1 => 4390,
+        :answer_for_event1 => 3390,
+        :answer_id_for_event1 => 3390,
+        :answer_for_structure2 => 6955,
+        :answer_id_for_structure2 => 6955,
+        :answer_for_structure3 => 7676,
+        :answer_id_for_structure3 => 7676,
+        :answer_for_structure4 => 7604,
+        :answer_id_for_structure4 => 7604,
+        :answer_for_event2 => 3353,
+        :answer_id_for_event2 => 3353,
+        :answer_for_structure5 => 9908,
+        :answer_id_for_structure5 => 9908,
+        :answer_for_structure6 => 6994,
+        :answer_id_for_structure6 => 6994,
+        :answer_for_structure7 => 1121,
+        :answer_id_for_structure7 => 1121,
+      }
+    end
+
+    it "should score a fill_in_multiple_blanks_question" do
+      q = fill_in_multiple_blanks_question_data
       user_answer = QuizSubmission.score_question(q, {
         "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "control",
         "question_1_a95fbffb573485f87b8c8aca541f5d4e" => "patrol",
@@ -496,8 +1025,21 @@ describe QuizSubmission do
         "question_1_90811a00aaf122ea20ab5c28be681ac9" => "assplode",
         "question_1_ce36b05cfdedbc990a188907fc29d37b" => "old",
       })
-      user_answer[:correct].should be_true
-      user_answer[:points].should == 50.0
+      user_answer.should ==
+        { :question_id => 1, :correct => true, :points => 50.0, :text => "",
+          :answer_for_answer1 => "control",
+          :answer_id_for_answer1 => 3950,
+          :answer_for_answer2 => "patrol",
+          :answer_id_for_answer2 => 9181,
+          :answer_for_answer3 => "soul",
+          :answer_id_for_answer3 => 3733,
+          :answer_for_answer4 => "toll",
+          :answer_id_for_answer4 => 7829,
+          :answer_for_answer5 => "assplode",
+          :answer_id_for_answer5 => 5301,
+          :answer_for_answer6 => "old",
+          :answer_id_for_answer6 => 3367,
+        }
 
       user_answer = QuizSubmission.score_question(q, {
         "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "control",
@@ -507,8 +1049,22 @@ describe QuizSubmission do
         "question_1_90811a00aaf122ea20ab5c28be681ac9" => "wut",
         "question_1_ce36b05cfdedbc990a188907fc29d37b" => "old",
       })
-      user_answer[:correct].should == "partial"
-      user_answer[:points].should be_close(41.6, 0.1)
+      user_answer.delete(:points).should be_close(41.6, 0.1)
+      user_answer.should ==
+        { :question_id => 1, :correct => "partial", :text => "",
+          :answer_for_answer1 => "control",
+          :answer_id_for_answer1 => 3950,
+          :answer_for_answer2 => "patrol",
+          :answer_id_for_answer2 => 9181,
+          :answer_for_answer3 => "soul",
+          :answer_id_for_answer3 => 3733,
+          :answer_for_answer4 => "toll",
+          :answer_id_for_answer4 => 7829,
+          :answer_for_answer5 => "wut",
+          :answer_id_for_answer5 => nil,
+          :answer_for_answer6 => "old",
+          :answer_id_for_answer6 => 3367,
+        }
 
       user_answer = QuizSubmission.score_question(q, {
         "question_1_a95fbffb573485f87b8c8aca541f5d4e" => "0",
@@ -517,8 +1073,43 @@ describe QuizSubmission do
         "question_1_90811a00aaf122ea20ab5c28be681ac9" => "wut",
         "question_1_ce36b05cfdedbc990a188907fc29d37b" => "oh well",
       })
-      user_answer[:correct].should be_false
-      user_answer[:points].should == 0
+      user_answer.should ==
+        { :question_id => 1, :correct => false, :points => 0, :text => "",
+          :answer_for_answer1 => "",
+          :answer_id_for_answer1 => nil,
+          :answer_for_answer2 => "0",
+          :answer_id_for_answer2 => nil,
+          :answer_for_answer3 => "fail",
+          :answer_id_for_answer3 => nil,
+          :answer_for_answer4 => "wrong",
+          :answer_id_for_answer4 => nil,
+          :answer_for_answer5 => "wut",
+          :answer_id_for_answer5 => nil,
+          :answer_for_answer6 => "oh well",
+          :answer_id_for_answer6 => nil,
+        }
+
+      # one blank to fill in
+      user_answer = QuizSubmission.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_10ca8479f89652b254a5c6ec90ab9ab8" => " DUmB \n " })
+      user_answer.should ==
+        { :question_id => 2, :correct => true, :points => 3.75, :text => "",
+          :answer_for_myblank => "dumb",
+          :answer_id_for_myblank => 1235, }
+
+      user_answer = QuizSubmission.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_10ca8479f89652b254a5c6ec90ab9ab8" => "wut" })
+      user_answer.should ==
+        { :question_id => 2, :correct => false, :points => 0, :text => "",
+          :answer_for_myblank => "wut",
+          :answer_id_for_myblank => nil, }
+    end
+
+    it "should score an unknown question type" do
+      # if a question with an invalid type makes it into the quiz data, we
+      # score it as always 0 out of points_possible, rather than raise an error
+      qd = {"name"=>"Question 1", "question_type"=>"Error", "assessment_question_id"=>nil, "migration_id"=>"i1234", "id"=>2, "points_possible"=>5.35, "question_name"=>"Question 1", "qti_error"=>"There was an error exporting an assessment question - No question type used when trying to parse a qti question", "question_text"=>"test1", "answers"=>[], "assessment_question_migration_id"=>"i1234"}.with_indifferent_access
+      user_answer = QuizSubmission.score_question(qd, {})
+      user_answer.should ==
+        { :question_id => 2, :correct => false, :points => 0, :text => "", }
     end
 
     it "should not escape user responses in fimb questions" do
@@ -560,6 +1151,97 @@ describe QuizSubmission do
       lambda {
         QuizSubmission.score_question(q, { "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "bleh" })
       }.should_not raise_error
+    end
+  end
+
+  describe "#score_to_keep" do
+    before(:each) do
+      student_in_course
+      assignment_quiz([])
+      qd = multiple_choice_question_data
+      @quiz.quiz_data = [qd]
+      @quiz.points_possible = qd[:points_possible]
+      @quiz.save!
+    end
+
+    context "keep_highest" do
+      before(:each) do
+        @quiz.scoring_policy = "keep_highest"
+        @quiz.save!
+      end
+
+      it "should be nil during first in-progress submission" do
+        qs = @quiz.generate_submission(@student)
+        qs.score_to_keep.should be_nil
+      end
+
+      it "should be the submission score for one complete submission" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs.score_to_keep.should == @quiz.points_possible
+      end
+
+      it "should be correct for multiple complete versions" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
+        qs.score_to_keep.should == @quiz.points_possible
+      end
+
+      it "should be correct for multiple versions, current version in progress" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.score_to_keep.should == @quiz.points_possible
+      end
+    end
+
+    context "keep_latest" do
+      before(:each) do
+        @quiz.scoring_policy = "keep_latest"
+        @quiz.save!
+      end
+
+      it "should be nil during first in-progress submission" do
+        qs = @quiz.generate_submission(@student)
+        qs.score_to_keep.should be_nil
+      end
+
+      it "should be the submission score for one complete submission" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs.score_to_keep.should == @quiz.points_possible
+      end
+
+      it "should be correct for multiple complete versions" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
+        qs.score_to_keep.should == 0
+      end
+
+      it "should be correct for multiple versions, current version in progress" do
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "1658" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.score_to_keep.should == 0
+      end
     end
   end
 

@@ -106,4 +106,43 @@ else
       ]
     end
   end
+
+  # ensure that the query cache is cleared on inserts, even if there's a db
+  # error. this is fixed in rails 3.1. unfortunately we have to reproduce
+  # whole method here and can't just alias it, since it calls super :(
+  # https://github.com/rails/rails/commit/1f3d3eb49d16b62250c24e3374cc36de99b397b8
+  if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+    ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+      remove_method :insert
+      def insert_sql(sql, name = nil, pk = nil, id_value = nil, sequence_name = nil)
+        # Extract the table from the insert sql. Yuck.
+        table = sql.split(" ", 4)[2].gsub('"', '')
+
+        # Try an insert with 'returning id' if available (PG >= 8.2)
+        if supports_insert_with_returning?
+          pk, sequence_name = *pk_and_sequence_for(table) unless pk
+          if pk
+            id = select_value("#{sql} RETURNING #{quote_column_name(pk)}")
+            return id
+          end
+        end
+
+        # Otherwise, insert then grab last_insert_id.
+        if insert_id = super
+          insert_id
+        else
+          # If neither pk nor sequence name is given, look them up.
+          unless pk || sequence_name
+            pk, sequence_name = *pk_and_sequence_for(table)
+          end
+
+          # If a pk is given, fallback to default sequence name.
+          # Don't fetch last insert id for a table without a pk.
+          if pk && sequence_name ||= default_sequence_name(table, pk)
+            last_insert_id(table, sequence_name)
+          end
+        end
+      end
+    end
+  end
 end

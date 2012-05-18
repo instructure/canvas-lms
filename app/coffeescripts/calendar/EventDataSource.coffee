@@ -65,7 +65,7 @@ define [
         fetchedAppointmentGroups: null
       }
       for contextInfo in @contexts
-        @cache.contexts[contextInfo.asset_string] = { 
+        @cache.contexts[contextInfo.asset_string] = {
           events: {},
           fetchedRanges: [],
           fetchedUndated: false,

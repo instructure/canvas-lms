@@ -42,41 +42,43 @@ class CountsReport
   def process
     start_time = Time.now
 
-    Shard.with_each_shard do
-      Account.root_accounts.each do |account|
-        next if account.external_status == 'test'
-        activity = CountsReport.last_activity(account.id)
-        next unless activity
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shard.with_each_shard do
+        Account.root_accounts.each do |account|
+          next if account.external_status == 'test'
+          activity = CountsReport.last_activity(account.id)
+          next unless activity
 
-        data = {}.with_indifferent_access
-        data[:generated_at] = @timestamp
-        data[:id] = account.id
-        data[:name] = account.name
-        data[:external_status] = account.external_status
-        data[:last_activity] = activity
-        data[:page_views_in_last_week] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", account.id, @yesterday - 1.week, @yesterday])
-        data[:page_views_in_last_month] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", account.id, @yesterday - 1.month, @yesterday])
+          data = {}.with_indifferent_access
+          data[:generated_at] = @timestamp
+          data[:id] = account.id
+          data[:name] = account.name
+          data[:external_status] = account.external_status
+          data[:last_activity] = activity
 
-        course_ids = get_course_ids(account)
+          course_ids = get_course_ids(account)
 
-        data[:courses] = course_ids.length
-        data[:teachers] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'TeacherEnrollment' })
-        data[:students] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'StudentEnrollment' })
-        data[:users] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => ["course_id IN (?) AND type <> ?", course_ids, 'StudentViewEnrollment'])
-        # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
-        data[:files], data[:files_size] = course_ids.length == 0 ? [0, 0] : Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.id]).first.map(&:to_i)
-        data[:media_files], data[:media_files_size] = course_ids.length == [0, 0] ? 0 : MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
-        data[:media_files_size] *= 1000
+          data[:courses] = course_ids.length
+          data[:teachers] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'TeacherEnrollment' })
+          data[:students] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'StudentEnrollment' })
+          data[:users] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => ["course_id IN (?) AND type <> ?", course_ids, 'StudentViewEnrollment'])
+          # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
+          data[:files], data[:files_size] = course_ids.length == 0 ? [0, 0] : Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.id]).first.map(&:to_i)
+          data[:media_files], data[:media_files_size] = course_ids.length == [0, 0] ? 0 : MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
+          data[:media_files_size] *= 1000
 
-        detailed = account.report_snapshots.detailed.build
-        detailed.created_at = @yesterday
-        detailed.data = data
-        detailed.save!
+          ActiveRecord::Base::ConnectionSpecification.with_environment(nil) do
+            detailed = account.report_snapshots.detailed.build
+            detailed.created_at = @yesterday
+            detailed.data = data
+            detailed.save!
 
-        save_detailed_progressive(account, data)
-        add_account_stats(data)
+            save_detailed_progressive(account, data)
+            add_account_stats(data)
+          end
+        end
+        nil
       end
-      nil
     end
     @overview[:seconds_to_process] = Time.now - start_time
 
@@ -140,7 +142,6 @@ class CountsReport
     if cumulative[:monthly].last and cumulative[:monthly].last[:year] == month[:year] and cumulative[:monthly].last[:month] == month[:month]
       cumulative[:monthly].pop 
     end
-    month[:page_views] = totals[:page_views_in_last_month]
     cumulative[:monthly] << month
     while cumulative[:monthly].length > MONTHS_TO_KEEP
       cumulative[:monthly].shift
@@ -151,7 +152,6 @@ class CountsReport
     if cumulative[:weekly].last and cumulative[:weekly].last[:year] == week[:year] and cumulative[:weekly].last[:week] == week[:week]
       cumulative[:weekly].pop 
     end
-    week[:page_views] = totals[:page_views_in_last_week]
     cumulative[:weekly] << week
     while cumulative[:weekly].length > WEEKS_TO_KEEP
       cumulative[:weekly].shift
@@ -168,8 +168,6 @@ class CountsReport
     to[:files_size] = from[:files_size]
     to[:media_files] = from[:media_files]
     to[:media_files_size] = from[:media_files_size]
-    to[:page_views_in_last_week] = from[:page_views_in_last_week]
-    to[:page_views_in_last_month] = from[:page_views_in_last_month]
   end
 
   def add_account_stats(account)
@@ -186,8 +184,6 @@ class CountsReport
     @overview[account[:external_status]][:media_files] += account[:media_files]
     @overview[account[:external_status]][:media_files_size] += account[:media_files_size]
     @overview[account[:external_status]][:users] += account[:users]
-    @overview[account[:external_status]][:page_views_in_last_week] += account[:page_views_in_last_week]
-    @overview[account[:external_status]][:page_views_in_last_month] += account[:page_views_in_last_month]
 
     @overview[:totals][:institutions] += 1
     @overview[:totals][:courses] += account[:courses]
@@ -198,8 +194,6 @@ class CountsReport
     @overview[:totals][:media_files] += account[:media_files]
     @overview[:totals][:media_files_size] += account[:media_files_size]
     @overview[:totals][:users] += account[:users]
-    @overview[:totals][:page_views_in_last_week] += account[:page_views_in_last_week]
-    @overview[:totals][:page_views_in_last_month] += account[:page_views_in_last_month]
   end
 
   def self.last_activity(account_id)
@@ -231,8 +225,6 @@ class CountsReport
       :files_size=>0,
       :media_files=>0,
       :media_files_size=>0,
-      :page_views_in_last_week=>0,
-      :page_views_in_last_month=>0
     }
   end
 

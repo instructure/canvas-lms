@@ -21,10 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'appointment_group_updated.email' do
   it "should render" do
-    user = user_model
-    appointment_group_model(:context => course_model)
+    user = course_with_student(:active_all => true)
+    appointment_group_model(:contexts => [@course])
 
-    generate_message(:appointment_group_updated, :email, @appointment_group)
+    generate_message(:appointment_group_updated, :email, @appointment_group, :user => @user)
 
     @message.subject.should include('some title')
     @message.body.should include('some title')
@@ -36,7 +36,7 @@ describe 'appointment_group_updated.email' do
     user = user_model
     @course = course_model
     cat = @course.group_categories.create(:name => 'teh category')
-    appointment_group_model(:context => @course, :sub_context => cat)
+    appointment_group_model(:contexts => [@course], :sub_context => cat)
 
     generate_message(:appointment_group_updated, :email, @appointment_group)
 

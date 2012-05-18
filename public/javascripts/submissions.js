@@ -21,7 +21,6 @@ define([
   'jquery',
   'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
-  'jquery.instructure_jquery_patches' /* /\.scrollTop/ */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,

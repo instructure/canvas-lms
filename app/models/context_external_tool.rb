@@ -23,6 +23,7 @@ class ContextExternalTool < ActiveRecord::Base
   workflow do
     state :anonymous
     state :name_only
+    state :email_only
     state :public
     state :deleted
   end
@@ -71,7 +72,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def privacy_level=(val)
-    if ['anonymous', 'name_only', 'public'].include?(val)
+    if ['anonymous', 'name_only', 'email_only', 'public'].include?(val)
       self.workflow_state = val
     end
   end
@@ -224,7 +225,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def include_email?
-    public?
+    email_only? || public?
   end
   
   def include_name?
@@ -290,33 +291,28 @@ class ContextExternalTool < ActiveRecord::Base
   # the teacher).
   def self.find_external_tool(url, context, preferred_tool_id=nil)
     url = ContextExternalTool.standardize_url(url)
-    account_contexts = []
-    other_contexts = []
+    contexts = []
     while context
       if context.is_a?(Group)
-        other_contexts << context
+        contexts << context
         context = context.context || context.account
       elsif context.is_a?(Course)
-        other_contexts << context
+        contexts << context
         context = context.account
       elsif context.is_a?(Account)
-        account_contexts << context
+        contexts << context
         context = context.parent_account
       else
         context = nil
       end
     end
-    return nil if account_contexts.empty? && other_contexts.empty?
-    account_contexts.each do |context|
+    return nil if contexts.empty?
+    contexts.each do |context|
+      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.url && tool.matches_url?(url) }
+      return res if res
+    end
+    contexts.each do |context|
       res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.domain && tool.matches_url?(url) }
-      return res if res
-    end
-    account_contexts.each do |context|
-      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.matches_url?(url) }
-      return res if res
-    end
-    other_contexts.reverse.each do |context|
-      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.matches_url?(url) }
       return res if res
     end
     nil

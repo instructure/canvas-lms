@@ -67,7 +67,7 @@ class GradebooksController < ApplicationController
           @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
           # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
           # assignment in order to calculate grade distributions
-          @all_submissions = @context.submissions.all
+          @all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
           @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
           format.html { render :action => 'grade_summary' }
         else

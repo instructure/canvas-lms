@@ -56,6 +56,26 @@ describe CoursesController do
       response.should be_success
       response.should render_template("settings")
     end
+
+    it "should give a helpful error message for students that can't access yet" do
+      course_with_student_logged_in(:active_all => true)
+      @course.workflow_state = 'claimed'
+      @course.save!
+      get 'settings', :course_id => @course.id
+      response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_reason].should == :unpublished
+      assigns[:unauthorized_message].should_not be_nil
+
+      @course.workflow_state = 'available'
+      @course.save!
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.save!
+      get 'settings', :course_id => @course.id
+      response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_reason].should == :unpublished
+      assigns[:unauthorized_message].should_not be_nil
+    end
   end
   
   describe "GET 'enrollment_invitation'" do
@@ -157,6 +177,7 @@ describe CoursesController do
       @course.save!
       get 'show', :id => @course.id
       response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
 
       @course.workflow_state = 'available'
@@ -166,6 +187,7 @@ describe CoursesController do
       @enrollment.save!
       get 'show', :id => @course.id
       response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
     end
 
@@ -199,9 +221,9 @@ describe CoursesController do
         @course1 = @course
         course_with_teacher(:course => @course1)
         
-        course_with_student_logged_in(:active_all => true, :user => @student)
+        course_with_student(:active_all => true, :user => @student)
         @course2 = @course
-        course_with_teacher(:course => @course1, :user => @teacher)
+        course_with_teacher(:course => @course2, :user => @teacher)
         
         @a1 = @course1.assignments.new(:title => "some assignment course 1")
         @a1.workflow_state = "published"
@@ -209,6 +231,7 @@ describe CoursesController do
         @s1 = @a1.submit_homework(@student)
         @c1 = @s1.add_comment(:author => @teacher, :comment => "some comment1")
         
+        # this shouldn't show up in any course 1 list
         @a2 = @course2.assignments.new(:title => "some assignment course 2")
         @a2.workflow_state = "published"
         @a2.save
@@ -256,6 +279,12 @@ describe CoursesController do
         assigns(:recent_feedback).first.assignment_id.should == @a1.id
       end
       
+      it "should only show recent feedback if user is student in specified course" do
+        course_with_teacher(:active_all => true, :user => @student)
+        @course3 = @course
+        get 'show', :id => @course3.id
+        assigns(:show_recent_feedback).should be_false
+      end
     end
 
     context "invitations" do

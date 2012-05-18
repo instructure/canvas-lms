@@ -14,8 +14,7 @@
 define([
 	'jquery',
 	'jqueryui/core',
-	'jqueryui/widget',
-  'jquery.instructure_jquery_patches' /* /\.disabled/ */
+	'jqueryui/widget'
 ], function( $, _core, _widget, undefined ) {
 
 var lastActive, startXPos, startYPos, clickDragged,

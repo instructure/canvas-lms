@@ -53,7 +53,7 @@ sample markup:
 .al-options {
   background-color: transparent;
   border: none;
-  box-shadow: rgba(0,0,0, 0.8) 0px 3px 5px 0px;
+  box-shadow: 0px 3px 5px 0px rgba(0,0,0, 0.8);
   .ui-menu-item a {
     background-color: black; /* ie<=8 */
     background-color: rgba(0,0,0, 0.7);

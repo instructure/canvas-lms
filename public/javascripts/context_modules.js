@@ -23,7 +23,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* /\$\.underscore/ */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
@@ -415,320 +415,6 @@ define([
     };
   })();
   
-  $(document).ready(function() {
-    $(".datetime_field").datetime_field();
-    $(".context_module").live('mouseover', function() {
-      $(".context_module_hover").removeClass('context_module_hover');
-      $(this).addClass('context_module_hover');
-    });
-    $(".context_module_item").live('mouseover', function() {
-      $(".context_module_item_hover").removeClass('context_module_item_hover');
-      $(this).addClass('context_module_item_hover');
-    });
-    var $currentElem = null;
-    var hover = function($elem) {
-      if($elem.hasClass('context_module')) {
-        $(".context_module_hover").removeClass('context_module_hover');
-        $(".context_module_item_hover").removeClass('context_module_item_hover');
-        $elem.addClass('context_module_hover');
-      } else if($elem.hasClass('context_module_item')) {
-        $(".context_module_item_hover").removeClass('context_module_item_hover');
-        $(".context_module_hover").removeClass('context_module_hover');
-        $elem.addClass('context_module_item_hover');
-        $elem.parents(".context_module").addClass('context_module_hover');
-      }
-      $elem.find(":tabbable:first").focus();
-    };
-    $(document).keycodes('j k', function(event) {
-      $currentElem = $(".context_module_hover:visible,.context_module_item_hover:visible").filter(":last");
-      if($currentElem.length === 0) {
-        $currentElem = $(".context_module:visible:first");
-        hover($currentElem);
-        return;
-      }
-      var method = "prev";
-      var $elem = null;
-      if(event.keyString == 'j') {
-        if($currentElem.hasClass('context_module')) {
-          $elem = $currentElem.find(".context_module_item:visible:first");
-          if($elem.length === 0) {
-            $elem = $currentElem.next(".context_module");
-          }
-        } else if($currentElem.hasClass('context_module_item')) {
-          $elem = $currentElem.next(".context_module_item:visible");
-          if($elem.length === 0) {
-            $elem = $currentElem.parents(".context_module").next(".context_module");
-          }
-        }
-      } else if(event.keyString == 'k') {
-        if($currentElem.hasClass('context_module')) {
-          $elem = $currentElem.prev(".context_module").find(".context_module_item:visible:last");
-          if($elem.length === 0) {
-            $elem = $currentElem.prev(".context_module");
-          }
-        } else if($currentElem.hasClass('context_module_item')) {
-          $elem = $currentElem.prev(".context_module_item:visible");
-          if($elem.length === 0) {
-            $elem = $currentElem.parents(".context_module");
-          }
-        }
-      }
-      if($elem && $elem.length > 0) {
-        $currentElem = $elem;
-      }
-      hover($currentElem);
-    }).keycodes('e d i o', function(event) {
-      if(!$currentElem || $currentElem.length === 0) {
-        return;
-      }
-      if(event.keyString == 'e') {
-        $currentElem.find(".edit_link:first:visible").click();
-      } else if(event.keyString == 'd') {
-        $currentElem.find(".delete_link:first:visible").click();
-      } else if(event.keyString == 'i') {
-        $currentElem.find(".indent_item_link:first:visible").click();
-      } else if(event.keyString == 'o') {
-        $currentElem.find(".outdent_item_link:first:visible").click();
-      }
-    }).keycodes('n', function(event) {
-      if(event.keyString == 'n') {
-        $(".add_module_list:visible:first").click();
-      }
-    });;
-    if($(".context_module:first .content:visible").length == 0) {
-      $("html,body").scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"));
-    }
-    if($("#context_modules").hasClass('editable')) {
-      setTimeout(modules.initModuleManagement, 1000);
-    }
-    
-    modules.updateProgressions();
-    modules.refreshProgressions();
-    modules.updateAssignmentData();
-    
-    $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click', function(event, goSlow) {
-      event.preventDefault();
-      var expandCallback = null;
-      if(goSlow && $.isFunction(goSlow)) {
-        expandCallback = goSlow;
-        goSlow = null;
-      }
-      var collapse = $(this).hasClass('collapse_module_link') ? '1' : '0';
-      var $module = $(this).parents(".context_module");
-      var reload_entries = $module.find(".content .context_module_items").children().length === 0;
-      var toggle = function(show) {
-        var callback = function() {
-          $module.find(".collapse_module_link").showIf($module.find(".content:visible").length > 0);
-          $module.find(".expand_module_link").showIf($module.find(".content:visible").length === 0);
-          if($module.find(".content:visible").length > 0) {
-            $module.find(".footer .manage_module").css('display', '');
-            $module.toggleClass('collapsed_module', false);
-          } else {
-            $module.find(".footer .manage_module").css('display', ''); //'none');
-            $module.toggleClass('collapsed_module', true);
-          }
-          if(expandCallback && $.isFunction(expandCallback)) {
-            expandCallback();
-          }
-        };
-        if(show) {
-          $module.find(".content").show();
-          callback();
-        } else {
-          $module.find(".content").slideToggle(callback);
-        }
-      }
-      if(reload_entries || goSlow) {
-        $module.loadingImage();
-      }
-      var url = $(this).attr('href');
-      if(goSlow) {
-        url = $module.find(".edit_module_link").attr('href');
-      }
-      $.ajaxJSON(url, (goSlow ? 'GET' : 'POST'), {collapse: collapse}, function(data) {
-        if(goSlow) {
-          $module.loadingImage('remove');
-          var items = data;
-          var next = function() {
-            var item = items.shift();
-            if(item) {
-              modules.addItemToModule($module, item.content_tag);
-              next();
-            } else {
-              $module.find(".context_module_items").sortable('refresh');
-              toggle(true);
-              modules.updateProgressionState($module);
-              $("#context_modules").triggerHandler('slow_load');
-            }
-          };
-          next();
-        } else {
-          if(reload_entries) {
-            $module.loadingImage('remove');
-            for(var idx in data) {
-              modules.addItemToModule($module, data[idx].content_tag);
-            }
-            $module.find(".context_module_items").sortable('refresh');
-            toggle();
-            modules.updateProgressionState($module);
-          }
-        }
-      }, function(data) {
-        $module.loadingImage('remove');
-      });
-      if(collapse == '1' || !reload_entries) {
-        toggle();
-      }
-    });
-    $(".refresh_progressions_link").click(function(event) {
-      event.preventDefault();
-      $(this).addClass('refreshing');
-      var $link = $(this);
-      var id = $("#student_progression_dialog").find(".student.selected_side_tab:first").getTemplateData({textValues: ['id']}).id;
-      if(id) {
-        modules.updateProgressions(id, function() {
-          $link.removeClass('refreshing');
-          $link.blur();
-          $("#student_progression_dialog").find(".student.selected_side_tab:first").click();
-        });
-      }
-    });
-    $("#student_progression_dialog").delegate('.student', 'click', function(event) {
-      $("#student_progression_dialog").find(".selected_side_tab").removeClass('selected_side_tab');
-      $(this).addClass('selected_side_tab');
-      event.preventDefault();
-      var id = $(this).getTemplateData({textValues: ['id']}).id;
-      var $studentWithProgressions = $("#progression_list .student_" + id + ":first");
-      $("#context_modules .context_module:visible").each(function() {
-        var $module = $(this);
-        var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
-        var $row = $("#student_progression_dialog .module_" + moduleData.id);
-        
-        moduleData.progress = $studentWithProgressions.find(".progression_" + moduleData.id + ":first").getTemplateData({textValues: ['workflow_state']}).workflow_state;
-        moduleData.progress = moduleData.progress || "no information";
-        var type = "nothing";
-        if(moduleData.progress == "unlocked") {
-          type = "in_progress";
-          moduleData.progress = "in progress";
-        } else if(moduleData.progress == "started") {
-          type = "in_progress";
-          moduleData.progress = "in progress";
-        } else if(moduleData.progress == "completed") {
-          type = "completed";
-        } else if(moduleData.progress == "locked") {
-          type = "locked";
-        }
-        $row.find(".still_need_completing").empty();
-        if(moduleData.progress == "in progress") {
-          var $requirements = $("#context_module_" + moduleData.id + " .context_module_item.progression_requirement");
-          var progression = $studentWithProgressions.find(".progression_" + moduleData.id).data('progression');
-          var unfulfilled = [];
-          $requirements.each(function() {
-            var $req = $(this);
-            var req = {id: $req.attr('id').substring(20)};
-            if($req.hasClass('must_view_requirement')) {
-              req.type = 'must_view';
-            } else if($req.hasClass('min_score_requirement')) {
-              req.type = 'min_score';
-            } else if($req.hasClass('max_score_requirement')) {
-              req.type = 'max_score';
-            } else if($req.hasClass('must_contribute_requirement')) {
-              req.type = 'must_contribute';
-            } else if($req.hasClass('must_submit_requirement')) {
-              req.type = 'must_submit';
-            }
-            var met = false;
-            if(progression && progression.requirements_met) {
-              for(var jdx = 0; jdx < progression.requirements_met.length; jdx++) {
-                var compare = progression.requirements_met[jdx];
-                if(compare.id == req.id && compare.type == req.type) {
-                  met = true;
-                }
-              }
-            }
-            if(!met) {
-              unfulfilled.push($req.find(".title:first").text());
-            }
-          });
-          $row.find(".still_need_completing")
-            .append("<b>"+I18n.t('still_needs_completing', 'Still Needs to Complete')+"</b><br/>")
-            .append(unfulfilled.join("<br/>"));
-        }
-        $row.removeClass('locked').removeClass('in_progress').removeClass('completed')
-          .addClass(type);
-        moduleData.progressString = moduleData.progress;
-        $row.fillTemplateData({data: moduleData});
-      });
-    });
-    $(".module_progressions_link").click(function(event) {
-      event.preventDefault();
-      var $dialog = $("#student_progression_dialog");
-      var $student_list = $dialog.find(".student_list");
-      $student_list.find(".student:not(.blank)").remove();
-      $dialog.find(".side_tabs_content tbody .module:not(.blank)").remove();
-      var $visible_modules = $("#context_modules .context_module:visible");
-      var module_ids = [];
-      $visible_modules.each(function() {
-        var $mod = $(this);
-        var id = $mod.attr('id').substring(15);
-        module_ids.push(id);
-      });
-      $("#progression_list .student").each(function() {
-        var $student = $dialog.find(".student.blank:first").clone(true).removeClass('blank');
-        var $studentWithProgressions = $(this);
-        var data = $studentWithProgressions.getTemplateData({textValues: ['name', 'id', 'current_module']});
-        data.current_module = data.current_module || I18n.t('none_in_progress', "none in progress");
-        $student.find("a").attr('href', '#' + data.id);
-        $student.fillTemplateData({data: data});
-        $student_list.append($student.show())
-      });
-      $visible_modules.each(function() {
-        var $module = $(this);
-        var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
-        var $template = $dialog.find(".module.blank:first").clone(true).removeClass('blank');
-        
-        $template.addClass('module_' + moduleData.id);
-        $template.fillTemplateData({data: moduleData});
-        $dialog.find(".side_tabs_content tbody").append($template.show());
-      });
-  
-      $("#student_progression_dialog").dialog('close').dialog({
-        autoOpen: false,
-        width: 800,
-        open: function() {
-          $(this).find(".student:not(.blank):first .name").click();
-        }
-      }).dialog('open');
-    });
-    $(".context_module .progression_details_link").click(function(event) {
-      event.preventDefault();
-      var data = $(this).parents(".context_module").find(".header").getTemplateData({textValues: ['id', 'name']});
-      data.module_name = data.name;
-      var $dialog = $("#module_progression_dialog");
-      $dialog.fillTemplateData({data: data});
-      $dialog.find("ul").empty();
-      $dialog.find(".progression_list").hide();
-      $("#progression_list .student").each(function() { //.progressions .progression_" + data.id).each(function() {
-        var $progression = $(this).find(".progressions .progression_" + data.id);
-        var progressionData = $progression.getTemplateData({textValues: ['context_module_id', 'workflow_state']});
-        progressionData.workflow_state = progressionData.workflow_state || "locked";
-        progressionData.name = $(this).getTemplateData({textValues: ['name']}).name;
-        $dialog.find("." + progressionData.workflow_state + "_list").show()
-          .find("ul").show().append($("<li />").text(progressionData.name));
-      });
-      $("#module_progression_dialog").dialog('close').dialog({
-        autoOpen: false,
-        title: I18n.t('titles.student_progress', "Student Progress for Module"),
-        width: 500
-      }).dialog('open');
-    });
-    $(document).fragmentChange(function(event, hash) {
-      var module = $(hash.replace(/module/, "context_module"));
-      if (module.hasClass('collapsed_module')) {
-        module.find(".expand_module_link").triggerHandler('click');
-      }
-    });
-  });
   modules.initModuleManagement = function() {
     $("#unlock_module_at").change(function() {
       $(".unlock_module_at_details").showIf($(this).attr('checked'));
@@ -1152,6 +838,349 @@ define([
       modules.refreshed = true;
     }, 1000);
   }
+
+  $(document).ready(function() {
+    $(".datetime_field").datetime_field();
+    $(".context_module").live('mouseover', function() {
+      $(".context_module_hover").removeClass('context_module_hover');
+      $(this).addClass('context_module_hover');
+    });
+    $(".context_module_item").live('mouseover', function() {
+      $(".context_module_item_hover").removeClass('context_module_item_hover');
+      $(this).addClass('context_module_item_hover');
+    });
+    var $currentElem = null;
+    var hover = function($elem) {
+      if($elem.hasClass('context_module')) {
+        $(".context_module_hover").removeClass('context_module_hover');
+        $(".context_module_item_hover").removeClass('context_module_item_hover');
+        $elem.addClass('context_module_hover');
+      } else if($elem.hasClass('context_module_item')) {
+        $(".context_module_item_hover").removeClass('context_module_item_hover');
+        $(".context_module_hover").removeClass('context_module_hover');
+        $elem.addClass('context_module_item_hover');
+        $elem.parents(".context_module").addClass('context_module_hover');
+      }
+      $elem.find(":tabbable:first").focus();
+    };
+    $(document).keycodes('j k', function(event) {
+      $currentElem = $(".context_module_hover:visible,.context_module_item_hover:visible").filter(":last");
+      if($currentElem.length === 0) {
+        $currentElem = $(".context_module:visible:first");
+        hover($currentElem);
+        return;
+      }
+      var method = "prev";
+      var $elem = null;
+      if(event.keyString == 'j') {
+        if($currentElem.hasClass('context_module')) {
+          $elem = $currentElem.find(".context_module_item:visible:first");
+          if($elem.length === 0) {
+            $elem = $currentElem.next(".context_module");
+          }
+        } else if($currentElem.hasClass('context_module_item')) {
+          $elem = $currentElem.next(".context_module_item:visible");
+          if($elem.length === 0) {
+            $elem = $currentElem.parents(".context_module").next(".context_module");
+          }
+        }
+      } else if(event.keyString == 'k') {
+        if($currentElem.hasClass('context_module')) {
+          $elem = $currentElem.prev(".context_module").find(".context_module_item:visible:last");
+          if($elem.length === 0) {
+            $elem = $currentElem.prev(".context_module");
+          }
+        } else if($currentElem.hasClass('context_module_item')) {
+          $elem = $currentElem.prev(".context_module_item:visible");
+          if($elem.length === 0) {
+            $elem = $currentElem.parents(".context_module");
+          }
+        }
+      }
+      if($elem && $elem.length > 0) {
+        $currentElem = $elem;
+      }
+      hover($currentElem);
+    }).keycodes('e d i o', function(event) {
+      if(!$currentElem || $currentElem.length === 0) {
+        return;
+      }
+      if(event.keyString == 'e') {
+        $currentElem.find(".edit_link:first:visible").click();
+      } else if(event.keyString == 'd') {
+        $currentElem.find(".delete_link:first:visible").click();
+      } else if(event.keyString == 'i') {
+        $currentElem.find(".indent_item_link:first:visible").click();
+      } else if(event.keyString == 'o') {
+        $currentElem.find(".outdent_item_link:first:visible").click();
+      }
+    }).keycodes('n', function(event) {
+      if(event.keyString == 'n') {
+        $(".add_module_list:visible:first").click();
+      }
+    });;
+    if($(".context_module:first .content:visible").length == 0) {
+      $("html,body").scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"));
+    }
+    if($("#context_modules").hasClass('editable')) {
+      setTimeout(modules.initModuleManagement, 1000);
+    }
+    
+    modules.updateProgressions();
+    modules.refreshProgressions();
+    modules.updateAssignmentData();
+    
+    $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click', function(event, goSlow) {
+      event.preventDefault();
+      var expandCallback = null;
+      if(goSlow && $.isFunction(goSlow)) {
+        expandCallback = goSlow;
+        goSlow = null;
+      }
+      var collapse = $(this).hasClass('collapse_module_link') ? '1' : '0';
+      var $module = $(this).parents(".context_module");
+      var reload_entries = $module.find(".content .context_module_items").children().length === 0;
+      var toggle = function(show) {
+        var callback = function() {
+          $module.find(".collapse_module_link").showIf($module.find(".content:visible").length > 0);
+          $module.find(".expand_module_link").showIf($module.find(".content:visible").length === 0);
+          if($module.find(".content:visible").length > 0) {
+            $module.find(".footer .manage_module").css('display', '');
+            $module.toggleClass('collapsed_module', false);
+          } else {
+            $module.find(".footer .manage_module").css('display', ''); //'none');
+            $module.toggleClass('collapsed_module', true);
+          }
+          if(expandCallback && $.isFunction(expandCallback)) {
+            expandCallback();
+          }
+        };
+        if(show) {
+          $module.find(".content").show();
+          callback();
+        } else {
+          $module.find(".content").slideToggle(callback);
+        }
+      }
+      if(reload_entries || goSlow) {
+        $module.loadingImage();
+      }
+      var url = $(this).attr('href');
+      if(goSlow) {
+        url = $module.find(".edit_module_link").attr('href');
+      }
+      $.ajaxJSON(url, (goSlow ? 'GET' : 'POST'), {collapse: collapse}, function(data) {
+        if(goSlow) {
+          $module.loadingImage('remove');
+          var items = data;
+          var next = function() {
+            var item = items.shift();
+            if(item) {
+              modules.addItemToModule($module, item.content_tag);
+              next();
+            } else {
+              $module.find(".context_module_items").sortable('refresh');
+              toggle(true);
+              modules.updateProgressionState($module);
+              $("#context_modules").triggerHandler('slow_load');
+            }
+          };
+          next();
+        } else {
+          if(reload_entries) {
+            $module.loadingImage('remove');
+            for(var idx in data) {
+              modules.addItemToModule($module, data[idx].content_tag);
+            }
+            $module.find(".context_module_items").sortable('refresh');
+            toggle();
+            modules.updateProgressionState($module);
+          }
+        }
+      }, function(data) {
+        $module.loadingImage('remove');
+      });
+      if(collapse == '1' || !reload_entries) {
+        toggle();
+      }
+    });
+    $(".refresh_progressions_link").click(function(event) {
+      event.preventDefault();
+      $(this).addClass('refreshing');
+      var $link = $(this);
+      var id = $("#student_progression_dialog").find(".student.selected_side_tab:first").getTemplateData({textValues: ['id']}).id;
+      if(id) {
+        modules.updateProgressions(id, function() {
+          $link.removeClass('refreshing');
+          $link.blur();
+          $("#student_progression_dialog").find(".student.selected_side_tab:first").click();
+        });
+      }
+    });
+    $("#student_progression_dialog").delegate('.student', 'click', function(event) {
+      $("#student_progression_dialog").find(".selected_side_tab").removeClass('selected_side_tab');
+      $(this).addClass('selected_side_tab');
+      event.preventDefault();
+      var id = $(this).getTemplateData({textValues: ['id']}).id;
+      var $studentWithProgressions = $("#progression_list .student_" + id + ":first");
+      $("#context_modules .context_module:visible").each(function() {
+        var $module = $(this);
+        var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
+        var $row = $("#student_progression_dialog .module_" + moduleData.id);
+        
+        moduleData.progress = $studentWithProgressions.find(".progression_" + moduleData.id + ":first").getTemplateData({textValues: ['workflow_state']}).workflow_state;
+        moduleData.progress = moduleData.progress || "no information";
+        var type = "nothing";
+        if(moduleData.progress == "unlocked") {
+          type = "in_progress";
+          moduleData.progress = "in progress";
+        } else if(moduleData.progress == "started") {
+          type = "in_progress";
+          moduleData.progress = "in progress";
+        } else if(moduleData.progress == "completed") {
+          type = "completed";
+        } else if(moduleData.progress == "locked") {
+          type = "locked";
+        }
+        $row.find(".still_need_completing").empty();
+        if(moduleData.progress == "in progress") {
+          var $requirements = $("#context_module_" + moduleData.id + " .context_module_item.progression_requirement");
+          var progression = $studentWithProgressions.find(".progression_" + moduleData.id).data('progression');
+          var unfulfilled = [];
+          $requirements.each(function() {
+            var $req = $(this);
+            var req = {id: $req.attr('id').substring(20)};
+            if($req.hasClass('must_view_requirement')) {
+              req.type = 'must_view';
+            } else if($req.hasClass('min_score_requirement')) {
+              req.type = 'min_score';
+            } else if($req.hasClass('max_score_requirement')) {
+              req.type = 'max_score';
+            } else if($req.hasClass('must_contribute_requirement')) {
+              req.type = 'must_contribute';
+            } else if($req.hasClass('must_submit_requirement')) {
+              req.type = 'must_submit';
+            }
+            var met = false;
+            if(progression && progression.requirements_met) {
+              for(var jdx = 0; jdx < progression.requirements_met.length; jdx++) {
+                var compare = progression.requirements_met[jdx];
+                if(compare.id == req.id && compare.type == req.type) {
+                  met = true;
+                }
+              }
+            }
+            if(!met) {
+              unfulfilled.push($req.find(".title:first").text());
+            }
+          });
+          $row.find(".still_need_completing")
+            .append("<b>"+I18n.t('still_needs_completing', 'Still Needs to Complete')+"</b><br/>")
+            .append(unfulfilled.join("<br/>"));
+        }
+        $row.removeClass('locked').removeClass('in_progress').removeClass('completed')
+          .addClass(type);
+        moduleData.progressString = moduleData.progress;
+        $row.fillTemplateData({data: moduleData});
+      });
+    });
+    $(".module_progressions_link").click(function(event) {
+      event.preventDefault();
+      var $dialog = $("#student_progression_dialog");
+      var $student_list = $dialog.find(".student_list");
+      $student_list.find(".student:not(.blank)").remove();
+      $dialog.find(".side_tabs_content tbody .module:not(.blank)").remove();
+      var $visible_modules = $("#context_modules .context_module:visible");
+      var module_ids = [];
+      $visible_modules.each(function() {
+        var $mod = $(this);
+        var id = $mod.attr('id').substring(15);
+        module_ids.push(id);
+      });
+      $("#progression_list .student").each(function() {
+        var $student = $dialog.find(".student.blank:first").clone(true).removeClass('blank');
+        var $studentWithProgressions = $(this);
+        var data = $studentWithProgressions.getTemplateData({textValues: ['name', 'id', 'current_module']});
+        data.current_module = data.current_module || I18n.t('none_in_progress', "none in progress");
+        $student.find("a").attr('href', '#' + data.id);
+        $student.fillTemplateData({data: data});
+        $student_list.append($student.show())
+      });
+      $visible_modules.each(function() {
+        var $module = $(this);
+        var moduleData = $module.find(".header").getTemplateData({textValues: ['id', 'name']});
+        var $template = $dialog.find(".module.blank:first").clone(true).removeClass('blank');
+        
+        $template.addClass('module_' + moduleData.id);
+        $template.fillTemplateData({data: moduleData});
+        $dialog.find(".side_tabs_content tbody").append($template.show());
+      });
+  
+      $("#student_progression_dialog").dialog('close').dialog({
+        autoOpen: false,
+        width: 800,
+        open: function() {
+          $(this).find(".student:not(.blank):first .name").click();
+        }
+      }).dialog('open');
+    });
+    $(".context_module .progression_details_link").click(function(event) {
+      event.preventDefault();
+      var data = $(this).parents(".context_module").find(".header").getTemplateData({textValues: ['id', 'name']});
+      data.module_name = data.name;
+      var $dialog = $("#module_progression_dialog");
+      $dialog.fillTemplateData({data: data});
+      $dialog.find("ul").empty();
+      $dialog.find(".progression_list").hide();
+      $("#progression_list .student").each(function() { //.progressions .progression_" + data.id).each(function() {
+        var $progression = $(this).find(".progressions .progression_" + data.id);
+        var progressionData = $progression.getTemplateData({textValues: ['context_module_id', 'workflow_state']});
+        progressionData.workflow_state = progressionData.workflow_state || "locked";
+        progressionData.name = $(this).getTemplateData({textValues: ['name']}).name;
+        $dialog.find("." + progressionData.workflow_state + "_list").show()
+          .find("ul").show().append($("<li />").text(progressionData.name));
+      });
+      $("#module_progression_dialog").dialog('close').dialog({
+        autoOpen: false,
+        title: I18n.t('titles.student_progress', "Student Progress for Module"),
+        width: 500
+      }).dialog('open');
+    });
+    $(document).fragmentChange(function(event, hash) {
+      var module = $(hash.replace(/module/, "context_module"));
+      if (module.hasClass('collapsed_module')) {
+        module.find(".expand_module_link").triggerHandler('click');
+      }
+    });
+
+    // from context_modules/_content
+    var foundExpanded = false;
+    var collapsedModules = ENV.COLLAPSED_MODULES;
+    for(var idx in collapsedModules) {
+      $("#context_module_" + collapsedModules[idx]).addClass('collapsed_module');
+    }
+    var foundModules = [];
+    var $contextModules = $("#context_modules .context_module");
+    if (!$contextModules.length) {
+      $('#no_context_modules_message').show();
+    }
+    $contextModules.each(function() {
+      modules.updateProgressionState($(this));
+    });
+    $contextModules.filter(":visible").each(function() {
+      if($(this).find(".content:visible").length > 0) {
+        foundExpanded = true;
+      } else if(foundExpanded) {
+        foundModules.push($(this));
+      }
+    });
+    $("#context_modules").bind('slow_load', function() {
+      var $module = foundModules.shift();
+      if($module) {
+        $module.find(".expand_module_link:first").triggerHandler('click', true);
+      }
+    });
+  });
 
   return modules;
 });

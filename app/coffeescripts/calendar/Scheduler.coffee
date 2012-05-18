@@ -1,5 +1,6 @@
 define [
   'jquery',
+  'underscore'
   'i18n!calendar'
   'jst/calendar/appointmentGroupList'
   'jst/calendar/schedulerRightSideAdminSection'
@@ -7,11 +8,11 @@ define [
   'compiled/calendar/MessageParticipantsDialog'
   'jst/calendar/deleteItem'
   'jquery.instructure_date_and_time'
-  'jquery.instructure_jquery_patches'
+  'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'vendor/jquery.spin'
-], ($, I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate) ->
+], ($, _, I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate) ->
 
   class Scheduler
     constructor: (selector, @calendar) ->
@@ -33,6 +34,9 @@ define [
         @rightSideAdminSection = $(schedulerRightSideAdminSectionTemplate())
         @rightSideAdminSection.find(".create_link").click @createClick
 
+        @appointmentGroupContexts = _.filter @contexts, (c) ->
+          c.can_create_appointment_groups
+
       $.subscribe "CommonEvent/eventSaved", @eventSaved
       $.subscribe "CommonEvent/eventDeleted", @eventDeleted
 
@@ -40,10 +44,11 @@ define [
       jsEvent.preventDefault()
 
       group = {
-        contexts: @calendar.contexts
+        context_codes: []
+        sub_context_codes: []
       }
 
-      @createDialog = new EditAppointmentGroupDialog(group, @dialogCloseCB)
+      @createDialog = new EditAppointmentGroupDialog(group, @appointmentGroupContexts, @dialogCloseCB)
       @createDialog.show()
 
     dialogCloseCB: (saved) =>
@@ -137,9 +142,8 @@ define [
             for appointmentEvent in group.appointmentEvents
               group.signed_up += appointmentEvent.childEvents.length if appointmentEvent.childEvents
 
-          # look up the context name for the group
-          for contextInfo in @contexts when contextInfo.asset_string == group.context_code
-            group.context = contextInfo
+          # look up the context names for the group
+          group.contexts = _.filter(@contexts, (c) -> c.asset_string in group.context_codes)
 
           group.published = group.workflow_state == "active"
 
@@ -223,8 +227,7 @@ define [
       group = @groups?[$(jsEvent.target).closest(".appointment-group-item").data('appointment-group-id')]
       return unless group
 
-      group.contexts = @calendar.contexts
-      @createDialog = new EditAppointmentGroupDialog(group, @dialogCloseCB)
+      @createDialog = new EditAppointmentGroupDialog(group, @appointmentGroupContexts, @dialogCloseCB)
       @createDialog.show()
 
     deleteLinkClick: (jsEvent) =>
@@ -246,5 +249,5 @@ define [
     messageLinkClick: (jsEvent) =>
       jsEvent.preventDefault()
       group = @groups?[$(jsEvent.target).closest(".appointment-group-item").data('appointment-group-id')]
-      @messageDialog = new MessageParticipantsDialog(group, @calendar.dataSource)
+      @messageDialog = new MessageParticipantsDialog(group: group, dataSource: @calendar.dataSource)
       @messageDialog.show()

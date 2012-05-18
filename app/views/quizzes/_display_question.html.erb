@@ -69,6 +69,8 @@
           <span class="text_after_answers"><%= user_content(hash_get(question, :text_after_answers)) %></span>
         <% elsif question && hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && @stored_params %>
           <%= fill_in_multiple_blanks_question :question => question, :answers => @stored_params %>
+        <% elsif question && hash_get(question, :question_type) == "multiple_dropdowns_question" %>
+          <%= multiple_dropdowns_question :question => question, :answers => @stored_params %>
         <% else %>
           <%= user_content(hash_get(question, :question_text)) %>
         <% end %>

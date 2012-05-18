@@ -4,7 +4,6 @@
 define [
   'jquery'
   'vendor/slickgrid'
-  'jquery.instructure_jquery_patches'
   'vendor/jquery.scrollTo'
 ], ($, Slick) ->
 

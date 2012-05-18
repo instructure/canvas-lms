@@ -53,11 +53,20 @@ describe ConversationsController do
 
       get 'index'
       response.should be_success
-      assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
+      assigns[:js_env].should_not be_nil
       assigns[:contexts][:courses].to_a.map{|p|p[1]}.
         reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
       assigns[:contexts][:courses][@course.id][:term].should == "Fall"
-      assigns[:filterable].should be_true
+    end
+
+    it "should assign variables for json" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+
+      get 'index', :format => 'json'
+      response.should be_success
+      assigns[:js_env].should be_nil
+      assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
     end
 
     it "should work for an admin as well" do
@@ -66,7 +75,7 @@ describe ConversationsController do
       user_session(@user)
       conversation
 
-      get 'index'
+      get 'index', :format => 'json'
       response.should be_success
       assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
     end
@@ -78,7 +87,7 @@ describe ConversationsController do
       @c3 = conversation
       @c3.update_attribute :workflow_state, 'archived'
 
-      get 'index', :scope => 'sent'
+      get 'index', :scope => 'sent', :format => 'json'
       response.should be_success
       assigns[:conversations_json].size.should eql 3
     end
@@ -93,26 +102,10 @@ describe ConversationsController do
       @user.reload
       @c2 = conversation(:num_other_users => 1, :course => @other_course)
 
-      get 'index', :filter => @other_course.asset_string
+      get 'index', :filter => @other_course.asset_string, :format => 'json'
       response.should be_success
       assigns[:conversations_json].size.should eql 1
       assigns[:conversations_json][0][:id].should == @c2.conversation_id
-    end
-
-    it "should hide the filter UI if some conversations have not been tagged yet" do
-      course_with_student_logged_in(:active_all => true)
-      conversation
-      Conversation.update_all "tags = NULL"
-      ConversationParticipant.update_all "tags = NULL"
-      ConversationMessageParticipant.update_all "tags = NULL"
-
-      # create some more that are tagged
-      conversation
-      conversation
-
-      get 'index'
-      response.should be_success
-      assigns[:filterable].should be_false
     end
 
     it "should not allow student view student to load inbox" do
@@ -124,21 +117,32 @@ describe ConversationsController do
       assert_unauthorized
     end
 
-    it "should filter conversations when masquerading" do
-      a = Account.default
-      @student = user_with_pseudonym(:active_all => true)
-      course_with_student(:active_all => true, :account => a, :user => @student)
-      @student.associated_accounts << a
-      @student.initiate_conversation([user.id]).add_message('test1', :root_account_id => a.id)
-      @student.initiate_conversation([user.id]).add_message('test2') # no root account, so teacher can't see it
+    context "masquerading" do
+      before do
+        a = Account.default
+        @student = user_with_pseudonym(:active_all => true)
+        course_with_student(:active_all => true, :account => a, :user => @student)
+        @student.associated_accounts << a
+        @student.initiate_conversation([user.id]).add_message('test1', :root_account_id => a.id)
+        @student.initiate_conversation([user.id]).add_message('test2') # no root account, so teacher can't see it
+  
+        course_with_teacher_logged_in(:active_all => true, :account => a)
+        a.add_user(@user)
+        session[:become_user_id] = @student.id
+      end
 
-      course_with_teacher_logged_in(:active_all => true, :account => a)
-      a.add_user(@user)
-      session[:become_user_id] = @student.id
+      it "should filter conversations" do
+        get 'index', :format => 'json'
+        response.should be_success
+        assigns[:conversations_json].size.should eql 1
+      end
 
-      get 'index'
-      response.should be_success
-      assigns[:conversations_json].size.should eql 1
+      it "should filter conversations when returning ids" do
+        get 'index', :format => 'json', :include_all_conversation_ids => true
+        response.should be_success
+        assigns[:conversations_json][:conversations].size.should eql 1
+        assigns[:conversations_json][:conversation_ids].size.should eql 1
+      end
     end
   end
 

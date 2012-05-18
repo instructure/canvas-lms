@@ -20,7 +20,7 @@ define([
   'jquery' /* $ */,
   'str/htmlEscape',
   'jquery.instructure_forms' /* fillFormData */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/, /\.scrollTop/, windowScrollTop */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* truncateText */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
@@ -294,8 +294,7 @@ window.rubricAssessment = {
           .find(".criterion_points").text(rating.points).end()
           .find(".ignore_for_scoring").showIf(rating.ignore_for_scoring);
         if(rating.comments_enabled && rating.comments) {
-          var abbrev = $.truncateText(rating.comments, 50);
-          $rubricSummary.find("#criterion_" + rating.criterion_id).find(".rating_custom").show().text(abbrev);
+          $rubricSummary.find("#criterion_" + rating.criterion_id).find(".rating_custom").show().text(rating.comments);
         }
         if(rating.points && !rating.ignore_for_scoring) {
           total += rating.points;

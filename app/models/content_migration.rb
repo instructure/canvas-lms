@@ -322,6 +322,12 @@ class ContentMigration < ActiveRecord::Base
           migration_settings[:migration_ids_to_import][:copy][:new_end_date] = copy_options[:new_end_date]
           migration_settings[:migration_ids_to_import][:copy][:day_substitutions] = copy_options[:day_substitutions]
         end
+        # set any attachments referenced in html to be copied
+        ce.selected_content['attachments'] ||= {}
+        ce.referenced_files.values.each do |att_mig_id|
+          ce.selected_content['attachments'][att_mig_id] = true
+        end
+        ce.save
 
         self.save
         worker = Canvas::Migration::Worker::CCWorker.new

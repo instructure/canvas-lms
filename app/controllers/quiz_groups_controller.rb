@@ -41,6 +41,7 @@ class QuizGroupsController < ApplicationController
       @group = @quiz.quiz_groups.find(params[:id])
       @quiz.did_edit if @quiz.created?
       params[:quiz_group][:position] = @quiz.root_entries_max_position + 1
+      params[:quiz_group].delete(:assessment_question_bank_id)
       params[:quiz_group].delete(:position) # position is taken care of in reorder
       if @group.update_attributes(params[:quiz_group])
         render :json => @group.to_json

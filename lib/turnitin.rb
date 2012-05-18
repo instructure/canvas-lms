@@ -30,7 +30,7 @@ module Turnitin
       @testing = testing
       @functions = {
         :create_user              => '1', # instructor or student
-        :create_course             => '2', # instructor only
+        :create_course            => '2', # instructor only
         :enroll_student           => '3', # student only
         :create_assignment        => '4', # instructor only
         :submit_paper             => '5', # student or teacher
@@ -80,33 +80,67 @@ module Turnitin
     
     def createStudent(user)
       res = sendRequest(:create_user, 2, :user => user, :utp => '1')
-      res.css("userid")[0].content rescue nil
+      res.css("userid").first.try(:content)
     end
     
     def createTeacher(user)
       res = sendRequest(:create_user, 2, :user => user, :utp => '2')
-      res.css("userid")[0].content rescue nil
+      res.css("userid").first.try(:content)
     end
     
     def createCourse(course)
       res = sendRequest(:create_course, 2, :utp => '2', :course => course, :user => course, :utp => '2')
-      res.css("classid")[0].content rescue nil
+      res.css("classid").first.try(:content)
     end
     
     def enrollStudent(course, student)
       res = sendRequest(:enroll_student, 2, :user => student, :course => course, :utp => '1', :tem => email(course))
-      res.css("userid")[0].content rescue nil
+      res.css("userid").first.try(:content)
+    end
+
+    def self.default_assignment_turnitin_settings
+      {
+        :originality_report_visibility => 'immediate',
+        :s_paper_check => '1',
+        :internet_check => '1',
+        :journal_check => '1',
+        :exclude_biblio => '1',
+        :exclude_quoted => '1',
+        :exclude_type => '0',
+        :exclude_value => ''
+      }
+    end
+
+    def self.normalize_assignment_turnitin_settings(settings)
+      unless settings.nil?
+        valid_keys = Turnitin::Client.default_assignment_turnitin_settings.keys
+        valid_keys << :created
+        settings = settings.slice(*valid_keys)
+
+        settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date'].include?(settings[:originality_report_visibility])
+
+        [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
+          settings[key] = '0' unless settings[key] == '1'
+        end
+
+        exclude_value = settings[:exclude_value].to_i
+        settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
+        settings[:exclude_value] = case settings[:exclude_type]
+          when '0': ''
+          when '1': [exclude_value, 1].max.to_s
+          when '2': (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+        end
+      end
+      settings
     end
     
-    def createOrUpdateAssignment(assignment)
-      return true if assignment.turnitin_settings[:current]
-
+    def createOrUpdateAssignment(assignment, settings)
       course = assignment.context
-      today = Time.zone.today
-      settings = assignment.turnitin_settings.dup
+      today = (Time.now.utc - 1.day).to_date # buffer by a day until we figure out what turnitin is doing with timezones
+      settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
       # institution_check   - 1/0, check institution
       # submit_papers_to    - 0=none, 1=standard, 2=institution
-      res = sendRequest(:create_assignment, settings.delete(:created) ? '3' : '2', settings.merge({
+      res = sendRequest(:create_assignment, settings.delete(:created) ? '3' : '2', settings.merge!({
         :user => course,
         :course => course,
         :assignment => assignment,
@@ -118,50 +152,53 @@ module Turnitin
         :late_accept_flag => '1',
         :post => true
       }))
-      begin
-        ret = res.css("assignmentid")[0].content
-        assignment.turnitin_settings = assignment.turnitin_settings
-        assignment.turnitin_settings[:current] = true
-        assignment.turnitin_settings[:created] = true
-        assignment.save
-        ret
-      rescue
-        nil
-      end
+
+      assignment_id = res.css("assignmentid").first.try(:content)
+      rcode = res.css('rcode').first.try(:content).try(:to_i)
+      rmessage = res.css('rmessage').first.try(:content)
+
+      assignment_id ?
+        { :assignment_id => assignment_id } :
+        { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(rcode) }
     end
     
-    def submitPaper(submission)
+    # if asset_string is passed in, only submit that attachment
+    def submitPaper(submission, asset_string=nil)
       student = submission.user
       assignment = submission.assignment
       course = assignment.context
-      submission.turnitin_data ||= {}
-      object_ids = []
+      opts = { 
+        :post => true, 
+        :utp => '1', 
+        :user => student, 
+        :course => course, 
+        :assignment => assignment, 
+        :tem => email(course) 
+      }
+      responses = {}
       if submission.submission_type == 'online_upload'
-        attachments = submission.attachments.select{|a| a.turnitinable? }
+        attachments = submission.attachments.select{ |a| a.turnitinable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
-          res = sendRequest(:submit_paper, '2', :post => true, :utp => '1', :ptl => a.display_name, :pdata => a.open(), :ptype => "2", :user => student, :course => course, :assignment => assignment, :tem => email(course))
-          object_id = res.css("objectID")[0].content rescue nil
-          if object_id
-            submission.turnitin_data[a.asset_string] = {:object_id => object_id}
-            submission.turnitin_data_changed!
-            submission.send_at(5.minutes.from_now, :check_turnitin_status, a.asset_string)
-            object_ids << object_id
-          end
+          responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open(), :ptype => '2' }.merge!(opts))
         end
-      elsif submission.submission_type == 'online_text_entry'
-        res = sendRequest(:submit_paper, '2', :post => true, :utp => '1', :ptl => assignment.title, :pdata => submission.plaintext_body, :ptype => "1", :user => student, :course => course, :assignment => assignment, :tem => email(course))
-        object_id = res.css("objectID")[0].content rescue nil
-        if object_id
-          submission.turnitin_data[submission.asset_string] = {:object_id => object_id}
-          submission.turnitin_data_changed!
-          submission.send_at(5.minutes.from_now, :check_turnitin_status, submission.asset_string)
-          object_ids << object_id
-        end
+      elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
+        responses[submission.asset_string] = sendRequest(:submit_paper, '2', { :ptl => assignment.title, :pdata => submission.plaintext_body, :ptype => "1" }.merge!(opts))
       else
         raise "Unsupported submission type for turnitin integration: #{submission.submission_type}"
       end
-      submission.save
-      object_ids
+
+      responses.keys.each do |asset_string|
+        res = responses[asset_string]
+        object_id = res.css("objectID").first.try(:content)
+        rcode = res.css('rcode').first.try(:content).try(:to_i)
+        rmessage = res.css('rmessage').first.try(:content)
+
+        responses[asset_string] = object_id ? 
+                                  { :object_id => object_id } : 
+                                  { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(:rcode) }
+      end
+
+      responses
     end
     
     def generateReport(submission, asset_string)
@@ -173,10 +210,10 @@ module Turnitin
       res = sendRequest(:generate_report, 2, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment) if object_id
       data = {}
       if res
-        data[:similarity_score] = res.css("originalityscore")[0].content rescue nil
-        data[:web_overlap] = res.css("web_overlap")[0].content rescue nil
-        data[:publication_overlap] = res.css("publication_overlap")[0].content rescue nil
-        data[:student_overlap] = res.css("student_paper_overlap")[0].content rescue nil
+        data[:similarity_score] = res.css("originalityscore").first.try(:content)
+        data[:web_overlap] = res.css("web_overlap").first.try(:content)
+        data[:publication_overlap] = res.css("publication_overlap").first.try(:content)
+        data[:student_overlap] = res.css("student_paper_overlap").first.try(:content)
       end
       data
     end
@@ -345,6 +382,33 @@ module Turnitin
           Rails.logger.error(res.body)
         end
         doc
+      end
+    end
+
+    # We store the actual error message we got back from turnitin in the hash
+    # on the object, but often that message is not appropriate to show to
+    # users. So we're picking out the most common error messages we see, fixing
+    # up the wording, and then using this to display public facing error messages.
+    def public_error_message(error_code)
+      case error_code
+      when 216
+        I18n.t('turnitin.error_216', "The student limit for this account has been reached. Please contact your account administrator.")
+      when 217
+        I18n.t('turnitin.error_217', "The turnitin product for this account has expired. Please contact your sales agent to renew the turnitin product.")
+      when 414
+        I18n.t('turnitin.error_414', "The originality report for this submission is not available yet.")
+      when 415
+        I18n.t('turnitin.error_415', "The originality score for this submission is not available yet.")
+      when 1007
+        I18n.t('turnitin.error_1007', "The uploaded file is too big.")
+      when 1009
+        I18n.t('turnitin.error_1009', "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)")
+      when 1013
+        I18n.t('turnitin.error_1013', "The student submission must be more than twenty words of text in order for it to be rated by turnitin.")
+      when 1023
+        I18n.t('turnitin.error_1023', "The PDF file could not be read. Please make sure that the file is not password protected.")
+      else
+        I18n.t('turnitin.error_default', "There was an error submitting to turnitin. Please try resubmitting the file before contacting support.")
       end
     end
   end

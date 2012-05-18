@@ -238,6 +238,7 @@ class Enrollment < ActiveRecord::Base
   def conclude
     self.workflow_state = "completed"
     self.completed_at = Time.now
+    self.user.touch
     self.save
   end
 
@@ -397,17 +398,17 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    if state == :active
+    if [:invited, :active].include?(state)
       ranges = self.enrollment_dates
       now = Time.now
       ranges.each do |range|
         start_at, end_at = range
         # start_at <= now <= end_at, allowing for open ranges on either end
-        return :active if (start_at || now) <= now && now <= (end_at || now)
+        return state if (start_at || now) <= now && now <= (end_at || now)
       end
       # not strictly within any range
       global_start_at = ranges.map(&:first).compact.min
-      return :active unless global_start_at
+      return state unless global_start_at
       if global_start_at < Time.now
         :completed
       else
@@ -424,6 +425,10 @@ class Enrollment < ActiveRecord::Base
 
   def inactive?
     state_based_on_date == :inactive
+  end
+
+  def invited?
+    state_based_on_date == :invited
   end
 
   def completed?
@@ -469,6 +474,34 @@ class Enrollment < ActiveRecord::Base
       @permission_lookup[action] = RoleOverride.permission_for(self, action, self.class.to_s)[:enabled]
     end
     @permission_lookup[action]
+  end
+
+  # Determine if a user has permissions to conclude this enrollment.
+  #
+  # user    - The user requesting permission to conclude/delete enrollment.
+  # context - The current context, e.g. course or section.
+  # session - The current user's session (pass nil if not available).
+  #
+  # return Boolean
+  def can_be_concluded_by(user, context, session)
+    can_remove = [StudentEnrollment].include?(self.class) &&
+      context.grants_right?(user, session, :manage_students)
+    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+  end
+
+  # Determine if a user has permissions to delete this enrollment.
+  #
+  # user    - The user requesting permission to conclude/delete enrollment.
+  # context - The current context, e.g. course or section.
+  # session - The current user's session (pass nil if not available).
+  #
+  # return Boolean
+  def can_be_deleted_by(user, context, session)
+    can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) &&
+      context.grants_right?(user, session, :manage_students)
+    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+    can_remove &&= self.user_id != user.id ||
+      context.account.grants_right?(user, session, :manage_admin_users)
   end
 
   def pending?

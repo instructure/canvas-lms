@@ -19,7 +19,6 @@
 define [
   'jquery'
   'compiled/widget/TokenSelector'
-  'jquery.instructure_jquery_patches'
   'jquery.instructure_misc_plugins'
 ], ($, TokenSelector) ->
 
@@ -94,7 +93,7 @@ define [
                 @$fakeInput.addClass('browse')
             .prependTo(@$fakeInput)
           @$fakeInput.addClass('browsable')
-        @selector = new type(this, @$node.attr('finder_url'), @options.selector)
+        @selector = new type(this, @$node.data('finder_url'), @options.selector)
 
       @baseExclude = []
 
@@ -164,6 +163,11 @@ define [
         e.preventDefault()
         return false
       true
+
+    tokenPairs: ->
+      for li in @$tokens.find('li')
+        $li = $(li)
+        [$li.find('input').val(), $li.find('div').attr('title')]
 
     tokenValues: ->
       input.value for input in @$tokens.find('input')

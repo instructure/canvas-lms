@@ -16,7 +16,7 @@ require([
 ], function($) {
 
 $(document).ready(function() {
-  $("#media_comment").mediaComment('show_inline', '<%= params[:id] %>', '<%= @media_object ? @media_object.media_type : 'video' %>');
+  $("#media_comment").mediaComment('show_inline', <%= raw params[:id].to_json %>, <%= raw((@media_object ? @media_object.media_type.to_s : 'video').to_json) %>);
 });
 
 });

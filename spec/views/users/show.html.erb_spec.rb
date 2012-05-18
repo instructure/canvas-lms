@@ -29,8 +29,10 @@ describe "/users/show" do
     assigns[:upcoming_events] = []
     assigns[:enrollments] = []
     assigns[:group_memberships] = []
+    assigns[:page_views] = PageView.paginate(:page => 1, :per_page => 20)
 
     render "users/show"
     response.should_not be_nil
+    response.capture(:right_side).should include "Message #{@user.name}" # regardless of permissions
   end
 end

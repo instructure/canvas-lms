@@ -23,7 +23,7 @@ define([
   'str/htmlEscape',
   'jquery.instructure_date_and_time' /* parseFromISO, dateString, timeString, date_field, time_field, datetime_field, /\.timepicker/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, showIf */,
   'jquery.keycodes' /* keycodes */,
@@ -39,18 +39,19 @@ define([
   // hideFullAssignmentForm;
   // addGroupCategory;
 
+  hideFullAssignmentForm = function(redirect) {
+    var $assignment = $("#full_assignment");
+    var $form = $("#edit_assignment_form");
+    $form.hide();
+    if(wikiSidebar) {
+      wikiSidebar.hide();
+      $("#sidebar_content").show();
+    }
+    $assignment.find(".description").show();
+    $assignment.find(".edit_full_assignment_link").show();
+  };
+
   $(function(){
-    hideFullAssignmentForm = function(redirect) {
-      var $assignment = $("#full_assignment");
-      var $form = $("#edit_assignment_form");
-      $form.hide();
-      if(wikiSidebar) {
-        wikiSidebar.hide();
-        $("#sidebar_content").show();
-      }
-      $assignment.find(".description").show();
-      $assignment.find(".edit_full_assignment_link").show();
-    };
 
     function doFocus(id) {
       if(!$("#" + id).editorBox('focus')) {
@@ -78,17 +79,22 @@ define([
         $form.find("select[name='points_type']").change();
         $form.fillFormData(data, {object_name: 'assignment'});
         $assignment.find(".description, .edit_full_assignment_link").hide();
-        $form.show().find("textarea:first").editorBox();
-        if (wikiSidebar) {
-          wikiSidebar.attachToEditor($form.find("textarea:first"));
-          wikiSidebar.show();
-          $("#sidebar_content").hide();
+        $form.show();
+        if (!ENV.HIDE_DESCRIPTION){
+          $form.find("textarea:first").editorBox();
+          if (wikiSidebar) {
+            wikiSidebar.attachToEditor($form.find("textarea:first"));
+            wikiSidebar.show();
+            $("#sidebar_content").hide();
+          }
         }
         $form.find(".more_options_link").show();
         $form.find(".more_assignment_values").hide();
-        setTimeout(function(){
-          doFocus($form.find("textarea:first").attr('id'));
-        }, 500);
+        if (!ENV.HIDE_DESCRIPTION){
+          setTimeout(function(){
+            doFocus($form.find("textarea:first").attr('id'));
+          }, 500);
+        }
         if (!$form.parents(".ui-dialog").length ) {
           $("html,body").scrollTo($form);
         }

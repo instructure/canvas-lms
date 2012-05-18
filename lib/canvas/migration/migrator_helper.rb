@@ -39,12 +39,12 @@ module MigratorHelper
       timestamp = timestamp.to_i/ 1000 rescue 0
       t = nil
       if timestamp > 0
-        t = Time.at(timestamp)
+        t = Time.at(timestamp).utc
         t = Time.utc(t.year, t.month, t.day, t.hour, t.min, t.sec)
       end
       t
     else
-      Time.parse(timestamp.to_s)
+      Time.use_zone("UTC"){Time.zone.parse(timestamp.to_s)}
     end
   end
 

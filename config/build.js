@@ -20,22 +20,18 @@
   // paths we have set up (matches require onfig in application.html.erb)
   paths: {
     common: 'compiled/bundles/common',
-    jquery: 'vendor/jquery-1.6.4',
     jqueryui: 'vendor/jqueryui',
-    underscore: 'vendor/underscore',
-    backbone: 'vendor/backbone',
     uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4',
     use: 'vendor/use'
   },
 
   // non-amd shims
   use: {
-    backbone: {
-      deps: ['use!underscore', 'jquery'],
-      attach: 'Backbone'
-    },
-    underscore: {
-      attach: '_'
+    'vendor/backbone': {
+      deps: ['underscore', 'jquery'],
+      attach: function(_, $){
+        return Backbone;
+      }
     }
   },
 
@@ -55,7 +51,7 @@
         'i18n',
         'str/escapeRegex',
         'vendor/date',
-        'vendor/jquery-1.6.4',
+        'jquery',
         'str/pluralize',
         'INST',
         'str/htmlEscape',
@@ -78,7 +74,6 @@
         'translations/scribd',
         'i18n!scribd',
         'vendor/scribd.view',
-        'vendor/jquery.ba-throttle-debounce',
         'vendor/jquery.store',
         'jquery.dropdownList',
         'vendor/jqueryui/progressbar',
@@ -86,7 +81,7 @@
         'i18n!media_comments',
         'vendor/jqueryui/button',
         'vendor/jqueryui/draggable',
-        'instructure-jquery.ui.draggable-patch',
+        'jqueryui/draggable',
         'vendor/jqueryui/resizable',
         'vendor/jqueryui/dialog',
         'jquery.instructure_jquery_patches',

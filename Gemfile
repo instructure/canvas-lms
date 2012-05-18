@@ -8,7 +8,6 @@ gem 'authlogic',      '2.1.3'
 gem "aws-s3-instructure", "~> 0.6.2.1319643167",  :require => 'aws/s3'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
-gem 'compass',        '0.11.5'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'erubis',         '2.7.0'
@@ -22,9 +21,9 @@ gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.0'
 gem 'json',           '1.5.2'
 # native xml parsing, diigo
-gem 'libxml-ruby',    '1.1.3',  :require => 'xml/libxml'
+gem 'libxml-ruby',    '2.3.2',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
-gem 'mailman',        '0.4.0'
+gem 'mailman',        '0.5.0'
 gem 'mime-types',     '1.16',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
@@ -32,8 +31,9 @@ gem 'mini_magick',    '1.3.2'
 gem 'netaddr',        '1.5.0'
 gem 'nokogiri',       '1.5.0'
 gem 'oauth',          '0.4.5'
-gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
+gem 'rack',           '1.1.3'
 gem 'rake',           '< 0.10'
+gem 'rdoc',           '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rbx-require-relative', '0.0.5'
 gem 'rdiscount',      '1.6.8'
@@ -41,7 +41,7 @@ gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.8'
+gem 'ruby-saml-mod',  '0.1.14'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '2.0.3'
@@ -50,6 +50,10 @@ gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 # this is only needed by jammit, but we're pinning at 0.9.4 because 0.9.5 breaks
 gem 'yui-compressor', '0.9.4'
+
+group :assets do
+  gem 'compass-rails', '1.0.1'
+end
 
 group :mysql do
   gem 'mysql',        '2.8.1'
@@ -65,10 +69,10 @@ end
 
 group :test do
   gem 'coffee-script'
-  gem 'coffee-script-source',  '1.1.2' #pinned so everyone's compiled output matches
+  gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
-  gem 'parallel_tests-instructure', '0.6.19'
+  gem 'parallelized_specs', '0.0.8'
   gem 'mocha',        '0.10.0'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
@@ -80,7 +84,7 @@ end
 
 group :development do
   gem 'coffee-script'
-  gem 'coffee-script-source',  '1.1.2' #pinned so everyone's compiled output matches
+  gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'parallel',     '0.5.16'
   gem 'ruby-debug',   '0.10.4'
   gem 'ruby_parser', '2.0.6'

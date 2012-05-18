@@ -20,7 +20,7 @@ define([
   'i18n!accounts.statistics',
   'jquery', // $
   'jquery.ajaxJSON', // ajaxJSON
-  'jquery.instructure_jquery_patches', // /\.dialog/
+  'jqueryui/dialog', // /\.dialog/
   'jquery.instructure_misc_helpers' // replaceTags
 ], function(I18n, $) {
 

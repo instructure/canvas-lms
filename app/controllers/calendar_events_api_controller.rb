@@ -64,7 +64,7 @@ class CalendarEventsApiController < ApplicationController
     if authorized_action(@event, @current_user, :reserve)
       begin
         if params[:participant_id] && @event.appointment_group.grants_right?(@current_user, session, :manage)
-          participant = @event.appointment_group.possible_participants.find_by_id(params[:participant_id].to_i)
+          participant = @event.appointment_group.possible_participants.detect { |p| p.id == params[:participant_id].to_i }
         else
           participant = @event.appointment_group.participant_for(@current_user)
           participant = nil if participant && params[:participant_id] && params[:participant_id].to_i != participant.id

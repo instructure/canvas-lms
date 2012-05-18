@@ -8,7 +8,7 @@
     title_message = t :ta_title, "Invited as a TA, click to see the Course"
   when 'ObserverEnrollment'
     title_message = t :observer_title, "Invited as an observer, click to see the Course"
-  when 'CourseDesignerEnrollment'
+  when 'DesignerEnrollment'
     title_message = t :designer_title, "Invited as a designer, click to see the Course"
   end
 
@@ -22,7 +22,7 @@
     t :ta, "%{course} as a TA.", :course => enrollment.course.name
   when 'ObserverEnrollment'
     t :observer, "%{course} as an observer.", :course => enrollment.course.name
-  when 'CourseDesignerEnrollment'
+  when 'DesignerEnrollment'
     t :designer, "%{course} as a designer.", :course => enrollment.course.name
   else
     t :student, "%{course} as a student.", :course => enrollment.course.name

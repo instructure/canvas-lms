@@ -317,7 +317,16 @@ class ConversationParticipant < ActiveRecord::Base
     # preload last_authored_message
     ConversationMessage.preload_latest conversations.select(&:visible_last_authored_at), author_id
   end
-  
+
+  def self.conversation_ids
+    scope = current_scoped_methods && current_scoped_methods[:find]
+    raise "conversation_ids needs to be scoped to a user" unless scope && scope[:conditions] =~ /user_id = \d+/
+    scope[:order] ||= "last_message_at DESC"
+    # need to join on conversations in case we use this w/ scopes like for_masquerading_user
+    connection.select_all("SELECT conversation_id FROM conversations, conversation_participants WHERE #{scope[:conditions]} AND conversations.id = conversation_participants.conversation_id ORDER BY #{scope[:order]}").
+      map{ |row| row['conversation_id'].to_i }
+  end
+
   protected
   def message_tags
     messages.map(&:tags).inject([], &:concat).uniq

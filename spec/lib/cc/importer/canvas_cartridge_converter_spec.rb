@@ -432,6 +432,7 @@ describe "Canvas Cartridge importing" do
     rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}, {:ignore_for_scoring=>false, :mastery_points=>3, :learning_outcome_id=>lo.id, :ratings=>[{:criterion_id=>"309_343", :points=>5, :description=>"Exceeds Expectations", :id=>"309_6516", :long_description=>""}, {:criterion_id=>"309_343", :points=>0, :description=>"Does Not Meet Expectations", :id=>"309_9962", :long_description=>""}], :points=>5, :description=>"Learning Outcome", :id=>"309_343", :long_description=>"<p>Outcome</p>"}]
     rubric.save!
     rubric.associate_with(@copy_from, @copy_from)
+    rubric.associate_with(@copy_from, @copy_from)
 
     #create a rubric in a different course to associate with
     new_course = course_model
@@ -645,7 +646,9 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
-    WikiPage.import_from_migration(hash, @copy_to)
+    WikiPage.process_migration({'wikis' => [hash, nil]}, @migration)
+
+    ErrorReport.last.message.should =~ /nil wiki/
 
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
@@ -677,7 +680,16 @@ describe "Canvas Cartridge importing" do
     page_2.body.should match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
   end
   
-  it "should import assignments" do 
+  it "should import assignments" do
+     PluginSetting.stubs(:settings_for_plugin).returns({"lock_at" => "yes",
+                  "assignment_group" => "yes",
+                  "title" => "yes",
+                  "assignment_group_id" => "yes",
+                  "submission_types" => "yes",
+                  "points_possible" => "yes",
+                  "description" => "yes",
+                  "grading_type" => "yes"})
+
     body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
 <div>
   <div><img src="http://www.instructure.com/images/header-logo.png"></div>
@@ -699,6 +711,7 @@ describe "Canvas Cartridge importing" do
     asmnt.peer_reviews = true
     asmnt.anonymous_peer_reviews = true
     asmnt.peer_review_count = 37
+    asmnt.freeze_on_copy = true
     asmnt.save!
 
     #export to xml/html
@@ -732,6 +745,8 @@ describe "Canvas Cartridge importing" do
     asmnt_2.mastery_score.should be_nil
     asmnt_2.max_score.should be_nil
     asmnt_2.min_score.should be_nil
+    asmnt_2.freeze_on_copy.should == true
+    asmnt_2.copied.should == true
   end
   
   it "should import external tool assignments" do

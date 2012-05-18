@@ -1,8 +1,12 @@
 require [
-  'compiled/backbone-ext/Backbone'
+  'Backbone'
+  'compiled/discussions/app'
   'compiled/discussions/TopicView'
-], (Backbone, TopicView) ->
+  'compiled/discussions/ParticipantCollection'
+], (Backbone, app, TopicView, ParticipantCollection) ->
+
+  @app = app
 
   $ ->
-    app = new TopicView model: new Backbone.Model
+    app.topicView = new TopicView model: new Backbone.Model
 

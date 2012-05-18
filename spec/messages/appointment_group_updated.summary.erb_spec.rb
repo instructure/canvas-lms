@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_group_updated.email' do
   it "should render" do
     user = user_model
-    appointment_group_model(:context => course_model)
+    appointment_group_model(:contexts => [course_model])
 
     generate_message(:appointment_group_updated, :summary, @appointment_group)
 

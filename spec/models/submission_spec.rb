@@ -281,25 +281,106 @@ describe Submission do
   end
 
   context "turnitin" do
-    before do
-      @assignment.turnitin_enabled = true
-      @assignment.turnitin_settings = @assignment.turnitin_settings
-      @assignment.save!
-      submission_spec_model
-    end
-
     context "submission" do
+      def init_turnitin_api
+        @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
+        @submission.context.expects(:turnitin_settings).at_least(1).returns([:placeholder])
+        Turnitin::Client.expects(:new).at_least(1).with(:placeholder).returns(@turnitin_api)
+      end
+
+      before(:each) do
+        Delayed::Job.destroy_all(:tag => 'Submission#submit_to_turnitin')
+        @assignment.submission_types = "online_upload,online_text_entry"
+        @assignment.turnitin_enabled = true
+        @assignment.turnitin_settings = @assignment.turnitin_settings
+        @assignment.save!
+        @submission = @assignment.submit_homework(@user, { :body => "hello there", :submission_type => 'online_text_entry' })
+      end
+
       it "should submit to turnitin after a delay" do
-        @submission.submission_type = 'online_upload'
-        @submission.save!
         job = Delayed::Job.find_by_tag('Submission#submit_to_turnitin')
         job.should_not be_nil
         job.run_at.should > Time.now.utc
+      end
+
+      it "should initially set turnitin submission to pending" do
+        init_turnitin_api
+        @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
+        @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(true)
+        @turnitin_api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => @submission.plaintext_body)).returns(Nokogiri('<objectID>12345</objectID>'))
+        @submission.submit_to_turnitin
+        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
+      end
+
+      it "should schedule a retry if something fails initially" do
+        init_turnitin_api
+        @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
+        @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(false)
+        @submission.submit_to_turnitin
+        Delayed::Job.find_all_by_tag('Submission#submit_to_turnitin').count.should == 2
+      end
+
+      it "should set status as failed if something fails after several attempts" do
+        init_turnitin_api
+        @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
+        @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(true)
+        example_error = '<rerror><rcode>1001</rcode><rmessage>You may not submit a paper to this assignment until the assignment start date</rmessage></rerror>'
+        @turnitin_api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => @submission.plaintext_body)).returns(Nokogiri(example_error))
+        @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
+        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
+      end
+      
+      it "should set status back to pending on retry" do
+        init_turnitin_api
+        # first a submission, to get us into failed state
+        example_error = '<rerror><rcode>123</rcode><rmessage>You cannot create this assignment right now</rmessage></rerror>'
+        @turnitin_api.expects(:sendRequest).with(:create_assignment, '2', has_entries(@assignment.turnitin_settings)).returns(Nokogiri(example_error))
+        @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(false)
+        @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
+        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
+
+        # resubmit
+        @submission.resubmit_to_turnitin
+        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
+      end
+
+      it "should set status to scored on success" do
+        init_turnitin_api
+        @submission.turnitin_data ||= {}
+        @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
+        @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({
+          :similarity_score => 56,
+          :web_overlap => 22,
+          :publication_overlap => 0,
+          :student_overlap => 33
+        })
+
+        @submission.check_turnitin_status(@submission.asset_string)
+        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'scored'
+      end
+
+      it "should set status as failed if something fails after several attempts" do
+        init_turnitin_api
+        @submission.turnitin_data ||= {}
+        @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
+        @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({})
+
+        @submission.check_turnitin_status(@submission.asset_string, Submission::TURNITIN_RETRY-1)
+        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
+        Delayed::Job.find_by_tag('Submission#check_turnitin_status').should_not be_nil
+
+        @submission.check_turnitin_status(@submission.asset_string, Submission::TURNITIN_RETRY)
+        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
       end
     end
 
     context "report" do
       before do
+        @assignment.submission_types = "online_upload,online_text_entry"
+        @assignment.turnitin_enabled = true
+        @assignment.turnitin_settings = @assignment.turnitin_settings
+        @assignment.save!
+        @submission = @assignment.submit_homework(@user, { :body => "hello there", :submission_type => 'online_text_entry' })
         @submission.turnitin_data = {
           "submission_#{@submission.id}" => {
             :web_overlap => 92,

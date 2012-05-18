@@ -25,23 +25,23 @@ describe AppointmentGroupsController, :type => :integration do
   end
 
   expected_fields = [
-    'appointments_count', 'context_code', 'created_at', 'description',
+    'appointments_count', 'context_codes', 'created_at', 'description',
     'end_at', 'id', 'location_address', 'location_name',
     'max_appointments_per_participant', 'min_appointments_per_participant',
     'participant_type', 'participant_visibility',
     'participants_per_appointment', 'requiring_action', 'start_at',
-    'sub_context_code', 'title', 'updated_at', 'url', 'workflow_state'
+    'sub_context_codes', 'title', 'updated_at', 'url', 'workflow_state'
   ]
 
   it 'should return manageable appointment groups' do
-    ag1 = @course.appointment_groups.create(:title => "something")
+    ag1 = AppointmentGroup.create!(:title => "something", :contexts => [@course])
     cat = @course.group_categories.create
-    ag2 = @course.appointment_groups.create(:title => "another", :sub_context_code => cat.asset_string)
-    ag3 = Course.create.appointment_groups.create(:title => "inaccessible")
-    ag4 = @course.appointment_groups.create(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
+    ag2 = AppointmentGroup.create!(:title => "another", :contexts => [@course], :sub_context_codes => [cat.asset_string])
+    ag3 = AppointmentGroup.create!(:title => "inaccessible", :contexts => [Course.create!])
+    ag4 = AppointmentGroup.create!(:title => "past", :contexts => [@course], :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
-                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'})
+                    :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'})
     json.size.should eql 2
     json.first.keys.sort.should eql expected_fields
     json.first.slice('id', 'title', 'participant_type').should eql({'id' => ag1.id, 'title' => 'something', 'participant_type' => 'User'})
@@ -49,36 +49,36 @@ describe AppointmentGroupsController, :type => :integration do
   end
 
   it "should return past manageable appointment groups, if requested" do
-    ag = @course.appointment_groups.create(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include_past_appointments=1", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include_past_appointments => '1'})
     json.size.should eql 1
   end
 
   it 'should return reservable appointment groups' do
-    ag1 = @course.appointment_groups.create(:title => "can't reserve")
+    ag1 = AppointmentGroup.create!(:title => "can't reserve", :contexts => [@course])
     ag1.publish!
-    ag2 = Course.create.appointment_groups.create(:title => "me neither")
+    ag2 = AppointmentGroup.create!(:title => "me neither", :contexts => [Course.create!])
     ag2.publish!
 
     student_in_course :course => course(:active_all => true), :user => @me
-    ag3 = @course.appointment_groups.create(:title => "enrollment not active")
+    ag3 = AppointmentGroup.create!(:title => "enrollment not active", :contexts => [@course])
     ag3.publish!
 
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
-    ag4 = @course.appointment_groups.create(:title => "unpublished")
-    ag5 = @course.appointment_groups.create(:title => "no times")
+    ag4 = AppointmentGroup.create!(:title => "unpublished", :contexts => [@course])
+    ag5 = AppointmentGroup.create!(:title => "no times", :contexts => [@course])
     ag5.publish!
 
-    ag6 = @course.appointment_groups.create(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]])
+    ag6 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag6.publish!
     cat = @course.group_categories.create
     mygroup = cat.groups.create(:context => @course)
     mygroup.users << @me
     @me.reload
-    ag7 = @course.appointment_groups.create(:title => "double yay", :sub_context_code => cat.asset_string, :new_appointments => [["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+    ag7 = AppointmentGroup.create!(:title => "double yay", :sub_context_codes => [cat.asset_string], :new_appointments => [["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
     ag7.publish!
-    ag8 = @course.appointment_groups.create(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
+    ag8 = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     ag8.publish!
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
@@ -91,7 +91,7 @@ describe AppointmentGroupsController, :type => :integration do
 
   it "should return past reservable appointment groups, if requested" do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
-    ag = @course.appointment_groups.create(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     ag.publish!
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable&include_past_appointments=1", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable', :include_past_appointments => '1'})
@@ -99,7 +99,7 @@ describe AppointmentGroupsController, :type => :integration do
   end
 
   it 'should paginate appointment groups' do
-    ids = 25.times.map { |i| @course.appointment_groups.create(:title => "#{i}").id }
+    ids = 25.times.map { |i| AppointmentGroup.create!(:title => "#{i}".object_id, :contexts => [@course]) }
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=10", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
                       :scope => 'manageable', :per_page => '10'})
@@ -114,7 +114,7 @@ describe AppointmentGroupsController, :type => :integration do
   end
 
   it 'should include appointments and child_events, if requested' do
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     student = student_in_course(:course => @course, :active_all => true).user
     ag.appointments.first.reserve_for student, @me
     @user = @me
@@ -136,7 +136,7 @@ describe AppointmentGroupsController, :type => :integration do
   end
 
   it 'should get a manageable appointment group' do
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}", {
                       :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s})
@@ -149,7 +149,7 @@ describe AppointmentGroupsController, :type => :integration do
   end
 
   it 'should include child_events, if requested' do
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     student = student_in_course(:course => @course, :active_all => true).user
     ag.appointments.first.reserve_for student, @me
     @user = @me
@@ -169,7 +169,7 @@ describe AppointmentGroupsController, :type => :integration do
   it 'should get a reservable appointment group' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
     @user = @me
-    ag = @course.appointment_groups.create(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag.publish!
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}", {
@@ -182,7 +182,7 @@ describe AppointmentGroupsController, :type => :integration do
   it 'should require action until the min has been met' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
     @user = @me
-    ag = @course.appointment_groups.create(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :min_appointments_per_participant => 1)
+    ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :min_appointments_per_participant => 1, :contexts => [@course])
     ag.publish!
     appt = ag.appointments.first
 
@@ -206,14 +206,14 @@ describe AppointmentGroupsController, :type => :integration do
     @user = @me
     raw_api_call(:post, "/api/v1/appointment_groups",
                       {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_code => @course.asset_string, :title => "ohai"} })
+                      {:appointment_group => {:context_codes => [@course.asset_string], :title => "ohai"} })
     JSON.parse(response.body)['status'].should == 'unauthorized'
   end
 
   it 'should create a new appointment group' do
     json = api_call(:post, "/api/v1/appointment_groups",
                       {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_code => @course.asset_string, :title => "ohai", :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"]}} })
+                      {:appointment_group => {:context_codes => [@course.asset_string], :title => "ohai", :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"]}} })
     json.keys.sort.should eql((expected_fields + ['new_appointments']).sort)
     json['start_at'].should eql "2012-01-01T12:00:00Z"
     json['end_at'].should eql "2012-01-01T13:00:00Z"
@@ -224,16 +224,16 @@ describe AppointmentGroupsController, :type => :integration do
   it 'should create a new appointment group with a sub_context' do
     json = api_call(:post, "/api/v1/appointment_groups",
                       {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_code => @course.asset_string, :sub_context_code => @course.default_section.asset_string, :title => "ohai"} })
+                      {:appointment_group => {:context_codes => [@course.asset_string], :sub_context_codes => [@course.default_section.asset_string], :title => "ohai"} })
     json.keys.sort.should eql expected_fields
     json['workflow_state'].should eql 'pending'
-    json['sub_context_code'].should eql @course.default_section.asset_string
+    json['sub_context_codes'].should eql [@course.default_section.asset_string]
   end
 
   it 'should enforce update permissions' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
     @user = @me
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     raw_api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
                       {:appointment_group => {:title => "lol"} })
@@ -241,7 +241,7 @@ describe AppointmentGroupsController, :type => :integration do
   end
 
   it 'should update an appointment group' do
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
                       {:appointment_group => {:title => "lol"} })
@@ -250,17 +250,17 @@ describe AppointmentGroupsController, :type => :integration do
   end
 
   it 'should ignore updates to readonly fields' do
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
-                      {:appointment_group => {:title => "lol", :sub_context_code => @course.default_section.asset_string} })
+                      {:appointment_group => {:title => "lol", :sub_context_codes => [@course.default_section.asset_string]} })
     json.keys.sort.should eql expected_fields
     json['title'].should eql 'lol'
-    json['sub_context_code'].should be_nil
+    json['sub_context_codes'].should eql []
   end
 
   it 'should publish an appointment group in an update through the api' do
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     ag.workflow_state.should == 'pending'
     json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
@@ -272,7 +272,7 @@ describe AppointmentGroupsController, :type => :integration do
   it 'should publish an appointment group when creating through the api when requested' do
     json = api_call(:post, "/api/v1/appointment_groups",
                       {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_code => @course.asset_string, :title => "ohai", :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"]}, :publish => '1'} })
+                      {:appointment_group => {:context_codes => [@course.asset_string], :title => "ohai", :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"]}, :publish => '1'} })
     json['workflow_state'].should eql 'active'
     AppointmentGroup.find(json['id']).workflow_state.should eql 'active'
   end
@@ -280,14 +280,14 @@ describe AppointmentGroupsController, :type => :integration do
   it 'should enforce delete permissions' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
     @user = @me
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     raw_api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
     JSON.parse(response.body)['status'].should == 'unauthorized'
   end
 
   it 'should delete an appointment group' do
-    ag = @course.appointment_groups.create(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
     json.keys.sort.should eql expected_fields
@@ -297,7 +297,7 @@ describe AppointmentGroupsController, :type => :integration do
 
   types = {
     'users' => proc {
-      @ag = @course.appointment_groups.create(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
       student1 = student_in_course(:course => @course, :active_all => true).user
       @ag.appointments.first.reserve_for student1, @me
@@ -305,7 +305,7 @@ describe AppointmentGroupsController, :type => :integration do
     },
     'groups' => proc {
       cat = @course.group_categories.create
-      @ag = @course.appointment_groups.create(:title => "yay", :sub_context_code => cat.asset_string, :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag = AppointmentGroup.create!(:title => "yay", :sub_context_codes => [cat.asset_string], :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
       group1 = cat.groups.create(:context => @course)
       group1.users << student_in_course(:course => @course, :active_all => true).user

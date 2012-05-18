@@ -18,7 +18,7 @@
 define([
   'i18n!gradebook',
   'jquery',
-  'use!underscore',
+  'underscore',
   'str/htmlEscape',
   'vendor/slickgrid-googlecode/slick.grid',
   'vendor/slickgrid-googlecode/slick.editors',

@@ -245,6 +245,71 @@ describe ContentMigration do
       @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should be_nil
     end
 
+    it "should re-copy deleted items" do
+      dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      cm = @copy_from.context_modules.create!(:name => "some module")
+      att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+      wiki = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      quiz = @copy_from.quizzes.create! if Qti.qti_enabled?
+      ag = @copy_from.assignment_groups.create!(:name => 'empty group')
+      asmnt = @copy_from.assignments.create!(:title => "some assignment")
+      cal = @copy_from.calendar_events.create!(:title => "haha", :description => "oi")
+      tool = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+      tool.workflow_state = 'public'
+      tool.save
+      data = [{:points => 3,:description => "Outcome row",:id => 1,:ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}]}]
+      rub1 = @copy_from.rubrics.build(:title => "rub1")
+      rub1.data = data
+      rub1.save!
+      rub1.associate_with(@copy_from, @copy_from)
+      default = LearningOutcomeGroup.default_for(@copy_from)
+      lo = @copy_from.learning_outcomes.new
+      lo.context = @copy_from
+      lo.short_description = "outcome1"
+      lo.workflow_state = 'active'
+      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.save!
+      default.add_item(lo)
+      gs = @copy_from.grading_standards.new
+      gs.title = "Standard eh"
+      gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
+      gs.save!
+
+      run_course_copy
+
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).destroy
+      @copy_to.context_modules.find_by_migration_id(mig_id(cm)).destroy
+      @copy_to.attachments.find_by_migration_id(mig_id(att)).destroy
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).destroy
+      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).destroy
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).destroy
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).destroy if Qti.qti_enabled?
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).destroy
+      @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).destroy
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).destroy
+      @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).destroy
+      @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).destroy
+
+      @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
+      @cm.user = @user
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1)).workflow_state.should == 'active'
+      @copy_to.context_modules.find_by_migration_id(mig_id(cm)).workflow_state.should == 'active'
+      @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
+      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).workflow_state.should == 'active'
+      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'
+      @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).workflow_state.should == 'available'
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).workflow_state.should == 'available'
+      @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).workflow_state.should == 'active'
+      @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).workflow_state.should == 'active'
+    end
+
     it "should copy learning outcomes into the new course" do
       lo = @copy_from.learning_outcomes.new
       lo.context = @copy_from
@@ -372,6 +437,23 @@ describe ContentMigration do
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
     end
 
+    it "should still associate rubrics and assignments" do
+      rubric = @copy_from.rubrics.new
+      rubric.title = "Rubric"
+      rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
+      rubric.save!
+
+      assignment = @copy_from.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
+      rubric.associate_with(assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+
+      run_course_copy
+
+      rub = @copy_to.rubrics.find_by_migration_id(mig_id(rubric))
+      rub.should_not be_nil
+      asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(assignment))
+      asmnt2.rubric.id.should == rub.id
+    end
+
     it "should assign the correct parent folder when the parent folder has already been created" do
       folder = Folder.root_folders(@copy_from).first
       folder = folder.sub_folders.create!(:context => @copy_from, :name => 'folder_1')
@@ -400,7 +482,6 @@ describe ContentMigration do
       new_attachment.should_not be_nil
       new_attachment.full_path.should == "course files/dummy.txt"
       new_attachment.folder.should == to_root
-      puts @copy_to.syllabus_body
       @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
     end
 
@@ -419,6 +500,94 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.gsub("/courses/#{@copy_from.id}/file_contents/course%20files",'')
+    end
+
+    it "should included implied files for course exports" do
+      att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att3 = Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('3333'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+
+      asmnt_des = %{<a href="/courses/%s/files/%s/preview">First file</a>}
+      wiki_body = %{<img src="/courses/%s/files/%s/preview">}
+      asmnt = @copy_from.assignments.create!(:points_possible => 40, :grading_type => 'points', :description=>(asmnt_des % [@copy_from.id, att.id]), :title => "assignment")
+      wiki = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => (wiki_body % [@copy_from.id, att2.id]))
+
+      # don't mark the attachments
+      @cm.copy_options = {
+              :wiki_pages => {mig_id(wiki) => "1"},
+              :assignments => {mig_id(asmnt) => "1"},
+      }
+      @cm.save!
+      run_course_copy
+
+      @copy_to.attachments.count.should == 2
+      att_2 = @copy_to.attachments.find_by_migration_id(mig_id(att))
+      att_2.should_not be_nil
+      att2_2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
+      att2_2.should_not be_nil
+
+      @copy_to.assignments.first.description.should == asmnt_des % [@copy_to.id, att_2.id]
+      @copy_to.wiki.wiki_pages.first.body.should == wiki_body % [@copy_to.id, att2_2.id]
+    end
+
+    it "should include implied objects for context modules" do
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+      mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+      page2 = @copy_from.wiki.wiki_pages.create!(:title => "some page 2")
+      mod1.add_item({:id => page.id, :type => 'wiki_page'})
+      att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      mod1.add_item({:id => att.id, :type => 'attachment'})
+      mod1.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
+      mod1.add_item :type => 'context_module_sub_header', :title => "Sub Header"
+      tool = @copy_from.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      tool2 = @copy_from.context_external_tools.create!(:name => "b", :url => "http://www.instructure.com", :consumer_key => '12345', :shared_secret => 'secret')
+      mod1.add_item :type => 'context_external_tool', :id => tool.id, :url => tool.url
+      topic = @copy_from.discussion_topics.create!(:title => "topic")
+      topic2 = @copy_from.discussion_topics.create!(:title => "topic2")
+      mod1.add_item :type => 'discussion_topic', :id => topic.id
+      quiz = @copy_from.quizzes.create!(:title => 'quiz')
+      quiz2 = @copy_from.quizzes.create!(:title => 'quiz2')
+      mod1.add_item :type => 'quiz', :id => quiz.id
+      mod1.save!
+
+      mod2 = @copy_from.context_modules.create!(:name => "not copied")
+      asmnt2 = @copy_from.assignments.create!(:title => "some assignment again")
+      mod2.add_item({:id => asmnt2.id, :type => 'assignment', :indent => 1})
+      mod2.save!
+
+      @cm.copy_options = {
+                      :context_modules => {mig_id(mod1) => "1", mig_id(mod2) => "0"},
+              }
+      @cm.save!
+
+      run_course_copy
+
+      mod1_copy = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+      mod1_copy.should_not be_nil
+      if Qti.qti_enabled?
+        mod1_copy.content_tags.count.should == 8
+      else
+        mod1_copy.content_tags.count.should == 7
+      end
+
+
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt1)).should_not be_nil
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page)).should_not be_nil
+      @copy_to.attachments.find_by_migration_id(mig_id(att)).should_not be_nil
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).should_not be_nil
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).should_not be_nil if Qti.qti_enabled?
+
+      @copy_to.context_modules.find_by_migration_id(mig_id(mod2)).should be_nil
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt2)).should be_nil
+      @copy_to.attachments.find_by_migration_id(mig_id(att2)).should be_nil
+      @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page2)).should be_nil
+      @copy_to.context_external_tools.find_by_migration_id(mig_id(tool2)).should be_nil
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic2)).should be_nil
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz2)).should be_nil
     end
 
     it "should perform day substitutions" do
@@ -506,6 +675,60 @@ describe ContentMigration do
       new_mod.end_at.to_i.should == (new_start + 3.day).to_i
     end
 
+    it "should copy time correctly across daylight savings shift MST to MDT" do
+      Time.use_zone('America/Denver') do
+        asmnt = @copy_from.assignments.new
+        asmnt.title = "Nothing Assignment"
+        asmnt.description = 'oi'
+        asmnt.due_at = Time.zone.at(1325876400) # Fri, 06 Jan 2012 12:00:00 MST -07:00
+        asmnt.save!
+
+        @cm.migration_settings[:migration_ids_to_import] = {
+                :copy => {
+                        :everything => true,
+                        :shift_dates => true,
+                        :old_start_date => 'Jan 1, 2012',
+                        :old_end_date => 'Jan 15, 2012',
+                        :new_start_date => 'Jun 2, 2012',
+                        :new_end_date => 'Jun 16, 2012'
+                }
+        }
+        @cm.save!
+
+        run_course_copy
+
+        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
+        asmnt_2.due_at.to_i.should == Time.zone.at(1339178400).to_i # Fri, 08 Jun 2012 12:00:00 MDT -06:00
+      end
+    end
+
+    it "should copy time correctly across daylight savings shift MDT to MST" do
+      Time.use_zone('America/Denver') do
+        asmnt = @copy_from.assignments.new
+        asmnt.title = "Nothing Assignment"
+        asmnt.description = 'oi'
+        asmnt.due_at = Time.zone.at(1339178400) # Fri, 08 Jun 2012 12:00:00 MDT -06:00
+        asmnt.save!
+
+        @cm.migration_settings[:migration_ids_to_import] = {
+                :copy => {
+                        :everything => true,
+                        :shift_dates => true,
+                        :old_start_date => 'Jun 2, 2012',
+                        :old_end_date => 'Jun 16, 2012',
+                        :new_start_date => 'Jan 4, 2013',
+                        :new_end_date => 'Jan 18, 2013'
+                }
+        }
+        @cm.save!
+
+        run_course_copy
+
+        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
+        asmnt_2.due_at.to_i.should == Time.zone.at(1357326000).to_i # Fri, 04 Jan 2013 12:00:00 MST -07:00
+      end
+    end
+
     it "should leave file references in AQ context as-is on copy" do
       pending unless Qti.qti_enabled?
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
@@ -516,6 +739,8 @@ describe ContentMigration do
       different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
       media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
       equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
+      link to some other course: <a href="/courses/#{@copy_from.id + @copy_to.id}">Cool Course</a>
+      canvas image: <img style="max-width: 723px;" src="/images/preview.png" alt="">
       HTML
       @question = @bank.assessment_questions.create!(:question_data => data)
       @question.reload.question_data['question_text'].should =~ %r{/assessment_questions/}
@@ -527,6 +752,46 @@ describe ContentMigration do
       aq = bank.assessment_questions.first
 
       aq.question_data['question_text'].should == @question.question_data['question_text']
+    end
+
+    it "should correctly copy quiz question html file references" do
+      pending unless Qti.qti_enabled?
+      att = Attachment.create!(:filename => 'first.jpg', :display_name => "first.jpg", :uploaded_data => StringIO.new('first'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('second'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att3 = Attachment.create!(:filename => 'testing.jpg', :display_name => "testing.jpg", :uploaded_data => StringIO.new('test this'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      qtext = <<-HTML.strip
+File ref:<img src="/courses/%s/files/%s/download">
+different file ref: <img src="/courses/%s/%s">
+media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
+        HTML
+
+      data = {:correct_comments_html => "<strong>correct</strong>",
+                    :question_type => "multiple_choice_question",
+                    :question_name => "test fun",
+                    :name => "test fun",
+                    :points_possible => 10,
+                    :question_text => qtext % [@copy_from.id, att.id, @copy_from.id, "file_contents/course%20files/test.jpg"],
+                    :answers =>
+                            [{:migration_id => "QUE_1016_A1", :html => %{File ref:<img src="/courses/#{@copy_from.id}/files/#{att3.id}/download">}, :comments_html =>'<i>comment</i>', :text => "", :weight => 100, :id => 8080},
+                             {:migration_id => "QUE_1017_A2", :html => "<strong>html answer 2</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
+
+      q1 = @copy_from.quizzes.create!(:title => 'quiz1')
+      qq = q1.quiz_questions.create!
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      run_course_copy
+
+      @copy_to.attachments.count.should == 3
+      att_2 = @copy_to.attachments.find_by_migration_id(mig_id(att))
+      att2_2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
+      att3_2 = @copy_to.attachments.find_by_migration_id(mig_id(att3))
+
+      q_to = @copy_to.quizzes.first
+      qq_to = q_to.quiz_questions.first
+      qq_to.question_data[:question_text].should == qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview"]
+      qq_to.question_data[:answers][0][:html].should == %{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">}
     end
 
     it "should copy all html fields in assessment questions" do

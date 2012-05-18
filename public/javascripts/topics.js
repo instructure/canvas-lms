@@ -25,7 +25,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox, hideErrors, formSuggestion */,
-  'jquery.instructure_jquery_patches' /* /\.dialog/ */,
+  'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
@@ -135,7 +135,7 @@ define([
       $form.addClass('add_topic_form_new').attr('id', 'add_topic_form_' + id)
         .find(".topic_content").addClass('topic_content_new').attr('id', 'topic_content_' + id);
       var data = $topic.getTemplateData({
-        textValues: ['title', 'is_announcement', 'delayed_post_at', 'assignment[id]', 'attachment_name', 'assignment[points_possible]', 'assignment[assignment_group_id]', 'assignment[due_at]', 'podcast_enabled', 'podcast_has_student_posts', 'require_initial_post', 'threaded'],
+        textValues: ['title', 'is_announcement', 'delayed_post_at', 'assignment[id]', 'attachment_name', 'assignment[points_possible]', 'assignment[assignment_group_id]', 'assignment[due_at]', 'assignment[is_frozen]', 'podcast_enabled', 'podcast_has_student_posts', 'require_initial_post', 'threaded'],
         htmlValues: ['message']
       });
       data.message = $topic.find(".content .message_html").val();
@@ -146,8 +146,14 @@ define([
       $.each(['podcast_enabled', 'podcast_has_student_posts', 'require_initial_post', 'threaded'], function(i, bool){
         if (data[bool] === 'true') data[bool] = '1';
       });
-      if (data['assignment[id]'])
-        data['assignment[set_assignment]'] = '1';
+      if (data['assignment[id]']){
+        if (data['assignment[is_frozen]']){
+          var $asmnt_options = $form.find('.assignment_options');
+          $asmnt_options.text(I18n.t('assignment_is_locked', "Some properties for this assignment are locked, go to the assignment page to edit."));
+        } else {
+          data['assignment[set_assignment]'] = '1';
+        }
+      }
       var addOrUpdate = $topic.hasClass('announcement') ?
         I18n.t('update_announcment', "Update Announcement") :
         I18n.t('update_topic', "Update Topic");

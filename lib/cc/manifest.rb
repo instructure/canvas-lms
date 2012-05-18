@@ -20,12 +20,13 @@ module CC
     include CCHelper
     
     attr_accessor :exporter, :weblinks, :basic_ltis
-    delegate :add_error, :set_progress, :export_object?, :for_course_copy, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :for_course_copy, :add_item_to_export, :to => :exporter
 
     def initialize(exporter)
       @exporter = exporter
       @file = nil
       @document = nil
+      @resource = nil
       @weblinks = []
     end
     
@@ -72,7 +73,7 @@ module CC
         set_progress(10)
 
         begin
-          Resource.create_resources(self, manifest_node)
+          @resource = Resource.create_resources(self, manifest_node)
         rescue
           add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
         end
@@ -85,6 +86,10 @@ module CC
           @document.comment! error.first
         end
       end
+    end
+
+    def referenced_files
+      @resource ? @resource.referenced_files : {}
     end
 
     def create_metadata(md)

@@ -60,20 +60,21 @@ shared_examples_for "discussions selenium tests" do
   def validate_entry_text(discussion_entry, text)
     li_selector = %([data-id$="#{discussion_entry.id}"])
     keep_trying_until do
-      f(li_selector).should be_displayed
+      fj(li_selector).should include_text(text)
     end
-    f(li_selector).should include_text(text)
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)
     li_selector = %([data-id$="#{discussion_entry.id}"])
-    f(li_selector).should be_displayed
-    f(li_selector).find_element(:css, '.al-trigger').should be_displayed
-    f(li_selector).find_element(:css, '.al-trigger').click
-    keep_trying_until do
-      f(menu_item_selector).should be_displayed
+    menu_item = keep_trying_until do
+      fj(li_selector).should be_displayed
+      fj("#{li_selector} .al-trigger").should be_displayed
+      fj("#{li_selector} .al-trigger").click
+      menu_item = fj(menu_item_selector)
+      menu_item.should be_displayed
+      menu_item
     end
-    f(menu_item_selector).click
+    menu_item.click
   end
 
   def click_topic_option(topic_selector, menu_item_selector)

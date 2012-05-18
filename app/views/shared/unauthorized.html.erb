@@ -21,6 +21,8 @@
         <%= t('headings.needs_cookies', %{Cookies Required}) %>
       <% elsif !@files_domain && (!@current_user || @unauthorized_user) -%>
         <%= t('headings.needs_login', %{Please Log In}) %>
+      <% elsif @unauthorized_reason == :unpublished %>
+        <%= t('headings.unpublished', %{Not Yet Available}) %>
       <% else -%>
         <%= t('headings.unauthorized_action', %{Unauthorized}) %>
       <% end -%>
