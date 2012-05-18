@@ -61,17 +61,12 @@ describe DiscussionTopicsController, :type => :integration do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
-  it "should return discussion topic list" do
-    attachment = create_attachment(@course)
-    @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => attachment)
-    sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
-
-    json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                    {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
-
-    # get rid of random characters in podcast url
-    json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-    json.last.should ==
+  context "show topic(s)" do
+    before do
+      @attachment = create_attachment(@course)
+      @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => @attachment)
+      @sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
+      @response_json =
                  {"read_state"=>"read",
                   "unread_count"=>0,
                   "podcast_url"=>"/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
@@ -88,15 +83,35 @@ describe DiscussionTopicsController, :type => :integration do
                   "root_topic_id"=>nil,
                   "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                   "attachments"=>[{"content-type"=>"unknown/unknown",
-                                   "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
+                                   "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                                    "filename"=>"content.txt",
                                    "display_name"=>"content.txt",
-                                   "id"=>attachment.id,
-                                   "size"=>attachment.size,
+                                   "id"=>@attachment.id,
+                                   "size"=>@attachment.size,
                   }],
-                  "topic_children"=>[sub.id],
+                  "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
                   "permissions" => { "attach" => true }}
+    end
+
+    it "should return discussion topic list" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+
+      json.size.should == 2
+      # get rid of random characters in podcast url
+      json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+      json.last.should == @response_json
+    end
+
+    it "should return an individual topic" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                      {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+
+      # get rid of random characters in podcast url
+      json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+      json.should == @response_json
+    end
   end
 
   it "should translate user content in topics" do
@@ -352,7 +367,7 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       entry_json = json.first
       entry_json['attachment'].should_not be_nil
-      entry_json['attachment']['url'].should == "http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+      entry_json['attachment']['url'].should == "http://#{Account.default.domain}/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     end
 
     it "should include replies on top level entries" do
@@ -550,6 +565,13 @@ describe DiscussionTopicsController, :type => :integration do
       raw_api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      response.status.should == '403 Forbidden'
+      response.body.should == 'require_initial_post'
+
+      raw_api_call(
+        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       response.status.should == '403 Forbidden'
       response.body.should == 'require_initial_post'
@@ -934,7 +956,7 @@ describe DiscussionTopicsController, :type => :integration do
 
       reply_reply1_attachment_json = {
         "content-type"=>"application/loser",
-        "url"=>"http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
+        "url"=>"http://#{Account.default.domain}/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
         "filename"=>"unknown.loser",
         "display_name"=>"unknown.loser",
         "id" => @attachment.id,
@@ -968,7 +990,7 @@ describe DiscussionTopicsController, :type => :integration do
             { 'id' => @reply2.id,
               'parent_id' => @root1.id,
               'user_id' => @teacher.id,
-              'message' => "<p><a href=\"http://localhost/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://localhost/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\"></video>\n    </p>",
+              'message' => "<p><a href=\"http://#{Account.default.domain}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\"></video>\n    </p>",
               'created_at' => @reply2.created_at.as_json,
               'updated_at' => @reply2.updated_at.as_json,
               'replies' => [ {

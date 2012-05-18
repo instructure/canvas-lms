@@ -249,10 +249,10 @@ describe "Canvas Cartridge importing" do
 
     mod1 = @copy_from.context_modules.create!(:name => "some module")
 
-    tag = mod1.add_item({:title => "test", :type => 'context_external_tool', :url => "http://example.com.ims/lti"})
+    tag = mod1.add_item({:title => "test", :type => 'context_external_tool', :url => "http://example.com.ims/lti", :new_tab => true})
     tag = mod1.add_item({:title => "test2", :type => 'context_external_tool', :url => "http://example.com.ims/lti"})
     mod1.save!
-    
+
     mod1.content_tags.count.should == 2
 
     #export to xml
@@ -271,9 +271,11 @@ describe "Canvas Cartridge importing" do
     tag = mod1_2.content_tags.first
     tag.content_id.should == tool_to.id
     tag.content_type.should == 'ContextExternalTool'
+    tag.new_tab.should == true
     tag.url.should == "http://example.com.ims/lti"
     tag = mod1_2.content_tags.last
     tag.content_id.should == tool_to.id
+    tag.new_tab.should_not == true
     tag.content_type.should == 'ContextExternalTool'
     tag.url.should == "http://example.com.ims/lti"
   end

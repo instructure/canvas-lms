@@ -2,11 +2,20 @@ define ['Backbone'], ({Model}) ->
 
   class Assignment extends Model
 
+    url: ->
+      "/api/v1/courses/#{@get 'course_id'}/assignments"
+
     defaults:
-      title: 'No Title'
-      description: 'No Description'
+      name: 'No Title'
       due_at: null
       points_possible: null
       grading_type: 'points'
       submission_types: 'online_upload,online_text_entry'
+      course_id: null
+
+    validate: (attrs) ->
+      return "need a course id" unless attrs.course_id
+
+    toJSON: ->
+      assignment: super
 

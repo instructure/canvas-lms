@@ -311,7 +311,7 @@ TEXT
 <div style="display: none;" id="progression_list">
   <a href="#" class="progression_list_url">&nbsp;</a>
   <% cache([@context, @current_user, 'students_visible_to_user'].cache_key, :no_locale => true) do %>
-    <% @context.students_visible_to(@current_user).scoped(:select => "id, name").each do |student| %>
+    <% @context.students_visible_to(@current_user).scoped(:select => "id, name").order_by_sortable_name.each do |student| %>
       <div class="student student_<%= student.id %>">
         <div class="id"><%= student.id %></div>
         <div class="name"><%= student.last_name_first %></div>

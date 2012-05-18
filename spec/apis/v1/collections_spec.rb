@@ -138,9 +138,9 @@ describe "Collections API", :type => :integration do
 
   describe "Collection Items" do
     before do
-      @i1 = @c1.collection_items.create!(:description => "item 1", :collection_item_data => CollectionItemData.create! { |d| d.item_type = "url"; d.link_url = "http://www.example.com/one" }).reload
-      @i2 = @c1.collection_items.create!(:description => "item 2", :collection_item_data => CollectionItemData.create! { |d| d.item_type = "url"; d.link_url = "http://www.example.com/two" }).reload
-      @i3 = @c2.collection_items.create!(:description => "item 3", :collection_item_data => CollectionItemData.create! { |d| d.item_type = "url"; d.link_url = "https://www.example.com/three" }).reload
+      @i1 = collection_item_model(:description => "item 1", :user => @c1.context, :collection => @c1, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/one"))
+      @i2 = collection_item_model(:description => "item 2", :user => @c1.context, :collection => @c1, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/two"))
+      @i3 = collection_item_model(:description => "item 3", :user => @c2.context, :collection => @c2, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/three"))
       @items1_path = "/api/v1/collections/#{@c1.id}/items"
       @items2_path = "/api/v1/collections/#{@c2.id}/items"
       @items1_path_options = { :controller => "collection_items", :action => "index", :format => "json", :collection_id => @c1.to_param }
@@ -151,7 +151,7 @@ describe "Collections API", :type => :integration do
       @user2 = @user
       @user = @user1
       @c3 = @user2.collections.create!(:name => 'user2', :visibility => 'public')
-      @i4 = @c3.collection_items.create!(:description => 'cloned item 3', :collection_item_data => @i3.collection_item_data).reload; @i3.reload
+      @i4 = collection_item_model(:description => "cloned item 3", :user => @c3.context, :collection => @c3, :collection_item_data => @i3.collection_item_data); @i3.reload
       @items3_path = "/api/v1/collections/#{@c3.id}/items"
       @items3_path_options = { :controller => "collection_items", :action => "index", :format => "json", :collection_id => @c3.to_param }
     end
@@ -166,7 +166,8 @@ describe "Collections API", :type => :integration do
         'upvote_count' => item.collection_item_data.upvote_count,
         'upvoted_by_user' => upvoted_by_user,
         'root_item_id' => item.collection_item_data.root_item_id,
-        'image_url' => nil,
+        'image_url' => item.data.image_attachment && "http://www.example.com/images/thumbnails/#{item.data.image_attachment.id}/#{item.data.image_attachment.uuid}",
+        'image_pending' => item.data.image_pending,
         'description' => item.description,
         'url' => "http://www.example.com/api/v1/collections/#{item.collection_id}/items/#{item.id}",
       }
@@ -183,6 +184,7 @@ describe "Collections API", :type => :integration do
         json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :description => 'new item' })
         new_item = @c1.collection_items.last(:order => :id)
         new_item.collection_item_data.link_url.should == "http://www.example.com/a/b/c"
+        new_item.user.should == @user
       end
 
       it "should allow cloning an existing item" do
@@ -190,6 +192,7 @@ describe "Collections API", :type => :integration do
         json['post_count'].should == 3
         new_item = @c1.collection_items.last(:order => :id)
         new_item.collection_item_data.should == @i3.collection_item_data
+        new_item.user.should == @user
       end
 
       it "should not allow cloning an item the user can't access" do
@@ -204,13 +207,52 @@ describe "Collections API", :type => :integration do
           json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "javascript:alert(1)", :description => 'new item' }, {}, :expected_status => 400)
         }.to change(CollectionItem, :count).by(0)
       end
+
+      describe "images" do
+        it "should take a snapshot of the link url if no image is provided" do
+          json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :description => 'new item' })
+          @item = CollectionItem.find(json['id'])
+          @item.data.image_pending.should == true
+          @att = Attachment.new(:uploaded_data => stub_png_data)
+          CutyCapt.expects(:snapshot_attachment_for_url).with(@item.data.link_url).returns(@att)
+          run_job()
+
+          @att.reload.context.should == Account.default
+
+          @item.reload.data.image_pending.should == false
+          @item.data.image_attachment.should == @att
+
+          json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
+          json['image_pending'].should == false
+          json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}"
+        end
+
+        it "should clone and use the image if provided" do
+          json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :image_url => "http://www.example.com/my/image.png", :description => 'new item' })
+          @item = CollectionItem.find(json['id'])
+          @item.data.image_pending.should == true
+          @att = Attachment.new(:uploaded_data => stub_png_data)
+          CutyCapt.expects(:snapshot_attachment_for_url).with(@item.data.image_url).returns(@att)
+          run_job()
+
+          @att.reload.context.should == Account.default
+
+          @item.reload.data.image_pending.should == false
+          @item.data.image_attachment.should == @att
+
+          json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
+          json['image_pending'].should == false
+          json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}"
+        end
+      end
     end
 
     it "should allow editing mutable fields" do
-      json = api_call(:put, @items1_path + "/#{@i1.id}", @items1_path_options.merge(:item_id => @i1.to_param, :action => "update"), { :description => "modified", :link_url => 'cant change', :item_type => 'cant change' })
+      json = api_call(:put, @items1_path + "/#{@i1.id}", @items1_path_options.merge(:item_id => @i1.to_param, :action => "update"), { :description => "modified", :link_url => 'cant change', :item_type => 'cant change', :image_url => "http://www.example.com/cant_change" })
       json.should == item_json(@i1.reload)
       @i1.description.should == "modified"
       @i1.collection_item_data.item_type.should == "url"
+      @i1.data.image_pending.should == false
     end
 
     it "should allow deleting an owned item" do

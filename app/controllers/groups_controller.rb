@@ -74,7 +74,7 @@ class GroupsController < ApplicationController
     end
     @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
     @groups = @current_user.group_memberships_for(@group.context) if @current_user
-    if params[:join] && @group.free_association?(@current_user)
+    if params[:join] && @group.can_join?(@current_user)
       @group.request_user(@current_user)
       if !@group.grants_right?(@current_user, session, :read)
         render :action => 'membership_pending'
@@ -85,7 +85,7 @@ class GroupsController < ApplicationController
         return
       end
     end
-    if params[:leave] && (@group.free_association?(@current_user) || @group.student_organized?)
+    if params[:leave] && @group.can_leave?(@current_user)
       membership = @group.membership_for_user(@current_user)
       if membership
         membership.destroy
@@ -334,7 +334,7 @@ class GroupsController < ApplicationController
     @user_groups = @current_user.group_memberships_for(@context).select{|g| group_ids.include?(g.id) } if @current_user
     @user_groups ||= []
 
-    @available_groups = (@groups - @user_groups).select{|g| g.free_association?(@current_user) }
+    @available_groups = (@groups - @user_groups).select{|g| g.can_join?(@current_user) }
     if !@context.grants_right?(@current_user, session, :manage_groups)
       @groups = @user_groups
     end

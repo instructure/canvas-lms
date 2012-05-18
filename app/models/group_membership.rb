@@ -23,7 +23,7 @@ class GroupMembership < ActiveRecord::Base
   belongs_to :group
   belongs_to :user
 
-  attr_accessible :group, :user
+  attr_accessible :group, :user, :workflow_state
   
   before_save :ensure_mutually_exclusive_membership
   before_save :assign_uuid
@@ -40,6 +40,7 @@ class GroupMembership < ActiveRecord::Base
   named_scope :include_user, :include => :user
   
   named_scope :active, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
+  named_scope :moderators, :conditions => { :moderator => true }
   
   set_broadcast_policy do |p|
     p.dispatch :new_context_group_membership
@@ -111,6 +112,7 @@ class GroupMembership < ActiveRecord::Base
   
   workflow do
     state :accepted
+    state :following
     state :invited do
       event :reject, :transitions_to => :rejected
       event :accept, :transitions_to => :accepted

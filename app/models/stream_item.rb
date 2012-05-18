@@ -146,7 +146,9 @@ class StreamItem < ActiveRecord::Base
     when Message
       res = object.attributes
       res['notification_category'] = object.notification_display_category
-      if object.asset_context_type
+      if !object.context.is_a?(Context) && object.context.respond_to?(:context) && object.context.context.is_a?(Context)
+        self.context_code = object.context.context.asset_string
+      elsif object.asset_context_type
         self.context_code = "#{object.asset_context_type.underscore}_#{object.asset_context_id}"
       end
     when Submission
@@ -253,6 +255,15 @@ class StreamItem < ActiveRecord::Base
     object = object.submission if object.is_a?(SubmissionComment)
     object = object.conversation if object.is_a?(ConversationMessage)
     object
+  end
+
+  # call destroy_stream_items using a before_date based on the global setting
+  def self.destroy_stream_items_using_setting
+    ttl = Setting.get('stream_items_ttl', 4.weeks.to_s).ago
+    # we pass false for the touch_users argument, on the assumption that these
+    # stream items that we delete aren't visible on the user's dashboard anymore
+    # anyway, so there's no need to invalidate all the caches.
+    destroy_stream_items(ttl, false)
   end
 
   # delete old stream items and the corresponding instances before a given date

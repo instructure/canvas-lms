@@ -97,8 +97,8 @@ class CutyCapt
     return nil unless config = self.config
     return nil unless self.verify_url(url)
 
-    tmp_file = Tempfile.new('websnappr')
-    img_file = tmp_file.path + ".#{format}"
+    tmp_file = Tempfile.new(['websnappr', ".#{format}"])
+    img_file = tmp_file.path
     # We need to finalize the tmp_file now, because if we don't then it will get closed
     # in the child process below, deleting it. This does introduce a potential race condition
     # but in practice shouldn't be a problem since Tempfiles normally include the process pid.
@@ -142,5 +142,17 @@ class CutyCapt
     end
 
     img_file
+  end
+
+  def self.snapshot_attachment_for_url(url)
+    require 'action_controller/test_process.rb'
+
+    attachment = nil
+    self.snapshot_url(url, "png") do |file_path|
+      # this is a really odd way to get Attachment the data it needs, which
+      # should probably be remedied at some point
+      attachment = Attachment.new(:uploaded_data => ActionController::TestUploadedFile.new(file_path, "image/png"))
+    end
+    return attachment
   end
 end

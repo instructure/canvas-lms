@@ -828,6 +828,7 @@ class ContextModule < ActiveRecord::Base
     if item
       item_map[hash[:migration_id]] = item if hash[:migration_id]
       item.migration_id = hash[:migration_id]
+      item.new_tab = hash[:new_tab]
       item.position = (@item_migration_position ||= self.content_tags.active.map(&:position).compact.max || 0)
       item.workflow_state = 'active'
       @item_migration_position += 1

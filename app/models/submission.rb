@@ -1054,17 +1054,12 @@ class Submission < ActiveRecord::Base
   
   def get_web_snapshot
     # This should always be called in the context of a delayed job
-    require 'cutycapt'
     return unless CutyCapt.enabled?
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
-    
-    CutyCapt.snapshot_url(self.url, "png") do |file|
-      attachment = Attachment.new(:uploaded_data => ActionController::TestUploadedFile.new(file, "image/png"))
-      attachment.context = self
-      attachment.save!
-      attach_screenshot(attachment)
-    end
+
+    attachment = CutyCapt.snapshot_attachment_for_url(self.url)
+    attachment.context = self
+    attachment.save!
+    attach_screenshot(attachment)
   end
   
   def attach_screenshot(attachment)

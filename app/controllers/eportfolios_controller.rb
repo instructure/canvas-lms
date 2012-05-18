@@ -69,7 +69,9 @@ class EportfoliosController < ApplicationController
         @used_submission_ids = []
         @portfolio.eportfolio_entries.each do |entry|
           entry.content_sections.each do |s|
-            @used_submission_ids << s[:submission_id].to_i if s[:section_type] == "submission"
+            if s.is_a?(Hash) && s[:section_type] == "submission"
+              @used_submission_ids << s[:submission_id].to_i
+            end
           end
         end
       end

@@ -281,7 +281,7 @@ This layout is probably best for courses that aren't based on a specific schedul
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
   <% else %>
     <% cache(safe_cache_key([@current_user, @contexts, @current_conferences, 'recent_messages'])) do %>
-      <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.stream_items(:contexts => @contexts)) || []), :locals => {:conferences => @current_conferences, :show_context => @contexts && @contexts.length > 1 } %>
+      <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.recent_stream_items(:contexts => @contexts)) || []), :locals => {:conferences => @current_conferences, :show_context => @contexts && @contexts.length > 1 } %>
     <% end %>
   <% end %>
 </div>

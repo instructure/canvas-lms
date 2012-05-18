@@ -4,16 +4,33 @@ define [
 ], ({View, Collection, Model}, activityFeedItemViewFactory) ->
 
   class ActivityFeedItemsCollection extends Collection
+
     model: Model.extend()
+
     urlKey: 'everything'
+
     filter: ''
+
     urls:
       everything: '/api/v1/users/self/activity_stream'
       course: '/api/v1/courses/:filter/activity_stream'
+
     url: ->
       @urls[@urlKey].replace /:filter/, @filter
 
+    add: (models, options) ->
+      newModels = (model for model in models when not @get(model.id)?)
+      super newModels, options
 
+    comparator: (x, y) ->
+      x = Date.parse(x.get('created_at')).getTime()
+      y = Date.parse(y.get('created_at')).getTime()
+      if x is y
+        0
+      else if x < y
+        -1
+      else
+        1
 
   class ActivityFeedItemsView extends View
 
@@ -21,15 +38,21 @@ define [
       super
       @collection ?= new ActivityFeedItemsCollection
       @collection.on 'add', @addActivityFeedItem
-      @collection.on 'reset', @resetActivityFeedItems
+      @collection.on 'reset', @onResetActivityFeedItems
       @collection.fetch()
 
-    addActivityFeedItem: (activityFeedItem) =>
+    addActivityFeedItem: (activityFeedItem, collection, fetchOptions) =>
       view = activityFeedItemViewFactory activityFeedItem
+      @$itemList.prepend view.$el
+      view.$el.hide() if fetchOptions.animate
       view.render()
-      @$itemList.append view.el
+      if fetchOptions.animate
+        setTimeout ->
+          view.$el.slideDown()
+        , 150
 
-    resetActivityFeedItems: =>
+
+    onResetActivityFeedItems: =>
       @$itemList.empty()
       @collection.each @addActivityFeedItem
 
@@ -39,6 +62,9 @@ define [
       @collection.filter = filter.value
       @$itemList.html('<li>loading</li>')
       @collection.fetch()
+
+    refresh: (opts) =>
+      @collection.fetch add: true, animate: true
 
     ##
     # Splits something like "course:123" into {type: 'course', value: 123}

@@ -5,31 +5,11 @@ $canvas_tasks_loaded = true
 def check_syntax(files)
   quick = ENV["quick"] && ENV["quick"] == "true"
 
-  files_not_to_lint = %w{
-    ./public/javascripts/date.js
-    ./public/javascripts/jquery-1.4.js
-    ./public/javascripts/jquery.ba-hashchange.js
-    ./public/javascripts/jquery-ui-1.8.js
-    ./public/javascripts/scribd.view.js
-    ./public/javascripts/swfobject/swfobject.js
-    ./public/javascripts/ui.selectmenu.js
-    ./public/javascripts/raphael.js
-    ./public/javascripts/g.raphael/g.raphael.js
-    ./public/javascripts/g.raphael/g.pie.js
-    ./public/javascripts/g.raphael/g.bar.js
-    ./public/javascripts/g.raphael/g.dot.js
-    ./public/javascripts/g.raphael/g.line.js
-    ./public/javascripts/underscore.js
-    ./public/flash/uploadify/jquery.uploadify.v2.1.0.js
-    ./public/javascripts/json2.js
-    ./public/javascripts/mathquill.js
-  }
   show_stoppers = []
   Array(files).each do |js_file|
     js_file.strip!
-    if files_not_to_lint.include?(js_file) || !js_file.match('public/javascripts/') || js_file.match('public/javascripts/vendor/')
-      puts " --> \033[1;35m  skipping: #{js_file}\033[0m"
-    else
+    # only lint things in public/javascripts that are not in /vendor, /compiled, etc.
+    if js_file.match /public\/javascripts\/(?!vendor|compiled|i18n.js|translations)/
       file_path = File.join(Rails.root, js_file)
 
       unless quick
@@ -39,7 +19,7 @@ def check_syntax(files)
         # brew install node
         # npm install jshint
         unless `which jshint`.empty?
-          puts " --> \033[1;33m  Checking #{js_file} using JSHint: \033[0m"
+          puts " --> Checking #{js_file} using JSHint:"
           js_hint_errors = `jshint #{file_path} --config "#{File.join(Rails.root, '.jshintrc')}"`
           puts js_hint_errors
         end
@@ -48,14 +28,14 @@ def check_syntax(files)
         # Only works if you have gjslint installed.
         # Download from http://code.google.com/closure/utilities/
         unless `which gjslint`.empty?
-          puts " --> \033[1;33m  Checking #{js_file} using gjslint.py: \033[0m"
+          puts " --> Checking #{js_file} using gjslint.py:"
           gjslint_errors = `gjslint --nojsdoc --strict #{js_file}`
           puts gjslint_errors = gjslint_errors.split("\n").reject{ |l| l.match("Line too long") }.join("\n")
         end
       end
 
       raise "jsl needs to be in your $PATH, download from: javascriptlint.com" if `which jsl`.empty?
-      puts " --> \033[1;33m  Checking #{js_file} using jsl: \033[0m"
+      puts " --> Checking #{js_file} using jsl:"
       jsl_output = `jsl -process "#{file_path}" -nologo -conf "#{File.join(Rails.root, 'config', 'jslint.conf')}"`
       exit_status = $?.exitstatus
       if exit_status != 0
@@ -65,14 +45,12 @@ def check_syntax(files)
         end
         if exit_status >= 2
           show_stoppers << jsl_output
-          puts "\033[1;31m #{jsl_output} \033[0m"
-        else
-          puts jsl_output
         end
+        puts jsl_output
       end
     end
   end
-  raise "\033[1;31m Fatal JavaScript errors found \033[0m" unless show_stoppers.empty?
+  raise "Fatal JavaScript errors found" unless show_stoppers.empty?
 end
 
 

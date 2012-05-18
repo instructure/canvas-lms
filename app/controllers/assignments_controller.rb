@@ -178,7 +178,7 @@ class AssignmentsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end
-      @students = @context.students_visible_to(@current_user)
+      @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end

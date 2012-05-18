@@ -2,9 +2,14 @@ require 'tempfile'
 
 Tempfile.class_eval do
   # overwrite so tempfiles use the extension of the basename.  important for rmagick and image science
+  alias_method :make_tmpname_original, :make_tmpname
   def make_tmpname(basename, n)
-    ext = nil
-    sprintf("%s%d-%d%s", basename.to_s.gsub(/\.\w+$/) { |s| ext = s; '' }, $$, n || 0, ext)
+    if basename.is_a?(String)
+      ext = nil
+      sprintf("%s%d-%d%s", basename.to_s.gsub(/\.\w+$/) { |s| ext = s; '' }, $$, n || 0, ext)
+    else
+      make_tmpname_original(basename, n)
+    end
   end
 end
 

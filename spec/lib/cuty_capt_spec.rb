@@ -18,8 +18,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-require 'cutycapt'
-
 describe CutyCapt do
   before(:each) do 
     CutyCapt.config = nil

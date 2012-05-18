@@ -57,6 +57,14 @@ module Context
     Wiki = ::Wiki
     WikiNamespace = ::WikiNamespace
     WikiPage = ::WikiPage
+    
+    def self.get_for_string(str)
+      if RUBY_VERSION >= "1.9."
+        self.const_defined?(str, false) ? self.const_get(str, false) : nil
+      else
+        self.const_defined?(str) ? self.const_get(str) : nil
+      end
+    end
   end
 
   def add_aggregate_entries(entries, feed)

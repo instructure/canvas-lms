@@ -38,10 +38,10 @@
 <h2><%= t(:title, "Profile Pictures") %></h2>
 <div class="views">
   <span style="padding-right: 10px; font-weight: bold;"><%= before_label :show, 'Show' %> </span>
-  <a href="?avatar_state=submitted" class="<%= 'selected' if @avatar_state == 'submitted' %>"><%= t(:submitted_link, { :zero => "Submitted", :one => "Submitted %{count}", :other => "Submitted %{count}" }, :count => @avatar_counts[:submitted] || 0) %></a> |
-  <a href="?avatar_state=reported" class="<%= 'selected' if @avatar_state == 'reported' %>"><%= t(:reported_link, { :zero => "Reported", :one => "Reported %{count}", :other => "Reported %{count}" }, :count => @avatar_counts[:reported] || 0) %></a> |
-  <a href="?avatar_state=re_reported" class="<%= 'selected' if @avatar_state == 're_reported' %>"><%= t(:re_reported_link, { :zero => "Approved, Re-Reported", :one => "Approved, Re-Reported %{count}", :other => "Approved, Re-Reported %{count}"}, :count => @avatar_counts[:re_reported] || 0) %></a> |
-  <a href="?avatar_state=any" class="<%= 'selected' if @avatar_state == 'any' %>"><%= t(:all_link, { :zero => "All", :one => "All %{count}", :other => "All %{count}" }, :count => @avatar_counts[:all] || 0) %></a>
+  <a href="?avatar_state=submitted" id="submitted_profile"  class="<%= 'selected' if @avatar_state == 'submitted' %>"><%= t(:submitted_link, { :zero => "Submitted", :one => "Submitted %{count}", :other => "Submitted %{count}" }, :count => @avatar_counts[:submitted] || 0) %></a> |
+  <a href="?avatar_state=reported" id="reported_profile"class="<%= 'selected' if @avatar_state == 'reported' %>"><%= t(:reported_link, { :zero => "Reported", :one => "Reported %{count}", :other => "Reported %{count}" }, :count => @avatar_counts[:reported] || 0) %></a> |
+  <a href="?avatar_state=re_reported" id="re_reported_profile" class="<%= 'selected' if @avatar_state == 're_reported' %>"><%= t(:re_reported_link, { :zero => "Approved, Re-Reported", :one => "Approved, Re-Reported %{count}", :other => "Approved, Re-Reported %{count}"}, :count => @avatar_counts[:re_reported] || 0) %></a> |
+  <a href="?avatar_state=any" id="any_profile" class="<%= 'selected' if @avatar_state == 'any' %>"><%= t(:all_link, { :zero => "All", :one => "All %{count}", :other => "All %{count}" }, :count => @avatar_counts[:all] || 0) %></a>
 </div>
 
 <% if @users.empty? %>

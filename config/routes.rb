@@ -658,7 +658,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
-      courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
+      courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
@@ -706,6 +706,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :discussion_topics_api) do |topics|
       def topic_routes(topics, context)
+        topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :action => :show, :path_name => "#{context}_discussion_topic"
         topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/view", :action => :view, :path_name => "#{context}_discussion_topic_view"
         topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entry_list", :action => :entry_list, :path_name => "#{context}_discussion_topic_entry_list"
         topics.post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", :action => :add_entry, :path_name => "#{context}_discussion_add_entry"
@@ -744,7 +745,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :users) do |users|
-      users.get 'users/self/activity_stream', :action => :activity_stream
+      users.get 'users/self/activity_stream', :action => :activity_stream, :path_name => 'user_activity_stream'
       users.get 'users/activity_stream', :action => :activity_stream # deprecated
 
       users.get 'users/self/todo', :action => :todo_items

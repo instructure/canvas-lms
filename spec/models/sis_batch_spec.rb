@@ -25,9 +25,12 @@ describe SisBatch do
 
   def create_csv_data(data)
     i = 0
-    tempfile = Tempfile.new(["sis_rspec", ".zip"])
+    tempfile = Tempfile.new("sis_rspec.zip")
     path = tempfile.path
-    FileUtils.rm(path)
+    # we just want the path, and if we don't tell the tempfile to close,
+    # it'll try to delete the file later during finalization, which is
+    # not a convenient time for us.
+    tempfile.close!
     Zip::ZipFile.open(path, true) do |z|
       data.each do |dat|
         z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
@@ -53,9 +56,9 @@ describe SisBatch do
   end
 
   it "should not add attachments to the list" do
-    create_csv_data('abc') { |batch| batch.attachment.position.should be_nil}
-    create_csv_data('abc') { |batch| batch.attachment.position.should be_nil}
-    create_csv_data('abc') { |batch| batch.attachment.position.should be_nil}
+    create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
+    create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
+    create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
   end
 
   describe "batch mode" do
@@ -76,8 +79,8 @@ describe SisBatch do
 
       # initial import of one course, to test courses that haven't changed at all between imports
       process_csv_data([
-%{course_id,short_name,long_name,account_id,term_id,status
-another_course,not-delete,not deleted not changed,,term1,active}
+        "course_id,short_name,long_name,account_id,term_id,status\n" +
+        "another_course,not-delete,not deleted not changed,,term1,active"
       ])
       @c4 = @account.courses.find_by_course_code('not-delete')
 
@@ -216,9 +219,9 @@ s2,test_1,section2,active},
       @c1 = factory_with_protected_attributes(@account.courses, :name => "delete me", :enrollment_term => @term1, :sis_batch_id => @previous_batch.id)
       @c1.offer!
 
-      @batch = process_csv_data(
+      @batch = process_csv_data([
         %{course_id,short_name,long_name,account_id,term_id,status
-          test_1,TC 101,Test Course 101,,,active},
+          test_1,TC 101,Test Course 101,,,active}],
         :batch_mode => false)
       @c1.reload.should be_available
     end
@@ -273,7 +276,7 @@ s2,test_1,section2,active},
 
       # only supply courses
       process_csv_data(
-          %{course_id,short_name,long_name,term_id},
+          [%{course_id,short_name,long_name,term_id}],
           :batch_mode => true, :batch_mode_term => @term)
       @course.reload.should be_deleted
     end

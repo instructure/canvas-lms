@@ -646,7 +646,7 @@ class FilesController < ApplicationController
   def image_thumbnail
     cancel_cache_buster
     url = Rails.cache.fetch(['thumbnail_url', params[:uuid]].cache_key, :expires_in => 30.minutes) do
-      attachment = Attachment.find_by_id_and_uuid(params[:id], params[:uuid]) if params[:id].present?
+      attachment = Attachment.active.find_by_id_and_uuid(params[:id], params[:uuid]) if params[:id].present?
       url = attachment.thumbnail_url rescue nil
       url ||= '/images/no_pic.gif'
       url

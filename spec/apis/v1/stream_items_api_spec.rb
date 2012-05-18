@@ -363,11 +363,18 @@ describe UsersController, :type => :integration do
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     json.size.should == 2
+    response.headers['Link'].should be_present
+
+    json = api_call(:get, "/api/v1/users/activity_stream.json?per_page=1",
+                    { :controller => "users", :action => "activity_stream", :format => 'json', :per_page => '1' })
+    json.size.should == 1
+    response.headers['Link'].should be_present
 
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/activity_stream.json",
                     { :controller => "courses", :action => "activity_stream", :course_id => @course2.to_param, :format => 'json' })
     json.size.should == 1
     json.first['discussion_topic_id'].should == @topic2.id
+    response.headers['Link'].should be_present
   end
 end
 

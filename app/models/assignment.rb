@@ -1052,7 +1052,7 @@ class Assignment < ActiveRecord::Base
       :include_root => false
     )
     avatar_methods = avatars ? [:avatar_path] : []
-    visible_students = context.students_visible_to(user).uniq
+    visible_students = context.students_visible_to(user).order_by_sortable_name.uniq
     res[:context][:students] = visible_students.
       map{|u| u.as_json(:include_root => false, :methods => avatar_methods)}
     res[:context][:active_course_sections] = context.sections_visible_to(user).
