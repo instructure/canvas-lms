@@ -24,6 +24,7 @@ class ActiveRecord::Base
     'asset_user_accesses' => %w(asset_access_stat_id),
     'assignments' => %w(sequence_position minimum_required_blog_posts minimum_required_blog_comments),
     'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at),
+    'calendar_events' => %w(calendar_event_repeat_id for_repeat_on),
     'content_tags' => %w(sequence_position),
     'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist sis_name students_can_participate_before_start_at),
     'courses' => %w(section hidden_tabs sis_name sis_course_code),
