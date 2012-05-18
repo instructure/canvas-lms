@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-describe DataFixup::ReintroduceDeletedEntriesToUnreadCount do
+describe 'DataFixup::ReintroduceDeletedEntriesToUnreadCount' do
   it "should mark existing deleted entries as read" do
     course_with_teacher(:active_user => true, :active_course => true)
     @student1 = student_in_course(:active_all => true).user

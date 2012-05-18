@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20120502212620_fix_user_conversations_counts_for_all.rb'
 
-describe FixUserConversationsCountsForAll do
+describe 'FixUserConversationsCountsForAll' do
   describe "up" do
     it "should fix incorrect entries and correctly count already correct entries" do
       # Setup user with correct unread_conversations_count (2 unread convos)

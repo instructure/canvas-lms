@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20120402054921_populate_conversation_root_account_ids.rb'
 
-describe PopulateConversationRootAccountIds do
+describe 'PopulateConversationRootAccountIds' do
   describe "up" do
     it "should work" do
       u = user

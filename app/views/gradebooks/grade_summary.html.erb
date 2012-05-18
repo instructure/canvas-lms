@@ -137,7 +137,7 @@
       <% end %>
     </td>
     <td class="due">
-      <% if not (assignment.group_weight rescue false) %>
+      <% if !(assignment.group_weight rescue false) %>
         <%= datetime_string(assignment.due_at, :due_date) rescue "" %>
       <% end %>
     </td>

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20111209000047_fix_spelling_of_privileges_column_on_enrollments.rb'
 
-describe FixSpellingOfPrivilegesColumnOnEnrollments do
+describe 'FixSpellingOfPrivilegesColumnOnEnrollments' do
   describe "existing records" do
     before do
       course_with_teacher

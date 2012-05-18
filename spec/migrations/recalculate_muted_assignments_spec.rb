@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20111209171640_recalculate_muted_assignments.rb'
 
-describe RecalculateMutedAssignments do
+describe 'RecalculateMutedAssignments' do
   describe "up" do
     it "should work" do
       c1 = course

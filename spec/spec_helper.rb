@@ -760,4 +760,21 @@ Spec::Runner.configure do |config|
     conn.after_transaction_commit_callbacks.each { |cb| cb.call }
     conn.after_transaction_commit_callbacks.clear
   end
+
+  def verify_post_matches(post_lines, expected_post_lines)
+    # first lines should match
+    post_lines[0].should == expected_post_lines[0]
+
+    # now extract the headers
+    post_headers = post_lines[1..post_lines.index("")]
+    expected_post_headers = expected_post_lines[1..expected_post_lines.index("")]
+    if RUBY_VERSION >= "1.9."
+      expected_post_headers << "User-Agent: Ruby"
+    end
+    post_headers.sort.should == expected_post_headers.sort
+
+    # now check payload
+    post_lines[post_lines.index(""),-1].should ==
+      expected_post_lines[expected_post_lines.index(""),-1]
+  end
 end
