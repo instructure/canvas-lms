@@ -309,12 +309,12 @@ shared_examples_for "profile pictures selenium tests" do
 
     new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
     new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
-    spans = dialog.find_elements(:css, ".profile_pic_list span.img")
-    spans.length.should == 3
 
     FilesController.filter_chain.pop
 
     keep_trying_until do
+      spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
+      spans.length.should == 3
       spans.last.attribute('class') =~ /selected/
       IMAGE_SRC = new_image.attribute('src')
       IMAGE_SRC.should =~ %r{/images/thumbnails/}
