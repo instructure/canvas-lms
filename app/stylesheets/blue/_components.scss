@@ -1,3 +1,7 @@
+.container {
+  margin: $gridGutterWidth auto
+}
+
 .toolbar {
   padding: $contentBoxPadding / 2;
   font-size: $baseFontSize;

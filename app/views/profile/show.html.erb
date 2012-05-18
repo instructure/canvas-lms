@@ -1,0 +1,21 @@
+<% jammit_css :profile %>
+<% content_for :page_title do %>
+  <%= @user.name %>
+<% end %>
+<div class="container">
+  <div class="row">
+    <div class="span2 profile-pic-container">
+      <%= image_tag avatar_image_url(User.avatar_key @user.id), :class => 'profile-pic' %>
+    </div>
+    <div class="span6">
+      <h1><%= @user.short_name %></h1>
+      <p><%= @user.bio %></p>
+      <% if @user != @current_user %>
+        <p><button id="follow-user">Follow</button></p>
+      <% end %>
+    </div>
+    <div class="span4">
+      Stats
+    </div>
+  </div>
+</div>

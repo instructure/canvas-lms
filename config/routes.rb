@@ -524,6 +524,7 @@ ActionController::Routing::Routes.draw do |map|
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
     user.resources :messages, :only => [:index]
   end
+
   map.resource :profile, :only => %w(show edit update),
                          :controller => "profile",
                          :member => { :communication => :get, :update_communication => :post } do |profile|
@@ -533,6 +534,8 @@ ActionController::Routing::Routes.draw do |map|
     profile.user_service "user_services/:id", :controller => "users", :action => "delete_user_service", :conditions => {:method => :delete}
     profile.create_user_service "user_services", :controller => "users", :action => "create_user_service", :conditions => {:method => :post}
   end
+  map.user_profile 'about/:id', :controller => :profile, :action => :show
+
   map.resources :communication_channels
   map.resource :pseudonym_session
 

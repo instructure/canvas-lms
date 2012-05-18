@@ -26,8 +26,14 @@ class ProfileController < ApplicationController
   include Api::V1::Avatar
 
   def show
-    @context = UserProfile.new(@current_user)
-    render :text => "new profile page", :layout => true
+    @use_new_styles = true
+    if params[:id]
+      @user = User.find(params[:id])
+      # TODO: check view permissions for this profile... or are all profiles
+      # viewable?
+    else
+      @user = @current_user
+    end
   end
 
   # @API Get user profile
