@@ -541,7 +541,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # dashboard_url is / , not /dashboard
   map.dashboard '', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
-  map.styleguide 'kylesheet', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
+  map.styleguide 'styleguide', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
   map.root :dashboard
   # backwards compatibility with the old /dashboard url
   map.dashboard_redirect 'dashboard', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
