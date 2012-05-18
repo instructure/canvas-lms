@@ -863,7 +863,7 @@ class ApplicationController < ActionController::Base
         redirect_to(login_url(:needs_cookies => '1'))
         return false
       else
-        raise(ActionController::InvalidAuthenticityToken) unless form_authenticity_token == form_authenticity_param
+        raise(ActionController::InvalidAuthenticityToken) unless (form_authenticity_token == form_authenticity_param) || (form_authenticity_token == request.headers['X-CSRF-Token'])
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
