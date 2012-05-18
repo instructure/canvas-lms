@@ -221,6 +221,8 @@ class UsersController < ApplicationController
   def user_dashboard
     if @domain_root_account.show_new_dashboard?
       @use_new_styles = true
+      load_all_contexts
+      js_env :CONTEXTS => @contexts
       return render :action => :new_user_dashboard
     end
 

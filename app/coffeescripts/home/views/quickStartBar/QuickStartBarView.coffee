@@ -32,15 +32,21 @@ define [
       event.preventDefault()
       $form = $ event.target
       json = formToJSON $(event.target)
-      @currentFormView.onBeforeSave?()
-      @currentFormView.model.save json,
+      @currentFormView.onFormSubmit json
+      ###
+      @currentFormView.onBeforeSave?(json)
+      @currentFormView.model.set json
+      @currentFormView.model.save null,
         success: @onCurrentFormViewModelSaveSuccess
         fail: => # TODO
+      ###
 
-    onCurrentFormViewModelSaveSuccess: (model) =>
+    onSaveSuccess: (model) =>
       @model.set 'expanded', false
       @currentFormView.render()
       @trigger 'save'
+
+    onSaveFail: (model) =>
 
     onNavClick: (event) ->
       event.preventDefault()

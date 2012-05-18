@@ -36,6 +36,7 @@ define [
         @change?(@tokenValues())
 
       @added = @options.added
+      @change = @options.change
 
       @$placeholder = $('<span />')
       @$placeholder.text(@options.placeholder)
@@ -100,7 +101,10 @@ define [
       @resize()
 
     resize: () ->
-      @$fakeInput.css('width', @$node.css('width'))
+      width = @$node.css 'width'
+      if parseInt(width, 10) is 0
+        width = '100%'
+      @$fakeInput.css('width', width)
 
     addToken: (data) ->
       val = data?.value ? @val()
@@ -216,3 +220,6 @@ define [
   $.fn.tokenInput = (options) ->
     @each ->
       new TokenInput $(this), $.extend(true, {}, options)
+
+  TokenInput
+

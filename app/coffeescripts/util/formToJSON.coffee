@@ -7,7 +7,18 @@ define ['jquery'], ($) ->
     json = {}
     array = $form.serializeArray()
     for item in array
-      json[item.name] = item.value
+
+      # second time around, change the type to an array and add the old value to it
+      if json[item.name]?
+        if typeof json[item.name] is 'string'
+          oldValue = json[item.name]
+          json[item.name] = []
+          json[item.name].push oldValue
+        json[item.name].push item.value
+
+      else
+        json[item.name] = item.value
+
     json
 
   ##

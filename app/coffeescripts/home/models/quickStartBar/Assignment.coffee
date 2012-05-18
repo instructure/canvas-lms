@@ -1,4 +1,8 @@
-define ['Backbone'], ({Model}) ->
+define [
+  'Backbone'
+  'underscore'
+  'jquery'
+], ({Model}, _, $) ->
 
   class Assignment extends Model
 
@@ -12,9 +16,6 @@ define ['Backbone'], ({Model}) ->
       grading_type: 'points'
       submission_types: 'online_upload,online_text_entry'
       course_id: null
-
-    validate: (attrs) ->
-      return "need a course id" unless attrs.course_id
 
     toJSON: ->
       assignment: super
