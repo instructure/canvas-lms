@@ -24,7 +24,8 @@ describe ProfileController do
     u = user_with_pseudonym(:account => a, :active_user => true)
     u.short_name = 'Bracken'
     u.save!
-    user_session(u, u.pseudonyms.first)
+    p = u.pseudonyms.first
+    user_session(u, p)
 
     get '/profile/settings'
     Nokogiri::HTML(response.body).css('input#user_short_name').should_not be_empty
@@ -35,6 +36,8 @@ describe ProfileController do
 
     a.settings[:users_can_edit_name] = false
     a.save!
+    p.reload
+
     get '/profile/settings'
     Nokogiri::HTML(response.body).css('input#user_short_name').should be_empty
 
