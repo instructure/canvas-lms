@@ -620,7 +620,7 @@ describe CoursesController do
       user
       user_session(@user, @pseudonym)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
       response.should redirect_to(course_url(@course))
       flash[:notice].should_not be_empty
       @user.enrollments.length.should == 1
@@ -655,7 +655,7 @@ describe CoursesController do
       @new_pseudonym = Pseudonym.new(:account => @account2, :unique_id => 'jt@instructure.com', :user => @user)
       User.any_instance.stubs(:find_or_initialize_pseudonym_for_account).with(@account2).once.returns(@new_pseudonym)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
       response.should redirect_to(course_url(@course))
       flash[:notice].should_not be_empty
       @user.enrollments.length.should == 1
@@ -682,7 +682,7 @@ describe CoursesController do
       user
       user_session(@user)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code.dup
       response.should redirect_to(course_url(@course))
       @user.enrollments.length.should == 0
     end
@@ -692,7 +692,7 @@ describe CoursesController do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
       response.should redirect_to(login_url)
     end
 
@@ -700,7 +700,7 @@ describe CoursesController do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
       response.should be_success
       response.should render_template('open_enrollment')
     end
@@ -709,7 +709,7 @@ describe CoursesController do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
 
-      post 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code, :email => 'bracken@instructure.com'
+      post 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup, :email => 'bracken@instructure.com'
       response.should be_success
       response.should render_template('open_enrollment_confirmed')
       @course.student_enrollments.length.should == 1
