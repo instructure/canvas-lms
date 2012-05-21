@@ -1,6 +1,6 @@
 <% jammit_css :profile %>
 <% content_for :page_title do %>
-  <%= @user.name %>
+  <%= @user.short_name %>
 <% end %>
 <div class="container">
   <div class="row">
@@ -16,6 +16,18 @@
     </div>
     <div class="span4">
       Stats
+      <ul class="user-stats">
+        <li>Followers</li>
+        <li>Collections</li>
+        <li>Comments</li>
+        <li>Posts</li>
+      </ul>
+
+      <% if @user.show_user_services? %>
+        Find Me On
+        <ul class="social-links">
+        </ul>
+      <% end %>
     </div>
   </div>
 </div>

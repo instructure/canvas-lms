@@ -18,7 +18,8 @@
 
 # @API Users
 class ProfileController < ApplicationController
-  before_filter :require_user
+  before_filter :require_user, :except => :show
+  before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
   before_filter { |c| c.active_tab = "profile" }
 
@@ -27,12 +28,17 @@ class ProfileController < ApplicationController
 
   def show
     @use_new_styles = true
-    if params[:id]
-      @user = User.find(params[:id])
-      # TODO: check view permissions for this profile... or are all profiles
-      # viewable?
-    else
-      @user = @current_user
+    @user ||= @current_user
+
+    if @user.private? && @user != @current_user
+      if @user.grants_right?(@current_user, :view_statistics)
+        return render :action => :show
+      elsif @current_user.messageable_users(:ids => [@user.id]) == [@user]
+        return render :action => :show_limited
+      # TODO: also show full profile if user is following other user?
+      else
+        return render :action => :unauthorized
+      end
     end
   end
 
@@ -241,4 +247,13 @@ class ProfileController < ApplicationController
       end
     end
   end
+
+  def require_user_for_private_profile
+    if params[:id]
+      @user = User.find(params[:id])
+      return if @user.public?
+    end
+    require_user
+  end
+  private :require_user_for_private_profile
 end
