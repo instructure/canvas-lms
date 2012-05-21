@@ -3,7 +3,7 @@
 
 <h2><%= t'headings.copy_course', 'Copy %{course}', :course => @context.name %></h2>
 <p>
-  <%= t('details', %{Enter the following details to begin creating a copy of this course.}) %>
+  <%= t('details', %{Please enter the details for the new course.}) %>
 </p>
 <% form_for :course, :url => course_copy_course_url(@context), :html => {} do |f| %>
   <table class="formtable">
