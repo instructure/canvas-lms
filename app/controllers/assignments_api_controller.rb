@@ -133,7 +133,7 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
-  ALLOWED_FIELDS = %w(name position points_possible grading_type due_at)
+  ALLOWED_FIELDS = %w(name position points_possible grading_type due_at description)
 
   # @API Create an assignment
   # Create a new assignment for this course. The assignment is created in the
@@ -147,6 +147,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"points"] The strategy used for grading the assignment. The assignment is ungraded if this field is omitted.
   # @argument assignment[due_at] [Timestamp] The day/time the assignment is due. Accepts
   #   times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  # @argument assignment[description] [String] The assignment's description, supports HTML.
   def create
     assignment_params = {}
     if params[:assignment].is_a?(Hash)
