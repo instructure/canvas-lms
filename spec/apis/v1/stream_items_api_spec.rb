@@ -376,5 +376,28 @@ describe UsersController, :type => :integration do
     json.first['discussion_topic_id'].should == @topic2.id
     response.headers['Link'].should be_present
   end
+
+  it "should return the group-specific activity stream" do
+    group_with_user
+    @group1 = @group
+    @group2 = Group.create!
+    @group2.participating_users << @user
+
+    @context = @group1
+    @topic1 = discussion_topic_model
+    @context = @group2
+    @topic2 = discussion_topic_model
+
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.size.should == 2
+    response.headers['Link'].should be_present
+
+    json = api_call(:get, "/api/v1/groups/#{@group1.id}/activity_stream.json",
+                    { :controller => "groups", :action => "activity_stream", :group_id => @group1.to_param, :format => 'json' })
+    json.size.should == 1
+    json.first['discussion_topic_id'].should == @topic1.id
+    response.headers['Link'].should be_present
+  end
 end
 

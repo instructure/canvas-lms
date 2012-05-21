@@ -834,6 +834,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :groups) do |groups|
       groups.post 'groups/:group_id/files', :action => :create_file
+      groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
     end
 
     api.with_options(:controller => :collections) do |collections|
