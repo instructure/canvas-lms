@@ -37,7 +37,7 @@ class QuizzesController < ApplicationController
       @surveys = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
       @submissions_hash = {}
       @submissions_hash
-      @current_user && @current_user.quiz_submissions.each do |s|
+      @current_user && @current_user.quiz_submissions.scoped(:conditions => ['quizzes.context_id=? AND quizzes.context_type=?', @context.id, @context.class.to_s], :include => :quiz).each do |s|
         if s.needs_grading?
           s.grade_submission(:finished_at => s.end_at)
           s.reload
