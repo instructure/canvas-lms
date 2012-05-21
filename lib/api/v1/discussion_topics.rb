@@ -51,10 +51,11 @@ module Api::V1::DiscussionTopics
                   :unread_count => topic.unread_count(user),
                   :topic_children => children,
                   :attachments => attachments,
-                  :url => named_context_url(context,
+                  :html_url => named_context_url(context,
                                             :context_discussion_topic_url,
                                             topic,
                                             :include_host => true)
+      json[:url] = json[:html_url] # deprecated
     end
   end
 

@@ -1,7 +1,7 @@
 shared_examples_for "discussions selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  def create_and_go_to_topic(title = 'new topic', discussion_type = 'side-comment', is_locked = false)
+  def create_and_go_to_topic(title = 'new topic', discussion_type = 'side_comment', is_locked = false)
     topic = @course.discussion_topics.create!(:title => title, :discussion_type => discussion_type)
     if is_locked
       topic.workflow_state = 'locked'

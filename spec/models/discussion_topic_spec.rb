@@ -36,6 +36,12 @@ describe DiscussionTopic do
     d.discussion_type.should == 'side_comment'
   end
 
+  it "should require a valid discussion_type" do
+    @topic = course_model.discussion_topics.build(:message => 'test', :discussion_type => "gesundheit")
+    @topic.save.should == false
+    @topic.errors.detect { |e| e.first == 'discussion_type' }.should be_present
+  end
+
   it "should update the assignment it is associated with" do
     course_model
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -392,7 +398,7 @@ describe DiscussionTopic do
       course_with_teacher(:course => @course, :active_all => true)
       student_in_course(:course => @course, :active_all => true)
 
-      topic = @course.discussion_topics.create(:title => "secret topic", :user => @teacher)
+      topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher)
 
       StreamItem.for_user(@student).count.should == 0
       StreamItem.for_user(@teacher).count.should == 1
