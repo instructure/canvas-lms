@@ -27,7 +27,7 @@ class CalendarEvent < ActiveRecord::Base
       :remove_child_events
   attr_accessor :cancel_reason
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
-  copy_authorized_links(:description) { [self.context, nil] }
+  copy_authorized_links(:description) { [self.effective_context, nil] }
 
   include Workflow
 

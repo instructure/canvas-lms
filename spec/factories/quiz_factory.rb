@@ -66,6 +66,10 @@ def short_answer_question_data
   {"name"=>"Question", "correct_comments"=>"", "question_type"=>"short_answer_question", "assessment_question_id"=>8197062, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>16.5, "answers"=>[{"comments"=>"", "weight"=>100, "text"=>"stupid", "id"=>7100}, {"comments"=>"", "weight"=>100, "text"=>"dumb", "id"=>2159}], "question_text"=>"<p>there's no such thing as a _____ question</p>", "id" => 1}.with_indifferent_access
 end
 
+def short_answer_question_data_one_blank
+  {"name"=>"Question", "correct_comments"=>"", "question_type"=>"short_answer_question", "assessment_question_id"=>8197062, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>16.5, "answers"=>[{"comments"=>"", "weight"=>100, "text"=>"stupid", "id"=>7100}, {"comments"=>"", "weight"=>100, "text"=>"dumb", "id"=>2159}, {"comments"=>"", "weight"=>100, "text"=>"", "id"=>9090}], "question_text"=>"<p>there's no such thing as a _____ question</p>", "id" => 1}.with_indifferent_access
+end
+
 def essay_question_data
   {"name"=>"Question", "correct_comments"=>"", "question_type"=>"essay_question", "comments"=>nil, "assessment_question_id"=>8197062, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>13.6, "answers"=>[], "question_text"=>"<p>Please summarize the history of the world in 3 sentences</p>", "id" => 1}.with_indifferent_access
 end

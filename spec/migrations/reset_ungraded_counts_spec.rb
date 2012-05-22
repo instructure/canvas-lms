@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'lib/data_fixup/reset_ungraded_counts.rb'
 
-describe DataFixup::ResetUngradedCounts do
+describe 'DataFixup::ResetUngradedCounts' do
   it "should work" do
     assignment_model
 

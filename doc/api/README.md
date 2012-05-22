@@ -19,7 +19,17 @@ For POST and PUT requests, parameters are sent using standard
 <a href="http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4">HTML form
 encoding</a> (the application/x-www-form-urlencoded content type).
 
-All timestamps are sent and returned in ISO 8601 format (UTC time zone):
+POST and PUT requests may also optionally be sent in <a href="http://www.json.org/">JSON format</a> format. The content-type of the request must be set to application/json in this case. There is currently no way to upload a file as part of a JSON POST, the multipart form type must be used.
+
+As an example, this HTML form request:
+
+    name=test+name&file_ids[]=1&file_ids[]=2&sub[name]=foo&sub[message]=bar
+
+would translate into this JSON request:
+
+    { "name": "test name", "file_ids": [1,2], "sub": { "name": "foo", "message": "bar" } }
+
+With either encoding, all timestamps are sent and returned in ISO 8601 format (UTC time zone):
 
     YYYY-MM-DDTHH:MM:SSZ
 

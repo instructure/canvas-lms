@@ -120,7 +120,15 @@ module Delayed
             # does a FOR UPDATE, which postgresql won't allow in a stable fn)
             #
             # so without the subselect, it'd evaluate the function once for every row in delayed_jobs
-            job = self.first(:conditions => ["id = (select pop_from_delayed_jobs(?, ?, ?, ?, ?))", worker_name, queue, min_priority, max_priority, db_time_now])
+            now = db_time_now
+            job = self.first(:conditions => ["id = (select pop_from_delayed_jobs(?, ?, ?, ?, ?))", worker_name, queue, min_priority, max_priority, now])
+            # the pop_from_delayed_jobs function takes care of updating the db
+            # row with the locked_at/locked_by information, but that happens
+            # too late for the outer select to see those changes. so we will
+            # update the AR record client-side to match what the trigger did.
+            if job
+              job.mark_as_locked!(now, worker_name)
+            end
             return job
           else
             @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
@@ -178,17 +186,20 @@ module Delayed
           # We don't own this job so we will update the locked_by name and the locked_at
           affected_rows = self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and locked_at is null and run_at <= ?", id, now])
           if affected_rows == 1
-            self.locked_at    = now
-            self.locked_by    = worker
-            # we cheated ActiveRecord::Dirty with the update_all calls above, so
-            # we'll fix things up here.
-            changed_attributes['locked_at'] = now
-            changed_attributes['locked_by'] = worker
-
+            mark_as_locked!(now, worker)
             return true
           else
             return false
           end
+        end
+
+        def mark_as_locked!(time, worker)
+          self.locked_at    = time
+          self.locked_by    = worker
+          # we cheated ActiveRecord::Dirty with the update_all calls above, so
+          # we'll fix things up here.
+          changed_attributes['locked_at'] = time
+          changed_attributes['locked_by'] = worker
         end
 
         def create_and_lock!(worker)

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20120106220543_set_saml_entity_id'
 
-describe SetSamlEntityId do
+describe 'SetSamlEntityId' do
   before(:each) do
     Setting.set_config('saml', {
             :entity_id => "http://watup_fool.com/saml2"

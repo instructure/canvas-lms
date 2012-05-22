@@ -28,4 +28,43 @@ describe Canvas do
       end
     end
   end
+
+  describe ".timeout_protection" do
+    it "should wrap the block in a timeout" do
+      Setting.set("service_generic_timeout", "2")
+      Timeout.expects(:timeout).with(2).yields
+      ran = false
+      Canvas.timeout_protection("spec") { ran = true }
+      ran.should == true
+
+      # service-specific timeout
+      Setting.set("service_spec_timeout", "1")
+      Timeout.expects(:timeout).with(1).yields
+      ran = false
+      Canvas.timeout_protection("spec") { ran = true }
+      ran.should == true
+    end
+
+    if Canvas.redis_enabled?
+      it "should skip calling the block after X failures" do
+        Setting.set("service_spec_cutoff", "2")
+        Timeout.expects(:timeout).with(15).twice.raises(Timeout::Error)
+        Canvas.timeout_protection("spec") {}
+        Canvas.timeout_protection("spec") {}
+        ran = false
+        # third time, won't call timeout
+        Canvas.timeout_protection("spec") { ran = true }
+        ran.should == false
+        # verify the redis key has a ttl
+        key = "service:timeouts:spec"
+        Canvas.redis.get(key).should == "2"
+        Canvas.redis.ttl(key).should be_present
+        # delete the redis key and it'll try again
+        Canvas.redis.del(key)
+        Timeout.expects(:timeout).with(15).yields
+        Canvas.timeout_protection("spec") { ran = true }
+        ran.should == true
+      end
+    end
+  end
 end

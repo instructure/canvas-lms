@@ -83,8 +83,9 @@ class DiscussionTopicsController < ApplicationController
     @context.assert_assignment_group rescue nil
     @all_topics = @context.discussion_topics.active
     @all_topics = @all_topics.only_discussion_topics if params[:include_announcements] != "1"
-    @topics = Api.paginate(@all_topics, self, topic_pagination_path).reject{|a| a.locked_for?(@current_user, :check_policies => true) }.
-      each { |t| t.current_user = @current_user }
+    @topics = Api.paginate(@all_topics, self, topic_pagination_path)
+    @topics.reject! { |a| a.locked_for?(@current_user, :check_policies => true) }
+    @topics.each { |t| t.current_user = @current_user }
     if authorized_action(@context.discussion_topics.new, @current_user, :read)
       return child_topic if params[:root_discussion_topic_id] && @context.respond_to?(:context) && @context.context && @context.context.discussion_topics.find(params[:root_discussion_topic_id])
       log_asset_access("topics:#{@context.asset_string}", "topics", 'other')

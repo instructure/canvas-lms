@@ -24,13 +24,14 @@ describe SSLCommon do
     SSLCommon.post_data("http://theusername:thepassword@localhost:#{server.addr[1]}/endpoint",
         "somedata", "application/x-jt-is-so-cool")
     server_thread.join
-    post_lines.should == [
+    verify_post_matches(post_lines,
+    [
         "POST /endpoint HTTP/1.1",
         "Accept: */*",
         "Content-Type: application/x-jt-is-so-cool",
         "Authorization: Basic #{Base64.encode64("theusername:thepassword").strip}",
         "",
-        "somedata"]
+        "somedata"])
   end
 
   it "should work with http basic auth, username and password, with encoded characters" do
@@ -38,13 +39,13 @@ describe SSLCommon do
     SSLCommon.post_data("http://theusername%40theuseremail.tld:thepassword@localhost:#{server.addr[1]}/endpoint",
         "somedata", "application/x-jt-is-so-cool")
     server_thread.join
-    post_lines.should == [
+    verify_post_matches(post_lines, [
         "POST /endpoint HTTP/1.1",
         "Accept: */*",
         "Content-Type: application/x-jt-is-so-cool",
         "Authorization: Basic #{Base64.encode64("theusername@theuseremail.tld:thepassword").strip}",
         "",
-        "somedata"]
+        "somedata"])
   end
 
   it "should work with http basic auth, just username" do
@@ -52,13 +53,13 @@ describe SSLCommon do
     SSLCommon.post_data("http://theusername@localhost:#{server.addr[1]}/endpoint",
         "somedata", "application/x-jt-is-so-cool")
     server_thread.join
-    post_lines.should == [
+    verify_post_matches(post_lines, [
         "POST /endpoint HTTP/1.1",
         "Accept: */*",
         "Content-Type: application/x-jt-is-so-cool",
         "Authorization: Basic #{Base64.encode64("theusername:").strip}",
         "",
-        "somedata"]
+        "somedata"])
   end
 
   it "should work with no auth" do
@@ -66,11 +67,11 @@ describe SSLCommon do
     SSLCommon.post_data("http://localhost:#{server.addr[1]}/endpoint",
         "somedata", "application/x-jt-is-so-cool")
     server_thread.join
-    post_lines.should == [
+    verify_post_matches(post_lines, [
         "POST /endpoint HTTP/1.1",
         "Accept: */*",
         "Content-Type: application/x-jt-is-so-cool",
         "",
-        "somedata"]
+        "somedata"])
   end
 end

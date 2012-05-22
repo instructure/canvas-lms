@@ -40,7 +40,12 @@
             <% show_comment = false if answer_type == "matching_answer" %>
           <% else %>
             <% matched = (hash_get(question, :matches) || hash_get(question, :answers, [])).find{|a| hash_get(a, :match_id).to_i == hash_get(user_answer, "answer_#{hash_get(answer, :id)}").to_i} %>
-            You put: <%= (hash_get(matched, :right) || hash_get(matched, :text)) %>
+            <span class="text_box_answer <%= 'correct_text_box_answer' if matched && matched[:weight] == 100 %>">
+                    <%= before_label(:your_answer, 'Your Answer') %>
+              <% user_text = (hash_get(matched, :right) || hash_get(matched, :text))
+                 user_text = nil if user_text.blank? %>
+              <b><%= user_text || t(:you_left_this_blank, 'You left this blank') %></b>
+            </span>
             <% if show_correct_answers %>
               <br/>It was really: <%= (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(user_answer, :match_id).to_i}[:text] rescue '')) %>
             <% end %>

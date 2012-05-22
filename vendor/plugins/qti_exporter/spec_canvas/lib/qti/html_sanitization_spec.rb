@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require File.dirname(__FILE__) + '/../../qti_helper'
 if Qti.migration_executable
 describe "HTML Sanitization of" do

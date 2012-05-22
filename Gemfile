@@ -12,7 +12,7 @@ gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
-gem 'encrypted_cookie_store-instructure', '1.0.0', :require => 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.0.1', :require => 'encrypted_cookie_store'
 gem 'erubis',         '2.7.0'
 gem 'hairtrigger',    '0.1.13'
 gem 'haml',           '3.1.2'
@@ -110,6 +110,10 @@ end
 
 group :redis do
   gem 'redis-store', '1.0.0.rc1'
+end
+
+group :embedly do
+  gem 'embedly', '1.5.5'
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from

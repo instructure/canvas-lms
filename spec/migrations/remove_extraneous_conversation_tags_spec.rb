@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'lib/data_fixup/remove_extraneous_conversation_tags.rb'
 
-describe DataFixup::RemoveExtraneousConversationTags do
+describe 'DataFixup::RemoveExtraneousConversationTags' do
   before do
     @u1 = student_in_course(:active_all => true).user
     @u2 = student_in_course(:active_all => true, :course => @course).user

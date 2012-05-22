@@ -18,14 +18,9 @@
 
 class QuizQuestion::ShortAnswerQuestion < QuizQuestion::Base
   def correct_answer_parts(user_answer)
-    answer_text = user_answer.answer_text
-    return nil if answer_text.nil?
-
-    answer_text = CGI::escapeHTML(answer_text).strip.downcase
-
-    answer = @question_data[:answers].sort_by{|a| a[:weight] || 0}.find do |answer|
-      (answer[:text] || "").strip.downcase == answer_text
-    end
+    answer = matching_answer(user_answer)
+    # if nil answer (question not presented to student... undefined). return nil directly
+    return nil if answer.nil?
 
     if answer
       user_answer.answer_id = answer[:id]
@@ -33,4 +28,21 @@ class QuizQuestion::ShortAnswerQuestion < QuizQuestion::Base
 
     !!answer
   end
+
+  # Find and return the matching answer for the user's answer.
+  # If no matching answer is found, a +nil+ is returned.
+  def matching_answer(user_answer)
+    answer_text = user_answer.answer_text
+    return nil if answer_text.nil?
+
+    answer_text = CGI::escapeHTML(answer_text).strip.downcase
+
+    answer = @question_data[:answers].sort_by{|a| a[:weight] || 0}.find do |answer|
+      valid_answer = (answer[:text] || '').strip.downcase
+      # Ignore blank answers (no match on that)
+      (valid_answer == answer_text) && !valid_answer.blank?
+    end
+    answer
+  end
+
 end

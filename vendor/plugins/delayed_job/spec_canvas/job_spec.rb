@@ -36,7 +36,10 @@ describe Delayed::Job do
       job = @backend.create(:payload_object => SimpleJob.new)
       Delayed::Job.expects(:find_available).never
       Delayed::Job.expects(:lock_exclusively!).never
-      Delayed::Job.get_and_lock_next_available('test1', 1).should == job
+      new_job = Delayed::Job.get_and_lock_next_available('test1', 1)
+      new_job.locked_by.should == 'test1'
+      new_job.locked_at.should be_present
+      new_job.should == job
     end
   end
 end

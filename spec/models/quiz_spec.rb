@@ -243,7 +243,11 @@ describe Quiz do
   it "should return processed root entries for each question/group" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
-    q.quiz_questions.create!(:question_data => { :name => "test 1" }, :quiz_group => g)
+
+    qq1 = q.quiz_questions.create!(:question_data => { :name => "test 1" }, :quiz_group => g)
+    # make sure we handle sorting with nil positions
+    QuizQuestion.update_all({:position => nil}, {:id => qq1.id})
+
     q.quiz_questions.create!(:question_data => { :name => "test 2" }, :quiz_group => g)
     q.quiz_questions.create!(:question_data => { :name => "test 3" })
     q.quiz_questions.create!(:question_data => { :name => "test 4" })
