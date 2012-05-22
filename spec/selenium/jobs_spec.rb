@@ -173,13 +173,16 @@ describe "jobs ui" do
 
       it "should confirm that clicking on delete button should delete all jobs" do
         filter_jobs(FlavorTags::ALL)
-        f("#select-all-jobs").click
+        validate_all_jobs_selected
         f("#jobs-grid .odd").should be_displayed
         f("#jobs-grid .even").should be_displayed
         f("#jobs-total").text.should eql "3"
-        f("#delete-jobs").click
-        driver.switch_to.alert.should_not be_nil
-        driver.switch_to.alert.accept
+        keep_trying_until do
+          f("#delete-jobs").click
+          driver.switch_to.alert.should_not be_nil
+          driver.switch_to.alert.accept
+          true
+        end
         wait_for_ajax_requests
         f("#jobs-grid .odd").should be_nil
         f("#jobs-grid .even").should be_nil
