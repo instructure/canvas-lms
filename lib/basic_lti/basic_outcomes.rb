@@ -138,7 +138,7 @@ module BasicLTI::BasicOutcomes
       text_value = self.result_score
       new_value = Float(text_value) rescue false
       if new_value && (0.0 .. 1.0).include?(new_value)
-        submission_hash = { :grade => "#{new_value * 100}%" }
+        submission_hash = { :grade => "#{new_value * 100}%", :submission_type => 'external_tool' }
         @submission = assignment.grade_student(user, submission_hash).first
         self.body = "<replaceResultResponse />"
         return true
