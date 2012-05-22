@@ -151,7 +151,7 @@ describe "edititing grades" do
   end
 
   it "should correctly set default grades for a specific section" do
-    pending('bug 7540 - Setting default grade for one section changes it for all ') do
+      pending("intermittently fails")
       def open_section_menu_and_click(menu_item_css)
         f('#section_to_show').click
         section_menu = f('#section-to-show-menu')
@@ -169,7 +169,6 @@ describe "edititing grades" do
       open_section_menu_and_click('#section-to-show-menu-0')
       f(gradebook_row_1).should be_displayed
       validate_cell_text(f("#{gradebook_row_1} .r2"), '-')
-    end
   end
 
   it "should not factor non graded assignments into group total" do
