@@ -5,6 +5,7 @@ define [
   'jst/quickStartBar/assignment'
   'jquery.instructure_date_and_time'
   'compiled/widget/ContextSearch'
+  'jquery.disableWhileLoading'
 ], ({View}, _, Assignment, template, formToJSON, ContextSearch) ->
 
   class AssignmentView extends View
@@ -18,15 +19,10 @@ define [
       @setup()
 
     setup: ->
-      @$submitButton = @$ 'button[type=submit]'
-      @$inputs = @$ ':input'
-      @originalSubmitHTML = @$submitButton.html()
       @$('input[name=due_at]').datetime_field()
       @$('input[name=course_id]').contextSearch
         contexts: ENV.CONTEXTS
         placeholder: "Type the name of a class to assign this too..."
-        added: ->
-          console.log this, arguments
         selector:
           baseData:
             type: 'course'
@@ -35,14 +31,7 @@ define [
               row.noExpand = true
           browser: false
 
-    onSaveFail: ->
-      @$submitButton.html @originalSubmitHTML
-      @$inputs.attr 'disabled', true
-      @parentView.onSaveFail()
-
     onFormSubmit: (json) ->
-      @$submitButton.html 'Saving...'
-      @$inputs.attr 'disabled', true
       ids = json['course_id[]']
 
       # get real date
@@ -52,12 +41,14 @@ define [
       delete json['course_id[]']
 
       if _.isArray ids
-        @saveCopies ids, json
+        dfd = @saveCopies ids, json
       else
         json.course_id = ids.replace /^course_/, ''
-        @model.save json,
+        dfd = @model.save json,
           success: @parentView.onSaveSuccess
-          fail: @onSaveFail
+          fail: @parentView.onSaveFail
+
+      @$('form').disableWhileLoading dfd
 
     saveCopies: (ids, attrs) ->
       dfds = _.map ids, (id) =>
@@ -65,7 +56,7 @@ define [
         model.set 'course_id', id.replace /^course_/, ''
         model.save
           success: @parentView.onSaveSuccess
-          fail: @onSaveFail
+          fail: @parentView.onSaveFail
 
 
       $.when(dfds...).then @parentView.onSaveSuccess #TODO onFail

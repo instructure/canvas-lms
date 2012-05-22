@@ -1,9 +1,11 @@
 define [
+  'i18n!dashboard'
   'Backbone'
   'compiled/home/models/quickStartBar/Message'
   'jst/quickStartBar/message'
-  'jquery.instructure_date_and_time'
-], ({View}, Message, template) ->
+  'jquery.rails_flash_notifications'
+  'jquery.disableWhileLoading'
+], (I18n, {View}, Message, template) ->
 
   class MessageView extends View
 
@@ -14,9 +16,31 @@ define [
       html = template @model.toJSON
       @$el.html html
       @filter()
-    
+
+    onFormSubmit: (json) ->
+      json.recipients = json['recipients[]']
+      delete json['recipients[]']
+
+      dfd = @model.save json,
+        success: =>
+          $.flashMessage I18n.t 'message_sent', 'Message Sent'
+          @parentView.onSaveSuccess()
+        fail: @onSaveFail
+
+      @$('form').disableWhileLoading dfd
+
+    onFail: ->
+      # TODO
+
     filter: ->
-      console.profile 'datetime field'
-      @$('.dateField').datetime_field()
-      console.profileEnd 'datetime field'
+      @$('.recipients').contextSearch
+        contexts: ENV.CONTEXTS
+        placeholder: "Type the name of the person to send this to..."
+        selector:
+          preparer: (postData, data, parent) ->
+            for row in data
+              row.noExpand = true
+          browser: false
+
+
 
