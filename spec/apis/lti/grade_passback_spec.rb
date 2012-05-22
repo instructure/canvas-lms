@@ -164,6 +164,8 @@ describe LtiApiController, :type => :integration do
       submission = @assignment.submissions.find_by_user_id(@student.id)
       submission.should be_present
       submission.should be_graded
+      submission.should be_submitted_at
+      submission.submission_type.should eql 'external_tool'
       submission.score.should == 12
     end
 
