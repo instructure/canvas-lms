@@ -1,7 +1,8 @@
 define [
   'Backbone'
   'compiled/home/collections/CourseCollection'
-], ({View}, CourseCollection) ->
+  'jst/activityFeed/ActivityFeedFilterView'
+], ({View}, CourseCollection, template) ->
 
   class ActivityFeedFilterView extends View
 
@@ -30,29 +31,6 @@ define [
       @$('.courseList').append "<li><a href='#' data-value='course:#{id}'>#{course_code}</a></li>"
 
     render: ->
-      @$el.html """
-        <header class="toolbar">&nbsp;</header>
-        <div class="list-view">
-          <ul class="filterList">
-            <li><a href="#" class="active" data-value="everything">Everything</a>
-          </ul>
-
-          <header>Courses</header>
-          <ul class="courseList">
-            <li><a>Loading...</a></li>
-          </ul>
-
-          <header>Canvas Network</header>
-          <ul class="community">
-            <li><a href="#" data-value="peopleIFollow">People I Follow</a>
-            <li><a href="#" data-value="popular">Popular</a>
-            <li><a href="#" data-value="questions">Questions</a>
-          </ul>
-          <ul class="communityUserCommunities filterList">
-            <li><a href="#">TODO: fake data</a>
-          </ul>
-        </div>
-      """
+      @$el.html template()
       @$active = @$ '.active'
       super
-

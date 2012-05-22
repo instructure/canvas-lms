@@ -1,36 +1,9 @@
 define [
   'Backbone'
+  'compiled/home/collections/ActivityFeedItemsCollection'
   'compiled/home/util/activityFeedItemViewFactory'
-], ({View, Collection, Model}, activityFeedItemViewFactory) ->
-
-  class ActivityFeedItemsCollection extends Collection
-
-    model: Model.extend()
-
-    urlKey: 'everything'
-
-    filter: ''
-
-    urls:
-      everything: '/api/v1/users/self/activity_stream'
-      course: '/api/v1/courses/:filter/activity_stream'
-
-    url: ->
-      @urls[@urlKey].replace /:filter/, @filter
-
-    add: (models, options) ->
-      newModels = (model for model in models when not @get(model.id)?)
-      super newModels, options
-
-    comparator: (x, y) ->
-      x = Date.parse(x.get('created_at')).getTime()
-      y = Date.parse(y.get('created_at')).getTime()
-      if x is y
-        0
-      else if x < y
-        -1
-      else
-        1
+  'jst/activityFeed/ActivityFeedItemsView'
+], ({View, Collection, Model}, ActivityFeedItemsCollection, activityFeedItemViewFactory, template) ->
 
   class ActivityFeedItemsView extends View
 
@@ -82,24 +55,7 @@ define [
       filter
 
     render: ->
-      @$el.html """
-        <header class="activityFeedItemsToolbar toolbar border border-trbl border-round-t">
-          <div class="row-fluid">
-            <div class="span5">
-              <h2 class="header"><i class="icon-drawer-toggle">☭</i>Recent Activity</h2>
-            </div>
-            <div class="span7">
-              <ul class="activityFeedItemsFilter nav nav-links">
-                <li><a href="#" class="active">All</a>
-                <li><a href="#">Announcements</a>
-                <li><a href="#">Discussions</a>
-                <li><a href="#">Messages</a>
-              </ul>
-            </div>
-          </div>
-        </header>
-        <ul class="activityFeedItemsList"></ul>
-      """
+      @$el.html template()
       @cacheElements()
       super
 
