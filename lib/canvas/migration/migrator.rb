@@ -95,13 +95,14 @@ class Migrator
     end
   end
   
-  def package_course_files
+  def package_course_files(base_dir=nil)
+    base_dir ||= @unzipped_file_path
     zip_file = File.join(@base_export_dir, MigratorHelper::ALL_FILES_ZIP)
     make_export_dir
 
     Zip::ZipFile.open(zip_file, 'w') do |zipfile|
       @course[:file_map].each_value do |val|
-        file_path = File.join(@unzipped_file_path, val[:real_path] || val[:path_name])
+        file_path = File.join(base_dir, val[:real_path] || val[:path_name])
         val.delete :real_path
         if File.exists?(file_path)
           zipfile.add(val[:path_name], file_path)

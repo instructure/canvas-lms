@@ -42,7 +42,7 @@ class Converter < Canvas::Migration::Migrator
       apply_respondus_settings
     end
 
-    @course['all_files_zip'] = package_course_files
+    @course['all_files_zip'] = package_course_files(@dest_dir_2_1)
     save_to_file
     delete_unzipped_archive
     @course
@@ -59,7 +59,7 @@ class Converter < Canvas::Migration::Migrator
 
   def run_qti_converter
     # convert to 2.1
-    @dest_dir_2_1 = File.join(@unzipped_file_path, QTI_2_OUTPUT_PATH)
+    @dest_dir_2_1 = Dir.mktmpdir(QTI_2_OUTPUT_PATH)
     command = Qti.get_conversion_command(@dest_dir_2_1, @unzipped_file_path)
     logger.debug "Running migration command: #{command}"
     python_std_out = `#{command}`
