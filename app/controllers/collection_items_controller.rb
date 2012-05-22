@@ -27,6 +27,14 @@
 # original item came from, a user may be able to view the cloned item but not
 # the original item.
 #
+# A collection item also has a Discussion Topic associated with it, which can be
+# used for comments on the item. See the Discussion Topic API for details on
+# querying and adding to a discussion. The scope for the discussion topic will
+# be the collection item, and the id of the topic is "self". For example, the
+# DiscussionTopicsApiController#view endpoint looks like this:
+#
+#   /api/v1/collection_items/<id>/discussion_topics/self/view
+#
 # A Collection Item object looks like:
 #
 #     !!!javascript

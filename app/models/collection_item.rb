@@ -47,6 +47,11 @@ class CollectionItem < ActiveRecord::Base
   named_scope :active, { :conditions => { :workflow_state => 'active' } }
   named_scope :newest_first, { :order => "id desc" }
 
+  def discussion_topic
+    DiscussionTopic.find_by_context_type_and_context_id(self.class.name, self.id) ||
+      DiscussionTopic.new(:context => self, :discussion_type => DiscussionTopic::DiscussionTypes::FLAT)
+  end
+
   def destroy
     self.workflow_state = 'deleted'
     save!
@@ -80,5 +85,19 @@ class CollectionItem < ActiveRecord::Base
       WHERE id = OLD.collection_item_data_id;
       SQL
     end
+  end
+
+  set_policy do
+    given { |user, session| self.collection.grants_right?(user, session, :read) }
+    can :read
+
+    given { |user, session| self.collection.grants_right?(user, session, :comment) }
+    can :comment
+
+    given { |user, session| self.collection.grants_right?(user, session, :delete) }
+    can :delete
+
+    given { |user, session| self.collection.grants_right?(user, session, :update) }
+    can :update
   end
 end

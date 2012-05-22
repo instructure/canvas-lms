@@ -58,7 +58,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   on_create_send_to_inboxes do
-    if self.context && self.context.available?
+    if self.context && self.context.respond_to?(:available?) && self.context.available?
       user_id = nil
       if self.parent_entry
         user_id = self.parent_entry.user_id
@@ -198,6 +198,9 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def infer_root_entry_id
+    # don't allow parent ids for flat discussions
+    self.parent_entry = nil if self.discussion_topic.discussion_type == DiscussionTopic::DiscussionTypes::FLAT
+    
     # only allow non-root parents for threaded discussions
     unless self.discussion_topic.try(:threaded?)
       self.parent_entry = parent_entry.try(:root_entry) || parent_entry
@@ -246,6 +249,12 @@ class DiscussionEntry < ActiveRecord::Base
 
     given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
+
+    given { |user, session| self.discussion_topic.context.respond_to?(:collection) && self.discussion_topic.context.collection.grants_right?(user, session, :read) }
+    can :read
+
+    given { |user, session| self.discussion_topic.context.respond_to?(:collection) && self.discussion_topic.context.collection.grants_right?(user, session, :comment) }
+    can :create
   end
 
   named_scope :for_user, lambda{|user|

@@ -733,5 +733,12 @@ describe DiscussionTopic do
       run_transaction_commit_callbacks
       Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
     end
+
+    it "should return empty data for a materialized view on a new (unsaved) topic" do
+      new_topic = DiscussionTopic.new(:context => @topic.context, :discussion_type => DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
+      new_topic.should be_new_record
+      new_topic.materialized_view.should == [ "[]", [], [], "[]" ]
+      Delayed::Job.find_all_by_strand("materialized_discussion:#{new_topic.id}").size.should == 0
+    end
   end
 end

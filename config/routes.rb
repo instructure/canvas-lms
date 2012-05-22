@@ -724,6 +724,7 @@ ActionController::Routing::Routes.draw do |map|
       end
       topic_routes(topics, "course")
       topic_routes(topics, "group")
+      topic_routes(topics, "collection_item")
     end
 
     api.with_options(:controller => :external_tools) do |tools|

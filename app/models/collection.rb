@@ -50,9 +50,9 @@ class Collection < ActiveRecord::Base
 
   set_policy do
     given { |user| self.public? }
-    can :read
+    can :read and can :comment
 
     given { |user| self.context == user }
-    can :read and can :create and can :update and can :delete
+    can :read and can :create and can :update and can :delete and can :comment
   end
 end
