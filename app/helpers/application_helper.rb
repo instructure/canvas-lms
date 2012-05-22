@@ -311,8 +311,9 @@ module ApplicationHelper
   # See `js_base_url`
   def use_optimized_js?
     if ENV['USE_OPTIMIZED_JS'] == 'true'
-      # allows overriding by adding ?debug_assets=1 to the url
-      !params[:debug_assets]
+      # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
+      # (debug_assets is also used by jammit => you'll get unpackaged css AND js)
+      !(params[:debug_assets] || params[:debug_js])
     else
       # allows overriding by adding ?optimized_js=1 to the url
       params[:optimized_js] || false
