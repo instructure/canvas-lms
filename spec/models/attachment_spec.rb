@@ -770,6 +770,11 @@ describe Attachment do
       Attachment.domain_namespace = nil
       attachment_model
       @attachment.s3_config[:bucket_name].should == 'pluginsetting_bucket'
+      # if local storage is configured, this will return "no-bucket"
+      @attachment.stubs(:bucket_name).returns('pluginsetting_bucket')
+
+      # thumbnails should use the same bucket as the attachment they are parented to
+      Thumbnail.new(:attachment => @attachment).bucket_name.should == 'pluginsetting_bucket'
     end
   end
 end
