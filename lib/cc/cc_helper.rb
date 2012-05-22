@@ -174,7 +174,7 @@ module CCHelper
       end
       @rewriter.set_default_handler do |match|
         new_url = match.url
-        if match.obj_id
+        if match.obj_id && match.obj_class
           obj = match.obj_class.find_by_id(match.obj_id)
           if obj && @rewriter.user_can_view_content?(obj)
             # for all other types,
@@ -182,6 +182,8 @@ module CCHelper
             migration_id = CCHelper.create_key(obj)
             new_url = "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}"
           end
+        elsif match.obj_id
+          new_url = "#{COURSE_TOKEN}/#{match.type}/#{match.obj_id}#{match.rest}"
         else
           new_url = "#{COURSE_TOKEN}/#{match.type}#{match.rest}"
         end
