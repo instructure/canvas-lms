@@ -12,7 +12,7 @@ require [
 ], ($, {View}, DashboardView, QuickStartBarView, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView) ->
 
   $ ->
-    @dashboard = new DashboardView
+    window.dashboard = new DashboardView
 
       el: document.getElementById('content')
 

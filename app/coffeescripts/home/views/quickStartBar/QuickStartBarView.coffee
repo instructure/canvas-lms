@@ -2,8 +2,8 @@ define [
   'Backbone',
   'i18n!dashboard'
   'compiled/home/views/quickStartBar/allViews'
-  'compiled/util/formToJSON'
-], ({View, Model}, I18n, views, formToJSON) ->
+  'formToJSON'
+], ({View, Model}, I18n, views) ->
 
 	capitalize = (str) ->
     str.replace /\b[a-z]/g, (match) -> match.toUpperCase()
@@ -31,19 +31,11 @@ define [
     onFormSubmit: (event) ->
       event.preventDefault()
       $form = $ event.target
-      json = formToJSON $(event.target)
+      json = $(event.target).toJSON()
       @currentFormView.onFormSubmit json
-      ###
-      @currentFormView.onBeforeSave?(json)
-      @currentFormView.model.set json
-      @currentFormView.model.save null,
-        success: @onCurrentFormViewModelSaveSuccess
-        fail: => # TODO
-      ###
 
     onSaveSuccess: (model) =>
-      @model.set 'expanded', false
-      @currentFormView.render()
+      @switchFormView()
       @trigger 'save'
 
     onSaveFail: (model) =>

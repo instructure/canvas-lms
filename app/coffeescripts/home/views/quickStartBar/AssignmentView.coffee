@@ -3,10 +3,10 @@ define [
   'underscore'
   'compiled/home/models/quickStartBar/Assignment'
   'jst/quickStartBar/assignment'
-  'jquery.instructure_date_and_time'
   'compiled/widget/ContextSearch'
+  'jquery.instructure_date_and_time'
   'jquery.disableWhileLoading'
-], ({View}, _, Assignment, template, formToJSON, ContextSearch) ->
+], ({View}, _, Assignment, template, ContextSearch) ->
 
   class AssignmentView extends View
 
@@ -16,11 +16,11 @@ define [
     render: ->
       html = template @model.toJSON
       @$el.html html
-      @setup()
+      @filter()
 
-    setup: ->
+    filter: ->
       @$('input[name=due_at]').datetime_field()
-      @$('input[name=course_id]').contextSearch
+      @$('input[name=course_ids]').contextSearch
         contexts: ENV.CONTEXTS
         placeholder: "Type the name of a class to assign this too..."
         selector:
@@ -32,32 +32,13 @@ define [
           browser: false
 
     onFormSubmit: (json) ->
-      ids = json['course_id[]']
-
-      # get real date
       json.date = @$('.datetime_suggest').text()
-
-      # get rid of course_id[] from autocomplete
-      delete json['course_id[]']
-
-      if _.isArray ids
-        dfd = @saveCopies ids, json
-      else
-        json.course_id = ids.replace /^course_/, ''
-        dfd = @model.save json,
-          success: @parentView.onSaveSuccess
-          fail: @parentView.onSaveFail
-
-      @$('form').disableWhileLoading dfd
-
-    saveCopies: (ids, attrs) ->
-      dfds = _.map ids, (id) =>
-        model = new Assignment attrs
+      dfds = _.map json.course_ids, (id) =>
+        model = new Assignment json
         model.set 'course_id', id.replace /^course_/, ''
         model.save
           success: @parentView.onSaveSuccess
           fail: @parentView.onSaveFail
-
-
-      $.when(dfds...).then @parentView.onSaveSuccess #TODO onFail
+      dfd = $.when(dfds...).then @parentView.onSaveSuccess, @parentView.onSaveFail
+      @$('form').disableWhileLoading dfd
 
