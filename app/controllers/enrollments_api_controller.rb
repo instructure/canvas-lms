@@ -44,6 +44,7 @@ class EnrollmentsApiController < ApplicationController
   # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are returned.
   # @argument state[] Filter by enrollment state. Accepted values are 'active', 'invited', and 'creation_pending', 'deleted', 'rejected', 'completed', and 'inactive'. If omitted, 'active' and 'invited' enrollments are returned.
   #
+  # @response_field id The unique id of the enrollment.
   # @response_field course_id The unique id of the course.
   # @response_field course_section_id The unique id of the user's section.
   # @response_field enrollment_state The state of the user's enrollment in the course.
@@ -62,6 +63,7 @@ class EnrollmentsApiController < ApplicationController
   # @example_response
   #   [
   #     {
+  #       "id": 1,
   #       "course_id": 1,
   #       "course_section_id": 1,
   #       "enrollment_state": "active",
@@ -82,6 +84,7 @@ class EnrollmentsApiController < ApplicationController
   #       }
   #     },
   #     {
+  #       "id": 2,
   #       "course_id": 1,
   #       "course_section_id": 2,
   #       "enrollment_state": "active",
@@ -102,6 +105,7 @@ class EnrollmentsApiController < ApplicationController
   #       }
   #     },
   #     {
+  #       "id": 3,
   #       "course_id": 1,
   #       "course_section_id": 2,
   #       "enrollment_state": "active",
