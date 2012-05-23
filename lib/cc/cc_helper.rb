@@ -172,6 +172,11 @@ module CCHelper
       @rewriter.set_handler('wiki') do |match|
         "#{WIKI_TOKEN}/#{match.type}#{match.rest}"
       end
+      @rewriter.set_handler('items') do |match|
+        item = ContentTag.find(match.obj_id)
+        migration_id = CCHelper.create_key(item)
+        new_url = "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}"
+      end
       @rewriter.set_default_handler do |match|
         new_url = match.url
         if match.obj_id && match.obj_class

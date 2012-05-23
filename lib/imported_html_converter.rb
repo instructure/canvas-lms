@@ -48,6 +48,10 @@ class ImportedHtmlConverter
                 node[attr] = URI::escape("#{course_path}/discussion_topics/#{linked_topic.id}")
               end
             end
+          elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/(.*)}
+            if tag = context.context_module_tags.find_by_migration_id($1, :select => 'id')
+              node[attr] = URI::escape "#{course_path}/modules/items/#{tag.id}"
+            end
           elsif val =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/(.*)}
             type = $1
             migration_id = $2
