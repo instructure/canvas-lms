@@ -12,7 +12,7 @@
     <div class="ui-state-error error_message"></div>
   </div>
   
-  <div id="exports">
+  <div id="export_files">
     <% @exports.each do |export| %>
       <% unless export.running? %>
         <% if export.workflow_state == 'exported' #&& export.attachment %>
