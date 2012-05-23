@@ -174,6 +174,7 @@ class Course < ActiveRecord::Base
   before_save :update_enrollments_later
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
+  after_save :set_self_enrollment_code
   before_validation :verify_unique_sis_source_id
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_locale :allow_nil => true
@@ -645,9 +646,42 @@ class Course < ActiveRecord::Base
   end
 
   def self_enrollment_code
+    read_attribute(:self_enrollment_code) || set_self_enrollment_code if self_enrollment?
+  end
+
+  def set_self_enrollment_code
+    return if !self_enrollment? || read_attribute(:self_enrollment_code)
+
+    # subset of letters and numbers that are unambiguous
+    alphanums = 'ABCDEFGHJKLMNPRTWXY346789'
+    code_length = 6
+
+    # we're returning a 6-digit base-25(ish) code. that means there are ~250
+    # million possible codes. we should expect to see our first collision
+    # within the first 16k or so (thus the retry loop), but we won't risk ever
+    # exhausting a retry loop until we've used up about 15% or so of the
+    # keyspace. if needed, we can grow it at that point (but it's scoped to a
+    # shard, and not all courses will have enrollment codes, so that may not be
+    # necessary)
+    code = nil
+    self.class.unique_constraint_retry(10) do
+      code = code_length.times.map{
+        alphanums[(rand * alphanums.size).to_i, 1]
+      }.join
+      update_attribute :self_enrollment_code, code
+    end
+    code
+  end
+
+  def long_self_enrollment_code
     Digest::MD5.hexdigest("#{uuid}_for_#{id}")
   end
-  memoize :self_enrollment_code
+  memoize :long_self_enrollment_code
+
+  # still include the old longer format, since links may be out there
+  def self_enrollment_codes
+    [self_enrollment_code, long_self_enrollment_code]
+  end
 
   def update_final_scores_on_weighting_scheme_change
     if @group_weighting_scheme_changed

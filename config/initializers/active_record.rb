@@ -379,6 +379,10 @@ class ActiveRecord::Base
     {:order => order_by}
   }
 
+  named_scope :where, lambda { |conditions|
+    {:conditions => conditions}
+  }
+
   # set up class-specific getters/setters for a polymorphic association, e.g.
   #   belongs_to :context, :polymorphic => true, :types => [:course, :account]
   def self.belongs_to(name, options={})
@@ -423,14 +427,18 @@ class ActiveRecord::Base
     end
   end
 
-  def self.unique_constraint_retry
+  def self.unique_constraint_retry(retries = 1)
     # runs the block in a (possibly nested) transaction. if a unique constraint
-    # violation occurs, it will run it a second time. the nested transaction
-    # (savepoint) ensures we don't mess up things for the outer transaction.
-    # useful for possible race conditions where we don't want to take a lock
-    # (e.g. when we create a submission).
-    transaction(:requires_new => true) { uncached { yield } }
-  rescue UniqueConstraintViolation
+    # violation occurs, it will run it "retries" more times. the nested
+    # transaction (savepoint) ensures we don't mess up things for the outer
+    # transaction. useful for possible race conditions where we don't want to
+    # take a lock (e.g. when we create a submission).
+    retries.times do
+      begin
+        return transaction(:requires_new => true) { uncached { yield } }
+      rescue UniqueConstraintViolation
+      end
+    end
     transaction(:requires_new => true) { uncached { yield } }
   end
 

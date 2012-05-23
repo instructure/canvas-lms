@@ -44,6 +44,12 @@ class User < ActiveRecord::Base
                            ( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')))) )"
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
+  has_many :observer_enrollments
+  has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
+  has_many :user_observers, :dependent => :delete_all
+  has_many :observers, :through => :user_observers, :class_name => 'User'
+  has_many :user_observees, :class_name => 'UserObserver', :foreign_key => :observer_id, :dependent => :delete_all
+  has_many :observed_users, :through => :user_observees, :source => :user
   has_many :courses, :through => :current_enrollments, :uniq => true
   has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
@@ -817,6 +823,19 @@ class User < ActiveRecord::Base
         logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
       end
     end
+    # delete duplicate enrollments where this user is the observee
+    new_user.observee_enrollments.remove_duplicates!
+
+    # delete duplicate observers/observees, move the rest
+    user_observees.where(:user_id => new_user.user_observees.map(&:user_id)).delete_all
+    user_observees.update_all(:observer_id => new_user.id)
+    xor_observer_ids = (Set.new(user_observers.map(&:observer_id)) ^ new_user.user_observers.map(&:observer_id)).to_a
+    user_observers.where(:observer_id => new_user.user_observers.map(&:observer_id)).delete_all
+    user_observers.update_all(:user_id => new_user.id)
+    # for any observers not already watching both users, make sure they have
+    # any missing observer enrollments added
+    new_user.user_observers.where(:observer_id => xor_observer_ids).each(&:create_linked_enrollments)
+
     self.reload
     Enrollment.send_later(:recompute_final_scores, new_user.id)
     new_user.update_account_associations

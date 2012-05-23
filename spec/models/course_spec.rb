@@ -2666,3 +2666,29 @@ describe Course do
     end
   end
 end
+
+describe Course do
+  describe "self_enrollment" do
+    it "should generate a unique code" do
+      c1 = course()
+      c1.self_enrollment_code.should be_nil # normally only set when self_enrollment is enabled
+      c1.update_attribute(:self_enrollment, true)
+      c1.self_enrollment_code.should_not be_nil
+      c1.self_enrollment_code.should =~ /\A[A-Z0-9]{6}\z/
+
+      c2 = course()
+      c2.update_attribute(:self_enrollment, true)
+      c2.self_enrollment_code.should =~ /\A[A-Z0-9]{6}\z/
+      c1.self_enrollment_code.should_not == c2.self_enrollment_code
+    end
+
+    it "should generate a code on demand for existing self enrollment courses" do
+      c1 = course()
+      Course.update_all({:self_enrollment => true}, {:id => @course.id})
+      c1.reload
+      c1.read_attribute(:self_enrollment_code).should be_nil
+      c1.self_enrollment_code.should_not be_nil
+      c1.self_enrollment_code.should =~ /\A[A-Z0-9]{6}\z/
+    end
+  end
+end
