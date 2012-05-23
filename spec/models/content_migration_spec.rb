@@ -941,6 +941,83 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
     end
 
+    context "copying frozen assignments" do
+      append_before (:each) do
+        @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => {"no_copying" => "yes"})
+
+        @asmnt = @copy_from.assignments.create!(:title => 'lock locky')
+        @asmnt.copied = true
+        @asmnt.freeze_on_copy = true
+        @asmnt.save!
+        @quiz = @copy_from.quizzes.create(:title => "quiz", :quiz_type => "assignment")
+        @quiz.workflow_state = 'available'
+        @quiz.save!
+        @quiz.assignment.copied = true
+        @quiz.assignment.freeze_on_copy = true
+        @quiz.save!
+        @topic = @copy_from.discussion_topics.build(:title => "topic")
+        assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+        assignment.infer_due_at
+        assignment.saved_by = :discussion_topic
+        assignment.copied = true
+        assignment.freeze_on_copy = true
+        @topic.assignment = assignment
+        @topic.save
+
+        @admin = account_admin_user(opts={})
+      end
+
+      it "should copy for admin" do
+        @cm.user = @admin
+        @cm.save!
+
+        run_course_copy
+
+        @copy_to.assignments.count.should == (Qti.qti_enabled? ? 3 : 2)
+        @copy_to.quizzes.count.should == 1 if Qti.qti_enabled?
+        @copy_to.discussion_topics.count.should == 1
+        @cm.content_export.error_messages.should == []
+      end
+
+      it "should copy for teacher if flag not set" do
+        @setting.settings = {}
+        @setting.save!
+
+        run_course_copy
+
+        @copy_to.assignments.count.should == (Qti.qti_enabled? ? 3 : 2)
+        @copy_to.quizzes.count.should == 1 if Qti.qti_enabled?
+        @copy_to.discussion_topics.count.should == 1
+        @cm.content_export.error_messages.should == []
+      end
+
+      it "should not copy for teacher" do
+        run_course_copy
+
+        @copy_to.assignments.count.should == 0
+        @copy_to.quizzes.count.should == 0
+        @copy_to.discussion_topics.count.should == 0
+
+        @cm.content_export.error_messages.should == [
+                ["The assignment \"lock locky\" could not be copied because it is locked.", nil],
+                ["The topic \"topic\" could not be copied because it is locked.", nil],
+                ["The quiz \"quiz\" could not be copied because it is locked.", nil]]
+      end
+
+      it "should not mark assignment as copied if not set to be frozen" do
+        @asmnt.freeze_on_copy = false
+        @asmnt.copied = false
+        @asmnt.save!
+
+        run_course_copy
+
+        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(@asmnt))
+        asmnt_2.freeze_on_copy.should be_nil
+        asmnt_2.copied.should be_nil
+      end
+
+    end
+
     context "notifications" do
       before(:each) do
         Notification.create!(:name => 'Migration Export Ready', :category => 'Migration')

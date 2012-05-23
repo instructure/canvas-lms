@@ -35,6 +35,7 @@ module CC
       @manifest = manifest
       @manifest_node = manifest_node
       @course = @manifest.course
+      @user = @manifest.user
       @export_dir = @manifest.export_dir
       @resources = nil
       @zip_file = manifest.zip_file
