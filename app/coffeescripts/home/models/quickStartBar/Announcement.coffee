@@ -1,4 +1,7 @@
-define ['Backbone'], ({Model}) ->
+define ['compiled/home/models/quickStartBar/Discussion'], (Discussion) ->
 
-  class Announcement extends Model
+  class Announcement extends Discussion
+
+    defaults:
+      is_announcement: true
 
