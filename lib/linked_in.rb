@@ -158,10 +158,7 @@ module LinkedIn
   end
   
   def self.config
-    # Return existing value, even if nil, as long as it's defined
-    return @config if defined?(@config)
-    @config ||= Canvas::Plugin.find(:linked_in).try(:settings)
-    @config ||= (YAML.load_file(RAILS_ROOT + "/config/linked_in.yml")[RAILS_ENV] rescue nil)
+    Canvas::Plugin.find(:linked_in).try(:settings) || Setting.from_config('linked_in')
   end
   
 end
