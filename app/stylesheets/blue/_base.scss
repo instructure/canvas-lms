@@ -12,6 +12,38 @@ body {
   min-height: 400px;
 }
 
+#left-side {
+  .section {
+    list-style-type: none;
+    border-right: 1px solid $borderColor;
+  }
+}
+#section-tabs {
+  margin: 0;
+  padding: 0;
+
+  a {
+    padding-left: $gridGutterWidth;
+    display: block;
+    line-height: 29px;
+    background-color: #f8fafb;
+    border-bottom: 1px solid lighten($borderColor, 22%);
+    font-weight: bold;
+    color: $gray;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+#section-tabs-header {
+  color: black;
+  background-color: #dae2e9;
+  font-size: 13px;
+  padding-left: $gridGutterWidth;
+  border-right: 1px solid $borderColor;
+  border-bottom: 1px solid $borderColor;
+}
+
 #footer {
   margin-top: 40px;
 }

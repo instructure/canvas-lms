@@ -8,4 +8,14 @@
   margin-bottom: $gridGutterWidth * 1.5;
 }
 
+@media (min-width: 1200px) {
+  .v-gutter {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
 
+  .v-gutter-large {
+    margin-top: 45px;
+    margin-bottom: 45px;
+  }
+}

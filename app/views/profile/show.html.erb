@@ -3,25 +3,36 @@
   <%= @user.short_name %>
 <% end %>
 <div class="container">
-  <div class="row">
+  <div class="row v-gutter">
     <div class="span2 profile-pic-container">
       <%= image_tag avatar_image_url(User.avatar_key @user.id), :class => 'profile-pic' %>
     </div>
-    <div class="span6">
+    <div class="span5">
       <h1><%= @user.short_name %></h1>
       <p><%= @user.bio %></p>
       <% if @user != @current_user %>
         <p><button id="follow-user">Follow</button></p>
       <% end %>
     </div>
-    <div class="span4">
-      Stats
-      <ul class="user-stats">
-        <li>Followers</li>
-        <li>Collections</li>
-        <li>Comments</li>
-        <li>Posts</li>
-      </ul>
+    <div class="span3">
+      <table class="stats">
+        <tr class="stats-header">
+          <th colspan="2">Stats</th>
+        </tr>
+        <tr>
+          <th>Followers</th>
+          <td>103</td>
+        </tr><tr>
+          <th>Collections</th>
+          <td>5</td>
+        </tr><tr>
+          <th>Comments</th>
+          <td>223</td>
+        </tr> <tr>
+          <th>Posts</th>
+          <td>37</td>
+        </tr>
+      </table>
 
       <% if @user.show_user_services? %>
         Find Me On
