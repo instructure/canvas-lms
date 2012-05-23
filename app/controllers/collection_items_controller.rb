@@ -87,7 +87,7 @@
 #       url: "https://<canvas>/api/v1/collections/2/items/7"
 #     }
 class CollectionItemsController < ApplicationController
-  before_filter :require_collection, :except => [:link_data, :new]
+  before_filter :require_collection, :except => [:get_bookmarklet, :link_data, :new]
 
   include Api::V1::Collection
 

@@ -106,6 +106,7 @@ group :development do
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
   gem 'guard'
+  gem 'uglifier'
 end
 
 group :redis do

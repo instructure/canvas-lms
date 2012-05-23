@@ -889,6 +889,7 @@ ActionController::Routing::Routes.draw do |map|
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
 
   map.resources :collection_items, :only => [:new]
+  map.get_bookmarklet 'get_bookmarklet', :controller => 'collection_items', :action => 'get_bookmarklet'
   map.collection_item_link_data 'collection_items/link_data', :controller => 'collection_items', :action => 'link_data', :conditions => { :method => :post }
 
   # See how all your routes lay out with "rake routes"
