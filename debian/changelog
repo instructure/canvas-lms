@@ -1,3 +1,13 @@
+canvas-lms (2012.05.12.23) stable; urgency=low
+
+  * Package ref: 5c8b656c35b3c3d350f28ad3b11882d852ed9e7c
+  *
+  * [+f51b0d4] handle sorting quiz questions with nil position; fixes #8639
+  * [+98487e8] rename id for list of content exports to prevent javascript error
+  * [+5c8b656] fix sis import of email addresses that match active and retired addresses
+
+ -- Brian Palmer <brianp@instructure.com>  Wed, 23 May 2012 10:17:48 -0600
+
 canvas-lms (2012.05.12.21) stable; urgency=low
 
   * Package ref: c9dd974ee0944a5ae174aad9fef9f02c9fcde060
