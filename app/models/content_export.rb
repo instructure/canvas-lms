@@ -131,7 +131,7 @@ class ContentExport < ActiveRecord::Base
     selected_content[asset_type][CC::CCHelper.create_key(obj)] = true
   end
   
-  def add_error(user_message, exception_or_info)
+  def add_error(user_message, exception_or_info=nil)
     self.settings[:errors] ||= []
     if exception_or_info.is_a?(Exception)
       er = ErrorReport.log_exception(:course_export, exception_or_info)

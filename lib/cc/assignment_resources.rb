@@ -21,10 +21,17 @@ module CC
     def add_assignments
       @course.assignments.active.no_graded_quizzes_or_topics.each do |assignment|
         next unless export_object?(assignment)
+
+        title = assignment.title rescue I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
+
+        if !assignment.can_copy?(@user)
+          add_error(I18n.t('course_exports.errors.assignment_is_locked', "The assignment \"%{title}\" could not be copied because it is locked.", :title => title))
+          next
+        end
+
         begin
           add_assignment(assignment)
         rescue
-          title = assignment.title rescue I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
           add_error(I18n.t('course_exports.errors.assignment', "The assignment \"%{title}\" failed to export", :title => title), $!)
         end
       end

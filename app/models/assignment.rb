@@ -1526,8 +1526,12 @@ class Assignment < ActiveRecord::Base
     description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context)
     description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
     item.description = description
-    item.copied = true
-    item.copying = true
+
+    if hash[:freeze_on_copy]
+      item.freeze_on_copy = true
+      item.copied = true
+      item.copying = true
+    end
     if !hash[:submission_types].blank?
       item.submission_types = hash[:submission_types]
     elsif ['discussion_topic'].include?(hash[:submission_format])
@@ -1608,7 +1612,7 @@ class Assignment < ActiveRecord::Base
     [:all_day, :turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
      :automatic_peer_reviews, :anonymous_peer_reviews,
      :grade_group_students_individually, :allowed_extensions, :min_score,
-     :max_score, :mastery_score, :position, :peer_review_count, :freeze_on_copy
+     :max_score, :mastery_score, :position, :peer_review_count
     ].each do |prop|
       item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
     end
@@ -1727,6 +1731,10 @@ class Assignment < ActiveRecord::Base
     end
 
     false
+  end
+
+  def can_copy?(user)
+    !att_frozen?("no_copying", user)
   end
 
   def frozen_atts_not_altered
