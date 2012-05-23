@@ -176,6 +176,21 @@ describe ContentMigration do
       new_topic.message.should match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
     end
 
+    it "should tranlsate links to module items in html content" do
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+      tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+      body = %{<p>Link to module item: <a href="/courses/%s/modules/items/%s">some assignment</a></p>}
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, tag.id])
+
+      run_course_copy
+
+      mod1_to = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+      tag_to = mod1_to.content_tags.first
+      page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      page_to.body.should == body % [@copy_to.id, tag_to.id]
+    end
+
     it "should selectively copy items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       dt2 = @copy_from.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
