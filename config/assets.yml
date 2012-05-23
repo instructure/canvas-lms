@@ -219,6 +219,8 @@ stylesheets:
     - public/stylesheets/compiled/context_list.css
   prior_users:
     - public/stylesheets/compiled/prior_users.css
+  popup:
+    - public/stylesheets/compiled/popup/main.css
   reports:
     - public/stylesheets/compiled/reports.css
   statistics:
