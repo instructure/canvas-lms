@@ -18,9 +18,6 @@ define [
       @filter()
 
     onFormSubmit: (json) ->
-      json.recipients = json['recipients[]']
-      delete json['recipients[]']
-
       dfd = @model.save json,
         success: =>
           $.flashMessage I18n.t 'message_sent', 'Message Sent'
