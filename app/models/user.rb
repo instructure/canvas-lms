@@ -2330,4 +2330,8 @@ class User < ActiveRecord::Base
   def fake_student?
     self.preferences[:fake_student] && !!self.enrollments.find(:first, :conditions => {:type => "StudentViewEnrollment"})
   end
+
+  def private?
+    not public?
+  end
 end
