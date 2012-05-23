@@ -73,4 +73,26 @@ module Api::V1::Assignment
 
     hash
   end
+
+  API_ALLOWED_ASSIGNMENT_FIELDS = %w(name position points_possible grading_type due_at description)
+
+  def create_api_assignment(context, assignment_params)
+    assignment = context.assignments.build
+    update_api_assignment(assignment, assignment_params)
+  end
+
+  def update_api_assignment(assignment, assignment_params)
+    return nil unless assignment_params.is_a?(Hash)
+    update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_FIELDS)
+    update_params["time_zone_edited"] = Time.zone.name if update_params["due_at"]
+
+    assignment.update_attributes(update_params)
+    assignment.infer_due_at
+    # TODO: allow rubric creation
+
+    if custom_vals = assignment_params[:set_custom_field_values]
+      assignment.set_custom_field_values = custom_vals
+    end
+    return assignment
+  end
 end

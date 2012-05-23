@@ -53,7 +53,16 @@ describe Folder do
     great_grandchild.reload
     great_grandchild.full_name.should eql("child/grandchild/great_grandchild")
   end
-  
+
+  it "should not allow recursive folder structures" do
+    f1 = @course.folders.create!(:name => "f1")
+    f2 = f1.sub_folders.create!(:name => "f2", :context => @course)
+    f3 = f2.sub_folders.create!(:name => "f3", :context => @course)
+    f1.parent_folder = f3
+    f1.save.should == false
+    f1.errors.on(:parent_folder_id).should be_present
+  end
+
   it "files without an explicit folder_id should be inferred" do
     f = @course.folders.create!(:name => "unfiled")
     a = f.active_file_attachments.build

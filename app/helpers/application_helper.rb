@@ -298,8 +298,8 @@ module ApplicationHelper
   end
   def hidden_dialogs; @hidden_dialogs ||= {}; end
   def render_hidden_dialogs
-    output = hidden_dialogs.inject('') do |str, item|
-      str << "<div id='#{item[0]}' style='display: none;''>" << item[1] << "</div>"
+    output = hidden_dialogs.keys.sort.inject('') do |str, id|
+      str << "<div id='#{id}' style='display: none;''>" << hidden_dialogs[id] << "</div>"
     end
     raw(output)
   end

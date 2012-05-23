@@ -61,6 +61,69 @@ describe DiscussionTopicsController, :type => :integration do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
+  context "create topic" do
+    it "should check permissions" do
+      @user = user(:active_all => true)
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "hai", :message => "test message" }, {}, :expected_status => 401)
+    end
+
+    it "should make a basic topic" do
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>" })
+      @topic = @course.discussion_topics.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.message.should == "test <b>message</b>"
+      @topic.threaded?.should be_false
+      @topic.post_delayed?.should be_false
+      @topic.podcast_enabled?.should be_false
+      @topic.podcast_has_student_posts?.should be_false
+      @topic.require_initial_post?.should be_false
+    end
+
+    it "should post an announcment" do
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>", :is_announcement => true })
+      @topic = @course.announcements.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.message.should == "test <b>message</b>"
+    end
+
+    it "should create a topic with all the bells and whistles" do
+      post_at = 1.month.from_now
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", :delayed_post_at => post_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1' })
+      @topic = @course.discussion_topics.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.message.should == "test <b>message</b>"
+      @topic.threaded?.should == true
+      @topic.post_delayed?.should == true
+      @topic.delayed_post_at.to_i.should == post_at.to_i
+      @topic.podcast_enabled?.should == true
+      @topic.podcast_has_student_posts?.should == true
+      @topic.require_initial_post?.should == true
+    end
+
+    it "should allow creating a discussion assignment" do
+      due_date = 1.week.from_now
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>", :assignment => { :points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!" } })
+      @topic = @course.discussion_topics.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.assignment.should be_present
+      @topic.assignment.points_possible.should == 15
+      @topic.assignment.grading_type.should == "percent"
+      @topic.assignment.due_at.to_i.should == due_date.to_i
+      @topic.assignment.submission_types.should == "discussion_topic"
+      @topic.assignment.title.should == "test title"
+    end
+  end
+
   context "show topic(s)" do
     before do
       @attachment = create_attachment(@course)
@@ -82,6 +145,7 @@ describe DiscussionTopicsController, :type => :integration do
                   "posted_at"=>@topic.posted_at.as_json,
                   "root_topic_id"=>nil,
                   "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                  "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                   "attachments"=>[{"content-type"=>"unknown/unknown",
                                    "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                                    "filename"=>"content.txt",
@@ -111,6 +175,12 @@ describe DiscussionTopicsController, :type => :integration do
       # get rid of random characters in podcast url
       json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
       json.should == @response_json
+    end
+
+    it "should delete a topic" do
+        json = api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        {:controller => 'discussion_topics', :action => 'destroy', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+        @topic.reload.should be_deleted
     end
   end
 
@@ -170,6 +240,7 @@ describe DiscussionTopicsController, :type => :integration do
                           "last_reply_at"=>gtopic.last_reply_at.as_json,
                           "message"=>"<p>content here</p>",
                           "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+                          "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
                           "attachments"=>
                                   [{"content-type"=>"unknown/unknown",
                                     "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",

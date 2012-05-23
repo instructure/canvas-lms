@@ -20,7 +20,7 @@ describe "discussions" do
 
     it "should edit a discussion" do
       edit_name = 'edited discussion name'
-      create_discussion(DISCUSSION_NAME, 'side-comment')
+      create_discussion(DISCUSSION_NAME, 'side_comment')
       get "/courses/#{@course.id}/discussion_topics"
       driver.action.move_to(f('.discussion_topic')).perform
       f('.edit_topic_link').click
@@ -28,7 +28,7 @@ describe "discussions" do
     end
 
     it "should delete a discussion" do
-      create_discussion(DISCUSSION_NAME, 'side-comment')
+      create_discussion(DISCUSSION_NAME, 'side_comment')
       get "/courses/#{@course.id}/discussion_topics"
 
       topic = DiscussionTopic.last
@@ -44,7 +44,7 @@ describe "discussions" do
 
     it "should reorder topics" do
       pending("dragging and dropping does not work well with selenium")
-      2.times { |i| create_discussion("new discussion #{i}", "side-comment") }
+      2.times { |i| create_discussion("new discussion #{i}", "side_comment") }
       get "/courses/#{@course.id}/discussion_topics"
       f('.reorder_topics_link').click
       f('#topics_reorder_list').should be_displayed
@@ -59,7 +59,7 @@ describe "discussions" do
 
     it "should validate view topics and announcements and topics only button" do
       announcement_name = 'new announcement'
-      create_discussion(DISCUSSION_NAME, 'side-comment')
+      create_discussion(DISCUSSION_NAME, 'side_comment')
       @context = @course
       @announcement = announcement_model(:title => announcement_name, :message => 'some announcement message')
       get "/courses/#{@course.id}/discussion_topics"
@@ -230,7 +230,7 @@ describe "discussions" do
     end
 
     it "should validate reopening the discussion for comments" do
-      create_and_go_to_topic('closed discussion', 'side-comment', true)
+      create_and_go_to_topic('closed discussion', 'side_comment', true)
       expect_new_page_load { f('.edit_discussion_topic button[type=submit]').click }
       ff('.discussion-reply-label').should_not be_empty
       DiscussionTopic.last.workflow_state.should == 'active'
@@ -242,7 +242,7 @@ describe "discussions" do
       course_with_teacher(:name => 'teacher@example.com')
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @course.enroll_student(@student).accept
-      @topic = @course.discussion_topics.create!(:user => @teacher, :message => 'new topic from teacher', :discussion_type => 'side-comment')
+      @topic = @course.discussion_topics.create!(:user => @teacher, :message => 'new topic from teacher', :discussion_type => 'side_comment')
       @entry = @topic.discussion_entries.create!(:user => @teacher, :message => 'new entry from teacher')
       user_session(@student)
     end

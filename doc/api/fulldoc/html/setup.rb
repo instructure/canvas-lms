@@ -25,6 +25,26 @@ module YARD::Templates::Helpers::HtmlHelper
   end
 end
 
+module YARD::Templates::Helpers::BaseHelper
+  def linkify_with_api(*args)
+    if args.first.is_a?(String) && args.first =~ %r{^api:([^#]+)#(.*)}
+      topic = options[:resources].find { |r,cs| cs.any? { |c| c.name.to_s == $1 } }
+      if topic
+        controller = topic.last.find { |c| c.name.to_s == $1 }
+        html_file = "#{topicize topic.first}.html"
+        action = $2
+        link_url("#{html_file}#method.#{topicize(controller.name.to_s).sub("_controller", "")}.#{action}", args[1])
+      else
+        raise "couldn't find API link for #{args.first}"
+      end
+    else
+      linkify_without_api(*args)
+    end
+  end
+  alias_method :linkify_without_api, :linkify
+  alias_method :linkify, :linkify_with_api
+end
+
 def init
   options[:objects] = run_verifier(options[:objects])
   options[:resources] = options[:objects].

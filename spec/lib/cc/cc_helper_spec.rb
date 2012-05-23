@@ -74,5 +74,14 @@ describe CC::CCHelper do
       doc.encoding.should == 'utf-8'
       doc.at_css('html body div').to_s.should == "<div>My Title\302\240</div>"
     end
+
+    it "should only translate course when trying to translate /cousers/x/users/y type links" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy=>true)
+      orig = <<-HTML
+      <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>
+      HTML
+      translated = @exporter.html_content(orig)
+      translated.should =~ /users\/#{@teacher.id}/
+    end
   end
 end

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'set'
+
 class Folder < ActiveRecord::Base
   include Workflow
   attr_accessible :name, :full_name, :parent_folder, :workflow_state, :lock_at, :unlock_at, :locked, :hidden, :context
@@ -42,9 +44,23 @@ class Folder < ActiveRecord::Base
   after_destroy :clean_up_children
   after_save :touch_context
   before_save :infer_hidden_state
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  
+  validates_presence_of :context_id, :context_type
+  validate_on_update :reject_recursive_folder_structures
+
+  def reject_recursive_folder_structures
+    return true if !self.parent_folder_id_changed?
+    seen_folders = Set.new([self])
+    folder = self
+    while folder.parent_folder
+      folder = folder.parent_folder
+      if seen_folders.include?(folder)
+        errors.add(:parent_folder_id, t("errors.invalid_recursion", "A folder cannot be the parent of itself"))
+        return false
+      end
+      seen_folders << folder
+    end
+    return true
+  end
 
   workflow do
     # Anyone who has read access to the course can view

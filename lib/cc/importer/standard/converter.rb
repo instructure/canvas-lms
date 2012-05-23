@@ -141,13 +141,13 @@ module CC::Importer::Standard
             begin
               if val =~ FILEBASE_REGEX
                 val.gsub!(FILEBASE_REGEX, '')
-                if new_url = URI::escape(get_canvas_att_replacement_url(val, resource_dir))
-                  node[attr] = new_url
+                if new_url = get_canvas_att_replacement_url(val, resource_dir)
+                  node[attr] = URI::escape(new_url)
                 end
               else
                 if ImportedHtmlConverter.relative_url?(val)
-                  if new_url = URI::escape(get_canvas_att_replacement_url(val))
-                    node[attr] = new_url
+                  if new_url = get_canvas_att_replacement_url(val)
+                    node[attr] = URI::escape(new_url)
                   end
                 end
               end
