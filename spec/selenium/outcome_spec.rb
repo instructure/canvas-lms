@@ -12,17 +12,17 @@ describe "learning outcome test" do
     get "/courses/#{@course.id}/outcomes"
 
     #create learning outcome
-    driver.find_element(:css, '.add_outcome_link').click
+    f('.add_outcome_link').click
     outcome_name = 'first new outcome'
-    driver.find_element(:id, 'learning_outcome_short_description').send_keys(outcome_name)
+    f('#learning_outcome_short_description').send_keys(outcome_name)
     tiny_frame = wait_for_tiny(driver.find_element(:id, 'learning_outcome_description'))
     in_frame tiny_frame["id"] do
-      driver.find_element(:id, 'tinymce').send_keys('new outcome description')
+      f('#tinymce').send_keys('new outcome description')
     end
     #add a new rating
-    driver.find_element(:css, '#edit_outcome_form .add_rating_link').click
-    rating_table = driver.find_element(:css, '#edit_outcome_form .rubric_criterion')
-    new_rating_row = find_with_jquery('#edit_outcome_form .rubric_criterion tr:nth-child(6)')
+    f('#edit_outcome_form .add_rating_link').click
+    rating_table = f('#edit_outcome_form .rubric_criterion')
+    new_rating_row = fj('#edit_outcome_form .rubric_criterion tr:nth-child(6)')
     new_rating_row.find_element(:css, 'input.outcome_rating_description').clear
     new_rating_row.find_element(:css, 'input.outcome_rating_description').send_keys('New Expectation')
     new_rating_points = new_rating_row.find_element(:name, 'learning_outcome[rubric_criterion][ratings][5][description]')
@@ -33,12 +33,11 @@ describe "learning outcome test" do
     threshold_input = rating_table.find_element(:name, 'learning_outcome[rubric_criterion][mastery_points]')
     threshold_input.clear
     threshold_input.send_keys('4')
-    driver.find_element(:id, 'edit_outcome_form').submit
-    wait_for_ajax_requests
-    wait_for_animations
-    driver.find_element(:link, outcome_name).should be_displayed
-    driver.find_element(:css, '.show_details_link').click
-    find_all_with_jquery('#outcomes .rubric_criterion .rating:visible').size.should eql(3)
+    submit_form('#edit_outcome_form')
+    wait_for_ajaximations
+    f("#outcomes .learning_outcome .short_description").text.should == outcome_name
+    f('.show_details_link').click
+    ffj('#outcomes .rubric_criterion .rating:visible').size.should eql(3)
   end
 
   def create_groups(names)

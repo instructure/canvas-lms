@@ -117,8 +117,9 @@ define([
     showTextarea: function(){
       $form.find(".add_users_button, .go_back_button, #user_list_parsed").hide();
       $form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").show().removeAttr('disabled');
-      $form.find(".user_list").removeAttr('disabled').loadingImage('remove').focus().select();
       $form.find(".verify_syntax_button").attr('disabled', false).text(I18n.t('buttons.continue', "Continue..."));
+      $user_list = $form.find(".user_list").removeAttr('disabled').loadingImage('remove').focus();
+      if ($user_list.is(':visible')) { $user_list.select(); } // .select() blows up in IE9 + jQuery 1.7.2 on invisible elements
     },
 
     showProcessing: function(){

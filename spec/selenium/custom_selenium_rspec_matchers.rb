@@ -73,4 +73,30 @@ module CustomSeleniumRspecMatchers
   def have_value(value)
     HasValue.new(value)
   end
+
+  class HasAttribute
+    def initialize(attribute, value)
+      @attribute = attribute
+      @attribute_value = value
+    end
+
+    def matches? (element)
+      @element = element
+      !!@element.attribute(@attribute).match(@attribute_value)
+    end
+
+    def failure_message
+      "expected #{@element.inspect} to have attribute #{@attribute_value}, actual attribute type: #{
+      lement.attribute('#{@attribute.to_s}')}"
+    end
+
+    def negative_failure_message
+      "expected #{@element.inspect} to NOT have attribute #{@attribute_value}, actual attribute type
+  #{@element.attribute('#{@attribute.to_s}')}"
+    end
+  end
+
+  def have_attribute(attribute, value)
+    HasAttribute.new(attribute, value)
+  end
 end

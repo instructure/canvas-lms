@@ -53,6 +53,7 @@ class ContentExportsController < ApplicationController
         export.selected_content = params[:copy]
       else
         export.export_type = ContentExport::COMMON_CARTRIDGE
+        export.selected_content = { :everything => true }
       end
       export.progress = 0
       if export.save
