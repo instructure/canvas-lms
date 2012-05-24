@@ -19,6 +19,7 @@ define [
 
     events:
       'submit form' : 'save'
+      'change [name=user_comment]' : 'setUserComment'
 
     initialize: ->
       @kollections = new KollectionCollection
@@ -43,3 +44,6 @@ define [
 
     save: preventDefault ->
       @$el.disableWhileLoading @model.save()
+
+    setUserComment: (event) ->
+      @model.set 'user_comment', event.target.value
