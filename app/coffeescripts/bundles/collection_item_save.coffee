@@ -13,7 +13,8 @@ require [
     model: kollectionItem
     el: '#kollectionItemSaveViewContainer'
 
+  # TODO: do something more useful once it's been created
   kollectionItem.on 'create sync', ->
-    kollectionItemSaveView.$el.hide()
     $('#savedSuccessfullyMessage').show()
+    $('.popup-container .image-block').remove()
     setTimeout(window.close, 2000) if window.opener
