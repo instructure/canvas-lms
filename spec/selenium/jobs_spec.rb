@@ -184,8 +184,8 @@ describe "jobs ui" do
           true
         end
         wait_for_ajax_requests
-        f("#jobs-grid .odd").should be_nil
-        f("#jobs-grid .even").should be_nil
+        fj("#jobs-grid .odd").should be_nil # using fj to bypass selenium cache
+        fj("#jobs-grid .even").should be_nil #using fj to bypass selenium cache
         Delayed::Job.count.should eql 0
       end
     end
