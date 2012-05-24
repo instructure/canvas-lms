@@ -20,7 +20,6 @@ define [
     events:
       'click .nav a': 'onNavClick'
       'focus .expander': 'onExpandClick'
-      'submit form': 'onFormSubmit'
 
     initialize: ->
       @model or= new QuickStartBarModel
@@ -28,17 +27,13 @@ define [
       @model.on 'change:expanded', @toggleExpanded
       @models = {}
 
-    onFormSubmit: (event) ->
-      event.preventDefault()
-      $form = $ event.target
-      json = $(event.target).toJSON()
-      @currentFormView.onFormSubmit json
-
     onSaveSuccess: (model) =>
       @switchFormView()
       @trigger 'save'
 
     onSaveFail: (model) =>
+      @switchFormView()
+      @trigger 'saveFail'
 
     onNavClick: (event) ->
       event.preventDefault()
@@ -56,8 +51,8 @@ define [
       @currentFormView?.teardown?()
       @currentFormView = @views[viewName] or= do =>
         view = new views[viewName]
-        view.parentView = this
-        view
+        view.on 'save', @onSaveSuccess
+        view.on 'saveFail', @onSaveFail
       @currentFormView.render()
       @$newItemFormContainer.empty().append @currentFormView.el
       @model.set 'expanded', false

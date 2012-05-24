@@ -1,17 +1,29 @@
 define [
-  'Backbone'
+  'compiled/home/views/quickStartBar/BaseItemView'
   'underscore'
   'compiled/home/models/quickStartBar/Announcement'
   'jst/quickStartBar/announcement'
   'jquery.instructure_date_and_time'
-], ({View}, _, Announcement, template) ->
+], (BaseItemView, _, Announcement, template) ->
 
-  class AnnouncementView extends View
+  class AnnouncementView extends BaseItemView
 
-    initialize: ->
-      @model or= new Announcement
+    template: template
 
-    onFormSubmit: (json) ->
+    contextSearchOptions:
+      fakeInputWidth: '100%'
+      contexts: ENV.CONTEXTS
+      placeholder: "Type the name of a class to announce this too..."
+      selector:
+        baseData:
+          type: 'course'
+        preparer: (postData, data, parent) ->
+          for row in data
+            row.noExpand = true
+        browser: false
+
+
+    save: (json) ->
 
       # get real date
       if json.assignment?.due_at?
@@ -21,32 +33,7 @@ define [
       dfds = _.map json.course_ids, (id) =>
         model = new Announcement json
         model.set 'course_id', id.replace /^course_/, ''
-        model.save
-          success: @parentView.onSaveSuccess
-          fail: @parentView.onSaveFail
+        model.save()
 
-      # wait for all to be saved
-      dfd = $.when(dfds...).then @parentView.onSaveSuccess, @parentView.onSaveFail
-      @$('form').disableWhileLoading dfd
-
-
-    render: ->
-      html = template @model.toJSON
-      @$el.html html
-      @filter()
-
-    filter: ->
-      @$('.dateField').datetime_field()
-      @$('input[name=course_ids]').contextSearch
-        contexts: ENV.CONTEXTS
-        placeholder: "Type the name of a class to announce this too..."
-        selector:
-          baseData:
-            type: 'course'
-          preparer: (postData, data, parent) ->
-            for row in data
-              row.noExpand = true
-          browser: false
-
-
+      $.when dfds...
 

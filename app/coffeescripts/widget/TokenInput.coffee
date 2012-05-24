@@ -101,9 +101,7 @@ define [
       @resize()
 
     resize: () ->
-      width = @$node.css 'width'
-      if parseInt(width, 10) is 0
-        width = '100%'
+      width = @options.fakeInputWidth or @$node.css 'width'
       @$fakeInput.css('width', width)
 
     addToken: (data) ->

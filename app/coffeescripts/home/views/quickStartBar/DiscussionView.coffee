@@ -1,28 +1,38 @@
 define [
-  'Backbone'
+  'compiled/home/views/quickStartBar/BaseItemView'
   'underscore'
   'compiled/home/models/quickStartBar/Discussion'
   'jst/quickStartBar/discussion'
   'jquery.instructure_date_and_time'
   'vendor/jquery.placeholder'
-], ({View}, _, Discussion, template) ->
+], (BaseItemView, _, Discussion, template) ->
 
-  class DiscussionView extends View
+  class DiscussionView extends BaseItemView
 
     events:
       'change [name=graded]': 'onGradedClick'
 
-    initialize: ->
-      @model or= new Discussion
+    template: template
+
+    contextSearchOptions:
+      fakeInputWidth: '100%'
+      contexts: ENV.CONTEXTS
+      placeholder: "Type the name of a class to send this too..."
+      selector:
+        baseData:
+          type: 'course'
+        preparer: (postData, data, parent) ->
+          for row in data
+            row.noExpand = true
+        browser: false
+
 
     onGradedClick: (event) ->
       graded = event.target.checked
       @$('[name="assignment[points_possible]"], [name="assignment[due_at]"]').prop 'disabled', not graded
       @$('.ui-datepicker-trigger').toggleClass 'disabled', not graded
 
-    ##
-    # TODO: abstract, shared by assignmentview
-    onFormSubmit: (json) ->
+    save: (json) ->
 
       # get real date
       if json.assignment?.due_at?
@@ -32,31 +42,11 @@ define [
       dfds = _.map json.course_ids, (id) =>
         model = new Discussion json
         model.set 'course_id', id.replace /^course_/, ''
-        model.save
-          success: @parentView.onSaveSuccess
-          fail: @parentView.onSaveFail
+        model.save()
 
-      # wait for all to be saved
-      dfd = $.when(dfds...).then @parentView.onSaveSuccess, @parentView.onSaveFail
-      @$('form').disableWhileLoading dfd
-
-    render: ->
-      html = template @model.toJSON
-      @$el.html html
-      @filter()
+      $.when dfds...
 
     filter: ->
-      @$('.dateField').datetime_field()
+      super
       @$('.ui-datepicker-trigger').addClass('disabled')
-      @$('input[name=course_ids]').contextSearch
-        contexts: ENV.CONTEXTS
-        placeholder: "Type the name of a class to assign this too..."
-        selector:
-          baseData:
-            type: 'course'
-          preparer: (postData, data, parent) ->
-            for row in data
-              row.noExpand = true
-          browser: false
-
 
