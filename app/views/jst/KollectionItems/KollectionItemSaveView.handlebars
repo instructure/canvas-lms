@@ -1,35 +1,14 @@
-<div class="toolbar border border-trbl">
-  <h2 class="header">{{#t "pin_to_canvas_network"}}Pin to Canvas Network{{/t}}</h2>
-</div>
-<div class="popup-container kollectionItemSaveView-container">
-  {{#if id}}
-    saved successfully!!
-  {{else}}
-    <div class="image-block">
-      <div class="image-block-image">
-        {{> avatar}}
-      </div>
-      <form class="image-block-content">
-        <div class=" triangle-box-with-header kollectionItemSaveView">
-          <header class="triangle-box-header">
-            <div class="row-fluid">
-              <input autofocus placeholder="{{#t "say_something_about_this..."}}Say something about this...{{/t}}" class="span12" name="user_comment" value="{{user_comment}}">
-            </div>
-          </header>
-          <div class="triangle-box-content">
-            <div class="linkDataView"></div>
-
-          </div>
-        </div>
-        <div class="button-container-right-aligned v-gutter">
-          <span class="SelectKollectionView"></span>
-          <button data-text-while-loading="{{#t "saving..."}}Saving...{{/t}}" type="submit" class="button button-default">{{#t "add_to_collection"}}Add to Collection{{/t}}</button>
-        </div>
-      </form>
+<form class="triangle-box-with-header kollectionItemSaveView">
+  <header class="triangle-box-header">
+    <div class="row-fluid">
+      <input autofocus placeholder="{{#t "say_something_about_this..."}}Say something about this...{{/t}}" class="span12" name="user_comment" value="{{user_comment}}">
     </div>
-  {{/if}}
-</div>
-
-
-
-
+  </header>
+  <div class="triangle-box-content">
+    <div class="linkDataView"></div>
+  </div>
+  <div class="button-container border border-t toolbar">
+    <span class="SelectKollectionView"></span>
+    <button data-text-while-loading="{{#t "saving..."}}Saving...{{/t}}" type="submit" class="button button-default">{{#t "add_to_collection"}}Add to Collection{{/t}}</button>
+  </div>
+</form>

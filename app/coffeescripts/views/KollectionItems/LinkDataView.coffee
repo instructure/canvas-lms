@@ -15,7 +15,7 @@ define [
 
     initialize: ->
       @render()
-      @$el.disableWhileLoading @model.fetchLinkData().done(@render)
+      @model.fetchLinkData().done(@render)
       @model.on('change', @render)
 
     render: =>

@@ -1,6 +1,7 @@
-.scripts-not-loaded .kollectionItemSaveView-container {display: none }
-input[name=user_comment] { margin-bottom: 0 }
+.scripts-not-loaded .popup-container {display: none }
+
 .kollectionItemSaveView {
+  input[name=user_comment] { margin-bottom: 0 }
   .thumbnail { width: 170px}
   .not-important {
     color: #888;
@@ -19,10 +20,14 @@ input[name=user_comment] { margin-bottom: 0 }
     }
   }
   .choose-thumbnail { margin-bottom: 5px }
-}
-.SelectKollectionView select{
-  // these are to make it be inline with the button
-  margin: 0;
-  height: 31px;
+  .button-container {
+    padding: 10px;
+    text-align: right;
+  }
+  .SelectKollectionView select{
+    // these are to make it be inline with the button
+    margin: 0;
+    height: 31px;
+  }
 }
 
