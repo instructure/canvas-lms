@@ -78,12 +78,7 @@ describe PageViewsController do
         page_view(@user, '/somewhere/in/app/2', :created_at => '2012-05-01 20:48:04')  # 3rd day
         get 'index', :user_id => @user.id, :format => 'csv'
         response.should be_success
-        response.body.should == <<-EOS
-url,context_type,asset_type,controller,action,contributed,interaction_seconds,created_at,updated_at,user_request,render_time,user_agent,participated,summarized
-/somewhere/in/app/2,,,,,,5,2012-05-01 20:48:04 UTC,2012-05-01 20:48:04 UTC,,,Firefox/12.0,,
-/somewhere/in/app,,,,,,5,2012-04-30 20:48:04 UTC,2012-04-30 20:48:04 UTC,,,Firefox/12.0,,
-/somewhere/in/app/1,,,,,,5,2012-04-29 20:48:04 UTC,2012-04-29 20:48:04 UTC,,,Firefox/12.0,,
-EOS
+        response.body.should match /2012-05-01 20:48:04 UTC.*\n.*2012-04-30 20:48:04 UTC.*\n.*2012-04-29 20:48:04 UTC/
       end
     end
   end
