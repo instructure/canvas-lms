@@ -125,6 +125,7 @@ stylesheets:
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css
+    - public/stylesheets/compiled/g_util_fancy_links.css
     - public/stylesheets/compiled/g_bootstrap_parts.css
     - public/stylesheets/compiled/g_util_buttons.css
     - public/stylesheets/compiled/g_util_inst_tree.css
