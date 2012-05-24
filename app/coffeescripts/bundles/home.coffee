@@ -2,11 +2,11 @@ require [
   'jquery'
   'Backbone'
   'compiled/home/views/DashboardView'
-  'compiled/home/views/QuickStartBar/QuickStartBarView'
-  'compiled/home/views/ActivityFeed/ActivityFeedView'
+  'compiled/home/views/quickStartBar/QuickStartBarView'
+  'compiled/ActivityFeed/views/ActivityFeedView'
   'compiled/home/views/SideBar/SideBarView'
-  'compiled/home/views/ActivityFeed/ActivityFeedFilterView'
-  'compiled/home/views/ActivityFeed/ActivityFeedItemsView'
+  'compiled/ActivityFeed/views/ActivityFeedFilterView'
+  'compiled/ActivityFeed/views/ActivityFeedItemsView'
   'compiled/home/views/SideBar/TodoView'
   'compiled/home/views/SideBar/ComingUpView'
 ], ($, {View}, DashboardView, QuickStartBarView, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView) ->
@@ -26,4 +26,3 @@ require [
           views:
             todo: new TodoView
             comingUp: new ComingUpView
-

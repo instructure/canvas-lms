@@ -1,5 +1,5 @@
 define [
-  'compiled/home/views/ActivityFeed/items/ActivityFeedItemView'
+  'compiled/ActivityFeed/views/items/ActivityFeedItemView'
 ], (ActivityFeedItemView) ->
 
   class ActivityFeedItemView.Submission extends ActivityFeedItemView

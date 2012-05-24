@@ -1,12 +1,12 @@
 define [
-  'compiled/home/views/ActivityFeed/items/ActivityFeedItemView'
-  'compiled/home/views/ActivityFeed/items/Announcement'
-  'compiled/home/views/ActivityFeed/items/Collaboration'
-  'compiled/home/views/ActivityFeed/items/Conference'
-  'compiled/home/views/ActivityFeed/items/Conversation'
-  'compiled/home/views/ActivityFeed/items/DiscussionTopic'
-  'compiled/home/views/ActivityFeed/items/Message'
-  'compiled/home/views/ActivityFeed/items/Submission'
+  'compiled/ActivityFeed/views/items/ActivityFeedItemView'
+  'compiled/ActivityFeed/views/items/Announcement'
+  'compiled/ActivityFeed/views/items/Collaboration'
+  'compiled/ActivityFeed/views/items/Conference'
+  'compiled/ActivityFeed/views/items/Conversation'
+  'compiled/ActivityFeed/views/items/DiscussionTopic'
+  'compiled/ActivityFeed/views/items/Message'
+  'compiled/ActivityFeed/views/items/Submission'
 ], (ActivityFeedItemView) ->
 
   activityFeedItemViewFactory = (activityFeedItem) ->

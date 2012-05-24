@@ -67,6 +67,11 @@ class GroupsController < ApplicationController
   end
 
   def show
+    @use_new_styles = true
+    js_env :GROUP_ID => @group.id
+    return render :action => :dashboard, :layout => 'new_application'
+
+    # FIXME: what are we going to do with all of this stuff?
     if @group.deleted? && @group.context
       flash[:notice] = t('notices.already_deleted', "That group has been deleted")
       redirect_to named_context_url(@group.context, :context_url)

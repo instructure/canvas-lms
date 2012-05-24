@@ -1,9 +1,9 @@
 define [
-  'compiled/home/views/QuickStartBar/AssignmentView'
-  'compiled/home/views/QuickStartBar/DiscussionView'
-  'compiled/home/views/QuickStartBar/AnnouncementView'
-  'compiled/home/views/QuickStartBar/MessageView'
-  'compiled/home/views/QuickStartBar/PinView'
+  'compiled/home/views/quickStartBar/AssignmentView'
+  'compiled/home/views/quickStartBar/DiscussionView'
+  'compiled/home/views/quickStartBar/AnnouncementView'
+  'compiled/home/views/quickStartBar/MessageView'
+  'compiled/home/views/quickStartBar/PinView'
 ], (AssignmentView, DiscussionView, AnnouncementView, MessageView, PinView) ->
   {AssignmentView, DiscussionView, AnnouncementView, MessageView, PinView}
 
