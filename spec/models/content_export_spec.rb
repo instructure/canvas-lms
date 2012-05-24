@@ -58,7 +58,41 @@ describe ContentExport do
       @ce.selected_content = {:content_exports => {CC::CCHelper.create_key(@ce) => "1"}}
       @ce.export_object?(@ce).should == true
     end
+  end
 
+  context "add_item_to_export" do
+    before do
+      @ce = ContentExport.new
+    end
+
+    it "should not add nil" do
+      @ce.add_item_to_export(nil)
+      @ce.selected_content.should be_empty
+    end
+
+    it "should only add data model objects" do
+      @ce.add_item_to_export("hi")
+      @ce.selected_content.should be_empty
+
+      @ce.selected_content = { :assignments => nil }
+      @ce.save!
+
+      assignment_model
+      @ce.add_item_to_export(@assignment)
+      @ce.selected_content[:assignments].should_not be_empty
+    end
+
+    it "should not add objects if everything is already set" do
+      assignment_model
+      @ce.add_item_to_export(@assignment)
+      @ce.selected_content.should be_empty
+
+      @ce.selected_content = { :everything => 1 }
+      @ce.save!
+
+      @ce.add_item_to_export(@assignment)
+      @ce.selected_content.keys.map(&:to_s).should == ["everything"]
+    end
   end
 
   context "notifications" do
