@@ -235,6 +235,13 @@ describe "discussions" do
       ff('.discussion-reply-label').should_not be_empty
       DiscussionTopic.last.workflow_state.should == 'active'
     end
+
+    it "should escape correctly when posting an attachment" do
+      create_and_go_to_topic
+      message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
+      add_reply(message, 'graded.png')
+      @last_entry.find_element(:css, '.message').text.should == message
+    end
   end
 
   context "as a student" do
