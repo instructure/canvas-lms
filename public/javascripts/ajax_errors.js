@@ -91,6 +91,7 @@ define([
   // puts the little red box when something bad happens in ajax.
   $(document).ready(function() {
     $("#instructure_ajax_error_result").defaultAjaxError(function(event, request, settings, error, debugOnly) {
+      if (error === 'abort') return;
       var status = "0";
       var text = I18n.t('no_text', "No text");
       var json_data = {};
