@@ -107,7 +107,7 @@ class EnrollmentTerm < ActiveRecord::Base
       :select => "enrollments.user_id", 
       :distinct => true,
       :joins => :course,
-      :conditions => ['enrollments.course_id = courses.id AND courses.enrollment_term_id = ?', id]
+      :conditions => ['enrollments.course_id = courses.id AND courses.enrollment_term_id = ? AND enrollments.root_account_id = ?', id, self.root_account_id]
     )
   end
   
