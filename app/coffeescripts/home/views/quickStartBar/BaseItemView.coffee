@@ -26,14 +26,13 @@ define [
 
     render: ->
       @$el.html @template()
-      @filter()
+      super
 
     filter: ->
       @$('.dateField').datetime_field()
       @$('.contextSearch').contextSearch @contextSearchOptions
 
     onFormSubmit: (event) ->
-      console.log 'onFormSubmit'
       event.preventDefault()
       $form = $ event.target
       json = $(event.target).toJSON()

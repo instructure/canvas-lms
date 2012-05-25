@@ -21,9 +21,8 @@ $boxSizingBaseLineHeight: $baseLineHeight + 8;
 
 .quickStartBar {
   font-size: 14px;
-  font-weight: bold;
   min-height: 118px;
-
+  color: inherit;
   /* hide box-shadow */
   overflow: hidden;
 }
@@ -32,6 +31,7 @@ $boxSizingBaseLineHeight: $baseLineHeight + 8;
   padding-top: 4px;
   padding-bottom: 4px;
   background: #fff;
+  font-weight: bold;
 }
 
 /* kill bootstrap stuff */

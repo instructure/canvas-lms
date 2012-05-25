@@ -8,9 +8,15 @@ define [
     urlRoot: ->
       "/api/v1/collections/#{@kollection.id}/items"
 
-    fetchLinkData: _.once ->
-      dfd = $.post '/collection_items/link_data', url: @get('link_url')
-      dfd.done (data) =>
+    fetchLinkData: ->
+      @set 'state', 'loading'
+      @lastDfd?.abort()
+      @lastDfd = $.post '/collection_items/link_data', url: @get('link_url')
+      @lastDfd.done (data) =>
+        if data.title
+          @set 'state', 'loaded'
+        else
+          @set 'state', 'noData'
         @set data
         @set('image_url', data.images?[0]?.url) unless @get('image_url')
 

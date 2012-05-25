@@ -15,7 +15,7 @@ define [
 
     initialize: ->
       @render()
-      @model.fetchLinkData().done(@render)
+      @model.fetchLinkData().done(@render) if @model.get('link_url')
       @model.on('change', @render)
 
     render: =>

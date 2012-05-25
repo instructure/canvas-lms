@@ -34,7 +34,7 @@ define [
       locals.avatar_image_url = "/images/users/#{@model.get('user_id')}"
 
       @$el.html @template(locals)
-      new LinkDataView
+      @linkDataView = new LinkDataView
         el: @$('.linkDataView')
         model: @model
       new SelectKollectionView

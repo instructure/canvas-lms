@@ -1,4 +1,4 @@
-{{#if title}}
+{{#ifEqual state "loaded"}}
   <div class="image-block">
     <div class="image-block-image">
       {{#if image_url}}
@@ -41,6 +41,13 @@
       </p>
     </div>
   </div>
-{{else}}
+{{/ifEqual}}
+
+{{#ifEqual state "loading"}}
   <h5>{{#t "loading..."}}Loading...{{/t}}</h5>
-{{/if}}
+{{/ifEqual}}
+
+{{#ifEqual state "noData"}}
+  <h5>{{#t "no_data"}}Hmm, nothing there...{{/t}}</h5>
+{{/ifEqual}}
+
