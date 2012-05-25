@@ -3,6 +3,7 @@ class AddPublicColumnToUser < ActiveRecord::Migration
 
   def self.up
     add_column :users, :public, :boolean, :default => false
+    User.reset_column_information
   end
 
   def self.down

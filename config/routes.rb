@@ -748,6 +748,9 @@ ActionController::Routing::Routes.draw do |map|
       users.get 'users/self/activity_stream', :action => :activity_stream, :path_name => 'user_activity_stream'
       users.get 'users/activity_stream', :action => :activity_stream # deprecated
 
+      users.put "users/:user_id/followers/self", :action => :follow
+      users.delete "users/:user_id/followers/self", :action => :unfollow
+
       users.get 'users/self/todo', :action => :todo_items
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
@@ -840,15 +843,18 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :collections) do |collections|
-      collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_"
-      collections.resources :collections, :path_prefix => "groups/:group_id", :name_prefix => "group_"
+      collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_", :only => [:index, :create]
+      collections.resources :collections, :path_prefix => "groups/:group_id", :name_prefix => "group_", :only => [:index, :create]
+      collections.resources :collections, :except => [:index, :create]
+      collections.put "collections/:collection_id/followers/self", :action => :follow
+      collections.delete "collections/:collection_id/followers/self", :action => :unfollow
 
       collections.with_options(:controller => :collection_items) do |items|
         items.get "collections/:collection_id/items", :action => :index, :path_name => 'collection_items_list'
         items.resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items, :only => [:index, :create]
         items.resources :items, :path_prefix => "collections", :name_prefix => "collection_", :controller => :collection_items, :except => [:index, :create]
-        items.put "collections/items/:item_id/upvote", :action => :upvote
-        items.delete "collections/items/:item_id/upvote", :action => :remove_upvote
+        items.put "collections/items/:item_id/upvotes/self", :action => :upvote
+        items.delete "collections/items/:item_id/upvotes/self", :action => :remove_upvote
       end
     end
 

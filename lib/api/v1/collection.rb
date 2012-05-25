@@ -36,8 +36,14 @@ module Api::V1::Collection
     :only => %w(user_id created_at),
   }
 
-  def collection_json(collection, current_user, session)
-    api_json(collection, current_user, session, API_COLLECTION_JSON_OPTS)
+  def collections_json(collections, current_user, session)
+    followed = ::UserFollow.followed_by_user(collections, current_user)
+
+    collections.map do |collection|
+      hash = api_json(collection, current_user, session, API_COLLECTION_JSON_OPTS)
+      hash['followed_by_user'] = !!followed.include?(collection)
+      hash
+    end
   end
 
   def collection_items_json(items, current_user, session)

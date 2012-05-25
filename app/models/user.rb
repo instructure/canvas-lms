@@ -132,6 +132,9 @@ class User < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :messages
 
+  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
+  has_many :user_follows, :foreign_key => 'following_user_id'
+
   has_many :collections, :as => :context
 
   include StickySisFields
@@ -915,6 +918,9 @@ class User < ActiveRecord::Base
   set_policy do
     given { |user| user == self }
     can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar
+
+    given { |user| user.present? && self.public? }
+    can :follow
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename

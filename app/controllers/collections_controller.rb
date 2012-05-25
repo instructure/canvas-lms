@@ -45,13 +45,17 @@
 #       // The visibility of the collection. If "public", the collection is visible to everybody.
 #       // If "private", the collection is visible only to the creating user.
 #       // The default is "private".
-#       visibility: "public"
+#       visibility: "public",
+#
+#       // Boolean indicating whether this user is following this collection.
+#       followed_by_user: false
 #     }
 #
 class CollectionsController < ApplicationController
-  before_filter :require_context
+  before_filter :require_context, :only => [:index, :create]
 
   include Api::V1::Collection
+  include Api::V1::UserFollow
 
   SETTABLE_ATTRIBUTES = %w(name visibility)
 
@@ -70,12 +74,14 @@ class CollectionsController < ApplicationController
   #       {
   #         id: 1,
   #         name: "My Collection",
-  #         visibility: "public"
+  #         visibility: "public",
+  #         followed_by_user: false
   #       },
   #       {
   #         id: 2,
   #         name: "My Personal Collection",
-  #         visibility: "private"
+  #         visibility: "private",
+  #         followed_by_user: true
   #       }
   #     ]
   def index
@@ -87,7 +93,7 @@ class CollectionsController < ApplicationController
     end
 
     @collections = Api.paginate(scope, self, collection_route)
-    render :json => @collections.map { |c| collection_json(c, @current_user, session) }
+    render :json => collections_json(@collections, @current_user, session)
   end
 
   # @API Get a single collection
@@ -97,18 +103,19 @@ class CollectionsController < ApplicationController
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
-  #          https://<canvas>/api/v1/users/<user_id>/collections/<collection_id>
+  #          https://<canvas>/api/v1/collections/<collection_id>
   #
   # @example_response
   #     {
   #       id: 1,
   #       name: "My Collection",
-  #       visibility: "public"
+  #       visibility: "public",
+  #       followed_by_user: false
   #     }
   def show
     @collection = find_collection
     if authorized_action(@collection, @current_user, :read)
-      render :json => collection_json(@collection, @current_user, session)
+      render :json => collections_json([@collection], @current_user, session).first
     end
   end
 
@@ -130,13 +137,14 @@ class CollectionsController < ApplicationController
   #     {
   #       id: 1,
   #       name: "My Collection",
-  #       visibility: "public"
+  #       visibility: "public",
+  #       followed_by_user: false
   #     }
   def create
     @collection = @context.collections.new(params.slice(*SETTABLE_ATTRIBUTES))
     if authorized_action(@collection, @current_user, :create)
       if @collection.save
-        render :json => collection_json(@collection, @current_user, session)
+        render :json => collections_json([@collection], @current_user, session).first
       else
         render :json => @collection.errors, :status => :bad_request
       end
@@ -155,19 +163,20 @@ class CollectionsController < ApplicationController
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          -X PUT \ 
   #          -F name='My Edited Collection' \ 
-  #          https://<canvas>/api/v1/users/self/collections/<collection_id>
+  #          https://<canvas>/api/v1/collections/<collection_id>
   #
   # @example_response
   #     {
   #       id: 1,
   #       name: "My Edited Collection",
-  #       visibility: "public"
+  #       visibility: "public",
+  #       followed_by_user: false
   #     }
   def update
     @collection = find_collection
     if authorized_action(@collection, @current_user, :update)
       if @collection.update_attributes(params.slice(*SETTABLE_ATTRIBUTES))
-        render :json => collection_json(@collection, @current_user, session)
+        render :json => collections_json([@collection], @current_user, session).first
       else
         render :json => @collection.errors, :status => :bad_request
       end
@@ -182,29 +191,83 @@ class CollectionsController < ApplicationController
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          -X DELETE \ 
-  #          https://<canvas>/api/v1/users/<user_id>/collections/<collection_id>
+  #          https://<canvas>/api/v1/collections/<collection_id>
   #
   # @example_response
   #     {
   #       id: 1,
   #       name: "My Collection",
-  #       visibility: "public"
+  #       visibility: "public",
+  #       followed_by_user: false
   #     }
   def destroy
     @collection = find_collection
     if authorized_action(@collection, @current_user, :delete)
       if @collection.destroy
-        render :json => collection_json(@collection, @current_user, session)
+        render :json => collections_json([@collection], @current_user, session).first
       else
         render :json => @collection.errors, :status => :bad_request
       end
     end
   end
 
+  # @API Follow a collection
+  #
+  # Follow this collection. If the current user is already following the
+  # collection, nothing happens. The user must have permissions to view the
+  # collection in order to follow it.
+  #
+  # On success, returns the Collection object. Responds with a 401 if the user
+  # doesn't have permission to follow the collection, or a 400 if the user
+  # can't follow the collection (if it's the user's own collection, for
+  # example).
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/collections/<collection_id>/followers/self \ 
+  #          -X PUT \ 
+  #          -H 'Content-Length: 0' \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #     {
+  #       following_user_id: 5,
+  #       followed_collection_id: 6,
+  #       created_at: <timestamp>
+  #     }
+  def follow
+    @collection = find_collection
+    if authorized_action(@collection, @current_user, :follow)
+      user_follow = UserFollow.create_follow(@current_user, @collection)
+      if !user_follow.new_record?
+        render :json => user_follow_json(user_follow, @current_user, session)
+      else
+        render :json => user_follow.errors, :status => :bad_request
+      end
+    end
+  end
+
+  # @API Un-follow a collection
+  #
+  # Stop following this collection. If the current user is not already
+  # following the collection, nothing happens.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/collections/<collection_id>/followers/self \ 
+  #          -X DELETE \ 
+  #          -H 'Authorization: Bearer <token>'
+  def unfollow
+    @collection = find_collection
+    if authorized_action(@collection, @current_user, :follow)
+      user_follow = @current_user.user_follows.find(:first, :conditions => { :followed_item_id => @collection.id, :followed_item_type => 'Collection' })
+      user_follow.try(:destroy)
+      render :json => { "ok" => true }
+    end
+  end
+
   protected
 
   def find_collection
-    @context.collections.active.find(params[:collection_id])
+    Collection.active.find(params[:collection_id])
   end
 end
 
