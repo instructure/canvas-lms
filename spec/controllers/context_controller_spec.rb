@@ -124,6 +124,20 @@ describe ContextController do
     end
   end
 
+  describe "GET '/media_objects/:id/thumbnail" do
+    it "should redirect to kaltura even if the MediaObject does not exist" do
+      Kaltura::ClientV3.stubs(:config).returns({})
+      Kaltura::ClientV3.any_instance.expects(:thumbnail_url).returns("http://example.com/thumbnail_redirect")
+      get :media_object_thumbnail,
+        :id => '0_notexist',
+        :width => 100,
+        :height => 100
+
+      response.should be_redirect
+      response.location.should == "http://example.com/thumbnail_redirect"
+    end
+  end
+
   describe "POST '/media_objects'" do
     before :each do
       course_with_student_logged_in(:active_all => true)
