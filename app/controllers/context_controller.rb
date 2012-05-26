@@ -56,23 +56,28 @@ class ContextController < ApplicationController
     end
   end
 
-   def media_object_thumbnail
-     mo = MediaObject.by_media_id(params[:id]).first
-     width = params[:width]
-     height = params[:height]
-     type = (params[:type].presence || 2).to_i
-     config = Kaltura::ClientV3.config
-     if config
-       redirect_to Kaltura::ClientV3.new.thumbnail_url(mo.media_id,
-                                                       :width => width,
-                                                       :height => height,
-                                                       :type => type,
-                                                       :protocol => (request.ssl? ? "https" : "http")),
-                   :status => 301
-     else
-       render :text => t(:media_objects_not_configured, "Media Objects not configured")
-     end
-   end
+  def media_object_thumbnail
+    media_id = params[:id]
+    # we prefer using the MediaObject if it exists (so that it can give us
+    # a different media_id if it wants to), but we will also use the provided
+    # media id directly if we can't find a MediaObject. (They don't always get
+    # created yet.)
+    mo = MediaObject.by_media_id(media_id).first
+    width = params[:width]
+    height = params[:height]
+    type = (params[:type].presence || 2).to_i
+    config = Kaltura::ClientV3.config
+    if config
+      redirect_to Kaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
+                                                      :width => width,
+                                                      :height => height,
+                                                      :type => type,
+                                                      :protocol => (request.ssl? ? "https" : "http")),
+                  :status => 301
+    else
+      render :text => t(:media_objects_not_configured, "Media Objects not configured")
+    end
+  end
 
   def kaltura_notifications
     request_params = request.request_parameters.to_a.sort_by{|k, v| k }.select{|k, v| k != 'sig' }
