@@ -382,7 +382,7 @@ define([
 
     submitForm: function(e){
       userSettings.set('eg_sort_by', $('#eg_sort_by').val());
-      userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked').toString());
+      userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked'));
       $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
       window.location.reload();
       return false;
