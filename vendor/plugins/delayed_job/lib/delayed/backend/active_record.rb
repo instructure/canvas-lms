@@ -115,20 +115,14 @@ module Delayed
             # note postgresql is optimized to use this db function, and doesn't
             # use find_available, lock_exclusively and friends
             #
-            # the reason we do a subselect here is that pop_from_delayed_jobs
-            # is a volatile function (we can't mark it as stable because it
-            # does a FOR UPDATE, which postgresql won't allow in a stable fn)
-            #
-            # so without the subselect, it'd evaluate the function once for every row in delayed_jobs
+            # because pop_from_delayed_jobs returns a delayed_jobs row, we have
+            # to re-create the function every time we change the schema of
+            # delayed_jobs. fortunately that doesn't happen often. see the
+            # define_pg_pop_function method below, and the
+            # PopJobsWithDbFunctionOnPostgresql migration.
             now = db_time_now
-            job = self.first(:conditions => ["id = (select pop_from_delayed_jobs(?, ?, ?, ?, ?))", worker_name, queue, min_priority, max_priority, now])
-            # the pop_from_delayed_jobs function takes care of updating the db
-            # row with the locked_at/locked_by information, but that happens
-            # too late for the outer select to see those changes. so we will
-            # update the AR record client-side to match what the trigger did.
-            if job
-              job.mark_as_locked!(now, worker_name)
-            end
+            job = self.find_by_sql(sanitize_sql_array(["select * from pop_from_delayed_jobs(?, ?, ?, ?, ?)", worker_name, queue, min_priority, max_priority, now])).first
+            job = nil if !job.id
             return job
           else
             @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
@@ -246,6 +240,44 @@ module Delayed
         class Failed < Job
           include Delayed::Backend::Base
           set_table_name :failed_jobs
+        end
+
+        def self.define_pg_pop_function
+          transaction do
+            drop_pg_pop_function()
+            connection.execute(<<-CODE)
+        CREATE FUNCTION pop_from_delayed_jobs (worker_name varchar, queue_name varchar, min_priority integer, max_priority integer, cur_time timestamp without time zone) RETURNS delayed_jobs AS $$
+        DECLARE
+          result delayed_jobs;
+        BEGIN
+          IF queue_name IS NULL THEN
+            SELECT * INTO result FROM delayed_jobs WHERE run_at <= cur_time AND locked_at IS NULL AND next_in_strand = true AND priority >= min_priority AND priority <= max_priority AND queue IS NULL ORDER BY priority ASC, run_at ASC FOR UPDATE;
+          ELSE
+            SELECT * INTO result FROM delayed_jobs WHERE run_at <= cur_time AND locked_at IS NULL AND next_in_strand = true AND priority >= min_priority AND priority <= max_priority AND queue = queue_name ORDER BY priority ASC, run_at ASC FOR UPDATE;
+          END IF;
+          IF NOT FOUND THEN
+            RETURN NULL;
+          END IF;
+
+          -- since we did a select FOR UPDATE, this locking should always succeed without contention
+          -- however, we still check the return value as a sanity check
+          UPDATE delayed_jobs SET locked_at = cur_time, locked_by = worker_name WHERE id = result.id AND locked_at IS NULL AND run_at <= cur_time;
+          IF FOUND THEN
+            result.locked_at = cur_time;
+            result.locked_by = worker_name;
+            RETURN result;
+          ELSE
+            RAISE EXCEPTION 'found but then not locked % for %', result.id, worker_name;
+          END IF;
+
+        END;
+        $$ LANGUAGE plpgsql;
+            CODE
+          end
+        end
+
+        def self.drop_pg_pop_function
+          connection.execute("DROP FUNCTION IF EXISTS pop_from_delayed_jobs(varchar, varchar, integer, integer, timestamp without time zone)")
         end
       end
 
