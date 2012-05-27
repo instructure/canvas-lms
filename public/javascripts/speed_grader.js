@@ -134,6 +134,12 @@ define([
       match = (window.location.pathname.match(pathRegex) || window.location.search.match(searchRegex));
       if (!match) return false;
       return match[1];
+    },
+    shouldHideStudentNames: function() {
+      // this is for backwards compatability, we used to store the value as
+      // strings "true" or "false", but now we store boolean true/false values.
+      var settingVal = userSettings.get("eg_hide_student_names");
+      return settingVal === true || settingVal === "true";
     }
   };
 
@@ -171,10 +177,7 @@ define([
     
     //by defaut the list is sorted alphbetically by student last name so we dont have to do any more work here, 
     // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
-    var hideStudentNames;
-    if (userSettings.get("eg_hide_student_names")) {
-      hideStudentNames = true;
-    }
+    var hideStudentNames = utils.shouldHideStudentNames();
     if(hideStudentNames) {
       jsonData.studentsWithSubmissions.sort(function(a,b){
         return ((a && a.submission && a.submission.id) || Number.MAX_VALUE) - 
@@ -226,7 +229,7 @@ define([
   function initDropdown(){
     var hideStudentNames;
 
-    if (userSettings.get("eg_hide_student_names") || window.anonymousAssignment) {
+    if (utils.shouldHideStudentNames() || window.anonymousAssignment) {
       hideStudentNames = true;
     }
     $("#hide_student_names").attr('checked', hideStudentNames);
