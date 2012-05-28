@@ -3,7 +3,7 @@ define [
   'i18n!dashboard'
   'compiled/home/views/quickStartBar/allViews'
   'formToJSON'
-], ({View, Model}, I18n, views) ->
+], ({View, Model}, I18n, allViews) ->
 
 	capitalize = (str) ->
     str.replace /\b[a-z]/g, (match) -> match.toUpperCase()
@@ -50,7 +50,7 @@ define [
       viewName = capitalize(@modelName) + 'View'
       @currentFormView?.teardown?()
       @currentFormView = @views[viewName] or= do =>
-        view = new views[viewName]
+        view = new allViews[viewName]
         view.on 'save', @onSaveSuccess
         view.on 'saveFail', @onSaveFail
       @currentFormView.render()
