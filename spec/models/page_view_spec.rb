@@ -40,7 +40,7 @@ describe PageView do
       PageView.count.should == 0
       PageView.process_cache_queue
       PageView.count.should == 1
-      PageView.first.attributes.except('created_at', 'updated_at').should == @page_view.attributes.except('created_at', 'updated_at')
+      PageView.first.attributes.except('created_at', 'updated_at', 'summarized').should == @page_view.attributes.except('created_at', 'updated_at', 'summarized')
     end
 
     it "should store into redis in transactional batches" do

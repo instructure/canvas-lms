@@ -20,7 +20,7 @@ module CC
     include CCHelper
     
     attr_accessor :exporter, :weblinks, :basic_ltis
-    delegate :add_error, :set_progress, :export_object?, :for_course_copy, :add_item_to_export, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :for_course_copy, :add_item_to_export, :user, :to => :exporter
 
     def initialize(exporter)
       @exporter = exporter

@@ -235,4 +235,15 @@ class AssignmentGroup < ActiveRecord::Base
     group.save
   end
 
+  def has_frozen_assignments?(user)
+    return false unless PluginSetting.settings_for_plugin(:assignment_freezer)
+    return false unless self.active_assignments.length > 0
+
+    self.active_assignments.each do |asmnt|
+      return true if asmnt.frozen_for_user?(user)
+    end
+
+    false
+  end
+
 end

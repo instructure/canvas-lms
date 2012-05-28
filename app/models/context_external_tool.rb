@@ -7,7 +7,7 @@ class ContextExternalTool < ActiveRecord::Base
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button,
-                  :config_type, :config_url, :config_xml
+                  :config_type, :config_url, :config_xml, :tool_id
   validates_presence_of :name
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
@@ -33,10 +33,13 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def url_or_domain_is_set
+    setting_types = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button]
+    # both url and domain should not be set
     if url.present? && domain.present?
       errors.add(:url, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
       errors.add(:domain, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
-    elsif url.blank? && domain.blank?
+    # url or domain (or url on canvas lti extension) is required
+    elsif url.blank? && domain.blank? && setting_types.all?{|k| !settings[k] || settings[k]['url'].blank? }
       errors.add(:url, t('url_or_domain_required', "Either the url or domain should be set."))
       errors.add(:domain, t('url_or_domain_required', "Either the url or domain should be set."))
     end
@@ -194,6 +197,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings.delete(:account_navigation) if settings[:account_navigation] && (!settings[:account_navigation][:url])
     settings.delete(:resource_selection) if settings[:resource_selection] && (!settings[:resource_selection][:url] || !settings[:resource_selection][:selection_width] || !settings[:resource_selection][:selection_height])
     settings.delete(:editor_button) if settings[:editor_button] && (!settings[:editor_button][:url] || !settings[:editor_button][:icon_url])
+    settings[:icon_url] ||= settings[:editor_button][:icon_url] if settings[:editor_button] && settings[:editor_button][:icon_url]
     [:resource_selection, :editor_button].each do |type|
       if settings[type]
         settings[type][:selection_width] = settings[type][:selection_width].to_i
@@ -305,7 +309,14 @@ class ContextExternalTool < ActiveRecord::Base
         context = nil
       end
     end
-    return nil if contexts.empty?
+
+    # Always use the preferred tool if it's valid and has a resource_selection configuration.
+    # If it didn't have resource_selection then a change in the URL would have been done manually,
+    # and there's no reason to assume a different URL was intended. With a resource_selection 
+    # insertion, there's a stronger chance that a different URL was intended.
+    preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
+    return preferred_tool if preferred_tool && preferred_tool.settings[:resource_selection]
+    
     contexts.each do |context|
       res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.url && tool.matches_url?(url) }
       return res if res
@@ -403,6 +414,7 @@ class ContextExternalTool < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.name = hash[:title]
     item.description = hash[:description]
+    item.tool_id = hash[:tool_id]
     item.url = hash[:url] unless hash[:url].blank?
     item.domain = hash[:domain] unless hash[:domain].blank?
     item.privacy_level = hash[:privacy_level] || 'name_only'

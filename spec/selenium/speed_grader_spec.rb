@@ -416,6 +416,14 @@ describe "speedgrader" do
       driver.find_element(:css, '#settings_form .submit_button').click
     }
     keep_trying_until { driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
+
+    # unselect the hide option
+    driver.find_element(:css, "#settings_link").click
+    driver.find_element(:css, '#hide_student_names').click
+    expect_new_page_load {
+      driver.find_element(:css, '#settings_form .submit_button').click
+    }
+    keep_trying_until { driver.find_element(:css, '#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "student@example.com" }
   end
 
   it "should leave the full rubric open when switching submissions" do

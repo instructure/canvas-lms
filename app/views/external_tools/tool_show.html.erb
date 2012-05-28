@@ -16,7 +16,7 @@
 </script>
 <% end %>
 
-<form action="<%= @resource_url %>" method="POST" <%= raw("target='#{@target || 'tool_content'}'") unless @self_target %> id="tool_form" class="<%= 'new_tab' if @tag.try(:new_tab) %>">
+<form action="<%= @resource_url %>" method="POST" <%= raw("target='#{@target || 'tool_content'}'") unless @self_target %> id="tool_form" class="<%= 'new_tab' if @tag.try(:new_tab) %>" data-tool-id="<%= @tool.tool_id || 'unknown' %>">
   <% @tool_settings.each do |key, value| %>
     <%= hidden_field_tag key, value %>
   <% end %>

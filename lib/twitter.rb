@@ -151,10 +151,7 @@ module Twitter
   end
   
   def self.config
-    # Return existing value, even if nil, as long as it's defined
-    return @twitter_config if defined?(@twitter_config)
-    @twitter_config ||= Canvas::Plugin.find(:twitter).try(:settings)
-    @twitter_config ||= YAML.load_file(RAILS_ROOT + "/config/twitter.yml")[RAILS_ENV] rescue nil
+    Canvas::Plugin.find(:twitter).try(:settings) || Setting.from_config('twitter')
   end
   
 end

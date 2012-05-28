@@ -22,7 +22,7 @@ class EnrollmentsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
 
   @@errors = {
-    :missing_parameters => "No parameters given",
+    :missing_parameters => 'No parameters given',
     :missing_user_id    => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
     :bad_type           => 'Invalid type'
   }
@@ -132,15 +132,21 @@ class EnrollmentsApiController < ApplicationController
       c[:workflow_state] = params[:state] if params[:state].present?
       c[:course_section_id] = @section.id if @section.present?
     }
+
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
-    scope_arguments = { :conditions => @conditions, :order => 'enrollments.type ASC, users.sortable_name ASC' }
+    scope_arguments = { :conditions => @conditions,
+      :order => 'enrollments.type ASC, users.sortable_name ASC',
+      :include => [:user, :course, :course_section] }
+
     return unless enrollments = @context.is_a?(Course) ?
       course_index_enrollments(scope_arguments) :
       user_index_enrollments(scope_arguments)
+
     enrollments = Api.paginate(
       enrollments,
       self, send("api_v1_#{endpoint_scope}_enrollments_path"))
     includes = [:user] + Array(params[:include])
+
     render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, includes) }
   end
 
@@ -250,9 +256,19 @@ class EnrollmentsApiController < ApplicationController
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
   def user_index_enrollments(scope_arguments)
     user = api_find(User, params[:user_id])
+
     # if user is requesting for themselves, just return all of their
     # enrollments without any extra checking.
-    return user.current_enrollments.scoped(scope_arguments) if user == @current_user
+    if user == @current_user
+      enrollments = if params[:state].present?
+                      user.enrollments.scoped(scope_arguments.merge(
+                        :conditions => conditions_for_self))
+                    else
+                      user.current_and_invited_enrollments.scoped(scope_arguments)
+                    end
+
+      return enrollments
+    end
 
     # otherwise check for read_roster rights on all of the requested
     # user's accounts
@@ -266,10 +282,39 @@ class EnrollmentsApiController < ApplicationController
     render_unauthorized_action(@user) and return false if approved_accounts.empty?
 
     scope_arguments[:conditions].merge!({ 'enrollments.root_account_id' => approved_accounts })
-    enrollments = scope_arguments[:conditions].include?(:workflow_state) ?
-      user.enrollments.scoped(scope_arguments) :
-      user.current_and_invited_enrollments.scoped(scope_arguments)
+    # by default, return active and invited courses. don't use the existing
+    # current_and_invited_enrollments scope because it won't return enrollments
+    # on unpublished courses.
+    scope_arguments[:conditions][:workflow_state] ||= %w{active invited}
 
-    enrollments
+    user.enrollments.scoped(scope_arguments)
+  end
+
+  # Internal: Collect type, section, and state info from params and format them
+  # for use in a request for the requester's own enrollments.
+  #
+  # Returns a hash or array.
+  def conditions_for_self
+    type, state = params.values_at(:type, :state)
+    conditions  = [[], {}]
+
+    if type.present?
+      conditions[0] << 'enrollments.type IN (:type)'
+      conditions[1][:type] = type
+    end
+
+    if state.present?
+      state.map(&:to_sym).each do |s|
+        conditions[0] << User::ENROLLMENT_CONDITIONS[s]
+      end
+    end
+
+    if @section.present?
+      conditions[0] << 'enrollments.course_section_id = :course_section_id'
+      conditions[1][:course_section_id] = @section.id
+    end
+
+    conditions[0] = conditions[0].join(' AND ')
+    conditions
   end
 end

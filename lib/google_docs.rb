@@ -293,6 +293,6 @@ module GoogleDocs
   end
 
   def self.config
-    Canvas::Plugin.find(:google_docs).try(:settings) || (YAML.load_file(RAILS_ROOT + "/config/google_docs.yml")[RAILS_ENV] rescue nil)
+    Canvas::Plugin.find(:google_docs).try(:settings) || Setting.from_config('google_docs')
   end
 end

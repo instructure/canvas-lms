@@ -102,6 +102,17 @@ describe PseudonymSessionsController do
       response.should render_template('pseudonym_sessions/new')
     end
 
+    it "should login a site admin user with other identical pseudonyms" do
+      account1 = Account.create!
+      Account.any_instance.stubs(:trusted_account_ids).returns([account1.id, Account.site_admin.id])
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account1)
+      user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => Account.site_admin)
+      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      # it should have preferred the site admin pseudonym
+      assigns[:pseudonym].should == @pseudonym
+    end
+
     context "sharding" do
       it_should_behave_like "sharding"
 

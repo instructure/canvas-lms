@@ -30,9 +30,11 @@
         <a href="#" class="edit_group_link no-hover">
           <%= image_tag 'edit.png', :alt => t('alts.edit_group_details', "Edit"), :title => t('links.edit_group_details', "Edit Group Details") %>
         </a>
-        <a href="<%= context_url(@context, :controller => :assignment_groups, :action => :destroy, :id => (assignment_group ? assignment_group.id : "{{ id }}")) %>" class="delete_group_link no-hover">
-          <%= image_tag 'delete.png', :alt => t('alts.delete_assignment_group', "Delete"), :title => t('titles.delete_assignment_group', "Delete Assignment Group") %>
-        </a>
+        <% if !group || !group.has_frozen_assignments?(@current_user) %>
+          <a href="<%= context_url(@context, :controller => :assignment_groups, :action => :destroy, :id => (assignment_group ? assignment_group.id : "{{ id }}")) %>" class="delete_group_link no-hover">
+            <%= image_tag 'delete.png', :alt => t('alts.delete_assignment_group', "Delete"), :title => t('titles.delete_assignment_group', "Delete Assignment Group") %>
+          </a>
+        <% end %>
       </div>
       <div class="clear"></div>
       <div class="more_info" style="min-height: 30px; display: none; padding-left: 30px; font-size: 0.8em;">

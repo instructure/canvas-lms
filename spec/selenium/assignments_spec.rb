@@ -259,6 +259,13 @@ describe "assignments" do
           f('#edit_assignment_form #assignment_description').should_not be_nil
         end
       end
+
+      it "should not allow assignment group to be deleted" do
+        get "/courses/#{@course.id}/assignments"
+
+        f("#group_#{@asmnt.assignment_group_id} .delete_group_link").should be_nil
+        f("#assignment_#{@asmnt.id} .delete_assignment_link").should be_nil
+      end
     end
 
     it "should show a \"more errors\" errorBox if any invalid fields are hidden" do

@@ -765,5 +765,42 @@ describe Quiz do
 
   end
   
-  
+  it "should ignore lockdown-browser setting if that plugin is not enabled" do
+    q = @course.quizzes.build(:title => "some quiz")
+    q1 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => false)
+    q2 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => true)
+
+    # first, disable any lockdown browsers that might be configured already
+    Canvas::Plugin.all_for_tag(:lockdown_browser).each { |p| p.settings[:enabled] = false }
+
+    # nothing should be restricted
+    Quiz.lockdown_browser_plugin_enabled?.should be_false
+    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?]).
+        each { |qs| qs[0].send(qs[1]).should be_false }
+
+    # register a plugin
+    Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
+        :settings => {:enabled => false}})
+
+    # nothing should change yet
+    Quiz.lockdown_browser_plugin_enabled?.should be_false
+    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?]).
+        each { |qs| qs[0].send(qs[1]).should be_false }
+
+    # now actually enable the plugin
+    setting = PluginSetting.find_or_create_by_name('example_spec_lockdown_browser')
+    setting.settings = {:enabled => true}
+    setting.save!
+
+    # now the restrictions should take effect
+    Quiz.lockdown_browser_plugin_enabled?.should be_true
+    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?].
+        each { |s| q.send(s).should be_false }
+    [:require_lockdown_browser, :require_lockdown_browser?].
+        each { |s| q1.send(s).should be_true }
+    [:require_lockdown_browser_for_results, :require_lockdown_browser_for_results?].
+        each { |s| q1.send(s).should be_false }
+    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?].
+        each { |s| q2.send(s).should be_true }
+  end
 end

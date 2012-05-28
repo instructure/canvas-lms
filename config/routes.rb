@@ -756,6 +756,7 @@ ActionController::Routing::Routes.draw do |map|
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
+      users.delete 'accounts/:account_id/users/:id', :action => :destroy
 
       users.put 'users/:id', :action => :update
       users.post 'users/:user_id/files', :action => :create_file

@@ -101,5 +101,6 @@ describe "External Tools" do
       doc.at_css('#tool_form').should_not be_nil
       doc.at_css("input[name='launch_presentation_return_url']")['value'].should match(/^http/)
     end
+    
   end
 end

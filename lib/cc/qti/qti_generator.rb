@@ -24,6 +24,7 @@ module CC
 
       def initialize(manifest, resources_node, html_exporter)
         @manifest = manifest
+        @user = manifest.user
         @resources_node = resources_node
         @course = manifest.course
         @export_dir = @manifest.export_dir
@@ -55,10 +56,17 @@ module CC
         
         @course.quizzes.active.each do |quiz|
           next unless export_object?(quiz) || export_object?(quiz.assignment)
+
+          title = quiz.title rescue I18n.t('unknown_quiz', "Unknown quiz")
+
+          if quiz.assignment && !quiz.assignment.can_copy?(@user)
+            add_error(I18n.t('course_exports.errors.quiz_is_locked', "The quiz \"%{title}\" could not be copied because it is locked.", :title => title))
+            next
+          end
+
           begin
             generate_quiz(quiz)
           rescue
-            title = quiz.title rescue I18n.t('unknown_quiz', "Unknown quiz")
             add_error(I18n.t('course_exports.errors.quiz', "The quiz \"%{title}\" failed to export", :title => title), $!)
           end
         end

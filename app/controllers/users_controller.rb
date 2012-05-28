@@ -898,8 +898,29 @@ class UsersController < ApplicationController
     end
   end
 
+  #@API Delete a user.
+  # Delete a user record from Canvas.
+  #
+  # WARNING: This API will allow a user to delete themselves. If you do this,
+  # you won't be able to make API calls or log into Canvas.
+  #
+  # @example_request
+  #
+  # curl https://<canvas>/api/v1/users/5 \ 
+  #   -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
+  #   -X DELETE
+  #
+  # @example_response
+  #
+  #   {
+  #     "id":133,
+  #     "login_id":"bieber@example.com",
+  #     "name":"Justin Bieber",
+  #     "short_name":"The Biebs",
+  #     "sortable_name":"Bieber, Justin"
+  #   }
   def destroy
-    @user = User.find(params[:id])
+    @user = api_request? ? api_find(User, params[:id]) : User.find(params[:id])
     if authorized_action(@user, @current_user, [:manage, :manage_logins])
       @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       if @user == @current_user
@@ -908,13 +929,15 @@ class UsersController < ApplicationController
       end
 
       respond_to do |format|
-        flash[:notice] = t('user_is_deleted', "%{user_name} has been deleted", :user_name => @user.name)
-        if @user == @current_user
-          format.html { redirect_to root_url }
-        else
-          format.html { redirect_to(users_url) }
+        format.html do
+          flash[:notice] = t('user_is_deleted', "%{user_name} has been deleted", :user_name => @user.name)
+          redirect_to(@user == @current_user ? root_url : users_url)
         end
-        format.json { render :json => @user.to_json }
+
+        format.json do
+          get_context # need the context for user_json
+          render :json => user_json(@user, @current_user, session)
+        end
       end
     end
   end
