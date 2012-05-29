@@ -87,8 +87,14 @@ class CollectionsController < ApplicationController
   def index
     collection_route = polymorphic_url([:api_v1, @context, :collections])
     scope = @context.collections.active.newest_first
+    view_private = is_authorized_action?(@context.collections.new(:visibility => 'private'), @current_user, :read)
 
-    unless is_authorized_action?(@context.collections.new(:visibility => 'private'), @current_user, :read)
+    if view_private && scope.empty?
+      name = @context.try(:default_collection_name)
+      @context.collections.create(:name => name, :visibility => 'private') if name
+    end
+
+    unless view_private
       scope = scope.public
     end
 

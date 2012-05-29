@@ -197,6 +197,15 @@ describe "Collections API", :type => :integration do
 
     context "a user's own collections" do
       it_should_behave_like "full access to collections"
+
+      it "should create a default private collection if no collections exist for the context" do
+        @empty_user = user_with_pseudonym
+        @user = @empty_user
+        json = api_call(:get, "/api/v1/users/#{@empty_user.id}/collections", { :controller => "collections", :action => "index", :format => "json", :user_id => @empty_user.to_param })
+        response['Link'].should be_present
+        json.should_not be_empty
+        json.first['visibility'].should == 'private'
+      end
     end
 
     context "another user's collections" do
@@ -476,12 +485,19 @@ describe "Collections API", :type => :integration do
 
     context "a group's collections, as moderator" do
       before do
-        @group_membership = @group.add_user(@user)
-        @group_membership.moderator = true
-        @group_membership.save!
+        @group_membership = @group.add_user(@user).tap{|gm| gm.moderator = true; gm.save}
       end
 
       it_should_behave_like "full access to collections"
+
+      it "should create a default private collection if no collections exist for the context" do
+        @empty_group = group_model({:group_category => GroupCategory.communities_for(Account.default), :is_public => true})
+        @empty_group.add_user(@user).tap{|gm| gm.moderator = true; gm.save}
+        json = api_call(:get, "/api/v1/groups/#{@empty_group.id}/collections", { :controller => "collections", :action => "index", :format => "json", :group_id => @empty_group.to_param })
+        response['Link'].should be_present
+        json.should_not be_empty
+        json.first['visibility'].should == 'private'
+      end
     end
 
     context "a group's collections, as member" do

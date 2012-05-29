@@ -474,4 +474,8 @@ class Group < ActiveRecord::Base
     users = self.users + [user]
     self.context.course_sections.active.any?{ |section| section.common_to_users?(users) }
   end
+
+  def default_collection_name
+    t "#group.default_collection_name", "%{group_name}'s Collection", :group_name => self.name
+  end
 end
