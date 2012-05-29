@@ -22,7 +22,7 @@ define [
   class PinView extends BaseItemView
 
     events: _.extend
-      'keyup [name=title]': 'onUrlKeyUp'
+      'keyup [name=url]': 'onUrlKeyUp'
     , BaseItemView::events
 
     template: template
