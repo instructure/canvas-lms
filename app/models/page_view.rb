@@ -196,10 +196,10 @@ class PageView < ActiveRecord::Base
 
   def store_page_view_to_user_counts
     return unless Setting.get_cached('page_views_store_active_user_counts', 'false') == 'redis' && Canvas.redis_enabled?
-    return unless self.created_at.present?
+    return unless self.created_at.present? && self.user.present?
     exptime = Setting.get_cached('page_views_active_user_exptime', 1.day.to_s).to_i
     bucket = PageView.user_count_bucket_for_time(self.created_at)
-    Canvas.redis.sadd(bucket, self.user_id)
+    Canvas.redis.sadd(bucket, self.user.global_id)
     Canvas.redis.expire(bucket, exptime)
   end
 end
