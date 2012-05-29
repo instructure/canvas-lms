@@ -19,9 +19,14 @@
 module Api::V1::Group
   include Api::V1::Json
 
+  API_GROUP_JSON_OPTS = {
+    :only => %w(id name description is_public join_level group_category_id),
+    :methods => %w(members_count),
+  }
+
   def group_json(group, user, session, options = {})
+    hash = api_json(group, user, session, API_GROUP_JSON_OPTS)
     include = options[:include] || []
-    hash = api_json(group, user, session, :only => %w{id name})
     if include.include?('users')
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }
     end

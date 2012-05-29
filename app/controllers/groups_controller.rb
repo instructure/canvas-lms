@@ -18,13 +18,68 @@
 
 # @API Groups
 #
-# API for accessing group information.
+# Groups serve as the data for a few different ideas in Canvas.  The first is
+# that they can be a community in the canvas network.  The second is that they
+# can be organized by students in a course, for study or communication (but not
+# grading).  The third is that they can be organized by teachers or account
+# administrators for the purpose of projects, assignments, and grading.  This
+# last kind of group is always part of a group category, which adds the
+# restriction that a user may only be a member of one group per category.
+#
+# All of these types of groups function similarly, and can be the parent
+# context for many other types of functionality and interaction, such as
+# collections, discussions, wikis, and shared files.
+#
+# A Group object looks like:
+#
+#     !!!javascript
+#     {
+#       // The ID of the group.
+#       id: 17,
+#
+#       // The display name of the group.
+#       name: "Math Group 1",
+#
+#       // A description of the group. This is plain text.
+#       description: null,
+#
+#       // Whether or not the group is public.  Currently only community groups
+#       // can be made public.  Also, once a group has been set to public, it
+#       // cannot be changed back to private.
+#       is_public: false,
+#
+#       // How people are allowed to join the group.  For all groups except for
+#       // community groups, the user must share the group's parent course or
+#       // account.  For student organized or community groups, where a user
+#       // can be a member of as many or few as they want, the applicable
+#       // levels are "parent_context_auto_join", "parent_context_request", and
+#       // "invitation_only".  For class groups, where students are divided up
+#       // and should only be part of one group of the category, this value
+#       // will always be "invitation_only", and is not relevant.
+#       //
+#       // * If "parent_context_auto_join", anyone can join and will be
+#       //   automatically accepted.
+#       // * If "parent_context_request", anyone  can request to join, which
+#       //   must be approved by a group moderator.
+#       // * If "invitation_only", only those how have received an
+#       //   invitation my join the group, by accepting that invitation.
+#       join_level: "invitation_only",
+#
+#       // The number of members currently in the group
+#       members_count: 0
+#
+#       // The ID of the group's category.
+#       group_category_id: 4,
+#     }
+#
 class GroupsController < ApplicationController
   before_filter :get_context
   before_filter :require_context, :only => [:create_category, :delete_category]
-  before_filter :get_group_as_context, :only => [:show]
 
   include Api::V1::Attachment
+  include Api::V1::Group
+
+  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category)
 
   def context_group_members
     @group = @context
@@ -66,38 +121,101 @@ class GroupsController < ApplicationController
     @groups = @current_user ? @current_user.groups.active : []
   end
 
-  def show
-    if @group.deleted? && @group.context
-      flash[:notice] = t('notices.already_deleted', "That group has been deleted")
-      redirect_to named_context_url(@group.context, :context_url)
-      return
+  def context_index
+    add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
+    add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
+    @active_tab = @context.is_a?(Account) ? "users" : "people"
+    @groups = @context.groups.active
+    @categories = @context.group_categories
+    group_ids = @groups.map(&:id)
+
+    @user_groups = @current_user.group_memberships_for(@context).select{|g| group_ids.include?(g.id) } if @current_user
+    @user_groups ||= []
+
+    @available_groups = (@groups - @user_groups).select{|g| g.can_join?(@current_user) }
+    if !@context.grants_right?(@current_user, session, :manage_groups)
+      @groups = @user_groups
     end
-    @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
-    @groups = @current_user.group_memberships_for(@group.context) if @current_user
-    if params[:join] && @group.can_join?(@current_user)
-      @group.request_user(@current_user)
-      if !@group.grants_right?(@current_user, session, :read)
-        render :action => 'membership_pending'
-        return
-      else
-        flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
-        redirect_to named_context_url(@group.context, :context_groups_url)
-        return
-      end
-    end
-    if params[:leave] && @group.can_leave?(@current_user)
-      membership = @group.membership_for_user(@current_user)
-      if membership
-        membership.destroy
-        flash[:notice] = t('notices.goodbye', "You have removed yourself from the group %{group_name}.", :group_name => @group.name)
-        redirect_to named_context_url(@group.context, :context_groups_url)
-        return
-      end
-    end
-    if authorized_action(@group, @current_user, :read)
-      @home_page = WikiNamespace.default_for_context(@group).wiki.wiki_page
+    # sort by name, but with the student organized category in the back
+    @categories = @categories.sort_by{|c| [ (c.student_organized? ? 1 : 0), c.name ] }
+    @groups = @groups.sort_by{ |g| [(g.name || '').downcase, g.created_at]  }
+
+    if authorized_action(@context, @current_user, :read_roster)
       respond_to do |format|
-        format.html
+        if @context.grants_right?(@current_user, session, :manage_groups)
+          format.html { render :action => 'context_manage_groups' }
+        else
+          format.html { render :action => 'context_groups' }
+        end
+        format.atom { render :xml => @groups.to_atom.to_xml }
+      end
+    end
+  end
+
+  # @API Get a single group
+  #
+  # Returns the data for a single group, or a 401 if the caller doesn't have
+  # the rights to see it.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #     {
+  #       id: 13,
+  #       name: "Mary's Group",
+  #       description: "A group for my friends",
+  #       is_public: false,
+  #       join_level: "parent_context_request",
+  #       members_count: 3
+  #       group_category_id: 2
+  #     },
+  def show
+    find_group
+    respond_to do |format|
+      format.html do
+        if @group && @group.context
+          add_crumb @group.context.short_name, named_context_url(@group.context, :context_url)
+          add_crumb @group.short_name, named_context_url(@group, :context_url)
+        elsif @group
+          add_crumb @group.short_name, named_context_url(@group, :context_url)
+        end
+        @context = @group
+        if @group.deleted? && @group.context
+          flash[:notice] = t('notices.already_deleted', "That group has been deleted")
+          redirect_to named_context_url(@group.context, :context_url)
+          return
+        end
+        @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
+        if params[:join] && @group.can_join?(@current_user)
+          @group.request_user(@current_user)
+          if !@group.grants_right?(@current_user, session, :read)
+            render :action => 'membership_pending'
+            return
+          else
+            flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
+            redirect_to named_context_url(@group.context, :context_groups_url)
+            return
+          end
+        end
+        if params[:leave] && @group.can_leave?(@current_user)
+          membership = @group.membership_for_user(@current_user)
+          if membership
+            membership.destroy
+            flash[:notice] = t('notices.goodbye', "You have removed yourself from the group %{group_name}.", :group_name => @group.name)
+            redirect_to named_context_url(@group.context, :context_groups_url)
+            return
+          end
+        end
+        if authorized_action(@group, @current_user, :read)
+          @home_page = WikiNamespace.default_for_context(@group).wiki.wiki_page
+        end
+      end
+      format.json do
+        if authorized_action(@group, @current_user, :read)
+          render :json => group_json(@group, @current_user, session)
+        end
       end
     end
   end
@@ -105,6 +223,163 @@ class GroupsController < ApplicationController
   def new
     if authorized_action(@context, @current_user, :manage_groups)
       @group = @context.groups.build
+    end
+  end
+
+  # @API Create a group
+  #
+  # Creates a new group. Right now, only community groups can be created
+  # through the API.
+  #
+  # @argument name
+  # @argument description
+  # @argument is_public
+  # @argument join_level
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
+  #          -F 'name=Math Teachers' \ 
+  #          -F 'description=A place to gather resources for our classes.' \ 
+  #          -F 'is_public=true' \ 
+  #          -F 'join_level=parent_context_auto_join' \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #     {
+  #       id: 25,
+  #       name: "Math Teachers",
+  #       description: "A place to gather resources for our classes.",
+  #       is_public: true,
+  #       join_level: "parent_context_auto_join",
+  #       members_count: 13
+  #       group_category_id: 7
+  #     }
+  def create
+    # only allow community groups from the api right now
+    if api_request?
+      @context = @domain_root_account
+      params[:group_category] = GroupCategory.communities_for(@context)
+    elsif params[:group]
+      group_category_id = params[:group].delete :group_category_id
+      if group_category_id && @context.grants_right?(@current_user, session, :manage_groups)
+        group_category = @context.group_categories.find_by_id(group_category_id)
+        return render :json => {}, :status => :bad_request unless group_category
+        params[:group][:group_category] = group_category
+      else
+        params[:group][:group_category] = nil
+      end
+    end
+
+    attrs = api_request? ? params : params[:group]
+    @group = @context.groups.new(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+
+    if authorized_action(@group, @current_user, :create)
+      respond_to do |format|
+        if @group.save
+          @group.add_user(@current_user, 'accepted', true) if @group.should_add_creator?
+          @group.invitees = params[:invitees]
+          flash[:notice] = t('notices.create_success', 'Group was successfully created.')
+          format.html { redirect_to group_url(@group) }
+          format.json { render :json => group_json(@group, @current_user, session) }
+        else
+          format.html { render :action => "new" }
+          format.json { render :json => @group.errors, :status => :bad_request }
+        end
+      end
+    end
+  end
+
+  def edit
+    @group = (@context ? @context.groups : Group).find(params[:id])
+    @context = @group
+    if authorized_action(@group, @current_user, :update)
+    end
+  end
+
+  # @API Edit a group
+  #
+  # Modifies an existing group.
+  #
+  # @argument name
+  # @argument description
+  # @argument is_public Currently you cannot set a group back to private once
+  #   it has been made public.
+  # @argument join_level
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
+  #          -X PUT \ 
+  #          -F 'name=Algebra Teachers' \ 
+  #          -F 'join_level=parent_context_request' \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #     {
+  #       id: 25,
+  #       name: "Algebra Teachers",
+  #       description: "A place to gather resources for our classes.",
+  #       is_public: true,
+  #       join_level: "parent_context_request",
+  #       members_count: 13
+  #       group_category_id: 7
+  #     }
+  def update
+    find_group
+    if !api_request? && params[:group] && params[:group][:group_category_id]
+      group_category_id = params[:group].delete :group_category_id
+      group_category = @context.group_categories.find_by_id(group_category_id)
+      return render :json => {}, :status => :bad_request unless group_category
+      params[:group][:group_category] = group_category
+    end
+    attrs = api_request? ? params : params[:group]
+    if authorized_action(@group, @current_user, :update)
+      respond_to do |format|
+        if @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+          flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
+          format.html { redirect_to group_url(@group) }
+          format.json { render :json => group_json(@group, @current_user, session) }
+        else
+          format.html { render :action => "edit" }
+          format.json { render :json => @group.errors, :status => :bad_request }
+        end
+      end
+    end
+  end
+
+  # @API Delete a group
+  #
+  # Deletes a group and removes all members.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
+  #          -X DELETE \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #     {
+  #       id: 144,
+  #       name: "My Group",
+  #       description: null,
+  #       is_public: false,
+  #       join_level: "invitation_only",
+  #       members_count: 0,
+  #       group_category_id: 9
+  #     }
+  def destroy
+    find_group
+    if authorized_action(@group, @current_user, :delete)
+      if @group.destroy
+        flash[:notice] = t('notices.delete_success', "Group successfully deleted")
+        respond_to do |format|
+          format.html { redirect_to(dashboard_url) }
+          format.json { render :json => group_json(@group, @current_user, session) }
+        end
+      else
+        respond_to do |format|
+          format.html { redirect_to(dashboard_url) }
+          format.json { render :json => @group.errors, :status => :bad_request }
+        end
+      end
     end
   end
 
@@ -166,84 +441,6 @@ class GroupsController < ApplicationController
       @membership.destroy
       @group.touch
       render :json => @membership.to_json
-    end
-  end
-
-  def create
-    if params[:group]
-      group_category_id = params[:group].delete :group_category_id
-      if group_category_id && @context.grants_right?(@current_user, session, :manage_groups)
-        group_category = @context.group_categories.find_by_id(group_category_id)
-        return render :json => {}, :status => :bad_request unless group_category
-        params[:group][:group_category] = group_category
-      else
-        params[:group][:group_category] = nil
-      end
-    end
-    @group = @context.groups.build(params[:group])
-    if authorized_action(@group, @current_user, :create)
-      respond_to do |format|
-        if @group.save
-          if !@context.grants_right?(@current_user, session, :manage_groups)
-            @group.add_user(@current_user)
-          end
-          @group.invitees = params[:invitees]
-          flash[:notice] = t('notices.create_success', 'Group was successfully created.')
-          format.html { redirect_to group_url(@group) }
-          format.json { render :json => @group.to_json(:methods => :participating_users_count) }
-        else
-          format.html { render :action => "new" }
-          format.json { render :json => @group.errors.to_json }
-        end
-      end
-    end
-  end
-
-  def edit
-    @group = (@context ? @context.groups : Group).find(params[:id])
-    @context = @group
-    if authorized_action(@group, @current_user, :update)
-    end
-  end
-
-  def update
-    @group = (@context ? @context.groups : Group).find(params[:id])
-    if params[:group] && params[:group][:group_category_id]
-      group_category_id = params[:group].delete :group_category_id
-      group_category = @context.group_categories.find_by_id(group_category_id)
-      return render :json => {}, :status => :bad_request unless group_category
-      params[:group][:group_category] = group_category
-    end
-    if authorized_action(@group, @current_user, :manage)
-      respond_to do |format|
-        if @group.update_attributes(params[:group])
-          flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
-          format.html { redirect_to group_url(@group) }
-          format.json { render :json => @group.to_json(:methods => :participating_users_count) }
-        else
-          format.html { render :action => "edit" }
-          format.json { render :json => @group.errors.to_json }
-        end
-      end
-    end
-  end
-
-  def destroy
-    @group = (@context ? @context.groups : Group).find(params[:id])
-    if authorized_action(@group, @current_user, :manage)
-      begin
-        @group.destroy
-        flash[:notice] = t('notices.delete_success', "Group successfully deleted")
-        respond_to do |format|
-          format.html { redirect_to(dashboard_url) }
-          format.json { render :json => @group.to_json }
-        end
-      rescue Exception => e
-        respond_to do |format|
-          format.html { redirect_to(dashboard_url) }
-          format.json { render :json => @group.to_json, :status => :bad_request }
-        end
-      end
     end
   end
 
@@ -325,45 +522,11 @@ class GroupsController < ApplicationController
 
   protected
 
-  def get_group_as_context
-    @group = (@context ? @context.groups : Group).find(params[:id])
-    if @group && @group.context
-      add_crumb @group.context.short_name, named_context_url(@group.context, :context_url)
-      add_crumb @group.short_name, named_context_url(@group, :context_url)
-    elsif @group
-      add_crumb @group.short_name, named_context_url(@group, :context_url)
-    end
-    @context = @group
-  end
-
-  def context_index
-    add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
-    add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
-    @active_tab = @context.is_a?(Account) ? "users" : "people"
-    @groups = @context.groups.active
-    @categories = @context.group_categories
-    group_ids = @groups.map(&:id)
-
-    @user_groups = @current_user.group_memberships_for(@context).select{|g| group_ids.include?(g.id) } if @current_user
-    @user_groups ||= []
-
-    @available_groups = (@groups - @user_groups).select{|g| g.can_join?(@current_user) }
-    if !@context.grants_right?(@current_user, session, :manage_groups)
-      @groups = @user_groups
-    end
-    # sort by name, but with the student organized category in the back
-    @categories = @categories.sort_by{|c| [ (c.student_organized? ? 1 : 0), c.name ] }
-    @groups = @groups.sort_by{ |g| [(g.name || '').downcase, g.created_at]  }
-
-    if authorized_action(@context, @current_user, :read_roster)
-      respond_to do |format|
-        if @context.grants_right?(@current_user, session, :manage_groups)
-          format.html { render :action => 'context_manage_groups' }
-        else
-          format.html { render :action => 'context_groups' }
-        end
-        format.atom { render :xml => @groups.to_atom.to_xml }
-      end
+  def find_group
+    if api_request?
+      @group = Group.active.find(params[:group_id])
+    else
+      @group = (@context ? @context.groups : Group).find(params[:id])
     end
   end
 

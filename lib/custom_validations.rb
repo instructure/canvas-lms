@@ -52,6 +52,15 @@ module CustomValidations
       end
     end
 
+    # only allow false -> true type changes
+    def validates_only_false_to_true(*fields)
+      validates_each(fields) do |record, attr, value|
+        if !record.new_record? && record.send("#{attr}_changed?") && !!record.send("#{attr}_was") && !value
+          record.errors.add attr, "cannot be changed back to false"
+        end
+      end
+    end
+
   end
 
   def self.included(klass)

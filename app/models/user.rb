@@ -1751,7 +1751,7 @@ class User < ActiveRecord::Base
       # according to the set_policy block in group.rb, user u can manage group
       # g if either:
       # (a) g.context.grants_right?(u, :manage_groups)
-      # (b) g.participating_users.include(u)
+      # (b) g.has_member?(u)
       # this is a very performance sensitive method, so we're bypassing the
       # normal policy checking and somewhat duplicating auth logic here. which
       # is a shame. it'd be really nice to add support to our policy framework

@@ -412,7 +412,7 @@ describe GroupsController do
   describe "POST create" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      post 'create', :course_id => @course.id
+      post 'create', :course_id => @course.id, :group => {:name => "some group"}
       assert_unauthorized
     end
 

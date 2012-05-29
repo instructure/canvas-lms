@@ -21,7 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Group do
   
   before do
-    group_model
+    course_model
+    group_model(:context => @course)
   end
 
   context "validation" do
@@ -36,6 +37,22 @@ describe Group do
   
   it "should be private by default" do
     @group.is_public.should be_false
+  end
+
+  it "should allow a private group to be made public" do
+    @communities = GroupCategory.communities_for(Account.default)
+    group_model(:group_category => @communities, :is_public => false)
+    @group.is_public = true
+    @group.save!
+    @group.reload.is_public.should be_true
+  end
+
+  it "should not allow a public group to be made private" do
+    @communities = GroupCategory.communities_for(Account.default)
+    group_model(:group_category => @communities, :is_public => true)
+    @group.is_public = false
+    @group.save.should be_false
+    @group.reload.is_public.should be_true
   end
   
   context "#peer_groups" do
