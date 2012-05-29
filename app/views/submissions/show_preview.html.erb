@@ -179,7 +179,7 @@
     });
     </script>
   <% end %>
-<% elsif @submission.has_submission? %>
+<% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>
   </div>

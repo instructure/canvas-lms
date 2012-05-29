@@ -52,7 +52,7 @@ module Api::V1::Collection
       item_data = item.collection_item_data
       hash['image_pending'] = item_data.image_pending
       image = item_data.image_attachment
-      hash['image_url'] = image && thumbnail_image_url(image, image.uuid)
+      hash['image_url'] = image && thumbnail_image_url(image, image.uuid, :size => CollectionItemData::THUMBNAIL_SIZE)
       hash.merge!(api_json(item_data, current_user, session, API_COLLECTION_ITEM_DATA_JSON_OPTS))
       hash
     end

@@ -43,14 +43,23 @@ shared_examples_for "discussions selenium tests" do
     end
   end
 
-  def add_reply(message = 'message!')
+  def add_reply(message = 'message!', attachment = nil)
     @last_entry ||= f('#discussion_topic')
     @last_entry.find_element(:css, '.discussion-reply-label').click
     type_in_tiny 'textarea', message
+
+    if attachment.present?
+      filename, fullpath, data = get_file(attachment)
+      @last_entry.find_element(:css, '.discussion-reply-add-attachment').click
+      @last_entry.find_element(:css, '.discussion-reply-attachments input').send_keys(fullpath)
+    end
+
     f('.discussion-reply-form').submit
     wait_for_ajax_requests
-    id = DiscussionEntry.last.id
-    @last_entry = fj ".entry[data-id=#{id}]"
+    keep_trying_until { 
+      id = DiscussionEntry.last.id 
+      @last_entry = fj ".entry[data-id=#{id}]"
+    }
   end
 
   def get_all_replies

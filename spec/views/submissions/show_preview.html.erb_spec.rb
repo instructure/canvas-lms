@@ -29,5 +29,15 @@ describe "/submissions/show_preview" do
     render "submissions/show_preview"
     response.should_not be_nil
   end
+
+  it "should give a user-friendly explaination why there's no preview" do
+    course_with_student
+    view_context
+    a = @course.assignments.create!(:title => "some assignment", :submission_types => 'on_paper')
+    assigns[:assignment] = a
+    assigns[:submission] = a.submit_homework(@user)
+    render "submissions/show_preview"
+    response.body.should match /No Preview Available/
+  end
 end
 

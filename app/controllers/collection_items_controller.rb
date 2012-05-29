@@ -71,8 +71,8 @@
 #
 #       // An image representation of the collection item. This will be in a
 #       // common web format such as png or jpeg. The resolution and geometry may depend on
-#       // the item, but Canvas will attempt to make it at least 200px in one
-#       // direction when possible.
+#       // the item, but Canvas will attempt to make it 640 pixels wide
+#       // when possible.
 #       image_url: "https://<canvas>/files/item_image.png",
 #
 #       // If true, the image for this item is still being processed and

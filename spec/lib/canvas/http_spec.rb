@@ -77,4 +77,29 @@ Location: http://www.example3.com/a})
       expect { Canvas::HTTP.get("http://www.example.com/a", {}, 2) }.to raise_error
     end
   end
+
+  describe ".clone_url_as_attachment" do
+    it "should reject invalid urls" do
+      Canvas::HTTP.clone_url_as_attachment("ftp://some/stuff").should == nil
+    end
+
+    it "should not clone non-200 responses" do
+      url = "http://example.com/test.png"
+      Canvas::HTTP.expects(:get).with(url).returns(mock('code' => '401'))
+      Canvas::HTTP.clone_url_as_attachment(url).should == nil
+    end
+
+    it "should detect the content_type from the body" do
+      url = "http://example.com/test.png"
+      Canvas::HTTP.expects(:get).with(url).returns(mock('code' => '200', 'body' => 'this is a jpeg'))
+      File.expects(:mime_type?).returns('image/jpeg')
+      att = Canvas::HTTP.clone_url_as_attachment(url)
+      att.should be_present
+      att.should be_new_record
+      att.content_type.should == 'image/jpeg'
+      att.context = Account.default
+      att.save!
+      att.open.read.should == 'this is a jpeg'
+    end
+  end
 end

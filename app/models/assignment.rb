@@ -1642,6 +1642,10 @@ class Assignment < ActiveRecord::Base
     submission_types && submission_types.strip != "" && submission_types != "none" && submission_types != 'not_graded' && submission_types != "on_paper" && submission_types != 'external_tool'
   end
 
+  def expects_external_submission?
+    submission_types == 'on_paper' || submission_types == 'external_tool'
+  end
+
   def <=>(comparable)
     sort_key <=> comparable.sort_key
   end
