@@ -89,6 +89,12 @@ module Api::V1::User
         json[:grades] = {
           :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),
         }
+
+        if has_grade_permissions?(user, enrollment)
+          %w{current_score final_score}.each do |method|
+            json[:grades][method.to_sym] = enrollment.send("computed_#{method}")
+          end
+        end
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
       user_includes = includes.include?('avatar_url') ? ['avatar_url'] : []
@@ -99,5 +105,14 @@ module Api::V1::User
         json[:locked] = lockedbysis
       end
     end
+  end
+
+  protected
+  def has_grade_permissions?(user, enrollment)
+    course = enrollment.course
+    enrollment_user = enrollment.user
+
+    (user == enrollment_user && !course.settings[:hide_final_grade]) ||
+     course.grants_rights?(user, :manage_grades, :view_all_grades).values.any?
   end
 end
