@@ -1022,6 +1022,42 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
     end
 
+    it "should import calendar events" do
+      body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+      cal = @copy_from.calendar_events.new
+      cal.title = "Calendar event"
+      cal.description = body_with_link % @copy_from.id
+      cal.start_at = 1.week.from_now
+      cal.save!
+      cal.all_day = true
+      cal.save!
+      cal2 = @copy_from.calendar_events.new
+      cal2.title = "Stupid events"
+      cal2.start_at = 5.minutes.from_now
+      cal2.end_at = 10.minutes.from_now
+      cal2.all_day = false
+      cal2.save!
+      cal3 = @copy_from.calendar_events.create!(:title => "deleted event")
+      cal3.destroy
+
+      run_course_copy
+
+      @copy_to.calendar_events.count.should == 2
+      cal_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal))
+      cal_2.title.should == cal.title
+      cal_2.start_at.to_i.should == cal.start_at.to_i
+      cal_2.end_at.to_i.should == cal.end_at.to_i
+      cal_2.all_day.should == true
+      cal_2.all_day_date.should == cal.all_day_date
+      cal_2.description = body_with_link % @copy_to.id
+
+      cal2_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal2))
+      cal2_2.title.should == cal2.title
+      cal2_2.start_at.to_i.should == cal2.start_at.to_i
+      cal2_2.end_at.to_i.should == cal2.end_at.to_i
+      cal2_2.description.should == ''
+    end
+
     context "copying frozen assignments" do
       append_before (:each) do
         @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => {"no_copying" => "yes"})
