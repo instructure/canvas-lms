@@ -25,6 +25,7 @@ class ApplicationController < ActionController::Base
 
   include Api
   include LocaleSelection
+  include Api::V1::User
   around_filter :set_locale
 
   helper :all
@@ -73,6 +74,7 @@ class ApplicationController < ActionController::Base
     # set some defaults
     @js_env ||= {
       :current_user_id => @current_user.try(:id),
+      :current_user => user_display_json(@current_user),
       :current_user_roles => @current_user.try(:roles),
       :context_asset_string => @context.try(:asset_string),
       :AUTHENTICITY_TOKEN => form_authenticity_token

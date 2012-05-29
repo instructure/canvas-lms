@@ -12,6 +12,12 @@
   color: $blueDark;
 }
 
+@mixin ellipsis {
+  white-space: nowrap;
+  overflow: hidden;              /* "overflow" value must be different from "visible" */
+  text-overflow: ellipsis;
+}
+
 @mixin box-with-header {
   border: solid 1px $borderColor;
   border-radius: 3px;
@@ -19,7 +25,9 @@
   @include gradient-vertical($white, $lightBackground);
 
   .box-header {
-    padding: 8px 20px;
+    & > * {
+      padding: 8px 20px;
+    }
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     @include content-callout();
@@ -32,43 +40,34 @@
     }
   }
 
+
   .box-content {
     padding: 10px 20px;
   }
-  .box-actions {
-    float: right;
-    list-style: none;
-    margin: 0;
-    margin-top: -8px; //undo the padding of .box-header
-    margin-right: -20px; //undo the padding of .box-header
-    li {
-      float: left;
-      &:last-child a {
-        border-right-width: 0;
-      }
+  .box-header-column {
+    display: table-cell;
+    width: 100000px;
+    vertical-align: middle;
+  }
+  a.box-header-column {
+    width: 0;
+    color: #9babb6;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    border-left: 1px solid #c3ccd5;
+    text-align: center;
+    font-size: 14px;
+    &:hover {
+      @include box-shadow(inset 0 1px 1px white);
+      @include gradient-vertical($contentCalloutColor, darken($contentCalloutColor, 8%));
+      text-decoration: none;
+      border-left-color: $borderColor;
     }
-    a {
-      display: block;
-      padding: 10px 10px;
-      height: 32px;
-      color: #9babb6;
-      text-shadow: 0 1px 0 rgba(255,255,255,.5);
-      border: 1px solid #c3ccd5;
-      border-width: 0 1px;
-      margin-left: -1px;
-      position: relative;
-      text-align: center;
-      &:hover{
-        @include box-shadow(inset 0 1px 1px white);
-        @include gradient-vertical($contentCalloutColor, darken($contentCalloutColor, 8%));
-        text-decoration: none;
-        border-color: $borderColor;
-        z-index: 1;
-      }
+    &:last-child {
+      border-top-right-radius: 3px; // prevent my corner from bleeding out when the hover bg is applied
     }
     i[class*="icon-"], i[class^="icon-"] {
-      display: block;
       margin: 0 auto;
+      opacity: .5;
     }
   }
 }

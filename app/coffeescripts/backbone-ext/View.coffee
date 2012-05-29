@@ -21,7 +21,8 @@ define [
 
     ##
     # Extends render to add support for chid views and element filtering
-    render: (opts = {}) ->
+    render: (opts = {}) =>
+      @$el.html @template(@toJSON()) if @template
       @filter() unless opts.noFilter is true
       @renderViews() if @options.views
       this
@@ -34,6 +35,12 @@ define [
     filter: ->
       @$('[data-bind]').each => @createBinding.apply this, arguments
       #@$('[data-behavior]').each => @_createBehavior.apply this, arguments
+
+    ##
+    # in charge of getting variables ready to pass to handlebars during render
+    # override with your own logic to do something fancy.
+    toJSON: ->
+      (@model ? @collection)?.toJSON arguments...
 
     ##
     # Renders all child views

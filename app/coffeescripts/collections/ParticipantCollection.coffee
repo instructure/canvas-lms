@@ -1,6 +1,6 @@
 define [
   'Backbone'
-  'compiled/discussions/Participant'
+  'compiled/models/Participant'
 ], (Backbone, Participant) ->
 
   class ParticipantCollection extends Backbone.Collection

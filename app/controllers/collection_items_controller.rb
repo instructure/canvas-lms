@@ -187,6 +187,10 @@ class CollectionItemsController < ApplicationController
   #        created_at: "2012-05-30T17:45:25Z",
   #     }
   def show
+    if !api_request?
+      render :template => "collections/collection_backbone_app"
+      return false
+    end
     find_item_and_collection
     if authorized_action(@item, @current_user, :read)
       render :json => collection_items_json([@item], @current_user, session).first

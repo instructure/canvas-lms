@@ -18,6 +18,9 @@ require [
   'compiled/license_help'
   'compiled/behaviors/ujsLinks'
   'compiled/behaviors/elementToggler'
+  'compiled/behaviors/upvote-item'
+  'compiled/behaviors/repin-item'
+  'compiled/behaviors/follow'
 
   # other stuff several bundles use
   'media_comments'

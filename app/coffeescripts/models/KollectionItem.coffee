@@ -1,12 +1,33 @@
 define [
   'Backbone'
   'underscore'
-], (Backbone, _) ->
+  'vendor/jquery.ba-tinypubsub'
+  'compiled/models/Topic'
+], (Backbone, _, {subscribe}, Topic) ->
 
   class KollectionItem  extends Backbone.Model
 
-    urlRoot: ->
-      "/api/v1/collections/#{@kollection.id}/items"
+
+    # non-standard url handling
+    parse: ->
+      res = super
+      @url = res.url if res.url
+      res
+
+    # same as Backbone's default url function but reverses the priority of
+    # this.collection.url and this.rootUrl
+    url: ->
+      if @isNew()
+        _.result(this.collection, 'url')
+      else
+        "/api/v1/collection_items/#{encodeURIComponent(@id)}"
+
+    initialize: ->
+      @commentTopic = new Topic
+      @commentTopic.url = => "/api/v1/collection_items/#{@id}/discussion_topics/self"
+      _.each ['upvote', 'deupvote'], (action) =>
+        subscribe "#{action}Item", (itemId) =>
+          @set('upvoted_by_user', action is 'upvote') if itemId == @id
 
     fetchLinkData: ->
       @set 'state', 'loading'
@@ -30,5 +51,5 @@ define [
 
     toJSON: ->
       res = super
-      res.collection_id = @kollection?.get 'id'
+      res.collection_id ||= @kollection?.get('id')
       res

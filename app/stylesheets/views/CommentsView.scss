@@ -1,0 +1,16 @@
+@import "environment.sass";
+.CommentsView {
+  .not-important {
+    color: #888;
+    font-size: 11px;
+  }
+  .image-block-image {
+    margin-right: 20px;
+  }
+  .comment {
+    margin-bottom: 20px;
+  }
+  [name=message] {
+    width: 98%;
+  }
+}

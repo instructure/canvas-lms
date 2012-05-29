@@ -1,6 +1,7 @@
+@import "environment.sass";
 .scripts-not-loaded .popup-container {display: none }
 
-.kollectionItemSaveView {
+.collection-item {
   input[name=user_comment] { margin-bottom: 0 }
   .thumbnail { width: 170px}
   .not-important {

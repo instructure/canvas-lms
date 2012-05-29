@@ -11,6 +11,7 @@ define [
     template: LinkDataViewTemplate
 
     events:
+      # TODO abstract handleClick
       'click [data-event]' : 'handleClick'
 
     initialize: ->
@@ -48,6 +49,7 @@ define [
     editDescription: ->
       @$('.description').hide().filter('textarea').show().focus()
 
+    # TODO abstract handleClick
     handleClick: (event) =>
       method = $(event.currentTarget).data 'event'
       preventDefault @[method] arguments...
