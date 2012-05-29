@@ -1749,7 +1749,7 @@ class Course < ActiveRecord::Base
     WikiPage.process_migration_course_outline(data, migration);migration.fast_update_progress(95)
 
     if !migration.copy_options || migration.is_set?(migration.copy_options[:everything]) || migration.is_set?(migration.copy_options[:all_course_settings])
-      import_settings_from_migration(data); migration.fast_update_progress(96)
+      import_settings_from_migration(data, migration); migration.fast_update_progress(96)
     end
 
     begin
@@ -1802,17 +1802,37 @@ class Course < ActiveRecord::Base
   attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash, :content_migration
   attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :assignment_group_no_drop_assignments
 
-  def import_settings_from_migration(data)
+  def import_settings_from_migration(data, migration)
     return unless data[:course]
     settings = data[:course]
     self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
     if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
       self.tab_configuration = settings[:tab_configuration]
     end
+    if settings[:storage_quota] && ( migration.for_course_copy? || self.account.grants_right?(migration.user, nil, :manage_courses))
+      self.storage_quota = settings[:storage_quota]
+    end
+    self.settings[:hide_final_grade] = !!settings[:hide_final_grade] unless settings[:hide_final_grade].nil?
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
       self.send("#{key}=", val)
+    end
+    if settings[:grading_standard_enabled]
+      self.grading_standard_enabled = true
+      if settings[:grading_standard_identifier_ref]
+        if gs = self.grading_standards.find_by_migration_id(settings[:grading_standard_identifier_ref])
+          self.grading_standard = gs
+        else
+          migration.add_warning("Couldn't find copied grading standard for the course.")
+        end
+      elsif settings[:grading_standard_id]
+        if gs = GradingStandard.sorted_standards_for(self).find{|s|s.id == settings[:grading_standard_id]}
+          self.grading_standard = gs
+        else
+          migration.add_warning("Couldn't find account grading standard for the course.")
+        end
+      end
     end
   end
 

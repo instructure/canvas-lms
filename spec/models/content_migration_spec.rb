@@ -25,7 +25,7 @@ describe ContentMigration do
       course_with_teacher(:course_name => "from course", :active_all => true)
       @copy_from = @course
 
-      course_with_teacher(:user => @user, :course_name => "to course")
+      course_with_teacher(:user => @user, :course_name => "tocourse", :course_code => "tocourse")
       @copy_to = @course
 
       @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
@@ -88,16 +88,97 @@ describe ContentMigration do
       @copy_to.syllabus_body.should match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
     end
 
+    def make_grading_standard(context)
+      gs = context.grading_standards.new
+      gs.title = "Standard eh"
+      gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
+      gs.save!
+      gs
+    end
     it "should copy course attributes" do
-      @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      #set all the possible values to non-default values
+      @copy_from.start_at = 5.minutes.ago
+      @copy_from.conclude_at = 1.month.from_now
+      @copy_from.is_public = false
+      @copy_from.name = "haha copy from test &amp;"
+      @copy_from.course_code = 'something funny'
+      @copy_from.publish_grades_immediately = false
+      @copy_from.allow_student_wiki_edits = true
+      @copy_from.allow_student_assignment_edits = true
+      @copy_from.hashtag = 'oi'
+      @copy_from.show_public_context_messages = false
+      @copy_from.allow_student_forum_attachments = false
+      @copy_from.default_wiki_editing_roles = 'teachers'
+      @copy_from.allow_student_organized_groups = false
+      @copy_from.default_view = 'modules'
+      @copy_from.show_all_discussion_entries = false
+      @copy_from.open_enrollment = true
+      @copy_from.storage_quota = 444
+      @copy_from.allow_wiki_comments = true
+      @copy_from.turnitin_comments = "Don't plagiarize"
+      @copy_from.self_enrollment = true
+      @copy_from.license = "cc_by_nc_nd"
       @copy_from.locale = "es"
-      @copy_from.save
+      @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      @copy_from.settings[:hide_final_grade] = true
+      gs = make_grading_standard(@copy_from)
+      @copy_from.grading_standard = gs
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
+
+      body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+  <div>
+    <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+    <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+  </div>}
+      @copy_from.syllabus_body = body_with_link % @copy_from.id
 
       run_course_copy
 
-      @copy_to.locale.should == 'es'
+      #compare settings
+      @copy_to.conclude_at.should == nil
+      @copy_to.start_at.should == nil
+      @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
+      @copy_to.storage_quota.should == 444
+      @copy_to.settings[:hide_final_grade].should == true
+      @copy_to.grading_standard_enabled.should == true
+      gs_2 = @copy_to.grading_standards.find_by_migration_id(mig_id(gs))
+      gs_2.data.should == gs.data
+      @copy_to.grading_standard.should == gs_2
+      @copy_to.name.should == "tocourse"
+      @copy_to.course_code.should == "tocourse"
+      atts = Course.clonable_attributes
+      atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
+      atts.each do |att|
+        @copy_to.send(att).should == @copy_from.send(att)
+      end
       @copy_to.tab_configuration.should == @copy_from.tab_configuration
+     end
+
+    it "should retain reference to account grading standard" do
+      gs = make_grading_standard(@copy_from.root_account)
+      @copy_from.grading_standard = gs
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.grading_standard.should == gs
     end
+
+    it "should create a warning if an account grading standard can't be found" do
+      gs = make_grading_standard(@copy_from.root_account)
+      @copy_from.grading_standard = gs
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
+
+      gs.delete
+
+      run_course_copy(["Couldn't find account grading standard for the course."])
+
+      @copy_to.grading_standard.should == nil
+    end
+
 
     it "should copy external tools" do
       tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
@@ -600,7 +681,7 @@ describe ContentMigration do
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.gsub("/courses/#{@copy_from.id}/file_contents/course%20files",'')
     end
 
-    it "should included implied files for course exports" do
+    it "should include implied files for course exports" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att3 = Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('3333'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)

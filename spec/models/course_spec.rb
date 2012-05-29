@@ -2518,6 +2518,34 @@ describe Course, ".import_from_migration" do
     @course.course_imports.first.update_attribute(:workflow_state, 'failed')
     @course.should_not have_open_course_imports
   end
+
+  describe "setting storage quota" do
+    before do
+      course_with_teacher
+      @course.storage_quota = 1
+      @cm = ContentMigration.new(:context => @course, :user => @user, :copy_options => {:everything => "1"})
+      @cm.user = @user
+      @cm.save!
+    end
+
+    it "should not adjust for unauthorized user" do
+      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
+      @course.storage_quota.should == 1
+    end
+
+    it "should adjust for authorized user" do
+      account_admin_user(:user => @user)
+      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
+      @course.storage_quota.should == 4
+    end
+
+    it "should be set for course copy" do
+      @cm.source_course = @course
+      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
+      @course.storage_quota.should == 4
+    end
+  end
+
 end
 
 describe Course, "enrollments" do
