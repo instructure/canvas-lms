@@ -15,7 +15,7 @@ define [
     contextSearchOptions:
       fakeInputWidth: '100%'
       contexts: ENV.CONTEXTS
-      placeholder: "Type the name of a class to assign this too..."
+      placeholder: "Type the name of a class to assign this to..."
       selector:
         baseData:
           type: 'course'

@@ -37,6 +37,7 @@ $boxSizingBaseLineHeight: $baseLineHeight + 8;
 /* kill bootstrap stuff */
 .quickStartBar .nav {
   margin: 0;
+  margin-left: 20px;
   border: none;
 }
 
@@ -59,7 +60,7 @@ $boxSizingBaseLineHeight: $baseLineHeight + 8;
 .quickStartBar .new-text {
   font-size: 16px;
   display: block;
-  padding: 4px 4px 4px 43px;
+  padding: 9px 4px 4px 22px;
   color: #000;
 }
 

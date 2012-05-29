@@ -2,8 +2,9 @@ define [
   'Backbone',
   'i18n!dashboard'
   'compiled/home/views/quickStartBar/allViews'
+  'jst/quickStartBar/QuickStartBarView'
   'formToJSON'
-], ({View, Model}, I18n, allViews) ->
+], ({View, Model}, I18n, allViews, template) ->
 
 	capitalize = (str) ->
     str.replace /\b[a-z]/g, (match) -> match.toUpperCase()
@@ -74,37 +75,8 @@ define [
       @$newItemFormContainer = $ '.newItemFormContainer'
 
     render: ->
-      @$el.html """
-        <div class="row-fluid pick-an-item border border-b box-shadow">
-          <div class="span2">
-            <span class="new-text">#{I18n.t 'new', 'New'}:</span>
-          </div>
-          <div class=span10>
-            <ul class="nav nav-tabs">
-              <li><a data-type="assignment" href="#"><i class="icon-assignment"></i>#{I18n.t 'assignment', 'Assignment'}</a></li>
-              <li><a data-type="discussion" href="#"><i class="icon-discussion"></i>#{I18n.t 'discussion', 'Discussion'}</a></li>
-              <li><a data-type="announcement" href="#"><i class="icon-announcement"></i>#{I18n.t 'announcement', 'Announcement'}</a></li>
-              <li><a data-type="message" href="#"><i class="icon-message"></i>#{I18n.t 'message', 'Message'}</a></li>
-              <li><a data-type="pin" href="#"><i class="icon-pin"></i>#{I18n.t 'pin', 'Pin'}</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="v-gutter">
-          <div class="container-fluid">
-            <div class="image-block control-group">
-              <div class="image-block-image">
-                <i class="item-type-image icon-large-"></i>
-              </div>
-
-              <div class="newItemFormContainer image-block-content triangle-box"></div>
-
-            </div>
-          </div>
-        </div>
-      """
+      @$el.html template()
       @cacheElements()
-      # get the right form in there after render
       @switchFormView()
       super
 

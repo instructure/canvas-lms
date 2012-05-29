@@ -4,6 +4,7 @@ define [
   'compiled/home/views/quickStartBar/AnnouncementView'
   'compiled/home/views/quickStartBar/MessageView'
   'compiled/home/views/quickStartBar/PinView'
-], (AssignmentView, DiscussionView, AnnouncementView, MessageView, PinView) ->
-  {AssignmentView, DiscussionView, AnnouncementView, MessageView, PinView}
+  'compiled/home/views/quickStartBar/EventView'
+], (AssignmentView, DiscussionView, AnnouncementView, MessageView, PinView, EventView) ->
+  {AssignmentView, DiscussionView, AnnouncementView, MessageView, PinView, EventView}
 
