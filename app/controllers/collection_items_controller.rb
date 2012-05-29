@@ -33,7 +33,7 @@
 # be the collection item, and the id of the topic is "self". For example, the
 # DiscussionTopicsApiController#view endpoint looks like this:
 #
-#   /api/v1/collection_items/<id>/discussion_topics/self/view
+#     /api/v1/collection_items/<id>/discussion_topics/self/view
 #
 # A Collection Item object looks like:
 #
@@ -98,10 +98,10 @@
 #       html_preview: "<iframe>...</iframe>",
 #
 #       // The API URL for this item. Used to clone the collection item.
-#       url: "https://<canvas>/api/v1/collections/2/items/7"
+#       url: "https://<canvas>/api/v1/collections/items/7"
 #     }
 class CollectionItemsController < ApplicationController
-  before_filter :require_collection, :except => [:link_data]
+  before_filter :require_collection, :only => [:index, :create]
 
   include Api::V1::Collection
 
@@ -129,11 +129,11 @@ class CollectionItemsController < ApplicationController
   #          root_item_id: 3,
   #          image_url: "https://<canvas>/files/item_image.png",
   #          description: "some block of plain text",
-  #          url: "https://<canvas>/api/v1/collections/2/items/7"
+  #          url: "https://<canvas>/api/v1/collections/items/7"
   #       }
   #     ]
   def index
-    pagination_route = api_v1_collection_items_url(@collection)
+    pagination_route = api_v1_collection_items_list_url(@collection)
     if authorized_action(@collection, @current_user, :read)
       @items = Api.paginate(@collection.collection_items.active.newest_first, self, pagination_route)
       render :json => collection_items_json(@items, @current_user, session)
@@ -147,7 +147,7 @@ class CollectionItemsController < ApplicationController
   # Returns an individual collection item. The user must have read access to the collection.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id> \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #     -H 'Authorization: Bearer <token>'
   #
   # @example_response
@@ -162,11 +162,11 @@ class CollectionItemsController < ApplicationController
   #        root_item_id: 3,
   #        image_url: "https://<canvas>/files/item_image.png",
   #        description: "some block of plain text",
-  #        url: "https://<canvas>/api/v1/collections/2/items/7"
+  #        url: "https://<canvas>/api/v1/collections/items/7"
   #     }
   def show
+    find_item_and_collection
     if authorized_action(@collection, @current_user, :read)
-      @item = find_item
       render :json => collection_items_json([@item], @current_user, session).first
     end
   end
@@ -190,7 +190,7 @@ class CollectionItemsController < ApplicationController
   #
   # @argument image_url The URL of the image to use for this item. If no image
   #   url is provided, canvas will try to automatically determine an image
-  #   representation for the link. This parameter is ignored of the new item is
+  #   representation for the link. This parameter is ignored if the new item is
   #   a clone of an existing item.
   #
   # @example_request
@@ -201,7 +201,7 @@ class CollectionItemsController < ApplicationController
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
-  #          -F link_url="https://<canvas>/api/v1/collections/1/items/3" \ 
+  #          -F link_url="https://<canvas>/api/v1/collections/items/3" \ 
   #          -F description="clone of some other item" \ 
   #          -H 'Authorization: Bearer <token>'
   #
@@ -231,14 +231,14 @@ class CollectionItemsController < ApplicationController
   # @argument description
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id> \ 
+  #     curl https://<canvas>/api/v1/collectionss/items/<item_id> \ 
   #          -X PUT \ 
   #          -F description='edited description' \ 
   #          -H 'Authorization: Bearer <token>'
   #
   def update
+    find_item_and_collection
     if authorized_action(@collection, @current_user, :update)
-      @item = find_item
       if @item.update_attributes(params.slice(*ITEM_SETTABLE_ATTRIBUTES))
         render :json => collection_items_json([@item], @current_user, session).first
       else
@@ -255,12 +255,12 @@ class CollectionItemsController < ApplicationController
   # clones of the item in other collections.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id> \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
   def destroy
+    find_item_and_collection
     if authorized_action(@collection, @current_user, :update)
-      @item = find_item
       if @item.destroy
         render :json => collection_items_json([@item], @current_user, session).first
       else
@@ -282,7 +282,7 @@ class CollectionItemsController < ApplicationController
   # to determine if the user has already upvoted the item.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id>/upvote \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id>/upvote \ 
   #          -X PUT \ 
   #          -H 'Content-Length: 0' \ 
   #          -H 'Authorization: Bearer <token>'
@@ -295,8 +295,8 @@ class CollectionItemsController < ApplicationController
   #       created_at: "2012-05-03T18:12:18Z",
   #     }
   def upvote
+    find_item_and_collection
     if authorized_action(@collection, @current_user, :read)
-      @item = find_item
       @upvote = find_upvote
       @upvote ||= @item.collection_item_data.collection_item_upvotes.create!({ :user => @current_user })
       render :json => collection_item_upvote_json(@item, @upvote, @current_user, session)
@@ -311,12 +311,12 @@ class CollectionItemsController < ApplicationController
   # has not upvoted this item.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id>/upvote \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id>/upvote \ 
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
   def remove_upvote
+    find_item_and_collection
     if authorized_action(@collection, @current_user, :read)
-      @item = find_item
       @upvote = find_upvote
       if @upvote
         @upvote.destroy
@@ -348,8 +348,9 @@ class CollectionItemsController < ApplicationController
     @collection = Collection.active.find(params[:collection_id])
   end
 
-  def find_item
-    @collection.collection_items.active.find(params[:item_id])
+  def find_item_and_collection
+    @item = CollectionItem.active.find(params[:item_id])
+    @collection = @item.active_collection
   end
 
   def find_upvote

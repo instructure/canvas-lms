@@ -842,9 +842,11 @@ ActionController::Routing::Routes.draw do |map|
       collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_"
 
       collections.with_options(:controller => :collection_items) do |items|
-        items.resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items
-        items.put "collections/:collection_id/items/:item_id/upvote", :action => :upvote
-        items.delete "collections/:collection_id/items/:item_id/upvote", :action => :remove_upvote
+        items.get "collections/:collection_id/items", :action => :index, :path_name => 'collection_items_list'
+        items.resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items, :only => [:index, :create]
+        items.resources :items, :path_prefix => "collections", :name_prefix => "collection_", :controller => :collection_items, :except => [:index, :create]
+        items.put "collections/items/:item_id/upvote", :action => :upvote
+        items.delete "collections/items/:item_id/upvote", :action => :remove_upvote
       end
     end
 

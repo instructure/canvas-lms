@@ -33,6 +33,13 @@ class CollectionItem < ActiveRecord::Base
 
   after_create :set_data_root_item
 
+  # raises RecordNotFound if the collection is marked deleted or doesn't exist
+  def active_collection
+    col = self.collection
+    raise ActiveRecord::RecordNotFound if !col || col.try(:deleted?)
+    col
+  end
+
   def set_data_root_item
     if self.collection_item_data && self.collection_item_data.root_item_id.nil?
       self.collection_item_data.update_attribute(:root_item_id, self.id)

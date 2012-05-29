@@ -72,9 +72,9 @@ class CollectionItemData < ActiveRecord::Base
   def self.data_for_url(url, creating_user)
     # TODO: handle other canvas hostnames
     # TODO: restrict this to be more precise on what urls it will accept as a clone
-    if url.match(%r{https?://#{Regexp.escape HostUrl.default_host}/api/v1/collections/(\d+)/items/(\d+)$})
-      collection = Collection.active.find($1)
-      original_item = collection.collection_items.active.find($2)
+    if url.match(%r{https?://#{Regexp.escape HostUrl.default_host}/api/v1/collections/items/(\d+)$})
+      original_item = CollectionItem.active.find($1)
+      collection = original_item.active_collection
       if collection.grants_right?(@current_user, :read)
         return original_item.collection_item_data
       else

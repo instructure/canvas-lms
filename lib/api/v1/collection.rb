@@ -48,7 +48,7 @@ module Api::V1::Collection
 
     items.map do |item|
       hash = api_json(item, current_user, session, API_COLLECTION_ITEM_JSON_OPTS)
-      hash['url'] = api_v1_collection_item_url(item.collection, item)
+      hash['url'] = api_v1_collection_item_url(item)
       item_data = item.collection_item_data
       hash['image_pending'] = item_data.image_pending
       image = item_data.image_attachment

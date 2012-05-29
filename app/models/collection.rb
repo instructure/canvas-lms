@@ -44,7 +44,6 @@ class Collection < ActiveRecord::Base
 
   def destroy
     self.workflow_state = 'deleted'
-    collection_items.active.find_each { |item| item.destroy }
     save!
   end
 

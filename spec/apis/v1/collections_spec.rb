@@ -170,7 +170,7 @@ describe "Collections API", :type => :integration do
         'image_pending' => item.data.image_pending,
         'html_preview' => item.data.html_preview,
         'description' => item.description,
-        'url' => "http://www.example.com/api/v1/collections/#{item.collection_id}/items/#{item.id}",
+        'url' => "http://www.example.com/api/v1/collections/items/#{item.id}",
       }
     end
 
@@ -189,7 +189,7 @@ describe "Collections API", :type => :integration do
       end
 
       it "should allow cloning an existing item" do
-        json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/#{@i3.collection_id}/items/#{@i3.id}", :description => 'cloned' })
+        json = api_call(:post, @items1_path, @items1_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/items/#{@i3.id}", :description => 'cloned' })
         json['post_count'].should == 3
         new_item = @c1.collection_items.last(:order => :id)
         new_item.collection_item_data.should == @i3.collection_item_data
@@ -199,7 +199,7 @@ describe "Collections API", :type => :integration do
       it "should not allow cloning an item the user can't access" do
         @user = @user2
         expect {
-          json = api_call(:post, @items3_path, @items3_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/#{@i1.collection_id}/items/#{@i1.id}", :description => 'cloned' }, {}, :expected_status => 401)
+          json = api_call(:post, @items3_path, @items3_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/items/#{@i1.id}", :description => 'cloned' }, {}, :expected_status => 401)
         }.to change(CollectionItem, :count).by(0)
       end
 
@@ -223,7 +223,7 @@ describe "Collections API", :type => :integration do
           @item.reload.data.image_pending.should == false
           @item.data.image_attachment.should == @att
 
-          json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
+          json = api_call(:get, "/api/v1/collections/items/#{@item.id}", { :controller => "collection_items", :item_id => @item.to_param, :action => "show", :format => "json" })
           json['image_pending'].should == false
           json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}?size=640x%3E"
         end
@@ -241,7 +241,7 @@ describe "Collections API", :type => :integration do
           @att.should be_present
           @att.context.should == Account.default
 
-          json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
+          json = api_call(:get, "/api/v1/collections/items/#{@item.id}", { :controller => "collection_items", :item_id => @item.to_param, :action => "show", :format => "json" })
           json['image_pending'].should == false
           json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}?size=640x%3E"
         end
@@ -262,7 +262,7 @@ describe "Collections API", :type => :integration do
 
           @item.data.html_preview.should == "<iframe>test</iframe>"
 
-          json = api_call(:get, "/api/v1/collections/#{@c1.id}/items/#{@item.id}", @items1_path_options.merge(:item_id => @item.to_param, :action => "show"))
+          json = api_call(:get, "/api/v1/collections/items/#{@item.id}", { :controller => "collection_items", :item_id => @item.to_param, :action => "show", :format => "json" })
           json['image_pending'].should == false
           json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}?size=640x%3E"
         end
@@ -270,7 +270,7 @@ describe "Collections API", :type => :integration do
     end
 
     it "should allow editing mutable fields" do
-      json = api_call(:put, @items1_path + "/#{@i1.id}", @items1_path_options.merge(:item_id => @i1.to_param, :action => "update"), { :description => "modified", :link_url => 'cant change', :item_type => 'cant change', :image_url => "http://www.example.com/cant_change" })
+      json = api_call(:put, "/api/v1/collections/items/#{@i1.id}", { :controller => "collection_items", :item_id => @i1.to_param, :action => "update", :format => "json" }, { :description => "modified", :link_url => 'cant change', :item_type => 'cant change', :image_url => "http://www.example.com/cant_change" })
       json.should == item_json(@i1.reload)
       @i1.description.should == "modified"
       @i1.collection_item_data.item_type.should == "url"
@@ -278,8 +278,17 @@ describe "Collections API", :type => :integration do
     end
 
     it "should allow deleting an owned item" do
-      json = api_call(:delete, @items1_path + "/#{@i1.id}", @items1_path_options.merge(:item_id => @i1.to_param, :action => "destroy"))
+      json = api_call(:delete, "/api/v1/collections/items/#{@i1.id}", { :controller => "collection_items", :item_id => @i1.to_param, :action => "destroy", :format => "json" })
       @i1.reload.state.should == :deleted
+    end
+
+    it "should not allow getting from a deleted collection" do
+      @i1.collection.destroy
+      # deleting the collection doesn't mark all the items as deleted, though
+      # they can't be retrieved through the api
+      # this makes undeleting work better
+      @i1.reload.should be_active
+      json = api_call(:get, "/api/v1/collections/items/#{@i1.id}", { :controller => "collection_items", :item_id => @i1.to_param, :action => "show", :format => "json" }, {}, {}, :expected_status => 404)
     end
 
     context "deleted item" do
@@ -293,7 +302,7 @@ describe "Collections API", :type => :integration do
       end
 
       it "should not allow getting" do
-        json = api_call(:get, @items1_path + "/#{@i1.id}", @items1_path_options.merge(:item_id => @i1.to_param, :action => "show"), {}, {}, :expected_status => 404)
+        json = api_call(:get, "/api/v1/collections/items/#{@i1.id}", { :controller => "collection_items", :item_id => @i1.to_param, :action => "show", :format => "json" }, {}, {}, :expected_status => 404)
       end
     end
 
@@ -316,7 +325,7 @@ describe "Collections API", :type => :integration do
     context "upvoting" do
       it "should allow upvoting an item" do
         @user = @user2
-        json = api_call(:put, "/api/v1/collections/#{@c2.id}/items/#{@i3.id}/upvote", @items2_path_options.merge(:action => "upvote", :item_id => @i3.to_param))
+        json = api_call(:put, "/api/v1/collections/items/#{@i3.id}/upvote", { :controller => "collection_items", :action => "upvote", :item_id => @i3.to_param, :format => "json" })
         json.slice('item_id', 'root_item_id', 'user_id').should == {
           'item_id' => @i3.id,
           'root_item_id' => @i3.id,
@@ -325,7 +334,7 @@ describe "Collections API", :type => :integration do
         @i3.reload.collection_item_data.upvote_count.should == 1
 
         # upvoting again is a no-op
-        json = api_call(:put, "/api/v1/collections/#{@c2.id}/items/#{@i3.id}/upvote", @items2_path_options.merge(:action => "upvote", :item_id => @i3.to_param))
+        json = api_call(:put, "/api/v1/collections/items/#{@i3.id}/upvote", { :controller => "collection_items", :action => "upvote", :item_id => @i3.to_param, :format => "json" })
         json.slice('item_id', 'root_item_id', 'user_id').should == {
           'item_id' => @i3.id,
           'root_item_id' => @i3.id,
@@ -336,7 +345,7 @@ describe "Collections API", :type => :integration do
 
       it "should not allow upvoting a non-visible item" do
         @user = @user2
-        json = api_call(:put, "/api/v1/collections/#{@c1.id}/items/#{@i1.id}/upvote", @items1_path_options.merge(:action => "upvote", :item_id => @i1.to_param), {}, {}, :expected_status => 401)
+        json = api_call(:put, "/api/v1/collections/items/#{@i1.id}/upvote", { :controller => "collection_items", :action => "upvote", :item_id => @i1.to_param, :format => "json" }, {}, {}, :expected_status => 401)
         @i1.reload.collection_item_data.upvote_count.should == 0
       end
     end
@@ -349,12 +358,12 @@ describe "Collections API", :type => :integration do
       it "should allow removing an upvote" do
         @i3.collection_item_data.collection_item_upvotes.create!(:user => @user)
         @i3.reload.collection_item_data.upvote_count.should == 1
-        json = api_call(:delete, "/api/v1/collections/#{@c2.id}/items/#{@i3.id}/upvote", @items2_path_options.merge(:action => "remove_upvote", :item_id => @i3.to_param))
+        json = api_call(:delete, "/api/v1/collections/items/#{@i3.id}/upvote", { :controller => "collection_items", :action => "remove_upvote", :item_id => @i3.to_param, :format => "json" })
         @i3.reload.collection_item_data.upvote_count.should == 0
       end
 
       it "should ignore if the user hasn't upvoted the item" do
-        json = api_call(:delete, "/api/v1/collections/#{@c2.id}/items/#{@i3.id}/upvote", @items2_path_options.merge(:action => "remove_upvote", :item_id => @i3.to_param))
+        json = api_call(:delete, "/api/v1/collections/items/#{@i3.id}/upvote", { :controller => "collection_items", :action => "remove_upvote", :item_id => @i3.to_param, :format => "json" })
       end
     end
   end
