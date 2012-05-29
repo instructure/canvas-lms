@@ -1020,7 +1020,7 @@ define([
     for(var idx in prevList) {
       var $obj = prevList[idx],
           $box = $obj.data('associated_error_box');
-      if($box.length && $box[0].parentNode) {
+      if($box && $box.length && $box[0].parentNode) {
         list.push($obj);
         if($obj.filter(":visible").length) {
           var offset = $obj.offset();

@@ -25,7 +25,7 @@ class User < ActiveRecord::Base
 
   include Context
 
-  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio
+  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code
   attr_accessor :original_id, :menu_data
 
   before_save :infer_defaults
@@ -195,13 +195,39 @@ class User < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
+    :require_self_enrollment_code, :birthdate_min_years, :self_enrollment_code,
+    :self_enrollment_course, :root_account
+
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  validates_presence_of :name, :if => :require_presence_of_name
   validates_locale :locale, :browser_locale, :allow_nil => true
+  validates_acceptance_of :terms_of_use, :if => :require_acceptance_of_terms, :allow_nil => false
+  validates_each :birthdate do |record, attr, value|
+    next unless record.birthdate_min_years
+    if value
+      record.errors.add(attr, "too_young") if value > record.birthdate_min_years.years.ago
+    else
+      record.errors.add(attr, "blank")
+    end
+  end
+  validates_each :self_enrollment_code do |record, attr, value|
+    next unless record.require_self_enrollment_code
+    if value.blank?
+      record.errors.add(attr, "blank")
+    elsif record.root_account
+      record.self_enrollment_course = record.root_account.all_courses.find_by_self_enrollment_code(value)
+      record.errors.add(attr, "invalid") unless record.self_enrollment_course
+    else
+      record.errors.add(attr, "account_required")
+    end
+  end
 
   before_save :assign_uuid
   before_save :update_avatar_image
   after_save :generate_reminders_if_changed
   after_save :update_account_associations_if_necessary
+  after_save :self_enroll_if_necessary
 
   def self.skip_updating_account_associations(&block)
     @skip_updating_account_associations = true
@@ -1507,6 +1533,11 @@ class User < ActiveRecord::Base
       r.update_for(assignment)
     end
     save
+  end
+
+  def self_enroll_if_necessary
+    return unless @self_enrollment_course
+    @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
   end
 
   def time_difference_from_date(hash)

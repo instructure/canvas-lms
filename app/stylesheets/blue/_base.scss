@@ -76,3 +76,25 @@ h1 {
   display: none;
 }
 
+.error_box {
+  position: absolute;
+  top: -1000px;
+  left: -100px;
+  z-index: 11;
+  max-width: 200px;
+  min-width: 100px;
+  .error_text {
+    max-height: 100px;
+    overflow: auto;
+    margin-bottom: 10px;
+    background-color: #edd;
+    border: 2px solid #a44;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  .error_bottom {
+    position: absolute;
+    bottom: 0;
+    left: 4px;
+  }
+}

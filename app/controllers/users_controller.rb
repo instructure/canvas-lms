@@ -540,9 +540,9 @@ class UsersController < ApplicationController
   end
 
   def new
-    @user = User.new
-    @pseudonym = @current_user ? @current_user.pseudonyms.build(:account => @context) : Pseudonym.new(:account => @context)
-    render :action => "new"
+    return redirect_to(root_url) if @current_user
+    @use_new_styles = true
+    render :layout => 'bare'
   end
 
   include Api::V1::User
@@ -556,18 +556,23 @@ class UsersController < ApplicationController
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
   # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
   # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
+  # @argument user[birthdate] [Optional] The user's birth date.
   # @argument pseudonym[unique_id] User's login ID.
   # @argument pseudonym[password] [Optional] User's password.
   # @argument pseudonym[sis_user_id] [Optional] [Integer] SIS ID for the user's account. To set this parameter, the caller must be able to manage SIS permissions.
-  # @argument pseudonym[:send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
+  # @argument pseudonym[send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
   def create
     # Look for an incomplete registration with this pseudonym
     @pseudonym = @context.pseudonyms.active.custom_find_by_unique_id(params[:pseudonym][:unique_id])
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
     @pseudonym = nil if @pseudonym && !['creation_pending', 'pre_registered', 'pending_approval'].include?(@pseudonym.user.workflow_state)
 
+    manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
+    self_enrollment = params[:self_enrollment].present?
+    allow_password = self_enrollment || manage_user_logins
+
     notify = params[:pseudonym].delete(:send_confirmation) == '1'
-    notify = :self_registration unless @context.grants_right?(@current_user, session, :manage_user_logins)
+    notify = :self_registration unless manage_user_logins
     email = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
 
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
@@ -575,16 +580,56 @@ class UsersController < ApplicationController
 
     @user = @pseudonym && @pseudonym.user
     @user ||= User.new
-    @user.attributes = params[:user]
+    if params[:user]
+      params[:user].delete(:self_enrollment_code) unless self_enrollment
+      @user.attributes = params[:user]
+    end
     @user.name ||= params[:pseudonym][:unique_id]
-    @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
-    @user.save!
+    unless @user.registered?
+      @user.workflow_state = if self_enrollment
+        # no email confirmation required (self_enrollment_code and password
+        # validations will ensure everything is legit)
+        'registered'
+      elsif notify == :self_registration && @user.registration_approval_required?
+        'pending_approval'
+      else
+        'pre_registered'
+      end
+    end
+    if !manage_user_logins # i.e. a new user signing up
+      @user.require_acceptance_of_terms = true
+      @user.require_presence_of_name = true
+      @user.require_self_enrollment_code = self_enrollment
+      @user.root_account = @domain_root_account
+      @user.birthdate_min_years = if params[:enrollment_type] == 'student'
+        self_enrollment ? 13 : 18
+      end
+    end
+    
+    @observee = nil
+    if params[:enrollment_type] == 'observer'
+      # TODO: SAML/CAS support
+      if observee = Pseudonym.authenticate(params[:observee] || {},
+          [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
+        @user.observed_users << observee.user unless @user.observed_users.include?(observee.user)
+      else
+        @observee = Pseudonym.new
+        @observee.errors.add('unique_id', 'bad_credentials')
+      end
+    end
 
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
+    @pseudonym.require_password = self_enrollment
     # pre-populate the reverse association
     @pseudonym.user = @user
     # don't require password_confirmation on api calls
     params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
+    # don't allow password setting for new users that are not self-enrolling
+    # in a course (they need to go the email route)
+    unless allow_password
+      params[:pseudonym].delete(:password)
+      params[:pseudonym].delete(:password_confirmation)
+    end
     @pseudonym.attributes = params[:pseudonym]
     @pseudonym.sis_user_id = sis_user_id
 
@@ -594,12 +639,16 @@ class UsersController < ApplicationController
     @cc ||= @user.communication_channels.build(:path => email)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
-    if @pseudonym.valid?
-      @pseudonym.save_without_session_maintenance
-      @cc.save!
+
+    if @user.valid? && @pseudonym.valid? && @observee.nil?
+      # saving the user takes care of the @pseudonym and @cc, so we can't call
+      # save_without_session_maintenance directly. we only want to auto-log-in
+      # if a student is self enrolling in a course
+      @pseudonym.send(:skip_session_maintenance=, true) unless self_enrollment # automagically logged in
+      @user.save!
       message_sent = false
       if notify == :self_registration
-        unless @user.workflow_state == 'pending_approval'
+        unless @user.pending_approval? || @user.registered?
           message_sent = true
           @pseudonym.send_confirmation!
         end
@@ -612,24 +661,21 @@ class UsersController < ApplicationController
         @cc.send_merge_notification! if other_cc_count != 0
       end
 
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent }
-      respond_to do |format|
-        flash[:user_id] = @user.id
-        flash[:pseudonym_id] = @pseudonym.id
-        format.html { redirect_to registered_url }
-        format.json {
-          if api_request?
-            render(:json => user_json(@user, @current_user, session, %w{locale}))
-          else
-            render(:json => data)
-          end
-        }
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent }
+      if api_request?
+        render(:json => user_json(@user, @current_user, session, %w{locale}))
+      else
+        render(:json => data)
       end
     else
-      respond_to do |format|
-        format.html { render :action => :new }
-        format.json { render :json => @pseudonym.errors.to_json, :status => :bad_request }
-      end
+      errors = {
+        :errors => {
+          :user => @user.errors.as_json[:errors],
+          :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
+          :observee => @observee ? @observee.errors.as_json[:errors] : {}
+        }
+      }
+      render :json => errors, :status => :bad_request
     end
   end
 

@@ -154,6 +154,8 @@ stylesheets:
     - public/stylesheets/compiled/dashboard.css
     - public/stylesheets/compiled/quick_start_bar.css
     - public/stylesheets/compiled/activity_feed.css
+  registration:
+    - public/stylesheets/compiled/registration.css
   profile:
     - public/stylesheets/compiled/profile/show.css
   profile_edit:

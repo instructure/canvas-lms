@@ -451,8 +451,8 @@ describe "Users API", :type => :integration do
       )
       response.status.should eql "400 Bad Request"
       errors = JSON.parse(response.body)['errors']
-      errors.length.should eql 1
-      errors['unique_id'].length.should be > 0
+      errors['pseudonym'].should be_present
+      errors['pseudonym']['unique_id'].should be_present
     end
   end
 

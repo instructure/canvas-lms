@@ -1397,6 +1397,17 @@ class Course < ActiveRecord::Base
     enroll_user(user, 'StudentEnrollment', opts)
   end
 
+  def self_enroll_student(user, opts = {})
+    enrollment = enroll_student(user, opts.merge(:no_notify => true))
+    enrollment.self_enrolled = true
+    enrollment.accept
+    unless opts[:skip_pseudonym]
+      new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
+      new_pseudonym.save if new_pseudonym && new_pseudonym.changed?
+    end
+    enrollment
+  end
+
   def enroll_ta(user)
     enroll_user(user, 'TaEnrollment')
   end
