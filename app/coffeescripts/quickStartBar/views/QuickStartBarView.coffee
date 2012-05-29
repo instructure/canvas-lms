@@ -1,7 +1,7 @@
 define [
   'Backbone',
   'i18n!dashboard'
-  'compiled/home/views/quickStartBar/allViews'
+  'compiled/quickStartBar/views/allViews'
   'jst/quickStartBar/QuickStartBarView'
   'formToJSON'
 ], ({View, Model}, I18n, allViews, template) ->

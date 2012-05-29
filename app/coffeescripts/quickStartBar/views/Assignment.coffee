@@ -1,6 +1,6 @@
 define [
   'Backbone'
-  'compiled/home/models/quickStartBar/Assignment'
+  'compiled/quickStartBar/models/Assignment'
   'jst/quickStartBarTemplates/assignment'
   'jquery.instructure_date_and_time'
 ], ({View}, Assignment, template) ->

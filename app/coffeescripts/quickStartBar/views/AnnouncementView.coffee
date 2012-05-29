@@ -1,7 +1,7 @@
 define [
-  'compiled/home/views/quickStartBar/BaseItemView'
+  'compiled/quickStartBar/views/BaseItemView'
   'underscore'
-  'compiled/home/models/quickStartBar/Announcement'
+  'compiled/quickStartBar/models/Announcement'
   'jst/quickStartBar/announcement'
   'jquery.instructure_date_and_time'
 ], (BaseItemView, _, Announcement, template) ->

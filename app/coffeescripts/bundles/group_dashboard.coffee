@@ -2,11 +2,10 @@ require [
   'jquery'
   'Backbone'
   'compiled/groups/dashboard/views/GroupDashboardView'
-  'compiled/home/views/quickStartBar/QuickStartBarView'
+  'compiled/quickStartBar/views/QuickStartBarView'
   'compiled/ActivityFeed/views/ActivityFeedItemsView'
   'compiled/groups/dashboard/collections/ActivityFeedItemsCollection'
-  'compiled/home/views/SideBar/SideBarView'
-], ($, {View}, GroupDashboardView, QuickStartBarView, ActivityFeedItemsView, ActivityFeedItemsCollection, SideBarView) ->
+], ($, {View}, GroupDashboardView, QuickStartBarView, ActivityFeedItemsView, GroupActivityFeedItemsCollection) ->
 
   $ ->
     window.dashboard = new GroupDashboardView
@@ -16,5 +15,4 @@ require [
       views:
         quickStartBar: new QuickStartBarView
         activityFeedItems: new ActivityFeedItemsView
-          collection: new ActivityFeedItemsCollection
-    dashboardAside: new SideBarView
+          collection: new GroupActivityFeedItemsCollection

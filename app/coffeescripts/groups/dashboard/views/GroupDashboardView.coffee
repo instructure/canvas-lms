@@ -20,7 +20,12 @@ define ['Backbone'], ({View}) ->
               <div class="quickStartBar not-expanded border border-rbl border-round-b content-callout"></div>
               <div class="activityFeedItems v-gutter content-box border border-trbl border-round box-shadow"></div>
             </div>
-            <div class="span3 SideBarView"></div>
+            <div class="span3">
+              <!-- TODO: new collection thing -->
+              <div class="sidebar-header">Collections</div>
+              <div class="CollectionsView"></div>
+              <!-- TODO: member activity and popular views -->
+            </div>
           </div>
         </div>
       """

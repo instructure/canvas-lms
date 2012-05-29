@@ -1,7 +1,7 @@
 define [
-  'compiled/home/views/quickStartBar/BaseItemView'
+  'compiled/quickStartBar/views/BaseItemView'
   'underscore'
-  'compiled/home/models/quickStartBar/Assignment'
+  'compiled/quickStartBar/models/Assignment'
   'jst/quickStartBar/assignment'
   'compiled/widget/ContextSearch'
   'jquery.instructure_date_and_time'

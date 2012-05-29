@@ -2,7 +2,7 @@ require [
   'jquery'
   'Backbone'
   'compiled/home/views/DashboardView'
-  'compiled/home/views/quickStartBar/QuickStartBarView'
+  'compiled/quickStartBar/views/QuickStartBarView'
   'compiled/ActivityFeed/views/ActivityFeedView'
   'compiled/home/views/SideBar/SideBarView'
   'compiled/ActivityFeed/views/ActivityFeedFilterView'

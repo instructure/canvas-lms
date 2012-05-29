@@ -1,8 +1,8 @@
 define [
   'underscore'
   'compiled/views/KollectionItems/KollectionItemSaveView'
-  'compiled/home/views/quickStartBar/BaseItemView'
-  'compiled/home/models/quickStartBar/Pin'
+  'compiled/quickStartBar/views/BaseItemView'
+  'compiled/quickStartBar/models/Pin'
   'jst/quickStartBar/pin'
   'compiled/models/KollectionItem'
   'jquery.instructure_date_and_time'
