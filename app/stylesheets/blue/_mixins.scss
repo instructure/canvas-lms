@@ -58,7 +58,8 @@
       position: relative;
       text-align: center;
       &:hover{
-        @include gradient-vertical(#dae8f5, #b5d1eb);
+        @include box-shadow(inset 0 1px 1px white);
+        @include gradient-vertical($contentCalloutColor, darken($contentCalloutColor, 8%));
         text-decoration: none;
         border-color: $borderColor;
         z-index: 1;
