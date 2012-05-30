@@ -111,7 +111,7 @@ module Delayed
           min_priority ||= Delayed::MIN_PRIORITY
           max_priority ||= Delayed::MAX_PRIORITY
 
-          if connection.adapter_name == 'PostgreSQL' && Setting.get_cached('delayed_jobs_db_fn_pop', 'true') == 'true'
+          if connection.adapter_name == 'PostgreSQL' && Setting.get_cached('delayed_jobs_db_fn_pop', 'false') == 'true'
             # note postgresql is optimized to use this db function, and doesn't
             # use find_available, lock_exclusively and friends
             #
