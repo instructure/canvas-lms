@@ -67,9 +67,11 @@ class GroupsController < ApplicationController
   end
 
   def show
-    @use_new_styles = true
-    js_env :GROUP_ID => @group.id
-    return render :action => :dashboard, :layout => 'new_application'
+    if @domain_root_account.show_new_dashboard?
+      @use_new_styles = true
+      js_env :GROUP_ID => @group.id
+      return render :action => :dashboard, :layout => 'new_application'
+    end
 
     # FIXME: what are we going to do with all of this stuff?
     if @group.deleted? && @group.context

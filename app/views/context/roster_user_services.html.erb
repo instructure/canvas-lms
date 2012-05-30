@@ -65,7 +65,7 @@
 </style>
 <% end %>
 <h2><%= t('headings.registered_services', %{Registered Services}) %></h2>
-<a href="<%= profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
+<a href="<%= edit_profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
 <p>
   <%= t 'help.user_services', %{If other members choose, they can let you see which outside services they've linked to their Canvas account.  This can make it easier to coordinate group projects and also link up outside of class.} %>
 </p>
@@ -74,7 +74,7 @@
     <%= t 'help.no_services', %{You haven't linked your user profile to any external services.  You can link your Canvas account to services like Facebook and Twitter.} %>
   </p>
   <p>
-    <a href="<%= profile_path %>#registered_web_services" class="button"><%= t('links.link_service', %{Link web services to my account}) %></a>
+    <a href="<%= edit_profile_path %>#registered_web_services" class="button"><%= t('links.link_service', %{Link web services to my account}) %></a>
   </p>
 <% elsif @current_user && !@current_user.show_user_services %>
   <p>
@@ -113,7 +113,7 @@
       <a href="<%= UserService.registration_url(service_type) %>"><%= t('links.sign_up_for_service', %{Sign Up}) %></a>
       |
     <% end %>
-    <a href="<%= profile_path %>#register_<%= service_type %>"><%= t('links.link_existing_service_account', %{Link Existing Account}) %></a>
+    <a href="<%= edit_profile_path %>#register_<%= service_type %>"><%= t('links.link_existing_service_account', %{Link Existing Account}) %></a>
   </li>
 <% end %>
 </ul>

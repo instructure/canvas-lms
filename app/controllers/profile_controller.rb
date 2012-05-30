@@ -27,6 +27,8 @@ class ProfileController < ApplicationController
   include Api::V1::Avatar
 
   def show
+    # FFT TODO: should this be conditional based on a setting? i.e. use the old
+    # styles like we do on the dashboard
     @use_new_styles = true
     @user ||= @current_user
 

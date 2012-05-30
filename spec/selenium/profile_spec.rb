@@ -37,7 +37,7 @@ describe "profile" do
   it "should change the password" do
     user_with_pseudonym({:active_user => true})
     login_as
-    get '/profile'
+    get '/profile/edit'
     old_password = 'asdfasdf'
     new_password = 'newpassword'
     edit_form = click_edit
@@ -63,7 +63,7 @@ describe "profile" do
       notification_model(:category => 'Grading')
       notification_policy_model(:notification_id => @notification.id)
 
-      get "/profile"
+      get "/profile/edit"
       #Add email address to profile
       driver.find_element(:css, '#right-side .add_email_link').click
       driver.find_element(:css, '#communication_channels a[href="#register_sms_number"]').click
@@ -88,7 +88,7 @@ describe "profile" do
 
       notification_model(:category => 'Grading')
 
-      get "/profile"
+      get "/profile/edit"
       #Test modifying notifications
       driver.find_element(:css, '#section-tabs .notifications').click
       content_tbody = driver.find_element(:css, '#content > table > tbody')
@@ -127,14 +127,14 @@ describe "profile" do
     end
 
     it "should display file uploader link on files page" do
-      get "/profile"
+      get "/profile/edit"
       expect_new_page_load { driver.find_element(:css, '#left-side .files').click }
       driver.find_element(:id, 'file_swfUploader').should be_displayed
     end
 
     it "should edit full name" do
       new_user_name = 'new user name'
-      get "/profile"
+      get "/profile/edit"
       edit_form = click_edit
       edit_form.find_element(:id, 'user_name').send_keys(new_user_name)
       edit_form.submit
@@ -144,7 +144,7 @@ describe "profile" do
 
     it "should edit display name and validate" do
       new_display_name = 'test name'
-      get "/profile"
+      get "/profile/edit"
       edit_form = click_edit
       edit_form.find_element(:id, 'user_short_name').send_keys(new_display_name)
       edit_form.submit
@@ -154,7 +154,7 @@ describe "profile" do
     end
 
     it "should change the language" do
-      get "/profile"
+      get "/profile/edit"
       edit_form = click_edit
       click_option('#user_locale', 'Español')
       expect_new_page_load { edit_form.submit }
@@ -166,7 +166,7 @@ describe "profile" do
       a.settings[:users_can_edit_name] = false
       a.save!
 
-      get "/profile"
+      get "/profile/edit"
       edit_form = click_edit
       edit_form.find_elements(:id, 'user_short_name').first.should be_nil
       click_option('#user_locale', 'Español')
@@ -176,7 +176,7 @@ describe "profile" do
 
     it "should add another contact method - sms" do
       test_cell_number = '8017121011'
-      get "/profile"
+      get "/profile/edit"
       driver.find_element(:css, '.add_contact_link').click
       register_form = driver.find_element(:id, 'register_sms_number')
       register_form.find_element(:css, '.sms_number').send_keys(test_cell_number)
@@ -188,12 +188,12 @@ describe "profile" do
     end
 
     it "should register a service" do
-      get "/profile"
+      get "/profile/edit"
       add_skype_service
     end
 
     it "should delete a service" do
-      get "/profile"
+      get "/profile/edit"
       add_skype_service
       #had to use add class because tests were failing inconsistently in aws
       driver.execute_script("$('.service').addClass('service-hover')")
@@ -205,7 +205,7 @@ describe "profile" do
     end
 
     it "should toggle service visibility" do
-      get "/profile"
+      get "/profile/edit"
       add_skype_service
       initial_state = @user.show_user_services
 
@@ -219,12 +219,12 @@ describe "profile" do
     end
 
     it "should generate a new access token" do
-      get "/profile"
+      get "/profile/edit"
       generate_access_token
     end
 
     it "should test canceling creating a new access token" do
-      get "/profile"
+      get "/profile/edit"
       driver.find_element(:css, '.add_access_token_link').click
       access_token_form = driver.find_element(:id, 'access_token_form')
       access_token_form.find_element(:css, '.cancel_button').click
@@ -232,7 +232,7 @@ describe "profile" do
     end
 
     it "should view the details of an access token" do
-      get "/profile"
+      get "/profile/edit"
       generate_access_token('testing', true)
       #had to use :visible because it was failing saying element wasn't visible
       find_with_jquery('#access_tokens .show_token_link:visible').click
@@ -240,7 +240,7 @@ describe "profile" do
     end
 
     it "should delete an access token" do
-      get "/profile"
+      get "/profile/edit"
       generate_access_token('testing', true)
       #had to use :visible because it was failing saying element wasn't visible
       find_with_jquery("#access_tokens .delete_key_link:visible").click
@@ -295,7 +295,7 @@ shared_examples_for "profile pictures selenium tests" do
     a.save!
     IMAGE_SRC = ''
 
-    get "/profile"
+    get "/profile/edit"
     keep_trying_until { f(".profile_pic_link") }.click
     dialog = f("#profile_pic_dialog")
     dialog.should be_displayed
