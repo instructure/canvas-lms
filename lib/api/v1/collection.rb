@@ -28,7 +28,7 @@ module Api::V1::Collection
   }
 
   API_COLLECTION_ITEM_DATA_JSON_OPTS = {
-    :only => %w(item_type link_url root_item_id post_count upvote_count),
+    :only => %w(item_type link_url root_item_id post_count upvote_count html_preview),
     :methods => %w(upvoted_by_user),
   }
 
@@ -48,7 +48,7 @@ module Api::V1::Collection
 
     items.map do |item|
       hash = api_json(item, current_user, session, API_COLLECTION_ITEM_JSON_OPTS)
-      hash['url'] = api_v1_collection_item_url(item.collection, item)
+      hash['url'] = api_v1_collection_item_url(item)
       item_data = item.collection_item_data
       hash['image_pending'] = item_data.image_pending
       image = item_data.image_attachment

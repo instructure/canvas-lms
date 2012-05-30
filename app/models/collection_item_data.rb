@@ -40,8 +40,14 @@ class CollectionItemData < ActiveRecord::Base
   end
 
   def snapshot_link_url
+    embedly_data = Canvas::Embedly.new(link_url)
+
+    self.html_preview = embedly_data.object_html
+
     if image_url.present?
       attachment = Canvas::HTTP.clone_url_as_attachment(image_url)
+    elsif embedly_data.images.first
+      attachment = Canvas::HTTP.clone_url_as_attachment(embedly_data.images.first.url)
     else
       attachment = CutyCapt.snapshot_attachment_for_url(link_url)
     end
@@ -66,9 +72,9 @@ class CollectionItemData < ActiveRecord::Base
   def self.data_for_url(url, creating_user)
     # TODO: handle other canvas hostnames
     # TODO: restrict this to be more precise on what urls it will accept as a clone
-    if url.match(%r{https?://#{Regexp.escape HostUrl.default_host}/api/v1/collections/(\d+)/items/(\d+)$})
-      collection = Collection.active.find($1)
-      original_item = collection.collection_items.active.find($2)
+    if url.match(%r{https?://#{Regexp.escape HostUrl.default_host}/api/v1/collections/items/(\d+)$})
+      original_item = CollectionItem.active.find($1)
+      collection = original_item.active_collection
       if collection.grants_right?(@current_user, :read)
         return original_item.collection_item_data
       else

@@ -33,6 +33,13 @@ class CollectionItem < ActiveRecord::Base
 
   after_create :set_data_root_item
 
+  # raises RecordNotFound if the collection is marked deleted or doesn't exist
+  def active_collection
+    col = self.collection
+    raise ActiveRecord::RecordNotFound if !col || col.try(:deleted?)
+    col
+  end
+
   def set_data_root_item
     if self.collection_item_data && self.collection_item_data.root_item_id.nil?
       self.collection_item_data.update_attribute(:root_item_id, self.id)
@@ -46,6 +53,11 @@ class CollectionItem < ActiveRecord::Base
 
   named_scope :active, { :conditions => { :workflow_state => 'active' } }
   named_scope :newest_first, { :order => "id desc" }
+
+  def discussion_topic
+    DiscussionTopic.find_by_context_type_and_context_id(self.class.name, self.id) ||
+      DiscussionTopic.new(:context => self, :discussion_type => DiscussionTopic::DiscussionTypes::FLAT)
+  end
 
   def destroy
     self.workflow_state = 'deleted'
@@ -80,5 +92,28 @@ class CollectionItem < ActiveRecord::Base
       WHERE id = OLD.collection_item_data_id;
       SQL
     end
+  end
+
+  set_policy do
+    given { |user, session| self.collection.grants_right?(user, session, :read) }
+    can :read
+
+    given { |user, session| self.collection.grants_right?(user, session, :comment) }
+    can :comment
+
+    given { |user, session| self.collection.grants_right?(user, session, :create) }
+    can :create
+
+    given { |user, session| self.collection.grants_right?(user, session, :delete) }
+    can :delete
+
+    given { |user, session| self.collection.grants_right?(user, session, :update) }
+    can :update
+
+    given { |user| self.user == user }
+    can :read and can :update and can :delete
+
+    given { |user| self.collection.context.respond_to?(:has_member?) && self.collection.context.has_member?(user) }
+    can :create
   end
 end

@@ -174,7 +174,7 @@ class Attachment < ActiveRecord::Base
     if in_the_right_state && transitioned_to_this_state &&
         self.content_type && self.content_type.match(/\A(video|audio)/)
       delay = Setting.get_cached('attachment_build_media_object_delay_seconds', 10.to_s).to_i
-      MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now }, self, false)
+      MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY }, self, false)
     end
   end
 

@@ -22,10 +22,15 @@
 #
 # Collections are buckets of content that can be used to organize links to
 # helpful resources. For instance, a user could create a collection storing a
-# set of links to various web sites containing potential discussion questions.
+# set of links to various web sites containing potential discussion questions,
+# or members of a group could all contribute to a collection focused on
+# potential assessment questions.
 #
-# A user can have multiple collections, and each can be marked as private
-# (viewable only to the user) or public (viewable by the world).
+# A user/group can have multiple collections, and each can be marked as private
+# (viewable only to the user/group) or public (viewable by the world).
+#
+# Group collections can only be created, updated, or deleted by group
+# moderators.
 #
 # A Collection object looks like:
 #
@@ -109,7 +114,8 @@ class CollectionsController < ApplicationController
 
   # @API Create a collection
   #
-  # Creates a new collection. You can only create collections on your own user.
+  # Creates a new collection. You can only create collections on your own user,
+  # or on a group to which you belong.
   #
   # @argument name
   # @argument visibility

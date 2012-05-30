@@ -44,15 +44,20 @@ class Collection < ActiveRecord::Base
 
   def destroy
     self.workflow_state = 'deleted'
-    collection_items.active.find_each { |item| item.destroy }
     save!
   end
 
   set_policy do
     given { |user| self.public? }
-    can :read
+    can :read and can :comment
 
     given { |user| self.context == user }
-    can :read and can :create and can :update and can :delete
+    can :read and can :create and can :update and can :delete and can :comment
+
+    given { |user| self.context.respond_to?(:has_member?) && self.context.has_member?(user) }
+    can :read and can :comment
+
+    given { |user| self.context.respond_to?(:has_moderator?) && self.context.has_moderator?(user) }
+    can :read and can :create and can :update and can :delete and can :comment
   end
 end

@@ -58,6 +58,7 @@ class Group < ActiveRecord::Base
   has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
+  has_many :collections, :as => :context
 
   before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted

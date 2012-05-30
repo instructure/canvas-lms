@@ -346,12 +346,8 @@ class UsersController < ApplicationController
   #     'collaboration_id': 1234
   #   }
   def activity_stream
-    # for backwards compatibility, since this api used to be hard-coded to return 21 items
-    params[:per_page] ||= 21
-
     if @current_user
-      scope = @current_user.visible_stream_items
-      render :json => Api.paginate(scope, self, api_v1_user_activity_stream_url).map { |i| stream_item_json(i, @current_user.id) }
+      api_render_stream_for_contexts(nil, :api_v1_user_activity_stream_url)
     else
       render_unauthorized_action
     end

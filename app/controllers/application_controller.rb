@@ -347,6 +347,10 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:course_section_id]
         params[:context_type] = "CourseSection"
         @context = CourseSection.find(params[:course_section_id])
+      elsif params[:collection_item_id]
+        params[:context_id] = params[:collection_item_id]
+        params[:context_type] = 'CollectionItem'
+        @context = CollectionItem.find(params[:collection_item_id])
       elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
         @context = @current_user
         @context_membership = @context

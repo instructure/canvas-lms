@@ -92,7 +92,8 @@ class DiscussionTopicsApiController < ApplicationController
 
     if structure
       participant_info = User.find(participant_ids).map do |user|
-        { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => polymorphic_url([@context, user]) }
+        participant_url = @context.is_a?(CollectionItem) ? user_url(user) : polymorphic_url([@context, user])
+        { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => participant_url }
       end
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
       # as an optimization, the view structure is pre-serialized as a json
@@ -438,7 +439,11 @@ class DiscussionTopicsApiController < ApplicationController
 
   protected
   def require_topic
-    @topic = @context.all_discussion_topics.active.find(params[:topic_id])
+    if params[:topic_id] == "self" && @context.is_a?(CollectionItem)
+      @topic = @context.discussion_topic
+    else
+      @topic = @context.all_discussion_topics.active.find(params[:topic_id])
+    end
     return authorized_action(@topic, @current_user, :read)
   end
 
@@ -452,6 +457,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def build_entry(association)
+    @topic.save! if @topic.new_record?
     association.build(:message => params[:message], :user => @current_user, :discussion_topic => @topic)
   end
 
