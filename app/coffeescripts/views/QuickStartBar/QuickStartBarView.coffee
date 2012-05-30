@@ -22,11 +22,25 @@ define [
       'click .nav a': 'onNavClick'
       'focus .expander': 'onExpandClick'
 
-    initialize: ->
+    initialize: (@quickStartItems)  ->
       @model or= new QuickStartBarModel
       @model.on 'change:modelName', @switchFormView
       @model.on 'change:expanded', @toggleExpanded
       @models = {}
+
+      @quickStartItems or= [
+        {type: 'assignment'}
+        {type: 'discussion'}
+        {type: 'announcement'}
+        {type: 'message'}
+        {type: 'pin'}
+        {type: 'event', icon: 'calendar-day'}
+      ]
+
+      for qi in @quickStartItems
+        qi.icon  or= qi.type
+        qi.title or= capitalize qi.type
+
 
     onSaveSuccess: (model) =>
       @switchFormView()
@@ -75,7 +89,7 @@ define [
       @$newItemFormContainer = $ '.newItemFormContainer'
 
     render: ->
-      @$el.html template()
+      @$el.html template(quickStartItems: @quickStartItems)
       @cacheElements()
       @switchFormView()
       super

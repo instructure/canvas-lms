@@ -13,6 +13,10 @@ require [
       el: document.getElementById('main')
 
       views:
-        quickStartBar: new QuickStartBarView
+        quickStartBar: new QuickStartBarView([
+          {type: 'discussion'}
+          {type: 'announcement'}
+          {type: 'message'}
+        ])
         activityFeedItems: new ActivityFeedItemsView
           collection: new GroupActivityFeedItemsCollection
