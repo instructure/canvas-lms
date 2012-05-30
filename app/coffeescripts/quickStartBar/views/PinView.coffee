@@ -14,8 +14,8 @@ define [
     render: =>
       super
       @$('.toolbar').removeClass('toolbar')
-      @$('.triangle-box-header').removeClass('triangle-box-header')
-      @$('.triangle-box-content').removeClass('triangle-box-content').addClass('v-gutter')
+      @$('.box-header').removeClass('box-header')
+      @$('.box-content').removeClass('box-content').addClass('v-gutter')
       @$('.button').addClass('small-button')
       @$('[autoFocus]').removeAttr('autoFocus')
 

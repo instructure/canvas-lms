@@ -175,29 +175,21 @@
   @include box-shadow(0 2px 4px rgba(0,0,0,.25))
 }
 
-.triangle-box, .triangle-box-with-header {
+.box-with-header,
+.triangle-box,
+.triangle-box-with-header {
+  @include box-with-header;
+}
+
+.triangle-box,
+.triangle-box-with-header {
   position: relative; // for the triangle
   margin-left: 20px;
-  border: solid 1px $borderColor;
-  border-radius: 3px;
-  @include box-shadow(0 1px 1px 0px lighten($borderColor, 20%));
-  @include gradient-vertical($white, $lightBackground);
 
-  .triangle-box-header {
+  .box-header {
     // relative position to sit on top of the triangle
     position: relative;
     z-index: 1;
-    padding: 8px 20px;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    @include content-callout();
-    border-bottom: solid 1px $listBorderColor;
-    color: $blueDark;
-
-    .triangle-box-subheader {
-      color: $grayDark;
-      font-size: 11px;
-    }
   }
 
   // the triangle
@@ -214,25 +206,15 @@
     border-right: none;
     border-top: none;
     background: $white;
-  }
-
-  .triangle-box-content {
-    padding: 10px 20px;
+    .ie & {
+      display: none;
+    }
   }
 }
-
 .triangle-box-with-header:before {
   @include box-shadow(0 1px 1px 0px lighten($borderColor, 20%));
   @include gradient-directional(lighten($contentCalloutColor, 4%), $contentCalloutColor, 45deg);
 }
-
-.ie {
-  .triangle-box:before, .triangle-box-with-header:before {
-    display: none;
-    content: '';
-  }
-}
-
 .checkbox-inline {
   padding-top: 4px;
 }

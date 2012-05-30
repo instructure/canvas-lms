@@ -46,11 +46,11 @@ define ['Backbone'], ({View}) ->
             <img src="http://placekitten.com/42/42/">
           </div>
           <div class="image-block-content triangle-box-with-header">
-            <header class="triangle-box-header">
+            <header class="box-header">
               <div class="activityFeedItemTitle">#{locals.header}</div>
               <div class="triangle-box-subheader">#{locals.subHeader}</div>
             </header>
-            <div class="triangle-box-content">
+            <div class="box-content">
               #{@renderContent locals}
             </div>
           </div>
