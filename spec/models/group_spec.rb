@@ -157,6 +157,15 @@ describe Group do
     attachment.grants_right?(teacher, nil, :create).should be_true
   end
 
+  it "should only allow me to moderate_forum if I can moderate_forum of group's context" do
+    course_with_teacher
+    student_in_course
+    group = @course.groups.create
+
+    group.grants_right?(@teacher, nil, :moderate_forum).should be_true
+    group.grants_right?(@student, nil, :moderate_forum).should be_false
+  end
+
   it "should grant read_roster permissions to students that can freely join or request an invitation to the group" do
     course_with_teacher
     student_in_course

@@ -25,7 +25,7 @@ class ProfileController < ApplicationController
   include Api::V1::User
   include Api::V1::Avatar
 
-  # @API
+  # @API Get user profile
   # Returns user profile data, including user id, name, and profile pic.
   #
   # When requesting the profile for the user accessing the API, the user's
@@ -134,7 +134,7 @@ class ProfileController < ApplicationController
     @other_channels.reject! { |c| c.path_type == 'twitter' } unless has_twitter_installed
   end
   
-  # @API
+  # @API List avatar options
   # Retrieve the possible user avatar options that can be set with the user update endpoint. The response will be an array of avatar records. If the 'type' field is 'attachment', the record will include all the normal attachment json fields; otherwise it will include only the 'url' and 'display_name' fields. Additionally, all records will include a 'type' field and a 'token' field. The following explains each field in more detail
   # type:: ["gravatar"|"twitter"|"linked_in"|"attachment"|"no_pic"] The type of avatar record, for categorization purposes.
   # url:: The url of the avatar 

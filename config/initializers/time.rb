@@ -1,5 +1,5 @@
-if RUBY_VERSION < "1.9."
-  Time.class_eval do
+Time.class_eval do
+  if RUBY_VERSION < "1.9."
     def strftime_with_1_9_parity(string)
       string = string.gsub(/%[369]?N|%./) do |match|
         case match
@@ -14,15 +14,15 @@ if RUBY_VERSION < "1.9."
       strftime_without_1_9_parity(string)
     end
     alias_method_chain :strftime, :'1_9_parity'
+  end
 
-    def utc_datetime
-      timestamp = self.getutc
-      DateTime.civil(timestamp.strftime("%Y").to_i, 
-                     timestamp.strftime("%m").to_i,
-                     timestamp.strftime("%d").to_i,
-                     timestamp.strftime("%H").to_i, 
-                     timestamp.strftime("%M").to_i)
-    end
+  def utc_datetime
+    timestamp = self.getutc
+    DateTime.civil(timestamp.strftime("%Y").to_i, 
+                   timestamp.strftime("%m").to_i,
+                   timestamp.strftime("%d").to_i,
+                   timestamp.strftime("%H").to_i, 
+                   timestamp.strftime("%M").to_i)
   end
 end
 

@@ -223,7 +223,12 @@ class Quiz < ActiveRecord::Base
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
       Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
-      self.quiz_submissions.each { |q| q.submission.try(:destroy); q.submission = nil; q.save! }
+      self.quiz_submissions.each do |qs|
+        submission = qs.submission
+        qs.submission = nil
+        qs.save! if qs.changed?
+        submission.try(:destroy)
+      end
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
       ContentTag.delete_for(Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     end
@@ -323,7 +328,7 @@ class Quiz < ActiveRecord::Base
           data[:assessment_question_bank_id] = e.assessment_question_bank_id
           data[:questions] = []
         else
-          data[:questions] = e.quiz_questions.sort_by{|q| q.position}.map{|q| q.data}
+          data[:questions] = e.quiz_questions.sort_by{|q| q.position || 99999}.map(&:data)
         end
         data[:actual_pick_count] = e.actual_pick_count
         res = data
@@ -406,7 +411,7 @@ class Quiz < ActiveRecord::Base
       variables.each do |variable|
         variable_id = AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub(re, "<input class='question_input' type='text' style='width: 120px;' name='question_#{q[:id]}_#{variable_id}' value='{{question_#{q[:id]}_#{variable_id}}}' />")
+        text = text.sub(re, "<input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_#{q[:id]}_#{variable_id}' value='{{question_#{q[:id]}_#{variable_id}}}' />")
       end
       q[:original_question_text] = q[:question_text]
       q[:question_text] = text
@@ -518,7 +523,8 @@ class Quiz < ActiveRecord::Base
     submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
     # Admins can take the full quiz whenever they want
     unless user.is_a?(User) && self.grants_right?(user, nil, :grade)
-      submission.end_at = self.due_at if self.due_at && Time.now < self.due_at && (!submission.end_at || self.due_at < submission.end_at)
+      submission.end_at = due_at if due_at && Time.now < due_at && (!submission.end_at || due_at < submission.end_at)
+      submission.end_at = lock_at if lock_at && (!submission.end_at || lock_at < submission.end_at)
     end
     submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
     submission.finished_at = nil
@@ -765,6 +771,24 @@ class Quiz < ActiveRecord::Base
     dup.clone_updated = true
     dup
   end
+
+  def strip_html_answers(question)
+    return if !question || !question[:answers] || !(%w(multiple_choice_question multiple_answers_question).include? question[:question_type])
+    for answer in question[:answers] do
+      answer[:text] = strip_tags(answer[:html]) if !answer[:html].blank? && answer[:text].blank?
+    end
+  end
+
+  def submissions_for_statistics(include_all_versions=true)
+    for_users = self.context.students.map(&:id)
+    self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
+      map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
+      flatten.
+      compact.
+      select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
+      sort_by(&:updated_at).
+      reverse
+  end
   
   def statistics_csv(options={})
     options ||= {}
@@ -774,12 +798,7 @@ class Quiz < ActiveRecord::Base
     columns << t('statistics.csv_columns.submitted', 'submitted')
     columns << t('statistics.csv_columns.attempt', 'attempt') if options[:include_all_versions]
     first_question_index = columns.length
-    submissions = self.quiz_submissions.scoped(:include => (options[:include_all_versions] ? [:versions] : [])).select { |s| self.context.students.map(&:id).include?(s.user_id) }
-    if options[:include_all_versions]
-      submissions = submissions.map(&:submitted_versions).flatten
-    end
-    submissions = submissions.select{|s| s.completed? && s.submission_data.is_a?(Array) }
-    submissions = submissions.sort_by(&:updated_at).reverse
+    submissions = submissions_for_statistics(options[:include_all_versions])
     found_question_ids = {}
     quiz_datas = [quiz_data] + submissions.map(&:quiz_data)
     quiz_datas.each do |quiz_data|
@@ -814,11 +833,12 @@ class Quiz < ActiveRecord::Base
           row << ''
           next
         end
-        answer_item = question && question[:answers].detect{|a| a[:id].to_s == answer[:text] }
+        strip_html_answers(question)
+        answer_item = question && question[:answers].detect{|a| a[:id] == answer[:answer_id]}
         answer_item ||= answer
         if question[:question_type] == 'fill_in_multiple_blanks_question'
           blank_ids = question[:answers].map{|a| a[:blank_id] }.uniq
-          row << blank_ids.map{|blank_id| answer["answer_for_#{blank_id}".to_sym].gsub(/,/, '\,') }.join(',')
+          row << blank_ids.map{|blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.compact.join(',')
         elsif question[:question_type] == 'multiple_answers_question'
           row << question[:answers].map{|a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.compact.join(',')
         elsif question[:question_type] == 'multiple_dropdowns_question'
@@ -863,12 +883,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def statistics(include_all_versions=true)
-    submissions = self.quiz_submissions.scoped(:include => (include_all_versions ? [:versions] : [])).select{|s| self.context.students.map(&:id).include?(s.user_id) }
-    if include_all_versions
-      submissions = submissions.map(&:submitted_versions).flatten
-    end
-    submissions = submissions.select{|s| s.completed? && s.submission_data.is_a?(Array) }
-    submissions = submissions.sort_by(&:updated_at).reverse
+    submissions = submissions_for_statistics(include_all_versions)
     questions = (self.quiz_data || []).map{|q| q[:questions] ? q[:questions] : [q] }.flatten
     stats = {}
     found_ids = {}
@@ -897,8 +912,8 @@ class Quiz < ActiveRecord::Base
       points = answers.map{|a| a[:points] }.sum
       score_counter << points
       stats[:submission_score_tally] += points
-      stats[:submission_incorrect_tally] += answers.select{|a| a[:correct] == false }.length
-      stats[:submission_correct_tally] += answers.select{|a| a[:correct] == true }.length
+      stats[:submission_incorrect_tally] += answers.count{|a| a[:correct] == false }
+      stats[:submission_correct_tally] += answers.count{|a| a[:correct] == true }
       stats[:submission_duration_tally] += ((sub.finished_at - sub.started_at).to_i rescue 30)
       sub.quiz_data.each do |question|
         question_ids << question[:id]
@@ -941,6 +956,7 @@ class Quiz < ActiveRecord::Base
       answer[:user_ids] = []
       answer
     }
+    strip_html_answers(res)
     res[:multiple_responses] = true if question[:question_type] == 'calculated_question'
     if question[:question_type] == 'numerical_question'
       res[:answers].each do |answer|
@@ -982,7 +998,7 @@ class Quiz < ActiveRecord::Base
     end
     submissions.each do |submission|
       answers = submission.submission_data || []
-      response = answers.select{|a| a[:question_id] == question[:id] }.first
+      response = answers.detect{|a| a[:question_id] == question[:id] }
       if response
         res[:responses] += 1
         res[:response_values] << response[:text]
@@ -1213,7 +1229,9 @@ class Quiz < ActiveRecord::Base
     elsif !item.assignment && grading = hash[:grading]
       # The actual assignment will be created when the quiz is published
       item.quiz_type = 'assignment'
-      hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id] 
+      hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
+    elsif hash[:available]
+      item.workflow_state = 'available'
     end
     
     if hash[:assignment_group_migration_id]

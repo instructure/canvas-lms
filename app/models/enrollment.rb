@@ -41,38 +41,51 @@ class Enrollment < ActiveRecord::Base
 
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :limit_privileges_to_course_section
 
-  no_other_enrollments_sql = "NOT EXISTS (SELECT 1 FROM enrollments WHERE workflow_state = 'active' AND user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id LIMIT 1)"
-  trigger_sql = {:default => <<-SQL, :mysql => <<-MYSQL} # IN (...) subselects perform poorly in mysql, plus we want to avoid locking rows in other tables
-    UPDATE assignments SET needs_grading_count = needs_grading_count + %s
-    WHERE context_id = NEW.course_id
-      AND context_type = 'Course'
-      AND EXISTS (
-        SELECT 1
-        FROM submissions
-        WHERE user_id = NEW.user_id
-          AND assignment_id = assignments.id
-          AND (#{Submission.needs_grading_conditions})
-        LIMIT 1
-      )
-      AND #{no_other_enrollments_sql};
-    SQL
-
-    IF #{no_other_enrollments_sql} THEN
-      UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s
-      WHERE context_id = NEW.course_id
-        AND context_type = 'Course'
-        AND assignments.id = submissions.assignment_id
-        AND submissions.user_id = NEW.user_id
-        AND (#{Submission.needs_grading_conditions});
-    END IF;
-    MYSQL
-
-  trigger.after(:insert).where("NEW.workflow_state = 'active'") do
-    Hash[trigger_sql.map{|key, value| [key, value % 1]}]
+  def self.active_student_conditions(prefix = 'enrollments')
+    "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
   end
 
-  trigger.after(:update).where("NEW.workflow_state <> OLD.workflow_state AND (NEW.workflow_state = 'active' OR OLD.workflow_state = 'active')") do
-    Hash[trigger_sql.map{|key, value| [key, value % "CASE WHEN NEW.workflow_state = 'active' THEN 1 ELSE -1 END"]}]
+  def self.active_student_subselect(conditions)
+    "EXISTS (SELECT 1 FROM enrollments WHERE #{conditions} AND #{active_student_conditions} LIMIT 1)"
+  end
+
+  def self.needs_grading_trigger_sql
+    no_other_enrollments_sql = "NOT " + active_student_subselect("user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id")
+
+    # IN (...) subselects perform poorly in mysql, plus we want to avoid
+    # locking rows in other tables
+    {:default => <<-SQL, :mysql => <<-MYSQL}
+      UPDATE assignments SET needs_grading_count = needs_grading_count + %s
+      WHERE context_id = NEW.course_id
+        AND context_type = 'Course'
+        AND EXISTS (
+          SELECT 1
+          FROM submissions
+          WHERE user_id = NEW.user_id
+            AND assignment_id = assignments.id
+            AND (#{Submission.needs_grading_conditions})
+          LIMIT 1
+        )
+        AND #{no_other_enrollments_sql};
+    SQL
+
+      IF #{no_other_enrollments_sql} THEN
+        UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s
+        WHERE context_id = NEW.course_id
+          AND context_type = 'Course'
+          AND assignments.id = submissions.assignment_id
+          AND submissions.user_id = NEW.user_id
+          AND (#{Submission.needs_grading_conditions});
+      END IF;
+    MYSQL
+  end
+
+  trigger.after(:insert).where(active_student_conditions('NEW')) do
+    Hash[needs_grading_trigger_sql.map{|key, value| [key, value % 1]}]
+  end
+
+  trigger.after(:update).where("#{active_student_conditions('NEW')} <> #{active_student_conditions('OLD')}") do
+    Hash[needs_grading_trigger_sql.map{|key, value| [key, value % "CASE WHEN NEW.workflow_state = 'active' THEN 1 ELSE -1 END"]}]
   end
 
   include StickySisFields

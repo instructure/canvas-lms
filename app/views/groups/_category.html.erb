@@ -51,7 +51,7 @@
           <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="edit_group_link no-hover"><%= image_tag "edit.png" %></a>
           <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="delete_group_link no-hover"><%= image_tag "delete.png" %></a>
         </div>
-        <h3 style="display: none;" class="group_name"><a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" target="_blank" class="name"><%= t :group_name, "Name" %></a></h3>
+        <h3 style="display: none;" class="group_name"><a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="name"><%= t :group_name, "Name" %></a></h3>
         <% if student_organized %>
           <h3 class="name blank_name"><%= t :group_category_all, "Everyone" %></h3>
         <% else %>
@@ -95,7 +95,7 @@
           <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" class="delete_group_link no-hover"><%= image_tag "delete.png" %></a>
         </div>
         <h3 class="name">
-          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" target="_blank"><%= group.name %></a>
+          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>"><%= group.name %></a>
         </h3>
         <div style="display: none;">
           <span class="category_name"><%= category_name || nbsp %></span>

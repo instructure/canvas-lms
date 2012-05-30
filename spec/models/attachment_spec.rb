@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -750,6 +751,8 @@ describe Attachment do
       @attachment.should be_scribdable
       Attachment.clear_cached_mime_ids
       @shard1.activate do
+        # need to create a context on this shard
+        @context = course_model(:account => Account.create!)
         attachment_model(:content_type => 'pdf')
         @attachment.should be_scribdable
       end
@@ -767,6 +770,11 @@ describe Attachment do
       Attachment.domain_namespace = nil
       attachment_model
       @attachment.s3_config[:bucket_name].should == 'pluginsetting_bucket'
+      # if local storage is configured, this will return "no-bucket"
+      @attachment.stubs(:bucket_name).returns('pluginsetting_bucket')
+
+      # thumbnails should use the same bucket as the attachment they are parented to
+      Thumbnail.new(:attachment => @attachment).bucket_name.should == 'pluginsetting_bucket'
     end
   end
 end

@@ -81,16 +81,18 @@ module SIS
         update_account_associations = course.account_id_changed? || course.root_account_id_changed?
 
         course.sis_source_id = course_id
-        if status =~ /active/i
-          if course.workflow_state == 'completed'
-            course.workflow_state = 'available'
-          elsif course.workflow_state != 'available'
-            course.workflow_state = 'claimed'
+        if !course.stuck_sis_fields.include?(:workflow_state)
+          if status =~ /active/i
+            if course.workflow_state == 'completed'
+              course.workflow_state = 'available'
+            elsif course.workflow_state != 'available'
+              course.workflow_state = 'claimed'
+            end
+          elsif status =~ /deleted/i
+            course.workflow_state = 'deleted'
+          elsif status =~ /completed/i
+            course.workflow_state = 'completed'
           end
-        elsif status =~ /deleted/i
-          course.workflow_state = 'deleted'
-        elsif status =~ /completed/i
-          course.workflow_state = 'completed'
         end
 
         course_dates_stuck = !(course.stuck_sis_fields & [:start_at, :conclude_at, :restrict_enrollments_to_course_dates]).empty?

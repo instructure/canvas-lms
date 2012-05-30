@@ -23,7 +23,7 @@ module SIS
     class AbstractCourseImporter < BaseImporter
 
       def self.is_abstract_course_csv?(row)
-        row.header?('abstract_course_id') && !row.header?('course_id') && row.header?('short_name')
+        row.include?('abstract_course_id') && !row.include?('course_id') && row.include?('short_name')
       end
 
       # expected columns

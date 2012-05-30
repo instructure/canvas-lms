@@ -20,7 +20,7 @@ class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
 
   before_filter :require_user
-  before_filter :get_context, :only => :create
+  before_filter :get_calendar_context, :only => :create
   before_filter :get_options, :only => :index
 
   def index
@@ -118,7 +118,7 @@ class CalendarEventsApiController < ApplicationController
 
   protected
 
-  def get_context
+  def get_calendar_context
     @context = Context.find_by_asset_string(params[:calendar_event].delete(:context_code)) if params[:calendar_event] && params[:calendar_event][:context_code]
     raise ActiveRecord::RecordNotFound unless @context
   end

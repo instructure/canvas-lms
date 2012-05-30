@@ -37,9 +37,9 @@ describe CommunicationChannel do
       c = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => "path3@example.com")
       d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
       notification_model
-      notification_policy_model(:communication_channel_id => a.id, :notification_id => @notification.id )
-      notification_policy_model(:communication_channel_id => b.id, :notification_id => @notification.id )
-      notification_policy_model(:communication_channel_id => c.id, :notification_id => @notification.id )
+      notification_policy_model(:communication_channel => a, :notification => @notification )
+      notification_policy_model(:communication_channel => b, :notification => @notification )
+      notification_policy_model(:communication_channel => c, :notification => @notification )
       @user.reload
       channels = CommunicationChannel.find_all_for(@user, @notification)
       channels.should include(a)
@@ -285,7 +285,7 @@ describe CommunicationChannel do
     
     it "should not be able to be used if it has a policy to not use it" do
       communication_channel_model
-      notification_policy_model(:frequency => "never", :communication_channel_id => @communication_channel.id)
+      notification_policy_model(:frequency => "never", :communication_channel => @communication_channel)
       @communication_channel.reload
       @communication_channel.should_not be_can_notify
     end

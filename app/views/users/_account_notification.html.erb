@@ -1,19 +1,14 @@
 <% notification = account_notification %>
-<div class="communication_message dashboard_notification pinned_notification">
+<div class="communication_message dashboard_notification alert">
   <div class="header">
+    <a class="close_notification_link close" href="#" rel="<%= dashboard_close_notification_path(notification.id) %>" title="<%= t :close, 'close' %>">×</a>
     <div class="header_title">
-      <%= image_tag "#{notification.icon || 'warning'}.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
+      <%= image_tag "#{notification.icon || 'warning'}.png", :class => "header_icon", :style => "padding: 0" %>
       <span class="title subject"><%= notification.subject %></span>
-      <div class="sub_title">
-        <span class="context_code"><%= t('announcmenet', 'Announcement') %></span>
-      </div>
-    </div>
-    <div class="links">
-      <a href="#" rel="<%= dashboard_close_notification_path(notification.id) %>" class="close_notification_link"><%= t('close', 'close') %></a>
     </div>
     <div style="clear: left;"></div>
   </div>
-  <div class="content">
+  <div style="" class="content">
     <div class="message user_content">
       <%= user_content(notification.message) %>
     </div>

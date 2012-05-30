@@ -1,95 +1,92 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
-  <title>Page Error</title>
-  <noscript> <meta http-equiv=refresh content="0; URL=/enable-javascript.html" /> </noscript> 
-  <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
-  <link href="/assets/common.css?1274476615" media="all" rel="stylesheet" type="text/css" /> 
-</head> 
-<body class=""> 
-  <div id="header" class="no-print no-user"> 
-    <b id="header-logo"></b>  
-    <a href="#content" id="skip_navigation_link">Skip To Content</a> 
-    <div id="topbar"> 
-      <ul id="identity"> 
-        <li class="no-left-border"><a href="/register">Sign Up as a Teacher</a></li> 
-        <li><a href="/login">Log In</a></li> 
-      </ul>
-    </div> 
-  </div> 
-  <div id="flash_message_holder"> 
-    <div id="flash_notice_message" style="display: none;"></div> 
-    <div id="flash_error_message" style="display: none;"></div> 
-  </div> 
-  <div id="wrapper-container"> 
-    <div id="wrapper"> 
-      <div id="main"> 
-        <div id="right-side-wrapper"> 
-          <div id="right-side"></div> 
-        </div> 
-        <div id="content"> 
-          <div style="width: 410px; margin-left: auto; margin-right: auto; margin-top: 50px;"> 
-            <h2>Page Error</h2>
-            <p>Well, looks like something broke.  Sorry you had to see that.</p>
-            <a href="#" style="font-size: 1.2em;" class="submit_error_link discussion-topic">Tell us what you were looking for.</a> 
-            <form id="submit_error_form" style="display: none;" action="/errors" method="POST"> 
-              <input id="error_category" name="error[category]" type="hidden" value="500" /> 
-              <input id="error_id" name="error[id]" type="hidden" /> 
-              <input id="error_url" name="error[url]" type="hidden" value="the value of this field should be changed by javascript on dom ready." /> 
-              <div style="width: 100%; margin: 0px auto;"> 
-                <textarea cols="40" id="error_comments" name="error[comments]" rows="20" style="width: 100%; height: 100px; border: 1px solid #888;"></textarea> 
-                Email (optional): <input id="error_email" name="error[email]" size="30" style="border: 1px solid #888;" type="text" value="" /> 
-              </div> 
-              <div class="button-container"> 
-                <button type="submit" class="button">Send Comments</button> 
-              </div> 
-            </form> 
-          </div> 
-        </div> 
-      </div> 
-      <div id="footer"> 
-        <a href="http://www.instructure.com"><img alt="Powered By Instructure" src="/images/footer-logo.png?1274476615" /></a> 
-        <a href="http://support.instructure.com">Support</a>
-      </div> 
-    </div> 
-  </div> 
-  <div id="feedback_user_email" style="display: none;"></div> 
-  <div id="feedback_dialog" style="display: none;"></div> 
-  <script type="text/javascript"> 
-    var INST = {
-      environment: "production",
-      logPageViews: true,
-      allowMediaComments: false,
-      http_status: "404 Not Found"
-    };
-  </script> 
-  <script src="/assets/common.js?1274476615" type="text/javascript"></script> 
-  <script> 
-  $("input#error_url").val(window.location.toString());
-  $(document).ready(function() {
-    $(".submit_error_link").click(function(event) {
-      event.preventDefault();
-      $("#submit_error_form").slideToggle(function() {
-        $("#submit_error_form :input:visible:first").focus().select();
-      });
-    });
-    $("#submit_error_form").formSubmit({
-      formErrors: false,
-      beforeSubmit: function(data) {
-        $(this).loadingImage();
-      },
-      success: function(data) {
-        $(this).loadingImage('remove');
-        $.flashMessage("Thank you for your help!  We'll get right on this.");
-        $("#submit_error_form").slideToggle();
-      },
-      error: function(data) {
-        $(this).loadingImage('remove');
-        $(this).errorBox("Report didn't send.  Please try again.");
-      }
-    });
-  });
-  </script> 
-</body> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+  <title>Canvas Page Error</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      line-height: 18px;
+      color: #333333;
+      background-color: #eee;
+    }
+
+    a {
+      color: #0088cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #005580;
+      text-decoration: underline;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: normal;
+      border-bottom: 1px solid #ccc;
+      margin: 0;
+    }
+    .centered-div {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: 0;
+      padding: 0;
+      margin-top: -210px;
+      margin-left: -250px;
+      width: 500px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      border-radius: 5px;
+      z-index: 1;
+
+    }
+    .centered-div-content {
+      padding: 15px 20px;
+    }
+    body, html {
+      margin: 0;
+      height: 100%;
+    }
+    .sticky-footer {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      margin: 10px;
+      z-index: 0;
+    }
+    a img {
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <form class="centered-div" id="submit_error_form" action="/errors" method="POST">
+    <h1 class="centered-div-content">Oops! It Looks Like Something Broke</h1>
+    <div class="centered-div-content">
+      <p>Please let us know how you got here so we can fix it as soon as possible:</p>
+      <input id="error_category" name="error[category]" type="hidden" value="500" />
+      <input id="error_url" name="error[url]" type="hidden" value="the value of this field should be changed by javascript on dom ready." />
+      <textarea autofocus name="error[comments]" style="width: 100%; min-height: 100px"></textarea>
+      Your email address: <input id="error_email" name="error[email]" style="width: 100%" />
+      <p>
+        If you need more assistance, go to our
+        <a href="http://help.instructure.com">support website</a> or
+        <a href="mailto:support@instructure.com?subject=Feedback from Canvas page error">send us an email</a>.
+      </p>
+      <div class="button-container">
+        <button type="submit" class="button">Send Comments</button>
+      </div>
+    </div>
+  </form>
+  <div class="sticky-footer">
+    <a href="http://www.instructure.com"><img alt="Powered By Instructure" src="/images/footer-logo.png?1274476615" /></a>
+  </div>
+  <script>
+    document.getElementById('error_url').value = window.location;
+  </script>
+</body>
 </html>

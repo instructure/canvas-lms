@@ -57,7 +57,7 @@ define([
       return this;
     },
 
-    // Determines whether or to show the "show question details" link.
+    // Determines whether or not to show the "show question details" link.
     checkShowDetails: function() {
       var hasQuestions = this.$questions.find('div.display_question:not(.essay_question, .text_only_question)').length;
       this.$showDetailsWrap[hasQuestions ? 'show' : 'hide'](200);

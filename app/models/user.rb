@@ -116,6 +116,8 @@ class User < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :messages
 
+  has_many :collections, :as => :context
+
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
 
@@ -801,7 +803,7 @@ class User < ActiveRecord::Base
     end
     updates['submission_comments'] = 'author_id'
     updates['conversation_messages'] = 'author_id'
-    updates = updates.map
+    updates = updates.to_a
     updates << ['enrollments', 'associated_user_id']
     updates.each do |table, column|
       begin
@@ -1321,7 +1323,10 @@ class User < ActiveRecord::Base
   def assignments_needing_submitting(opts={})
     course_codes = opts[:contexts] ? (Array(opts[:contexts]).map(&:asset_string) & current_student_enrollment_course_codes) : current_student_enrollment_course_codes
     ignored_ids = ignored_items(:submitting).select{|key, val| key.match(/\Aassignment_/) }.map{|key, val| key.sub(/\Aassignment_/, "") }
-    Assignment.for_context_codes(course_codes).active.due_before(1.week.from_now).expecting_submission.due_after(opts[:due_after] || 4.weeks.ago).need_submitting_info(id, opts[:limit] || 15, ignored_ids)
+    Assignment.for_context_codes(course_codes).active.due_before(1.week.from_now).
+      expecting_submission.due_after(opts[:due_after] || 4.weeks.ago).
+      need_submitting_info(id, opts[:limit] || 15, ignored_ids).
+      not_locked
   end
   memoize :assignments_needing_submitting
 

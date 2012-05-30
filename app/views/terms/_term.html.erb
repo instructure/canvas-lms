@@ -29,7 +29,7 @@
       </div>
     <% end %>
   </td>
-  <% types = [StudentEnrollment, TeacherEnrollment, TaEnrollment] %>
+  <% types = [StudentEnrollment, TeacherEnrollment, TaEnrollment, DesignerEnrollment] %>
   <td class="permissions">
     <table>
       <tr class="general_dates">
@@ -57,6 +57,10 @@
                 start_tooltip = t 'tooltips.term_starts_tas', "For TAs the term starts"
                 end_tooltip = t 'tooltips.term_ends_tas', "For TAs the term ends"
                 access_label = mt 'labels.tas_can_access_from', "**TAs** can access from"
+              when 'designer_enrollment'
+                start_tooltip = t 'tooltips.term_starts_designers', "For designers the term starts"
+                end_tooltip = t 'tooltips.term_ends_designers', "For designers the term ends"
+                access_label = mt 'labels.designers_can_access_from', "**Designers** can access from"
               end
           %>
           <%= access_label %>

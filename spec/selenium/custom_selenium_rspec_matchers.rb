@@ -15,13 +15,14 @@ module CustomSeleniumRspecMatchers
     end
 
     def negative_failure_message
-      "expected #{@element.inspect} to not have class #{@class_name}, actual class names: #{@element.attribute('class')}"
+      "expected #{@element.inspect} to NOT have class #{@class_name}, actual class names: #{@element.attribute('class')}"
     end
   end
 
   def have_class(class_name)
     HasClass.new(class_name)
   end
+
 
   class IncludeText
     def initialize(text)
@@ -48,5 +49,28 @@ module CustomSeleniumRspecMatchers
 
   def include_text(text)
     IncludeText.new(text)
+  end
+
+  class HasValue
+    def initialize(value)
+      @value_attribute = value
+    end
+
+    def matches? (element)
+      @element = element
+      !!@element.attribute('value').match(@value_attribute)
+    end
+
+    def failure_message
+      "expected #{@element.inspect} to have value #{@value_attribute}, actual class names: #{@element.attribute('value')}"
+    end
+
+    def negative_failure_message
+      "expected #{@element.inspect} to NOT have value #{@value_attribute}, actual value names: #{@element.attribute('value')}"
+    end
+  end
+
+  def have_value(value)
+    HasValue.new(value)
   end
 end

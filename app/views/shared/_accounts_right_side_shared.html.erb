@@ -16,7 +16,8 @@
       'jqueryui/autocomplete' /* /\.autocomplete/ */
     ], function($) {
 
-      $(function(){
+      // disabling until we can make this fast
+      /*$(function(){
         $("#new_user").find("#user_name").autocomplete({
           minLength: 4,
           delay: 150, //miliseconds
@@ -25,7 +26,7 @@
             window.location = $("#new_user")[0].action + "/" + ui.item.id;
           }
         });
-      });
+      });*/
     });
     </script>
   <% end %>

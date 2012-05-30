@@ -150,6 +150,8 @@ define [
       else if @event.object?.available_slots > 0
         params.availableSlotsText = @event.object.available_slots
 
+      params.showEventLink   = params.can_edit and params.fullDetailsURL()
+      params.showEventLink or= params.isAppointmentGroupEvent()
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
 
       @popover.el.find(".edit_event_link").click preventDefault @showEditDialog

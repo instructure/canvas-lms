@@ -153,7 +153,7 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API
+  # @API List users
   # Retrieve the list of users associated with this account.
   #
   # @example_response
@@ -206,12 +206,12 @@ class UsersController < ApplicationController
     return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
     if request.post?
       if @user == @real_current_user
-        session[:become_user_id] = nil
+        session.delete(:become_user_id)
       else
         session[:become_user_id] = params[:user_id]
       end
       return_url = session[:masquerade_return_to]
-      session[:masquerade_return_to] = nil
+      session.delete(:masquerade_return_to)
       return return_to(return_url, request.referer || dashboard_url)
     end
   end
@@ -235,13 +235,14 @@ class UsersController < ApplicationController
 
   include Api::V1::StreamItem
 
-  # @API
+  # @API List the activity stream
   # Returns the current user's global activity stream.
   #
   # The response is currently hard-coded to the last 2 weeks or 21 total items.
   #
   # There are many types of objects that can be returned in the activity
   # stream. All object types have the same basic set of shared attributes:
+  #   !!!javascript
   #   {
   #     'created_at': '2011-07-13T09:12:00Z',
   #     'updated_at': '2011-07-25T08:52:41Z',
@@ -252,40 +253,46 @@ class UsersController < ApplicationController
   #     'context_type': 'course', // course|group
   #     'course_id': 1,
   #     'group_id': null,
+  #     'html_url': "http://..." // URL to the Canvas web UI for this stream item
   #   }
   #
   # In addition, each item type has its own set of attributes available.
   #
   # DiscussionTopic:
   #
+  #   !!!javascript
   #   {
   #     'type': 'DiscussionTopic',
   #     'discussion_topic_id': 1234,
   #     'total_root_discussion_entries': 5,
-  #     'require_initial_post' => true,
-  #     'user_has_posted' => true,
+  #     'require_initial_post': true,
+  #     'user_has_posted': true,
   #     'root_discussion_entries': {
   #       ...
   #     }
   #   }
+  #
   # For DiscussionTopic, the message is truncated at 4kb.
   #
   # Announcement:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Announcement',
   #     'announcement_id': 1234,
   #     'total_root_discussion_entries': 5,
-  #     'require_initial_post' => true,
-  #     'user_has_posted' => null,
+  #     'require_initial_post': true,
+  #     'user_has_posted': null,
   #     'root_discussion_entries': {
   #       ...
   #     }
   #   }
+  #
   # For Announcement, the message is truncated at 4kb.
   #
   # Conversation:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Conversation',
   #     'conversation_id': 1234,
@@ -295,6 +302,7 @@ class UsersController < ApplicationController
   #
   # Message:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Message',
   #     'message_id': 1234,
@@ -303,6 +311,7 @@ class UsersController < ApplicationController
   #
   # Submission:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Submission',
   #     'grade': '12',
@@ -316,6 +325,7 @@ class UsersController < ApplicationController
   #
   # Conference:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Conference',
   #     'web_conference_id': 1234
@@ -323,6 +333,7 @@ class UsersController < ApplicationController
   #
   # Collaboration:
   #
+  #   !!!javascript
   #   {
   #     'type': 'Collaboration',
   #     'collaboration_id': 1234
@@ -356,7 +367,7 @@ class UsersController < ApplicationController
   end
 
   include Api::V1::TodoItem
-  # @API
+  # @API List the TODO items
   # Returns the current user's list of todo items, as seen on the user dashboard.
   #
   # There is a limit to the number of items returned.
@@ -414,7 +425,7 @@ class UsersController < ApplicationController
     render :json => { :hidden => true }
   end
 
-  # @API
+  # @API Upload a file
   #
   # Upload a file to the user's personal files section.
   #
@@ -529,7 +540,8 @@ class UsersController < ApplicationController
 
   include Api::V1::User
   include Api::V1::Avatar
-  # @API
+
+  # @API Create a user
   # Create and return a new user and pseudonym for an account.
   #
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
@@ -627,7 +639,7 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API
+  # @API Edit a user
   # Modify an existing user. To modify a user's login, see the documentation for logins.
   #
   # @argument user[name] [Optional] The full name of the user. This name will be used by teacher for grading.
@@ -779,7 +791,7 @@ class UsersController < ApplicationController
     if @user_about_to_go_away && @user_that_will_still_be_around && @user_about_to_go_away.id.to_s == params[:user_id]
       @user_about_to_go_away.move_to_user(@user_that_will_still_be_around)
       @user_that_will_still_be_around.touch
-      session[:merge_user_uuid] = nil
+      session.delete(:merge_user_uuid)
       flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
     else
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
@@ -807,7 +819,7 @@ class UsersController < ApplicationController
       if @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
         session[:merge_user_id] = @user.id
         session[:merge_user_uuid] = @user.uuid
-        session[:pending_user_id] = nil
+        session.delete(:pending_user_id)
       else
         @other_user = nil
       end

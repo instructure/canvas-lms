@@ -59,10 +59,10 @@
   <% if pending_invitations.empty? %>
   <% elsif pending_invitations.length == 1 %>
     <% invitation = pending_invitations.first %>
-    <div class="communication_message dashboard_notification pinned_notification">
+    <div class="communication_message dashboard_notification alert alert-info">
       <div class="header">
         <div class="header_title">
-          <%= image_tag "information.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
+          <%= image_tag "information.png", :class => "header_icon", :style => "padding: 0;" %>
           <span class="title subject"><a href="<%= course_path(invitation.course_id, :invitation => invitation.uuid) %>"><%= invitation.long_name %></a></span>
           <div class="sub_title">
             <span class="context_code"><%= t('information', 'Information') %></span>
@@ -78,7 +78,7 @@
       </div>
     </div>
   <% else %>
-    <div class="communication_message dashboard_notification pinned_notification">
+    <div class="communication_message dashboard_notification alert alert-info">
       <div class="header">
         <div class="header_title">
           <%= image_tag "information.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>

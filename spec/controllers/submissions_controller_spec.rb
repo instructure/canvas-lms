@@ -236,5 +236,21 @@ describe SubmissionsController do
         assigns[:submission].send(secret_attr).should be_nil
       end
     end
+
+    it "should show rubric assessments to peer reviewers" do
+      course_with_student_and_submitted_homework
+
+      @assessor = student_in_course.user
+      outcome_with_rubric
+      @association = @rubric.associate_with @assignment, @course, :purpose => 'grading'
+      @assignment.assign_peer_review(@assessor, @submission.user)
+      @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading'})
+      user_session(@assessor)
+
+      get "show", :id => @submission.to_param, :assignment_id => @assignment.to_param, :course_id => @course.to_param
+      response.should be_success
+
+      assigns[:visible_rubric_assessments].should == [@assessment]
+    end
   end
 end

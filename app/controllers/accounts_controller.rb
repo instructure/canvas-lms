@@ -24,7 +24,7 @@ class AccountsController < ApplicationController
 
   include Api::V1::Account
 
-  # @API
+  # @API List accounts
   # List accounts that the current user can view or manage.  Typically,
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
@@ -42,7 +42,7 @@ class AccountsController < ApplicationController
     end
   end
 
-  # @API
+  # @API Get a single account
   # Retrieve information on an individual account, given by id or sis
   # sis_account_id.
   def show
@@ -61,7 +61,7 @@ class AccountsController < ApplicationController
 
   include Api::V1::Course
 
-  # @API
+  # @API List active courses in an account
   # Retrieve the list of active (non-deleted) courses in this account.
   #
   # @argument hide_enrollmentless_courses [optional] If set, only return courses that have at least one enrollment.

@@ -261,10 +261,13 @@ define([
         data.type = data.type || data['item[type]'] || $.underscore(data.content_type);
         data.title = data.title || data['item[title]'];
         data.new_tab = data.new_tab ? '1' : '0';
-        if(data.id != 'new') {
-          $("#context_module_item_" + data.id).remove();
+        var $item, $olditem = (data.id != 'new') ? $("#context_module_item_" + data.id) : [];
+        if($olditem.length) {
+          $item = $olditem.clone(true).removeAttr('id');
+          $olditem.remove();
+        } else {
+          $item = $("#context_module_item_blank").clone(true).removeAttr('id');
         }
-        var $item = $("#context_module_item_blank").clone(true).removeAttr('id');
         $item.addClass(data.type + "_" + data.id);
         $item.addClass(data.type);
         $item.fillTemplateData({
@@ -415,6 +418,7 @@ define([
     };
   })();
   
+
   modules.initModuleManagement = function() {
     $("#unlock_module_at").change(function() {
       $(".unlock_module_at_details").showIf($(this).attr('checked'));
@@ -447,7 +451,8 @@ define([
         .removeClass('max_score_requirement')
         .removeClass('must_view_requirement')
         .removeClass('must_submit_requirement')
-        .removeClass('must_contribute_requirement');
+        .removeClass('must_contribute_requirement')
+        .find('.criterion').removeClass('defined');
       for(var idx in data.context_module.completion_requirements) {
         var req = data.context_module.completion_requirements[idx];
         req.criterion_type = req.type;

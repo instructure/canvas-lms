@@ -31,7 +31,10 @@ def init
       @contents = @file.contents
       @file = File.basename(@file.path)
     end
+    def @object.source_type; nil; end
     sections :layout, [:diskfile]
+  elsif options[:all_resources]
+    sections :layout, [T('topic')]
   elsif options[:controllers]
     sections :layout, [T('topic')]
   else
@@ -52,7 +55,6 @@ def index
 end
 
 def diskfile
-  options[:no_highlight] = true
   content = "<div id='filecontents'>" +
   case (File.extname(@file)[1..-1] || '').downcase
   when 'htm', 'html'

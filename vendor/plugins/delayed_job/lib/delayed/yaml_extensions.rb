@@ -1,5 +1,10 @@
 # New definitions for YAML to aid in serialization and deserialization of delayed jobs.
 
+require 'yaml'
+# this code needs to be updated to work with the new Psych YAML engine in ruby 1.9.x
+# for now we force Syck
+YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
+
 # First, tell YAML how to load a Module. This depends on Rails .constantize and autoloading.
 YAML.add_ruby_type("object:Module") do |type, val|
   val.constantize

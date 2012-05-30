@@ -2,14 +2,14 @@
 <% unless dashboard %>
   <li class="<%= 'unpublished' if current_enrollment.course.created? || current_enrollment.course.claimed? %> <%= current_enrollment.state_based_on_date %>">
 <% end %>
-  <% if current_enrollment.workflow_state == "invited" %>
-  <div class="<%= dashboard ? 'communication_message dashboard_notification pinned_notification' : 'reminder' %>">
+<% if current_enrollment.workflow_state == "invited" %>
+  <div class="<%= dashboard ? 'communication_message dashboard_notification alert alert-info' : 'reminder' %>">
     <h2><a href="<%= course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid) %>"><%= current_enrollment.long_name %></a></h2>
     <div class="body">
       <%=  render :partial => 'shared/invitation', :object => current_enrollment %>
     </div>
   </div>
-  <% else %>
+<% else %>
   <a href="<%= course_path(current_enrollment.course_id) %>">
     <span class="name ellipsis" title="<%= current_enrollment.long_name %>">
       <%= current_enrollment.long_name %>
@@ -37,7 +37,7 @@
     %> 
     <span class="subtitle ellipsis"><%= message %></span> 
   </a>  
-  <% end %>
+<% end %>
 <% unless dashboard %>
   </li>
 <% end %>

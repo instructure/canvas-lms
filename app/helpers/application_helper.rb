@@ -311,8 +311,9 @@ module ApplicationHelper
   # See `js_base_url`
   def use_optimized_js?
     if ENV['USE_OPTIMIZED_JS'] == 'true'
-      # allows overriding by adding ?debug_assets=1 to the url
-      !params[:debug_assets]
+      # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
+      # (debug_assets is also used by jammit => you'll get unpackaged css AND js)
+      !(params[:debug_assets] || params[:debug_js])
     else
       # allows overriding by adding ?optimized_js=1 to the url
       params[:optimized_js] || false
@@ -555,15 +556,8 @@ module ApplicationHelper
   end
 
   def map_courses_for_menu(courses)
-    # so we can display the term for duplicate course names
-    name_counts = {}
-    courses.each do |course|
-      name_counts[course.short_name] ||= 0
-      name_counts[course.short_name] += 1
-    end
-
     mapped = courses.map do |course|
-      term = course.enrollment_term.name if (name_counts[course.short_name] > 1 && !course.enrollment_term.default_term?)
+      term = course.enrollment_term.name if !course.enrollment_term.default_term?
       subtitle = (course.primary_enrollment_state == 'invited' ?
                   before_label('#shared.menu_enrollment.labels.invited_as', 'Invited as') :
                   before_label('#shared.menu_enrollment.labels.enrolled_as', "Enrolled as")

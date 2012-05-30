@@ -24,7 +24,7 @@ module SIS
     
       def self.is_term_csv?(row)
         #This matcher works because a course has long_name/short_name
-        row.header?('term_id') && row.header?('name')
+        row.include?('term_id') && row.include?('name')
       end
     
       # expected columns

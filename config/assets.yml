@@ -61,7 +61,7 @@ css_compressor_options:
     end
     plugin_assets[plugin] = assets
   end
-  subdoc = YAML.dump('plugins' => plugin_assets).gsub(/^--- \n/, '')
+  subdoc = YAML.dump('plugins' => plugin_assets).gsub(/^---\s?\n/, '')
 
   # add anchors to the various bundles in the imported plugin asset definitions.
   # these bundles will be included in the known bundle types below with a
@@ -117,6 +117,7 @@ stylesheets:
     - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css
     - public/stylesheets/compiled/g_util_fancy_links.css
+    - public/stylesheets/compiled/g_bootstrap_parts.css
     - public/stylesheets/compiled/g_util_buttons.css
     - public/stylesheets/compiled/g_util_inst_tree.css
     - public/stylesheets/compiled/g_util_chevron_crumbs.css

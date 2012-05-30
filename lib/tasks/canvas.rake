@@ -115,36 +115,52 @@ namespace :canvas do
 
   desc "Compile javascript and css assets."
   task :compile_assets do
-    threads = []
-    threads << Thread.new do
-      puts "--> Compiling static assets [css]"
-      Rake::Task['css:generate'].invoke
+    puts "--> Compiling static assets [css]"
+    Rake::Task['css:generate'].invoke
 
-      puts "--> Compiling static assets [jammit]"
-      output = `bundle exec jammit 2>&1`
-      raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
+    puts "--> Compiling static assets [jammit]"
+    output = `bundle exec jammit 2>&1`
+    raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
 
-      puts "--> Compiled static assets [css/jammit]"
-    end
+    puts "--> Compiled static assets [css/jammit]"
 
-    threads << Thread.new do
-      puts "--> Compiling static assets [javascript]"
-      Rake::Task['js:generate'].invoke
+    puts "--> Compiling static assets [javascript]"
+    Rake::Task['js:generate'].invoke
 
-      puts "--> Generating js localization bundles"
-      Rake::Task['i18n:generate_js'].invoke
+    puts "--> Generating js localization bundles"
+    Rake::Task['i18n:generate_js'].invoke
 
-      puts "--> Optimizing JavaScript [r.js]"
-      Rake::Task['js:build'].invoke
-    end
+    puts "--> Optimizing JavaScript [r.js]"
+    Rake::Task['js:build'].invoke
 
-    threads << Thread.new do
-      puts "--> Generating documentation [yardoc]"
-      Rake::Task['doc:api'].invoke
-    end
-
-    threads.each(&:join)
+    puts "--> Generating documentation [yardoc]"
+    Rake::Task['doc:api'].invoke
   end
+
+  desc "Check static assets and generate api documentation."
+     task :check_static_assets do
+       threads = []
+       threads << Thread.new do
+         puts "--> JS tests"
+         Rake::Task['js:test'].invoke
+       end
+
+       threads << Thread.new do
+         puts "--> i18n check"
+         Rake::Task['i18n:check'].invoke
+       end
+
+       threads << Thread.new do
+         puts "--> Check syntax"
+         Rake::Task['canvas:check_syntax'].invoke
+       end
+
+       threads << Thread.new do
+         puts "--> Generating API documentation"
+         Rake::Task['doc:api'].invoke
+       end
+     threads.each(&:join)
+   end
 end
 
 namespace :db do

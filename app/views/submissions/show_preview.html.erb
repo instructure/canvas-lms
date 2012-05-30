@@ -179,6 +179,10 @@
     });
     </script>
   <% end %>
+<% elsif @submission.has_submission? %>
+  <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
+    <%= t('no_preview_available', 'No Preview Available') %>
+  </div>
 <% else %>
   <div style="margin: 20px auto; width: 200px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_submission', 'No Submission') %>

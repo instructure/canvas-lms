@@ -101,30 +101,28 @@ describe "dashboard" do
     end
 
     it "should put locked graded discussions / quizzes in the coming up list only" do
-      pending("bug 6610 - Problem with todo list and assignments that are not visible yet") do
-        def check_list_text(list_element, text, should_have_text = true)
-          if should_have_text
-            list_element.should include_text(text)
-          else
-            list_element.should_not include_text(text)
-          end
+      def check_list_text(list_element, text, should_have_text = true)
+        if should_have_text
+          list_element.should include_text(text)
+        else
+          list_element.should_not include_text(text)
         end
-
-        DUE_DATE = Time.now.utc + 2.days
-        names = ['locked discussion assignment', 'locked quiz']
-        @course.assignments.create(:name => names[0], :submission_types => 'discussion', :due_at => DUE_DATE, :lock_at => Time.now, :unlock_at => DUE_DATE)
-        q = @course.quizzes.create!(:title => names[1], :due_at => DUE_DATE, :lock_at => Time.now, :unlock_at => DUE_DATE)
-        q.workflow_state = 'available'
-        q.save
-        q.reload
-        get "/"
-
-        todo_list = driver.find_element(:css, '.right-side-list.to-do-list')
-        coming_up_list = driver.find_element(:css, '.right-side-list.events')
-
-        2.times { |i| check_list_text(todo_list, names[i], false) }
-        2.times { |i| check_list_text(coming_up_list, names[i]) }
       end
+
+      DUE_DATE = Time.now.utc + 2.days
+      names = ['locked discussion assignment', 'locked quiz']
+      @course.assignments.create(:name => names[0], :submission_types => 'discussion', :due_at => DUE_DATE, :lock_at => Time.now, :unlock_at => DUE_DATE)
+      q = @course.quizzes.create!(:title => names[1], :due_at => DUE_DATE, :lock_at => Time.now, :unlock_at => DUE_DATE)
+      q.workflow_state = 'available'
+      q.save
+      q.reload
+      get "/"
+
+      # No "To Do" list shown
+      f('.right-side-list.to-do-list').should be_nil
+      coming_up_list = driver.find_element(:css, '.right-side-list.events')
+
+      2.times { |i| check_list_text(coming_up_list, names[i]) }
     end
 
     it "should limit the number of visible items in the to do list" do
@@ -343,7 +341,7 @@ describe "dashboard" do
 
     it "should show submitted essay quizzes in the todo list" do
       quiz_title = 'new quiz'
-      student_in_course
+      student_in_course(:active_all => true)
       q = @course.quizzes.create!(:title => quiz_title)
       q.quiz_questions.create!(:question_data => {:id => 31, :name => "Quiz Essay Question 1", :question_type => 'essay_question', :question_text => 'qq1', :points_possible => 10})
       q.generate_quiz_data

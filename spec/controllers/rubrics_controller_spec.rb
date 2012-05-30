@@ -61,7 +61,7 @@ describe RubricsController do
     it "should invite users if specified" do
       course_with_teacher_logged_in(:active_all => true)
       association = @course.assignments.create!(assignment_valid_attributes)
-      post 'create', :course_id => @course.id, :rubric => {}, :rubric_association => {:association_type => association.class.to_s, :association_id => association.id, :invitations => "bob@example.com"}
+      post 'create', :course_id => @course.id, :rubric => {}, :rubric_association => {:association_type => association.class.to_s, :association_id => association.id, :invitations => "bob@example.com", :purpose => 'grading'}
       assigns[:rubric].should_not be_nil
       assigns[:rubric].should_not be_new_record
       assigns[:rubric].rubric_associations.length.should eql(1)

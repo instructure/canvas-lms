@@ -144,25 +144,32 @@ class SisBatch < ActiveRecord::Base
   def remove_previous_imports
     # we shouldn't be able to get here without a term, but if we do, skip
     return unless self.batch_mode_term
+    return unless data[:supplied_batches]
 
-    # delete courses that weren't in this batch, in the selected term
-    scope = Course.active.for_term(self.batch_mode_term).scoped(:conditions => ["courses.root_account_id = ?", self.account.id])
-    scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id]).find_each do |course|
-      course.destroy
+    if data[:supplied_batches].include?(:course)
+      # delete courses that weren't in this batch, in the selected term
+      scope = Course.active.for_term(self.batch_mode_term).scoped(:conditions => ["courses.root_account_id = ?", self.account.id])
+      scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id]).find_each do |course|
+        course.destroy
+      end
     end
 
-    # delete sections who weren't in this batch, whose course was in the selected term
-    scope = CourseSection.scoped(:conditions => ["course_sections.workflow_state = ? and course_sections.root_account_id = ? and course_sections.sis_batch_id is not null and course_sections.sis_batch_id <> ?", 'active', self.account.id, self.id])
-    scope = scope.scoped(:include => :course, :select => "course_sections.*", :conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
-    scope.find_each do |section|
-      section.destroy
+    if data[:supplied_batches].include?(:section)
+      # delete sections who weren't in this batch, whose course was in the selected term
+      scope = CourseSection.scoped(:conditions => ["course_sections.workflow_state = ? and course_sections.root_account_id = ? and course_sections.sis_batch_id is not null and course_sections.sis_batch_id <> ?", 'active', self.account.id, self.id])
+      scope = scope.scoped(:include => :course, :select => "course_sections.*", :conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
+      scope.find_each do |section|
+        section.destroy
+      end
     end
 
-    # delete enrollments for courses that weren't in this batch, in the selected term
-    scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.root_account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id])
-    scope = scope.scoped(:conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
-    scope.find_each do |enrollment|
-      enrollment.destroy
+    if data[:supplied_batches].include?(:enrollment)
+      # delete enrollments for courses that weren't in this batch, in the selected term
+      scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.root_account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id])
+      scope = scope.scoped(:conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
+      scope.find_each do |enrollment|
+        enrollment.destroy
+      end
     end
   end
 

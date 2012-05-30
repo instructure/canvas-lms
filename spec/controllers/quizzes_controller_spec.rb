@@ -179,13 +179,12 @@ describe QuizzesController do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
       q1 = quiz_question
-      q1.quiz_group_id = 5
       q1.save!
       q2 = quiz_question
       g3 = quiz_group
       q1.position.should eql(1)
-      q2.position.should eql(1)
-      g3.position.should eql(2)
+      q2.position.should eql(2)
+      g3.position.should eql(3)
       post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => "group_#{g3.id},question_#{q1.id},question_#{q2.id}"
       assigns[:quiz].should eql(@quiz)
       q1.reload

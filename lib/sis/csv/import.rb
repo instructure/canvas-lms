@@ -128,6 +128,14 @@ module SIS
         # and don't do it more often than we have work to do
         @updates_every = [ [ @total_rows / @parallelism / 100, 500 ].min, 10 ].max
 
+        if @batch
+          @batch.data[:supplied_batches] = []
+          IMPORTERS.each do |importer|
+            @batch.data[:supplied_batches] << importer if @csvs[importer].present?
+          end
+          @batch.save!
+        end
+
         if (@parallelism > 1)
           # re-balance the CSVs
           @batch.data[:importers] = {}
@@ -388,11 +396,11 @@ module SIS
             return
           end
           begin
-            FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS) do |row|
+            FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
               importer = IMPORTERS.index do |importer|
                 if SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)
                   @csvs[importer] << csv
-                  @headers[importer].merge(row.headers)
+                  @headers[importer].merge(row)
                   true
                 else
                   false

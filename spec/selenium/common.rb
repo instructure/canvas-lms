@@ -712,6 +712,10 @@ shared_examples_for "all selenium tests" do
     el.send_keys(value)
   end
 
+  def submit_form(form_css)
+    f(form_css + ' button[type="submit"]').click
+  end
+
   def check_image(element)
     require 'open-uri'
     element.should be_displayed
@@ -797,12 +801,13 @@ shared_examples_for "all selenium tests" do
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     end
-    ALL_MODELS.each { |m| truncate_table(m) }
+    truncate_all_tables
   end
 
   append_before (:each) do
     driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
+    EncryptedCookieStore.any_instance.stubs(:secret).returns(ActiveSupport::SecureRandom.hex(64))
   end
 
   append_before (:all) do
@@ -838,7 +843,8 @@ end
     "attachments.zip" => File.read(File.dirname(__FILE__) + "/../fixtures/attachments.zip"),
     "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png'),
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip'),
-    "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip')
+    "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip'),
+    "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip')
   }
 
   def get_file(filename, data = nil)
@@ -869,14 +875,22 @@ end
     pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
   end
 
+  # for when you have something like a textarea's value and you want to match it's contents
+  # against a css selector.
+  # usage:
+  # find_css_in_string(some_textarea[:value], '.some_selector').should_not be_empty
+  def find_css_in_string(string_of_html, css_selector)
+    driver.execute_script("return $('<div />').append('#{string_of_html}').find('#{css_selector}')")
+  end
+
   shared_examples_for "in-process server selenium tests" do
     it_should_behave_like "all selenium tests"
     prepend_before (:all) do
       $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
     end
     before do
-      HostUrl.default_host = $app_host_and_port
-      HostUrl.file_host = $app_host_and_port
+      HostUrl.stubs(:default_host).returns($app_host_and_port)
+      HostUrl.stubs(:file_host).returns($app_host_and_port)
     end
   end
 

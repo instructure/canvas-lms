@@ -148,8 +148,9 @@ class Attachment < ActiveRecord::Base
       self.save!
     end
     existing = context.attachments.active.find_by_id(self.id)
-    existing ||= context.attachments.active.find_by_cloned_item_id(self.cloned_item_id || 0)
+    existing ||= self.cloned_item_id ? context.attachments.active.find_by_cloned_item_id(self.cloned_item_id) : nil
     return existing if existing && !options[:overwrite] && !options[:force_copy]
+    existing ||= self.cloned_item_id ? context.attachments.find_by_cloned_item_id(self.cloned_item_id) : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
     self.attributes.delete_if{|k,v| [:id, :uuid, :folder_id, :user_id, :filename].include?(k.to_sym) }.each do |key, val|

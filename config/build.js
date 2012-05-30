@@ -32,6 +32,28 @@
       attach: function(_, $){
         return Backbone;
       }
+    },
+
+    // slick grid shim
+    'vendor/slickgrid/lib/jquery.event.drag-2.0.min': {
+      deps: ['jquery'],
+      attach: '$'
+    },
+    'vendor/slickgrid/slick.core': {
+      deps: ['jquery', 'use!vendor/slickgrid/lib/jquery.event.drag-2.0.min'],
+      attach: 'Slick'
+    },
+    'vendor/slickgrid/slick.grid': {
+      deps: ['use!vendor/slickgrid/slick.core'],
+      attach: 'Slick'
+    },
+    'vendor/slickgrid/slick.editors': {
+      deps: ['use!vendor/slickgrid/slick.core'],
+      attach: 'Slick'
+    },
+    'vendor/slickgrid/plugins/slick.rowselectionmodel': {
+      deps: ['use!vendor/slickgrid/slick.core'],
+      attach: 'Slick'
     }
   },
 
@@ -74,7 +96,6 @@
         'translations/scribd',
         'i18n!scribd',
         'vendor/scribd.view',
-        'vendor/jquery.store',
         'jquery.dropdownList',
         'vendor/jqueryui/progressbar',
         'translations/media_comments',

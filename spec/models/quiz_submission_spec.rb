@@ -291,6 +291,7 @@ describe QuizSubmission do
   end
 
   it "should know if it is extendable" do
+    @quiz.update_attribute(:time_limit, 10)
     now = Time.now.utc
     q = @quiz.quiz_submissions.new
     q.end_at = now

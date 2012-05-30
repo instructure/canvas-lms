@@ -21,23 +21,9 @@ class UserProfile
   def initialize(user)
     @user = user
   end
-  
-  def short_name
-    @user.short_name
-  end
-  
-  def name
-    @user.name
-  end
-  
-  def asset_string
-    @user.asset_string
-  end
-  
-  def opaque_identifier(*args)
-    @user.opaque_identifier(*args)
-  end
-  
+
+  delegate :id, :short_name, :name, :asset_string, :opaque_identifier, :to => :@user
+
   TAB_PROFILE = 0
   TAB_COMMUNICATION_PREFERENCES = 1
   TAB_FILES = 2

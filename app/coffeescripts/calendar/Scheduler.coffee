@@ -85,7 +85,7 @@ define [
         # not the last _visible_ element
         @rightSideAdminSection?.detach()
 
-    show: () =>
+    show: =>
       $("#undated-events, #calendar-feed").hide()
       @active = true
       @div.show()
@@ -93,7 +93,7 @@ define [
       @toggleListMode(true)
       $.publish "Calendar/saveVisibleContextListAndClear"
 
-    hide: () =>
+    hide: =>
       $("#undated-events, #calendar-feed").show()
       @active = false
       @div.hide()
@@ -101,13 +101,13 @@ define [
       @calendar.displayAppointmentEvents = null
       $.publish "Calendar/restoreVisibleContextList"
 
-    canManageAGroup: () =>
+    canManageAGroup: =>
       for contextInfo in @contexts
         if contextInfo.can_create_appointment_groups
           return true
       false
 
-    loadData: () =>
+    loadData: =>
       if not @loadingDeferred || (@loadingDeferred && not @loadingDeferred.isResolved())
         @loadingDeferred = new $.Deferred()
 
@@ -120,7 +120,7 @@ define [
         @redraw()
         @loadingDeferred.resolve()
 
-    redraw: () =>
+    redraw: =>
       @loadingDiv.hide()
 
       if @groups
@@ -210,12 +210,13 @@ define [
 
         @calendar.displayAppointmentEvents = @viewingGroup
         $.publish "Calendar/refetchEvents"
+        @redraw()
 
     doneClick: (jsEvent) =>
       jsEvent.preventDefault()
       @toggleListMode(true)
 
-    showList: () =>
+    showList: =>
       @div.removeClass('showing-single')
       @listDiv.find('.appointment-group-item').removeClass('active')
 
@@ -240,9 +241,9 @@ define [
         message: $ deleteItemTemplate(message: I18n.t('confirm_appointment_group_deletion', "Are you sure you want to delete this appointment group?"), details: I18n.t('appointment_group_deletion_details', "Deleting it will also delete any appointments that have been signed up for by students."))
         dialog: {title: I18n.t('confirm_deletion', "Confirm Deletion")}
         prepareData: ($dialog) => {cancel_reason: $dialog.find('#cancel_reason').val() }
-        confirmed: () =>
+        confirmed: =>
           $(jsEvent.target).closest(".appointment-group-item").addClass("event_pending")
-        success: () =>
+        success: =>
           @calendar.dataSource.clearCache()
           @loadData()
 

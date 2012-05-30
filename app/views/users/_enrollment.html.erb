@@ -6,6 +6,11 @@
         <%= image_tag "hammer.png", :title => t('course_not_published', "This course hasn't been published yet"), :alt => t('unpublished', "Unpublished"), :class => "unpublished_icon" %>
       <% end %>
     </span>
+
+    <% unless enrollment.course.enrollment_term.default_term? %>
+      <span class="subtitle ellipsis"><%= enrollment.course.enrollment_term.name %></span>
+    <% end %>
+
     <span class="subtitle ellipsis">
       <%= Enrollment.workflow_readable_type(enrollment.state_based_on_date) %>,
       <%= 
@@ -24,6 +29,7 @@
           t('roles_student', "Enrolled as a Student.")
         end
       %>
+
       <% if enrollment.associated_user %>
         <%= t('linked_to_user', '(Linked to %{user_name})', :user_name => enrollment.associated_user.name) %>
       <% end %>

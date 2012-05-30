@@ -672,18 +672,14 @@ describe ConversationsController, :type => :integration do
     it "should return the conversation" do
       conversation = conversation(@bob)
       attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
-      media_object = nil
-      message = conversation.add_message("another", :attachment_ids => [attachment.id]) do |message|
-        media_object = MediaObject.new
-        media_object.media_id = '0_12345678'
-        media_object.media_type = 'audio'
-        media_object.context = @me
-        media_object.user = @me
-        media_object.title = "test title"
-        media_object.save!
-        message.media_comment = media_object
-        message.save!
-      end
+      media_object = MediaObject.new
+      media_object.media_id = '0_12345678'
+      media_object.media_type = 'audio'
+      media_object.context = @me
+      media_object.user = @me
+      media_object.title = "test title"
+      media_object.save!
+      message = conversation.add_message("another", :attachment_ids => [attachment.id], :media_comment => media_object)
 
       conversation.reload
 
@@ -858,6 +854,22 @@ describe ConversationsController, :type => :integration do
         ]
       })
     end
+
+    it "should create a media object if it doesn't exist" do
+      conversation = conversation(@bob)
+
+      MediaObject.count.should eql 0
+      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+              { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :body => "another", :media_comment_id => "asdf", :media_comment_type => "audio" })
+      conversation.reload
+      mjson = json["messages"][0]["media_comment"]
+      mjson.should be_present
+      mjson["media_id"].should eql "asdf"
+      mjson["media_type"].should eql "audio"
+      MediaObject.count.should eql 1
+    end
+
 
     it "should add recipients to the conversation" do
       conversation = conversation(@bob, @billy)

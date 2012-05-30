@@ -31,9 +31,9 @@ class PseudonymSessionsController < ApplicationController
       return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
     end
 
-    session[:expected_user_id] = params[:expected_user_id].to_i
-    session[:confirm] = params[:confirm]
-    session[:enrollment] = params[:enrollment]
+    session[:expected_user_id] = params[:expected_user_id].to_i if params[:expected_user_id]
+    session[:confirm] = params[:confirm] if params[:confirm]
+    session[:enrollment] = params[:enrollment] if params[:enrollment]
 
     @pseudonym_session = PseudonymSession.new
     @headers = false
@@ -42,7 +42,7 @@ class PseudonymSessionsController < ApplicationController
     @is_saml = @domain_root_account.saml_authentication? && @is_delegated
     if @is_cas && !params[:no_auto]
       if session[:exit_frame]
-        session[:exit_frame] = nil
+        session.delete(:exit_frame)
         render :template => 'shared/exit_frame', :layout => false, :locals => {
           :url => login_url(params)
         }
@@ -205,7 +205,7 @@ class PseudonymSessionsController < ApplicationController
     flash[:notice] = t 'notices.logged_out', "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
-      session[:return_to] = nil
+      session.delete(:return_to)
       if @domain_root_account.delegated_authentication?
         format.html { redirect_to login_url(:no_auto=>'true') }
       else
@@ -216,8 +216,8 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def clear_file_session
-    session['file_access_user_id'] = nil
-    session['file_access_expiration'] = nil
+    session.delete('file_access_user_id')
+    session.delete('file_access_expiration')
     render :text => "ok"
   end
 

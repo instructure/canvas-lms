@@ -27,16 +27,22 @@ shared_examples_for "files selenium tests" do
     login_as username, password
   end
 
-  def add_file(fixture, course, name)
-    resp, body = SSLCommon.get "#{app_host}/courses/#{course.id}/files",
+  def add_file(fixture, context, name)
+    if context.is_a?(Course)
+      path = "/courses/#{context.id}/files"
+    elsif context.is_a?(User)
+      path = "/dashboard/files"
+    end
+    context_code = context.asset_string.capitalize
+    resp, body = SSLCommon.get "#{app_host}#{path}",
                                "Cookie" => @cookie
     resp.code.should == "200"
     body.should =~ /<div id="ajax_authenticity_token">([^<]*)<\/div>/
     authenticity_token = $1
     resp, body = SSLCommon.post_form("#{app_host}/files/pending", {
-        "attachment[folder_id]" => course.folders.active.first.id,
+        "attachment[folder_id]" => context.folders.active.first.id,
         "attachment[filename]" => name,
-        "attachment[context_code]" => "Course_#{course.id}",
+        "attachment[context_code]" => context_code,
         "authenticity_token" => authenticity_token,
         "no_redirect" => true}, {"Cookie" => @cookie})
     resp.code.should == "200"
@@ -88,7 +94,6 @@ shared_examples_for "files selenium tests" do
     # also make sure that it has a tooltip of the file name so that you can read really long names
     f(".node.folder .name[title='my folder']").should_not be_nil
   end
-
 end
 
 describe "files without s3 and forked tests" do
@@ -152,6 +157,38 @@ describe "files local tests" do
       driver.find_element(:css, "#edit_content_dialog button.save_button").click
       keep_trying_until { !driver.find_element(:css, "#edit_content_dialog").displayed? }
     end
+  end
+
+  it "should allow uploaded files to be used for submission" do
+    skip_if_ie("IE hangs")
+    user_with_pseudonym :username => "nobody2@example.com",
+                        :password => "asdfasdf2"
+    course_with_student_logged_in :user => @user
+    login "nobody2@example.com", "asdfasdf2"
+    add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
+             @user, "html-editing-test.html")
+    current_content = File.read(fixture_file_path("files/html-editing-test.html"))
+    assignment = @course.assignments.create!(:title => 'assignment 1',
+                                             :name => 'assignment 1',
+                                             :submission_types => "online_upload")
+    get "/courses/#{@course.id}/assignments/#{assignment.id}"
+    f('.submit_assignment_link').click
+    f('.toggle_uploaded_files_link').click
+
+    # traverse the tree
+    f('#uploaded_files > ul > li.folder > .sign').click
+    wait_for_animations
+    f('#uploaded_files > ul > li.folder .file .name').click
+    wait_for_animations
+
+    f('#submit_file_button').click
+    wait_for_ajax_requests
+    wait_for_dom_ready
+
+    keep_trying_until {
+      f('.details .header').should include_text "Turned In!"
+      f('.details .file-big').should include_text "html-editing-test.html"
+    }
   end
 end
 
