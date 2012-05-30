@@ -99,6 +99,9 @@
 #
 #       // The API URL for this item. Used to clone the collection item.
 #       url: "https://<canvas>/api/v1/collections/items/7"
+#
+#       // The timestamp of when the item was posted by the user
+#       created_at: "2012-05-30T17:45:25Z",
 #     }
 class CollectionItemsController < ApplicationController
   before_filter :require_collection, :only => [:index, :create]
@@ -130,6 +133,7 @@ class CollectionItemsController < ApplicationController
   #          image_url: "https://<canvas>/files/item_image.png",
   #          description: "some block of plain text",
   #          url: "https://<canvas>/api/v1/collections/items/7"
+  #          created_at: "2012-05-30T17:45:25Z",
   #       }
   #     ]
   def index
@@ -163,6 +167,7 @@ class CollectionItemsController < ApplicationController
   #        image_url: "https://<canvas>/files/item_image.png",
   #        description: "some block of plain text",
   #        url: "https://<canvas>/api/v1/collections/items/7"
+  #        created_at: "2012-05-30T17:45:25Z",
   #     }
   def show
     find_item_and_collection

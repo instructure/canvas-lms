@@ -158,6 +158,7 @@ describe "Collections API", :type => :integration do
     {
       'id' => item.id,
       'collection_id' => item.collection_id,
+      'user_id' => item.user_id,
       'item_type' => item.collection_item_data.item_type,
       'link_url' => item.collection_item_data.link_url,
       'post_count' => item.collection_item_data.post_count,
@@ -169,6 +170,7 @@ describe "Collections API", :type => :integration do
       'html_preview' => item.data.html_preview,
       'description' => item.description,
       'url' => "http://www.example.com/api/v1/collections/items/#{item.id}",
+      'created_at' => item.created_at.iso8601,
     }
   end
 
