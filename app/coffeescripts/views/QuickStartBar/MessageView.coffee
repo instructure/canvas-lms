@@ -1,7 +1,7 @@
 define [
   'i18n!dashboard'
-  'compiled/home/views/quickStartBar/BaseItemView'
-  'compiled/home/models/quickStartBar/Message'
+  'compiled/views/QuickStartBar/BaseItemView'
+  'compiled/models/Message'
   'jst/quickStartBar/message'
   'jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'

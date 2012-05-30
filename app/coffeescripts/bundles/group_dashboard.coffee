@@ -2,8 +2,8 @@ require [
   'jquery'
   'Backbone'
   'compiled/groups/dashboard/views/GroupDashboardView'
-  'compiled/quickStartBar/views/QuickStartBarView'
-  'compiled/ActivityFeed/views/ActivityFeedItemsView'
+  'compiled/views/QuickStartBar/QuickStartBarView'
+  'compiled/views/ActivityFeed/ActivityFeedItemsView'
   'compiled/groups/dashboard/collections/ActivityFeedItemsCollection'
 ], ($, {View}, GroupDashboardView, QuickStartBarView, ActivityFeedItemsView, GroupActivityFeedItemsCollection) ->
 

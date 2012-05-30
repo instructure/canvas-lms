@@ -1,6 +1,6 @@
 define [
   'Backbone'
-  'compiled/home/collections/CourseCollection'
+  'compiled/collections/CourseCollection'
   'jst/activityFeed/ActivityFeedFilterView'
 ], ({View}, CourseCollection, template) ->
 

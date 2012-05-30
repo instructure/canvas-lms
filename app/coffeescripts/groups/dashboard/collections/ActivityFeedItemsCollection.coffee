@@ -1,5 +1,5 @@
 define [
-  'compiled/ActivityFeed/ActivityFeedItemsCollection'
+  'compiled/collections/ActivityFeedItemsCollection'
 ], (BaseActivityFeedItemsCollection) ->
 
   class ActivityFeedItemsCollection extends BaseActivityFeedItemsCollection

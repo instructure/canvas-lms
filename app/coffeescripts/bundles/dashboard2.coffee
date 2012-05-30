@@ -1,14 +1,14 @@
 require [
   'jquery'
   'Backbone'
-  'compiled/home/views/DashboardView'
-  'compiled/quickStartBar/views/QuickStartBarView'
-  'compiled/ActivityFeed/views/ActivityFeedView'
-  'compiled/home/views/SideBar/SideBarView'
-  'compiled/ActivityFeed/views/ActivityFeedFilterView'
-  'compiled/ActivityFeed/views/ActivityFeedItemsView'
-  'compiled/home/views/SideBar/TodoView'
-  'compiled/home/views/SideBar/ComingUpView'
+  'compiled/views/Dashboard/DashboardView'
+  'compiled/views/QuickStartBar/QuickStartBarView'
+  'compiled/views/ActivityFeed/ActivityFeedView'
+  'compiled/views/Dashboard/SideBarView'
+  'compiled/views/ActivityFeed/ActivityFeedFilterView'
+  'compiled/views/ActivityFeed/ActivityFeedItemsView'
+  'compiled/views/Dashboard/TodoView'
+  'compiled/views/Dashboard/ComingUpView'
 ], ($, {View}, DashboardView, QuickStartBarView, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView) ->
 
   $ ->

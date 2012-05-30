@@ -1,8 +1,8 @@
 define [
   'i18n!dashboard'
   'Backbone'
-  'compiled/home/collections/TodoCollection'
-  'compiled/home/views/SideBar/TodoItemView'
+  'compiled/collections/TodoCollection'
+  'compiled/views/Dashboard/TodoItemView'
 ], (I18n, {View, Collection, Model}, TodoCollection, TodoItemView) ->
 
   class TodoView extends View

@@ -1,21 +1,19 @@
 define [
-  'compiled/quickStartBar/views/BaseItemView'
+  'compiled/views/QuickStartBar/BaseItemView'
   'underscore'
-  'compiled/quickStartBar/models/Assignment'
-  'jst/quickStartBar/assignment'
-  'compiled/widget/ContextSearch'
+  'compiled/models/Announcement'
+  'jst/quickStartBar/announcement'
   'jquery.instructure_date_and_time'
-  'jquery.disableWhileLoading'
-], (BaseItemView, _, Assignment, template, ContextSearch) ->
+], (BaseItemView, _, Announcement, template) ->
 
-  class AssignmentView extends BaseItemView
+  class AnnouncementView extends BaseItemView
 
     template: template
 
     contextSearchOptions:
       fakeInputWidth: '100%'
       contexts: ENV.CONTEXTS
-      placeholder: "Type the name of a class to assign this to..."
+      placeholder: "Type the name of a class to announce this too..."
       selector:
         baseData:
           type: 'course'
@@ -24,11 +22,18 @@ define [
             row.noExpand = true
         browser: false
 
+
     save: (json) ->
-      json.date = @$('.datetime_suggest').text()
+
+      # get real date
+      if json.assignment?.due_at?
+        json.assignment.due_at = @$('.datetime_suggest').text()
+
+      # map the course_ids into deferreds, saving a copy for each course
       dfds = _.map json.course_ids, (id) =>
-        model = new Assignment json
+        model = new Announcement json
         model.set 'course_id', id.replace /^course_/, ''
         model.save()
+
       $.when dfds...
 

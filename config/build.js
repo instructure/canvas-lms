@@ -1,7 +1,7 @@
 ({
 
   // file optimizations
-  optimize: "uglify",
+  optimize: "none",
 
   // continue to let Jammit do its thing
   optimizeCss: "none",
@@ -197,6 +197,7 @@
     { name: "compiled/bundles/user_sortable_name", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/wiki", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/calendar2", exclude: ['common', 'compiled/tinymce'] },
+    { name: "compiled/bundles/dashboard2", exclude: ['common', 'compiled/tinymce'] },
   ]
 })
 

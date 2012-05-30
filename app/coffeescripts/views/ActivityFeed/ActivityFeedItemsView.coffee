@@ -1,7 +1,7 @@
 define [
   'Backbone'
-  'compiled/ActivityFeed/ActivityFeedItemsCollection'
-  'compiled/home/util/activityFeedItemViewFactory'
+  'compiled/collections/ActivityFeedItemsCollection'
+  'compiled/views/ActivityFeed/activityFeedItemViewFactory'
   'jst/activityFeed/ActivityFeedItemsView'
 ], ({View, Collection, Model}, ActivityFeedItemsCollection, activityFeedItemViewFactory, template) ->
 

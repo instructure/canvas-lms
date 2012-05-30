@@ -1,4 +1,4 @@
-define ['compiled/quickStartBar/models/Discussion'], (Discussion) ->
+define ['compiled/models/Discussion'], (Discussion) ->
 
   class Announcement extends Discussion
 
