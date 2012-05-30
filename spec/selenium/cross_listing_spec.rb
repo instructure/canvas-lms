@@ -33,7 +33,7 @@ describe "cross-listing" do
     keep_trying_until { course_name.text != "Confirming Course ID \"#{@course2.id}\"..." }
     course_name.text.should eql @course2.name
     form.find_element(:id, 'course_autocomplete_id').attribute(:value).should eql @course.id.to_s
-    submit_btn.attribute(:disabled).should eql 'false'
+    submit_btn.should_not have_class('disabled')
     submit_btn.click
     wait_for_ajaximations
     keep_trying_until { driver.current_url.match /courses\/#{@course2.id}/ }
