@@ -473,4 +473,12 @@ class Group < ActiveRecord::Base
     users = self.users + [user]
     self.context.course_sections.active.any?{ |section| section.common_to_users?(users) }
   end
+
+  def self.join_levels
+    [
+      ["invitation_only", "Invite only"],
+      ["parent_context_auto_join", "Auto join"],
+      ["parent_context_request", "Request to join"]
+    ]
+  end
 end

@@ -162,6 +162,8 @@ stylesheets:
     - public/stylesheets/compiled/quick_start_bar.css
     - public/stylesheets/compiled/activity_feed.css
     - public/stylesheets/compiled/groups/dashboard.css
+  group_settings:
+    - public/stylesheets/compiled/groups/edit.css
   facebook:
     - public/stylesheets/compiled/facebook.css
   speed_grader:

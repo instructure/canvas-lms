@@ -471,9 +471,12 @@ class GroupsController < ApplicationController
   end
 
   def edit
+    @use_new_styles = true
     @group = (@context ? @context.groups : Group).find(params[:id])
     @context = @group
+    js_env :GROUP_ID => @group.id, :FOLDER_ID => @group.folders.active.first.id
     if authorized_action(@group, @current_user, :update)
+      render :action => :edit, :layout => 'new_application'
     end
   end
 
