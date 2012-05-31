@@ -370,14 +370,9 @@ class Group < ActiveRecord::Base
     self.storage_quota || Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
   end
 
-  TAB_HOME = 0
-  TAB_PAGES = 1
-  TAB_PEOPLE = 2
-  TAB_DISCUSSIONS = 3
-  TAB_CHAT = 4
-  TAB_FILES = 5
-  TAB_CONFERENCES = 6
-  TAB_ANNOUNCEMENTS = 7
+  TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_CHAT, TAB_FILES,
+    TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_COLLECTIONS,
+    TAB_SETTINGS = *1..20
   def tabs_available(user=nil, opts={})
     available_tabs = [
       { :id => TAB_HOME,          :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
@@ -385,10 +380,14 @@ class Group < ActiveRecord::Base
       { :id => TAB_PAGES,         :label => t("#group.tabs.pages", "Pages"), :css_class => 'pages', :href => :group_wiki_pages_path },
       { :id => TAB_PEOPLE,        :label => t("#group.tabs.people", "People"), :css_class => 'peopel', :href => :group_users_path },
       { :id => TAB_DISCUSSIONS,   :label => t("#group.tabs.discussions", "Discussions"), :css_class => 'discussions', :href => :group_discussion_topics_path },
+      { :id => TAB_COLLECTIONS,   :label => t("#group.tabs.collections", "Collections"), :css_class => 'collections', :href => :group_collections_path },
       { :id => TAB_CHAT,          :label => t("#group.tabs.chat", "Chat"), :css_class => 'chat', :href => :group_chat_path },
-      { :id => TAB_FILES,         :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path }
+      { :id => TAB_PROFILE,       :label => t('#tabs.profile', 'Profile'), :css_class => 'profile', :href => :group_profile_path },
     ]
+
+    available_tabs << { :id => TAB_FILES, :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path } if context_type == 'Course'
     available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :read)
+    available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path } if user && grants_right?(user, nil, :manage)
     available_tabs
   end
 

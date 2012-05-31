@@ -254,6 +254,15 @@ class GroupsController < ApplicationController
     end
   end
 
+  def profile
+    @group = Group.find(params[:group_id])
+    render :text => @group.name
+  end
+
+  def collections
+    render :text => "TODO"
+  end
+
   def public_feed
     return unless get_feed_context(:only => [:group])
     feed = Atom::Feed.new do |f|
