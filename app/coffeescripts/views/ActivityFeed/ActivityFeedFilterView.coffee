@@ -9,13 +9,15 @@ define [
     events:
       'click a': 'clickFilter'
 
+    template: template
+
     initialize: ->
-      @courseCollection = new CourseCollection
-      @courseCollection.on 'add', @addCourse
-      @courseCollection.on 'reset', => @courseCollection.each @addCourse
-      @courseCollection.fetch
-        # remove the "loading..." indicator element
-        success: => @$('.courseList li:first').remove()
+      @courses = @getCoursesFromENV()
+      @communities = @getCommuntiesFromENV()
+      @render()
+
+    toJSON: ->
+      {@courses, @communities}
 
     clickFilter: (event) ->
       event.preventDefault()
@@ -25,12 +27,14 @@ define [
       @$active = $el.addClass 'active'
       @trigger 'filter', value
 
-    addCourse: (course) =>
-      id = course.get 'id'
-      course_code = course.get 'course_code'
-      @$('.courseList').append "<li><a href='#' data-value='course:#{id}'>#{course_code}</a></li>"
-
     render: ->
-      @$el.html template()
+      @$el.html @template @toJSON()
       @$active = @$ '.active'
       super
+
+    getCoursesFromENV: ->
+      course for k, course of ENV.CONTEXTS.courses when course.state is 'active'
+
+    getCommuntiesFromENV: ->
+      group for k, group of ENV.CONTEXTS.groups when group.category is 'Communities'
+

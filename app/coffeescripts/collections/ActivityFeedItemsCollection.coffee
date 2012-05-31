@@ -11,6 +11,7 @@ define ['Backbone'], ({Collection, Model}) ->
     urls:
       everything: '/api/v1/users/self/activity_stream'
       course: '/api/v1/courses/:filter/activity_stream'
+      community: '/api/v1/groups/:filter/activity_stream'
 
     url: ->
       @urls[@urlKey].replace /:filter/, @filter

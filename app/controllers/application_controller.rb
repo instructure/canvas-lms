@@ -1333,7 +1333,8 @@ class ApplicationController < ActionController::Base
           :type => :group,
           :state => group.active? ? :active : :inactive,
           :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
-          :context_name => group.context.name
+          :context_name => group.context.name,
+          :category => group.category
         }
       end
 

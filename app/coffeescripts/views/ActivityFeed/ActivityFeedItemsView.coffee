@@ -7,6 +7,8 @@ define [
 
   class ActivityFeedItemsView extends View
 
+    template: template
+
     initialize: ->
       super
       @collection ?= new ActivityFeedItemsCollection
@@ -24,10 +26,13 @@ define [
           view.$el.slideDown()
         , 150
 
-
     onResetActivityFeedItems: =>
       @$itemList.empty()
-      @collection.each @addActivityFeedItem
+      if @collection.length
+        @collection.each @addActivityFeedItem
+      else
+        # TODO: empty stream template
+        @$itemList.html "TODO: empty stream template for #{@collection.urlKey}:#{@collection.filter}"
 
     filterByKey: (key) =>
       filter = @parseKey key
@@ -45,17 +50,15 @@ define [
     parseKey: (key) ->
       filter = {}
       matches = key.match /(.+):(.+)/
-
       if matches
         filter.type = matches[1]
         filter.value = matches[2]
       else
         filter.type = key
-
       filter
 
     render: ->
-      @$el.html template()
+      @$el.html @template()
       @cacheElements()
       super
 
