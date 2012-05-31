@@ -130,6 +130,7 @@
 
 .nav-links {
   @include clearfix();
+  overflow: visible;
   padding-left:0;
 
   & > li {
