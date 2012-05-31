@@ -1156,7 +1156,7 @@ describe DiscussionTopicsController, :type => :integration do
   context "collection items" do
     before(:each) do
       @collection = @user.collections.create!(:name => 'test1', :visibility => 'private')
-      @item = collection_item_model(:description => "item 1", :user => @collection.context, :collection => @collection, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/one"))
+      @item = collection_item_model(:user_comment => "item 1", :user => @collection.context, :collection => @collection, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/one"))
     end
 
     it "should return a discussion topic for an item" do

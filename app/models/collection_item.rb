@@ -25,7 +25,7 @@ class CollectionItem < ActiveRecord::Base
   alias :data :collection_item_data
   belongs_to :user
 
-  attr_accessible :collection, :collection_item_data, :description, :user
+  attr_accessible :collection, :collection_item_data, :user_comment, :user
 
   validates_presence_of :collection, :collection_item_data, :user
   validates_associated :collection_item_data

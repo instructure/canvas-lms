@@ -49,9 +49,15 @@
 #       user_id: 37,
 #
 #       // The type of the item.
-#       // The only type currently defined is "url", but api consumers should
-#       // expect new types to be returned in the future and handle that
-#       // appropriately (even if it means just ignoring the item).
+#       // Currently defined types are: "url", "image", "audio", and "video".
+#       //
+#       // Canvas may define new item types at any time. "url" is the most
+#       // generic type, and just means any sort of web link. If an api consumer
+#       // sees an item_type that it doesn't yet know how to handle, treating it
+#       // as a "url" is a safe bet.
+#       //
+#       // "image", "audio" and "video" are URLs either directly to a file of that mime type, or
+#       // to a web page that was determined to contain that type as its main content.
 #       item_type: "url",
 #
 #       // The link to the item. For item type of "url", this is the entire
@@ -88,8 +94,15 @@
 #       // If image_url is null but image_pending is false, the item has no image.
 #       image_pending: false,
 #
-#       // The user-provided description of the item. This is plain text.
+#       // The title of the item.
+#       title: "My Image",
+#
+#       // The description of the item. This is plain text.
 #       description: "some block of plain text",
+#
+#       // Any user-provided comments on the item. A user can add their own
+#       // comments when cloning an existing item. This is plain text.
+#       user_comment: "some block of plain text",
 #
 #       // A snippet of HTML that can be used as an in-line preview of the
 #       // item. For example, a link to a youtube page may have an iframe inline
@@ -131,7 +144,9 @@ class CollectionItemsController < ApplicationController
   #          upvoted_by_user: false,
   #          root_item_id: 3,
   #          image_url: "https://<canvas>/files/item_image.png",
+  #          title: "my title",
   #          description: "some block of plain text",
+  #          user_comment: nil,
   #          url: "https://<canvas>/api/v1/collections/items/7"
   #          created_at: "2012-05-30T17:45:25Z",
   #       }
@@ -165,7 +180,9 @@ class CollectionItemsController < ApplicationController
   #        upvoted_by_user: false,
   #        root_item_id: 3,
   #        image_url: "https://<canvas>/files/item_image.png",
+  #        title: "my title",
   #        description: "some block of plain text",
+  #        user_comment: nil,
   #        url: "https://<canvas>/api/v1/collections/items/7"
   #        created_at: "2012-05-30T17:45:25Z",
   #     }
@@ -176,7 +193,8 @@ class CollectionItemsController < ApplicationController
     end
   end
 
-  ITEM_SETTABLE_ATTRIBUTES = %w(description)
+  NEW_ITEM_DATA_SETTABLE_ATTRIBUTES = %w(image_url title description)
+  ITEM_SETTABLE_ATTRIBUTES = %w(user_comment)
 
   # @API Create or clone a collection item
   #
@@ -191,23 +209,32 @@ class CollectionItemsController < ApplicationController
   #   To clone an existing item, pass in the url to that item as returned in
   #   the JSON response in the "url" field.
   #
+  # @argument title The title of the item.
+  #   If no title  is provided, Canvas will try to automatically
+  #   add a relevant title based on the linked content.
+  #
   # @argument description The plain-text description of the item.
+  #   If no description is provided, Canvas will try to automatically
+  #   add a relevant description based on the linked content.
   #
   # @argument image_url The URL of the image to use for this item. If no image
-  #   url is provided, canvas will try to automatically determine an image
+  #   url is provided, Canvas will try to automatically determine an image
   #   representation for the link. This parameter is ignored if the new item is
   #   a clone of an existing item.
+  #
+  # @argument user_comment The user's comments on the item. This can be set
+  #   when cloning an existing item, as well.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
   #          -F link_url="http://www.google.com/" \ 
-  #          -F description="lmgtfy" \ 
+  #          -F user_comment="lmgtfy" \ 
   #          -H 'Authorization: Bearer <token>'
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
   #          -F link_url="https://<canvas>/api/v1/collections/items/3" \ 
-  #          -F description="clone of some other item" \ 
+  #          -F user_comment="clone of some other item" \ 
   #          -H 'Authorization: Bearer <token>'
   #
   def create
@@ -215,7 +242,9 @@ class CollectionItemsController < ApplicationController
     if authorized_action(@item, @current_user, :create)
       item_data = CollectionItemData.data_for_url(params[:link_url] || "", @current_user)
       return render_unauthorized_action unless item_data
-      item_data.image_url = params[:image_url] if item_data.new_record?
+      if item_data.new_record?
+        item_data.attributes = params.slice(*NEW_ITEM_DATA_SETTABLE_ATTRIBUTES)
+      end
       @item.collection_item_data = item_data
       @item.attributes = params.slice(*ITEM_SETTABLE_ATTRIBUTES)
 
@@ -234,12 +263,12 @@ class CollectionItemsController < ApplicationController
   #
   # Change a collection item's mutable attributes.
   #
-  # @argument description
+  # @argument user_comment
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #          -X PUT \ 
-  #          -F description='edited description' \ 
+  #          -F user_comment='edited comment' \ 
   #          -H 'Authorization: Bearer <token>'
   #
   def update

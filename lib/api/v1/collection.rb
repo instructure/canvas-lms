@@ -24,11 +24,11 @@ module Api::V1::Collection
   }
 
   API_COLLECTION_ITEM_JSON_OPTS = {
-    :only => %w(id collection_id user_id description created_at),
+    :only => %w(id collection_id user_id user_comment created_at),
   }
 
   API_COLLECTION_ITEM_DATA_JSON_OPTS = {
-    :only => %w(item_type link_url root_item_id post_count upvote_count html_preview),
+    :only => %w(item_type link_url root_item_id post_count upvote_count html_preview title description),
     :methods => %w(upvoted_by_user),
   }
 
