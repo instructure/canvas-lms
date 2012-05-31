@@ -6,7 +6,7 @@ define [
   'formToJSON'
 ], ({View, Model}, I18n, allViews, template) ->
 
-	capitalize = (str) ->
+  capitalize = (str) ->
     str.replace /\b[a-z]/g, (match) -> match.toUpperCase()
 
   class QuickStartBarModel extends Model

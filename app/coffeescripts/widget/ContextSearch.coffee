@@ -154,7 +154,8 @@ define [
 
   $.fn.contextSearch = (options) ->
     @each ->
-      new ContextSearch $(this), $.extend(true, {}, options)
+      $el = $ this
+      $el.data 'contextSearch', new ContextSearch($(this), $.extend(true, {}, options))
 
   ContextSearch
 

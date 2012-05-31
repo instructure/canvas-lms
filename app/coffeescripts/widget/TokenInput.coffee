@@ -100,6 +100,9 @@ define [
 
       @resize()
 
+    teardown: ->
+      @selector.teardown()
+
     resize: () ->
       width = @options.fakeInputWidth or @$node.css 'width'
       @$fakeInput.css('width', width)

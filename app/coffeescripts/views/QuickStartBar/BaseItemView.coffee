@@ -5,7 +5,7 @@ define [
   'compiled/widget/ContextSearch'
   'jquery.instructure_date_and_time'
   'jquery.disableWhileLoading'
-], ({View}, _, $, Assignment, template, ContextSearch) ->
+], ({View}, _, $, ContextSearch) ->
 
   ##
   # Base class for all quickstart bar form views.
@@ -56,7 +56,10 @@ define [
     # Creates date pickers and context search instances after render
     filter: ->
       @$('.dateField').datetime_field()
-      @$('.contextSearch').contextSearch @contextSearchOptions
+      @contextSearch = new ContextSearch @$('.contextSearch'), @contextSearchOptions
+
+    teardown: ->
+      @contextSearch.teardown()
 
     ##
     # Form submit handler, converts the form into a JavaScript object and calls
