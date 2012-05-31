@@ -1,7 +1,7 @@
 ({
 
   // file optimizations
-  optimize: "none",
+  optimize: "uglify",
 
   // continue to let Jammit do its thing
   optimizeCss: "none",
