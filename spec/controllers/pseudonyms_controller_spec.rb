@@ -62,6 +62,16 @@ describe PseudonymsController do
         assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_empty
       end
 
+      it "should use case insensitive match for CommunicationChannel email" do
+        # Setup user with communication channel that has mixed case email
+        user_with_pseudonym
+        @cc = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => 'Victoria.Silvstedt@example.com')
+        get 'forgot_password', :pseudonym_session => {:unique_id_forgot => 'victoria.silvstedt@example.com'}
+        response.should be_redirect
+        assigns[:ccs].should include(@cc)
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
+        assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_empty
+      end
       it "should send password-change email case insensitively" do
         user_with_pseudonym(:username => 'user1@example.com')
         get 'forgot_password', :pseudonym_session => {:unique_id_forgot => 'USER1@EXAMPLE.COM'}
