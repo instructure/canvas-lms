@@ -20,7 +20,12 @@ require 'lib/api_route_set'
 require 'bundler'
 Bundler.setup
 require 'action_controller'
+
+# load routing files, including those in plugins
 require 'config/routes'
+Dir.glob('vendor/plugins/*/config/routes.rb').each do |plugin_routes|
+  require plugin_routes.gsub(/\.rb$/, '')
+end
 
 # Extend YARD to generate our API documentation
 YARD::Tags::Library.define_tag("Is an API method", :API)
