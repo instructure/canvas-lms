@@ -26,6 +26,8 @@ module Api::V1::Group
 
   def group_json(group, user, session, options = {})
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS)
+    image = group.avatar_attachment
+    hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
     include = options[:include] || []
     if include.include?('users')
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }

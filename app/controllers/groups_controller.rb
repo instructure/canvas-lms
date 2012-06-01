@@ -66,7 +66,10 @@
 #       join_level: "invitation_only",
 #
 #       // The number of members currently in the group
-#       members_count: 0
+#       members_count: 0,
+#
+#       // The url of the group's avatar
+#       avatar_url: "https://<canvas>/files/avatar_image.png",
 #
 #       // The ID of the group's category.
 #       group_category_id: 4,
@@ -79,7 +82,7 @@ class GroupsController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Group
 
-  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category)
+  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment)
 
   def context_group_members
     @group = @context
@@ -168,8 +171,9 @@ class GroupsController < ApplicationController
   #       description: "A group for my friends",
   #       is_public: false,
   #       join_level: "parent_context_request",
-  #       members_count: 3
-  #       group_category_id: 2
+  #       members_count: 3,
+  #       avatar_url: "https://<canvas>/files/avatar_image.png",
+  #       group_category_id: 2,
   #     },
   def show
     find_group
@@ -251,7 +255,8 @@ class GroupsController < ApplicationController
   #       description: "A place to gather resources for our classes.",
   #       is_public: true,
   #       join_level: "parent_context_auto_join",
-  #       members_count: 13
+  #       members_count: 13,
+  #       avatar_url: "https://<canvas>/files/avatar_image.png",
   #       group_category_id: 7
   #     }
   def create
@@ -298,13 +303,19 @@ class GroupsController < ApplicationController
 
   # @API Edit a group
   #
-  # Modifies an existing group.
+  # Modifies an existing group.  Note that to set an avatar image for the
+  # group, you must first upload the image file to the group, and the use the
+  # id in the response as the argument to this function.  See the
+  # {file:file_uploads.html File Upload Documentation} for details on the file
+  # upload workflow.
   #
   # @argument name
   # @argument description
   # @argument is_public Currently you cannot set a group back to private once
   #   it has been made public.
   # @argument join_level
+  # @argument avatar_id The id of the attachment previously uploaded to the
+  #   group that you would like to use as the avatar image for this group.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \ 
@@ -320,7 +331,8 @@ class GroupsController < ApplicationController
   #       description: "A place to gather resources for our classes.",
   #       is_public: true,
   #       join_level: "parent_context_request",
-  #       members_count: 13
+  #       members_count: 13,
+  #       avatar_url: "https://<canvas>/files/avatar_image.png",
   #       group_category_id: 7
   #     }
   def update
@@ -332,6 +344,11 @@ class GroupsController < ApplicationController
       params[:group][:group_category] = group_category
     end
     attrs = api_request? ? params : params[:group]
+
+    if avatar_id = (params[:avatar_id] || (params[:group] && params[:group][:avatar_id]))
+      attrs[:avatar_attachment] = @group.active_images.find_by_id(avatar_id)
+    end
+
     if authorized_action(@group, @current_user, :update)
       respond_to do |format|
         if @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
@@ -363,6 +380,7 @@ class GroupsController < ApplicationController
   #       is_public: false,
   #       join_level: "invitation_only",
   #       members_count: 0,
+  #       avatar_url: "https://<canvas>/files/avatar_image.png",
   #       group_category_id: 9
   #     }
   def destroy

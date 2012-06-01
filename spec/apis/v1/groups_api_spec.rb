@@ -28,6 +28,7 @@ describe "Groups API", :type => :integration do
       'is_public' => group.is_public,
       'join_level' => group.join_level,
       'members_count' => group.members_count,
+      'avatar_url' => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
       'group_category_id' => group.group_category_id,
     }
   end
@@ -65,12 +66,14 @@ describe "Groups API", :type => :integration do
   end
 
   it "should allow a moderator to edit a group" do
+    avatar = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @group)
     @user = @moderator
     new_attrs = {
       'name' => "Algebra II Teachers",
       'description' => "Math rocks!",
       'is_public' => true,
       'join_level' => "parent_context_auto_join",
+      'avatar_id' => avatar.id,
     }
     json = api_call(:put, @group_path, @group_path_options.merge(:group_id => @group.to_param, :action => "update"), new_attrs)
     @group.reload
@@ -78,7 +81,8 @@ describe "Groups API", :type => :integration do
     @group.description.should == "Math rocks!"
     @group.is_public.should == true
     @group.join_level.should == "parent_context_auto_join"
-    json.should == @group_json.merge(new_attrs)
+    @group.avatar_attachment.should == avatar
+    json.should == group_json(@group)
   end
 
   it "should only allow updating a group from private to public" do

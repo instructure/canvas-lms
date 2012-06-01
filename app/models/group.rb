@@ -21,7 +21,7 @@ class Group < ActiveRecord::Base
   include Workflow
   include CustomValidations
 
-  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public
+  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment
   validates_only_false_to_true :is_public
 
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
@@ -32,7 +32,6 @@ class Group < ActiveRecord::Base
   belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"
-
   has_many :calendar_events, :as => :context, :dependent => :destroy
   has_many :discussion_topics, :as => :context, :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user, :dependent => :destroy, :order => 'discussion_topics.position DESC, discussion_topics.created_at DESC'
   has_many :active_discussion_topics, :as => :context, :class_name => 'DiscussionTopic', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user
@@ -62,6 +61,7 @@ class Group < ActiveRecord::Base
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :collections, :as => :context
+  belongs_to :avatar_attachment, :class_name => "Attachment"
 
   before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted
