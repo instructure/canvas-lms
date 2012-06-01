@@ -29,12 +29,12 @@ define [
       @models = {}
 
       @quickStartItems or= [
-        {type: 'assignment'}
-        {type: 'discussion'}
-        {type: 'announcement'}
-        {type: 'message'}
-        {type: 'pin'}
-        {type: 'event', icon: 'calendar-day'}
+        {type: 'assignment', title: I18n.t('assignment', 'Assignment')}
+        {type: 'discussion', title: I18n.t('discussion', 'Discussion')}
+        {type: 'announcement', title: I18n.t('announcement', 'Announcement')}
+        {type: 'message', title: I18n.t('message', 'Message')}
+        {type: 'pin', title: I18n.t('pin', 'Pin')}
+        {type: 'event', icon: 'calendar-day', title: I18n.t('event', 'Event')}
       ]
 
       for qi in @quickStartItems
