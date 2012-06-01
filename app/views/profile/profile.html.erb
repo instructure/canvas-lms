@@ -46,7 +46,7 @@
   <tr>
     <td><%= f.blabel :bio, :en => "Bio" %></td>
     <td>
-      <span class="display_data"><%= @user.bio %></span>
+      <span class="display_data"><%= format_message(@user.bio).first.html_safe %></span>
       <%= f.text_area :bio, :class => :edit_data, :id => 'user_bio' %>
     </td>
   </tr>
