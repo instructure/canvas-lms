@@ -19,6 +19,7 @@
 class Collection < ActiveRecord::Base
   include Workflow
   include CustomValidations
+  include UserFollow::FollowedItem
 
   belongs_to :context, :polymorphic => true
   has_many :collection_items

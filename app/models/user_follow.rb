@@ -115,4 +115,13 @@ class UserFollow < ActiveRecord::Base
       item_subset.find_all { |c| followed_ids.include?(c.id.to_s) }
     end
   end
+
+  module FollowedItem
+    # returns the users who are following this item
+    def followers
+      follows = self.following_user_follows.to_a
+      UserFollow.send(:preload_associations, follows, :following_user)
+      follows.map(&:following_user)
+    end
+  end
 end

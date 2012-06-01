@@ -19,6 +19,7 @@
 class CollectionItem < ActiveRecord::Base
   include Workflow
   include CustomValidations
+  include SendToStream
 
   belongs_to :collection
   belongs_to :collection_item_data
@@ -115,5 +116,9 @@ class CollectionItem < ActiveRecord::Base
 
     given { |user| self.collection.context.respond_to?(:has_member?) && self.collection.context.has_member?(user) }
     can :create
+  end
+
+  on_create_send_to_streams do
+    (self.collection.try(:followers) || []) - [self.user]
   end
 end
