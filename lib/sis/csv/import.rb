@@ -397,6 +397,7 @@ module SIS
           end
           begin
             FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
+              row.each(&:downcase!)
               importer = IMPORTERS.index do |importer|
                 if SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)
                   @csvs[importer] << csv
