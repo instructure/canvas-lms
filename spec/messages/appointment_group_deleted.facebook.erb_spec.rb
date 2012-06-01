@@ -25,10 +25,11 @@ describe 'appointment_group_deleted.facebook' do
     appointment_group_model(:contexts => [@course])
     @appointment_group.cancel_reason = 'just because'
 
-    generate_message(:appointment_group_deleted, :facebook, @appointment_group, :user => @user)
+    generate_message(:appointment_group_deleted, :facebook, @appointment_group,
+                     :user => @user, :data => {:cancel_reason => "because"})
 
     @message.body.should include('some title')
-    @message.body.should include('just because')
+    @message.body.should include('because')
     @message.body.should include(@course.name)
   end
 end

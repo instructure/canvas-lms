@@ -85,7 +85,7 @@ describe "conversations" do
     it "should link to the course page" do
       get_messages
 
-      find_with_jquery("#create_message_form .audience a").click
+      expect_new_page_load { fj("#create_message_form .audience a").click }
       driver.current_url.should match %r{/courses/#{@course.id}}
     end
 

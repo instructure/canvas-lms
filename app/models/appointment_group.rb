@@ -38,6 +38,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   before_validation :default_values
+  before_validation :update_contexts_and_sub_contexts
   before_save :update_cached_values
   after_save :update_appointments
 
@@ -59,8 +60,8 @@ class AppointmentGroup < ActiveRecord::Base
 
   def validate
     if appointment_group_contexts.empty?
-      errors.add(:appointment_group_contexts,
-                 t('errors.needs_contexts', 'Must have at least one context'))
+      errors.add :appointment_group_contexts,
+                 t('errors.needs_contexts', 'Must have at least one context')
     end
   end
 
@@ -88,28 +89,66 @@ class AppointmentGroup < ActiveRecord::Base
     super
   end
 
+  # TODO: someday this should become context_codes= for consistency
   def contexts=(new_contexts)
-    new_contexts -= self.contexts
-    self.appointment_group_contexts += new_contexts.map do |context|
-      AppointmentGroupContext.create! :appointment_group => self,
-                                      :context => context
-    end
-    appointments.update_all :effective_context_code => contexts.map(&:asset_string).join(",")
+    @new_contexts ||= []
+    @new_contexts  += new_contexts.compact
   end
 
   def sub_context_codes=(codes)
-    if new_record?
-      sub_contexts = codes.map do |code|
-        context = case code
-                  when /\Acourse_section_(.*)/; CourseSection.find_by_id($1)
-                  when /\Agroup_category_(.*)/; GroupCategory.find_by_id($1)
-                  else next
-                  end
-        AppointmentGroupSubContext.new :appointment_group => self,
-                                       :sub_context => context,
-                                       :sub_context_code => code
+    @new_sub_context_codes ||= []
+    @new_sub_context_codes   += codes.compact
+  end
+
+  def update_contexts_and_sub_contexts
+    # TODO: validate the updating user has manage rights for all contexts /
+    # sub_contexts
+    #
+    # sub contexts
+    @new_sub_context_codes -= sub_context_codes if @new_sub_context_codes
+    if @new_sub_context_codes.present?
+      if new_record? &&
+          @new_contexts.size == 1 &&
+          @new_sub_context_codes.size == 1 &&
+          @new_sub_context_codes.first =~ /\Agroup_category_(.*)/
+        # a group category can only be assigned at creation time to
+        # appointment groups with one course
+        gc = GroupCategory.find_by_id($1)
+        code = @new_sub_context_codes.first
+        self.appointment_group_sub_contexts = [
+          AppointmentGroupSubContext.new :appointment_group => self,
+                                         :sub_context => gc,
+                                         :sub_context_code => code
+        ]
+      else
+        # right now we don't support changing the sub contexts for a context
+        # on an appointment group after it has been saved
+        disallowed_sub_context_codes = contexts.map(&:course_sections).
+          flatten.map(&:asset_string)
+        @new_sub_context_codes -= disallowed_sub_context_codes
+
+        new_sub_contexts = @new_sub_context_codes.map { |code|
+          next unless code =~ /\Acourse_section_(.*)/
+          cs = CourseSection.find_by_id($1)
+          AppointmentGroupSubContext.new :appointment_group => self,
+                                         :sub_context => cs,
+                                         :sub_context_code => code
+        }
+        self.appointment_group_sub_contexts += new_sub_contexts.compact
       end
-      self.appointment_group_sub_contexts = sub_contexts.compact
+    end
+
+    # contexts
+    @new_contexts -= contexts if @new_contexts
+    if @new_contexts.present?
+      unless appointment_group_sub_contexts.size == 1 &&
+          appointment_group_sub_contexts.first.sub_context_type == 'GroupCategory' &&
+          !new_record?
+        self.appointment_group_contexts += @new_contexts.map { |c|
+          AppointmentGroupContext.new :context => c, :appointment_group => self
+        }
+        @contexts_changed = true
+      end
     end
   end
 
@@ -176,10 +215,12 @@ class AppointmentGroup < ActiveRecord::Base
     given { |user, session|
       next false if deleted?
       next false unless contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
-      if appointment_group_sub_contexts.present?
-        raise "you can't have multiple contexts and sub_contexts" if appointment_group_contexts.size > 1
-        context = contexts.first
-        next true if appointment_group_sub_contexts.any? { |sc| sc.sub_context_type == 'CourseSection' && context.section_visibilities_for(user).any?{ |v| sc.sub_context_id == v[:course_section_id] } }
+      if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
+        sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
+        user_visible_sections = sub_context_ids & contexts.map { |c|
+          c.section_visibilities_for(user).map { |v| v[:course_section_id] }
+        }.flatten
+        next true if user_visible_sections.length == sub_contexts.length
       end
       !contexts.all? { |c| c.visibility_limited_to_course_sections?(user) }
     }
@@ -212,6 +253,7 @@ class AppointmentGroup < ActiveRecord::Base
     dispatch :appointment_group_deleted
     to       { possible_users }
     whenever { contexts.any?(&:available?) && deleted? && workflow_state_changed? }
+    data     { {:cancel_reason => @cancel_reason} }
   end
 
   def possible_users
@@ -271,7 +313,7 @@ class AppointmentGroup < ActiveRecord::Base
   def eligible_participant?(participant)
     return false unless participant && participant.class.base_ar_class.name == participant_type
     codes = participant.appointment_context_codes
-    return false unless (codes[:primary]. & appointment_group_contexts.map(&:context_code)).present?
+    return false unless (codes[:primary] & appointment_group_contexts.map(&:context_code)).present?
     return false unless sub_context_codes.empty? || (codes[:secondary] & sub_context_codes).present?
     true
   end
@@ -326,12 +368,20 @@ class AppointmentGroup < ActiveRecord::Base
       map{ |attr| [attr, attr == :description ? description_html : send(attr)] }
     ]
 
+    if @contexts_changed
+      changed[:effective_context_code] = contexts.map(&:asset_string).join(",")
+    end
+
     return unless changed.present?
 
     desc = changed.delete :description
 
     if changed.present?
       appointments.update_all changed
+      changed.delete(:effective_context_code)
+    end
+
+    if changed.present?
       CalendarEvent.update_all changed, {:parent_calendar_event_id => appointments.map(&:id), :workflow_state => ['active', 'locked']}
     end
 

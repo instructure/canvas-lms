@@ -20,70 +20,6 @@ describe "Canvas Cartridge importing" do
     @copy_to.content_migration = @migration
   end
 
-  it "should import course settings" do
-    #set all the possible values to non-default values
-    @copy_from.start_at = 5.minutes.ago
-    @copy_from.conclude_at = 1.month.from_now
-    @copy_from.is_public = false
-    @copy_from.name = "haha copy from test &amp;"
-    @copy_from.course_code = 'something funny'
-    @copy_from.publish_grades_immediately = false
-    @copy_from.allow_student_wiki_edits = true
-    @copy_from.allow_student_assignment_edits = true
-    @copy_from.hashtag = 'oi'
-    @copy_from.show_public_context_messages = false
-    @copy_from.allow_student_forum_attachments = false
-    @copy_from.default_wiki_editing_roles = 'teachers'
-    @copy_from.allow_student_organized_groups = false
-    @copy_from.default_view = 'modules'
-    @copy_from.show_all_discussion_entries = false
-    @copy_from.open_enrollment = true
-    @copy_from.storage_quota = 444
-    @copy_from.allow_wiki_comments = true
-    @copy_from.turnitin_comments = "Don't plagiarize"
-    @copy_from.self_enrollment = true
-    @copy_from.license = "cc_by_nc_nd"
-    @copy_from.locale = "es"
-    @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
-    @copy_from.save!
-
-    body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
-<div>
-  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-</div>}
-    @copy_from.syllabus_body = body_with_link % @copy_from.id 
-
-    #export to xml
-    builder = Builder::XmlMarkup.new(:indent=>2)
-    @resource.create_course_settings("1", builder)
-    syllabus = StringIO.new
-    @resource.create_syllabus(syllabus)
-    #convert to json
-    doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_course_settings(doc)
-    syl_doc = Nokogiri::HTML(syllabus.string)
-    hash[:syllabus_body] = @converter.convert_syllabus(syl_doc)
-    #import json into new course
-    hash = hash.with_indifferent_access
-    @copy_to.import_settings_from_migration({:course=>hash})
-    @copy_to.save!
-
-    #compare settings
-    @copy_to.conclude_at.should == nil
-    @copy_to.start_at.should == nil
-    @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
-    @copy_to.storage_quota.should_not == @copy_from.storage_quota
-    @copy_to.name.should == 'alt name'
-    @copy_to.course_code.should == 'alt name'
-    atts = Course.clonable_attributes
-    atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
-    atts.each do |att|
-      @copy_to.send(att).should == @copy_from.send(att)
-    end
-    @copy_to.tab_configuration.should == @copy_from.tab_configuration
-  end
-
   it "should import assignment groups" do
     ag1 = @copy_from.assignment_groups.new
     ag1.name = "Boring assignments"
@@ -898,50 +834,6 @@ XML
     a.points_possible.should == assignment.points_possible
     a.discussion_topic.should == dt_2
     a.assignment_group.id.should == ag1.id
-  end
-  
-  it "should import calendar events" do
-    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
-    cal = @copy_from.calendar_events.new
-    cal.title = "Calendar event"
-    cal.description = body_with_link % @copy_from.id
-    cal.start_at = 1.week.from_now
-    cal.save!
-    cal.all_day = true
-    cal.save!
-    cal2 = @copy_from.calendar_events.new
-    cal2.title = "Stupid events"
-    cal2.start_at = 5.minutes.from_now
-    cal2.end_at = 10.minutes.from_now
-    cal2.all_day = false
-    cal2.save!
-    
-    #export to xml
-    builder = Builder::XmlMarkup.new(:indent=>2)
-    @resource.create_events(builder)
-    #convert to json
-    doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_events(doc)
-    #import json into new course
-    hash[0] = hash[0].with_indifferent_access
-    hash[1] = hash[1].with_indifferent_access
-    CalendarEvent.process_migration({'calendar_events'=>hash}, @migration)
-    @copy_to.save!
-    
-    @copy_to.calendar_events.count.should == 2
-    cal_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal))
-    cal_2.title.should == cal.title
-    cal_2.start_at.to_i.should == cal.start_at.to_i
-    cal_2.end_at.to_i.should == cal.end_at.to_i
-    cal_2.all_day.should == true
-    cal_2.all_day_date.should == cal.all_day_date
-    cal_2.description = body_with_link % @copy_to.id
-    
-    cal2_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal2))
-    cal2_2.title.should == cal2.title
-    cal2_2.start_at.to_i.should == cal2.start_at.to_i
-    cal2_2.end_at.to_i.should == cal2.end_at.to_i
-    cal2_2.description.should == ''
   end
   
   it "should import quizzes into correct assignment group" do

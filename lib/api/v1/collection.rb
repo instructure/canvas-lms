@@ -24,7 +24,7 @@ module Api::V1::Collection
   }
 
   API_COLLECTION_ITEM_JSON_OPTS = {
-    :only => %w(id collection_id description),
+    :only => %w(id collection_id user_id description created_at),
   }
 
   API_COLLECTION_ITEM_DATA_JSON_OPTS = {

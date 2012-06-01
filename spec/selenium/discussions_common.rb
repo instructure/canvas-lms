@@ -34,9 +34,9 @@ shared_examples_for "discussions selenium tests" do
   end
 
   def delete_entry(entry)
-    click_entry_option(entry, '#ui-menu-0-2')
-    validate_entry_text(entry, "This entry has been deleted")
     keep_trying_until do
+      click_entry_option(entry, '#ui-menu-0-2')
+      validate_entry_text(entry, "This entry has been deleted")
       entry.save!
       entry.reload
       entry.workflow_state.should == 'deleted'
@@ -56,8 +56,8 @@ shared_examples_for "discussions selenium tests" do
 
     f('.discussion-reply-form').submit
     wait_for_ajax_requests
-    keep_trying_until { 
-      id = DiscussionEntry.last.id 
+    keep_trying_until {
+      id = DiscussionEntry.last.id
       @last_entry = fj ".entry[data-id=#{id}]"
     }
   end
@@ -75,14 +75,11 @@ shared_examples_for "discussions selenium tests" do
 
   def click_entry_option(discussion_entry, menu_item_selector)
     li_selector = %([data-id$="#{discussion_entry.id}"])
-    menu_item = keep_trying_until do
-      fj(li_selector).should be_displayed
-      fj("#{li_selector} .al-trigger").should be_displayed
-      fj("#{li_selector} .al-trigger").click
-      menu_item = fj(menu_item_selector)
-      menu_item.should be_displayed
-      menu_item
-    end
+    fj(li_selector).should be_displayed
+    fj("#{li_selector} .al-trigger").should be_displayed
+    fj("#{li_selector} .al-trigger").click
+    menu_item = fj(menu_item_selector)
+    menu_item.should be_displayed
     menu_item.click
   end
 

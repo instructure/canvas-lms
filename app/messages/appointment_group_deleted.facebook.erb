@@ -8,4 +8,4 @@
     asset.contexts_for_user(user).map(&:name).join(", ") %><br>
 <br>
 <b><%= before_label :cancel_reason, "Reason for canceling" %></b><br>
-<%= asset.cancel_reason || t(:no_reason_given, "none given") %>
+<%= data.cancel_reason || t(:no_reason_given, "none given") %>

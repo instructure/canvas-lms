@@ -313,6 +313,14 @@ Spec::Runner.configure do |config|
     course_with_student(opts)
   end
 
+  def student_in_section(section, opts={})
+    user
+    enrollment = section.course.enroll_user(@user, 'StudentEnrollment', :section => section)
+    enrollment.workflow_state = 'active'
+    enrollment.save!
+    @user
+  end
+
   def teacher_in_course(opts={})
     opts[:course] = @course if @course && !opts[:course]
     course_with_teacher(opts)

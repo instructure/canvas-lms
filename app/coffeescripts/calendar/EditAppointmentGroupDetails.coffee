@@ -169,30 +169,33 @@ define [
 
     contextsChanged: (contextCodes, sectionCodes) =>
       # dropdown text
-      if sectionCodes
-        sectionCode = sectionCodes[0]
-        section = _.chain(@contexts)
-                   .pluck('course_sections')
-                   .flatten()
-                   .find((s) -> s.asset_string == sectionCode)
-                   .value()
-        text = section.name
-        if sectionCodes.length > 1
-          text += I18n.t('and_n_sectionCodes', ' and %{n} others', n: sectionCodes.length - 1)
-        @form.find('.ag_contexts_selector').text(text)
-      else if contextCodes.length > 0
-        contextCode = contextCodes[0]
-        text = @contextsHash[contextCode].name
-        if contextCodes.length > 1
-          text += I18n.t('and_n_contexts', ' and %{n} others', n: contextCodes.length - 1)
-        @form.find('.ag_contexts_selector').text(text)
-      else
+      if sectionCodes.length == 0 and contextCodes.length == 0
         @form.find('.ag_contexts_selector').text(I18n.t 'select_calendars', 'Select Calendars')
+      else
+        if contextCodes.length > 0
+          contextCode = contextCodes[0]
+          text = @contextsHash[contextCode].name
+          if contextCodes.length > 1
+            text += I18n.t('and_n_contexts', ' and %{n} others', n: contextCodes.length - 1)
+          @form.find('.ag_contexts_selector').text(text)
+        if sectionCodes.length > 0
+          sectionCode = sectionCodes[0]
+          section = _.chain(@contexts)
+                     .pluck('course_sections')
+                     .flatten()
+                     .find((s) -> s.asset_string == sectionCode)
+                     .value()
+          text = section.name
+          if sectionCodes.length > 1
+            text += I18n.t('and_n_sectionCodes', ' and %{n} others', n: sectionCodes.length - 1)
+          @form.find('.ag_contexts_selector').text(text)
 
       # group selector
       context = @contextsHash[contextCodes[0]]
-      if contextCodes.length == 1 and not sectionCodes and context.group_categories?.length > 0
+      if contextCodes.length == 1 and sectionCodes.length == 0 and context.group_categories?.length > 0
         @enableGroups(context)
+        if @apptGroup.sub_context_codes.length > 0
+          @form.find('[name=group_category_id]').prop('disabled', true)
       else
         @disableGroups()
 

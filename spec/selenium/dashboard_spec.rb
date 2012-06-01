@@ -84,11 +84,11 @@ describe "dashboard" do
       @appointment_group.update_attributes(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
 
       get "/"
-      find_all_with_jquery(".topic_message div.communication_message.dashboard_notification").size.should == 3
+      ffj(".topic_message div.communication_message.dashboard_notification").size.should == 3
       # appointment group publish and update notifications
-      find_all_with_jquery("div.communication_message.message_appointment_group_#{@appointment_group.id}").size.should == 2
+      ffj("div.communication_message.message_appointment_group_#{@appointment_group.id}").size.should == 2
       # signup notification
-      find_all_with_jquery("div.communication_message.message_group_#{@group.id}").size.should == 1
+      ffj("div.communication_message.message_group_#{@group.id}").size.should == 1
     end
 
     it "should display assignment in to do list" do

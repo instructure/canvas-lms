@@ -198,10 +198,16 @@ define([
 
     $(".configure_report_link").click(function(event) {
       event.preventDefault();
-      $(this).parent("td").find(".report_dialog").clone(true).dialog({
-        width: 400,
-        title: I18n.t('titles.configure_report', 'Configure Report')
-      });
+      var data = $(this).data(),
+        $dialog = data.$report_dialog;
+      if (!$dialog) {
+        $dialog = data.$report_dialog = $(this).parent("td").find(".report_dialog").dialog({
+          autoOpen: false,
+          width: 400,
+          title: I18n.t('titles.configure_report', 'Configure Report')
+        });
+      }
+      $dialog.dialog('open');
     })
 
     $('.service_help_dialog').each(function(index) {
