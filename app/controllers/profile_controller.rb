@@ -21,7 +21,6 @@ class ProfileController < ApplicationController
   before_filter :require_user, :except => :show
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
-  before_filter { |c| c.active_tab = "profile" }
 
   include Api::V1::User
   include Api::V1::Avatar
@@ -29,12 +28,15 @@ class ProfileController < ApplicationController
   include TextHelper
 
   def show
+    @user ||= @current_user
+
     # FFT TODO: should this be conditional based on a setting? i.e. use the old
     # styles like we do on the dashboard
     @use_new_styles = true
-    @user ||= @current_user
-
+    @active_tab = "profile"
     @context = UserProfile.new(@current_user) if @user == @current_user
+
+    @items_count = @user.collection_items.scoped(:conditions => {'collections.visibility' => 'public'}).count
 
     if @user.private? && @user != @current_user
       if @user.grants_right?(@current_user, :view_statistics)
@@ -87,9 +89,10 @@ class ProfileController < ApplicationController
     @pseudonyms = @user.pseudonyms.active
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
     @context = UserProfile.new(@user)
+    @active_tab = "edit_profile"
     respond_to do |format|
       format.html do
-        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), profile_path )
+        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), edit_profile_path )
         render :action => "profile"
       end
       format.json do

@@ -24,12 +24,8 @@ class UserProfile
 
   delegate :id, :short_name, :name, :asset_string, :opaque_identifier, :to => :@user
 
-  TAB_PROFILE = 0
-  TAB_COMMUNICATION_PREFERENCES = 1
-  TAB_FILES = 2
-  TAB_EPORTFOLIOS = 3
-  TAB_HOME = 4
-  TAB_PROFILE_SETTINGS = 5
+  TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS,
+    TAB_HOME, TAB_PROFILE_SETTINGS = *0..10
 
   def tabs_available(user=nil, opts={})
     unless @tabs

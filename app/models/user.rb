@@ -133,6 +133,7 @@ class User < ActiveRecord::Base
   has_many :messages
 
   has_many :collections, :as => :context
+  has_many :collection_items, :through => :collections
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name

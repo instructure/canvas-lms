@@ -24,14 +24,10 @@
           <td>103</td>
         </tr><tr>
           <th>Collections</th>
-          <td>5</td>
+          <td><%= @user.collections.public.count %></td>
         </tr><tr>
-          <th>Comments</th>
-          <td>223</td>
-        </tr> <tr>
-          <th>Posts</th>
-          <td>37</td>
-        </tr>
+          <th>Items</th>
+          <td><%= @items_count %></td>
       </table>
 
       <% if @user.show_user_services? %>
