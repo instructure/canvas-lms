@@ -94,10 +94,10 @@ class CollectionItemData < ActiveRecord::Base
   attr_accessor :upvoted_by_user
   # sets the upvoted_by_user attribute on each item passed in
   def self.load_upvoted_by_user(datas, user)
-    Shard.partition_by_shard(datas) do |datas_subset|
-      data_ids = datas_subset.map(&:id)
+    user.shard.activate do
+      data_ids = datas.map(&:id)
       upvoted_ids = Set.new(connection.select_values(sanitize_sql_for_conditions(["SELECT collection_item_data_id FROM collection_item_upvotes WHERE collection_item_data_id IN (?) AND user_id = ?", data_ids, user.id])))
-      datas_subset.each { |item| item.upvoted_by_user = upvoted_ids.include?(item.id.to_s) }
+      datas.each { |item| item.upvoted_by_user = upvoted_ids.include?(item.id.to_s) }
     end
   end
 end

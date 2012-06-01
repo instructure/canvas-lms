@@ -218,12 +218,14 @@ class StreamItem < ActiveRecord::Base
 
     # Then insert a StreamItemInstance for each user in user_ids
     instance_ids = []
-    StreamItemInstance.transaction do
-      user_ids.each do |user_id|
-        i = res.stream_item_instances.build(:user_id => user_id)
-        i.hidden = object.class == Submission && object.assignment.muted? ? true : false
-        i.save
-        instance_ids << i.id
+    Shard.partition_by_shard(user_ids) do |user_ids_subset|
+      StreamItemInstance.transaction do
+        user_ids_subset.each do |user_id|
+          i = StreamItemInstance.create(:user_id => user_id, :stream_item => res) do |sii|
+            sii.hidden = object.class == Submission && object.assignment.muted? ? true : false
+          end
+          instance_ids << i.id
+        end
       end
     end
     smallest_generated_id = instance_ids.min || 0

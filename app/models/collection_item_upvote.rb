@@ -25,19 +25,28 @@ class CollectionItemUpvote < ActiveRecord::Base
   validates_presence_of :collection_item_data, :user
   attr_readonly :collection_item_data_id, :user_id
 
-  trigger.after(:insert) do
-    <<-SQL
-    UPDATE collection_item_datas
-    SET upvote_count = upvote_count + 1
-    WHERE id = NEW.collection_item_data_id;
-    SQL
+  after_create :update_upvote_count
+  after_destroy :update_upvote_count
+
+  # upvotes get saved to the user's shard, and then increment the counter
+  # stored on the collection_item_data, wherever it may live
+  set_shard_override do |record|
+    record.user.shard
   end
 
-  trigger.after(:delete) do
-    <<-SQL
-    UPDATE collection_item_datas
-    SET upvote_count = upvote_count - 1
-    WHERE id = OLD.collection_item_data_id;
-    SQL
+  def update_upvote_count
+    increment = 0
+    if self.id_changed?
+      # was a new record
+      increment = 1
+    elsif self.destroyed?
+      increment = -1
+    end
+
+    if increment != 0
+      collection_item_data.shard.activate do
+        collection_item_data.class.update_all(['upvote_count = upvote_count + ?', increment], :id => collection_item_data.id)
+      end
+    end
   end
 end

@@ -60,38 +60,34 @@ class CollectionItem < ActiveRecord::Base
       DiscussionTopic.new(:context => self, :discussion_type => DiscussionTopic::DiscussionTypes::FLAT)
   end
 
+  alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     save!
   end
 
-  trigger.after(:insert) do |t|
-    t.where("NEW.workflow_state = 'active'") do
-      <<-SQL
-      UPDATE collection_item_datas
-      SET post_count = post_count + 1
-      WHERE id = NEW.collection_item_data_id;
-      SQL
-    end
-  end
+  after_save :update_post_count
+  after_destroy :update_post_count
 
-  trigger.after(:update) do |t|
-    t.where("NEW.workflow_state <> OLD.workflow_state") do
-      <<-SQL
-      UPDATE collection_item_datas
-      SET post_count = post_count + CASE WHEN (NEW.workflow_state = 'active') THEN 1 ELSE -1 END
-      WHERE id = NEW.collection_item_data_id;
-      SQL
+  def update_post_count
+    increment = 0
+    if self.id_changed?
+      # was a new record
+      increment = 1 if self.active?
+    elsif self.destroyed?
+      increment = -1
+    elsif self.workflow_state_changed?
+      if self.active?
+        increment = 1
+      else
+        increment = -1
+      end
     end
-  end
 
-  trigger.after(:delete) do |t|
-    t.where("OLD.workflow_state = 'active'") do
-      <<-SQL
-      UPDATE collection_item_datas
-      SET post_count = post_count - 1
-      WHERE id = OLD.collection_item_data_id;
-      SQL
+    if increment != 0
+      data.shard.activate do
+        data.class.update_all(['post_count = post_count + ?', increment], :id => data.id)
+      end
     end
   end
 

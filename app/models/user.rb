@@ -125,7 +125,6 @@ class User < ActiveRecord::Base
   has_many :user_notes
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
-  has_many :stream_items, :through => :stream_item_instances
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation
   has_many :favorites
   has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
@@ -1681,24 +1680,24 @@ class User < ActiveRecord::Base
   end
   memoize :recent_feedback
 
-  def visible_stream_items(opts={})
-    items = stream_items.scoped(:conditions => { 'stream_item_instances.hidden' => false }, :order => 'stream_item_instances.id desc')
+  def visible_stream_item_instances(opts={})
+    instances = stream_item_instances.scoped(:conditions => { 'stream_item_instances.hidden' => false }, :order => 'stream_item_instances.id desc', :include => :stream_item)
 
-    # dont make the query do an stream_items.context_code IN
+    # dont make the query do an stream_item_instances.context_code IN
     # ('course_20033','course_20237','course_20247' ...) if they dont pass any
     # contexts, just assume it wants any context code.
     if opts[:contexts]
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      items = items.scoped(:conditions => ['stream_item_instances.context_code in (?)', setup_context_lookups(opts[:contexts])])
+      instances = instances.scoped(:conditions => ['stream_item_instances.context_code in (?)', setup_context_lookups(opts[:contexts])])
     end
 
-    items
+    instances
   end
 
   def recent_stream_items(opts={})
-    visible_stream_items(opts).scoped(:limit => 21).all
+    visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item)
   end
   memoize :recent_stream_items
 
