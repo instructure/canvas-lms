@@ -78,7 +78,9 @@ class GroupMembership < ActiveRecord::Base
   # auto accept 'requested' or 'invited' memberships until we implement
   # accepting requests/invitations
   def auto_join
+    return true if self.group.try(:group_category).try(:communities?)
     self.workflow_state = 'accepted' if self.group && (self.requested? || self.invited?)
+    true
   end
   protected :auto_join
 
@@ -100,6 +102,7 @@ class GroupMembership < ActiveRecord::Base
   attr_accessor :old_group_id
   def capture_old_group_id
     self.old_group_id = self.group_id_was if self.group_id_changed?
+    true
   end
   protected :capture_old_group_id
   
@@ -129,5 +132,21 @@ class GroupMembership < ActiveRecord::Base
   def active_given_enrollments?(enrollments)
     accepted? && (!self.group.context.is_a?(Course) ||
      enrollments.any?{ |e| e.user == self.user && e.course == self.group.context })
+  end
+
+  set_policy do
+    # for non-communities, people can be put into groups
+    given { |user, session| user.present? && (user == self.user || self.group.grants_right?(user, session, :manage)) && self.group.can_join?(user) && !self.group.group_category.try(:communities?) }
+    can :create
+
+    # for communities, users must initiate in order to be added to a group
+    given { |user, session| user.present? && user == self.user && self.group.can_join?(user) && self.group.group_category.try(:communities?) }
+    can :create
+
+    given { |user, session| user.present? && self.group.grants_right?(user, session, :manage) }
+    can :update
+
+    given { |user, session| user.present? && (user == self.user || self.group.grants_right?(user, session, :manage)) && self.group.can_leave?(user) }
+    can :delete
   end
 end

@@ -21,9 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe GroupMembership do
   
   it "should ensure a mutually exclusive relationship" do
-    group = group_model
-    user = user_model
-    @gm = group_membership_model(:group_id => group.id, :user_id => user.id, :save => false)
+    group_model
+    user_model
+    @gm = group_membership_model(:save => false)
     @gm.expects(:ensure_mutually_exclusive_membership)
     @gm.save!
   end
@@ -104,56 +104,19 @@ describe GroupMembership do
       membership.active_given_enrollments?([]).should be_true
     end
   end
+
+  it "should auto_join for backwards compatibility" do
+    user_model
+    group_model
+    group_membership_model(:workflow_state => "invited")
+    @group_membership.workflow_state.should == "accepted"
+  end
+
+  it "should not auto_join for communities" do
+    user_model
+    @communities = GroupCategory.communities_for(Account.default)
+    group_model(:name => "Algebra Teachers", :group_category => @communities, :join_level => "parent_context_request")
+    group_membership_model(:workflow_state => "requested")
+    @group_membership.workflow_state.should == "requested"
+  end
 end
-
-def group_membership_model(opts={})
-  do_save = opts.has_key?(:save) ? opts.delete(:save) : true
-  @group_membership = factory_with_protected_attributes(GroupMembership, valid_group_membership_attributes.merge(opts), do_save)
-end
-
-def valid_group_membership_attributes
-  {
-    :group_id => 1, 
-    :user_id => 1
-  }
-end
-
-
-#   include Workflow
-#   
-#   belongs_to :group
-#   belongs_to :user
-#   
-#   before_save :ensure_mutually_exclusive_membership
-#   before_save :assign_uuid
-#   
-#   def assign_uuid
-#     self.uuid ||= UUIDSingleton.instance.generate
-#   end
-#   protected :assign_uuid
-# 
-#   def ensure_mutually_exclusive_membership
-#     return unless self.group
-#     self.group.peer_groups.each do |group|
-#       member = group.group_memberships.find_by_user_id(self.user_id)
-#       member.destroy if member
-#     end
-#   end
-#   protected :ensure_mutually_exclusive_membership
-#   
-#   workflow do
-#     state :new do
-#       event :admit, :transitions_to => :admitted
-#       event :reject, :transitions_to => :rejected
-#     end
-#     
-#     state :admitted do
-#       event :expel, :transitions_to => :expelled
-#     end
-#     
-#     state :expelled
-#     state :rejected
-#     
-#   end
-#   
-# end

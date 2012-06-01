@@ -178,7 +178,7 @@ class GroupsController < ApplicationController
   #       members_count: 3,
   #       avatar_url: "https://<canvas>/files/avatar_image.png",
   #       group_category_id: 2,
-  #     },
+  #     }
   def show
     find_group
     respond_to do |format|
@@ -456,6 +456,49 @@ class GroupsController < ApplicationController
     end
   end
 
+  # @API Invite others to a group
+  #
+  # @subtopic Group Memberships
+  #
+  # Sends an invitation to all supplied email addresses which will allow the
+  # receivers to join the group.
+  #
+  # @argument invitees An array of email addresses to be sent invitations
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/invite \ 
+  #          -F 'invitees[]=leonard@example.com&invitees[]=sheldon@example.com' \ 
+  #          -H 'Authorization: Bearer <token>'
+  def invite
+    find_group
+    if authorized_action(@group, @current_user, :manage)
+      ul = UserList.new(params[:invitees], nil, :preferred)
+      @memberships = []
+      ul.users.each{ |u| @memberships << @group.invite_user(u) }
+      render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }
+    end
+  end
+
+  def accept_invitation
+    require_user
+    find_group
+    @membership = @group.group_memberships.scoped(:conditions => { :uuid => params[:uuid] }).first if @group
+    @membership.accept! if @membership.try(:invited?)
+    if @membership.try(:active?)
+      flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
+      respond_to do |format|
+        format.html { redirect_to(group_url(@group)) }
+        format.json { render :json => group_membership_json(@membership, @current_user, session) }
+      end
+    else
+      flash[:notice] = t('notices.invalid_invitation', "", :group_name => @group.name)
+      respond_to do |format|
+        format.html { redirect_to(dashboard_url) }
+        format.json { render :json => "Unable to find associated group invitation", :status => :bad_request }
+      end
+    end
+  end
+
   def create_category
     if authorized_action(@context, @current_user, :manage_groups)
       @group_category = @context.group_categories.build
@@ -599,7 +642,8 @@ class GroupsController < ApplicationController
     if api_request?
       @group = Group.active.find(params[:group_id])
     else
-      @group = (@context ? @context.groups : Group).find(params[:id])
+      @group = @context if @context.is_a?(Group)
+      @group ||= (@context ? @context.groups : Group).find(params[:id])
     end
   end
 

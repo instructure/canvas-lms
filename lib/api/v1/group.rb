@@ -24,6 +24,10 @@ module Api::V1::Group
     :methods => %w(members_count),
   }
 
+  API_GROUP_MEMBERSHIP_JSON_OPTS = {
+    :only => %w(id group_id user_id workflow_state moderator)
+  }
+
   def group_json(group, user, session, options = {})
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS)
     followed = ::UserFollow.followed_by_user([group], user)
@@ -35,6 +39,10 @@ module Api::V1::Group
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }
     end
     hash
+  end
+
+  def group_membership_json(membership, user, session)
+    api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
   end
 end
 

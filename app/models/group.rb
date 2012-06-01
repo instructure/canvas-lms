@@ -209,17 +209,24 @@ class Group < ActiveRecord::Base
     end
   end
 
-  def add_user(user, new_record_state=nil, moderator=false)
+  # this method is idempotent
+  def add_user(user, new_record_state=nil, moderator=nil)
     return nil if !user
-    attrs = { :user => user, :moderator => moderator }
+    attrs = { :user => user, :moderator => !!moderator }
     new_record_state ||= case self.join_level
       when 'invitation_only'          then 'invited'
       when 'parent_context_request'   then 'requested'
       when 'parent_context_auto_join' then 'accepted'
       end
     attrs[:workflow_state] = new_record_state if new_record_state
-    member = self.group_memberships.find_by_user_id(user.id)
-    member ||= self.group_memberships.create(attrs)
+    if member = self.group_memberships.find_by_user_id(user.id)
+      member.workflow_state = new_record_state unless member.active?
+      # only update moderator if true/false is explicitly passed in
+      member.moderator = moderator unless moderator.nil?
+      member.save if member.changed?
+    else
+      member = self.group_memberships.create(attrs)
+    end
     return member
   end
 
@@ -304,12 +311,9 @@ class Group < ActiveRecord::Base
     given { |user| user && self.has_member?(user) }
     can :create_collaborations and
     can :create_conferences and
-    can :manage and
-    can :manage_admin_users and
     can :manage_calendar and
     can :manage_content and 
     can :manage_files and
-    can :manage_students and 
     can :manage_wiki and
     can :post_to_forum and
     can :read and 
@@ -324,6 +328,9 @@ class Group < ActiveRecord::Base
 
     given { |user| user && self.has_moderator?(user) }
     can :delete and
+    can :manage and
+    can :manage_admin_users and
+    can :manage_students and 
     can :moderate_forum and
     can :update
 
