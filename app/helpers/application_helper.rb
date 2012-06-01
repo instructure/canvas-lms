@@ -336,10 +336,11 @@ module ApplicationHelper
 
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    paths = js_bundles.map do |(bundle,plugin)|
+    paths = js_bundles.inject([]) do |ary, (bundle, plugin)|
       base_url = js_base_url
-      base_url = "/plugins/#{plugin}#{base_url}" if plugin
-      "#{base_url}/compiled/bundles/#{bundle}.js"
+      base_url += "/plugins/#{plugin}" if plugin
+      ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
+      ary << "#{base_url}/compiled/bundles/#{bundle}.js"
     end
     javascript_include_tag *paths
   end

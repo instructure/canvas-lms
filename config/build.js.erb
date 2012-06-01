@@ -1,0 +1,96 @@
+({
+
+  // file optimizations
+  optimize: "uglify",
+
+  // continue to let Jammit do its thing
+  optimizeCss: "none",
+
+  // where to place optimized javascript, relative to this file
+  dir: "../public/optimized",
+
+  // where the "app" is, relative to this file
+  appDir: "../public/javascripts",
+
+  // base path for modules, relative to appDir
+  baseUrl: "./",
+
+  translate: true,
+
+  paths: <%= paths %>,
+
+  // non-amd shims
+  use: <%= shims %>,
+
+  // which modules should have their dependencies concatenated into them
+  modules: [
+
+    // non "app" bundles, should be careful not to try to have too many of these
+    {
+      name: "compiled/tinymce",
+
+      // this stuff is already in common, should be able to make this a smaller
+      // list since some things depend on others in the list, yes, its a bit crazy
+      // this is the intersection of common and tinymce, we need to script this
+      // config file...
+      exclude: [
+        'order',
+        'i18n',
+        'str/escapeRegex',
+        'vendor/date',
+        'jquery',
+        'str/pluralize',
+        'INST',
+        'str/htmlEscape',
+        'i18nObj',
+        'vendor/jquery.scrollTo',
+        'vendor/jqueryui/core',
+        'vendor/jqueryui/widget',
+        'vendor/jqueryui/mouse',
+        'vendor/jqueryui/position',
+        'translations/instructure',
+        'i18n!instructure',
+        'compiled/util/objectCollection',
+        'vendor/spin',
+        'vendor/jquery.spin',
+        'jquery.google-analytics',
+        'vendor/jquery.ba-hashchange',
+        'vendor/jqueryui/effects/core',
+        'vendor/jqueryui/effects/drop',
+        'jquery.rails_flash_notifications',
+        'translations/scribd',
+        'i18n!scribd',
+        'vendor/scribd.view',
+        'jquery.dropdownList',
+        'vendor/jqueryui/progressbar',
+        'translations/media_comments',
+        'i18n!media_comments',
+        'vendor/jqueryui/button',
+        'vendor/jqueryui/draggable',
+        'jqueryui/draggable',
+        'vendor/jqueryui/resizable',
+        'vendor/jqueryui/dialog',
+        'jquery.instructure_jquery_patches',
+        'vendor/jqueryui/datepicker',
+        'vendor/jqueryui/sortable',
+        'jquery.scrollToVisible',
+        'vendor/jqueryui/tabs',
+        'jquery.disableWhileLoading',
+        'jquery.keycodes',
+        'jquery.instructure_date_and_time',
+        'jquery.instructure_misc_plugins',
+        'tinymce.editor_box',
+        'jquery.instructure_forms',
+        'jquery.ajaxJSON',
+        'jquery.instructure_misc_helpers',
+        'media_comments'
+      ]
+    },
+
+    { name: "common" },
+
+    // "apps"
+    <%= app_bundles %>
+  ]
+})
+
