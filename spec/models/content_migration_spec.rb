@@ -1058,6 +1058,31 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       cal2_2.description.should == ''
     end
 
+    it "should leave text answers as text" do
+      pending unless Qti.qti_enabled?
+      @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
+      data = {
+                          :question_type => "multiple_choice_question",
+                          :question_name => "test fun",
+                          :name => "test fun",
+                          :points_possible => 10,
+                          :question_text => "<strong>html for fun</strong>",
+                          :answers =>
+                                  [{:migration_id => "QUE_1016_A1", :text => "<br />", :weight => 100, :id => 8080},
+                                   {:migration_id => "QUE_1017_A2", :text => "<pre>", :weight => 0, :id => 2279}]}.with_indifferent_access
+      aq_from1 = @bank.assessment_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      aq = @copy_to.assessment_questions.find_by_migration_id(mig_id(aq_from1))
+
+      aq.question_data[:answers][0][:text].should == data[:answers][0][:text]
+      aq.question_data[:answers][1][:text].should == data[:answers][1][:text]
+      aq.question_data[:answers][0][:html].should be_nil
+      aq.question_data[:answers][1][:html].should be_nil
+      aq.question_data[:question_text].should == data[:question_text]
+    end
+
     context "copying frozen assignments" do
       append_before (:each) do
         @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => {"no_copying" => "yes"})

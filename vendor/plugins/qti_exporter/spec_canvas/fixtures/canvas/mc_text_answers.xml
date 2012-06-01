@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop xsi:schemaLocation="http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2">
+  <objectbank ident="i35b5819e71e59e50208a2071da15dee5">
+    <qtimetadata>
+      <qtimetadatafield>
+        <fieldlabel>bank_title</fieldlabel>
+        <fieldentry>Test Bank</fieldentry>
+      </qtimetadatafield>
+    </qtimetadata>
+    <item title="Br" ident="i149d254243105bb525e78490f62d9c4c">
+      <itemmetadata>
+        <qtimetadata>
+          <qtimetadatafield>
+            <fieldlabel>question_type</fieldlabel>
+            <fieldentry>multiple_choice_question</fieldentry>
+          </qtimetadatafield>
+          <qtimetadatafield>
+            <fieldlabel>points_possible</fieldlabel>
+            <fieldentry>1</fieldentry>
+          </qtimetadatafield>
+          <qtimetadatafield>
+            <fieldlabel>assessment_question_identifierref</fieldlabel>
+            <fieldentry>i666fd869d0c2a444eaa3e9dc4a767545</fieldentry>
+          </qtimetadatafield>
+        </qtimetadata>
+      </itemmetadata>
+      <presentation>
+        <material>
+          <mattext texttype="text/html">&lt;div&gt;&lt;p&gt;This tag is an inline element that will restart text that follows it onto next line.&lt;/p&gt;&lt;/div&gt;</mattext>
+        </material>
+        <response_lid rcardinality="Single" ident="response1">
+          <render_choice>
+            <response_label ident="8860">
+              <material>
+                <mattext texttype="text/plain">&lt;br /&gt;</mattext>
+              </material>
+            </response_label>
+            <response_label ident="5086">
+              <material>
+                <mattext texttype="text/plain">&lt;hr /&gt;</mattext>
+              </material>
+            </response_label>
+            <response_label ident="7365">
+              <material>
+                <mattext texttype="text/plain">&lt;pre&gt;</mattext>
+              </material>
+            </response_label>
+            <response_label ident="3041">
+              <material>
+                <mattext texttype="text/plain">&lt;n /&gt;</mattext>
+              </material>
+            </response_label>
+          </render_choice>
+        </response_lid>
+      </presentation>
+      <resprocessing>
+        <outcomes>
+          <decvar maxvalue="100" minvalue="0" vartype="Decimal" varname="SCORE"/>
+        </outcomes>
+        <respcondition continue="No">
+          <conditionvar>
+            <varequal respident="response1">8860</varequal>
+          </conditionvar>
+          <setvar action="Set" varname="SCORE">100</setvar>
+        </respcondition>
+      </resprocessing>
+    </item>
+  </objectbank>
+</questestinterop>

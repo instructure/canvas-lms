@@ -133,6 +133,19 @@ describe "Converting Canvas QTI" do
                                                                                   :question_bank_is_external => true}]
   end
 
+  it "should leave text answers as text" do
+    hash = get_quiz_data(CANVAS_FIXTURE_DIR, 'mc_text_answers').first.first
+    hash[:answers][0][:text].should == '<br />'
+    hash[:answers][0][:html].should be_nil
+    hash[:answers][1][:text].should == '<hr />'
+    hash[:answers][1][:html].should be_nil
+    hash[:answers][2][:text].should == '<pre>'
+    hash[:answers][2][:html].should be_nil
+    hash[:answers][3][:text].should == '<n />'
+    hash[:answers][3][:html].should be_nil
+    hash[:question_text].should == "<div><p>This tag is an inline element that will restart text that follows it onto next line.</p></div>"
+  end
+
 end
 
 module CanvasExpected
