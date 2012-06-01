@@ -517,7 +517,7 @@ module CC
           html = @html_exporter.html_content(html_val)
           mat_node.mattext html, :texttype => 'text/html'
         else
-          mat_node.mattext text_val
+          mat_node.mattext text_val, :texttype => 'text/plain'
         end
       end
       
