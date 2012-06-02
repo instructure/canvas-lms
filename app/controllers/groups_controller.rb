@@ -84,6 +84,8 @@ class GroupsController < ApplicationController
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment)
 
+  include TextHelper
+
   def context_group_members
     @group = @context
     if authorized_action(@group, @current_user, :read_roster)
@@ -474,19 +476,28 @@ class GroupsController < ApplicationController
     @use_new_styles = true
     @group = (@context ? @context.groups : Group).find(params[:id])
     @context = @group
-    js_env :GROUP_ID => @group.id, :FOLDER_ID => @group.folders.active.first.id
+
+    folder   = @group.folders.active.first
+    folder ||= @group.folders.active.create! :name => 'Group Pictures'
+    js_env :GROUP_ID => @group.id, :FOLDER_ID => folder.id
+
     if authorized_action(@group, @current_user, :update)
       render :action => :edit, :layout => 'new_application'
     end
   end
 
   def profile
+    @use_new_styles = true
+    @active_tab = 'profile'
     @group = Group.find(params[:group_id])
-    render :text => @group.name
-  end
 
-  def collections
-    render :text => "TODO"
+    # FIXME: there are probably some permissions that could override the
+    # public/private setting on groups (school admins or something?)
+    @can_join = %(parent_context_auto_join
+                  parent_context_request).include? @group.join_level
+    @in_group = @current_user && @current_user.groups.include?(@group)
+
+    render :action => :profile, :layout => 'new_application'
   end
 
   def public_feed

@@ -404,7 +404,6 @@ ActionController::Routing::Routes.draw do |map|
     group.resources :short_messages
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
     group.profile 'profile', :controller => :groups, :action => 'profile', :conditions => {:method => :get}
-    group.collections 'collections', :controller => :groups, :action => 'collections', :conditions => {:method => :get}
   end
 
   map.resources :accounts, :member => { :statistics => :get } do |account|

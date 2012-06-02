@@ -169,6 +169,8 @@ stylesheets:
     - public/stylesheets/compiled/groups/dashboard.css
   group_settings:
     - public/stylesheets/compiled/groups/edit.css
+  group_profile:
+    - public/stylesheets/compiled/groups/profile.css
   facebook:
     - public/stylesheets/compiled/facebook.css
   speed_grader:
