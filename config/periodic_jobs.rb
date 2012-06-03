@@ -73,7 +73,7 @@ if PageView.page_view_method == :cache
   # periodically pull new page views off the cache and insert them into the db
   Delayed::Periodic.cron 'PageView.process_cache_queue', '*/1 * * * *' do
     Shard.with_each_shard do
-      PageView.process_cache_queue
+      PageView.send_later_enqueue_args(:process_cache_queue, :singleton => "PageView.process_cache_queue:#{Shard.current.description}")
     end
   end
 end
