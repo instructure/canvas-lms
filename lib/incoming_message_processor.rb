@@ -40,16 +40,22 @@ class IncomingMessageProcessor
     end
 
     msg = Message.find_by_id(message_id)
-    context = msg.context if msg && secure_id == msg.reply_to_secure_id
-    user = msg.try(:user)
-    if user && context && context.respond_to?(:reply_from)
-      context.reply_from({
-        :purpose => 'general',
-        :user => user,
-        :subject => utf8ify(message.subject, message.header[:subject].try(:charset)),
-        :html => html_body,
-        :text => body
-      })
+    if msg
+      msg.shard.activate do
+        context = msg.context if secure_id == msg.reply_to_secure_id
+        user = msg.user
+        if user && context && context.respond_to?(:reply_from)
+          context.reply_from({
+            :purpose => 'general',
+            :user => user,
+            :subject => utf8ify(message.subject, message.header[:subject].try(:charset)),
+            :html => html_body,
+            :text => body
+          })
+        else
+          IncomingMessageProcessor.ndr(message.from.first, message.subject) if message.from.try(:first)
+        end
+      end
     else
       IncomingMessageProcessor.ndr(message.from.first, message.subject) if message.from.try(:first)
     end
