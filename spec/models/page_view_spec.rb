@@ -83,6 +83,7 @@ describe PageView do
         Enrollment.delete_all
         UserAccountAssociation.delete_all
         User.delete_all
+        CourseAccountAssociation.delete_all
         Course.delete_all
       end
     end
