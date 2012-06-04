@@ -38,7 +38,7 @@ describe "context_modules" do
   def add_module(module_name = 'Test Module')
     add_form = new_module_form
     replace_content(add_form.find_element(:id, 'context_module_name'), module_name)
-    add_form.submit
+    submit_form(add_form)
     wait_for_ajaximations
     add_form.should_not be_displayed
     driver.find_element(:id, 'context_modules').should include_text(module_name)
@@ -175,7 +175,7 @@ describe "context_modules" do
       driver.find_element(:css, '.ui-dialog').should be_displayed
       edit_form = driver.find_element(:id, 'add_context_module_form')
       edit_form.find_element(:id, 'context_module_name').send_keys(edit_text)
-      edit_form.submit
+      submit_form(edit_form)
       edit_form.should_not be_displayed
       wait_for_ajaximations
       driver.find_element(:css, '.context_module > .header').should include_text(edit_text)
@@ -194,7 +194,7 @@ describe "context_modules" do
       wait_for_ajaximations
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
-      edit_form.submit
+      submit_form(edit_form)
       edit_form.should_not be_displayed
       wait_for_ajax_requests
 
@@ -223,7 +223,7 @@ describe "context_modules" do
       edit_form = driver.find_element(:id, 'add_context_module_form')
       f('.completion_entry .delete_criterion_link', edit_form).click
       wait_for_ajaximations
-      edit_form.submit
+      submit_form(edit_form)
       wait_for_ajax_requests
 
       # verify it's gone
@@ -259,7 +259,7 @@ describe "context_modules" do
       module_item.find_element(:css, '.edit_item_link').click
       edit_form = driver.find_element(:id, 'edit_item_form')
       replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
-      edit_form.submit
+      submit_form(edit_form)
       wait_for_ajaximations
       module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(item_edit_text)
@@ -339,7 +339,7 @@ describe "context_modules" do
         wait_for_animations
         #have to do it this way because the select has no css attributes on it
         click_option(':input:visible.eq(3)', first_module_name)
-        add_form.submit
+        submit_form(add_form)
         wait_for_ajaximations
         db_module = ContextModule.last
         context_module = driver.find_element(:id, "context_module_#{db_module.id}")
@@ -401,7 +401,7 @@ describe "context_modules" do
 
       driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
       click_option("#content_tag_indent_select", "Indent 1 Level")
-      f("#edit_item_form").submit
+      submit_form("#edit_item_form")
       wait_for_ajaximations
       driver.find_element(:id, "context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
 
@@ -427,7 +427,7 @@ describe "context_modules" do
       # change indent from edit form
       driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
       click_option("#content_tag_indent_select", "Don't Indent")
-      f("#edit_item_form").submit
+      submit_form("#edit_item_form")
       wait_for_ajaximations
 
       module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
@@ -448,7 +448,7 @@ describe "context_modules" do
       wait_for_ajaximations
       click_option('#add_context_module_form .assignment_picker', @assignment2.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_contribute', :value)
-      edit_form.submit
+      submit_form(edit_form)
       wait_for_ajax_requests
 
       # verify it shows up (both visually and in the template data)

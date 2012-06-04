@@ -14,7 +14,7 @@ describe "conversations" do
 
     expect {
       f('#body').send_keys(new_message)
-      5.times { f('#create_message_form button[type=submit]').click }
+      5.times { submit_form('#create_message_form') }
       keep_trying_until{ get_conversations.size == 1 }
     }.to change(ConversationMessage, :count).by(1)
   end
@@ -140,7 +140,7 @@ describe "conversations" do
       add_recipient("student1")
       add_recipient("student2")
       driver.find_element(:id, "body").send_keys "testing testing"
-      driver.find_element(:css, '#create_message_form button[type="submit"]').click
+      submit_form('#create_message_form')
 
       wait_for_ajaximations
 

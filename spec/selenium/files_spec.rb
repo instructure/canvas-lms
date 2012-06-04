@@ -246,7 +246,7 @@ describe "zip file uploads" do
       filename, path, data, file = get_file('attachments.zip')
       first_selected_option(f('#upload_to select')).attribute('value').should == folder.id.to_s
       f('input#zip_file').send_keys(path)
-      f('button.submit_button').click
+      submit_form('#zip_file_import_form')
 
       zfi = keep_trying_until { ZipFileImport.last(:order => :id) }
       zfi.context.should == @context

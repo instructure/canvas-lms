@@ -37,9 +37,8 @@ describe "gradebook2" do
       open_assignment_options(0)
       f('#ui-menu-1-3').click
       dialog = find_with_jquery('.ui-dialog:visible')
-      dialog_form = dialog.find_element(:css, '.ui-dialog-content')
       f('.grading_value').send_keys(5)
-      dialog_form.submit
+      submit_dialog(dialog, '.ui-button')
       keep_trying_until do
         driver.switch_to.alert.should_not be_nil
         driver.switch_to.alert.text.should eql 'None to Update'
@@ -234,7 +233,7 @@ describe "gradebook2" do
         expect {
           message_form = f('#message_assignment_recipients')
           message_form.find_element(:css, '#body').send_keys(message_text)
-          message_form.submit
+          submit_form(message_form)
           wait_for_ajax_requests
         }.to change(ConversationMessage, :count).by(2)
       end

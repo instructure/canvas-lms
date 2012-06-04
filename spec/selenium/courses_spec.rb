@@ -72,7 +72,7 @@ describe "courses" do
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
       quota_input.clear
       quota_input.send_keys("10")
-      form.submit
+      submit_form(form)
       keep_trying_until { driver.find_element(:css, ".loading_image_holder").nil? rescue true }
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
 
@@ -81,7 +81,7 @@ describe "courses" do
       form = driver.find_element(:css, "#course_form")
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
       form.find_element(:css, ".edit_course_link").click
-      form.submit
+      submit_form(form)
       keep_trying_until { driver.find_element(:css, ".loading_image_holder").nil? rescue true }
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
 

@@ -74,7 +74,7 @@ describe "admin settings tab" do
   end
 
   def click_submit
-    f("#account_settings button[type ='submit']").click
+    submit_form("#account_settings")
     wait_for_ajax_requests
   end
 

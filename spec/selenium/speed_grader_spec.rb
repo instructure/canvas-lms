@@ -68,7 +68,7 @@ describe "speed grader" do
     in_frame('speedgrader_iframe') do
       question_inputs = ff('.question_input')
       question_inputs.each { |qi| replace_content(qi, 3) }
-      f('button[type=submit]').click #TODO - find out if we can find the form with a selector so we can use the submit_form helper method
+      submit_form('#update_history_form')
     end
     keep_trying_until { f('#grade_container input').attribute('value').should == expected_points }
   end

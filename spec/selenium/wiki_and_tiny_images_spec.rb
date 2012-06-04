@@ -8,7 +8,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     el.find_element(:css, '.mce_instructure_embed').click
     driver.find_element(:css, '.flickr_search_link').click
     driver.find_element(:css, '#image_search_form > input').send_keys('angel')
-    driver.find_element(:id, 'image_search_form').submit
+    submit_form('#image_search_form')
     wait_for_ajax_requests
     keep_trying_until { driver.find_element(:css, '.image_link').should be_displayed }
     driver.find_element(:css, '.image_link').click
@@ -26,7 +26,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       driver.find_element(:css, '#tinymce img').should be_displayed
     end
 
-    driver.find_element(:id, 'wiki_page_submit').click
+    submit_form('#new_wiki_page')
     wait_for_ajax_requests
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
@@ -158,7 +158,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         true
       end
 
-      driver.find_element(:id, 'wiki_page_submit').click
+      submit_form('#new_wiki_page')
       wait_for_ajax_requests
       get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
       wait_for_ajax_requests
@@ -186,7 +186,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         driver.find_element(:css, '#tinymce img').should be_displayed
       end
 
-      driver.find_element(:id, 'wiki_page_submit').click
+      submit_form('#new_wiki_page')
       wait_for_ajax_requests
       get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
       wait_for_ajax_requests

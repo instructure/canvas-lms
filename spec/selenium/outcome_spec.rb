@@ -189,14 +189,14 @@ describe "learning outcome test" do
     driver.find_element(:css, '#criterion_1 .criterion_description .edit_criterion_link img').click
     driver.find_element(:css, '#edit_criterion_form input[name="description"]').clear
     driver.find_element(:css, '#edit_criterion_form input[name="description"]').send_keys('important criterion')
-    driver.find_element(:id, 'edit_criterion_form').submit
+    submit_form('#edit_criterion_form')
     rating_row = find_with_jquery('#criterion_1 td:nth-child(2) table tr')
     rating_row.find_element(:css, '.edit_rating_link img').click
     rating_row.find_element(:css, '#edit_rating_form input[name="description"]').clear
     rating_row.find_element(:css, '#edit_rating_form input[name="description"]').send_keys('really good')
     rating_row.find_element(:css, '#edit_rating_form input[name="points"]').clear
     rating_row.find_element(:css, '#edit_rating_form input[name="points"]').send_keys('3')
-    rating_row.find_element(:id, 'edit_rating_form').submit
+    submit_form('#edit_rating_form')
     sleep 1
     driver.find_element(:css, '#criterion_1 .criterion_points').clear
     driver.find_element(:css, '#criterion_1 .criterion_points').send_keys('4')
@@ -205,7 +205,7 @@ describe "learning outcome test" do
     driver.find_element(:css, '#rubric_new .add_criterion_link').click
     driver.find_element(:css, '#edit_criterion_form input[name="description"]').clear
     driver.find_element(:css, '#edit_criterion_form input[name="description"]').send_keys('second critierion')
-    driver.find_element(:id, 'edit_criterion_form').submit
+    submit_form('#edit_criterion_form')
 
     #add outcome
     driver.find_element(:css, '#rubric_new .find_outcome_link').click
@@ -230,7 +230,7 @@ describe "learning outcome test" do
     sleep 1 #wait for points to recalculate
 
     #save and check rubric
-    driver.find_element(:id, 'edit_rubric_form').submit
+    submit_form('#edit_rubric_form')
     wait_for_ajaximations
     driver.find_element(:css, '#rubrics .edit_rubric_link img').should be_displayed
     find_all_with_jquery('#rubrics tr.criterion:visible').size.should == 4

@@ -69,7 +69,7 @@ describe "login logout" do
   it "should validate i don't know my password functionality" do
     go_to_forgot_password
     driver.find_element(:css, '#pseudonym_session_unique_id_forgot').send_keys(USERNAME)
-    driver.find_element(:css, '#forgot_password_form').submit
+    submit_form('#forgot_password_form')
     wait_for_ajaximations
     assert_flash_notice_message /Password confirmation sent/
   end

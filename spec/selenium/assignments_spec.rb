@@ -50,7 +50,7 @@ describe "assignments" do
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
       driver.find_element(:id, 'assignment_points_possible').send_keys('5')
-      driver.find_element(:id, 'add_assignment_form').submit
+      submit_form('#add_assignment_form')
 
       #make sure assignment was added to correct assignment group
       wait_for_animations
@@ -73,7 +73,7 @@ describe "assignments" do
         first_stamp = group.reload.updated_at.to_i
         driver.find_element(:css, '.add_assignment_link').click
         expect_new_page_load { driver.find_element(:css, '.more_options_link').click }
-        expect_new_page_load { driver.find_element(:css, '#edit_assignment_form').submit }
+        expect_new_page_load { submit_form('#edit_assignment_form') }
         @course.assignments.count.should == 1
         driver.find_element(:css, '.no_assignments_message').should_not be_displayed
         driver.find_element(:css, '#groups').should include_text(expected_text)
@@ -111,9 +111,9 @@ describe "assignments" do
       driver.find_element(:css, '.more_options_link').click
       driver.find_element(:id, 'assignment_group_assignment').click
       click_option('#assignment_group_category_select', 'new', :value)
-      driver.find_element(:css, 'div.ui-dialog button[type=submit]').click
+      submit_dialog('div.ui-dialog')
       wait_for_ajaximations
-      driver.find_element(:id, 'edit_assignment_form').submit
+      submit_form('#edit_assignment_form')
       wait_for_ajaximations
       @assignment.reload
       @assignment.group_category_id.should_not be_nil
@@ -124,7 +124,7 @@ describe "assignments" do
       driver.find_element(:css, '.edit_full_assignment_link').click
       driver.find_element(:css, '.more_options_link').click
       driver.find_element(:id, 'assignment_group_assignment').click
-      driver.find_element(:id, 'edit_assignment_form').submit
+      submit_form('#edit_assignment_form')
       wait_for_ajaximations
       @assignment.reload
       @assignment.group_category_id.should be_nil
@@ -145,7 +145,7 @@ describe "assignments" do
       driver.find_element(:css, ".submission_type_option option[value='online']").click
       driver.find_element(:css, ".assignment_type option[value='quiz']").click
 
-      expect_new_page_load { driver.find_element(:id, 'edit_assignment_form').submit }
+      expect_new_page_load { submit_form('#edit_assignment_form') }
     end
 
     it "should edit an assignment" do
@@ -179,16 +179,17 @@ describe "assignments" do
       close_visible_dialog
 
       #check peer reviews option
-      driver.find_element(:css, '#edit_assignment_form #assignment_peer_reviews').click
-      driver.find_element(:css, '#edit_assignment_form #auto_peer_reviews').click
-      driver.find_element(:css, '#edit_assignment_form #assignment_peer_review_count').send_keys('2')
-      driver.find_element(:css, '#edit_assignment_form #assignment_peer_reviews_assign_at + img').click
+      form = f("#edit_assignment_form")
+      form.find_element(:css, '#assignment_peer_reviews').click
+      form.find_element(:css, '#auto_peer_reviews').click
+      driver.find_element(:css, '#assignment_peer_review_count').send_keys('2')
+      driver.find_element(:css, '#assignment_peer_reviews_assign_at + img').click
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
       driver.find_element(:id, 'assignment_title').send_keys(' edit')
 
       #save changes
-      driver.find_element(:id, 'edit_assignment_form').submit
+      submit_form(form)
       wait_for_ajaximations
       driver.find_elements(:css, '.loading_image_holder').length.should eql 0
       driver.find_element(:css, 'h2.title').should include_text(assignment_name + ' edit')
@@ -233,7 +234,7 @@ describe "assignments" do
         driver.find_element(:id, 'assignment_title').send_keys(' edit')
 
         #save changes
-        driver.find_element(:id, 'edit_assignment_form').submit
+        submit_form('#edit_assignment_form')
         wait_for_ajaximations
         driver.find_elements(:css, '.loading_image_holder').length.should eql 0
         driver.find_element(:css, 'h2.title').should include_text(orig_title + ' edit')
@@ -281,7 +282,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       driver.find_element(:css, "a.edit_full_assignment_link").click
-      driver.find_element(:id, 'edit_assignment_form').submit
+      submit_form('#edit_assignment_form')
 
       wait_for_animations
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
@@ -314,7 +315,7 @@ describe "assignments" do
       wait_for_tiny(assignment_form)
 
       type_in_tiny('#submission_body', 'my assigment submission')
-      assignment_form.submit
+      submit_form(assignment_form)
       wait_for_dom_ready
 
       @course.student_view_student.submissions.count.should == 1
@@ -507,7 +508,7 @@ describe "assignments" do
       driver.find_element(:css, '.submit_assignment_link').click
       assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
-      assignment_form.submit
+      submit_form(assignment_form)
 
       # it should not actually submit and pop up an error message
       driver.find_element(:css, '.error_box').should be_displayed
@@ -516,7 +517,7 @@ describe "assignments" do
       # now make sure it works
       lambda {
         type_in_tiny('#submission_body', 'now it is not blank')
-        assignment_form.submit
+        submit_form(assignment_form)
       }.should change { Submission.count }.by(1)
     end
 
@@ -526,7 +527,7 @@ describe "assignments" do
       driver.find_element(:css, '.submit_assignment_link').click
       assignment_form = driver.find_element(:id, 'submit_online_text_entry_form')
       replace_content(assignment_form.find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
-      assignment_form.find_element(:css, "#submit_online_text_entry_form button[type=submit]").click
+      submit_form("#submit_online_text_entry_form")
 
       # it should not actually submit and pop up an error message
       driver.find_element(:css, '.error_box').should be_displayed

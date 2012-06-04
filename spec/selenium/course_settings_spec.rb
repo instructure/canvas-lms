@@ -21,7 +21,7 @@ describe "course settings" do
       fj('.grading_standard_select:visible a').click
       fj('button.select_grading_standard_link:visible').click
       f('.done_button').click
-      f('#course_form').submit
+      submit_form('#course_form')
       wait_for_ajaximations
 
       f('.grading_scheme_set').should include_text @standard.title
@@ -44,7 +44,7 @@ describe "course settings" do
       f('.edit_course_link').click
       f('.course_form_more_options_link').click
       f('#course_self_enrollment').click
-      f('#course_form').submit
+      submit_form('#course_form')
       wait_for_ajaximations
 
       code = @course.reload.self_enrollment_code
@@ -74,7 +74,7 @@ describe "course settings" do
       driver.find_element(:css, '.course_form_more_options_link').click
       wait_for_animations
       driver.find_element(:css, '.course_form_more_options').should be_displayed
-      course_form.submit
+      submit_form(course_form)
       wait_for_ajaximations
 
       driver.find_element(:css, '.course_info').should include_text(course_name)
@@ -89,7 +89,7 @@ describe "course settings" do
       section_input = driver.find_element(:id, 'course_section_name')
       keep_trying_until { section_input.should be_displayed }
       replace_content(section_input, section_name)
-      driver.find_element(:id, 'add_section_form').submit
+      submit_form('#add_section_form')
       wait_for_ajaximations
       new_section = driver.find_elements(:css, 'ul#sections > .section')[1]
       new_section.should include_text(section_name)
@@ -205,7 +205,7 @@ describe "course settings" do
       end
       wait_for_ajax_requests
       click_option("#student_enrollment_link_option", student.try(:name) || "[ No Link ]")
-      driver.find_element(:css, "#link_student_dialog_form").submit
+      submit_form("#link_student_dialog_form")
       wait_for_ajax_requests
     end
 

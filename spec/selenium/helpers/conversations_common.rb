@@ -154,7 +154,7 @@ shared_examples_for "conversations selenium tests" do
 
     expect {
       # ensure that we've focused on the button, since file inputs go away
-      f('#create_message_form button[type=submit]').click
+      submit_form('#create_message_form')
       # file uploads can trigger multiple ajax requests, so we just wait for stuff to get reenabled
       keep_trying_until{ f('#create_message_form textarea').enabled? }
     }.to change(ConversationMessage, :count).by(opts[:group_conversation] ? 1 : ff('.token_input li').size)

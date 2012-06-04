@@ -28,7 +28,7 @@ describe "admin courses tab" do
     f(".add_course_link").click
     f("#add_course_form #course_name").send_keys("course 1")
     f("#course_course_code").send_keys("12345")
-    f("#add_course_form button[type='submit']").click
+    submit_form("#add_course_form")
     # we need to refresh the page so the course shows up
     refresh_page
     course = Course.find_by_name("course 1")

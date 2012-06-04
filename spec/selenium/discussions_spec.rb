@@ -119,7 +119,7 @@ describe "discussions" do
       type_in_tiny('#topic_content_topic_new', 'asdf')
       f('.more_options_link').click
       f('#discussion_topic_assignment_set_assignment').click
-      f('#add_topic_form_topic_new .submit_button').click
+      submit_form('#add_topic_form_topic_new')
       wait_for_ajax_requests
 
       10.times do |i|
@@ -151,7 +151,7 @@ describe "discussions" do
       form.find_element(:css, '.more_options_link').click
       form.find_element(:id, 'discussion_topic_podcast_enabled').click
 
-      form.submit
+      submit_form(form)
       wait_for_ajaximations
 
       f('.discussion_topic .podcast img').click
@@ -181,7 +181,7 @@ describe "discussions" do
       expect_new_page_load { click_topic_option('#discussion_topic', '#ui-menu-0-0') }
       replace_content(f('#discussion_topic_title'), edit_text)
       type_in_tiny(".topic_content", ' new message')
-      f('.submit_button').click
+      submit_form('.add_topic_form_new')
       wait_for_ajaximations
       f('.discussion_topic').should include_text(edit_text)
     end
@@ -206,7 +206,7 @@ describe "discussions" do
       d_title= keep_trying_until {f("#discussion_topic_title")}
       replace_content(d_title, edit_text)
       type_in_tiny("textarea", 'other message')
-      f(".add_topic_form_new button[type=submit]").click
+      submit_form(".add_topic_form_new")
       wait_for_ajaximations
       f(".discussion_topic").should include_text(edit_text)
     end
@@ -223,7 +223,7 @@ describe "discussions" do
 
     it "should validate closing the discussion for comments" do
       create_and_go_to_topic
-      expect_new_page_load { f('.edit_discussion_topic button[type=submit]').click }
+      expect_new_page_load { submit_form('.edit_discussion_topic') }
       f('.discussion-fyi').text.should == 'This topic is closed for comments'
       ff('.discussion-reply-label').should be_empty
       DiscussionTopic.last.workflow_state.should == 'locked'
@@ -231,7 +231,7 @@ describe "discussions" do
 
     it "should validate reopening the discussion for comments" do
       create_and_go_to_topic('closed discussion', 'side_comment', true)
-      expect_new_page_load { f('.edit_discussion_topic button[type=submit]').click }
+      expect_new_page_load { submit_form('.edit_discussion_topic') }
       ff('.discussion-reply-label').should_not be_empty
       DiscussionTopic.last.workflow_state.should == 'active'
     end
@@ -303,7 +303,7 @@ describe "discussions" do
 
         f('.add-side-comment-wrap .discussion-reply-label').click
         type_in_tiny '.reply-textarea', side_comment_text
-        f('.add-side-comment-wrap button[type=submit]').click
+        submit_form('.add-side-comment-wrap')
         wait_for_ajax_requests
         last_entry = DiscussionEntry.last
         validate_entry_text(last_entry, side_comment_text)

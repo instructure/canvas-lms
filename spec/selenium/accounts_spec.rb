@@ -26,7 +26,7 @@ describe "account" do
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_password').send_keys('primary password')
       ldap_form.find_element(:id, 'account_authorization_config_0_login_handle_name').send_keys('login handle')
       ldap_form.find_element(:id, 'account_authorization_config_0_change_password_url').send_keys('http://forgot.password.example.com/')
-      expect_new_page_load { ldap_form.find_element(:css, 'button[type="submit"]').click }
+      expect_new_page_load { submit_form(ldap_form) }
 
       Account.default.account_authorization_configs.length.should == 1
       config = Account.default.account_authorization_configs.first
@@ -51,7 +51,7 @@ describe "account" do
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_filter').send_keys('secondary filter')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_username').send_keys('secondary username')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_password').send_keys('secondary password')
-      expect_new_page_load { ldap_form.find_element(:css, 'button[type="submit"]').click }
+      expect_new_page_load { submit_form(ldap_form) }
 
       Account.default.account_authorization_configs.length.should == 2
       config = Account.default.account_authorization_configs.first
@@ -76,7 +76,7 @@ describe "account" do
       driver.find_element(:css, '.edit_auth_link').click
       ldap_form = driver.find_element(:css, 'form.ldap_form')
       ldap_form.find_element(:css, '.remove_secondary_ldap_link').click
-      expect_new_page_load { ldap_form.find_element(:css, 'button[type="submit"]').click }
+      expect_new_page_load { submit_form(ldap_form) }
 
       Account.default.account_authorization_configs.length.should == 1
 
@@ -113,7 +113,7 @@ describe "account" do
 
       driver.find_element(:id, "account_authorization_config_0_auth_base").send_keys("cas.example.com")
       driver.find_element(:id, "account_authorization_config_0_login_handle_name").send_keys("CAS Username")
-      expect_new_page_load { driver.find_element(:css, '#cas_div button[type="submit"]').click }
+      expect_new_page_load { submit_form('#auth_form') }
 
       get "/accounts/#{Account.default.id}/users"
       driver.find_element(:css, ".add_user_link").click
@@ -126,7 +126,7 @@ describe "account" do
       driver.find_element(:css, '.add_course_link').click
       driver.find_element(:css, '#add_course_form input[type=text]:first-child').send_keys('Test Course')
       driver.find_element(:id, 'course_course_code').send_keys('TEST001')
-      driver.find_element(:css, '#add_course_form .submit_button').click
+      submit_form('#add_course_form')
 
       wait_for_ajaximations
       driver.find_element(:id, 'add_course_dialog').should_not be_displayed
@@ -147,7 +147,7 @@ describe "account" do
       term.find_element(:css, ".edit_term_link").click
       term.find_element(:css, ".editing_term .general_dates .start_date .edit_term input").send_keys("2011-07-01")
       term.find_element(:css, ".editing_term .general_dates .end_date .edit_term input").send_keys("2011-07-31")
-      term.find_element(:css, ".enrollment_term_form .submit_button").click
+      submit_form(".enrollment_term_form")
       keep_trying_until { term.attribute(:class) !~ /editing_term/ }
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],
@@ -161,7 +161,7 @@ describe "account" do
       term.find_element(:css, ".edit_term_link").click
       term.find_element(:css, ".editing_term .student_enrollment_dates .start_date .edit_term input").send_keys("2011-07-02")
       term.find_element(:css, ".editing_term .student_enrollment_dates .end_date .edit_term input").send_keys("2011-07-30")
-      term.find_element(:css, ".enrollment_term_form .submit_button").click
+      submit_form(".enrollment_term_form")
       keep_trying_until { term.attribute(:class) !~ /editing_term/ }
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],
@@ -177,7 +177,7 @@ describe "account" do
       term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").send_keys("2011-07-29")
       term.find_element(:css, ".editing_term .ta_enrollment_dates .start_date .edit_term input").send_keys("2011-07-04")
       term.find_element(:css, ".editing_term .ta_enrollment_dates .end_date .edit_term input").send_keys("2011-07-28")
-      term.find_element(:css, ".enrollment_term_form .submit_button").click
+      submit_form(".enrollment_term_form")
       keep_trying_until { term.attribute(:class) !~ /editing_term/ }
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],
@@ -191,7 +191,7 @@ describe "account" do
       term.find_element(:css, ".edit_term_link").click
       term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").clear
       term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").clear
-      term.find_element(:css, ".enrollment_term_form .submit_button").click
+      submit_form(".enrollment_term_form")
       keep_trying_until { term.attribute(:class) !~ /editing_term/ }
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],

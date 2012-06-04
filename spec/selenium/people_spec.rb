@@ -25,11 +25,11 @@ describe "people" do
 
   def create_student_group(group_text = "new student group")
     expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
-    dialog = open_student_group_dialog
+    open_student_group_dialog
     inputs = find_all_with_jquery('input:visible')
     inputs[0].clear
     inputs[0].send_keys(group_text)
-    dialog.find_element(:css, '#add_category_form').submit
+    submit_form('#add_category_form')
     wait_for_ajaximations
     driver.find_element(:css, '#category_list').should include_text(group_text)
   end
@@ -154,7 +154,7 @@ describe "people" do
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
-      dialog.find_element(:css, '#add_category_form').submit
+      submit_form('#add_category_form')
       wait_for_ajaximations
       driver.find_elements(:css, '.left_side .group_name').count.should == group_count.to_i
     end
@@ -167,7 +167,7 @@ describe "people" do
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_groups').click
       dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
-      dialog.find_element(:css, '#add_category_form').submit
+      submit_form('#add_category_form')
       wait_for_ajaximations
       driver.find_elements(:css, '.left_side .group_name').count.should == group_count.to_i
     end
@@ -178,7 +178,7 @@ describe "people" do
       driver.find_element(:css, '.edit_category_link').click
       edit_form = driver.find_element(:css, '#edit_category_form')
       edit_form.find_element(:css, 'input#category_name').send_keys(new_group_name)
-      edit_form.submit
+      submit_form(edit_form)
       wait_for_ajaximations
       find_with_jquery("h3.category_name").text.should == new_group_name
     end
@@ -205,7 +205,7 @@ describe "people" do
       expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
-      dialog.find_element(:css, '#add_category_form').submit
+      submit_form('#add_category_form')
       wait_for_ajaximations
       group_count.times do
         driver.find_element(:css, '.add_group_link').click
@@ -236,7 +236,7 @@ describe "people" do
       enrollment.find_element(:css, ".link_enrollment_link").click
       wait_for_ajax_requests
       click_option("#student_enrollment_link_option", student.try(:name) || "[ No Link ]")
-      driver.find_element(:css, "#link_student_dialog_form").submit
+      submit_form("#link_student_dialog_form")
       wait_for_ajax_requests
     end
 

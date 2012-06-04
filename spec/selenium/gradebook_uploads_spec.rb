@@ -64,7 +64,7 @@ describe "gradebook uploads" do
 
     click_option('.assignment_section #assignment_resolution_template select', 'new', :value)
 
-    f('#gradebook_importer_resolution_section button[type="submit"]').click
+    submit_form('#gradebook_importer_resolution_section')
 
     f('#no_changes_detected').should_not be_displayed
 
@@ -89,7 +89,7 @@ describe "gradebook uploads" do
 
     click_option('.assignment_section #assignment_resolution_template select', assignment.id.to_s, :value)
 
-    f('#gradebook_importer_resolution_section button[type="submit"]').click
+    submit_form('#gradebook_importer_resolution_section')
 
     f('#no_changes_detected').should be_displayed
   end
@@ -113,7 +113,7 @@ describe "gradebook uploads" do
 
     click_option('.assignment_section #assignment_resolution_template select', assignment2.id.to_s, :value)
 
-    f('#gradebook_importer_resolution_section button[type="submit"]').click
+    submit_form('#gradebook_importer_resolution_section')
 
     f('#no_changes_detected').should_not be_displayed
 
@@ -138,7 +138,7 @@ describe "gradebook uploads" do
 
     click_option('.student_section #student_resolution_template select', @student.id.to_s, :value)
 
-    f('#gradebook_importer_resolution_section button[type="submit"]').click
+    submit_form('#gradebook_importer_resolution_section')
 
     f('#no_changes_detected').should be_displayed
   end
@@ -162,7 +162,7 @@ describe "gradebook uploads" do
 
     click_option('.student_section #student_resolution_template select', @student.id.to_s, :value)
 
-    f('#gradebook_importer_resolution_section button[type="submit"]').click
+    submit_form('#gradebook_importer_resolution_section')
 
     f('#no_changes_detected').should_not be_displayed
 

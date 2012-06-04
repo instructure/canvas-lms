@@ -33,7 +33,7 @@ describe "assignments turn it in" do
     driver.find_element(:id, 'settings_exclude_small_matches').click # 0 -> 1
     driver.find_element(:id, 'settings_exclude_fewer_than_count').click # 0 -> 1
     driver.find_element(:id, 'settings_exclude_value_count').send_keys("5") # '' -> 5
-    driver.find_element(:id, 'turnitin_settings_form').submit
+    submit_form('#turnitin_settings_form')
     wait_for_ajaximations
     driver.find_element(:id, 'turnitin_settings_form').should_not be_displayed
   end
@@ -60,7 +60,7 @@ describe "assignments turn it in" do
       change_turnitin_settings
     }.to_not change { Assignment.count } # although we "saved" the dialog, we haven't actually posted anything yet
 
-    driver.find_element(:id, 'edit_assignment_form').submit
+    submit_form('#edit_assignment_form')
     wait_for_ajaximations
     keep_trying_until do
       assignment = Assignment.last

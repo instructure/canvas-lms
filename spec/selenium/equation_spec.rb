@@ -10,8 +10,8 @@ describe "equation editor" do
     get "/courses/#{@course.id}/quizzes"
     driver.find_element(:css, '.new-quiz-link').click
 
-    def save_question_and_wait(question)
-      question.find_element(:css, "button[type='submit']").click
+    def save_question_and_wait
+      submit_form('.question_form')
       wait_for_ajaximations
     end
 
@@ -37,7 +37,7 @@ describe "equation editor" do
       equation_editor.find_element(:css, 'button').click
       question.find_element(:css, '.toggle_question_content_views_link').click
       question.find_element(:css, 'textarea.question_content').attribute(:value).should include('<img class="equation_image" title="1+1" src="/equation_images/1%2B1" alt="1+1" />')
-      save_question_and_wait(question)
+      save_question_and_wait
 
       question.find_elements(:css, 'img.equation_image').size.should == 1
       driver.find_element(:css, "#right-side .points_possible").text.should eql((time + 1).to_s)
