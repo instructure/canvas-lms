@@ -30,20 +30,23 @@ define ['Backbone'], ({View}) ->
     # Returns an object of strings to use in the rendered template.
     # All sub-classes need to return a header and subHeader property
     # becuase they are used in the shared render method.
-    present: ->
+    toJSON: ->
       locals = @model.toJSON()
       locals.header = locals.title
       locals.subHeader = locals.type
       locals
 
+    renderAvatar: ->
+      "<img src='http://placekitten.com/42/42/'>"
+
     ##
     # Shared layout
     render: ->
-      locals = @present()
+      locals = @toJSON()
       @$el.html """
         <div class="image-block">
           <div class="image-block-image">
-            <img src="http://placekitten.com/42/42/">
+            #{@renderAvatar()}
           </div>
           <div class="image-block-content triangle-box-with-header">
             <header class="box-header">
@@ -56,5 +59,6 @@ define ['Backbone'], ({View}) ->
           </div>
         </div>
       """
+      @$el.addClass locals.type.toLowerCase()
       super
 

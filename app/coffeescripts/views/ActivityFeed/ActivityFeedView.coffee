@@ -15,7 +15,8 @@ define ['Backbone'], ({View}) ->
 
     initialize: ->
       super
-      @options.views.activityFeedFilter.on 'filter', @options.views.activityFeedItems.filterByKey
+      @options.views.activityFeedFilter.on 'filter',
+        @options.views.activityFeedItems.filterByContextKey
 
     toggleDrawer: ->
       @$el.toggleClass 'drawerClosed'

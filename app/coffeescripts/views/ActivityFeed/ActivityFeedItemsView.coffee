@@ -7,6 +7,9 @@ define [
 
   class ActivityFeedItemsView extends View
 
+    events:
+      'click .activityFeedItemsFilter': 'onClickItemFilter'
+
     template: template
 
     initialize: ->
@@ -34,12 +37,15 @@ define [
         # TODO: empty stream template
         @$itemList.html "TODO: empty stream template for #{@collection.urlKey}:#{@collection.filter}"
 
-    filterByKey: (key) =>
-      filter = @parseKey key
+    filterByContextKey: (key) =>
+      filter = @parseContextKey key
       @collection.urlKey = filter.type
       @collection.filter = filter.value
       @$itemList.html('<li>loading</li>')
       @collection.fetch()
+
+      # remove item filter when filtering by context
+      @setActiveFilterElement 'all'
 
     refresh: (opts) =>
       @collection.fetch add: true, animate: true
@@ -47,7 +53,7 @@ define [
     ##
     # Splits something like "course:123" into {type: 'course', value: 123}
     # and "everything" into {type: 'everything'}
-    parseKey: (key) ->
+    parseContextKey: (key) ->
       filter = {}
       matches = key.match /(.+):(.+)/
       if matches
@@ -64,4 +70,30 @@ define [
 
     cacheElements: ->
       @$itemList = @$ '.activityFeedItemsList'
+      @$itemFilters = @$ '.activityFeedItemsFilter a'
+
+    onClickItemFilter: (event) ->
+      value = $(event.target).data 'value'
+      @filterByItemType value
+
+    ##
+    # This is pretty disgusting, but when the API for filtering is written
+    # it all goes away and we'll use regular filter method
+    filterByItemType: (type) ->
+      @setActiveFilterElement type
+      if type is 'all'
+        @$itemList.find('li').show()
+      else
+        @$itemList.find("li").hide()
+        className = type.replace(/s$/, '')
+        $els = @$itemList.find("li.#{className}")
+        if $els.length
+          $els.show()
+        else
+          @$itemList.append("<li class='none'>TODO: No items, wah wah</li>")
+
+    setActiveFilterElement: (type) ->
+      @$itemList.find('.none').remove() # kill empty result messages
+      @$itemFilters.removeClass 'active'
+      @$itemFilters.filter("[data-value=#{type}]").addClass 'active'
 
