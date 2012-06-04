@@ -32,9 +32,7 @@
 # Group collections can only be created, updated, or deleted by group
 # moderators.
 #
-# A Collection object looks like:
-#
-#     !!!javascript
+# @object Collection
 #     {
 #       // The ID of the collection.
 #       id: 5,
@@ -70,21 +68,7 @@ class CollectionsController < ApplicationController
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          https://<canvas>/api/v1/users/self/collections
   #
-  # @example_response
-  #     [
-  #       {
-  #         id: 1,
-  #         name: "My Collection",
-  #         visibility: "public",
-  #         followed_by_user: false
-  #       },
-  #       {
-  #         id: 2,
-  #         name: "My Personal Collection",
-  #         visibility: "private",
-  #         followed_by_user: true
-  #       }
-  #     ]
+  # @returns [Collection]
   def index
     collection_route = polymorphic_url([:api_v1, @context, :collections])
     scope = @context.collections.active.newest_first
@@ -112,13 +96,7 @@ class CollectionsController < ApplicationController
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          https://<canvas>/api/v1/collections/<collection_id>
   #
-  # @example_response
-  #     {
-  #       id: 1,
-  #       name: "My Collection",
-  #       visibility: "public",
-  #       followed_by_user: false
-  #     }
+  # @returns Collection
   def show
     @collection = find_collection
     if authorized_action(@collection, @current_user, :read)
@@ -140,13 +118,7 @@ class CollectionsController < ApplicationController
   #          -F visibility=public \ 
   #          https://<canvas>/api/v1/users/self/collections
   #
-  # @example_response
-  #     {
-  #       id: 1,
-  #       name: "My Collection",
-  #       visibility: "public",
-  #       followed_by_user: false
-  #     }
+  # @returns Collection
   def create
     @collection = @context.collections.new(params.slice(*SETTABLE_ATTRIBUTES))
     if authorized_action(@collection, @current_user, :create)
@@ -175,13 +147,7 @@ class CollectionsController < ApplicationController
   #          -F name='My Edited Collection' \ 
   #          https://<canvas>/api/v1/collections/<collection_id>
   #
-  # @example_response
-  #     {
-  #       id: 1,
-  #       name: "My Edited Collection",
-  #       visibility: "public",
-  #       followed_by_user: false
-  #     }
+  # @returns Collection
   def update
     @collection = find_collection
     if authorized_action(@collection, @current_user, :update)
@@ -203,13 +169,7 @@ class CollectionsController < ApplicationController
   #          -X DELETE \ 
   #          https://<canvas>/api/v1/collections/<collection_id>
   #
-  # @example_response
-  #     {
-  #       id: 1,
-  #       name: "My Collection",
-  #       visibility: "public",
-  #       followed_by_user: false
-  #     }
+  # @returns Collection
   def destroy
     @collection = find_collection
     if authorized_action(@collection, @current_user, :delete)

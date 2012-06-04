@@ -1,0 +1,11 @@
+<%= htmlify(@docstring.strip, :markdown) %>
+
+<% @json_objects.each do |name, json| %>
+<div class='object_definition'>
+  <h3><a name="<%= name %>">A <%= name %> object looks like:</a></h3>
+
+  <pre class="example code brush:js">
+<%= html_syntax_highlight(json, :plain) %>
+  </pre>
+</div>
+<% end %>

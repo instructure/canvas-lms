@@ -53,6 +53,7 @@ def init
 
   options[:page_title] = "Canvas LMS REST API Documentation"
 
+  build_json_objects_map
   generate_assets
   serialize_index
   serialize_static_pages
@@ -135,4 +136,21 @@ def serialize_static_pages
     serialize_redirect(filename)
     options.delete(:file)
   end
+end
+
+def build_json_objects_map
+  obj_map = {}
+  resource_obj_list = {}
+  options[:resources].each do |r,cs|
+    cs.each do |controller|
+      controller.tags(:object).each do |obj|
+        name, json = obj.text.split(%r{\n+}, 2).map(&:strip)
+        obj_map[name] = topicize r
+        resource_obj_list[r] ||= []
+        resource_obj_list[r] << [name, json]
+      end
+    end
+  end
+  options[:json_objects_map] = obj_map
+  options[:json_objects] = resource_obj_list
 end

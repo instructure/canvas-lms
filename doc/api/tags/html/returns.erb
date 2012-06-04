@@ -1,0 +1,6 @@
+<% if @is_list %>
+  Returns a list of 
+<% else %>
+  Returns a 
+<% end %>
+<a href='<%= @resource_name %>.html#<%= @object_name %>'><%= @is_list ? @object_name.pluralize : @object_name %></a>

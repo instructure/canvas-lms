@@ -18,13 +18,14 @@
 
 module Api::V1::Collection
   include Api::V1::Json
+  include Api::V1::User
 
   API_COLLECTION_JSON_OPTS = {
     :only => %w(id name visibility),
   }
 
   API_COLLECTION_ITEM_JSON_OPTS = {
-    :only => %w(id collection_id user_id user_comment created_at),
+    :only => %w(id collection_id user_comment created_at),
   }
 
   API_COLLECTION_ITEM_DATA_JSON_OPTS = {
@@ -54,6 +55,7 @@ module Api::V1::Collection
 
     items.map do |item|
       hash = api_json(item, current_user, session, API_COLLECTION_ITEM_JSON_OPTS)
+      hash['user'] = user_display_json(item.user)
       hash['url'] = api_v1_collection_item_url(item)
       item_data = item.collection_item_data
       hash['image_pending'] = item_data.image_pending
