@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes question banks" do
   it_should_behave_like "quizzes selenium tests"

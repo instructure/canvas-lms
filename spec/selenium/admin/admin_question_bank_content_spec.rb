@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/external_tools_common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_common')
 
 describe "admin question bank" do
   it_should_behave_like "in-process server selenium tests"

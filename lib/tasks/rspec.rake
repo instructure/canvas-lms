@@ -42,7 +42,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     if ENV['SINGLE_TEST']
       t.spec_opts += ['-e', %{"#{ENV['SINGLE_TEST']}"}]
     end
-    spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
+    spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
     Gem.loaded_specs.values.each do |spec|
       path = spec.full_gem_path
       spec_canvas_path = File.expand_path(path+"/spec_canvas")

@@ -21,7 +21,7 @@ require "selenium-webdriver"
 require "socket"
 require "timeout"
 require 'coffee-script'
-require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 include I18nUtilities
 
@@ -760,7 +760,7 @@ shared_examples_for "all selenium tests" do
   # will only load it once even if its called multiple times
   def load_simulate_js
     @load_simulate_js ||= begin
-      js = File.read('spec/selenium/jquery.simulate.js')
+      js = File.read('spec/selenium/helpers/jquery.simulate.js')
       driver.execute_script js
     end
   end

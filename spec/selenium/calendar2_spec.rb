@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/calendar2_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "calendar2" do
   it_should_behave_like "calendar2 selenium tests"

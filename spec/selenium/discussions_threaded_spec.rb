@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/discussions_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 
 describe "threaded discussions" do
   it_should_behave_like "discussions selenium tests"
