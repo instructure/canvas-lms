@@ -126,6 +126,6 @@ module Canvas::Security
   end
 
   def self.login_attempts_key(pseudonym)
-    "login_attempts:#{pseudonym.id}"
+    "login_attempts:#{pseudonym.global_id}"
   end
 end
