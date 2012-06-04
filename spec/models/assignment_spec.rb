@@ -434,6 +434,32 @@ describe Assignment do
       end
     end
 
+    it "should assign when already graded" do
+      setup_assignment
+      assignment_model
+
+      @submissions = []
+      users = []
+      10.times do |i|
+        users << User.create(:name => "user #{i}")
+      end
+      users.each do |u|
+        @c.enroll_user(u)
+      end
+      @a.reload
+      users.each do |u|
+        @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
+        @a.grade_student(u, :grader => @teacher, :grade => '100')
+      end
+      @a.peer_review_count = 1
+      res = @a.assign_peer_reviews
+      res.length.should eql(@submissions.length)
+      @submissions.each do |s|
+        res.map{|a| a.asset}.should be_include(s)
+        res.map{|a| a.assessor_asset}.should be_include(s)
+      end
+    end
+
     it "should allow setting peer_reviews_assign_at" do
       setup_assignment
       assignment_model
