@@ -38,6 +38,10 @@ class ProfileController < ApplicationController
 
     @items_count = @user.collection_items.scoped(:conditions => {'collections.visibility' => 'public'}).count
 
+    @services = @user.user_services.where(
+      :service => %w(facebook twitter linked_in delicious diigo skype)
+    ).sort_by { |s| UserService.sort_position(s.service) }
+
     if @user.private? && @user != @current_user
       if @user.grants_right?(@current_user, :view_statistics)
         return render :action => :show, :layout => "new_application"

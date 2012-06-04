@@ -31,8 +31,11 @@
       </table>
 
       <% if @user.show_user_services? %>
-        Find Me On
+        <div class="social-header border border-b">Find Me On</div>
         <ul class="social-links">
+          <% @services.each do |s| %>
+            <li><a href="<%= s.service_user_link %>" class="social <%= s.service %>"><%= s.service_name %></a></li>
+            <% end %>
         </ul>
       <% end %>
     </div>
