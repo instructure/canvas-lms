@@ -52,6 +52,22 @@ module Api::V1::User
     end
   end
 
+  # this mini-object is used for secondary user responses, when we just want to
+  # provide enough information to display a user.
+  # for instance, discussion entries return this json as a sub-object.
+  #
+  # if parent_context is given, the html_url will be scoped to that context, so:
+  #   /courses/X/users/Y
+  # otherwise it'll just be:
+  #   /users/Y
+  # keep in mind the latter form is only accessible if the user has a public profile
+  # (or if the api caller is an admin)
+  def user_display_json(user, parent_context = nil)
+    return {} unless user
+    participant_url = parent_context ? polymorphic_url([parent_context, user]) : user_url(user)
+    { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => participant_url }
+  end
+
   # optimization hint, currently user only needs to pull pseudonyms from the db
   # if a site admin is making the request or they can manage_students
   def user_json_is_admin?(context = @context, current_user = @current_user)

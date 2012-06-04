@@ -36,5 +36,6 @@ end
 def topic_doc
   @docstring = options[:controllers].map { |c| c.docstring }.join("\n\n")
   def @object.source_type; nil; end
-  htmlify(@docstring.strip, :markdown)
+  @json_objects = options[:json_objects][@resource] || []
+  erb(:topic_doc)
 end

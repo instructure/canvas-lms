@@ -35,18 +35,14 @@
 #
 #     /api/v1/collection_items/<id>/discussion_topics/self/view
 #
-# A Collection Item object looks like:
+# @object Collection Item
 #
-#     !!!javascript
 #     {
 #       // The ID of the collection item.
 #       id: 7,
 #
 #       // The ID of the collection that this item belongs to.
 #       collection_id: 2,
-#
-#       // The ID of the user that created the collection item.
-#       user_id: 37,
 #
 #       // The type of the item.
 #       // Currently defined types are: "url", "image", "audio", and "video".
@@ -115,6 +111,21 @@
 #
 #       // The timestamp of when the item was posted by the user
 #       created_at: "2012-05-30T17:45:25Z",
+#
+#       // Information on the user that created the collection item.
+#       user : {
+#         // The ID of the user.
+#         id: 37,
+#
+#         // The display name of the user.
+#         display_name: "John Doe",
+#
+#         // The URL of the user's avatar image, or a fallback image if the user has not given one.
+#         avatar_image_url: "http://...",
+#
+#         // The URL to the HTML page in Canvas of this user's public profile.
+#         html_url: "http://<canvas>/users/37"
+#       },
 #     }
 class CollectionItemsController < ApplicationController
   before_filter :require_collection, :only => [:index, :create]
@@ -132,29 +143,11 @@ class CollectionItemsController < ApplicationController
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     [
-  #       {
-  #          id: 7,
-  #          collection_id: 2,
-  #          item_type: "url",
-  #          link_url: "https://example.com/some/path",
-  #          post_count: 2,
-  #          upvote_count: 3,
-  #          upvoted_by_user: false,
-  #          root_item_id: 3,
-  #          image_url: "https://<canvas>/files/item_image.png",
-  #          title: "my title",
-  #          description: "some block of plain text",
-  #          user_comment: nil,
-  #          url: "https://<canvas>/api/v1/collections/items/7"
-  #          created_at: "2012-05-30T17:45:25Z",
-  #       }
-  #     ]
+  # @returns [Collection Item]
   def index
     pagination_route = api_v1_collection_items_list_url(@collection)
     if authorized_action(@collection, @current_user, :read)
-      @items = Api.paginate(@collection.collection_items.active.newest_first, self, pagination_route)
+      @items = Api.paginate(@collection.collection_items.active.newest_first.scoped(:include => :user), self, pagination_route)
       render :json => collection_items_json(@items, @current_user, session)
     end
   end
@@ -169,23 +162,7 @@ class CollectionItemsController < ApplicationController
   #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #     -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     {
-  #        id: 7,
-  #        collection_id: 2,
-  #        item_type: "url",
-  #        link_url: "https://example.com/some/path",
-  #        post_count: 2,
-  #        upvote_count: 3,
-  #        upvoted_by_user: false,
-  #        root_item_id: 3,
-  #        image_url: "https://<canvas>/files/item_image.png",
-  #        title: "my title",
-  #        description: "some block of plain text",
-  #        user_comment: nil,
-  #        url: "https://<canvas>/api/v1/collections/items/7"
-  #        created_at: "2012-05-30T17:45:25Z",
-  #     }
+  # @returns Collection Item
   def show
     find_item_and_collection
     if authorized_action(@item, @current_user, :read)
@@ -237,6 +214,7 @@ class CollectionItemsController < ApplicationController
   #          -F user_comment="clone of some other item" \ 
   #          -H 'Authorization: Bearer <token>'
   #
+  # @returns Collection Item
   def create
     @item = @collection.collection_items.new(:user => @current_user)
     if authorized_action(@item, @current_user, :create)
@@ -271,6 +249,7 @@ class CollectionItemsController < ApplicationController
   #          -F user_comment='edited comment' \ 
   #          -H 'Authorization: Bearer <token>'
   #
+  # @returns Collection Item
   def update
     find_item_and_collection
     if authorized_action(@item, @current_user, :update)
@@ -293,6 +272,8 @@ class CollectionItemsController < ApplicationController
   #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns Collection Item
   def destroy
     find_item_and_collection
     if authorized_action(@item, @current_user, :delete)
@@ -384,7 +365,7 @@ class CollectionItemsController < ApplicationController
   end
 
   def find_item_and_collection
-    @item = CollectionItem.active.find(params[:item_id])
+    @item = CollectionItem.active.find(params[:item_id], :include => :user)
     @collection = @item.active_collection
   end
 

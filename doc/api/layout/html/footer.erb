@@ -18,7 +18,6 @@
   SyntaxHighlighter.defaults['gutter'] = false;
   SyntaxHighlighter.defaults['toolbar'] = false;
   SyntaxHighlighter.defaults['auto-links'] = false;
-  $('.example_response pre.example.code').addClass('brush: js');
   $('#content pre.code.javascript code').each(function(i, el) {
     $(el).parent().addClass('brush: js');
     $(el).replaceWith(el.innerHTML);

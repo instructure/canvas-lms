@@ -18,7 +18,7 @@
 
 def init
   super
-  sections :argument, :request_field, :response_field, :example_request, :example_response
+  sections :argument, :request_field, :response_field, :example_request, :example_response, :returns
 end
 
 def request_field
@@ -31,6 +31,22 @@ end
 
 def argument
   generic_tag :argument, :no_types => false, :label => "Request Parameters"
+end
+
+def returns
+  return unless object.has_tag?(:returns)
+  response_info = object.tag(:returns)
+  case response_info.text
+  when %r{\[(.*)\]}
+    @object_name = $1.strip
+    @is_list = true
+  else
+    @object_name = response_info.text.strip
+    @is_list = false
+  end
+  @resource_name = options[:json_objects_map][@object_name]
+  return unless @resource_name
+  erb(:returns)
 end
 
 def generic_tag(name, opts = {})
