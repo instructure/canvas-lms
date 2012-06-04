@@ -24,31 +24,40 @@ module CC::Importer::Canvas
       
       @manifest.css('resource[type=imsdt_xmlv1p1]').each do |res|
         cc_path = File.join @unzipped_file_path, res.at_css('file')['href']
-        canvas_id = res.at_css('dependency')['identifierref']
-        canvas_path = File.join @unzipped_file_path, "#{canvas_id}.xml"
+        cc_id = res['identifier']
+        canvas_id = get_node_att(res, 'dependency', 'identifierref')
+        if canvas_id && meta_res = @manifest.at_css(%{resource[identifier="#{canvas_id}"]})
+          canvas_path = File.join @unzipped_file_path, meta_res.at_css('file')['href']
+          meta_node = open_file_xml(canvas_path)
+        else
+          meta_node = nil
+        end
         cc_doc = open_file_xml(cc_path)
-        meta_node = open_file_xml(canvas_path)
-        
-        topics << convert_topic(cc_doc, meta_node)
+
+        topics << convert_topic(cc_doc, meta_node, canvas_id || cc_id)
       end
       
       topics
     end
     
-    def convert_topic(cc_doc, meta_doc)
+    def convert_topic(cc_doc, meta_doc, mig_id=nil)
       topic = {}
-      topic['migration_id'] = get_node_val(meta_doc, 'topic_id')
-      topic['title'] = get_node_val(meta_doc, 'title')
       topic['description'] = get_node_val(cc_doc, 'text')
-      topic['type'] = get_node_val(meta_doc, 'type')
-      topic['external_feed_migration_id'] = get_node_val(meta_doc, 'external_feed_identifierref')
-      topic['attachment_migration_id'] = get_node_val(meta_doc, 'attachment_identifierref')
-      topic['posted_at'] = get_time_val(meta_doc, 'posted_at')
-      topic['delayed_post_at'] = get_time_val(meta_doc, 'delayed_post_at')
-      topic['position'] = get_int_val(meta_doc, 'position')
-      
-      if asmnt_node = meta_doc.at_css('assignment')
-        topic['assignment'] = convert_assignment(asmnt_node)
+      topic['title'] = get_node_val(cc_doc, 'title')
+      topic['migration_id'] = mig_id
+      if meta_doc
+        topic['migration_id'] = get_node_val(meta_doc, 'topic_id')
+        topic['title'] = get_node_val(meta_doc, 'title')
+        topic['type'] = get_node_val(meta_doc, 'type')
+        topic['external_feed_migration_id'] = get_node_val(meta_doc, 'external_feed_identifierref')
+        topic['attachment_migration_id'] = get_node_val(meta_doc, 'attachment_identifierref')
+        topic['posted_at'] = get_time_val(meta_doc, 'posted_at')
+        topic['delayed_post_at'] = get_time_val(meta_doc, 'delayed_post_at')
+        topic['position'] = get_int_val(meta_doc, 'position')
+
+        if asmnt_node = meta_doc.at_css('assignment')
+          topic['assignment'] = convert_assignment(asmnt_node)
+        end
       end
 
       topic
