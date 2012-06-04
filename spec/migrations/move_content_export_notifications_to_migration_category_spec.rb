@@ -20,19 +20,25 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe 'DataFixup::MoveContentExportNotificationsToMigrationCategory' do
   it "remove correct notification policies" do
-    user(:active_user => true)
 
     @n1 = Notification.create!(:name => 'Content Export Finished', :category => 'Other')
     @n2 = Notification.create!(:name => 'Other Thing', :category => 'Other')
-    @cc = @user.communication_channels.create(:path => "user1@example.com").tap{|cc| cc.confirm!}
 
-    NotificationPolicy.create(:notification => @n1, :communication_channel => @cc, :frequency => "daily")
-    NotificationPolicy.create(:notification => @n2, :communication_channel => @cc, :frequency => "daily")
+    users = []
+    3.times do |i|
+      u = user(:active_user => true)
+      cc = u.communication_channels.create(:path => "user#{i}@example.com").tap{|cc| cc.confirm!} 
+      NotificationPolicy.create(:notification => @n1, :communication_channel => cc, :frequency => "daily")
+      NotificationPolicy.create(:notification => @n2, :communication_channel => cc, :frequency => "daily")
+      users << u
+    end
 
     DataFixup::MoveContentExportNotificationsToMigrationCategory.run
 
-    nps = NotificationPolicy.for(@user)
-    nps.count.should == 1
-    nps.first.notification.should == @n2
+    users.each do |u|
+      nps = NotificationPolicy.for(u)
+      nps.count.should == 1
+      nps.first.notification.should == @n2
+    end
   end
 end
