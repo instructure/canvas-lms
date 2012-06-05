@@ -87,6 +87,34 @@ describe UnzipAttachment do
       @ua.process
       progress.should_not be_nil
     end
+
+    it "should import files alphabetically" do
+      filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures alphabet_soup.zip)))
+      Zip::ZipFile.open(filename) do |zip|
+        # make sure the files aren't read from the zip in alphabetical order (so it's not alphabetized by chance)
+        fake_files = []
+        fake_files << zip.get_entry('f.txt')
+        fake_files << zip.get_entry('d/e.txt')
+        fake_files << zip.get_entry('d/d.txt')
+        fake_files << zip.get_entry('c.txt')
+        fake_files << zip.get_entry('b.txt')
+        fake_files << zip.get_entry('a.txt')
+
+        Zip::ZipFile.stubs(:open).returns(fake_files)
+
+        ua = UnzipAttachment.new(:course => @course, :filename => 'fake')
+        ua.process
+
+        @course.attachments.count.should == 6
+        @course.attachments.find_by_position(0).display_name.should == 'a.txt'
+        @course.attachments.find_by_position(1).display_name.should == 'b.txt'
+        @course.attachments.find_by_position(2).display_name.should == 'c.txt'
+        @course.attachments.find_by_position(3).display_name.should == 'd.txt'
+        @course.attachments.find_by_position(4).display_name.should == 'e.txt'
+        @course.attachments.find_by_position(5).display_name.should == 'f.txt'
+      end
+    end
+
   end
 
   context "scribdable files" do
