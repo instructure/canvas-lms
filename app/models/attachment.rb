@@ -109,7 +109,7 @@ class Attachment < ActiveRecord::Base
       # a no-op.)
       self.process
     elsif ScribdAPI.enabled? && !Attachment.skip_scribd_submits?
-      send_later_enqueue_args(:submit_to_scribd!, { :strand => 'scribd', :max_attempts => 1 })
+      send_later_enqueue_args(:submit_to_scribd!, { :n_strand => 'scribd', :max_attempts => 1 })
     end
 
     send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/

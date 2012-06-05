@@ -304,6 +304,21 @@ shared_examples_for 'a backend' do
         @backend.get_and_lock_next_available('w1', 60).should be_nil
       end
     end
+
+    context 'n_strand' do
+      it "should default to 1" do
+        Delayed::Job.expects(:rand).never
+        job = Delayed::Job.enqueue(SimpleJob.new, :n_strand => 'njobs')
+        job.strand.should == "njobs"
+      end
+
+      it "should pick a strand randomly out of N" do
+        Setting.set("njobs_num_strands", "3")
+        Delayed::Job.expects(:rand).with(3).returns(1)
+        job = Delayed::Job.enqueue(SimpleJob.new, :n_strand => 'njobs')
+        job.strand.should == "njobs:2"
+      end
+    end
   end
 
   context "on hold" do
