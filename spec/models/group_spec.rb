@@ -488,9 +488,12 @@ describe Group do
         Group::TAB_PAGES,
         Group::TAB_PEOPLE,
         Group::TAB_DISCUSSIONS,
+        Group::TAB_COLLECTIONS,
         Group::TAB_CHAT,
         Group::TAB_FILES,
-        Group::TAB_CONFERENCES
+        Group::TAB_PROFILE,
+        Group::TAB_CONFERENCES,
+        Group::TAB_SETTINGS
       ]
     end
 
@@ -501,9 +504,12 @@ describe Group do
         Group::TAB_PAGES,
         Group::TAB_PEOPLE,
         Group::TAB_DISCUSSIONS,
+        Group::TAB_COLLECTIONS,
         Group::TAB_CHAT,
         Group::TAB_FILES,
-        Group::TAB_CONFERENCES
+        Group::TAB_PROFILE,
+        Group::TAB_CONFERENCES,
+        Group::TAB_SETTINGS
       ]
     end
 

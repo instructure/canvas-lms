@@ -66,6 +66,7 @@ module TextHelper
     # insert placeholders for the links we're going to generate, before we go and escape all the html
     links = []
     placeholder_blocks = []
+    message ||= ''
     message = message.gsub(AUTO_LINKIFY_REGEX) do |match|
       placeholder_blocks << if match == AUTO_LINKIFY_PLACEHOLDER
         AUTO_LINKIFY_PLACEHOLDER
