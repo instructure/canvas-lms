@@ -718,8 +718,8 @@ shared_examples_for "all selenium tests" do
     form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css).click : f(form + ' ' + submit_button_css).click
   end
 
-  def submit_dialog(dialog_css)
-    f(dialog_css + ' .submit_button').click
+  def submit_dialog(dialog, submit_button_css = '.submit_button')
+    dialog.is_a?(Selenium::WebDriver::Element) ? dialog.find_element(:css, submit_button_css).click : f(dialog + ' ' + submit_button_css).click
   end
 
   def check_image(element)
