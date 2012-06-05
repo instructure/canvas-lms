@@ -30,6 +30,7 @@ describe "Groups API", :type => :integration do
       'members_count' => group.members_count,
       'avatar_url' => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
       'group_category_id' => group.group_category_id,
+      'followed_by_user' => false,
     }
   end
 
@@ -123,6 +124,44 @@ describe "Groups API", :type => :integration do
     @user = @member
     json = api_call(:delete, @group_path, @group_path_options.merge(:group_id => @group.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
     json['message'].should match /not authorized/
+  end
+
+  describe "following" do
+    it "should allow following a public group" do
+      user_model
+      @group.update_attribute(:is_public, true)
+      json = api_call(:put, @group_path + "/followers/self", @group_path_options.merge(:group_id => @group.to_param, :action => "follow"))
+      @user.user_follows.map(&:followed_item).should == [@group]
+      uf = @user.user_follows.first
+      json.should == { "following_user_id" => @user.id, "followed_group_id" => @group.id, "created_at" => uf.created_at.as_json }
+    end
+
+    it "should not allow following a private group" do
+      user_model
+      json = api_call(:put, @group_path + "/followers/self", @group_path_options.merge(:group_id => @group.to_param, :action => "follow"), {}, {}, :expected_status => 401)
+    end
+
+    it "should allow members to follow a private group" do
+      @user = @member
+      api_call(:put, @group_path + "/followers/self", @group_path_options.merge(:group_id => @group.to_param, :action => "follow"))
+      @user.user_follows.map(&:followed_item).should == [@group]
+    end
+  end
+
+  describe "unfollowing" do
+    it "should allow unfollowing a group" do
+      @user.user_follows.create!(:followed_item => @group)
+      @user.reload.user_follows.map(&:followed_item).should == [@group]
+
+      json = api_call(:delete, @group_path + "/followers/self", @group_path_options.merge(:group_id => @group.to_param, :action => "unfollow"))
+      @user.reload.user_follows.should == []
+    end
+
+    it "should do nothing if not following" do
+      @user.reload.user_follows.should == []
+      json = api_call(:delete, @group_path + "/followers/self", @group_path_options.merge(:group_id => @group.to_param, :action => "unfollow"))
+      @user.reload.user_follows.should == []
+    end
   end
 
   context "group files" do

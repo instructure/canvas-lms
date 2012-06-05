@@ -26,6 +26,8 @@ module Api::V1::Group
 
   def group_json(group, user, session, options = {})
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS)
+    followed = ::UserFollow.followed_by_user([group], user)
+    hash['followed_by_user'] = !!followed.include?(group)
     image = group.avatar_attachment
     hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
     include = options[:include] || []

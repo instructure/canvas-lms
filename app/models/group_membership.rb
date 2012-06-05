@@ -112,7 +112,6 @@ class GroupMembership < ActiveRecord::Base
   
   workflow do
     state :accepted
-    state :following
     state :invited do
       event :reject, :transitions_to => :rejected
       event :accept, :transitions_to => :accepted

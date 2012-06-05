@@ -312,6 +312,7 @@ class Group < ActiveRecord::Base
     can :read and 
     can :read_roster and
     can :send_messages and
+    can :follow
 
     # if I am a member of this group and I can moderate_forum in the group's context
     # (makes it so group members cant edit each other's discussion entries)
@@ -350,6 +351,9 @@ class Group < ActiveRecord::Base
 
     given { |user| user && self.can_join?(user) }
     can :read_roster
+
+    given { |user| user && self.is_public? }
+    can :follow
   end
 
   def file_structure_for(user)

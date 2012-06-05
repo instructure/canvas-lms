@@ -17,7 +17,7 @@
 #
 
 class UserFollow < ActiveRecord::Base
-  VALID_FOLLOWED_ITEM_TYPES = [:user, :collection]
+  VALID_FOLLOWED_ITEM_TYPES = [:user, :collection, :group]
 
   attr_accessible :following_user, :followed_item
 
@@ -54,6 +54,8 @@ class UserFollow < ActiveRecord::Base
         errors.add(:followed_item, t("errors.follow_own_collection", "You cannot follow your own collection"))
         return false
       end
+    when Group
+      # always ok
     else
       raise("unknown followed_item type: #{followed_item.inspect}")
     end

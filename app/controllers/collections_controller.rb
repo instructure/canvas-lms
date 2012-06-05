@@ -186,10 +186,9 @@ class CollectionsController < ApplicationController
   # collection, nothing happens. The user must have permissions to view the
   # collection in order to follow it.
   #
-  # On success, returns the Collection object. Responds with a 401 if the user
-  # doesn't have permission to follow the collection, or a 400 if the user
-  # can't follow the collection (if it's the user's own collection, for
-  # example).
+  # Responds with a 401 if the user doesn't have permission to follow the
+  # collection, or a 400 if the user can't follow the collection (if it's the
+  # user's own collection, for example).
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/followers/self \ 
