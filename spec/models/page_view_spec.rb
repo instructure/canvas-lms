@@ -20,7 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe PageView do
   before do
-    @page_view = PageView.new { |p| p.send(:attributes=, { :url => "http://test.one/", :session_id => "phony", :context_id => 1, :context_type => 'Course', :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => user_model }, false) }
+    # sets both @user and @course (@user is a teacher in @course)
+    course_model
+    @page_view = PageView.new { |p| p.send(:attributes=, { :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, false) }
   end
 
   it "should store directly to the db in db mode" do
@@ -76,7 +78,13 @@ describe PageView do
 
       after do
         PageView.delete_all
+
+        # tear down both the course and the user and their detritus
+        Enrollment.delete_all
+        UserAccountAssociation.delete_all
         User.delete_all
+        CourseAccountAssociation.delete_all
+        Course.delete_all
       end
     end
 

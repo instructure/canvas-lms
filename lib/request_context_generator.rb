@@ -25,8 +25,7 @@ class RequestContextGenerator
   def call(env)
     # This is a crummy way to plumb this data through to the logger
     request_id = UUIDSingleton.instance.generate
-    @@session_key ||= ActionController::Base.session_options[:key]
-    session_id = CGI::Cookie::parse(env['HTTP_COOKIE'])[@@session_key][0] rescue nil
+    session_id = (env['rack.session.options'] || {})[:id]
     Thread.current[:context] = {
       :request_id => request_id,
       :session_id => session_id

@@ -140,4 +140,18 @@ describe SIS::CSV::AccountImporter do
     Account.find_by_sis_source_id('A001').name.should == "Science"
   end
 
+  it 'should match headers case-insensitively' do
+    before_count = Account.count
+    process_csv_data_cleanly(
+      "Account_ID,Parent_Account_ID,Name,Status",
+      "A001,,Humanities,active"
+    )
+    Account.count.should == before_count + 1
+
+    a1 = @account.sub_accounts.find_by_sis_source_id('A001')
+    a1.should_not be_nil
+    a1.parent_account_id.should == @account.id
+    a1.root_account_id.should == @account.id
+    a1.name.should == 'Humanities'
+  end
 end

@@ -712,8 +712,14 @@ shared_examples_for "all selenium tests" do
     el.send_keys(value)
   end
 
-  def submit_form(form_css)
-    f(form_css + ' button[type="submit"]').click
+  # can pass in either an element or a forms css
+  def submit_form(form)
+    submit_button_css = 'button[type="submit"]'
+    form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css).click : f(form + ' ' + submit_button_css).click
+  end
+
+  def submit_dialog(dialog_css)
+    f(dialog_css + ' .submit_button').click
   end
 
   def check_image(element)

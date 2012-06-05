@@ -49,6 +49,10 @@ class Shard
     {}
   end
 
+  def description
+    "default"
+  end
+
   yaml_as "tag:instructure.com,2012:Shard"
 
   def self.yaml_new(klass, tag, val)

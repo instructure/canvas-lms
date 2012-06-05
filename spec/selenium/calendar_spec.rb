@@ -98,7 +98,8 @@ describe "calendar" do
       f("form#edit_calendar_event_form button[type=submit]").click
       wait_for_ajax_requests
 
-      fj("a.edit_calendar_event_link").click #using fj to bypass selenium cache
+      keep_trying_until { fj("a.edit_calendar_event_link").should be_displayed } #using fj to bypass selenium cache
+      fj("a.edit_calendar_event_link").click
       replace_content(f("input[name=start_date]"), "2012-04-05")
       replace_content(f("input#calendar_event_title"), "edit2")
       f("form#edit_calendar_event_form button[type=submit]").click

@@ -86,13 +86,11 @@ module CustomSeleniumRspecMatchers
     end
 
     def failure_message
-      "expected #{@element.inspect} to have attribute #{@attribute_value}, actual attribute type: #{
-      lement.attribute('#{@attribute.to_s}')}"
+      "expected #{@element.inspect} to have attribute #{@attribute_value}, actual attribute type: #{@element.attribute('#{@attribute.to_s}')}"
     end
 
     def negative_failure_message
-      "expected #{@element.inspect} to NOT have attribute #{@attribute_value}, actual attribute type
-  #{@element.attribute('#{@attribute.to_s}')}"
+      "expected #{@element.inspect} to NOT have attribute #{@attribute_value}, actual attribute type: #{@element.attribute('#{@attribute.to_s}')}"
     end
   end
 
