@@ -34,6 +34,15 @@ module Delayed
           options[:queue] ||= Delayed::Worker.queue
           options[:max_attempts] ||= Delayed::Worker.max_attempts
           options[:current_shard] = Shard.current
+
+          if options[:n_strand]
+            strand_name = options.delete(:n_strand)
+            num_strands = Setting.get_cached("#{strand_name}_num_strands", "1").to_i
+            strand_num = num_strands > 1 ? rand(num_strands) + 1 : 1
+            strand_name += ":#{strand_num}" if strand_num > 1
+            options[:strand] = strand_name
+          end
+
           if options[:singleton]
             options[:strand] = options.delete :singleton
             self.transaction do
