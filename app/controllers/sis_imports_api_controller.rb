@@ -153,7 +153,7 @@ class SisImportsApiController < ApplicationController
 
       batch.save!
 
-      batch.process
+      batch.process unless (@account.global_id == 10000000087357 && Setting.get('do_alamo_hack', 'false') == 'true')
       render :json => batch.api_json
     end
   end
