@@ -9,7 +9,7 @@
     </div>
     <div class="span5">
       <h1><%= @user.short_name %></h1>
-      <p><%= format_message(@user.bio).first.html_safe %></p>
+      <p><%= format_message(@user.bio || "").first.html_safe %></p>
       <% if @user != @current_user %>
         <p><button id="follow-user">Follow</button></p>
       <% end %>
