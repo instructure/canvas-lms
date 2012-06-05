@@ -80,6 +80,9 @@ module CC::Importer
           tool[:consumer_key] = ext[:custom_fields].delete 'consumer_key'
           tool[:shared_secret] = ext[:custom_fields].delete 'shared_secret'
           tool[:tool_id] = ext[:custom_fields].delete 'tool_id'
+          if tool[:assignment_points_possible] = ext[:custom_fields].delete('outcome')
+            tool[:assignment_points_possible] = tool[:assignment_points_possible].to_f
+          end
           tool[:settings] = ext[:custom_fields]
         else
           tool[:extensions] << ext
@@ -138,6 +141,25 @@ module CC::Importer
         end
       end
       "blti"
+    end
+
+    def create_assignments_from_lti_links(lti_tools)
+      asmnts = []
+
+      lti_tools.each do |tool|
+        if tool[:assignment_points_possible]
+          asmnt = {:migration_id => tool[:migration_id]}
+          asmnt[:title] = tool[:title]
+          asmnt[:description] = tool[:description]
+          asmnt[:submission_format] = "external_tool"
+          asmnt[:external_tool_url] = tool[:url]
+          asmnt[:grading_type] = 'points'
+          asmnt[:points_possible] = tool[:assignment_points_possible]
+          asmnts << asmnt
+        end
+      end
+
+      asmnts
     end
     class CCImportError < Exception; end
   end
