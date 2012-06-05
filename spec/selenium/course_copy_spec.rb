@@ -120,6 +120,27 @@ describe "course copy" do
         @new_course.wiki.wiki_pages.count.should == 5
       end
     end
+
+    it "should set the course name and code correctly" do
+      course_with_admin_logged_in
+
+      get "/courses/#{@course.id}/copy"
+
+      name = f('#course_name')
+      name.clear
+      name.send_keys("course name of testing")
+      name = f('#course_course_code')
+      name.clear
+      name.send_keys("course code of testing")
+
+      expect_new_page_load { f('button[type="submit"]').click }
+      submit_form('#copy_context_form')
+      wait_for_ajaximations
+
+      new_course = Course.last
+      new_course.name.should == "course name of testing"
+      new_course.course_code.should == "course code of testing"
+    end
   end
 
   describe "course copy (through course 'importing')" do
