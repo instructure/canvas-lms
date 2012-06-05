@@ -30,7 +30,7 @@
           <td><%= @items_count %></td>
       </table>
 
-      <% if @user.show_user_services? %>
+      <% if @user.show_user_services? && @services.present? %>
         <div class="social-header border border-b">Find Me On</div>
         <ul class="social-links">
           <% @services.each do |s| %>
