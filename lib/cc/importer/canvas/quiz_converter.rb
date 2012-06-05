@@ -21,8 +21,10 @@ module CC::Importer::Canvas
     
     def convert_quizzes
       assessments = []
-      
       qti_folder = File.join(@unzipped_file_path, ASSESSMENT_NON_CC_FOLDER)
+
+      return unless File.exists?(qti_folder) && File.directory?(qti_folder)
+
       run_qti_converter(qti_folder)
       @course[:assessment_questions] = convert_questions
       @course[:assessments] = convert_assessments

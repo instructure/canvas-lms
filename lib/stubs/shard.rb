@@ -76,4 +76,8 @@ ActiveRecord::Base.class_eval do
   def global_id
     id
   end
+
+  def self.set_shard_override(&block)
+    # pass
+  end
 end

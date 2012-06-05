@@ -19,8 +19,11 @@
 class Group < ActiveRecord::Base
   include Context
   include Workflow
+  include CustomValidations
 
-  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description
+  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment
+  validates_only_false_to_true :is_public
+
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
   has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
   has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
@@ -29,7 +32,6 @@ class Group < ActiveRecord::Base
   belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"
-
   has_many :calendar_events, :as => :context, :dependent => :destroy
   has_many :discussion_topics, :as => :context, :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user, :dependent => :destroy, :order => 'discussion_topics.position DESC, discussion_topics.created_at DESC'
   has_many :active_discussion_topics, :as => :context, :class_name => 'DiscussionTopic', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user
@@ -59,6 +61,7 @@ class Group < ActiveRecord::Base
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :collections, :as => :context
+  belongs_to :avatar_attachment, :class_name => "Attachment"
 
   before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted
@@ -139,6 +142,10 @@ class Group < ActiveRecord::Base
     self.participating_group_memberships.moderators.find_by_user_id(user && user.id)
   end
 
+  def should_add_creator?
+    self.group_category && (self.group_category.communities? || self.group_category.student_organized?)
+  end
+
   def short_name
     name
   end
@@ -199,9 +206,9 @@ class Group < ActiveRecord::Base
     end
   end
 
-  def add_user(user, new_record_state=nil)
+  def add_user(user, new_record_state=nil, moderator=false)
     return nil if !user
-    attrs = { :user => user }
+    attrs = { :user => user, :moderator => moderator }
     new_record_state ||= case self.join_level
       when 'invitation_only'          then 'invited'
       when 'parent_context_request'   then 'requested'
@@ -268,6 +275,7 @@ class Group < ActiveRecord::Base
     self.group_category ||= GroupCategory.student_organized_for(self.context)
     self.join_level ||= 'invitation_only'
     self.is_public ||= false
+    self.is_public = false unless self.group_category.try(:communities?)
     if self.context && self.context.is_a?(Course)
       self.account = self.context.account
     elsif self.context && self.context.is_a?(Account)
@@ -291,10 +299,8 @@ class Group < ActiveRecord::Base
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
     given { |user| user && self.has_member?(user) }
-    can :create and
     can :create_collaborations and
     can :create_conferences and
-    can :delete and
     can :manage and
     can :manage_admin_users and
     can :manage_calendar and
@@ -306,7 +312,6 @@ class Group < ActiveRecord::Base
     can :read and 
     can :read_roster and
     can :send_messages and
-    can :update
 
     # if I am a member of this group and I can moderate_forum in the group's context
     # (makes it so group members cant edit each other's discussion entries)
@@ -314,7 +319,12 @@ class Group < ActiveRecord::Base
     can :moderate_forum
 
     given { |user| user && self.has_moderator?(user) }
-    can :moderate_forum
+    can :delete and
+    can :moderate_forum and
+    can :update
+
+    given { |user| self.group_category.try(:communities?) }
+    can :create
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
     can :create
@@ -362,8 +372,8 @@ class Group < ActiveRecord::Base
     end
   end
 
-  def participating_users_count
-    self.participating_users.count
+  def members_count
+    self.participating_group_memberships.count
   end
 
   def quota

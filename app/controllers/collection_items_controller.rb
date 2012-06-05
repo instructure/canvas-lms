@@ -237,7 +237,7 @@ class CollectionItemsController < ApplicationController
   # @argument description
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collectionss/items/<item_id> \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #          -X PUT \ 
   #          -F description='edited description' \ 
   #          -H 'Authorization: Bearer <token>'
@@ -288,7 +288,7 @@ class CollectionItemsController < ApplicationController
   # to determine if the user has already upvoted the item.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/items/<item_id>/upvote \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id>/upvotes/self \ 
   #          -X PUT \ 
   #          -H 'Content-Length: 0' \ 
   #          -H 'Authorization: Bearer <token>'
@@ -317,7 +317,7 @@ class CollectionItemsController < ApplicationController
   # has not upvoted this item.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/items/<item_id>/upvote \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id>/upvotes/self \ 
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
   def remove_upvote

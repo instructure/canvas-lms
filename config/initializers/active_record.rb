@@ -442,6 +442,9 @@ class ActiveRecord::Base
     transaction(:requires_new => true) { uncached { yield } }
   end
 
+  # returns batch_size ids at a time, working through the primary key from
+  # smallest to largest.
+  #
   # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_batches(options = {})
     batch_size = options[:batch_size] || 1000
@@ -456,6 +459,9 @@ class ActiveRecord::Base
     end
   end
 
+  # returns 2 ids at a time (the min and the max of a range), working through
+  # the primary key from smallest to largest.
+  #
   # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_ranges(options = {})
     batch_size = options[:batch_size] || 1000

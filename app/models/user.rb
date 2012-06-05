@@ -132,6 +132,9 @@ class User < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :messages
 
+  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
+  has_many :user_follows, :foreign_key => 'following_user_id'
+
   has_many :collections, :as => :context
   has_many :collection_items, :through => :collections
 
@@ -916,6 +919,9 @@ class User < ActiveRecord::Base
   set_policy do
     given { |user| user == self }
     can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar
+
+    given { |user| user.present? && self.public? }
+    can :follow
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1752,7 +1758,7 @@ class User < ActiveRecord::Base
       # according to the set_policy block in group.rb, user u can manage group
       # g if either:
       # (a) g.context.grants_right?(u, :manage_groups)
-      # (b) g.participating_users.include(u)
+      # (b) g.has_member?(u)
       # this is a very performance sensitive method, so we're bypassing the
       # normal policy checking and somewhat duplicating auth logic here. which
       # is a shame. it'd be really nice to add support to our policy framework

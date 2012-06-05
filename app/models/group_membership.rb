@@ -23,7 +23,7 @@ class GroupMembership < ActiveRecord::Base
   belongs_to :group
   belongs_to :user
 
-  attr_accessible :group, :user, :workflow_state
+  attr_accessible :group, :user, :workflow_state, :moderator
   
   before_save :ensure_mutually_exclusive_membership
   before_save :assign_uuid

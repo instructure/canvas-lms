@@ -46,11 +46,11 @@ define([
         $(this).slideUp();
         var $group = $("#group_blank").clone(true);
         $group.fillTemplateData({
-          data: data.group || data.course_assigned_group,
+          data: data,
           hrefValues: ['id']
         });
-        $group.attr('id', "group_" + data.group.id)
-        $group.find(".members_count").text(I18n.t('member', 'member', { count: data.group.participating_users_count }));
+        $group.attr('id', "group_" + data.id)
+        $group.find(".members_count").text(I18n.t('member', 'member', { count: data.members_count }));
         $("#group_blank").before($group.show());
         $("html,body").scrollTo($group);
         $group.animate({'backgroundColor': '#FFEE88'}, 1000)

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,23 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::Group
+module Api::V1::UserFollow
   include Api::V1::Json
 
-  API_GROUP_JSON_OPTS = {
-    :only => %w(id name description is_public join_level group_category_id),
-    :methods => %w(members_count),
+  API_USER_FOLLOW_JSON_OPTS = {
+    :only => %w(following_user_id created_at),
   }
 
-  def group_json(group, user, session, options = {})
-    hash = api_json(group, user, session, API_GROUP_JSON_OPTS)
-    image = group.avatar_attachment
-    hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
-    include = options[:include] || []
-    if include.include?('users')
-      hash['users'] = group.users.map{ |u| user_json(u, user, session) }
-    end
+  def user_follow_json(user_follow, current_user, session)
+    hash = api_json(user_follow, current_user, session, API_USER_FOLLOW_JSON_OPTS)
+    hash["followed_#{user_follow.followed_item_type.underscore}_id"] = user_follow.followed_item_id
     hash
   end
 end
-

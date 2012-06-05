@@ -27,7 +27,7 @@ describe "Collections API", :type => :integration do
     end
 
     it "should allow retrieving a private collection" do
-      json = api_call(:get, @collections_path + "/#{@c1.id}", @collections_path_options.merge(:collection_id => @c1.to_param, :action => "show"))
+      json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" })
       json.should == @c1_json
     end
 
@@ -41,11 +41,12 @@ describe "Collections API", :type => :integration do
         'id' => @c3.id,
         'name' => 'test3',
         'visibility' => 'public',
+        'followed_by_user' => false,
       }
     end
 
     it "should allow updating a collection" do
-      json = api_call(:put, @collections_path + "/#{@c1.id}", @collections_path_options.merge(:collection_id => @c1.to_param, :action => "update"), {
+      json = api_call(:put, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "update", :format => "json" }, {
         :name => "test1 edited",
       })
       json.should == @c1_json.merge('name' => 'test1 edited')
@@ -53,7 +54,7 @@ describe "Collections API", :type => :integration do
     end
 
     it "should not allow changing visibility" do
-      json = api_call(:put, @collections_path + "/#{@c1.id}", @collections_path_options.merge(:collection_id => @c1.to_param, :action => "update"), {
+      json = api_call(:put, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "update", :format => "json" }, {
         :name => "test1 edited",
         :visibility => "public",
       }, {}, :expected_status => 400)
@@ -62,7 +63,7 @@ describe "Collections API", :type => :integration do
     end
 
     it "should allow deleting a collection" do
-      json = api_call(:delete, @collections_path + "/#{@c1.id}", @collections_path_options.merge(:collection_id => @c1.to_param, :action => "destroy"))
+      json = api_call(:delete, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "destroy", :format => "json" })
       @c1.reload.state.should == :deleted
     end
 
@@ -77,7 +78,7 @@ describe "Collections API", :type => :integration do
       end
 
       it "should not allow getting" do
-        json = api_call(:get, @collections_path + "/#{@c1.id}", @collections_path_options.merge(:collection_id => @c1.to_param, :action => "show"), {}, {}, :expected_status => 404)
+        json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" }, {}, {}, :expected_status => 404)
       end
     end
   end
@@ -94,12 +95,12 @@ describe "Collections API", :type => :integration do
     end
 
     it "should allow getting a public collection" do
-      json = api_call(:get, @collections_path + "/#{@c2.id}", @collections_path_options.merge(:collection_id => @c2.to_param, :action => "show"))
+      json = api_call(:get, "/api/v1/collections/#{@c2.id}", { :controller => "collections", :collection_id => @c2.to_param, :action => "show", :format => "json" })
       json.should == @c2_json
     end
 
     it "should not allow getting a private collection" do
-      json = api_call(:get, @collections_path + "/#{@c1.id}", @collections_path_options.merge(:collection_id => @c1.to_param, :action => "show"), {}, {}, :expected_status => 401)
+      json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" }, {}, {}, :expected_status => 401)
       json['message'].should match /not authorized/
     end
 
@@ -113,14 +114,14 @@ describe "Collections API", :type => :integration do
     end
 
     it "should not allow updating a collection" do
-      json = api_call(:put, @collections_path + "/#{@c2.id}", @collections_path_options.merge(:collection_id => @c2.to_param, :action => "update"), {
+      json = api_call(:put, "/api/v1/collections/#{@c2.id}", { :controller => "collections", :collection_id => @c2.to_param, :action => "update", :format => "json" }, {
         :name => "test2 edited",
       }, {}, :expected_status => 401)
       @c2.reload.name.should == "test2"
     end
 
     it "should not allow deleting a collection" do
-      json = api_call(:delete, @collections_path + "/#{@c2.id}", @collections_path_options.merge(:collection_id => @c2.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
+      json = api_call(:delete, "/api/v1/collections/#{@c2.id}", { :controller => "collections", :collection_id => @c2.to_param, :action => "destroy", :format => "json" }, {}, {}, :expected_status => 401)
       @c2.reload.should be_active
     end
   end
@@ -133,12 +134,14 @@ describe "Collections API", :type => :integration do
         'id' => @c1.id,
         'name' => @c1.name,
         'visibility' => 'private',
+        'followed_by_user' => false,
       }
     @c2_json = 
       {
         'id' => @c2.id,
         'name' => @c2.name,
         'visibility' => 'public',
+        'followed_by_user' => false,
       }
   end
 
@@ -188,6 +191,11 @@ describe "Collections API", :type => :integration do
 
     context "another user's collections" do
       it_should_behave_like "public only access to collections"
+    end
+
+    it "should not allow following your own collection" do
+      json = api_call(:put, "/api/v1/collections/#{@c2.id}/followers/self", { :controller => "collections", :collection_id => @c2.to_param, :action => "follow", :format => "json" }, {}, {}, :expected_status => 400)
+      @user.reload.user_follows.should == []
     end
 
     describe "Collection Items" do
@@ -359,7 +367,7 @@ describe "Collections API", :type => :integration do
       context "upvoting" do
         it "should allow upvoting an item" do
           @user = @user2
-          json = api_call(:put, "#{@unscoped_items_path}/#{@i3.id}/upvote", @unscoped_items_path_options.merge(:action => "upvote", :item_id => @i3.to_param))
+          json = api_call(:put, "#{@unscoped_items_path}/#{@i3.id}/upvotes/self", @unscoped_items_path_options.merge(:action => "upvote", :item_id => @i3.to_param))
           json.slice('item_id', 'root_item_id', 'user_id').should == {
             'item_id' => @i3.id,
             'root_item_id' => @i3.id,
@@ -368,7 +376,7 @@ describe "Collections API", :type => :integration do
           @i3.reload.collection_item_data.upvote_count.should == 1
 
           # upvoting again is a no-op
-          json = api_call(:put, "#{@unscoped_items_path}/#{@i3.id}/upvote", @unscoped_items_path_options.merge(:action => "upvote", :item_id => @i3.to_param))
+          json = api_call(:put, "#{@unscoped_items_path}/#{@i3.id}/upvotes/self", @unscoped_items_path_options.merge(:action => "upvote", :item_id => @i3.to_param))
           json.slice('item_id', 'root_item_id', 'user_id').should == {
             'item_id' => @i3.id,
             'root_item_id' => @i3.id,
@@ -379,7 +387,7 @@ describe "Collections API", :type => :integration do
 
         it "should not allow upvoting a non-visible item" do
           @user = @user2
-          json = api_call(:put, "#{@unscoped_items_path}/#{@i1.id}/upvote", @unscoped_items_path_options.merge(:action => "upvote", :item_id => @i1.to_param), {}, {}, :expected_status => 401)
+          json = api_call(:put, "#{@unscoped_items_path}/#{@i1.id}/upvotes/self", @unscoped_items_path_options.merge(:action => "upvote", :item_id => @i1.to_param), {}, {}, :expected_status => 401)
           @i1.reload.collection_item_data.upvote_count.should == 0
         end
       end
@@ -392,12 +400,12 @@ describe "Collections API", :type => :integration do
         it "should allow removing an upvote" do
           @i3.collection_item_data.collection_item_upvotes.create!(:user => @user)
           @i3.reload.collection_item_data.upvote_count.should == 1
-          json = api_call(:delete, "#{@unscoped_items_path}/#{@i3.id}/upvote", @unscoped_items_path_options.merge(:action => "remove_upvote", :item_id => @i3.to_param))
+          json = api_call(:delete, "#{@unscoped_items_path}/#{@i3.id}/upvotes/self", @unscoped_items_path_options.merge(:action => "remove_upvote", :item_id => @i3.to_param))
           @i3.reload.collection_item_data.upvote_count.should == 0
         end
 
         it "should ignore if the user hasn't upvoted the item" do
-          json = api_call(:delete, "#{@unscoped_items_path}/#{@i3.id}/upvote", @unscoped_items_path_options.merge(:action => "remove_upvote", :item_id => @i3.to_param))
+          json = api_call(:delete, "#{@unscoped_items_path}/#{@i3.id}/upvotes/self", @unscoped_items_path_options.merge(:action => "remove_upvote", :item_id => @i3.to_param))
         end
       end
     end
@@ -434,7 +442,7 @@ describe "Collections API", :type => :integration do
       end
 
       it "should allow retrieving a private collection" do
-        json = api_call(:get, @collections_path + "/#{@c1.id}", @collections_path_options.merge(:collection_id => @c1.to_param, :action => "show"))
+        json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" })
         json.should == @c1_json
       end
 
@@ -448,20 +456,61 @@ describe "Collections API", :type => :integration do
       end
 
       it "should not allow updating a collection" do
-        json = api_call(:put, @collections_path + "/#{@c2.id}", @collections_path_options.merge(:collection_id => @c2.to_param, :action => "update"), {
+        json = api_call(:put, "/api/v1/collections/#{@c2.id}", { :controller => "collections", :collection_id => @c2.to_param, :action => "update", :format => "json" }, {
           :name => "test2 edited",
         }, {}, :expected_status => 401)
         @c2.reload.name.should == "test2"
       end
 
       it "should not allow deleting a collection" do
-        json = api_call(:delete, @collections_path + "/#{@c2.id}", @collections_path_options.merge(:collection_id => @c2.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
+        json = api_call(:delete, "/api/v1/collections/#{@c2.id}", { :controller => "collections", :collection_id => @c2.to_param, :action => "destroy", :format => "json" }, {}, {}, :expected_status => 401)
         @c2.reload.should be_active
       end
     end
 
     context "a group's collections, as a non-member" do
       it_should_behave_like "public only access to collections"
+    end
+
+    describe "following" do
+      it "should allow following a public collection" do
+        json = api_call(:put, "/api/v1/collections/#{@c2.id}/followers/self", { :controller => "collections", :collection_id => @c2.to_param, :action => "follow", :format => "json" })
+        @user.user_follows.map(&:followed_item).should == [@c2]
+        uf = @user.user_follows.first
+        json.should == { "following_user_id" => @user.id, "followed_collection_id" => @c2.id, "created_at" => uf.created_at.as_json }
+      end
+
+      it "should do nothing if already following the collection" do
+        @user.user_follows.create!(:followed_item => @c2)
+        uf = @user.user_follows.first
+        @user.user_follows.map(&:followed_item).should == [@c2]
+
+        json = api_call(:put, "/api/v1/collections/#{@c2.id}/followers/self", { :controller => "collections", :collection_id => @c2.to_param, :action => "follow", :format => "json" })
+        @user.reload.user_follows.map(&:followed_item).should == [@c2]
+        json.should == { "following_user_id" => @user.id, "followed_collection_id" => @c2.id, "created_at" => uf.created_at.as_json }
+      end
+
+      it "should not allow following a private collection" do
+        json = api_call(:put, "/api/v1/collections/#{@c1.id}/followers/self", { :controller => "collections", :collection_id => @c1.to_param, :action => "follow", :format => "json" }, {}, {}, :expected_status => 401)
+        @user.reload.user_follows.should == []
+      end
+    end
+
+
+    describe "unfollowing" do
+      it "should allow unfollowing a collection" do
+        @user.user_follows.create!(:followed_item => @c2)
+        @user.reload.user_follows.map(&:followed_item).should == [@c2]
+
+        json = api_call(:delete, "/api/v1/collections/#{@c2.id}/followers/self", { :controller => "collections", :collection_id => @c2.to_param, :action => "unfollow", :format => "json" })
+        @user.reload.user_follows.should == []
+      end
+
+      it "should do nothing if not following" do
+        @user.reload.user_follows.should == []
+        json = api_call(:delete, "/api/v1/collections/#{@c2.id}/followers/self", { :controller => "collections", :collection_id => @c2.to_param, :action => "unfollow", :format => "json" })
+        @user.reload.user_follows.should == []
+      end
     end
 
     describe "Collection Items" do

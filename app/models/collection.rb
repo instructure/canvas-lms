@@ -22,6 +22,7 @@ class Collection < ActiveRecord::Base
 
   belongs_to :context, :polymorphic => true
   has_many :collection_items
+  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
 
   attr_accessible :name, :visibility
   validates_as_readonly :visibility
@@ -50,6 +51,9 @@ class Collection < ActiveRecord::Base
   set_policy do
     given { |user| self.public? }
     can :read and can :comment
+
+    given { |user| user.present? && self.public? }
+    can :follow
 
     given { |user| self.context == user }
     can :read and can :create and can :update and can :delete and can :comment
