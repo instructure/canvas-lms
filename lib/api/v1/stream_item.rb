@@ -33,17 +33,25 @@ module Api::V1::StreamItem
       hash['message'] = data.body
       hash['type'] = data.type
       hash.merge!(context_data(data))
-      context_type, context_id = stream_item.context_code.try(:split, '_', 2)
+      if stream_item.context_code
+        context_type, context_id = ::StreamItem.asset_string_components(stream_item.context_code)
+      end
 
       case data.type
       when 'DiscussionTopic', 'Announcement'
         hash['message'] = data.message
         if data.type == 'DiscussionTopic'
-          hash['discussion_topic_id'] = data.id
-          hash['html_url'] = send("#{context_type}_discussion_topic_url", context_id.to_i, data.id.to_i)
+          if context_type == "collection_item"
+            # TODO: build the html_url for the collection item (we want to send them
+            # there instead of directly to the discussion.)
+            # These html routes aren't enabled yet, so we can't build them here yet.
+          else
+            hash['discussion_topic_id'] = data.id
+            hash['html_url'] = send("#{context_type}_discussion_topic_url", context_id, data.id.to_i)
+          end
         else
           hash['announcement_id'] = data.id
-          hash['html_url'] = send("#{context_type}_announcement_url", context_id.to_i, data.id.to_i)
+          hash['html_url'] = send("#{context_type}_announcement_url", context_id, data.id.to_i)
         end
         hash['total_root_discussion_entries'] = data.total_root_discussion_entries
         hash['require_initial_post'] = data.require_initial_post
@@ -85,12 +93,12 @@ module Api::V1::StreamItem
         hash['web_conference_id'] = data.id
         hash['type'] = 'WebConference'
         hash['message'] = data.description
-        hash['html_url'] = send("#{context_type}_conference_url", context_id.to_i, data.id.to_i) if context_type
+        hash['html_url'] = send("#{context_type}_conference_url", context_id, data.id.to_i) if context_type
       when /Collaboration/
         hash['collaboration_id'] = data.id
         # TODO: this type isn't even shown on the web activity stream yet
         hash['type'] = 'Collaboration'
-        hash['html_url'] = send("#{context_type}_collaboration_url", context_id.to_i, data.id.to_i) if context_type
+        hash['html_url'] = send("#{context_type}_collaboration_url", context_id, data.id.to_i) if context_type
       when "CollectionItem"
         item = ::CollectionItem.find(data.id, :include => { :collection_item_data => :image_attachment })
         hash['title'] = item.data.title

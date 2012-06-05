@@ -28,8 +28,8 @@ module Api::V1::Context
       return {}
     end
     {
-      'context_type' => context_type.capitalize,
-      "#{context_type.downcase}_id" => id.to_i,
+      'context_type' => context_type.camelcase,
+      "#{context_type.underscore}_id" => id.to_i,
     }
   end
 
