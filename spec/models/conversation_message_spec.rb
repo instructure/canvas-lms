@@ -121,7 +121,7 @@ describe ConversationMessage do
       student.user_notes.size.should be(1)
       student.user_notes.first.should eql(note)
       note.creator.should eql(@teacher)
-      note.title.should eql("Private message, Jan  1, 1970")
+      note.title.should eql("Private message, Jan 1, 1970")
       note.note.should eql("reprimanded!")
     end
 
