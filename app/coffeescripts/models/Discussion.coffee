@@ -3,7 +3,7 @@ define ['Backbone'], ({Model}) ->
   class Discussion extends Model
 
     url: ->
-      "/api/v1/courses/#{@get 'course_id'}/discussion_topics"
+      "/api/v1/#{@contextType}s/#{@contextId}/discussion_topics"
 
     defaults:
       title: 'No title'

@@ -39,10 +39,11 @@ define [
       if json.assignment?.due_at?
         json.assignment.due_at = @$('.datetime_suggest').text()
 
-      # map the course_ids into deferreds, saving a copy for each course
-      dfds = _.map json.course_ids, (id) =>
+      # map the context_ids into deferreds, saving a copy for each course
+      dfds = _.map json.context_ids, (id) =>
+        [z, contextType, contextId] = id.match(/^(group|course)_(\d+)$/)
         model = new Discussion json
-        model.set 'course_id', id.replace /^course_/, ''
+        _.extend model, {contextId, contextType}
         model.save()
 
       $.when dfds...
