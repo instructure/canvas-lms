@@ -30,6 +30,8 @@ class Collection < ActiveRecord::Base
 
   validates_inclusion_of :visibility, :in => %w(public private)
 
+  after_create :check_auto_follow_users
+
   named_scope :public, :conditions => { :visibility => 'public' }
   named_scope :newest_first, { :order => "id desc" }
 
@@ -47,6 +49,8 @@ class Collection < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     save!
+    # follows won't be recoverable on undelete, they'll have to be re-created
+    following_user_follows.destroy_all
   end
 
   set_policy do
@@ -60,9 +64,24 @@ class Collection < ActiveRecord::Base
     can :read and can :create and can :update and can :delete and can :comment
 
     given { |user| self.context.respond_to?(:has_member?) && self.context.has_member?(user) }
-    can :read and can :comment
+    can :read and can :comment and can :follow
 
     given { |user| self.context.respond_to?(:has_moderator?) && self.context.has_moderator?(user) }
     can :read and can :create and can :update and can :delete and can :comment
+  end
+
+  def check_auto_follow_users
+    if context.respond_to?(:following_user_follows) && !context.following_user_follows.empty?
+      send_later_enqueue_args :auto_follow_users, :priority => Delayed::LOW_PRIORITY
+    end
+    true
+  end
+
+  def auto_follow_users
+    context.followers.each do |user|
+      if self.grants_right?(user, :follow)
+        UserFollow.create_follow(user, self)
+      end
+    end
   end
 end

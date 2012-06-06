@@ -20,6 +20,7 @@ class Group < ActiveRecord::Base
   include Context
   include Workflow
   include CustomValidations
+  include UserFollow::FollowedItem
 
   attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment
   validates_allowed_transitions :is_public, false => true
@@ -62,6 +63,8 @@ class Group < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :collections, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
+  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
+  has_many :user_follows, :foreign_key => 'following_user_id'
 
   before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted

@@ -105,6 +105,29 @@ class UserFollow < ActiveRecord::Base
     end
   end
 
+  after_create :check_auto_follow_collections
+
+  # when a user follows a group or other user, they auto-follow all existing
+  # collections in that context as well
+  def check_auto_follow_collections
+    return true if complementary_record
+    case followed_item
+    when User, Group
+      if !followed_item.collections.empty?
+        send_later_enqueue_args :auto_follow_collections, :priority => Delayed::LOW_PRIORITY
+      end
+    end
+    true
+  end
+
+  def auto_follow_collections
+    followed_item.collections.active.each do |coll|
+      if coll.grants_right?(following_user, :follow)
+        UserFollow.create_follow(following_user, coll)
+      end
+    end
+  end
+
   # returns the subset of items that are currently being followed by the given user
   #
   # currently this method assumes that all the items are of the same type, this

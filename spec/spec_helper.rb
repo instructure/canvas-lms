@@ -752,7 +752,22 @@ Spec::Runner.configure do |config|
   end
 
   def run_job(job = Delayed::Job.last(:order => :id))
+    case job
+    when Hash
+      job = Delayed::Job.first(:conditions => job, :order => :id)
+    end
     Delayed::Worker.new.perform(job)
+  end
+
+  def run_jobs
+    while job = Delayed::Job.get_and_lock_next_available(
+      'spec run_jobs',
+      1.hour,
+      Delayed::Worker.queue,
+      0,
+      Delayed::MAX_PRIORITY)
+      run_job(job)
+    end
   end
 
   # send a multipart post request in an integration spec post_params is
