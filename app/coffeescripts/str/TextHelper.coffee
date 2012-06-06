@@ -94,3 +94,28 @@ define [
           processedLines.push line
       processedLines.push th.quoteClump(quoteBlock) if quoteBlock.length
       message = processedLines.join "\n"
+
+    delimit: (number) ->
+      # only process real numbers
+      return String(number) if isNaN number
+
+      # capture sign and then start working with the absolute value. don't
+      # process infinities.
+      sign = if number < 0 then '-' else ''
+      abs = Math.abs number
+      return String(number) if abs is Infinity
+
+      # break out the integer portion and initialize the result to just the
+      # decimal (if any)
+      integer = Math.floor abs
+      result = if abs == integer then '' else String(abs).replace(/^\d+\./, '.')
+
+      # for each comma'd chunk, prepend to the result and remove from integer
+      while integer >= 1000
+        mod = String(integer).replace(/\d+(\d\d\d)$/, ',$1')
+        integer = Math.floor integer / 1000
+        result = mod + result
+
+      # integer is now either in [1, 999], or equal to 0 iff number in (-1, 1).
+      # prepend it with the sign
+      sign + String(integer) + result
