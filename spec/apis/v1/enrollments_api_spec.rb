@@ -174,6 +174,16 @@ describe EnrollmentsApiController, :type => :integration do
 
         Enrollment.find(json['id']).course_section.should eql @section
       end
+
+      it "should optionally not send notifications" do
+        StudentEnrollment.any_instance.expects(:save_without_broadcasting).at_least_once
+
+        api_call(:post, @path, @path_options, {
+          :enrollment => {
+            :user_id                            => @unenrolled_user.id,
+            :enrollment_state                   => 'active',
+            :notify                             => false }})
+      end
     end
 
     context "a teacher" do
