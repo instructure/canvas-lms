@@ -1,4 +1,7 @@
-<% jammit_css :profile %>
+<%
+  jammit_css :profile
+  js_bundle :profile_show
+%>
 <% content_for :page_title do %>
   <%= @user.short_name %>
 <% end %>
@@ -10,8 +13,8 @@
     <div class="span5">
       <h1><%= @user.short_name %></h1>
       <p><%= format_message(@user.bio || "").first.html_safe %></p>
-      <% if @user != @current_user %>
-        <p><button id="follow-user">Follow</button></p>
+      <% if @user.grants_right? @current_user, :follow %>
+        <p><button id="follow_user">Follow</button></p>
       <% end %>
     </div>
     <div class="span3">

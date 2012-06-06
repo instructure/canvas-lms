@@ -34,6 +34,8 @@ class ProfileController < ApplicationController
     @active_tab = "profile"
     @context = UserProfile.new(@current_user) if @user == @current_user
 
+    js_env :USER_ID => @user.id
+
     @items_count = @user.collection_items.scoped(:conditions => {'collections.visibility' => 'public'}).count
 
     @services = @user.user_services.where(
