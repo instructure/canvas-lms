@@ -353,6 +353,46 @@ describe UsersController, :type => :integration do
     }]
   end
 
+  it "should format CollectionItem" do
+    @user1 = @user
+    group_with_user
+    @user2 = @user
+    @user = @user1
+    @coll = @group.collections.create!
+    UserFollow.create_follow(@user1, @coll)
+    @item = collection_item_model(:collection => @coll, :user => @user2)
+
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.should == [{
+      'id' => StreamItem.last.id,
+      'title' => @item.data.title,
+      'type' => 'CollectionItem',
+      'message' => @item.data.description,
+      'created_at' => StreamItem.last.created_at.as_json,
+      'updated_at' => StreamItem.last.updated_at.as_json,
+      'collection_item' => {
+        'id' => @item.id,
+        'collection_id' => @item.collection_id,
+        'user_id' => @item.user_id,
+        'item_type' => @item.collection_item_data.item_type,
+        'link_url' => @item.collection_item_data.link_url,
+        'post_count' => @item.collection_item_data.post_count,
+        'upvote_count' => @item.collection_item_data.upvote_count,
+        'upvoted_by_user' => false,
+        'root_item_id' => @item.collection_item_data.root_item_id,
+        'image_url' => "http://www.example.com/images/thumbnails/#{@item.data.image_attachment.id}/#{@item.data.image_attachment.uuid}?size=640x%3E",
+        'image_pending' => @item.data.image_pending,
+        'html_preview' => @item.data.html_preview,
+        'user_comment' => @item.user_comment,
+        'url' => "http://www.example.com/api/v1/collections/items/#{@item.id}",
+        'created_at' => @item.created_at.iso8601,
+        'description' => @item.data.description,
+        'title' => @item.data.title,
+      }
+    }]
+  end
+
   it "should return the course-specific activity stream" do
     @course1 = @course
     @course2 = course_with_student(:user => @user, :active_all => true).course

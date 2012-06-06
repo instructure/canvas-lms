@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 shared_examples_for "external tools tests" do
   it_should_behave_like "in-process server selenium tests"

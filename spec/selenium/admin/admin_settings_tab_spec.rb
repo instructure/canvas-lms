@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin settings tab" do
   it_should_behave_like "in-process server selenium tests"

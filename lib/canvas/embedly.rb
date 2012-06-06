@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html)
+class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html, :data_type)
 
   class Image < Struct.new(:url)
     def as_json(*a)
@@ -34,7 +34,7 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html)
   MAXWIDTH = 640
 
   def as_json(*a)
-    { 'title' => self.title, 'description' => self.description, 'images' => self.images.map { |i| i.as_json(*a) }, 'object_html' => self.object_html }
+    { 'title' => self.title, 'description' => self.description, 'images' => self.images.map { |i| i.as_json(*a) }, 'object_html' => self.object_html, 'data_type' => self.data_type }
   end
 
   protected
@@ -48,6 +48,7 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html)
       return
     end
 
+    self.data_type = data.type
     self.title = data.title
     self.description = data.description
     if data.images
@@ -62,6 +63,14 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html)
       self.object_html = data.object.html
     elsif data.html
       self.object_html = data.html
+    end
+
+    # reject non-iframe html embeds
+    if self.object_html.present?
+      doc = Nokogiri::HTML::DocumentFragment.parse(self.object_html)
+      if doc.children.map { |c| c.name.downcase } != ['iframe']
+        self.object_html = nil
+      end
     end
 
     @raw_response = data

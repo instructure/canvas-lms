@@ -935,12 +935,16 @@ describe ContentMigration do
 
     it "should correctly copy quiz question html file references" do
       pending unless Qti.qti_enabled?
-      att = Attachment.create!(:filename => 'first.jpg', :display_name => "first.jpg", :uploaded_data => StringIO.new('first'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      att2 = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('second'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      att3 = Attachment.create!(:filename => 'testing.jpg', :display_name => "testing.jpg", :uploaded_data => StringIO.new('test this'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      root = Folder.root_folders(@copy_from).first
+      folder = root.sub_folders.create!(:context => @copy_from, :name => 'folder 1')
+      att = Attachment.create!(:filename => 'first.jpg', :display_name => "first.jpg", :uploaded_data => StringIO.new('first'), :folder => root, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('second'), :folder => root, :context => @copy_from)
+      att3 = Attachment.create!(:filename => 'testing.jpg', :display_name => "testing.jpg", :uploaded_data => StringIO.new('test this'), :folder => root, :context => @copy_from)
+      att4 = Attachment.create!(:filename => 'sub_test.jpg', :display_name => "sub_test.jpg", :uploaded_data => StringIO.new('sub_folder'), :folder => folder, :context => @copy_from)
       qtext = <<-HTML.strip
 File ref:<img src="/courses/%s/files/%s/download">
 different file ref: <img src="/courses/%s/%s">
+subfolder file ref: <img src="/courses/%s/%s">
 media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
 equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
         HTML
@@ -950,7 +954,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
                     :question_name => "test fun",
                     :name => "test fun",
                     :points_possible => 10,
-                    :question_text => qtext % [@copy_from.id, att.id, @copy_from.id, "file_contents/course%20files/test.jpg"],
+                    :question_text => qtext % [@copy_from.id, att.id, @copy_from.id, "file_contents/course%20files/test.jpg", @copy_from.id, "file_contents/course%20files/folder%201/sub_test.jpg"],
                     :answers =>
                             [{:migration_id => "QUE_1016_A1", :html => %{File ref:<img src="/courses/#{@copy_from.id}/files/#{att3.id}/download">}, :comments_html =>'<i>comment</i>', :text => "", :weight => 100, :id => 8080},
                              {:migration_id => "QUE_1017_A2", :html => "<strong>html answer 2</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
@@ -962,14 +966,15 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       run_course_copy
 
-      @copy_to.attachments.count.should == 3
+      @copy_to.attachments.count.should == 4
       att_2 = @copy_to.attachments.find_by_migration_id(mig_id(att))
       att2_2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
       att3_2 = @copy_to.attachments.find_by_migration_id(mig_id(att3))
+      att4_2 = @copy_to.attachments.find_by_migration_id(mig_id(att4))
 
       q_to = @copy_to.quizzes.first
       qq_to = q_to.quiz_questions.first
-      qq_to.question_data[:question_text].should == qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview"]
+      qq_to.question_data[:question_text].should == qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"]
       qq_to.question_data[:answers][0][:html].should == %{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">}
     end
 

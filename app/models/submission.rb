@@ -673,9 +673,7 @@ class Submission < ActiveRecord::Base
   named_scope :ungraded, lambda {
     {:conditions => ['submissions.grade IS NULL'], :include => :assignment}
   }
-  named_scope :having_submission, lambda {
-    {:conditions => ["submissions.submission_type IS NOT NULL AND submissions.workflow_state = 'submitted'"] }
-  }
+  named_scope :having_submission, :conditions => 'submissions.submission_type IS NOT NULL'
   named_scope :include_user, lambda {
     {:include => [:user] }
   }

@@ -59,27 +59,39 @@ describe "profile" do
       course_with_teacher_logged_in
     end
 
-    it "should add a new email address" do
-      notification_model(:category => 'Grading')
-      notification_policy_model(:notification_id => @notification.id)
+    def add_email_link
+      f('#right-side .add_email_link').click
+    end
 
-      get "/profile/edit"
-      #Add email address to profile
-      driver.find_element(:css, '#right-side .add_email_link').click
-      driver.find_element(:css, '#communication_channels a[href="#register_sms_number"]').click
-      driver.find_element(:css, '#communication_channels a[href="#register_email_address"]').click
-      form = driver.find_element(:id, "register_email_address")
-      test_email = 'nobody+1234@example.com'
-      form.find_element(:id, 'communication_channel_address').send_keys(test_email)
-      form.find_element(:id, 'register_email_address').submit
+    ['with link', 'with drop down', 'on profile page'].each do |add_with|
+      it "should add a new email address #{add_with}" do
+        notification_model(:category => 'Grading')
+        notification_policy_model(:notification_id => @notification.id)
+        if add_with == 'on profile page'
+          get '/profile/edit'
+          add_email_link
+        else
+          get "/profile/communication"
 
-      confirmation_dialog = driver.find_element(:id, "confirm_email_channel")
-      keep_trying_until { confirmation_dialog.displayed? }
-      driver.execute_script("return INST.errorCount;").should == 0
-      confirmation_dialog.find_element(:css, "button").click
-      confirmation_dialog.should_not be_displayed
+          add_email_link if add_with == 'with link'
+          click_option('.notification_preferences .email_select', 'new', :value) if add_with == 'with drop down'
+        end
+        f('#communication_channels a[href="#register_sms_number"]').click
+        replace_content(f('#register_sms_number #communication_channel_address'), 'test@example.com')
+        f('#register_sms_number button[type="submit"]').should be_displayed
+        f('#communication_channels a[href="#register_email_address"]').click
+        form = f("#register_email_address")
+        test_email = 'nobody+1234@example.com'
+        form.find_element(:id, 'communication_channel_address').send_keys(test_email)
+        submit_form('#register_email_address')
 
-      driver.find_element(:link, test_email).should be_displayed
+        confirmation_dialog = f("#confirm_email_channel")
+        keep_trying_until { confirmation_dialog.should be_displayed }
+        driver.execute_script("return INST.errorCount;").should == 0
+        submit_dialog(confirmation_dialog, '.cancel_button')
+        confirmation_dialog.should_not be_displayed
+        f('.email_channels').should include_text(test_email)
+      end
     end
 
     it "should modify user notification policies" do
@@ -256,9 +268,9 @@ describe "profile" do
       course_with_teacher_logged_in
 
       @immediate = notification_model(:name => "Immediate", :category => "TestImmediately")
-      @daily     = notification_model(:name => "Daily", :category => "TestDaily")
-      @weekly    = notification_model(:name => "Weekly", :category => "TestWeekly")
-      @never     = notification_model(:name => "Never", :category => "TestNever")
+      @daily = notification_model(:name => "Daily", :category => "TestDaily")
+      @weekly = notification_model(:name => "Weekly", :category => "TestWeekly")
+      @never = notification_model(:name => "Never", :category => "TestNever")
     end
 
     it "should show the correct defaults when there are no policies set" do
@@ -327,7 +339,7 @@ shared_examples_for "profile pictures selenium tests" do
     keep_trying_until do
       profile_pic = fj('.profile_pic_link img')
       profile_pic.attribute('src').should == IMAGE_SRC
-   end
+    end
     Attachment.last.folder.should == @user.profile_pics_folder
   end
 end

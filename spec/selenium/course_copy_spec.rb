@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "course copy" do
   it_should_behave_like "in-process server selenium tests"
 
-  def course_copy_helper
+  def course_copy_helper(dont_submit_form=false)
     course_with_teacher_logged_in unless @course
     @second_course ||= Course.create!(:name => 'second course')
     @second_course.offer!
@@ -32,6 +32,7 @@ describe "course copy" do
     f('button[type="submit"]').click
 
     yield driver if block_given?
+    return if dont_submit_form
 
     f('button[type="submit"]').click
     wait_for_ajaximations
@@ -119,6 +120,27 @@ describe "course copy" do
         f("#no_topics_message").should include_text("No Recent Messages")
         @new_course.wiki.wiki_pages.count.should == 5
       end
+    end
+
+    it "should set the course name and code correctly" do
+      course_with_admin_logged_in
+
+      get "/courses/#{@course.id}/copy"
+
+      name = f('#course_name')
+      name.clear
+      name.send_keys("course name of testing")
+      name = f('#course_course_code')
+      name.clear
+      name.send_keys("course code of testing")
+
+      expect_new_page_load { f('button[type="submit"]').click }
+      submit_form('#copy_context_form')
+      wait_for_ajaximations
+
+      new_course = Course.last
+      new_course.name.should == "course name of testing"
+      new_course.course_code.should == "course code of testing"
     end
   end
 
@@ -223,6 +245,20 @@ describe "course copy" do
       keep_trying_until { f('#copy_results > h2').should include_text('Copy Succeeded') }
       @course.reload
       @course.wiki.wiki_pages.count.should == 5
+    end
+
+    it "should not list deleted attachments in the selection list" do
+      @second_course ||= Course.create!(:name => 'second course')
+      att1 = Attachment.create!(:filename => 'deleted.txt', :display_name => "deleted.txt", :uploaded_data => StringIO.new('deleted stuff'), :folder => Folder.root_folders(@second_course).first, :context => @second_course)
+      att2 = Attachment.create!(:filename => 'active.txt', :display_name => "active.txt", :uploaded_data => StringIO.new('not deleted'), :folder => Folder.root_folders(@second_course).first, :context => @second_course)
+      att1.destroy
+
+      course_copy_helper(true) do
+        f('#copy_everything').click
+        wait_for_ajaximations
+        f("#copy_attachments_#{CC::CCHelper.create_key(att1)}").should be_nil
+        f("#copy_attachments_#{CC::CCHelper.create_key(att2)}").should_not be_nil
+      end
     end
   end
 

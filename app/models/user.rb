@@ -2382,4 +2382,8 @@ class User < ActiveRecord::Base
   def private?
     not public?
   end
+
+  def default_collection_name
+    t :default_collection_name, "%{user_name}'s Collection", :user_name => self.short_name
+  end
 end

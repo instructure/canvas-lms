@@ -38,6 +38,7 @@ describe CollectionItemsController do
         'description' => nil,
         'images' => [],
         'object_html' => nil,
+        'data_type' => nil,
       }
     end
 
@@ -53,12 +54,13 @@ describe CollectionItemsController do
         'description' => data.description,
         'images' => [{ 'url' => data.thumbnail_url }],
         'object_html' => nil,
+        'data_type' => nil,
       }
     end
 
     it "should return extended data for paid embedly accounts" do
       user_session(user)
-      data = OpenObject.new(:title => "t1", :description => "d1", :images => [{'url' => 'u1'},{'url' => 'u2'}], :object => OpenObject.new(:html => "<b>hai</b>"))
+      data = OpenObject.new(:title => "t1", :description => "d1", :images => [{'url' => 'u1'},{'url' => 'u2'}], :object => OpenObject.new(:html => "<iframe src='test'></iframe>"))
       PluginSetting.expects(:settings_for_plugin).with(:embedly).returns({ :api_key => 'test', :plan_type => 'paid'})
       Embedly::API.any_instance.expects(:preview).with(:url => "http://www.example.com/", :maxwidth => Canvas::Embedly::MAXWIDTH).returns([data])
       post "/collection_items/link_data", :url => "http://www.example.com/"
@@ -67,7 +69,8 @@ describe CollectionItemsController do
         'title' => data.title,
         'description' => data.description,
         'images' => [{ 'url' => 'u1' }, { 'url' => 'u2' }],
-        'object_html' => "<b>hai</b>",
+        'object_html' => "<iframe src='test'></iframe>",
+        'data_type' => nil,
       }
     end
   end

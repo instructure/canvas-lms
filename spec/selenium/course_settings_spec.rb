@@ -84,9 +84,8 @@ describe "course settings" do
 
     it "should add a section" do
       section_name = 'new section'
-      get "/courses/#{@course.id}/settings"
+      get "/courses/#{@course.id}/settings#tab-sections"
 
-      driver.find_element(:link, 'Sections').click
       section_input = driver.find_element(:id, 'course_section_name')
       keep_trying_until { section_input.should be_displayed }
       replace_content(section_input, section_name)
@@ -98,9 +97,8 @@ describe "course settings" do
 
     it "should delete a section" do
       add_section('Delete Section')
-      get "/courses/#{@course.id}/settings"
+      get "/courses/#{@course.id}/settings#tab-sections"
 
-      driver.find_element(:link, 'Sections').click
       driver.find_element(:css, '.section_link.delete_section_link').click
       keep_trying_until do
         driver.switch_to.alert.should_not be_nil
@@ -114,9 +112,8 @@ describe "course settings" do
     it "should edit a section" do
       edit_text = 'Section Edit Text'
       add_section('Edit Section')
-      get "/courses/#{@course.id}/settings"
+      get "/courses/#{@course.id}/settings#tab-sections"
 
-      driver.find_element(:link, 'Sections').click
       driver.find_element(:css, '.section_link.edit_section_link').click
       section_input = driver.find_element(:id, 'course_section_name')
       keep_trying_until { section_input.should be_displayed }
@@ -127,7 +124,7 @@ describe "course settings" do
     end
 
     it "should move a nav item to disabled" do
-      driver.find_element(:link, 'Navigation').click
+      get "/courses/#{@course.id}/settings#tab-navigation"
       disabled_div = driver.find_element(:id, 'nav_disabled_list')
       announcements_nav = driver.find_element(:id, 'nav_edit_tab_id_14')
       driver.action.click_and_hold(announcements_nav).
@@ -141,13 +138,11 @@ describe "course settings" do
   describe "course users" do
 
     it "should add a user to a section" do
-      user = user_with_pseudonym(:active_user => true, :username => 'user@example.com', :name=> 'user@example.com')
-
-      get "/courses/#{@course.id}/settings"
+      user = user_with_pseudonym(:active_user => true, :username => 'user@example.com', :name => 'user@example.com')
       section_name = 'Add User Section'
       add_section(section_name)
-      driver.find_element(:link, 'Users').click
-      refresh_page
+      get "/courses/#{@course.id}/settings#tab-users"
+
       add_button = driver.find_element(:css, '.add_users_link')
       keep_trying_until { add_button.should be_displayed }
       add_button.click
@@ -158,8 +153,8 @@ describe "course settings" do
       driver.find_element(:id, 'user_list_parsed').should include_text(user.name)
       driver.find_element(:css, '.add_users_button').click
       wait_for_ajax_requests
-      refresh_page
-      driver.find_element(:link, 'Sections').click
+      refresh_page #needed to update the student count on the next page
+      f("a[href='#tab-sections']").click
       new_section = driver.find_elements(:css, 'ul#sections > .section')[1]
       new_section.find_element(:css, '.users_count').should include_text("1")
     end
@@ -169,8 +164,7 @@ describe "course settings" do
       student_in_course(:name => username)
       @enrollment.course_section = @course_section; @enrollment.save
 
-      get "/courses/#{@course.id}/settings"
-      driver.find_element(:link, 'Users').click
+      get "/courses/#{@course.id}/settings#tab-users"
       driver.execute_script("$('#enrollment_#{@enrollment.id} .unenroll_user_link').click()")
       driver.switch_to.alert.accept
       wait_for_ajaximations
@@ -183,8 +177,7 @@ describe "course settings" do
       student_in_course
       @enrollment.course_section = @course_section; @enrollment.save
 
-      get "/courses/#{@course.id}/settings"
-      driver.find_element(:link, 'Users').click
+      get "/courses/#{@course.id}/settings#tab-users"
       driver.execute_script("$('#enrollment_#{@enrollment.id} .edit_section_link').click()")
       click_option("#enrollment_#{@enrollment.id} .course_section_id", section_name)
       wait_for_ajaximations
@@ -196,8 +189,7 @@ describe "course settings" do
       student_in_course(:name => username, :active_all => true)
       @enrollment.course_section = @course_section; @enrollment.save
 
-      get "/courses/#{@course.id}/settings"
-      driver.find_element(:link, 'Users').click
+      get "/courses/#{@course.id}/settings#tab-users"
       driver.execute_script("$('#enrollment_#{@enrollment.id} .user_information_link').click()")
       enrollment_dialog = driver.find_element(:id, 'enrollment_dialog')
       enrollment_dialog.should be_displayed
@@ -206,7 +198,11 @@ describe "course settings" do
 
     def link_to_student(link, student)
       assoc_links = link.find_elements(:css, ".associated_user_link")
-      if assoc_links[0].displayed? then assoc_links[0].click else assoc_links[1].click end
+      if assoc_links[0].displayed? then
+        assoc_links[0].click
+      else
+        assoc_links[1].click
+      end
       wait_for_ajax_requests
       click_option("#student_enrollment_link_option", student.try(:name) || "[ No Link ]")
       driver.find_element(:css, "#link_student_dialog_form").submit
@@ -245,7 +241,7 @@ describe "course settings" do
       links[1].find_element(:css, ".associated_user_name").should include_text @students[3].name
 
       @obs.reload
-      @obs.enrollments.map {|e| e.associated_user_id}.sort.should == [@students[2].id, @students[3].id]
+      @obs.enrollments.map { |e| e.associated_user_id }.sort.should == [@students[2].id, @students[3].id]
 
       link_to_student(links[0], nil)
       link_to_student(links[1], nil)
@@ -258,7 +254,7 @@ describe "course settings" do
       links[1].find_element(:css, ".associated_user_name").should include_text @students[1].name
 
       @obs.reload
-      @obs.enrollments.map {|e| e.associated_user_id}.sort.should == [@students[0].id, @students[1].id]
+      @obs.enrollments.map { |e| e.associated_user_id }.sort.should == [@students[0].id, @students[1].id]
     end
 
     it "should not show the student view student" do
@@ -280,24 +276,21 @@ describe "course settings" do
     end
 
     it "should coalesce multiple enrollments under a single student" do
-      get "/courses/#{@course.id}/settings"
-      driver.find_element(:link, 'Users').click
+      get "/courses/#{@course.id}/settings#tab-users"
 
       driver.find_elements(:css, ".user_#{@user.id} .section").length.should == 2
       driver.find_elements(:css, ".user_#{@user.id} .links .unenroll_user_link").length.should == 0
     end
 
     it "should show individual course section remove icons" do
-      get "/courses/#{@course.id}/settings"
-      driver.find_element(:link, 'Users').click
+      get "/courses/#{@course.id}/settings#tab-users"
 
       driver.execute_script("$('.user_#{@user.id} .edit_section_link').click()")
       find_all_with_jquery(".user_#{@user.id} .sections .unenroll_user_link:visible").length.should == 2
     end
 
     it "should only remove a user from a single section" do
-      get "/courses/#{@course.id}/settings"
-      driver.find_element(:link, 'Users').click
+      get "/courses/#{@course.id}/settings#tab-users"
 
       driver.execute_script("$('.user_#{@user.id} .section_#{@course_section.id} .unenroll_user_link').click()")
       driver.switch_to.alert.accept
@@ -309,8 +302,7 @@ describe "course settings" do
     it "should change the correct section when editing" do
       add_section("Section 3")
 
-      get "/courses/#{@course.id}/settings"
-      driver.find_element(:link, 'Users').click
+      get "/courses/#{@course.id}/settings#tab-users"
 
       driver.execute_script("$('.user_#{@user.id} .edit_section_link').click()")
       click_option(".user_#{@user.id} .section_#{@old_section.id} .course_section_id", @course_section.name)

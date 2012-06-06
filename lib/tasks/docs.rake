@@ -6,7 +6,7 @@ namespace :doc do
 
   YARD::Rake::YardocTask.new(:api) do |t|
     t.before = proc { FileUtils.rm_rf(API_DOC_DIR) }
-    t.files = ["app/controllers/*.rb"]
+    t.files = ["app/controllers/*.rb", "vendor/plugins/*/app/controllers/*.rb"]
     t.options = ["-e", "lib/api_routes.rb", "--title", "Canvas REST API", "-p", "doc", "-t", "api", "--readme", "doc/api/README.md", "-o", API_DOC_DIR]
   end
 

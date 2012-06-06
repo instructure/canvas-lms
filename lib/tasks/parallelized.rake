@@ -13,7 +13,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     task :selenium, :count do |t, args|
       require "parallelized_specs"
       count = args[:count]
-      test_files = FileList['spec/selenium/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/selenium/*_spec.rb']
+      test_files = FileList['spec/selenium/**/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/selenium/*_spec.rb']
       test_files.map! { |f| "#{Rails.root}/#{f}" }
       Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
     end

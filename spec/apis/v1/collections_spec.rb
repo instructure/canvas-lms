@@ -53,13 +53,21 @@ describe "Collections API", :type => :integration do
       @c1.reload.name.should == "test1 edited"
     end
 
-    it "should not allow changing visibility" do
+    it "should allow changing private to public but not the reverse" do
       json = api_call(:put, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "update", :format => "json" }, {
         :name => "test1 edited",
         :visibility => "public",
+      })
+      @c1.reload
+      @c1.name.should == "test1 edited"
+      @c1.visibility.should == "public"
+
+      json = api_call(:put, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "update", :format => "json" }, {
+        :visibility => "private",
       }, {}, :expected_status => 400)
-      @c1.name.should == "test1"
-      @c1.visibility.should == "private"
+      @c1.reload
+      @c1.name.should == "test1 edited"
+      @c1.visibility.should == "public"
     end
 
     it "should allow deleting a collection" do
@@ -146,9 +154,9 @@ describe "Collections API", :type => :integration do
   end
 
   def create_collection_items(user)
-    @i1 = collection_item_model(:description => "item 1", :user => user, :collection => @c1, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/one"))
-    @i2 = collection_item_model(:description => "item 2", :user => user, :collection => @c1, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/two"))
-    @i3 = collection_item_model(:description => "item 3", :user => user, :collection => @c2, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/three"))
+    @i1 = collection_item_model(:user_comment => "item 1", :user => user, :collection => @c1, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/one"))
+    @i2 = collection_item_model(:user_comment => "item 2", :user => user, :collection => @c1, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/two"))
+    @i3 = collection_item_model(:user_comment => "item 3", :user => user, :collection => @c2, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/three"))
     @unscoped_items_path = "/api/v1/collections/items"
     @c1_items_path = "/api/v1/collections/#{@c1.id}/items"
     @c2_items_path = "/api/v1/collections/#{@c2.id}/items"
@@ -171,9 +179,11 @@ describe "Collections API", :type => :integration do
       'image_url' => item.data.image_attachment && "http://www.example.com/images/thumbnails/#{item.data.image_attachment.id}/#{item.data.image_attachment.uuid}?size=640x%3E",
       'image_pending' => item.data.image_pending,
       'html_preview' => item.data.html_preview,
-      'description' => item.description,
+      'user_comment' => item.user_comment,
       'url' => "http://www.example.com/api/v1/collections/items/#{item.id}",
       'created_at' => item.created_at.iso8601,
+      'description' => item.data.description,
+      'title' => item.data.title,
     }
   end
 
@@ -187,6 +197,15 @@ describe "Collections API", :type => :integration do
 
     context "a user's own collections" do
       it_should_behave_like "full access to collections"
+
+      it "should create a default private collection if no collections exist for the context" do
+        @empty_user = user_with_pseudonym
+        @user = @empty_user
+        json = api_call(:get, "/api/v1/users/#{@empty_user.id}/collections", { :controller => "collections", :action => "index", :format => "json", :user_id => @empty_user.to_param })
+        response['Link'].should be_present
+        json.should_not be_empty
+        json.first['visibility'].should == 'private'
+      end
     end
 
     context "another user's collections" do
@@ -206,7 +225,7 @@ describe "Collections API", :type => :integration do
         @user2 = @user
         @user = @user1
         @c3 = @user2.collections.create!(:name => 'user2', :visibility => 'public')
-        @i4 = collection_item_model(:description => "cloned item 3", :user => @c3.context, :collection => @c3, :collection_item_data => @i3.collection_item_data); @i3.reload
+        @i4 = collection_item_model(:user_comment => "cloned item 3", :user => @c3.context, :collection => @c3, :collection_item_data => @i3.collection_item_data); @i3.reload
         @items3_path = "/api/v1/collections/#{@c3.id}/items"
         @items3_path_options = { :controller => "collection_items", :action => "index", :format => "json", :collection_id => @c3.to_param }
       end
@@ -219,14 +238,14 @@ describe "Collections API", :type => :integration do
 
       describe "item creation" do
         it "should allow creating from a http url" do
-          json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :description => 'new item' })
+          json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
           new_item = @c1.collection_items.last(:order => :id)
           new_item.collection_item_data.link_url.should == "http://www.example.com/a/b/c"
           new_item.user.should == @user
         end
 
         it "should allow cloning an existing item" do
-          json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/items/#{@i3.id}", :description => 'cloned' })
+          json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/items/#{@i3.id}", :user_comment => 'cloned' })
           json['post_count'].should == 3
           new_item = @c1.collection_items.last(:order => :id)
           new_item.collection_item_data.should == @i3.collection_item_data
@@ -236,19 +255,19 @@ describe "Collections API", :type => :integration do
         it "should not allow cloning an item the user can't access" do
           @user = @user2
           expect {
-            json = api_call(:post, @items3_path, @items3_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/items/#{@i1.id}", :description => 'cloned' }, {}, :expected_status => 401)
+            json = api_call(:post, @items3_path, @items3_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/items/#{@i1.id}", :user_comment => 'cloned' }, {}, :expected_status => 401)
           }.to change(CollectionItem, :count).by(0)
         end
 
         it "should reject non-http urls" do
           expect {
-            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "javascript:alert(1)", :description => 'new item' }, {}, :expected_status => 400)
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "javascript:alert(1)", :user_comment => 'new item' }, {}, :expected_status => 400)
           }.to change(CollectionItem, :count).by(0)
         end
 
         describe "images" do
           it "should take a snapshot of the link url if no image is provided and there is no embedly image" do
-            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :description => 'new item' })
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
             @item = CollectionItem.find(json['id'])
             @item.data.image_pending.should == true
             @att = Attachment.new(:uploaded_data => stub_png_data)
@@ -266,7 +285,7 @@ describe "Collections API", :type => :integration do
           end
 
           it "should clone and use the image if provided" do
-            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :image_url => "http://www.example.com/my/image.png", :description => 'new item' })
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :image_url => "http://www.example.com/my/image.png", :user_comment => 'new item' })
             @item = CollectionItem.find(json['id'])
             @item.data.image_pending.should == true
             http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
@@ -284,7 +303,7 @@ describe "Collections API", :type => :integration do
           end
 
           it "should use the embedly image if no image is provided" do
-            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :description => 'new item' })
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
             @item = CollectionItem.find(json['id'])
             @item.data.image_pending.should == true
             Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'test', :images => [{'url' => 'http://www.example.com/image1'}], :html => "<iframe>test</iframe>"))
@@ -304,17 +323,61 @@ describe "Collections API", :type => :integration do
             json['image_url'].should == "http://www.example.com/images/thumbnails/#{@att.id}/#{@att.uuid}?size=640x%3E"
           end
         end
+
+        describe "embedly data" do
+          it "should use the embeldy description and title if none are given" do
+            Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :description => 'e desc', :title => 'e title'))
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
+            run_job()
+            CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "e title", 'description' => "e desc" }
+
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item', :title => "custom title" })
+            run_job()
+            CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "custom title", 'description' => "e desc" }
+
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item', :description => "custom description" })
+            run_job()
+            CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "e title", 'description' => "custom description" }
+          end
+
+          it "should use the embedly item type if valid" do
+            Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'video'))
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
+            run_job()
+            CollectionItem.find(json['id']).data.item_type.should == 'video'
+
+            Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'rtf'))
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
+            run_job()
+            CollectionItem.find(json['id']).data.item_type.should == 'url'
+          end
+
+          it "should only allow iframe embeds" do
+            iframe_html =  "<iframe src='http://example.com/'></iframe>"
+            div_html = "<div class='blah'><p>text</p></div>"
+
+            Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :html => iframe_html))
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
+            run_job()
+            CollectionItem.find(json['id']).data.html_preview.should == iframe_html
+
+            Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :html => div_html))
+            json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
+            run_job()
+            CollectionItem.find(json['id']).data.html_preview.should be_blank
+          end
+        end
       end
 
       it "should allow editing mutable fields" do
         json = api_call(:put, "#{@unscoped_items_path}/#{@i1.id}", @unscoped_items_path_options.merge(:item_id => @i1.to_param, :action => "update"), {
-          :description => "modified",
+          :user_comment => "modified",
           :link_url => 'cant change',
           :item_type => 'cant change',
           :image_url => "http://www.example.com/cant_change"
         })
         json.should == item_json(@i1.reload)
-        @i1.description.should == "modified"
+        @i1.user_comment.should == "modified"
         @i1.collection_item_data.item_type.should == "url"
         @i1.data.image_pending.should == false
       end
@@ -422,12 +485,19 @@ describe "Collections API", :type => :integration do
 
     context "a group's collections, as moderator" do
       before do
-        @group_membership = @group.add_user(@user)
-        @group_membership.moderator = true
-        @group_membership.save!
+        @group_membership = @group.add_user(@user).tap{|gm| gm.moderator = true; gm.save}
       end
 
       it_should_behave_like "full access to collections"
+
+      it "should create a default private collection if no collections exist for the context" do
+        @empty_group = group_model({:group_category => GroupCategory.communities_for(Account.default), :is_public => true})
+        @empty_group.add_user(@user).tap{|gm| gm.moderator = true; gm.save}
+        json = api_call(:get, "/api/v1/groups/#{@empty_group.id}/collections", { :controller => "collections", :action => "index", :format => "json", :group_id => @empty_group.to_param })
+        response['Link'].should be_present
+        json.should_not be_empty
+        json.first['visibility'].should == 'private'
+      end
     end
 
     context "a group's collections, as member" do
@@ -520,7 +590,7 @@ describe "Collections API", :type => :integration do
         @user2 = user_with_pseudonym
         @group_membership2 = @group.add_user(@user2)
 
-        @i4 = collection_item_model(:description => "item 4", :user => @user2, :collection => @c2, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/three"))
+        @i4 = collection_item_model(:user_comment => "item 4", :user => @user2, :collection => @c2, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/three"))
       end
 
       context "as a group member" do
@@ -531,18 +601,18 @@ describe "Collections API", :type => :integration do
         end
 
         it "should allow creating a new item" do
-          json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :description => 'new item' })
+          json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
           new_item = @c1.collection_items.last(:order => :id)
           new_item.collection_item_data.link_url.should == "http://www.example.com/a/b/c"
           new_item.user.should == @user
         end
 
         it "should not allow updating an item created by someone else" do
-          orig_description = @i1.description
+          orig_user_comment = @i1.user_comment
           json = api_call(:put, "#{@unscoped_items_path}/#{@i1.id}", @unscoped_items_path_options.merge(:item_id => @i1.to_param, :action => "update"), {
-            :description => "item1 description edited",
+            :user_comment => "item1 user_comment edited",
           }, {}, :expected_status => 401)
-          @i1.reload.description.should == orig_description
+          @i1.reload.user_comment.should == orig_user_comment
         end
 
         it "should not allow deleting an item created by someone else" do
@@ -561,9 +631,9 @@ describe "Collections API", :type => :integration do
         end
 
         it "should allow updating an item created by someone else" do
-          json = api_call(:put, "#{@unscoped_items_path}/#{@i4.id}", @unscoped_items_path_options.merge(:item_id => @i4.to_param, :action => "update"), { :description => "modified" })
+          json = api_call(:put, "#{@unscoped_items_path}/#{@i4.id}", @unscoped_items_path_options.merge(:item_id => @i4.to_param, :action => "update"), { :user_comment => "modified" })
           json.should == item_json(@i4.reload)
-          @i4.description.should == "modified"
+          @i4.user_comment.should == "modified"
         end
 
         it "should allow deleting an item created by someone else" do

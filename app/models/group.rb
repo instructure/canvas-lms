@@ -22,7 +22,7 @@ class Group < ActiveRecord::Base
   include CustomValidations
 
   attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment
-  validates_only_false_to_true :is_public
+  validates_allowed_transitions :is_public, false => true
 
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
   has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
@@ -480,5 +480,9 @@ class Group < ActiveRecord::Base
       ["parent_context_auto_join", "Auto join"],
       ["parent_context_request", "Request to join"]
     ]
+  end
+
+  def default_collection_name
+    t "#group.default_collection_name", "%{group_name}'s Collection", :group_name => self.name
   end
 end

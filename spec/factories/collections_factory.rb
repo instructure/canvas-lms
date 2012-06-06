@@ -17,7 +17,7 @@ end
 
 def valid_collection_item_attributes
   {
-    :description => "test item",
+    :user_comment => "test item",
   }
 end
 

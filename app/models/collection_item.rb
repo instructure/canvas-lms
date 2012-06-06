@@ -19,13 +19,14 @@
 class CollectionItem < ActiveRecord::Base
   include Workflow
   include CustomValidations
+  include SendToStream
 
   belongs_to :collection
   belongs_to :collection_item_data
   alias :data :collection_item_data
   belongs_to :user
 
-  attr_accessible :collection, :collection_item_data, :description, :user
+  attr_accessible :collection, :collection_item_data, :user_comment, :user
 
   validates_presence_of :collection, :collection_item_data, :user
   validates_associated :collection_item_data
@@ -115,5 +116,9 @@ class CollectionItem < ActiveRecord::Base
 
     given { |user| self.collection.context.respond_to?(:has_member?) && self.collection.context.has_member?(user) }
     can :create
+  end
+
+  on_create_send_to_streams do
+    (self.collection.try(:followers) || []) - [self.user]
   end
 end

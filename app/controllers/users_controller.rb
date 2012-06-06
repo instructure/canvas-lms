@@ -351,6 +351,14 @@ class UsersController < ApplicationController
   #     'type': 'Collaboration',
   #     'collaboration_id': 1234
   #   }
+  #
+  # CollectionItem:
+  #
+  #   !!!javascript
+  #   {
+  #     'type': 'CollectionItem',
+  #     'collection_item' { ... full CollectionItem data ... }
+  #   }
   def activity_stream
     if @current_user
       api_render_stream_for_contexts(nil, :api_v1_user_activity_stream_url)
