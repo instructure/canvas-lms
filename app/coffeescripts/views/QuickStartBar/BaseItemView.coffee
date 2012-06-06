@@ -78,3 +78,7 @@ define [
     # that returns a deferred object, used in `@onFormSubmit`
     save: -> @model.save()
 
+    @title: (scope, text) ->
+      title = ""
+      I18n.scoped('dashboard', (i) -> title = i.t scope, text)
+      title

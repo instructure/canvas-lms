@@ -28,3 +28,5 @@ define [
       @model.save(json).done ->
         $.flashMessage I18n.t 'message_sent', 'Message Sent'
 
+    @type:  'message'
+    @title: -> super 'message', 'Message'

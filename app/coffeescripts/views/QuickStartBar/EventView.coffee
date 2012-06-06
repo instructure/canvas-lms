@@ -38,3 +38,5 @@ define [
       $.when(dfds...).done ->
         $.flashMessage I18n.t 'event_created', 'Event created'
 
+    @type:  'event'
+    @title: -> super 'event', 'Event'

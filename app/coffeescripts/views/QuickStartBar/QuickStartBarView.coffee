@@ -1,10 +1,10 @@
 define [
   'Backbone',
   'i18n!dashboard'
-  'compiled/views/QuickStartBar/allViews'
+  'underscore'
   'jst/quickStartBar/QuickStartBarView'
   'formToJSON'
-], ({View, Model}, I18n, allViews, template) ->
+], ({View, Model}, I18n, _, template) ->
 
   capitalize = (str) ->
     str.replace /\b[a-z]/g, (match) -> match.toUpperCase()
@@ -22,25 +22,18 @@ define [
       'click .nav a': 'onNavClick'
       'focus .expander': 'onExpandClick'
 
-    initialize: (@quickStartItems)  ->
+    initialize: ->
       @model or= new QuickStartBarModel
       @model.on 'change:modelName', @switchFormView
       @model.on 'change:expanded', @toggleExpanded
       @models = {}
 
-      @quickStartItems or= [
-        {type: 'assignment', title: I18n.t('assignment', 'Assignment')}
-        {type: 'discussion', title: I18n.t('discussion', 'Discussion')}
-        {type: 'announcement', title: I18n.t('announcement', 'Announcement')}
-        {type: 'message', title: I18n.t('message', 'Message')}
-        {type: 'pin', title: I18n.t('pin', 'Pin')}
-        {type: 'event', icon: 'calendar-day', title: I18n.t('event', 'Event')}
-      ]
-
-      for qi in @quickStartItems
-        qi.icon  or= qi.type
-        qi.title or= capitalize qi.type
-
+      @formViewsObj = _.reduce @options.formViews
+      , (h, v) ->
+        h[v.type] = v
+        h
+      , {}
+      console.log @formViewsObj
 
     onSaveSuccess: (model) =>
       @switchFormView()
@@ -62,10 +55,9 @@ define [
       @$el.removeClass @modelName if @modelName
       @modelName = @model.get 'modelName'
       @$el.addClass @modelName
-      viewName = capitalize(@modelName) + 'View'
       @currentFormView?.teardown?()
-      @currentFormView = @views[viewName] or= do =>
-        view = new allViews[viewName]
+      @currentFormView = @views[@modelName] or= do =>
+        view = new @formViewsObj[@modelName]
         view.on 'save', @onSaveSuccess
         view.on 'saveFail', @onSaveFail
       @currentFormView.render()
@@ -89,7 +81,7 @@ define [
       @$newItemFormContainer = $ '.newItemFormContainer'
 
     render: ->
-      @$el.html template(quickStartItems: @quickStartItems)
+      @$el.html(template formViews: @options.formViews)
       @cacheElements()
       @switchFormView()
       super

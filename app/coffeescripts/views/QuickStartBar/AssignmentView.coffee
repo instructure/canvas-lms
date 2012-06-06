@@ -32,3 +32,5 @@ define [
         model.save()
       $.when dfds...
 
+    @type:  'assignment'
+    @title: -> super 'assignment', 'Assignment'

@@ -65,3 +65,5 @@ define [
         @model.set 'link_url', url, silent: true
         @model.fetchLinkData()
 
+    @type: 'pin'
+    @title: -> super('pin', 'Pin')

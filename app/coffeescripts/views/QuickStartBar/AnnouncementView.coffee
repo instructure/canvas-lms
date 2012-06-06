@@ -37,3 +37,5 @@ define [
 
       $.when dfds...
 
+    @type: 'announcement'
+    @title: -> super 'announcement', 'Announcement'

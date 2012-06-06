@@ -52,3 +52,5 @@ define [
       super
       @$('.ui-datepicker-trigger').addClass('disabled')
 
+    @type:  'discussion'
+    @title: -> super 'discussion', 'Discussion'

@@ -3,6 +3,7 @@ require [
   'Backbone'
   'compiled/views/Dashboard/DashboardView'
   'compiled/views/QuickStartBar/QuickStartBarView'
+  'compiled/views/QuickStartBar/allViews'
   'compiled/views/ActivityFeed/ActivityFeedView'
   'compiled/views/Dashboard/SideBarView'
   'compiled/views/ActivityFeed/ActivityFeedFilterView'
@@ -10,7 +11,7 @@ require [
   'compiled/views/Dashboard/TodoView'
   'compiled/views/Dashboard/ComingUpView'
   'compiled/dashboardToggle'
-], ($, {View}, DashboardView, QuickStartBarView, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView, dashboardToggle) ->
+], ($, {View}, DashboardView, QuickStartBarView, allViews, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView, dashboardToggle) ->
 
   $ ->
     window.dashboard = new DashboardView
@@ -18,7 +19,7 @@ require [
       el: document.getElementById('content')
 
       views:
-        quickStartBar: new QuickStartBarView
+        quickStartBar: new QuickStartBarView(formViews: allViews)
         activityFeed: new ActivityFeedView
           views:
             activityFeedFilter: new ActivityFeedFilterView

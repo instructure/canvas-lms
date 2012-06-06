@@ -75,3 +75,6 @@ define [
       return unless obj
       obj.start_at = Date.parse obj.start_date+' '+obj.start_time
       obj.end_at   = Date.parse obj.start_date+' '+obj.end_time
+
+    @type:  'event'
+    @title: -> super 'event', 'Event'
