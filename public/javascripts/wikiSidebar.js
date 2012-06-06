@@ -20,6 +20,7 @@ define([
   'i18n!wiki.sidebar',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'jst/wikiSidebar/collectionItem',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData */,
@@ -33,7 +34,7 @@ define([
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'vendor/scribd.view' /* scribd */
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape, collectionItem) {
 
   var $editor_tabs,
       $tree1,
@@ -41,7 +42,8 @@ define([
       $course_show_secondary, 
       $sidebar_upload_image_form,
       $sidebar_upload_file_form,
-      $wiki_sidebar_select_folder_dialog;
+      $wiki_sidebar_select_folder_dialog,
+      $collectionItems;
 
   // unlikely, but there's a chance this domready call will happen after other
   // scripts try to call methods on wikiSidebar, need to re-architect this a bit
@@ -53,9 +55,20 @@ define([
     $sidebar_upload_image_form = $("form#sidebar_upload_image_form");
     $sidebar_upload_file_form = $("form#sidebar_upload_file_form");
     $wiki_sidebar_select_folder_dialog = $("#wiki_sidebar_select_folder_dialog");
+    $collectionItems = $('#wiki_sidebar_collections ul');
   });
 
   var wikiSidebar = {
+    itemSelected: function(item) {
+      switch(item.item_type) {
+        case 'image':
+          wikiSidebar.editor.editorBox('insert_code', '<img alt="' + item.title + '" src="' + item.link_url + '"/>');
+          break;
+        default: // we'll rely on enhance-user-content to create youtube thumbnails, etc.
+          wikiSidebar.editor.editorBox('create_link', {title: (item.title || I18n.t("no_title", "No title")), url: item.link_url});
+          break;
+      }
+    },
     fileSelected: function(node) {
       var $span = node.find('span.text'),
           url = $span.attr('rel'),
@@ -280,6 +293,28 @@ define([
       });
 
       $editor_tabs.tabs();
+
+      $('#wiki_sidebar_collections select').change(function() {
+        $.ajaxJSON('/api/v1/collections/' + $(this).val() + '/items', 'GET', {}, function(items) {
+          $collectionItems.html();
+          for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            item.iconClass = "icon-" + ({url: 'link', image: 'analytics'}[item.item_type] || item.item_type); 
+            var $node = $(collectionItem(item));
+            $node.data('item', item);
+            if (i % 2 == 1)
+              $node.addClass('even');
+            if (i == items.length - 1)
+              $node.addClass('last');
+            $collectionItems.append($node);
+          }
+        });
+      }).change();
+
+      $collectionItems.on('click', 'li', function() {
+        wikiSidebar.itemSelected($(this).data('item'));
+      });
+
       $('.wiki_pages li a').live('click', function(event){
         event.preventDefault();
         wikiSidebar.editor.editorBox('create_link', {title: $(this).text(), url: $(this).attr('href')});
