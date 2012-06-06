@@ -138,6 +138,7 @@ class PageView < ActiveRecord::Base
   def self.process_cache_queue
     redis = Canvas.redis
     lock_key = 'page_view_queue_processing'
+    lock_key += ":#{Shard.current.description}" unless Shard.current.default?
     # lock other processors out until we're done. if more than an hour
     # passes, the lock will be dropped and we'll assume this processor died.
     #
