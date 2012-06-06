@@ -9,7 +9,10 @@ require [
   'compiled/views/ActivityFeed/ActivityFeedItemsView'
   'compiled/groups/dashboard/collections/ActivityFeedItemsCollection'
   'compiled/dashboardToggle'
-], ($, {View}, GroupDashboardView, QuickStartBarView, DiscussionView, AnnouncementView, MessageView, ActivityFeedItemsView, GroupActivityFeedItemsCollection, dashboardToggle) ->
+  'compiled/views/Kollections/IndexView'
+  'compiled/collections/KollectionCollection'
+
+], ($, {View}, GroupDashboardView, QuickStartBarView, DiscussionView, AnnouncementView, MessageView, ActivityFeedItemsView, GroupActivityFeedItemsCollection, dashboardToggle, KollectionIndexView, KollectionCollection) ->
 
   $ ->
     window.dashboard = new GroupDashboardView
@@ -24,5 +27,10 @@ require [
         ])
         activityFeedItems: new ActivityFeedItemsView
           collection: new GroupActivityFeedItemsCollection
+        kollectionIndexView: new KollectionIndexView
+          collection: do ->
+            collection = new KollectionCollection
+            collection.url = "/api/v1/groups/#{ENV.GROUP_ID}/collections"
+            collection
 
-    $('.sidebar-header').eq(0).prepend(dashboardToggle('disable'))    
+    $('.sidebar-header').eq(0).before(dashboardToggle('disable'))

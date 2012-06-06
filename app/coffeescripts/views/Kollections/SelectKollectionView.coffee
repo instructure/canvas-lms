@@ -17,7 +17,7 @@ define [
       @render()
 
     render: =>
-      modelsKollection =  @model.kollection
+      modelsKollection = @model.collection
       @$el.html @template @collection.map (kollection) ->
         cid: kollection.cid
         name: kollection.get('name')
@@ -29,8 +29,6 @@ define [
       # ask for new Kollection name and add it and persist it.
       if val is 'new' && newName = prompt('Collection Name')
         selectedKollection = @collection.create name: newName
-
       else
         selectedKollection = @collection.getByCid(val)
-
-      @model.kollection = selectedKollection
+      @model.collection = selectedKollection.kollectionItems

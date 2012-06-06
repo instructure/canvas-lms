@@ -1,4 +1,6 @@
-define ['Backbone'], ({View}) ->
+define [
+  'Backbone'
+], ({View}) ->
 
   class GroupDashboardView extends View
 
@@ -22,8 +24,8 @@ define ['Backbone'], ({View}) ->
             </div>
             <div class="span3">
               <!-- TODO: new collection thing -->
-              <div class="sidebar-header">Collections</div>
-              <div class="CollectionsView"></div>
+              <h2>Collections</h2>
+              <div class="kollectionIndexView"></div>
               <!-- TODO: member activity and popular views -->
             </div>
           </div>
