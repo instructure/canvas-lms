@@ -9,8 +9,9 @@ define [
 
   class DiscussionView extends BaseItemView
 
-    events:
+    events: _.extend
       'change [name=graded]': 'onGradedClick'
+    , BaseItemView::events
 
     template: template
 
