@@ -37,6 +37,14 @@ class ProfileController < ApplicationController
     js_env :USER_ID => @user.id
 
     @items_count = @user.collection_items.scoped(:conditions => {'collections.visibility' => 'public'}).count
+    @followers_count = @user.following_user_follow_ids.count
+
+    @following_user = @current_user &&
+      UserFollow.followed_by_user([@user], @current_user).present?
+
+    @can_follow = !@following_user &&
+      @current_user &&
+      @user.grants_right?(@current_user, :follow)
 
     @services = @user.user_services.where(
       :service => %w(facebook twitter linked_in delicious diigo skype)
