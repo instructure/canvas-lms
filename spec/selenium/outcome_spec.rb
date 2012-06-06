@@ -15,27 +15,24 @@ describe "learning outcome test" do
     f('.add_outcome_link').click
     outcome_name = 'first new outcome'
     f('#learning_outcome_short_description').send_keys(outcome_name)
-    tiny_frame = wait_for_tiny(driver.find_element(:id, 'learning_outcome_description'))
-    in_frame tiny_frame["id"] do
-      f('#tinymce').send_keys('new outcome description')
-    end
+    f('.switch_views_link').click
+    f('#learning_outcome_description').send_keys('new learning outcome')
     #add a new rating
-    f('#edit_outcome_form .add_rating_link').click
-    rating_table = f('#edit_outcome_form .rubric_criterion')
+    outcome_form = f('#edit_outcome_form')
+    outcome_form.find_element(:css, '.add_rating_link').click
+    rating_table = outcome_form.find_element(:css, '.rubric_criterion')
     new_rating_row = fj('#edit_outcome_form .rubric_criterion tr:nth-child(6)')
     new_rating_row.find_element(:css, 'input.outcome_rating_description').clear
     new_rating_row.find_element(:css, 'input.outcome_rating_description').send_keys('New Expectation')
     new_rating_points = new_rating_row.find_element(:name, 'learning_outcome[rubric_criterion][ratings][5][description]')
-    new_rating_points.clear
-    new_rating_points.send_keys('1')
+    replace_content(new_rating_points, '1')
     #delete a rating
     rating_table.find_element(:css, 'tr:nth-child(4) .delete_rating_link img').click
     threshold_input = rating_table.find_element(:name, 'learning_outcome[rubric_criterion][mastery_points]')
-    threshold_input.clear
-    threshold_input.send_keys('4')
-    submit_form('#edit_outcome_form')
+    replace_content(threshold_input, '4')
+    submit_form(outcome_form)
     wait_for_ajaximations
-    f("#outcomes .learning_outcome .short_description").text.should == outcome_name
+    keep_trying_until { fj("#outcomes .learning_outcome .short_description").text.should == outcome_name }
     f('.show_details_link').click
     ffj('#outcomes .rubric_criterion .rating:visible').size.should eql(3)
   end
@@ -45,7 +42,7 @@ describe "learning outcome test" do
     records = []
     names.each do |name|
       button.click
-      input = driver.find_element(:id, 'learning_outcome_group_title').send_keys(name, :enter)
+      driver.find_element(:id, 'learning_outcome_group_title').send_keys(name, :enter)
       wait_for_ajax_requests
       records << LearningOutcomeGroup.find_by_title(name)
     end
@@ -57,7 +54,7 @@ describe "learning outcome test" do
     records = []
     names.each do |name|
       button.click
-      input = driver.find_element(:id, 'learning_outcome_short_description').send_keys(name, :enter)
+      driver.find_element(:id, 'learning_outcome_short_description').send_keys(name, :enter)
       wait_for_ajax_requests
       records << LearningOutcome.find_by_short_description(name)
     end
