@@ -854,6 +854,40 @@ describe ContentMigration do
       new_mod.end_at.to_i.should == (new_start + 3.day).to_i
     end
 
+    it "should copy all quiz attributes" do
+      pending unless Qti.qti_enabled?
+      q = @copy_from.quizzes.create!(
+              :title => 'quiz',
+              :description => "<p>description eh</p>",
+              :shuffle_answers => true,
+              :show_correct_answers => 'true',
+              :time_limit => 20,
+              :allowed_attempts => 4,
+              :scoring_policy => 'keep_highest',
+              :quiz_type => 'survey',
+              :access_code => 'code',
+              :anonymous_submissions => true,
+              :hide_results => 'until_after_last_attempt',
+              :ip_filter => '192.168.1.1',
+              :require_lockdown_browser => true,
+              :require_lockdown_browser_for_results => true,
+              :notify_of_update => true
+      )
+
+      run_course_copy
+
+      new_quiz = @copy_to.quizzes.first
+
+      [:title, :description, :points_possible, :shuffle_answers,
+       :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
+       :access_code, :anonymous_submissions,
+       :hide_results, :ip_filter, :require_lockdown_browser,
+       :require_lockdown_browser_for_results].each do |prop|
+        new_quiz.send(prop).should == q.send(prop)
+      end
+
+    end
+
     it "should copy time correctly across daylight savings shift MST to MDT" do
       Time.use_zone('America/Denver') do
         asmnt = @copy_from.assignments.new
