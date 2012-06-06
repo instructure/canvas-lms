@@ -257,6 +257,8 @@ class AssessmentItemConverter
           child.remove
         end
         break unless node.children.size == 1 && ['p', 'div', 'span'].include?(node.child.name)
+        break if !node.child.attributes.empty? && !has_known_meta_class(node.child)
+
         node = node.child
       end
     end
@@ -266,6 +268,12 @@ class AssessmentItemConverter
     # Clear WebCT-specific relative paths
     text.gsub!(%r{/webct/RelativeResourceManager/Template/}, '')
     text.gsub(%r{/webct/urw/[^/]+/RelativeResourceManager\?contentID=(\d*)}, "$CANVAS_OBJECT_REFERENCE$/attachments/\\1")
+  end
+
+  KNOWN_META_CLASSES = ['FORMATTED_TEXT_BLOCK', 'flow_1']
+  def has_known_meta_class(node)
+    return false unless node.attributes['class']
+    KNOWN_META_CLASSES.member?(node.attributes['class'].value)
   end
   
   def self.get_interaction_type(manifest_node)

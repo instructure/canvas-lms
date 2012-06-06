@@ -991,7 +991,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
                           :question_text => "<strong>html for fun</strong>",
                           :answers =>
                                   [{:migration_id => "QUE_1016_A1", :html => "<strong>html answer 1</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 100, :id => 8080},
-                                   {:migration_id => "QUE_1017_A2", :html => "<strong>html answer 2</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
+                                   {:migration_id => "QUE_1017_A2", :html => "<span style=\"color: #808000;\">html answer 2</span>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
       aq_from1 = @bank.assessment_questions.create!(:question_data => data)
       data2 = data.clone
       data2[:question_text] = "<i>matching yo</i>"

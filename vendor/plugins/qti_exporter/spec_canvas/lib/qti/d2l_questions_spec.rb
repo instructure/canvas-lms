@@ -204,7 +204,7 @@ module D2LExpected
               :migration_id=>"OBJ_3503046",
               :matches=>
                       [{:html=>"<strong>1</strong>", :text=>'1'},
-                       {:text=>'2'}],
+                       {:html=>"<span style=\"text-decoration: underline;\">2</span>", :text=>'2'}],
               :correct_comments=>"",
               :question_type=>"matching_question",
               :incorrect_comments=>"",
