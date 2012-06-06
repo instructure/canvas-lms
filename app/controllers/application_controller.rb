@@ -1102,6 +1102,10 @@ class ApplicationController < ActionController::Base
   end
   helper_method :feature_and_service_enabled?
   
+  def show_new_dashboard?
+    @current_user && @current_user.preferences[:new_dashboard]
+  end
+
   def temporary_user_code(generate=true)
     if generate
       session[:temporary_user_code] ||= "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i.to_s}_#{rand.to_s}")}"

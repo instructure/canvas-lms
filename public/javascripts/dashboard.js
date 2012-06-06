@@ -18,8 +18,11 @@
 define([
   'i18n!dashboard',
   'jquery' /* $ */,
+  'compiled/dashboardToggle',
   'jquery.instructure_misc_plugins' /* showIf */
-], function(I18n, $) {
+], function(I18n, $, dashboardToggle) {
+
+  $('#not_right_side').prepend(dashboardToggle('enable'));
 
   $(function initDashbardJs(){
 

@@ -30,8 +30,6 @@ class ProfileController < ApplicationController
   def show
     @user ||= @current_user
 
-    # FFT TODO: should this be conditional based on a setting? i.e. use the old
-    # styles like we do on the dashboard
     @use_new_styles = true
     @active_tab = "profile"
     @context = UserProfile.new(@current_user) if @user == @current_user

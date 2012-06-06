@@ -98,3 +98,24 @@ h1 {
     left: 4px;
   }
 }
+
+.dashboard-toggle a {
+  padding: 0 10px;
+  border-radius: 3px;
+  @include gradient-vertical(#0abdff, #008fd6);
+  text-decoration: none !important;
+  &:hover {
+    border-color: #165A92;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5);
+    color: white;
+  }
+  font-size: 12px;
+  font-family: GillSans,Calibri,Trebuchet,sans-serif;
+  border: 1px solid #1e7eca;
+  color: white;
+  text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
+  -moz-user-select: none;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0 0 10px 0;
+}

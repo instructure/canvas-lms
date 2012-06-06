@@ -215,7 +215,7 @@ class GroupsController < ApplicationController
           end
         end
         if authorized_action(@group, @current_user, :read)
-          if @domain_root_account.show_new_dashboard?
+          if show_new_dashboard?
             @use_new_styles = true
             js_env :GROUP_ID => @group.id
             return render :action => :dashboard, :layout => 'new_application'

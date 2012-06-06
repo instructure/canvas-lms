@@ -30,7 +30,7 @@ class UsersController < ApplicationController
   include Twitter
   include LinkedIn
   include DeliciousDiigo
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
   before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :user_dashboard, :masquerade]
   before_filter :require_open_registration, :only => [:new, :create]
 
@@ -219,7 +219,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if @domain_root_account.show_new_dashboard?
+    if show_new_dashboard?
       @use_new_styles = true
       load_all_contexts
       js_env :CONTEXTS => @contexts
@@ -240,6 +240,12 @@ class UsersController < ApplicationController
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+  end
+
+  def toggle_dashboard
+    @current_user.preferences[:new_dashboard] = !@current_user.preferences[:new_dashboard]
+    @current_user.save!
+    render :json => {}
   end
 
   include Api::V1::StreamItem

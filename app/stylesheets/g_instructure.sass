@@ -1414,19 +1414,27 @@ form.user_content_post_form
 #change_gradebook_version_link_holder, #change_calendar_version_link_holder
   float: right !important
   background: none !important
-  a
-    margin-right: 10px
-    padding: 1px 10px
-    +border-radius(3px)
-    +vertical-gradient(#0abdff, #008fd6)
-    text-decoration: none !important
-    &:hover
-      border-color: #165A92
-      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5)
-    font-size: 12px
+#change_gradebook_version_link_holder a, #change_calendar_version_link_holder a, .dashboard-toggle a
+  margin-right: 10px
+  padding: 1px 10px
+  +border-radius(3px)
+  +vertical-gradient(#0abdff, #008fd6)
+  text-decoration: none !important
+  &:hover
+    border-color: #165A92
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5)
+  font-size: 12px
+  font-family: GillSans,Calibri,Trebuchet,sans-serif
 
-    border: 1px solid #1e7eca
-    color: white
-    text-shadow: rgba(0,0,0,0.5) 1px 0 1px
+  border: 1px solid #1e7eca
+  color: white !important
+  text-shadow: rgba(0,0,0,0.5) 1px 0 1px
 
-    -moz-user-select: none
+  -moz-user-select: none
+  cursor: pointer
+
+.dashboard-toggle
+  float: right
+  margin: 10px 0 0
+#breadcrumbs .dashboard-toggle
+  margin: 4px 0

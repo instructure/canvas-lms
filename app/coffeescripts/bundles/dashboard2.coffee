@@ -9,7 +9,8 @@ require [
   'compiled/views/ActivityFeed/ActivityFeedItemsView'
   'compiled/views/Dashboard/TodoView'
   'compiled/views/Dashboard/ComingUpView'
-], ($, {View}, DashboardView, QuickStartBarView, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView) ->
+  'compiled/dashboardToggle'
+], ($, {View}, DashboardView, QuickStartBarView, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView, dashboardToggle) ->
 
   $ ->
     window.dashboard = new DashboardView
@@ -26,3 +27,5 @@ require [
           views:
             todo: new TodoView
             comingUp: new ComingUpView
+
+    $('#content .dashboardActions').prepend(dashboardToggle('disable'))

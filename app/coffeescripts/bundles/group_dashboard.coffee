@@ -5,7 +5,8 @@ require [
   'compiled/views/QuickStartBar/QuickStartBarView'
   'compiled/views/ActivityFeed/ActivityFeedItemsView'
   'compiled/groups/dashboard/collections/ActivityFeedItemsCollection'
-], ($, {View}, GroupDashboardView, QuickStartBarView, ActivityFeedItemsView, GroupActivityFeedItemsCollection) ->
+  'compiled/dashboardToggle'
+], ($, {View}, GroupDashboardView, QuickStartBarView, ActivityFeedItemsView, GroupActivityFeedItemsCollection, dashboardToggle) ->
 
   $ ->
     window.dashboard = new GroupDashboardView
@@ -20,3 +21,5 @@ require [
         ])
         activityFeedItems: new ActivityFeedItemsView
           collection: new GroupActivityFeedItemsCollection
+
+    $('.sidebar-header').eq(0).prepend(dashboardToggle('disable'))    

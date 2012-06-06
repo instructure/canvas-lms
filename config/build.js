@@ -156,6 +156,7 @@
     { name: "compiled/bundles/gradebook_uploads", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/gradebooks", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/grading_standards", exclude: ['common', 'compiled/tinymce'] },
+    { name: "compiled/bundles/group", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/groups", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/jobs", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/jquery_ui_menu", exclude: ['common', 'compiled/tinymce'] },
