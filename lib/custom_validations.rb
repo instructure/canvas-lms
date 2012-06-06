@@ -52,15 +52,18 @@ module CustomValidations
       end
     end
 
-    # only allow false -> true type changes
-    def validates_only_false_to_true(*fields)
-      validates_each(fields) do |record, attr, value|
-        if !record.new_record? && record.send("#{attr}_changed?") && !!record.send("#{attr}_was") && !value
-          record.errors.add attr, "cannot be changed back to false"
+    # alloweds is a hash of old_value => [new_value]
+    # on update, only those transitions will be allowed for the given field
+    def validates_allowed_transitions(field, alloweds)
+      validates_each(field) do |record, attr, value|
+        if !record.new_record? && record.send("#{attr}_changed?")
+          old_val = record.send("#{attr}_was")
+          unless alloweds.any? { |old,news| old_val == old && Array(news).include?(value) }
+            record.errors.add attr, "cannot be changed to that value"
+          end
         end
       end
     end
-
   end
 
   def self.included(klass)

@@ -158,6 +158,9 @@ class CollectionsController < ApplicationController
   # Collection visibility cannot be modified once the collection is created.
   #
   # @argument name
+  # @argument visibility The visibility of a "private" collection can be
+  #     changed to "public". However, a "public" collection cannot be made
+  #     "private" again.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 

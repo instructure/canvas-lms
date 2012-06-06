@@ -25,7 +25,7 @@ class Collection < ActiveRecord::Base
   has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
 
   attr_accessible :name, :visibility
-  validates_as_readonly :visibility
+  validates_allowed_transitions :visibility, "private" => "public"
 
   validates_inclusion_of :visibility, :in => %w(public private)
 
