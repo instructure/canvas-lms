@@ -1,12 +1,15 @@
 require [
   'jquery'
   'Backbone'
-  'compiled/groups/dashboard/views/GroupDashboardView'
+  'compiled/views/groups/dashboard/GroupDashboardView'
   'compiled/views/QuickStartBar/QuickStartBarView'
+  'compiled/views/QuickStartBar/DiscussionView'
+  'compiled/views/groups/dashboard/AnnouncementView'
+  'compiled/views/QuickStartBar/MessageView'
   'compiled/views/ActivityFeed/ActivityFeedItemsView'
   'compiled/groups/dashboard/collections/ActivityFeedItemsCollection'
   'compiled/dashboardToggle'
-], ($, {View}, GroupDashboardView, QuickStartBarView, ActivityFeedItemsView, GroupActivityFeedItemsCollection, dashboardToggle) ->
+], ($, {View}, GroupDashboardView, QuickStartBarView, DiscussionView, AnnouncementView, MessageView, ActivityFeedItemsView, GroupActivityFeedItemsCollection, dashboardToggle) ->
 
   $ ->
     window.dashboard = new GroupDashboardView
@@ -14,10 +17,10 @@ require [
       el: document.getElementById('main')
 
       views:
-        quickStartBar: new QuickStartBarView([
-          {type: 'discussion'}
-          {type: 'announcement'}
-          {type: 'message'}
+        quickStartBar: new QuickStartBarView(formViews: [
+          DiscussionView
+          AnnouncementView
+          MessageView
         ])
         activityFeedItems: new ActivityFeedItemsView
           collection: new GroupActivityFeedItemsCollection

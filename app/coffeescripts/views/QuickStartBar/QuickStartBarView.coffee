@@ -11,7 +11,6 @@ define [
 
   class QuickStartBarModel extends Model
     defaults:
-      modelName: 'assignment'
       expanded: false
 
   ##
@@ -33,7 +32,9 @@ define [
         h[v.type] = v
         h
       , {}
-      console.log @formViewsObj
+
+      # not calling set() because I don't want the magic to run
+      @model.attributes.modelName = @options.formViews[0].type
 
     onSaveSuccess: (model) =>
       @switchFormView()
