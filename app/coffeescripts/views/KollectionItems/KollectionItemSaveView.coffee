@@ -15,8 +15,6 @@ define [
 
     template: KollectionItemSaveViewTemplate
 
-    el: document.body
-
     events:
       'submit form' : 'save'
       'change [name=user_comment]' : 'setUserComment'
