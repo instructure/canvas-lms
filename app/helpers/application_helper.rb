@@ -361,11 +361,11 @@ module ApplicationHelper
   def section_tabs
     @section_tabs ||= begin
       if @context
-        Rails.cache.fetch([@context, @current_user, "section_tabs", I18n.locale].cache_key) do
+        html = []
+        html << '<nav role="navigation"><ul id="section-tabs">'
+        tabs = Rails.cache.fetch([@context, @current_user, "section_tabs_hash", I18n.locale].cache_key) do
           if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
-            html = []
-            html << '<nav role="navigation"><ul id="section-tabs">'
-            tabs = tabs.select do |tab|
+            tabs.select do |tab|
               if (tab[:id] == @context.class::TAB_CHAT rescue false)
                 tab[:href] && tab[:label] && feature_enabled?(:tinychat)
               elsif (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
@@ -376,24 +376,26 @@ module ApplicationHelper
                 tab[:href] && tab[:label]
               end
             end
-            tabs.each do |tab|
-              path = nil
-              if tab[:args]
-                path = send(tab[:href], *tab[:args])
-              elsif tab[:no_args]
-                path = send(tab[:href])
-              else
-                path = send(tab[:href], @context)
-              end
-              hide = tab[:hidden] || tab[:hidden_unused]
-              class_name = tab[:css_class].to_css_class
-              class_name += ' active' if @active_tab == tab[:css_class]
-              html << "<li class='section #{"hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
-            end
-            html << "</ul></nav>"
-            html.join("")
+          else
+            []
           end
         end
+        tabs.each do |tab|
+          path = nil
+          if tab[:args]
+            path = send(tab[:href], *tab[:args])
+          elsif tab[:no_args]
+            path = send(tab[:href])
+          else
+            path = send(tab[:href], @context)
+          end
+          hide = tab[:hidden] || tab[:hidden_unused]
+          class_name = tab[:css_class].to_css_class
+          class_name += ' active' if @active_tab == tab[:css_class]
+          html << "<li class='section #{"hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
+        end
+        html << "</ul></nav>"
+        html.join("")
       end
     end
     raw(@section_tabs)
