@@ -6,10 +6,11 @@
 
 <% content_for :right_side do %>
   <div class="dashboardActions">
-    <ul class="actions">
-      <li><a href="#" class="active"><%= t 'new_class', 'Start a new class' %></a></li>
-      <li><a href="#"><%= t 'find_people', 'Find people on Canvas' %></a></li>
-      <li><a href="#"><%= t 'start_a_community', 'Start a Community' %></a></li>
+    <ul class="page-action-list">
+      <li><a href="#"><i class="icon-add"></i> <%= t 'new_course', 'Add a new course' %></a></li>
+      <li><a href="#"><i class="icon-search"></i> <%= t 'find_people', 'Find people on Canvas' %></a></li>
+      <li><a href="#"><i class="icon-group-new"></i> <%= t 'start_a_group', 'Start a group' %></a></li>
+      <li><a href="#"><i class="icon-collection"></i> <%= t 'create_collection', 'Create a collection' %></a></li>
     </ul>
   </div>
   <div class="dashboardAside"></div>

@@ -225,10 +225,28 @@
     }
   }
 }
+
 .triangle-box-with-header:before {
-  @include box-shadow(0 1px 1px 0px lighten($borderColor, 20%));
+  @include box-shadow(0 1px 1px 0px lighten($borderColor, 30%));
   @include gradient-directional(lighten($contentCalloutColor, 4%), $contentCalloutColor, 45deg);
 }
 .checkbox-inline {
   padding-top: 4px;
 }
+
+.page-action-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  > li {
+    > a {
+      display: block;
+      color: $gray;
+      font-weight: bold;
+      border-bottom: solid 1px lighten($grayLight, 10%);
+      @include box-shadow(0 1px 0px rgba(255, 255, 255, 0.85));
+      padding: 8px 0;
+    }
+  }
+}
+
