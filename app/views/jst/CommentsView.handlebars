@@ -1,11 +1,11 @@
 <div class="CommentsView">
-  <h2>
+  <h3>
     {{#if entries.length}}
       {{entries.length}} Comments
     {{else}}
       No Comments
     {{/if}}
-  </h2>
+  </h3>
   <hr>
   {{#each entries}}
     <div class="image-block comment">
@@ -16,7 +16,7 @@
         {{#if canDelete}}<a href="#" data-delete-comment="{{id}}" class="close">&times;</a>{{/if}}
         <h5><a href="{{author.html_url}}">{{author.display_name}}</a> said:</h4>
         <div class="not-important">{{friendlyDatetime created_at pubdate=true}}</div>
-        <p>{{newlinesToBreak message}}</p>
+        <p>{{{message}}}</p>
       </div>
     </div>
   {{/each}}
@@ -28,7 +28,7 @@
       <form>
         <textarea name="message" placeholder="Add a comment..."></textarea>
         <div>
-          <button class="button small-button" type="submit">Save</button>
+          <button class="button small-button" type="submit">Post</button>
         </div>
       </form>
     </div>

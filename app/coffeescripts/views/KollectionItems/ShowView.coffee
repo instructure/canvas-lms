@@ -37,7 +37,7 @@ define [
 
     toJSON: ->
       _.extend super,
-        comments_count: @model.commentTopic.entries.length
+        comments_count: @model.commentTopic.entries.length || '&nbsp;'
         fullView:  @options.fullView
 
     # TODO abstract handleClick

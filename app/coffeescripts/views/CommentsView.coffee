@@ -36,7 +36,8 @@ define [
     addNewComment: preventDefault ->
       return unless message = @$('[name="message"]').val()
       entry = @model.entries.create
-        message: message
+        # convert newlines to breaks before we send it to the server
+        message: message.replace(/\n/g, "<br />")
       # wait till after the sync request to set user_id because API chokes if it is present
       # but set it so that it doesn't show up in the view as 'unknown author'
       entry.set 'user_id', ENV.current_user_id
