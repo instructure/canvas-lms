@@ -13,7 +13,7 @@ class Worker
   self.max_run_time = 4.hours
   self.queue = "canvas_queue"
 
-  attr_reader :config, :queue, :min_priority, :max_priority, :sleep_delay
+  attr_reader :config, :queue, :min_priority, :max_priority, :sleep_delay, :sleep_delay_stagger
 
   # Callback to fire when a delayed job fails max_attempts times. If this
   # callback is defined, then the value of destroy_failed_jobs is ignored, and
@@ -81,6 +81,7 @@ class Worker
   def run
     # need to do this here, since we're avoiding db calls in the master process pre-fork
     @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '5.0').to_f
+    @sleep_delay_stagger ||= Setting.get_cached('delayed_jobs_sleep_delay_stagger', '2.5').to_f
     @make_tmpdir ||= Setting.get_cached('delayed_jobs_unique_tmpdir', 'true') == 'true'
 
     job = Delayed::Job.get_and_lock_next_available(
@@ -112,7 +113,7 @@ class Worker
       end
     else
       set_process_name("wait:#{@queue}:#{min_priority || 0}:#{max_priority || 'max'}")
-      sleep(sleep_delay)
+      sleep(sleep_delay + (rand * sleep_delay_stagger))
     end
   end
 
