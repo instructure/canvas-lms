@@ -1,4 +1,8 @@
-define ['Backbone'], ({View}) ->
+define [
+  'Backbone'
+  'jst/TodoItemView/grading'
+  'jst/TodoItemView/submitting'
+], ({View}, grading, submitting) ->
 
   class TodoItemView extends View
 
@@ -6,16 +10,8 @@ define ['Backbone'], ({View}) ->
 
     className: 'todoItem'
 
-    render: ->
-      locals = @model.toJSON()
-      assignment = locals.assignment
-      @$el.html """
-        <a href="#{assignment.html_url}" class="image-block">
-          <span class="image-block-image" style="text-align: right; width: 30px">
-            <span class="badge badget-important">#{locals.needs_grading_count}</span>
-          </span>
-          <span class="image-block-content">
-            #{assignment.name} <span style="color: #979A9C">need grading</span>
-          </span>
-        </a>
-      """
+    templates: {grading, submitting}
+
+    initialize: ->
+      @template = @templates[@model.get 'type']
+

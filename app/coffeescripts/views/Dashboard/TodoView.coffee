@@ -7,6 +7,9 @@ define [
 
   class TodoView extends View
 
+    els:
+      '.to-do-list': '$list'
+
     initialize: ->
       @collection or= new TodoCollection
       @collection.on 'add', @addTodo
@@ -21,12 +24,9 @@ define [
     resetTodos: =>
       @collection.each @addTodo
 
-    render: ->
-      @$el.html """
-        <h2>#{I18n.t 'todo', 'Todo'}</h2>
-        <ul class="todoList nav nav-list"></ul>
+    template: ->
       """
-      @$list = @$ '.todoList'
-      super
-
+        <h2>#{I18n.t 'todo', 'Todo'}</h2>
+        <ul class="right-side-list to-do-list"></ul>
+      """
 

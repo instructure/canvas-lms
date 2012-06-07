@@ -11,6 +11,9 @@ define [
 
     template: template
 
+    els:
+      '.active': '$active'
+
     initialize: ->
       @courses = @getCoursesFromENV()
       @communities = @getCommuntiesFromENV()
@@ -26,11 +29,6 @@ define [
       @$active.removeClass 'active'
       @$active = $el.addClass 'active'
       @trigger 'filter', value
-
-    render: ->
-      @$el.html @template @toJSON()
-      @$active = @$ '.active'
-      super
 
     getCoursesFromENV: ->
       course for k, course of ENV.CONTEXTS.courses when course.state is 'active'
