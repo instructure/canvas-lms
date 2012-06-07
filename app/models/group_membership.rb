@@ -29,11 +29,13 @@ class GroupMembership < ActiveRecord::Base
   before_save :assign_uuid
   before_save :auto_join
   before_save :capture_old_group_id
+
   before_validation :verify_section_homogeneity_if_necessary
-  
+
   after_save :touch_groups
-  
+  after_save :check_auto_follow_group
   before_destroy :touch_groups
+  after_destroy :check_auto_follow_group
   
   has_a_broadcast_policy
   
@@ -105,6 +107,15 @@ class GroupMembership < ActiveRecord::Base
     true
   end
   protected :capture_old_group_id
+
+  def check_auto_follow_group
+    if (self.id_changed? || self.workflow_state_changed?) && self.active?
+      UserFollow.create_follow(self.user, self.group)
+    elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
+      user_follow = self.user.user_follows.find(:first, :conditions => { :followed_item_id => self.group_id, :followed_item_type => 'Group' })
+      user_follow.try(:destroy)
+    end
+  end
   
   def touch_groups
     groups_to_touch = [ self.group_id ]

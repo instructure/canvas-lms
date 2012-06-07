@@ -24,6 +24,8 @@ describe 'Collections' do
       @pub1 = @context.collections.create!(:visibility => "public")
       @pri1 = @context.collections.create!(:visibility => "private")
       @del1 = @context.collections.create!(:visibility => "public")
+      run_jobs
+
       @del1.destroy
       UserFollow.create_follow(@user, @context)
       run_jobs

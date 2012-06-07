@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe "Groups API", :type => :integration do
-  def group_json(group)
+  def group_json(group, user)
     {
       'id' => group.id,
       'name' => group.name,
@@ -30,7 +30,7 @@ describe "Groups API", :type => :integration do
       'members_count' => group.members_count,
       'avatar_url' => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
       'group_category_id' => group.group_category_id,
-      'followed_by_user' => false,
+      'followed_by_user' => group.followers.include?(user),
     }
   end
 
@@ -54,13 +54,12 @@ describe "Groups API", :type => :integration do
     @community.add_user(@moderator, 'accepted', true)
     @community_path = "/api/v1/groups/#{@community.id}"
     @community_path_options = { :controller => "groups", :format => "json" }
-    @community_json = group_json(@community)
   end
 
   it "should allow a member to retrieve the group" do
     @user = @member
     json = api_call(:get, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "show"))
-    json.should == @community_json
+    json.should == group_json(@community, @user)
   end
 
   it "should allow anyone to create a new community" do
@@ -73,7 +72,7 @@ describe "Groups API", :type => :integration do
     })
     @community2 = Group.last(:order => :id)
     @community2.group_category.should be_communities
-    json.should == group_json(@community2)
+    json.should == group_json(@community2, @user)
   end
 
   it "should allow a moderator to edit a group" do
@@ -93,7 +92,7 @@ describe "Groups API", :type => :integration do
     @community.is_public.should == true
     @community.join_level.should == "parent_context_auto_join"
     @community.avatar_attachment.should == avatar
-    json.should == group_json(@community)
+    json.should == group_json(@community, @user)
   end
 
   it "should only allow updating a group from private to public" do
@@ -127,7 +126,7 @@ describe "Groups API", :type => :integration do
   it "should allow a moderator to delete a group" do
     @user = @moderator
     json = api_call(:delete, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "destroy"))
-    json.should == @community_json.merge({ 'members_count' => 0 })
+    @community.reload.workflow_state.should == 'deleted'
   end
 
   it "should not allow a member to delete a group" do
@@ -160,7 +159,7 @@ describe "Groups API", :type => :integration do
 
   describe "unfollowing" do
     it "should allow unfollowing a group" do
-      @user.user_follows.create!(:followed_item => @community)
+      @user = @member
       @user.reload.user_follows.map(&:followed_item).should == [@community]
 
       json = api_call(:delete, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
@@ -168,7 +167,10 @@ describe "Groups API", :type => :integration do
     end
 
     it "should do nothing if not following" do
+      @user = @member
+      json = api_call(:delete, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
       @user.reload.user_follows.should == []
+
       json = api_call(:delete, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
       @user.reload.user_follows.should == []
     end
