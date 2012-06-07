@@ -48,13 +48,15 @@ define ['Backbone'], ({View}) ->
           <div class="image-block-image">
             #{@renderAvatar()}
           </div>
-          <div class="image-block-content triangle-box-with-header">
-            <header class="box-header">
-              <div class="activityFeedItemTitle">#{locals.header}</div>
-              <div class="triangle-box-subheader">#{locals.subHeader}</div>
-            </header>
-            <div class="box-content">
-              #{@renderContent locals}
+          <div class="image-block-content">
+            <div class="triangle-box-with-header">
+              <header class="box-header">
+                <div class="activityFeedItemTitle">#{locals.header}</div>
+                <div class="triangle-box-subheader">#{locals.subHeader}</div>
+              </header>
+              <div class="box-content">
+                #{@renderContent locals}
+              </div>
             </div>
           </div>
         </div>

@@ -24,8 +24,24 @@ define [
     render: (opts = {}) =>
       @$el.html @template(@toJSON()) if @template
       @filter() unless opts.noFilter is true
+      @cacheEls() if @els
+
+      # its important for renderViews to come last so we don't filter
+      # and cache all the child views elements
       @renderViews() if @options.views
       this
+
+    ##
+    # Caches elements from `els` config
+    #
+    #   class Foo extends View
+    #     els:
+    #       '.someSelector': '$somePropertyName'
+    #
+    # After render is called, the `@$somePropertyName` is now available
+    # with the element found in `.someSelector`
+    cacheEls: ->
+      @[name] = @$(selector) for selector, name of @els if @els
 
     ##
     # Filters elements to add behavior and bindings. Can be called automatically

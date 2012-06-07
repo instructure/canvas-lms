@@ -16,7 +16,7 @@ require [
   $ ->
     window.dashboard = new DashboardView
 
-      el: document.getElementById('content')
+      el: $('#main')[0]
 
       views:
         quickStartBar: new QuickStartBarView(formViews: allViews)

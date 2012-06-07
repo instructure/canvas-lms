@@ -23,10 +23,8 @@ define [
 
     render: ->
       @$el.html """
-        <h3>#{I18n.t 'todo', 'Todo'}</h3>
-        <div class="well" style="padding: 8px 0">
-          <ul class="todoList nav nav-list"></ul>
-        </div>
+        <h2>#{I18n.t 'todo', 'Todo'}</h2>
+        <ul class="todoList nav nav-list"></ul>
       """
       @$list = @$ '.todoList'
       super

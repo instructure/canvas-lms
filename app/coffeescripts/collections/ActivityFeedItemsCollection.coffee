@@ -21,8 +21,8 @@ define ['Backbone'], ({Collection, Model}) ->
       super newModels, options
 
     comparator: (x, y) ->
-      x = Date.parse(x.get('created_at')).getTime()
-      y = Date.parse(y.get('created_at')).getTime()
+      x = Date.parse(x.get('updated_at')).getTime()
+      y = Date.parse(y.get('updated_at')).getTime()
       if x is y
         0
       else if x < y

@@ -3,3 +3,17 @@
   jammit_css :dashboard, :tinymce, :collection_item_save
 %>
 
+<% content_for :right_side do %>
+  <div class="dashboardActions">
+    <ul class="actions">
+      <li><a href="#" class="active"><%= t 'new_class', 'Start a new class' %></a></li>
+      <li><a href="#"><%= t 'find_people', 'Find people on Canvas' %></a></li>
+      <li><a href="#"><%= t 'start_a_community', 'Start a Community' %></a></li>
+    </ul>
+  </div>
+  <div class="dashboardAside"></div>
+<% end %>
+
+<div class="quickStartBar not-expanded border border-rbl border-round-b content-callout"></div>
+<div class="activityFeed drawerClosed"></div>
+

@@ -12,6 +12,10 @@ define [
 
     template: template
 
+    els:
+      '.activityFeedItemsList': '$itemList'
+      '.activityFeedItemsFilter a': '$itemFilters'
+
     initialize: ->
       super
       @collection ?= new ActivityFeedItemsCollection
@@ -62,15 +66,6 @@ define [
       else
         filter.type = key
       filter
-
-    render: ->
-      @$el.html @template()
-      @cacheElements()
-      super
-
-    cacheElements: ->
-      @$itemList = @$ '.activityFeedItemsList'
-      @$itemFilters = @$ '.activityFeedItemsFilter a'
 
     onClickItemFilter: (event) ->
       value = $(event.target).data 'value'
