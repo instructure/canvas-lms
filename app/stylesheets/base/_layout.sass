@@ -3,7 +3,7 @@
 body, html
   height: 100%
 body
-  background: url("/images/body-bg.png") repeat-x top #e0e0e0
+  background: url("/images/blue/bg.jpg") center center
 
   &.no-headers
     background: #fff
@@ -31,7 +31,6 @@ body
   // the sole purpose of this div is to make it so the shadow on #wrapper does not cause the page to have scroll bars.
   overflow: hidden
 #wrapper
-  margin: 0 21px
   +pie-clearfix
 
 
@@ -39,18 +38,23 @@ body
 #main
   position: relative
   z-index: 10
-  background-color: $main_background_color  
-  border-left: 1px solid #ddd
-  border-top: 0px solid #ddd
-  border-bottom: 1px solid #ccc
-  border-right: 1px solid #ccc
   margin-bottom: 40px
   +pie-clearfix
   min-height: 450px
-  
+
+
+#content-wrapper
+  border: solid 1px #dddddd
+  border-top: none
+  /* I have no idea why this overflow hidden
+     makes the width change, but it does    */
+  overflow: hidden
+
 #content
   padding: 1em
   overflow: hidden
+  background-color: #fff
+
 body.padless-content #content,#content.padless
   padding: 0
   
@@ -91,6 +95,7 @@ body
   border-bottom: 1px solid #ccc
   background-color: #F9F9F9
   box-shadow: 0 0 36px #F2F2F2
+  overflow: hidden
   ul
     +reset-list
     +clearfix

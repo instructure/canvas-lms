@@ -353,10 +353,9 @@ module ApplicationHelper
 
   def include_common_stylesheet
     if @use_new_styles
-      include_stylesheets :new_common, :media => "all"
-    else
-      include_stylesheets :common, :media => "all"
+      jammit_css :new_common
     end
+    include_stylesheets :common, :media => "all"
   end
 
   def section_tabs
@@ -386,7 +385,10 @@ module ApplicationHelper
               else
                 path = send(tab[:href], @context)
               end
-              html << "<li class='section #{"hidden" if tab[:hidden] || tab[:hidden_unused] }'>" + link_to(tab[:label], path, :class => tab[:css_class].to_css_class) + "</li>" if tab[:href]
+              hide = tab[:hidden] || tab[:hidden_unused]
+              class_name = tab[:css_class].to_css_class
+              class_name += ' active' if @active_tab == tab[:css_class]
+              html << "<li class='section #{"hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
             end
             html << "</ul></nav>"
             html.join("")

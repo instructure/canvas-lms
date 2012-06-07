@@ -109,12 +109,6 @@ javascripts:
 stylesheets:
   new_common:
     - public/stylesheets/compiled/blue/application.css
-    - public/stylesheets/static/jquery-ui-theme.css
-    - public/stylesheets/compiled/jquery-ui-button.css
-    - public/stylesheets/compiled/jquery-ui-menu.css
-    - public/stylesheets/compiled/g_util_buttons.css
-    - public/stylesheets/compiled/helpDialog.css
-    - public/stylesheets/compiled/print.css
 
   common:
     - public/stylesheets/compiled/g_reset.css
