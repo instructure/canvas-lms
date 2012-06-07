@@ -139,21 +139,21 @@ class PageView < ActiveRecord::Base
     redis = Canvas.redis
     lock_key = 'page_view_queue_processing'
     lock_key += ":#{Shard.current.description}" unless Shard.current.default?
-    # lock other processors out until we're done. if more than an hour
+    lock_time = Setting.get("page_view_queue_lock_time", 15.minutes.to_s).to_i
+
+    # lock other processors out until we're done. if more than lock_time
     # passes, the lock will be dropped and we'll assume this processor died.
-    #
-    # we're really being pessimistic here, there shouldn't ever be more than
-    # one periodic job worker running anyway.
     unless redis.setnx lock_key, 1
       return
     end
-    redis.expire lock_key, 1.hour
+    redis.expire lock_key, lock_time
 
     begin
       # process as many items as were in the queue when we started.
       todo = redis.llen(self.cache_queue_name)
       while todo > 0
         batch_size = [Setting.get_cached('page_view_queue_batch_size', '1000').to_i, todo].min
+        redis.expire lock_key, lock_time
         transaction do
           process_cache_queue_batch(batch_size, redis)
         end
