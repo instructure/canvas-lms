@@ -1,3 +1,5 @@
+@import "blue/variables"
+
 #right-side-wrapper
   display: none
 
@@ -12,15 +14,17 @@
     border-width: 1px 0 0
     margin: 17px 0 20px
   h2
-    font-size: 1.12em
-    padding: 7px 10px 7px 15px
-    font-weight: normal
-    color: $right_side_header_color
-    background-color: #8a8a8a
-    margin-bottom: 8px
+    font-size: 13px
+    background: transparent
+    color: $gray
+    font-weight: bold
+    border-bottom: solid 1px
+    margin: 0 20px 10px
+    padding: 0
     +text-shadow(-1px, -1px, rgba(100, 100, 100, 0.4))
     a
-      color: $right_side_header_color
+      color: $blue
+
 .rs-match-list-indent
   padding-left: 31px
 .rs-margin-lr
@@ -34,15 +38,16 @@
   margin-bottom: 20px
 .right-side-list
   +reset-list
-  margin-left: 15px
-  margin-right: 15px
-  margin-bottom: 19px
-  li 
+  margin: 10px 20px
+  li
     a
-      padding: 3px 0 0px 31px
+      padding: 4px 0
       display: block
-      background-position: left 7px
-      
+      color: $blue
+      border-bottom: 1px solid $grayLighter
+      // override fancy links grade checkmark
+      background: transparent
+
       &:hover, &:focus
         text-decoration: none
         b, &.more_link
@@ -65,7 +70,6 @@
       line-height: 13px
     em
       color: #bcbcbc
-      border-bottom: 1px dotted #aaa
       padding-bottom: 5px
     .more_link
       padding-top: 6px
