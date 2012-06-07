@@ -18,29 +18,32 @@ class JobsController < ApplicationController
       params[:flavor] = params[:flavor] == 'failed' ? params[:flavor] : 'all'
     end
 
-    jobs_scope
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      jobs_scope
 
-    respond_to do |format|
-      format.html do
-        running
-        tags(@jobs)
-        @jobs_count = @jobs.count
-      end
-
-      format.js do
-        result = {}
-        case params[:only]
-        when 'running'
-          result[:running] = running
-        when 'tags'
-          result[:tags] = tags(@jobs)
-        when 'jobs'
-          result[:jobs] = @jobs.all(
-            :limit => params[:limit] || LIMIT,
-            :offset => params[:offset].try(:to_i))
-          result[:total] = @jobs.count
+      respond_to do |format|
+        format.html do
+          running
+          tags(@jobs)
+          @jobs_count = @jobs.count
+          render
         end
-        render :json => result.to_json(:include_root => false)
+
+        format.js do
+          result = {}
+          case params[:only]
+          when 'running'
+            result[:running] = running
+          when 'tags'
+            result[:tags] = tags(@jobs)
+          when 'jobs'
+            result[:jobs] = @jobs.all(
+              :limit => params[:limit] || LIMIT,
+              :offset => params[:offset].try(:to_i))
+            result[:total] = @jobs.count
+          end
+          render :json => result.to_json(:include_root => false)
+        end
       end
     end
   end
