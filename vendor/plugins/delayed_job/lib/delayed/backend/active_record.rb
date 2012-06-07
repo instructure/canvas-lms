@@ -64,7 +64,7 @@ module Delayed
             self.class.adapter_name = connection.adapter_name
           end
           if strand.present? && adapter_name == 'PostgreSQL'
-            connection.execute("LOCK delayed_jobs IN SHARE ROW EXCLUSIVE MODE")
+            connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
           end
         end
 
