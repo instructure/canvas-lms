@@ -31,6 +31,7 @@ class ProfileController < ApplicationController
     @user ||= @current_user
 
     @use_new_styles = true
+
     @active_tab = "profile"
     @context = UserProfile.new(@current_user) if @user == @current_user
 
@@ -52,16 +53,16 @@ class ProfileController < ApplicationController
 
     if @user.private? && @user != @current_user
       if @user.grants_right?(@current_user, :view_statistics)
-        return render :action => :show, :layout => "new_application"
+        return render :action => :show
       elsif @current_user.messageable_users(:ids => [@user.id]) == [@user]
-        return render :action => :show_limited, :layout => "new_application"
+        return render :action => :show_limited
       # TODO: also show full profile if user is following other user?
       else
-        return render :action => :unauthorized, :layout => "new_application"
+        return render :action => :unauthorized
       end
     end
 
-    render :action => :show, :layout => "new_application"
+    render :action => :show
   end
 
   # @API Get user profile

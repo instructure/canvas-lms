@@ -1,46 +1,46 @@
 <%
   jammit_css :profile
   js_bundle :profile_show
+  @body_classes << 'no-page-block'
 %>
 <% content_for :page_title do %>
   <%= @user.short_name %>
 <% end %>
-<div class="container">
-  <div class="row v-gutter">
-    <div class="span2 profile-pic-container">
-      <%= image_tag avatar_image_url(User.avatar_key @user.id), :class => 'profile-pic' %>
-    </div>
-    <div class="span5">
-      <h1><%= @user.short_name %></h1>
-      <p><%= format_message(@user.bio || "").first.html_safe %></p>
-      <% if @can_follow %>
-        <p><button id="follow_user" class="button">Follow</button></p>
-      <% end %>
-    </div>
-    <div class="span3">
-      <table class="stats">
-        <tr class="stats-header">
-          <th colspan="2">Stats</th>
-        </tr>
-        <tr>
-          <th>Followers</th>
-          <td><%= @followers_count %></td>
-        </tr><tr>
-          <th>Collections</th>
-          <td><%= @user.collections.public.count %></td>
-        </tr><tr>
-          <th>Items</th>
-          <td><%= @items_count %></td>
-      </table>
-
-      <% if @user.show_user_services? && @services.present? %>
-        <div class="social-header border border-b">Find Me On</div>
-        <ul class="social-links">
-          <% @services.each do |s| %>
-            <li><a href="<%= s.service_user_link %>" class="social <%= s.service %>"><%= s.service_name %></a></li>
-            <% end %>
-        </ul>
-      <% end %>
-    </div>
+<div class="row v-gutter">
+  <div class="span2 profile-pic-container">
+    <%= image_tag avatar_image_url(User.avatar_key @user.id), :class => 'profile-pic' %>
+  </div>
+  <div class="span5">
+    <h1><%= @user.short_name %></h1>
+    <p><%= format_message(@user.bio || "").first.html_safe %></p>
+    <% if @can_follow %>
+      <p><button id="follow_user" class="button">Follow</button></p>
+    <% end %>
   </div>
 </div>
+
+<% content_for :right_side do %>
+    <table class="stats">
+      <tr class="stats-header">
+        <th colspan="2">Stats</th>
+      </tr>
+      <tr>
+        <th>Followers</th>
+        <td><%= @followers_count %></td>
+      </tr><tr>
+        <th>Collections</th>
+        <td><%= @user.collections.public.count %></td>
+      </tr><tr>
+        <th>Items</th>
+        <td><%= @items_count %></td>
+    </table>
+
+    <% if @user.show_user_services? && @services.present? %>
+      <div class="social-header border border-b">Find Me On</div>
+      <ul class="social-links">
+        <% @services.each do |s| %>
+          <li><a href="<%= s.service_user_link %>" class="social <%= s.service %>"><%= s.service_name %></a></li>
+          <% end %>
+      </ul>
+    <% end %>
+  <% end %>
