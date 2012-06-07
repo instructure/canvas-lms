@@ -39,7 +39,7 @@
       </p>
       <% form_tag api_v1_group_url(@group), :method => 'PUT', :class => 'group_avatar_form' do %>
         <p><input type="file" name="avatar" class="avatar_file"></p>
-        <p><button type="submit">Change</button>
+        <p><button type="submit" class="button">Change</button>
         <%= link_to "Cancel", "#", :class => "cancel_avatar" %></p>
       <% end %>
     </div>

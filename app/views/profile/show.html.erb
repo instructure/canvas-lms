@@ -14,7 +14,7 @@
       <h1><%= @user.short_name %></h1>
       <p><%= format_message(@user.bio || "").first.html_safe %></p>
       <% if @can_follow %>
-        <p><button id="follow_user">Follow</button></p>
+        <p><button id="follow_user" class="button">Follow</button></p>
       <% end %>
     </div>
     <div class="span3">
