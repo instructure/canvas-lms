@@ -21,7 +21,7 @@ module Api::V1::Collection
   include Api::V1::User
 
   API_COLLECTION_JSON_OPTS = {
-    :only => %w(id name visibility),
+    :only => %w(id name visibility followers_count items_count),
   }
 
   API_COLLECTION_ITEM_JSON_OPTS = {

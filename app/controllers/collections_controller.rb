@@ -46,7 +46,13 @@
 #       visibility: "public",
 #
 #       // Boolean indicating whether this user is following this collection.
-#       followed_by_user: false
+#       followed_by_user: false,
+#
+#       // The number of people following this collection.
+#       followers_count: 10,
+#
+#       // The number of items in this collection.
+#       items_count: 7
 #     }
 #
 class CollectionsController < ApplicationController

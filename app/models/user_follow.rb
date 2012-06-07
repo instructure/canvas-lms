@@ -128,6 +128,26 @@ class UserFollow < ActiveRecord::Base
     end
   end
 
+  trigger.after(:insert) do |t|
+    t.where("NEW.followed_item_type = 'Collection'") do
+      <<-SQL
+      UPDATE collections
+      SET followers_count = followers_count + 1
+      WHERE id = NEW.followed_item_id;
+      SQL
+    end
+  end
+
+  trigger.after(:delete) do |t|
+    t.where("OLD.followed_item_type = 'Collection'") do
+      <<-SQL
+      UPDATE collections
+      SET followers_count = followers_count - 1
+      WHERE id = OLD.followed_item_id;
+      SQL
+    end
+  end
+
   # returns the subset of items that are currently being followed by the given user
   #
   # currently this method assumes that all the items are of the same type, this

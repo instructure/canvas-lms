@@ -23,12 +23,12 @@ describe "Collections API", :type => :integration do
     it "should allow retrieving a paginated collection list" do
       json = api_call(:get, @collections_path, @collections_path_options)
       response['Link'].should be_present
-      json.should == [ @c2_json, @c1_json ]
+      json.should == [ collection_json(@c2), collection_json(@c1) ]
     end
 
     it "should allow retrieving a private collection" do
       json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" })
-      json.should == @c1_json
+      json.should == collection_json(@c1)
     end
 
     it "should allow creating a collection" do
@@ -37,19 +37,18 @@ describe "Collections API", :type => :integration do
         :visibility => 'public',
       })
       @c3 = Collection.last(:order => :id)
-      json.should == {
+      json.should == collection_json(@c3).merge({
         'id' => @c3.id,
         'name' => 'test3',
         'visibility' => 'public',
-        'followed_by_user' => false,
-      }
+      })
     end
 
     it "should allow updating a collection" do
       json = api_call(:put, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "update", :format => "json" }, {
         :name => "test1 edited",
       })
-      json.should == @c1_json.merge('name' => 'test1 edited')
+      json.should == collection_json(@c1).merge('name' => 'test1 edited')
       @c1.reload.name.should == "test1 edited"
     end
 
@@ -82,7 +81,7 @@ describe "Collections API", :type => :integration do
 
       it "should not return in list" do
         json = api_call(:get, @collections_path, @collections_path_options)
-        json.should == [ @c2_json ]
+        json.should == [ collection_json(@c2) ]
       end
 
       it "should not allow getting" do
@@ -99,12 +98,12 @@ describe "Collections API", :type => :integration do
     it "should only list public collections" do
       json = api_call(:get, @collections_path, @collections_path_options)
       response['Link'].should be_present
-      json.should == [ @c2_json ]
+      json.should == [ collection_json(@c2) ]
     end
 
     it "should allow getting a public collection" do
       json = api_call(:get, "/api/v1/collections/#{@c2.id}", { :controller => "collections", :collection_id => @c2.to_param, :action => "show", :format => "json" })
-      json.should == @c2_json
+      json.should == collection_json(@c2)
     end
 
     it "should not allow getting a private collection" do
@@ -137,20 +136,6 @@ describe "Collections API", :type => :integration do
   def create_collections(context)
     @c1 = context.collections.create!(:name => 'test1', :visibility => 'private')
     @c2 = context.collections.create!(:name => 'test2', :visibility => 'public')
-    @c1_json =
-      {
-        'id' => @c1.id,
-        'name' => @c1.name,
-        'visibility' => 'private',
-        'followed_by_user' => false,
-      }
-    @c2_json = 
-      {
-        'id' => @c2.id,
-        'name' => @c2.name,
-        'visibility' => 'public',
-        'followed_by_user' => false,
-      }
   end
 
   def create_collection_items(user)
@@ -163,6 +148,17 @@ describe "Collections API", :type => :integration do
     @unscoped_items_path_options = { :controller => "collection_items", :action => "index", :format => "json" }
     @c1_items_path_options = { :controller => "collection_items", :action => "index", :format => "json", :collection_id => @c1.to_param }
     @c2_items_path_options = { :controller => "collection_items", :action => "index", :format => "json", :collection_id => @c2.to_param }
+  end
+
+  def collection_json(collection)
+    {
+      'id' => collection.id,
+      'name' => collection.name,
+      'visibility' => collection.visibility,
+      'followed_by_user' => false,
+      'followers_count' => collection.followers.count,
+      'items_count' => collection.collection_items.active.count,
+    }
   end
 
   def item_json(item, upvoted_by_user = false)
@@ -504,7 +500,7 @@ describe "Collections API", :type => :integration do
       it "should allow retrieving a paginated collection list" do
         json = api_call(:get, @collections_path, @collections_path_options)
         response['Link'].should be_present
-        json.should == [ @c2_json, @c1_json ]
+        json.should == [ collection_json(@c2), collection_json(@c1) ]
       end
 
       it "should create a default private collection if no collections exist for the context" do
@@ -518,7 +514,7 @@ describe "Collections API", :type => :integration do
 
       it "should allow retrieving a private collection" do
         json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" })
-        json.should == @c1_json
+        json.should == collection_json(@c1)
       end
 
       it "should not allow creating a collection" do
