@@ -176,6 +176,7 @@ class PageView < ActiveRecord::Base
   def self.process_cache_queue_item(attrs)
     self.transaction(:requires_new => true) do
       if attrs['is_update']
+        return if Setting.get_cached('skip_pageview_updates', nil) == "true"
         page_view = self.find_by_request_id(attrs['request_id'])
         return unless page_view
         page_view.do_update(attrs)
