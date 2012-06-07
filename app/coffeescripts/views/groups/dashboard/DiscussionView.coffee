@@ -1,13 +1,13 @@
 define [
-  'compiled/views/QuickStartBar/DiscussionView'
-], (BaseDiscussionView) ->
+  'compiled/views/QuickStartBar/AnnouncementView'
+], (BaseAnnouncementView) ->
 
-  class DiscussionView extends BaseDiscussionView
+  class AnnouncementView extends BaseAnnouncementView
     
     render: (opts = {}) ->
       super opts
       @$('.course_finder').html("&nbsp;")
-      $("<input>",
+      $("<input>", 
         type: "hidden",
         name: "context_ids[]",
         value: "group_#{ENV.GROUP_ID}")

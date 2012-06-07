@@ -41,9 +41,8 @@ define [
 
       # map the context_ids into deferreds, saving a copy for each course
       dfds = _.map json.context_ids, (id) =>
-        [z, contextType, contextId] = id.match(/^(group|course)_(\d+)$/)
         model = new Discussion json
-        _.extend model, {contextId, contextType}
+        model.contextCode = id
         model.save()
 
       $.when dfds...

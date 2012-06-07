@@ -3,7 +3,8 @@ define ['Backbone'], ({Model}) ->
   class Discussion extends Model
 
     url: ->
-      "/api/v1/#{@contextType}s/#{@contextId}/discussion_topics"
+      [z, contextType, contextId] = @contextCode.match /^(group|course)_(\d+)$/
+      "/api/v1/#{contextType}s/#{contextId}/discussion_topics"
 
     defaults:
       title: 'No title'
