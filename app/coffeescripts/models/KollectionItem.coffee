@@ -20,7 +20,7 @@ define [
       if @isNew()
         _.result(this.collection, 'url')
       else
-        "/api/v1/collection_items/#{encodeURIComponent(@id)}"
+        "/api/v1/collections/items/#{encodeURIComponent(@id)}"
 
     initialize: ->
       @commentTopic = new Topic

@@ -31,7 +31,7 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html, 
     get_data_for(url)
   end
 
-  MAXWIDTH = 640
+  MAXWIDTH = 922
 
   def as_json(*a)
     { 'title' => self.title, 'description' => self.description, 'images' => self.images.map { |i| i.as_json(*a) }, 'object_html' => self.object_html, 'data_type' => self.data_type }
@@ -86,6 +86,7 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html, 
       embedly_api.send(api_method, {
         :url => url,
         :maxwidth => MAXWIDTH,
+        :autoplay => true
       }).first
     end
   end

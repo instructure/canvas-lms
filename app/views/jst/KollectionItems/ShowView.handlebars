@@ -52,11 +52,15 @@
     </a>
   </header>
   <div class="box-content image-block">
-    {{#if image_url}}
-      <a href="/collections/{{collection_id}}/collection_items/{{id}}" class="image-block-image">
-        <img class="thumbnail" src="{{image_url}}"/>
-      </a>
-    {{/if}}
+    {{#ifAll fullView html_preview}}
+      <div>{{{html_preview}}}</div>
+    {{else}}
+      {{#if image_url}}
+        <a href="/collections/{{collection_id}}/collection_items/{{id}}" class="image-block-image">
+          <img class="thumbnail" src="{{image_url}}"/>
+        </a>
+      {{/if}}
+    {{/ifAll}}
     <div class="image-block-content">
       <a class="title not_external" href="/collections/{{collection_id}}/collection_items/{{id}}">{{title}}</a>
       <div>

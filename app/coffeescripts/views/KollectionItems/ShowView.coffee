@@ -1,8 +1,9 @@
 define [
   'Backbone'
+  'underscore'
   'compiled/views/CommentsView'
   'jst/KollectionItems/ShowView'
-], (Backbone, CommentsView, template) ->
+], (Backbone, _, CommentsView, template) ->
 
   class KollectionItemShowView extends Backbone.View
 
@@ -35,9 +36,9 @@ define [
       @render()
 
     toJSON: ->
-      res = super
-      res.comments_count = @model.commentTopic.entries.length
-      res
+      _.extend super,
+        comments_count: @model.commentTopic.entries.length
+        fullView:  @options.fullView
 
     # TODO abstract handleClick
     handleClick: (event) ->
