@@ -43,7 +43,7 @@ class Periodic
   end
 
   def self.audit_queue
-    if 0 == Delayed::Job.count(:conditions => ['tag = ? and failed_at is null', 'Delayed::Periodic.perform_audit!'])
+    if 0 == Delayed::Job.count(:conditions => ['tag = ?', 'Delayed::Periodic.perform_audit!'])
       # this isn't running in a delayed job, so there are race conditions -- but
       # that's ok, because having the audit performed twice is safe (due to the
       # strand), just a bit of extra work.
@@ -58,7 +58,7 @@ class Periodic
   end
 
   def schedule_if_unscheduled(compare_count)
-    if compare_count >= Delayed::Job.count(:conditions => ['tag = ? and failed_at is null', self.tag])
+    if compare_count >= Delayed::Job.count(:conditions => ['tag = ?', self.tag])
       self.enqueue
     end
   end
