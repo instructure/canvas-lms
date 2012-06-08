@@ -23,8 +23,10 @@ define [
     # Extends render to add support for chid views and element filtering
     render: (opts = {}) =>
       @$el.html @template(@toJSON()) if @template
-      @filter() unless opts.noFilter is true
+
+      # cacheEls before filter so we have access to elements in filter
       @cacheEls() if @els
+      @filter() unless opts.noFilter is true
 
       # its important for renderViews to come last so we don't filter
       # and cache all the child views elements

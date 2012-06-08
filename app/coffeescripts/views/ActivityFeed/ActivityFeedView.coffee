@@ -6,12 +6,12 @@ define ['Backbone'], ({View}) ->
 
     ##
     # Requires these sub-views
-    views:
-      activityFeedFilter: null # new ActivityFeedFilterView
-      activityFeedItems: null # new ActivityFeedItemsView
+    #
+    # ActivityFeedFilterView
+    # ActivityFeedItemsView
 
     events:
-      'click .icon-drawer-toggle': 'toggleDrawer'
+      'click .drawerToggle': 'toggleDrawer'
 
     initialize: ->
       super
@@ -19,7 +19,9 @@ define ['Backbone'], ({View}) ->
         @options.views.activityFeedItems.filterByContextKey
 
     toggleDrawer: ->
-      @$el.toggleClass 'drawerClosed'
+      @drawerClosed = not @drawerClosed
+      @$el.toggleClass 'drawerClosed', @drawerClosed
+      @options.views.activityFeedItems.toggleDrawerIcon @drawerClosed
 
     render: ->
       @$el.html """
@@ -27,4 +29,7 @@ define ['Backbone'], ({View}) ->
         <div class="activityFeedItems content-box border border-trbl border-round-t box-shadow"></div>
       """
       super
+
+    filter: ->
+      @drawerClosed = @$el.hasClass 'drawerClosed'
 

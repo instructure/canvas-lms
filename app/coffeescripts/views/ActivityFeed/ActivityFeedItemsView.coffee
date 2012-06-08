@@ -15,6 +15,7 @@ define [
     els:
       '.activityFeedItemsList': '$itemList'
       '.activityFeedItemsFilter a': '$itemFilters'
+      '.drawerToggle': '$drawerToggle'
 
     initialize: ->
       super
@@ -22,6 +23,14 @@ define [
       @collection.on 'add', @addActivityFeedItem
       @collection.on 'reset', @onResetActivityFeedItems
       @collection.fetch()
+
+    toggleDrawerIcon: (drawerClosed) ->
+      if drawerClosed
+        @$drawerToggle.removeClass 'icon-toggle-left'
+        @$drawerToggle.addClass 'icon-toggle-right'
+      else
+        @$drawerToggle.addClass 'icon-toggle-left'
+        @$drawerToggle.removeClass 'icon-toggle-right'
 
     addActivityFeedItem: (activityFeedItem, collection, fetchOptions) =>
       view = activityFeedItemViewFactory activityFeedItem

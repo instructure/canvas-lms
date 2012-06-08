@@ -2,7 +2,16 @@
   js_bundle :dashboard2
   jammit_css :dashboard, :tinymce, :collection_item_save
   @body_classes << "no-page-block"
+  @show_left_side = false
 %>
+
+<% content_for :page_title do %><%= t('user_dashboard', 'User Dashboard') %><% end %>
+
+<% content_for :auto_discovery do %>
+  <% if @current_user %>
+      <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")}) %>
+  <% end %>
+<% end %>
 
 <% content_for :right_side do %>
   <div class="dashboardActions">
@@ -17,5 +26,5 @@
 <% end %>
 
 <div class="quickStartBar not-expanded border border-rbl border-round-b content-callout"></div>
-<div class="activityFeed drawerClosed"></div>
+<div class="activityFeed"></div>
 
