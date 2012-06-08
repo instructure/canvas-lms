@@ -42,7 +42,8 @@ describe SisBatch do
     # arrrgh attachment.rb
     def tmp.original_filename; File.basename(path); end
     batch = SisBatch.create_with_attachment(@account, 'instructure_csv', tmp)
-    yield batch
+    yield batch if block_given?
+    batch
   ensure
     FileUtils.rm(path) if path and File.file?(path)
   end
@@ -59,6 +60,38 @@ describe SisBatch do
     create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
     create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
     create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
+  end
+
+  describe ".process_all_for_account" do
+    it "should process all non-processed batches for the account" do
+      b1 = create_csv_data(['abc'])
+      b2 = create_csv_data(['abc'])
+      b3 = create_csv_data(['abc'])
+      b4 = create_csv_data(['abc'])
+      b2.update_attribute(:workflow_state, 'imported')
+      @a1 = @account
+      @a2 = account_model
+      b5 = create_csv_data(['abc'])
+      b2.any_instantiation.expects(:process_without_send_later).never
+      b5.any_instantiation.expects(:process_without_send_later).never
+      SisBatch.process_all_for_account(@a1)
+      [b1, b2, b4].each { |batch| [:imported, :imported_with_messages].should be_include(batch.reload.state) }
+    end
+  end
+
+  it "should schedule in the future if configured" do
+    create_csv_data(['abc']) do |batch|
+      batch.process
+      Delayed::Job.find_by_tag('SisBatch.process_all_for_account').run_at.to_i.should <= Time.now.to_i
+    end
+
+    Setting.set('sis_batch_process_start_delay', '120')
+    create_csv_data(['abc']) do |batch|
+      batch.process
+      job = Delayed::Job.find_by_tag('SisBatch.process_all_for_account')
+      job.run_at.to_i.should >= Time.now.to_i
+      job.run_at.to_i.should <= 3.minutes.from_now.to_i
+    end
   end
 
   describe "batch mode" do

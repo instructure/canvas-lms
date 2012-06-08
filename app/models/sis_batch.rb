@@ -75,6 +75,19 @@ class SisBatch < ActiveRecord::Base
   end
 
   def process
+    process_delay = Setting.get_cached('sis_batch_process_start_delay', '0').to_f
+    job_args = { :singleton => "sis_batch:account:#{Shard.default.activate { self.account_id }}", :priority => Delayed::LOW_PRIORITY }
+    if process_delay > 0
+      job_args[:run_at] = process_delay.seconds.from_now
+    end
+
+    SisBatch.send_later_enqueue_args(:process_all_for_account, job_args, self.account)
+  end
+
+  # this method name is to stay backwards compatible with existing jobs when we deploy
+  # once no SisBatch#process_without_send_later jobs are being created anymore, we
+  # can rename this to something more sensible.
+  def process_without_send_later
     self.options ||= {}
     if self.workflow_state == 'created'
       self.workflow_state = :importing
@@ -96,9 +109,16 @@ class SisBatch < ActiveRecord::Base
     self.workflow_state = "failed"
     self.save
   end
-  handle_asynchronously :process, :strand => proc { |sis_batch| Shard.default.activate { "sis_batch:account:#{sis_batch.account_id}" } }, :priority => Delayed::LOW_PRIORITY
 
   named_scope :needs_processing, :conditions => { :workflow_state => 'created' }, :order => :created_at
+
+  def self.process_all_for_account(account)
+    loop do
+      batches = account.sis_batches.needs_processing.all(:limit => 1000, :order => :created_at)
+      break if batches.empty?
+      batches.each { |batch| batch.process_without_send_later }
+    end
+  end
 
   def fast_update_progress(val)
     self.progress = val
