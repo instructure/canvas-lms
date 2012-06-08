@@ -71,9 +71,6 @@
   background-color: $lightBackground;
   overflow: auto;
 
-  // oldskool overrides
-  background-color: $lightBackground !important;
-
   & > header,
   // oldskool compat
   #section-tabs-header {

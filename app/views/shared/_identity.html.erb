@@ -1,10 +1,10 @@
 <ul id="identity">
   <% if !@current_user %>
     <% if !@domain_root_account || @domain_root_account == Account.default %>
-      <li class="no-left-border"><%= link_to t('links.sign_up_as_teacher', "Sign Up as a Teacher"), register_path %></li>
+      <li><%= link_to t('links.sign_up_as_teacher', "Sign Up as a Teacher"), register_path %></li>
       <li><%= link_to "Log In", login_path %></li>
     <% else %>
-      <li class="no-left-border"><%= link_to t('links.log_in', "Log In"), login_path %></li>
+      <li><%= link_to t('links.log_in', "Log In"), login_path %></li>
     <% end %>
   <% else %>
     <li class="user_name"><%= link_to @current_user.short_name, profile_path %></li>
