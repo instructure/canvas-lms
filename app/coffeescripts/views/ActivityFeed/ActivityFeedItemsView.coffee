@@ -68,6 +68,7 @@ define [
       filter
 
     onClickItemFilter: (event) ->
+      event.preventDefault()
       value = $(event.target).data 'value'
       @filterByItemType value
 
@@ -79,7 +80,7 @@ define [
       if type is 'all'
         @$itemList.find('li').show()
       else
-        @$itemList.find("li").hide()
+        @$itemList.find('li').hide()
         className = type.replace(/s$/, '')
         $els = @$itemList.find("li.#{className}")
         if $els.length
