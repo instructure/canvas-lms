@@ -219,13 +219,6 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if show_new_dashboard?
-      @use_new_styles = true
-      load_all_contexts
-      js_env :CONTEXTS => @contexts
-      return render :action => :new_user_dashboard
-    end
-
     get_context
 
     # dont show crubms on dashboard because it does not make sense to have a breadcrumb
@@ -240,6 +233,14 @@ class UsersController < ApplicationController
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+
+    if show_new_dashboard?
+      @use_new_styles = true
+      load_all_contexts
+      js_env :CONTEXTS => @contexts
+      return render :action => :new_user_dashboard
+    end
+
   end
 
   def toggle_dashboard
@@ -432,6 +433,41 @@ class UsersController < ApplicationController
     submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, @current_user, session, 'submitting') }
     render :json => (grading + submitting)
   end
+
+  include Api::V1::Assignment
+  include Api::V1::CalendarEvent
+  # Returns the user's upcoming events
+  #
+  #   [{"type": "Assignment|CalendarEvent", "title": "Some Title", start_at: "2012-06-11T00:00:00-06:00"}]
+  def coming_up_items
+    unless @current_user
+      return render_unauthorized_action
+    end
+
+    def api_event(event)
+      url =  event.is_a?(CalendarEvent) ? api_v1_calendar_event_url(event) : course_assignment_url(event.context_id, event)
+      {
+        :title => event.title,
+        :start_at => event.start_at,
+        :type => event.class.name,
+        :html_url => url
+      }
+    end
+    render :json => @current_user.upcoming_events.map { |e| api_event(e) }
+  end
+
+  def recent_feedback
+    unless @current_user
+      return render_unauthorized_action
+    end
+
+    def api_feedback(feedback)
+
+    end
+
+    render :json => @current_user.recent_feedback
+  end
+
 
   def ignore_item
     unless %w[grading submitting].include?(params[:purpose])

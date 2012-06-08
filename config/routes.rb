@@ -759,6 +759,9 @@ ActionController::Routing::Routes.draw do |map|
       users.delete "users/:user_id/followers/self", :action => :unfollow
 
       users.get 'users/self/todo', :action => :todo_items
+      users.get 'users/self/coming_up', :action => :coming_up_items
+      users.get 'users/self/recent_feedback', :action => :recent_feedback
+
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
