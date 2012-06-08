@@ -103,49 +103,28 @@ body.no-page-block
     width: 180px
 
 #breadcrumbs
-  border-bottom: 1px solid #ccc
-  background-color: #F9F9F9
-  box-shadow: 0 0 36px #F2F2F2
+  border-bottom: 1px solid #efefef
   overflow: hidden
+  background-color: #fff
   ul
     +reset-list
     +clearfix
-    margin: 0 0 0 10px
-    color: #595959
-    font-size: 13px
-    font-family: GillSans,Calibri,Trebuchet,sans-serif
-
+    margin-left: 10px
+    color: #637178
+    font-size: 12px
     li
       float: left
       height: 27px
-      line-height: 2.1em
-      padding-left: 18px
-      margin: 0
-      margin-left: 1px
-      background: url(/images/breadcrumb-right-chevron.png) left 50% no-repeat
-
+      line-height: 27px
+      &:before // :after would be better, but ie8 can't do :last-child to take the '/' of the last
+        content: '/' // works in ie8+
+        padding: 0 10px
       &:first-child
-        background: none
-        padding-left: 0
-        margin-left: 0
-        
-
-  a
-    color: inherit
-    &:hover, &:focus
-      background-color: transparent
-      text-decoration: underline
-      
+        &:before
+          content: none
   .ellipsis
     display: inline-block
 
-  ul li.home a
-    background: url(/images/breadcrumb-home.png) no-repeat left 50%
-    display: block
-    width: 10px
-    height: 27px
-    span
-      display: none
 
 // pasted from themes/warehouse screen.sass
 
