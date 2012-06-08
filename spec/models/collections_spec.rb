@@ -21,26 +21,25 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe 'Collections' do
   shared_examples_for "auto-follow context" do
     it "should auto-follow for users following" do
-      @user1 = user_model
       @pub1 = @context.collections.create!(:visibility => "public")
       @pri1 = @context.collections.create!(:visibility => "private")
       @del1 = @context.collections.create!(:visibility => "public")
       @del1.destroy
-      UserFollow.create_follow(@user1, @context)
+      UserFollow.create_follow(@user, @context)
       run_jobs
 
-      # user1 is now following context, and will auto-follow context's existing and
+      # user is now following context, and will auto-follow context's existing and
       # new collections
-      @pub1.reload.followers.should == [@user1]
-      @pri1.reload.followers.should == []
+      @pub1.reload.followers.should == [@user]
+      @pri1.reload.followers.should == (@follows_private ? [@user] : [])
       @del1.reload.followers.should == []
 
       @pub2 = @context.collections.create!(:visibility => "public")
       @pri2 = @context.collections.create!(:visibility => "private")
       run_jobs
 
-      @pub2.reload.followers.should == [@user1]
-      @pri2.reload.followers.should == []
+      @pub2.reload.followers.should == [@user]
+      @pri2.reload.followers.should == (@follows_private ? [@user] : [])
 
       @pub2.destroy
       @pub2.reload.followers.should == []
@@ -51,14 +50,26 @@ describe 'Collections' do
     it_should_behave_like "auto-follow context"
     before do
       @context = user_model
+      @user = user_model
+      @follows_private = false
     end
   end
 
-  describe "group collections" do
+  describe "group collections as non-member" do
+    it_should_behave_like "auto-follow context"
+    before do
+      @context = group_model
+      @user = user_model
+      @follows_private = false
+    end
+  end
+
+  describe "group collections as member" do
     it_should_behave_like "auto-follow context"
     before do
       group_with_user
       @context = @group
+      @follows_private = true
     end
   end
 end

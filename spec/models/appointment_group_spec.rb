@@ -66,12 +66,12 @@ describe AppointmentGroup do
       group.contexts = [course2]
       group.save!
 
-      group.contexts.should eql [course1, course2]
+      group.contexts.sort_by(&:id).should eql [course1, course2].sort_by(&:id)
 
       # also make sure you can't get duplicates
       group.contexts = [course1]
       group.save!
-      group.contexts.should eql [course1, course2]
+      group.contexts.sort_by(&:id).should eql [course1, course2].sort_by(&:id)
     end
 
     it "should not add contexts when it has a group category" do
@@ -104,7 +104,7 @@ describe AppointmentGroup do
       group.contexts = [course1, course2]
       group.save!
       group.reload
-      group.appointments.map(&:effective_context_code).should eql ["#{course1.asset_string},#{course2.asset_string}"]
+      group.appointments.map(&:effective_context_code).sort.should eql ["#{course1.asset_string},#{course2.asset_string}"]
     end
   end
 
@@ -129,8 +129,8 @@ describe AppointmentGroup do
       c2section = @course2.default_section.asset_string
       ag.sub_context_codes = [c2section]
       ag.save!
-      ag.contexts.should eql [@course1, @course2]
-      ag.sub_context_codes.should eql [@c1section1.asset_string, c2section]
+      ag.contexts.sort_by(&:id).should eql [@course1, @course2].sort_by(&:id)
+      ag.sub_context_codes.sort.should eql [@c1section1.asset_string, c2section].sort
     end
   end
 
@@ -493,7 +493,7 @@ describe AppointmentGroup do
 
     it "should respect group sub_contexts" do
       @ag.appointment_group_sub_contexts.create! :sub_context => @gc
-      @ag.possible_participants.should eql [@group1, @group2]
+      @ag.possible_participants.sort_by(&:id).should eql [@group1, @group2].sort_by(&:id)
       @ag.possible_users.should eql [@users.last]
     end
 
@@ -507,7 +507,7 @@ describe AppointmentGroup do
     it "should allow filtering on registration status (for groups)" do
       @ag.appointment_group_sub_contexts.create! :sub_context => @gc, :sub_context_code => @gc.asset_string
       @ag.appointments.first.reserve_for(@group1, @users.first)
-      @ag.possible_participants.should eql [@group1, @group2]
+      @ag.possible_participants.sort_by(&:id).should eql [@group1, @group2].sort_by(&:id)
       @ag.possible_participants('registered').should eql [@group1]
       @ag.possible_participants('unregistered').should eql [@group2]
     end
