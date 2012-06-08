@@ -5,6 +5,8 @@ require [
   'jquery.instructure_forms'
 ], ($, I18n, preventDefault) ->
 
+  ##
+  # avatar stuff
   $form = $('.group_avatar_form')
   $changeLink = $('.change_group_pic')
 
@@ -34,3 +36,14 @@ require [
 
   $('.cancel_avatar').click preventDefault ->
     toggleForm()
+
+
+  ##
+  # invitations
+  $('.invite_form').formSubmit
+    required: ['email']
+    processData: (data) ->
+      data['invitees[]'] = data.email
+      delete data.email
+      data
+    success: -> $.flashMessage("Invitation sent")
