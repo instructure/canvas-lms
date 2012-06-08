@@ -306,6 +306,13 @@ describe "Groups API", :type => :integration do
       @membership.workflow_state.should == "deleted"
     end
 
+    it "should allow leaving a group using 'self'" do
+      @user = @member
+      api_call(:delete, "#{@memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => 'self', :action => "destroy"))
+      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership.workflow_state.should == "deleted"
+    end
+
     it "should allow a moderator to invite people to a group" do
       @user = @moderator
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }

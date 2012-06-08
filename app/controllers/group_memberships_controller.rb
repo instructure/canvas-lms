@@ -148,7 +148,8 @@ class GroupMembershipsController < ApplicationController
   # @subtopic Group Memberships
   #
   # Leave a group if you are allowed to leave (some groups, such as sets of
-  # course groups created by teachers, cannot be left).
+  # course groups created by teachers, cannot be left). You may also use 'self'
+  # in place of a membership_id.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships/<membership_id> \ 
@@ -170,6 +171,10 @@ class GroupMembershipsController < ApplicationController
   end
 
   def find_membership
-    @membership = @group.group_memberships.find(params[:membership_id])
+    if params[:membership_id] == 'self'
+      @membership = @group.group_memberships.scoped(:conditions => { :user_id => @current_user.id }).first
+    else
+      @membership = @group.group_memberships.find(params[:membership_id])
+    end
   end
 end
