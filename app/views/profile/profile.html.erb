@@ -44,6 +44,13 @@
     </td>
   </tr>
   <tr>
+    <td><%= f.blabel :birthdate, :en => "Birthday" %></td>
+    <td>
+      <span class="display_data"><%= @user.birthdate.strftime('%m/%d/%Y') %></span>
+      <%= f.date_select :birthdate, {:order => [:day, :month, :year]}, :class => 'edit_data' %>
+    </td>
+  </tr>
+  <tr>
     <td><%= f.blabel :bio, :en => "Bio" %></td>
     <td>
       <span class="display_data"><%= format_message(@user.bio).first.html_safe %></span>
