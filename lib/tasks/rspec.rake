@@ -81,10 +81,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     desc "Run non-selenium files in a single thread"
     Spec::Rake::SpecTask.new(:single) do |t|
       require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
-      single_thread_files = ParallelExclude::FILES
-      test_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
-      available_files = test_files.select { |file_name| single_thread_files.include?(file_name) }
-      t.spec_files = available_files
+      t.spec_files = ParallelExclude::AVAILABLE_FILES
     end
 
     desc "Run all specs in spec directory with RCov (excluding plugin specs)"
