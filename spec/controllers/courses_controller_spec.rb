@@ -619,6 +619,22 @@ describe CoursesController do
       @enrollment.should be_self_enrolled
     end
 
+    it "should enroll the currently logged in user using the long code" do
+      course(:active_all => true)
+      @course.update_attribute(:self_enrollment, true)
+      user
+      user_session(@user, @pseudonym)
+
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
+      response.should redirect_to(course_url(@course))
+      flash[:notice].should_not be_empty
+      @user.enrollments.length.should == 1
+      @enrollment = @user.enrollments.first
+      @enrollment.course.should == @course
+      @enrollment.workflow_state.should == 'active'
+      @enrollment.should be_self_enrolled
+    end
+
     it "should create a compatible pseudonym" do
       @account2 = Account.create!
       course(:active_all => true, :account => @account2)
@@ -655,7 +671,7 @@ describe CoursesController do
       user
       user_session(@user)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
       response.should redirect_to(course_url(@course))
       @user.enrollments.length.should == 0
     end

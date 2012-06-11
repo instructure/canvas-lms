@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20120227194305_reassociate_conversation_attachments.rb'
 
-describe ReassociateConversationAttachments do
+describe 'ReassociateConversationAttachments' do
   describe "up" do
     it "should work" do
       c = Conversation.create!

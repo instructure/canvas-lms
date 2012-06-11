@@ -103,4 +103,19 @@ describe "gradebooks" do
 
     f("#student_#{@fake_student.id} .display_name").should include_text @fake_student.sortable_name
   end
+
+  it "should link to the correct student in speedgrader" do
+    s1 = @assignment.submit_homework(@student1, :submission_type => 'online_text_entry', :body => 'asdf')
+    s2 = @assignment.submit_homework(@student2, :submission_type => 'online_text_entry', :body => 'heyo')
+
+    get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
+
+    keep_trying_until {
+      fj('#datagrid_data .row:nth-child(3) .cell:first .grade').click
+      fj('#submission_information').displayed?
+    }
+    link_el = f('#submission_information .submission_details .view_submission_link')
+    URI.decode(URI.parse(link_el.attribute(:href)).fragment).should == "{\"student_id\":#{@student2.id}}"
+  end
 end

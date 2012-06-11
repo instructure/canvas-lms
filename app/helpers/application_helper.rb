@@ -298,8 +298,8 @@ module ApplicationHelper
   end
   def hidden_dialogs; @hidden_dialogs ||= {}; end
   def render_hidden_dialogs
-    output = hidden_dialogs.inject('') do |str, item|
-      str << "<div id='#{item[0]}' style='display: none;''>" << item[1] << "</div>"
+    output = hidden_dialogs.keys.sort.inject('') do |str, id|
+      str << "<div id='#{id}' style='display: none;''>" << hidden_dialogs[id] << "</div>"
     end
     raw(output)
   end
@@ -348,6 +348,14 @@ module ApplicationHelper
     unless jammit_css_bundles.empty?
       bundles = jammit_css_bundles.map{ |(bundle,plugin)| plugin ? "plugins_#{plugin}_#{bundle}" : bundle }
       include_stylesheets(*bundles)
+    end
+  end
+
+  def include_common_stylesheet
+    if @use_new_styles
+      include_stylesheets :new_common, :media => "all"
+    else
+      include_stylesheets :common, :media => "all"
     end
   end
 

@@ -236,9 +236,7 @@ class UsersController < ApplicationController
   include Api::V1::StreamItem
 
   # @API List the activity stream
-  # Returns the current user's global activity stream.
-  #
-  # The response is currently hard-coded to the last 2 weeks or 21 total items.
+  # Returns the current user's global activity stream, paginated.
   #
   # There are many types of objects that can be returned in the activity
   # stream. All object types have the same basic set of shared attributes:
@@ -339,8 +337,12 @@ class UsersController < ApplicationController
   #     'collaboration_id': 1234
   #   }
   def activity_stream
+    # for backwards compatibility, since this api used to be hard-coded to return 21 items
+    params[:per_page] ||= 21
+
     if @current_user
-      render :json => @current_user.stream_items.map { |i| stream_item_json(i, @current_user.id) }
+      scope = @current_user.visible_stream_items
+      render :json => Api.paginate(scope, self, api_v1_user_activity_stream_url).map { |i| stream_item_json(i, @current_user.id) }
     else
       render_unauthorized_action
     end
@@ -887,8 +889,29 @@ class UsersController < ApplicationController
     end
   end
 
+  #@API Delete a user.
+  # Delete a user record from Canvas.
+  #
+  # WARNING: This API will allow a user to delete themselves. If you do this,
+  # you won't be able to make API calls or log into Canvas.
+  #
+  # @example_request
+  #
+  # curl https://<canvas>/api/v1/users/5 \ 
+  #   -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
+  #   -X DELETE
+  #
+  # @example_response
+  #
+  #   {
+  #     "id":133,
+  #     "login_id":"bieber@example.com",
+  #     "name":"Justin Bieber",
+  #     "short_name":"The Biebs",
+  #     "sortable_name":"Bieber, Justin"
+  #   }
   def destroy
-    @user = User.find(params[:id])
+    @user = api_request? ? api_find(User, params[:id]) : User.find(params[:id])
     if authorized_action(@user, @current_user, [:manage, :manage_logins])
       @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       if @user == @current_user
@@ -897,13 +920,15 @@ class UsersController < ApplicationController
       end
 
       respond_to do |format|
-        flash[:notice] = t('user_is_deleted', "%{user_name} has been deleted", :user_name => @user.name)
-        if @user == @current_user
-          format.html { redirect_to root_url }
-        else
-          format.html { redirect_to(users_url) }
+        format.html do
+          flash[:notice] = t('user_is_deleted', "%{user_name} has been deleted", :user_name => @user.name)
+          redirect_to(@user == @current_user ? root_url : users_url)
         end
-        format.json { render :json => @user.to_json }
+
+        format.json do
+          get_context # need the context for user_json
+          render :json => user_json(@user, @current_user, session)
+        end
       end
     end
   end

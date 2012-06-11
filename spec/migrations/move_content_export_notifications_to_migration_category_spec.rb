@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-describe DataFixup::MoveContentExportNotificationsToMigrationCategory do
+describe 'DataFixup::MoveContentExportNotificationsToMigrationCategory' do
   it "remove correct notification policies" do
     user(:active_user => true)
 

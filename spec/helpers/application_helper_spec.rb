@@ -1,4 +1,5 @@
-#
+# coding: utf-8
+# 
 # Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -163,7 +164,7 @@ describe ApplicationHelper do
       hidden_dialog('first_dialog') { "first" }
       hidden_dialog('second_dialog') { "second" }
       str = render_hidden_dialogs
-      str.should == "<div id='second_dialog' style='display: none;''>second</div><div id='first_dialog' style='display: none;''>first</div>"
+      str.should == "<div id='first_dialog' style='display: none;''>first</div><div id='second_dialog' style='display: none;''>second</div>"
     end
 
     it "should raise an error when a dialog with conflicting content is added" do

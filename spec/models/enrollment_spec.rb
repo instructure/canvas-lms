@@ -1291,4 +1291,74 @@ describe Enrollment do
       end
     end
   end
+
+  describe 'observing users' do
+    before do
+      @student = user(:active_all => true)
+      @parent = user(:active_all => true)
+      @student.observers << @parent
+    end
+
+    it 'should get new observer enrollments when an observed user gets a new enrollment' do
+      se = course_with_student(:active_all => true, :user => @student)
+      pe = @parent.observer_enrollments.first
+
+      pe.should_not be_nil
+      pe.course_id.should eql se.course_id
+      pe.course_section_id.should eql se.course_section_id
+      pe.workflow_state.should eql se.workflow_state
+      pe.associated_user_id.should eql se.user_id
+    end
+
+    it 'should have their observer enrollments updated when an observed user\'s enrollment is updated' do
+      se = course_with_student(:user => @student)
+      pe = @parent.observer_enrollments.first
+      pe.should_not be_nil
+
+      se.invite
+      se.accept
+      pe.reload.should be_active
+
+      se.complete
+      pe.reload.should be_completed
+    end
+
+    it 'should update the best observer enrollment if there are duplicates' do
+      se = course_with_student(:user => @student)
+      pe = @parent.observer_enrollments.first
+      pe.should_not be_nil
+
+      pe.destroy
+      pe2 = @parent.observer_enrollments.build
+      pe2.course_id = pe.course_id
+      pe2.course_section_id = pe.course_section_id
+      pe2.associated_user_id = pe.associated_user_id
+      pe2.save!
+
+      se.invite
+      pe.reload.should be_deleted
+      pe2.reload.should be_invited
+
+      se.accept
+      pe.reload.should be_deleted
+      pe2.reload.should be_active
+
+      se.complete
+      pe.reload.should be_deleted
+      pe2.reload.should be_completed
+    end
+
+    it 'should not undelete observer enrollments if the student enrollment wasn\'t already deleted' do
+      se = course_with_student(:user => @student)
+      pe = @parent.observer_enrollments.first
+      pe.should_not be_nil
+      pe.destroy
+
+      se.invite
+      pe.reload.should be_deleted
+
+      se.accept
+      pe.reload.should be_deleted
+    end
+  end
 end

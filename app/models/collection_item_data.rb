@@ -31,6 +31,26 @@ class CollectionItemData < ActiveRecord::Base
 
   attr_accessible :root_item, :item_type, :link_url
 
+  before_create :prepare_to_snapshot_link_url
+  after_create :snapshot_link_url
+
+  def prepare_to_snapshot_link_url
+    self.image_pending = true
+  end
+
+  def snapshot_link_url
+    attachment = CutyCapt.snapshot_attachment_for_url(image_url.presence || link_url)
+    if attachment
+      attachment.context = Account.default # these images belong to nobody
+      attachment.save!
+      self.image_attachment = attachment
+    end
+
+    self.image_pending = false
+    self.save!
+  end
+  handle_asynchronously :snapshot_link_url, :priority => Delayed::LOW_PRIORITY
+
   # convert a given url string into a CollectionItemData
   # if the url points to another collection item in this canvas instance, it'll
   # verify the user can access that item and then create a clone of that

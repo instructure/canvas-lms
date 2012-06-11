@@ -18,7 +18,7 @@
 module CC
   module Events
     def create_events(document=nil)
-      return nil unless @course.calendar_events.count > 0
+      return nil unless @course.calendar_events.active.count > 0
       
       if document
         events_file = nil
@@ -35,7 +35,7 @@ module CC
               "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |events_node|
-        @course.calendar_events.each do |event|
+        @course.calendar_events.active.each do |event|
           next unless export_object?(event)
           migration_id = CCHelper.create_key(event)
           events_node.event(:identifier=>migration_id) do |event_node|

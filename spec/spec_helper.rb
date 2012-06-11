@@ -313,6 +313,14 @@ Spec::Runner.configure do |config|
     course_with_student(opts)
   end
 
+  def student_in_section(section, opts={})
+    user
+    enrollment = section.course.enroll_user(@user, 'StudentEnrollment', :section => section)
+    enrollment.workflow_state = 'active'
+    enrollment.save!
+    @user
+  end
+
   def teacher_in_course(opts={})
     opts[:course] = @course if @course && !opts[:course]
     course_with_teacher(opts)
@@ -743,7 +751,7 @@ Spec::Runner.configure do |config|
     Attachment.local_storage?.should eql(true)
   end
 
-  def run_job(job)
+  def run_job(job = Delayed::Job.last(:order => :id))
     Delayed::Worker.new.perform(job)
   end
 
@@ -759,5 +767,22 @@ Spec::Runner.configure do |config|
   def run_transaction_commit_callbacks(conn = ActiveRecord::Base.connection)
     conn.after_transaction_commit_callbacks.each { |cb| cb.call }
     conn.after_transaction_commit_callbacks.clear
+  end
+
+  def verify_post_matches(post_lines, expected_post_lines)
+    # first lines should match
+    post_lines[0].should == expected_post_lines[0]
+
+    # now extract the headers
+    post_headers = post_lines[1..post_lines.index("")]
+    expected_post_headers = expected_post_lines[1..expected_post_lines.index("")]
+    if RUBY_VERSION >= "1.9."
+      expected_post_headers << "User-Agent: Ruby"
+    end
+    post_headers.sort.should == expected_post_headers.sort
+
+    # now check payload
+    post_lines[post_lines.index(""),-1].should ==
+      expected_post_lines[expected_post_lines.index(""),-1]
   end
 end

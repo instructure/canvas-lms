@@ -82,6 +82,7 @@ module UserContent
       'external_tools' => nil,
       'file_contents' => nil,
       'modules' => ContextModule,
+      'items' => ContentTag
     }
     DefaultAllowedTypes = AssetTypes.keys
 
@@ -126,9 +127,13 @@ module UserContent
       asset_types = AssetTypes.reject { |k,v| !@allowed_types.include?(k) }
 
       html.gsub(@toplevel_regex) do |relative_url|
-        type = $1
-        obj_id = $2.to_i
-        rest = $3
+        type, obj_id, rest = [$1, $2.to_i, $3]
+
+        if module_item = rest.try(:match, %r{/items/(\d+)})
+          type   = 'items'
+          obj_id = module_item[1].to_i
+        end
+
         if asset_types.key?(type)
           match = UriMatch.new(relative_url, type, asset_types[type], (obj_id > 0 ? obj_id : nil), rest)
           handler = @handlers[type] || @default_handler

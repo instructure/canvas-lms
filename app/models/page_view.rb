@@ -138,21 +138,22 @@ class PageView < ActiveRecord::Base
   def self.process_cache_queue
     redis = Canvas.redis
     lock_key = 'page_view_queue_processing'
-    # lock other processors out until we're done. if more than an hour
+    lock_key += ":#{Shard.current.description}" unless Shard.current.default?
+    lock_time = Setting.get("page_view_queue_lock_time", 15.minutes.to_s).to_i
+
+    # lock other processors out until we're done. if more than lock_time
     # passes, the lock will be dropped and we'll assume this processor died.
-    #
-    # we're really being pessimistic here, there shouldn't ever be more than
-    # one periodic job worker running anyway.
     unless redis.setnx lock_key, 1
       return
     end
-    redis.expire lock_key, 1.hour
+    redis.expire lock_key, lock_time
 
     begin
       # process as many items as were in the queue when we started.
       todo = redis.llen(self.cache_queue_name)
       while todo > 0
         batch_size = [Setting.get_cached('page_view_queue_batch_size', '1000').to_i, todo].min
+        redis.expire lock_key, lock_time
         transaction do
           process_cache_queue_batch(batch_size, redis)
         end
@@ -175,6 +176,7 @@ class PageView < ActiveRecord::Base
   def self.process_cache_queue_item(attrs)
     self.transaction(:requires_new => true) do
       if attrs['is_update']
+        return if Setting.get_cached('skip_pageview_updates', nil) == "true"
         page_view = self.find_by_request_id(attrs['request_id'])
         return unless page_view
         page_view.do_update(attrs)
@@ -196,10 +198,10 @@ class PageView < ActiveRecord::Base
 
   def store_page_view_to_user_counts
     return unless Setting.get_cached('page_views_store_active_user_counts', 'false') == 'redis' && Canvas.redis_enabled?
-    return unless self.created_at.present?
+    return unless self.created_at.present? && self.user.present?
     exptime = Setting.get_cached('page_views_active_user_exptime', 1.day.to_s).to_i
     bucket = PageView.user_count_bucket_for_time(self.created_at)
-    Canvas.redis.sadd(bucket, self.user_id)
+    Canvas.redis.sadd(bucket, self.user.global_id)
     Canvas.redis.expire(bucket, exptime)
   end
 end

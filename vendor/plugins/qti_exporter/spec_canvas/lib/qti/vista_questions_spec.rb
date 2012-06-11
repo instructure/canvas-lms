@@ -6,7 +6,7 @@ describe "Converting Blackboard Vista qti" do
     archive_file_path = File.join(BASE_FIXTURE_DIR, 'bb_vista', 'vista_archive.zip')
     unzipped_file_path = File.join(File.dirname(archive_file_path), "qti_#{File.basename(archive_file_path, '.zip')}", 'oi')
     export_folder = File.join(File.dirname(archive_file_path), "qti_vista_archive")
-    @exporter = Qti::Converter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path)
+    @exporter = Qti::Converter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path, :flavor => Qti::Flavors::WEBCT)
     @exporter.export
     @exporter.delete_unzipped_archive
     @assessment = @exporter.course[:assessments][:assessments].first
@@ -95,7 +95,7 @@ describe "Converting Blackboard Vista qti" do
   end
 
   it "should convert the assessments into quizzes" do
-    @assessment == VistaExpected::ASSESSMENT
+    @assessment.should == VistaExpected::ASSESSMENT
   end
 
   it "should convert simple calculated questions" do
@@ -240,9 +240,10 @@ module VistaExpected
                 :question_count=>11,
                 :title=>"Blackboard Vista Export Test",
                 :quiz_name=>"Blackboard Vista Export Test",
+                :show_score=>true,
                 :quiz_type=>"assignment",
                 :allowed_attempts=>1,
-                :migration_id=>"ID_2f207fc5-0a34-0287-01c7-bcc0a626db16.4609765293341_R",
+                :migration_id=>"ID_4609765292341",
                 :questions=>
                         [{:question_type=>"question_reference",
                           :migration_id=>"ID_4609823478341",
@@ -277,13 +278,11 @@ module VistaExpected
                          {:question_type=>"question_reference",
                           :migration_id=>"ID_4609885376341",
                           :points_possible=>10.0}],
-                :points_possible=>"237.0",
                 :grading=>
                         {
-                                :migration_id=>"ID_2f207fc5-0a34-0287-01c7-bcc0a626db16.4609765293341_R",
+                                :migration_id=>"ID_4609765292341",
                                 :title=>"Blackboard Vista Export Test",
-                                :points_possible=>"237.0",
-                                :grade_type=>"numeric",
+                                :points_possible=>nil,
                                 :due_date=>nil,
                                 :weight=>nil
                         }

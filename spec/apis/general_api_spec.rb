@@ -52,4 +52,55 @@ describe "API", :type => :integration do
       @course.as_json(:include_root => false, :permissions => { :user => @user, :include_permissions => false }, :only => %w(name sis_source_id)).keys.sort.should == %w(name sis_source_id)
     end
   end
+
+  describe "json post format" do
+    before do
+      course_with_teacher(:user => user_with_pseudonym, :active_all => true)
+      @token = @user.access_tokens.create!(:purpose => "specs")
+    end
+
+    it "should use html form encoding by default" do
+      html_request = "assignment[name]=test+assignment&assignment[points_possible]=15"
+      # no content-type header is sent
+      post "/api/v1/courses/#{@course.id}/assignments", html_request, { "authorization" => "Bearer #{@token.token}" }
+      response.should be_success
+      response.header['content-type'].should == 'application/json; charset=utf-8'
+
+      @assignment = @course.assignments.last(:order => :id)
+      @assignment.title.should == "test assignment"
+      @assignment.points_possible.should == 15
+    end
+
+    it "should support json POST request bodies" do
+      json_request = { "assignment" => { "name" => "test assignment", "points_possible" => 15 } }
+      post "/api/v1/courses/#{@course.id}/assignments", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.token}" }
+      response.should be_success
+      response.header['content-type'].should == 'application/json; charset=utf-8'
+
+      @assignment = @course.assignments.last(:order => :id)
+      @assignment.title.should == "test assignment"
+      @assignment.points_possible.should == 15
+    end
+
+    it "should use array params without the [] on the key" do
+      assignment_model(:course => @course, :submission_types => 'online_upload')
+      @user = user_with_pseudonym
+      course_with_student(:course => @course, :user => @user, :active_all => true)
+      @token = @user.access_tokens.create!(:purpose => "specs")
+      a1 = attachment_model(:context => @user)
+      a2 = attachment_model(:context => @user)
+      json_request = { "comment" => {
+                          "text_comment" => "yay" },
+                       "submission" => {
+                          "submission_type" => "online_upload",
+                          "file_ids" => [a1.id, a2.id] } }
+      post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.token}" }
+      response.should be_success
+      response.header['content-type'].should == 'application/json; charset=utf-8'
+
+      @submission = @assignment.submissions.find_by_user_id(@user.id)
+      @submission.attachments.map { |a| a.id }.sort.should == [a1.id, a2.id]
+      @submission.submission_comments.first.comment.should == "yay"
+    end
+  end
 end

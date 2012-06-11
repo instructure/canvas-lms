@@ -15,7 +15,7 @@ describe "grades" do
     @group = @course.assignment_groups.create!(:name => 'first assignment group')
     @first_assignment = assignment_model({
       :course => @course,
-      :name => 'first assignment',
+      :title => 'first assignment',
       :due_at => due_date,
       :points_possible => 10,
       :submission_types => 'online_text_entry',
@@ -54,7 +54,7 @@ describe "grades" do
     due_date = due_date + 1.days
     @second_assignment = assignment_model({
       :course => @course,
-      :name => 'second assignment',
+      :title => 'second assignment',
       :due_at => due_date,
       :points_possible => 5,
       :submission_types => 'online_text_entry',
@@ -68,7 +68,7 @@ describe "grades" do
 
     #third assignment data
     due_date = due_date + 1.days
-    @third_assignment = assignment_model({ :name => 'third assignment', :due_at => due_date, :course => @course })
+    @third_assignment = assignment_model({ :title => 'third assignment', :due_at => due_date, :course => @course })
   end
 
   context "as a teacher" do
@@ -117,14 +117,13 @@ describe "grades" do
 
     it "should display rubric on assignment" do
       #click rubric
-      driver.find_element(:css, '.toggle_rubric_assessments_link').click
+      f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
       wait_for_animations
-      driver.find_element(:css, '#assessor .rubric_title').should include_text(@rubric.title)
-
-      driver.find_element(:css, '#assessor .rubric_total').should include_text('2')
+      fj('.rubric_assessments:visible .rubric_title').should include_text(@rubric.title)
+      fj('.rubric_assessments:visible .rubric_total').should include_text('2')
 
       #check rubric comment
-      driver.find_element(:css, '.assessment-comments div').text.should == 'cool, yo'
+      fj('.assessment-comments:visible div').text.should == 'cool, yo'
     end
 
     it "should not display rubric on muted assignment" do
@@ -138,7 +137,7 @@ describe "grades" do
     it "should not display letter grade score on muted assignment" do
       @another_assignment = assignment_model({
                                                :course => @course,
-                                               :name => 'another assignment',
+                                               :title => 'another assignment',
                                                :points_possible => 100,
                                                :submission_types => 'online_text_entry',
                                                :assignment_group => @group,
@@ -165,6 +164,34 @@ describe "grades" do
       #statistics_text.include?('Mean: 3.5').should be_true
       #statistics_text.include?('High: 4').should be_true
       #statistics_text.include?('Low: 3').should be_true
+    end
+
+    it "should show rubric even if there are no comments" do
+      @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
+      @third_submission = @third_assignment.submissions.create!(:user => @student_1) # unsubmitted submission :/
+
+      @third_association.assess({
+        :user => @student_1,
+        :assessor => @teacher,
+        :artifact => @third_submission,
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 2,
+            :comments => "not bad, not bad"
+          }
+        }
+      })
+
+      get "/courses/#{@course.id}/grades"
+
+      #click rubric
+      f("#submission_#{@third_assignment.id} .toggle_rubric_assessments_link").click
+      fj('.rubric_assessments:visible .rubric_title').should include_text(@rubric.title)
+      fj('.rubric_assessments:visible .rubric_total').should include_text('2')
+
+      #check rubric comment
+      fj('.assessment-comments:visible div').text.should == 'not bad, not bad'
     end
   end
 

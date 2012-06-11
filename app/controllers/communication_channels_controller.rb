@@ -176,16 +176,21 @@ class CommunicationChannelsController < ApplicationController
       @merge_opportunities = []
       merge_users.each do |user|
         account_to_pseudonyms_hash = {}
-        user.pseudonyms.each do |p|
-          next unless p.active?
-          # populate reverse association
-          p.user = user
-          (account_to_pseudonyms_hash[p.account] ||= []) << p
+        root_account_pseudonym = user.find_pseudonym_for_account(@root_account)
+        if root_account_pseudonym
+          @merge_opportunities << [user, [root_account_pseudonym]]
+        else
+          user.pseudonyms.each do |p|
+            next unless p.active?
+            # populate reverse association
+            p.user = user
+            (account_to_pseudonyms_hash[p.account] ||= []) << p
+          end
+          @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
+            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort { |a, b| a.position <=> b.position }.first
+          end]
+          @merge_opportunities.last.last.sort! { |a, b| a.account.name <=> b.account.name }
         end
-        @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
-          pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort { |a, b| a.position <=> b.position }.first
-        end]
-        @merge_opportunities.last.last.sort! { |a, b| a.account.name <=> b.account.name }
       end
       @merge_opportunities.sort! { |a, b| [a.first == @current_user ? 0 : 1, a.first.name] <=> [b.first == @current_user ? 0 : 1, b.first.name] }
 

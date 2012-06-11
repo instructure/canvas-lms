@@ -536,6 +536,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # dashboard_url is / , not /dashboard
   map.dashboard '', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+  map.styleguide 'styleguide', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
   map.root :dashboard
   # backwards compatibility with the old /dashboard url
   map.dashboard_redirect 'dashboard', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
@@ -652,7 +653,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
-      courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
+      courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.delete 'courses/:id', :action => :destroy
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
@@ -700,7 +701,12 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :discussion_topics_api) do |topics|
       def topic_routes(topics, context)
+        topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :action => :show, :path_name => "#{context}_discussion_topic"
+        topics.post "#{context.pluralize}/:#{context}_id/discussion_topics", :controller => :discussion_topics, :action => :create
+        topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :controller => :discussion_topics, :action => :destroy
+
         topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/view", :action => :view, :path_name => "#{context}_discussion_topic_view"
+
         topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entry_list", :action => :entry_list, :path_name => "#{context}_discussion_topic_entry_list"
         topics.post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", :action => :add_entry, :path_name => "#{context}_discussion_add_entry"
         topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", :action => :entries, :path_name => "#{context}_discussion_entries"
@@ -738,13 +744,14 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :users) do |users|
-      users.get 'users/self/activity_stream', :action => :activity_stream
+      users.get 'users/self/activity_stream', :action => :activity_stream, :path_name => 'user_activity_stream'
       users.get 'users/activity_stream', :action => :activity_stream # deprecated
 
       users.get 'users/self/todo', :action => :todo_items
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
+      users.delete 'accounts/:account_id/users/:id', :action => :destroy
 
       users.put 'users/:id', :action => :update
       users.post 'users/:user_id/files', :action => :create_file
@@ -876,6 +883,8 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
+
+  map.collection_item_link_data 'collection_items/link_data', :controller => 'collection_items', :action => 'link_data', :conditions => { :method => :post }
 
   # See how all your routes lay out with "rake routes"
 end

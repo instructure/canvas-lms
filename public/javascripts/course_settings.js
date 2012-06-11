@@ -341,6 +341,11 @@ define([
         $("#course_form .public_options").showIf(course.is_public);
         $("#course_form .self_enrollment_message").css('display', course.self_enrollment ? '' : 'none');
         $("#course_form").fillTemplateData({data: course});
+        if (course.self_enrollment_code) {
+          $("#course_form .self_enrollment_message b").each(function() {
+            $(this).text($.replaceTags($(this).text(), 'self_enrollment_code', course.self_enrollment_code));
+          });
+        }
         $(".hashtag_form").showIf($("#course_hashtag").text().length > 0);
       },
       error: function(data) {

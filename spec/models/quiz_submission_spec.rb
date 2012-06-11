@@ -596,11 +596,19 @@ describe QuizSubmission do
       QuizSubmission.score_question(qd, { "question_1" => "short" }).should ==
         { :question_id => 1, :correct => false, :points => 0, :text => "short" }
 
+      # Blank answer from quiz taker should not match even if blank answer is on quiz (blanks created by default)
+      qd_with_blank = short_answer_question_data_one_blank
+      QuizSubmission.score_question(qd_with_blank, { "question_1" => "" }).should ==
+        { :question_id => 1, :correct => false, :points => 0, :text => "" }
+
       QuizSubmission.score_question(qd, {}).should ==
         { :question_id => 1, :correct => false, :points => 0, :text => "" }
 
+      # Preserve idea of "undefined" for when student wasn't asked the question (ie no response) as separate from
+      # student was asked but didn't answer. Can happen when instructor adds question to a quiz that a student has
+      # already started or completed.
       QuizSubmission.score_question(qd, { "undefined_if_blank" => "1" }).should ==
-        { :question_id => 1, :correct => "undefined", :points => 0, :text => "" }
+        { :question_id => 1, :correct => 'undefined', :points => 0, :text => "" }
     end
 
     it "should score an essay_question" do

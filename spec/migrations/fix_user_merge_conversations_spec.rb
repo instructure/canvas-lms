@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20120216163427_fix_user_merge_conversations.rb'
 
-describe FixUserMergeConversations do
+describe 'FixUserMergeConversations' do
   describe "up" do
     it "should work" do
       u1 = user

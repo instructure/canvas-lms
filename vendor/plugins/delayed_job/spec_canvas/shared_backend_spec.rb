@@ -287,27 +287,6 @@ shared_examples_for 'a backend' do
       @backend.get_and_lock_next_available('w3', 60).should == nil
     end
 
-    context "next_in_strand" do
-      # mysql non-transactional DDL strikes us here
-      self.use_transactional_fixtures = false
-      it "should migrate existing jobs to the new next_in_strand strategy" do
-        require 'db/migrate/20110831210257_add_delayed_jobs_next_in_strand'
-        AddDelayedJobsNextInStrand.down
-        Delayed::Job.reset_column_information
-        y1 = create_job(:strand => 'myjobs')
-        n1 = create_job(:strand => 'myjobs')
-        n2 = create_job(:strand => 'myjobs')
-        y2 = create_job(:strand => 'myjobs2')
-        n3 = create_job(:strand => 'myjobs2')
-        y3 = create_job()
-        AddDelayedJobsNextInStrand.up
-        Delayed::Job.reset_column_information
-        [y1, y2, y3].each { |j| j.reload.next_in_strand.should be_true }
-        [n1, n2, n3].each { |j| j.reload.next_in_strand.should be_false }
-        Delayed::Job.delete_all
-      end
-    end
-
     context 'clear' do
       it "should clear all jobs" do
         create_job(:strand => 'myjobs')
@@ -323,6 +302,21 @@ shared_examples_for 'a backend' do
         # returns nil, because job1 is still running and job2 shouldn't
         # start yet
         @backend.get_and_lock_next_available('w1', 60).should be_nil
+      end
+    end
+
+    context 'n_strand' do
+      it "should default to 1" do
+        Delayed::Job.expects(:rand).never
+        job = Delayed::Job.enqueue(SimpleJob.new, :n_strand => 'njobs')
+        job.strand.should == "njobs"
+      end
+
+      it "should pick a strand randomly out of N" do
+        Setting.set("njobs_num_strands", "3")
+        Delayed::Job.expects(:rand).with(3).returns(1)
+        job = Delayed::Job.enqueue(SimpleJob.new, :n_strand => 'njobs')
+        job.strand.should == "njobs:2"
       end
     end
   end

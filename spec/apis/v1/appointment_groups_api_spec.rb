@@ -21,6 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe AppointmentGroupsController, :type => :integration do
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
+    @course1 = @course
+    course_with_teacher(:active_all => true, :user => @user)
+    @course2 = @course
     @me = @user
   end
 
@@ -34,11 +37,11 @@ describe AppointmentGroupsController, :type => :integration do
   ]
 
   it 'should return manageable appointment groups' do
-    ag1 = AppointmentGroup.create!(:title => "something", :contexts => [@course])
-    cat = @course.group_categories.create
-    ag2 = AppointmentGroup.create!(:title => "another", :contexts => [@course], :sub_context_codes => [cat.asset_string])
+    ag1 = AppointmentGroup.create!(:title => "something", :contexts => [@course1])
+    cat = @course1.group_categories.create
+    ag2 = AppointmentGroup.create!(:title => "another", :contexts => [@course1], :sub_context_codes => [cat.asset_string])
     ag3 = AppointmentGroup.create!(:title => "inaccessible", :contexts => [Course.create!])
-    ag4 = AppointmentGroup.create!(:title => "past", :contexts => [@course], :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
+    ag4 = AppointmentGroup.create!(:title => "past", :contexts => [@course1, @course2], :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
                     :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'})
@@ -81,12 +84,32 @@ describe AppointmentGroupsController, :type => :integration do
     ag8 = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     ag8.publish!
 
+    c1s2 = @course1.course_sections.create!
+    c2s2 = @course2.course_sections.create!
+    user_in_c1s2 = student_in_section(c1s2)
+    user_in_c2s2 = student_in_section(c2s2)
+    @user = @me
+
+    ag9 = AppointmentGroup.create! :title => "multiple contexts / sub contexts",
+                                   :contexts => [@course1, @course2],
+                                   :sub_context_codes => [c1s2.asset_string, c2s2.asset_string],
+                                   :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]]
+    ag9.publish!
+
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'})
     json.size.should eql 2
     json.first.keys.sort.should eql expected_fields
     json.first.slice('id', 'title', 'participant_type').should eql({'id' => ag6.id, 'title' => 'yay', 'participant_type' => 'User'})
     json.last.slice('id', 'title', 'participant_type').should eql({'id' => ag7.id, 'title' => 'double yay', 'participant_type' => 'Group'})
+
+    [user_in_c1s2, user_in_c2s2].each do |user|
+      @user = user
+      json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
+                        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'})
+      json.size.should eql 1
+      json.first['id'].should eql ag9.id
+    end
   end
 
   it "should return past reservable appointment groups, if requested" do
@@ -247,16 +270,6 @@ describe AppointmentGroupsController, :type => :integration do
                       {:appointment_group => {:title => "lol"} })
     json.keys.sort.should eql expected_fields
     json['title'].should eql 'lol'
-  end
-
-  it 'should ignore updates to readonly fields' do
-    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
-    json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
-                      {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
-                      {:appointment_group => {:title => "lol", :sub_context_codes => [@course.default_section.asset_string]} })
-    json.keys.sort.should eql expected_fields
-    json['title'].should eql 'lol'
-    json['sub_context_codes'].should eql []
   end
 
   it 'should publish an appointment group in an update through the api' do

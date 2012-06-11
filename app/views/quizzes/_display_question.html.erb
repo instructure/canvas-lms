@@ -181,7 +181,9 @@
               <div style="margin-left: 20px;">
                 <% answers = hash_get(question, :answers, []).select{|a| hash_get(a, :blank_id) == variable } %>
                 <% if question_type.entry_type == "text_box" %>
-                  <% user_answer[:text] = hash_get(user_answer, "answer_for_#{variable}") %>
+                  <% user_answer[:text] = hash_get(user_answer, "answer_for_#{variable}")
+                     user_answer[:text] = nil if user_answer[:text].blank?
+                  %>
                   <% matched_answer = answers.find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
                   <span class="text_box_answer <%= 'correct_text_box_answer' if matched_answer && matched_answer[:weight] == 100 %>">
                     <%= before_label(:your_answer, "Your Answer") %>
@@ -217,17 +219,22 @@
           <% else %>
             <% if user_answer && question_type.display_answers == "single" %>
               <div style="padding: 5px 20px;">
-                Your Answer: 
                 <% if question_type.entry_type == 'textarea' %>
+                  Your Answer:
                   <div class="user_content quiz_response_text"><%= hash_get(user_answer, :text).html_safe %></div>
                 <% else %>
-                  <b><%= h(hash_get(user_answer, :text) || t(:you_left_this_blank, "You left this blank")) %></b>
                   <% matched_answer = hash_get(question, :answers, []).find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
-                  <% hash_get(question, :answers, []).each do |a| 
-                    val = hash_get(user_answer, :text).to_f 
-                    matched_answer = a if hash_get(a, :numerical_answer_type) == "exact_answer" && val <= (hash_get(a, :exact) + hash_get(a, :margin)) && val >= (hash_get(a, :exact) - hash_get(a, :margin)) 
-                    matched_answer = a if hash_get(a, :numerical_answer_type) == "range_answer" && val <= hash_get(a, :end) && val >= hash_get(a, :start)
-                   end %>
+                  <% hash_get(question, :answers, []).each do |a|
+                    val = hash_get(user_answer, :text).to_f
+                    matched_answer = a if hash_get(a, :numerical_answer_type) == 'exact_answer' && val <= (hash_get(a, :exact) + hash_get(a, :margin)) && val >= (hash_get(a, :exact) - hash_get(a, :margin))
+                    matched_answer = a if hash_get(a, :numerical_answer_type) == 'range_answer' && val <= hash_get(a, :end) && val >= hash_get(a, :start)
+                  end %>
+                  <span class="text_box_answer <%= 'correct_text_box_answer' if user_answer[:correct] %>">
+                    <%= before_label(:your_answer, 'Your Answer') %>
+                    <% user_text = hash_get(user_answer, :text)
+                       user_text = nil if user_text.blank? %>
+                    <b><%= h(user_text || t(:you_left_this_blank, 'You left this blank')) %></b>
+                  </span>
                   <% if matched_answer && comment_get(matched_answer, :comments).present? %>
                     <div class="answer hide_right_arrow correct_answer">
                     <div class="answer_comment_holder">
@@ -245,7 +252,7 @@
               <% show_headers = @quiz && @quiz.show_correct_answers && user_answer && question_type.display_answers == "single" && hash_get(question, :question_type) != "essay_question" %>
               <% if show_headers %>
                 <div style="margin-left: 20px; font-size: 0.8em;">
-                <u><%= before_label :correct_answers2, "Correct Answer(s)" %></u>
+                <u><%= before_label :correct_answers2, 'Correct Answer(s)' %></u>
                 <div style="xfont-size: 0.8em;">
               <% end %>
               <% if editing || show_headers || !question_type.entry_type.match(/text_box/) %>

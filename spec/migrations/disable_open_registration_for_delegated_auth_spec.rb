@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20111121175219_disable_open_registration_for_delegated_auth.rb'
 
-describe DisableOpenRegistrationForDelegatedAuth do
+describe 'DisableOpenRegistrationForDelegatedAuth' do
   describe "up" do
     it "should work" do
       @cas_account = Account.create!

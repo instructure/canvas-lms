@@ -108,7 +108,7 @@ class Attachment < ActiveRecord::Base
       # a no-op.)
       self.process
     elsif ScribdAPI.enabled? && !Attachment.skip_scribd_submits?
-      send_later_enqueue_args(:submit_to_scribd!, { :strand => 'scribd', :max_attempts => 1 })
+      send_later_enqueue_args(:submit_to_scribd!, { :n_strand => 'scribd', :max_attempts => 1 })
     end
 
     send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/
@@ -728,7 +728,7 @@ class Attachment < ActiveRecord::Base
   # you should be able to pass an optional width, height, and page_number/video_seconds to this method
   # can't handle arbitrary thumbnails for our attachment_fu thumbnails on s3 though, we could handle a couple *predefined* sizes though
   def thumbnail_url(options={})
-    return nil if Attachment.skip_thumbnails || !ScribdAPI.enabled?
+    return nil if Attachment.skip_thumbnails
     if self.scribd_doc #handle if it is a scribd doc, get the thumbnail from scribd's api
       self.scribd_thumbnail(options)
     elsif self.thumbnail #handle attachment_fu iamges that we have made a thubnail for on our s3
@@ -1064,7 +1064,11 @@ class Attachment < ActiveRecord::Base
   named_scope :to_be_zipped, lambda{
     {:conditions => ['attachments.workflow_state = ? AND attachments.scribd_attempts < ?', 'to_be_zipped', 10], :order => 'created_at' }
   }
-  
+
+  named_scope :active, lambda {
+    { :conditions => ['attachments.file_state != ?', 'deleted'] }
+  }
+
   alias_method :destroy!, :destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
@@ -1075,6 +1079,9 @@ class Attachment < ActiveRecord::Base
     ContentTag.delete_for(self)
     MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:attachment_id => self.id}) if self.id && delete_media_object
     save!
+    # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
+    # then clear the avatar_image_url value.
+    self.context.clear_avatar_image_url_with_uuid(self.uuid) if self.context_type == 'User' && self.uuid.present?
   end
   
   def restore

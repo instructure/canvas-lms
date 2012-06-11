@@ -97,7 +97,7 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id) }
         elsif @assignment.submission_types == 'attendance' && !@editing
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
-        elsif @assignment.submission_types == 'external_tool' && !@editing && @assignment.external_tool_tag
+        elsif @assignment.submission_types == 'external_tool' && !@editing && @assignment.external_tool_tag && @unlocked
           format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url) }
         else
           format.html { render :action => 'show' }
@@ -178,7 +178,7 @@ class AssignmentsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end
-      @students = @context.students_visible_to(@current_user)
+      @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end

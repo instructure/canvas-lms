@@ -358,16 +358,20 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </tr><tr>
         <td></td>
         <td colspan="3">
-          <span class="course_info self_enrollment_message" style="<%= hidden unless @context.self_enrollment %>">
-            <%= before_label 'course_open_enrollment', 'This course has enabled open enrollment.  Students can self-enroll in the course once you share with them this url' %><br/>
-            <input type="text" class="copyable" value="<%= h(course_self_enrollment_url(@context, @context.self_enrollment_code)) %>"/>
+          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment %>">
+            <%= t 'course_open_enrollment', <<-TEXT, :url => course_self_enrollment_url(@context, @context.self_enrollment_code || '{{ self_enrollment_code }}'), :wrapper => '<b>\1</b>'
+                  This course has enabled open enrollment. Students can
+                  self-enroll in the course once you share with them this URL:
+                  *%{url}*
+                TEXT
+            %>
           </span>
           <a href="#" class="course_form course_form_more_options_link" style="padding-left: 20px;"><%= t('links.more_options', %{more options}) %></a>
           <div class="course_form_more_options" style="display: none; padding-left: 20px;">
             <% f.fields_for :settings do |settings| %>
               <% if @context.self_enrollment_allowed? %>
                 <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox' %>
-                <%= f.label :self_enrollment, :en => "Let students self-enroll by sharing with them a secret URL" %><br/>
+                <%= f.label :self_enrollment, :en => "Let students self-enroll by sharing with them a secret URL or code" %><br/>
                 <div class="open_enrollment_holder" style="display: none;">
                 <%= f.check_box :open_enrollment %>
                 <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>

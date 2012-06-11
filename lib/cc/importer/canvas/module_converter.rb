@@ -18,11 +18,11 @@
 module CC::Importer::Canvas
   module ModuleConverter
     include CC::Importer
-    
+
     def convert_modules(doc)
       modules = []
       return modules unless doc
-      
+
       doc.css('module').each do |r_node|
         mod = {}
         mod[:migration_id] = r_node['identifier']
@@ -32,7 +32,7 @@ module CC::Importer::Canvas
         mod[:end_at] = get_time_val(r_node, 'end_at')
         mod[:unlock_at] = get_time_val(r_node, 'unlock_at')
         mod[:require_sequential_progress] = get_bool_val(r_node, 'require_sequential_progress')
-        
+
         mod[:items] = []
         r_node.css('item').each do |item_node|
           item = {}
@@ -41,12 +41,13 @@ module CC::Importer::Canvas
           item[:indent] = get_int_val(item_node, 'indent')
           item[:url] = get_node_val(item_node, 'url')
           item[:title] = get_node_val(item_node, 'title')
+          item[:new_tab] = get_bool_val(item_node, 'new_tab')
           item[:linked_resource_type] = get_node_val(item_node, 'content_type')
           item[:linked_resource_id] = get_node_val(item_node, 'identifierref')
-          
+
           mod[:items] << item
         end
-        
+
         mod[:completion_requirements] = []
         r_node.css('completionRequirement').each do |cr_node|
           cr = {}
@@ -54,24 +55,24 @@ module CC::Importer::Canvas
           cr[:item_migration_id] = get_node_val(cr_node, 'identifierref')
           cr[:min_score] = get_float_val(cr_node, 'min_score')
           cr[:max_score] = get_float_val(cr_node, 'max_score')
-          
+
           mod[:completion_requirements] << cr
         end
-        
+
         mod[:prerequisites] = []
         r_node.css('prerequisite').each do |p_node|
           prereq = {}
           prereq[:type] = p_node['type']
-          prereq[:title] = get_node_val(p_node, 'title')          
-          prereq[:module_migration_id] = get_node_val(p_node, 'identifierref')          
+          prereq[:title] = get_node_val(p_node, 'title')
+          prereq[:module_migration_id] = get_node_val(p_node, 'identifierref')
           mod[:prerequisites] << prereq
         end
-        
+
         modules << mod
       end
-      
+
       modules
     end
-    
+
   end
 end

@@ -290,6 +290,22 @@ describe EnrollmentsApiController, :type => :integration do
         }
       end
 
+      it "should return enrollments for unpublished courses" do
+        course
+        @course.claim
+        enrollment = course.enroll_student(@student)
+        enrollment.update_attribute(:workflow_state, 'active')
+
+        # without a state[] filter
+        json = api_call(:get, @user_path, @user_params)
+        json.map { |e| e['id'] }.should include enrollment.id
+
+        # with a state[] filter
+        json = api_call(:get, "#{@user_path}?state[]=active",
+                        @user_params.merge(:state => %w{active}))
+        json.map { |e| e['id'] }.should include enrollment.id
+      end
+
       it "should not return enrollments from other accounts" do
         # enroll the user in a course in another account
         account = Account.create!(:name => 'Account Two')
@@ -304,7 +320,7 @@ describe EnrollmentsApiController, :type => :integration do
         enrollment = @student.enrollments.first
         enrollment.course_section = @section
         enrollment.save!
-        
+
         @path = "/api/v1/sections/#{@section.id}/enrollments"
         @params = { :controller => "enrollments_api", :action => "index", :section_id => @section.id.to_param, :format => "json" }
         json = api_call(:get, @path, @params)
@@ -381,6 +397,24 @@ describe EnrollmentsApiController, :type => :integration do
             'updated_at' => e.updated_at.xmlschema
           }
         }
+      end
+
+      it "should not show enrollments for courses that aren't published" do
+        # Setup test with an unpublished course and an active enrollment in
+        # that course.
+        course
+        @course.claim
+        enrollment = course.enroll_student(@user)
+        enrollment.update_attribute(:workflow_state, 'active')
+
+        # Request w/o a state[] filter.
+        json = api_call(:get, @user_path, @user_params)
+        json.map { |e| e['id'] }.should_not include enrollment.id
+
+        # Request w/ a state[] filter.
+        json = api_call(:get, "#{@user_path}?state[]=active&type[]=StudentEnrollment",
+                        @user_params.merge(:state => %w{active}, :type => %w{StudentEnrollment}))
+        json.map { |e| e['id'] }.should_not include enrollment.id
       end
 
       it "should not include the users' sis and login ids" do
@@ -641,6 +675,15 @@ describe EnrollmentsApiController, :type => :integration do
           } if e.student?
           h
         }
+      end
+
+      it "should return an empty array when no user enrollments match a filter" do
+        site_admin_user(:active_all => true)
+
+        json = api_call(:get, "#{@user_path}?type[]=TeacherEnrollment",
+          @user_params.merge(:type => %w{TeacherEnrollment}))
+
+        json.should be_empty
       end
     end
   end

@@ -126,7 +126,7 @@ describe "Standard Common Cartridge importing" do
     et.name.should == "BLTI Test"
     et.url.should == 'http://www.imsglobal.org/developers/BLTI/tool.php'
     et.settings[:custom_fields].should == {"key1"=>"value1", "key2"=>"value2"}
-    et.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}, {:platform=>"your.lms.com", :custom_fields=>{"key"=>"value", "key2"=>"value2"}}]
+    et.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}, {:platform=>"your.lms.com", :custom_fields=>{"key"=>"value", "key2"=>"value2"}}].map(&:with_indifferent_access)
     @migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.").should be_true
   end
 

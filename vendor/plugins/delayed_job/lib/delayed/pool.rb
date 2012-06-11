@@ -50,7 +50,11 @@ class Pool
     when 'run'
       start
     when 'status'
-      status
+      if status
+        exit 0
+      else
+        exit 1
+      end
     when 'restart'
       stop if status(false)
       sleep(0.5) while status(false)

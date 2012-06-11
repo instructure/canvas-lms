@@ -166,6 +166,7 @@
     { name: "compiled/bundles/manage_avatars", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/manage_groups", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/moderate_quiz", exclude: ['common', 'compiled/tinymce'] },
+    { name: "compiled/bundles/notifications", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/plugins", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/prerequisites_lookup", exclude: ['common', 'compiled/tinymce'] },
     { name: "compiled/bundles/profile", exclude: ['common', 'compiled/tinymce'] },

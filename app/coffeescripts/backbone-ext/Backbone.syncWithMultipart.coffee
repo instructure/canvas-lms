@@ -21,7 +21,10 @@ define [
         else if not _.isEmpty(attr) and (_.isArray(attr) or typeof attr is 'object')
           toForm(attr, key)
         else if not "#{key}".match(/^_/) and attr? and typeof attr isnt 'object' and typeof attr isnt 'function'
-          $("<input type='hidden' name='#{key}' value='#{attr}' />")[0]
+          $el = $ "<input/>",
+            name: key
+            value: attr
+          $el[0]
       _.flatten(inputs)
     $form = $("""
       <form enctype='multipart/form-data' target='#{iframeId}' action='#{options.url ? model.url()}' method='POST'>

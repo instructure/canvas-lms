@@ -214,12 +214,10 @@ class ContentTag < ActiveRecord::Base
   def content_asset_string=(val)
     vals = val.split("_")
     id = vals.pop
-    if Context::AssetTypes.const_defined?(vals.join("_").classify)
-      type = Context::AssetTypes.const_get(vals.join("_").classify).to_s
-      if type && id && id.to_i > 0
-        self.content_type = type
-        self.content_id = id
-      end
+    type = Context::AssetTypes.get_for_string(vals.join("_").classify)
+    if type && id && id.to_i > 0
+      self.content_type = type.to_s
+      self.content_id = id
     end
   end
   

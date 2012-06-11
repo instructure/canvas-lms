@@ -133,8 +133,6 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
-  ALLOWED_FIELDS = %w(name position points_possible grading_type due_at)
-
   # @API Create an assignment
   # Create a new assignment for this course. The assignment is created in the
   # active state.
@@ -147,22 +145,11 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"points"] The strategy used for grading the assignment. The assignment is ungraded if this field is omitted.
   # @argument assignment[due_at] [Timestamp] The day/time the assignment is due. Accepts
   #   times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  # @argument assignment[description] [String] The assignment's description, supports HTML.
   def create
-    assignment_params = {}
-    if params[:assignment].is_a?(Hash)
-      assignment_params = params[:assignment].slice(*ALLOWED_FIELDS)
-      assignment_params["time_zone_edited"] = Time.zone.name if assignment_params["due_at"]
-    end
-    # TODO: allow rubric creation
-
-    @assignment = @context.active_assignments.build(assignment_params)
-    @assignment.infer_due_at
+    @assignment = create_api_assignment(@context, params[:assignment])
 
     if authorized_action(@assignment, @current_user, :create)
-      if custom_vals = params[:assignment][:set_custom_field_values]
-        @assignment.set_custom_field_values = custom_vals
-      end
-
       if @assignment.save
         render :json => assignment_json(@assignment, @current_user, session, [], @context.user_is_teacher?(@current_user)).to_json, :status => 201
       else
@@ -177,22 +164,15 @@ class AssignmentsApiController < ApplicationController
   # Modify an existing assignment. See the documentation for assignment
   # creation.
   def update
-    assignment_params = {}
-    if params[:assignment].is_a?(Hash)
-      assignment_params = params[:assignment].slice(*ALLOWED_FIELDS)
-    end
-
     @assignment = @context.assignments.find(params[:id])
 
     if authorized_action(@assignment, @current_user, :update_content)
       if @assignment.frozen?
         render :json => {:message => t('errors.no_edit_frozen', "You cannot edit a frozen assignment.")}.to_json, :status => 400
       else
-        if custom_vals = params[:assignment][:set_custom_field_values]
-          @assignment.set_custom_field_values = custom_vals
-        end
+        update_api_assignment(@assignment, params[:assignment])
 
-        if @assignment.update_attributes(assignment_params)
+        if @assignment.save
           render :json => assignment_json(@assignment, @current_user, session, [], @context.user_is_teacher?(@current_user)).to_json, :status => 201
         else
           # TODO: we don't really have a strategy in the API yet for returning

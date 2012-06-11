@@ -176,6 +176,21 @@ describe ContentMigration do
       new_topic.message.should match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
     end
 
+    it "should tranlsate links to module items in html content" do
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+      tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+      body = %{<p>Link to module item: <a href="/courses/%s/modules/items/%s">some assignment</a></p>}
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, tag.id])
+
+      run_course_copy
+
+      mod1_to = @copy_to.context_modules.find_by_migration_id(mig_id(mod1))
+      tag_to = mod1_to.content_tags.first
+      page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      page_to.body.should == body % [@copy_to.id, tag_to.id]
+    end
+
     it "should selectively copy items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       dt2 = @copy_from.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
@@ -839,12 +854,16 @@ describe ContentMigration do
 
     it "should correctly copy quiz question html file references" do
       pending unless Qti.qti_enabled?
-      att = Attachment.create!(:filename => 'first.jpg', :display_name => "first.jpg", :uploaded_data => StringIO.new('first'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      att2 = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('second'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      att3 = Attachment.create!(:filename => 'testing.jpg', :display_name => "testing.jpg", :uploaded_data => StringIO.new('test this'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      root = Folder.root_folders(@copy_from).first
+      folder = root.sub_folders.create!(:context => @copy_from, :name => 'folder 1')
+      att = Attachment.create!(:filename => 'first.jpg', :display_name => "first.jpg", :uploaded_data => StringIO.new('first'), :folder => root, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('second'), :folder => root, :context => @copy_from)
+      att3 = Attachment.create!(:filename => 'testing.jpg', :display_name => "testing.jpg", :uploaded_data => StringIO.new('test this'), :folder => root, :context => @copy_from)
+      att4 = Attachment.create!(:filename => 'sub_test.jpg', :display_name => "sub_test.jpg", :uploaded_data => StringIO.new('sub_folder'), :folder => folder, :context => @copy_from)
       qtext = <<-HTML.strip
 File ref:<img src="/courses/%s/files/%s/download">
 different file ref: <img src="/courses/%s/%s">
+subfolder file ref: <img src="/courses/%s/%s">
 media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
 equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
         HTML
@@ -854,7 +873,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
                     :question_name => "test fun",
                     :name => "test fun",
                     :points_possible => 10,
-                    :question_text => qtext % [@copy_from.id, att.id, @copy_from.id, "file_contents/course%20files/test.jpg"],
+                    :question_text => qtext % [@copy_from.id, att.id, @copy_from.id, "file_contents/course%20files/test.jpg", @copy_from.id, "file_contents/course%20files/folder%201/sub_test.jpg"],
                     :answers =>
                             [{:migration_id => "QUE_1016_A1", :html => %{File ref:<img src="/courses/#{@copy_from.id}/files/#{att3.id}/download">}, :comments_html =>'<i>comment</i>', :text => "", :weight => 100, :id => 8080},
                              {:migration_id => "QUE_1017_A2", :html => "<strong>html answer 2</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
@@ -866,14 +885,15 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       run_course_copy
 
-      @copy_to.attachments.count.should == 3
+      @copy_to.attachments.count.should == 4
       att_2 = @copy_to.attachments.find_by_migration_id(mig_id(att))
       att2_2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
       att3_2 = @copy_to.attachments.find_by_migration_id(mig_id(att3))
+      att4_2 = @copy_to.attachments.find_by_migration_id(mig_id(att4))
 
       q_to = @copy_to.quizzes.first
       qq_to = q_to.quiz_questions.first
-      qq_to.question_data[:question_text].should == qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview"]
+      qq_to.question_data[:question_text].should == qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"]
       qq_to.question_data[:answers][0][:html].should == %{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">}
     end
 
@@ -924,6 +944,144 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq.question_data[:answers][0][:left_html].should == data2[:answers][0][:left_html]
       aq.question_data[:answers][1][:html].should == data2[:answers][1][:html]
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
+    end
+
+    it "should import calendar events" do
+      body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+      cal = @copy_from.calendar_events.new
+      cal.title = "Calendar event"
+      cal.description = body_with_link % @copy_from.id
+      cal.start_at = 1.week.from_now
+      cal.save!
+      cal.all_day = true
+      cal.save!
+      cal2 = @copy_from.calendar_events.new
+      cal2.title = "Stupid events"
+      cal2.start_at = 5.minutes.from_now
+      cal2.end_at = 10.minutes.from_now
+      cal2.all_day = false
+      cal2.save!
+      cal3 = @copy_from.calendar_events.create!(:title => "deleted event")
+      cal3.destroy
+
+      run_course_copy
+
+      @copy_to.calendar_events.count.should == 2
+      cal_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal))
+      cal_2.title.should == cal.title
+      cal_2.start_at.to_i.should == cal.start_at.to_i
+      cal_2.end_at.to_i.should == cal.end_at.to_i
+      cal_2.all_day.should == true
+      cal_2.all_day_date.should == cal.all_day_date
+      cal_2.description = body_with_link % @copy_to.id
+
+      cal2_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal2))
+      cal2_2.title.should == cal2.title
+      cal2_2.start_at.to_i.should == cal2.start_at.to_i
+      cal2_2.end_at.to_i.should == cal2.end_at.to_i
+      cal2_2.description.should == ''
+    end
+
+    it "should leave text answers as text" do
+      pending unless Qti.qti_enabled?
+      @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
+      data = {
+                          :question_type => "multiple_choice_question",
+                          :question_name => "test fun",
+                          :name => "test fun",
+                          :points_possible => 10,
+                          :question_text => "<strong>html for fun</strong>",
+                          :answers =>
+                                  [{:migration_id => "QUE_1016_A1", :text => "<br />", :weight => 100, :id => 8080},
+                                   {:migration_id => "QUE_1017_A2", :text => "<pre>", :weight => 0, :id => 2279}]}.with_indifferent_access
+      aq_from1 = @bank.assessment_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      aq = @copy_to.assessment_questions.find_by_migration_id(mig_id(aq_from1))
+
+      aq.question_data[:answers][0][:text].should == data[:answers][0][:text]
+      aq.question_data[:answers][1][:text].should == data[:answers][1][:text]
+      aq.question_data[:answers][0][:html].should be_nil
+      aq.question_data[:answers][1][:html].should be_nil
+      aq.question_data[:question_text].should == data[:question_text]
+    end
+
+    context "copying frozen assignments" do
+      append_before (:each) do
+        @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => {"no_copying" => "yes"})
+
+        @asmnt = @copy_from.assignments.create!(:title => 'lock locky')
+        @asmnt.copied = true
+        @asmnt.freeze_on_copy = true
+        @asmnt.save!
+        @quiz = @copy_from.quizzes.create(:title => "quiz", :quiz_type => "assignment")
+        @quiz.workflow_state = 'available'
+        @quiz.save!
+        @quiz.assignment.copied = true
+        @quiz.assignment.freeze_on_copy = true
+        @quiz.save!
+        @topic = @copy_from.discussion_topics.build(:title => "topic")
+        assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+        assignment.infer_due_at
+        assignment.saved_by = :discussion_topic
+        assignment.copied = true
+        assignment.freeze_on_copy = true
+        @topic.assignment = assignment
+        @topic.save
+
+        @admin = account_admin_user(opts={})
+      end
+
+      it "should copy for admin" do
+        @cm.user = @admin
+        @cm.save!
+
+        run_course_copy
+
+        @copy_to.assignments.count.should == (Qti.qti_enabled? ? 3 : 2)
+        @copy_to.quizzes.count.should == 1 if Qti.qti_enabled?
+        @copy_to.discussion_topics.count.should == 1
+        @cm.content_export.error_messages.should == []
+      end
+
+      it "should copy for teacher if flag not set" do
+        @setting.settings = {}
+        @setting.save!
+
+        run_course_copy
+
+        @copy_to.assignments.count.should == (Qti.qti_enabled? ? 3 : 2)
+        @copy_to.quizzes.count.should == 1 if Qti.qti_enabled?
+        @copy_to.discussion_topics.count.should == 1
+        @cm.content_export.error_messages.should == []
+      end
+
+      it "should not copy for teacher" do
+        run_course_copy
+
+        @copy_to.assignments.count.should == 0
+        @copy_to.quizzes.count.should == 0
+        @copy_to.discussion_topics.count.should == 0
+
+        @cm.content_export.error_messages.should == [
+                ["The assignment \"lock locky\" could not be copied because it is locked.", nil],
+                ["The topic \"topic\" could not be copied because it is locked.", nil],
+                ["The quiz \"quiz\" could not be copied because it is locked.", nil]]
+      end
+
+      it "should not mark assignment as copied if not set to be frozen" do
+        @asmnt.freeze_on_copy = false
+        @asmnt.copied = false
+        @asmnt.save!
+
+        run_course_copy
+
+        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(@asmnt))
+        asmnt_2.freeze_on_copy.should be_nil
+        asmnt_2.copied.should be_nil
+      end
+
     end
 
     context "notifications" do

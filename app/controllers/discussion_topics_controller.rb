@@ -18,7 +18,83 @@
 
 # @API Discussion Topics
 #
-# API for accessing and participating in discussion topics in groups and courses.
+# A discussion topic object looks like:
+#
+#      !!!javascript
+#      {
+#        // The ID of this topic.
+#        "id":1,
+#
+#        // The topic title.
+#        "title":"Topic 1",
+#
+#        // The HTML content of the message body.
+#        "message":"<p>content here</p>",
+#
+#        // The URL to the discussion topic in canvas.
+#        "html_url": "https://<canvas>/courses/1/discussion_topics/2",
+#
+#        // The datetime the topic was posted. If it is null it hasn't been
+#        // posted yet. (see delayed_post_at)
+#        "posted_at":"2037-07-21T13:29:31Z",
+#
+#        // The datetime for when the last reply was in the topic.
+#        "last_reply_at":"2037-07-28T19:38:31Z",
+#
+#        // If true then a user may not respond to other replies until that user
+#        // has made an initial reply. Defaults to false.
+#        "require_initial_post":false,
+#
+#        // The count of entries in the topic.
+#        "discussion_subentry_count":0,
+#
+#        // The read_state of the topic for the current user, "read" or "unread".
+#        "read_state":"read",
+#
+#        // The count of unread entries of this topic for the current user.
+#        "unread_count":0,
+#
+#        // The unique identifier of the assignment if the topic is for grading, otherwise null.
+#        "assignment_id":null,
+#
+#        // The datetime to publish the topic (if not right away).
+#        "delayed_post_at":null,
+#
+#        // The username of the topic creator.
+#        "user_name":"User Name",
+#
+#        // An array of topic_ids for the group discussions the user is a part of.
+#        "topic_children":[5, 7, 10],
+#
+#        // If the topic is for grading and a group assignment this will
+#        // point to the original topic in the course.
+#        "root_topic_id":null,
+#
+#        // If the topic is a podcast topic this is the feed url for the current user.
+#        "podcast_url":"/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
+#
+#        // The type of discussion. Values are 'side_comment', for discussions
+#        // that only allow one level of nested comments, and 'threaded' for
+#        // fully threaded discussions.
+#        "discussion_type":"side_comment",
+#
+#        // Array of file attachments.
+#        "attachments":[
+#          {
+#            "content-type":"unknown/unknown",
+#            "url":"http://www.example.com/courses/1/files/1/download",
+#            "filename":"content.txt",
+#            "display_name":"content.txt"
+#          }
+#        ],
+#
+#        // The current user's permissions on this topic.
+#        "permissions":
+#        {
+#          // If true, the calling user can attach files to this discussion's entries.
+#          "attach": true
+#        }
+#      }
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
 
@@ -26,67 +102,22 @@ class DiscussionTopicsController < ApplicationController
   before_filter { |c| c.active_tab = "discussions" }
 
   include Api::V1::DiscussionTopics
+  include Api::V1::Assignment
 
   # @API List discussion topics
   #
-  # Returns the list of discussion topics for this course.
+  # Returns the paginated list of discussion topics for this course or group.
   #
-  # @response_field assignment_id The unique identifier of the assignment if the topic is for grading, otherwise null
-  # @response_field attachments Array of attachments
-  # @response_field delayed_post_at The datetime to post the topic (if not right away)
-  # @response_field discussion_subentry_count The count of entries in the topic
-  # @response_field read_state The read_state of the topic, "read" or "unread"
-  # @response_field unread_count The count of unread entries of this topic
-  # @response_field id The unique identifier for the discussion topic.
-  # @response_field last_reply_at The datetime for when the last reply was in the topic
-  # @response_field message The HTML content of the topic
-  # @response_field podcast_url If the topic is a podcast topic this is the feed url for the current user
-  # @response_field posted_at The datetime the topic was posted. If it is null it hasn't been posted yet. (see delayed_post_at)
-  # @response_field require_initial_post If true then a user may not respond to other replies until that user has made an initial reply
-  # @response_field root_topic_id If the topic is for grading and a group assignment this will point to the original topic in the course
-  # @response_field title The title of the topic
-  # @response_field topic_children An array of topic_ids for the group discussions the user is a part of
-  # @response_field user_name The username of the creator
-  # @response_field url The URL to the discussion topic in canvas
-  # @response_field discussion_type The type of discussion. Values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
-  # @response_field permissions[attach] If true, the calling user can attach files to this discussion's entries.
-  #
-  # @example_response
-  #     [
-  #      {
-  #        "id":1,
-  #        "title":"Topic 1",
-  #        "message":"<p>content here</p>",
-  #        "posted_at":"2037-07-21T13:29:31Z",
-  #        "last_reply_at":"2037-07-28T19:38:31Z",
-  #        "require_initial_post":null,
-  #        "discussion_subentry_count":0,
-  #        "read_state":"read",
-  #        "unread_count":0,
-  #        "assignment_id":null,
-  #        "delayed_post_at":null,
-  #        "user_name":"User Name",
-  #        "topic_children":[],
-  #        "root_topic_id":null,
-  #        "podcast_url":"/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
-  #        "discussion_type":"side_comment",
-  #        "attachments":[
-  #          {
-  #            "content-type":"unknown/unknown",
-  #            "url":"http://www.example.com/courses/1/files/1/download",
-  #            "filename":"content.txt",
-  #            "display_name":"content.txt"
-  #          }
-  #        ],
-  #        "permissions": { "attach": true }
-  #      }
-  #     ]
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
+  #         -H 'Authorization: Bearer <token>'
   def index
     @context.assert_assignment_group rescue nil
     @all_topics = @context.discussion_topics.active
     @all_topics = @all_topics.only_discussion_topics if params[:include_announcements] != "1"
-    @topics = Api.paginate(@all_topics, self, topic_pagination_path).reject{|a| a.locked_for?(@current_user, :check_policies => true) }.
-      each { |t| t.current_user = @current_user }
+    @topics = Api.paginate(@all_topics, self, topic_pagination_path)
+    @topics.reject! { |a| a.locked_for?(@current_user, :check_policies => true) }
+    @topics.each { |t| t.current_user = @current_user }
     if authorized_action(@context.discussion_topics.new, @current_user, :read)
       return child_topic if params[:root_discussion_topic_id] && @context.respond_to?(:context) && @context.context && @context.context.discussion_topics.find(params[:root_discussion_topic_id])
       log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
@@ -227,22 +258,63 @@ class DiscussionTopicsController < ApplicationController
   end
   protected :generate_assignment
 
+  # @API Create a new discussion topic
+  #
+  # Create an new discussion topic for the course or group.
+  #
+  # @argument title
+  # @argument message
+  # @argument discussion_type
+  #
+  # @argument delayed_post_at If a timestamp is given, the topic will not be published until that time.
+  #
+  # @argument podcast_enabled If true, the topic will have an associated podcast feed.
+  # @argument podcast_has_student_posts If true, the podcast will include posts from students as well. Implies podcast_enabled.
+  #
+  # @argument require_initial_post If true then a user may not respond to other replies until that user has made an initial reply. Defaults to false.
+  #
+  # @argument assignment To create an assignment discussion, pass the assignment parameters as a sub-object. See the {api:AssignmentsApiController#create Create an Assignment API} for the available parameters. The name parameter will be ignored, as it's taken from the discussion title.
+  #
+  # @argument is_announcement If true, this topic is an announcement. It will appear in the announcements section rather than the discussions section. This requires announcment-posting permissions.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
+  #         -F title='my topic' \ 
+  #         -F message='initial message' \ 
+  #         -F podcast_enabled=1 \ 
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
+  #         -F title='my assignment topic' \ 
+  #         -F message='initial message' \ 
+  #         -F assignment[points_possible]=15 \ 
+  #         -H 'Authorization: Bearer <token>'
+  #
   def create
-    params[:discussion_topic].delete(:remove_attachment)
-
-    delay_posting = params[:discussion_topic].delete(:delay_posting)
-    assignment = params[:discussion_topic].delete(:assignment)
-    generate_assignment(assignment) if assignment && assignment[:set_assignment]
+    if api_request?
+      delay_posting = '1' if params[:delayed_post_at].present?
+      params[:podcast_enabled] = true if value_to_boolean(params[:podcast_has_student_posts])
+      params[:discussion_topic] = params.slice(:title, :message, :discussion_type, :delayed_post_at, :podcast_enabled, :podcast_has_student_posts, :require_initial_post, :is_announcement)
+      params[:discussion_topic][:assignment] = create_api_assignment(@context, params[:assignment])
+    else
+      params[:discussion_topic].delete(:remove_attachment)
+      delay_posting ||= params[:discussion_topic].delete(:delay_posting)
+      assignment = params[:discussion_topic].delete(:assignment)
+      generate_assignment(assignment) if assignment && assignment[:set_assignment]
+    end
 
     unless @context.grants_right?(@current_user, session, :moderate_forum)
       params[:discussion_topic].delete :podcast_enabled
       params[:discussion_topic].delete :podcast_has_student_posts
     end
-    if params[:discussion_topic].delete(:is_announcement) == "1" && @context.announcements.new.grants_right?(@current_user, session, :create)
+
+    if value_to_boolean(params[:discussion_topic].delete(:is_announcement)) && @context.announcements.new.grants_right?(@current_user, session, :create)
       @topic = @context.announcements.build(params[:discussion_topic])
     else
       @topic = @context.discussion_topics.build(params[:discussion_topic])
     end
+
     @topic.workflow_state = 'post_delayed' if delay_posting == '1' && @topic.delayed_post_at && @topic.delayed_post_at > Time.now
     @topic.delayed_post_at = "" unless @topic.post_delayed?
     @topic.user = @current_user
@@ -263,9 +335,17 @@ class DiscussionTopicsController < ApplicationController
             @topic.attachment = @attachment
             @topic.save
           end
-          flash[:notice] = t :topic_created_notice, 'Topic was successfully created.'
-          format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic) }
-          format.json  { render :json => @topic.to_json(:include => [:assignment,:attachment], :methods => [:user_name, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session}), :status => :created }
+          format.html do
+            flash[:notice] = t :topic_created_notice, 'Topic was successfully created.'
+            redirect_to named_context_url(@context, :context_discussion_topic_url, @topic)
+          end
+          format.json do
+            if api_request?
+              render :json => discussion_topics_api_json([@topic], @context, @current_user, session).first
+            else
+              render :json => @topic.to_json(:include => [:assignment,:attachment], :methods => [:user_name, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session}), :status => :created
+            end
+          end
           format.text  { render :json => @topic.to_json(:include => [:assignment,:attachment], :methods => [:user_name, :read_state, :unread_count], :permissions => {:user => @current_user, :session => session}), :status => :created }
         else
           format.html { render :action => "new" }
@@ -331,8 +411,16 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
+  # @API Delete a topic
+  #
+  # Deletes the discussion topic. This will also delete the assignment, if it's
+  # an assignment discussion.
+  #
+  # @example_request
+  #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
+  #         -H 'Authorization: Bearer <token>'
   def destroy
-    @topic = @context.all_discussion_topics.find(params[:id])
+    @topic = @context.all_discussion_topics.find(params[:id] || params[:topic_id])
     if authorized_action(@topic, @current_user, :delete)
       @topic.destroy
       respond_to do |format|

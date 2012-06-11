@@ -26,6 +26,6 @@
 </div>
 <div id="group_messages">
   <% cache([@current_user, @context, @current_conferences, 'recent_messages']) do %>
-    <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.stream_items(:contexts => @context)) || []), :locals => {:conferences => @current_conferences } %>
+    <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.recent_stream_items(:contexts => @context)) || []), :locals => {:conferences => @current_conferences } %>
   <% end %>
 </div>

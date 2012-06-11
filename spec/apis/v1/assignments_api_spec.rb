@@ -148,6 +148,7 @@ describe AssignmentsApiController, :type => :integration do
           { :assignment => { 'name' => 'some assignment',
               'position' => '1', 'points_possible' => '12',
               'due_at' => '2011-01-01',
+              'description' => 'assignment description',
               'grading_type' => 'points', 'set_custom_field_values' => { 'test_custom' => { 'value' => '1' } } } })
 
     assignment = Assignment.first
@@ -156,7 +157,7 @@ describe AssignmentsApiController, :type => :integration do
       'assignment_group_id' => assignment.assignment_group_id,
       'name' => 'some assignment',
       'course_id' => @course.id,
-      'description' => nil,
+      'description' => 'assignment description',
       'muted' => false,
       'position' => 1,
       'points_possible' => 12,
@@ -270,6 +271,7 @@ describe AssignmentsApiController, :type => :integration do
       'read_state' => 'unread',
       'unread_count' => 0,
       'url' => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+      'html_url' => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
       'attachments' => [],
       'permissions' => { 'attach' => true },
       'discussion_type' => 'side_comment',

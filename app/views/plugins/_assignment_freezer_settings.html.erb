@@ -9,6 +9,12 @@ TEXT
         %></p>
       </td>
     </tr>
+    <tr>
+      <td colspan="2">
+        <%= f.check_box "no_copying", {}, 'yes', 'no' %>
+        <%= f.label "no_copying", t('no_copying_frozen', "Don't allow frozen assignments to be copied.") %>
+      </td>
+    </tr>
     <% Assignment::FREEZABLE_ATTRIBUTES.sort.each do |att| %>
       <tr>
         <td colspan=2><%= f.check_box att, {}, 'yes', 'no' %>

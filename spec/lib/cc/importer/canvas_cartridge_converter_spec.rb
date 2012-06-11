@@ -146,12 +146,14 @@ describe "Canvas Cartridge importing" do
     tool1.privacy_level = 'name_only'
     tool1.consumer_key = 'haha'
     tool1.shared_secret = "don't share me"
+    tool1.tool_id = "test_tool"
     tool1.settings[:custom_fields] = {"key1" => "value1", "key2" => "value2"}
     tool1.settings[:user_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
     tool1.settings[:course_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra'}
     tool1.settings[:account_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
     tool1.settings[:resource_selection] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:editor_button] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra'}
+    tool1.settings[:icon_url] = "http://www.example.com/favicon.ico"
     tool1.save!
     tool2 = @copy_from.context_external_tools.new
     tool2.domain = 'example.com'
@@ -190,6 +192,8 @@ describe "Canvas Cartridge importing" do
     t1.domain.should == nil
     t1.consumer_key.should == 'fake'
     t1.shared_secret.should == 'fake'
+    t1.tool_id.should == 'test_tool'
+    t1.settings[:icon_url].should == 'http://www.example.com/favicon.ico'
     [:user_navigation, :course_navigation, :account_navigation].each do |type|
       t1.settings[type][:url].should == "http://www.example.com"
       t1.settings[type][:text].should == "hello"
@@ -228,6 +232,8 @@ describe "Canvas Cartridge importing" do
     t2.workflow_state.should == tool2.workflow_state
     t2.consumer_key.should == 'fake'
     t2.shared_secret.should == 'fake'
+    t2.tool_id.should be_nil
+    t2.settings[:icon_url].should be_nil
     t2.settings[:user_navigation].should be_nil
     t2.settings[:course_navigation].should be_nil
     t2.settings[:account_navigation].should be_nil
@@ -249,10 +255,10 @@ describe "Canvas Cartridge importing" do
 
     mod1 = @copy_from.context_modules.create!(:name => "some module")
 
-    tag = mod1.add_item({:title => "test", :type => 'context_external_tool', :url => "http://example.com.ims/lti"})
+    tag = mod1.add_item({:title => "test", :type => 'context_external_tool', :url => "http://example.com.ims/lti", :new_tab => true})
     tag = mod1.add_item({:title => "test2", :type => 'context_external_tool', :url => "http://example.com.ims/lti"})
     mod1.save!
-    
+
     mod1.content_tags.count.should == 2
 
     #export to xml
@@ -271,9 +277,11 @@ describe "Canvas Cartridge importing" do
     tag = mod1_2.content_tags.first
     tag.content_id.should == tool_to.id
     tag.content_type.should == 'ContextExternalTool'
+    tag.new_tab.should == true
     tag.url.should == "http://example.com.ims/lti"
     tag = mod1_2.content_tags.last
     tag.content_id.should == tool_to.id
+    tag.new_tab.should_not == true
     tag.content_type.should == 'ContextExternalTool'
     tag.url.should == "http://example.com.ims/lti"
   end
@@ -890,50 +898,6 @@ XML
     a.points_possible.should == assignment.points_possible
     a.discussion_topic.should == dt_2
     a.assignment_group.id.should == ag1.id
-  end
-  
-  it "should import calendar events" do
-    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
-    cal = @copy_from.calendar_events.new
-    cal.title = "Calendar event"
-    cal.description = body_with_link % @copy_from.id
-    cal.start_at = 1.week.from_now
-    cal.save!
-    cal.all_day = true
-    cal.save!
-    cal2 = @copy_from.calendar_events.new
-    cal2.title = "Stupid events"
-    cal2.start_at = 5.minutes.from_now
-    cal2.end_at = 10.minutes.from_now
-    cal2.all_day = false
-    cal2.save!
-    
-    #export to xml
-    builder = Builder::XmlMarkup.new(:indent=>2)
-    @resource.create_events(builder)
-    #convert to json
-    doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_events(doc)
-    #import json into new course
-    hash[0] = hash[0].with_indifferent_access
-    hash[1] = hash[1].with_indifferent_access
-    CalendarEvent.process_migration({'calendar_events'=>hash}, @migration)
-    @copy_to.save!
-    
-    @copy_to.calendar_events.count.should == 2
-    cal_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal))
-    cal_2.title.should == cal.title
-    cal_2.start_at.to_i.should == cal.start_at.to_i
-    cal_2.end_at.to_i.should == cal.end_at.to_i
-    cal_2.all_day.should == true
-    cal_2.all_day_date.should == cal.all_day_date
-    cal_2.description = body_with_link % @copy_to.id
-    
-    cal2_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal2))
-    cal2_2.title.should == cal2.title
-    cal2_2.start_at.to_i.should == cal2.start_at.to_i
-    cal2_2.end_at.to_i.should == cal2.end_at.to_i
-    cal2_2.description.should == ''
   end
   
   it "should import quizzes into correct assignment group" do

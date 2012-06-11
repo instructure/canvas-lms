@@ -137,7 +137,7 @@
       <% end %>
     </td>
     <td class="due">
-      <% if not (assignment.group_weight rescue false) %>
+      <% if !(assignment.group_weight rescue false) %>
         <%= datetime_string(assignment.due_at, :due_date) rescue "" %>
       <% end %>
     </td>
@@ -246,8 +246,9 @@
     </td>
     <% end %>
   </tr>
-  <% if !assignment.special_class && (has_comments || has_scoring_details) %>
-    <tr class="comments <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %>" style="display: none;">
+  <%# always add row (even if empty) so javascript references work %>
+  <tr class="comments <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %>" style="display: none;">
+    <% if !assignment.special_class && (has_comments || has_scoring_details) %>
       <td colspan="5" style="padding-bottom: 20px;">
         <% if assignment && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted? %>
         <% high, low, mean = assignment.grade_distribution(@all_submissions.select { |s| s.assignment_id == assignment.id }) %>
@@ -328,18 +329,18 @@
           <% end %>
         <% end %>
       </td>
-    </tr>
-    <% unless visible_rubric_assessments.empty? %>
-      <tr class="rubric_assessments <%= 'assignment_graded' if submission && submission.grade %>" style="display: none;">
-        <td colspan="5">
-          <% visible_rubric_assessments.each do |assessment| %>
-            <div id="assessor" style="text-align: right; margin-bottom: 5px"><%= t(:assessment_by, "Assessment by %{name}", :name => assessment.assessor_name) %></span>
-            <%= render :partial => "shared/rubric", :object => assessment.rubric, :locals => { :assessment => assessment } %>
-          <% end %>
-        </td>
-      </tr>
     <% end %>
-  <% end %>
+  </tr>
+  <tr class="rubric_assessments <%= 'assignment_graded' if submission && submission.grade %>" style="display: none;">
+    <% unless visible_rubric_assessments.empty? %>
+      <td colspan="5">
+        <% visible_rubric_assessments.each do |assessment| %>
+          <div class="assessor" style="text-align: right; margin-bottom: 5px"><%= t(:assessment_by, "Assessment by %{name}", :name => assessment.assessor_name) %></div>
+          <%= render :partial => "shared/rubric", :object => assessment.rubric, :locals => { :assessment => assessment } %>
+        <% end %>
+      </td>
+    <% end %>
+  </tr>
 <% end %>
 </table>
 <% muted_assignment_count = @assignments.inject(0) { |i, a| if a.muted? then i + 1 else i end } %>

@@ -249,4 +249,8 @@ module Api
 
     return doc.to_s
   end
+
+  def value_to_boolean(value)
+    Canvas::Plugin.value_to_boolean(value)
+  end
 end

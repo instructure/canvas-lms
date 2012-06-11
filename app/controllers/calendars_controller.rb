@@ -66,6 +66,11 @@ class CalendarsController < ApplicationController
       @view_start = event.start_at.in_time_zone.strftime("%Y-%m-%d")
     end
     @contexts_json = @contexts.map do |context|
+      if context.respond_to? :appointment_groups
+        ag = AppointmentGroup.new(:contexts => [context])
+        ag.update_contexts_and_sub_contexts
+        can_create_ags = ag.grants_right? @current_user, session, :create
+      end
       info = {
         :name => context.name,
         :asset_string => context.asset_string,
@@ -82,7 +87,7 @@ class CalendarsController < ApplicationController
         :can_create_calendar_events => context.respond_to?("calendar_events") && context.calendar_events.new.grants_right?(@current_user, session, :create),
         :can_create_assignments => context.respond_to?("assignments") && context.assignments.new.grants_right?(@current_user, session, :create),
         :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.scoped(:select => "id, name").map {|g| { :id => g.id, :name => g.name } } : [],
-        :can_create_appointment_groups => context.respond_to?("appointment_groups") && AppointmentGroup.new(:contexts => [context]).grants_right?(@current_user, session, :create),
+        :can_create_appointment_groups => can_create_ags
       }
       if context.respond_to?("course_sections")
         info[:course_sections] = context.course_sections.active.scoped(:select => "id, name").map {|cs| { :id => cs.id, :asset_string => cs.asset_string, :name => cs.name } }

@@ -29,6 +29,40 @@ describe ContextExternalTool do
     @account.parent_account.should eql(@root_account)
     @account.root_account.should eql(@root_account)
   end
+  describe "url or domain validation" do
+    it "should validate with a domain setting" do
+      @tool = @course.context_external_tools.create(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.should_not be_new_record
+      @tool.errors.should be_empty
+    end
+    
+    it "should validate with a url setting" do
+      @tool = @course.context_external_tools.create(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.should_not be_new_record
+      @tool.errors.should be_empty
+    end
+    
+    it "should validate with a canvas lti extension url setting" do
+      @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.settings[:editor_button] = {
+        "icon_url"=>"http://www.example.com/favicon.ico", 
+        "text"=>"Example",
+        "url"=>"http://www.example.com", 
+        "selection_height"=>400, 
+        "selection_width"=>600
+      }
+      @tool.save
+      @tool.should_not be_new_record
+      @tool.errors.should be_empty
+    end
+    
+    it "should not validate with no domain or url setting" do
+      @tool = @course.context_external_tools.create(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.should be_new_record
+      @tool.errors['url'].should == "Either the url or domain should be set."
+      @tool.errors['domain'].should == "Either the url or domain should be set."
+    end
+  end
   describe "find_external_tool" do
     it "should match on the same domain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -140,10 +174,26 @@ describe ContextExternalTool do
       @found_tool.should eql(@tool2)
     end
     
-    it "should not find the preferred tool if there is a higher priority tool configured" do
+    it "should find the preferred tool even if there is a higher priority tool configured, provided the preferred tool has resource_selection set" do
       @tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @preferred = @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @root_account.context_external_tools.create!(:name => "e", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @preferred = @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
+      @found_tool.should eql(@tool)
+      @preferred.settings[:resource_selection] = {:url => "http://www.example.com", :selection_width => 400, :selection_height => 400}
+      @preferred.save!
+      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
+      @found_tool.should eql(@preferred)
+    end
+    
+    it "should not find the preferred tool if it is deleted" do
+      @preferred = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @preferred.destroy
+      @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool = @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @root_account.context_external_tools.create!(:name => "e", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -285,6 +335,21 @@ describe ContextExternalTool do
       tool.has_editor_button.should be_true
     end
 
+    it "should allow setting tool_id and icon_url" do
+      tool = new_external_tool
+      tool.tool_id = "new_tool"
+      tool.settings[:icon_url] = "http://www.example.com/favicon.ico"
+      tool.save
+      tool.tool_id.should == "new_tool"
+      tool.settings[:icon_url].should == "http://www.example.com/favicon.ico"
+    end
+    
+    it "should use editor button's icon_url if none is set on the tool" do
+      tool = new_external_tool
+      tool.settings = {:editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com/favicon.ico", :selection_width => 100, :selection_height => 100}}
+      tool.save
+      tool.settings[:icon_url].should == "http://www.example.com/favicon.ico"
+    end
   end
 
   describe "standardize_url" do

@@ -59,10 +59,7 @@ end
 
 Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
   Shard.with_each_shard do
-    # we pass false for the touch_users argument, on the assumption that these
-    # stream items that we delete aren't visible on the user's dashboard anymore
-    # anyway, so there's no need to invalidate all the caches.
-    StreamItem.destroy_stream_items(4.weeks.ago, false)
+    StreamItem.destroy_stream_items_using_setting
   end
 end
 
@@ -76,7 +73,7 @@ if PageView.page_view_method == :cache
   # periodically pull new page views off the cache and insert them into the db
   Delayed::Periodic.cron 'PageView.process_cache_queue', '*/1 * * * *' do
     Shard.with_each_shard do
-      PageView.process_cache_queue
+      PageView.send_later_enqueue_args(:process_cache_queue, :singleton => "PageView.process_cache_queue:#{Shard.current.description}")
     end
   end
 end

@@ -103,7 +103,7 @@ describe "security" do
       post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
         "pseudonym_session[password]" => "asdfasdf"
       assert_response 302
-      c = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
       c.should_not match(/expires=/)
       reset!
       https!
@@ -111,7 +111,7 @@ describe "security" do
         "pseudonym_session[password]" => "asdfasdf",
         "pseudonym_session[remember_me]" => "1"
       assert_response 302
-      c = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
       c.should_not match(/expires=/)
     end
 
@@ -124,8 +124,8 @@ describe "security" do
       post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
         "pseudonym_session[password]" => "asdfasdf"
       assert_response 302
-      c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
-      c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
+      c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
       c1.should_not be_present
       c2.should be_present
     end
@@ -140,8 +140,8 @@ describe "security" do
         "pseudonym_session[password]" => "asdfasdf",
         "pseudonym_session[remember_me]" => "1"
       assert_response 302
-      c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
-      c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
+      c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
       c1.should match(/; *HttpOnly/)
       c2.should match(/; *HttpOnly/)
       c1.should_not match(/; *secure/)
@@ -160,8 +160,8 @@ describe "security" do
         "pseudonym_session[password]" => "asdfasdf",
         "pseudonym_session[remember_me]" => "1"
       assert_response 302
-      c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
-      c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+      c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
+      c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
       c1.should match(/; *secure/)
       c2.should match(/; *secure/)
       ActionController::Base.session_options[:secure] = nil

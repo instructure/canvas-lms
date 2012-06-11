@@ -49,9 +49,11 @@ describe AppointmentGroup do
       group.should be_valid
       group.sub_context_codes.should be_empty
     end
+  end
 
+  context "add context" do
     it "should only add contexts" do
-      course1 = @course
+      course1 = course
       course_with_student(:active_all => true)
       course2 = @course
 
@@ -71,9 +73,20 @@ describe AppointmentGroup do
       group.save!
       group.contexts.should eql [course1, course2]
     end
-  end
 
-  context "add context" do
+    it "should not add contexts when it has a group category" do
+      course1 = course
+      gc = course1.group_categories.create!
+      ag = AppointmentGroup.create!(:title => 'test',
+                                    :contexts => [course1],
+                                    :sub_context_codes => [gc.asset_string])
+      ag.contexts.should eql [course1]
+
+      ag.contexts = [course]
+      ag.save!
+      ag.contexts.should eql [course1]
+    end
+
     it "should update appointments effective_context_code" do
       course(:active_all => true)
       course1 = @course
@@ -92,6 +105,32 @@ describe AppointmentGroup do
       group.save!
       group.reload
       group.appointments.map(&:effective_context_code).should eql ["#{course1.asset_string},#{course2.asset_string}"]
+    end
+  end
+
+  context "add sub_contexts" do
+    before do
+      @course1 = course
+      @c1section1 = @course1.default_section
+      @c1section2 = @course1.course_sections.create!
+
+      @course2 = course
+    end
+
+    it "should only add sub_contexts when first adding a course" do
+      ag = AppointmentGroup.create! :title => 'test',
+                                    :contexts => [@course1],
+                                    :sub_context_codes => [@c1section1.asset_string]
+      ag.sub_contexts.should eql [@c1section1]
+      ag.sub_context_codes = [@c1section2.asset_string]
+      ag.sub_contexts.should eql [@c1section1]
+
+      ag.contexts = [@course1, @course2]
+      c2section = @course2.default_section.asset_string
+      ag.sub_context_codes = [c2section]
+      ag.save!
+      ag.contexts.should eql [@course1, @course2]
+      ag.sub_context_codes.should eql [@c1section1.asset_string, c2section]
     end
   end
 
@@ -132,14 +171,6 @@ describe AppointmentGroup do
   end
 
   context "permissions" do
-    def student_in_section(section)
-      @user = user
-      enrollment = @course.enroll_user(@user, 'StudentEnrollment', :section => section)
-      enrollment.workflow_state = 'active'
-      enrollment.save!
-      @user
-    end
-
     before do
       course_with_teacher(:active_all => true)
       @teacher = @user
@@ -154,8 +185,8 @@ describe AppointmentGroup do
       @student = @user
       @user_group.users << @user
 
-      @student_in_section2 = student_in_section(section2)
-      @student_in_section3 = student_in_section(section3)
+      @student_in_section2 = student_in_section(section2, :course => @course)
+      @student_in_section3 = student_in_section(section3, :course => @course)
 
       user(:active_all => true)
       @course.enroll_user(@user, 'TaEnrollment', :section => section2, :limit_privileges_to_course_section => true).accept!
@@ -186,6 +217,17 @@ describe AppointmentGroup do
       @course3, @teacher3, @course, @teacher = @course, @teacher, course_bak, teacher_bak
       @g8 = AppointmentGroup.create(:title => "test", :contexts => [@course2, @course3])
       @g8.publish!
+
+      c2s2 = @course2.course_sections.create!
+      c3s2 = @course3.course_sections.create!
+      @student_in_course2_section2 = student_in_section(c2s2, :course => @course2)
+      @student_in_course3_section2 = student_in_section(c3s2, :course => @course3)
+
+      # multiple contexts and sub contexts
+      @g9 = AppointmentGroup.create! :title => "multiple everything",
+                                     :contexts => [@course2, @course3],
+                                     :sub_context_codes => [c2s2.asset_string, c3s2.asset_string]
+      @g9.publish!
 
       @groups = [@g1, @g2, @g3, @g4, @g5, @g7]
     end
@@ -233,6 +275,14 @@ describe AppointmentGroup do
       @g8.grants_right?(@student_in_course1, nil, :reserve).should be_false
       @g8.grants_right?(@student_in_course2, nil, :reserve).should be_true
       @g8.grants_right?(@student_in_course3, nil, :reserve).should be_true
+
+      # multiple contexts and sub contexts
+      @g9.grants_right?(@student_in_course1, nil, :reserve).should be_false
+      @g9.grants_right?(@student_in_course2, nil, :reserve).should be_false
+      @g9.grants_right?(@student_in_course3, nil, :reserve).should be_false
+
+      @g9.grants_right?(@student_in_course2_section2, nil, :reserve).should be_true
+      @g9.grants_right?(@student_in_course3_section2, nil, :reserve).should be_true
     end
 
 
@@ -257,7 +307,7 @@ describe AppointmentGroup do
       @g4.grants_right?(@ta, nil, :manage).should be_false
       @g5.grants_right?(@ta, nil, :manage).should be_true
       @g6.grants_right?(@ta, nil, :manage).should be_false
-      @g7.grants_right?(@ta, nil, :manage).should be_true
+      @g7.grants_right?(@ta, nil, :manage).should be_false # not in all sections
 
       # student can't manage anything
       visible_groups = AppointmentGroup.manageable_by(@student).sort_by(&:id)
@@ -268,6 +318,10 @@ describe AppointmentGroup do
       @g8.grants_right?(@teacher, nil, :manage).should be_false  # not in any courses
       @g8.grants_right?(@teacher2, nil, :manage).should be_true
       @g8.grants_right?(@teacher3, nil, :manage).should be_false # not in all courses
+
+      # multiple contexts and sub contexts
+      @g9.grants_right?(@teacher2, nil, :manage).should be_true
+      @g9.grants_right?(@teacher3, nil, :manage).should be_false
     end
   end
 

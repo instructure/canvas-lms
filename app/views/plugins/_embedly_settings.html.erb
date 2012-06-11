@@ -1,0 +1,18 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p><%= t :description, "This plugin integrates with the Embedly service to pre-fill information on collection items. The paid plan returns extra information over the free plan: you can select from multiple images on the page, and it returns the embed information for in-line previewing (playing youtube videos, etc)." %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= t :api_key, "Embedly API Key" %></td>
+      <td><%= f.text_field :api_key %></td>
+    </tr>
+    <tr>
+      <td><%= t :plan_type, "Embedly plan type" %></td>
+      <td><%= f.select :plan_type, [["Free Plan", "free"], ["Paid Plan", "paid"]] %></td>
+    </tr>
+  </table>
+<% end %>
+

@@ -1,0 +1,21 @@
+// bootstrap overrides
+$gridColumnWidth:               62;
+$black:                         #000 !default;
+$gray:                          rgb(100, 103, 105) !default;
+$grayDarker:                    darken($gray, 15%) !default;
+$grayDark:                      darken($gray, 8%) !default;
+$grayLight:                     lighten($gray, 7%) !default;
+$grayLighter:                   lighten($gray, 1%) !default;
+$white:                         #fff !default;
+
+// canvas stuff
+$lightBackground:               rgb(248, 250, 251);
+$borderColor:                   #a8adb3;
+$borderRadius:                  4px;
+$contentCalloutColor:           #dceaf7;
+$toolbarBackground:             #D4E0E6;
+$toolbarBackgroundLight:        lighten($toolbarBackground, 5%);
+$listViewHeaderBackground:      rgb(225, 230, 235);
+$listViewHeaderBackgroundLight: lighten($listViewHeaderBackground, 5%);
+$contentBoxPadding:             8px;
+$listBorderColor:               lighten($borderColor, 5%);

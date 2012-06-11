@@ -33,4 +33,7 @@ def get_routes
   @controller = object.parent.path.underscore.sub("_controller", '')
   @action = object.path.sub(/^.*#/, '')
   @routes = ApiRouteSet.apis.first.api_methods_for_controller_and_action(@controller, @action)
+  @route = @routes.first
+  @controller_path = "app/controllers/#{@route.requirements[:controller]}_controller.rb"
+  @controller_path = nil unless File.file?(Rails.root+@controller_path)
 end

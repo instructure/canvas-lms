@@ -142,6 +142,26 @@ describe AssignmentsController do
       response.should_not be_redirect
       response.should be_success
     end
+
+    it "should not show locked external tool assignments" do
+      course_with_student_logged_in(:active_all => true)
+
+      course_assignment
+      @assignment.lock_at = Time.now - 1.week
+      @assignment.unlock_at = Time.now + 1.week
+      @assignment.submission_types = 'external_tool'
+      @assignment.save
+      # This is usually a ContentExternalTool, but it only needs to
+      # be true here because we aren't redirecting to it.
+      Assignment.any_instance.stubs(:external_tool_tag).returns(true)
+
+      get 'show', :course_id => @course.id, :id => @assignment.id
+
+      assigns[:locked].should be_true
+      # make sure that the show.html.erb template is rendered, because
+      # in normal cases we redirect to the assignment's external_tool_tag.
+      response.rendered[:template].should eql 'assignments/show.html.erb'
+    end
   end
   
   describe "GET 'syllabus'" do

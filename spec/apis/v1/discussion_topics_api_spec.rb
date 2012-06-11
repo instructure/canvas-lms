@@ -61,17 +61,75 @@ describe DiscussionTopicsController, :type => :integration do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
-  it "should return discussion topic list" do
-    attachment = create_attachment(@course)
-    @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => attachment)
-    sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
+  context "create topic" do
+    it "should check permissions" do
+      @user = user(:active_all => true)
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "hai", :message => "test message" }, {}, :expected_status => 401)
+    end
 
-    json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                    {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+    it "should make a basic topic" do
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>" })
+      @topic = @course.discussion_topics.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.message.should == "test <b>message</b>"
+      @topic.threaded?.should be_false
+      @topic.post_delayed?.should be_false
+      @topic.podcast_enabled?.should be_false
+      @topic.podcast_has_student_posts?.should be_false
+      @topic.require_initial_post?.should be_false
+    end
 
-    # get rid of random characters in podcast url
-    json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-    json.last.should ==
+    it "should post an announcment" do
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>", :is_announcement => true })
+      @topic = @course.announcements.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.message.should == "test <b>message</b>"
+    end
+
+    it "should create a topic with all the bells and whistles" do
+      post_at = 1.month.from_now
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", :delayed_post_at => post_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1' })
+      @topic = @course.discussion_topics.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.message.should == "test <b>message</b>"
+      @topic.threaded?.should == true
+      @topic.post_delayed?.should == true
+      @topic.delayed_post_at.to_i.should == post_at.to_i
+      @topic.podcast_enabled?.should == true
+      @topic.podcast_has_student_posts?.should == true
+      @topic.require_initial_post?.should == true
+    end
+
+    it "should allow creating a discussion assignment" do
+      due_date = 1.week.from_now
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>", :assignment => { :points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!" } })
+      @topic = @course.discussion_topics.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.assignment.should be_present
+      @topic.assignment.points_possible.should == 15
+      @topic.assignment.grading_type.should == "percent"
+      @topic.assignment.due_at.to_i.should == due_date.to_i
+      @topic.assignment.submission_types.should == "discussion_topic"
+      @topic.assignment.title.should == "test title"
+    end
+  end
+
+  context "show topic(s)" do
+    before do
+      @attachment = create_attachment(@course)
+      @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => @attachment)
+      @sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
+      @response_json =
                  {"read_state"=>"read",
                   "unread_count"=>0,
                   "podcast_url"=>"/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
@@ -87,16 +145,43 @@ describe DiscussionTopicsController, :type => :integration do
                   "posted_at"=>@topic.posted_at.as_json,
                   "root_topic_id"=>nil,
                   "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                  "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                   "attachments"=>[{"content-type"=>"unknown/unknown",
-                                   "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
+                                   "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                                    "filename"=>"content.txt",
                                    "display_name"=>"content.txt",
-                                   "id"=>attachment.id,
-                                   "size"=>attachment.size,
+                                   "id"=>@attachment.id,
+                                   "size"=>@attachment.size,
                   }],
-                  "topic_children"=>[sub.id],
+                  "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
                   "permissions" => { "attach" => true }}
+    end
+
+    it "should return discussion topic list" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+
+      json.size.should == 2
+      # get rid of random characters in podcast url
+      json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+      json.last.should == @response_json
+    end
+
+    it "should return an individual topic" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                      {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+
+      # get rid of random characters in podcast url
+      json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+      json.should == @response_json
+    end
+
+    it "should delete a topic" do
+        json = api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        {:controller => 'discussion_topics', :action => 'destroy', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+        @topic.reload.should be_deleted
+    end
   end
 
   it "should translate user content in topics" do
@@ -155,6 +240,7 @@ describe DiscussionTopicsController, :type => :integration do
                           "last_reply_at"=>gtopic.last_reply_at.as_json,
                           "message"=>"<p>content here</p>",
                           "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+                          "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
                           "attachments"=>
                                   [{"content-type"=>"unknown/unknown",
                                     "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
@@ -352,7 +438,7 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       entry_json = json.first
       entry_json['attachment'].should_not be_nil
-      entry_json['attachment']['url'].should == "http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+      entry_json['attachment']['url'].should == "http://#{Account.default.domain}/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     end
 
     it "should include replies on top level entries" do
@@ -550,6 +636,13 @@ describe DiscussionTopicsController, :type => :integration do
       raw_api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      response.status.should == '403 Forbidden'
+      response.body.should == 'require_initial_post'
+
+      raw_api_call(
+        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       response.status.should == '403 Forbidden'
       response.body.should == 'require_initial_post'
@@ -934,7 +1027,7 @@ describe DiscussionTopicsController, :type => :integration do
 
       reply_reply1_attachment_json = {
         "content-type"=>"application/loser",
-        "url"=>"http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
+        "url"=>"http://#{Account.default.domain}/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
         "filename"=>"unknown.loser",
         "display_name"=>"unknown.loser",
         "id" => @attachment.id,
@@ -968,7 +1061,7 @@ describe DiscussionTopicsController, :type => :integration do
             { 'id' => @reply2.id,
               'parent_id' => @root1.id,
               'user_id' => @teacher.id,
-              'message' => "<p><a href=\"http://localhost/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://localhost/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\"></video>\n    </p>",
+              'message' => "<p><a href=\"http://#{Account.default.domain}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\"></video>\n    </p>",
               'created_at' => @reply2.created_at.as_json,
               'updated_at' => @reply2.updated_at.as_json,
               'replies' => [ {

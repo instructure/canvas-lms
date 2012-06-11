@@ -287,7 +287,7 @@ class CoursesController < ApplicationController
     # DEPRECATED. #users should replace this in a new version of the API.
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      proxy = @context.students
+      proxy = @context.students.order_by_sortable_name
       if user_json_is_admin?
         proxy = proxy.scoped(:include => :pseudonyms)
       end
@@ -346,14 +346,19 @@ class CoursesController < ApplicationController
 
   include Api::V1::StreamItem
   # @API Course activity stream
-  # Returns the current user's course-specific activity stream.
+  # Returns the current user's course-specific activity stream, paginated.
   #
   # For full documentation, see the API documentation for the user activity
   # stream, in the user api.
   def activity_stream
     get_context
+
+    # for backwards compatibility, since this api used to be hard-coded to return 21 items
+    params[:per_page] ||= 21
+
     if authorized_action(@context, @current_user, :read)
-      render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i, @current_user.id) }
+      scope = @current_user.visible_stream_items(:contexts => [@context])
+      render :json => Api.paginate(scope, self, api_v1_course_activity_stream_url(@context)).map { |i| stream_item_json(i, @current_user.id) }
     end
   end
 
@@ -636,7 +641,7 @@ class CoursesController < ApplicationController
   
   def self_enrollment
     get_context
-    unless @context.self_enrollment && params[:self_enrollment] && params[:self_enrollment] == @context.self_enrollment_code
+    unless @context.self_enrollment && params[:self_enrollment] && @context.self_enrollment_codes.include?(params[:self_enrollment])
       return redirect_to course_url(@context)
     end
     unless @current_user || @context.root_account.open_registration?
@@ -966,7 +971,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read) &&
       authorized_action(@context, @current_user, :read_as_admin)
-      args = params[:course].slice(:name, :start_at, :conclude_at)
+      args = params[:course].slice(:name, :start_at, :conclude_at, :course_code)
       account = @context.account
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])

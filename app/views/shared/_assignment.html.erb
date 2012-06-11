@@ -11,7 +11,7 @@
 <div class=" group_assignment <%= 'frozen' if assignment && assignment.att_frozen?(:assignment_group_id, @current_user) %> <%= 'points_uneditable' if assignment && assignment.points_uneditable? %> assignment_<%= assignment ? assignment.id : "blank" %> <%= "muted" if assignment && assignment.muted? %>" id="assignment_<%= assignment ? assignment.id : "blank" %>" style="<%= hidden unless assignment %>">
   <div class="content">
     <div class="move data">
-      <% if assignment && !assignment.att_frozen?(:assignment_group_id, @current_user) %>
+      <% if assignment.nil? || (assignment && !assignment.att_frozen?(:assignment_group_id, @current_user)) %>
         <%= image_tag 'move.png', :alt => t('alts.move', "Move"), :class => "move_icon", :title => t('titles.sort_or_move', "Sort Assignments or Move to Another Group"), :style => "margin-top: 3px;" %>
       <% end %>
     </div>
@@ -49,7 +49,7 @@
       <a href="<%= assignment_url %>" class="preview_assignment_link no-hover" style="<%= hidden unless false %>">
         <%= image_tag 'preview.png', :alt => "Preview", :title => t('links.preview_assignment', "Preview Assignment"), :style => "display: none;" %>
       </a>
-      <% if assignment && !assignment.frozen_for_user?(@current_user) %>
+      <% if assignment.nil? || (assignment && !assignment.frozen_for_user?(@current_user)) %>
         <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
           <%= image_tag 'edit.png', :alt => "Edit", :title => t('links.edit_assignment', "Edit Assignment") %>
         </a>

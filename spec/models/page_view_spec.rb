@@ -20,7 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe PageView do
   before do
-    @page_view = PageView.new { |p| p.send(:attributes=, { :user_id => 7, :url => "http://test.one/", :session_id => "phony", :context_id => 1, :context_type => 'Course', :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5 }, false) }
+    # sets both @user and @course (@user is a teacher in @course)
+    course_model
+    @page_view = PageView.new { |p| p.send(:attributes=, { :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, false) }
   end
 
   it "should store directly to the db in db mode" do
@@ -40,7 +42,7 @@ describe PageView do
       PageView.count.should == 0
       PageView.process_cache_queue
       PageView.count.should == 1
-      PageView.first.attributes.except('created_at', 'updated_at').should == @page_view.attributes.except('created_at', 'updated_at')
+      PageView.first.attributes.except('created_at', 'updated_at', 'summarized').should == @page_view.attributes.except('created_at', 'updated_at', 'summarized')
     end
 
     it "should store into redis in transactional batches" do
@@ -76,6 +78,13 @@ describe PageView do
 
       after do
         PageView.delete_all
+
+        # tear down both the course and the user and their detritus
+        Enrollment.delete_all
+        UserAccountAssociation.delete_all
+        User.delete_all
+        CourseAccountAssociation.delete_all
+        Course.delete_all
       end
     end
 
@@ -103,19 +112,21 @@ describe PageView do
         @page_view.created_at = store_time
         @page_view.store.should be_true
         bucket = PageView.user_count_bucket_for_time(store_time)
-        Canvas.redis.smembers(bucket).should == ['7']
+        Canvas.redis.smembers(bucket).should == [@user.global_id.to_s]
         Canvas.redis.ttl(bucket).should > 23.hours
 
         store_time_2 = Time.zone.parse('2012-01-13T15:47:52Z')
-        pv2 = PageView.new { |p| p.send(:attributes=, { :user_id => 13, :url => "http://test.one/", :session_id => "phony", :context_id => 1, :context_type => 'Course', :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5 }, false) }
-        pv3 = PageView.new { |p| p.send(:attributes=, { :user_id => 13, :url => "http://test.one/", :session_id => "phony", :context_id => 1, :context_type => 'Course', :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5 }, false) }
+        @user1 = @user
+        @user2 = user_model
+        pv2 = PageView.new { |p| p.send(:attributes=, { :user => @user2, :url => "http://test.one/", :session_id => "phony", :context_id => 1, :context_type => 'Course', :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5 }, false) }
+        pv3 = PageView.new { |p| p.send(:attributes=, { :user => @user2, :url => "http://test.one/", :session_id => "phony", :context_id => 1, :context_type => 'Course', :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5 }, false) }
         pv2.created_at = store_time
         pv3.created_at = store_time_2
         pv2.store.should be_true
         pv3.store.should be_true
 
-        Canvas.redis.smembers(bucket).sort.should == ['13', '7']
-        Canvas.redis.smembers(PageView.user_count_bucket_for_time(store_time_2)).should == ['13']
+        Canvas.redis.smembers(bucket).sort.should == [@user1.global_id.to_s, @user2.global_id.to_s]
+        Canvas.redis.smembers(PageView.user_count_bucket_for_time(store_time_2)).should == [@user2.global_id.to_s]
       end
     end
   end

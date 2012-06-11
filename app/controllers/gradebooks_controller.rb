@@ -114,7 +114,7 @@ class GradebooksController < ApplicationController
     add_crumb t(:crumb, 'Attendance')
     if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)
       @assignments = @context.assignments.active.select{|a| a.submission_types == "attendance" }
-      @students = @context.students_visible_to(@current_user)
+      @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @context.submissions
       @at_least_one_due_at = @assignments.any?{|a| a.due_at }
       # Find which assignment group most attendance items belong to,
@@ -123,7 +123,7 @@ class GradebooksController < ApplicationController
       @default_group_id = @assignments.to_a.count_per(&:assignment_group_id).sort_by{|id, cnt| cnt }.reverse.first[0] rescue nil
     elsif @enrollment && @enrollment.grants_right?(@current_user, session, :read_grades)
       @assignments = @context.assignments.active.select{|a| a.submission_types == "attendance" }
-      @students = @context.students_visible_to(@current_user)
+      @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @context.submissions.find_all_by_user_id(@enrollment.user_id)
       @user = @enrollment.user
       render :action => "student_attendance"
@@ -163,7 +163,7 @@ class GradebooksController < ApplicationController
           end
           @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
           @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
-          @students = @context.students_visible_to(@current_user).sort_by{|u| u.sortable_name.downcase }.uniq
+          @students = @context.students_visible_to(@current_user).order_by_sortable_name.uniq
           if params[:view] == "simple"
             @headers = false
             render :action => "show_simple"
@@ -207,7 +207,7 @@ class GradebooksController < ApplicationController
                        id=assignments.group_category_id) AS group_category"].join(", ")) + groups_as_assignments
     elsif params[:students]
       # you need to specify specifically which student fields you want returned to the gradebook via json here
-      render :json => @context.students_visible_to(@current_user).to_json(:only => ["id", "name", "sortable_name", "short_name"])
+      render :json => @context.students_visible_to(@current_user).order_by_sortable_name.to_json(:only => ["id", "name", "sortable_name", "short_name"])
     else
       params[:user_ids] ||= params[:user_id]
       user_ids = params[:user_ids].split(",").map(&:to_i) if params[:user_ids]

@@ -560,6 +560,64 @@ describe "Users API", :type => :integration do
     end
   end
 
+  describe "user deletion" do
+    before do
+      @admin = account_admin_user
+      course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'student@example.com'))
+      @student = @user
+      @user = @admin
+      @path = "/api/v1/accounts/#{Account.default.id}/users/#{@student.id}"
+      @path_options = { :controller => 'users', :action => 'destroy',
+        :format => 'json', :id => @student.to_param,
+        :account_id => Account.default.to_param }
+    end
+
+    context "a user with permissions" do
+      it "should be able to delete a user" do
+        json = api_call(:delete, @path, @path_options)
+        @student.reload.should be_deleted
+        json.should == {
+          'id' => @student.id,
+          'name' => 'Student',
+          'short_name' => 'Student',
+          'sortable_name' => 'Student'
+        }
+      end
+
+      it "should be able to delete a user by SIS ID" do
+        @student.pseudonym.update_attribute(:sis_user_id, '12345')
+        id_param = "sis_user_id:#{@student.sis_user_id}"
+
+        path = "/api/v1/accounts/#{Account.default.id}/users/#{id_param}"
+        path_options = @path_options.merge(:id => id_param)
+
+        json = api_call(:delete, path, path_options)
+        response.code.should eql '200'
+        @student.reload.should be_deleted
+      end
+
+      it 'should be able to delete itself' do
+        path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@user.id}"
+        json = api_call(:delete, path, @path_options.merge(:id => @user.to_param))
+        @user.reload.should be_deleted
+        json.should == {
+          'id' => @user.id,
+          'name' => @user.name,
+          'short_name' => @user.short_name,
+          'sortable_name' => @user.sortable_name
+        }
+      end
+    end
+
+    context 'an unauthorized user' do
+      it "should receive a 401" do
+        user
+        raw_api_call(:delete, @path, @path_options)
+        response.code.should eql '401'
+      end
+    end
+  end
+
   context "user files" do
     it_should_behave_like "file uploads api with folders"
 

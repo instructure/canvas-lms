@@ -1292,4 +1292,18 @@ class Quiz < ActiveRecord::Base
       end
     end
   end
+
+  def self.lockdown_browser_plugin_enabled?
+    Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
+  end
+
+  def require_lockdown_browser
+    self[:require_lockdown_browser] && Quiz.lockdown_browser_plugin_enabled?
+  end
+  alias :require_lockdown_browser? :require_lockdown_browser
+
+  def require_lockdown_browser_for_results
+    self[:require_lockdown_browser_for_results] && Quiz.lockdown_browser_plugin_enabled?
+  end
+  alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
 end
