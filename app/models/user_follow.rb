@@ -128,6 +128,40 @@ class UserFollow < ActiveRecord::Base
     end
   end
 
+  after_destroy :check_auto_unfollow_collections
+
+  # when a user leaves a group, they auto-unfollow all private collections in
+  # that group
+  def check_auto_unfollow_collections
+    return true if complementary_record
+    case followed_item
+    when Group
+      if !followed_item.collections.empty?
+        UserFollow.send_later_enqueue_args(:auto_unfollow_collections_for,
+                                           { :priority => Delayed::LOW_PRIORITY },
+                                           self.following_user_id,
+                                           self.followed_item_type,
+                                           self.followed_item_id)
+      end
+    end
+    true
+  end
+
+  # this is called after the UserFollow object is destroyed, so it needs to
+  # re-lookup the user and context
+  def self.auto_unfollow_collections_for(following_user_id, followed_item_type, followed_item_id)
+    if context = Object.const_get(followed_item_type).find_by_id(followed_item_id)
+      following_user = User.find(following_user_id)
+      context.collections.active.each do |coll|
+        if !coll.grants_right?(following_user, :follow)
+          user_follow = following_user.user_follows.scoped(:conditions => { :followed_item_type => 'Collection', 
+                                                                            :followed_item_id => coll.id }).first
+          user_follow.try(:destroy)
+        end
+      end
+    end
+  end
+
   trigger.after(:insert) do |t|
     t.where("NEW.followed_item_type = 'Collection'") do
       <<-SQL
