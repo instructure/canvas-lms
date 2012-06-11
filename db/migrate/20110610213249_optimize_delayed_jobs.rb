@@ -29,32 +29,12 @@ class OptimizeDelayedJobs < ActiveRecord::Migration
     add_index :delayed_jobs, %w(strand id), :name => 'index_delayed_jobs_on_strand'
 
     # move all failed jobs to the new failed table
-    Delayed::Job.find_each(:conditions => 'failed_at is not null') do |job|
+    Delayed::Backend::ActiveRecord::Job.find_each(:conditions => 'failed_at is not null') do |job|
       job.fail! unless job.on_hold?
     end
   end
 
   def self.down
-    remove_index :delayed_jobs, :name => 'index_delayed_jobs_for_get_next'
-    remove_index :delayed_jobs, :name => 'index_delayed_jobs_on_strand'
-
-    add_index :delayed_jobs, [:strand]
-    # from CleanupDelayedJobsIndexes migration
-    case connection.adapter_name
-    when 'PostgreSQL'
-      # "nulls first" syntax is postgresql specific, and allows for more
-      # efficient querying for the next job
-      connection.execute("CREATE INDEX get_delayed_jobs_index ON delayed_jobs (priority, run_at, failed_at nulls first, locked_at nulls first, queue)")
-    else
-      add_index :delayed_jobs, %w(priority run_at locked_at failed_at queue), :name => 'get_delayed_jobs_index'
-    end
-
-    Delayed::Job::Failed.find_each do |job|
-      attrs = job.attributes
-      attrs.delete('id')
-      Delayed::Job.create!(attrs)
-    end
-
-    drop_table :failed_jobs
+    raise ActiveRecord::IrreversibleMigration
   end
 end

@@ -12,10 +12,17 @@ module Delayed
 
       def self.included(base)
         base.extend ClassMethods
+        base.send :attr_writer, :current_shard
+        base.default_priority = Delayed::NORMAL_PRIORITY
+      end
+
+      def current_shard
+        @current_shard || Shard.default
       end
 
       module ClassMethods
         attr_accessor :batches
+        attr_accessor :default_priority
 
         # Add a job to the queue
         # The first argument should be an object that respond_to?(:perform)
@@ -60,6 +67,13 @@ module Delayed
 
         def in_delayed_job=(val)
           Thread.current[:in_delayed_job] = val
+        end
+
+        # Get the current time (GMT or local depending on DB)
+        # Note: This does not ping the DB to get the time, so all your clients
+        # must have syncronized clocks.
+        def db_time_now
+          Time.now.in_time_zone
         end
       end
 

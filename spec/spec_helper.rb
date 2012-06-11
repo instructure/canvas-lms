@@ -32,7 +32,7 @@ ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
       model = File.basename(file, ".*").camelize.constantize
       next unless model < ActiveRecord::Base
       model
-    }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || model == Tableless }
+    }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || (model.respond_to?(:tableless?) && model.tableless?) }
 ALL_MODELS << Version
 ALL_MODELS << Delayed::Backend::ActiveRecord::Job::Failed
 ALL_MODELS << Delayed::Backend::ActiveRecord::Job
@@ -759,7 +759,6 @@ Spec::Runner.configure do |config|
   def run_jobs
     while job = Delayed::Job.get_and_lock_next_available(
       'spec run_jobs',
-      1.hour,
       Delayed::Worker.queue,
       0,
       Delayed::MAX_PRIORITY)

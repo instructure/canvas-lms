@@ -86,7 +86,6 @@ class Worker
 
     job = Delayed::Job.get_and_lock_next_available(
       name,
-      self.class.max_run_time,
       queue,
       min_priority,
       max_priority)

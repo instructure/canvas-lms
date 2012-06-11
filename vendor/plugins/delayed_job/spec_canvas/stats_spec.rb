@@ -1,14 +1,12 @@
-require File.expand_path("../spec_helper", __FILE__)
-
 if Canvas.redis_enabled?
-describe Delayed::Stats do
+shared_examples_for 'Delayed::Stats' do
   before do
     Setting.set('delayed_jobs_store_stats', 'redis')
   end
 
   it "should store stats for jobs" do
     job = "ohai".send_later(:reverse)
-    job.lock_exclusively!(60, 'stub worker').should be_true
+    job.lock_exclusively!('stub worker').should be_true
     worker = mock('Delayed::Worker')
     worker.stubs(:name).returns("stub worker")
     Delayed::Stats.job_complete(job, worker)
@@ -18,7 +16,7 @@ describe Delayed::Stats do
 
   it "should completely clean up after stats" do
     job = "ohai".send_later(:reverse)
-    job.lock_exclusively!(60, 'stub worker').should be_true
+    job.lock_exclusively!('stub worker').should be_true
     worker = mock('Delayed::Worker')
     worker.stubs(:name).returns("stub worker")
 

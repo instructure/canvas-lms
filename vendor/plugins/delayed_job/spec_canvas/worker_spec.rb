@@ -1,6 +1,4 @@
-require File.expand_path("../spec_helper", __FILE__)
-
-describe Delayed::Worker do
+shared_examples_for 'Delayed::Worker' do
   def job_create(opts = {})
     Delayed::Job.create({:payload_object => SimpleJob.new, :queue => Delayed::Worker.queue}.merge(opts))
   end
@@ -177,7 +175,7 @@ describe Delayed::Worker do
     it "should record last_error when destroy_failed_jobs = false, max_attempts = 1" do
       Delayed::Worker.on_max_failures = proc { false }
       @job.update_attribute(:max_attempts, 1)
-      @job.lock_exclusively!(Delayed::Worker.max_run_time, @worker.name).should == true
+      @job.lock_exclusively!(@worker.name).should == true
       @worker.perform(@job)
       old_id = @job.id
       @job = Delayed::Job::Failed.first
@@ -191,9 +189,7 @@ describe Delayed::Worker do
       # job stays locked after failing, for record keeping of time/worker
       @job.should be_locked
 
-      all_jobs = Delayed::Job.all_available(@worker.name,
-                                 Delayed::Worker.max_run_time,
-                                 @job.queue)
+      all_jobs = Delayed::Job.all_available(@job.queue)
       all_jobs.find_by_id(@job.id).should be_nil
     end
     

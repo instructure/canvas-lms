@@ -1,6 +1,6 @@
 class CleanupDelayedJobsIndexes < ActiveRecord::Migration
   def self.connection
-    Delayed::Job.connection
+    Delayed::Backend::ActiveRecord::Job.connection
   end
 
   def self.up

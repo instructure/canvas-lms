@@ -19,11 +19,6 @@ module Delayed
       class Job < ::ActiveRecord::Base
         include Delayed::Backend::Base
         set_table_name :delayed_jobs
-        attr_writer :current_shard
-
-        def current_shard
-          @current_shard || Shard.default
-        end
 
         # be aware that some strand functionality is controlled by triggers on
         # the database. see
@@ -68,9 +63,6 @@ module Delayed
           end
         end
 
-        cattr_accessor :default_priority
-        self.default_priority = Delayed::NORMAL_PRIORITY
-
         named_scope :current, lambda {
           { :conditions => ["run_at <= ?", db_time_now] }
         }
@@ -88,7 +80,7 @@ module Delayed
         # 500.times { |i| "ohai".send_later_enqueue_args(:reverse, { :run_at => (12.hours.ago + (rand(24.hours.to_i))) }) }
         # then fire up your workers
         # you can check out strand correctness: diff test1.txt <(sort -n test1.txt)
-        named_scope :ready_to_run, lambda {|worker_name, max_run_time|
+        named_scope :ready_to_run, lambda {
           { :conditions => ["run_at <= ? AND locked_at IS NULL AND next_in_strand = ?", db_time_now, true] }
         }
         named_scope :by_priority, :order => 'priority ASC, run_at ASC'
@@ -103,7 +95,6 @@ module Delayed
         end
 
         def self.get_and_lock_next_available(worker_name,
-                                             max_run_time,
                                              queue = nil,
                                              min_priority = nil,
                                              max_priority = nil)
@@ -113,30 +104,26 @@ module Delayed
 
           @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
           loop do
-            jobs = find_available(worker_name, @batch_size, max_run_time, queue, min_priority, max_priority)
+            jobs = find_available(@batch_size, queue, min_priority, max_priority)
             return nil if jobs.empty?
             job = jobs.detect do |job|
-              job.lock_exclusively!(max_run_time, worker_name)
+              job.lock_exclusively!(worker_name)
             end
             return job if job
           end
         end
 
-        def self.find_available(worker_name,
-                                limit,
-                                max_run_time,
+        def self.find_available(limit,
                                 queue = nil,
                                 min_priority = nil,
                                 max_priority = nil)
-          all_available(worker_name, max_run_time, queue, min_priority, max_priority).all(:limit => limit)
+          all_available(queue, min_priority, max_priority).all(:limit => limit)
         end
 
-        def self.all_available(worker_name,
-                               max_run_time,
-                               queue = nil,
+        def self.all_available(queue = nil,
                                min_priority = nil,
                                max_priority = nil)
-          scope = self.ready_to_run(worker_name, max_run_time)
+          scope = self.ready_to_run
           scope = scope.scoped(:conditions => ['priority >= ?', min_priority]) if min_priority
           scope = scope.scoped(:conditions => ['priority <= ?', max_priority]) if max_priority
           scope = scope.scoped(:conditions => ['queue = ?', queue]) if queue
@@ -169,7 +156,7 @@ module Delayed
         # It's important to note that for performance reasons, this method does
         # not re-check the strand constraints -- so you could manually lock a
         # job using this method that isn't the next to run on its strand.
-        def lock_exclusively!(max_run_time, worker)
+        def lock_exclusively!(worker)
           now = self.class.db_time_now
           # We don't own this job so we will update the locked_by name and the locked_at
           affected_rows = self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and locked_at is null and run_at <= ?", id, now])
@@ -222,13 +209,6 @@ module Delayed
         def self.unhold!
           now = db_time_now
           update_all(["locked_by = NULL, locked_at = NULL, attempts = 0, run_at = (CASE WHEN run_at > ? THEN run_at ELSE ? END), failed_at = NULL", now, now])
-        end
-
-        # Get the current time (GMT or local depending on DB)
-        # Note: This does not ping the DB to get the time, so all your clients
-        # must have syncronized clocks.
-        def self.db_time_now
-          Time.now.in_time_zone
         end
 
         class Failed < Job

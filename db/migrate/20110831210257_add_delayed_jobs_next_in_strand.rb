@@ -1,6 +1,6 @@
 class AddDelayedJobsNextInStrand < ActiveRecord::Migration
   def self.connection
-    Delayed::Job.connection
+    Delayed::Backend::ActiveRecord::Job.connection
   end
 
   def self.up
@@ -95,10 +95,10 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
     if connection.adapter_name == 'MySQL'
       # use temp tables to work around subselect limitations in mysql
       execute(%{CREATE TEMPORARY TABLE dj_20110831210257 (strand varchar(255), next_job_id bigint) SELECT strand, min(id) as next_job_id FROM delayed_jobs WHERE strand IS NOT NULL GROUP BY strand})
-      execute(%{UPDATE delayed_jobs SET next_in_strand = #{Delayed::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT t.next_job_id FROM dj_20110831210257 t WHERE t.strand = delayed_jobs.strand)})
+      execute(%{UPDATE delayed_jobs SET next_in_strand = #{Delayed::Backend::ActiveRecord::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT t.next_job_id FROM dj_20110831210257 t WHERE t.strand = delayed_jobs.strand)})
       execute(%{DROP TABLE dj_20110831210257})
     else
-      execute(%{UPDATE delayed_jobs SET next_in_strand = #{Delayed::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT id FROM delayed_jobs j2 WHERE j2.strand = delayed_jobs.strand ORDER BY j2.strand, j2.id ASC LIMIT 1)})
+      execute(%{UPDATE delayed_jobs SET next_in_strand = #{Delayed::Backend::ActiveRecord::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT id FROM delayed_jobs j2 WHERE j2.strand = delayed_jobs.strand ORDER BY j2.strand, j2.id ASC LIMIT 1)})
     end
   end
 

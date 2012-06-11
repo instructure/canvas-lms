@@ -1,6 +1,6 @@
 require File.expand_path("../../../../../spec/sharding_spec_helper", __FILE__)
 
-describe Delayed::Batch do
+shared_examples_for 'Delayed::Batch' do
   before :each do
     Delayed::Worker.queue = nil
     Delayed::Job.delete_all
