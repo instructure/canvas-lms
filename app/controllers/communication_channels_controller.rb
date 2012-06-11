@@ -160,7 +160,7 @@ class CommunicationChannelsController < ApplicationController
         @user.touch
         flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         return respond_to do |format|
-          format.html { redirect_back_or_default(profile_url) }
+          format.html { redirect_back_or_default(user_profile_url(@current_user)) }
           format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
         end
       end

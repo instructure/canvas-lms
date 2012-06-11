@@ -88,7 +88,7 @@ describe UsersController do
       managed_pseudonym @student
       get 'delete', :user_id => @student.id
       flash[:error].should =~ /cannot delete a system-generated user/
-      response.redirected_to.should == profile_url
+      response.redirected_to.should == user_profile_url(@current_user)
     end
 
     it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do

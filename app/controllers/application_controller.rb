@@ -171,7 +171,7 @@ class ApplicationController < ActionController::Base
   
   def user_url(*opts)
     opts[0] == @current_user && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
-      profile_url :
+      user_profile_url(@current_user) :
       super
   end
 

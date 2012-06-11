@@ -1,5 +1,5 @@
 <% view ||= 'profile' %>
 <ul>
-  <li class="<%= 'active' if view == 'profile' %>" ><%= link_to t('links.user_settings', 'User Settings'), profile_url %></li>
+  <li class="<%= 'active' if view == 'profile' %>" ><%= link_to t('links.user_settings', 'User Settings'), user_profile_url(@current_user) %></li>
   <li class="<%= 'active' if view == 'communication' %>" ><%= link_to t('links.communication_preferences', 'Communicaton Preferences'), communication_profile_url %></li>
 </ul>

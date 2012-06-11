@@ -86,9 +86,9 @@ class UsersController < ApplicationController
   def oauth
     if !feature_and_service_enabled?(params[:service])
       flash[:error] = t('service_not_enabled', "That service has not been enabled")
-      return redirect_to(profile_url)
+      return redirect_to(user_profile_url(@current_user))
     end
-    return_to_url = params[:return_to] || profile_url
+    return_to_url = params[:return_to] || user_profile_url(@current_user)
     if params[:service] == "google_docs"
       redirect_to google_docs_request_token_url(return_to_url)
     elsif params[:service] == "twitter"
@@ -117,7 +117,7 @@ class UsersController < ApplicationController
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
       flash[:error] = t('oauth_fail', "OAuth Request failed. Couldn't find valid request")
-      redirect_to (@current_user ? profile_url : root_url)
+      redirect_to (@current_user ? user_profile_url(@current_user) : root_url)
     elsif request.host_with_port != oauth_request.original_host_with_port
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
@@ -151,7 +151,7 @@ class UsersController < ApplicationController
           flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
       end
-      return_to(oauth_request.return_url, profile_url)
+      return_to(oauth_request.return_url, user_profile_url(@current_user))
     end
   end
 
@@ -557,7 +557,7 @@ class UsersController < ApplicationController
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
     @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
     if authorized_action(@user, @current_user, :view_statistics)
-      add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? profile_path : user_path(@user) )
+      add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
       @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC', :per_page => 50, :without_count => true
 
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
@@ -581,11 +581,11 @@ class UsersController < ApplicationController
     @opaque_id = @current_user.opaque_identifier(:asset_string)
     @context = UserProfile.new(@current_user)
     @resource_type = 'user_navigation'
-    @return_url = profile_url(:include_host => true)
+    @return_url = user_profile_url(@current_user, :include_host => true)
     @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
     @tool_settings = @launch.generate
     @active_tab = @tool.asset_string
-    add_crumb(@current_user.short_name, profile_path)
+    add_crumb(@current_user.short_name, user_profile_path(@current_user))
     render :template => 'external_tools/tool_show'
   end
 
@@ -900,7 +900,7 @@ class UsersController < ApplicationController
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
     end
     if @user_that_will_still_be_around == @current_user
-      redirect_to profile_url
+      redirect_to user_profile_url(@current_user)
     elsif @user_that_will_still_be_around
       redirect_to user_url(@user_that_will_still_be_around)
     else
@@ -984,7 +984,7 @@ class UsersController < ApplicationController
       if @user.pseudonyms.any? {|p| p.managed_password? }
         unless @user.grants_right?(@current_user, session, :manage_logins)
           flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
-          redirect_to profile_url
+          redirect_to user_profile_url(@current_user)
         end
       end
     end

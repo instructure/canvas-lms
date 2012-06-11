@@ -130,12 +130,12 @@ class ProfileController < ApplicationController
     @user = @current_user
     @user = User.find(params[:id]) if params[:id]
 
-    add_crumb(@user.short_name, profile_path )
+    add_crumb(@user.short_name, user_profile_path(@current_user) )
     add_crumb(t(:crumb_notification_preferences, "Notification Preferences"), communication_profile_path )
 
     if @user.communication_channel.blank?
       flash[:error] = t('errors.no_channels', "Please define at least one email address or other way to be contacted before setting notification preferences.")
-      redirect_to profile_url
+      redirect_to user_profile_url(@current_user)
       return
     end
 
@@ -245,7 +245,7 @@ class ProfileController < ApplicationController
           if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             pseudonymed = true
             flash[:error] = t('errors.invalid_old_password', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
-            format.html { redirect_to profile_url }
+            format.html { redirect_to user_profile_url(@current_user) }
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
           if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
@@ -256,13 +256,13 @@ class ProfileController < ApplicationController
           if !params[:pseudonym].empty? && pseudonym_to_update && !pseudonym_to_update.update_attributes(params[:pseudonym])
             pseudonymed = true
             flash[:error] = t('errors.profile_update_failed', "Login failed to update")
-            format.html { redirect_to profile_url }
+            format.html { redirect_to user_profile_url(@current_user) }
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
         end
         unless pseudonymed
           flash[:notice] = t('notices.updated_profile', "Profile successfully updated")
-          format.html { redirect_to profile_url }
+          format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @user.to_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path]}, :pseudonym => {:only => [:id, :unique_id]} }) }
         end
       else

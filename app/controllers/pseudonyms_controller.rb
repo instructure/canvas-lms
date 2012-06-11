@@ -181,7 +181,7 @@ class PseudonymsController < ApplicationController
     if @pseudonym.save
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
-        format.html { redirect_to profile_url }
+        format.html { redirect_to user_profile_url(@current_user) }
         format.json { render :json => pseudonym_json(@pseudonym, @current_user, session) }
       end
     else
@@ -252,7 +252,7 @@ class PseudonymsController < ApplicationController
     if @pseudonym.update_attributes(params[:pseudonym])
       flash[:notice] = t 'notices.account_updated', "Account updated!"
       respond_to do |format|
-        format.html { redirect_to profile_url }
+        format.html { redirect_to user_profile_url(@current_user) }
         format.json { render :json => pseudonym_json(@pseudonym, @current_user, session) }
       end
     else

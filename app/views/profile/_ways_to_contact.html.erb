@@ -45,7 +45,7 @@
   <% @email_channels.each do |c| %>
     <tr class="channel <%= "default" if c.position && c.position <= 1 %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
       <td style="padding: 0; text-align: center;">
-        <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
+        <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
       </td>
       <td><div style="overflow: hidden; position: relative;">&nbsp;
       <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="<%=h c.path %>">
@@ -67,7 +67,7 @@
   <% end %>
   <tr class="channel blank unconfirmed" style="display: none;">
     <td style="padding: 0; text-align: center;">
-      <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
+      <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
     </td>
     <td><div style="overflow: hidden; position: relative;">&nbsp;
     <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="">
