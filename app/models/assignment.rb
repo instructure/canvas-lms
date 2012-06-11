@@ -1605,11 +1605,11 @@ class Assignment < ActiveRecord::Base
     item.assignment_group ||= context.assignment_groups.find_or_create_by_name(t :imported_assignments_group, "Imported Assignments")
 
     hash[:due_at] ||= hash[:due_date]
-    [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at, :all_day_date].each do |key|
+    [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
       item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key]) unless hash[key].nil?
     end
 
-    [:all_day, :turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
+    [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
      :automatic_peer_reviews, :anonymous_peer_reviews,
      :grade_group_students_individually, :allowed_extensions, :min_score,
      :max_score, :mastery_score, :position, :peer_review_count
