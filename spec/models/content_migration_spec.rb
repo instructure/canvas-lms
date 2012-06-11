@@ -942,6 +942,26 @@ describe ContentMigration do
       end
     end
 
+    it "should correctly copy all day dates for assignments and events" do
+      date = "Jun 21 2012 11:59pm"
+      date2 = "Jun 21 2012 00:00am"
+      asmnt = @copy_from.assignments.create!(:title => 'all day', :due_at => date)
+      asmnt.all_day.should be_true
+      cal = @copy_from.calendar_events.create(:title => "haha", :description => "oi", :start_at => date2, :end_at => date2)
+
+      run_course_copy
+
+      asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
+      asmnt_2.all_day.should be_true
+      asmnt_2.due_at.strftime("%H:%M").should == "23:59"
+      asmnt_2.all_day_date.should == Date.parse("Jun 21 2012")
+
+      cal_2 = @copy_to.calendar_events.find_by_migration_id(mig_id(cal))
+      cal_2.all_day.should be_true
+      cal_2.all_day_date.should == Date.parse("Jun 21 2012")
+      cal_2.start_at.strftime("%H:%M").should == "00:00"
+    end
+
     it "should leave file references in AQ context as-is on copy" do
       pending unless Qti.qti_enabled?
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
