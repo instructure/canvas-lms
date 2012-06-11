@@ -851,6 +851,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :collections) do |collections|
+      collections.get "collections", :action => :list, :path_name => 'collections'
       collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_", :only => [:index, :create]
       collections.resources :collections, :path_prefix => "groups/:group_id", :name_prefix => "group_", :only => [:index, :create]
       collections.resources :collections, :except => [:index, :create]

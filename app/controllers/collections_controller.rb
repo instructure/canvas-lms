@@ -63,11 +63,14 @@ class CollectionsController < ApplicationController
 
   SETTABLE_ATTRIBUTES = %w(name visibility)
 
-  # @API List collections
+  # @API List user/group collections
   #
-  # Returns the visible collections for the given user, returned most-recently-created first.
-  # If the given user is the current user, then all collections will be
-  # returned, otherwise only public collections will be returned.
+  # Returns the visible collections for the given group or user, returned
+  # most-recently-created first.  If the given context is the current user or
+  # a group to which the current user belongs, then all collections will be
+  # returned, otherwise only public collections will be returned. In the former
+  # case, if no collections exist for the context, a default, private
+  # collection will be created and returned.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
@@ -79,16 +82,45 @@ class CollectionsController < ApplicationController
     scope = @context.collections.active.newest_first
     view_private = is_authorized_action?(@context.collections.new(:visibility => 'private'), @current_user, :read)
 
-    if view_private && scope.empty?
-      name = @context.try(:default_collection_name)
-      @context.collections.create(:name => name, :visibility => 'private') if name
-    end
+    ensure_default_collection_for(@context) if view_private
 
     unless view_private
       scope = scope.public
     end
 
     @collections = Api.paginate(scope, self, collection_route)
+    render :json => collections_json(@collections, @current_user, session)
+  end
+
+  # @API List pinnable collections
+  #
+  # Returns the list of collections to which the current user has permission to
+  # post.  For each possible collection context (the current user and each
+  # community she belongs to) if no collections exist for the context,
+  # a default, private collection will be created and included in the returned
+  # list.
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \ 
+  #          https://<canvas>/api/v1/collections
+  #
+  def list
+    route = polymorphic_url([:api, :v1, :collections])
+
+    # make sure there is a default colleciton for the current user and all
+    # communities to which they belong
+    ensure_default_collection_for(@current_user)
+    current_communities = @current_user.current_groups.scoped(:joins => :group_category, :conditions => { :group_categories => { :role => 'communities' } }).all
+    if current_communities.present?
+      preload_groups_collections_counts(current_communities)
+      current_communities.each{ |g| ensure_default_collection_for(g) }
+    end
+
+    scope = Collection.active.newest_first.scoped(:conditions => [<<-SQL, @current_user.id, current_communities.map(&:id)])
+      (context_type='User' AND context_id=?) OR (context_type='Group' AND context_id IN (?))
+    SQL
+
+    @collections = Api.paginate(scope, self, route)
     render :json => collections_json(@collections, @current_user, session)
   end
 
@@ -243,5 +275,26 @@ class CollectionsController < ApplicationController
   def find_collection
     Collection.active.find(params[:collection_id])
   end
-end
 
+  def ensure_default_collection_for(context)
+    precount = @collections_counts.try(:[], context.id) if context.is_a?(Group)
+
+    if (precount.present? && precount == 0) || (!precount.present? && context.collections.active.empty?)
+      name = context.try(:default_collection_name)
+      context.collections.create(:name => name, :visibility => 'private') if name
+    end
+  end
+
+  def preload_groups_collections_counts(groups)
+    counts_data = Collection.connection.execute(Collection.send(:sanitize_sql_array, [<<-SQL, groups.map(&:id)])).to_a
+      SELECT context_id AS group_id, COUNT(*) AS collections_count 
+      FROM collections 
+      WHERE context_id IN (?) AND context_type='Group' AND workflow_state='active' 
+      GROUP BY context_id
+    SQL
+    @collections_counts = {}
+    counts_data.each do |cd| 
+      @collections_counts[cd['group_id'].to_i] = cd['collections_count'].to_i
+    end
+  end
+end
