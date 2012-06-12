@@ -46,28 +46,10 @@ describe "Canvas::Redis" do
     end
   end
 
-  it "should try again on redis EAGAIN" do
-    Canvas::Redis.patch
-    Redis::Client.any_instance.expects(:ensure_connected).twice.raises(Errno::EAGAIN).then.returns(Marshal.dump("success!"))
-    enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
-      Rails.cache.read('blah').should == "success!"
-    end
-    Canvas::Redis.reset_redis_failure
-  end
-
-  it "should give up after two EAGAINs" do
-    Canvas::Redis.patch
-    Redis::Client.any_instance.expects(:ensure_connected).twice.raises(Errno::EAGAIN)
-    enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
-      Rails.cache.read('blah').should == nil
-    end
-    Canvas::Redis.reset_redis_failure
-  end
-
   describe "redis failure" do
     before do
       Canvas::Redis.patch
-      Redis::Client.any_instance.expects(:ensure_connected).raises(Timeout::Error).once
+      Redis::Client.any_instance.expects(:ensure_connected).raises(Redis::TimeoutError).once
     end
 
     after do
