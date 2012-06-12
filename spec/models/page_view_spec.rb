@@ -98,7 +98,8 @@ describe PageView do
           Shard.default.save!
 
           @shard1.activate do
-            course_model
+            account = Account.create!
+            course_model(:account => account)
             pv = page_view_model
             pv.user = @user
             pv.context = @course
@@ -122,7 +123,8 @@ describe PageView do
         @pv_user = user_model
         id = @shard1.activate do
           @user2 = User.create! { |u| u.id = @user.local_id }
-          course_model
+          account = Account.create!
+          course_model(:account => account)
           pv = page_view_model
           pv.user = @pv_user
           pv.context = @course

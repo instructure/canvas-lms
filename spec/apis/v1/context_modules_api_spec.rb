@@ -197,7 +197,10 @@ describe "Modules API", :type => :integration do
       end
 
       it "should 404 if no modules exist with the given ids" do
-        @modules_to_update.each { |m| m.destroy! }
+        @modules_to_update.each do |m|
+          m.content_tags.scoped.delete_all
+          m.destroy!
+        end
         api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update },
                  {}, { :expected_status => 404 })
       end

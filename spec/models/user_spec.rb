@@ -500,7 +500,8 @@ describe User do
         @shard1.activate do
           alice = User.create!(:name => 'alice')
           bob = User.create!(:name => 'bob')
-          courseX = Course.new
+          account = Account.create!
+          courseX = account.courses.build
           courseX.workflow_state = 'available'
           courseX.save!
           bobs_enrollment = StudentEnrollment.create!(:course => courseX, :user => bob, :workflow_state => 'completed')
@@ -508,7 +509,8 @@ describe User do
         end
 
         @shard2.activate do
-          courseY = Course.new
+          account = Account.create!
+          courseY = account.courses.build
           courseY.workflow_state = 'available'
           courseY.save!
           alices_enrollment = StudentEnrollment.new(:course => courseY, :user => alice, :workflow_state => 'active')
@@ -523,7 +525,8 @@ describe User do
         alice = nil
         @shard1.activate do
           alice = User.create!(:name => 'alice')
-          courseX = Course.new
+          account = Account.create!
+          courseX = account.courses.build
           courseX.workflow_state = 'available'
           courseX.save!
           StudentEnrollment.create!(:course => courseX, :user => alice, :workflow_state => 'completed')

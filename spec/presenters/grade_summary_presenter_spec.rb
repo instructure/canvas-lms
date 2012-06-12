@@ -43,7 +43,8 @@ describe GradeSummaryPresenter do
         user = course = enrollment = nil
         @shard1.activate do
           user = User.create!
-          course = Course.create!
+          account = Account.create!
+          course = account.courses.create!
           enrollment = StudentEnrollment.create!(:course => course, :user => user)
           enrollment.update_attribute(:workflow_state, 'active')
           course.update_attribute(:workflow_state, 'available')
@@ -60,7 +61,8 @@ describe GradeSummaryPresenter do
         end
 
         @shard2.activate do
-          course = Course.create!
+          account = Account.create!
+          course = account.courses.create!
           enrollment = StudentEnrollment.create!(:course => course, :user => user)
           enrollment.update_attribute(:workflow_state, 'active')
           course.update_attribute(:workflow_state, 'available')
