@@ -23,7 +23,7 @@ describe "AuthenticationAudit API", type: :integration do
   it_should_behave_like "cassandra audit logs"
 
   before do
-    @viewing_user = site_admin_user
+    @viewing_user = site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     @account = Account.default
     user_with_pseudonym(active_all: true)
     @event = Auditors::Authentication.record(@pseudonym, 'login')
