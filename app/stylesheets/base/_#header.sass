@@ -34,10 +34,14 @@
   bottom: 6px
   position: absolute
 
+#header-inner
+  padding-top: 26px
+  max-width: $max_main_width
+  position: relative
+
 #header
   position: relative
   z-index: 11 /* IE7 needs this o so the menu-item-drops get stuck above #main */
-  padding-top: 26px
   background: #6a7177 url("/images/canvas/header_bg.png") repeat-x bottom
   &.no-user
     background-position: 0 -25px
@@ -59,7 +63,7 @@
   +reset-list
   float: right
   font-size: 12px
-  margin-right: 22px
+  margin-right: $right_side_margin
   margin-bottom: 4px /*make room for the drop shadow*/
   padding: 0 11px
   background: transparent url('/images/canvas/top_bar_bg.png') repeat-x

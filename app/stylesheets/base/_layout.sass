@@ -4,6 +4,7 @@ body, html
   height: 100%
 body
   background: url("/images/blue/bg.jpg") center center
+  min-width: $min_main_width
 
   &.no-headers
     background: #fff
@@ -33,32 +34,26 @@ body
 #wrapper
   +pie-clearfix
 
-
-
 #main
   position: relative
   z-index: 10
+  background-color: $main_background_color
+  border: 1px solid $listBorderColor
+  border-top: 0
   margin-bottom: 40px
   +pie-clearfix
   min-height: 450px
-
-
-#content-wrapper
-  border: solid 1px #dddddd
-  border-top: none
-  /* I have no idea why this overflow hidden
-     makes the width change, but it does    */
-  overflow: hidden
+  max-width: $max_main_width
 
 #content
   padding: 1em
   overflow: hidden
-  background-color: #fff
 
 body.padless-content #content,#content.padless
   padding: 0
-  
+
 body.with-left-side
+  min-width: $left_side_width + $min_main_width
   #footer
     margin-left: $left_side_width
   #wrapper
@@ -67,40 +62,39 @@ body.with-left-side
     display: block
   #main
     margin-left: $left_side_width
-body.with-right-side.with-left-side
-  min-width: $right_side_width + $left_side_width + $min_main_width
+  #header-inner
+    max-width: left_side_width + $max_main_width
+
 body
   &.with-right-side
+    min-width: $right_side_width + $min_main_width
     #right-side-wrapper
       display: block
       float: right
-      padding: 0px 20px 20px 20px
-  &.with-scrolling-right-side, &.with-sidebar-pinned-to-bottom
-    #content
-      padding-right: $right_side_width + 29px
-    #right-side-wrapper
-      position: absolute
-      right: 0
-      width: $right_side_width + 16px
+    #main
+      margin-right: $right_side_width
+    #header-inner
+      max-width: $right_side_width + $max_main_width
+
   &.with-scrolling-right-side
     #right-side
       position: fixed
       top: 0
   &.with-sidebar-pinned-to-bottom
-    #right-side, #right-side-wrapper
+    #right-side-wrapper
+      position: absolute
       bottom: 0
+
+body.with-right-side.with-left-side
+  min-width: $right_side_width + $left_side_width + $min_main_width
+  #header-inner
+    max-width: $right_side_width + $left_side_width + $max_main_width
+
 
 body.no-page-block
   #main
-    width: 964px
-    +container-fixed
-  #content-wrapper
-    border-width: 0
-  #content
     background-color: transparent
-    padding-top: 0
-  #right-side
-    width: 180px
+    border: none
 
 #breadcrumbs
   border-bottom: 1px solid #efefef

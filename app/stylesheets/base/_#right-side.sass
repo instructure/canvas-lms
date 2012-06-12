@@ -2,6 +2,9 @@
 
 #right-side-wrapper
   display: none
+  position: relative
+  width: 0
+  right: 0
 
 #right-side
   width: $right_side_width
@@ -30,14 +33,14 @@
 .rs-match-list-indent
   padding-left: 31px
 .rs-margin-lr
-  margin: 0 20px
+  margin: 0 $right_side_margin
 .rs-margin-all
-  margin: 0 20px 20px
-  padding-top: 20px
+  margin: 0 $right_side_margin $right_side_margin
+  padding-top: $right_side_margin
 .rs-margin-top
-  padding-top: 20px
+  padding-top: $right_side_margin
 .rs-margin-bottom
-  margin-bottom: 20px
+  margin-bottom: $right_side_margin
 .right-side-list
   +reset-list
   margin: 10px 0
