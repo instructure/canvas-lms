@@ -6,17 +6,10 @@ en:
     bad_max_appts: "You must allow at least one appointment per participant"
     context_required: "You need to select a calendar"
     select_calendars: "Select Calendars"
-  accont: 
-    feedback_pricing_sub: "Get the numbers for your institution"
   account: 
     default_account_name: "Default Account"
     default_site_administrator_account_name: "Site Admin"
     default_term_name: "Default Term"
-    feedback_coach: "Ask the Community"
-    feedback_coach_sub: "Get help from a Canvas expert"
-    feedback_feature_request: "Request a Feature"
-    feedback_feature_request_sub: "Have an idea to improve Canvas?"
-    feedback_pricing: "Canvas Pricing Information"
     manually_created_courses: "Manually-Created Courses"
     root_account_cant_have_sis_id: "SIS IDs cannot be set on root accounts"
     sis_id_in_use: "SIS ID \"%{sis_id}\" is already in use"
@@ -238,19 +231,6 @@ en:
     add_user_dialog_title: "Add a New User"
     adding_course_message: "Adding Course..."
     adding_user_message: "Adding User..."
-    additional_settings: 
-      labels: 
-        file_quota_in_gb: "File Storage"
-        media_quota_in_gb: "Media Storage"
-        student_quota: Students
-    additional_settings_right_side: 
-      links: 
-        suspend: "Suspend Account"
-        unsuspend: "Unsuspend Account"
-      title: 
-        suspend: "Suspend Account"
-      titles: 
-        unsuspend: "Unsuspend Account"
     avatars: 
       all_link: 
         one: "All %{count}"
@@ -320,9 +300,6 @@ en:
       page_title: Accounts
       title: "Accounts I Manage"
     no_user_message: "No user found with that id"
-    root_accounts: 
-      labels: 
-        name: "Account Name"
     settings: 
       about_google_docs: |-
           In order to make it easier for users, rather than forcing them to download things like Word docs, PDFs, Excel spreadsheets, and open office documents (In addition to requiring that those programs be installed on their on their computer), in many areas throughout Canvas, it will allow you an inline preview of the document.
@@ -503,8 +480,6 @@ en:
       title: "SIS Import"
       try_import_again_link: "Try import again"
     sis_import_in_process_notice: "An SIS import is already in process."
-    site_admin_statistics: 
-      page_title: "Statistics for %{account}"
     statistics: 
       concluded_at: "concluded %{at}"
       created_at: "created %{at}"
@@ -632,25 +607,6 @@ en:
       criteria_required: "At least one trigger is required"
       recipients_required: "At least one recipient is required"
       threshold_should_be_numeric: "This should be a positive number"
-  analytics: 
-    course: 
-      analytics: Analytics
-      page_title: "Analytics: %{course}"
-    crumb: 
-      completed: "Completed Courses"
-      current: "Current Courses"
-    department: 
-      analytics: Analytics
-    filters: 
-      completed: "Completed Courses"
-      current: "Current Courses"
-    page_title: 
-      completed: "Analytics: %{account} -- Completed Courses"
-      current: "Analytics: %{account} -- Current Courses"
-      term: "Analytics: %{account} -- %{term}"
-    student_in_course: 
-      analytics: Analytics
-      page_title: "Analytics: %{course} -- %{student}"
   announcement: 
     no_title: "No Title"
   announcements: 
@@ -733,11 +689,6 @@ en:
       page_disabled_for_account: "That page has been disabled for this account"
       page_disabled_for_course: "That page has been disabled for this course"
       page_disabled_for_group: "That page has been disabled for this group"
-    warnings: 
-      details: 
-        suspended: "This institution's Canvas account has been suspended. Only Account Administrators may log in to correct any problems."
-      titles: 
-        suspended: "Institution Suspended"
     wiki_front_page_default_content_course: "Welcome to your new course wiki!"
     wiki_front_page_default_content_group: "Welcome to your new group wiki!"
   appointment_group: 
@@ -5191,6 +5142,7 @@ en:
     titles: 
       grading_scheme_info: "View/Edit Grading Scheme"
   group: 
+    default_collection_name: "%{group_name}'s Collection"
     tabs: 
       chat: Chat
       discussions: Discussions
@@ -5367,6 +5319,7 @@ en:
       delete_category_success: "Category successfully deleted"
       delete_success: "Group successfully deleted"
       goodbye: "You have removed yourself from the group %{group_name}."
+      invalid_invitation: ""
       no_students_assigned: "Nothing to do."
       students_assigned: "Students assigned to groups."
       update_category_success: "Category was successfully updated."
@@ -5707,10 +5660,6 @@ en:
     message_student: "Message Students for %{course_name}"
     send_message: "Send Message"
   messages: 
-    account_suspended: 
-      email: 
-        body: "%{institution} has been suspended.  Please contact your Site Admin to find out why."
-        subject: "Institution Suspended"
     account_user_notification: 
       email: 
         subject: "Account Admin Notification"
@@ -8959,7 +8908,6 @@ en:
       become_user: "Become other users"
       change_course_state: "Change course state"
       comment_on_others_submissions: "View all students' submissions and make comments on them"
-      create_accounts: "Create new root accounts"
       create_collaborations: "Create student collaborations"
       create_conferences: "Create web conferences"
       manage_account_memberships: "Add/remove other admins for the account"
@@ -8975,7 +8923,6 @@ en:
       manage_grades: "Edit grades (includes assessing rubrics)"
       manage_groups: "Manage (create / edit / delete) groups"
       manage_interaction_alerts: "Manage alerts"
-      manage_links: "Manage role and trust links"
       manage_outcomes: "Manage learning outcomes"
       manage_role_overrides: "Manage permissions"
       manage_sections: "Manage (create / edit / delete) course sections"
@@ -8996,9 +8943,7 @@ en:
       read_reports: "View usage reports for the course"
       read_roster: "See the list of users"
       send_messages: "Send messages to course members"
-      suspend_accounts: "Suspend accounts"
       view_all_grades: "View all grades"
-      view_analytics: "View analytics pages"
       view_error_reports: "View error reports"
       view_group_pages: "View the group pages of all student groups"
       view_statistics: "View statistics"
@@ -10072,12 +10017,6 @@ en:
     columns: 
       date: Date
       value: Value
-    institution_suspended: 
-      body: "Your school's Canvas account is temporarily suspended. Please contact your Canvas administrator."
-      links: 
-        logout: Logout
-        stop_masquerading: "[Stop Masquerading]"
-      page_title: "Institution Suspended"
     links: 
       over_time: "over time"
     status: 
@@ -10401,6 +10340,7 @@ en:
   unknown_question_bank: "Unknown question bank"
   unknown_quiz: "Unknown quiz"
   user: 
+    default_collection_name: "%{user_name}'s Collection"
     default_user_name: User
   user_follow: 
     errors: 
