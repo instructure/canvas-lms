@@ -524,7 +524,7 @@ class Quiz < ActiveRecord::Base
     # Admins can take the full quiz whenever they want
     unless user.is_a?(User) && self.grants_right?(user, nil, :grade)
       submission.end_at = due_at if due_at && Time.now < due_at && (!submission.end_at || due_at < submission.end_at)
-      submission.end_at = lock_at if lock_at && (!submission.end_at || lock_at < submission.end_at)
+      submission.end_at = lock_at if lock_at && !submission.manually_unlocked && (!submission.end_at || lock_at < submission.end_at)
     end
     submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
     submission.finished_at = nil
