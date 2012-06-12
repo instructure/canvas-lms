@@ -57,7 +57,19 @@ describe AnnouncementsController do
       assigns[:announcements].should_not be_nil
       assigns[:announcements].should_not be_empty
       assigns[:announcements][0].should eql(@announcement)
-    end    
+    end
+
+    it "should sort announcements by posted_at date" do
+      course_with_student_logged_in(:active_all => true)
+      posted_30_min_ago = course_announcement
+      posted_30_min_ago.posted_at = 30.minutes.ago
+      posted_now = course_announcement
+      posted_now.posted_at = Time.now
+      get 'index', :course_id => @course.id
+
+      assigns[:announcements][0].should eql(posted_now)
+      assigns[:announcements][1].should eql(posted_30_min_ago)
+    end
   end
 
   describe "GET 'public_feed.atom'" do
