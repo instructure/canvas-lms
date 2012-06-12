@@ -11,10 +11,10 @@ define ['Backbone', 'i18n!dashboard'], ({View}, I18n) ->
           required: ['name']
           disableWhileLoading: true
           success: (data) ->
-            debugger
             window.location = "/groups/#{data.id}/edit?return_to=#{ENV.DASHBOARD_PATH}"
         createGroupForm.dialog
           title: I18n.t('creating_group', 'Creating a group...')
+          open: -> createGroupForm.css('overflow', 'hidden')
           buttons:
             'Create': => createGroupForm.submit()
     ###
