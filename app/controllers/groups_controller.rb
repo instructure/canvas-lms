@@ -363,7 +363,7 @@ class GroupsController < ApplicationController
       respond_to do |format|
         if @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
-          format.html { redirect_to group_url(@group) }
+          format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
           format.json { render :json => group_json(@group, @current_user, session) }
         else
           format.html { render :action => "edit" }

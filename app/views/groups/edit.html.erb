@@ -8,6 +8,8 @@
   <div class="row">
     <div class="span5">
       <% form_for :group, :url => context_url(@context, :context_url), :html => {:method => :put} do |f| %>
+        <%= hidden_field_tag :return_to, params[:return_to] %>
+
         <%= f.blabel :name, :en => "Title" %>
         <%= f.text_field :name %>
 

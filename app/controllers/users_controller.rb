@@ -237,7 +237,7 @@ class UsersController < ApplicationController
     if show_new_dashboard?
       @use_new_styles = true
       load_all_contexts
-      js_env :CONTEXTS => @contexts
+      js_env :CONTEXTS => @contexts, :DASHBOARD_PATH => dashboard_path
       return render :action => :new_user_dashboard
     end
 

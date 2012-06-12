@@ -18,7 +18,7 @@
     <ul class="page-action-list">
       <li><a href="#"><i class="icon-add"></i> <%= t 'new_course', 'Add a new course' %></a></li>
       <li><a href="#"><i class="icon-search"></i> <%= t 'find_people', 'Find people on Canvas' %></a></li>
-      <li><a href="#"><i class="icon-group-new"></i> <%= t 'start_a_group', 'Start a group' %></a></li>
+      <li><a href="#" class="make_group"><i class="icon-group-new"></i> <%= t 'start_a_group', 'Start a group' %></a></li>
       <li><a href="#"><i class="icon-collection"></i> <%= t 'create_collection', 'Create a collection' %></a></li>
     </ul>
   </div>
@@ -28,3 +28,7 @@
 <div class="quickStartBar not-expanded border border-rbl border-round-b content-callout"></div>
 <div class="activityFeed"></div>
 
+<% form_tag api_v1_groups_path, :class => 'hide create_group_form' do %>
+  <%= label_tag :name, t('group_name', 'Group Name') %>
+  <%= text_field_tag :name %>
+<% end %>
