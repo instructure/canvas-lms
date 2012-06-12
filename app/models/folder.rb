@@ -300,9 +300,9 @@ class Folder < ActiveRecord::Base
   def self.unfiled_folder(context)
     folder = context.folders.find_by_parent_folder_id_and_workflow_state_and_name(Folder.root_folders(context).first.id, 'visible', 'unfiled')
     unless folder
-      folder = context.folders.new(:parent_folder => Folder.root_folders(context).first, :name => 'unfiled')
+      folder = context.folders.build(:parent_folder => Folder.root_folders(context).first, :name => 'unfiled')
       folder.workflow_state = 'visible'
-      folder.save
+      folder.save!
     end
     folder
   end

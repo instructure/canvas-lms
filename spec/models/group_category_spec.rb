@@ -279,7 +279,8 @@ describe GroupCategory do
 
     it "should return nil if no active groups in category" do
       group = @category.groups.create(:context => @course)
-      group.add_user(@student)
+      gm = group.add_user(@student)
+      gm.destroy!
       group.destroy!
       @category.group_for(@student).should be_nil
     end
