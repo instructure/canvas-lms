@@ -80,18 +80,20 @@ describe GradesPresenter do
 
       it 'pulls the student enrollment from the same shard as the observer enrollment' do
         course = Course.create!
+        course.offer!
         enrollments = []
         student_enrollment = nil
 
         @shard2.activate do
-          student = User.create!
-          observer = User.create!
-          student_enrollment = student.student_enrollments.create!(:course => course)
-          observer_enrollment = observer.observer_enrollments.new(:course => course)
-          observer_enrollment.associated_user_id = student.id
-          observer_enrollment.save!
-          enrollments << observer_enrollment
+          @student = User.create!
+          @observer = User.create!
         end
+        student_enrollment = course.enroll_student(@student)
+        student_enrollment.accept!
+        observer_enrollment = course.observer_enrollments.build(:user => @observer)
+        observer_enrollment.associated_user = @student
+        observer_enrollment.save!
+        enrollments << observer_enrollment
 
         enrollments.each { |e| e.stubs(:state_based_on_date).returns(:active) }
         presenter = GradesPresenter.new(enrollments)
