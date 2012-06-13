@@ -487,6 +487,9 @@ class GroupsController < ApplicationController
   end
 
   def profile
+    # FIXME: use backend setting for this instead of user preference
+    raise ActiveRecord::RecordNotFound unless show_new_dashboard?
+
     @use_new_styles = true
     @active_tab = 'profile'
     @group = Group.find(params[:group_id])
