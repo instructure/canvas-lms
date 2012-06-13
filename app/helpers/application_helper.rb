@@ -351,13 +351,6 @@ module ApplicationHelper
     end
   end
 
-  def include_common_stylesheet
-    if @use_new_styles
-      jammit_css :new_common
-    end
-    include_stylesheets :common, :media => "all"
-  end
-
   def section_tabs
     @section_tabs ||= begin
       if @context

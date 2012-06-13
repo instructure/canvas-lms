@@ -49,10 +49,14 @@ body
   padding: 1em
   overflow: hidden
 
-body.padless-content #content,#content.padless
+
+// **********************************************************************************
+// all of the following are classes that should be applied to 'body' when appropriate
+
+.padless-content #content, #content.padless
   padding: 0
 
-body.with-left-side
+.with-left-side
   min-width: $left_side_width + $min_main_width
   #footer
     margin-left: $left_side_width
@@ -65,36 +69,42 @@ body.with-left-side
   #header-inner
     max-width: left_side_width + $max_main_width
 
-body
-  &.with-right-side
-    min-width: $right_side_width + $min_main_width
-    #right-side-wrapper
-      display: block
-      float: right
-    #main
-      margin-right: $right_side_width
-    #header-inner
-      max-width: $right_side_width + $max_main_width
+.with-right-side
+  min-width: $right_side_width + $min_main_width
+  #right-side-wrapper
+    display: block
+    float: right
+  #main
+    margin-right: $right_side_width
+  #header-inner
+    max-width: $right_side_width + $max_main_width
 
-  &.with-scrolling-right-side
-    #right-side
-      position: fixed
-      top: 0
-  &.with-sidebar-pinned-to-bottom
-    #right-side-wrapper
-      position: absolute
-      bottom: 0
+.with-scrolling-right-side
+  #right-side
+    position: fixed
+    top: 0
 
-body.with-right-side.with-left-side
+.with-sidebar-pinned-to-bottom
+  #right-side-wrapper
+    position: absolute
+    bottom: 0
+
+.with-right-side.with-left-side
   min-width: $right_side_width + $left_side_width + $min_main_width
   #header-inner
     max-width: $right_side_width + $left_side_width + $max_main_width
 
+.full-width
+  #header-inner, #main
+    max-width: none
 
-body.no-page-block
+.no-page-block
   #main
     background-color: transparent
     border: none
+
+// **********************************************************************************
+// end classes applied to body
 
 #breadcrumbs
   border-bottom: 1px solid #efefef
@@ -120,15 +130,22 @@ body.no-page-block
     display: inline-block
 
 
-// pasted from themes/warehouse screen.sass
-
-.hightlight
-  background-color: #ffc
-
-
-.small
+#footer
+  color: #5c5c5c
   font-size: 11px
+  margin: 0 15px 34px
+  img
+    vertical-align: bottom
+    padding: 0 20px 3px 0
 
-
-.gray
-  color: #999
+#footer-links
+  a
+    border-left: 1px solid #5C5C5C
+    color: #5C5C5C
+    margin-right: 0.4em
+    padding-left: 0.4em
+    &:hover, &:focus
+      text-decoration: underline
+    // ie7 supports :first-child so this will work on everything we support.
+    &:first-child
+      border-left: none

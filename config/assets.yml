@@ -107,9 +107,6 @@ css_compressor_options:
 javascripts:
 
 stylesheets:
-  new_common:
-    - public/stylesheets/compiled/blue/application.css
-
   common:
     - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/g_base.css
@@ -120,7 +117,6 @@ stylesheets:
     - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css
     - public/stylesheets/compiled/g_util_fancy_links.css
-    - public/stylesheets/compiled/g_bootstrap_parts.css
     - public/stylesheets/compiled/g_util_buttons.css
     - public/stylesheets/compiled/g_util_inst_tree.css
     - public/stylesheets/compiled/g_util_chevron_crumbs.css

@@ -1,14 +1,15 @@
 i[class*=icon-], i[class^=icon-] {
+  display: inline-block;
   width: 16px;
   height: 16px;
   line-height: 16px;
-  background-image: url(../../../images/blue/canvas-icons-16x16-dkgrey.png);
+  background-image: url(/images/blue/canvas-icons-16x16-dkgrey.png);
   background-repeat: no-repeat;
 }
 
 .quickStartBar {
   i[class*=icon-], i[class^=icon-] {
-    background-image: url(../../../images/blue/quickstart-icons.png);
+    background-image: url(/images/blue/quickstart-icons.png);
   }
 }
 
