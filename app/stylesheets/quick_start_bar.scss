@@ -1,5 +1,4 @@
-@import 'blue/variables';
-@import 'blue/mixins';
+@import 'environment';
 
 // Can remove this when we upgrade to bootstrap 2.0.3
 $boxSizingBaseLineHeight: $baseLineHeight + 8;

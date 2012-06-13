@@ -5,6 +5,9 @@
     margin: 4px;
     width: 200px;
   }
+  code,pre{padding:0 3px 2px;font-family:Menlo,Monaco,"Courier New",monospace;font-size:12px;color:#505354;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px}
+  code{padding:2px 4px;color:#d14;background-color:#f7f7f9;border:1px solid #e1e1e8}
+  
 </style>
 
 
@@ -27,14 +30,14 @@
   </div>
 
   <h2>Grid</h2>
-  <p>Regular bootstrap 12 column grid. Use <code>.spanX</code> to have an element span 'X' number of columns.</p>
-  <div class="row">
+  <p>Since our interface is resizable you can only use a fluid grid.  we just have the default bootstrap fluid grid.  <a href="http://twitter.github.com/bootstrap/scaffolding.html#fluidGridSystem">see their docs for more info</a>. Use <code>.spanX</code> to have an element span 'X' number of columns.</p>
+  <div class="row-fluid">
     <div class="span2"><div class="content-box border border-trbl"><p>span 2</p></div></div>
     <div class="span2"><div class="content-box border border-trbl"><p>span 2</p></div></div>
     <div class="span8"><div class="content-box border border-trbl"><p>span 8</p></div></div>
   </div>
 
-  <div class="row v-gutter">
+  <div class="row-fluid v-gutter">
     <div class="span4">
       <h2>Content Box</h2>
       <div class="content-box">
@@ -66,7 +69,7 @@
     </div>
   </div>
 
-  <div class="row v-gutter">
+  <div class="row-fluid v-gutter">
     <div class="span4">
       <h2>List View</h2>
       <div class="list-view border border-trbl" style="height: 200px">
@@ -105,7 +108,7 @@
   </div>
 
   <h2>ImageBlock</h2>
-  <div class="row">
+  <div class="row-fluid">
     <div class="span6">
       <div class="image-block">
         <a href="#" class="image-block-image"><img class="border-round box-shadow" src="http://www.gravatar.com/avatar/749001c9fe6927c4b069a45c2a3d68f7?s=100"></a>
@@ -178,7 +181,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row-fluid">
     <div class="span4">
       <h2 class="v-gutter">Page Action List</h2>
       <ul class="page-action-list">
@@ -275,3 +278,16 @@
 
 </div>
 
+<% js_block do %>
+  <script>
+    require(['jquery'], function($){
+
+      $('#content').on({
+        mouseover: function() { $(this).addClass('hover') },
+        click: function() { $(this).addClass('active') },
+        mouseout: function() { $(this).removeClass('hover active') }
+      }, '.demo-icons');
+    });
+
+  </script>
+<% end %>
