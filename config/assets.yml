@@ -228,6 +228,7 @@ stylesheets:
   prior_users:
     - public/stylesheets/compiled/prior_users.css
   popup:
+    - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/popup/main.css
   reports:
     - public/stylesheets/compiled/reports.css

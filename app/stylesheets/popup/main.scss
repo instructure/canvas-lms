@@ -1,71 +1,10 @@
-@import "variables";
-@import "blue/variables";
-@import "blue/mixins";
+@import "environment";
 
-// Core variables and mixins
-@import "bootstrap/bootstrap/mixins";
+@import 'base/native';
+@import 'base/typography';
+@import "bootstrap_parts";
 
-// CSS Reset
-@import "bootstrap/bootstrap/reset";
-
-// Grid system and page structure
-@import "bootstrap/bootstrap/scaffolding";
-@import "bootstrap/bootstrap/grid";
-//@import "bootstrap/bootstrap/layouts";
-
-// Base CSS
-@import "bootstrap/bootstrap/type";
-//@import "bootstrap/bootstrap/code";
-@import "bootstrap/bootstrap/forms";
-//@import "bootstrap/bootstrap/tables";
-
-// Components: common
-//@import "bootstrap/bootstrap/sprites";
-//@import "bootstrap/bootstrap/dropdowns";
-//@import "bootstrap/bootstrap/wells";
-//@import "bootstrap/bootstrap/component-animations";
-//@import "bootstrap/bootstrap/close";
-
-// Components: Buttons & Alerts
-@import "bootstrap/bootstrap/buttons";
-@import "bootstrap/bootstrap/button-groups";
-//@import "bootstrap/bootstrap/alerts"; // Note: alerts share common CSS with buttons and thus have styles in buttons.less
-
-// Components: Nav
-//@import "bootstrap/bootstrap/navs";
-//@import "bootstrap/bootstrap/navbar";
-//@import "bootstrap/bootstrap/breadcrumbs";
-//@import "bootstrap/bootstrap/pagination";
-//@import "bootstrap/bootstrap/pager";
-
-// Components: Popovers
-//@import "bootstrap/bootstrap/modals";
-//@import "bootstrap/bootstrap/tooltip";
-//@import "bootstrap/bootstrap/popovers";
-
-// Components: Misc
-//@import "bootstrap/bootstrap/thumbnails";
-//@import "bootstrap/bootstrap/labels";
-//@import "bootstrap/bootstrap/badges";
-//@import "bootstrap/bootstrap/progress-bars";
-//@import "bootstrap/bootstrap/accordion";
-//@import "bootstrap/bootstrap/carousel";
-//@import "bootstrap/bootstrap/hero-unit";
-
-// Utility classes
-@import "bootstrap/bootstrap/utilities"; // Has to be last to override when necessary
-
-
-
-
-//@import "bootstrap/bootstrap-responsive";
-@import "blue/bootstrap_overrides";
-
-@import "blue/icons";
-@import "blue/borders";
-@import "blue/gutters";
-@import "blue/components";
-@import "blue/forms";
+@import "blue/main";
 
 @import "g_util_buttons";
 
