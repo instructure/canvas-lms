@@ -362,7 +362,6 @@ module ApplicationHelper
     @section_tabs ||= begin
       if @context
         html = []
-        html << '<nav role="navigation"><ul id="section-tabs">'
         tabs = Rails.cache.fetch([@context, @current_user, "section_tabs_hash", I18n.locale].cache_key) do
           if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
             tabs.select do |tab|
@@ -380,6 +379,8 @@ module ApplicationHelper
             []
           end
         end
+        return '' if tabs.empty?
+        html << '<nav role="navigation"><ul id="section-tabs">'
         tabs.each do |tab|
           path = nil
           if tab[:args]
