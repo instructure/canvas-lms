@@ -113,6 +113,7 @@ class CoursesController < ApplicationController
   # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
   # @argument course[self_enrollment] [Boolean] [optional] Set to true if the course is self enrollment.
   # @argument course[restrict_enrollments_to_course_dates] [Boolean] [optional] Set to true to restrict user enrollments to the start and end dates of the course.
+  # @argument course[enroll_me] [Boolean] [optional] Set to true to enroll the current user as the teacher.
   # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
   # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
   #
@@ -144,6 +145,7 @@ class CoursesController < ApplicationController
       @course.offer if api_request? and params[:offer].present?
       respond_to do |format|
         if @course.save
+          @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           format.html
           format.json { render :json => course_json(
             @course,
@@ -153,7 +155,7 @@ class CoursesController < ApplicationController
              :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
-             :restrict_enrollments_to_course_dates], nil)
+             :restrict_enrollments_to_course_dates, :workflow_state], nil)
           }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")

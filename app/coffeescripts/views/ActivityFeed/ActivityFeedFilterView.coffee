@@ -31,8 +31,13 @@ define [
       @trigger 'filter', value
 
     getCoursesFromENV: ->
-      course for k, course of ENV.CONTEXTS.courses when course.state is 'active'
+      course for k, course of ENV.CONTEXTS.courses when course.state in ['active', 'available']
 
     getCommuntiesFromENV: ->
       group for k, group of ENV.CONTEXTS.groups when group.category is 'Communities'
 
+    addCourse: (course) ->
+      ENV.CONTEXTS.courses[course.id] = course
+      @courses = @getCoursesFromENV()
+      @render()
+      @$(".courseList a[data-value='course:#{course.id}']").click()

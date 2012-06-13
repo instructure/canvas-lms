@@ -1502,7 +1502,8 @@ class Course < ActiveRecord::Base
   end
 
   def default_section
-    self.course_sections.active.find_or_create_by_default_section(true) do |section|
+    init_method = (new_record? ? :find_or_initialize_by_default_section : :find_or_create_by_default_section)
+    course_sections.active.send(init_method, true) do |section|
       section.course = self
       section.root_account = self.root_account
     end
