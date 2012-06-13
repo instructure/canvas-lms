@@ -74,7 +74,7 @@ module Canvas::AccountReports
 
       Zip::ZipFile.open(filepath, Zip::ZipFile::CREATE) do |zipfile|
         csv.each do |(report_name, contents)|
-          zipfile.get_output_stream(report_name) { |f| f << contents }
+          zipfile.get_output_stream(report_name + ".csv") { |f| f << contents }
         end
         zipfile
       end
