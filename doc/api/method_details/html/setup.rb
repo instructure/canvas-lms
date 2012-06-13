@@ -26,6 +26,7 @@ def header
   @subtopic = (object.tag('subtopic') || object.parent.tag('API')).text
   route = @routes.first
   @method_link = "method.#{route.requirements[:controller]}.#{route.requirements[:action]}"
+  @beta = object.tag('beta') || object.parent.tag('beta')
   erb(:header)
 end
 

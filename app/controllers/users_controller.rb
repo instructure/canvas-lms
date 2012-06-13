@@ -893,20 +893,19 @@ class UsersController < ApplicationController
     end
   end
 
-  #@API Delete a user.
+  # @API Delete a user
+  #
   # Delete a user record from Canvas.
   #
   # WARNING: This API will allow a user to delete themselves. If you do this,
   # you won't be able to make API calls or log into Canvas.
   #
   # @example_request
-  #
-  # curl https://<canvas>/api/v1/users/5 \ 
-  #   -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
-  #   -X DELETE
+  #     curl https://<canvas>/api/v1/users/5 \ 
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
+  #       -X DELETE
   #
   # @example_response
-  #
   #   {
   #     "id":133,
   #     "login_id":"bieber@example.com",
@@ -1075,6 +1074,7 @@ class UsersController < ApplicationController
   include Api::V1::UserFollow
 
   # @API Follow a user
+  # @beta
   #
   # Follow this user. If the current user is already following the
   # target user, nothing happens. The target user must have a public profile in
@@ -1110,6 +1110,7 @@ class UsersController < ApplicationController
   end
 
   # @API Un-follow a user
+  # @beta
   #
   # Stop following this user. If the current user is not already
   # following the target user, nothing happens.
