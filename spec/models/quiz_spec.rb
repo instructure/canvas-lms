@@ -421,6 +421,16 @@ describe Quiz do
       end
     end
 
+    it "should not set end_at to lock_at if a submission is manually unlocked" do
+      lock_at = 1.day.ago
+      u = User.create!(:name => "Fred Colon")
+      q = @course.quizzes.create!(:title => "locked yesterday", :lock_at => lock_at)
+      sub = q.find_or_create_submission(u, nil, 'settings_only')
+      sub.manually_unlocked = true
+      sub.save!
+      sub2 = q.generate_submission(u)
+      sub2.end_at.should be_nil
+    end
   end
   
   it "should return a default title if the quiz is untitled" do

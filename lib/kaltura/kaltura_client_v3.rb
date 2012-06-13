@@ -65,10 +65,21 @@ module Kaltura
         :type => "2",
         :protocol => ""
       }.merge(opts)
-      "#{opts[:protocol] + ":" unless opts[:protocol].blank?}" + 
-        "//#{@resource_domain}/p/#{@partnerId}/thumbnail/entry_id/#{entryId}" +
-        "/width/#{opts[:width]}/height/#{opts[:height]}/bgcolor/#{opts[:bgcolor]}" +
-        "/type/#{opts[:type]}/vid_sec/#{opts[:vid_sec]}"
+
+      protocol = if [ "http", "https" ].include?(opts[:protocol])
+        opts[:protocol] + ":"
+      else
+        ""
+      end
+
+      "#{protocol}" +
+        "//#{@resource_domain}/p/#{@partnerId}/thumbnail" +
+        "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_]/, '')}" +
+        "/width/#{opts[:width].to_i}" +
+        "/height/#{opts[:height].to_i}" +
+        "/bgcolor/#{opts[:bgcolor].gsub(/[^a-fA-F0-9]/, '')}" +
+        "/type/#{opts[:type].to_i}" +
+        "/vid_sec/#{opts[:vid_sec].to_i}"
     end
 
     def startSession(type = SessionType::USER, userId = nil)
