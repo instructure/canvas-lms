@@ -59,6 +59,8 @@ class FileInContext
       @attachment.context = context
       @attachment.save!
       @attachment
+    ensure
+      uploaded_data.close if uploaded_data
     end
     
   end
