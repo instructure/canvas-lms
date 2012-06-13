@@ -406,6 +406,7 @@ class GroupsController < ApplicationController
   end
 
   # @API Follow a group
+  # @beta
   #
   # Follow this group. If the current user is already following the
   # group, nothing happens. The user must have permissions to view the
@@ -439,6 +440,7 @@ class GroupsController < ApplicationController
   end
 
   # @API Un-follow a group
+  # @beta
   #
   # Stop following this group. If the current user is not already
   # following the group, nothing happens.

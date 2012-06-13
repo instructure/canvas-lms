@@ -17,6 +17,7 @@
 #
 
 # @API Collections
+# @beta
 #
 # Collections contain Collection Items, which are links to content. There are
 # different types of items for links to different types of data.
