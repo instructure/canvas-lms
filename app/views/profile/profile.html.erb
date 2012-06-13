@@ -46,7 +46,7 @@
   <tr>
     <td><%= f.blabel :birthdate, :en => "Birthday" %></td>
     <td>
-      <span class="display_data"><%= @user.birthdate.strftime('%m/%d/%Y') %></span>
+      <span class="display_data"><%= @user.birthdate ? @user.birthdate.strftime('%m/%d/%Y') : "" %></span>
       <%= f.date_select :birthdate, {:order => [:day, :month, :year]}, :class => 'edit_data' %>
     </td>
   </tr>
