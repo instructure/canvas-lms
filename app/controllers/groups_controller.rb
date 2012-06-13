@@ -482,7 +482,7 @@ class GroupsController < ApplicationController
     js_env :GROUP_ID => @group.id, :FOLDER_ID => folder.id
 
     if authorized_action(@group, @current_user, :update)
-      render :action => :edit, :layout => 'new_application'
+      render :action => :edit
     end
   end
 
@@ -497,7 +497,7 @@ class GroupsController < ApplicationController
                   parent_context_request).include? @group.join_level
     @in_group = @current_user && @current_user.groups.include?(@group)
 
-    render :action => :profile, :layout => 'new_application'
+    render :action => :profile
   end
 
   def public_feed
