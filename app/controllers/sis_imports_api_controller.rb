@@ -91,9 +91,15 @@ class SisImportsApiController < ApplicationController
   #
   # @argument clear_sis_stickiness ["1"] This option, if present, will clear "stickiness" from all fields touched by this import. Requires that 'override_sis_stickiness' is also provided. If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will overrule the behavior of 'add_sis_stickiness'
   def create
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_sis)
       params[:import_type] ||= 'instructure_csv'
       raise "invalid import type parameter" unless SisBatch.valid_import_types.has_key?(params[:import_type])
+
+      if !api_request? && @account.current_sis_batch.try(:importing?)
+        return render :json => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true}.to_json,
+               :as_text => true
+      end
+
       file_obj = nil
       if params.has_key?(:attachment)
         file_obj = params[:attachment]
@@ -156,6 +162,12 @@ class SisImportsApiController < ApplicationController
       unless Setting.get('skip_sis_jobs_account_ids', '').split(',').include?(@account.global_id.to_s)
         batch.process
       end
+
+      unless api_request?
+        @account.current_sis_batch_id = batch.id
+        @account.save
+      end
+
       render :json => batch.api_json
     end
   end
@@ -164,7 +176,7 @@ class SisImportsApiController < ApplicationController
   #
   # Get the status of an already created SIS import.
   def show
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_sis)
       @batch = SisBatch.find(params[:id])
       raise "Sis Import not found" unless @batch
       raise "Batch does not match account" unless @batch.account.id == @account.id
