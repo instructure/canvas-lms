@@ -372,6 +372,8 @@ module Technoweenie # :nodoc:
               read_bytes = true
             end
           rescue => e
+          ensure
+            io.close if file_from_path
           end
           self.md5 = read_bytes ? digest.hexdigest : nil
           if self.md5 && ns = self.infer_namespace
