@@ -210,7 +210,7 @@ class RubricAssociation < ActiveRecord::Base
     # Go up to the assignment and loop through all submissions.
     # Update each submission's assessment_requests with a link to this rubric association
     # but only if not already associated and the assessment is incomplete.
-    if self.association_id
+    if self.association_id && self.association_type != 'Account'
       self.association.submissions.each do |sub|
         sub.assessment_requests.incomplete.update_all(['rubric_association_id = ?', self.id],
                                                       'rubric_association_id IS NULL')
