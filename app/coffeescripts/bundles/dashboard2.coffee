@@ -29,4 +29,4 @@ require [
             todo: new TodoView
             comingUp: new ComingUpView
 
-    $('#content .dashboardActions').prepend(dashboardToggle('disable'))
+    $('#right-side').prepend(dashboardToggle('disable'))

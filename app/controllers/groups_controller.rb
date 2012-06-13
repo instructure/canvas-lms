@@ -217,13 +217,13 @@ class GroupsController < ApplicationController
           end
         end
         if authorized_action(@group, @current_user, :read)
-          if show_new_dashboard?
-            @use_new_styles = true
-            js_env :GROUP_ID => @group.id
-            return render :action => :dashboard, :layout => 'new_application'
-          else
-            @home_page = WikiNamespace.default_for_context(@group).wiki.wiki_page
-          end
+          #if show_new_dashboard?
+          #  @use_new_styles = true
+          #  js_env :GROUP_ID => @group.id
+          #  return render :action => :dashboard
+          #else
+          @home_page = WikiNamespace.default_for_context(@group).wiki.wiki_page
+          #end
         end
       end
       format.json do

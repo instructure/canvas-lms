@@ -1,5 +1,4 @@
 <% content_for :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
-<% js_bundle :group %>
 <%  @active_tab = "home" %>
 <% content_for :auto_discovery do %>
   <% if @context_membership %>

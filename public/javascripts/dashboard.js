@@ -22,7 +22,9 @@ define([
   'jquery.instructure_misc_plugins' /* showIf */
 ], function(I18n, $, dashboardToggle) {
 
-  $('#not_right_side').prepend(dashboardToggle('enable'));
+  var $toggle = $(dashboardToggle('enable'));
+  $toggle.css({float: 'right'})
+  $('#not_right_side').prepend($toggle);
 
   $(function initDashbardJs(){
 
