@@ -213,6 +213,14 @@
               </div>
              <% end %>
           <% end %>
+          <% f.fields_for :services do |services| %>
+            <% Account.services_exposed_to_ui_hash(:setting).sort_by { |k,h| h[:name] }.each do |key, service| %>
+              <div>
+                <%= services.check_box key, :checked => @account.service_enabled?(key) %>
+                <%= services.label key, service[:name] + " " %>
+              </div>
+            <% end %>
+          <% end %>
         </fieldset>
 
         <fieldset id="account_settings_global_includes_settings" style="<%= hidden unless @account.settings[:global_includes] %>">
@@ -334,11 +342,11 @@
           </fieldset>
         <% end %>
 
-        <% if @account.root_account? and not Account.services_exposed_to_ui_hash.empty? %>
+        <% if @account.root_account? and not Account.services_exposed_to_ui_hash(:service).empty? %>
           <fieldset>
             <legend><%= t(:enabled_web_serices_title, "Enabled Web Services") %></legend>
             <% f.fields_for :services do |services| %>
-              <% Account.services_exposed_to_ui_hash.each do |key, service| %>
+              <% Account.services_exposed_to_ui_hash(:service).sort_by { |k,h| h[:name] }.each do |key, service| %>
                 <div>
                   <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                   <%= services.label key, service[:name] + " " %>
