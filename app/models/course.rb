@@ -598,7 +598,7 @@ class Course < ActiveRecord::Base
   def update_course_section_names
     return if @course_name_was == self.name || !@course_name_was
     sections = self.course_sections
-    fields_to_possibly_rename = [:name, :section_code, :long_section_code]
+    fields_to_possibly_rename = [:name, :section_code]
     sections.each do |section|
       something_changed = false
       fields_to_possibly_rename.each do |field|

@@ -131,16 +131,13 @@ class CourseSection < ActiveRecord::Base
     #   and I don't know which one is best, or which one to show.
     name_had_changed = name_changed?
     # Here's the current plan:
-    # - if it's from the SIS, long_section_code seems like the best bet
     # - otherwise, just use name
     # - use the method display_name to consolidate this logic
     self.name ||= self.course.name if self.default_section
     self.name ||= "#{self.course.name} #{Time.zone.today.to_s}"
     self.section_code ||= self.name
-    self.long_section_code ||= self.name
     if name_had_changed
       self.section_code = self.name
-      self.long_section_code = self.name
     end
   end
 
@@ -155,13 +152,11 @@ class CourseSection < ActiveRecord::Base
   # The only place this is used by itself right now is when listing
   # enrollments within a course
   def display_name
-    @section_display_name ||= defined_by_sis? ?
-      (self.long_section_code || self.name || self.section_code) :
-      (self.name || self.section_code || self.long_section_code)
+    @section_display_name ||= self.name || self.section_code
   end
 
   def assert_course
-    self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account)
+    self.course ||= Course.create!(:name => self.name || self.section_code, :root_account => self.root_account)
   end
 
   def move_to_course(course, *opts)
