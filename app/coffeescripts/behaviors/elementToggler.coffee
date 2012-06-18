@@ -17,7 +17,7 @@
 #
 # <button class="element_toggler" aria-controls="thing">Show Thing Dialog</button>
 # <form id="thing" data-turn-into-dialog='{"width":450,"modal":true}' style="display:none">
-#   This will pop up as a dilog when you click the button and pass along the data-turn-into-dialog
+#   This will pop up as a dialog when you click the button and pass along the data-turn-into-dialog
 #   options.  then it will pass it through fixDialogButtons to turn the buttons in your markup
 #   into proper dialog buttons (look at fixDialogButtons to see what it does)
 #   <div class="button-container">
@@ -76,6 +76,13 @@ define [
 
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 
-  $(document).delegate '.element_toggler[aria-controls]:not(.user_content *)', 'click', preventDefault ->
-    $region = $("##{$(this).attr('aria-controls')}")
+  $(document).delegate '.element_toggler[aria-controls]', 'click', preventDefault ->
+    $this = $(this)
+
+    # allow .links inside .user_content to be elementTogglers, but only for other elements inside of
+    # that .user_content area
+    $parent = $this.closest('.user_content')
+    $parent = $(document.body) unless $parent.length
+
+    $region = $parent.find("##{$this.attr('aria-controls')}")
     toggleRegion($region) if $region.length
