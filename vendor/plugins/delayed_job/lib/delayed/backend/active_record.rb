@@ -64,7 +64,7 @@ module Delayed
             self.class.adapter_name = connection.adapter_name
           end
           if strand.present? && adapter_name == 'PostgreSQL'
-            connection.execute("LOCK delayed_jobs IN SHARE ROW EXCLUSIVE MODE")
+            connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
           end
         end
 
@@ -111,29 +111,14 @@ module Delayed
           min_priority ||= Delayed::MIN_PRIORITY
           max_priority ||= Delayed::MAX_PRIORITY
 
-          if connection.adapter_name == 'PostgreSQL' && Setting.get_cached('delayed_jobs_db_fn_pop', 'true') == 'true'
-            # note postgresql is optimized to use this db function, and doesn't
-            # use find_available, lock_exclusively and friends
-            #
-            # because pop_from_delayed_jobs returns a delayed_jobs row, we have
-            # to re-create the function every time we change the schema of
-            # delayed_jobs. fortunately that doesn't happen often. see the
-            # define_pg_pop_function method below, and the
-            # PopJobsWithDbFunctionOnPostgresql migration.
-            now = db_time_now
-            job = self.find_by_sql(sanitize_sql_array(["select * from pop_from_delayed_jobs(?, ?, ?, ?, ?)", worker_name, queue, min_priority, max_priority, now])).first
-            job = nil if !job.id
-            return job
-          else
-            @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
-            loop do
-              jobs = find_available(worker_name, @batch_size, max_run_time, queue, min_priority, max_priority)
-              return nil if jobs.empty?
-              job = jobs.detect do |job|
-                job.lock_exclusively!(max_run_time, worker_name)
-              end
-              return job if job
+          @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          loop do
+            jobs = find_available(worker_name, @batch_size, max_run_time, queue, min_priority, max_priority)
+            return nil if jobs.empty?
+            job = jobs.detect do |job|
+              job.lock_exclusively!(max_run_time, worker_name)
             end
+            return job if job
           end
         end
 
@@ -159,14 +144,23 @@ module Delayed
           scope.by_priority
         end
 
-        # Clear all pending jobs for a specified strand
-        #
-        # Note that it *does* not clear out currently running or held jobs, for
-        # synchronization purposes: If you're using a strand for a "singleton" job,
-        # the currently running instance should complete, before the next instance
-        # starts.
-        def self.clear_strand!(strand_name)
-          self.delete_all(['strand=? AND locked_at IS NULL', strand_name])
+        # Create the job on the specified strand, but only if there aren't any
+        # other non-running jobs on that strand.
+        # (in other words, the job will still be created if there's another job
+        # on the strand but it's already running)
+        def self.create_singleton(options)
+          strand = options[:strand]
+
+          self.transaction do
+            if adapter_name == 'PostgreSQL'
+              connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
+              job = self.first(:conditions => ["run_at <= ? AND strand = ? AND locked_at IS NULL", db_time_now, strand])
+              job || self.create(options)
+            else
+              self.delete_all(['strand=? AND locked_at IS NULL', strand])
+              self.create(options)
+            end
+          end
         end
 
         # Lock this job for this worker.
@@ -240,44 +234,6 @@ module Delayed
         class Failed < Job
           include Delayed::Backend::Base
           set_table_name :failed_jobs
-        end
-
-        def self.define_pg_pop_function
-          transaction do
-            drop_pg_pop_function()
-            connection.execute(<<-CODE)
-        CREATE FUNCTION pop_from_delayed_jobs (worker_name varchar, queue_name varchar, min_priority integer, max_priority integer, cur_time timestamp without time zone) RETURNS delayed_jobs AS $$
-        DECLARE
-          result delayed_jobs;
-        BEGIN
-          IF queue_name IS NULL THEN
-            SELECT * INTO result FROM delayed_jobs WHERE run_at <= cur_time AND locked_at IS NULL AND next_in_strand = true AND priority >= min_priority AND priority <= max_priority AND queue IS NULL ORDER BY priority ASC, run_at ASC FOR UPDATE;
-          ELSE
-            SELECT * INTO result FROM delayed_jobs WHERE run_at <= cur_time AND locked_at IS NULL AND next_in_strand = true AND priority >= min_priority AND priority <= max_priority AND queue = queue_name ORDER BY priority ASC, run_at ASC FOR UPDATE;
-          END IF;
-          IF NOT FOUND THEN
-            RETURN NULL;
-          END IF;
-
-          -- since we did a select FOR UPDATE, this locking should always succeed without contention
-          -- however, we still check the return value as a sanity check
-          UPDATE delayed_jobs SET locked_at = cur_time, locked_by = worker_name WHERE id = result.id AND locked_at IS NULL AND run_at <= cur_time;
-          IF FOUND THEN
-            result.locked_at = cur_time;
-            result.locked_by = worker_name;
-            RETURN result;
-          ELSE
-            RAISE EXCEPTION 'found but then not locked % for %', result.id, worker_name;
-          END IF;
-
-        END;
-        $$ LANGUAGE plpgsql;
-            CODE
-          end
-        end
-
-        def self.drop_pg_pop_function
-          connection.execute("DROP FUNCTION IF EXISTS pop_from_delayed_jobs(varchar, varchar, integer, integer, timestamp without time zone)")
         end
       end
 

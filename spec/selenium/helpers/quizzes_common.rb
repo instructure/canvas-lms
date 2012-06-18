@@ -20,7 +20,7 @@ shared_examples_for "quizzes selenium tests" do
     set_feedback_content(question.find_element(:css, "div.text .question_incorrect_comment"), "You know what they say - study long study wrong.")
     set_feedback_content(question.find_element(:css, "div.text .question_neutral_comment"), "Pass or fail, you're a winner!")
 
-    question.submit
+    submit_form(question)
     wait_for_ajaximations
   end
 
@@ -38,7 +38,7 @@ shared_examples_for "quizzes selenium tests" do
     answers[1].find_element(:css, ".comment_focus").click
     answers[1].find_element(:css, ".answer_comments textarea").send_keys("Good job!")
 
-    question.submit
+    submit_form(question)
     wait_for_ajaximations
   end
 
@@ -54,7 +54,7 @@ shared_examples_for "quizzes selenium tests" do
     replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
     replace_content(answers[1].find_element(:css, ".short_answer input"), "Blank")
 
-    question.submit
+    submit_form(question)
     wait_for_ajaximations
   end
 
@@ -64,7 +64,7 @@ shared_examples_for "quizzes selenium tests" do
     driver.find_element(:css, '.add_question_link').click
     question = find_with_jquery('.question_form:visible')
     replace_content(question.find_element(:css, "input[name='question_points']"), points)
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
     questions = find_all_with_jquery(".question_holder:visible")
     questions.length.should eql(@question_count)
@@ -138,7 +138,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def save_question
-    fj('.question_form:visible').submit
+    submit_form('.question_form')
     wait_for_ajax_requests
   end
 
@@ -173,7 +173,7 @@ shared_examples_for "quizzes selenium tests" do
   # creates a question group through the browser
   def create_question_group
     f('.add_question_group_link').click
-    f('#group_top_new form').submit
+    submit_form('#group_top_new form')
     wait_for_ajax_requests
     @group = QuizGroup.last
   end

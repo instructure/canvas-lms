@@ -17,7 +17,7 @@ describe "assignment groups" do
     wait_for_animations
     driver.find_element(:css, '#right-side .add_group_link').click
     driver.find_element(:id, 'assignment_group_name').send_keys('test group')
-    driver.find_element(:id, 'add_group_form').submit
+    submit_form('#add_group_form')
     wait_for_animations
     driver.find_element(:id, 'add_group_form').should_not be_displayed
     driver.find_element(:css, '#groups .assignment_group').should include_text('test group')
@@ -48,7 +48,7 @@ describe "assignment groups" do
     click_option(assignment_css, assignment.title)
     #delete second grading rule and save
     driver.find_element(:css, '.form_rules div:nth-child(2) a img').click
-    driver.find_element(:css, '#add_group_form button[type="submit"]').click
+    submit_form('#add_group_form')
 
     #verify grading rules
     driver.find_element(:css, '.more_info_link').click

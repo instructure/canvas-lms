@@ -101,7 +101,7 @@ describe "admin question bank" do
     question_bank_2 = create_question_bank("bank 2")
     f(".move_question_link").click
     f("#move_question_dialog #question_bank_#{question_bank_2.id}").click
-    f("#move_question_dialog .submit_button").click
+    submit_dialog("#move_question_dialog")
     wait_for_ajaximations
     question_bank_2.assessment_questions.find_by_name(@question.name).should be_present
   end

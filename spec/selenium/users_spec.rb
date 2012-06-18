@@ -13,12 +13,12 @@ describe "user selenium tests" do
       course.enroll_student(@user)
 
       get "/users/#{@user.id}"
-
+      pseudonym_form = f('#edit_pseudonym_form')
       driver.find_element(:css, ".add_pseudonym_link").click
-      driver.find_element(:css, "#edit_pseudonym_form #pseudonym_unique_id").send_keys('new_user')
-      driver.find_element(:css, "#edit_pseudonym_form #pseudonym_password").send_keys('qwerty1')
-      driver.find_element(:css, "#edit_pseudonym_form #pseudonym_password_confirmation").send_keys('qwerty1')
-      driver.find_element(:css, '#edit_pseudonym_form button[type="submit"]').click
+      pseudonym_form.find_element(:css, "#pseudonym_unique_id").send_keys('new_user')
+      pseudonym_form.find_element(:css, "#pseudonym_password").send_keys('qwerty1')
+      pseudonym_form.find_element(:css, "#pseudonym_password_confirmation").send_keys('qwerty1')
+      submit_form(pseudonym_form)
       wait_for_ajaximations
 
       new_login = driver.find_elements(:css, '.login').select { |e| e.attribute(:class) !~ /blank/ }.first

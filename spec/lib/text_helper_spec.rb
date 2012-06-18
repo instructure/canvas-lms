@@ -36,7 +36,7 @@ describe TextHelper do
 
     it "should just give the start if no end is provided" do
       datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
-      th.datetime_string(datetime).should == "Jan  1 at 12pm"
+      th.datetime_string(datetime).should == "Jan 1 at 12pm"
     end
 
     it "should omit the time if shorten_midnight is true and it's (due) at midnight" do
@@ -48,7 +48,7 @@ describe TextHelper do
 
     it "should ignore end if the type is due_date" do
       datetime = Time.zone.parse("#{Time.now.year}-01-01 12:00:00")
-      expected = "Jan  1 by 12pm"
+      expected = "Jan 1 by 12pm"
       th.datetime_string(datetime, :due_date).should == expected
       th.datetime_string(datetime, :due_date, datetime + 1.hour).should == expected
     end
@@ -57,14 +57,14 @@ describe TextHelper do
       start_datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
       end_datetime = start_datetime + 2.days
       th.datetime_string(start_datetime, :event, end_datetime).should ==
-        "Jan  1 at 12pm to Jan  3 at 12pm"
+        "Jan 1 at 12pm to Jan 3 at 12pm"
     end
 
     it "should give a same-day range if start and end are on the same day" do
       start_datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
       end_datetime = start_datetime.advance(:hours => 1)
       th.datetime_string(start_datetime, :event, end_datetime).should ==
-        "Jan  1 from 12pm to  1pm"
+        "Jan 1 from 12pm to  1pm"
     end
 
     it "should include the year if the current year isn't the same" do

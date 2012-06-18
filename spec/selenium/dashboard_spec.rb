@@ -59,7 +59,7 @@ describe "dashboard" do
       get "/"
       driver.find_element(:css, ".reply_message .textarea").click
       driver.find_element(:css, "textarea[name='body']").send_keys("hey there")
-      driver.find_element(:css, ".communication_sub_message .submit_button").click
+      submit_form(".communication_sub_message")
       wait_for_ajax_requests
       messages = find_all_with_jquery(".communication_message.conversation .communication_sub_message:visible")
 
@@ -243,7 +243,7 @@ describe "dashboard" do
       get "/"
       driver.find_element(:css, '.topic_message .add_entry_link').click
       driver.find_element(:name, 'discussion_entry[plaintext_message]').send_keys('first comment')
-      driver.find_element(:css, '.add_sub_message_form').submit
+      submit_form('.add_sub_message_form')
       wait_for_ajax_requests
       wait_for_animations
       driver.find_element(:css, '.topic_message .subcontent').should include_text('first comment')

@@ -29,11 +29,13 @@ class GroupMembership < ActiveRecord::Base
   before_save :assign_uuid
   before_save :auto_join
   before_save :capture_old_group_id
+
   before_validation :verify_section_homogeneity_if_necessary
-  
+
   after_save :touch_groups
-  
+  after_save :check_auto_follow_group
   before_destroy :touch_groups
+  after_destroy :check_auto_follow_group
   
   has_a_broadcast_policy
   
@@ -78,7 +80,9 @@ class GroupMembership < ActiveRecord::Base
   # auto accept 'requested' or 'invited' memberships until we implement
   # accepting requests/invitations
   def auto_join
+    return true if self.group.try(:group_category).try(:communities?)
     self.workflow_state = 'accepted' if self.group && (self.requested? || self.invited?)
+    true
   end
   protected :auto_join
 
@@ -100,8 +104,18 @@ class GroupMembership < ActiveRecord::Base
   attr_accessor :old_group_id
   def capture_old_group_id
     self.old_group_id = self.group_id_was if self.group_id_changed?
+    true
   end
   protected :capture_old_group_id
+
+  def check_auto_follow_group
+    if (self.id_changed? || self.workflow_state_changed?) && self.active?
+      UserFollow.create_follow(self.user, self.group)
+    elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
+      user_follow = self.user.user_follows.find(:first, :conditions => { :followed_item_id => self.group_id, :followed_item_type => 'Group' })
+      user_follow.try(:destroy)
+    end
+  end
   
   def touch_groups
     groups_to_touch = [ self.group_id ]
@@ -112,7 +126,6 @@ class GroupMembership < ActiveRecord::Base
   
   workflow do
     state :accepted
-    state :following
     state :invited do
       event :reject, :transitions_to => :rejected
       event :accept, :transitions_to => :accepted
@@ -130,5 +143,21 @@ class GroupMembership < ActiveRecord::Base
   def active_given_enrollments?(enrollments)
     accepted? && (!self.group.context.is_a?(Course) ||
      enrollments.any?{ |e| e.user == self.user && e.course == self.group.context })
+  end
+
+  set_policy do
+    # for non-communities, people can be put into groups
+    given { |user, session| user.present? && (user == self.user || self.group.grants_right?(user, session, :manage)) && self.group.can_join?(user) && !self.group.group_category.try(:communities?) }
+    can :create
+
+    # for communities, users must initiate in order to be added to a group
+    given { |user, session| user.present? && user == self.user && self.group.can_join?(user) && self.group.group_category.try(:communities?) }
+    can :create
+
+    given { |user, session| user.present? && self.group.grants_right?(user, session, :manage) }
+    can :update
+
+    given { |user, session| user.present? && (user == self.user || self.group.grants_right?(user, session, :manage)) && self.group.can_leave?(user) }
+    can :delete
   end
 end

@@ -153,7 +153,9 @@ class SisImportsApiController < ApplicationController
 
       batch.save!
 
-      batch.process
+      unless Setting.get('skip_sis_jobs_account_ids', '').split(',').include?(@account.global_id.to_s)
+        batch.process
+      end
       render :json => batch.api_json
     end
   end

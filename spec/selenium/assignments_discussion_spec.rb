@@ -10,7 +10,7 @@ describe "discussion assignments" do
     wait_for_animations
 
     click_option(".assignment_submission_types", text)
-    driver.find_element(:css, "#add_assignment_form").submit
+    submit_form("#add_assignment_form")
     wait_for_ajaximations
   end
 
@@ -39,7 +39,7 @@ describe "discussion assignments" do
     driver.find_element(:css, ".edit_full_assignment_link").click
     wait_for_animations
     click_option(".assignment_type", "Discussion")
-    driver.find_element(:css, "#edit_assignment_form").submit
+    submit_form("#edit_assignment_form")
     wait_for_ajaximations
     expect_new_page_load { driver.find_element(:css, ".assignment_topic_link").click }
     driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
@@ -57,7 +57,7 @@ describe "discussion assignments" do
     keep_trying_until { edit_form.should be_displayed }
     replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)
     edit_form.find_element(:id, 'assignment_peer_reviews').click
-    edit_form.submit
+    submit_form(edit_form)
     wait_for_ajaximations
     expect_new_page_load { driver.find_element(:link, assignment_title).click }
     f('.assignment_peer_reviews_link').should be_displayed

@@ -35,7 +35,7 @@ describe "external tool assignments" do
     end
     driver.find_element(:css, '#select_context_content_dialog .add_item_button').click
     driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t2.url
-    driver.find_element(:css, 'form.new_assignment').submit
+    submit_form('form.new_assignment')
 
     wait_for_ajax_requests
     a = @course.assignments(true).last
@@ -60,7 +60,7 @@ describe "external tool assignments" do
     driver.find_element(:css, '#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
     driver.find_element(:css, '#select_context_content_dialog .add_item_button').click
     driver.find_element(:css, '#assignment_external_tool_tag_attributes_url').attribute('value').should == @t1.url
-    driver.find_element(:css, 'form.edit_assignment').submit
+    submit_form('form.edit_assignment')
 
     wait_for_ajax_requests
     a.reload

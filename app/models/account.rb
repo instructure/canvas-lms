@@ -819,59 +819,66 @@ class Account < ActiveRecord::Base
   def help_links
     settings[:custom_help_links] || []
   end
-  
+
   def self.allowable_services
     {
       :google_docs => {
         :name => "Google Docs", 
         :description => "",
-        :expose_to_ui => !!GoogleDocs.config
+        :expose_to_ui => (GoogleDocs.config ? :service : false)
       },
       :google_docs_previews => {
         :name => "Google Docs Previews", 
         :description => "",
-        :expose_to_ui => true
+        :expose_to_ui => :service
       },
       :facebook => {
         :name => "Facebook", 
         :description => "",
-        :expose_to_ui => !!Facebook.config
+        :expose_to_ui => (Facebook.config ? :service : false)
       },
       :skype => {
         :name => "Skype", 
         :description => "",
-        :expose_to_ui => true
+        :expose_to_ui => :service
       },
       :linked_in => {
         :name => "LinkedIn", 
         :description => "",
-        :expose_to_ui => !!LinkedIn.config
+        :expose_to_ui => (LinkedIn.config ? :service : false)
       },
       :twitter => {
         :name => "Twitter", 
         :description => "",
-        :expose_to_ui => !!Twitter.config
+        :expose_to_ui => (Twitter.config ? :service : false)
       },
       :delicious => {
         :name => "Delicious", 
         :description => "",
-        :expose_to_ui => true
+        :expose_to_ui => :service
       },
       :diigo => {
         :name => "Diigo", 
         :description => "",
-        :expose_to_ui => true
+        :expose_to_ui => :service
       },
       # TODO: move avatars to :settings hash, it makes more sense there
+      # In the meantime, we leave it as a service but expose it in the
+      # "Features" (settings) portion of the account admin UI
       :avatars => {
         :name => "User Avatars",
         :description => "",
         :default => false,
-        :expose_to_ui => true
+        :expose_to_ui => :setting
       }
-    }.freeze
+    }.merge(@plugin_services || {}).freeze
   end
-  
+
+  def self.register_service(service_name, info_hash)
+    @plugin_services ||= {}
+    @plugin_services[service_name.to_sym] = info_hash.freeze
+  end
+
   def self.default_allowable_services
     self.allowable_services.reject {|s, info| info[:default] == false }
   end
@@ -935,9 +942,15 @@ class Account < ActiveRecord::Base
     end
     @allowed_services_hash = account_allowed_services
   end
-  
-  def self.services_exposed_to_ui_hash
-    self.allowable_services.reject { |key, setting| !setting[:expose_to_ui] }
+
+  # if expose_as is nil, all services exposed in the ui are returned
+  # if it's :service or :setting, then only services set to be exposed as that type are returned
+  def self.services_exposed_to_ui_hash(expose_as = nil)
+    if expose_as
+      self.allowable_services.reject { |key, setting| setting[:expose_to_ui] != expose_as }
+    else
+      self.allowable_services.reject { |key, setting| !setting[:expose_to_ui] }
+    end
   end
   
   def service_enabled?(service)

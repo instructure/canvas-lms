@@ -17,6 +17,7 @@
 #
 
 # @API Collections
+# @beta
 #
 # Collections contain Collection Items, which are links to content. There are
 # different types of items for links to different types of data.
@@ -318,7 +319,7 @@ class CollectionItemsController < ApplicationController
     find_item_and_collection
     if authorized_action(@item, @current_user, :read)
       @upvote = find_upvote
-      @upvote ||= @item.collection_item_data.collection_item_upvotes.create!({ :user => @current_user })
+      @upvote ||= CollectionItemUpvote.create!(:user => @current_user, :collection_item_data => @item.data)
       render :json => collection_item_upvote_json(@item, @upvote, @current_user, session)
     end
   end

@@ -75,7 +75,7 @@ describe "eportfolios" do
       f('#section_list_manage .portfolio_settings_link').click
       replace_content f('#edit_eportfolio_form #eportfolio_name'), "new ePortfolio name"
       f('#edit_eportfolio_form #eportfolio_public').click
-      f('#edit_eportfolio_form button[type=submit]').click
+      submit_form('#edit_eportfolio_form')
       wait_for_ajax_requests
       @eportfolio.reload
       @eportfolio.name.should eql "new ePortfolio name"
@@ -113,9 +113,7 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
       f(".delete_eportfolio_link").click
-      delete_button = f("#delete_eportfolio_form button[type=submit]")
-      delete_button.should be_displayed
-      delete_button.click
+      submit_form("#delete_eportfolio_form")
       f("#wrapper-container .eportfolios").click
       f("#whats_an_eportfolio .add_eportfolio_link").should be_displayed
       fj("#portfolio_#{@eportfolio.id}").should be_nil
@@ -139,7 +137,7 @@ describe "eportfolios" do
       it "should add rich text content" do
         f(".add_rich_content_link").click
         type_in_tiny "textarea", "hello student"
-        f(".form_content button[type='submit']").click
+        submit_form(".form_content")
         wait_for_ajax_requests
         entry_verifier ({:section_type => "rich_text", :content => "hello student"})
         f("#page_content .section_content").should include_text("hello student")
@@ -153,7 +151,7 @@ describe "eportfolios" do
         end
 
         def add_html
-          f(".form_content button[type='submit']").click
+          submit_form(".form_content")
           wait_for_ajax_requests
           f(".section_content b").text.should eql "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
@@ -166,12 +164,12 @@ describe "eportfolios" do
           comment_public="#eportfolio_entry_show_comments"
           f(comment_public).click
           is_checked(comment_public).should be_true
-          f(".form_content button[type='submit']").click
+          submit_form(".form_content")
           f(".section_content b").text.should eql "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
           refresh_page
           f("#page_comment_message").send_keys("hi student")
-          f("#add_page_comment_form button[type='submit']").click
+          submit_form("#add_page_comment_form")
           wait_for_ajax_requests
           f("#page_comments .message").should include_text("hi student")
           @eportfolio_entry.page_comments[0].message.should eql "hi student"
@@ -192,7 +190,7 @@ describe "eportfolios" do
           hover_and_click("#page_section_1 .delete_page_section_link")
           driver.switch_to.alert.accept
           wait_for_ajaximations
-          f(".form_content button[type='submit']").click
+          submit_form(".form_content")
           wait_for_ajaximations
           @eportfolio.eportfolio_entries.first.content[0].should eql "No Content Added Yet"
           f("#edit_page_section_1").should be_nil
@@ -213,7 +211,7 @@ describe "eportfolios" do
         f(".add_submission_link").click
         f(".submission_list").should include_text(@assignment.title)
         f(".select_submission_button").click
-        f(".form_content button[type='submit']").click
+        submit_form(".form_content")
       end
     end
 
@@ -261,7 +259,7 @@ describe "eportfolios file upload" do
     fj(".file_upload:visible").send_keys(fullpath)
     fj(".upload_file_button").click
     wait_for_ajaximations
-    f(".form_content button[type='submit']").click
+    submit_form(".form_content")
     wait_for_ajax_requests
     download = f("a.eportfolio_download")
     download.should be_displayed

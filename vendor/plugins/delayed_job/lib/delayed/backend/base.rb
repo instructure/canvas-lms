@@ -31,7 +31,7 @@ module Delayed
           options = args.first || {}
           options[:priority] ||= self.default_priority
           options[:payload_object] = object
-          options[:queue] ||= Delayed::Worker.queue
+          options[:queue] = Delayed::Worker.queue unless options.key?(:queue)
           options[:max_attempts] ||= Delayed::Worker.max_attempts
           options[:current_shard] = Shard.current
 
@@ -45,10 +45,7 @@ module Delayed
 
           if options[:singleton]
             options[:strand] = options.delete :singleton
-            self.transaction do
-              self.clear_strand!(options[:strand])
-              self.create(options)
-            end
+            self.create_singleton(options)
           elsif batches && options.slice(:strand, :run_at).empty?
             batch_enqueue_args = options.slice(:priority, :queue)
             batches[batch_enqueue_args] << options

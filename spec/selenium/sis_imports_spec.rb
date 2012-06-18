@@ -117,7 +117,7 @@ describe "sis imports ui" do
     driver.find_element(:css, "#override_sis_stickiness").click
     driver.find_element(:css, "#add_sis_stickiness").click
     driver.find_element(:css, "#batch_mode").click
-    driver.find_element(:css, "button.submit_button").click
+    submit_form('#sis_importer')
     keep_trying_until { driver.find_element(:css, 'div.progress_bar_holder div.progress_message').should be_displayed }
     SisBatch.last.process_without_send_later
     keep_trying_until { driver.find_element(:css, "div.sis_messages div.error_message").text =~ /There was an error importing your SIS data\./ }
@@ -127,7 +127,7 @@ describe "sis imports ui" do
 
     expect_new_page_load { get "/accounts/#{@account.id}/sis_import" }
     driver.find_element(:css, "#override_sis_stickiness").click
-    driver.find_element(:css, "button.submit_button").click
+    submit_form('#sis_importer')
     keep_trying_until { driver.find_element(:css, 'div.progress_bar_holder div.progress_message').should be_displayed }
     SisBatch.last.process_without_send_later
     keep_trying_until { driver.find_element(:css, "div.sis_messages div.error_message").text =~ /There was an error importing your SIS data\./ }

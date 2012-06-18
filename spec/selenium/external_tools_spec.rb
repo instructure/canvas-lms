@@ -302,7 +302,7 @@ describe "editing external tools" do
     f("#edit_item_form").should be_displayed
     replace_content(f("#edit_item_form #content_tag_title"), "Example 2")
     f("#edit_item_form #content_tag_new_tab").click
-    f("#edit_item_form button[type='submit']").click
+    submit_form("#edit_item_form")
 
     wait_for_ajax_requests
 

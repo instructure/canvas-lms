@@ -142,10 +142,11 @@ class CoursesController < ApplicationController
 
       @course = (@sub_account || @account).courses.build(params[:course])
       @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
-      @course.offer if api_request? and params[:offer].present?
       respond_to do |format|
         if @course.save
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
+          # offer updates the workflow state, saving the record without doing validation callbacks
+          @course.offer if api_request? and params[:offer].present?
           format.html
           format.json { render :json => course_json(
             @course,

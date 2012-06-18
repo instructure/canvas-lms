@@ -425,8 +425,8 @@ describe UsersController, :type => :integration do
   it "should return the group-specific activity stream" do
     group_with_user
     @group1 = @group
-    @group2 = Group.create!
-    @group2.participating_users << @user
+    group_with_user(:user => @user)
+    @group2 = @group
 
     @context = @group1
     @topic1 = discussion_topic_model

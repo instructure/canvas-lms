@@ -373,19 +373,16 @@ Spec::Runner.configure do |config|
     session[:become_user_id].should == @fake_student.id.to_s
   end
 
+  VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
   def group(opts={})
-    opts.delete(:active_all)
-    if opts[:group_context]
-      @group = opts.delete(:group_context).groups.create! opts
-    else
-      @group = Group.create! opts
-    end
+    @group = (opts[:group_context].try(:groups) || Group).create! opts.slice(VALID_GROUP_ATTRIBUTES)
   end
 
   def group_with_user(opts={})
     group(opts)
-    user(opts)
-    @group.participating_users << @user
+    u = opts[:user] || user(opts)
+    workflow_state = opts[:active_all] ? 'accepted' : nil
+    @group.add_user(u, workflow_state, opts[:moderator])
   end
 
   def group_with_user_logged_in(opts={})
@@ -752,7 +749,22 @@ Spec::Runner.configure do |config|
   end
 
   def run_job(job = Delayed::Job.last(:order => :id))
+    case job
+    when Hash
+      job = Delayed::Job.first(:conditions => job, :order => :id)
+    end
     Delayed::Worker.new.perform(job)
+  end
+
+  def run_jobs
+    while job = Delayed::Job.get_and_lock_next_available(
+      'spec run_jobs',
+      1.hour,
+      Delayed::Worker.queue,
+      0,
+      Delayed::MAX_PRIORITY)
+      run_job(job)
+    end
   end
 
   # send a multipart post request in an integration spec post_params is

@@ -29,7 +29,7 @@ describe "admin courses tab" do
    end
    f("#add_user_form #user_name").send_keys name
    f("#pseudonym_unique_id").send_keys email
-   f("#add_user_form [type='submit']").click
+   submit_form("#add_user_form")
    wait_for_ajax_requests
    user = User.first(:conditions =>{:name => name})
    user.should be_present

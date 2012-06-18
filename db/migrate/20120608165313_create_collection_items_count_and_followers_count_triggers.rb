@@ -2,7 +2,7 @@
 # While you can edit this file, any changes you make to the definitions here
 # will be undone by the next auto-generated trigger migration.
 
-class CreateTriggersForCollections < ActiveRecord::Migration
+class CreateCollectionItemsCountAndFollowersCountTriggers < ActiveRecord::Migration
   tag :predeploy
 
   def self.up
@@ -11,9 +11,9 @@ class CreateTriggersForCollections < ActiveRecord::Migration
         after(:insert) do |t|
       t.where("NEW.workflow_state = 'active'") do
         <<-SQL_ACTIONS
-      UPDATE collection_item_datas
-      SET post_count = post_count + 1
-      WHERE id = NEW.collection_item_data_id;
+      UPDATE collections
+      SET items_count = items_count + 1
+      WHERE id = NEW.collection_id;
         SQL_ACTIONS
       end
     end
@@ -23,9 +23,9 @@ class CreateTriggersForCollections < ActiveRecord::Migration
         after(:update) do |t|
       t.where("NEW.workflow_state <> OLD.workflow_state") do
         <<-SQL_ACTIONS
-      UPDATE collection_item_datas
-      SET post_count = post_count + CASE WHEN (NEW.workflow_state = 'active') THEN 1 ELSE -1 END
-      WHERE id = NEW.collection_item_data_id;
+      UPDATE collections
+      SET items_count = items_count + CASE WHEN (NEW.workflow_state = 'active') THEN 1 ELSE -1 END
+      WHERE id = NEW.collection_id;
         SQL_ACTIONS
       end
     end
@@ -35,31 +35,35 @@ class CreateTriggersForCollections < ActiveRecord::Migration
         after(:delete) do |t|
       t.where("OLD.workflow_state = 'active'") do
         <<-SQL_ACTIONS
-      UPDATE collection_item_datas
-      SET post_count = post_count - 1
-      WHERE id = OLD.collection_item_data_id;
+      UPDATE collections
+      SET items_count = items_count - 1
+      WHERE id = OLD.collection_id;
         SQL_ACTIONS
       end
     end
 
-    create_trigger("collection_item_upvotes_after_insert_row_tr", :generated => true, :compatibility => 1).
-        on("collection_item_upvotes").
-        after(:insert) do
-      <<-SQL_ACTIONS
-    UPDATE collection_item_datas
-    SET upvote_count = upvote_count + 1
-    WHERE id = NEW.collection_item_data_id;
-      SQL_ACTIONS
+    create_trigger("user_follows_after_insert_row_tr", :generated => true, :compatibility => 1).
+        on("user_follows").
+        after(:insert) do |t|
+      t.where("NEW.followed_item_type = 'Collection'") do
+        <<-SQL_ACTIONS
+      UPDATE collections
+      SET followers_count = followers_count + 1
+      WHERE id = NEW.followed_item_id;
+        SQL_ACTIONS
+      end
     end
 
-    create_trigger("collection_item_upvotes_after_delete_row_tr", :generated => true, :compatibility => 1).
-        on("collection_item_upvotes").
-        after(:delete) do
-      <<-SQL_ACTIONS
-    UPDATE collection_item_datas
-    SET upvote_count = upvote_count - 1
-    WHERE id = OLD.collection_item_data_id;
-      SQL_ACTIONS
+    create_trigger("user_follows_after_delete_row_tr", :generated => true, :compatibility => 1).
+        on("user_follows").
+        after(:delete) do |t|
+      t.where("OLD.followed_item_type = 'Collection'") do
+        <<-SQL_ACTIONS
+      UPDATE collections
+      SET followers_count = followers_count - 1
+      WHERE id = OLD.followed_item_id;
+        SQL_ACTIONS
+      end
     end
   end
 
@@ -76,8 +80,12 @@ class CreateTriggersForCollections < ActiveRecord::Migration
 
     drop_trigger("collection_items_after_delete_row_when_old_workflow_state_ac_tr", "collection_items", :generated => true)
 
-    drop_trigger("collection_item_upvotes_after_insert_row_tr", "collection_item_upvotes", :generated => true)
+    drop_trigger("user_follows_after_insert_row_tr", "user_follows", :generated => true)
 
-    drop_trigger("collection_item_upvotes_after_delete_row_tr", "collection_item_upvotes", :generated => true)
+    drop_trigger("user_follows_after_insert_row_when_new_followed_item_type_co_tr", "user_follows", :generated => true)
+
+    drop_trigger("user_follows_after_delete_row_tr", "user_follows", :generated => true)
+
+    drop_trigger("user_follows_after_delete_row_when_old_followed_item_type_co_tr", "user_follows", :generated => true)
   end
 end

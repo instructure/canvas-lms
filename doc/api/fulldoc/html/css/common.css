@@ -43,6 +43,7 @@ h3.beta {
   background-color: #E5E8FF;
   text-align: center;
   padding: 6px;
+  font-weight: bold;
 }
 
 #sidebar {
@@ -94,7 +95,7 @@ h3.beta {
 .syntaxhighlighter .line code { white-space: nowrap; }
 .syntaxhighlighter { overflow: auto; }
 
-.method_details h3 {
+.method_details h3.endpoint {
   font-size: 14px;
   font-weight: normal;
   font-family: Monaco, Consolas, Courier, monospace;

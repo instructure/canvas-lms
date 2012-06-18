@@ -71,7 +71,7 @@ describe "help dialog" do
       feedback_form = driver.find_element(:css, "#help-dialog #teacher_feedback")
       feedback_form.find_element(:css, '[name="recipients[]"]')['value'].should == "course_#{@course.id}_admins"
       feedback_form.find_element(:css, '[name="body"]').send_keys('test message')
-      feedback_form.submit
+      submit_form(feedback_form)
       wait_for_ajaximations
       feedback_form.should_not be_displayed
       cm = ConversationMessage.last
@@ -92,7 +92,7 @@ describe "help dialog" do
       create_ticket_form.find_element(:css, 'textarea[name="error[comments]"]').send_keys('test comments')
       severity = 'blocks_what_i_need_to_do'
       set_value(create_ticket_form.find_element(:css, '[name="error[user_perceived_severity]"]'), severity)
-      create_ticket_form.submit
+      submit_form(create_ticket_form)
       wait_for_ajaximations
       create_ticket_form.should_not be_displayed
       er = ErrorReport.last

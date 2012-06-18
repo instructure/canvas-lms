@@ -25,7 +25,7 @@ describe "profile" do
     driver.find_element(:css, '.add_access_token_link').click
     access_token_form = driver.find_element(:id, 'access_token_form')
     access_token_form.find_element(:id, 'access_token_purpose').send_keys(purpose)
-    access_token_form.submit
+    submit_form(access_token_form)
     wait_for_ajax_requests
     details_dialog = driver.find_element(:id, 'token_details_dialog')
     details_dialog.should be_displayed
@@ -45,7 +45,7 @@ describe "profile" do
     edit_form.find_element(:id, 'old_password').send_keys(old_password)
     edit_form.find_element(:id, 'pseudonym_password').send_keys(new_password)
     edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
-    edit_form.submit
+    submit_form(edit_form)
     wait_for_ajax_requests
     #login with new password
     login_as('nobody@example.com', new_password)
@@ -83,7 +83,7 @@ describe "profile" do
         form = f("#register_email_address")
         test_email = 'nobody+1234@example.com'
         form.find_element(:id, 'communication_channel_address').send_keys(test_email)
-        submit_form('#register_email_address')
+        submit_form(form)
 
         confirmation_dialog = f("#confirm_email_channel")
         keep_trying_until { confirmation_dialog.should be_displayed }
@@ -149,7 +149,7 @@ describe "profile" do
       get "/profile/edit"
       edit_form = click_edit
       edit_form.find_element(:id, 'user_name').send_keys(new_user_name)
-      edit_form.submit
+      submit_form(edit_form)
       wait_for_ajaximations
       keep_trying_until { driver.find_element(:css, '.full_name').text.should == new_user_name }
     end
@@ -159,7 +159,7 @@ describe "profile" do
       get "/profile/edit"
       edit_form = click_edit
       edit_form.find_element(:id, 'user_short_name').send_keys(new_display_name)
-      edit_form.submit
+      submit_form(edit_form)
       wait_for_ajaximations
       refresh_page
       keep_trying_until { driver.find_element(:css, '#topbar li.user_name').text.should == new_display_name }
@@ -169,7 +169,7 @@ describe "profile" do
       get "/profile/edit"
       edit_form = click_edit
       click_option('#user_locale', 'Español')
-      expect_new_page_load { edit_form.submit }
+      expect_new_page_load { submit_form(edit_form) }
       driver.find_element(:css, '.profile_table').should include_text('Nombre')
     end
 
@@ -182,7 +182,7 @@ describe "profile" do
       edit_form = click_edit
       edit_form.find_elements(:id, 'user_short_name').first.should be_nil
       click_option('#user_locale', 'Español')
-      expect_new_page_load { edit_form.submit }
+      expect_new_page_load { submit_form(edit_form) }
       driver.find_element(:css, '.profile_table').should include_text('Nombre')
     end
 
@@ -193,7 +193,7 @@ describe "profile" do
       register_form = driver.find_element(:id, 'register_sms_number')
       register_form.find_element(:css, '.sms_number').send_keys(test_cell_number)
       click_option('select.user_selected.carrier', 'AT&T')
-      register_form.submit
+      submit_form(register_form)
       wait_for_ajaximations
       close_visible_dialog
       keep_trying_until { driver.find_element(:css, '.other_channels .path').should include_text(test_cell_number) }
@@ -318,7 +318,7 @@ shared_examples_for "profile pictures selenium tests" do
     # Make ajax request slow down to verify transitional state
     FilesController.before_filter { sleep 5; true }
 
-    driver.find_element(:id, 'add_pic_form').submit
+    submit_form('#add_pic_form')
 
     new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
     new_image.attribute('src').should_not =~ %r{/images/thumbnails/}

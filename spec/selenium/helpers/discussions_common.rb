@@ -20,7 +20,7 @@ shared_examples_for "discussions selenium tests" do
   def edit_discussion(discussion_name, message)
     replace_content(f('#discussion_topic_title'), discussion_name)
     type_in_tiny 'textarea', message
-    f('.submit_button').click
+    submit_form('.add_topic_form_new')
     wait_for_ajaximations
     f('.discussion_topic .title').text.should == discussion_name
   end
@@ -54,7 +54,7 @@ shared_examples_for "discussions selenium tests" do
       @last_entry.find_element(:css, '.discussion-reply-attachments input').send_keys(fullpath)
     end
 
-    f('.discussion-reply-form').submit
+    submit_form('.discussion-reply-form')
     wait_for_ajax_requests
     keep_trying_until {
       id = DiscussionEntry.last.id

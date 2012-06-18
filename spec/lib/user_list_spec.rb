@@ -192,6 +192,12 @@ describe UserList do
     ul.duplicate_addresses.should == []
   end
 
+  it "should work with a list of paths" do
+    ul = UserList.new(['leonard@example.com', 'sheldon@example.com'], @account, :preferred)
+    ul.addresses.count.should == 2
+    expect { ul.users }.to change(User, :count).by(2)
+  end
+
   context "closed registration" do
     before(:each) do
       @account.settings = { :open_registration => false }

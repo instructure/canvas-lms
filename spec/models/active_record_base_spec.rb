@@ -349,4 +349,26 @@ describe ActiveRecord::Base do
       a.should == 1
     end
   end
+
+  context "Finder tests" do
+    before(:each) do
+      @user = user_model
+    end
+
+    it "should fail with improper nested hashes" do
+      lambda {
+        User.find(:first, :conditions => { :name => { :users => { :id => @user.id }}})
+      }.should raise_error(ActiveRecord::StatementInvalid)
+    end
+
+    it "should fail with dot in nested column name" do
+      lambda {
+        User.find(:first, :conditions => { :name => { "users.id" => @user.id }})
+      }.should raise_error(ActiveRecord::StatementInvalid)
+    end
+
+    it "should not fail with a dot in column name only" do
+      User.find(:first, :conditions => { 'users.id' => @user.id }).should_not be_nil
+    end
+  end
 end

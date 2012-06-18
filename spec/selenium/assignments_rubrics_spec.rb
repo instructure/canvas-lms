@@ -34,7 +34,7 @@ describe "assignment rubrics" do
       criterion_points.send_keys(:return)
       driver.find_element(:id, 'grading_rubric').click
       wait_for_ajax_requests
-      f('#edit_rubric_form').submit
+      submit_form('#edit_rubric_form')
       wait_for_ajaximations
       rubric = Rubric.last
       rubric.data.first[:points].should eql(initial_points)
@@ -102,7 +102,7 @@ describe "assignment rubrics" do
 
       f('.add_rubric_link').click
       driver.find_element(:id, 'grading_rubric').click
-      driver.find_element(:id, 'edit_rubric_form').submit
+      submit_form('#edit_rubric_form')
       find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
       wait_for_ajaximations
       f('#rubrics span .rubric_total').text.should == '5'
@@ -117,7 +117,7 @@ describe "assignment rubrics" do
 
       f('.add_rubric_link').click
       driver.find_element(:id, 'grading_rubric').click
-      driver.find_element(:id, 'edit_rubric_form').submit
+      submit_form('#edit_rubric_form')
       find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Change")').click
       wait_for_ajaximations
 
@@ -287,7 +287,7 @@ describe "assignment rubrics" do
         expect {
           f('.add_rubric_link').click
           replace_content(f('.rubric_title input'), rubric_name)
-          driver.find_element(:id, 'edit_rubric_form').submit
+          submit_form('#edit_rubric_form')
           wait_for_ajaximations
         }.to change(Rubric, :count).by(1)
         refresh_page

@@ -83,10 +83,12 @@ describe SisImportsApiController, :type => :integration do
           "progress" => 0,
           "id" => batch.id,
           "workflow_state"=>"created" }
+    job = Delayed::Job.last(:conditions => { :tag => 'SisBatch.process_all_for_account' })
+    job.strand.should == "sis_batch:account:#{@account.id}"
 
     SisBatch.count.should == @batch_count + 1
     batch.batch_mode.should be_false
-    batch.process_without_send_later
+    run_job(job)
     User.count.should == @user_count + 1
     User.last.name.should == "Jamie Kennedy"
     
@@ -117,6 +119,19 @@ describe SisImportsApiController, :type => :integration do
           "progress" => 100,
           "id" => batch.id,
           "workflow_state"=>"imported" }
+  end
+
+  it "should skip the job for skip_sis_jobs_account_ids" do
+    scope = Delayed::Job.scoped(:conditions => { :tag => 'SisBatch.process_all_for_account' })
+    Setting.set('skip_sis_jobs_account_ids', "fake,#{@account.global_id}")
+    expect {
+      api_call(:post,
+            "/api/v1/accounts/#{@account.id}/sis_imports.json",
+            { :controller => 'sis_imports_api', :action => 'create',
+              :format => 'json', :account_id => @account.id.to_s }, 
+            { :import_type => 'instructure_csv',
+              :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv') })
+    }.to change(scope, :count).by(0)
   end
 
   it "should enable batch mode and require selecting a valid term" do

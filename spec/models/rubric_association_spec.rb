@@ -106,4 +106,17 @@ describe RubricAssociation do
       end
     end
   end
+
+  context "when a rubric is associated with an account" do
+    it "should not try to link to assessments" do
+      site_admin_user
+      user_session(@user)
+      @account = @user.account
+      @rubric = @account.rubrics.build
+      rubric_params = HashWithIndifferentAccess.new({"title"=>"Some Rubric", "criteria"=>{"0"=>{"learning_outcome_id"=>"", "ratings"=>{"0"=>{"points"=>"5", "id"=>"blank", "description"=>"Full Marks"}, "1"=>{"points"=>"0", "id"=>"blank_2", "description"=>"No Marks"}}, "points"=>"5", "long_description"=>"", "id"=>"", "description"=>"Description of criterion"}}, "points_possible"=>"5", "free_form_criterion_comments"=>"0"})
+      rubric_association_params = HashWithIndifferentAccess.new({:association=>@account, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
+      #8864: the below raised a MethodNotFound error by trying to call @account.submissions
+      lambda { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params, nil) }.should_not raise_error
+    end
+  end
 end

@@ -9,7 +9,7 @@ describe "manage admin groups" do
     driver.find_element(:css, ".add_category_link").click
     form = driver.find_element(:css, "#add_category_form")
     replace_content form.find_element(:css, "input[type=text]"), name
-    form.find_element(:css, "button[type=submit]").click
+    submit_form(form)
     wait_for_ajaximations
     category = account.group_categories.find_by_name(name)
     category.should_not be_nil
@@ -102,7 +102,7 @@ describe "manage admin groups" do
       hover_and_click(".edit_group_link")
       form = driver.find_element(:css, "#edit_group_form")
       replace_content form.find_element(:css, "input[type=text]"), "New Name"
-      form.find_element(:css, "button[type=submit]").click
+      submit_form(form)
       driver.find_element(:css, "#category_#{@courses_group_category.id} #group_#{group.id}").should be_displayed
     end
 
@@ -211,7 +211,7 @@ describe "manage admin groups" do
       input_box = form.find_element(:css, "input[type=text]")
       category_name = "New Category"
       replace_content input_box, category_name
-      form.find_element(:css, "button[type=submit]").click
+      submit_form(form)
       wait_for_ajaximations
       @admin_account.group_categories.last.name.should eql category_name
     end
@@ -223,7 +223,7 @@ describe "manage admin groups" do
       form = driver.find_element(:id, "edit_category_form")
       form.find_element(:id, "category_enable_self_signup").click
       is_checked('#category_enable_self_signup').should be_true
-      form.find_element(:css, "button[type=submit]").click
+      submit_form(form)
       wait_for_ajaximations
       driver.find_element(:css, "#category_#{@courses_group_category.id} .self_signup_text").should include_text "Self sign-up is enabled"
     end
@@ -237,7 +237,7 @@ describe "manage admin groups" do
       is_checked('#category_enable_self_signup').should be_true
       form.find_element(:id, "category_restrict_self_signup").click
       is_checked('#category_restrict_self_signup').should be_true
-      form.find_element(:css, "button[type=submit]").click
+      submit_form(form)
       wait_for_ajaximations
       driver.find_element(:css, ".self_signup_text").should include_text "Self sign-up is enabled"
       driver.find_element(:css, ".restricted_self_signup_text").should include_text "All students in a group are required to be in the same section"

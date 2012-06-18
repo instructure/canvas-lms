@@ -40,7 +40,7 @@ describe "course syllabus" do
     edit_form = driver.find_element(:id, 'edit_course_syllabus_form')
     wait_for_tiny(keep_trying_until { driver.find_element(:id, 'edit_course_syllabus_form') })
     type_in_tiny('#course_syllabus_body', new_description)
-    edit_form.submit
+    submit_form(edit_form)
     wait_for_ajaximations
     driver.find_element(:id, 'course_syllabus').text.should == new_description
   end

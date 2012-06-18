@@ -388,6 +388,7 @@ ActionController::Routing::Routes.draw do |map|
     add_users(group)
     group.remove_user 'remove_user/:id', :controller => 'groups', :action => 'remove_user', :conditions => {:method => :delete}
     group.add_user 'add_user', :controller => 'groups', :action => 'add_user'
+    group.accept_invitation 'accept_invitation/:uuid', :controller => 'groups', :action => 'accept_invitation', :conditions => {:method => :get}
     group.members 'members.:format', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
     group.members 'members', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
     add_announcements(group)
@@ -848,8 +849,15 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :groups) do |groups|
       groups.resources :groups, :except => [:index]
+      groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
+      groups.put "groups/:group_id/followers/self", :action => :follow
+      groups.delete "groups/:group_id/followers/self", :action => :unfollow
+
+      groups.with_options(:controller => :group_memberships) do |memberships|
+        memberships.resources :memberships, :path_prefix => "groups/:group_id", :name_prefix => "group_", :controller => :group_memberships, :except => [:show]
+      end
     end
 
     api.with_options(:controller => :collections) do |collections|

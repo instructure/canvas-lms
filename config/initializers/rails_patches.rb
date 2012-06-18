@@ -160,3 +160,38 @@ else
     end
   end
 end
+
+if Rails::VERSION::MAJOR == 2
+  # So far a new version of rails 2.3 has not been released to patch this.
+  # Hopefully the next minor version (if there is one) will incorporate it
+  # and we can add another && Rails::VERSION::MINOR < condition to above
+  class ActiveRecord::Base
+    def self.sanitize_sql_hash_for_conditions(attrs, default_table_name = quoted_table_name, top_level = true)
+      attrs = expand_hash_conditions_for_aggregates(attrs)
+
+      conditions = attrs.map do |attr, value|
+        table_name = default_table_name
+
+        if not value.is_a?(Hash)
+          attr = attr.to_s
+
+          # Extract table name from qualified attribute names.
+          if attr.include?('.') and top_level
+            attr_table_name, attr = attr.split('.', 2)
+            attr_table_name = connection.quote_table_name(attr_table_name)
+          else
+            attr_table_name = table_name
+          end
+
+          attribute_condition("#{attr_table_name}.#{connection.quote_column_name(attr)}", value)
+        elsif top_level
+          sanitize_sql_hash_for_conditions(value, connection.quote_table_name(attr.to_s), false)
+        else
+          raise ActiveRecord::StatementInvalid
+        end
+      end.join(' AND ')
+
+      replace_bind_variables(conditions, expand_range_bind_variables(attrs.values))
+    end
+  end
+end

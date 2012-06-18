@@ -146,7 +146,6 @@ define([
     var thumbnailsQueued = [];
     var thumbnailing = false;
     var nextThumbnail = function() {
-      if (!thumbnailsQueued.length) return; // shortcut if there's no work to do
       thumbnailing = true;
       var iterations = Math.min(thumbnailsQueued.length, 30),
           thumbnail;

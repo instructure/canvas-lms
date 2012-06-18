@@ -17,7 +17,7 @@
 #
 
 class UserFollow < ActiveRecord::Base
-  VALID_FOLLOWED_ITEM_TYPES = [:user, :collection]
+  VALID_FOLLOWED_ITEM_TYPES = [:user, :collection, :group]
 
   attr_accessible :following_user, :followed_item
 
@@ -54,6 +54,8 @@ class UserFollow < ActiveRecord::Base
         errors.add(:followed_item, t("errors.follow_own_collection", "You cannot follow your own collection"))
         return false
       end
+    when Group
+      # always ok
     else
       raise("unknown followed_item type: #{followed_item.inspect}")
     end
@@ -100,6 +102,49 @@ class UserFollow < ActiveRecord::Base
         UserFollow.first(:conditions => { :following_user_id => following_user.id,
                                           :followed_item_id => followed_item.id,
                                           :followed_item_type => followed_item.class.name })
+    end
+  end
+
+  after_create :check_auto_follow_collections
+
+  # when a user follows a group or other user, they auto-follow all existing
+  # collections in that context as well
+  def check_auto_follow_collections
+    return true if complementary_record
+    case followed_item
+    when User, Group
+      if !followed_item.collections.empty?
+        send_later_enqueue_args :auto_follow_collections, :priority => Delayed::LOW_PRIORITY
+      end
+    end
+    true
+  end
+
+  def auto_follow_collections
+    followed_item.collections.active.each do |coll|
+      if coll.grants_right?(following_user, :follow)
+        UserFollow.create_follow(following_user, coll)
+      end
+    end
+  end
+
+  trigger.after(:insert) do |t|
+    t.where("NEW.followed_item_type = 'Collection'") do
+      <<-SQL
+      UPDATE collections
+      SET followers_count = followers_count + 1
+      WHERE id = NEW.followed_item_id;
+      SQL
+    end
+  end
+
+  trigger.after(:delete) do |t|
+    t.where("OLD.followed_item_type = 'Collection'") do
+      <<-SQL
+      UPDATE collections
+      SET followers_count = followers_count - 1
+      WHERE id = OLD.followed_item_id;
+      SQL
     end
   end
 

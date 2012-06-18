@@ -150,7 +150,7 @@ describe "manage groups" do
     form = driver.find_element(:css, "#edit_group_form")
     form.find_element(:css, "input[type=text]").clear
     form.find_element(:css, "input[type=text]").send_keys("New Name")
-    form.find_element(:css, "button[type=submit]").click
+    submit_form(form)
     find_with_jquery("#category_#{group_category.id} #group_#{group.id}").should be_displayed
   end
 end
