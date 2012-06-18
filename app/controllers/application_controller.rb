@@ -920,16 +920,17 @@ class ApplicationController < ActionController::Base
   end
 
   def content_tag_redirect(context, tag, error_redirect_symbol)
+    url_params = { :module_item_id => tag.id }
     if tag.content_type == 'Assignment'
-      redirect_to named_context_url(context, :context_assignment_url, tag.content_id)
+      redirect_to named_context_url(context, :context_assignment_url, tag.content_id, url_params)
     elsif tag.content_type == 'WikiPage'
-      redirect_to named_context_url(context, :context_wiki_page_url, tag.content.url)
+      redirect_to named_context_url(context, :context_wiki_page_url, tag.content.url, url_params)
     elsif tag.content_type == 'Attachment'
-      redirect_to named_context_url(context, :context_file_url, tag.content_id)
+      redirect_to named_context_url(context, :context_file_url, tag.content_id, url_params)
     elsif tag.content_type == 'Quiz'
-      redirect_to named_context_url(context, :context_quiz_url, tag.content_id)
+      redirect_to named_context_url(context, :context_quiz_url, tag.content_id, url_params)
     elsif tag.content_type == 'DiscussionTopic'
-      redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id)
+      redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module

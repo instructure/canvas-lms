@@ -55,10 +55,10 @@ describe ContextModulesController do
       header2 = @module.add_item :type => 'context_module_sub_header'
 
       get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
-      response.should redirect_to course_assignment_url(@course.id, assignment1.id)
+      response.should redirect_to course_assignment_url(@course.id, assignment1.id, :module_item_id => assignmentTag1.id)
 
       get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
-      response.should redirect_to course_assignment_url(@course.id, assignment2.id)
+      response.should redirect_to course_assignment_url(@course.id, assignment2.id, :module_item_id => assignmentTag2.id)
 
       assignmentTag1.destroy
       assignmentTag2.destroy
@@ -152,7 +152,7 @@ describe ContextModulesController do
       
       get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
       response.should be_redirect
-      response.should redirect_to course_assignment_url(@course, assignment1)
+      response.should redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
     end
     
     it "should redirect to a discussion page" do
@@ -165,7 +165,7 @@ describe ContextModulesController do
       
       get 'item_redirect', :course_id => @course.id, :id => topicTag.id
       response.should be_redirect
-      response.should redirect_to course_discussion_topic_url(@course, topic)
+      response.should redirect_to course_discussion_topic_url(@course, topic, :module_item_id => topicTag.id)
     end
     
     it "should redirect to a quiz page" do
@@ -178,7 +178,7 @@ describe ContextModulesController do
       
       get 'item_redirect', :course_id => @course.id, :id => tag.id
       response.should be_redirect
-      response.should redirect_to course_quiz_url(@course, quiz)
+      response.should redirect_to course_quiz_url(@course, quiz, :module_item_id => tag.id)
     end
   end
   

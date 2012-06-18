@@ -134,6 +134,8 @@ class QuizzesController < ApplicationController
       @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked = @locked_reason && !@quiz.grants_right?(@current_user, session, :update)
 
+      @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
+      @sequence_asset = @context_module_tag.try(:content)
       @quiz.context_module_action(@current_user, :read) if !@locked
 
       @assignment = @quiz.assignment
