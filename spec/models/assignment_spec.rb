@@ -122,6 +122,7 @@ describe Assignment do
     it "should update when enrollment changes" do
       setup_assignment_with_homework
       @assignment.needs_grading_count.should eql(1)
+      @course.offer!
       @course.enrollments.find_by_user_id(@user.id).destroy
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)

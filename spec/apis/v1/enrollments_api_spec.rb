@@ -127,6 +127,21 @@ describe EnrollmentsApiController, :type => :integration do
         e.course_section.should eql @course.default_section
       end
 
+      it "should default new enrollments to the 'creation_pending' state for unpublished courses" do
+        @course.update_attribute(:workflow_state, 'claimed')
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type => 'StudentEnrollment'
+            }
+          }
+
+        e = Enrollment.find(json['id'])
+        e.workflow_state.should eql 'creation_pending'
+        e.course_section.should eql @course.default_section
+      end
+
       it "should throw an error if no params are given" do
         raw_api_call :post, @path, @path_options, { :enrollment => {  } }
         response.code.should eql '403'
