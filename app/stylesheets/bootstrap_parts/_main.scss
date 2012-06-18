@@ -1,13 +1,13 @@
 //add variable modifications to the global _variables.sass
 //they will override bootstrap styles
-@import 'environment.sass';
+@import 'environment';
 
 
 // Grid system and page structure
 @include gridFluid($fluidGridColumnWidth, $fluidGridGutterWidth);
 
 // Base CSS
-@import "bootstrap/forms";
+@import "forms";
 
 // Components: common
 @import "bootstrap/close";
@@ -26,4 +26,4 @@
 //@import "bootstrap/popovers"; //want
 
 
-@import "bootstrap_overrides";
+@import "overrides";
