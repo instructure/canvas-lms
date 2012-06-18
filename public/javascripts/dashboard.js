@@ -23,7 +23,7 @@ define([
 ], function(I18n, $, dashboardToggle) {
 
   var $toggle = $(dashboardToggle('enable'));
-  $toggle.css({float: 'right'})
+  $toggle.css({'float': 'right'})
   $('#not_right_side').prepend($toggle);
 
   $(function initDashbardJs(){
