@@ -172,6 +172,15 @@ describe CoursesController, :type => :integration do
         new_course = Course.find(json['id'])
         new_course.should be_available
       end
+
+      it "should allow setting sis_course_id without offering the course" do
+        json = api_call(:post, @resource_path,
+          @resource_params,
+          { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' } }
+        )
+        new_course = Course.find(json['id'])
+        new_course.sis_source_id.should == '9999'
+      end
     end
 
     context "a user without permissions" do

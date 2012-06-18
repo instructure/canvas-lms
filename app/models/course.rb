@@ -231,6 +231,7 @@ class Course < ActiveRecord::Base
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
+    infer_root_account unless self.root_account_id
     existing_course = self.root_account.all_courses.find_by_sis_source_id(self.sis_source_id)
     return true if !existing_course || existing_course.id == self.id
 
@@ -554,6 +555,19 @@ class Course < ActiveRecord::Base
     self.enrollments.find_by_user_id(user && user.id)
   end
 
+  def infer_root_account
+    # This is a bit tricky.  Basically, it ensures a is the current account;
+    # if account is not loaded, it will not double load (because it's
+    # already cached). If it's already loaded, and correct, it again will
+    # only use the cache.  If it's already loaded and the wrong one, it will
+    # force reload
+    a = self.account(self.account && self.account.id != self.account_id)
+    self.root_account_id = a.root_account_id if a
+    self.root_account_id ||= a.id if a
+    # Ditto
+    self.root_account(self.root_account && self.root_account.id != self.root_account_id)
+  end
+
   def assert_defaults
     Hashtag.find_or_create_by_hashtag(self.hashtag) if self.hashtag && self.hashtag != ""
     self.tab_configuration ||= [] unless self.tab_configuration == []
@@ -570,16 +584,7 @@ class Course < ActiveRecord::Base
     @group_weighting_scheme_changed = self.group_weighting_scheme_changed?
     self.indexed = nil unless self.is_public
     if self.account_id && self.account_id_changed?
-      # This is a bit tricky.  Basically, it ensures a is the current account;
-      # if account is not loaded, it will not double load (because it's
-      # already cached). If it's already loaded, and correct, it again will
-      # only use the cache.  If it's already loaded and the wrong one, it will
-      # force reload
-      a = self.account(self.account && self.account.id != self.account_id)
-      self.root_account_id = a.root_account_id if a
-      self.root_account_id ||= a.id if a
-      # Ditto
-      self.root_account(self.root_account && self.root_account.id != self.root_account_id)
+      infer_root_account
     end
     if self.root_account_id && self.root_account_id_changed?
       a = self.account(self.account && self.account.id != self.account_id)
