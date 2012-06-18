@@ -112,7 +112,7 @@ module CC
       else
         doc.tag!('type', 'topic')
       end
-      if topic.assignment
+      if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = CCHelper.create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|
           AssignmentResources.create_assignment(a, topic.assignment)
