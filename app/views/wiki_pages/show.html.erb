@@ -5,10 +5,6 @@
   content_for :right_side, render(:partial => 'wiki_pages/wiki_right_side')
 %>
 
-<% if @page && @page.context_module_tag_for(@context, @current_user) && @page.context_module_tag_for(@context, @current_user).context_module %>
-  <%= render :partial => "shared/context_module_legend", :object => @page.context_module_tag_for(@context, @current_user).context_module %>
-  <div class="clear"></div>
-<% end %>
 <% if reason = @page.locked_for?(@context, @current_user) %>
   <h2><%= @page.title %></h2>
   <%= lock_explanation(reason, 'page', @context) %>
