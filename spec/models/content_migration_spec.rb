@@ -594,6 +594,46 @@ describe ContentMigration do
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
     end
 
+    it "should not copy deleted assignment attached to topic" do
+      topic = @copy_from.discussion_topics.build(:title => "topic")
+      assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
+      assignment.infer_due_at
+      assignment.saved_by = :discussion_topic
+      topic.assignment = assignment
+      topic.save!
+      assignment.workflow_state = 'deleted'
+      assignment.save!
+
+      topic.reload
+      topic.active?.should == true
+
+      run_course_copy
+
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
+      @copy_to.assignments.find_by_migration_id(mig_id(assignment)).should be_nil
+    end
+
+    it "should not copy deleted assignment attached to quizzes" do
+      pending unless Qti.qti_enabled?
+      g = @copy_from.assignment_groups.create!(:name => "new group")
+      quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => g.id)
+      quiz.workflow_state = 'available'
+      quiz.save!
+
+      asmnt = quiz.assignment
+
+      quiz.quiz_type = 'practice_quiz'
+      quiz.save!
+
+      asmnt.workflow_state = 'deleted'
+      asmnt.save!
+
+      run_course_copy
+
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).should_not be_nil
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).should be_nil
+    end
+
     def create_rubric_asmnt
       @rubric = @copy_from.rubrics.new
       @rubric.title = "Rubric"
