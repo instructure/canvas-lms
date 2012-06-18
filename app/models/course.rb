@@ -1362,7 +1362,11 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
-    enrollment_state = 'invited' if enrollment_state == 'creation_pending' && (type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment')
+    if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
+      enrollment_state = 'invited' if enrollment_state == 'creation_pending'
+    else
+      enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
+    end
     if opts[:allow_multiple_enrollments]
       e = self.enrollments.find_by_user_id_and_type_and_course_section_id(user.id, type, section.id)
     else
