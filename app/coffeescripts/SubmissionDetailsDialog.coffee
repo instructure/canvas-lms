@@ -15,7 +15,7 @@ define [
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
-      @submission = $.extend {}, @student["assignment_#{@assignment.id}"], 
+      @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
         assignment: @assignment
         speedGraderUrl: "#{@options.context_url}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@student.id}%7D"
         loading: true
@@ -33,7 +33,7 @@ define [
           event.preventDefault()
           $(event.currentTarget).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
             @update(data)
-            setTimeout => 
+            setTimeout =>
               @dialog.dialog('close')
             , 500
 
@@ -42,10 +42,10 @@ define [
 
     open: =>
       @dialog.dialog('open')
-    
+
     scrollCommentsToBottom: =>
       @dialog.find('.submission_details_comments').scrollTop(999999)
-      
+
     update: (newData) =>
       $.extend @submission, newData
       @submission.submission_history[0] = @submission
@@ -69,7 +69,7 @@ define [
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()
-    
+
     @cachedDialogs: {}
 
     @open: (assignment, student, options) ->
