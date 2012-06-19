@@ -44,6 +44,16 @@ describe "submissions" do
     wait_for_ajax_requests
   end
 
+  it "should display the grade in grade field" do
+    course_with_teacher_logged_in
+    student_in_course
+    assignment = create_assignment
+    assignment.submissions.create(:user => @student)
+    assignment.grade_student @student, :grade => 2
+    get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+    f('.grading_value')[:value].should == '2'
+  end
+
   it "should not break when you open and close the media comment dialog" do
     stub_kaltura
     course_with_student_logged_in
