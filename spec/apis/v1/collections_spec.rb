@@ -169,7 +169,7 @@ describe "Collections API", :type => :integration do
         'id' => item.user.id,
         'display_name' => item.user.short_name,
         'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(item.user.id)}",
-        'html_url' => (item.user == @user) ? "http://www.example.com/profile" : "http://www.example.com/users/#{item.user.id}",
+        'html_url' => (item.user == @user) ? "http://www.example.com/about/#{item.user.id}" : "http://www.example.com/users/#{item.user.id}",
       },
       'item_type' => item.collection_item_data.item_type,
       'link_url' => item.collection_item_data.link_url,
@@ -231,7 +231,7 @@ describe "Collections API", :type => :integration do
         @items3_path_options = { :controller => "collection_items", :action => "index", :format => "json", :collection_id => @c3.to_param }
       end
 
-      it "should allow retrieving a pagniated item list from a private collection" do
+      it "should allow retrieving a paginated item list from a private collection" do
         json = api_call(:get, @c1_items_path, @c1_items_path_options)
         response['Link'].should be_present
         json.should == [ item_json(@i2), item_json(@i1) ]
