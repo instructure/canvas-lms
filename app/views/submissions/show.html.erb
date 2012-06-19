@@ -11,7 +11,7 @@
       :user_id => @submission.user_id,
       :assignment_id => @assignment.id,
       # don't leak grades if assignment is muted
-      :submission => @assignment.muted? ? {} : @submission.attributes.to_json
+      :submission => @assignment.muted? ? {} : @submission.attributes
     }
   })
   content_for :page_title, join_title(@assignment.title, @submission.user.name)
