@@ -46,7 +46,11 @@ describe CollectionItemsController do
       user_session(user)
       data = OpenObject.new(:title => "t1", :description => "d1", :thumbnail_url => "/1.jpg")
       PluginSetting.expects(:settings_for_plugin).with(:embedly).returns({ :api_key => 'test', :plan_type => 'free'})
-      Embedly::API.any_instance.expects(:oembed).with(:url => "http://www.example.com/", :maxwidth => Canvas::Embedly::MAXWIDTH).returns([data])
+      Embedly::API.any_instance.expects(:oembed).with(
+        :url => "http://www.example.com/",
+        :autoplay => true,
+        :maxwidth => Canvas::Embedly::MAXWIDTH
+      ).returns([data])
       post "/collection_items/link_data", :url => "http://www.example.com/"
       response.should be_success
       json_parse.should == {
@@ -62,7 +66,11 @@ describe CollectionItemsController do
       user_session(user)
       data = OpenObject.new(:title => "t1", :description => "d1", :images => [{'url' => 'u1'},{'url' => 'u2'}], :object => OpenObject.new(:html => "<iframe src='test'></iframe>"))
       PluginSetting.expects(:settings_for_plugin).with(:embedly).returns({ :api_key => 'test', :plan_type => 'paid'})
-      Embedly::API.any_instance.expects(:preview).with(:url => "http://www.example.com/", :maxwidth => Canvas::Embedly::MAXWIDTH).returns([data])
+      Embedly::API.any_instance.expects(:preview).with(
+        :url => "http://www.example.com/",
+        :autoplay => true,
+        :maxwidth => Canvas::Embedly::MAXWIDTH
+      ).returns([data])
       post "/collection_items/link_data", :url => "http://www.example.com/"
       response.should be_success
       json_parse.should == {
