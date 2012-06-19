@@ -50,7 +50,7 @@ define([
   $(function(){
     $editor_tabs = $("#editor_tabs");
     $tree1 = $editor_tabs.find('ul#tree1');
-    $image_list = $editor_tabs.find('#editor_tabs_3 .image_list');
+    $image_list = $editor_tabs.find('#editor_tabs_4 .image_list');
     $course_show_secondary = $("#course_show_secondary");
     $sidebar_upload_image_form = $("form#sidebar_upload_image_form");
     $sidebar_upload_file_form = $("form#sidebar_upload_file_form");
@@ -122,7 +122,7 @@ define([
       }
       if(newUpload && (attachment.mime_class == 'image' || attachment.content_type.match(/^image/)) &&
         $image_list.hasClass('initialized')) {
-        var url = $.replaceTags($("#editor_tabs_3 .file_url").attr('href'), 'id', attachment.id);
+        var url = $.replaceTags($("#editor_tabs_4 .file_url").attr('href'), 'id', attachment.id);
         var $img = $editor_tabs.find("#wiki_sidebar_image_uploads .img_link").clone();
         $img.find(".img")
             .attr({'src': attachment.thumbnail_url || url, 'alt': attachment.display_name})
@@ -275,7 +275,7 @@ define([
           });
         }
         // defer setting up the <img>es until we click the "images" tab
-        if (ui.index === 2 && !$image_list.hasClass('initialized')) {
+        if (ui.index === 3 && !$image_list.hasClass('initialized')) {
           $image_list.addClass('initialized')
           $image_list.pageless({
             container: $image_list,
@@ -398,7 +398,7 @@ define([
           $wiki_sidebar_select_folder_dialog.dialog('close');
         });
 
-        $("#editor_tabs_3 .image_list_holder").bind('dragenter dragover', function(event) {
+        $("#editor_tabs_4 .image_list_holder").bind('dragenter dragover', function(event) {
           if(!$(this).hasClass('file_drop')) { return; }
           event.preventDefault();
           event.stopPropagation();

@@ -19,7 +19,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     driver.find_element(:css, '.wiki_switch_views_link').click
     clear_wiki_rce
     driver.find_element(:css, '.wiki_switch_views_link').click
-    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(4) a').click
     driver.find_element(:css, '.upload_new_image_link').click
     wiki_page_tools_upload_file('#sidebar_upload_image_form', :image)
     in_frame "wiki_page_body_ifr" do
@@ -78,7 +78,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       get "/courses/#{new_course.id}/wiki"
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       keep_trying_until do
-        images = ffj('#editor_tabs_3 .image_list img.img')
+        images = ffj('#editor_tabs_4 .image_list img.img')
         images.length.should == 2
         #images.each { |i| i.attribute('complete').should == 'true' } - commented out because it is breaking with
         #webdriver 2.22 and firefox 12

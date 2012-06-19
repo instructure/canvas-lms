@@ -32,6 +32,6 @@ shared_examples_for "wiki and tiny selenium tests" do
     get "/courses/#{@course.id}/wiki"
 
     @tree1 = driver.find_element(:id, :tree1)
-    @image_list = driver.find_element(:css, '#editor_tabs_3 .image_list')
+    @image_list = driver.find_element(:css, '#editor_tabs_4 .image_list')
   end
 end
