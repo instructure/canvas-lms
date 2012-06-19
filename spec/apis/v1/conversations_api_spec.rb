@@ -743,6 +743,24 @@ describe ConversationsController, :type => :integration do
       })
     end
 
+    it "should auto-mark-as-read if unread" do
+      conversation = conversation(@bob, :workflow_state => 'unread')
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}?scope=unread",
+              { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :scope => 'unread', :format => 'json' })
+      json["visible"].should be_false
+      conversation.reload.should be_read
+    end
+
+    it "should not auto-mark-as-read if auto_mark_as_read = false" do
+      conversation = conversation(@bob, :workflow_state => 'unread')
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}?scope=unread&auto_mark_as_read=0",
+              { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :scope => 'unread', :auto_mark_as_read => "0", :format => 'json' })
+      json["visible"].should be_true
+      conversation.reload.should be_unread
+    end
+
     it "should properly flag if starred in the response" do
       conversation1 = conversation(@bob)
       conversation2 = conversation(@billy, :starred => true)
