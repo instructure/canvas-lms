@@ -62,8 +62,13 @@ define [
 
     updated: (conversation, $node) ->
       @emptyCheck()
-      if @isActive(conversation) and conversation.messages?[0]
-        @app.addMessages(conversation.messages, 'prepend', 'slide')
+      if @isActive(conversation.id) and conversation.get('workflow_state') is 'unread'
+        @markAsUnread = setTimeout =>
+          conversation.inboxAction
+            method: 'PUT'
+            data: {conversation: {workflow_state: 'read'}}
+            success: (data) -> data.defer_visibility_check = true
+        , 2000
 
     removed: (data, $node) ->
       @emptyCheck()
@@ -99,11 +104,11 @@ define [
       @active and @active.id is id
 
     deactivate: ->
-      return unless @active and @item(@active.id)
-      @$item(@active.id)?.removeClass('selected')
-      if @scope is 'unread' # TODO: do an ajax request to set unread state, then remove when we deselect, depending on visible-ness
-        @removeItem(@active)
+      return unless @active and item = @item(@active.id)
       delete @active
+      @$item(item.id)?.removeClass('selected')
+      @removeItem(item) unless item.get('visible')
+      clearTimeout @markAsUnread
 
     ensureSelected: (id, activate=true) ->
       if activate # deselect any existing selection(s) ... soon we will have bulk conversation actions, so this will make more sense

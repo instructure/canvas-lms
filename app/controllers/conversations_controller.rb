@@ -222,6 +222,10 @@ class ConversationsController < ApplicationController
   # @argument filter [optional, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the index API action
+  # @argument auto_mark_as_read Boolean, default true. If true, unread
+  #   conversations will be automatically marked as read. This will default
+  #   to false in a future API release, so clients should explicitly send
+  #   true if that is the desired behavior.
   #
   # @response_field participants Array of relevant users. Includes current
   #   user. If there are forwarded messages in this conversation, the authors
@@ -306,7 +310,7 @@ class ConversationsController < ApplicationController
       return redirect_to conversations_path(:scope => scope, :id => @conversation.conversation_id, :message => params[:message])
     end
 
-    @conversation.update_attribute(:workflow_state, "read") if @conversation.unread?
+    @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
     messages = @conversation.messages
     ConversationMessage.send(:preload_associations, messages, :asset)
     submissions = messages.map(&:submission).compact
@@ -1034,6 +1038,7 @@ class ConversationsController < ApplicationController
     }
   end
 
+  # TODO API v2: default to true, like we do in the UI
   def interleave_submissions
     params[:interleave_submissions] || !api_request?
   end
@@ -1045,5 +1050,11 @@ class ConversationsController < ApplicationController
 
   def blank_fallback
     params[:blank_avatar_fallback] || @blank_fallback
+  end
+
+  # TODO API v2: default to false, like we do in the UI
+  def auto_mark_as_read?
+    params[:auto_mark_as_read] ||= api_request?
+    Canvas::Plugin.value_to_boolean(params[:auto_mark_as_read])
   end
 end
