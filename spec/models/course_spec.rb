@@ -2466,6 +2466,10 @@ describe Course, "section_visibility" do
     it "should return user's sections" do
       @course.sections_visible_to(@ta).should eql [@course.default_section]
     end
+
+    it "should return non-limited admins from other sections" do
+      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should eql [@teacher]
+    end
   end
 
   context "restricted" do
