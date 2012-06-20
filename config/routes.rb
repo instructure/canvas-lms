@@ -802,6 +802,14 @@ ActionController::Routing::Routes.draw do |map|
       roles.put 'accounts/:account_id/roles/:role', :action => :update
     end
 
+    api.with_options(:controller => :account_reports) do |reports|
+      reports.get 'accounts/:account_id/reports/:report', :action => :index
+      reports.get 'accounts/:account_id/reports', :action => :available_reports
+      reports.get 'accounts/:account_id/reports/:report/:id', :action => :show
+      reports.post 'accounts/:account_id/reports/:report', :action => :create
+      reports.delete 'accounts/:account_id/reports/:report/:id', :action => :destroy
+    end
+
     api.with_options(:controller => :admins) do |admins|
       admins.post 'accounts/:account_id/admins', :action => :create
     end
