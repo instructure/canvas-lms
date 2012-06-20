@@ -154,7 +154,7 @@ define([
     },
     loadFolder: function(node) {
       node.data('includes_files', true);
-      var url = $.replaceTags($("#editor_tabs_2 #folder_url").attr('href'), 'id', node.data('id'));
+      var url = $.replaceTags($("#editor_tabs_3 #folder_url").attr('href'), 'id', node.data('id'));
       $loading = $tree1.find(">.loading").clone();
       $loading.show();
       node.append($loading);
@@ -255,7 +255,7 @@ define([
       $editor_tabs.bind( "tabsshow tagselect", function(event, ui) { 
         // defer loading everything in the "files" tree until we click on that tab
         // if ui.index is 1 then we are on the "files" tab
-        if (ui.index === 1 && !$tree1.hasClass('initialized')) {
+        if (ui.index === 2 && !$tree1.hasClass('initialized')) {
           $tree1.addClass('initialized unstyled_list');
           $tree1.instTree({
             multi: false,
@@ -341,7 +341,7 @@ define([
         wikiSidebar.imageSelected($(this).find(".img"));
       });
       if($.handlesHTML5Files) {
-        $("#editor_tabs_2 .file_list_holder").bind('dragenter dragover', function(event) {
+        $("#editor_tabs_3 .file_list_holder").bind('dragenter dragover', function(event) {
           if(!$(this).hasClass('file_drop')) { return; }
           event.preventDefault();
           event.stopPropagation();
