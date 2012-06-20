@@ -94,6 +94,11 @@ module BasicLTI
         hash['custom_canvas_course_id'] = context.id
       end
 
+      # need to set the locale here (instead of waiting for the first call to
+      # I18n.t like we usually do), because otherwise we'll have the wrong code
+      # for the launch_presentation_locale.
+      I18n.set_locale_with_localizer
+
       hash['context_id'] = context.opaque_identifier(:asset_string)
       hash['context_title'] = context.name
       hash['context_label'] = context.course_code rescue nil
