@@ -19,6 +19,7 @@
 module Api::V1::StreamItem
   include Api::V1::Context
   include Api::V1::Collection
+  include Api::V1::Course
 
   def stream_item_json(stream_item, current_user, session)
     data = stream_item.stream_data(current_user.id)
@@ -88,6 +89,7 @@ module Api::V1::StreamItem
           'id' => data.assignment.try(:id),
           'points_possible' => data.assignment.try(:points_possible),
         }
+        hash['course'] = course_json(Course.find(data.course_id), current_user, session, ['html_url'], nil)
       when /Conference/
         hash['web_conference_id'] = data.id
         hash['type'] = 'WebConference'

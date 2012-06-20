@@ -319,6 +319,10 @@ class UsersController < ApplicationController
   #       'id': 5678,
   #       'points_possible': 15
   #     }
+  #
+  #     // The course the submission assignment belongs to.
+  #     // See the course API docs for available fields.
+  #     'course': {}
   #   }
   #
   # Conference:

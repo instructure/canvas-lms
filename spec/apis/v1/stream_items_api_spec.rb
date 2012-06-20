@@ -19,6 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe UsersController, :type => :integration do
+
+
   before do
     course_with_student(:active_all => true)
   end
@@ -194,6 +196,7 @@ describe UsersController, :type => :integration do
     @sub.save!
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
+
     json.should == [{
       'id' => StreamItem.last.id,
       'title' => "assignment 1",
@@ -210,7 +213,18 @@ describe UsersController, :type => :integration do
         'id' => @assignment.id,
         'points_possible' => 14.2,
       },
-      
+
+      'course' => {
+        'name' => @course.name,
+        'end_at' => @course.end_at,
+        'account_id' => @course.account_id,
+        'start_at' => @course.start_at.as_json,
+        'id' => @course.id,
+        'course_code' => @course.course_code,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
+        'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
+      },
+
       'submission_comments' => [{
         'body' => '<p>c1</p>',
         'user_name' => 'teacher',
@@ -266,6 +280,17 @@ describe UsersController, :type => :integration do
         'user_id' => @user.id,
       },],
 
+      'course' => {
+        'name' => @course.name,
+        'end_at' => @course.end_at,
+        'account_id' => @course.account_id,
+        'start_at' => @course.start_at.as_json,
+        'id' => @course.id,
+        'course_code' => @course.course_code,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
+        'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
+      },
+
       'context_type' => 'Course',
       'course_id' => @course.id,
     }]
@@ -295,6 +320,17 @@ describe UsersController, :type => :integration do
         'title' => 'assignment 1',
         'id' => @assignment.id,
         'points_possible' => 14.2,
+      },
+
+      'course' => {
+        'name' => @course.name,
+        'end_at' => @course.end_at,
+        'account_id' => @course.account_id,
+        'start_at' => @course.start_at.as_json,
+        'id' => @course.id,
+        'course_code' => @course.course_code,
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
+        'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
       },
 
       'context_type' => 'Course',
