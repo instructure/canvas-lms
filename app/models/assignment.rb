@@ -115,7 +115,8 @@ class Assignment < ActiveRecord::Base
                 :process_if_quiz,
                 :default_values,
                 :update_submissions_if_details_changed,
-                :maintain_group_category_attribute
+                :maintain_group_category_attribute,
+                :process_if_topic
 
   after_save    :update_grades_if_details_changed,
                 :generate_reminders_if_changed,
@@ -494,6 +495,15 @@ class Assignment < ActiveRecord::Base
     end
   end
   protected :process_if_quiz
+
+  def process_if_topic
+    if self.submission_types == "discussion_topic"
+      #8569: discussion topics don't have lock-after date, so clear this on conversion 
+      self.lock_at = nil
+    end
+    self
+  end
+  protected :process_if_topic
 
   def grading_scheme
     if self.grading_standard
