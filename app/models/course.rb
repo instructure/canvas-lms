@@ -1259,7 +1259,8 @@ class Course < ActiveRecord::Base
     single = assignments.length == 1
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
-    student_enrollments = self.student_enrollments.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
+    student_enrollments = scope.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
     # remove duplicate enrollments for students enrolled in multiple sections
     seen_users = []
     student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
