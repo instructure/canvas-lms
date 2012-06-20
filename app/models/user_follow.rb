@@ -68,14 +68,25 @@ class UserFollow < ActiveRecord::Base
   #
   # this way both associations work as expected
   set_shard_override do |record|
-    record.following_user.shard unless record.complementary_record
+    record.following_user.shard unless record.complementary_record?
   end
 
   after_create :create_complementary_record
-  attr_accessor :complementary_record
+  attr_writer :complementary_record
+
+  # returns true if the following user isn't on the same shard as the followed
+  # item, and this UserFollow is the secondary copy that's on the followed
+  # item's shard
+  def complementary_record?
+    if new_record?
+      @complementary_record
+    else
+      self.shard != following_user.shard
+    end
+  end
 
   def create_complementary_record
-    if !complementary_record && followed_item.shard != following_user.shard
+    if !complementary_record? && followed_item.shard != following_user.shard
       followed_item.shard.activate do
         UserFollow.create_follow(following_user, followed_item, true)
       end
@@ -85,10 +96,10 @@ class UserFollow < ActiveRecord::Base
 
   after_destroy :destroy_complementary_record
   def destroy_complementary_record
-    complementary_record.try(:destroy)
+    find_complementary_record.try(:destroy)
   end
 
-  def complementary_record
+  def find_complementary_record
     return nil if followed_item.shard == following_user.shard
     if self.shard == followed_item.shard
       finding_shard = following_user.shard
@@ -110,7 +121,7 @@ class UserFollow < ActiveRecord::Base
   # when a user follows a group or other user, they auto-follow all existing
   # collections in that context as well
   def check_auto_follow_collections
-    return true if complementary_record
+    return true if self.complementary_record?
     case followed_item
     when User, Group
       if !followed_item.collections.empty?
@@ -133,7 +144,7 @@ class UserFollow < ActiveRecord::Base
   # when a user leaves a group, they auto-unfollow all private collections in
   # that group
   def check_auto_unfollow_collections
-    return true if complementary_record
+    return true if self.complementary_record?
     case followed_item
     when Group
       if !followed_item.collections.empty?
