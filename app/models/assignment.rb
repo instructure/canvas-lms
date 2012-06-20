@@ -301,6 +301,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_quiz_or_discussion_topic
+    return true if self.deleted?
     if self.submission_types == "online_quiz" && @saved_by != :quiz
       quiz = Quiz.find_by_assignment_id(self.id) || self.context.quizzes.build
       quiz.assignment_id = self.id
@@ -315,7 +316,7 @@ class Assignment < ActiveRecord::Base
       quiz.saved_by = :assignment
       quiz.save
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
-      topic = DiscussionTopic.find_by_assignment_id(self.id) || self.context.discussion_topics.build
+      topic = self.discussion_topic || self.context.discussion_topics.build
       topic.assignment_id = self.id
       topic.title = self.title
       topic.message = self.description
@@ -323,6 +324,7 @@ class Assignment < ActiveRecord::Base
       topic.updated_at = Time.now
       topic.workflow_state = 'active' if topic.deleted?
       topic.save
+      self.discussion_topic = topic
     end
   end
   attr_writer :saved_by
@@ -406,6 +408,7 @@ class Assignment < ActiveRecord::Base
 
   def remove_assignment_updated_flag
     @assignment_changed = false
+    true
   end
 
   attr_accessor :suppress_broadcast
@@ -441,11 +444,12 @@ class Assignment < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
-    self.quiz.destroy if self.quiz && !self.quiz.deleted?
     ContentTag.delete_for(self)
     @grades_affected = true
     self.save
+
+    self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
+    self.quiz.destroy if self.quiz && !self.quiz.deleted?
   end
 
   def time_zone_edited

@@ -1805,6 +1805,23 @@ describe Assignment do
       Assignment.not_locked.count.should == 0
     end
   end
+
+  context "destroy" do
+    it "should destroy the associated discussion topic" do
+      group_discussion_assignment
+      @assignment.destroy
+      @topic.reload.should be_deleted
+      @assignment.reload.should be_deleted
+    end
+
+    it "should not revive the discussion if touched after destroyed" do
+      group_discussion_assignment
+      @assignment.destroy
+      @topic.reload.should be_deleted
+      @assignment.touch
+      @topic.reload.should be_deleted
+    end
+  end
 end
 
 def setup_assignment_with_group

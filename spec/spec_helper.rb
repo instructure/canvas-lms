@@ -457,6 +457,20 @@ Spec::Runner.configure do |config|
     @quiz_submission.submission_data = yield if block_given?
   end
 
+  def group_discussion_assignment
+    course = @course || course(:active_all => true)
+    group_category = course.group_categories.create!(:name => "category")
+    @group1 = course.groups.create!(:name => "group 1", :group_category => group_category)
+    @group2 = course.groups.create!(:name => "group 2", :group_category => group_category)
+
+    @topic = course.discussion_topics.build(:title => "topic")
+    @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
+    @assignment.infer_due_at
+    @assignment.saved_by = :discussion_topic
+    @topic.assignment = @assignment
+    @topic.save!
+  end
+
   def rubric_for_course
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [
