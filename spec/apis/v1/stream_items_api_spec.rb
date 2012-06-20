@@ -207,12 +207,49 @@ describe UsersController, :type => :integration do
       'grade' => '12',
       'score' => 12,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
+      'workflow_state' => 'graded',
 
       'assignment' => {
         'title' => 'assignment 1',
         'id' => @assignment.id,
         'points_possible' => 14.2,
+        'assignment_group_id' => @assignment.assignment_group.id,
+        'course_id' => @course.id,
+        'description' => @assignment.description,
+        'due_at' => @assignment.due_at,
+        'grading_type' => @assignment.grading_type,
+        'group_category_id' => nil,
+        'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}",
+        'muted' => @assignment.muted,
+        'name' => @assignment.title,
+        'position' => @assignment.position,
+        'submission_types' => ['online_text_entry']
       },
+
+      'assignment_id' => @assignment.id,
+      'attempt' => nil,
+      'body' => nil,
+      'grade_matches_current_submission' => true,
+      'preview_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}?preview=1",
+      'submission_type' => nil,
+      'submitted_at' => nil,
+      'url' => nil,
+      'user_id' => @sub.user_id,
+
+      'submission_comments' => [{
+        'body' => 'c1',
+        'comment' => 'c1',
+        'author_name' => 'teacher',
+        'author_id' => @teacher.id,
+        'created_at' => @sub.submission_comments[0].created_at.as_json,
+      },
+      {
+        'body' => 'c2',
+        'comment' => 'c2',
+        'author_name' => 'User',
+        'author_id' => @user.id,
+        'created_at' => @sub.submission_comments[1].created_at.as_json,
+      },],
 
       'course' => {
         'name' => @course.name,
@@ -224,17 +261,6 @@ describe UsersController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
       },
-
-      'submission_comments' => [{
-        'body' => '<p>c1</p>',
-        'user_name' => 'teacher',
-        'user_id' => @teacher.id,
-      },
-      {
-        'body' => '<p>c2</p>',
-        'user_name' => 'User',
-        'user_id' => @user.id,
-      },],
 
       'context_type' => 'Course',
       'course_id' => @course.id,
@@ -262,22 +288,48 @@ describe UsersController, :type => :integration do
       'grade' => nil,
       'score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
+      'workflow_state' => 'unsubmitted',
 
       'assignment' => {
         'title' => 'assignment 1',
         'id' => @assignment.id,
         'points_possible' => 14.2,
+        'assignment_group_id' => @assignment.assignment_group.id,
+        'course_id' => @course.id,
+        'description' => @assignment.description,
+        'due_at' => @assignment.due_at,
+        'grading_type' => @assignment.grading_type,
+        'group_category_id' => nil,
+        'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}",
+        'muted' => @assignment.muted,
+        'name' => @assignment.title,
+        'position' => @assignment.position,
+        'submission_types' => ['online_text_entry']
       },
-      
+
+      'assignment_id' => @assignment.id,
+      'attempt' => nil,
+      'body' => nil,
+      'grade_matches_current_submission' => nil,
+      'preview_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}?preview=1",
+      'submission_type' => nil,
+      'submitted_at' => nil,
+      'url' => nil,
+      'user_id' => @sub.user_id,
+
       'submission_comments' => [{
-        'body' => '<p>c1</p>',
-        'user_name' => 'teacher',
-        'user_id' => @teacher.id,
+        'body' => 'c1',
+        'comment' => 'c1',
+        'author_name' => 'teacher',
+        'author_id' => @teacher.id,
+        'created_at' => @sub.submission_comments[0].created_at.as_json,
       },
       {
-        'body' => '<p>c2</p>',
-        'user_name' => 'User',
-        'user_id' => @user.id,
+        'body' => 'c2',
+        'comment' => 'c2',
+        'author_name' => 'User',
+        'author_id' => @user.id,
+        'created_at' => @sub.submission_comments[1].created_at.as_json,
       },],
 
       'course' => {
@@ -295,7 +347,7 @@ describe UsersController, :type => :integration do
       'course_id' => @course.id,
     }]
   end
-  
+
   it "should format graded Submission without comments" do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
@@ -305,39 +357,13 @@ describe UsersController, :type => :integration do
     @sub.save!
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
-    json.should == [{
-      'id' => StreamItem.last.id,
-      'title' => "assignment 1",
-      'message' => nil,
-      'type' => 'Submission',
-      'created_at' => StreamItem.last.created_at.as_json,
-      'updated_at' => StreamItem.last.updated_at.as_json,
-      'grade' => '12',
-      'score' => 12,
-      'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
 
-      'assignment' => {
-        'title' => 'assignment 1',
-        'id' => @assignment.id,
-        'points_possible' => 14.2,
-      },
-
-      'course' => {
-        'name' => @course.name,
-        'end_at' => @course.end_at,
-        'account_id' => @course.account_id,
-        'start_at' => @course.start_at.as_json,
-        'id' => @course.id,
-        'course_code' => @course.course_code,
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
-        'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
-      },
-
-      'context_type' => 'Course',
-      'course_id' => @course.id,
-    }]
+    json[0]['grade'].should == '12'
+    json[0]['score'].should == 12
+    json[0]['workflow_state'].should == 'graded'
+    json[0]['submission_comments'].should == []
   end
-  
+
   it "should not format ungraded Submission without comments" do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')

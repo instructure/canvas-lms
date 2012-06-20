@@ -19,7 +19,7 @@
 module Api::V1::StreamItem
   include Api::V1::Context
   include Api::V1::Collection
-  include Api::V1::Course
+  include Api::V1::Submission
 
   def stream_item_json(stream_item, current_user, session)
     data = stream_item.stream_data(current_user.id)
@@ -73,23 +73,12 @@ module Api::V1::StreamItem
         hash['notification_category'] = data.notification_category
         hash['html_url'] = hash['url'] = data.url
       when 'Submission'
-        hash['title'] = data.assignment.try(:title)
-        hash['grade'] = data.grade
-        hash['score'] = data.score
-        hash['html_url'] = course_assignment_submission_url(context_id, data.assignment.id, data.user_id)
-        hash['submission_comments'] = data.submission_comments.map do |comment|
-          {
-            'body' => comment.formatted_body,
-            'user_name' => comment.user_short_name,
-            'user_id' => comment.author_id,
-          }
-        end unless data.submission_comments.blank?
-        hash['assignment'] = {
-          'title' => hash['title'],
-          'id' => data.assignment.try(:id),
-          'points_possible' => data.assignment.try(:points_possible),
-        }
-        hash['course'] = course_json(Course.find(data.course_id), current_user, session, ['html_url'], nil)
+        hash.merge! submission_json(Submission.find(data.id), Assignment.find(data.assignment.id), current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url'])
+
+        # backwards compat from before using submission_json
+        hash['assignment']['title'] = hash['assignment']['name']
+        hash['title'] = hash['assignment']['name']
+        hash['submission_comments'].each {|c| c['body'] = c['comment']}
       when /Conference/
         hash['web_conference_id'] = data.id
         hash['type'] = 'WebConference'

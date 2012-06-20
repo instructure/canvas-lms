@@ -61,7 +61,8 @@ describe 'Submissions API', :type => :integration do
       "submission_type"=>nil,
       "submission_comments"=>[],
       "grade_matches_current_submission"=>nil,
-      "score"=>nil
+      "score"=>nil,
+      "workflow_state"=>nil
     }
   end
 
@@ -395,7 +396,8 @@ describe 'Submissions API', :type => :integration do
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
            "author_id"=>student1.id}],
-        "score"=>13.5}
+        "score"=>13.5,
+        "workflow_state"=>"graded"}
 
     # can't access other students' submissions
     @user = student2
@@ -516,7 +518,8 @@ describe 'Submissions API', :type => :integration do
            "user_id"=>student1.id,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=0",
            "grade_matches_current_submission"=>nil,
-           "score"=>nil},
+           "score"=>nil,
+           "workflow_state" => "submitted"},
           {"grade"=>nil,
             "assignment_id" => a1.id,
            "media_comment" =>
@@ -533,7 +536,8 @@ describe 'Submissions API', :type => :integration do
            "user_id"=>student1.id,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
            "grade_matches_current_submission"=>nil,
-           "score"=>nil},
+           "score"=>nil,
+           "workflow_state" => "submitted"},
           {"grade"=>"A-",
             "assignment_id" => a1.id,
            "media_comment" =>
@@ -558,7 +562,8 @@ describe 'Submissions API', :type => :integration do
            "user_id"=>student1.id,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
            "grade_matches_current_submission"=>true,
-           "score"=>13.5}],
+           "score"=>13.5,
+           "workflow_state" => "graded"}],
         "attempt"=>3,
         "url"=>nil,
         "submission_type"=>"online_text_entry",
@@ -581,7 +586,8 @@ describe 'Submissions API', :type => :integration do
            "content-type" => "video/mp4",
            "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
            "display_name" => nil },
-        "score"=>13.5},
+        "score"=>13.5,
+        "workflow_state"=>"graded"},
        {"grade"=>"F",
         "assignment_id" => a1.id,
         "body"=>nil,
@@ -598,7 +604,7 @@ describe 'Submissions API', :type => :integration do
            "submission_type"=>"online_url",
            "user_id"=>student2.id,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=0",
-          "grade_matches_current_submission"=>true,
+           "grade_matches_current_submission"=>true,
            "attachments" =>
             [
              {"content-type" => "image/png",
@@ -616,7 +622,8 @@ describe 'Submissions API', :type => :integration do
               "size" => sub2.attachment.size,
               },
             ],
-           "score"=>9}],
+           "score"=>9,
+           "workflow_state" => "graded"}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
         "submission_type"=>"online_url",
@@ -642,7 +649,8 @@ describe 'Submissions API', :type => :integration do
         "score"=>9,
         "rubric_assessment"=>
          {"crit2"=>{"comments"=>"Hmm", "points"=>2},
-          "crit1"=>{"comments"=>nil, "points"=>7}}}]
+          "crit1"=>{"comments"=>nil, "points"=>7}},
+        "workflow_state"=>"graded"}]
     json.sort_by { |h| h['user_id'] }.should == res.sort_by { |h| h['user_id'] }
   end
 

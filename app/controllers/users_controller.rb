@@ -309,21 +309,7 @@ class UsersController < ApplicationController
   #
   # Submission:
   #
-  #   !!!javascript
-  #   {
-  #     'type': 'Submission',
-  #     'grade': '12',
-  #     'score': 12,
-  #     'assignment': {
-  #       'title': 'Assignment 3',
-  #       'id': 5678,
-  #       'points_possible': 15
-  #     }
-  #
-  #     // The course the submission assignment belongs to.
-  #     // See the course API docs for available fields.
-  #     'course': {}
-  #   }
+  # Returns an API {api:Submissions:Submission Submission} with its Course and Assignment data.
   #
   # Conference:
   #
