@@ -91,7 +91,22 @@ module BasicLTI
       end
       if tool.public?
         hash['custom_canvas_user_id'] = user.id
-        hash['custom_canvas_course_id'] = context.id
+        if context.respond_to?(:root_account)
+          pseudo = user.sis_pseudonym_for(context)
+        elsif tool.context && tool.context.respond_to?(:root_account)
+          pseudo = user.sis_pseudonym_for(tool.context)
+        end
+        if pseudo
+          hash['lis_person_sourcedid'] = pseudo.sis_user_id if pseudo.sis_user_id
+          hash['custom_canvas_user_login_id'] = pseudo.unique_id
+        end
+        if context.is_a?(Course)
+          hash['custom_canvas_course_id'] = context.id
+          hash['lis_course_offering_sourcedid'] = context.sis_source_id if context.sis_source_id
+        elsif context.is_a?(Account)
+          hash['custom_canvas_account_id'] = context.id
+          hash['custom_canvas_account_sis_id'] = context.sis_source_id if context.sis_source_id
+        end
       end
 
       # need to set the locale here (instead of waiting for the first call to
@@ -101,7 +116,7 @@ module BasicLTI
 
       hash['context_id'] = context.opaque_identifier(:asset_string)
       hash['context_title'] = context.name
-      hash['context_label'] = context.course_code rescue nil
+      hash['context_label'] = context.course_code if context.respond_to?(:course_code)
       hash['launch_presentation_locale'] = I18n.locale || I18n.default_locale.to_s
       hash['launch_presentation_document_target'] = 'iframe'
       hash['launch_presentation_width'] = 600
