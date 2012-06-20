@@ -39,7 +39,7 @@ class SubmissionComment < ActiveRecord::Base
   after_save :update_submission
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
-  after_create { |c| c.submission.create_or_update_conversations!(:create) if c.send_to_conversations? }
+  after_create { |c| c.submission.create_or_update_conversations!(:create, :respect_submission_comment_pref => true) if c.send_to_conversations? }
   after_destroy { |c| c.submission.create_or_update_conversations!(:destroy) if c.send_to_conversations? }
 
   serialize :cached_attachments

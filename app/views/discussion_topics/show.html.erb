@@ -49,9 +49,6 @@
 <% if @headers == false || @locked %>
   <div style="width: 600px; margin: 10px auto;">
 <% end %>
-<% if (@topic && @topic.context_module_tag && @topic.context_module_tag.context_module) || (@topic.for_assignment? && @topic.assignment.context_module_tag && @topic.assignment.context_module_tag.context_module) %>
-  <%= render :partial => "shared/context_module_legend", :object => (@topic && @topic.context_module_tag && @topic.context_module_tag.context_module) || (@topic.assignment && @topic.assignment.context_module_tag && @topic.assignment.context_module_tag.context_module) %>
-<% end %>
 <% if @headers == false || @locked %>
   <h2><%= @topic.title %></h2>
 <% end %>

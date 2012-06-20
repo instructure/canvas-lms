@@ -70,9 +70,6 @@ $(document).ready(function() {
 <% end %>
 <% if @locked && !@locked[:due_at] %>
   <h2><%= @assignment.title %></h2>
-  <% if @assignment_module && @assignment_module.context_module %>
-    <%= render :partial => "shared/context_module_legend", :object => @assignment_module.context_module %>
-  <% end %>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 <% else %>
   <%= render :partial => "shared/full_assignment", :object => @assignment %>

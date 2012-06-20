@@ -199,7 +199,7 @@ module CC
           q_node.time_limit quiz.time_limit unless quiz.time_limit.nil?
           q_node.allowed_attempts quiz.allowed_attempts unless quiz.allowed_attempts.nil?
           q_node.available quiz.available?
-          if quiz.assignment
+          if quiz.assignment && !quiz.assignment.deleted?
             assignment_migration_id = CCHelper.create_key(quiz.assignment)
             doc.assignment(:identifier=>assignment_migration_id) do |a|
               AssignmentResources.create_assignment(a, quiz.assignment)
