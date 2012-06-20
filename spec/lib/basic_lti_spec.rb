@@ -97,9 +97,13 @@ describe BasicLTI do
   end
   
   describe "generate" do
-    it "should generate correct parameters" do
+    before do
       course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
+      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com',
+        :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
+    end
+
+    it "should generate correct parameters" do
       hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
       hash['lti_message_type'].should == 'basic-lti-launch-request'
       hash['lti_version'].should == 'LTI-1p0'
@@ -122,18 +126,21 @@ describe BasicLTI do
       hash['tool_consumer_info_version'].should == 'cloud'
       hash['oauth_callback'].should == 'about:blank'
     end
-    
+
+    it "should set the locale if I18n.localizer exists" do
+      I18n.localizer = lambda { :es }
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
+      hash['launch_presentation_locale'].should == 'es'
+      I18n.localizer = lambda { :en }
+    end
+
     it "should include URI query parameters" do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
       hash = BasicLTI.generate(:url => 'http://www.yahoo.com?a=1&b=2', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
       hash['a'].should == '1'
       hash['b'].should == '2'
     end
     
     it "should not allow overwriting other parameters from the URI query string" do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
       hash = BasicLTI.generate(:url => 'http://www.yahoo.com?user_id=123&oauth_callback=1234', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
       hash['user_id'].should == @user.opaque_identifier(:asset_string)
       hash['oauth_callback'].should == 'about:blank'
