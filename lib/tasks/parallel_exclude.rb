@@ -23,8 +23,8 @@ module ParallelExclude
       'spec/models/eportfolio_entry_spec.rb',
       'spec/models/media_object_spec.rb',
       'spec/models/zip_file_import_spec.rb',
-      'spec/models/content_migration_spec.rb'
-      'spec/models/collections_spec.rb'
+      'spec/models/content_migration_spec.rb',
+      'spec/models/collections_spec.rb',
   ]
 
   test_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
