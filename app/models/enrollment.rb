@@ -41,7 +41,7 @@ class Enrollment < ActiveRecord::Base
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
 
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :limit_privileges_to_course_section
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section
 
   def self.active_student_conditions(prefix = 'enrollments')
     "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
@@ -809,20 +809,6 @@ class Enrollment < ActiveRecord::Base
       self.update_attribute(:uuid, AutoHandle.generate_securish_uuid)
     end
     read_attribute(:uuid)
-  end
-
-  # overwrite the accessors to limit_priveleges and limit_privileges to return the value wherever
-  # it exists.
-  [:limit_privileges_to_course_section, :limit_priveleges_to_course_section].each do |method_name|
-    define_method(method_name) do
-      read_attribute(:limit_privileges_to_course_section).nil? ?
-        read_attribute(:limit_priveleges_to_course_section) :
-        read_attribute(:limit_privileges_to_course_section)
-    end
-  end
-
-  def limit_priveleges_to_course_section=(value)
-    self.limit_privileges_to_course_section = value
   end
 
   def self.limit_privileges_to_course_section!(course, user, limit)
