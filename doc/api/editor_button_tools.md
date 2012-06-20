@@ -185,17 +185,20 @@ If the <code>launch_presentation_return_url</code> were
 ## Settings
 All of these settings are contained under "editor_button" in the tool configuration
 
--   url: &lt;url&gt; (required)
+-   url: &lt;url&gt; (optional)
 
     This is the URL that will be POSTed to when users click the button in any rich editor. It can be the same as the tool's URL, or something different. Domain and URL matching are not enforced for editor button links. In order to prevent security warnings for users, it is recommended that this URL be over SSL (https).
+    This is required if a url is not set on the main tool configuration.
   
--   icon_url: &lt;url&gt; (required)
+-   icon_url: &lt;url&gt; (optional)
 
     This is the URL of the icon that will be shown on the button in the rich editor. Icons should be 16x16 in size, and can be any standard web image format (png, gif, ico, etc.). It is recommended that this URL be over SSL (https).
+    This is required if an icon_url is not set on the main tool configuration.
   
--   text: &lt;text&gt; (required)
+-   text: &lt;text&gt; (optional)
 
     This is the default text that will be shown if a user hovers over the editor button. This can be overridden by language-specific settings if desired by using the labels setting. This text will also be shown next to the icon if there are too many buttons and the tool is available in the "more tools" dropdown.
+    This is required if a text value is not set on the main tool configuration.
   
 -   labels: &lt;set of locale-label pairs&gt; (optional)
 
@@ -208,3 +211,7 @@ All of these settings are contained under "editor_button" in the tool configurat
 -   selection_height: &lt;number&gt; (required)
 
     This value is the explicit height of the dialog that is loaded when a user clicks the icon in the rich editor.
+
+-   enabled: &lt;boolean&gt; (required)
+
+    Whether to enable this selection feature.

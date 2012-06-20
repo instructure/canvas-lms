@@ -39,9 +39,7 @@ found below.
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ### Domain matching, "name only" privacy level
     <?xml version="1.0" encoding="UTF-8"?>
@@ -60,9 +58,7 @@ found below.
           <lticm:property name="privacy_level">name_only</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ## Course Navigation External Tool Examples
 
@@ -78,19 +74,67 @@ found below.
         http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/attendance</blti:launch_url>
         <blti:title>Attendance</blti:title>
         <blti:description>Provides an interactive seating chart and attendance tool</blti:description>
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
-          <lticm:property name="domain">example.com</lticm:property>
           <lticm:options name="course_navigation">
-            <lticm:property name="url">https://example.com/attendance</lticm:property>
-            <lticm:property name="text">Attendance</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
+
+### Minimal configuration with specific launch url for extension
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+        xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+        xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+        xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+        xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+        http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+        http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+        http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/</blti:launch_url>
+        <blti:title>Attendance</blti:title>
+        <blti:description>Provides an interactive seating chart and attendance tool</blti:description>
+        <blti:extensions platform="canvas.instructure.com">
+          <lticm:property name="privacy_level">public</lticm:property>
+          <lticm:options name="course_navigation">
+            <lticm:property name="url">https://example.com/attendance</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
+          </lticm:options>
+        </blti:extensions>
+    </cartridge_basiclti_link>
+
+### Configuration with specific custom variables for extension
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+        xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+        xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+        xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+        xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+        http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+        http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+        http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/launch</blti:launch_url>
+        <blti:title>Mind blowing awesomeness</blti:title>
+        <blti:description>Provides something so awesome you'll just have to launch it to believe it</blti:description>
+        <blti:extensions platform="canvas.instructure.com">
+          <lticm:property name="privacy_level">public</lticm:property>
+          <lticm:options name="course_navigation">
+            <lticm:property name="enabled">true</lticm:property>
+            <lticm:options name="custom_fields">
+              <lticm:property name="key1">value1</lticm:property>
+              <lticm:property name="key2">value2</lticm:property>
+            </lticm:options>
+          </lticm:options>
+        </blti:extensions>
+    </cartridge_basiclti_link>
 
 ### Teacher/Admin-only navigation
 
@@ -104,20 +148,18 @@ found below.
         http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/attendance</blti:launch_url>
         <blti:title>Attendance</blti:title>
         <blti:description>Provides an interactive seating chart and attendance tool</blti:description>
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
           <lticm:options name="course_navigation">
-            <lticm:property name="url">https://example.com/attendance</lticm:property>
-            <lticm:property name="text">Attendance</lticm:property>
             <lticm:property name="visibility">admins</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ### Disabled by default
 
@@ -131,20 +173,18 @@ found below.
         http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/attendance</blti:launch_url>
         <blti:title>Attendance</blti:title>
         <blti:description>Provides an interactive seating chart and attendance tool</blti:description>
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
           <lticm:options name="course_navigation">
-            <lticm:property name="url">https://example.com/attendance</lticm:property>
-            <lticm:property name="text">Attendance</lticm:property>
             <lticm:property name="default">disabled</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ### Multiple language support
 
@@ -166,15 +206,14 @@ found below.
           <lticm:options name="course_navigation">
             <lticm:property name="url">https://example.com/attendance</lticm:property>
             <lticm:property name="text">Attendance</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
             <lticm:options name="labels">
               <lticm:property name="en">Attendance</lticm:property>
               <lticm:property name="es">Asistencia</lticm:property>
             </lticm:options>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ## Account Navigation External Tool Examples
 
@@ -190,19 +229,18 @@ found below.
         http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/reports</blti:launch_url>
         <blti:title>Custom Reports</blti:title>
         <blti:description>Department reports pulled from other campus systems</blti:description>
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
+          <lticm:property name="text">Other Reports</lticm:property>
           <lticm:options name="account_navigation">
-            <lticm:property name="url">https://example.com/reports</lticm:property>
-            <lticm:property name="text">Other Reports</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ## User Navigation External Tool Examples
 
@@ -218,19 +256,17 @@ found below.
         http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/profile</blti:launch_url>
         <blti:title>Campus Profile</blti:title>
         <blti:description>Access to campus profile from within Canvas</blti:description>
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
           <lticm:options name="user_navigation">
-            <lticm:property name="url">https://example.com/profile</lticm:property>
-            <lticm:property name="text">Campus Profile</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ## Rich Editor External Tool Examples
 
@@ -246,22 +282,21 @@ found below.
         http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/image_selector</blti:launch_url>
         <blti:title>Image Selector</blti:title>
         <blti:description>This connects to the campus image library and allows inserting images into content directly from this library</blti:description>
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
+          <lticm:property name="text">Image Library</lticm:property>
           <lticm:options name="editor_button">
-            <lticm:property name="url">https://example.com/image_selector</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="icon_url">https://example.com/image_selector.png</lticm:property>
-            <lticm:property name="text">Image Library</lticm:property>
             <lticm:property name="selection_width">500</lticm:property>
             <lticm:property name="selection_height">300</lticm:property>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ### Multiple language support
 
@@ -275,14 +310,15 @@ found below.
         http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/image_selector</blti:launch_url>
         <blti:title>Image Selector</blti:title>
         <blti:description>This connects to the campus image library and allows inserting images into content directly from this library</blti:description>
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
+          <lticm:property name="icon_url">https://example.com/image_selector.png</lticm:property>
           <lticm:options name="editor_button">
-            <lticm:property name="url">https://example.com/image_selector</lticm:property>
-            <lticm:property name="icon_url">https://example.com/image_selector.png</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="text">Image Library</lticm:property>
             <lticm:property name="selection_width">500</lticm:property>
             <lticm:property name="selection_height">300</lticm:property>
@@ -292,9 +328,7 @@ found below.
             </lticm:options>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ## Link Selection External Tool Examples
 
@@ -319,15 +353,14 @@ matching, and to only return URLs matching that domain.
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
           <lticm:options name="resource_selection">
+            <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="url">https://example.com/chapter_selector</lticm:property>
             <lticm:property name="text">eBook Chapter Selector</lticm:property>
             <lticm:property name="selection_width">500</lticm:property>
             <lticm:property name="selection_height">300</lticm:property>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ### Multiple language support
 
@@ -347,6 +380,7 @@ matching, and to only return URLs matching that domain.
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
           <lticm:options name="resource_selection">
+            <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="url">https://example.com/chapter_selector</lticm:property>
             <lticm:property name="text">eBook Chapter Selector</lticm:property>
             <lticm:property name="selection_width">500</lticm:property>
@@ -357,9 +391,7 @@ matching, and to only return URLs matching that domain.
             </lticm:options>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
 
 ## Combined External Tool Configuration Examples
 
@@ -386,19 +418,48 @@ by the service should be scoped to the matching domain.
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
           <lticm:options name="course_navigation">
+            <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="url">https://example.com/attendance</lticm:property>
             <lticm:property name="text">Attendance</lticm:property>
             <lticm:property name="visibility">admins</lticm:property>
             <lticm:property name="default">disabled</lticm:property>
           </lticm:options>
           <lticm:options name="account_navigation">
+            <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="url">https://example.com/attendance_admin</lticm:property>
             <lticm:property name="text">Attendance</lticm:property>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>
+
+### Course navigation and account navigation with shared url and text
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+        xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+        xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+        xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+        xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+        http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+        http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+        http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/attendance</blti:launch_url>
+        <blti:title>Attendance</blti:title>
+        <blti:description>Provides an interactive seating chart and attendance tool</blti:description>
+        <blti:extensions platform="canvas.instructure.com">
+          <lticm:property name="privacy_level">public</lticm:property>
+          <lticm:property name="text">Attendance</lticm:property>
+          <lticm:options name="course_navigation">
+            <lticm:property name="enabled">true</lticm:property>
+            <lticm:property name="visibility">admins</lticm:property>
+            <lticm:property name="default">disabled</lticm:property>
+          </lticm:options>
+          <lticm:options name="account_navigation">
+            <lticm:property name="enabled">true</lticm:property>
+          </lticm:options>
+        </blti:extensions>
+    </cartridge_basiclti_link>
 
 ### Rich editor and link selection with multiple language support
 
@@ -412,33 +473,27 @@ by the service should be scoped to the matching domain.
         http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
         http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:launch_url>https://example.com/wiki</blti:launch_url>
         <blti:title>Global Wiki</blti:title>
         <blti:description>Institution-wide wiki tool with all the trimmings</blti:description>
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:property name="domain">example.com</lticm:property>
-          <lticm:options name="editor_button">
-            <lticm:property name="url">https://example.com/wiki</lticm:property>
-            <lticm:property name="icon_url">https://example.com/wiki.png</lticm:property>
-            <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
-            <lticm:property name="selection_width">500</lticm:property>
-            <lticm:property name="selection_height">300</lticm:property>
-            <lticm:options name="labels">
+          <lticm:property name="icon_url">https://example.com/wiki.png</lticm:property>
+          <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+          <lticm:options name="labels">
               <lticm:property name="en-US">Build/Link to Wiki Page</lticm:property>
               <lticm:property name="en-GB">Build/Link to Wiki Page</lticm:property>
             </lticm:options>
+          <lticm:options name="editor_button">
+            <lticm:property name="enabled">true</lticm:property>
+            <lticm:property name="selection_width">500</lticm:property>
+            <lticm:property name="selection_height">300</lticm:property>
           </lticm:options>
           <lticm:options name="resource_selection">
-            <lticm:property name="url">https://example.com/wiki</lticm:property>
-            <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+            <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="selection_width">500</lticm:property>
             <lticm:property name="selection_height">300</lticm:property>
-            <lticm:options name="labels">
-              <lticm:property name="en-US">Build/Link to Wiki Page</lticm:property>
-              <lticm:property name="en-GB">Build/Link to Wiki Page</lticm:property>
-            </lticm:options>
           </lticm:options>
         </blti:extensions>
-        <cartridge_bundle identifierref="BLTI001_Bundle"/>
-        <cartridge_icon identifierref="BLTI001_Icon"/>
-    </cartridge_basiclti_link>  
+    </cartridge_basiclti_link>

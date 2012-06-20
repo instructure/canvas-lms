@@ -26,8 +26,26 @@ class ContextExternalTool < ActiveRecord::Base
     state :public
     state :deleted
   end
-  
-  set_policy do 
+
+  def create_launch(context, user, return_url, selection_type=nil)
+    if selection_type
+      if self.settings[selection_type.to_sym]
+        resource_url = self.settings[selection_type.to_sym][:url]
+      else
+        raise t('no_selection_type', "This tool has no selection type %{type}", :type => selection_type)
+      end
+    end
+    resource_url ||= self.url
+    BasicLTI::ToolLaunch.new(:url => resource_url,
+                             :tool => self,
+                             :user => user,
+                             :context => context,
+                             :link_code => context.opaque_identifier(:asset_string),
+                             :return_url => return_url,
+                             :resource_type => selection_type)
+  end
+
+  set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :update) }
     can :read and can :update and can :delete
   end
@@ -51,9 +69,12 @@ class ContextExternalTool < ActiveRecord::Base
   
   def label_for(key, lang=nil)
     labels = settings[key] && settings[key][:labels]
-    (labels && labels[lang]) || 
+    labels2 = settings[:labels]
+    (labels && labels[lang]) ||
       (labels && lang && labels[lang.split('-').first]) || 
-      (settings[key] && settings[key][:text]) || 
+      (settings[key] && settings[key][:text]) ||
+      (labels2 && labels2[lang]) ||
+      (labels2 && lang && labels2[lang.split('-').first]) ||
       settings[:text] || name || "External Tool"
   end
   
@@ -169,7 +190,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def resource_selection=(hash)
-    tool_setting(:resource_selection, hash, :selection_width, :selection_height)
+    tool_setting(:resource_selection, hash, :selection_width, :selection_height, :icon_url)
   end
 
   def resource_selection
@@ -183,6 +204,22 @@ class ContextExternalTool < ActiveRecord::Base
   def editor_button
     settings[:editor_button]
   end
+
+  def icon_url=(i_url)
+    settings[:icon_url] = i_url
+  end
+
+  def icon_url
+    settings[:icon_url]
+  end
+
+  def text=(val)
+    settings[:text] = val
+  end
+
+  def text
+    settings[:text]
+  end
   
   def shared_secret=(val)
     write_attribute(:shared_secret, val) unless val.blank?
@@ -191,19 +228,24 @@ class ContextExternalTool < ActiveRecord::Base
   def infer_defaults
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
-    
-    settings.delete(:user_navigation) if settings[:user_navigation] && (!settings[:user_navigation][:url])
-    settings.delete(:course_navigation) if settings[:course_navigation] && (!settings[:course_navigation][:url])
-    settings.delete(:account_navigation) if settings[:account_navigation] && (!settings[:account_navigation][:url])
-    settings.delete(:resource_selection) if settings[:resource_selection] && (!settings[:resource_selection][:url] || !settings[:resource_selection][:selection_width] || !settings[:resource_selection][:selection_height])
-    settings.delete(:editor_button) if settings[:editor_button] && (!settings[:editor_button][:url] || !settings[:editor_button][:icon_url])
-    settings[:icon_url] ||= settings[:editor_button][:icon_url] if settings[:editor_button] && settings[:editor_button][:icon_url]
+
     [:resource_selection, :editor_button].each do |type|
       if settings[type]
-        settings[type][:selection_width] = settings[type][:selection_width].to_i
-        settings[type][:selection_height] = settings[type][:selection_height].to_i
+        settings[:icon_url] ||= settings[type][:icon_url] if settings[type][:icon_url]
+        settings[type][:selection_width] = settings[type][:selection_width].to_i if settings[type][:selection_width]
+        settings[type][:selection_height] = settings[type][:selection_height].to_i if settings[type][:selection_height]
       end
     end
+    [:course_navigation, :account_navigation, :user_navigation, :resource_selection, :editor_button].each do |type|
+      if settings[type]
+        if !(settings[type][:url] || self.url) || (settings[type].has_key?(:enabled) && !settings[type][:enabled])
+          settings.delete(type)
+        end
+      end
+    end
+
+    settings.delete(:resource_selection) if settings[:resource_selection] && (!settings[:resource_selection][:selection_width] || !settings[:resource_selection][:selection_height])
+    settings.delete(:editor_button) if settings[:editor_button] && !settings[:icon_url]
 
     self.has_user_navigation = !!settings[:user_navigation]
     self.has_course_navigation = !!settings[:course_navigation]
@@ -369,19 +411,23 @@ class ContextExternalTool < ActiveRecord::Base
       end
     end
   end
-  
+
+  # sets the custom fields from the main tool settings, and any on individual resource type settings
   def set_custom_fields(hash, resource_type)
-    fields = resource_type ? settings[resource_type.to_sym][:custom_fields] : settings[:custom_fields]
-    (fields || {}).each do |key, val|
-      key = key.gsub(/[^\w]/, '_').downcase
-      if key.match(/^custom_/)
-        hash[key] = val
-      else
-        hash["custom_#{key}"] = val
+    fields = [settings[:custom_fields] || {}]
+    fields << (settings[resource_type.to_sym][:custom_fields] || {}) if resource_type && settings[resource_type.to_sym]
+    fields.each do |field_set|
+      field_set.each do |key, val|
+        key = key.to_s.gsub(/[^\w]/, '_').downcase
+        if key.match(/^custom_/)
+          hash[key] = val
+        else
+          hash["custom_#{key}"] = val
+        end
       end
     end
   end
-  
+
   def clone_for(context, dup=nil, options={})
     if !self.cloned_item && !self.new_record?
       self.cloned_item = ClonedItem.create(:original_item => self)
@@ -453,9 +499,11 @@ class ContextExternalTool < ActiveRecord::Base
       settings[setting] = {}
     end
 
-    settings[setting][:url] = hash[:url]
+    settings[setting][:url] = hash[:url] if hash[:url]
     settings[setting][:text] = hash[:text] if hash[:text]
-    keys.each { |key| settings[setting][key] = hash[key] }
+    settings[setting][:custom_fields] = hash[:custom_fields] if hash[:custom_fields]
+    settings[setting][:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash.has_key?(:enabled)
+    keys.each { |key| settings[setting][key] = hash[key] if hash.has_key?(key) }
 
     # if the type needs to do some validations for specific keys
     yield settings[setting] if block_given?
