@@ -28,10 +28,10 @@ class Collection < ActiveRecord::Base
   after_save :touch_context
 
   attr_accessible :name, :visibility
-  validates_allowed_transitions :visibility, "private" => "public"
 
   validates_inclusion_of :visibility, :in => %w(public private)
 
+  before_save :handle_visibility_change
   after_create :check_auto_follow_users
 
   named_scope :public, :conditions => { :visibility => 'public' }
@@ -85,5 +85,15 @@ class Collection < ActiveRecord::Base
         UserFollow.create_follow(user, self)
       end
     end
+  end
+
+  def handle_visibility_change
+    if !self.public? && self.visibility_changed?
+      send_later_enqueue_args :remove_all_followers, :priority => Delayed::LOW_PRIORITY
+    end
+  end
+
+  def remove_all_followers
+    self.following_user_follows.destroy_all
   end
 end

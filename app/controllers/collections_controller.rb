@@ -40,8 +40,9 @@
 #       // The display name of the collection, set by the collection creator.
 #       name: "My Collection",
 #
-#       // The visibility of the collection. If "public", the collection is visible to everybody.
-#       // If "private", the collection is visible only to the creating user.
+#       // The visibility of the collection. If "public", the collection is
+#       // visible to everybody, and can be followed.  If "private", the
+#       // collection is visible only to the creating user.
 #       // The default is "private".
 #       visibility: "public",
 #
@@ -175,9 +176,8 @@ class CollectionsController < ApplicationController
   # Collection visibility cannot be modified once the collection is created.
   #
   # @argument name
-  # @argument visibility The visibility of a "private" collection can be
-  #     changed to "public". However, a "public" collection cannot be made
-  #     "private" again.
+  # @argument visibility Be advised that setting a public collection to private
+  #     will permanantly remove all of its followers.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
