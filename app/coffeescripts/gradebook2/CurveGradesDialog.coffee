@@ -32,7 +32,8 @@ define [
               data[pre + "[grade]"] = curves[idx]
               cnt++
             if cnt == 0
-              @$dialog.errorBox I18n.t("errors.none_to_update", "None to Update")
+              errorBox = @$dialog.errorBox I18n.t("errors.none_to_update", "None to Update")
+              setTimeout((-> errorBox.fadeOut(-> errorBox.remove())), 3500)
               return false
             data
           success: (data) =>
