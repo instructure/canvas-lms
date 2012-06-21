@@ -54,6 +54,8 @@ class EnrollmentsApiController < ApplicationController
   # @response_field user_id The unique id of the user.
   # @response_field html_url The URL to the Canvas web UI page for this course enrollment.
   # @response_field grades[html_url] The URL to the Canvas web UI page for the user's grades, if this is a student enrollment.
+  # @response_field grades[current_grade] The user's current grade in the class. Only included if user has permissions to view this grade.
+  # @response_field grades[final_grade] The user's final grade for the class. Only included if user has permissions to view this grade.
   # @response_field user[id] The unique id of the user.
   # @response_field user[login_id] The unique login of the user.
   # @response_field user[name] The name of the user.
