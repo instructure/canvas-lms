@@ -175,7 +175,7 @@ define [
         [$li.find('input').val(), $li.find('div').attr('title')]
 
     tokenValues: ->
-      input.value for input in @$tokens.find('input')
+      input.value for input in @$tokens.find("[name='#{@nodeName}[]']")
 
     inputKeyUp: (e) ->
       @reposition()
