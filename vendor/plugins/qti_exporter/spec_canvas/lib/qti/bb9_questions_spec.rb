@@ -17,6 +17,11 @@ describe "Converting Blackboard 9 qti" do
     hash.should == BB9Expected::MATCHING
   end
 
+  it "should find question references in selection_metadata" do
+    hash = get_quiz_data(BB9_FIXTURE_DIR, 'group_with_selection_references')[1][0]
+    hash[:questions].first[:questions].first.should == {:question_type=>"question_reference", :migration_id=>"_428569_1"}
+  end
+
 end
 
 module BB9Expected

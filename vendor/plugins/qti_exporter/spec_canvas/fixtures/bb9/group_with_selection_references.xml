@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <assessment title="Chapter 10 Quiz">
+    <assessmentmetadata>
+      <bbmd_asi_object_id>_428917_1</bbmd_asi_object_id>
+      <bbmd_asitype>Assessment</bbmd_asitype>
+      <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+      <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+      <bbmd_questiontype>Multiple Choice</bbmd_questiontype>
+      <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+      <bbmd_is_disabled>false</bbmd_is_disabled>
+      <bbmd_numbertype>none</bbmd_numbertype>
+      <bbmd_partialcredit></bbmd_partialcredit>
+      <bbmd_orientationtype>vertical</bbmd_orientationtype>
+      <bbmd_is_extracredit>false</bbmd_is_extracredit>
+      <qmd_absolutescore_max>20.0</qmd_absolutescore_max>
+      <qmd_weighting>0.0</qmd_weighting>
+      <qmd_instructornotes></qmd_instructornotes>
+    </assessmentmetadata>
+    <rubric view="All">
+      <flow_mat class="Block">
+        <material>
+          <mat_extension>
+            <mat_formattedtext type="HTML"/>
+          </mat_extension>
+        </material>
+      </flow_mat>
+    </rubric>
+    <presentation_material>
+      <flow_mat class="Block">
+        <material>
+          <mat_extension>
+            <mat_formattedtext type="HTML"/>
+          </mat_extension>
+        </material>
+      </flow_mat>
+    </presentation_material>
+    <section>
+      <sectionmetadata>
+        <bbmd_asi_object_id>_428918_1</bbmd_asi_object_id>
+        <bbmd_asitype>Section</bbmd_asitype>
+        <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+        <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+        <bbmd_questiontype>Multiple Choice</bbmd_questiontype>
+        <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+        <bbmd_is_disabled>false</bbmd_is_disabled>
+        <bbmd_numbertype>none</bbmd_numbertype>
+        <bbmd_partialcredit></bbmd_partialcredit>
+        <bbmd_orientationtype>vertical</bbmd_orientationtype>
+        <bbmd_is_extracredit>false</bbmd_is_extracredit>
+        <qmd_absolutescore_max>20.0</qmd_absolutescore_max>
+        <qmd_weighting>0.0</qmd_weighting>
+        <qmd_instructornotes></qmd_instructornotes>
+      </sectionmetadata>
+      <section>
+        <sectionmetadata>
+          <bbmd_asi_object_id>_428919_1</bbmd_asi_object_id>
+          <bbmd_asitype>Section</bbmd_asitype>
+          <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+          <bbmd_sectiontype>Question Block</bbmd_sectiontype>
+          <bbmd_questiontype>Multiple Choice</bbmd_questiontype>
+          <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+          <bbmd_is_disabled>false</bbmd_is_disabled>
+          <bbmd_numbertype>none</bbmd_numbertype>
+          <bbmd_partialcredit></bbmd_partialcredit>
+          <bbmd_orientationtype>vertical</bbmd_orientationtype>
+          <bbmd_is_extracredit>false</bbmd_is_extracredit>
+          <qmd_absolutescore_max>20.0</qmd_absolutescore_max>
+          <qmd_weighting>2.0</qmd_weighting>
+          <qmd_instructornotes></qmd_instructornotes>
+        </sectionmetadata>
+        <selection_ordering>
+          <selection seltype="All">
+            <selection_number>10</selection_number>
+            <or_selection>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428569_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428448_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428329_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _427988_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428281_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428765_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428627_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428552_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428673_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428408_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428469_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428198_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428679_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428412_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428267_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428340_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428747_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428201_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428686_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428722_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428241_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428724_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428364_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428366_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428292_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428293_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428355_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428252_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428427_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428584_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428653_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428709_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428315_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428781_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428782_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428580_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428034_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428035_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428100_1
+              </selection_metadata>
+              <selection_metadata mdoperator="EQ" mdname="bbmd_questionid">
+                _428001_1
+              </selection_metadata>
+            </or_selection>
+          </selection>
+          <selection seltype="All"/>
+        </selection_ordering>
+      </section>
+    </section>
+  </assessment>
+</questestinterop>
