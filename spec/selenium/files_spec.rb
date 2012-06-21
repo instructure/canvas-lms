@@ -208,7 +208,7 @@ describe "collaborations folder in files menu" do
   before (:each) do
     course_with_teacher_logged_in
     group_category = @course.group_categories.create(:name => "groupage")
-    @group = Group.create!(:name=>"group1", :group_category => group_category, :context => @course)
+    @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
   end
 
   def load_collab_folder
@@ -237,33 +237,44 @@ describe "zip file uploads" do
 
   shared_examples_for "zip file uploads" do
     it "should allow unzipping into a folder from the form" do
-      get @files_url
-      folder = Folder.root_folders(@context).first
-      expect_new_page_load { f('a.upload_zip_link').click }
+      @folder = folder = Folder.root_folders(@context).first
 
-      URI.parse(driver.current_url).path.should == @files_import_url
+      def upload_file(refresh)
+        get @files_url
 
-      filename, path, data, file = get_file('attachments.zip')
-      first_selected_option(f('#upload_to select')).attribute('value').should == folder.id.to_s
-      f('input#zip_file').send_keys(path)
-      submit_form('#zip_file_import_form')
+        if !refresh
+          expect_new_page_load { f('a.upload_zip_link').click }
 
-      zfi = keep_trying_until { ZipFileImport.last(:order => :id) }
-      zfi.context.should == @context
-      zfi.folder.should == folder
+          URI.parse(driver.current_url).path.should == @files_import_url
+        else
+          refresh_page
+        end
+        filename, path, data, file = get_file('attachments.zip')
+        first_selected_option(f('#upload_to select')).attribute('value').should == @folder.id.to_s
+        f('input#zip_file').send_keys(path)
+        submit_form('#zip_file_import_form')
 
-      f('#uploading_please_wait_dialog') # verify it's visible
+        zfi = keep_trying_until { ZipFileImport.last(:order => :id) }
+        zfi.context.should == @context
+        zfi.folder.should == @folder
 
-      job = Delayed::Job.last(:order => :id)
-      job.tag.should == 'ZipFileImport#process_without_send_later'
-      run_job(job)
+        f('#uploading_please_wait_dialog') # verify it's visible
+
+        job = Delayed::Job.last(:order => :id)
+        job.tag.should == 'ZipFileImport#process_without_send_later'
+        run_job(job)
+        upload_file(true) if f("#flash_error_message").displayed? && refresh != true
+        zfi
+      end
+
+      zfi = upload_file(false)
 
       keep_trying_until { URI.parse(driver.current_url).path == @files_url }
 
       zfi.reload.state.should == :imported
 
-      folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
-      folder.sub_folders.active.count.should == 1
+      @folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
+      @folder.sub_folders.active.count.should == 1
       sub = folder.sub_folders.active.first
       sub.name.should == "adir"
       sub.attachments.active.map(&:display_name).should == ["second_entry.txt"]
