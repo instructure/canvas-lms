@@ -20,7 +20,7 @@
 <% end %>
 <h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Profile", :user => @user.short_name) %></h2>
 <div class="clear"></div>
-<% form_for @user, :url => user_profile_url(@current_user), :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;"} do |f| %>
+<% form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;"} do |f| %>
 <table class="profile_table">
   <tr>
     <% editable_name = @user.user_can_edit_name? %>

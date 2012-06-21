@@ -30,8 +30,6 @@ class ProfileController < ApplicationController
   def show
     @user ||= @current_user
 
-    @use_new_styles = true
-
     @active_tab = "profile"
     @context = UserProfile.new(@current_user) if @user == @current_user
 
