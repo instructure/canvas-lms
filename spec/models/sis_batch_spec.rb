@@ -90,9 +90,10 @@ describe SisBatch do
 
     Setting.set('sis_batch_process_start_delay', '120')
     create_csv_data(['abc']) do |batch|
+      start_time = Time.now.to_i
       batch.process
       job = Delayed::Job.find_by_tag('SisBatch.process_all_for_account')
-      job.run_at.to_i.should >= Time.now.to_i
+      job.run_at.to_i.should >= start_time
       job.run_at.to_i.should <= 3.minutes.from_now.to_i
     end
   end
