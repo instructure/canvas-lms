@@ -5,19 +5,19 @@ i[class*=icon-], i[class^=icon-] {
   line-height: 16px;
   background-image: url(/images/blue/canvas-icons-16x16-dkgrey.png);
   background-repeat: no-repeat;
-  
-  a:hover &, 
+
+  a:hover &,
   a:focus &,
   .hover & { background-image: url(../../../images/blue/canvas-icons-16x16-blue.png); }
 
   a:active &,
   .active & { background-image: url(../../../images/blue/canvas-icons-16x16-ltgrey.png); }
-  
+
 }
 
 .quickStartBar {
   i[class*=icon-], i[class^=icon-] {
-    background-image: url(/images/blue/quickstart-icons.png);
+    background-image: url(/images/blue/quickstart-icons.png) !important;
   }
 }
 

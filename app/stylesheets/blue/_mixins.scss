@@ -1,5 +1,20 @@
 @mixin bevelText {
-  text-shadow: 0 1px 1px rgba(255,255,255,.75);
+  text-shadow: 0 1px 1px hsla(0, 100%, 100%, 0.75);
+}
+
+@mixin header-text {
+  color: $fcHeader;
+  text-shadow: 0 1px 1px $textShadowHeader;
+}
+@mixin header-bg {
+  @include background-image(linear-gradient($gradientHeader));
+  box-shadow: inset 0 1px 0 hsla(0, 100%, 100%, 0.75);
+}
+
+@mixin ui-widget-header-bg-and-text {
+  border: 1px solid $borderColorHeader;
+  @include header-text;
+  @include header-bg;
 }
 
 @mixin content-callout {

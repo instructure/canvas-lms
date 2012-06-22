@@ -1,52 +1,41 @@
 @import environment.sass
-@import blue/_icons.scss
 
 #editor_tabs
-  :font-size 0.8em
-  
-  #tree1
-    margin: 10px 0
-  
-  h4
-    :margin 0 0 .5em
+  :font-size 11px
+  margin-left: 20px
+
+  > h4
+    font-size: 1.3em
+    margin-bottom: 0.3em
 
   .ui-tabs-panel
     :padding 0.5em 0.8em
 
   .wiki_pages
-    :list-style none
-    :margin 0
-    :padding 0
-    
-    a:hover
-      :text-decoration underline
+    +reset-list
 
   .page_list
-    :font-size 1.2em
-    :line-height 1.5em
-    li
-      :padding-left 20px
+    li a
+      display: block
+      padding: 3px 0 3px 20px
       :background-image url(/images/tick.png)
       :background-position left center
       :background-repeat no-repeat
-      
+
       &:hover
         :background-image url(/images/back.png)
         :background-color #eee
-        +border-radius(3px)
 
   #pages_accordion
-    span.header
-      :display block
-    
+
     .ui-accordion-header a
       :padding 0.1em 0.5em 0.1em 2.2em
-    
+
     .ui-accordion-content
       :padding 0.5em
       :height 190px
       :overflow auto
-      
+
     .add
       :display block
 

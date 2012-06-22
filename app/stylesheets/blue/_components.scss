@@ -1,11 +1,11 @@
+
+
 .toolbar {
+  @extend .ui-widget-header;
+
   padding: $contentBoxPadding / 2;
   font-size: $baseFontSize;
   line-height: $baseLineHeight;
-  @include bevelText;
-  @include buttonBackground(#E0E6EB, #D5DDE3);
-  $shadow: inset 0 1px 0 rgba(255,255,255,0.75);
-  @include box-shadow($shadow);
 
   .header {
     font-size: 16px;

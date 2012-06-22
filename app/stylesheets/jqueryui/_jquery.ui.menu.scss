@@ -1,5 +1,3 @@
-@import "environment.sass";
-
 /*
  * jQuery UI Menu @VERSION
  *
@@ -40,9 +38,7 @@
 
 .ui-menu-item label { cursor: pointer; }
 
-.ui-menu .ui-corner-all {
-  @include border-radius(0);
-}
+.ui-menu .ui-corner-all { border-radius: 0; }
 
 $kyle-menu-bg-color: #e6e7e9;
 $kyle-menu-border-color: #b0afaf;
@@ -92,7 +88,7 @@ $kyle-menu-border-radius: 8px;
   color: #525252;
   position: absolute; // take it out of the "flow" so that it pops on top and doesnt push things down
   z-index: 9999;
-  @include border-radius($kyle-menu-border-radius);
+  border-radius:  $kyle-menu-border-radius;
   box-shadow: 0px 2px 4px -1px rgba(0,0,0,.4);
 
   a { color: #525252}
@@ -108,8 +104,8 @@ $kyle-menu-border-radius: 8px;
   // have to use first-of-type instead of :first-child because the carat that gets inserted becomes
   // :first-child but the carat is not an <li>, so this gets the first <li> which is what we want.
   // doesn't work in ie8- but that's ok because neither does the border radius we are trying to fix.
-  li:first-of-type a { @include border-top-radius($kyle-menu-border-radius) }
-  li:last-child a { @include border-bottom-radius($kyle-menu-border-radius) }
+  li:first-of-type a { border-top-left-radius: $kyle-menu-border-radius; border-top-right-radius:$kyle-menu-border-radius; }
+  li:last-child a { border-bottom-left-radius: $kyle-menu-border-radius; border-bottom-right-radius:$kyle-menu-border-radius; }
   .ui-state-focus {
     @include vertical-gradient(#0abdff, #008fd6);
     border-top: 1px solid #d5f1fe;
