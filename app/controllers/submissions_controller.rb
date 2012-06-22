@@ -20,7 +20,7 @@
 #
 # @object Submission
 #     {
-#       // The submissions's assignment id
+#       // The submission's assignment id
 #       assignment_id: 23,
 #
 #       // The submission's assignment (see the assignments API) (optional)
@@ -29,7 +29,7 @@
 #       // The submission's course (see the course API) (optional)
 #       course: Course
 #
-#       // If multiple submissions have been made, this is the attempt number.
+#       // This is the submission attempt number.
 #       attempt: 1,
 #
 #       // The content of the submission, if it was submitted directly in a
@@ -74,15 +74,17 @@
 #       // ex: ("online_text_entry"|"online_url"|"online_upload"|"media_recording")
 #       submission_type: "online_text_entry",
 #
-#       // The timestamp when the assignment was submitted, if an actual
-#       // submission has been made.
+#       // The timestamp when the assignment was submitted
 #       submitted_at: "2012-01-01T01:00:00Z",
 #
-#       // The URL of the submission if the submission is a "online_url" submission.
+#       // The URL of the submission (for "online_url" submissions).
 #       url: null,
 #
 #       // The id of the user who created the submission
 #       user_id: 134
+#
+#       // The submissions user (see user API) (optional)
+#       user: User
 #     }
 #
 class SubmissionsController < ApplicationController

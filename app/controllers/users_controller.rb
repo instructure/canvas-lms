@@ -325,7 +325,7 @@ class UsersController < ApplicationController
   #
   # Submission:
   #
-  # Returns an API {api:Submissions:Submission Submission} with its Course and Assignment data.
+  # Returns an {api:Submissions:Submission Submission} with its Course and Assignment data.
   #
   # Conference:
   #

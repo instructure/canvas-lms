@@ -266,6 +266,10 @@ describe UsersController, :type => :integration do
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
       },
 
+      'user' => {
+        "name"=>"User", "sortable_name"=>"User", "id"=>@sub.user_id, "short_name"=>"User"
+      },
+
       'context_type' => 'Course',
       'course_id' => @course.id,
     }]
@@ -345,6 +349,10 @@ describe UsersController, :type => :integration do
         'course_code' => @course.course_code,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
+      },
+
+      'user' => {
+        "name"=>"User", "sortable_name"=>"User", "id"=>@sub.user_id, "short_name"=>"User"
       },
 
       'context_type' => 'Course',

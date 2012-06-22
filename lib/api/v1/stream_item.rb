@@ -73,7 +73,7 @@ module Api::V1::StreamItem
         hash['notification_category'] = data.notification_category
         hash['html_url'] = hash['url'] = data.url
       when 'Submission'
-        hash.merge! submission_json(Submission.find(data.id), Assignment.find(data.assignment.id), current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url'])
+        hash.merge! submission_json(Submission.find(data.id), Assignment.find(data.assignment.id), current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url', 'user'])
 
         # backwards compat from before using submission_json
         hash['assignment']['title'] = hash['assignment']['name']

@@ -22,6 +22,7 @@ module Api::V1::Submission
   include Api::V1::Attachment
   include Api::V1::DiscussionTopics
   include Api::V1::Course
+  include Api::V1::User
 
   def submission_json(submission, assignment, user, session, context = nil, includes = [])
     context ||= assignment.context
@@ -65,6 +66,10 @@ module Api::V1::Submission
 
     if includes.include?("html_url")
       hash['html_url'] = course_assignment_submission_url(submission.context.id, assignment.id, user.id)
+    end
+
+    if includes.include?("user")
+      hash['user'] = user_json(submission.user, user, session, ['avatar_url'], submission.context, nil)
     end
 
     hash
