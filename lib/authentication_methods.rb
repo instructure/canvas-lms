@@ -210,7 +210,9 @@ module AuthenticationMethods
         format.html {
           store_location
           flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
-          redirect_to login_url # should this have :no_auto => 'true' ?
+          opts = {}
+          opts[:canvas_login] = 1 if params[:canvas_login]
+          redirect_to login_url(opts) # should this have :no_auto => 'true' ?
         }
       end
       format.json { render :json => {:errors => {:message => I18n.t('lib.auth.authentication_required', "user authorization required")}}.to_json, :status => :unauthorized}

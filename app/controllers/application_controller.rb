@@ -1134,7 +1134,9 @@ class ApplicationController < ActionController::Base
     unless Account.site_admin.grants_right?(@current_user, permission)
       flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
       store_location
-      redirect_to @current_user ? root_url : login_url
+      opts = {}
+      opts[:canvas_login] = 1 if params[:canvas_login]
+      redirect_to @current_user ? root_url : login_url(opts)
       return false
     end
   end
