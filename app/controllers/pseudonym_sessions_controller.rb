@@ -41,13 +41,7 @@ class PseudonymSessionsController < ApplicationController
     @is_cas = @domain_root_account.cas_authentication? && @is_delegated
     @is_saml = @domain_root_account.saml_authentication? && @is_delegated
     if @is_cas && !params[:no_auto]
-      if session[:exit_frame]
-        session.delete(:exit_frame)
-        render :template => 'shared/exit_frame', :layout => false, :locals => {
-          :url => login_url(params)
-        }
-        return
-      elsif params[:ticket]
+      if params[:ticket]
         # handle the callback from CAS
         logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
         st = CASClient::ServiceTicket.new(params[:ticket], login_url)

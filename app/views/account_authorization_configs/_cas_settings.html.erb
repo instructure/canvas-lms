@@ -24,16 +24,6 @@
         </td>
       </tr>
       <tr>
-        <td><%= f.blabel :log_in_url, :en => "Alternate Login URL" %></td>
-        <td class="nobr">
-          <%= f.text_field :log_in_url, :class => "auth_form", :style => "width: 450px;" %>
-          <span class="auth_info log_in_url"><%= @account_config.log_in_url %></span>
-          <span class="auth_form" style="font-size: smaller;">
-            <br><%= t(:alternate_login_url_description, "An alternate URL for logging into CAS. You probably should not set this.") %>
-          </span>
-        </td>
-      </tr>
-      <tr>
         <td style="vertical-align: top; width: 200px;"><%= f.blabel :login_handle_name, :en => "Login Label" %></td>
         <td style="vertical-align: top;" class="nobr">
           <%= f.text_field :login_handle_name, :class => "auth_form", :style => "width: 300px;", :placeholder => AccountAuthorizationConfig.default_delegated_login_handle_name %>
