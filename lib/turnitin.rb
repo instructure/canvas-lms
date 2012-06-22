@@ -195,7 +195,7 @@ module Turnitin
 
         responses[asset_string] = object_id ? 
                                   { :object_id => object_id } : 
-                                  { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(:rcode) }
+                                  { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(rcode) }
       end
 
       responses
