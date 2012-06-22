@@ -1,21 +1,7 @@
 @import 'environment'
 
-/* this is the size of the default span2 */
-$profilePicWidth: $gridColumnWidth * 2 + $gridGutterWidth
-
-.profile-pic
-  width: $profilePicWidth
-
-@media (min-width: 1200px)
-  .profile-pic-container
-    width: $profilePicWidth
-    background-color: white
-    padding: 12px
-    border: 1px solid $borderColor
-
-@media (min-width: 768px) and (max-width: 979px)
-  .profile-pic
-    width: 104px
+.profile-avatar-wrapper
+  margin-right: 30px
 
 .stats
   text-align: left

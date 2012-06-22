@@ -1,15 +1,14 @@
-<% jammit_css :profile %>
-<% content_for :page_title do %>
-  <%= @user.short_name %>
-<% end %>
-<div class="container">
-  <div class="row">
-    <div class="span2 profile-pic-container">
-      <%= image_tag avatar_image_url(User.avatar_key @user.id), :class => 'profile-pic' %>
-    </div>
-    <div class="span6">
-      <h1><%= @user.short_name %></h1>
-      <p><button id="follow-user">Follow</button></p>
-    </div>
+<%
+  jammit_css :profile_show
+  content_for :page_title, @user.short_name
+%>
+<div class="image-block">
+  <div class="image-block-image profile-avatar-wrapper">
+    <%= avatar_image @user.id, 100 %>
+  </div>
+  <div class="image-block-content">
+    <h1><%= @user.short_name %></h1>
+    <p><button id="follow-user">Follow</button></p>
   </div>
 </div>
+

@@ -1,16 +1,14 @@
 <%
-  jammit_css :profile
+  jammit_css :profile_show
   js_bundle :profile_show
   @body_classes << 'no-page-block'
+  content_for :page_title, @user.short_name
 %>
-<% content_for :page_title do %>
-  <%= @user.short_name %>
-<% end %>
-<div class="row v-gutter">
-  <div class="span2 profile-pic-container">
-    <%= image_tag avatar_image_url(User.avatar_key @user.id), :class => 'profile-pic' %>
+<div class="image-block">
+  <div class="image-block-image profile-avatar-wrapper">
+    <%= avatar_image @user.id, 100 %>
   </div>
-  <div class="span5">
+  <div class="image-block-content">
     <h1><%= @user.short_name %></h1>
     <p><%= format_message(@user.bio || "").first.html_safe %></p>
     <% if @can_follow %>
@@ -20,6 +18,7 @@
 </div>
 
 <% content_for :right_side do %>
+  <div class="rs-margin-all">
     <table class="stats">
       <tr class="stats-header">
         <th colspan="2">Stats</th>
@@ -43,4 +42,5 @@
           <% end %>
       </ul>
     <% end %>
-  <% end %>
+  </div>
+<% end %>

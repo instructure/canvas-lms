@@ -145,7 +145,7 @@ stylesheets:
     - public/stylesheets/compiled/activity_feed.css
   registration:
     - public/stylesheets/compiled/registration.css
-  profile:
+  profile_show:
     - public/stylesheets/compiled/profile/show.css
   profile_edit:
     - public/stylesheets/compiled/profile/edit.css
