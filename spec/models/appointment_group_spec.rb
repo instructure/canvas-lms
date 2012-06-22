@@ -512,4 +512,26 @@ describe AppointmentGroup do
       @ag.possible_participants('unregistered').should eql [@group2]
     end
   end
+
+  context "#requiring_action?" do
+    before do
+      course_with_teacher(:active_all => true)
+      @teacher = @user
+    end
+
+    it "returns false when participants_per_appointment is set filled" do
+      # given
+      ag = AppointmentGroup.create(:title => "test",
+                                   :contexts => [@course],
+                                   :participants_per_appointment => 1,
+                                   :min_appointments_per_participant => 1,
+                                   :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]])
+      student = student_in_course(:course => @course, :active_all => true).user
+      ag.requiring_action?(student).should be_true
+      # when
+      res = ag.appointments.first.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      # expect
+      ag.requiring_action?(student).should be_false
+    end
+  end
 end
