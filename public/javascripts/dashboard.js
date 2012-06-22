@@ -18,7 +18,7 @@
 define([
   'i18n!dashboard',
   'jquery' /* $ */,
-  'compiled/dashboardToggle',
+  //'compiled/dashboardToggle',
   'jquery.instructure_misc_plugins' /* showIf */
 ], function(I18n, $, dashboardToggle) {
 
