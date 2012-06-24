@@ -107,9 +107,9 @@ module Api::V1::StreamItem
     opts[:contexts] = contexts if contexts.present?
 
     items = @current_user.shard.activate do
-      scope = @current_user.visible_stream_item_instances(opts)
+      scope = @current_user.visible_stream_item_instances(opts).scoped(:include => :stream_item)
       Api.paginate(scope, self, self.send(paginate_url, @context)).to_a
     end
-    render :json => items.map { |i| stream_item_json(i.stream_item, @current_user, session) }
+    render :json => items.map(&:stream_item).compact.map { |i| stream_item_json(i, @current_user, session) }
   end
 end

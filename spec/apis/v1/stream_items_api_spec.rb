@@ -42,6 +42,10 @@ describe UsersController, :type => :integration do
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     json.size.should == 0
     google_docs_collaboration_model(:user_id => @user.id)
+    @context = @course
+    @topic1 = discussion_topic_model
+    # introduce a dangling StreamItemInstance
+    StreamItem.delete_all(:id => @user.visible_stream_item_instances.last.stream_item_id)
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     json.size.should == 1
