@@ -147,7 +147,16 @@ describe User do
     @a.save
     StreamItem.for_user(@user).should_not be_empty
   end
-  
+
+  it "should ignore orphaned stream item instances" do
+    course_with_student(:active_all => true)
+    google_docs_collaboration_model(:user_id => @user.id)
+    @user.recent_stream_items.size.should == 1
+    StreamItem.delete_all
+    @user.unmemoize_all
+    @user.recent_stream_items.size.should == 0
+  end
+
   it "should be able to remove itself from a root account" do
     account1 = Account.create
     account2 = Account.create
