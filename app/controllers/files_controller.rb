@@ -323,7 +323,9 @@ class FilesController < ApplicationController
   protected :send_attachment
   
   def send_stored_file(attachment, inline=true, redirect_to_s3=false)
-    attachment.context_module_action(@current_user, :read) if @current_user && !params[:preview]
+    user = @current_user
+    user ||= User.find_by_id(params[:user_id]) if params[:user_id].present?
+    attachment.context_module_action(user, :read) if user && !params[:preview]
     log_asset_access(@attachment, "files", "files") unless params[:preview]
     if safer_domain_available?
       redirect_to safe_domain_file_url(attachment, @safer_domain_host, params[:verifier], !inline)
