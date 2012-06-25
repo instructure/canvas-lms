@@ -371,27 +371,44 @@ class Pseudonym < ActiveRecord::Base
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
-  def self.find_all_by_arbitrary_credentials(credentials, account_ids)
+  def self.find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
     return [] if credentials[:unique_id].blank? ||
                  credentials[:password].blank?
-    Shard.partition_by_shard(account_ids) do |account_ids|
+    too_many_attempts = false
+    pseudonyms = Shard.partition_by_shard(account_ids) do |account_ids|
       active.
         by_unique_id(credentials[:unique_id]).
         where(:account_id => account_ids).
         all(:include => :user).
         select { |p|
-          p.valid_arbitrary_credentials?(credentials[:password])
+          valid = p.valid_arbitrary_credentials?(credentials[:password])
+          too_many_attempts = true if p.audit_login(remote_ip, valid) == :too_many_attempts
+          valid
         }
     end
+    return :too_many_attempts if too_many_attempts
+    pseudonyms
   end
 
-  def self.authenticate(credentials, account_ids)
-    pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids)
+  def self.authenticate(credentials, account_ids, remote_ip = nil)
+    pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
+    return :too_many_attempts if pseudonyms == :too_many_attempts
     site_admin = pseudonyms.find { |p| p.account_id == Account.site_admin.id }
     # only log them in if these credentials match a single user OR if it matched site admin
     if pseudonyms.map(&:user).uniq.length == 1 || site_admin
       # prefer a pseudonym from Site Admin if possible, otherwise just choose one
       site_admin || pseudonyms.first
     end
+  end
+
+  def audit_login(remote_ip, valid_password)
+    return :too_many_attempts unless Canvas::Security.allow_login_attempt?(self, remote_ip)
+
+    if valid_password
+      Canvas::Security.successful_login!(self, remote_ip)
+    else
+      Canvas::Security.failed_login!(self, remote_ip)
+    end
+    nil
   end
 end
