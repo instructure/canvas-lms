@@ -165,7 +165,7 @@ describe "Alerts" do
     alert.find_element(:css, 'input[name="repetition"][value="value"]').click
     sleep 2 #need to wait for javascript to process
     keep_trying_until do
-      driver.find_element(:id, 'new_alert').submit
+      submit_form('#new_alert')
       wait_for_animations
       find_all_with_jquery('.error_box').length == 4
     end
@@ -180,7 +180,7 @@ describe "Alerts" do
     keep_trying_until { find_all_with_jquery('.error_box').length == 1 }
 
     alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
-    driver.find_element(:id, 'new_alert').submit
+    submit_form('#new_alert')
     keep_trying_until { find_all_with_jquery('.error_box').length == 2 }
   end
 end

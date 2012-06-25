@@ -388,6 +388,7 @@ ActionController::Routing::Routes.draw do |map|
     add_users(group)
     group.remove_user 'remove_user/:id', :controller => 'groups', :action => 'remove_user', :conditions => {:method => :delete}
     group.add_user 'add_user', :controller => 'groups', :action => 'add_user'
+    group.accept_invitation 'accept_invitation/:uuid', :controller => 'groups', :action => 'accept_invitation', :conditions => {:method => :get}
     group.members 'members.:format', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
     group.members 'members', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
     add_announcements(group)
@@ -724,6 +725,7 @@ ActionController::Routing::Routes.draw do |map|
       end
       topic_routes(topics, "course")
       topic_routes(topics, "group")
+      topic_routes(topics, "collection_item")
     end
 
     api.with_options(:controller => :external_tools) do |tools|
@@ -746,6 +748,9 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :users) do |users|
       users.get 'users/self/activity_stream', :action => :activity_stream, :path_name => 'user_activity_stream'
       users.get 'users/activity_stream', :action => :activity_stream # deprecated
+
+      users.put "users/:user_id/followers/self", :action => :follow
+      users.delete "users/:user_id/followers/self", :action => :unfollow
 
       users.get 'users/self/todo', :action => :todo_items
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
@@ -833,16 +838,31 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :groups) do |groups|
+      groups.resources :groups, :except => [:index]
+      groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
+      groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
+      groups.put "groups/:group_id/followers/self", :action => :follow
+      groups.delete "groups/:group_id/followers/self", :action => :unfollow
+
+      groups.with_options(:controller => :group_memberships) do |memberships|
+        memberships.resources :memberships, :path_prefix => "groups/:group_id", :name_prefix => "group_", :controller => :group_memberships, :except => [:show]
+      end
     end
 
     api.with_options(:controller => :collections) do |collections|
-      collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_"
+      collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_", :only => [:index, :create]
+      collections.resources :collections, :path_prefix => "groups/:group_id", :name_prefix => "group_", :only => [:index, :create]
+      collections.resources :collections, :except => [:index, :create]
+      collections.put "collections/:collection_id/followers/self", :action => :follow
+      collections.delete "collections/:collection_id/followers/self", :action => :unfollow
 
       collections.with_options(:controller => :collection_items) do |items|
-        items.resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items
-        items.put "collections/:collection_id/items/:item_id/upvote", :action => :upvote
-        items.delete "collections/:collection_id/items/:item_id/upvote", :action => :remove_upvote
+        items.get "collections/:collection_id/items", :action => :index, :path_name => 'collection_items_list'
+        items.resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items, :only => [:index, :create]
+        items.resources :items, :path_prefix => "collections", :name_prefix => "collection_", :controller => :collection_items, :except => [:index, :create]
+        items.put "collections/items/:item_id/upvotes/self", :action => :upvote
+        items.delete "collections/items/:item_id/upvotes/self", :action => :remove_upvote
       end
     end
 

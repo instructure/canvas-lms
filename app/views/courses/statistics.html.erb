@@ -155,47 +155,6 @@
     </table>
   </div>
 </div>
-<% if page_views_enabled? -%>
-<h3 class='h-margin-top'><%= t('headings.page_views', %{Page views over time}) %></h3>
-<div id='page_views_by_day' style='width: 600px; height: 240px;'></div>
-
-<% js_block do %>
-  <!--Load the GOOGLE AJAX API-->
-  <script type="text/javascript" src="//www.google.com/jsapi"></script>
-
-  <script type="text/javascript">
-  google.load('visualization', '1', {'packages':['annotatedtimeline']});
-
-  require(['jquery'], function($) {
-    var pageViewData = <%= raw @context.page_view_data(:dates => [1.month.ago, 1.second.ago]).to_json %>;
-
-    google.setOnLoadCallback(function(){
-      var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Date');
-      data.addColumn('number', <%= raw t('page_views', %{'Page Views'}).to_json %>);
-      data.addColumn('string', 'title1');
-      data.addColumn('string', 'text1');
-      
-      var rows = []
-      $.each(pageViewData, function() {
-        var date = new Date();
-        date.setTime(this[0]);
-        rows.push(
-          //this ends up being [(a date), (the number of pageViews on that date), "an annotation tile, (if any)", ""]
-          [date, this[1], undefined, undefined]
-        )
-      });
-      
-      data.addRows(rows);
-
-      var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('page_views_by_day'));
-      chart.draw(data, {displayAnnotations: false});
-      
-    });
-  });
-  </script>
-<% end -%>
-<% end -%>
 
 <% js_block do -%>
   <script>

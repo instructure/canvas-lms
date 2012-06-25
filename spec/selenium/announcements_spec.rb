@@ -53,7 +53,7 @@ describe "announcements" do
       first_text = 'Hi, this is my first announcement'
 
       get course_announcements_path(@course)
-      create_announcement_manual(nil).submit
+      submit_form(create_announcement_manual(nil))
       wait_for_ajaximations
       announcement = driver.find_element(:css, '#topic_list .topic')
       announcement.find_element(:link, "First Announcement").should be_displayed
@@ -73,7 +73,7 @@ describe "announcements" do
       replace_content(edit_form.find_element(:css, '.topic_title'), edit_title)
       wait_for_tiny(keep_trying_until { driver.find_element(:css, '.add_topic_form_new') })
       type_in_tiny('.topic_content', edit_message)
-      edit_form.submit
+      submit_form(edit_form)
       wait_for_ajaximations
       communication_message = driver.find_element(:css, '.communication_message')
       communication_message.find_element(:css, '.title').text.should == edit_title
@@ -94,14 +94,14 @@ describe "announcements" do
       get course_announcements_path(@course)
       add_form = create_announcement_manual('#discussion_topic_assignment_set_assignment')
       replace_content(add_form.find_element(:id, 'discussion_topic_assignment_points_possible'), "25")
-      add_form.submit
+      submit_form(add_form)
       wait_for_ajaximations
       driver.find_element(:css, '.for_assignment').should include_text('This topic is an assignment')
     end
 
     it "should crate an announcement with a podcast feed" do
       get course_announcements_path(@course)
-      create_announcement_manual('#discussion_topic_podcast_enabled').submit
+      submit_form(create_announcement_manual('#discussion_topic_podcast_enabled'))
       wait_for_ajaximations
       find_with_jquery('img[title="This topic has a podcast feed."]').should be_displayed
     end
@@ -111,7 +111,7 @@ describe "announcements" do
       add_form = create_announcement_manual('#discussion_topic_delay_posting')
       driver.find_element(:css, '.ui-datepicker-trigger').click
       datepicker_next
-      add_form.submit
+      submit_form(add_form)
       wait_for_ajaximations
       driver.find_element(:css, '.delayed_posting').should include_text('This topic will not be visible')
     end
@@ -124,7 +124,7 @@ describe "announcements" do
       driver.find_element(:css, ' #content .add_entry_link').click
       entry_text = 'new entry text'
       type_in_tiny('textarea.entry_content:first', entry_text)
-      driver.find_element(:id, 'add_entry_form_entry_new').submit
+      submit_form('#add_entry_form_entry_new')
       wait_for_ajaximations
       driver.find_element(:css, '#entry_list .discussion_entry .content').should include_text(entry_text)
       driver.find_element(:css, '#left-side .announcements').click
@@ -143,7 +143,7 @@ describe "announcements" do
         feed_form.find_element(:id, 'external_feed_add_header_match').click
       end
       feed_form.find_element(:id, 'external_feed_header_match').send_keys('blah')
-      feed_form.submit
+      submit_form(feed_form)
       wait_for_ajaximations
 
       #delete external feed

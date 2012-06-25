@@ -22,14 +22,15 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_canceled_by_user.email' do
   it "should render" do
     user = user_model
-    appointment_participant_model(:updating_user => user, :participant => user)
-    @event.cancel_reason = 'just because'
+    appointment_participant_model(:participant => user)
 
-    generate_message(:appointment_canceled_by_user, :email, @event)
+    generate_message(:appointment_canceled_by_user, :email, @event,
+                     :user => @user, :data => {:updating_user => user,
+                                               :cancel_reason => "because"})
 
     @message.subject.should include('some title')
     @message.body.should include('some title')
-    @message.body.should include('just because')
+    @message.body.should include('because')
     @message.body.should include(user.name)
     @message.body.should include(@course.name)
     @message.body.should include("/appointment_groups/#{@appointment_group.id}")
@@ -41,10 +42,12 @@ describe 'appointment_canceled_by_user.email' do
     cat = @course.group_categories.create
     @group = cat.groups.create(:context => @course)
     @group.users << user
-    appointment_participant_model(:updating_user => user, :participant => @group, :course => @course)
+    appointment_participant_model(:participant => @group, :course => @course)
     @event.cancel_reason = 'just because'
 
-    generate_message(:appointment_canceled_by_user, :email, @event)
+    generate_message(:appointment_canceled_by_user, :email, @event,
+                     :data => {:updating_user => user,
+                                       :cancel_reason => "just because"})
 
     @message.subject.should include('some title')
     @message.body.should include('some title')

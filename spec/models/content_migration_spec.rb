@@ -25,7 +25,7 @@ describe ContentMigration do
       course_with_teacher(:course_name => "from course", :active_all => true)
       @copy_from = @course
 
-      course_with_teacher(:user => @user, :course_name => "to course")
+      course_with_teacher(:user => @user, :course_name => "tocourse", :course_code => "tocourse")
       @copy_to = @course
 
       @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
@@ -88,16 +88,97 @@ describe ContentMigration do
       @copy_to.syllabus_body.should match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
     end
 
+    def make_grading_standard(context)
+      gs = context.grading_standards.new
+      gs.title = "Standard eh"
+      gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
+      gs.save!
+      gs
+    end
     it "should copy course attributes" do
-      @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      #set all the possible values to non-default values
+      @copy_from.start_at = 5.minutes.ago
+      @copy_from.conclude_at = 1.month.from_now
+      @copy_from.is_public = false
+      @copy_from.name = "haha copy from test &amp;"
+      @copy_from.course_code = 'something funny'
+      @copy_from.publish_grades_immediately = false
+      @copy_from.allow_student_wiki_edits = true
+      @copy_from.allow_student_assignment_edits = true
+      @copy_from.hashtag = 'oi'
+      @copy_from.show_public_context_messages = false
+      @copy_from.allow_student_forum_attachments = false
+      @copy_from.default_wiki_editing_roles = 'teachers'
+      @copy_from.allow_student_organized_groups = false
+      @copy_from.default_view = 'modules'
+      @copy_from.show_all_discussion_entries = false
+      @copy_from.open_enrollment = true
+      @copy_from.storage_quota = 444
+      @copy_from.allow_wiki_comments = true
+      @copy_from.turnitin_comments = "Don't plagiarize"
+      @copy_from.self_enrollment = true
+      @copy_from.license = "cc_by_nc_nd"
       @copy_from.locale = "es"
-      @copy_from.save
+      @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      @copy_from.settings[:hide_final_grade] = true
+      gs = make_grading_standard(@copy_from)
+      @copy_from.grading_standard = gs
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
+
+      body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+  <div>
+    <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+    <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+  </div>}
+      @copy_from.syllabus_body = body_with_link % @copy_from.id
 
       run_course_copy
 
-      @copy_to.locale.should == 'es'
+      #compare settings
+      @copy_to.conclude_at.should == nil
+      @copy_to.start_at.should == nil
+      @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
+      @copy_to.storage_quota.should == 444
+      @copy_to.settings[:hide_final_grade].should == true
+      @copy_to.grading_standard_enabled.should == true
+      gs_2 = @copy_to.grading_standards.find_by_migration_id(mig_id(gs))
+      gs_2.data.should == gs.data
+      @copy_to.grading_standard.should == gs_2
+      @copy_to.name.should == "tocourse"
+      @copy_to.course_code.should == "tocourse"
+      atts = Course.clonable_attributes
+      atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
+      atts.each do |att|
+        @copy_to.send(att).should == @copy_from.send(att)
+      end
       @copy_to.tab_configuration.should == @copy_from.tab_configuration
+     end
+
+    it "should retain reference to account grading standard" do
+      gs = make_grading_standard(@copy_from.root_account)
+      @copy_from.grading_standard = gs
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.grading_standard.should == gs
     end
+
+    it "should create a warning if an account grading standard can't be found" do
+      gs = make_grading_standard(@copy_from.root_account)
+      @copy_from.grading_standard = gs
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
+
+      gs.delete
+
+      run_course_copy(["Couldn't find account grading standard for the course."])
+
+      @copy_to.grading_standard.should == nil
+    end
+
 
     it "should copy external tools" do
       tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
@@ -513,6 +594,46 @@ describe ContentMigration do
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
     end
 
+    it "should not copy deleted assignment attached to topic" do
+      topic = @copy_from.discussion_topics.build(:title => "topic")
+      assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
+      assignment.infer_due_at
+      assignment.saved_by = :discussion_topic
+      topic.assignment = assignment
+      topic.save!
+      assignment.workflow_state = 'deleted'
+      assignment.save!
+
+      topic.reload
+      topic.active?.should == true
+
+      run_course_copy
+
+      @copy_to.discussion_topics.find_by_migration_id(mig_id(topic)).should_not be_nil
+      @copy_to.assignments.find_by_migration_id(mig_id(assignment)).should be_nil
+    end
+
+    it "should not copy deleted assignment attached to quizzes" do
+      pending unless Qti.qti_enabled?
+      g = @copy_from.assignment_groups.create!(:name => "new group")
+      quiz = @copy_from.quizzes.create(:title => "asmnt", :quiz_type => "assignment", :assignment_group_id => g.id)
+      quiz.workflow_state = 'available'
+      quiz.save!
+
+      asmnt = quiz.assignment
+
+      quiz.quiz_type = 'practice_quiz'
+      quiz.save!
+
+      asmnt.workflow_state = 'deleted'
+      asmnt.save!
+
+      run_course_copy
+
+      @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).should_not be_nil
+      @copy_to.assignments.find_by_migration_id(mig_id(asmnt)).should be_nil
+    end
+
     def create_rubric_asmnt
       @rubric = @copy_from.rubrics.new
       @rubric.title = "Rubric"
@@ -600,7 +721,7 @@ describe ContentMigration do
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.gsub("/courses/#{@copy_from.id}/file_contents/course%20files",'')
     end
 
-    it "should included implied files for course exports" do
+    it "should include implied files for course exports" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att3 = Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('3333'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
@@ -773,6 +894,40 @@ describe ContentMigration do
       new_mod.end_at.to_i.should == (new_start + 3.day).to_i
     end
 
+    it "should copy all quiz attributes" do
+      pending unless Qti.qti_enabled?
+      q = @copy_from.quizzes.create!(
+              :title => 'quiz',
+              :description => "<p>description eh</p>",
+              :shuffle_answers => true,
+              :show_correct_answers => 'true',
+              :time_limit => 20,
+              :allowed_attempts => 4,
+              :scoring_policy => 'keep_highest',
+              :quiz_type => 'survey',
+              :access_code => 'code',
+              :anonymous_submissions => true,
+              :hide_results => 'until_after_last_attempt',
+              :ip_filter => '192.168.1.1',
+              :require_lockdown_browser => true,
+              :require_lockdown_browser_for_results => true,
+              :notify_of_update => true
+      )
+
+      run_course_copy
+
+      new_quiz = @copy_to.quizzes.first
+
+      [:title, :description, :points_possible, :shuffle_answers,
+       :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
+       :access_code, :anonymous_submissions,
+       :hide_results, :ip_filter, :require_lockdown_browser,
+       :require_lockdown_browser_for_results].each do |prop|
+        new_quiz.send(prop).should == q.send(prop)
+      end
+
+    end
+
     it "should copy time correctly across daylight savings shift MST to MDT" do
       Time.use_zone('America/Denver') do
         asmnt = @copy_from.assignments.new
@@ -825,6 +980,26 @@ describe ContentMigration do
         asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
         asmnt_2.due_at.to_i.should == Time.zone.at(1357326000).to_i # Fri, 04 Jan 2013 12:00:00 MST -07:00
       end
+    end
+
+    it "should correctly copy all day dates for assignments and events" do
+      date = "Jun 21 2012 11:59pm"
+      date2 = "Jun 21 2012 00:00am"
+      asmnt = @copy_from.assignments.create!(:title => 'all day', :due_at => date)
+      asmnt.all_day.should be_true
+      cal = @copy_from.calendar_events.create(:title => "haha", :description => "oi", :start_at => date2, :end_at => date2)
+
+      run_course_copy
+
+      asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
+      asmnt_2.all_day.should be_true
+      asmnt_2.due_at.strftime("%H:%M").should == "23:59"
+      asmnt_2.all_day_date.should == Date.parse("Jun 21 2012")
+
+      cal_2 = @copy_to.calendar_events.find_by_migration_id(mig_id(cal))
+      cal_2.all_day.should be_true
+      cal_2.all_day_date.should == Date.parse("Jun 21 2012")
+      cal_2.start_at.strftime("%H:%M").should == "00:00"
     end
 
     it "should leave file references in AQ context as-is on copy" do
@@ -910,7 +1085,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
                           :question_text => "<strong>html for fun</strong>",
                           :answers =>
                                   [{:migration_id => "QUE_1016_A1", :html => "<strong>html answer 1</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 100, :id => 8080},
-                                   {:migration_id => "QUE_1017_A2", :html => "<strong>html answer 2</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
+                                   {:migration_id => "QUE_1017_A2", :html => "<span style=\"color: #808000;\">html answer 2</span>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
       aq_from1 = @bank.assessment_questions.create!(:question_data => data)
       data2 = data.clone
       data2[:question_text] = "<i>matching yo</i>"

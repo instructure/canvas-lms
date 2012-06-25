@@ -35,6 +35,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :scribd_account
   has_one :sis_batch
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
+  has_many :thumbnails, :foreign_key => "parent_id"
 
   before_save :infer_display_name
   before_save :default_values
@@ -173,7 +174,7 @@ class Attachment < ActiveRecord::Base
     if in_the_right_state && transitioned_to_this_state &&
         self.content_type && self.content_type.match(/\A(video|audio)/)
       delay = Setting.get_cached('attachment_build_media_object_delay_seconds', 10.to_s).to_i
-      MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now }, self, false)
+      MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY }, self, false)
     end
   end
 
@@ -731,8 +732,17 @@ class Attachment < ActiveRecord::Base
     return nil if Attachment.skip_thumbnails
     if self.scribd_doc #handle if it is a scribd doc, get the thumbnail from scribd's api
       self.scribd_thumbnail(options)
-    elsif self.thumbnail #handle attachment_fu iamges that we have made a thubnail for on our s3
-      self.thumbnail.cached_s3_url
+    elsif self.thumbnail || (options && options[:size].present?)
+      if options && options[:size].present?
+        geometry = options[:size]
+        if self.class.dynamic_thumbnail_sizes.include?(geometry)
+          to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.find_by_thumbnail(geometry)
+          to_use ||= create_dynamic_thumbnail(geometry)
+        end
+      end
+      to_use ||= self.thumbnail
+
+      to_use.cached_s3_url
     elsif self.media_object && self.media_object.media_id
       Kaltura::ClientV3.new.thumbnail_url(self.media_object.media_id,
                                           :width => options[:width] || 140,
@@ -1369,5 +1379,19 @@ class Attachment < ActiveRecord::Base
       addition += 1
     end
     new_name
+  end
+
+  DYNAMIC_THUMBNAIL_SIZES = %w(640x>)
+
+  # the list of allowed thumbnail sizes to be generated dynamically
+  def self.dynamic_thumbnail_sizes
+    DYNAMIC_THUMBNAIL_SIZES + Setting.get_cached("attachment_thumbnail_sizes", "").split(",")
+  end
+
+  def create_dynamic_thumbnail(geometry_string)
+    tmp = self.create_temp_file
+    Attachment.unique_constraint_retry do
+      self.create_or_update_thumbnail(tmp, geometry_string, geometry_string)
+    end
   end
 end

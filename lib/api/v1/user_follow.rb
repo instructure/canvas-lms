@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,5 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CourseAssignedGroup < Group
+module Api::V1::UserFollow
+  include Api::V1::Json
+
+  API_USER_FOLLOW_JSON_OPTS = {
+    :only => %w(following_user_id created_at),
+  }
+
+  def user_follow_json(user_follow, current_user, session)
+    hash = api_json(user_follow, current_user, session, API_USER_FOLLOW_JSON_OPTS)
+    hash["followed_#{user_follow.followed_item_type.underscore}_id"] = user_follow.followed_item_id
+    hash
+  end
 end

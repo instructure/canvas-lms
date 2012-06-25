@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes question banks" do
   it_should_behave_like "quizzes selenium tests"
@@ -31,7 +31,7 @@ describe "quizzes question banks" do
       find_questions_link.click
       driver.find_element(:css, ".select_all_link")
     }.click
-    find_with_jquery("div#find_question_dialog button.submit_button").click
+    submit_dialog("div#find_question_dialog")
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
 
@@ -52,7 +52,7 @@ describe "quizzes question banks" do
       driver.find_element(:css, ".select_all_link").should be_displayed
     }
     driver.find_element(:css, ".select_all_link").click
-    find_with_jquery("div#find_question_dialog button.submit_button").click
+    submit_dialog("div#find_question_dialog")
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
 
     driver.find_element(:css, ".add_question_group_link").click
@@ -60,8 +60,8 @@ describe "quizzes question banks" do
     keep_trying_until {
       find_with_jquery("#find_bank_dialog .bank:visible")
     }.click
-    driver.find_element(:css, "#find_bank_dialog .submit_button").click
-    driver.find_element(:css, ".quiz_group_form").submit
+    submit_dialog("#find_bank_dialog")
+    submit_form(".quiz_group_form")
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
 
@@ -83,7 +83,7 @@ describe "quizzes question banks" do
       driver.find_element(:css, ".select_all_link").should be_displayed
     }
     driver.find_element(:css, ".select_all_link").click
-    find_with_jquery("div#find_question_dialog button.submit_button").click
+    submit_dialog("div#find_question_dialog")
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
 
     driver.find_element(:css, ".add_question_group_link").click
@@ -91,8 +91,8 @@ describe "quizzes question banks" do
     keep_trying_until {
       find_with_jquery("#find_bank_dialog .bank:visible")
     }.click
-    driver.find_element(:css, "#find_bank_dialog .submit_button").click
-    driver.find_element(:css, ".quiz_group_form").submit
+    submit_dialog("#find_bank_dialog")
+    submit_form(".quiz_group_form")
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
 
@@ -138,7 +138,7 @@ describe "quizzes question banks" do
     group_form = driver.find_element(:css, '#group_top_new .quiz_group_form')
     group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
     replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
-    group_form.submit
+    submit_form(group_form)
     driver.find_element(:css, '#questions .group_top .group_display.name').should include_text('new group')
   end
 end

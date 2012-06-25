@@ -24,7 +24,7 @@ class AnnouncementsController < ApplicationController
     add_crumb(t(:announcements_crumb, "Announcements"))
     if authorized_action(@context, @current_user, :read)
       return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
-      @announcements = @context.active_announcements.paginate(:page => params[:page]).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+      @announcements = @context.active_announcements.paginate(:page => params[:page], :order => 'posted_at DESC').reject{|a| a.locked_for?(@current_user, :check_policies => true) }
       log_asset_access("announcements:#{@context.asset_string}", "announcements", "other")
       respond_to do |format|
         format.html { render }
@@ -40,7 +40,7 @@ class AnnouncementsController < ApplicationController
   
   def public_feed
     return unless get_feed_context
-    announcements = @context.announcements.active.find(:all, :order => 'created_at DESC', :limit => 15).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    announcements = @context.announcements.active.find(:all, :order => 'posted_at DESC', :limit => 15).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
     respond_to do |format|
       format.atom { 
         feed = Atom::Feed.new do |f|

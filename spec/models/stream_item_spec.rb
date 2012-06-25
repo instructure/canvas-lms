@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe StreamItem do
   it "should not infer a user_id for DiscussionTopic" do
@@ -34,11 +35,30 @@ describe StreamItem do
     notification_model(:name => 'Assignment Created')
     course_with_student(:active_all => true)
     assignment_model(:course => @course)
-    item = @user.stream_items.first
+    item = @user.stream_item_instances.first.stream_item
     item.data.notification_name.should == 'Assignment Created'
     item.context_code.should == @course.asset_string
 
     course_items = @user.recent_stream_items(:contexts => [@course])
     course_items.should == [item]
+  end
+
+  context "across shards" do
+    it_should_behave_like "sharding"
+
+    it "should create stream items on the user's shard" do
+      group_with_user
+      @user1 = @user
+      @user2 = @shard1.activate { user_model }
+      @coll = @group.collections.create!
+
+      UserFollow.create_follow(@user1, @coll)
+      UserFollow.create_follow(@user2, @coll)
+
+      @item = collection_item_model(:collection => @coll, :user => @user1)
+      @shard1.activate do
+        @user2.reload.visible_stream_item_instances.map { |i| i.stream_item.data.type }.should == ['CollectionItem']
+      end
+    end
   end
 end

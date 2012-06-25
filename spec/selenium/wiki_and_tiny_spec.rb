@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/wiki_and_tiny_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor" do
   it_should_behave_like "wiki and tiny selenium tests"
@@ -58,7 +58,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:id, 'tinymce').should_not include_text('<p>')
     end
 
-    driver.find_element(:id, 'wiki_page_submit').click
+    submit_form('#new_wiki_page')
     wait_for_ajax_requests
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
@@ -83,7 +83,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:id, 'tinymce').should include_text(quiz.title)
     end
 
-    driver.find_element(:id, 'wiki_page_submit').click
+    submit_form('#new_wiki_page')
     wait_for_ajax_requests
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
@@ -108,7 +108,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       driver.find_element(:id, 'tinymce').should include_text(assignment_name)
     end
 
-    driver.find_element(:id, 'wiki_page_submit').click
+    submit_form('#new_wiki_page')
     wait_for_ajax_requests
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
@@ -129,12 +129,12 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     basic_tab = driver.find_element(:css, '.mathquill-tab-bar > li:first-child a')
     driver.action.move_to(basic_tab).perform
     driver.find_element(:css, '#Basic_tab li:nth-child(27) a').click
-    driver.find_element(:id, 'instructure_equation_prompt_form').submit
+    submit_form('#instructure_equation_prompt_form')
     in_frame "wiki_page_body_ifr" do
       driver.find_element(:css, '#tinymce img').should be_displayed
     end
 
-    driver.find_element(:id, 'wiki_page_submit').click
+    submit_form('#new_wiki_page')
     wait_for_ajax_requests
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
@@ -178,7 +178,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     textarea.send_keys :arrow_right
     textarea.send_keys :arrow_right
     textarea.send_keys "\\text that. is. so. cool."
-    driver.find_element(:id, 'instructure_equation_prompt_form').submit
+    submit_form('#instructure_equation_prompt_form')
     wait_for_ajax_requests
     in_frame "wiki_page_body_ifr" do
       keep_trying_until { f('.equation_image').attribute('title').should == equation_text }
@@ -240,7 +240,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         end
         [:width, :color].each do |part|
           [:top, :right, :bottom, :left].each do |side|
-            expected_value = attributes[{:width => :border, :color => :bordercolor}[part]] || {:width => 1, :color => 'rgb(136, 136, 136)'}[part]
+            expected_value = attributes[{:width => :border, :color => :bordercolor}[part]] || {:width => 1, :color => 'rgba(136,136,136,1)'}[part]
             if expected_value.is_a?(Numeric)
               expected_value = 1 if expected_value == 0
               expected_value = "#{expected_value}px"
@@ -250,7 +250,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         end
       end
       # TODO: test how it looks after page is saved.
-      # driver.find_element(:id, :wiki_page_submit).click
+      #submit_form('#new_wiki_page')
 
     end
 
@@ -262,7 +262,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         :cellpadding => 5,
         :cellspacing => 6,
         :border => 7,
-        :bordercolor => 'rgb(255, 0, 0)'
+        :bordercolor => 'rgba(255,0,0,1)'
     )
     check_table(
         :align => 'center',
@@ -288,7 +288,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     def save_wiki
-      driver.find_element(:id, 'wiki_page_submit').click
+      submit_form('#new_wiki_page')
       wait_for_ajax_requests
       get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
       wait_for_ajax_requests

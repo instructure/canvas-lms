@@ -442,6 +442,9 @@ class ActiveRecord::Base
     transaction(:requires_new => true) { uncached { yield } }
   end
 
+  # returns batch_size ids at a time, working through the primary key from
+  # smallest to largest.
+  #
   # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_batches(options = {})
     batch_size = options[:batch_size] || 1000
@@ -456,6 +459,9 @@ class ActiveRecord::Base
     end
   end
 
+  # returns 2 ids at a time (the min and the max of a range), working through
+  # the primary key from smallest to largest.
+  #
   # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_ranges(options = {})
     batch_size = options[:batch_size] || 1000
@@ -543,6 +549,31 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       execute("ALTER TABLE #{quote_table_name(from_table)} VALIDATE CONSTRAINT #{quote_column_name(foreign_key_name)}") if options[:delay_validation]
     end
     alias_method_chain :add_foreign_key, :delayed_validation
+
+    # have to replace the entire method to support concurrent
+    def add_index(table_name, column_name, options = {})
+      column_names = Array(column_name)
+      index_name   = index_name(table_name, :column => column_names)
+
+      if Hash === options # legacy support, since this param was a string
+        index_type = options[:unique] ? "UNIQUE" : ""
+        index_name = options[:name].to_s if options[:name]
+      else
+        index_type = options
+      end
+
+      if index_name.length > index_name_length
+        @logger.warn("Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters. Skipping.")
+        return
+      end
+      if index_exists?(table_name, index_name, false)
+        @logger.warn("Index name '#{index_name}' on table '#{table_name}' already exists. Skipping.")
+        return
+      end
+      quoted_column_names = quoted_columns_for_index(column_names, options).join(", ")
+
+      execute "CREATE #{index_type} INDEX #{"CONCURRENTLY " if options[:concurrently]}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})"
+    end
   end
 end
 

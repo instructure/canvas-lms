@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/calendar2_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "calendar2" do
   it_should_behave_like "calendar2 selenium tests"
@@ -42,7 +42,7 @@ describe "calendar2" do
     title = edit_assignment_form.find_element(:id, 'assignment_title')
     replace_content(title, assignment_title)
     add_date(middle_number) if should_add_date
-    edit_assignment_form.submit
+    submit_form(edit_assignment_form)
     wait_for_ajax_requests
     #find_with_jquery(".fc-day-number:contains(#{middle_number})").click
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(assignment_title) }
@@ -56,7 +56,7 @@ describe "calendar2" do
     title = edit_event_form.find_element(:id, 'calendar_event_title')
     replace_content(title, event_title)
     add_date(middle_number) if should_add_date
-    edit_event_form.submit
+    submit_form(edit_event_form)
     wait_for_ajax_requests
     #find_with_jquery(".fc-day-number:contains(#{middle_number})").click
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(event_title) }
@@ -285,7 +285,7 @@ describe "calendar2" do
         select = Selenium::WebDriver::Support::Select.new(select)
         select.first_selected_option.attribute(:value).to_i.should == group2.id
         driver.find_element(:css, 'div.ui-dialog #assignment_title').tap { |tf| tf.clear; tf.send_keys("Assignment 2!") }
-        driver.find_element(:css, 'div.ui-dialog button[type=submit]').click
+        submit_form('#edit_assignment_form')
         wait_for_ajax_requests
         assignment2.reload.title.should == "Assignment 2!"
         assignment2.assignment_group.should == group2

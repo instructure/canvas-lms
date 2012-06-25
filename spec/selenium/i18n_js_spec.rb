@@ -62,7 +62,7 @@ describe "i18n js" do
   context "strftime" do
     it "should format just like ruby" do
       # everything except %N %6N %9N %U %V %W %Z
-      format = "%a %A %b %B %d %D %e %F %h %H %I %j %k %l %L %m %M %n %3N %p %P %r %R %s %S %t %T %u %v %w %y %Y %z %%"
+      format = "%a %A %b %B %d %-d %D %e %F %h %H %I %j %k %l %L %m %M %n %3N %p %P %r %R %s %S %t %T %u %v %w %y %Y %z %%"
       date = Time.now
       driver.execute_script(<<-JS).should == date.strftime(format)
         var date = new Date(#{date.strftime('%s')} * 1000 + #{date.strftime('%L').gsub(/^0+/, '')});

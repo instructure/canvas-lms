@@ -19,42 +19,11 @@ describe "submissions" do
     assignment
   end
 
-  def close_dialog
-    keep_trying_until { driver.find_element(:css, '.ui-dialog-titlebar-close').click; true }
-  end
-
-  it "should not break when you open and close the media comment dialog" do
-    stub_kaltura
-    course_with_student_logged_in
-    create_assignment_and_go_to_page 'media_recording'
-
-    driver.find_element(:css, ".submit_assignment_link").click
-    open_button = driver.find_element(:css, ".record_media_comment_link")
-
-    # open it twice
-    open_button.click
-    # swf and other stuff load, give it half a second before it starts trying to click
-    sleep 0.5
-    close_dialog
-    open_button.click
-    sleep 0.5
-    close_dialog
-
-    # fire the callback that the flash object fires
-    driver.execute_script "window.mediaCommentCallback([{entryId:1, entryType:1}]);"
-
-    # see if the confirmation element shows up
-    driver.find_element(:id, 'media_media_recording_ready').should be_displayed
-
-    # submit the assignment so the "are you sure?!" message doesn't freeze up selenium
-    driver.find_element(:css, '#submit_media_recording_form button[type=submit]').click
-  end
-
   def open_media_comment_dialog
-    driver.find_element(:css, '.media_comment_link').click
-    # swf and stuff loads, give it a sec to do its thing
-    sleep 0.5
-  end
+      f('.media_comment_link').click
+      # swf and stuff loads, give it a sec to do its thing
+      sleep 0.5
+    end
 
   def submit_media_comment_1
     open_media_comment_dialog
@@ -75,12 +44,49 @@ describe "submissions" do
     wait_for_ajax_requests
   end
 
+  it "should display the grade in grade field" do
+    course_with_teacher_logged_in
+    student_in_course
+    assignment = create_assignment
+    assignment.submissions.create(:user => @student)
+    assignment.grade_student @student, :grade => 2
+    get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+    f('.grading_value')[:value].should == '2'
+  end
+
+  it "should not break when you open and close the media comment dialog" do
+    stub_kaltura
+    course_with_student_logged_in
+    create_assignment_and_go_to_page 'media_recording'
+
+    driver.find_element(:css, ".submit_assignment_link").click
+    open_button = driver.find_element(:css, ".record_media_comment_link")
+
+    # open it twice
+    open_button.click
+    # swf and other stuff load, give it half a second before it starts trying to click
+    sleep 0.5
+    close_visible_dialog
+    open_button.click
+    sleep 0.5
+    close_visible_dialog
+
+    # fire the callback that the flash object fires
+    driver.execute_script "window.mediaCommentCallback([{entryId:1, entryType:1}]);"
+
+    # see if the confirmation element shows up
+    f('#media_media_recording_ready').should be_displayed
+
+    # submit the assignment so the "are you sure?!" message doesn't freeze up selenium
+    submit_form('#submit_media_recording_form')
+  end
+
   it "should allow media comments" do
     stub_kaltura
     course_with_teacher_logged_in
     student_in_course
     assignment = create_assignment
-    assignment.submissions.create :user => @student
+    assignment.submissions.create(:user => @student)
     get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
 
     # make sure the JS didn't burn any bridges, and submit two
@@ -91,6 +97,5 @@ describe "submissions" do
     number_of_comments = driver.execute_script "return $('.comment_list').children().length"
     number_of_comments.should == 2
   end
-
 end
 

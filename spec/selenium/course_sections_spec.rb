@@ -58,7 +58,7 @@ describe "course sections" do
     driver.find_element(:css, '.edit_section_link').click
     edit_form = driver.find_element(:id, 'edit_section_form')
     replace_content(edit_form.find_element(:id, 'course_section_name'), edit_name)
-    edit_form.find_element(:css, 'button[type=submit]').click
+    submit_form(edit_form)
     wait_for_ajaximations
     driver.find_element(:id, 'section_name').should include_text(edit_name)
   end

@@ -71,6 +71,19 @@ class Conversation < ActiveRecord::Base
     end
   end
 
+  #
+  # ==== Arguments
+  # * <tt>asset</tt> - The asset with conversation_messages to update.
+  # * <tt>options</tt> - Options for special behavior.
+  #
+  # ==== Options
+  # * <tt>:delete_all</tt> - Boolean option. If +true+, all of the asset's conversation messages are destroyed.
+  # * <tt>:only_existing</tt> - Boolean option. If +true+, only existing ones are updated. No new ones are created.
+  # Additional options are passed on further but not directly used here.
+  # * <tt>:update_participants</tt> - Boolean option.
+  # * <tt>:skip_ids</tt> - Array of IDs to skip.
+  # * <tt>:recalculate_count</tt> - Boolean
+  # * <tt>:recalculate_last_authored_at</tt> - Boolean
   def self.update_all_for_asset(asset, options)
     transaction do
       asset.lock!
@@ -98,6 +111,13 @@ class Conversation < ActiveRecord::Base
     end
   end
 
+  #
+  # ==== Arguments
+  # * <tt>asset</tt> - The asset with conversation_messages to update.
+  # * <tt>options</tt> - Options for special behavior.
+  #
+  # ==== Options
+  # * <tt>:update_participants</tt> - Boolean option.
   def update_for_asset(asset, options)
     message = asset.conversation_messages.detect { |m| m.conversation_id == id }
     if message
@@ -166,6 +186,27 @@ class Conversation < ActiveRecord::Base
     add_message(current_user, event_data.to_yaml, options.merge(:generated => true))
   end
 
+  # Add message to this conversation.
+  #
+  # ==== Arguments
+  # * <tt>current_user</tt> - The user who is creating the message.
+  # * <tt>body</tt> - Message body to add.
+  #
+  # ==== Options
+  # * <tt>:generated</tt> - Boolean. If the message was generated.
+  # * <tt>:update_for_sender</tt> - Boolean
+  # * <tt>:only_existing</tt> - Boolean
+  # * <tt>:update_participants</tt> - Boolean. Defaults to true unless message was :generated. Will update all
+  #                                   participants with the new message.
+  # * <tt>:update_for_skips</tt> - Boolean. Defaults to true (or :update_for_sender).
+  # * <tt>:skip_ids</tt> - Array of IDs. Defaults to the current_user only.
+  # * <tt>:tags</tt> - Array of tags for the message.
+  # * <tt>:root_account_id</tt> - The root account ID to link to the conversation. When set, the message context
+  #                               is the Account.
+  # * <tt>:asset</tt> - The asset to attach to the message
+  # * <tt>:attachment_ids</tt> - The attachment_ids to link to the new message. Defaults to nil.
+  # * <tt>:media_comment</tt> - The media_comment for the message. Defaults to nil.
+  # * <tt>:forwarded_message_ids</tt> - Array of message IDs to forward. Only if forwardable and limited to 1.
   def add_message(current_user, body, options = {})
     transaction do
       lock!
@@ -215,6 +256,18 @@ class Conversation < ActiveRecord::Base
     end
   end
 
+  # Add the message to the conversation for all the participants.
+  #
+  # ==== Arguments
+  # * <tt>message</tt> - Message to add to conversation for participants.
+  # * <tt>options</tt> - Additional options.
+  #
+  # ==== Options
+  # * <tt>:only_existing</tt> - Boolean value. If +true+, include only currently visible conversation participants.
+  #                             When +false+, all participants are included.
+  # * <tt>:new_message</tt> - Boolean value. When +false+, excludes already involved participants from receiving
+  #                           the message. Otherwise, the participants receive it.
+  # * <tt>:tags</tt> - Array of tags for the message data.
   def add_message_to_participants(message, options = {})
     cps = options[:only_existing] ?
       conversation_participants.visible :

@@ -44,7 +44,7 @@ describe "external migrations" do
 
     click_option('#choose_migration_system', 'Common Cartridge 1.0/1.1/1.2 Package')
     driver.find_element(:css, '#config_options').find_element(:name, 'export_file').send_keys(fullpath)
-    driver.find_element(:css, '#config_options').find_element(:css, '.submit_button').click
+    submit_form('#config_options')
     keep_trying_until { driver.find_element(:css, '#file_uploaded').displayed? }
 
     ContentMigration.for_context(@course).count.should == 1
@@ -60,10 +60,10 @@ describe "external migrations" do
     wait_for_ajaximations
     keep_trying_until { find_with_jquery("#copy_everything").should be_displayed }
 
-    yield driver
+    yield driver if block_given?
 
     expect_new_page_load {
-      driver.find_element(:id, 'copy_context_form').submit
+      submit_form('#copy_context_form')
       wait_for_ajaximations
 
       # since jobs aren't running
@@ -118,6 +118,15 @@ describe "external migrations" do
     @course.wiki.wiki_pages.count.should == 0
     @course.folders.count.should == 1
     @course.context_external_tools.count.should == 2
+  end
+
+  it "should import canvas cartridge without discussion metadata or quiz folder" do
+    run_import("canvas_cc_minimum.zip")
+
+    @course.discussion_topics.count.should == 1
+    dt = @course.discussion_topics.first
+    dt.title.should == "A topic"
+    dt.message.should == "<p>description</p>"
   end
 
 

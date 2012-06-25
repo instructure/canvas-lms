@@ -16,7 +16,7 @@ describe "web conference" do
 
     driver.find_element(:id, 'web_conference_title').clear
     driver.find_element(:id, 'web_conference_title').send_keys(conference_title)
-    driver.find_element(:id, 'add_conference_form').submit
+    submit_form('#add_conference_form')
     wait_for_ajaximations
     driver.find_element(:link, conference_title).click
     driver.find_element(:id, 'content').text.include?(conference_title).should be_true

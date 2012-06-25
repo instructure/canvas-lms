@@ -23,13 +23,14 @@ class CollectionItemData < ActiveRecord::Base
   belongs_to :image_attachment, :class_name => "Attachment"
   has_many :collection_item_upvotes
 
-  VALID_ITEM_TYPES = %w(url)
+  VALID_ITEM_TYPES = %w(url image audio video)
+  THUMBNAIL_SIZE = "640x>"
 
   validates_inclusion_of :item_type, :in => VALID_ITEM_TYPES
   validates_as_url :link_url
   validates_presence_of :link_url
 
-  attr_accessible :root_item, :item_type, :link_url
+  attr_accessible :root_item, :item_type, :link_url, :image_url, :description, :title
 
   before_create :prepare_to_snapshot_link_url
   after_create :snapshot_link_url
@@ -39,11 +40,31 @@ class CollectionItemData < ActiveRecord::Base
   end
 
   def snapshot_link_url
-    attachment = CutyCapt.snapshot_attachment_for_url(image_url.presence || link_url)
-    if attachment
+    embedly_data = Canvas::Embedly.new(link_url)
+
+    self.html_preview = embedly_data.object_html
+    self.title = embedly_data.title if self.title.blank?
+    self.description = embedly_data.description if self.description.blank?
+
+    if self.item_type == "url" && VALID_ITEM_TYPES.include?(embedly_data.data_type)
+      self.item_type = embedly_data.data_type
+    end
+
+    if image_url.present?
+      attachment = Canvas::HTTP.clone_url_as_attachment(image_url)
+    elsif embedly_data.images.first
+      attachment = Canvas::HTTP.clone_url_as_attachment(embedly_data.images.first.url)
+    else
+      attachment = CutyCapt.snapshot_attachment_for_url(link_url)
+    end
+
+    if attachment && attachment.image?
       attachment.context = Account.default # these images belong to nobody
       attachment.save!
       self.image_attachment = attachment
+
+      # we know we want this thumbnail size, so generate it now
+      attachment.create_dynamic_thumbnail(THUMBNAIL_SIZE)
     end
 
     self.image_pending = false
@@ -57,9 +78,9 @@ class CollectionItemData < ActiveRecord::Base
   def self.data_for_url(url, creating_user)
     # TODO: handle other canvas hostnames
     # TODO: restrict this to be more precise on what urls it will accept as a clone
-    if url.match(%r{https?://#{Regexp.escape HostUrl.default_host}/api/v1/collections/(\d+)/items/(\d+)$})
-      collection = Collection.active.find($1)
-      original_item = collection.collection_items.active.find($2)
+    if url.match(%r{https?://#{Regexp.escape HostUrl.default_host}/api/v1/collections/items/(\d+)$})
+      original_item = CollectionItem.active.find($1)
+      collection = original_item.active_collection
       if collection.grants_right?(@current_user, :read)
         return original_item.collection_item_data
       else
@@ -73,10 +94,10 @@ class CollectionItemData < ActiveRecord::Base
   attr_accessor :upvoted_by_user
   # sets the upvoted_by_user attribute on each item passed in
   def self.load_upvoted_by_user(datas, user)
-    Shard.partition_by_shard(datas) do |datas_subset|
-      data_ids = datas_subset.map(&:id)
+    user.shard.activate do
+      data_ids = datas.map(&:id)
       upvoted_ids = Set.new(connection.select_values(sanitize_sql_for_conditions(["SELECT collection_item_data_id FROM collection_item_upvotes WHERE collection_item_data_id IN (?) AND user_id = ?", data_ids, user.id])))
-      datas_subset.each { |item| item.upvoted_by_user = upvoted_ids.include?(item.id.to_s) }
+      datas.each { |item| item.upvoted_by_user = upvoted_ids.include?(item.id.to_s) }
     end
   end
 end

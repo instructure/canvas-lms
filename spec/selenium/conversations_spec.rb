@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/conversations_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations" do
   it_should_behave_like "in-process server selenium tests"
@@ -14,9 +14,24 @@ describe "conversations" do
 
     expect {
       f('#body').send_keys(new_message)
-      5.times { f('#create_message_form button[type=submit]').click }
+      5.times { submit_form('#create_message_form') }
       keep_trying_until{ get_conversations.size == 1 }
     }.to change(ConversationMessage, :count).by(1)
+  end
+
+  it "should auto-mark as read" do
+    @me = @user
+    5.times { conversation(@me, user, :workflow_state => 'unread') }
+    get "/conversations/unread"
+    c = get_conversations.first
+    c.click
+    c[:class].should =~ /unread/ # not marked immediately
+    @me.conversations.unread.size.should eql 5
+    keep_trying_until { get_conversations.first[:class] !~ /unread/ }
+    @me.conversations.unread.size.should eql 4
+
+    get_conversations.last.click
+    get_conversations.size.should eql 4 # removed once deselected
   end
 
   context "conversation loading" do
@@ -35,8 +50,9 @@ describe "conversations" do
     it "should properly clear the identity header when conversations are read" do
       enable_cache do
         @me = @user
-        5.times { conversation(@me, user).update_attribute(:workflow_state, 'unread') }
+        5.times { conversation(@me, user, :workflow_state => 'unread') }
         get_messages # loads the page, clicks the first conversation
+        keep_trying_until { get_conversations.first[:class] !~ /unread/ }
         get '/conversations'
         driver.find_element(:css, '.unread-messages-count').text.should eql '4'
       end
@@ -85,7 +101,7 @@ describe "conversations" do
     it "should link to the course page" do
       get_messages
 
-      find_with_jquery("#create_message_form .audience a").click
+      expect_new_page_load { fj("#create_message_form .audience a").click }
       driver.current_url.should match %r{/courses/#{@course.id}}
     end
 
@@ -140,7 +156,7 @@ describe "conversations" do
       add_recipient("student1")
       add_recipient("student2")
       driver.find_element(:id, "body").send_keys "testing testing"
-      driver.find_element(:css, '#create_message_form button[type="submit"]').click
+      submit_form('#create_message_form')
 
       wait_for_ajaximations
 

@@ -370,4 +370,28 @@ class Pseudonym < ActiveRecord::Base
   named_scope :trusted_by_including_self, lambda { |account| {} }
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
+
+  def self.find_all_by_arbitrary_credentials(credentials, account_ids)
+    return [] if credentials[:unique_id].blank? ||
+                 credentials[:password].blank?
+    Shard.partition_by_shard(account_ids) do |account_ids|
+      active.
+        by_unique_id(credentials[:unique_id]).
+        where(:account_id => account_ids).
+        all(:include => :user).
+        select { |p|
+          p.valid_arbitrary_credentials?(credentials[:password])
+        }
+    end
+  end
+
+  def self.authenticate(credentials, account_ids)
+    pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids)
+    site_admin = pseudonyms.find { |p| p.account_id == Account.site_admin.id }
+    # only log them in if these credentials match a single user OR if it matched site admin
+    if pseudonyms.map(&:user).uniq.length == 1 || site_admin
+      # prefer a pseudonym from Site Admin if possible, otherwise just choose one
+      site_admin || pseudonyms.first
+    end
+  end
 end

@@ -18,20 +18,21 @@
 #
 
 class UserList
+  # list_in is either a comma/semi-colon/newline separated string or an array of paths
   # open_registration is true, false, or nil. if nil, it defaults to root_account.open_registration?
   # search_method configures how e-mails are handled
   #   :open e-mails that don't match a pseudonym always create temporary users
   #   :closed e-mails must belong to a user
   #   :preferred if the e-mail belongs to a single user, that user is used. otherwise a temporary user is created
   #   :infer :open or :closed according to root_account.open_registration
-  def initialize(string, root_account = nil, search_method = :infer)
+  def initialize(list_in, root_account = nil, search_method = :infer)
     @addresses = []
     @errors = []
     @duplicate_addresses = []
     @root_account = root_account || Account.default
     @search_method = search_method
     @search_method = (@root_account.open_registration? ? :open : :closed) if search_method == :infer
-    parse_list(string)
+    parse_list(list_in)
     resolve
   end
   
@@ -93,23 +94,28 @@ class UserList
     end
   end
 
-  def parse_list(str)
-    str = str.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").gsub(/;/, ",") + ","
-    chars = str.split("")
-    user_start = 0
-    in_quotes = false
-    chars.each_with_index do |char, i|
-      if not in_quotes
-        case char
-        when ','
-          user_line = str[user_start, i - user_start].strip
-          parse_single_user(user_line) unless user_line.blank?
-          user_start = i + 1
-        when '"'
-          in_quotes = true if quote_ends(chars, i)
+  def parse_list(list_in)
+    if list_in.is_a?(Array)
+      list = list_in.map(&:strip)
+      list.each{ |path| parse_single_user(path) }
+    else
+      str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").gsub(/;/, ",") + ","
+      chars = str.split("")
+      user_start = 0
+      in_quotes = false
+      chars.each_with_index do |char, i|
+        if not in_quotes
+          case char
+          when ','
+            user_line = str[user_start, i - user_start].strip
+            parse_single_user(user_line) unless user_line.blank?
+            user_start = i + 1
+          when '"'
+            in_quotes = true if quote_ends(chars, i)
+          end
+        else
+          in_quotes = false if char == '"'
         end
-      else
-        in_quotes = false if char == '"'
       end
     end
   end

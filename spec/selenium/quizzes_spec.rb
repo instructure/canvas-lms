@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes" do
   it_should_behave_like "quizzes selenium tests"
@@ -45,7 +45,7 @@ describe "quizzes" do
 
       #add a question
       driver.find_element(:css, '.add_question_link').click
-      find_with_jquery('.question_form:visible').submit
+      submit_form('.question_form')
       wait_for_ajax_requests
 
       #save the quiz
@@ -158,7 +158,7 @@ describe "quizzes" do
       group_form = driver.find_element(:css, '#questions .quiz_group_form')
       group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
-      group_form.submit
+      submit_form(group_form)
       group_form.find_element(:css, '.group_display.name').should include_text('new group')
 
     end
@@ -172,7 +172,7 @@ describe "quizzes" do
       group_form = driver.find_element(:css, '#questions .quiz_group_form')
       group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
-      group_form.submit
+      submit_form(group_form)
       group_form.find_element(:css, '.group_display.name').should include_text('new group')
       keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "3" }
 
@@ -180,7 +180,7 @@ describe "quizzes" do
 
       group_form.find_element(:name, 'quiz_group[name]').send_keys('renamed')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
-      group_form.submit
+      submit_form(group_form)
       group_form.find_element(:css, '.group_display.name').should include_text('renamed')
       keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "2" }
     end
@@ -230,7 +230,7 @@ describe "quizzes" do
 
       driver.find_element(:css, '.moderate_student_link').click
       driver.find_element(:id, 'extension_extra_attempts').send_keys('2')
-      driver.find_element(:id, 'moderate_student_form').submit
+      submit_form('#moderate_student_form')
       wait_for_ajax_requests
       driver.find_element(:css, '.attempts_left').text.should == '3'
 
@@ -254,14 +254,14 @@ describe "quizzes" do
 
       #click second answer
       driver.find_element(:css, "#question_#{@quest2.id} .answers .answer:first-child input").click
-      driver.find_element(:id, 'submit_quiz_form').submit
+      submit_form('#submit_quiz_form')
 
       #dismiss dialog and submit quiz
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.dismiss
       driver.find_element(:css, "#question_#{@quest1.id} .answers .answer:last-child input").click
       expect_new_page_load {
-        driver.find_element(:id, 'submit_quiz_form').submit
+        submit_form('#submit_quiz_form')
       }
       driver.find_element(:id, 'quiz_title').text.should == @q.title
     end

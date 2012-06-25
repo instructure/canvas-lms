@@ -821,17 +821,32 @@ class Submission < ActiveRecord::Base
   # conversation between the submitter and each participating admin, and it
   # should have a single conversation_message that represents the submission
   # (there may of course be other regular messages in the conversation)
+  #
+  # ==== Arguments
+  # * <tt>trigger</tt> - Values of :create, :destroy, :migrate are supported.
+  # * <tt>overrides</tt> - Hash of overrides that can be passed through when
+  #                        updating the conversation.
+  #
+  # ==== Overrides
+  # * <tt>:skip_ids</tt> - Gets passed through to <tt>Conversation</tt>.<tt>update_all_for_asset</tt>.
   def create_or_update_conversations!(trigger, overrides={})
     options = {}
     case trigger
     when :create
       options[:update_participants] = true
-      options[:skip_ids] = overrides[:skip_ids]
+      options[:skip_ids] = overrides[:skip_ids] || []
       if commenting_instructors.empty?
         # until the first instructor comments, we don't want the submitter to see
         # the message (whether the submitter is the author, or someone in the group is)
         options[:update_for_skips] = false
         options[:skip_ids] = [user_id]
+      end
+      if overrides[:respect_submission_comment_pref]
+        # How to identify the teachers?
+        self.assignment.context.participating_instructors.each do |t|
+          # Check their settings and add to :skip_ids if set to suppress.
+          options[:skip_ids] << t.id if t.preferences[:no_submission_comments_inbox] == true
+        end
       end
     when :destroy
       options[:delete_all] = visible_submission_comments.empty?

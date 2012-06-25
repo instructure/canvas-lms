@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes questions" do
   it_should_behave_like "quizzes selenium tests"
@@ -40,7 +40,7 @@ describe "quizzes questions" do
     driver.find_element(:css, '#editor_tabs h4').should include_text("Insert Content into the Page")
     driver.find_element(:css, '#quiz_content_links .quiz_options_link').click
 
-    driver.find_element(:css, '.question_form').submit
+    submit_form(question)
     question = driver.find_element(:css, "#question_#{quest1.id}")
     question.find_element(:css, ".question_name").text.should == 'edited question'
     driver.find_element(:id, 'show_question_details').click
@@ -88,7 +88,7 @@ describe "quizzes questions" do
 
     question = find_with_jquery(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Text (no question)')
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     quiz.reload
@@ -103,7 +103,7 @@ describe "quizzes questions" do
 
     question = find_with_jquery(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Essay Question')
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     quiz.reload
@@ -121,7 +121,7 @@ describe "quizzes questions" do
     show_el.should_not be_displayed
 
     click_option('.question_form:visible .question_type', 'Multiple Choice')
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
     quiz.reload
 
@@ -140,7 +140,7 @@ describe "quizzes questions" do
     add_quiz_question('3')
     add_quiz_question('4')
 
-    driver.find_element(:id, 'quiz_options_form').submit
+    submit_form('#quiz_options_form')
     wait_for_ajax_requests
     quiz = Quiz.last
     quiz.reload
@@ -177,7 +177,7 @@ describe "quizzes questions" do
       $('input[name=answer_exact]').trigger('change');
     JS
     answers[0].find_element(:name, 'answer_error_margin').send_keys('0')
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     expect_new_page_load {
@@ -195,7 +195,7 @@ describe "quizzes questions" do
       $('input[type=text]').trigger('change');
     JS
     expect_new_page_load {
-      driver.find_element(:css, '.submit_button').click
+      submit_form('#submit_quiz_form')
     }
     driver.find_element(:css, '.score_value').text.strip.should == '1'
   end

@@ -6,7 +6,7 @@
   <%= t('subject', 'User signed up for "%{appointment_name}" (%{course})', :appointment_name => asset.title, :course => asset.appointment_group.contexts_for_user(user).map(&:name).join(", ")) %>
 <% end %>
 
-<%= t :message, '%{user} has signed up for "%{appointment_name}".', :user => asset.updating_user.name, :appointment_name => asset.title %>
+<%= t :message, '%{user} has signed up for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %>
 
 <%= before_label :details, "Appointment details" %>
 <%= before_label :date_and_time, "Date/time" %> <%= datetime_string(asset.start_at, asset.end_at) %>

@@ -19,19 +19,27 @@
 class CollectionItem < ActiveRecord::Base
   include Workflow
   include CustomValidations
+  include SendToStream
 
   belongs_to :collection
   belongs_to :collection_item_data
   alias :data :collection_item_data
   belongs_to :user
 
-  attr_accessible :collection, :collection_item_data, :description, :user
+  attr_accessible :collection, :collection_item_data, :user_comment, :user
 
   validates_presence_of :collection, :collection_item_data, :user
   validates_associated :collection_item_data
   validates_as_readonly :collection_item_data_id, :collection_id
 
   after_create :set_data_root_item
+
+  # raises RecordNotFound if the collection is marked deleted or doesn't exist
+  def active_collection
+    col = self.collection
+    raise ActiveRecord::RecordNotFound if !col || col.try(:deleted?)
+    col
+  end
 
   def set_data_root_item
     if self.collection_item_data && self.collection_item_data.root_item_id.nil?
@@ -47,38 +55,66 @@ class CollectionItem < ActiveRecord::Base
   named_scope :active, { :conditions => { :workflow_state => 'active' } }
   named_scope :newest_first, { :order => "id desc" }
 
+  def discussion_topic
+    DiscussionTopic.find_by_context_type_and_context_id(self.class.name, self.id) ||
+      DiscussionTopic.new(:context => self, :discussion_type => DiscussionTopic::DiscussionTypes::FLAT)
+  end
+
+  alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     save!
   end
 
-  trigger.after(:insert) do |t|
-    t.where("NEW.workflow_state = 'active'") do
-      <<-SQL
-      UPDATE collection_item_datas
-      SET post_count = post_count + 1
-      WHERE id = NEW.collection_item_data_id;
-      SQL
+  after_save :update_post_count
+  after_destroy :update_post_count
+
+  def update_post_count
+    increment = 0
+    if self.id_changed?
+      # was a new record
+      increment = 1 if self.active?
+    elsif self.destroyed?
+      increment = -1
+    elsif self.workflow_state_changed?
+      if self.active?
+        increment = 1
+      else
+        increment = -1
+      end
+    end
+
+    if increment != 0
+      data.shard.activate do
+        data.class.update_all(['post_count = post_count + ?', increment], :id => data.id)
+      end
     end
   end
 
-  trigger.after(:update) do |t|
-    t.where("NEW.workflow_state <> OLD.workflow_state") do
-      <<-SQL
-      UPDATE collection_item_datas
-      SET post_count = post_count + CASE WHEN (NEW.workflow_state = 'active') THEN 1 ELSE -1 END
-      WHERE id = NEW.collection_item_data_id;
-      SQL
-    end
+  set_policy do
+    given { |user, session| self.collection.grants_right?(user, session, :read) }
+    can :read
+
+    given { |user, session| self.collection.grants_right?(user, session, :comment) }
+    can :comment
+
+    given { |user, session| self.collection.grants_right?(user, session, :create) }
+    can :create
+
+    given { |user, session| self.collection.grants_right?(user, session, :delete) }
+    can :delete
+
+    given { |user, session| self.collection.grants_right?(user, session, :update) }
+    can :update
+
+    given { |user| self.user == user }
+    can :read and can :update and can :delete
+
+    given { |user| self.collection.context.respond_to?(:has_member?) && self.collection.context.has_member?(user) }
+    can :create
   end
 
-  trigger.after(:delete) do |t|
-    t.where("OLD.workflow_state = 'active'") do
-      <<-SQL
-      UPDATE collection_item_datas
-      SET post_count = post_count - 1
-      WHERE id = OLD.collection_item_data_id;
-      SQL
-    end
+  on_create_send_to_streams do
+    (self.collection.try(:followers) || []) - [self.user]
   end
 end

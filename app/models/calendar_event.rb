@@ -312,6 +312,7 @@ class CalendarEvent < ActiveRecord::Base
       just_created &&
       context == appointment_group.participant_for(user)
     }
+    data { {:updating_user => @updating_user} }
 
     dispatch :appointment_canceled_by_user
     to { appointment_group.instructors }
@@ -322,6 +323,10 @@ class CalendarEvent < ActiveRecord::Base
       @updating_user &&
       context == appointment_group.participant_for(@updating_user)
     }
+    data { {
+      :updating_user => @updating_user,
+      :cancel_reason => @cancel_reason
+    } }
 
     dispatch :appointment_reserved_for_user
     to { participants - [@updating_user] }
@@ -329,6 +334,7 @@ class CalendarEvent < ActiveRecord::Base
       appointment_group && parent_event &&
       just_created
     }
+    data { {:updating_user => @updating_user} }
 
     dispatch :appointment_deleted_for_user
     to { participants - [@updating_user] }
@@ -337,6 +343,10 @@ class CalendarEvent < ActiveRecord::Base
       deleted? &&
       workflow_state_changed?
     }
+    data { {
+      :updating_user => @updating_user,
+      :cancel_reason => @cancel_reason
+    } }
   end
 
   def participants

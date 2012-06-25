@@ -18,9 +18,10 @@
 
 module Api::V1::StreamItem
   include Api::V1::Context
+  include Api::V1::Collection
 
-  def stream_item_json(stream_item, viewing_user_id)
-    data = stream_item.stream_data(viewing_user_id)
+  def stream_item_json(stream_item, current_user, session)
+    data = stream_item.stream_data(current_user.id)
     {}.tap do |hash|
 
       # generic attributes common to all stream item types
@@ -97,9 +98,27 @@ module Api::V1::StreamItem
         # TODO: this type isn't even shown on the web activity stream yet
         hash['type'] = 'Collaboration'
         hash['html_url'] = send("#{context_type}_collaboration_url", context_id.to_i, data.id.to_i) if context_type
+      when "CollectionItem"
+        item = ::CollectionItem.find(data.id, :include => { :collection_item_data => :image_attachment })
+        hash['title'] = item.data.title
+        hash['message'] = item.data.description
+        hash['collection_item'] = collection_items_json([item], current_user, session).first
       else
         raise("Unexpected stream item type: #{data.type}")
       end
     end
+  end
+
+  def api_render_stream_for_contexts(contexts, paginate_url)
+    # for backwards compatibility, since this api used to be hard-coded to return 21 items
+    params[:per_page] ||= 21
+    opts = {}
+    opts[:contexts] = contexts if contexts.present?
+
+    items = @current_user.shard.activate do
+      scope = @current_user.visible_stream_item_instances(opts).scoped(:include => :stream_item)
+      Api.paginate(scope, self, self.send(paginate_url, @context)).to_a
+    end
+    render :json => items.map(&:stream_item).compact.map { |i| stream_item_json(i, @current_user, session) }
   end
 end

@@ -22,9 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_reserved_for_user.sms' do
   it "should render" do
     user = user_model
-    appointment_participant_model(:updating_user => @teacher, :participant => user)
+    appointment_participant_model(:participant => user)
 
-    generate_message(:appointment_reserved_for_user, :sms, @event)
+    generate_message(:appointment_reserved_for_user, :sms, @event,
+                     :data => {:updating_user => @teacher})
 
     @message.body.should include('some title')
   end

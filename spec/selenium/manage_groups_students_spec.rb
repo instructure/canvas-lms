@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/manage_groups_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common')
 require 'thread'
 
 describe "manage groups students" do

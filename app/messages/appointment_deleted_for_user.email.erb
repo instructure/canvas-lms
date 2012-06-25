@@ -9,7 +9,7 @@
   <%= t('subject', 'Your time slot for "%{appointment_name}" has been canceled (%{course})', :appointment_name => asset.title, :course => courses) %>
 <% end %>
 
-<%= t :message, '%{user} canceled your time slot for "%{appointment_name}".', :user => asset.updating_user.name, :appointment_name => asset.title %>
+<%= t :message, '%{user} canceled your time slot for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %>
 
 <%= before_label :details, "Appointment details" %>
 <%= before_label :date_and_time, "Date/time" %> <%= datetime_string(asset.start_at, asset.end_at) %>
@@ -22,6 +22,6 @@
 <%= before_label :course, "Course" %> <%= courses %>
 
 <%= before_label :cancel_reason, "Reason for canceling" %>
-<%= asset.cancel_reason || t(:no_reason_given, "none given") %>
+<%= data.cancel_reason || t(:no_reason_given, "none given") %>
 
 <%= t :instructions, 'Sign up for a different time slot at the following link: %{link}', :link => content(:link) %>

@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin courses tab" do
   it_should_behave_like "in-process server selenium tests"
@@ -29,7 +29,7 @@ describe "admin courses tab" do
    end
    f("#add_user_form #user_name").send_keys name
    f("#pseudonym_unique_id").send_keys email
-   f("#add_user_form [type='submit']").click
+   submit_form("#add_user_form")
    wait_for_ajax_requests
    user = User.first(:conditions =>{:name => name})
    user.should be_present

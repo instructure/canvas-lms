@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
   end
 
   include Context
+  include UserFollow::FollowedItem
 
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
   attr_accessor :original_id, :menu_data
@@ -125,12 +126,14 @@ class User < ActiveRecord::Base
   has_many :user_notes
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
-  has_many :stream_items, :through => :stream_item_instances
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation
   has_many :favorites
   has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
   has_many :zip_file_imports, :as => :context
   has_many :messages
+
+  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
+  has_many :user_follows, :foreign_key => 'following_user_id'
 
   has_many :collections, :as => :context
 
@@ -916,6 +919,9 @@ class User < ActiveRecord::Base
     given { |user| user == self }
     can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar
 
+    given { |user| user.present? && self.public? }
+    can :follow
+
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
 
@@ -1675,24 +1681,24 @@ class User < ActiveRecord::Base
   end
   memoize :recent_feedback
 
-  def visible_stream_items(opts={})
-    items = stream_items.scoped(:conditions => { 'stream_item_instances.hidden' => false }, :order => 'stream_item_instances.id desc')
+  def visible_stream_item_instances(opts={})
+    instances = stream_item_instances.scoped(:conditions => { 'stream_item_instances.hidden' => false }, :order => 'stream_item_instances.id desc', :include => :stream_item)
 
-    # dont make the query do an stream_items.context_code IN
+    # dont make the query do an stream_item_instances.context_code IN
     # ('course_20033','course_20237','course_20247' ...) if they dont pass any
     # contexts, just assume it wants any context code.
     if opts[:contexts]
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      items = items.scoped(:conditions => ['stream_item_instances.context_code in (?)', setup_context_lookups(opts[:contexts])])
+      instances = instances.scoped(:conditions => ['stream_item_instances.context_code in (?)', setup_context_lookups(opts[:contexts])])
     end
 
-    items
+    instances
   end
 
   def recent_stream_items(opts={})
-    visible_stream_items(opts).scoped(:limit => 21).all
+    visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item).compact
   end
   memoize :recent_stream_items
 
@@ -1751,7 +1757,7 @@ class User < ActiveRecord::Base
       # according to the set_policy block in group.rb, user u can manage group
       # g if either:
       # (a) g.context.grants_right?(u, :manage_groups)
-      # (b) g.participating_users.include(u)
+      # (b) g.has_member?(u)
       # this is a very performance sensitive method, so we're bypassing the
       # normal policy checking and somewhat duplicating auth logic here. which
       # is a shame. it'd be really nice to add support to our policy framework
@@ -2343,5 +2349,9 @@ class User < ActiveRecord::Base
 
   def private?
     not public?
+  end
+
+  def default_collection_name
+    t :default_collection_name, "%{user_name}'s Collection", :user_name => self.short_name
   end
 end

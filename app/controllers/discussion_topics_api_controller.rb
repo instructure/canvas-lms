@@ -21,6 +21,7 @@
 # API for accessing and participating in discussion topics in groups and courses.
 class DiscussionTopicsApiController < ApplicationController
   include Api::V1::DiscussionTopics
+  include Api::V1::User
 
   before_filter :require_context
   before_filter :require_topic
@@ -75,8 +76,8 @@ class DiscussionTopicsApiController < ApplicationController
   #   {
   #     "unread_entries": [1,3,4],
   #     "participants": [
-  #       { "id": 10, "display_name": "user 1", "avatar_url": "https://..." },
-  #       { "id": 11, "display_name": "user 2", "avatar_url": "https://..." }
+  #       { "id": 10, "display_name": "user 1", "avatar_image_url": "https://...", "html_url": "https://..." },
+  #       { "id": 11, "display_name": "user 2", "avatar_image_url": "https://...", "html_url": "https://..." }
   #     ],
   #     "view": [
   #       { "id": 1, "user_id": 10, "parent_id": null, "message": "...html text...", "replies": [
@@ -92,7 +93,7 @@ class DiscussionTopicsApiController < ApplicationController
 
     if structure
       participant_info = User.find(participant_ids).map do |user|
-        { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => polymorphic_url([@context, user]) }
+        user_display_json(user, @context.is_a_context? && @context)
       end
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
       # as an optimization, the view structure is pre-serialized as a json
@@ -438,7 +439,11 @@ class DiscussionTopicsApiController < ApplicationController
 
   protected
   def require_topic
-    @topic = @context.all_discussion_topics.active.find(params[:topic_id])
+    if params[:topic_id] == "self" && @context.is_a?(CollectionItem)
+      @topic = @context.discussion_topic
+    else
+      @topic = @context.all_discussion_topics.active.find(params[:topic_id])
+    end
     return authorized_action(@topic, @current_user, :read)
   end
 
@@ -452,6 +457,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def build_entry(association)
+    @topic.save! if @topic.new_record?
     association.build(:message => params[:message], :user => @current_user, :discussion_topic => @topic)
   end
 

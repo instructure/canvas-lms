@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin permissions" do
   it_should_behave_like "in-process server selenium tests"
@@ -123,13 +123,13 @@ describe "admin permissions" do
     end
 
     it "should enable manage wiki for observer" do
-      element_hash = checkbox_verifier("Manage wiki", 4)
+      checkbox_verifier("Manage wiki", 4)
       opts = {:manage_wiki => "ObserverEnrollment"}
       permissions_verifier(opts)
     end
 
     it "should enable view all grades for designer" do
-      element_hash = checkbox_verifier("View all grades", 3)
+      checkbox_verifier("View all grades", 3)
       opts = {:view_all_grades => "DesignerEnrollment"}
       permissions_verifier(opts)
     end

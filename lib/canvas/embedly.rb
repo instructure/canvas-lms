@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html)
+class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html, :data_type)
 
   class Image < Struct.new(:url)
     def as_json(*a)
@@ -31,26 +31,16 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html)
     get_data_for(url)
   end
 
-  MAXWIDTH = 200
+  MAXWIDTH = 640
 
   def as_json(*a)
-    { 'title' => self.title, 'description' => self.description, 'images' => self.images.map { |i| i.as_json(*a) }, 'object_html' => self.object_html }
+    { 'title' => self.title, 'description' => self.description, 'images' => self.images.map { |i| i.as_json(*a) }, 'object_html' => self.object_html, 'data_type' => self.data_type }
   end
 
   protected
 
   def get_data_for(url)
-    return unless settings
-    Bundler.require "embedly"
-
-    data = Canvas.timeout_protection("embedly") do
-      embedly_api = ::Embedly::API.new(:key => settings[:api_key])
-      api_method = settings[:plan_type] == "paid" ? :preview : :oembed
-      embedly_api.send(api_method, {
-        :url => url,
-        :maxwidth => MAXWIDTH,
-      }).first
-    end
+    data = get_embedly_data(url)
 
     return unless data
     if data.type == "error"
@@ -58,6 +48,7 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html)
       return
     end
 
+    self.data_type = data.type
     self.title = data.title
     self.description = data.description
     if data.images
@@ -74,7 +65,29 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html)
       self.object_html = data.html
     end
 
+    # reject non-iframe html embeds
+    if self.object_html.present?
+      doc = Nokogiri::HTML::DocumentFragment.parse(self.object_html)
+      if doc.children.map { |c| c.name.downcase } != ['iframe']
+        self.object_html = nil
+      end
+    end
+
     @raw_response = data
+  end
+
+  def get_embedly_data(url)
+    return unless settings
+    Bundler.require "embedly"
+
+    data = Canvas.timeout_protection("embedly") do
+      embedly_api = ::Embedly::API.new(:key => settings[:api_key])
+      api_method = settings[:plan_type] == "paid" ? :preview : :oembed
+      embedly_api.send(api_method, {
+        :url => url,
+        :maxwidth => MAXWIDTH,
+      }).first
+    end
   end
 
   def settings

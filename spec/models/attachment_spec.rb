@@ -777,6 +777,44 @@ describe Attachment do
       Thumbnail.new(:attachment => @attachment).bucket_name.should == 'pluginsetting_bucket'
     end
   end
+
+  context "dynamic thumbnails" do
+    before do
+      attachment_model(:uploaded_data => stub_png_data)
+    end
+
+    it "should use the default size if an unknown size is passed in" do
+      @attachment.thumbnail || @attachment.build_thumbnail.save!
+      url = @attachment.thumbnail_url(:size => "100x100")
+      url.should be_present
+      url.should == @attachment.thumbnail.authenticated_s3_url
+    end
+
+    it "should generate the thumbnail on the fly" do
+      thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
+      thumb.should == nil
+
+      sz = CollectionItemData::THUMBNAIL_SIZE
+      @attachment.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
+      url = @attachment.thumbnail_url(:size => "640x>")
+      url.should be_present
+      thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
+      thumb.should be_present
+      url.should == thumb.authenticated_s3_url
+    end
+
+    it "should use the existing thumbnail if present" do
+      sz = CollectionItemData::THUMBNAIL_SIZE
+      @attachment.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
+      url = @attachment.thumbnail_url(:size => "640x>")
+      @attachment.expects(:create_dynamic_thumbnail).never
+      url = @attachment.thumbnail_url(:size => "640x>")
+      thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
+      url.should be_present
+      thumb.should be_present
+      url.should == thumb.authenticated_s3_url
+    end
+  end
 end
 
 def processing_model

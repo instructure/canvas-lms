@@ -52,7 +52,7 @@ module CC::Importer::Canvas
 
       ['title', 'course_code', 'hashtag', 'default_wiki_editing_roles',
        'turnitin_comments', 'default_view', 'license', 'locale',
-       'group_weighting_scheme'].each do |string_type|
+       'group_weighting_scheme', 'storage_quota', 'grading_standard_identifier_ref'].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end
@@ -60,13 +60,16 @@ module CC::Importer::Canvas
        'allow_student_assignment_edits', 'show_public_context_messages',
        'allow_student_forum_attachments', 'allow_student_organized_groups',
        'show_all_discussion_entries', 'open_enrollment', 'allow_wiki_comments',
-       'self_enrollment'].each do |bool_val|
+       'self_enrollment', 'hide_final_grade', 'grading_standard_enabled'].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end
       ['start_at', 'conclude_at'].each do |date_type|
         val = get_time_val(doc, date_type)
         course[date_type] = val unless val.nil?
+      end
+      if val = get_int_val(doc, 'grading_standard_id')
+        course['grading_standard_id'] = val
       end
       if nav = get_node_val(doc, 'tab_configuration')
         begin

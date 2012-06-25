@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'zip/zip'
+
 module Canvas::AccountReports
   class AvailableReports
     @reports = {}
@@ -25,12 +27,12 @@ module Canvas::AccountReports
       private :new
     end
   end
-  
+
   def self.add_account_reports(account_id, module_name, reports)
     AvailableReports.reports[account_id] = reports
     AvailableReports.module_names[account_id] = module_name
   end
-  
+
   def self.for_account(id)
     (AvailableReports.reports['default'] || {}).merge(AvailableReports.reports[id] || {})
   end
@@ -63,15 +65,33 @@ module Canvas::AccountReports
     notification = Notification.by_name("Report Generated")
     notification = Notification.by_name("Report Generation Failed") if !csv
     attachment = nil
-    if csv
+    if csv.is_a? Hash
+      filename = "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.zip"
+      temp = Tempfile.open(filename)
+      filepath = temp.path
+      temp.close
+      FileUtils::rm temp.path
+
+      Zip::ZipFile.open(filepath, Zip::ZipFile::CREATE) do |zipfile|
+        csv.each do |(report_name, contents)|
+          zipfile.get_output_stream(report_name + ".csv") { |f| f << contents }
+        end
+        zipfile
+      end
+      filetype = 'application/zip'
+    elsif csv
       require 'action_controller'
       require 'action_controller/test_process.rb'
       filename = "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.csv"
       f = Tempfile.open(filename)
       f << csv
       f.close
+      filepath = f.path
+      filetype = 'text/csv'
+    end
+    if filename
       attachment = account.attachments.create!(
-              :uploaded_data => ActionController::TestUploadedFile.new(f.path, 'text/csv', true),
+              :uploaded_data => ActionController::TestUploadedFile.new(filepath, filetype, true),
               :display_name => filename,
               :user => user
       )

@@ -41,5 +41,15 @@ describe FileInContext do
       attachment.filename.should == 'escaping_test%5B0%5D.txt'
       class Attachment; undef_method :filename=; end
     end
+
+    it "should close the temp file" do
+      # If more than one thread is processing these specs another IO object could
+      # be opened. We don't think that should happen so hopefully this won't
+      # give any false-fails
+      before_count = ObjectSpace.each_object(IO).count {|io| !io.closed?}
+      filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files escaping_test[0].txt)))
+      attachment = FileInContext.attach(@course, filename, nil, @folder)
+      ObjectSpace.each_object(IO).count {|io| !io.closed?}.should == before_count
+    end
   end
 end

@@ -29,7 +29,7 @@ describe "course wizard" do
     expect {
       num_to_add.times do
         driver.find_element(:css, '.add_assignment_link').click
-        driver.find_element(:css, '#add_assignment_form').submit
+        submit_form('#add_assignment_form')
         wait_for_ajax_requests
       end
     }.to change(Assignment, :count).by(num_to_add)
@@ -65,7 +65,7 @@ describe "course wizard" do
   def quick_create
     expected_text = start_course
     get "/getting_started/setup"
-    expect_new_page_load { driver.find_element(:css, '#publish_course_url').submit }
+    expect_new_page_load { submit_form('#publish_course_url') }
     driver.find_element(:css, '#section-tabs-header').text.should == expected_text
   end
 
@@ -98,7 +98,7 @@ describe "course wizard" do
       group_text = driver.find_element(:css, '#assignment_group_name')
       group_text.clear
       group_text.send_keys(group_name)
-      driver.find_element(:css, '#add_group_form').submit
+      submit_form('#add_group_form')
       wait_for_ajax_requests
     }.to change(AssignmentGroup, :count).by(1)
 
@@ -113,7 +113,7 @@ describe "course wizard" do
       click_next_step('.assignment_list')
       driver.find_element(:css, ".add_assignment_link").click
       expect_new_page_load { driver.find_element(:css, ".more_options_link").click }
-      expect_new_page_load { driver.find_element(:css, "#edit_assignment_form button[type='submit']").click }
+      expect_new_page_load { submit_form("#edit_assignment_form") }
     }.to change(Assignment, :count).by(1)
     validate_assignment_addition
     click_next_step('#user_list_textarea_container')
@@ -210,7 +210,8 @@ describe "course wizard" do
     driver.find_element(:css, '.publish_course_in_wizard_link').click
     wait_for_animations
     driver.find_element(:css, '.wizard_options_list .publish_step').click
-    expect_new_page_load { driver.find_element(:css, '.details .edit_course').submit }
+    wait_for_animations
+    expect_new_page_load { submit_form(fj('.details .edit_course:visible')) }
     wizard_link = driver.find_element(:css, '.wizard_popup_link')
     wizard_link.click if wizard_link.displayed?
     driver.find_element(:css, '.wizard_content').should_not include_text('Publish')
@@ -234,7 +235,7 @@ describe "course wizard" do
     click_next_step('#user_list_textarea_container')
     add_students
     click_and_validate_last_page
-    expect_new_page_load { driver.find_element(:id, 'publish_course_url').find_element(:css, 'button[type=submit]').click }
+    expect_new_page_load { submit_form('#publish_course_url') }
     validate_section_tabs_header(expected_text)
   end
 

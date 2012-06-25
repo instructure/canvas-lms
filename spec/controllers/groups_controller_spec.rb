@@ -357,10 +357,8 @@ describe GroupsController do
     end
 
     it "should add user" do
-      @group = Group.create(:name => "some group")
-      @user = user(:active_all => true)
-      @group.add_user(@user)
-      user_session(@user)
+      course_with_teacher_logged_in(:active_all => true)
+      @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @user = user(:active_all => true)
       post 'add_user', :group_id => @group.id, :user_id => @user.id
       response.should be_success
@@ -398,9 +396,8 @@ describe GroupsController do
     end
 
     it "should remove user" do
-      @group = Group.create(:name => "some group")
-      @user = user(:active_all => true)
-      user_session(@user)
+      course_with_teacher_logged_in(:active_all => true)
+      @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @group.add_user(@user)
       delete 'remove_user', :group_id => @group.id, :user_id => @user.id
       response.should be_success
@@ -412,7 +409,7 @@ describe GroupsController do
   describe "POST create" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      post 'create', :course_id => @course.id
+      post 'create', :course_id => @course.id, :group => {:name => "some group"}
       assert_unauthorized
     end
 
@@ -785,6 +782,30 @@ describe GroupsController do
       feed.should_not be_nil
       feed.entries.should_not be_empty
       feed.entries.all?{|e| e.authors.present?}.should be_true
+    end
+  end
+
+  describe "GET 'accept_invitation'" do
+    before(:each) do
+      @communities = GroupCategory.communities_for(Account.default)
+      group_model(:group_category => @communities)
+      user(:active_user => true)
+      @membership = @group.add_user(@user, 'invited', false)
+      user_session(@user)
+    end
+
+    it "should successfully create invitations" do
+      get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid
+      @group.reload
+      @group.has_member?(@user).should be_true
+      @group.group_memberships.scoped(:conditions => {:workflow_state => "invited"}).count.should == 0
+    end
+
+    it "should reject an invalid invitation uuid" do
+      get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid + "x"
+      @group.reload
+      @group.has_member?(@user).should be_false
+      @group.group_memberships.scoped(:conditions => {:workflow_state => "invited"}).count.should == 1
     end
   end
 end

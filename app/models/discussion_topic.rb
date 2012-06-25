@@ -31,6 +31,7 @@ class DiscussionTopic < ActiveRecord::Base
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
     THREADED     = 'threaded'
+    FLAT         = 'flat'
     TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
   end
 
@@ -355,6 +356,9 @@ class DiscussionTopic < ActiveRecord::Base
       false
     elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now)
       false
+    elsif self.context.is_a?(CollectionItem)
+      # we'll only send notifications of entries to the streams, not creations of topics
+      false
     else
       true
     end
@@ -498,6 +502,15 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
     can :delete
+
+    given { |user, session| self.context.respond_to?(:collection) && self.context.collection.grants_right?(user, session, :read) }
+    can :read
+
+    given { |user, session| self.context.respond_to?(:collection) && self.context.collection.grants_right?(user, session, :comment) }
+    can :reply
+
+    given { |user, session| self.context.respond_to?(:collection) && user == self.context.user }
+    can :read and can :update and can :delete and can :reply
   end
 
   def discussion_topic_id
@@ -557,11 +570,17 @@ class DiscussionTopic < ActiveRecord::Base
   def set_assignment=(val); end
 
   def participants(include_observers=false)
-    ([self.user] + context.participants(include_observers)).compact.uniq
+    participants = [ self.user ]
+    if self.context.is_a?(CollectionItem)
+      participants += self.posters
+    else
+      participants += context.participants(include_observers)
+    end
+    participants.compact.uniq
   end
 
   def active_participants(include_observers=false)
-    if !self.context.available? && self.context.respond_to?(:participating_admins)
+    if self.context.respond_to?(:available?) && !self.context.available? && self.context.respond_to?(:participating_admins)
       self.context.participating_admins
     else
       self.participants(include_observers)
@@ -570,7 +589,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def posters
     user_ids = discussion_entries.map(&:user_id).push(self.user_id).uniq
-    context.participating_users(user_ids)
+    context.respond_to?(:participating_users) ? context.participating_users(user_ids) : User.find(user_ids)
   end
 
   def user_name
@@ -829,8 +848,16 @@ class DiscussionTopic < ActiveRecord::Base
   #
   # if a new message is posted, it won't appear in this view until the job to
   # update it completes. so this view is eventually consistent.
+  #
+  # if the topic itself is not yet created, it will return blank data. this is for situations
+  # where we're creating topics on the first write - until that first write, we need to return
+  # blank data on reads.
   def materialized_view(opts = {})
-    DiscussionTopic::MaterializedView.materialized_view_for(self, opts)
+    if self.new_record?
+      return "[]", [], [], "[]"
+    else
+      DiscussionTopic::MaterializedView.materialized_view_for(self, opts)
+    end
   end
 
   # synchronously create/update the materialized view

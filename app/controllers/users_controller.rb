@@ -336,13 +336,17 @@ class UsersController < ApplicationController
   #     'type': 'Collaboration',
   #     'collaboration_id': 1234
   #   }
+  #
+  # CollectionItem:
+  #
+  #   !!!javascript
+  #   {
+  #     'type': 'CollectionItem',
+  #     'collection_item' { ... full CollectionItem data ... }
+  #   }
   def activity_stream
-    # for backwards compatibility, since this api used to be hard-coded to return 21 items
-    params[:per_page] ||= 21
-
     if @current_user
-      scope = @current_user.visible_stream_items
-      render :json => Api.paginate(scope, self, api_v1_user_activity_stream_url).map { |i| stream_item_json(i, @current_user.id) }
+      api_render_stream_for_contexts(nil, :api_v1_user_activity_stream_url)
     else
       render_unauthorized_action
     end
@@ -889,20 +893,19 @@ class UsersController < ApplicationController
     end
   end
 
-  #@API Delete a user.
+  # @API Delete a user
+  #
   # Delete a user record from Canvas.
   #
   # WARNING: This API will allow a user to delete themselves. If you do this,
   # you won't be able to make API calls or log into Canvas.
   #
   # @example_request
-  #
-  # curl https://<canvas>/api/v1/users/5 \ 
-  #   -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
-  #   -X DELETE
+  #     curl https://<canvas>/api/v1/users/5 \ 
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
+  #       -X DELETE
   #
   # @example_response
-  #
   #   {
   #     "id":133,
   #     "login_id":"bieber@example.com",
@@ -1066,6 +1069,63 @@ class UsersController < ApplicationController
     redirect_to (url.blank? || url == "%{fallback}") ?
       fallback :
       url.sub(CGI.escape("%{fallback}"), CGI.escape(fallback))
+  end
+
+  include Api::V1::UserFollow
+
+  # @API Follow a user
+  # @beta
+  #
+  # Follow this user. If the current user is already following the
+  # target user, nothing happens. The target user must have a public profile in
+  # order to follow it.
+  #
+  # On success, returns the User object. Responds with a 401 if the user
+  # doesn't have permission to follow the target user, or a 400 if the user
+  # can't follow the target user (if the user and target user are the same, for
+  # example).
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/followers/self \ 
+  #          -X PUT \ 
+  #          -H 'Content-Length: 0' \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #     {
+  #       following_user_id: 5,
+  #       followed_user_id: 6,
+  #       created_at: <timestamp>
+  #     }
+  def follow
+    @user = api_find(User, params[:user_id])
+    if authorized_action(@user, @current_user, :follow)
+      user_follow = UserFollow.create_follow(@current_user, @user)
+      if !user_follow.new_record?
+        render :json => user_follow_json(user_follow, @current_user, session)
+      else
+        render :json => user_follow.errors, :status => :bad_request
+      end
+    end
+  end
+
+  # @API Un-follow a user
+  # @beta
+  #
+  # Stop following this user. If the current user is not already
+  # following the target user, nothing happens.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/followers/self \ 
+  #          -X DELETE \ 
+  #          -H 'Authorization: Bearer <token>'
+  def unfollow
+    @user = api_find(User, params[:user_id])
+    if authorized_action(@user, @current_user, :follow)
+      user_follow = @current_user.user_follows.find(:first, :conditions => { :followed_item_id => @user.id, :followed_item_type => 'User' })
+      user_follow.try(:destroy)
+      render :json => { "ok" => true }
+    end
   end
 
   protected

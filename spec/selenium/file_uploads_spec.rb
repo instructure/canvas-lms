@@ -36,7 +36,7 @@ shared_examples_for "file uploads selenium tests" do
     keep_trying_until { fj("#choose_migration_system").should be_displayed }
     click_option('#choose_migration_system', 'common_cartridge_importer', :value)
     driver.find_element(:css, '#config_options').find_element(:name, 'export_file').send_keys(fullpath)
-    driver.find_element(:css, '#config_options').find_element(:css, '.submit_button').click
+    submit_form('#config_options')
     wait_for_ajax_requests
     keep_trying_until { driver.find_element(:id, 'file_uploaded').should be_displayed }
 
@@ -66,7 +66,7 @@ shared_examples_for "file uploads selenium tests" do
       driver.execute_script("$('.submit_assignment_link').click();")
       keep_trying_until { driver.execute_script("return $('div#submit_assignment')[0].style.display") != "none" }
       driver.find_element(:name, 'attachments[0][uploaded_data]').send_keys(fullpath)
-      driver.find_element(:css, '#submit_online_upload_form #submit_file_button').click
+      submit_form('#submit_online_upload_form')
       keep_trying_until { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
       link = driver.find_element(:css, "div.details a.forward")
       link.text.should eql("Submission Details")

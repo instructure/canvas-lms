@@ -255,6 +255,45 @@ describe Account do
       @a.disable_service('google_docs')
       @a.allowed_services.should == '-google_docs_previews,-google_docs'
     end
+
+    describe "services_exposed_to_ui_hash" do
+      it "should return all ui services by default" do
+        Account.services_exposed_to_ui_hash.keys.should == Account.allowable_services.reject { |h,k| !k[:expose_to_ui] }.keys
+      end
+
+      it "should return services of a type if specified" do
+        Account.services_exposed_to_ui_hash(:setting).keys.should == Account.allowable_services.reject { |h,k| k[:expose_to_ui] != :setting }.keys
+      end
+    end
+
+    describe "plugin services" do
+      before do
+        Account.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false })
+      end
+
+      it "should return the service" do
+        Account.allowable_services.keys.should be_include(:myplugin)
+      end
+
+      it "should allow setting the service" do
+        @a.service_enabled?(:myplugin).should be_false
+
+        @a.enable_service(:myplugin)
+        @a.service_enabled?(:myplugin).should be_true
+        @a.allowed_services.should match(/\+myplugin/)
+
+        @a.disable_service(:myplugin)
+        @a.service_enabled?(:myplugin).should be_false
+        @a.allowed_services.should be_blank
+      end
+
+      describe "services_exposed_to_ui_hash" do
+        it "should return services defined in a plugin" do
+          Account.services_exposed_to_ui_hash().keys.should be_include(:myplugin)
+          Account.services_exposed_to_ui_hash(:setting).keys.should be_include(:myplugin)
+        end
+      end
+    end
   end
   
   context "settings=" do

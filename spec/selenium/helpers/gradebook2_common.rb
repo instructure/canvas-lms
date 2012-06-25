@@ -20,9 +20,8 @@ shared_examples_for "gradebook2 selenium tests" do
     open_assignment_options(cell_index)
     f('#ui-menu-1-3').click
     dialog = find_with_jquery('.ui-dialog:visible')
-    dialog_form = dialog.find_element(:css, '.ui-dialog-content')
     f('.grading_value').send_keys(points)
-    dialog_form.submit
+    submit_dialog(dialog, '.ui-button')
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.dismiss

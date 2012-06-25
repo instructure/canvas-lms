@@ -91,6 +91,10 @@ class GroupCategory < ActiveRecord::Base
     self.role.present?
   end
 
+  # Group categories generally restrict students to only be in one group per
+  # category, but we sort of cheat and implement student organized groups and
+  # communities as one big group category, and then relax that membership
+  # restriction.
   def allows_multiple_memberships?
     self.student_organized? || self.communities?
   end

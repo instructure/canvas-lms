@@ -245,6 +245,62 @@ This text has a http://www.google.com link in it...
         sconvo.workflow_state = :read
         sconvo.save!
       end
+
+      context "with no_submission_comments_inbox" do
+        context "when teacher sets after conversation started" do
+          before :each do
+            @submission1.add_comment(:author => @student1, :comment => 'Test comment')
+            @submission1.add_comment(:author => @teacher1, :comment => 'Test response')
+            @student1.mark_all_conversations_as_read!
+            @teacher1.mark_all_conversations_as_read!
+          end
+
+          it "should keep unread 0 when comments added" do
+            @teacher1.conversations.unread.count.should == 0
+            # Disable notification with existing conversation
+            @teacher1.preferences[:no_submission_comments_inbox] = true
+            @teacher1.save!
+            # Student adds another comment
+            @submission1.add_comment(:author => @student1, :comment => 'New comment')
+            @teacher1.conversations.unread.count.should == 0
+          end
+        end
+        context "when not set" do
+          before :each do
+            @submission1.add_comment(:author => @student1, :comment => 'Test comment')
+          end
+
+          it "should add an unread comment" do
+            @teacher1.conversations.unread.count.should == 1
+          end
+        end
+        context "when preference set for teacher" do
+          before :each do
+            # setup user setting
+            @teacher1.preferences[:no_submission_comments_inbox] = true
+            @teacher1.save!
+          end
+          it "should not show up in conversations" do
+            @teacher1.conversations.count.should == 0
+            # Disable notification with existing conversation
+            @teacher1.preferences[:no_submission_comments_inbox] = true
+            @teacher1.save!
+            # Student adds another comment
+            @submission1.add_comment(:author => @student1, :comment => 'New comment')
+            @teacher1.conversations.count.should == 0
+          end
+          it "should show teacher comment as new to student" do
+            @submission1.add_comment(:author => @student1, :comment => 'Test comment')
+            @submission1.add_comment(:author => @teacher1, :comment => 'Test response')
+            @student1.conversations.unread.count.should == 1
+          end
+          it "should not block direct message from student" do
+            convo = Conversation.initiate([@student1.id, @teacher.id], false)
+            convo.add_message(@student1, 'My direct message')
+            @teacher.conversations.unread.count.should == 1
+          end
+        end
+      end
     end
 
     context "unmuting" do

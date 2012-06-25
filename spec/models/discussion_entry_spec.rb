@@ -353,6 +353,18 @@ describe DiscussionEntry do
     end
   end
 
+  context "Flat discussions" do
+    it "should not have a parent entry if the discussion is flat" do
+      course_with_teacher
+      discussion_topic_model
+      @topic.discussion_type = DiscussionTopic::DiscussionTypes::FLAT
+      @topic.save!
+      root = @topic.reply_from(:user => @teacher, :text => "root entry")
+      sub1 = root.reply_from(:user => @teacher, :html => "shouldn't really be a subentry")
+      sub1.reload.parent_entry.should be_nil
+    end
+  end
+
   context "DiscussionEntryParticipant.read_entry_ids" do
     it "should return the ids of the read entries" do
       topic_with_nested_replies

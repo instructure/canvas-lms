@@ -85,7 +85,7 @@ group :test do
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.19.0'
+  gem 'selenium-webdriver', '2.22.2'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
   if ONE_NINE
@@ -105,7 +105,7 @@ group :development do
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
-  gem 'guard'
+  gem 'guard', '1.0.3'
 end
 
 group :redis do

@@ -18,19 +18,25 @@
 
 module CustomValidations
 
+  # returns [normalized_url_string, URI] if valid, raises otherwise
+  def self.validate_url(value)
+    value = value.strip
+    raise ArgumentError if value.empty?
+    uri = URI.parse(value)
+    unless uri.scheme
+      value = "http://#{value}"
+      uri = URI.parse(value)
+    end
+    raise ArgumentError unless uri.host && %w(http https).include?(uri.scheme.downcase)
+    return value, uri
+  end
+
   module ClassMethods
 
     def validates_as_url(*fields)
       validates_each(fields, :allow_nil => true) do |record, attr, value|
         begin
-          value = value.strip
-          raise ArgumentError if value.empty?
-          uri = URI.parse(value)
-          unless uri.scheme
-            value = "http://#{value}"
-            uri = URI.parse(value)
-          end
-          raise ArgumentError unless uri.host && %w(http https).include?(uri.scheme.downcase)
+          value, uri = CustomValidations.validate_url(value)
           record.send("#{attr}=", value)
         rescue URI::InvalidURIError, ArgumentError
           record.errors.add attr, 'is not a valid URL'
@@ -46,6 +52,18 @@ module CustomValidations
       end
     end
 
+    # alloweds is a hash of old_value => [new_value]
+    # on update, only those transitions will be allowed for the given field
+    def validates_allowed_transitions(field, alloweds)
+      validates_each(field) do |record, attr, value|
+        if !record.new_record? && record.send("#{attr}_changed?")
+          old_val = record.send("#{attr}_was")
+          unless alloweds.any? { |old,news| old_val == old && Array(news).include?(value) }
+            record.errors.add attr, "cannot be changed to that value"
+          end
+        end
+      end
+    end
   end
 
   def self.included(klass)

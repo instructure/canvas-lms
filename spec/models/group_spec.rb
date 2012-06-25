@@ -21,7 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Group do
   
   before do
-    group_model
+    course_model
+    group_model(:context => @course)
   end
 
   context "validation" do
@@ -36,6 +37,22 @@ describe Group do
   
   it "should be private by default" do
     @group.is_public.should be_false
+  end
+
+  it "should allow a private group to be made public" do
+    @communities = GroupCategory.communities_for(Account.default)
+    group_model(:group_category => @communities, :is_public => false)
+    @group.is_public = true
+    @group.save!
+    @group.reload.is_public.should be_true
+  end
+
+  it "should not allow a public group to be made private" do
+    @communities = GroupCategory.communities_for(Account.default)
+    group_model(:group_category => @communities, :is_public => true)
+    @group.is_public = false
+    @group.save.should be_false
+    @group.reload.is_public.should be_true
   end
   
   context "#peer_groups" do
@@ -112,26 +129,45 @@ describe Group do
     end
 
     it "should add a user at the right workflow_state by default" do
-      pending "waiting to turn off auto join functionality"
+      @communities = GroupCategory.communities_for(Account.default)
+      user_model
       {
         'invitation_only'          => 'invited',
         'parent_context_request'   => 'requested',
         'parent_context_auto_join' => 'accepted'
       }.each do |join_level, workflow_state|
-        usr = user_model
-        grp = group_model(:join_level => join_level)
-        grp.add_user(usr)
-        grp.group_memberships.scoped(:conditions => { :workflow_state => workflow_state }).map(&:user_id).should be_include usr.id
+        group = group_model(:join_level => join_level, :group_category => @communities)
+        group.add_user(@user)
+        group.group_memberships.scoped(:conditions => { :workflow_state => workflow_state, :user_id => @user.id }).first.should_not be_nil
       end
     end
 
     it "should allow specifying a workflow_state" do
-      pending "waiting to turn off auto join functionality"
+      @communities = GroupCategory.communities_for(Account.default)
+      @group.group_category = @communities
+      @group.save!
+      user_model
+
       [ 'invited', 'requested', 'accepted' ].each do |workflow_state|
-        usr = user_model
-        @group.add_user(usr, workflow_state)
-        @group.group_memberships.scoped(:conditions => { :workflow_state => workflow_state }).map(&:user_id).should be_include usr.id
+        @group.add_user(@user, workflow_state)
+        @group.group_memberships.scoped(:conditions => { :workflow_state => workflow_state, :user_id => @user.id }).first.should_not be_nil
       end
+    end
+
+    it "should allow specifying that the user should be a moderator" do
+      user_model
+      @membership = @group.add_user(@user, 'accepted', true)
+      @membership.moderator.should == true
+    end
+
+    it "should change the workflow_state of an already active user" do
+      @communities = GroupCategory.communities_for(Account.default)
+      @group.group_category = @communities
+      @group.save!
+      user_model
+      @group.add_user(@user, 'accepted')
+      @membership = @group.add_user(@user, 'requested')
+      @membership.workflow_state.should == 'accepted'
     end
   end
 

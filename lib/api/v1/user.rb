@@ -52,6 +52,22 @@ module Api::V1::User
     end
   end
 
+  # this mini-object is used for secondary user responses, when we just want to
+  # provide enough information to display a user.
+  # for instance, discussion entries return this json as a sub-object.
+  #
+  # if parent_context is given, the html_url will be scoped to that context, so:
+  #   /courses/X/users/Y
+  # otherwise it'll just be:
+  #   /users/Y
+  # keep in mind the latter form is only accessible if the user has a public profile
+  # (or if the api caller is an admin)
+  def user_display_json(user, parent_context = nil)
+    return {} unless user
+    participant_url = parent_context ? polymorphic_url([parent_context, user]) : user_url(user)
+    { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => participant_url }
+  end
+
   # optimization hint, currently user only needs to pull pseudonyms from the db
   # if a site admin is making the request or they can manage_students
   def user_json_is_admin?(context = @context, current_user = @current_user)
@@ -89,6 +105,12 @@ module Api::V1::User
         json[:grades] = {
           :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),
         }
+
+        if has_grade_permissions?(user, enrollment)
+          %w{current_score final_score}.each do |method|
+            json[:grades][method.to_sym] = enrollment.send("computed_#{method}")
+          end
+        end
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
       user_includes = includes.include?('avatar_url') ? ['avatar_url'] : []
@@ -99,5 +121,14 @@ module Api::V1::User
         json[:locked] = lockedbysis
       end
     end
+  end
+
+  protected
+  def has_grade_permissions?(user, enrollment)
+    course = enrollment.course
+    enrollment_user = enrollment.user
+
+    (user == enrollment_user && !course.settings[:hide_final_grade]) ||
+     course.grants_rights?(user, :manage_grades, :view_all_grades).values.any?
   end
 end

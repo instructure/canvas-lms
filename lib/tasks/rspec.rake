@@ -42,7 +42,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     if ENV['SINGLE_TEST']
       t.spec_opts += ['-e', %{"#{ENV['SINGLE_TEST']}"}]
     end
-    spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
+    spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
     Gem.loaded_specs.values.each do |spec|
       path = spec.full_gem_path
       spec_canvas_path = File.expand_path(path+"/spec_canvas")
@@ -76,6 +76,12 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       ENV["RAILS_ENV"] ||= "test"
       Rake::Task["db:test:prepare"].execute
       Rake::Task["spec"].execute
+    end
+
+    desc "Run non-selenium files in a single thread"
+    Spec::Rake::SpecTask.new(:single) do |t|
+      require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
+      t.spec_files = ParallelExclude::AVAILABLE_FILES
     end
 
     desc "Run all specs in spec directory with RCov (excluding plugin specs)"

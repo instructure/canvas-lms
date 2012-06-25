@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/external_tools_common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_common')
 
 describe "admin settings tabs" do
   it_should_behave_like "external tools tests"
@@ -122,7 +122,7 @@ describe "admin settings tabs" do
       ff("#add_notification_form .ui-datepicker-trigger")[1].click
       tomorrow = date_chooser("t")
       type_in_tiny "textarea", "this is a message"
-      f("#add_notification_form button[type='submit']").click
+      submit_form("#add_notification_form")
       wait_for_ajax_requests
       notification = AccountNotification.first
       notification.message.should include_text("this is a message")

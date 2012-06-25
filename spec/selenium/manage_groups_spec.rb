@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/manage_groups_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common')
 require 'thread'
 
 describe "manage groups" do
@@ -150,7 +150,7 @@ describe "manage groups" do
     form = driver.find_element(:css, "#edit_group_form")
     form.find_element(:css, "input[type=text]").clear
     form.find_element(:css, "input[type=text]").send_keys("New Name")
-    form.find_element(:css, "button[type=submit]").click
+    submit_form(form)
     find_with_jquery("#category_#{group_category.id} #group_#{group.id}").should be_displayed
   end
 end

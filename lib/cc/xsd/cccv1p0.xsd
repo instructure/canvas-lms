@@ -27,6 +27,11 @@
         <xs:element name="self_enrollment" type="xs:boolean" minOccurs="0"/>
         <xs:element name="turnitin_comments" type="xs:string" minOccurs="0"/>
         <xs:element name="locale" type="xs:string" minOccurs="0"/>
+        <xs:element name="hide_final_grade" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="grading_standard_enabled" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="grading_standard_identifier_ref" type="xs:string" minOccurs="0"/>
+        <xs:element name="grading_standard_id" type="xs:integer" minOccurs="0"/>
+        <xs:element name="storage_quota" type="xs:float" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
@@ -430,7 +435,7 @@
         <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
         <xs:element name="due_at" type="xs:dateTime" minOccurs="0"/>
         <xs:element name="shuffle_answers" type="xs:boolean" minOccurs="0"/>
-        <xs:element name="hide_results" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="hide_results" type="xs:string" minOccurs="0"/>
         <xs:element name="require_lockdown_browser" type="xs:boolean" minOccurs="0"/>
         <xs:element name="require_lockdown_browser_for_results" type="xs:boolean" minOccurs="0"/>
         <xs:element name="access_code" type="xs:string" minOccurs="0"/>

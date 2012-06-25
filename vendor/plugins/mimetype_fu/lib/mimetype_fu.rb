@@ -16,7 +16,7 @@ class File
        temp << file.string
        temp.close
        # INSTRUCTURE: added double-quotes around the file path to prevent error on file paths with spaces in them
-       mime = `file --mime -br "#{temp.path}"`
+       mime = `file --mime -br "#{temp.path}"`.strip
        mime = mime.gsub(/^.*: */,"")
        mime = mime.gsub(/;.*$/,"")
        mime = mime.gsub(/,.*$/,"")

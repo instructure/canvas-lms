@@ -60,7 +60,7 @@ describe "groups" do
     driver.find_element(:id, "group_name").send_keys("My Group")
     driver.find_elements(:css, "#group_join_level option").length.should == 2
     driver.find_element(:id, "invitees_#{@student.id}").click
-    driver.find_element(:class, "submit_button").click
+    submit_form('#add_group_form')
     wait_for_ajax_requests
 
     new_group_el = find_with_jquery(".group:visible")

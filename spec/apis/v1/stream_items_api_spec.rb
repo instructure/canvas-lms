@@ -40,6 +40,10 @@ describe UsersController, :type => :integration do
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     json.size.should == 0
     google_docs_collaboration_model(:user_id => @user.id)
+    @context = @course
+    @topic1 = discussion_topic_model
+    # introduce a dangling StreamItemInstance
+    StreamItem.delete_all(:id => @user.visible_stream_item_instances.last.stream_item_id)
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     json.size.should == 1
@@ -353,6 +357,51 @@ describe UsersController, :type => :integration do
     }]
   end
 
+  it "should format CollectionItem" do
+    @user1 = @user
+    group_with_user
+    @user2 = @user
+    @user = @user1
+    @coll = @group.collections.create!
+    UserFollow.create_follow(@user1, @coll)
+    @item = collection_item_model(:collection => @coll, :user => @user2)
+
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.should == [{
+      'id' => StreamItem.last.id,
+      'title' => @item.data.title,
+      'type' => 'CollectionItem',
+      'message' => @item.data.description,
+      'created_at' => StreamItem.last.created_at.as_json,
+      'updated_at' => StreamItem.last.updated_at.as_json,
+      'collection_item' => {
+        'id' => @item.id,
+        'collection_id' => @item.collection_id,
+        'user' => {
+          'id' => @item.user.id,
+          'display_name' => @item.user.short_name,
+          'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@item.user.id)}",
+          'html_url' => (@item.user == @user) ? "http://www.example.com/profile" : "http://www.example.com/users/#{@item.user.id}",
+        },
+        'item_type' => @item.collection_item_data.item_type,
+        'link_url' => @item.collection_item_data.link_url,
+        'post_count' => @item.collection_item_data.post_count,
+        'upvote_count' => @item.collection_item_data.upvote_count,
+        'upvoted_by_user' => false,
+        'root_item_id' => @item.collection_item_data.root_item_id,
+        'image_url' => "http://www.example.com/images/thumbnails/#{@item.data.image_attachment.id}/#{@item.data.image_attachment.uuid}?size=640x%3E",
+        'image_pending' => @item.data.image_pending,
+        'html_preview' => @item.data.html_preview,
+        'user_comment' => @item.user_comment,
+        'url' => "http://www.example.com/api/v1/collections/items/#{@item.id}",
+        'created_at' => @item.created_at.iso8601,
+        'description' => @item.data.description,
+        'title' => @item.data.title,
+      }
+    }]
+  end
+
   it "should return the course-specific activity stream" do
     @course1 = @course
     @course2 = course_with_student(:user => @user, :active_all => true).course
@@ -374,6 +423,29 @@ describe UsersController, :type => :integration do
                     { :controller => "courses", :action => "activity_stream", :course_id => @course2.to_param, :format => 'json' })
     json.size.should == 1
     json.first['discussion_topic_id'].should == @topic2.id
+    response.headers['Link'].should be_present
+  end
+
+  it "should return the group-specific activity stream" do
+    group_with_user
+    @group1 = @group
+    group_with_user(:user => @user)
+    @group2 = @group
+
+    @context = @group1
+    @topic1 = discussion_topic_model
+    @context = @group2
+    @topic2 = discussion_topic_model
+
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.size.should == 2
+    response.headers['Link'].should be_present
+
+    json = api_call(:get, "/api/v1/groups/#{@group1.id}/activity_stream.json",
+                    { :controller => "groups", :action => "activity_stream", :group_id => @group1.to_param, :format => 'json' })
+    json.size.should == 1
+    json.first['discussion_topic_id'].should == @topic1.id
     response.headers['Link'].should be_present
   end
 end

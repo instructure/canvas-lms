@@ -31,4 +31,24 @@ module Canvas::HTTP
       end
     end
   end
+
+  # Download a URL using a GET request and return a new un-saved Attachment
+  # with the data at that URL. Tries to detect the correct content_type as
+  # well.
+  #
+  # Returns nil on failure.
+  def self.clone_url_as_attachment(url)
+    url, uri = CustomValidations.validate_url(url)
+    http_response = Canvas::HTTP.get(url)
+    if http_response.code.to_i == 200
+      body = StringIO.new(http_response.body)
+      attachment = Attachment.new(:uploaded_data => body, :filename => File.basename(uri.path))
+      attachment.content_type = File.mime_type?(body)
+      return attachment
+    else
+      return nil
+    end
+  rescue ArgumentError, URI::InvalidURIError
+    return nil
+  end
 end

@@ -389,20 +389,19 @@ define([
         return $group;
       },
       success: function(data, $group) {
-        var group = data.group || data.course_assigned_group;
         $group.loadingImage('remove');
         $group.droppable(contextGroups.droppable_options);
         $group.find(".name.blank_name").hide().end()
           .find(".group_name").show();
         $group.find(".group_user_count").show();
-        group.group_id = group.id;
+        data.group_id = data.id;
         $group.fillTemplateData({
-          id: 'group_' + group.id,
-          data: group,
+          id: 'group_' + data.id,
+          data: data,
           avoid: '.student_list',
           hrefValues: ['id']
         });
-        contextGroups.addGroupToSidebar(group)
+        contextGroups.addGroupToSidebar(data)
         contextGroups.updateCategoryCounts($group.parents(".group_category"));
       }
     });
@@ -599,6 +598,7 @@ define([
         $("#group_tabs").tabs('add', '#category_' + group_category.id, group_category.name, newIndex);
         $("#group_tabs").tabs('select', newIndex);
         contextGroups.populateCategory($category);
+        contextGroups.updateCategory($category, group_category);
         contextGroups.updateCategoryCounts($category);
         $(window).triggerHandler('resize');
       });

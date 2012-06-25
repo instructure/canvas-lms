@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/calendar2_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 EDIT_NAME = 'edited appointment'
 EDIT_LOCATION = 'edited location'
@@ -181,7 +181,7 @@ describe "scheduler" do
         driver.execute_script("$('.appointment-group-item:index(#{i}').addClass('ui-state-hover')")
         ["all", "registered", "unregistered"].each do |registration_status|
           click_al_option('.message_link', i)
-          form = keep_trying_until { find_with_jquery('.ui-dialog form:visible') }
+          form = keep_trying_until { find_with_jquery('.ui-dialog:visible') }
           wait_for_ajaximations
 
           set_value form.find_element(:css, 'select'), registration_status
@@ -189,7 +189,7 @@ describe "scheduler" do
 
           form.find_elements(:css, 'li input').should_not be_empty
           set_value form.find_element(:css, 'textarea'), 'hello'
-          form.submit
+          submit_dialog(form, '.ui-button')
 
           assert_flash_notice_message /Messages Sent/
           keep_trying_until { find_with_jquery('.ui-dialog:visible').should be_nil }

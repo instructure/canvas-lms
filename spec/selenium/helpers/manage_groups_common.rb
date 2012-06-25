@@ -23,7 +23,7 @@ shared_examples_for "manage groups selenium tests" do
     else
       form.find_element(:css, "#category_no_groups").click
     end
-    form.find_element(:css, "button[type=submit]").click
+    submit_form(form)
     keep_trying_until { find_with_jquery("#add_category_form:visible").should be_nil }
     category = course.group_categories.find_by_name(name)
     category.should_not be_nil
@@ -49,7 +49,7 @@ shared_examples_for "manage groups selenium tests" do
       restrict_self_signup = form.find_element(:css, "#category_restrict_self_signup")
       restrict_self_signup.click unless !!restrict_self_signup.attribute('checked') == !!opts[:restrict_self_signup]
     end
-    form.find_element(:css, "button[type=submit]").click
+    submit_form(form)
     wait_for_ajaximations
   end
 
@@ -82,7 +82,7 @@ shared_examples_for "manage groups selenium tests" do
 
     find_with_jquery(".add_group_link:visible").click
     driver.find_element(:css, "#group_name").send_keys(name)
-    driver.find_element(:css, "#edit_group_form button[type='submit']").click
+    submit_form("#edit_group_form")
     wait_for_ajaximations
     group = context.groups.find_by_name(name)
     group.should_not be_nil

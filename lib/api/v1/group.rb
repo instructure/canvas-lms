@@ -19,13 +19,30 @@
 module Api::V1::Group
   include Api::V1::Json
 
+  API_GROUP_JSON_OPTS = {
+    :only => %w(id name description is_public join_level group_category_id),
+    :methods => %w(members_count),
+  }
+
+  API_GROUP_MEMBERSHIP_JSON_OPTS = {
+    :only => %w(id group_id user_id workflow_state moderator)
+  }
+
   def group_json(group, user, session, options = {})
+    hash = api_json(group, user, session, API_GROUP_JSON_OPTS)
+    followed = ::UserFollow.followed_by_user([group], user)
+    hash['followed_by_user'] = !!followed.include?(group)
+    image = group.avatar_attachment
+    hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
     include = options[:include] || []
-    hash = api_json(group, user, session, :only => %w{id name})
     if include.include?('users')
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }
     end
     hash
+  end
+
+  def group_membership_json(membership, user, session)
+    api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
   end
 end
 

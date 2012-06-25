@@ -12,7 +12,7 @@ describe "content exports" do
     def run_export
       get "/courses/#{@course.id}/content_exports"
       yield if block_given?
-      driver.find_element(:css, "button.submit_button").click
+      submit_form('#exporter_form')
       Delayed::Job.last(:conditions => {:tag => 'ContentExport#export_course_without_send_later'})
       @export = keep_trying_until { ContentExport.last }
       @export.export_course_without_send_later
@@ -51,6 +51,5 @@ describe "content exports" do
       manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q1)}]").should_not be_nil
       manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q2)}]").should be_nil
     end
-
   end
 end

@@ -352,13 +352,8 @@ class CoursesController < ApplicationController
   # stream, in the user api.
   def activity_stream
     get_context
-
-    # for backwards compatibility, since this api used to be hard-coded to return 21 items
-    params[:per_page] ||= 21
-
     if authorized_action(@context, @current_user, :read)
-      scope = @current_user.visible_stream_items(:contexts => [@context])
-      render :json => Api.paginate(scope, self, api_v1_course_activity_stream_url(@context)).map { |i| stream_item_json(i, @current_user.id) }
+      api_render_stream_for_contexts([@context], :api_v1_course_activity_stream_url)
     end
   end
 

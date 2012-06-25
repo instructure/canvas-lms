@@ -17,6 +17,7 @@
 #
 
 # @API Collections
+# @beta
 #
 # Collections contain Collection Items, which are links to content. There are
 # different types of items for links to different types of data.
@@ -27,9 +28,16 @@
 # original item came from, a user may be able to view the cloned item but not
 # the original item.
 #
-# A Collection Item object looks like:
+# A collection item also has a Discussion Topic associated with it, which can be
+# used for comments on the item. See the Discussion Topic API for details on
+# querying and adding to a discussion. The scope for the discussion topic will
+# be the collection item, and the id of the topic is "self". For example, the
+# DiscussionTopicsApiController#view endpoint looks like this:
 #
-#     !!!javascript
+#     /api/v1/collection_items/<id>/discussion_topics/self/view
+#
+# @object Collection Item
+#
 #     {
 #       // The ID of the collection item.
 #       id: 7,
@@ -37,13 +45,16 @@
 #       // The ID of the collection that this item belongs to.
 #       collection_id: 2,
 #
-#       // The ID of the user that created the collection item.
-#       user_id: 37,
-#
 #       // The type of the item.
-#       // The only type currently defined is "url", but api consumers should
-#       // expect new types to be returned in the future and handle that
-#       // appropriately (even if it means just ignoring the item).
+#       // Currently defined types are: "url", "image", "audio", and "video".
+#       //
+#       // Canvas may define new item types at any time. "url" is the most
+#       // generic type, and just means any sort of web link. If an api consumer
+#       // sees an item_type that it doesn't yet know how to handle, treating it
+#       // as a "url" is a safe bet.
+#       //
+#       // "image", "audio" and "video" are URLs either directly to a file of that mime type, or
+#       // to a web page that was determined to contain that type as its main content.
 #       item_type: "url",
 #
 #       // The link to the item. For item type of "url", this is the entire
@@ -71,8 +82,8 @@
 #
 #       // An image representation of the collection item. This will be in a
 #       // common web format such as png or jpeg. The resolution and geometry may depend on
-#       // the item, but Canvas will attempt to make it at least 200px in one
-#       // direction when possible.
+#       // the item, but Canvas will attempt to make it 640 pixels wide
+#       // when possible.
 #       image_url: "https://<canvas>/files/item_image.png",
 #
 #       // If true, the image for this item is still being processed and
@@ -80,14 +91,45 @@
 #       // If image_url is null but image_pending is false, the item has no image.
 #       image_pending: false,
 #
-#       // The user-provided description of the item. This is plain text.
+#       // The title of the item.
+#       title: "My Image",
+#
+#       // The description of the item. This is plain text.
 #       description: "some block of plain text",
 #
+#       // Any user-provided comments on the item. A user can add their own
+#       // comments when cloning an existing item. This is plain text.
+#       user_comment: "some block of plain text",
+#
+#       // A snippet of HTML that can be used as an in-line preview of the
+#       // item. For example, a link to a youtube page may have an iframe inline
+#       // embed of the video.
+#       // If no preview is available, this field will be null.
+#       html_preview: "<iframe>...</iframe>",
+#
 #       // The API URL for this item. Used to clone the collection item.
-#       url: "https://<canvas>/api/v1/collections/2/items/7"
+#       url: "https://<canvas>/api/v1/collections/items/7"
+#
+#       // The timestamp of when the item was posted by the user
+#       created_at: "2012-05-30T17:45:25Z",
+#
+#       // Information on the user that created the collection item.
+#       user : {
+#         // The ID of the user.
+#         id: 37,
+#
+#         // The display name of the user.
+#         display_name: "John Doe",
+#
+#         // The URL of the user's avatar image, or a fallback image if the user has not given one.
+#         avatar_image_url: "http://...",
+#
+#         // The URL to the HTML page in Canvas of this user's public profile.
+#         html_url: "http://<canvas>/users/37"
+#       },
 #     }
 class CollectionItemsController < ApplicationController
-  before_filter :require_collection, :except => [:link_data]
+  before_filter :require_collection, :only => [:index, :create]
 
   include Api::V1::Collection
 
@@ -102,26 +144,11 @@ class CollectionItemsController < ApplicationController
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     [
-  #       {
-  #          id: 7,
-  #          collection_id: 2,
-  #          item_type: "url",
-  #          link_url: "https://example.com/some/path",
-  #          post_count: 2,
-  #          upvote_count: 3,
-  #          upvoted_by_user: false,
-  #          root_item_id: 3,
-  #          image_url: "https://<canvas>/files/item_image.png",
-  #          description: "some block of plain text",
-  #          url: "https://<canvas>/api/v1/collections/2/items/7"
-  #       }
-  #     ]
+  # @returns [Collection Item]
   def index
-    pagination_route = api_v1_collection_items_url(@collection)
+    pagination_route = api_v1_collection_items_list_url(@collection)
     if authorized_action(@collection, @current_user, :read)
-      @items = Api.paginate(@collection.collection_items.active.newest_first, self, pagination_route)
+      @items = Api.paginate(@collection.collection_items.active.newest_first.scoped(:include => :user), self, pagination_route)
       render :json => collection_items_json(@items, @current_user, session)
     end
   end
@@ -133,31 +160,19 @@ class CollectionItemsController < ApplicationController
   # Returns an individual collection item. The user must have read access to the collection.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id> \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #     -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     {
-  #        id: 7,
-  #        collection_id: 2,
-  #        item_type: "url",
-  #        link_url: "https://example.com/some/path",
-  #        post_count: 2,
-  #        upvote_count: 3,
-  #        upvoted_by_user: false,
-  #        root_item_id: 3,
-  #        image_url: "https://<canvas>/files/item_image.png",
-  #        description: "some block of plain text",
-  #        url: "https://<canvas>/api/v1/collections/2/items/7"
-  #     }
+  # @returns Collection Item
   def show
-    if authorized_action(@collection, @current_user, :read)
-      @item = find_item
+    find_item_and_collection
+    if authorized_action(@item, @current_user, :read)
       render :json => collection_items_json([@item], @current_user, session).first
     end
   end
 
-  ITEM_SETTABLE_ATTRIBUTES = %w(description)
+  NEW_ITEM_DATA_SETTABLE_ATTRIBUTES = %w(image_url title description)
+  ITEM_SETTABLE_ATTRIBUTES = %w(user_comment)
 
   # @API Create or clone a collection item
   #
@@ -172,30 +187,44 @@ class CollectionItemsController < ApplicationController
   #   To clone an existing item, pass in the url to that item as returned in
   #   the JSON response in the "url" field.
   #
+  # @argument title The title of the item.
+  #   If no title  is provided, Canvas will try to automatically
+  #   add a relevant title based on the linked content.
+  #
   # @argument description The plain-text description of the item.
+  #   If no description is provided, Canvas will try to automatically
+  #   add a relevant description based on the linked content.
   #
   # @argument image_url The URL of the image to use for this item. If no image
-  #   url is provided, canvas will try to automatically determine an image
-  #   representation for the link.
+  #   url is provided, Canvas will try to automatically determine an image
+  #   representation for the link. This parameter is ignored if the new item is
+  #   a clone of an existing item.
+  #
+  # @argument user_comment The user's comments on the item. This can be set
+  #   when cloning an existing item, as well.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
   #          -F link_url="http://www.google.com/" \ 
-  #          -F description="lmgtfy" \ 
+  #          -F user_comment="lmgtfy" \ 
   #          -H 'Authorization: Bearer <token>'
   #
   # @example_request
   #     curl https://<canvas>/api/v1/collections/<collection_id>/items \ 
-  #          -F link_url="https://<canvas>/api/v1/collections/1/items/3" \ 
-  #          -F description="clone of some other item" \ 
+  #          -F link_url="https://<canvas>/api/v1/collections/items/3" \ 
+  #          -F user_comment="clone of some other item" \ 
   #          -H 'Authorization: Bearer <token>'
   #
+  # @returns Collection Item
   def create
-    if authorized_action(@collection, @current_user, :update)
+    @item = @collection.collection_items.new(:user => @current_user)
+    if authorized_action(@item, @current_user, :create)
       item_data = CollectionItemData.data_for_url(params[:link_url] || "", @current_user)
       return render_unauthorized_action unless item_data
-      item_data.image_url = params[:image_url] if item_data.new_record?
-      @item = @collection.collection_items.new(:collection_item_data => item_data, :user => @current_user)
+      if item_data.new_record?
+        item_data.attributes = params.slice(*NEW_ITEM_DATA_SETTABLE_ATTRIBUTES)
+      end
+      @item.collection_item_data = item_data
       @item.attributes = params.slice(*ITEM_SETTABLE_ATTRIBUTES)
 
       if @item.errors.empty? && @item.save
@@ -213,17 +242,18 @@ class CollectionItemsController < ApplicationController
   #
   # Change a collection item's mutable attributes.
   #
-  # @argument description
+  # @argument user_comment
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id> \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #          -X PUT \ 
-  #          -F description='edited description' \ 
+  #          -F user_comment='edited comment' \ 
   #          -H 'Authorization: Bearer <token>'
   #
+  # @returns Collection Item
   def update
-    if authorized_action(@collection, @current_user, :update)
-      @item = find_item
+    find_item_and_collection
+    if authorized_action(@item, @current_user, :update)
       if @item.update_attributes(params.slice(*ITEM_SETTABLE_ATTRIBUTES))
         render :json => collection_items_json([@item], @current_user, session).first
       else
@@ -240,12 +270,14 @@ class CollectionItemsController < ApplicationController
   # clones of the item in other collections.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id> \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id> \ 
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns Collection Item
   def destroy
-    if authorized_action(@collection, @current_user, :update)
-      @item = find_item
+    find_item_and_collection
+    if authorized_action(@item, @current_user, :delete)
       if @item.destroy
         render :json => collection_items_json([@item], @current_user, session).first
       else
@@ -267,7 +299,7 @@ class CollectionItemsController < ApplicationController
   # to determine if the user has already upvoted the item.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id>/upvote \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id>/upvotes/self \ 
   #          -X PUT \ 
   #          -H 'Content-Length: 0' \ 
   #          -H 'Authorization: Bearer <token>'
@@ -280,10 +312,10 @@ class CollectionItemsController < ApplicationController
   #       created_at: "2012-05-03T18:12:18Z",
   #     }
   def upvote
-    if authorized_action(@collection, @current_user, :read)
-      @item = find_item
+    find_item_and_collection
+    if authorized_action(@item, @current_user, :read)
       @upvote = find_upvote
-      @upvote ||= @item.collection_item_data.collection_item_upvotes.create!({ :user => @current_user })
+      @upvote ||= CollectionItemUpvote.create!(:user => @current_user, :collection_item_data => @item.data)
       render :json => collection_item_upvote_json(@item, @upvote, @current_user, session)
     end
   end
@@ -296,12 +328,12 @@ class CollectionItemsController < ApplicationController
   # has not upvoted this item.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/collections/<collection_id>/items/<item_id>/upvote \ 
+  #     curl https://<canvas>/api/v1/collections/items/<item_id>/upvotes/self \ 
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
   def remove_upvote
-    if authorized_action(@collection, @current_user, :read)
-      @item = find_item
+    find_item_and_collection
+    if authorized_action(@item, @current_user, :read)
       @upvote = find_upvote
       if @upvote
         @upvote.destroy
@@ -333,8 +365,9 @@ class CollectionItemsController < ApplicationController
     @collection = Collection.active.find(params[:collection_id])
   end
 
-  def find_item
-    @collection.collection_items.active.find(params[:item_id])
+  def find_item_and_collection
+    @item = CollectionItem.active.find(params[:item_id], :include => :user)
+    @collection = @item.active_collection
   end
 
   def find_upvote

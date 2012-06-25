@@ -102,7 +102,7 @@ describe "Standard Common Cartridge importing" do
     
     mod1 = @course.context_modules.find_by_migration_id("m3")
     mod1.name.should == "Misc Module"
-    mod1.content_tags.count.should == 3
+    mod1.content_tags.count.should == 4
     tag = mod1.content_tags[0]
     tag.content_type.should == 'ExternalUrl'
     tag.title.should == "Wikipedia - Sigmund Freud"
@@ -118,16 +118,35 @@ describe "Standard Common Cartridge importing" do
     tag.title.should == "BLTI Test"
     tag.url.should == "http://www.imsglobal.org/developers/BLTI/tool.php"
     tag.indent.should == 0
+    tag = mod1.content_tags[3]
+    tag.content_type.should == 'Assignment'
+    tag.title.should == "BLTI Assignment Test"
+    tag.content_id.should == @course.assignments.find_by_migration_id("I_00011_R").id
+    tag.indent.should == 0
   end
   
   it "should import external tools" do
-    @course.context_external_tools.count.should == 1
+    @course.context_external_tools.count.should == 2
     et = @course.context_external_tools.find_by_migration_id("I_00010_R")
     et.name.should == "BLTI Test"
     et.url.should == 'http://www.imsglobal.org/developers/BLTI/tool.php'
     et.settings[:custom_fields].should == {"key1"=>"value1", "key2"=>"value2"}
     et.settings[:vendor_extensions].should == [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}, {:platform=>"your.lms.com", :custom_fields=>{"key"=>"value", "key2"=>"value2"}}].map(&:with_indifferent_access)
     @migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.").should be_true
+
+    et = @course.context_external_tools.find_by_migration_id("I_00011_R")
+    et.name.should == "BLTI Assignment Test"
+    et.url.should == 'http://www.imsglobal.org/developers/BLTI/tool2.php'
+    et.settings[:custom_fields].should == {}
+    et.settings[:vendor_extensions].should == [].map(&:with_indifferent_access)
+    @migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.").should be_true
+
+    # That second tool had the assignment flag set, so an assignment for it should have been created
+    asmnt = @course.assignments.find_by_migration_id("I_00011_R")
+    asmnt.should_not be_nil
+    asmnt.points_possible.should == 15.5
+    asmnt.external_tool_tag.url.should == et.url
+    asmnt.external_tool_tag.content_type.should == 'ContextExternalTool'
   end
 
   it "should import assessment data" do

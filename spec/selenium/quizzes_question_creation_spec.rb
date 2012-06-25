@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes question creation" do
   it_should_behave_like "quizzes selenium tests"
@@ -82,7 +82,7 @@ describe "quizzes question creation" do
     replace_content(answers[2].find_element(:css, '.short_answer input'), 'blue')
     replace_content(answers[3].find_element(:css, '.short_answer input'), 'purple')
 
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     driver.find_element(:id, 'show_question_details').click
@@ -113,7 +113,7 @@ describe "quizzes question creation" do
     replace_content(answers[2].find_element(:css, '.select_answer input'), 'second answer')
     answers[2].find_element(:css, ".select_answer_link").click
 
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     driver.find_element(:id, 'show_question_details').click
@@ -152,7 +152,7 @@ describe "quizzes question creation" do
     replace_content(answers[2].find_element(:css, '.select_answer input'), 'blue')
     replace_content(answers[3].find_element(:css, '.select_answer input'), 'purple')
 
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     driver.find_element(:id, 'show_question_details').click
@@ -184,7 +184,7 @@ describe "quizzes question creation" do
     answers[2] = question.find_element(:name, 'answer_match_right').send_keys('second right side')
     question.find_element(:name, 'matching_answer_incorrect_matches').send_keys('first_distractor')
 
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     driver.find_element(:id, 'show_question_details').click
@@ -212,7 +212,7 @@ describe "quizzes question creation" do
     click_option('select.numerical_answer_type:eq(1)', 'Answer in the Range:')
     replace_content(answers[1].find_element(:name, 'answer_range_start'), 5)
     replace_content(answers[1].find_element(:name, 'answer_range_end'), 10)
-    quiz_form.submit
+    submit_form(quiz_form)
     wait_for_ajaximations
 
     driver.find_element(:id, 'show_question_details').click
@@ -246,7 +246,7 @@ describe "quizzes question creation" do
     }
     find_all_with_jquery('table.combinations:visible tr').size.should eql 11 # plus header row
 
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     quiz.reload
@@ -261,7 +261,7 @@ describe "quizzes question creation" do
     click_option('.question_form:visible .question_type', 'Essay Question')
 
     type_in_tiny '.question:visible textarea.question_content', 'This is an essay question.'
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     quiz.reload
@@ -278,7 +278,7 @@ describe "quizzes question creation" do
     click_option('.question_form:visible .question_type', 'Text (no question)')
 
     type_in_tiny '.question_form:visible textarea.question_content', 'This is a text question.'
-    question.submit
+    submit_form(question)
     wait_for_ajax_requests
 
     quiz.reload
@@ -383,22 +383,7 @@ describe "quizzes question creation" do
       close_first_html_answer
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
       html.should == '<p>HTML</p>'
-      find_with_jquery('.question_form:visible').submit
-      refresh_page
-      edit_first_question
-      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      html.should == '<p>HTML</p>'
-    end
-
-    it "should allow HTML answers for multiple answers" do
-      skip_if_ie 'Out of memory'
-      quiz_with_new_questions
-      edit_first_html_answer 'Multiple Answers'
-      type_in_tiny '.answer:eq(3) textarea', 'HTML'
-      close_first_html_answer
-      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      html.should == '<p>HTML</p>'
-      find_with_jquery('.question_form:visible').submit
+      submit_form('.question_form')
       refresh_page
       edit_first_question
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
@@ -443,7 +428,7 @@ describe "quizzes question creation" do
       input = find_with_jquery 'input[name=answer_text]:visible'
       input.click
       input.send_keys 'ohai'
-      find_with_jquery('.question_form:visible').submit
+      submit_form('.question_form')
       wait_for_ajax_requests
 
       # open it up in the editor, make sure the text matches the input
@@ -462,7 +447,7 @@ describe "quizzes question creation" do
       quiz_with_new_questions
       edit_first_html_answer
       type_in_tiny '.answer:eq(3) textarea', 'HTML'
-      find_with_jquery('.question_form:visible').submit
+      submit_form('.question_form')
       refresh_page
       edit_first_question
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
@@ -473,7 +458,7 @@ describe "quizzes question creation" do
       quiz_with_new_questions
       edit_first_html_answer 'Multiple Answers'
       type_in_tiny '.answer:eq(3) textarea', 'HTML'
-      find_with_jquery('.question_form:visible').submit
+      submit_form('.question_form')
       refresh_page
       edit_first_question
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
