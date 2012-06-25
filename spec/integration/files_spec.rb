@@ -147,6 +147,35 @@ describe FilesController do
     controller.instance_variable_get(:@current_user).should be_nil
   end
 
+  it "should update module progressions for html safefiles iframe" do
+    HostUrl.stubs(:file_host).returns('files-test.host')
+    course_with_student(:active_all => true, :user => user_with_pseudonym)
+    login_as
+    @att = @course.attachments.create(:uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({:type => 'attachment', :id => @att.id})
+    @module.reload
+    hash = {}
+    hash[@tag.id.to_s] = {:type => 'must_view'}
+    @module.completion_requirements = hash
+    @module.save!
+    @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+
+    # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
+    get "http://test.host/courses/#{@course.id}/files/#{@att.id}"
+    response.should be_success
+    response.content_type.should == 'text/html'
+    doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+    location = doc.at_css('iframe#file_content')['src']
+
+    # now reset the user session (simulating accessing via a separate domain), grab the document,
+    # and verify the module progress was recorded
+    reset!
+    get location
+    response.should be_success
+    @module.evaluate_for(@user, true, true).state.should eql(:completed)
+  end
+
   context "should support AssessmentQuestion as a context" do
     before do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
