@@ -685,6 +685,7 @@ ActionController::Routing::Routes.draw do |map|
       assignments.get 'courses/:course_id/assignments/:id', :action => :show
       assignments.post 'courses/:course_id/assignments', :action => :create
       assignments.put 'courses/:course_id/assignments/:id', :action => :update
+      assignments.delete 'courses/:course_id/assignments/:id', :action => :destroy, :controller => :assignments
     end
 
     api.with_options(:controller => :submissions_api) do |submissions|

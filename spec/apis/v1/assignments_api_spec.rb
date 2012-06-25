@@ -305,4 +305,22 @@ describe AssignmentsApiController, :type => :integration do
     json.find { |e| e['name'] == "Test Assignment" }['description'].should == "public stuff"
     json.find { |e| e['name'] == "Locked Assignment" }['description'].should be_nil
   end
+
+  it "should delete an assignment" do
+    course_with_student(:active_all => true)
+    @a = @course.assignments.create! :title => "Test Assignment", :description => "public stuff"
+    json = api_call(:delete,
+          "/api/v1/courses/#{@course.id}/assignments/#{@a.id}",
+          { :controller => 'assignments', :action => 'destroy',
+            :format => 'json', :course_id => @course.id.to_s, :id => @a.to_param }, {}, {}, :expected_status => 401)
+    @a.reload.should_not be_deleted
+
+    # now as a teacher
+    teacher_in_course(:course => @course, :active_all => true)
+    json = api_call(:delete,
+          "/api/v1/courses/#{@course.id}/assignments/#{@a.id}",
+          { :controller => 'assignments', :action => 'destroy',
+            :format => 'json', :course_id => @course.id.to_s, :id => @a.to_param })
+    @a.reload.should be_deleted
+  end
 end
