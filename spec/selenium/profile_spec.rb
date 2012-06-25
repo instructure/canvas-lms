@@ -108,7 +108,7 @@ describe "profile" do
     it "should display file uploader link on files page" do
       get "/profile/settings"
       expect_new_page_load { driver.find_element(:css, '#left-side .files').click }
-      driver.find_element(:id, 'file_swfUploader').should be_displayed
+      driver.find_element(:id, 'file_swf-button').should be_displayed
     end
 
     it "should edit full name" do

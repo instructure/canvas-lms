@@ -1,2 +1,2 @@
-require ['full_files', 'uploadify']
+require ['full_files', 'use!uploadify']
 

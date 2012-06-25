@@ -507,10 +507,13 @@ class Attachment < ActiveRecord::Base
         {'key' => sanitized_filename},
         {'acl' => 'private'},
         ['starts-with', '$Filename', ''],
-        ['starts-with', '$folder', ''],
         ['content-length-range', 1, (options[:max_size] || CONTENT_LENGTH_RANGE)]
       ]
     }
+    if res[:upload_params]['folder'].present?
+      policy['conditions'] << ['starts-with', '$folder', '']
+    end
+
     extras = []
     if options[:no_redirect]
       extras << {'success_action_status' => '201'}
@@ -538,7 +541,6 @@ class Attachment < ActiveRecord::Base
     res[:id] = id
     res[:upload_params].merge!({
        'Filename' => '',
-       'folder' => '',
        'key' => sanitized_filename,
        'acl' => 'private',
        'Policy' => policy_encoded,
