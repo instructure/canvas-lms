@@ -44,16 +44,23 @@
       </div>
     </div>
     <div style="margin-top: 1.5em">
+      <div id="options_help_dialog" style="display: none;">
+        <p>{{#t "appt_group_options_help1"}}Some existing reservations are over the limit you have added. These will not be affected, this change only prevents new reservations from being made.{{/t}}</p>
+        <p>{{#t "appt_group_options_help2"}}You can, however, manually remove any existing reservations.{{/t}}</p>
+      </div>
       <b>Options</b>
       <ul class="ag-options">
         <li>
           <input type="checkbox" id="appointment-blocks-per-slot-option-button" name="per_slot_option" value="1" />
           <label for="appointment-blocks-per-slot-option-button">Limit each time slot to</label>
-          <input type="number" name="participants_per_appointment" value="{{appointment_group.participants_per_appointment}}" style="width: 40px;" />
+          <input type="number" name="participants_per_appointment" value="{{appointment_group.participants_per_appointment}}" min="1" style="width: 40px;" />
           <label for="appointment-blocks-per-slot-option-button">
             <span {{#ifEqual participant_type "Group"}} {{else}} style="display:none;" {{/ifEqual}} class="per_appointment_groups_label">groups.</span>
             <span {{#ifEqual participant_type "Group"}} style="display:none;" {{/ifEqual}} class="per_appointment_users_label">users.</span>
           </label>
+          <a href="#" class="reservation_help hidden" title="{{#t "affect_reservations"}}How will this affect reservations?{{/t}}">
+            <img alt="Help" src="/images/help.png">
+          </a>
         </li>
         <li>
           <input type="checkbox" id="appointment-blocks-participant-visibility-button" name="participant_visibility" value="1" />
@@ -61,9 +68,12 @@
         </li>
         <li>
           <input type="checkbox" id="max-per-student-option" name="max_appointments_per_participant_option" value="1">
-          <label for="max-per-student-option">Limit participants to</label>
-          <input type="number" name="max_appointments_per_participant" value="{{appointment_group.max_appointments_per_participant}}" min="1"style="width: 40px">
+          <label for="max-per-student-option">Limit participants to attend</label>
+          <input type="number" name="max_appointments_per_participant" value="{{appointment_group.max_appointments_per_participant}}" min="1" style="width: 40px">
           <label for="max-per-student-option">appointment(s).</label>
+          <a href="#" class="reservation_help hidden" title="{{#t "affect_reservations"}}How will this affect reservations?{{/t}}">
+            <img alt="Help" src="/images/help.png">
+          </a>
         </li>
       </ul>
     </div>

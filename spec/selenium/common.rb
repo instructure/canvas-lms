@@ -599,9 +599,21 @@ shared_examples_for "all selenium tests" do
     driver.execute_script('return $("'+css_selector+'").prop("checked")')
   end
 
+  def get_value(selector)
+    driver.execute_script("return $(#{selector.inspect}).val()")
+  end
+
   def set_value(input, value)
-    if input.tag_name == 'select'
+    case input.tag_name
+    when 'select'
       input.find_element(:css, "option[value='#{value}']").click
+    when 'input'
+      case input.attribute(:type)
+      when 'checkbox'
+        input.click if (!input.selected? && value) || (input.selected? && !value)
+      else
+        replace_content(input, value)
+      end
     else
       replace_content(input, value)
     end
