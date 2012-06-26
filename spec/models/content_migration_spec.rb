@@ -511,6 +511,35 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
     end
 
+    it "should have correct question count on copied surveys and practive quizzes" do
+      pending unless Qti.qti_enabled?
+      sp = @copy_from.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
+      data = {
+                          :question_type => "multiple_choice_question",
+                          :question_name => "test fun",
+                          :name => "test fun",
+                          :points_possible => 10,
+                          :question_text => "<strong>html for fun</strong>",
+                          :answers =>
+                                  [{:migration_id => "QUE_1016_A1", :text => "<br />", :weight => 100, :id => 8080},
+                                   {:migration_id => "QUE_1017_A2", :text => "<pre>", :weight => 0, :id => 2279}]}.with_indifferent_access
+      qq = sp.quiz_questions.create!
+      qq.write_attribute(:question_data, data)
+      qq.save!
+      sp.generate_quiz_data
+      sp.published_at = Time.now
+      sp.workflow_state = 'available'
+      sp.save!
+
+      sp.question_count.should == 1
+
+      run_course_copy
+
+      q = @copy_to.quizzes.find_by_migration_id(mig_id(sp))
+      q.should_not be_nil
+      q.question_count.should == 1
+    end
+
     it "should copy quizzes as published if they were published before" do
       pending unless Qti.qti_enabled?
       g = @copy_from.assignment_groups.create!(:name => "new group")
