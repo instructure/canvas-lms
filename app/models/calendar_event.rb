@@ -40,6 +40,7 @@ class CalendarEvent < ActiveRecord::Base
   validates_presence_of :context
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
