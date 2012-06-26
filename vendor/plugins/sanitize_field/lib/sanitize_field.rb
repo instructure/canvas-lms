@@ -140,7 +140,7 @@ module Instructure #:nodoc:
       ],
       :transformers => lambda { |env| Instructure::SanitizeField.sanitize_style(env) if env[:node]['style'] }
     }
-    
+
     module ClassMethods
       
       def sanitize_field(*args)

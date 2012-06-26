@@ -132,9 +132,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     domains = HostUrl.context_hosts(account, current_host)
     
     settings = Onelogin::Saml::Settings.new
-    protocol = Rails.env.development? ? 'http' : 'https'
-    settings.sp_slo_url = "#{protocol}://#{domains.first}/saml_logout"
-    settings.assertion_consumer_service_url = domains.map { |domain| "#{protocol}://#{domain}/saml_consume" }
+    settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/saml_logout"
+    settings.assertion_consumer_service_url = domains.map { |domain| "#{HostUrl.protocol}://#{domain}/saml_consume" }
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
     

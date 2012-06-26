@@ -1,6 +1,7 @@
 development:
   storage: local
-  secure: false # defaults to true in production, false elsewhere
+  # the secure option in this file is deprecated, use the ssl option in domain.yml instead
+  # secure: false
   path_prefix: tmp/files
 
 test:

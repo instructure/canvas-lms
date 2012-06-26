@@ -22,6 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'account_user_notification.email' do
   it "should render" do
     @object = AccountUser.create(:account => account_model)
-    generate_message(:account_user_notification, :email, @object)
+    msg = generate_message(:account_user_notification, :email, @object)
   end
 end
