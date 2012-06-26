@@ -8,6 +8,7 @@
     }
   })
   @show_left_side = false
+  @body_classes << 'full-width'
   @can_edit_anything = !@context.completed?
 %>
 <% content_for :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
