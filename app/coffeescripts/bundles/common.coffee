@@ -17,6 +17,7 @@ require [
   'page_views'
   'compiled/license_help'
   'compiled/behaviors/ujsLinks'
+  'compiled/behaviors/admin-links'
   'compiled/behaviors/elementToggler'
   'compiled/behaviors/upvote-item'
   'compiled/behaviors/repin-item'
