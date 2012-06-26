@@ -450,7 +450,7 @@ class PseudonymSessionsController < ApplicationController
     end
 
     user = User.find(code_data['user'])
-    token = AccessToken.create!(:user => user, :developer_key => key)
+    token = user.access_tokens.create!(:developer_key => key)
     render :json => {
       'access_token' => token.token,
       'user' => user.as_json(:only => [:id, :name], :include_root => false),

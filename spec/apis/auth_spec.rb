@@ -313,6 +313,52 @@ describe "API Authentication", :type => :integration do
         post "/login/oauth2/token", :client_id => @client_id, :client_secret => 'nuh-uh', :code => code
         response.should be_client_error
       end
+
+      context "sharding" do
+        it_should_behave_like "sharding"
+
+        it "should create the access token on the same shard as the user" do
+          user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+
+          @shard1.activate do
+            account = Account.create!
+            LoadAccount.stubs(:default_domain_root_account).returns(account)
+            account.stubs(:trusted_account_ids).returns([Account.default.id])
+
+            # step 1
+            get "/login/oauth2/auth", :response_type => 'code', :client_id => @key.id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+            response.should redirect_to(login_url)
+
+            get response['Location']
+            response.should be_success
+            post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
+
+            # step 3
+            response.should be_redirect
+            response['Location'].should match(%r{/login/oauth2/confirm$})
+            get response['Location']
+            response.should render_template("pseudonym_sessions/oauth2_confirm")
+            post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+
+            response.should be_redirect
+            response['Location'].should match(%r{/login/oauth2/auth\?})
+            code = response['Location'].match(/code=([^\?&]+)/)[1]
+            code.should be_present
+
+            # we have the code, we can close the browser session
+            post "/login/oauth2/token", :client_id => @key.id, :client_secret => @client_secret, :code => code
+            response.should be_success
+            response.header['content-type'].should == 'application/json; charset=utf-8'
+            json = JSON.parse(response.body)
+            @token = json['access_token']
+            json['user'].should == { 'id' => @user.id, 'name' => 'test1@example.com' }
+            reset!
+          end
+
+          @user.access_tokens.first.shard.should == Shard.default
+          @user.access_tokens.first.token.should == @token
+        end
+      end
     end
 
     describe "oauth2 web app flow" do
