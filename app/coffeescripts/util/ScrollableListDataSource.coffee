@@ -53,7 +53,7 @@ define [
       items = @modelize(items)
       doTransitions = (items.length <= 1)
       for item in items
-        if not item.get('visible')
+        if not item.get('visible') and not item.get('defer_visibility_check')
           @_removeItem(item, doTransitions)
         else if @itemMap[item.id]?
           @_updateItem(item, doTransitions)

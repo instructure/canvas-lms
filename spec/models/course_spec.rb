@@ -650,7 +650,24 @@ describe Course, "gradebook_to_csv" do
       rows[5][1].should == @user3.id.to_s
       rows[5][2].should be_nil
       rows[5][3].should be_nil
-    end
+  end
+
+  it "should only include students from the appropriate section for a section limited teacher" do
+    course(:active_all => 1)
+    @teacher.enrollments.first.update_attribute(:limit_privileges_to_course_section, true)
+    @section = @course.course_sections.create!(:name => 'section 2')
+    @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
+    @section.enroll_user(@user1, 'StudentEnrollment', 'active')
+    @user2 = user_with_pseudonym(:active_all => true, :name => 'Jeremy', :username => 'jeremy@instructure.com')
+    @course.enroll_student(@user2)
+
+    csv = @course.gradebook_to_csv(:user => @teacher)
+    csv.should_not be_nil
+    rows = FasterCSV.parse(csv)
+    # two header rows, and one student row
+    rows.length.should == 3
+    rows[2][1].should == @user2.id.to_s
+  end
 end
 
 describe Course, "update_account_associations" do
@@ -2448,6 +2465,10 @@ describe Course, "section_visibility" do
 
     it "should return user's sections" do
       @course.sections_visible_to(@ta).should eql [@course.default_section]
+    end
+
+    it "should return non-limited admins from other sections" do
+      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should eql [@teacher]
     end
   end
 

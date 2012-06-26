@@ -303,7 +303,6 @@ class ContextModule < ActiveRecord::Base
       added_item
     else
       return nil unless item
-      added_item ||= ContentTag.find_by_content_id_and_content_type_and_context_id_and_context_type_and_tag_type(item.id, item.class.to_s, self.context_id, self.context_type, 'context_module')
       title = params[:title] || (item.title rescue item.name)
       added_item ||= self.content_tags.build(:context => context)
       added_item.attributes = {

@@ -17,6 +17,74 @@
 #
 
 # @API Submissions
+#
+# @object Submission
+#     {
+#       // The submissions's assignment id
+#       assignment_id: 23,
+#
+#       // The submission's assignment (see the assignments API) (optional)
+#       assignment: Assignment
+#
+#       // The submission's course (see the course API) (optional)
+#       course: Course
+#
+#       // If multiple submissions have been made, this is the attempt number.
+#       attempt: 1,
+#
+#       // The content of the submission, if it was submitted directly in a
+#       // text field.
+#       body: "There are three factors too...",
+#
+#       // The grade for the submission, translated into the assignment grading
+#       // scheme (so a letter grade, for example).
+#       grade: "A-",
+#
+#       // A boolean flag which is false if the student has re-submitted since
+#       // the submission was last graded.
+#       grade_matches_current_submission: true,
+#
+#       // URL to the submission. This will require the user to log in.
+#       html_url: "http://example.com/courses/255/assignments/543/submissions/134",
+#
+#       // URL to the submission preview. This will require the user to log in.
+#       preview_url: "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
+#
+#       // The raw score
+#       score: 13.5
+#
+#       // Associated comments for a submission (optional)
+#       submission_comments: [
+#         {
+#           author_id: 134
+#           author_name: "Toph Beifong",
+#           comment: "Well here's the thing...",
+#           created_at: "2012-01-01T01:00:00Z",
+#           media_comment: {
+#             content-type: "audio/mp4",
+#             display_name: "something",
+#             media_id: "3232",
+#             media_type: "audio",
+#             url:  "http://example.com/media_url"
+#           }
+#         }
+#       ],
+#
+#       // The types of submission
+#       // ex: ("online_text_entry"|"online_url"|"online_upload"|"media_recording")
+#       submission_type: "online_text_entry",
+#
+#       // The timestamp when the assignment was submitted, if an actual
+#       // submission has been made.
+#       submitted_at: "2012-01-01T01:00:00Z",
+#
+#       // The URL of the submission if the submission is a "online_url" submission.
+#       url: null,
+#
+#       // The id of the user who created the submission
+#       user_id: 134
+#     }
+#
 class SubmissionsController < ApplicationController
   include GoogleDocs
   before_filter :get_course_from_section, :only => :create

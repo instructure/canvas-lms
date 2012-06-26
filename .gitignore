@@ -15,6 +15,7 @@ db/*.sqlite
 db/demo
 config/GEM_HOME
 config/*.yml
+config/build.js
 config/environments/*-local.rb
 models.dot
 db/*sql
@@ -63,6 +64,7 @@ public/optimized
 !node_modules
 chromedriver.log
 public/plugins/
+public/javascripts/plugins/
 app/coffeescripts/plugins/
 app/views/jst/plugins/
 app/stylesheets/plugins/

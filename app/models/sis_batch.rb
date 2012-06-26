@@ -19,7 +19,6 @@
 class SisBatch < ActiveRecord::Base
   include Workflow
   belongs_to :account
-  has_many :sis_batch_log_entries, :order => :created_at
   serialize :data
   serialize :options
   serialize :processing_errors, Array
@@ -205,7 +204,6 @@ class SisBatch < ActiveRecord::Base
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
-    data["sis_batch_log_entries"] = self.sis_batch_log_entries if self.sis_batch_log_entries.present?
     return data.to_json
   end
 

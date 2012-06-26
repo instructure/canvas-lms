@@ -85,6 +85,15 @@ describe "context_modules" do
     @module = @course.context_modules.create!(:name => "some module")
   end
 
+  def edit_module_item(module_item)
+    driver.execute_script("$(arguments[0]).addClass('context_module_item_hover')", module_item)
+    module_item.find_element(:css, '.edit_item_link').click
+    edit_form = driver.find_element(:id, 'edit_item_form')
+    yield edit_form
+    submit_form(edit_form)
+    wait_for_ajaximations
+  end
+
   context "context modules as a teacher" do
 
     before (:each) do
@@ -255,12 +264,9 @@ describe "context_modules" do
       item_edit_text = "Assignment Edit 1"
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       tag = ContentTag.last
-      driver.execute_script("$('#context_module_item_#{tag.id}').addClass('context_module_item_hover')")
-      module_item.find_element(:css, '.edit_item_link').click
-      edit_form = driver.find_element(:id, 'edit_item_form')
-      replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
-      submit_form(edit_form)
-      wait_for_ajaximations
+      edit_module_item(module_item) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
+      end
       module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
       module_item.should include_text(item_edit_text)
 
@@ -273,6 +279,41 @@ describe "context_modules" do
 
     it "should add an assignment to a module" do
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+    end
+
+    it "should allow adding an item twice" do
+      item1 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      item2 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      item1.should_not == item2
+      @assignment.reload.context_module_tags.size.should == 2
+    end
+
+    it "should rename all instances of an item" do
+      item1 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      item2 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      edit_module_item(item2) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), "renamed assignment")
+      end
+      all_items = ff(".context_module_item.Assignment_#{@assignment.id}")
+      all_items.size.should == 2
+      all_items.each { |i| i.find_element(:css, '.title').text.should == 'renamed assignment' }
+      @assignment.reload.title.should == 'renamed assignment'
+      run_jobs
+      @assignment.context_module_tags.each { |tag| tag.title.should == 'renamed assignment' }
+
+      # reload the page and renaming should still work on existing items
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+      item3 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      edit_module_item(item3) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), "again")
+      end
+      all_items = ff(".context_module_item.Assignment_#{@assignment.id}")
+      all_items.size.should == 3
+      all_items.each { |i| i.find_element(:css, '.title').text.should == 'again' }
+      @assignment.reload.title.should == 'again'
+      run_jobs
+      @assignment.context_module_tags.each { |tag| tag.title.should == 'again' }
     end
 
     it "should add a quiz to a module" do
@@ -338,7 +379,7 @@ describe "context_modules" do
         driver.find_element(:css, '.ui-dialog .add_prerequisite_link').click
         wait_for_animations
         #have to do it this way because the select has no css attributes on it
-        click_option(':input:visible.eq(3)', first_module_name)
+        click_option('.criterion select', "the module, #{first_module_name}")
         submit_form(add_form)
         wait_for_ajaximations
         db_module = ContextModule.last
@@ -347,7 +388,7 @@ describe "context_modules" do
         driver.find_element(:css, "#context_module_#{db_module.id} .edit_module_link").click
         driver.find_element(:css, '.ui-dialog').should be_displayed
         wait_for_ajaximations
-        prereq_select = find_all_with_jquery(':input:visible')[3]
+        prereq_select = find_with_jquery('.criterion select')
         option = first_selected_option(prereq_select)
         option.text.should == 'the module, ' + first_module_name
       end
@@ -627,6 +668,48 @@ describe "context_modules" do
     end
 
     describe "sequence footer" do
+      it "should show the right nav when an item is in modules multiple times" do
+        @assignment = @course.assignments.create!(:title => "some assignment")
+        @atag1 = @module_1.add_item(:id => @assignment.id, :type => "assignment")
+        @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
+        @atag2 = @module_2.add_item(:id => @assignment.id, :type => "assignment")
+        @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
+        get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
+        wait_for_ajaximations
+        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
+        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after1.id}"
+
+        get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
+        wait_for_ajaximations
+        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_2.id}"
+        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after2.id}"
+
+        # if the user didn't get here from a module link, we show no nav,
+        # because we can't know which nav to show
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        prev.should_not be_displayed
+        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        nxt.should_not be_displayed
+      end
+
+      it "should show the nav when going straight to the item if there's only one tag" do
+        @assignment = @course.assignments.create!(:title => "some assignment")
+        @atag1 = @module_1.add_item(:id => @assignment.id, :type => "assignment")
+        @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
+        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after1.id}"
+      end
+
       it "should show module navigation for group assignment discussions" do
         group_assignment_discussion(:course => @course)
         @group.users << @student

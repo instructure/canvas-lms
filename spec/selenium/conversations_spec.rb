@@ -19,6 +19,21 @@ describe "conversations" do
     }.to change(ConversationMessage, :count).by(1)
   end
 
+  it "should auto-mark as read" do
+    @me = @user
+    5.times { conversation(@me, user, :workflow_state => 'unread') }
+    get "/conversations/unread"
+    c = get_conversations.first
+    c.click
+    c[:class].should =~ /unread/ # not marked immediately
+    @me.conversations.unread.size.should eql 5
+    keep_trying_until { get_conversations.first[:class] !~ /unread/ }
+    @me.conversations.unread.size.should eql 4
+
+    get_conversations.last.click
+    get_conversations.size.should eql 4 # removed once deselected
+  end
+
   context "conversation loading" do
     it "should load all conversations" do
       @me = @user
@@ -35,8 +50,9 @@ describe "conversations" do
     it "should properly clear the identity header when conversations are read" do
       enable_cache do
         @me = @user
-        5.times { conversation(@me, user).update_attribute(:workflow_state, 'unread') }
+        5.times { conversation(@me, user, :workflow_state => 'unread') }
         get_messages # loads the page, clicks the first conversation
+        keep_trying_until { get_conversations.first[:class] !~ /unread/ }
         get '/conversations'
         driver.find_element(:css, '.unread-messages-count').text.should eql '4'
       end

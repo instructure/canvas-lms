@@ -71,13 +71,13 @@ class Course < ActiveRecord::Base
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
-  has_many :current_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'rejected', 'completed', 'deleted', 'inactive'], :include => :user
+  has_many :current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
   has_many :students, :through => :student_enrollments, :source => :user
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') and enrollments.workflow_state = 'active'"
-  has_many :student_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", 'deleted', 'completed', 'rejected', 'inactive'], :include => :user
-  has_many :all_student_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state != ? AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", 'deleted'], :include => :user
+  has_many :student_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", :include => :user
+  has_many :all_student_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state != 'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", :include => :user
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
   has_many :all_real_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ["enrollments.workflow_state != ?", 'deleted'], :include => :user
   has_many :detailed_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => {:user => {:pseudonym => :communication_channel}}
@@ -120,7 +120,7 @@ class Course < ActiveRecord::Base
   has_many :all_discussion_topics, :as => :context, :class_name => "DiscussionTopic", :include => :user, :dependent => :destroy
   has_many :discussion_entries, :through => :discussion_topics, :include => [:discussion_topic, :user], :dependent => :destroy
   has_many :announcements, :as => :context, :class_name => 'Announcement', :dependent => :destroy
-  has_many :active_announcements, :as => :context, :class_name => 'Announcement', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :order => 'created_at DESC'
+  has_many :active_announcements, :as => :context, :class_name => 'Announcement', :conditions => ['discussion_topics.workflow_state != ?', 'deleted']
   has_many :attachments, :as => :context, :dependent => :destroy, :extend => Attachment::FindInContextAssociation
   has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.title, assignments.position'
@@ -1259,7 +1259,8 @@ class Course < ActiveRecord::Base
     single = assignments.length == 1
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
-    student_enrollments = self.student_enrollments.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
+    student_enrollments = scope.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
     # remove duplicate enrollments for students enrolled in multiple sections
     seen_users = []
     student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
@@ -2349,17 +2350,32 @@ class Course < ActiveRecord::Base
 
   # returns a scope, not an array of users/enrollments
   def students_visible_to(user, include_priors=false)
-    enrollments_visible_to(user, include_priors, true)
+    enrollments_visible_to(user, :include_priors => include_priors, :return_users => true)
   end
-  def enrollments_visible_to(user, include_priors=false, return_users=false, limit_to_section_ids=nil)
+  def enrollments_visible_to(user, opts = {})
     visibilities = section_visibilities_for(user)
-    if return_users
-      scope = include_priors ? self.all_students : self.students
+    relation = []
+    relation << 'all' if opts[:include_priors]
+    if opts[:type] == :all
+      relation << 'user' if opts[:return_users]
     else
-      scope = include_priors ? self.all_student_enrollments : self.student_enrollments
+      relation << (opts[:type].try(:to_s) || 'student')
     end
-    if limit_to_section_ids
-      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => limit_to_section_ids.to_a })
+    if opts[:return_users]
+      relation.last << 's'
+    else
+      relation << 'enrollments'
+    end
+    relation = relation.join('_')
+    # our relations don't all follow the same pattern
+    relation = case relation
+                 when 'all_enrollments'; 'enrollments'
+                 when 'enrollments'; 'current_enrollments'
+                 else; relation
+               end
+    scope = self.send(relation.to_sym)
+    if opts[:section_ids]
+      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => opts[:section_ids].to_a })
     end
     unless visibilities.any?{|v|v[:admin]}
       scope = scope.scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'")
@@ -2367,7 +2383,7 @@ class Course < ActiveRecord::Base
     # See also Users#messageable_users (same logic used to get users across multiple courses)
     case enrollment_visibility_level_for(user, visibilities)
       when :full then scope
-      when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      when :sections then scope.scoped(:conditions => ["enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false])
       when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
       else scope.scoped({:conditions => "FALSE"})
     end

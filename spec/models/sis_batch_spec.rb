@@ -41,7 +41,10 @@ describe SisBatch do
 
     # arrrgh attachment.rb
     def tmp.original_filename; File.basename(path); end
+    old_job_count = Delayed::Job.count
     batch = SisBatch.create_with_attachment(@account, 'instructure_csv', tmp)
+    # SisBatches shouldn't need any background processing
+    Delayed::Job.count.should == old_job_count
     yield batch if block_given?
     batch
   ensure
@@ -87,9 +90,10 @@ describe SisBatch do
 
     Setting.set('sis_batch_process_start_delay', '120')
     create_csv_data(['abc']) do |batch|
+      start_time = Time.now.to_i
       batch.process
       job = Delayed::Job.find_by_tag('SisBatch.process_all_for_account')
-      job.run_at.to_i.should >= Time.now.to_i
+      job.run_at.to_i.should >= start_time
       job.run_at.to_i.should <= 3.minutes.from_now.to_i
     end
   end

@@ -147,7 +147,16 @@ describe User do
     @a.save
     StreamItem.for_user(@user).should_not be_empty
   end
-  
+
+  it "should ignore orphaned stream item instances" do
+    course_with_student(:active_all => true)
+    google_docs_collaboration_model(:user_id => @user.id)
+    @user.recent_stream_items.size.should == 1
+    StreamItem.delete_all
+    @user.unmemoize_all
+    @user.recent_stream_items.size.should == 0
+  end
+
   it "should be able to remove itself from a root account" do
     account1 = Account.create
     account2 = Account.create
@@ -806,7 +815,9 @@ describe User do
 
     it "should not include users from other sections if visibility is limited to sections" do
       set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+      enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+      # we currently force limit_privileges_to_course_section to be false for students; override it in the db
+      Enrollment.update_all({ :limit_privileges_to_course_section => true }, :id => enrollment.id)
       messageable_users = @student.messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
@@ -864,7 +875,9 @@ describe User do
 
     it "should respect section visibility when returning users for a specified group" do
       set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+      enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+      # we currently force limit_privileges_to_course_section to be false for students; override it in the db
+      Enrollment.update_all({ :limit_privileges_to_course_section => true }, :id => enrollment.id)
 
       @group.users << @other_section_user
 
@@ -1012,8 +1025,10 @@ describe User do
   
       it "should return concluded enrollments in the group and section if they are still members" do
         set_up_course_with_users
-        @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
-  
+        enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+        # we currently force limit_privileges_to_course_section to be false for students; override it in the db
+        Enrollment.update_all({ :limit_privileges_to_course_section => true }, :id => enrollment.id)
+
         @group.users << @other_section_user
         @this_section_user_enrollment.conclude
   

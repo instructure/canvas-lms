@@ -805,7 +805,8 @@ define([
       options.property_validations = $._addObjectName(options.property_validations, options.object_name);
     }
     if (options.required) {
-      $.each(options.required, function(i, name) {
+      var required = _.result(options, 'required')
+      $.each(required, function(i, name) {
         if (!data[name]) {
           if (!errors[name]) {
             errors[name] = [];

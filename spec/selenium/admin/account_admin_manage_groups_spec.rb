@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/manage_groups_common')
 require 'thread'
 
-describe "manage admin groups" do
+describe "account admin manage groups" do
   it_should_behave_like "manage groups selenium tests"
 
   def add_account_category (account, name)

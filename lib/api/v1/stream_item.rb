@@ -19,6 +19,7 @@
 module Api::V1::StreamItem
   include Api::V1::Context
   include Api::V1::Collection
+  include Api::V1::Submission
 
   def stream_item_json(stream_item, current_user, session)
     data = stream_item.stream_data(current_user.id)
@@ -72,22 +73,12 @@ module Api::V1::StreamItem
         hash['notification_category'] = data.notification_category
         hash['html_url'] = hash['url'] = data.url
       when 'Submission'
-        hash['title'] = data.assignment.try(:title)
-        hash['grade'] = data.grade
-        hash['score'] = data.score
-        hash['html_url'] = course_assignment_submission_url(context_id, data.assignment.id, data.user_id)
-        hash['submission_comments'] = data.submission_comments.map do |comment|
-          {
-            'body' => comment.formatted_body,
-            'user_name' => comment.user_short_name,
-            'user_id' => comment.author_id,
-          }
-        end unless data.submission_comments.blank?
-        hash['assignment'] = {
-          'title' => hash['title'],
-          'id' => data.assignment.try(:id),
-          'points_possible' => data.assignment.try(:points_possible),
-        }
+        hash.merge! submission_json(Submission.find(data.id), Assignment.find(data.assignment.id), current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url'])
+
+        # backwards compat from before using submission_json
+        hash['assignment']['title'] = hash['assignment']['name']
+        hash['title'] = hash['assignment']['name']
+        hash['submission_comments'].each {|c| c['body'] = c['comment']}
       when /Conference/
         hash['web_conference_id'] = data.id
         hash['type'] = 'WebConference'
@@ -116,9 +107,9 @@ module Api::V1::StreamItem
     opts[:contexts] = contexts if contexts.present?
 
     items = @current_user.shard.activate do
-      scope = @current_user.visible_stream_item_instances(opts)
+      scope = @current_user.visible_stream_item_instances(opts).scoped(:include => :stream_item)
       Api.paginate(scope, self, self.send(paginate_url, @context)).to_a
     end
-    render :json => items.map { |i| stream_item_json(i.stream_item, @current_user, session) }
+    render :json => items.map(&:stream_item).compact.map { |i| stream_item_json(i, @current_user, session) }
   end
 end

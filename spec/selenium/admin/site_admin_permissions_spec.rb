@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-describe "admin permissions" do
+describe "site admin permissions" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do

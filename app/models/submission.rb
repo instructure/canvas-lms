@@ -205,44 +205,53 @@ class Submission < ActiveRecord::Base
     strip_tags((self.body || "").gsub(/\<\s*br\s*\/\>/, "\n<br/>").gsub(/\<\/p\>/, "</p>\n"))
   end
   
-  def check_turnitin_status(asset_string, attempt=1)
+  def check_turnitin_status(attempt=1)
     self.turnitin_data ||= {}
-    data = self.turnitin_data[asset_string]
-    return unless data && data[:object_id]
-    if data[:similarity_score].blank?
-      if attempt < TURNITIN_RETRY
-        turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
-        res = turnitin.generateReport(self, asset_string)
-        if res[:similarity_score]
-          data[:similarity_score] = res[:similarity_score].to_f
-          data[:web_overlap] = res[:web_overlap].to_f
-          data[:publication_overlap] = res[:publication_overlap].to_f
-          data[:student_overlap] = res[:student_overlap].to_f
-          data[:state] = 'failure'
-          data[:state] = 'problem' if data[:similarity_score] < 75
-          data[:state] = 'warning' if data[:similarity_score] < 50
-          data[:state] = 'acceptable' if data[:similarity_score] < 25
-          data[:state] = 'none' if data[:similarity_score] == 0
-          data[:status] = 'scored'
+    turnitin = nil
+    needs_retry = false
+
+    # check all assets in the turnitin_data (self.turnitin_assets is only the
+    # current assets) so that we get the status for assets of previous versions
+    # of the submission as well
+    self.turnitin_data.keys.each do |asset_string|
+      data = self.turnitin_data[asset_string]
+      next unless data && data.is_a?(Hash) && data[:object_id]
+      if data[:similarity_score].blank?
+        if attempt < TURNITIN_RETRY
+          turnitin ||= Turnitin::Client.new(*self.context.turnitin_settings)
+          res = turnitin.generateReport(self, asset_string)
+          if res[:similarity_score]
+            data[:similarity_score] = res[:similarity_score].to_f
+            data[:web_overlap] = res[:web_overlap].to_f
+            data[:publication_overlap] = res[:publication_overlap].to_f
+            data[:student_overlap] = res[:student_overlap].to_f
+            data[:state] = 'failure'
+            data[:state] = 'problem' if data[:similarity_score] < 75
+            data[:state] = 'warning' if data[:similarity_score] < 50
+            data[:state] = 'acceptable' if data[:similarity_score] < 25
+            data[:state] = 'none' if data[:similarity_score] == 0
+            data[:status] = 'scored'
+          else
+            needs_retry ||= true
+          end
         else
-          send_at((5 * attempt).minutes.from_now, :check_turnitin_status, asset_string, attempt + 1)
+          data[:status] = 'error'
         end
       else
-        data[:status] = 'error'
+        data[:status] = 'scored'
       end
-    else
-      data[:status] = 'scored'
+      self.turnitin_data[asset_string] = data
     end
-    self.turnitin_data[asset_string] = data
+
+    send_at((5 * attempt).minutes.from_now, :check_turnitin_status, attempt + 1) if needs_retry
     self.turnitin_data_changed!
     self.save
-    data
   end
   
   def turnitin_report_url(asset_string, user)
     if self.turnitin_data && self.turnitin_data[asset_string] && self.turnitin_data[asset_string][:similarity_score]
       turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
-      self.send_later(:check_turnitin_status, asset_string)
+      self.send_later(:check_turnitin_status)
       if self.grants_right?(user, nil, :grade)
         turnitin.submissionReportUrl(self, asset_string)
       elsif self.grants_right?(user, nil, :view_turnitin_report)
@@ -278,7 +287,7 @@ class Submission < ActiveRecord::Base
     turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
     reset_turnitin_assets
 
-    # 1. Make sure the assignment exists and user is enrolled
+    # Make sure the assignment exists and user is enrolled
     assign_status = self.assignment.create_in_turnitin
     enroll_status = turnitin.enrollStudent(self.context, self.user)
     unless assign_status && enroll_status
@@ -296,18 +305,20 @@ class Submission < ActiveRecord::Base
       return false
     end
 
-    # 2. Submit the file(s)
+    # Submit the file(s)
     submission_response = turnitin.submitPaper(self)
     submission_response.each do |res_asset_string, response|
       self.turnitin_data[res_asset_string].merge!(response)
       self.turnitin_data_changed!
-      if response[:object_id]
-        self.send_at(5.minutes.from_now, :check_turnitin_status, res_asset_string)
-      elsif !(attempt < TURNITIN_RETRY)
+      if !response[:object_id] && !(attempt < TURNITIN_RETRY)
         self.turnitin_data[res_asset_string][:status] = 'error'
       end
     end
+
+    self.send_at(5.minutes.from_now, :check_turnitin_status)
     self.save
+
+    # Schedule retry if there were failures
     submit_status = submission_response.present? && submission_response.values.all?{ |v| v[:object_id] }
     unless submit_status
       send_at(5.minutes.from_now, :submit_to_turnitin, attempt + 1) if attempt < TURNITIN_RETRY

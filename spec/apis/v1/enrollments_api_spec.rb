@@ -49,7 +49,7 @@ describe EnrollmentsApiController, :type => :integration do
           'id'                                 => new_enrollment.id,
           'user_id'                            => @unenrolled_user.id,
           'course_section_id'                  => @section.id,
-          'limit_privileges_to_course_section' => true,
+          'limit_privileges_to_course_section' => false,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
           'type'                               => 'StudentEnrollment',
@@ -65,7 +65,6 @@ describe EnrollmentsApiController, :type => :integration do
         new_enrollment.root_account_id.should eql @course.account.id
         new_enrollment.user_id.should eql @unenrolled_user.id
         new_enrollment.course_section_id.should eql @section.id
-        new_enrollment.limit_privileges_to_course_section.should eql true
         new_enrollment.workflow_state.should eql 'active'
         new_enrollment.course_id.should eql @course.id
         new_enrollment.should be_an_instance_of StudentEnrollment
@@ -207,7 +206,7 @@ describe EnrollmentsApiController, :type => :integration do
           'id'                                 => new_enrollment.id,
           'user_id'                            => @unenrolled_user.id,
           'course_section_id'                  => @section.id,
-          'limit_privileges_to_course_section' => true,
+          'limit_privileges_to_course_section' => false,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
           'type'                               => 'StudentEnrollment',
@@ -223,7 +222,6 @@ describe EnrollmentsApiController, :type => :integration do
         new_enrollment.root_account_id.should eql @course.account.id
         new_enrollment.user_id.should eql @unenrolled_user.id
         new_enrollment.course_section_id.should eql @section.id
-        new_enrollment.limit_privileges_to_course_section.should eql true
         new_enrollment.workflow_state.should eql 'active'
         new_enrollment.course_id.should eql @course.id
         new_enrollment.should be_an_instance_of StudentEnrollment

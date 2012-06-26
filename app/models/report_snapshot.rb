@@ -29,16 +29,18 @@ class ReportSnapshot < ActiveRecord::Base
 
   def self.report_value_over_time(report, key)
     items = []
+    now = Time.now.utc.to_i
     report['monthly'].each do |month|
       if month[key]
-        date = Date
         stamp = ((Time.utc(month['year'], month['month'], 1).to_date >> 1) - 1.day).to_time.to_i
-        items << [stamp*1000, month[key]]
+        next if stamp > now
+        items << [stamp.to_i*1000, month[key]]
       end
     end
     report['weekly'].each do |week|
       if week[key]
         stamp = (week['week'] * 604800) + ((week['year'] - 1970) * 31556926)
+        next if stamp > now
         items << [stamp*1000, week[key]]
       end
     end

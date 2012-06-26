@@ -220,8 +220,4 @@
     <%= render :partial => "shared/message_students" %>
   <% end %>
 <% end %>
-<%
-  sequence_asset = @quiz
-  sequence_asset = @quiz.assignment if @quiz.assignment && !@quiz.context_module_tag && @quiz.assignment.context_module_tag
-%>
-<%= render :partial => "shared/sequence_footer", :locals => {:asset => sequence_asset} if sequence_asset.context_module_tag %>
+<%= render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset} if @sequence_asset %>

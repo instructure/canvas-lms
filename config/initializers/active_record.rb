@@ -975,4 +975,26 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     add_index_without_length_raise(table_name, column_name, options)
   end
   alias_method_chain :add_index, :length_raise
+
+  # in anticipation of having to re-run migrations due to integrity violations or
+  # killing stuff that is holding locks too long
+  def add_foreign_key_if_not_exists(from_table, to_table, options = {})
+    return if self.adapter_name == 'SQLite'
+    column  = options[:column] || "#{to_table.to_s.singularize}_id"
+    foreign_key_name = foreign_key_name(from_table, column, options)
+    return if foreign_keys(from_table).find { |k| k.options[:name] == foreign_key_name }
+    add_foreign_key(from_table, to_table, options)
+  end
+
+  def remove_foreign_key_if_exists(table, options = {})
+    return if self.adapter_name == 'SQLite'
+    if Hash === options
+      foreign_key_name = foreign_key_name(table, options[:column], options)
+    else
+      foreign_key_name = foreign_key_name(table, "#{options.to_s.singularize}_id")
+    end
+
+    return unless foreign_keys(table).find { |k| k.options[:name] == foreign_key_name }
+    remove_foreign_key(table, options)
+  end
 end

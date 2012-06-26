@@ -11,6 +11,7 @@ define [
     # we don't currently save the model directly, rather we do inbox actions
     inboxAction: (options) ->
       defaults =
+        url: @url()
         method: 'POST'
         success: (data) => @list.updateItem(data)
       options = $.extend(true, {}, defaults, options)

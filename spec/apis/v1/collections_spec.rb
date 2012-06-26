@@ -136,6 +136,7 @@ describe "Collections API", :type => :integration do
   def create_collections(context)
     @c1 = context.collections.create!(:name => 'test1', :visibility => 'private')
     @c2 = context.collections.create!(:name => 'test2', :visibility => 'public')
+    [@c1, @c2]
   end
 
   def create_collection_items(user)
@@ -640,6 +641,47 @@ describe "Collections API", :type => :integration do
           @i4.reload.should be_deleted
         end
       end
+    end
+  end
+
+  context "unscoped collections" do
+    before do
+      user_with_pseudonym
+      group_model({:group_category => GroupCategory.communities_for(Account.default), :is_public => true})
+      @group_membership = @group.add_user(@user, 'accepted', true)
+    end
+
+    it "should list all pinnable collections" do
+      @gc1, @gc2 = create_collections(@group)
+      @uc1, @uc2 = create_collections(@user)
+      json = api_call(:get, "/api/v1/collections", { :controller => "collections", :action => "list", :format => "json" })
+      json.should == [@gc1, @gc2, @uc1, @uc2].sort_by(&:id).reverse.map{ |c| collection_json(c) }
+    end
+
+    it "should create a default collection for each pinnable context" do
+      json = api_call(:get, "/api/v1/collections", { :controller => "collections", :action => "list", :format => "json" })
+      json.count.should == 2
+      json.map{ |j| j['name']}.sort.should == [@user.default_collection_name, @group.default_collection_name].sort
+    end
+
+    it "should not create a default collection for non-community groups" do
+      @community = @group
+      @group = group_model
+      @group.add_user(@user, 'accepted', true)
+
+      json = api_call(:get, "/api/v1/collections", { :controller => "collections", :action => "list", :format => "json" })
+      json.count.should == 2
+      json.map{ |j| j['name']}.sort.should == [@user.default_collection_name, @community.default_collection_name].sort
+    end
+
+    it "should not return collections the user does not have permission to pin to" do
+      @community = @group
+      @community2 = group_model({:group_category => GroupCategory.communities_for(Account.default), :is_public => true})
+      @gc1, @gc2 = create_collections(@community)
+      @uc1, @uc2 = create_collections(@user)
+      @no1, @no2 = create_collections(@community2)
+      json = api_call(:get, "/api/v1/collections", { :controller => "collections", :action => "list", :format => "json" })
+      json.should == [@gc1, @gc2, @uc1, @uc2].sort_by(&:id).reverse.map{ |c| collection_json(c) }
     end
   end
 end

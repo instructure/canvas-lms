@@ -33,7 +33,7 @@ class ContentTag < ActiveRecord::Base
   validates_presence_of :context, :unless => proc { |tag| tag.context_id && tag.context_type }
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   before_save :default_values
-  after_save :enforce_unique_in_modules
+  after_save :update_could_be_locked
   after_save :touch_context_module
   after_save :touch_context_if_learning_outcome
   include CustomValidations
@@ -86,23 +86,17 @@ class ContentTag < ActiveRecord::Base
   def context_name
     self.context.name rescue ""
   end
-  
-  def enforce_unique_in_modules
-    if self.workflow_state != 'deleted' && self.content_id && self.content_id > 0 && self.tag_type == 'context_module' && self.content_type != 'ContextExternalTool'
-      tags = ContentTag.find_all_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(self.content_id, self.content_type, 'context_module', self.context_id, self.context_type)
-      tags.select{|t| t != self }.each do |tag|
-        tag.destroy
-      end
-    end
+
+  def update_could_be_locked
     if self.content_id && self.content_type
       klass = self.content_type.constantize
       if klass.new.respond_to?(:could_be_locked=)
-        self.content_type.constantize.update_all({:could_be_locked => true}, {:id => self.content_id}) rescue nil
+        klass.update_all({:could_be_locked => true}, {:id => self.content_id})
       end
     end
     true
   end
-  
+
   def confirm_valid_module_requirements
     self.context_module && self.context_module.confirm_valid_requirements
   end

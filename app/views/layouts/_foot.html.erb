@@ -8,42 +8,8 @@
   require = {
     translate: <%= use_optimized_js? %>,
     baseUrl: '<%= js_base_url %>',
-    paths: {
-      common: 'compiled/bundles/common',
-      jqueryui: 'vendor/jqueryui',
-      uploadify: '../flash/uploadify/jquery.uploadify.v2.1.4',
-      use: 'vendor/use'
-    },
-    use: {
-      'vendor/backbone': {
-        deps: ['underscore', 'jquery'],
-        attach: function(_, $){
-          return Backbone;
-        }
-      },
-
-      // slick grid shim
-      'vendor/slickgrid/lib/jquery.event.drag-2.0.min': {
-        deps: ['jquery'],
-        attach: '$'
-      },
-      'vendor/slickgrid/slick.core': {
-        deps: ['jquery', 'use!vendor/slickgrid/lib/jquery.event.drag-2.0.min'],
-        attach: 'Slick'
-      },
-      'vendor/slickgrid/slick.grid': {
-        deps: ['use!vendor/slickgrid/slick.core'],
-        attach: 'Slick'
-      },
-      'vendor/slickgrid/slick.editors': {
-        deps: ['use!vendor/slickgrid/slick.core'],
-        attach: 'Slick'
-      },
-      'vendor/slickgrid/plugins/slick.rowselectionmodel': {
-        deps: ['use!vendor/slickgrid/slick.core'],
-        attach: 'Slick'
-      }
-    }
+    paths: <%= raw Canvas::RequireJs.paths %>,
+    use: <%= raw Canvas::RequireJs.shims %>
   };
 </script>
 

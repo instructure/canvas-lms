@@ -287,49 +287,9 @@ class AccountsController < ApplicationController
       @terms = @account.enrollment_terms.active
       respond_to do |format|
         format.html
-        format.json { render :json => @current_batch.to_json(:include => :sis_batch_log_entries) }
+        format.json { render :json => @current_batch.try(:api_json) }
       end
     end
-  end
-
-  def sis_import_submit
-    raise "SIS imports can only be executed on root accounts" unless @account.root_account?
-    raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
-
-    if authorized_action(@account, @current_user, :manage_sis)
-      SisBatch.transaction do
-        if !@account.current_sis_batch || !@account.current_sis_batch.importing?
-          batch = SisBatch.create_with_attachment(@account, params[:import_type], params[:attachment])
-
-          if params[:batch_mode].to_i > 0
-            batch.batch_mode = true
-            if params[:batch_mode_term_id].present?
-              batch.batch_mode_term = @account.enrollment_terms.active.find(params[:batch_mode_term_id])
-            end
-          end
-
-          batch.options ||= {}
-          if params[:override_sis_stickiness].to_i > 0
-            batch.options[:override_sis_stickiness] = true
-            [:add_sis_stickiness, :clear_sis_stickiness].each do |option|
-              batch.options[option] = true if params[option].to_i > 0
-            end
-          end
-
-          batch.save!
-
-          @account.current_sis_batch_id = batch.id
-          @account.save
-          batch.process
-          render :json => batch.to_json(:include => :sis_batch_log_entries),
-                 :as_text => true
-        else
-          render :json => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true}.to_json,
-                 :as_text => true
-        end
-      end
-    end
-
   end
   
   def courses_redirect

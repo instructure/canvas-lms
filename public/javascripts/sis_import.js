@@ -118,27 +118,12 @@ $(document).ready(function(event) {
       var waitTime = 1500;
       $.ajaxJSON(location.href, 'GET', {}, function(data) {
         state = "updating";
-        var sis_batch = data.sis_batch;
+        var sis_batch = data;
         var progress = 0;
         if(sis_batch) {
           progress = Math.max($(".copy_progress").progressbar('option', 'value') || 0, sis_batch.progress);
           $(".copy_progress").progressbar('option', 'value', progress);
           $("#import_log").empty();
-          if(sis_batch.sis_batch_log_entries) {
-            for(var idx in sis_batch.sis_batch_log_entries) {
-              var entry = sis_batch.sis_batch_log_entries[idx].sis_batch_log_entry;
-              var lines = entry.text.split("\\n");
-              if($("#import_log #log_" + entry.id).length == 0) {
-                var $holder = $("<div id='log_" + entry.id + "'/>");
-                for(var jdx in lines) {
-                  var $div = $("<div/>");
-                  $div.text(lines[jdx]);
-                  $holder.append($div);
-                }
-                $("#import_log").append($holder);
-              }
-            }
-          }
         }
         if(!sis_batch || sis_batch.workflow_state == 'imported') {
           $("#sis_importer").hide();
@@ -185,7 +170,7 @@ $(document).ready(function(event) {
   $("#sis_importer").formSubmit({
    fileUpload: true,
    success: function(data) {
-     if(data && data.sis_batch) {
+     if(data && data.id) {
        startPoll();
      } else {
        //show error message
@@ -206,7 +191,7 @@ $(document).ready(function(event) {
       state = "checking";
       $.ajaxJSON(location.href, 'GET', {}, function(data) {
         state = "nothing";
-        var sis_batch = data.sis_batch;
+        var sis_batch = data;
         var progress = 0;
         if(sis_batch && (sis_batch.workflow_state == "importing" || sis_batch.workflow_state == "created")) {
           state = "nothing";

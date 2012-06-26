@@ -120,7 +120,7 @@ describe "sis imports ui" do
     submit_form('#sis_importer')
     keep_trying_until { driver.find_element(:css, 'div.progress_bar_holder div.progress_message').should be_displayed }
     SisBatch.last.process_without_send_later
-    keep_trying_until { driver.find_element(:css, "div.sis_messages div.error_message").text =~ /There was an error importing your SIS data\./ }
+    keep_trying_until { driver.find_element(:css, "div.sis_messages div.error_message").text =~ /No SIS records were imported. The import failed with these messages:/ }
     SisBatch.last.batch_mode.should == true
     SisBatch.last.options.should == {:override_sis_stickiness => true,
                                      :add_sis_stickiness => true}
@@ -130,7 +130,7 @@ describe "sis imports ui" do
     submit_form('#sis_importer')
     keep_trying_until { driver.find_element(:css, 'div.progress_bar_holder div.progress_message').should be_displayed }
     SisBatch.last.process_without_send_later
-    keep_trying_until { driver.find_element(:css, "div.sis_messages div.error_message").text =~ /There was an error importing your SIS data\./ }
+    keep_trying_until { driver.find_element(:css, "div.sis_messages div.error_message").text =~ /No SIS records were imported. The import failed with these messages:/ }
     (!!SisBatch.last.batch_mode).should be_false
     SisBatch.last.options.should == {:override_sis_stickiness => true}
   end

@@ -423,8 +423,8 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :terms
     account.resources :sub_accounts
     account.avatars 'avatars', :controller => 'accounts', :action => 'avatars'
-    account.sis_import 'sis_import', :controller => 'accounts', :action => 'sis_import'
-    account.sis_import_submit 'sis_import_submit', :controller => 'accounts', :action => 'sis_import_submit'
+    account.sis_import 'sis_import', :controller => 'accounts', :action => 'sis_import', :conditions => { :method => :get }
+    account.resources :sis_imports, :controller => 'sis_imports_api', :only => [:create, :show]
     account.add_user 'users', :controller => 'users', :action => 'create', :conditions => {:method => :post}
     account.confirm_delete_user 'users/:user_id/delete', :controller => 'accounts', :action => 'confirm_delete_user'
     account.delete_user 'users/:user_id', :controller => 'accounts', :action => 'remove_user', :conditions => {:method => :delete}
@@ -861,6 +861,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :collections) do |collections|
+      collections.get "collections", :action => :list, :path_name => 'collections'
       collections.resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_", :only => [:index, :create]
       collections.resources :collections, :path_prefix => "groups/:group_id", :name_prefix => "group_", :only => [:index, :create]
       collections.resources :collections, :except => [:index, :create]

@@ -124,8 +124,6 @@ class FilesController < ApplicationController
     if authorized_action(@attachment,@current_user,:read)
       if @attachment.grants_right?(@current_user, nil, :download)
         @headers = false
-        @tag = @attachment.context_module_tag
-        @module = @attachment.context_module_tag.context_module rescue nil
         render
       else
         show

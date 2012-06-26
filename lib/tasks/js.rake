@@ -8,7 +8,13 @@ namespace :js do
       Rake::Task['js:generate'].invoke
     end
     puts "--> executing phantomjs tests"
-    `erb spec/javascripts/runner.html.erb > spec/javascripts/runner.html`
+
+    require 'canvas/require_js'
+    require 'erubis'
+    output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/runner.html.erb")).
+      result(Canvas::RequireJs.get_binding)
+    File.open("#{Rails.root}/spec/javascripts/runner.html", 'w') { |f| f.write(output) }
+
     phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html`
     exit_status = $?.exitstatus
     puts phantomjs_output
@@ -83,25 +89,19 @@ namespace :js do
   desc "optimize and build js for production"
   task :build do
     require 'config/initializers/plugin_symlinks'
-    require 'parallel'
+    require 'canvas/require_js'
+    require 'erubis'
 
-    commands = []
-    commands << ['canvas-lms', "node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js 2>&1"]
+    output = Erubis::Eruby.new(File.read("#{Rails.root}/config/build.js.erb")).
+      result(Canvas::RequireJs.get_binding)
+    File.open("#{Rails.root}/config/build.js", 'w') { |f| f.write(output) }
 
-    files = Dir[Rails.root+'vendor/plugins/*/config/build.js']
-    files.each do |buildfile|
-      plugin = buildfile.gsub(%r{.*/vendor/plugins/(.*)/config/build\.js}, '\\1')
-      commands << ["#{plugin} plugin", "node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{buildfile} 2>&1"]
+    puts "--> Optimizing canvas-lms"
+    optimize_time = Benchmark.realtime do
+      output = `node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js 2>&1`
+      raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
     end
-
-    Parallel.each(commands, :in_threads => Parallel.processor_count) do |(plugin, command)|
-      puts "--> Optimizing #{plugin}"
-      optimize_time = Benchmark.realtime do
-        output = `#{command}`
-        raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
-      end
-      puts "--> Optimized #{plugin} in #{optimize_time}"
-    end
+    puts "--> Optimized canvas-lms in #{optimize_time}"
   end
 
 end

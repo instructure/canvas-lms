@@ -19,14 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe 'Collections' do
-  shared_examples_for "auto-follow context" do
-    def setup_collections
-      @pub1 = @context.collections.create!(:visibility => "public")
-      @pri1 = @context.collections.create!(:visibility => "private")
-      @del1 = @context.collections.create!(:visibility => "public")
-      run_jobs
-    end
+  def setup_collections
+    @pub1 = @context.collections.create!(:visibility => "public")
+    @pri1 = @context.collections.create!(:visibility => "private")
+    @del1 = @context.collections.create!(:visibility => "public")
+    run_jobs
+  end
 
+  shared_examples_for "auto-follow context" do
     it "should auto-follow for users following" do
       setup_collections
       @del1.destroy
@@ -111,6 +111,22 @@ describe 'Collections' do
       group_with_user
       @context = @group
       @follows_private = true
+    end
+
+    it "should auto-unfollow from private collections when a member leaves" do
+      setup_collections
+      @del1.destroy
+
+      @pub1.reload.followers.should == [@user]
+      @pri1.reload.followers.should == [@user]
+      @del1.reload.followers.should == []
+
+      GroupMembership.destroy_all
+      run_jobs
+
+      @pub1.reload.followers.should == [@user]
+      @pri1.reload.followers.should == []
+      @del1.reload.followers.should == []
     end
   end
 end

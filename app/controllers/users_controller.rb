@@ -325,17 +325,7 @@ class UsersController < ApplicationController
   #
   # Submission:
   #
-  #   !!!javascript
-  #   {
-  #     'type': 'Submission',
-  #     'grade': '12',
-  #     'score': 12,
-  #     'assignment': {
-  #       'title': 'Assignment 3',
-  #       'id': 5678,
-  #       'points_possible': 15
-  #     }
-  #   }
+  # Returns an API {api:Submissions:Submission Submission} with its Course and Assignment data.
   #
   # Conference:
   #
@@ -1114,7 +1104,7 @@ class UsersController < ApplicationController
         enrollments = student.student_enrollments.active.all(:include => :course)
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_teacher?(@teacher) && 
-                           enrollment.course.enrollments_visible_to(@teacher, true).find_by_id(enrollment.id) && 
+                           enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).find_by_id(enrollment.id) &&
                            enrollment.course.grants_right?(@current_user, :read_reports)
           if should_include
             Enrollment.recompute_final_score_if_stale(enrollment.course, student) { enrollment.reload }
@@ -1134,7 +1124,7 @@ class UsersController < ApplicationController
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
           Enrollment.recompute_final_score_if_stale(course)
-          @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher, true))
+          @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher, :include_priors => true))
         end
       end
 

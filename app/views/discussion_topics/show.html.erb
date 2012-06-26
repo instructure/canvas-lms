@@ -225,10 +225,7 @@
   </div>
 
   <%=
-    sequence_asset = @topic
-    sequence_asset = @topic.root_topic if @topic.root_topic && !@topic.context_module_tag && @topic.root_topic.context_module_tag
-    sequence_asset = @topic.assignment if @topic.assignment && !@topic.context_module_tag && @topic.assignment.context_module_tag
-    render :partial => "shared/sequence_footer", :locals => {:asset => sequence_asset, :context => sequence_asset.context} if sequence_asset.context_module_tag
+    render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset, :context => @sequence_asset.context} if @sequence_asset
   %>
 <% end %>
 <% if @headers == false || @locked %>

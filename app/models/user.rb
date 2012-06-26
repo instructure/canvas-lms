@@ -1730,7 +1730,7 @@ class User < ActiveRecord::Base
   end
 
   def recent_stream_items(opts={})
-    visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item)
+    visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item).compact
   end
   memoize :recent_stream_items
 

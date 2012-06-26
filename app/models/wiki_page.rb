@@ -24,12 +24,12 @@ class WikiPage < ActiveRecord::Base
   include Workflow
   include HasContentTags
   include CopyAuthorizedLinks
+  include ContextModuleItem
   
   belongs_to :wiki, :touch => true
   belongs_to :wiki_with_participants, :class_name => 'Wiki', :foreign_key => 'wiki_id', :include => {:wiki_namespaces => :context }
   belongs_to :cloned_item
   belongs_to :user
-  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
   has_many :wiki_page_comments, :order => "created_at DESC"
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
   
@@ -195,8 +195,7 @@ class WikiPage < ActiveRecord::Base
   
   def locked_for?(context, user, opts={})
     return false unless self.could_be_locked
-    @locks ||= {}
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       m = context_module_tag_for(context, user).context_module rescue nil
       locked = false
       if (m && !m.available_for?(user))

@@ -100,16 +100,6 @@ describe PseudonymSessionsController do
       flash[:delegated_message].should match(/Canvas doesn't have an account for user/)
     end
 
-    it "should redirect to alternate CAS login page if so configured, and frame bust on login" do
-      account_with_cas({:account => Account.default, :cas_log_in_url => 'http://example.com/cas'})
-
-      get login_url
-      redirect_until('http://example.com/cas')
-
-      get login_url :ticket => 'ST-abcd'
-      response.should render_template('shared/exit_frame')
-    end
-
     it "should login case insensitively" do
       account_with_cas({:account => Account.default})
       user = user_with_pseudonym({:active_all => true})
