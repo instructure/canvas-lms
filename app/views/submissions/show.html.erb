@@ -147,7 +147,7 @@
               <% if @assignment.muted? %>
                 <i><%= t('only_see_your_own_comments_muted', "You may not see all comments right now because the assignment is currently being graded") %></i>
               <% else %>
-                <i><%= t('only_see_your_own_comments_peer', "As a peer reviewing student, you will only see comments written by you.") %></i><
+                <i><%= t('only_see_your_own_comments_peer', "As a peer reviewing student, you will only see comments written by you.") %></i>
               <% end %>
               <br/><br/>
             <% end %>
@@ -208,7 +208,7 @@
           </div>
           <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
             <%= before_label('add_a_comment', 'Add a Comment') %>
-            <span style="font-size: 0.9em;"><br/><%= t('teachers_notified_of_comments', 'Teachers and submitter will be notified of all comments') %></span>
+            <span style="font-size: 0.9em;"><br/><%= t('teachers_notified_of_comments', 'Teachers and submitter will be notified of all comments.') %></span>
             <textarea style="width: 95%;" class="grading_comment"></textarea>
             <div class="comment_attachments">
             </div>
