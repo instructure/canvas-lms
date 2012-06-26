@@ -802,7 +802,7 @@ class Assignment < ActiveRecord::Base
     group = nil
     students = [student]
     if self.has_group_category?
-      group = self.group_category.groups.active.to_a.find{|g| g.users.include?(student)}
+      group = self.group_category.group_for(student)
       students = (group.users & self.context.students) if group
     end
     [group, students]

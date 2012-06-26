@@ -459,7 +459,8 @@ class FilesController < ApplicationController
     elsif @asset.is_a?(Assignment) && intent == 'submit'
       permission_object = @asset
       permission = (@asset.submission_types || "").match(/online_upload/) ? :submit : :nothing
-      @context = @current_user
+      @group = @asset.group_category.group_for(@current_user) if @asset.has_group_category?
+      @context = @group || @current_user
       @check_quota = false
     elsif @context && intent == 'attach_discussion_file'
       permission_object = @context.discussion_topics.new

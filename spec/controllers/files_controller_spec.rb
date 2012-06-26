@@ -493,6 +493,31 @@ describe FilesController do
       json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
       json['remote_url'].should eql(true)
     end
+
+    it "should associate assignment submission for a group assignment with the group" do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      category = @course.group_categories.create
+      assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
+      group = category.groups.create(:context => @course)
+      group.add_user(@student)
+      user_session(@student)
+
+      #assignment.grants_right?(@student, nil, :submit).should be_true
+      #assignment.grants_right?(@student, nil, :nothing).should be_true
+
+      s3_storage!
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :asset_string => assignment.asset_string,
+        :intent => 'submit',
+        :filename => "bob.txt"
+      }}
+      response.should be_success
+
+      assigns[:attachment].should_not be_nil
+      assigns[:attachment].context.should == group
+    end
   end
 
   describe "POST 'api_create'" do

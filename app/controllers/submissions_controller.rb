@@ -262,7 +262,7 @@ class SubmissionsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return
       end
-      @group = @assignment.group_category.groups.active.to_a.find{|g| g.users.include?(@current_user)} if @assignment.has_group_category?
+      @group = @assignment.group_category.group_for(@current_user) if @assignment.has_group_category?
 
       if api_request?
         # Verify submission_type is valid, and allowed by the assignment.

@@ -139,6 +139,10 @@ class GroupCategory < ActiveRecord::Base
     self.groups.any?{ |group| !group.has_common_section? }
   end
 
+  def group_for(user)
+    groups.active.to_a.find{ |g| g.users.include?(user) }
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     # TODO: this is kinda redundant with the :dependent => :destroy on the
