@@ -237,13 +237,11 @@ This text has a http://www.google.com link in it...
         @submission1.add_comment(:author => @student1, :comment => "hello")
         tconvo = @teacher1.conversations.first
         tconvo.should be_unread
+        tconvo.update_attribute :workflow_state, 'read' 
         @submission1.add_comment(:author => @teacher1, :comment => "hi")
         sconvo = @student1.conversations.first
         sconvo.should be_unread
-
-        tconvo.remove_messages(:all)
-        sconvo.workflow_state = :read
-        sconvo.save!
+        tconvo.reload.should be_read
       end
 
       context "with no_submission_comments_inbox" do
@@ -280,14 +278,19 @@ This text has a http://www.google.com link in it...
             @teacher1.preferences[:no_submission_comments_inbox] = true
             @teacher1.save!
           end
-          it "should not show up in conversations" do
+          it "should not create new conversations" do
             @teacher1.conversations.count.should == 0
-            # Disable notification with existing conversation
-            @teacher1.preferences[:no_submission_comments_inbox] = true
-            @teacher1.save!
-            # Student adds another comment
             @submission1.add_comment(:author => @student1, :comment => 'New comment')
             @teacher1.conversations.count.should == 0
+          end
+          it "should create conversations after re-enabling the notification" do
+            @submission1.add_comment(:author => @student1, :comment => 'New comment')
+            @teacher1.conversations.count.should == 0
+            @teacher1.preferences[:no_submission_comments_inbox] = false
+            @teacher1.save!
+            # Student adds another comment
+            @submission1.add_comment(:author => @student1, :comment => 'Another comment')
+            @teacher1.conversations.count.should == 1
           end
           it "should show teacher comment as new to student" do
             @submission1.add_comment(:author => @student1, :comment => 'Test comment')
@@ -298,6 +301,17 @@ This text has a http://www.google.com link in it...
             convo = Conversation.initiate([@student1.id, @teacher.id], false)
             convo.add_message(@student1, 'My direct message')
             @teacher.conversations.unread.count.should == 1
+          end
+          it "should add submission comments to existing conversations" do
+            convo = Conversation.initiate([@student1.id, @teacher1.id], true)
+            convo.add_message(@student1, 'My direct message')
+            c = @teacher1.conversations.unread.first
+            c.should_not be_nil
+            c.update_attribute(:workflow_state, 'read')
+            @submission1.add_comment(:author => @student1, :comment => 'A comment')
+            c.reload
+            c.should be_read # still read, since we don't care to be notified
+            c.messages.size.should eql 2 # but the submission is visible
           end
         end
       end
@@ -352,6 +366,29 @@ This text has a http://www.google.com link in it...
         @assignment.unmute!
 
         t1convo.reload.should be_unread
+        t2convo.reload.should be_unread
+        @student1.reload.conversations.size.should eql 2
+        @student1.conversations.first.should be_unread
+        @student1.conversations.last.should be_unread
+      end
+
+      it "should respect the no_submission_comments_inbox setting" do
+        @teacher1.preferences[:no_submission_comments_inbox] = true
+        @teacher1.save!
+        c1 = @submission1.add_comment(:author => @student1, :comment => "help!")
+        c2 = @submission1.add_comment(:author => @teacher1, :comment => "ok", :hidden => true)
+        c3 = @submission1.add_comment(:author => @teacher2, :comment => "no", :hidden => true)
+        @student1.conversations.size.should eql 0
+        @teacher1.conversations.size.should eql 0
+        t2convo = @teacher2.conversations.first
+        t2convo.workflow_state = :read
+        t2convo.save!
+
+        @assignment.unmute!
+
+        t1convo = @teacher1.reload.conversations.first
+        t1convo.should_not be_nil
+        t1convo.should be_read
         t2convo.reload.should be_unread
         @student1.reload.conversations.size.should eql 2
         @student1.conversations.first.should be_unread
