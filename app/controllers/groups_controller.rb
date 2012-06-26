@@ -171,8 +171,6 @@ class GroupsController < ApplicationController
   # @returns Group
   def show
     find_group
-
-    # FIXME: do something with this stuff
     respond_to do |format|
       format.html do
         if @group && @group.context
