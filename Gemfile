@@ -61,7 +61,7 @@ gem 'foreigner',      '0.9.2'
 
 group :assets do
   gem 'compass-rails', '1.0.2'
-  gem 'bootstrap-sass'
+  gem 'bootstrap-sass', '2.0.3.1'
 end
 
 group :mysql do
