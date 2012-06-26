@@ -66,8 +66,12 @@ define [
       @$carat?.remove()
       @$trigger.addClass('ui-state-active')
       triggerWidth = @$trigger.outerWidth()
-      differenceInOffset = @$trigger.offset().left - @$menu.offset().left
-      actualOffset = event.pageX - @$trigger.offset().left
+      triggerOffsetLeft = @$trigger.offset().left
+
+      # if it is a mouse event, it will have a 'pageX' otherwise use the middle of the trigger
+      pointToDropDownFrom = event.pageX || (triggerOffsetLeft + triggerWidth/2)
+      differenceInOffset = triggerOffsetLeft - @$menu.offset().left
+      actualOffset = pointToDropDownFrom - @$trigger.offset().left
       caratOffset = Math.min(
         Math.max(6, actualOffset),
         triggerWidth - 6
