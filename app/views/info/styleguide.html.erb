@@ -192,9 +192,9 @@
     </div>
   </div>
 
-  <div class="row-fluid">
+  <div class="row-fluid v-gutter">
     <div class="span4">
-      <h2 class="v-gutter">Page Action List</h2>
+      <h2>Page Action List</h2>
       <ul class="page-action-list">
         <li><a href="#"><i class="icon-add"></i> <%= t 'new_course', 'Add a new course' %></a></li>
         <li><a href="#"><i class="icon-search"></i> <%= t 'find_people', 'Find people on Canvas' %></a></li>
@@ -203,6 +203,36 @@
       </ul>
     </div>
   </div>
+
+  <h2>Admin Links</h2>
+  <div class="admin-link-hover-area">
+    <div class="admin-links">
+      <button class="al-trigger"><span class="al-trigger-inner">Manage (will be accessibly hidden)</span></button>
+      <ul class="al-options">
+        <li><a href="#"><span class="ui-icon ui-icon-pencil"></span>Edit</a></li>
+        <li><a href="#"><span class="ui-icon ui-icon-trash"></span>Delete (from database)</a></li>
+        <li><a href="#"><span class="ui-icon ui-icon-trash"></span>Hide from this screen</a></li>
+        <li><a href="#">an option with no icon</a></li>
+      </ul>
+    </div>
+    <p>This is an example of using <code>.admin-links</code></p>
+    <p>here is what the code should look like:</p>
+      <pre class="prettyprint linenums">
+      &lt;div class=&quot;admin-link-hover-area&quot;&gt;
+        &lt;div class=&quot;admin-links&quot;&gt;
+          &lt;button class=&quot;al-trigger&quot;&gt;&lt;span class=&quot;al-trigger-inner&quot;&gt;Manage (will be accessibly hidden)&lt;/span&gt;&lt;/button&gt;
+          &lt;ul class=&quot;al-options&quot;&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&lt;span class=&quot;ui-icon ui-icon-pencil&quot;&gt;&lt;/span&gt;Edit&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&lt;span class=&quot;ui-icon ui-icon-trash&quot;&gt;&lt;/span&gt;Delete (from database)&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&lt;span class=&quot;ui-icon ui-icon-trash&quot;&gt;&lt;/span&gt;Hide from this screen&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;an option with no icon&lt;/a&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/div&gt;
+        put all of the content here
+      &lt;/div&gt;
+      </pre>
+  </div>
+  
 
   <h2 class="v-gutter">Icons</h2>
   <span class="demo-icons"><i class="icon-stats"></i> icon-stats</span>
