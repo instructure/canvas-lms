@@ -18,7 +18,7 @@
         <% if version.model.user %>
           <%= mt :page_edited_by_with_link, 'by [%{user_name}](%{link})', :user_name => context_user_name(@context, version.model.user), :link => context_url(@context, :context_user_url, version.model.user) %>
         <% else %>
-          <%= t :page_edited_by, 'by %{user_name}', :user_name => version.model.user %>
+          <%= t :page_imported, 'by Content Importer' %>
         <% end %>
         </span>
       </td>

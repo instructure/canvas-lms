@@ -52,7 +52,9 @@ course will see this page first.  You can change that from [the course home page
     <div id="last_edited_by" class="clearfix">
       <% last_version = @page.versions.current.model rescue @page %>
       <a href="<%= context_url(@context, :context_wiki_page_wiki_page_revisions_path, @page) %>" id="page_history" class="history"><%= t 'links.page_history', 'Page history' %></a>
-      <%= t 'labels.last_edited', 'Last edited by %{name} %{time_ago} ago', :name => @page.user_name, :time_ago => (time_ago_in_words(last_version.updated_at) rescue "???") %>
+      <% if @page.user %>
+        <%= t 'labels.last_edited', 'Last edited by %{name} %{time_ago} ago', :name => @page.user_name, :time_ago => (time_ago_in_words(last_version.updated_at) rescue "???") %>
+      <% end %>
       <% if (@context.context.is_a?(Course) rescue false) %>
         <div><%= image_tag "warning.png", :style => "height: 10px;" %>
           <%= mt :group_wiki_warning, "This page is part of the group wiki, *not* your course wiki. If you're looking for the course wiki, [click here](%{link}).", 

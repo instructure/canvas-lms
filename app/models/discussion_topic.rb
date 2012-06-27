@@ -606,7 +606,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
-    self.user.name rescue t '#discussion_topic.default_user_name', "User Name"
+    self.user ? self.user.name : nil
   end
 
   def locked_for?(user=nil, opts={})

@@ -20,15 +20,23 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/wiki_page_revisions/show" do
-  it "should render" do
+  before do
     course_with_student
     view_context
     assigns[:wiki] = WikiNamespace.default_for_context(@course).wiki
     assigns[:page] = assigns[:wiki].wiki_page
     assigns[:page].save!
+  end
+  it "should say imported for no user edit" do
     assigns[:revision] = assigns[:page].versions.first
     render "wiki_page_revisions/show"
-    response.should_not be_nil
+    response.body.should =~ /Imported:/
+  end
+  it "should say username of editor" do
+    assigns[:page].update_attributes(:body => "oi", :user_id => @user.id)
+    assigns[:revision] = assigns[:page].versions[0]
+    render "wiki_page_revisions/show"
+    response.body.should =~ /Saved: .* by #{@user.name}/
   end
 end
 

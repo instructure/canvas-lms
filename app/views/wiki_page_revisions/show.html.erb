@@ -20,7 +20,11 @@
         <div>
           <a href="<%= context_url(@context, :context_wiki_page_url, @page) %>" class="forward"><%= t 'links.go_to_latest', 'Go to Latest Version' %></a>
           <ul class="item_list" style='line-height: 14px; font-size: 11px; padding-left:21px; '>
-            <li><%= t 'labels.by_user', 'by %{user}', :user => context_user_name(@context, @page.user) %></li>
+            <% if @revision.model.user %>
+              <li><%= t 'labels.by_user', 'by %{user}', :user => context_user_name(@context, @page.user) %></li>
+            <% else %>
+              <li><%= t 'labels.by_content_importer', 'by Content Importer' %></li>
+            <% end %>
             <li><%= t 'labels.on_date', 'on *%{date_time}*', :date_time => datetime_string(@page.updated_at),
               :wrapper => "<span title='#{time_ago_in_words_with_ago @page.updated_at}'>\\1</span>" %></li>
           </ul>
@@ -34,9 +38,15 @@
 <div id="wiki_show_view_main">
   <div id="last_edited_by" class="clearfix">
     <h2><%= t 'not_most_recent_version_warning', 'This is NOT the most recent version' %></h2>
-    <h3><%= t 'saved_by', 'Saved: *%{time_ago}* by %{user}', :user => @revision.model.user_name,
-      :time_ago => time_ago_in_words_with_ago(@revision.model.updated_at),
-      :wrapper => "<span title='#{datetime_string(@revision.model.updated_at)}'>\\1</span>" %></h3>
+    <% if @revision.model.user %>
+      <h3><%= t 'saved_by', 'Saved: *%{time_ago}* by %{user}', :user => @revision.model.user_name,
+        :time_ago => time_ago_in_words_with_ago(@revision.model.updated_at),
+        :wrapper => "<span title='#{datetime_string(@revision.model.updated_at)}'>\\1</span>" %></h3>
+    <% else %>
+      <h3><%= t('imported_at', 'Imported: *%{time_ago}*',
+                :time_ago => time_ago_in_words_with_ago(@revision.model.updated_at),
+                :wrapper => "<span title='#{datetime_string(@revision.model.updated_at)}'>\\1</span>") %></h3>
+    <% end %>
   </div>
   <div id="wiki_body">
     <%= user_content(@revision.model.body) %>
