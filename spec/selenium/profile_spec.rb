@@ -350,13 +350,3 @@ describe "profile pictures local tests" do
     Setting.set("file_storage_test_override", "local")
   end
 end
-
-describe "profile pictures s3 tests" do
-  it_should_behave_like "profile pictures selenium tests"
-  prepend_before(:each) {
-    Setting.set("file_storage_test_override", "s3")
-  }
-  prepend_before(:all) {
-    Setting.set("file_storage_test_override", "s3")
-  }
-end

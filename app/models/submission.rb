@@ -840,24 +840,22 @@ class Submission < ActiveRecord::Base
   #
   # ==== Overrides
   # * <tt>:skip_ids</tt> - Gets passed through to <tt>Conversation</tt>.<tt>update_all_for_asset</tt>.
+  #                        nil by default, which means mark-as-unread for
+  #                        everyone but the author.
   def create_or_update_conversations!(trigger, overrides={})
     options = {}
     case trigger
     when :create
       options[:update_participants] = true
-      options[:skip_ids] = overrides[:skip_ids] || []
+      options[:skip_ids] = overrides[:skip_ids] || [conversation_message_data[:author_id]] # don't mark-as-unread for the author
       if commenting_instructors.empty?
         # until the first instructor comments, we don't want the submitter to see
-        # the message (whether the submitter is the author, or someone in the group is)
+        # the message in existing conversations with anyone
         options[:update_for_skips] = false
-        options[:skip_ids] = [user_id]
       end
-      if overrides[:respect_submission_comment_pref]
-        # How to identify the teachers?
-        self.assignment.context.participating_instructors.each do |t|
-          # Check their settings and add to :skip_ids if set to suppress.
-          options[:skip_ids] << t.id if t.preferences[:no_submission_comments_inbox] == true
-        end
+      participating_instructors.each do |t|
+        # Check their settings and add to :skip_ids if set to suppress.
+        options[:skip_ids] << t.id if t.preferences[:no_submission_comments_inbox] == true
       end
     when :destroy
       options[:delete_all] = visible_submission_comments.empty?
