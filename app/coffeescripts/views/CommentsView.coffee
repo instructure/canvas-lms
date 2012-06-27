@@ -2,12 +2,11 @@ define [
   'Backbone'
   'underscore'
   'compiled/fn/preventDefault'
-  'compiled/collections/CommentCollection'
   'jst/CommentsView'
 
   # needed by CommentsView
   'jst/_avatar'
-], (Backbone, _, preventDefault, KollectionCollection, template) ->
+], (Backbone, _, preventDefault, template) ->
 
   class CommentsView extends Backbone.View
 
