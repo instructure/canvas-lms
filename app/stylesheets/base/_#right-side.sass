@@ -7,10 +7,11 @@
   right: 0
 
 #right-side
-  width: $right_side_width
+  width: $right_side_width - ($right_side_margin * 2)
   color: $right_side_text_color
   min-height: 20px
   z-index: 10 // puts it equal with #main, used so datepickers that pop up from #right-side pop up on top
+  margin: $right_side_margin $right_side_margin 0
 
   hr
     border: dotted #aaa
@@ -18,27 +19,22 @@
     margin: 17px 0 20px
   h2
     font-size: 14px
-    line-height: 20px
-    background: transparent
     color: $gray
     font-weight: bold
     border-bottom: solid 1px $grayLight
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85)
-    margin: 40px 0 0 0
-    padding: 0
-    +text-shadow(-1px, -1px, rgba(100, 100, 100, 0.4))
-    a
-      color: $blue
+    margin: $right_side_margin 0 0
 
 .rs-match-list-indent
   padding-left: 31px
-.rs-margin-lr
-  margin: 0 $right_side_margin
-.rs-margin-all
-  margin: 0 $right_side_margin $right_side_margin
-  padding-top: $right_side_margin
+
+// .rs-margin-lr was removed because it is not needed since #right-side has it's own margin
 .rs-margin-top
-  padding-top: $right_side_margin
+  margin-top: $right_side_margin
+.rs-margin-all
+  margin-top: $right_side_margin
+  margin-bottom: $right_side_margin
+
 .rs-margin-bottom
   margin-bottom: $right_side_margin
 .right-side-list
@@ -47,10 +43,9 @@
   li
     a
       font-size: 12px
-      padding: 4px 0
+      padding: 0 4px
       display: block
-      color: $blue
-      border-bottom: 1px solid $grayLighter
+      border-bottom: 1px solid #ddd
       box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85)
       // override fancy links grade checkmark
       background: transparent
@@ -71,9 +66,8 @@
       display: block  
     em, .more_link
       font:
-        family: "ff-clifford-eighteen-web-pro-1","ff-clifford-eighteen-web-pro-2",Georgia,"Times New Roman",Times,serif
         style: italic
-      font-size: 10px
+        size: 10px
       line-height: 13px
     em
       color: #bcbcbc
@@ -116,7 +110,23 @@
         top: 0
         z-index: 2
         border-bottom: none
+        box-shadow: none
       &:hover
         a.disable_item_link
           +opacity(1.0)
         
+
+
+// these are the classes that get applied to #right-side-wrapper to handle $.scrollSidebar
+// NOTE: they used to get applied to body but were moved to #right side to not force a repaint
+// of the entire page and be less jumpy going in and out display modes.
+.with-scrolling-right-side
+  #right-side
+    position: fixed
+    top: 0
+    margin-top: 0
+
+#right-side-wrapper.with-sidebar-pinned-to-bottom
+  position: absolute
+  bottom: 0
+

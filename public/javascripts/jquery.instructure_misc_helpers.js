@@ -147,16 +147,18 @@ define([
   $.scrollSidebar = function(){
     if(!scrollSideBarIsBound){
       var $right_side = $("#right-side"),
-          $body = $('body'),
           $main = $('#main'),
           $not_right_side = $("#not_right_side"),
           $window = $(window),
+          $rightSideWrapper = $("#right-side-wrapper"),
           headerHeight = $right_side.offset().top,
-          rightSideMarginBottom = $("#right-side-wrapper").height() - $right_side.outerHeight();
+          rightSideMarginBottom = $rightSideWrapper.height() - $right_side.outerHeight(),
+          rightSideMarginTop = $right_side.offset().top - $rightSideWrapper.offset().top;
 
       function onScroll(){
         var windowScrollTop = $window.scrollTop(),
-            windowScrollIsBelowHeader = (windowScrollTop > headerHeight);
+            windowScrollIsBelowHeader = (windowScrollTop > headerHeight - rightSideMarginTop);
+
         if (windowScrollIsBelowHeader) {
           var notRightSideHeight = $not_right_side.height(),
               rightSideHeight = $right_side.height(),
@@ -166,11 +168,11 @@ define([
         // windows chrome repaints when you set the class, even if the classes
         // aren't truly changing, which wreaks havoc on open select elements.
         // so we only toggle if we really need to
-        if ((windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && !rightSideBottomIsBelowMainBottom) ^ $body.hasClass('with-scrolling-right-side')) {
-          $body.toggleClass('with-scrolling-right-side');
+        if ((windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && !rightSideBottomIsBelowMainBottom) ^ $rightSideWrapper.hasClass('with-scrolling-right-side')) {
+          $rightSideWrapper.toggleClass('with-scrolling-right-side');
         }
-        if ((windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && rightSideBottomIsBelowMainBottom) ^ $body.hasClass('with-sidebar-pinned-to-bottom')) {
-          $body.toggleClass('with-sidebar-pinned-to-bottom');
+        if ((windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && rightSideBottomIsBelowMainBottom) ^ $rightSideWrapper.hasClass('with-sidebar-pinned-to-bottom')) {
+          $rightSideWrapper.toggleClass('with-sidebar-pinned-to-bottom');
         }
       }
       var throttledOnScroll = _.throttle(onScroll, 50);

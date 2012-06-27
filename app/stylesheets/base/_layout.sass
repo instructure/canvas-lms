@@ -79,15 +79,7 @@ body
   #header-inner
     max-width: $right_side_width + $max_main_width
 
-.with-scrolling-right-side
-  #right-side
-    position: fixed
-    top: 0
 
-.with-sidebar-pinned-to-bottom
-  #right-side-wrapper
-    position: absolute
-    bottom: 0
 
 .with-right-side.with-left-side
   min-width: $right_side_width + $left_side_width + $min_main_width
@@ -102,6 +94,9 @@ body
   #main
     background-color: transparent
     border: none
+
+  #content
+    padding-right: 0
 
 // **********************************************************************************
 // end classes applied to body

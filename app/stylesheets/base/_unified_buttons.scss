@@ -290,7 +290,7 @@ button.button-secondary {
       margin: 5px auto;
       display: block;
       /* 12px is the size of the padding on the button */
-      width: $right_side_width - $right_side_margin - $right_side_margin - 2px - 12px - 12px;
+      // width: $right_side_width - $right_side_margin - $right_side_margin - 2px - 12px - 12px;
     }
   }
   button.button-sidebar-wide { width: $right_side_width - $right_side_margin - $right_side_margin; }
