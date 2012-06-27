@@ -19,6 +19,7 @@
 module Api::V1::Assignment
   include Api::V1::Json
   include Api::V1::DiscussionTopics
+  include ApplicationHelper
 
   def assignment_json(assignment, user, session)
     hash = api_json(assignment, user, session, :only => %w(id grading_type points_possible position due_at description assignment_group_id group_category_id))
@@ -27,6 +28,10 @@ module Api::V1::Assignment
     hash['name'] = assignment.title
     hash['description'] = api_user_content(hash['description'], @context || assignment.context)
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
+
+    if hash['lock_info']
+      hash['lock_explanation'] = lock_explanation(hash['lock_info'], 'assignment', assignment.context)
+    end
 
     if assignment.grants_right?(user, :grade)
       hash['needs_grading_count'] = assignment.needs_grading_count

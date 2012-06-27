@@ -22,6 +22,7 @@ define [
       @object = @assignment = data
       @id = "assignment_#{data.id}"
       @title = data.title || data.name  || "Untitled" # due to a discrepancy between the legacy ajax API and the v1 API
+      @lock_explanation = @object.lock_explanation
       @addClass "group_#{@contextCode()}"
 
       @start = if data.due_at then $.parseFromISO(data.due_at, "due_date").time else null

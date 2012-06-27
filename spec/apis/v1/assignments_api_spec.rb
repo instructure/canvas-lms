@@ -295,7 +295,7 @@ describe AssignmentsApiController, :type => :integration do
     course_with_student(:active_all => true)
     @assignment1 = @course.assignments.create! :title => "Test Assignment", :description => "public stuff"
     @assignment2 = @course.assignments.create! :title => "Locked Assignment", :description => "secret stuff"
-    @assignment2.any_instantiation.expects(:locked_for?).returns(true)
+    @assignment2.any_instantiation.expects(:locked_for?).returns({:asset_string => '', :unlock_at => 1.minute.from_now})
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments.json",

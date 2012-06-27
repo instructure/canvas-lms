@@ -400,17 +400,6 @@ describe "calendar2" do
 
     describe "main calendar" do
 
-      it "should validate that a student cannot edit an assignment" do
-        @course.active_assignments.create(:name => "Assignment 1", :due_at => Time.zone.now)
-        get "/calendar2"
-        wait_for_ajaximations
-
-        f('.fc-event-title').click
-        f("#popover-0").should be_displayed
-        element_exists('.edit_event_link').should be_false
-        element_exists('.delete_event_link').should be_false
-      end
-
       it "should validate appointment group popup link functionality" do
         create_appointment_group
         ag = AppointmentGroup.first
