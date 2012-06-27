@@ -646,40 +646,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def to_ics(in_own_calendar=true)
-    cal = Icalendar::Calendar.new
-    # to appease Outlook
-    cal.custom_property("METHOD","PUBLISH")
-
-    event = Icalendar::Event.new
-    event.klass = "PUBLIC"
-    event.start = self.due_at.utc_datetime if self.due_at
-    event.start.icalendar_tzid = 'UTC' if event.start
-    event.end = event.start if event.start
-    event.end.icalendar_tzid = 'UTC' if event.end
-    if self.all_day
-      event.start = Date.new(self.all_day_date.year, self.all_day_date.month, self.all_day_date.day)
-      event.start.ical_params = {"VALUE"=>["DATE"]}
-      event.end = event.start
-      event.end.ical_params = {"VALUE"=>["DATE"]}
-    end
-    event.summary = self.title
-    event.description = strip_tags(self.description).strip
-    event.location = self.location
-    event.dtstamp = self.updated_at.utc_datetime if self.updated_at
-    event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
-    # This will change when there are other things that have calendars...
-    # can't call calendar_url or calendar_url_for here, have to do it manually
-    event.url           "http://#{HostUrl.context_host(self.context)}/calendar?include_contexts=#{self.context.asset_string}&month=#{self.due_at.strftime("%m") rescue ""}&year=#{self.due_at.strftime("%Y") rescue ""}#assignment_#{self.id.to_s}"
-    event.uid           "event-assignment-#{self.id.to_s}"
-    event.sequence      0
-    event = nil unless self.due_at
-
-    return event unless in_own_calendar
-
-    cal.add_event(event) if event
-
-    return cal.to_ical
-
+    return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
   end
 
   def all_day

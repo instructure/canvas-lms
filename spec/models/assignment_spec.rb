@@ -925,24 +925,24 @@ describe Assignment do
       res.match(/DTEND;VALUE=DATE:20080903/).should_not be_nil
     end
 
-    it ".to_ics should return a plain-text description" do
-      assignment_model(:due_at => "Sep 3 2008 12:00am", :description => <<-HTML)
-      <p>
+    it ".to_ics should return a plain-text description and alt html description" do
+      html = %{<div>
         This assignment is due December 16th. Plz discuss the reading.
         <p> </p>
-        <p> </p>
-        <p> </p>
-        <p> </p>
         <p>Test.</p>
-      </p>
-      HTML
+      </div>}
+      assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html)
       ev = @assignment.to_ics(false)
-      ev.description.should == "This assignment is due December 16th. Plz discuss the reading.
-         
-         
-         
-         
-        Test."
+      ev.description.should == "This assignment is due December 16th. Plz discuss the reading.\n  \n\n\n Test."
+      ev.x_alt_desc.should == html.strip
+    end
+
+    it ".to_ics should run the description through api_user_content to translate links" do
+      html = %{<a href="/calendar">Click!</a>}
+      assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html)
+      ev = @assignment.to_ics(false)
+      ev.description.should == "[Click!](http://localhost/calendar)"
+      ev.x_alt_desc.should == %{<a href="http://localhost/calendar">Click!</a>}
     end
   end
 

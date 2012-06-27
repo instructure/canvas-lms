@@ -227,6 +227,21 @@ describe TextHelper do
     TextHelper.make_subject_reply_to('Re: ohai').should == 'Re: ohai'
   end
 
+  context ".html_to_text" do
+    it "should format links in markdown-like style" do
+      th.html_to_text("<a href='www.example.com'>Link</a>").should == "[Link](www.example.com)"
+      th.html_to_text("<a href='www.example.com'>www.example.com</a>").should == "www.example.com"
+    end
+
+    it "should turn images into urls" do
+      th.html_to_text("<img src='http://www.example.com/a'>").should == "http://www.example.com/a"
+    end
+
+    it "should insert newlines for ps and brs" do
+      th.html_to_text("Ohai<br>Text <p>paragraph of text.</p>End").should == "Ohai\n\nText paragraph of text.\n\nEnd"
+    end
+  end
+
   context "markdown" do
     context "safety" do
       it "should escape Strings correctly" do
