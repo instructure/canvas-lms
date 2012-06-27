@@ -46,4 +46,4 @@ require [
       data['invitees[]'] = data.email
       delete data.email
       data
-    success: -> $.flashMessage("Invitation sent")
+    success: -> $.flashMessage I18n.t('invitation_sent', 'Invitation sent')
