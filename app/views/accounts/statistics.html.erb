@@ -62,7 +62,7 @@
 <% if can_do @account, @current_user, :read_course_list %>
 <% if @account == Account.default %>
 <h2><%= t(:recently_created_courses_title, "Recently Created Courses") %></h2>
-<ul class="item_list">
+<ul id="recently_created_item_list" class="item_list">
   <% @recently_created_courses.each do |course| %>
     <li>
       <a href="<%= course_path(course.id) %>" class="header"><%= course.name %></a>
@@ -87,7 +87,7 @@
 <% end %>
 
 <h2><%= t(:recently_started_courses_title, "Recently Started Courses") %></h2>
-<ul class="item_list">
+<ul id="recently_started_item_list" class="item_list">
   <% @recently_started_courses.each do |course| %>
     <li>
       <a href="<%= course_path(course.id) %>" class="header"><%= course.name %></a>
@@ -100,7 +100,7 @@
 </ul>
 
 <h2><%= t(:recently_ended_courses_title, "Recently Ended Courses") %></h2>
-<ul class="item_list">
+<ul id="recently_ended_item_list" class="item_list">
   <% @recently_ended_courses.each do |course| %>
     <li>
       <a href="<%= course_path(course.id) %>" class="header"><%= course.name %></a>
@@ -115,7 +115,7 @@
 
 <% if can_do @account, @current_user, :read_roster %>
 <h2><%= t(:recently_logged_in_users_title, "Recently Logged-In Users") %></h2>
-<ul class="item_list">
+<ul id="recently_logged_in_item_list" class="item_list">
   <% @recently_logged_users.each do |user| %>
     <li>
       <a href="<%= user_path(user.id) %>" class="header"><%= user.name %></a>

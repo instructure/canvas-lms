@@ -55,7 +55,7 @@ describe "account admin manage groups" do
       # submit new category form
       add_account_category @admin_account, 'New Category'
       driver.find_elements(:css, "#category_list li").size.should == 2
-      driver.find_elements(:css, "#category_list li a").last.text.should eql "New Category"
+      driver.find_elements(:css, "#category_list li a").last.text.should == "New Category"
     end
 
     it "should remove tab and sidebar entries for deleted category" do
@@ -118,7 +118,7 @@ describe "account admin manage groups" do
     it "should add another group and see that the group is there" do
       get "/accounts/#{@admin_account.id}/groups"
       group = add_group_to_category @courses_group_category, 'group 1'
-      driver.find_element(:css, "#group_#{group.id} .group_name").text.should eql(group.name)
+      driver.find_element(:css, "#group_#{group.id} .group_name").text.should == group.name
     end
 
     it "should add multiple groups and validate they exist" do
@@ -137,7 +137,7 @@ describe "account admin manage groups" do
       confirm_dialog.accept
       wait_for_ajaximations
       driver.find_elements(:css, ".left_side .group").should be_empty
-      @admin_account.group_categories.all.count.should eql 0
+      @admin_account.group_categories.all.count.should == 0
     end
 
     it "should edit an individual group" do
@@ -213,7 +213,7 @@ describe "account admin manage groups" do
       replace_content input_box, category_name
       submit_form(form)
       wait_for_ajaximations
-      @admin_account.group_categories.last.name.should eql category_name
+      @admin_account.group_categories.last.name.should == category_name
     end
 
     it "should create a category and should be able to check the Allow self sign-up box" do

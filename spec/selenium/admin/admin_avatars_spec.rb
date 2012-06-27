@@ -40,7 +40,7 @@ describe "admin avatars" do
     wait_for_ajax_requests
     f(".links .unlock_avatar_link").should be_displayed
     user.reload
-    user.avatar_state.should eql :locked
+    user.avatar_state.should == :locked
     user
   end
 
@@ -78,17 +78,17 @@ describe "admin avatars" do
     f(".links .unlock_avatar_link").click
     wait_for_ajax_requests
     user.reload
-    user.avatar_state.should eql :approved
+    user.avatar_state.should == :approved
     f(".links .lock_avatar_link").should be_displayed
   end
 
   it "should approve un-approved avatar" do
     user = create_avatar_state
-    user.avatar_state.should eql :submitted
+    user.avatar_state.should == :submitted
     f(".links .approve_avatar_link").click
     wait_for_ajax_requests
     user.reload
-    user.avatar_state.should eql :approved
+    user.avatar_state.should == :approved
     f(".links .approve_avatar_link").should_not be_displayed
   end
   it "should delete the avatar" do
@@ -98,7 +98,7 @@ describe "admin avatars" do
     driver.switch_to.alert.accept
     wait_for_ajax_requests
     user.reload
-    user.avatar_state.should eql :none
+    user.avatar_state.should == :none
     user.avatar_image_url.should be_nil
   end
 end
