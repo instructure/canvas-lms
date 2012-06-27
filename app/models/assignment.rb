@@ -1588,6 +1588,11 @@ class Assignment < ActiveRecord::Base
         assoc = rubric.associate_with(item, context, :purpose => 'grading')
         assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
         assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
+        if hash[:saved_rubric_comments]
+          assoc.summary_data ||= {}
+          assoc.summary_data[:saved_comments] ||= {}
+          assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
+        end
         assoc.save
       end
     end
