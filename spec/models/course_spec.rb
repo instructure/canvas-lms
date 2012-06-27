@@ -195,12 +195,15 @@ describe Course do
     @course.quizzes.create!
     @course.assignments.create!
     @course.wiki.wiki_page.save!
+    @course.self_enrollment = true
     @course.sis_source_id = 'sis_id'
     @course.stuck_sis_fields = [].to_set
     @course.save!
     @course.course_sections.should_not be_empty
     @course.students.should == [@student]
     @course.stuck_sis_fields.should == [].to_set
+    self_enrollment_code = @course.self_enrollment_code
+    self_enrollment_code.should_not be_nil
 
     @new_course = @course.reset_content
 
@@ -209,6 +212,7 @@ describe Course do
     @course.course_sections.should be_empty
     @course.students.should be_empty
     @course.sis_source_id.should be_nil
+    @course.self_enrollment_code.should be_nil
 
     @new_course.reload
     @new_course.course_sections.should_not be_empty
@@ -219,6 +223,7 @@ describe Course do
     @new_course.sis_source_id.should == 'sis_id'
     @new_course.syllabus_body.should be_blank
     @new_course.stuck_sis_fields.should == [].to_set
+    @new_course.self_enrollment_code.should == self_enrollment_code
 
     @course.uuid.should_not == @new_course.uuid
     @course.wiki_id.should_not == @new_course.wiki_id

@@ -2712,6 +2712,9 @@ class Course < ActiveRecord::Base
       self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration].include?(k.to_sym) }.each do |key, val|
         new_course.write_attribute(key, val)
       end
+      # there's a unique constraint on this, so we need to clear it out
+      self.self_enrollment_code = nil
+      self.self_enrollment = false
       # The order here is important; we have to set our sis id to nil and save first
       # so that the new course can be saved, then we need the new course saved to
       # get its id to move over sections and enrollments.  Setting this course to

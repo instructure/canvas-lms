@@ -340,7 +340,7 @@ class ApplicationController < ActionController::Base
         when 'self'
           @context = @current_user
         else
-          @context = User.find(params[:user_id])
+          @context = api_request? ? api_find(User, params[:user_id]) : User.find(params[:user_id])
         end
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
@@ -348,7 +348,7 @@ class ApplicationController < ActionController::Base
       elsif params[:course_section_id]
         params[:context_id] = params[:course_section_id]
         params[:context_type] = "CourseSection"
-        @context = CourseSection.find(params[:course_section_id])
+        @context = api_request? ? api_find(CourseSection, params[:course_section_id]) : CourseSection.find(params[:course_section_id])
       elsif params[:collection_item_id]
         params[:context_id] = params[:collection_item_id]
         params[:context_type] = 'CollectionItem'

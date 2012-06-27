@@ -78,7 +78,7 @@
     <div class="centered-block-wrap">
       <div class="centered-block-inner">
         <ul class="ui-listview" style="margin-top: 30px">
-          <li class="ui-listview-header"><%= mt('file_uploads_for_user', 'File Uploads for **%{user}**', :user => @submission.user.name) %></li>
+          <li class="ui-listview-header"><%= mt('file_uploads_for_user', 'File Uploads for **%{user}**', :user => params[:hide_student_name] ? t('student', 'Student') : @submission.user.name) %></li>
           <% if @submission.attachments.empty? %>
             <li>
               <div class="ui-listview-text ui-listview-right"></div>

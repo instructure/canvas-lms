@@ -641,14 +641,17 @@ describe ContentMigration do
       @rubric.save!
 
       @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)
-      assoc = @rubric.associate_with(@assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
-      assoc.hide_score_total = true
-      assoc.use_for_grading = true
-      assoc.save!
+      @assoc = @rubric.associate_with(@assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+      @assoc.hide_score_total = true
+      @assoc.use_for_grading = true
+      @assoc.save!
     end
 
     it "should still associate rubrics and assignments and copy rubric association properties" do
       create_rubric_asmnt
+      @assoc.summary_data = {:saved_comments=>{"309_6312"=>["what the comment", "hey"]}}
+      @assoc.save!
+
       run_course_copy
 
       rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
@@ -657,6 +660,7 @@ describe ContentMigration do
       asmnt2.rubric.id.should == rub.id
       asmnt2.rubric_association.use_for_grading.should == true
       asmnt2.rubric_association.hide_score_total.should == true
+      asmnt2.rubric_association.summary_data.should == @assoc.summary_data
     end
 
     it "should copy rubrics associated with assignments when rubric isn't selected" do

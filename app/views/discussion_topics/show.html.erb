@@ -53,7 +53,8 @@
   <h2><%= @topic.title %></h2>
 <% end %>
 <% if @locked %>
-  <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:locked_topic, "This topic is currently locked.") %>
+  <% use_context = (@context.is_a?(Group)) ? @context.context : @context %>
+  <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', use_context) : t(:locked_topic, "This topic is currently locked.") %>
 <% else %>
   <%
     js_bundle :discussion

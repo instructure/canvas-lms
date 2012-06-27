@@ -232,6 +232,44 @@ describe "speed grader" do
     ff("#comments > .comment .avatar")[0]['style'].should match(/display:\s*none/)
   end
 
+  it "should hide student names and avatar images if \"Hide student names\" is checked" do
+    # enable avatars
+    @account = Account.default
+    @account.enable_service(:avatars)
+    @account.save!
+    @account.service_enabled?(:avatars).should be_true
+
+    sub = student_submission
+    sub.add_comment(:comment => "ohai teacher")
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_animations
+    f("#avatar_image").should be_displayed
+
+    f("#settings_link").click
+    f('#hide_student_names').click
+    expect_new_page_load {
+      submit_form('#settings_form')
+    }
+    wait_for_animations
+
+    f("#avatar_image").should_not be_displayed
+    f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should eql "Student 1"
+
+    f('#comments > .comment').should include_text('ohai')
+    f("#comments > .comment .avatar").should_not be_displayed
+    f('#comments > .comment .author_name').should include_text('Student')
+
+    # add teacher comment
+    f('#add_a_comment > textarea').send_keys('grader comment')
+    submit_form('#add_a_comment')
+    keep_trying_until { ff('#comments > .comment').size == 2 }
+
+    # make sure name and avatar show up for teacher comment
+    ffj("#comments > .comment .avatar:visible").size.should eql 1
+    ff('#comments > .comment .author_name')[1].should include_text('nobody@example.com')
+  end
+
   it "should not show students in other sections if visibility is limited" do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission

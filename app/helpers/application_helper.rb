@@ -481,8 +481,8 @@ module ApplicationHelper
         {
           :name => tool.label_for(:editor_button, nil),
           :id => tool.id,
-          :url => tool.settings[:editor_button][:url],
-          :icon_url => tool.settings[:editor_button][:icon_url],
+          :url => tool.settings[:editor_button][:url] || tool.url,
+          :icon_url => tool.settings[:editor_button][:icon_url] || tool.settings[:icon_url],
           :width => tool.settings[:editor_button][:selection_width],
           :height => tool.settings[:editor_button][:selection_height]
         }
