@@ -342,6 +342,25 @@ describe Course do
       events.should include appointment_group
       events.should include assignment
     end
+
+    it "should return appropriate events when no user is supplied" do
+      course_with_teacher(:active_all => true)
+      event1 = @course.calendar_events.create
+      event2 = @course.calendar_events.build :child_event_data => [{:start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string}]
+      event2.updating_user = @teacher
+      event2.save!
+      event3 = event2.child_events.first
+      appointment_group = AppointmentGroup.create! :title => "ag", :contexts => [@course]
+      appointment_group.publish!
+      assignment = @course.assignments.create!
+
+      events = @course.events_for(nil)
+      events.should include event1
+      events.should_not include event2
+      events.should_not include event3
+      events.should_not include appointment_group
+      events.should include assignment
+    end
   end
 end
 

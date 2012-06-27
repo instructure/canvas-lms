@@ -188,13 +188,18 @@ class Course < ActiveRecord::Base
   has_a_broadcast_policy
 
   def events_for(user)
-    CalendarEvent.
-      active.
-      for_user_and_context_codes(user, [asset_string]).
-      all(:include => :child_events).
-      reject(&:hidden?) +
-    AppointmentGroup.manageable_by(user, [asset_string]) +
-    assignments.active
+    if user
+      CalendarEvent.
+        active.
+        for_user_and_context_codes(user, [asset_string]).
+        all(:include => :child_events).
+        reject(&:hidden?) +
+      AppointmentGroup.manageable_by(user, [asset_string]) +
+      assignments.active
+    else
+      calendar_events.active.all(:include => :child_events).reject(&:hidden?) +
+      assignments.active
+    end
   end
 
   def self.skip_updating_account_associations(&block)

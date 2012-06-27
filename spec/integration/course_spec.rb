@@ -29,4 +29,10 @@ describe "course" do
     response.should be_success
   end
 
+  it "should load syllabus on public course with no user logged in" do
+    course(:active_all => true)
+    @course.update_attribute(:is_public, true)
+    get "/courses/#{@course.id}/assignments/syllabus"
+    response.should be_success
+  end
 end
