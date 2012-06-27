@@ -84,6 +84,12 @@
     font-weight: normal;
     margin-bottom: 0;
   }
+  #section-tabs-header-subtitle {
+    display: block;
+    font-size: 11px;
+    font-style: italic;
+    color: inherit;
+  }
 
   & > *:first-child {
     border-top: 0 !important; // oldskool important
