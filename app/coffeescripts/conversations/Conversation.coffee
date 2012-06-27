@@ -20,6 +20,6 @@ define [
         options.success?(data)
         @list.updateItem(data)
       # TODO: use $el
-      @list.$item(@id).disableWhileLoading(ajaxRequest)
+      @list.$item(@id)?.disableWhileLoading(ajaxRequest)
 
     url: (action='') -> "/conversations/#{@id}/#{action}?#{$.param(@list.baseData())}"
