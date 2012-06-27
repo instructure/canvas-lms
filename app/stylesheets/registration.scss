@@ -12,7 +12,8 @@ a {
 }
 
 .registration-dialog {
-  margin-top: 2em
+  margin-top: 2em;
+  font-size: 1.1em;
 }
 
 .registration-dialog .spinner {
@@ -87,6 +88,8 @@ a {
   position: relative;
   h2 {
     text-indent: -9999em;
+    margin: 0;
+    height: 30px;
   }
 }
 

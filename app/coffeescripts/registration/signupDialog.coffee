@@ -5,6 +5,7 @@ define [
   'compiled/models/Pseudonym'
   'compiled/loadDir!jst/registration teacherDialog studentDialog studentHigherEdDialog parentDialog'
   'compiled/object/flatten'
+  'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
 ], (preventDefault, registrationSuccessDialog, User, Pseudonym, templates, flatten) ->
 
@@ -45,4 +46,7 @@ define [
       resizable: false
       title: title
       width: 550
+      open: ->
+        $(this).find('a').eq(0).blur()
+        $(this).find(':input').eq(0).focus()
       close: -> $('.error_box').filter(':visible').remove()
