@@ -581,7 +581,6 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
-    @use_new_styles = true
     render :layout => 'bare'
   end
 
@@ -641,9 +640,8 @@ class UsersController < ApplicationController
       @user.require_presence_of_name = true
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
-      @user.birthdate_min_years = if params[:enrollment_type] == 'student'
-        self_enrollment ? 13 : 18
-      end
+      # min age may also be enforced, depending on require_self_enrollment_code
+      @user.require_birthdate = (params[:enrollment_type] == 'student')
     end
     
     @observee = nil

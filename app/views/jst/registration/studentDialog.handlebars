@@ -1,11 +1,11 @@
 <div class="registration-dialog">
-  <form class="form-horizontal" method="post" action="/users">
+  <form class="form-horizontal bootstrap-form" method="post" action="/users">
     <div class="control-group">
-      <label class="control-label" for="student_course_code">{{#t "labels.course_code"}}Course Code{{/t}}
+      <label class="control-label" for="student_join_code">{{#t "labels.join_code"}}Join Code{{/t}}
         <a class="help-block-small signup_link" data-template="studentHigherEdDialog" href="#" title="Student Signup">{{#t "sign_up_without_code"}}don't have a code?{{/t}}</a>
       </label>
       <div class="controls">
-        <input type="text" id="student_course_code" name="user[self_enrollment_code]" class="input-small">
+        <input type="text" id="student_join_code" name="user[self_enrollment_code]" class="input-small">
       </div>
     </div>
     <div class="control-group">
@@ -50,7 +50,7 @@
       <div class="controls">
         <input type="hidden" name="enrollment_type" value="student">
         <input type="hidden" name="self_enrollment" value="1">
-        <button class="button" type="submit">{{#t "buttons.start_learning"}}Start Learning{{/t}}</button>
+        <button class="button btn-primary" type="submit">{{#t "buttons.start_learning"}}Start Learning{{/t}}</button>
       </div>
     </div>
   </form>

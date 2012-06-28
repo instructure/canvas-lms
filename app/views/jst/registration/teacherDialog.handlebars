@@ -1,5 +1,5 @@
 <div class="registration-dialog">
-  <form class="form-horizontal" method="post" action="/users">
+  <form class="form-horizontal bootstrap-form" method="post" action="/users">
     <div class="control-group">
       <label class="control-label" for="teacher_name">{{#t "labels.name"}}Name{{/t}}</label>
       <div class="controls">
@@ -23,7 +23,7 @@
     <div class="control-group">
       <div class="controls">
         <input type="hidden" name="enrollment_type" value="teacher">
-        <button class="button" type="submit">{{#t "buttons.start_teaching"}}Start Teaching{{/t}}</button>
+        <button class="button btn-primary" type="submit">{{#t "buttons.start_teaching"}}Start Teaching{{/t}}</button>
       </div>
     </div>
   </form>

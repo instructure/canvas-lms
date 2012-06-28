@@ -196,17 +196,22 @@ class User < ActiveRecord::Base
   has_a_broadcast_policy
 
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
-    :require_self_enrollment_code, :birthdate_min_years, :self_enrollment_code,
+    :require_self_enrollment_code, :require_birthdate, :self_enrollment_code,
     :self_enrollment_course, :validation_root_account
+
+  # users younger than this age can't sign up without a course join code
+  def self.self_enrollment_min_age
+    13
+  end
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :name, :if => :require_presence_of_name
   validates_locale :locale, :browser_locale, :allow_nil => true
   validates_acceptance_of :terms_of_use, :if => :require_acceptance_of_terms, :allow_nil => false
   validates_each :birthdate do |record, attr, value|
-    next unless record.birthdate_min_years
+    next unless record.require_birthdate
     if value
-      record.errors.add(attr, "too_young") if value > record.birthdate_min_years.years.ago
+      record.errors.add(attr, "too_young") if !record.require_self_enrollment_code && value > self_enrollment_min_age.years.ago
     else
       record.errors.add(attr, "blank")
     end

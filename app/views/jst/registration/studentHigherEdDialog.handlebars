@@ -1,6 +1,5 @@
 <div class="registration-dialog">
-  <p>{{#t "min_age"}}You must be at least 18 years old to sign up without a course code.{{/t}}</p>
-  <form class="form-horizontal" method="post" action="/users">
+  <form class="form-horizontal bootstrap-form" method="post" action="/users">
     <div class="control-group">
       <label class="control-label" for="student_higher_ed_name">{{#t "labels.name"}}Full Name{{/t}}</label>
       <div class="controls">
@@ -23,14 +22,14 @@
       <div class="controls">
         <label class="checkbox">
           <input type="checkbox" name="user[terms_of_use]" value="1">
-          {{#t "agree_to_terms"}}You agree to the <a href="{{terms_url}}" target="_new">terms of use</a> and certify that you are at least 18 years of age.{{/t}}
+          {{#t "agree_to_terms"}}You agree to the <a href="{{terms_url}}" target="_new">terms of use</a>.{{/t}}
         </label>
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
         <input type="hidden" name="enrollment_type" value="student">
-        <button class="button" type="submit">{{#t "buttons.start_learning"}}Start Learning{{/t}}</button>
+        <button class="button btn-primary" type="submit">{{#t "buttons.start_learning"}}Start Learning{{/t}}</button>
       </div>
     </div>
   </form>

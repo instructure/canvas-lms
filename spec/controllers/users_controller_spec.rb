@@ -276,6 +276,11 @@ describe UsersController do
         json = JSON.parse(response.body)
         json["errors"]["user"]["birthdate"].should be_present
 
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 2.years.ago.strftime('%Y-%m-%d') }, :enrollment_type => 'student'
+        response.status.should =~ /400 Bad Request/
+        json = JSON.parse(response.body)
+        json["errors"]["user"]["birthdate"].should be_present
+
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d') }, :enrollment_type => 'student'
         u = User.find_by_name 'Jacob Fugal'
         u.should be_pre_registered

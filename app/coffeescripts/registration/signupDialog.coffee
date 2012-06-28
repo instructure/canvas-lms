@@ -1,4 +1,6 @@
 define [
+  'underscore'
+  'i18n!registration'
   'compiled/fn/preventDefault'
   'compiled/registration/registrationSuccessDialog'
   'compiled/models/User'
@@ -7,7 +9,7 @@ define [
   'compiled/object/flatten'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], (preventDefault, registrationSuccessDialog, User, Pseudonym, templates, flatten) ->
+], (_, I18n, preventDefault, registrationSuccessDialog, User, Pseudonym, templates, flatten) ->
 
   $nodes = {}
 
@@ -35,12 +37,19 @@ define [
           registrationSuccessDialog(data.channel.communication_channel)
       formErrors: false
       error: (errors) ->
+        if _.any(errors.user.birthdate ? [], (e) -> e.type is 'too_young')
+          $node.find('.registration-dialog').html I18n.t('too_young_error', 'You must be at least %{min_years} years of age to use Canvas without a course join code.', min_years: ENV.USER.MIN_AGE)
+          $node.dialog buttons: [
+            text: I18n.t('ok', "OK")
+            click: -> $node.dialog('close')
+            class: 'btn-primary'
+          ]
+          return
         $form.formErrors flatten
           user: User::normalizeErrors(errors.user)
           pseudonym: Pseudonym::normalizeErrors(errors.pseudonym)
           observee: Pseudonym::normalizeErrors(errors.observee)
         , arrays: false
-        return
 
     $node.dialog
       resizable: false
@@ -50,3 +59,4 @@ define [
         $(this).find('a').eq(0).blur()
         $(this).find(':input').eq(0).focus()
       close: -> $('.error_box').filter(':visible').remove()
+    $node.fixDialogButtons()
