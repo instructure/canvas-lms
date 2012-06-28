@@ -848,7 +848,7 @@ class User < ActiveRecord::Base
       'assignment_reminders','attachments',
       'calendar_events','collaborations',
       'context_module_progressions','discussion_entries','discussion_topics',
-      'enrollments','group_memberships','page_comments','page_views',
+      'enrollments','group_memberships','page_comments',
       'rubric_assessments','short_messages',
       'submission_comment_participants','user_services','web_conferences',
       'web_conference_participants','wiki_pages'].each do |key|
