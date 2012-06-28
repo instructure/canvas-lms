@@ -19,7 +19,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     driver.find_element(:css, '.wiki_switch_views_link').click
     clear_wiki_rce
     driver.find_element(:css, '.wiki_switch_views_link').click
-    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(4) a').click
+    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
     driver.find_element(:css, '.upload_new_image_link').click
     wiki_page_tools_upload_file('#sidebar_upload_image_form', :image)
     in_frame "wiki_page_body_ifr" do
@@ -61,7 +61,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       @image_list.should_not have_class('initialized')
       @image_list.find_elements(:css, 'img.img').length.should == 0
 
-      driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(4) a').click
+      driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       keep_trying_until { @image_list.find_elements(:css, 'img.img').length }.should == 2
     end
@@ -76,7 +76,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       new_course.enroll_teacher(@user)
 
       get "/courses/#{new_course.id}/wiki"
-      f('#editor_tabs .ui-tabs-nav li:nth-child(4) a').click
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       keep_trying_until do
         images = ffj('#editor_tabs_4 .image_list img.img')
         images.length.should == 2
@@ -98,7 +98,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       @image_list.should_not have_class('initialized')
       @image_list.find_elements(:css, 'img.img').length.should == 0
 
-      driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(4) a').click
+      driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
       keep_trying_until { @image_list.find_elements(:css, 'img.img').length }.should == 30
 
@@ -117,8 +117,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     it "should show images uploaded on the files tab in the image list" do
       skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
-      driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(4) a').click
       driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       root_folders = @tree1.find_elements(:css, 'li.folder')
       root_folders.first.find_element(:css, '.sign.plus').click
       wait_for_ajaximations
@@ -146,7 +146,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       driver.find_element(:css, '.wiki_switch_views_link').click
       clear_wiki_rce
       driver.find_element(:css, '.wiki_switch_views_link').click
-      driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(4) a').click
+      driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajax_requests
 
       @image_list.find_elements(:css, 'img.img').length.should == 2

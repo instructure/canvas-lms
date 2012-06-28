@@ -75,7 +75,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     get "/courses/#{@course.id}/wiki"
     # add quiz to rce
-    f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     accordion = driver.find_element(:css, '#editor_tabs #pages_accordion')
     accordion.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
     keep_trying_until { accordion.find_element(:link, quiz.title).should be_displayed }
@@ -101,7 +100,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     clear_wiki_rce
     driver.find_element(:css, '.wiki_switch_views_link').click
     #check assigment accordion
-    f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     accordion = driver.find_element(:css, '#editor_tabs #pages_accordion')
     accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click
     keep_trying_until { accordion.find_element(:link, assignment_name).should be_displayed }

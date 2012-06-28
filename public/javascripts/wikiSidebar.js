@@ -254,8 +254,7 @@ define([
       
       $editor_tabs.bind( "tabsshow tagselect", function(event, ui) { 
         // defer loading everything in the "files" tree until we click on that tab
-        // if ui.index is 1 then we are on the "files" tab
-        if (ui.index === 2 && !$tree1.hasClass('initialized')) {
+        if (ui.panel.id === 'editor_tabs_3' && !$tree1.hasClass('initialized')) {
           $tree1.addClass('initialized unstyled_list');
           $tree1.instTree({
             multi: false,
@@ -275,7 +274,7 @@ define([
           });
         }
         // defer setting up the <img>es until we click the "images" tab
-        if (ui.index === 3 && !$image_list.hasClass('initialized')) {
+        if (ui.panel.id === 'editor_tabs_4' && !$image_list.hasClass('initialized')) {
           $image_list.addClass('initialized')
           $image_list.pageless({
             container: $image_list,
