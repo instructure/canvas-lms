@@ -1,9 +1,8 @@
 a
-  &:link, &:visited
-    color: $link_color
-    text-decoration: none
-  // this is to fix a strange bug with firefox where if you made a link to an unvisited 
-  // url in tiny it would be the browsers default link color and have underline.  the built-in 
+  color: $link_color
+  text-decoration: none
+  // this is to fix a strange bug with firefox where if you made a link to an unvisited
+  // url in tiny it would be the browsers default link color and have underline.  the built-in
   // system stylesheet of firefox was overriding that a:link rule above.
   &:link:-moz-read-write
     color: $link_color !important
@@ -47,9 +46,7 @@ table.stylized
     font-style: italic
   caption
     background: #eee
-// img
-   :vertical-align middle
-   
+
 table.striped
   thead th
     //for ie8

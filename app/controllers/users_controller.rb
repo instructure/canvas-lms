@@ -24,11 +24,13 @@
 # `users/:user_id/page_views` can be accessed as `users/self/page_views` to
 # access the current user's page views.
 class UsersController < ApplicationController
+
+
   include GoogleDocs
   include Twitter
   include LinkedIn
   include DeliciousDiigo
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
   before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :user_dashboard, :masquerade]
   before_filter :require_open_registration, :only => [:new, :create]
 
@@ -84,9 +86,9 @@ class UsersController < ApplicationController
   def oauth
     if !feature_and_service_enabled?(params[:service])
       flash[:error] = t('service_not_enabled', "That service has not been enabled")
-      return redirect_to(profile_url)
+      return redirect_to(user_profile_url(@current_user))
     end
-    return_to_url = params[:return_to] || profile_url
+    return_to_url = params[:return_to] || user_profile_url(@current_user)
     if params[:service] == "google_docs"
       redirect_to google_docs_request_token_url(return_to_url)
     elsif params[:service] == "twitter"
@@ -115,7 +117,7 @@ class UsersController < ApplicationController
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
       flash[:error] = t('oauth_fail', "OAuth Request failed. Couldn't find valid request")
-      redirect_to (@current_user ? profile_url : root_url)
+      redirect_to (@current_user ? user_profile_url(@current_user) : root_url)
     elsif request.host_with_port != oauth_request.original_host_with_port
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
@@ -149,7 +151,7 @@ class UsersController < ApplicationController
           flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
       end
-      return_to(oauth_request.return_url, profile_url)
+      return_to(oauth_request.return_url, user_profile_url(@current_user))
     end
   end
 
@@ -231,6 +233,20 @@ class UsersController < ApplicationController
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+
+    if show_new_dashboard?
+      @use_new_styles = true
+      load_all_contexts
+      js_env :CONTEXTS => @contexts, :DASHBOARD_PATH => dashboard_path
+      return render :action => :new_user_dashboard
+    end
+
+  end
+
+  def toggle_dashboard
+    @current_user.preferences[:new_dashboard] = !@current_user.preferences[:new_dashboard]
+    @current_user.save!
+    render :json => {}
   end
 
   include Api::V1::StreamItem
@@ -408,6 +424,41 @@ class UsersController < ApplicationController
     render :json => (grading + submitting)
   end
 
+  include Api::V1::Assignment
+  include Api::V1::CalendarEvent
+  # Returns the user's upcoming events
+  #
+  #   [{"type": "Assignment|CalendarEvent", "title": "Some Title", start_at: "2012-06-11T00:00:00-06:00"}]
+  def coming_up_items
+    unless @current_user
+      return render_unauthorized_action
+    end
+
+    def api_event(event)
+      url =  event.is_a?(CalendarEvent) ? api_v1_calendar_event_url(event) : course_assignment_url(event.context_id, event)
+      {
+        :title => event.title,
+        :start_at => event.start_at,
+        :type => event.class.name,
+        :html_url => url
+      }
+    end
+    render :json => @current_user.upcoming_events.map { |e| api_event(e) }
+  end
+
+  def recent_feedback
+    unless @current_user
+      return render_unauthorized_action
+    end
+
+    def api_feedback(feedback)
+
+    end
+
+    render :json => @current_user.recent_feedback
+  end
+
+
   def ignore_item
     unless %w[grading submitting].include?(params[:purpose])
       return render(:json => { :ignored => false }, :status => 400)
@@ -496,7 +547,7 @@ class UsersController < ApplicationController
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
     @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
     if authorized_action(@user, @current_user, :view_statistics)
-      add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? profile_path : user_path(@user) )
+      add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
       @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC', :per_page => 50, :without_count => true
 
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
@@ -520,18 +571,18 @@ class UsersController < ApplicationController
     @opaque_id = @current_user.opaque_identifier(:asset_string)
     @context = UserProfile.new(@current_user)
     @resource_type = 'user_navigation'
-    @return_url = profile_url(:include_host => true)
+    @return_url = user_profile_url(@current_user, :include_host => true)
     @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
     @tool_settings = @launch.generate
     @active_tab = @tool.asset_string
-    add_crumb(@current_user.short_name, profile_path)
+    add_crumb(@current_user.short_name, user_profile_path(@current_user))
     render :template => 'external_tools/tool_show'
   end
 
   def new
-    @user = User.new
-    @pseudonym = @current_user ? @current_user.pseudonyms.build(:account => @context) : Pseudonym.new(:account => @context)
-    render :action => "new"
+    return redirect_to(root_url) if @current_user
+    @use_new_styles = true
+    render :layout => 'bare'
   end
 
   include Api::V1::User
@@ -545,18 +596,23 @@ class UsersController < ApplicationController
   # @argument user[sortable_name] [Optional] User's name as used to sort alphabetically in lists.
   # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
   # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
+  # @argument user[birthdate] [Optional] The user's birth date.
   # @argument pseudonym[unique_id] User's login ID.
   # @argument pseudonym[password] [Optional] User's password.
   # @argument pseudonym[sis_user_id] [Optional] [Integer] SIS ID for the user's account. To set this parameter, the caller must be able to manage SIS permissions.
-  # @argument pseudonym[:send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
+  # @argument pseudonym[send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
   def create
     # Look for an incomplete registration with this pseudonym
     @pseudonym = @context.pseudonyms.active.custom_find_by_unique_id(params[:pseudonym][:unique_id])
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
     @pseudonym = nil if @pseudonym && !['creation_pending', 'pre_registered', 'pending_approval'].include?(@pseudonym.user.workflow_state)
 
+    manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
+    self_enrollment = params[:self_enrollment].present?
+    allow_password = self_enrollment || manage_user_logins
+
     notify = params[:pseudonym].delete(:send_confirmation) == '1'
-    notify = :self_registration unless @context.grants_right?(@current_user, session, :manage_user_logins)
+    notify = :self_registration unless manage_user_logins
     email = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
 
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
@@ -564,16 +620,56 @@ class UsersController < ApplicationController
 
     @user = @pseudonym && @pseudonym.user
     @user ||= User.new
-    @user.attributes = params[:user]
+    if params[:user]
+      params[:user].delete(:self_enrollment_code) unless self_enrollment
+      @user.attributes = params[:user]
+    end
     @user.name ||= params[:pseudonym][:unique_id]
-    @user.workflow_state = notify == :self_registration && @user.registration_approval_required? ? 'pending_approval' : 'pre_registered' unless @user.registered?
-    @user.save!
+    unless @user.registered?
+      @user.workflow_state = if self_enrollment
+        # no email confirmation required (self_enrollment_code and password
+        # validations will ensure everything is legit)
+        'registered'
+      elsif notify == :self_registration && @user.registration_approval_required?
+        'pending_approval'
+      else
+        'pre_registered'
+      end
+    end
+    if !manage_user_logins # i.e. a new user signing up
+      @user.require_acceptance_of_terms = true
+      @user.require_presence_of_name = true
+      @user.require_self_enrollment_code = self_enrollment
+      @user.validation_root_account = @domain_root_account
+      @user.birthdate_min_years = if params[:enrollment_type] == 'student'
+        self_enrollment ? 13 : 18
+      end
+    end
+    
+    @observee = nil
+    if params[:enrollment_type] == 'observer'
+      # TODO: SAML/CAS support
+      if observee = Pseudonym.authenticate(params[:observee] || {},
+          [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
+        @user.observed_users << observee.user unless @user.observed_users.include?(observee.user)
+      else
+        @observee = Pseudonym.new
+        @observee.errors.add('unique_id', 'bad_credentials')
+      end
+    end
 
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
+    @pseudonym.require_password = self_enrollment
     # pre-populate the reverse association
     @pseudonym.user = @user
     # don't require password_confirmation on api calls
     params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
+    # don't allow password setting for new users that are not self-enrolling
+    # in a course (they need to go the email route)
+    unless allow_password
+      params[:pseudonym].delete(:password)
+      params[:pseudonym].delete(:password_confirmation)
+    end
     @pseudonym.attributes = params[:pseudonym]
     @pseudonym.sis_user_id = sis_user_id
 
@@ -583,12 +679,16 @@ class UsersController < ApplicationController
     @cc ||= @user.communication_channels.build(:path => email)
     @cc.user = @user
     @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
-    if @pseudonym.valid?
-      @pseudonym.save_without_session_maintenance
-      @cc.save!
+
+    if @user.valid? && @pseudonym.valid? && @observee.nil?
+      # saving the user takes care of the @pseudonym and @cc, so we can't call
+      # save_without_session_maintenance directly. we only want to auto-log-in
+      # if a student is self enrolling in a course
+      @pseudonym.send(:skip_session_maintenance=, true) unless self_enrollment # automagically logged in
+      @user.save!
       message_sent = false
       if notify == :self_registration
-        unless @user.workflow_state == 'pending_approval'
+        unless @user.pending_approval? || @user.registered?
           message_sent = true
           @pseudonym.send_confirmation!
         end
@@ -601,24 +701,21 @@ class UsersController < ApplicationController
         @cc.send_merge_notification! if other_cc_count != 0
       end
 
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent }
-      respond_to do |format|
-        flash[:user_id] = @user.id
-        flash[:pseudonym_id] = @pseudonym.id
-        format.html { redirect_to registered_url }
-        format.json {
-          if api_request?
-            render(:json => user_json(@user, @current_user, session, %w{locale}))
-          else
-            render(:json => data)
-          end
-        }
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent }
+      if api_request?
+        render(:json => user_json(@user, @current_user, session, %w{locale}))
+      else
+        render(:json => data)
       end
     else
-      respond_to do |format|
-        format.html { render :action => :new }
-        format.json { render :json => @pseudonym.errors.to_json, :status => :bad_request }
-      end
+      errors = {
+        :errors => {
+          :user => @user.errors.as_json[:errors],
+          :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
+          :observee => @observee ? @observee.errors.as_json[:errors] : {}
+        }
+      }
+      render :json => errors, :status => :bad_request
     end
   end
 
@@ -793,7 +890,7 @@ class UsersController < ApplicationController
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
     end
     if @user_that_will_still_be_around == @current_user
-      redirect_to profile_url
+      redirect_to user_profile_url(@current_user)
     elsif @user_that_will_still_be_around
       redirect_to user_url(@user_that_will_still_be_around)
     else
@@ -877,7 +974,7 @@ class UsersController < ApplicationController
       if @user.pseudonyms.any? {|p| p.managed_password? }
         unless @user.grants_right?(@current_user, session, :manage_logins)
           flash[:error] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
-          redirect_to profile_url
+          redirect_to user_profile_url(@current_user)
         end
       end
     end

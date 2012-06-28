@@ -1,0 +1,106 @@
+@import 'blue/variables';
+@import 'blue/mixins';
+
+.activityFeed {
+  margin-top: 30px;
+  display: table;
+  width: 100%;
+}
+
+.activityFeedItem {
+  margin-bottom: 10px;
+}
+
+.activityFeedItem .image-block-image {
+  margin-top: 8px;
+  margin-right: 20px;
+}
+
+.activityFeedItemsList {
+  list-style: none;
+  margin: 0;
+  padding: 24px;
+}
+
+.activityFeedFilter {
+  // table-cell so it can share a bottom border with
+  // .activityFeedItems
+  display: table-cell;
+  vertical-align: top;
+  width: 25%;
+  height: 100%;
+}
+
+.activityFeedItems {
+  display: table-cell;
+  vertical-align: top;
+  width: 75%;
+  height: 100%;
+  position: relative;
+
+  // push content down since we pull the toolbar up
+  padding-top: 60px;
+
+  // pull the feed toolbar up to give staggered look
+  .activityFeedItemsToolbar {
+    position: absolute;
+    top: -10px;
+    left: -1px;
+    right: -1px;
+    height: 40px;
+    border-color: $borderColor;
+  }
+}
+
+.drawerClosed {
+  .activityFeedFilter {
+    display: none;
+  }
+  .activityFeedItems {
+    width: 100%;
+  }
+}
+
+.activityFeedFilter > * {
+  border-right: none;
+}
+
+.activityFeedItemsFilter {
+  float: right;
+  margin-top: 18px;
+}
+
+.dashboardActions {
+  margin-top: 13px;
+}
+
+.drawerToggle {
+  cursor: pointer;
+  margin: 3px 5px 0px 5px;
+}
+
+.item-type-image {
+  background-image: url('../../../images/blue/quickstart-icons.png') !important;
+  background-repeat: no-repeat;
+}
+
+.assignment .item-type-image {
+  background-position: -285px -35px;
+}
+.discussion .item-type-image {
+  background-position: -120px -35px;
+}
+.announcement .item-type-image {
+  background-position: -65px -35px;
+}
+.message .item-type-image {
+  background-position: -10px -35px;
+}
+.pin .item-type-image {
+  background-position: -175px -35px;
+}
+.event .item-type-image {
+  background-position: -230px -35px;
+}
+
+

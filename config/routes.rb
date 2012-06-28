@@ -404,6 +404,7 @@ ActionController::Routing::Routes.draw do |map|
     group.resources :collaborations
     group.resources :short_messages
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
+    group.profile 'profile', :controller => :groups, :action => 'profile', :conditions => {:method => :get}
   end
 
   map.resources :accounts, :member => { :statistics => :get } do |account|
@@ -525,18 +526,24 @@ ActionController::Routing::Routes.draw do |map|
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
     user.resources :messages, :only => [:index]
   end
-  map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
+
+  map.resource :profile, :only => %w(show edit update),
+                         :controller => "profile",
+                         :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
     profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'
     profile.user_service "user_services/:id", :controller => "users", :action => "delete_user_service", :conditions => {:method => :delete}
     profile.create_user_service "user_services", :controller => "users", :action => "create_user_service", :conditions => {:method => :post}
   end
+  map.user_profile 'about/:id', :controller => :profile, :action => :show
+
   map.resources :communication_channels
   map.resource :pseudonym_session
 
   # dashboard_url is / , not /dashboard
   map.dashboard '', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+  map.toggle_dashboard 'toggle_dashboard', :controller => 'users', :action => 'toggle_dashboard', :conditions => {:method => :post}
   map.styleguide 'styleguide', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
   map.root :dashboard
   # backwards compatibility with the old /dashboard url
@@ -753,6 +760,9 @@ ActionController::Routing::Routes.draw do |map|
       users.delete "users/:user_id/followers/self", :action => :unfollow
 
       users.get 'users/self/todo', :action => :todo_items
+      users.get 'users/self/coming_up', :action => :coming_up_items
+      users.get 'users/self/recent_feedback', :action => :recent_feedback
+
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
@@ -790,7 +800,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
-    api.get 'users/:user_id/profile', :controller => :profile, :action => :show
+    api.get 'users/:user_id/profile', :controller => :profile, :action => :edit
     api.get 'users/:user_id/avatars', :controller => :profile, :action => :profile_pics
 
     api.with_options(:controller => :conversations) do |conversations|
@@ -905,7 +915,14 @@ ActionController::Routing::Routes.draw do |map|
   map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
 
+  # commenting out all collection urls until collections are live
+  # map.resources :collection_items, :only => [:new]
+  # map.get_bookmarklet 'get_bookmarklet', :controller => 'collection_items', :action => 'get_bookmarklet'
   map.collection_item_link_data 'collection_items/link_data', :controller => 'collection_items', :action => 'link_data', :conditions => { :method => :post }
+  # 
+  # map.resources :collections, :only => [:show, :index] do |collection|
+  #   collection.resources :collection_items, :only => [:show, :index]
+  # end
 
   # See how all your routes lay out with "rake routes"
 end

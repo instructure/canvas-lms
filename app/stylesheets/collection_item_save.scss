@@ -1,0 +1,34 @@
+@import "environment.sass";
+.scripts-not-loaded .popup-container {display: none }
+
+.collection-item {
+  input[name=user_comment] { margin-bottom: 0 }
+  .thumbnail { width: 170px}
+  .not-important {
+    color: #888;
+    font-size: 11px;
+  }
+
+  .title, .description { width: 100% }
+  a.title { font-weight: bold }
+
+  textarea.description { min-height: 70px }
+  a.title, a.description {
+    color: inherit;
+    &:hover, &:focus {
+      text-decoration: none;
+      background-color: #FFF6D9
+    }
+  }
+  .choose-thumbnail { margin-bottom: 5px }
+  .button-container {
+    padding: 10px;
+    text-align: right;
+  }
+  .SelectKollectionView select{
+    // these are to make it be inline with the button
+    margin: 0;
+    height: 31px;
+  }
+}
+

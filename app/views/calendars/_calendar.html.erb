@@ -1,6 +1,7 @@
-<% js_bundle :calendar %>
 <%
+  js_bundle :calendar
   jammit_css :calendar
+  @body_classes << "full-width"
 %>
 <% content_for :stylesheets do %>
   <style type="text/css">

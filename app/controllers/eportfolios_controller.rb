@@ -30,7 +30,7 @@ class EportfoliosController < ApplicationController
     @context = UserProfile.new(@current_user)
     return unless tab_enabled?(UserProfile::TAB_EPORTFOLIOS)
     @active_tab = "eportfolios"
-    add_crumb(@current_user.short_name, profile_url)
+    add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))
     @portfolios = @current_user.eportfolios.active.find(:all, :order => :updated_at)
     render :action => 'user_index'
@@ -104,7 +104,7 @@ class EportfoliosController < ApplicationController
       respond_to do |format|
         if @portfolio.destroy
           flash[:notice] = t('notices.deleted', "Portfolio successfully deleted")
-          format.html { redirect_to profile_url }
+          format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @portfolio.to_json }
         else
           format.html { render :action => "delete" }

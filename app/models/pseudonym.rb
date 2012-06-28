@@ -28,7 +28,11 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   validates_length_of :unique_id, :maximum => maximum_string_length
-  validates_presence_of :account_id, :user_id
+  validates_presence_of :account_id
+  # allows us to validate the user and pseudonym together, before saving either
+  validates_each :user_id do |record, attr, value|
+    record.errors.add(attr, "blank?") unless value || record.user
+  end
   before_validation :validate_unique_id
   before_destroy :retire_channels
   
@@ -51,11 +55,12 @@ class Pseudonym < ActiveRecord::Base
     config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| p.unique_id_changed? && p.active? } }
   end
 
+  attr_writer :require_password
   def require_password?
     # Change from auth_logic: don't require a password just because new_record?
     # is true. just check if the pw has changed or crypted_password_field is
     # blank.
-    password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?)
+    password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
 
   acts_as_list :scope => :user_id
@@ -128,7 +133,7 @@ class Pseudonym < ActiveRecord::Base
   
   def infer_defaults
     self.account ||= Account.default
-    if !crypted_password || crypted_password == ""
+    if (!crypted_password || crypted_password == "") && !@require_password
       self.generate_temporary_password
     end
     self.sis_user_id = nil if self.sis_user_id.blank?

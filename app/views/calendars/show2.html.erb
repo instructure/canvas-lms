@@ -9,7 +9,8 @@
   }
   js_bundle :calendar2
   jammit_css :calendar2
-  add_crumb t('crumbs.my_calendar', "My Calendar"), calendar_url
+  crumbs.clear
+  @body_classes << "full-width no-page-block"
 %>
 
 <% content_for :auto_discovery do %>

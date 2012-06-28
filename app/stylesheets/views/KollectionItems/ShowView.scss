@@ -1,0 +1,35 @@
+@import "environment.sass";
+.KollectionItemShowView {
+  margin-bottom: 10px;
+  .thumbnail { width: 170px }
+  .not-important {
+    color: #888;
+    font-size: 11px;
+  }
+
+  a.title { font-weight: bold }
+
+  a.title, a.description {
+    color: inherit;
+    &:hover, &:focus {
+      text-decoration: none;
+    }
+  }
+  a.user_comment {
+    @include ellipsis;
+    max-width: 700px;
+    font-size: 15px;
+    display: block;
+  }
+  h1.user_comment {
+    font-size: 18px;
+    line-height: 1.27;
+  }
+
+  .box-header .avatar {
+    float: left;
+    margin-right: 15px;
+    img { max-height: 40px; }
+  }
+}
+

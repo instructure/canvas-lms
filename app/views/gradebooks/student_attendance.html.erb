@@ -3,10 +3,10 @@
 <% content_for :right_side do %>
   <div class='rs-margin-all'>
     <% if can_do(@enrollment, @current_user, :read_grades) %>
-      <a class="button button-sidebar button-sidebar-wide" href="<%= context_url(@context, :context_student_grades_url, @user.id) %>"><%= image_tag "grading_icon.png" %> <%= t('links.grades', "Grades for %{user}", :user => context_user_name(@context, @user)) %></a>
+      <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_student_grades_url, @user.id) %>"><%= image_tag "grading_icon.png" %> <%= t('links.grades', "Grades for %{user}", :user => context_user_name(@context, @user)) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :send_messages) %>
-      <a class="button button-sidebar button-sidebar-wide" href="<%= message_user_path(@user) %>"><%= image_tag "email.png" %> <%= t('links.message_user', "Message %{user}", :user => context_user_name(@context, @user)) %></a>
+      <a class="button button-sidebar-wide" href="<%= message_user_path(@user) %>"><%= image_tag "email.png" %> <%= t('links.message_user', "Message %{user}", :user => context_user_name(@context, @user)) %></a>
     <% end %>
   </div>
 <% end %>

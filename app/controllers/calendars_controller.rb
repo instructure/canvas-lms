@@ -250,8 +250,6 @@ class CalendarsController < ApplicationController
     if @domain_root_account.enable_scheduler?
       if preferred_calendar == 'show'
         add_crumb @template.link_to(t(:use_new_calendar, "Try out the new calendar"), switch_calendar_url('2'), :method => :post), nil, :id => 'change_calendar_version_link_holder'
-      else
-        add_crumb @template.link_to(t(:use_old_calendar, "Go back to the old calendar"), switch_calendar_url('1'), :method => :post), nil, :id => 'change_calendar_version_link_holder'
       end
     end
   end

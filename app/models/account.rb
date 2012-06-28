@@ -175,7 +175,7 @@ class Account < ActiveRecord::Base
     end
     settings
   end
-  
+
   def ip_filters=(params)
     filters = {}
     require 'ipaddr'
@@ -1013,4 +1013,8 @@ class Account < ActiveRecord::Base
   named_scope :limit, lambda {|limit|
     {:limit => limit}
   }
+
+  def canvas_network_enabled?
+    false
+  end
 end

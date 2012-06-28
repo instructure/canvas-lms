@@ -5,7 +5,7 @@ define [
   'compiled/discussions/EntryCollection'
   'compiled/discussions/EntryCollectionView'
   'compiled/discussions/EntryView'
-  'compiled/discussions/ParticipantCollection'
+  'compiled/collections/ParticipantCollection'
   'compiled/discussions/MarkAsReadWatcher'
   'jst/discussions/_reply_form'
   'vendor/ui.selectmenu'

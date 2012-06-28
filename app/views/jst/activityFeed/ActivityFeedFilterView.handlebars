@@ -1,0 +1,28 @@
+<header class="toolbar">&nbsp;</header>
+<div class="list-view">
+  <ul class="filterList">
+    <li><a href="#" class="active" data-value="everything">Everything</a>
+  </ul>
+
+  <header>Courses</header>
+  <ul class="courseList">
+    {{#each courses}}
+      <li><a href="#" data-value="course:{{id}}">{{name}}</a></li>
+    {{/each}}
+  </ul>
+
+  <header>Canvas Network</header>
+  <!--
+  <ul class="community">
+    <li><a href="#" data-value="peopleIFollow">People I Follow</a>
+    <li><a href="#" data-value="popular">Popular</a>
+    <li><a href="#" data-value="questions">Questions</a>
+  </ul>
+  -->
+  <ul class="communityUserCommunities filterList">
+    {{#each communities}}
+      <li><a href="#" data-value="community:{{id}}">{{name}}</a></li>
+    {{/each}}
+  </ul>
+</div>
+

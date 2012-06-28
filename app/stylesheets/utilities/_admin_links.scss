@@ -31,7 +31,7 @@ sample markup:
   .ui-button-text{ padding: 0; font-size: 10px;}
   .al-trigger-inner {
     display: block;
-    text-indent: -100px;
+    text-indent: -1000px;
     overflow: hidden;
   }
   outline: none;
@@ -54,6 +54,7 @@ sample markup:
   background-color: transparent;
   border: none;
   box-shadow: 0px 3px 5px 0px rgba(0,0,0, 0.8);
+  position: absolute;
   .ui-menu-item a {
     background-color: black; /* ie<=8 */
     background-color: rgba(0,0,0, 0.7);
@@ -88,11 +89,11 @@ $image: "cog-with-droparrow.png";
 .ui-icon-cog-with-droparrow, .al-trigger-inner  {
   height: image-height($image);
   width: image-width($image);
-  background: inline-image($image);
+  background-image: inline-image($image) !important;
 }
 .al-trigger:active .al-trigger-inner,
 .al-trigger.ui-state-active .al-trigger-inner,
 .ui-state-active .ui-icon-cog-with-droparrow{
-  background: inline-image('cog-with-droparrow-active.png')
+  background-image: inline-image('cog-with-droparrow-active.png') !important
 }
 

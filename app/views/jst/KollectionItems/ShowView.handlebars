@@ -1,0 +1,59 @@
+<section class="box-with-header KollectionItemShowView">
+  <header class="box-header">
+    <div class="box-header-column clearfix">
+      {{>avatar user}}
+      <{{#if fullView}}h1{{else}}a href="/collections/{{collection_id}}/collection_items/{{id}}"{{/if}} class="user_comment">
+        {{user_comment}}
+      </{{#if fullView}}h1{{else}}a{{/if}}>
+      <div class="box-subheader">{{user.display_name}} shared this {{item_type}} {{friendlyDatetime created_at pubdate=true}}</div>
+    </div>
+    {{#if upvoted_by_user}}
+      <a class="box-header-column some-class-that-denotes-this-is-active-and-makes-icon-blue" data-deupvote-item="{{id}}" href="#" title="you and {{upvote_count}} other people like this, click to unlike">
+        <i class="icon-like"></i>
+        <span class="box-header-count">
+          {{upvote_count}}
+        </span>
+      </a>
+    {{else}}
+      <a class="box-header-column" data-upvote-item="{{id}}" href="#" title="{{#if upvote_count}}{{upvote_count}} people like this, {{/if}}click to like">
+        <i class="icon-like"></i>
+        <span class="box-header-count">
+          {{upvote_count}}
+        </span>
+      </a>
+    {{/if}}
+    <a class="box-header-column" href="#" data-repin-item="{{id}}" title="{{#if post_count}}{{post_count}} re-pins, {{/if}}click to re-pin">
+      <i class="icon-pin"></i>
+      <span class="box-header-count">
+        {{post_count}}
+      </span>
+    </a>
+    <a class="box-header-column" data-event="onCommentButtonClick"  href="/collections/{{collection_id}}/collection_items/{{id}}" title="add a comment">
+      <i class="icon-discussion"></i>
+      <span class="box-header-count">
+        {{comments_count}}
+      </span>
+    </a>
+  </header>
+  <div class="box-content image-block">
+    {{#ifAll fullView html_preview}}
+      <div>{{{html_preview}}}</div>
+    {{else}}
+      {{#if image_url}}
+        <a href="/collections/{{collection_id}}/collection_items/{{id}}" class="image-block-image">
+          <img class="thumbnail" src="{{image_url}}"/>
+        </a>
+      {{/if}}
+    {{/ifAll}}
+    <div class="image-block-content">
+      <a class="title not_external" href="/collections/{{collection_id}}/collection_items/{{id}}">{{title}}</a>
+      <div>
+        <a class="not-important not_external" href="{{link_url}}">{{link_url}}</a>
+      </div>
+      <a class="description" href="/collections/{{collection_id}}/collection_items/{{id}}">
+        {{description}}
+      </a>
+    </div>
+  </div>
+</section>
+  <div class="commentsView"></div>

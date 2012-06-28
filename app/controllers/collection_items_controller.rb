@@ -165,6 +165,10 @@ class CollectionItemsController < ApplicationController
   #
   # @returns Collection Item
   def show
+    if !api_request?
+      render :template => "collections/collection_backbone_app"
+      return false
+    end
     find_item_and_collection
     if authorized_action(@item, @current_user, :read)
       render :json => collection_items_json([@item], @current_user, session).first
@@ -357,6 +361,10 @@ class CollectionItemsController < ApplicationController
     else
       render :nothing => true, :status => :unauthorized
     end
+  end
+
+  def new
+    render :layout => 'bare'
   end
 
   protected

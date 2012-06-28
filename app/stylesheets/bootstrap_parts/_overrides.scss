@@ -1,0 +1,12 @@
+// Instructure's bootstrap mods:
+
+// make links in .alert be same color as alert text but bold
+.alert a {
+  font-weight: bold;
+  color: inherit;
+}
+
+.nav-tabs.nav-stacked {
+  background: $lightBackground;
+}
+

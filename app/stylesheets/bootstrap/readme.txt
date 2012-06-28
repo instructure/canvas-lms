@@ -1,1 +1,0 @@
-copied from https://github.com/thomas-mcdonald/bootstrap-sass/commit/4a8dc21e8637ec0bfdacbe8d0c035021f40bf78f

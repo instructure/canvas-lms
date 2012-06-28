@@ -1,0 +1,28 @@
+<%
+  jammit_css :group_profile
+  content_for :page_title,  @group.name
+%>
+
+<div class="image-block">
+  <div class="image-block-image profile-avatar-wrapper">
+    <%= image_tag group_avatar_url(@group), :class => 'profile-pic' %>
+  </div>
+  <div class="image-block-content">
+    <h1><%= @group.name %></h1>
+    <% if @group.is_public? %>
+      <p><%= format_message(@group.description || "").first.html_safe %></p>
+    <% end %>
+
+    <% if @can_join %>
+      <p><button id="join_group" class="button">Join</button></p>
+    <% elsif not @in_group %>
+      <p>This group is not accepting new members at this time.</p>
+    <% end %>
+
+    <% if @group.is_public? %>
+      <p><button id="follow_group" class="button">Follow</button></p>
+
+      <%# TODO: collections go here %>
+    <% end %>
+  </div>
+</div>

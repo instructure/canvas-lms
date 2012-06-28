@@ -21,10 +21,29 @@ define [
 
     ##
     # Extends render to add support for chid views and element filtering
-    render: (opts = {}) ->
-      @renderViews() if @options.views
+    render: (opts = {}) =>
+      @$el.html @template(@toJSON()) if @template
+
+      # cacheEls before filter so we have access to elements in filter
+      @cacheEls() if @els
       @filter() unless opts.noFilter is true
+
+      # its important for renderViews to come last so we don't filter
+      # and cache all the child views elements
+      @renderViews() if @options.views
       this
+
+    ##
+    # Caches elements from `els` config
+    #
+    #   class Foo extends View
+    #     els:
+    #       '.someSelector': '$somePropertyName'
+    #
+    # After render is called, the `@$somePropertyName` is now available
+    # with the element found in `.someSelector`
+    cacheEls: ->
+      @[name] = @$(selector) for selector, name of @els if @els
 
     ##
     # Filters elements to add behavior and bindings. Can be called automatically
@@ -34,6 +53,12 @@ define [
     filter: ->
       @$('[data-bind]').each => @createBinding.apply this, arguments
       #@$('[data-behavior]').each => @_createBehavior.apply this, arguments
+
+    ##
+    # in charge of getting variables ready to pass to handlebars during render
+    # override with your own logic to do something fancy.
+    toJSON: ->
+      (@model ? @collection)?.toJSON arguments...
 
     ##
     # Renders all child views
@@ -48,10 +73,9 @@ define [
     # @api private
     renderView: (view, className) =>
       target = @$('.' + className).first()
-      view.$el = target
-      view.el = target[0]
-      view.delegateEvents()
+      view.setElement target
       view.render()
+      @[className] ?= view
 
     ##
     # Binds a `@model` data to the element's html. Whenever the data changes
@@ -64,7 +88,7 @@ define [
     createBinding: (index, el) ->
       $el = $ el
       attribute = $el.data 'bind'
-      @model.bind "change:#{attribute}", (model, value) =>
+      @model.on "change:#{attribute}", (model, value) =>
         $el.html value
 
     #_createBehavior: (index, el) ->

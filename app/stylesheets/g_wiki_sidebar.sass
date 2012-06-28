@@ -1,51 +1,40 @@
 @import environment.sass
 
 #editor_tabs
-  :font-size 0.8em
-  
-  #tree1
-    margin: 10px 0
-  
-  h4
-    :margin 0 0 .5em
+  :font-size 11px
+
+  > h4
+    font-size: 1.3em
+    margin-bottom: 0.3em
 
   .ui-tabs-panel
     :padding 0.5em 0.8em
 
   .wiki_pages
-    :list-style none
-    :margin 0
-    :padding 0
-    
-    a:hover
-      :text-decoration underline
+    +reset-list
 
   .page_list
-    :font-size 1.2em
-    :line-height 1.5em
-    li
-      :padding-left 20px
+    li a
+      display: block
+      padding: 3px 0 3px 20px
       :background-image url(/images/tick.png)
       :background-position left center
       :background-repeat no-repeat
-      
+
       &:hover
         :background-image url(/images/back.png)
         :background-color #eee
-        +border-radius(3px)
 
   #pages_accordion
-    span.header
-      :display block
-    
+
     .ui-accordion-header a
       :padding 0.1em 0.5em 0.1em 2.2em
-    
+
     .ui-accordion-content
       :padding 0.5em
       :height 190px
       :overflow auto
-      
+
     .add
       :display block
 
@@ -105,6 +94,41 @@
       font-weight: bold
       padding-left: 20px
       background: transparent url(/images/page_white_get.png) no-repeat left center
+#wiki_sidebar_collections
+  padding: 10px 0 0
+  ul
+    padding: 0
+    margin: 1em 0 3px
+    list-style: none
+    border: 1px solid #ccc
+    max-height: 279px
+    border: 1px solid #cccccc
+    overflow: auto
+    li
+      cursor: pointer
+      padding: 0 8px 0 39px
+      position: relative
+      margin: 0
+      height: 33px
+      border-top: 1px solid #fff
+      border-bottom: 1px solid #dfe0e0
+      color: #4790ec
+      &.even
+        background-color: #f2f9fe
+      &.last
+        border-bottom: none
+      img
+        position: absolute
+        top: 3px
+        left: 3px
+        width: 24px
+        height: 24px
+      i
+        position: absolute
+        top: 7px
+        left: 7px
+        width: 16px
+        height: 16px
 
 .ui-effects-transfer
   :border 2px dashed #000

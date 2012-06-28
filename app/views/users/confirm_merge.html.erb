@@ -20,7 +20,7 @@
   <% form_tag :url => user_merge_path(@user), :html => {:method => :post} do %>
     <div class="button-container">
       <button type="submit" class="button"><%= t('buttons.merge_user_accounts', 'Merge User Accounts') %></button>
-      <a href="<%= profile_path %>" class="button button-secondary"><%= t('#buttons.cancel', 'Cancel') %></a>
+      <a href="<%= user_profile_path(@current_user) %>" class="button button-secondary"><%= t('#buttons.cancel', 'Cancel') %></a>
     </div>
   <% end %>
   <%= t('login_to_merge_different_account', 'To merge the account, %{current_user_name} 

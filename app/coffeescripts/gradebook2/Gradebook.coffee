@@ -482,7 +482,10 @@ define [
       @arrangeColumnsBy('assignment_group')
 
       $('#gradebook_settings').show().kyleMenu
-        buttonOpts: {icons: {primary: "ui-icon-cog", secondary: "ui-icon-droparrow"}}
+        buttonOpts:
+          icons:
+            primary: "ui-icon-cog", secondary: "ui-icon-droparrow"
+          text: false
 
       $upload_modal = null
       $settingsMenu.find('.gradebook_upload_link').click (event) =>

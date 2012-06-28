@@ -55,8 +55,8 @@ define [
 
       fullCalendarParams =
         header:
-          left:   'prev,today,next'
-          center: 'title'
+          left:   'prev,today,next,title'
+          center: ''
           right:  ''
         editable: true
         columnFormat:

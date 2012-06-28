@@ -15,7 +15,7 @@ gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'encrypted_cookie_store-instructure', '1.0.1', :require => 'encrypted_cookie_store'
 gem 'erubis',         '2.7.0'
 gem 'hairtrigger',    '0.1.13'
-gem 'haml',           '3.1.2'
+gem 'haml',           '3.1.6'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
 end
@@ -60,7 +60,8 @@ gem 'yui-compressor', '0.9.4'
 gem 'foreigner',      '0.9.2'
 
 group :assets do
-  gem 'compass-rails', '1.0.1'
+  gem 'compass-rails', '1.0.2'
+  gem 'bootstrap-sass', '2.0.3.1'
 end
 
 group :mysql do
@@ -109,6 +110,7 @@ group :i18n_tools do
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
+  gem 'uglifier'
 end
 
 group :redis do

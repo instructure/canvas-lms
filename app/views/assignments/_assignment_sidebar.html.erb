@@ -17,19 +17,19 @@
   <div class="rs-margin-lr rs-margin-top">
     <% if can_do(@assignment, @current_user, :update_content) %>
       <% if @assignment.external_tool? %>
-        <%= link_to(image_tag("back.png") + t('links.view_assignment', "View Assignment"), polymorphic_url([@context, @assignment]), :class => 'view_assignment_link button button-sidebar button-sidebar-wide') %>
+        <%= link_to(image_tag("back.png") + t('links.view_assignment', "View Assignment"), polymorphic_url([@context, @assignment]), :class => 'view_assignment_link button button-sidebar-wide') %>
       <% end %>
-      <a href="#" class="edit_full_assignment_link button button-sidebar button-sidebar-wide"><%= image_tag "edit.png" %> <%= t 'links.edit_assignment', "Edit Assignment" %></a>
+      <a href="#" class="edit_full_assignment_link button button-sidebar-wide"><%= image_tag "edit.png" %> <%= t 'links.edit_assignment', "Edit Assignment" %></a>
     <% end %>
     <% if LearningOutcome.non_rubric_outcomes? && can_do(@context, @current_user, :manage_outcomes) && @context && @context.has_outcomes %>
-      <a href="#" class="align_outcomes_link button button-sidebar button-sidebar-wide"><%= image_tag "ball.png" %> <%= t 'links.align_outcomes', "Align Outcomes" %></a>
+      <a href="#" class="align_outcomes_link button button-sidebar-wide"><%= image_tag "ball.png" %> <%= t 'links.align_outcomes', "Align Outcomes" %></a>
     <% end %>
   </div>
   
   <% unless @assignment.new_record? %>
     <% if can_do(@assignment, @current_user, :update) %>
     <div class="rs-margin-lr">
-      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link button button-sidebar button-sidebar-wide" style="<%= hidden if @assignment.rubric_association %>"><%= image_tag "rubric.png" %> <%= t 'links.add_rubric', "Add Rubric" %></a>
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link button button-sidebar-wide" style="<%= hidden if @assignment.rubric_association %>"><%= image_tag "rubric.png" %> <%= t 'links.add_rubric', "Add Rubric" %></a>
     </div>
     <% end %>
     

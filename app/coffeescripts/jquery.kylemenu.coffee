@@ -66,8 +66,12 @@ define [
       @$carat?.remove()
       @$trigger.addClass('ui-state-active')
       triggerWidth = @$trigger.outerWidth()
-      differenceInOffset = @$trigger.offset().left - @$menu.offset().left
-      actualOffset = event.pageX - @$trigger.offset().left
+      triggerOffsetLeft = @$trigger.offset().left
+
+      # if it is a mouse event, it will have a 'pageX' otherwise use the middle of the trigger
+      pointToDropDownFrom = event.pageX || (triggerOffsetLeft + triggerWidth/2)
+      differenceInOffset = triggerOffsetLeft - @$menu.offset().left
+      actualOffset = pointToDropDownFrom - @$trigger.offset().left
       caratOffset = Math.min(
         Math.max(6, actualOffset),
         triggerWidth - 6
@@ -97,21 +101,5 @@ define [
   $.fn.kyleMenu = (options) ->
     this.each ->
       new KyleMenu(this, options) unless $(this).data().kyleMenu
-
-
-  # this is a behaviour that will automatically set up a set of .admin-links
-  # when the button is clicked, see _admin_links.scss for markup
-  $(document).delegate '.al-trigger', 'click', (event) ->
-    $trigger = $(this)
-    defaults =
-      buttonOpts:
-        icons:
-          primary: null
-          secondary: null
-
-    unless $trigger.data('kyleMenu')
-      event.preventDefault()
-      opts = $.extend defaults, $trigger.data('kyleMenuOptions')
-      new KyleMenu($trigger, opts).open()
 
   return KyleMenu

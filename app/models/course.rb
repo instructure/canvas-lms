@@ -1407,6 +1407,17 @@ class Course < ActiveRecord::Base
     enroll_user(user, 'StudentEnrollment', opts)
   end
 
+  def self_enroll_student(user, opts = {})
+    enrollment = enroll_student(user, opts.merge(:no_notify => true))
+    enrollment.self_enrolled = true
+    enrollment.accept
+    unless opts[:skip_pseudonym]
+      new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
+      new_pseudonym.save if new_pseudonym && new_pseudonym.changed?
+    end
+    enrollment
+  end
+
   def enroll_ta(user)
     enroll_user(user, 'TaEnrollment')
   end
@@ -1501,7 +1512,8 @@ class Course < ActiveRecord::Base
   end
 
   def default_section
-    self.course_sections.active.find_or_create_by_default_section(true) do |section|
+    init_method = (new_record? ? :find_or_initialize_by_default_section : :find_or_create_by_default_section)
+    course_sections.active.send(init_method, true) do |section|
       section.course = self
       section.root_account = self.root_account
     end

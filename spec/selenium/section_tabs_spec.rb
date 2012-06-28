@@ -11,7 +11,7 @@ describe "section tabs on the left side" do
       element_that_is_not_left_side = driver.find_element(:id, 'content')
       # make sure to mouse off the link so the :hover and :focus styles do not apply
       driver.action.move_to(element_that_is_not_left_side).perform
-      driver.execute_script(js).should eql('rgb(255, 255, 255)')
+      driver.execute_script(js).should eql('rgb(214, 236, 252)')
     end
   end
 end

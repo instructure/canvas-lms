@@ -761,66 +761,6 @@ class ConversationsController < ApplicationController
     @tags = tags.uniq
   end
 
-  def load_all_contexts
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user].cache_key, :expires_in => 10.minutes) do
-      contexts = {:courses => {}, :groups => {}, :sections => {}}
-
-      term_for_course = lambda do |course|
-        course.enrollment_term.default_term? ? nil : course.enrollment_term.name
-      end
-
-      @current_user.concluded_courses.each do |course|
-        contexts[:courses][course.id] = {
-          :id => course.id,
-          :url => course_url(course),
-          :name => course.name,
-          :type => :course,
-          :term => term_for_course.call(course),
-          :state => course.recently_ended? ? :recently_active : :inactive,
-          :can_add_notes => can_add_notes_to?(course)
-        }
-      end
-
-      @current_user.courses.each do |course|
-        contexts[:courses][course.id] = {
-          :id => course.id,
-          :url => course_url(course),
-          :name => course.name,
-          :type => :course,
-          :term => term_for_course.call(course),
-          :state => :active,
-          :can_add_notes => can_add_notes_to?(course)
-        }
-      end
-
-      section_ids = @current_user.enrollment_visibility[:section_user_counts].keys
-      CourseSection.find(:all, :conditions => {:id => section_ids}).each do |section|
-        contexts[:sections][section.id] = {
-          :id => section.id,
-          :name => section.name,
-          :type => :section,
-          :term => contexts[:courses][section.course_id][:term],
-          :state => contexts[:courses][section.course_id][:state],
-          :parent => {:course => section.course_id},
-          :context_name =>  contexts[:courses][section.course_id][:name]
-        }
-      end if section_ids.present?
-
-      @current_user.messageable_groups.each do |group|
-        contexts[:groups][group.id] = {
-          :id => group.id,
-          :name => group.name,
-          :type => :group,
-          :state => group.active? ? :active : :inactive,
-          :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
-          :context_name => group.context.name
-        }
-      end
-
-      contexts
-    end
-  end
-
   def messageable_context_states
     {:active => true, :recently_active => true, :inactive => false}
   end

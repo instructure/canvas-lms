@@ -71,7 +71,7 @@ describe CommunicationChannelsController do
         user_session(@user, @pseudonym)
         get 'confirm', :nonce => @cc.confirmation_code
         response.should be_redirect
-        response.should redirect_to(profile_url)
+        response.should redirect_to(user_profile_url(@user))
         @cc.reload
         @cc.should be_active
       end

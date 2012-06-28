@@ -113,6 +113,7 @@ class CoursesController < ApplicationController
   # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
   # @argument course[self_enrollment] [Boolean] [optional] Set to true if the course is self enrollment.
   # @argument course[restrict_enrollments_to_course_dates] [Boolean] [optional] Set to true to restrict user enrollments to the start and end dates of the course.
+  # @argument course[enroll_me] [Boolean] [optional] Set to true to enroll the current user as the teacher.
   # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
   # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
   #
@@ -143,6 +144,7 @@ class CoursesController < ApplicationController
       @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
       respond_to do |format|
         if @course.save
+          @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           # offer updates the workflow state, saving the record without doing validation callbacks
           @course.offer if api_request? and params[:offer].present?
           format.html
@@ -154,7 +156,7 @@ class CoursesController < ApplicationController
              :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
-             :restrict_enrollments_to_course_dates], nil)
+             :restrict_enrollments_to_course_dates, :workflow_state], nil)
           }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
@@ -646,11 +648,7 @@ class CoursesController < ApplicationController
       return redirect_to login_url
     end
     if @current_user
-      @enrollment = @context.enroll_student(@current_user, :no_notify => true)
-      @enrollment.self_enrolled = true
-      @enrollment.accept
-      new_pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@context.root_account)
-      new_pseudonym.save if new_pseudonym && new_pseudonym.changed?
+      @enrollment = @context.self_enroll_student(@current_user)
       flash[:notice] = t('notices.enrolled', "You are now enrolled in this course.")
       return redirect_to course_url(@context)
     end

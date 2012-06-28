@@ -186,7 +186,7 @@ describe "Users API", :type => :integration do
 
   it "should return another user's profile, if allowed" do
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-             :controller => "profile", :action => "show", :user_id => @student.to_param, :format => 'json')
+             :controller => "profile", :action => "edit", :user_id => @student.to_param, :format => 'json')
     json.should == {
       'id' => @student.id,
       'name' => 'Student',
@@ -213,7 +213,7 @@ describe "Users API", :type => :integration do
     @course.enroll_user(new_user, 'ObserverEnrollment')
     Account.site_admin.add_user(@user)
     json = api_call(:get, "/api/v1/users/#{new_user.id}/profile",
-             :controller => "profile", :action => "show", :user_id => new_user.to_param, :format => 'json')
+             :controller => "profile", :action => "edit", :user_id => new_user.to_param, :format => 'json')
     json.should == {
       'id' => new_user.id,
       'name' => 'new guy',
@@ -229,7 +229,7 @@ describe "Users API", :type => :integration do
 
   it "should return this user's profile" do
     json = api_call(:get, "/api/v1/users/self/profile",
-             :controller => "profile", :action => "show", :user_id => 'self', :format => 'json')
+             :controller => "profile", :action => "edit", :user_id => 'self', :format => 'json')
     json.should == {
       'id' => @admin.id,
       'name' => 'User',
@@ -245,7 +245,7 @@ describe "Users API", :type => :integration do
   it "should return this user's profile (non-admin)" do
     @user = @student
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-             :controller => "profile", :action => "show", :user_id => @student.to_param, :format => 'json')
+             :controller => "profile", :action => "edit", :user_id => @student.to_param, :format => 'json')
     json.should == {
       'id' => @student.id,
       'name' => 'Student',
@@ -268,7 +268,7 @@ describe "Users API", :type => :integration do
   it "shouldn't return disallowed profiles" do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
-             :controller => "profile", :action => "show", :user_id => @admin.to_param, :format => 'json')
+             :controller => "profile", :action => "edit", :user_id => @admin.to_param, :format => 'json')
     response.status.should == "401 Unauthorized"
     JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
@@ -451,8 +451,8 @@ describe "Users API", :type => :integration do
       )
       response.status.should eql "400 Bad Request"
       errors = JSON.parse(response.body)['errors']
-      errors.length.should eql 1
-      errors['unique_id'].length.should be > 0
+      errors['pseudonym'].should be_present
+      errors['pseudonym']['unique_id'].should be_present
     end
   end
 

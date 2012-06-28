@@ -30,6 +30,7 @@ describe "/calendars/_calendar" do
     assigns[:current] = today + 2
     assigns[:events] = [@course.calendar_events.create!(:title => "some event", :start_at => Time.now)]
     assigns[:assignment_groups_for] = {}
+    assigns[:body_classes] = []
     render :partial => 'calendars/calendar', :object => assigns[:events], :locals => {:current => today, :first_day => today - 3, :last_day => today + 30, :request => OpenObject.new(:path_parameters => {:controller => 'calendars', :action => 'show'}, :query_parameters => {})}
   end
 end

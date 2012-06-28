@@ -1,10 +1,14 @@
-@import "header";
+.dateFieldContainer {
+  position: relative;
 
-body {
-  background: url(../../../images/blue/bg.jpg);
+  .ui-datepicker-trigger {
+    position: absolute;
+    left: 138px;
+    top: 5px;
+  }
+
+  .dateField {
+    padding-right: 20px;
+    width: 160px;
+  }
 }
-
-#instructure_ajax_error_box {
-  display: none;
-}
-

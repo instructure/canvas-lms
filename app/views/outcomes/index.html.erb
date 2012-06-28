@@ -6,9 +6,9 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if can_do(@context, @current_user, :manage_outcomes) %>
-      <a href="#" class="add_outcome_link button button-sidebar button-sidebar-wide"><%= image_tag "add.png" %> <%= t("#buttons.add_learning_outcome", "Add Learning Outcome") %></a>
-      <a href="#" class="add_outcome_group_link button button-sidebar button-sidebar-wide"><%= image_tag "add.png" %> <%= t("#buttons.add_outcome_group", "Add Outcome Group") %></a>
-      <a href="#" class="find_outcome_link button button-sidebar button-sidebar-wide"><%= image_tag "find.png" %> <%= t("#buttons.find_learning_outcome", "Find Learning Outcome") %></a>
+      <a href="#" class="add_outcome_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t("#buttons.add_learning_outcome", "Add Learning Outcome") %></a>
+      <a href="#" class="add_outcome_group_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t("#buttons.add_outcome_group", "Add Outcome Group") %></a>
+      <a href="#" class="find_outcome_link button button-sidebar-wide"><%= image_tag "find.png" %> <%= t("#buttons.find_learning_outcome", "Find Learning Outcome") %></a>
       <a href="<%= context_url(@context, :context_rubrics_url) %>" class="button button-sidebar-wide"><%= image_tag "rubric.png" %> <%= t("#buttons.manage_rubrics", "Manage Rubrics") %></a>
     <% else %>
       <a href="<%= context_url(@context, :context_url) %>" class="button button-sidebar-wide"><%= image_tag "back.png" %>

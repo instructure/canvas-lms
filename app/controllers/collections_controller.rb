@@ -56,6 +56,7 @@
 #     }
 #
 class CollectionsController < ApplicationController
+  before_filter :render_backbone_app_if_html_request
   before_filter :require_context, :only => [:index, :create]
 
   include Api::V1::Collection
@@ -274,6 +275,13 @@ class CollectionsController < ApplicationController
 
   def find_collection
     Collection.active.find(params[:collection_id])
+  end
+
+  def render_backbone_app_if_html_request
+    if !api_request?
+      render :template => "collections/collection_backbone_app"
+      return false
+    end
   end
 
   def ensure_default_collection_for(context)

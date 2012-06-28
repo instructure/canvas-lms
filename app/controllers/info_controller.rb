@@ -85,11 +85,4 @@ class InfoController < ApplicationController
       format.json { render :json => { :status => 'canvas ok' } }
     end
   end
-
-  ##
-  # Visit /styleguide to see all the CSS components for building pages.
-  def styleguide
-    @use_new_styles = true
-  end
-
 end
