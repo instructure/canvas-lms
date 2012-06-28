@@ -640,7 +640,7 @@ class UsersController < ApplicationController
       @user.require_acceptance_of_terms = true
       @user.require_presence_of_name = true
       @user.require_self_enrollment_code = self_enrollment
-      @user.root_account = @domain_root_account
+      @user.validation_root_account = @domain_root_account
       @user.birthdate_min_years = if params[:enrollment_type] == 'student'
         self_enrollment ? 13 : 18
       end

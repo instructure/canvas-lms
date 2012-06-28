@@ -197,7 +197,7 @@ class User < ActiveRecord::Base
 
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
     :require_self_enrollment_code, :birthdate_min_years, :self_enrollment_code,
-    :self_enrollment_course, :root_account
+    :self_enrollment_course, :validation_root_account
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :name, :if => :require_presence_of_name
@@ -215,8 +215,8 @@ class User < ActiveRecord::Base
     next unless record.require_self_enrollment_code
     if value.blank?
       record.errors.add(attr, "blank")
-    elsif record.root_account
-      record.self_enrollment_course = record.root_account.all_courses.find_by_self_enrollment_code(value)
+    elsif record.validation_root_account
+      record.self_enrollment_course = record.validation_root_account.all_courses.find_by_self_enrollment_code(value)
       record.errors.add(attr, "invalid") unless record.self_enrollment_course
     else
       record.errors.add(attr, "account_required")
