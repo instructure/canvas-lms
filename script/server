@@ -6,11 +6,14 @@ if RAILS_ENV == "development" && ENV['BARE_SERVER'] != '1'
   dj = ENV["SCRIPT_SERVER_NO_JOBS"] != "1"
   if dj
     puts "Starting delayed jobs worker process. Pass SCRIPT_SERVER_NO_JOBS=1 to disable."
-    fork {
+    dj_pid = fork {
       require(Rails.root+"config/environment.rb")
       Dir.chdir(Rails.root)
       Delayed::Pool.new(["run", "--no-tail"]).run
     }
+    at_exit do
+      Process.kill("INT", dj_pid)
+    end
   else
     puts "Not starting a delayed jobs worker process."
   end
@@ -19,20 +22,24 @@ if RAILS_ENV == "development" && ENV['BARE_SERVER'] != '1'
   if guard
     puts "Starting guard. Pass SCRIPT_SERVER_NO_GUARD=1 to disable."
     Thread.new do
-      require 'open3'
-      guard_stdin, guard_stdout, guard_stderr = Open3.popen3('bundle exec guard')
-      guard_stdin.puts "" # trigger rebuild
-
-      Thread.new do
-        # pass on any return keypress to guard in a way that doesn't interfere with ruby-debug
-        line = STDIN.readline
-        if line.chomp == ""
-          guard_stdin.puts ""
-        end
+      child_stdin, guard_stdin = IO.pipe
+      guard_pid = fork do
+        STDIN.reopen(child_stdin)
+        guard_stdin.close
+        exec "bundle exec guard"
       end
-
-      while line = guard_stderr.readline
-        puts "GUARD: #{line}"
+      child_stdin.close
+      at_exit do
+        Process.kill("INT", guard_pid)
+      end
+      Thread.new do
+        loop do
+          # pass on any return keypress to guard in a way that doesn't interfere with ruby-debug
+          line = STDIN.readline
+          if line.chomp == ""
+            guard_stdin.puts ""
+          end
+        end
       end
     end
   else
