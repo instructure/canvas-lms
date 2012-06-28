@@ -15,7 +15,7 @@
       <select>
         <% @current_user.collections.each do |collection| %>
           <option value="<%= collection.id %>"><%= collection.name %></option>
-        <% end %>
+        <% end if @current_user %>
       </select>
       <ul></ul>
     </div>
