@@ -1,4 +1,4 @@
-<% possible_collaborators = @users.find(:all, :order => User.sortable_name_order_by_clause).uniq.find_all{|x| x != @current_user} %>
+<% possible_collaborators = @users %>
 <% if possible_collaborators.size > 0 %>
   <%= before_label :collaborate_with, "Collaborate With" %>
   <div style="margin-left: 10px">

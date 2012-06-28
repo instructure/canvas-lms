@@ -19,6 +19,7 @@
 class CollaborationsController < ApplicationController
   before_filter :require_context
   before_filter :require_collaborations_configured
+  before_filter :reject_student_view_student
   include GoogleDocs
   
   def require_collaborations_configured
@@ -35,7 +36,15 @@ class CollaborationsController < ApplicationController
       return unless tab_enabled?(@context.class::TAB_COLLABORATIONS)
       log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
       @google_docs = google_docs_verify_access_token rescue false
-      @users = @context.users
+
+      scope = @context.users
+      if @context.respond_to?(:all_real_users)
+        scope = @context.all_real_users
+      end
+      @users = scope.scoped({
+        :conditions => ["users.id <> ?", @current_user.id],
+        :order => User.sortable_name_order_by_clause
+      }).all.uniq
     end
   end
   
