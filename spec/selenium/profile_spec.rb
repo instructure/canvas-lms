@@ -34,6 +34,25 @@ describe "profile" do
     end
   end
 
+  it "should give error - wrong old password" do
+    user_with_pseudonym({:active_user => true})
+    login_as
+    get '/profile/edit'
+    old_password = 'oldpassword'
+    wrong_old_password = 'wrongoldpassword'
+    new_password = 'newpassword'
+    edit_form = click_edit
+    edit_form.find_element(:id, 'change_password_checkbox').click
+    edit_form.find_element(:id, 'old_password').send_keys(wrong_old_password)
+    edit_form.find_element(:id, 'pseudonym_password').send_keys(new_password)
+    edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
+    submit_form(edit_form)
+    # check to see if error box popped up
+    errorboxes = ff('.error_text')
+    errorboxes.length.should > 1
+    errorboxes.any? {|errorbox| errorbox.text =~ /Invalid old password for the login/}.should be_true
+  end
+
   it "should change the password" do
     user_with_pseudonym({:active_user => true})
     login_as
