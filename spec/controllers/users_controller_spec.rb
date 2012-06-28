@@ -474,6 +474,21 @@ describe UsersController do
       get 'grades'
       response.should redirect_to course_grades_url(@course2)
     end
+
+    it "should not include student view students in the grade average calculation" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true, :user => @teacher)
+      @s1 = student_in_course(:active_user => true).user
+      @s2 = student_in_course(:active_user => true).user
+      @test_student = @course.student_view_student
+      @assignment = assignment_model(:course => @course, :points_possible => 5)
+      @assignment.grade_student(@s1, :grade => 3)
+      @assignment.grade_student(@s2, :grade => 4)
+      @assignment.grade_student(@test_student, :grade => 5)
+
+      get 'grades'
+      assigns[:course_grade_summaries][@course.id].should == { :score => 70, :students => 2 }
+    end
   end
   
   describe "GET 'avatar_image'" do

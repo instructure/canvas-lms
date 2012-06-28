@@ -75,9 +75,9 @@ class UsersController < ApplicationController
       @course_grade_summaries = {}
       @teacher_enrollments.each do |enrollment|
         @course_grade_summaries[enrollment.course_id] = Rails.cache.fetch(['computed_avg_grade_for', enrollment.course].cache_key) do
-          goodies = enrollment.course.student_enrollments.map(&:computed_current_score).compact
-          score = (goodies.sum.to_f * 100.0 / goodies.length.to_f).round.to_f / 100.0 rescue nil
-          {:score => score, :students => goodies.length }
+          current_scores = enrollment.course.student_enrollments.not_fake.maximum(:computed_current_score, :group => :user_id).values.compact
+          score = (current_scores.sum.to_f * 100.0 / current_scores.length.to_f).round.to_f / 100.0 rescue nil
+          {:score => score, :students => current_scores.length }
         end
       end
     end
