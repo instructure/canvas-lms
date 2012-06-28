@@ -62,7 +62,9 @@ def truncate_table(model)
         model.connection.raw_connection.set_notice_processor(&old_proc)
       end
     else
+      model.connection.execute("SET FOREIGN_KEY_CHECKS=0")
       model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
+      model.connection.execute("SET FOREIGN_KEY_CHECKS=1")
   end
 end
 
