@@ -166,7 +166,7 @@ $.widget( "ui.autocomplete", {
 					clearTimeout( self.closing );
 				}, 13);
 			})
-			.menu({
+			.oldMenu({
 				focus: function( event, ui ) {
 					var item = ui.item.data( "item.autocomplete" );
 					if ( false !== self._trigger( "focus", event, { item: item } ) ) {
@@ -216,7 +216,7 @@ $.widget( "ui.autocomplete", {
 			// workaround for jQuery bug #5781 http://dev.jquery.com/ticket/5781
 			.css({ top: 0, left: 0 })
 			.hide()
-			.data( "menu" );
+			.data( "oldMenu" );
 		if ( $.fn.bgiframe ) {
 			 this.menu.element.bgiframe();
 		}
@@ -448,7 +448,10 @@ $.extend( $.ui.autocomplete, {
  *	jquery.ui.core.js
  *  jquery.ui.widget.js
  */
-$.widget("ui.menu", {
+
+// renamed to oldMenu since jQuery UI 1.9 has a menu widget that conflicts
+// with this one, and we only use this menu in autocomplete :)
+$.widget("ui.oldMenu", {
 	_create: function() {
 		var self = this;
 		this.element
