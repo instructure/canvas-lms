@@ -835,6 +835,30 @@ shared_examples_for "all selenium tests" do
       $check_screen_dimensions = true
     end
   end
+
+  append_after(:each) do
+    clear_timers!
+  end
+
+  def clear_timers!
+    # we don't want any AJAX requests getting kicked off after a test ends.
+    # the unload event won't fire until sometime after the next test begins (and
+    # the old session cookie becomes invalid). that means a late AJAX call can
+    # screw up the next test, i.e. two requests send the old (now-invalid)
+    # encrypted session cookie, each gets a new (different) session cookie in
+    # the response, meaning the authenticity token on your new page might
+    # already be invalid.
+    driver.execute_script <<-JS
+      var highest = setTimeout(function(){}, 1000);
+      for (var i = 0; i < highest; i++) {
+        clearTimeout(i);
+      }
+      highest = setInterval(function(){}, 1000);
+      for (var i = 0; i < highest; i++) {
+        clearInterval(i);
+      }
+    JS
+  end
 end
 
   TEST_FILE_UUIDS = {
