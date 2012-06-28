@@ -37,12 +37,8 @@ module Delayed
         # this means that deleting the first job from a strand from
         # outside rails is *not* safe when using mysql for the queue.
         after_destroy :update_strand_on_destroy
-        cattr_accessor :adapter_name
         def update_strand_on_destroy
-          if adapter_name.nil?
-            self.class.adapter_name = connection.adapter_name
-          end
-          if strand.present? && next_in_strand? && adapter_name == 'MySQL'
+          if strand.present? && next_in_strand? && self.class.connection.adapter_name == 'MySQL'
             # this funky sub-sub-select is to force mysql to create a temporary
             # table, otherwise it fails complaining that you can't select from
             # the same table you are updating
@@ -55,10 +51,7 @@ module Delayed
         # to raise the lock level
         before_create :lock_strand_on_create
         def lock_strand_on_create
-          if adapter_name.nil?
-            self.class.adapter_name = connection.adapter_name
-          end
-          if strand.present? && adapter_name == 'PostgreSQL'
+          if strand.present? && self.class.connection.adapter_name == 'PostgreSQL'
             connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
           end
         end
@@ -131,22 +124,46 @@ module Delayed
           scope.by_priority
         end
 
+        # used internally by create_singleton to take the appropriate lock
+        # depending on the db driver
+        def self.transaction_for_singleton(strand)
+          case self.connection.adapter_name
+          when 'PostgreSQL'
+            self.transaction do
+              connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
+              yield
+            end
+          when 'MySQL'
+            self.transaction do
+              begin
+                connection.execute("LOCK TABLES #{table_name} WRITE")
+                yield
+              ensure
+                connection.execute("UNLOCK TABLES")
+              end
+            end
+          when 'SQLite'
+            # can't use BEGIN EXCLUSIVE TRANSACTION here, since we might already be in a txn
+            self.transaction do
+              begin
+                connection.execute("PRAGMA locking_mode = EXCLUSIVE")
+                yield
+              ensure
+                connection.execute("PRAGMA locking_mode = NORMAL")
+              end
+            end
+          end
+        end
+
         # Create the job on the specified strand, but only if there aren't any
         # other non-running jobs on that strand.
         # (in other words, the job will still be created if there's another job
         # on the strand but it's already running)
         def self.create_singleton(options)
           strand = options[:strand]
-
-          self.transaction do
-            if adapter_name == 'PostgreSQL'
-              connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
-              job = self.first(:conditions => ["run_at <= ? AND strand = ? AND locked_at IS NULL", db_time_now, strand])
-              job || self.create(options)
-            else
-              self.delete_all(['strand=? AND locked_at IS NULL', strand])
-              self.create(options)
-            end
+          transaction_for_singleton(strand) do
+            job = self.first(:conditions => ["strand = ? AND locked_at IS NULL", strand], :order => :id)
+            job || self.create(options)
           end
         end
 

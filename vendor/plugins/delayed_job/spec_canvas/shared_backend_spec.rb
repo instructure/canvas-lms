@@ -363,12 +363,9 @@ shared_examples_for 'a backend' do
     it "should un-hold a scope of jobs" do
       3.times { create_job() }
       Delayed::Job.hold!
-      scope = Delayed::Job.scoped(:limit => 2)
-      scope.last.update_attribute(:run_at, 5.hours.from_now)
+      scope = Delayed::Job.scoped(:limit => 2, :order => :id)
       scope.unhold!.should == 2
-      jobs = scope.sort_by { |j| j.run_at }
-      jobs.first.run_at.should <= Time.now
-      jobs.last.run_at.should > 4.hours.from_now
+      Delayed::Job.count(:conditions => { :locked_by => 'on hold' }).should == 1
     end
   end
 
@@ -409,48 +406,39 @@ shared_examples_for 'a backend' do
       job = Delayed::Job.first
       Delayed::Periodic.perform_audit!
       Delayed::Job.count.should == 1
+      # verify that the same job still exists, it wasn't just replaced with a new one
       job.should == Delayed::Job.first
     end
 
-    it "should aduit on the auditor strand" do
-      Delayed::Periodic.audit_queue
-      Delayed::Job.count.should == 1
-      Delayed::Job.first.strand.should == Delayed::Periodic::STRAND
-    end
-
-    it "should only schedule an audit if none is scheduled" do
-      Delayed::Periodic.audit_queue
-      Delayed::Job.count.should == 1
-      Delayed::Periodic.audit_queue
-      Delayed::Job.count.should == 1
-    end
-
     it "should schedule the next job run after performing" do
+      # make the periodic job get scheduled in the past
+      Delayed::Periodic.expects(:now).twice.returns(5.minutes.ago)
+
       Delayed::Periodic.perform_audit!
-      job = Delayed::Job.first
+      job = Delayed::Job.get_and_lock_next_available('test1')
       run_job(job)
       job.destroy
 
-      Delayed::Job.count.should == 2
-      job = Delayed::Job.first(:order => 'run_at asc')
+      job = Delayed::Job.get_and_lock_next_available('test1')
       job.tag.should == 'SimpleJob#perform'
 
-      next_scheduled = Delayed::Job.last(:order => 'run_at asc')
+      next_scheduled = Delayed::Job.get_and_lock_next_available('test2')
       next_scheduled.tag.should == 'periodic: my SimpleJob'
       next_scheduled.payload_object.should be_is_a(Delayed::Periodic)
-      next_scheduled.run_at.utc.to_i.should >= Time.now.utc.to_i
     end
 
     it "should not schedule the next job if a duplicate exists" do
+      Delayed::Periodic.stubs(:now).returns(5.minutes.ago)
+      tag =  'periodic: my SimpleJob'
       Delayed::Periodic.perform_audit!
-      Delayed::Periodic.scheduled['my SimpleJob'].enqueue()
+      Delayed::Job.enqueue(Delayed::Periodic.scheduled['my SimpleJob'], :max_attempts => 1, :strand => tag)
       Delayed::Job.count(:conditions => {:tag => 'periodic: my SimpleJob'}).should == 2
       # there's a duplicate, so running this job will delete the dup and
       # re-schedule
-      run_job(Delayed::Job.first(:conditions => {:tag => 'periodic: my SimpleJob'}))
+      run_job(Delayed::Job.get_and_lock_next_available('test1'))
       Delayed::Job.count(:conditions => {:tag => 'periodic: my SimpleJob'}).should == 1
       # no more duplicate, so it should re-enqueue as normal
-      run_job(Delayed::Job.first(:conditions => {:tag => 'periodic: my SimpleJob'}))
+      run_job(Delayed::Job.get_and_lock_next_available('test1'))
       Delayed::Job.count(:conditions => {:tag => 'periodic: my SimpleJob'}).should == 1
     end
 
