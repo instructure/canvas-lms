@@ -723,10 +723,10 @@ describe "context_modules" do
         get "/courses/#{@course.id}/modules/items/#{i2.id}"
         wait_for_ajaximations
 
-        prev = driver.find_element(:css, '#sequence_footer a.prev')
+        prev = fj('#sequence_footer a.prev')
         URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i1.id}"
 
-        nxt = driver.find_element(:css, '#sequence_footer a.next')
+        nxt = fj('#sequence_footer a.next')
         URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i3.id}"
       end
     end

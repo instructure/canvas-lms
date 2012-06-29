@@ -5,16 +5,19 @@ describe "question bank" do
 
   it "deleting AJAX-loaded questions should work" do
     course_with_teacher_logged_in
-    @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
     (1..60).each { |idx| @bank.assessment_questions.create!(:question_data => {'question_name' => "test question #{idx}", 'answers' => [{'id' => 1}, {'id' => 2}]}) }
     get "/courses/#{@course.id}/question_banks/#{@bank.id}"
     f(".more_questions_link").click
-    keep_trying_until { ffj('.display_question:visible').length.should == 60 }
-    driver.execute_script("$('.display_question .links').css('visibility', 'visible')")
-    driver.execute_script("window.confirm = function(msg) { return true; };")
-    fj(".display_question:visible:last .delete_question_link").click
     wait_for_ajaximations
-    keep_trying_until { ffj('.display_question:visible').length.should == 59 }
+    keep_trying_until do
+      ffj('.display_question:visible').length.should == 60
+      driver.execute_script("$('.display_question .links').css('visibility', 'visible')")
+      driver.execute_script("window.confirm = function(msg) { return true; };")
+      fj(".display_question:visible:last .delete_question_link").click
+      wait_for_ajaximations
+      ffj('.display_question:visible').length.should == 59
+    end
     @bank.reload
     @bank.assessment_questions.select { |aq| !aq.deleted? }.length.should == 59
   end
