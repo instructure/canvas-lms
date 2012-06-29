@@ -293,22 +293,25 @@ define([
 
       $editor_tabs.tabs();
 
-      $('#wiki_sidebar_collections select').change(function() {
-        $.ajaxJSON('/api/v1/collections/' + $(this).val() + '/items', 'GET', {}, function(items) {
-          $collectionItems.html();
-          for (var i = 0; i < items.length; i++) {
-            var item = items[i];
-            item.iconClass = "icon-" + ({url: 'link', image: 'analytics'}[item.item_type] || item.item_type); 
-            var $node = $(collectionItem(item));
-            $node.data('item', item);
-            if (i % 2 == 1)
-              $node.addClass('even');
-            if (i == items.length - 1)
-              $node.addClass('last');
-            $collectionItems.append($node);
-          }
-        });
-      }).change();
+      var $collectionsSelect = $('#wiki_sidebar_collections select');
+      if ($collectionsSelect.length) {
+        $collectionsSelect.change(function() {
+          $.ajaxJSON('/api/v1/collections/' + $(this).val() + '/items', 'GET', {}, function(items) {
+            $collectionItems.html();
+            for (var i = 0; i < items.length; i++) {
+              var item = items[i];
+              item.iconClass = "icon-" + ({url: 'link', image: 'analytics'}[item.item_type] || item.item_type); 
+              var $node = $(collectionItem(item));
+              $node.data('item', item);
+              if (i % 2 == 1)
+                $node.addClass('even');
+              if (i == items.length - 1)
+                $node.addClass('last');
+              $collectionItems.append($node);
+            }
+          });
+        }).change();
+      }
 
       $collectionItems.on('click', 'li', function() {
         wikiSidebar.itemSelected($(this).data('item'));
