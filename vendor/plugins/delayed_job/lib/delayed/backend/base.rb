@@ -12,9 +12,10 @@ module Delayed
 
       def self.included(base)
         base.extend ClassMethods
-        base.send :attr_writer, :current_shard
         base.default_priority = Delayed::NORMAL_PRIORITY
       end
+
+      attr_writer :current_shard
 
       def current_shard
         @current_shard || Shard.default
