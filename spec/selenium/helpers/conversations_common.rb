@@ -1,3 +1,5 @@
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+
 shared_examples_for "conversations selenium tests" do
   before(:each) do
     course_with_teacher_logged_in

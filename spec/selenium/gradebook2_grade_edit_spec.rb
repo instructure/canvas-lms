@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + "/common")
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "edititing grades" do
   it_should_behave_like "gradebook2 selenium tests"

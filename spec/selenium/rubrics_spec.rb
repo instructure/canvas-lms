@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/rubrics_specs')
 describe "course rubrics" do
   it_should_behave_like "rubric tests"

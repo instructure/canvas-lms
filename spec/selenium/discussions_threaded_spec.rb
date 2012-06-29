@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 
 describe "threaded discussions" do

@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 shared_examples_for "conversations attachments selenium tests" do
