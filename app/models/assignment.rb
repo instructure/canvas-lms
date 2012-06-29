@@ -173,11 +173,7 @@ class Assignment < ActiveRecord::Base
 
   def update_grades_if_details_changed
     if @points_possible_was != self.points_possible || @grades_affected || @muted_was != self.muted
-      begin
-        self.context.recompute_student_scores
-      rescue
-        ErrorReport.log_exception(:grades, $!)
-      end
+      connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
   end
@@ -807,11 +803,12 @@ class Assignment < ActiveRecord::Base
         end
       end
     end
-    Enrollment.send_later_if_production(:recompute_final_score, context.students.map(&:id), self.context_id) rescue nil
-    send_later_if_production(:multiple_module_actions, context.students.map(&:id), :scored, score)
 
     changed_since_publish = !!self.available?
     Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
+
+    self.context.recompute_student_scores 
+    send_later_if_production(:multiple_module_actions, context.students.map(&:id), :scored, score)
   end
 
   def update_user_from_rubric(user, assessment)

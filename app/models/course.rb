@@ -696,7 +696,7 @@ class Course < ActiveRecord::Base
 
   def update_final_scores_on_weighting_scheme_change
     if @group_weighting_scheme_changed
-      Enrollment.send_later_if_production(:recompute_final_score, self.students.map(&:id), self.id)
+      connection.after_transaction_commit { self.recompute_student_scores }
     end
   end
 
