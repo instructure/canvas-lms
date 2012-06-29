@@ -117,7 +117,8 @@ define [
         student.secondary_identifier = student.sis_login_id || student.login_id
 
         if @sections_enabled
-          sectionNames = $.toSentence((@sections[sectionId].name for sectionId in student.sections).sort())
+          mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
+          sectionNames = $.toSentence(mySections.sort())
         student.display_name = rowStudentNameTemplate
           avatar_image_url: student.avatar_url
           display_name: student.name
