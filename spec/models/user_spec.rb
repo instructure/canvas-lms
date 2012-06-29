@@ -906,6 +906,24 @@ describe User do
       messageable_users.should_not include @other_section_user.id
     end
 
+    it "should not show non-linked observers to students" do
+      set_up_course_with_users
+      @course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
+      student1, student2 = user_model, user_model
+      @course.enroll_user(student1, 'StudentEnrollment', :enrollment_state => 'active')
+      @course.enroll_user(student2, 'StudentEnrollment', :enrollment_state => 'active')
+
+      observer = user_model
+      enrollment = @course.enroll_user(observer, 'ObserverEnrollment', :enrollment_state => 'active')
+      enrollment.associated_user_id = student1.id
+      enrollment.save
+
+      student1.messageable_users.map(&:id).should include observer.id
+      student1.enrollment_visibility[:user_counts][@course.id].should eql 8
+      student2.messageable_users.map(&:id).should_not include observer.id
+      student2.enrollment_visibility[:user_counts][@course.id].should eql 7
+    end
+
     it "should include all shared contexts and enrollment information" do
       set_up_course_with_users
       @first_course = @course

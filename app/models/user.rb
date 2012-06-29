@@ -65,6 +65,9 @@ class User < ActiveRecord::Base
   has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
+  has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
+           :conditions => [ENROLLMENT_CONDITIONS[:active], ENROLLMENT_CONDITIONS[:completed]].join(' OR '), :order => 'enrollments.created_at'
+  has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments, :uniq => true
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
 
@@ -1220,7 +1223,7 @@ class User < ActiveRecord::Base
   def avatar_approved?
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
-  
+
   def self.avatar_key(user_id)
     user_id = user_id.to_s
     if !user_id.blank? && user_id != '0'
@@ -1229,7 +1232,7 @@ class User < ActiveRecord::Base
       "0"
     end
   end
-  
+
   def self.user_id_from_avatar_key(key)
     user_id, sig = key.to_s.split(/-/, 2)
     (Canvas::Security.hmac_sha1(user_id.to_s)[0, 10] == sig) ? user_id : nil
@@ -1277,11 +1280,11 @@ class User < ActiveRecord::Base
     @avatar_url ||= gravatar_url(size, fallback, request) if avatar_setting == 'enabled'
     @avatar_url ||= fallback
   end
-  
+
   def avatar_path
     "/images/users/#{User.avatar_key(self.id)}"
   end
-  
+
   def self.default_avatar_fallback
     "/images/messages/avatar-50.png"
   end
@@ -1314,7 +1317,7 @@ class User < ActiveRecord::Base
       self.save
     end
   end
-  
+
   named_scope :with_avatar_state, lambda{|state|
     if state == 'any'
       {
@@ -1578,13 +1581,15 @@ class User < ActiveRecord::Base
   end
   memoize :account
 
-  def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil)
-    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key, :expires_in => 15.minutes) do
+  def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
+    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
       courses = send(association).distinct_on(["courses.id"],
         :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
         :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
-      date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
-      courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
+      unless options[:include_completed_courses]
+        date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
+        courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
+      end
       courses
     end.dup
     if association == :current_and_invited_courses
@@ -1966,7 +1971,9 @@ class User < ActiveRecord::Base
       restricted_course_hash = {}
       user_counts = {}
       section_user_counts = {}
-      (courses + concluded_courses).each do |course|
+      student_in_course_ids = []
+      linked_observer_ids = observee_enrollments.collect {|e| e.user_id}.uniq
+      courses_with_primary_enrollment(:current_and_concluded_courses, nil, :include_completed_courses => true).each do |course|
         section_visibilities = course.section_visibilities_for(self)
         conditions = nil
         case course.enrollment_visibility_level_for(self, section_visibilities)
@@ -1984,6 +1991,12 @@ class User < ActiveRecord::Base
         end
         base_conditions = messageable_enrollment_clause
         base_conditions << " AND " << messageable_enrollment_user_clause
+        if course.primary_enrollment == 'StudentEnrollment'
+          student_in_course_ids << course.id
+          base_conditions << " AND (enrollments.type != 'ObserverEnrollment'"
+          base_conditions << "  OR enrollments.user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.any?
+          base_conditions << ")"
+        end
         user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").count("DISTINCT user_id")
 
         sections = course.sections_visible_to(self)
@@ -1998,7 +2011,9 @@ class User < ActiveRecord::Base
        :section_id_hash => section_id_hash,
        :restricted_course_hash => restricted_course_hash,
        :user_counts => user_counts,
-       :section_user_counts => section_user_counts
+       :section_user_counts => section_user_counts,
+       :student_in_course_ids => student_in_course_ids,
+       :linked_observer_ids => linked_observer_ids
       }
     end
   end
@@ -2065,11 +2080,18 @@ class User < ActiveRecord::Base
     group_hash = group_membership_visibility
     full_group_ids = group_hash[:full_group_ids]
     group_section_ids = []
-
+    student_in_course_ids = course_hash[:student_in_course_ids]
+    linked_observer_ids = course_hash[:linked_observer_ids]
     account_ids = []
 
     limited_id = {}
     enrollment_type_sql = " AND enrollments.type != 'StudentViewEnrollment'"
+    if student_in_course_ids.any?
+      enrollment_type_sql += " AND (enrollments.type != 'ObserverEnrollment' OR course_id NOT IN (#{student_in_course_ids.join(',')})"
+      enrollment_type_sql += "  OR user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.any? 
+      enrollment_type_sql += ")"
+    end
+    
     include_concluded_students = true
 
     if options[:context]

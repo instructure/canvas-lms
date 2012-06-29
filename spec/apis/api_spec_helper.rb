@@ -60,6 +60,14 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   end
 end
 
+# like api_call, but performed by the specified user instead of @user
+def api_call_as_user(user, method, path, params, body_params = {}, headers = {}, opts = {})
+  token = user.access_tokens.first || user.access_tokens.create!(:purpose => 'test')
+  headers['Authorization'] = "Bearer #{token.token}"
+  user.pseudonyms.create!(:unique_id => "#{user.id}@example.com", :account => opts[:domain_root_account]) unless user.pseudonym(true)
+  api_call(method, path, params, body_params, headers, opts)
+end
+
 # like api_call, but don't assume success and a json response.
 def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   path = path.sub(%r{\Ahttps?://[^/]+}, '') # remove protocol+host

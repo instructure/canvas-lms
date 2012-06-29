@@ -43,6 +43,18 @@ describe ConversationsController, :type => :integration do
     u
   end
 
+  def observer_in_course(options = {})
+    section = options.delete(:section)
+    associated_user = options.delete(:associated_user)
+    u = User.create(options)
+    enrollment = @course.enroll_user(u, 'ObserverEnrollment', :section => section)
+    enrollment.associated_user = associated_user
+    enrollment.workflow_state = 'active'
+    enrollment.save
+    u.associated_accounts << Account.default
+    u
+  end
+
   context "conversations" do
     it "should return the conversation list" do
       @c1 = conversation(@bob, :workflow_state => 'read')
@@ -548,6 +560,78 @@ describe ConversationsController, :type => :integration do
       json.should eql [
         {"id" => other.id, "name" => "other personage", "common_courses" => {}, "common_groups" => {}},
       ]
+    end
+
+    context "observers" do
+      before do
+        @bobs_mom = observer_in_course(:name => "bob's mom", :associated_user => @bob)
+        @lonely = observer_in_course(:name => "lonely observer")
+      end
+
+      it "should show all observers to a teacher" do
+        json = api_call(:get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}",
+                        { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "course_#{@course.id}" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+                            {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @lonely.id, "name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+                        ]
+      end
+
+      it "should not show non-linked students to observers" do
+        json = api_call_as_user(@bobs_mom, :get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}",
+                        { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "course_#{@course.id}" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+                            {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}}
+                        ]
+
+        json = api_call_as_user(@lonely, :get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}",
+                        { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "course_#{@course.id}" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+                            {"id" => @lonely.id, "name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}}
+                        ]
+      end
+
+      it "should not show non-linked observers to students" do
+        json = api_call_as_user(@bob, :get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}",
+                                { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "course_#{@course.id}" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+                            {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            # must not include lonely observer here
+                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+                        ]
+
+        json = api_call_as_user(@billy, :get, "/api/v1/conversations/find_recipients.json?context=course_#{@course.id}",
+                                { :controller => 'conversations', :action => 'find_recipients', :format => 'json', :context => "course_#{@course.id}" })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+                            {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            # must not include bob's mom here
+                            {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            # must not include lonely observer here
+                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+                        ]
+      end
     end
 
     context "synthetic contexts" do
