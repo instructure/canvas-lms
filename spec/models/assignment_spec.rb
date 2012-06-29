@@ -711,16 +711,21 @@ describe Assignment do
       @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
       @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
       @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
+      @enrollment = @student.enrollments.first
       @assignment.reload
       @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'C').first
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should == 76
 
       @assignment.points_possible = 30
       @assignment.save!
       @sub.reload
       @sub.score.should eql(15.2)
       @sub.grade.should eql('F')
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should == 50.7
     end
 
     it "should accept lowercase letter grades" do
@@ -1179,6 +1184,7 @@ describe Assignment do
         @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
         @sub2.messages_sent.should be_empty
       end
+
       it "should notify affected students on a mass-grade change" do
         setup_unpublished_assignment_with_students
         @assignment.publish!
