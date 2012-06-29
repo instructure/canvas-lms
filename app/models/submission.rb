@@ -180,8 +180,10 @@ class Submission < ActiveRecord::Base
   end
   
   def update_final_score
-    Enrollment.send_later_if_production(:recompute_final_score, self.user_id, self.context.id) if @score_changed
-    self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment && @score_changed
+    if @score_changed
+      connection.after_transaction_commit { Enrollment.send_later_if_production(:recompute_final_score, self.user_id, self.context.id) }
+      self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
+    end
     true
   end
   

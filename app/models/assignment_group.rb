@@ -56,11 +56,7 @@ class AssignmentGroup < ActiveRecord::Base
   
   def update_student_grades
     if @grades_changed
-      begin
-        self.context.recompute_student_scores
-      rescue
-        ErrorReport.log_exception(:grades, $!)
-      end
+      connection.after_transaction_commit { self.context.recompute_student_scores }
     end
   end
   
