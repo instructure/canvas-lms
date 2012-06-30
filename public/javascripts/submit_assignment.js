@@ -42,10 +42,10 @@ define([
     // hasn't entered any content.
     submissionForm.delegate('#submission_comment', 'focus', function(e) {
       var box = $(this);
-      if (box.val().trim() === '') { box.css('height', '72px'); }
+      if (box.val().trim() === '') { box.addClass('focus_or_content'); }
     }).delegate('#submission_comment', 'blur', function(e) {
       var box = $(this);
-      if (box.val().trim() === '') { box.css('height', '16px'); }
+      if (box.val().trim() === '') { box.removeClass('focus_or_content'); }
     });
 
     submissionForm.submit(function(event) {

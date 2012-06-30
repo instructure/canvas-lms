@@ -49,7 +49,7 @@ describe "assignments" do
 
       f('.submit_assignment_link').click
       wait_for_ajaximations
-      driver.execute_script("return $('#submission_comment').height()").should == 16
+      driver.execute_script("return $('#submission_comment').height()").should == 14
       driver.execute_script("$('#submission_comment').focus()")
       wait_for_ajaximations
       driver.execute_script("return $('#submission_comment').height()").should == 72

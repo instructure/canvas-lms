@@ -69,8 +69,7 @@
       <% end %>
       <tr>
         <td colspan="2">
-          <%= blabel :submission, :comment, :en => "Comments" %>
-          <%= text_area :submission, :comment, :style => "width: 100%; height: 16px;" %>
+          <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
         </td>
       </tr>
       <%= render :partial => "group_comment" %>
@@ -109,8 +108,7 @@
         </td>
       </tr><tr>
         <td>
-          <%= blabel :submission, :comment, :en => "Comments" %>
-          <%= text_area :submission, :comment, :style => "width: 100%; height: 16px;" %>
+          <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
         </td>
       </tr>
       <%= render :partial => "group_comment" %>
@@ -145,9 +143,8 @@
       </tr><tr>
         <td colspan="2" style="text-align: center;">
           <div style="text-align: left;">
-            <%= blabel :submission, :comment, :en => "Comments" %>
+            <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
           </div>
-          <%= text_area :submission, :comment, :style => "width: 100%; height: 16px;" %>
         </td>
       </tr>
       <%= render :partial => "group_comment" %>
@@ -229,9 +226,8 @@
           </tr><tr>
             <td colspan="2" style="text-align: center;">
               <div style="text-align: left;">
-                <%= blabel :submission, :comment, :en => "Comments" %>
+                <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
               </div>
-              <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
             </td>
           </tr>
           <%= render :partial => "group_comment" %>
@@ -297,9 +293,8 @@
           <tr>
             <td colspan="2" style="text-align: center;">
               <div style="text-align: left;">
-                <%= blabel :submission, :comment, :en => "Comments" %>
+                <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
               </div>
-              <%= text_area :submission, :comment, :style => "width: 100%; height: 16px;" %>
             </td>
           </tr>
           <%= render :partial => "group_comment" %>
