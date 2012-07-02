@@ -2411,10 +2411,15 @@ define([
         }
         fileUpload.updateUploadCount();
       }, function(data) {
+        $.flashError(
+          data && data.base && data.base.match(/quota/) ?
+          data.base :
+          I18n.t('upload_error', 'There was an error uploading your file')
+        );
         $("#file_swf").uploadifyCancel(id);
         $file.find(".cancel_upload_link").hide().end()
           .find(".status").text("Upload Failed");
-      });
+      }, {skipDefaultError: true});
     },
     swfUploadNext: function() {
       if(fileUpload.swfQueuedAndPendingFiles.length > 0) {

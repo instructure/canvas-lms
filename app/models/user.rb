@@ -1899,7 +1899,15 @@ class User < ActiveRecord::Base
   end
 
   def quota
-    read_attribute(:storage_quota) || Setting.get_cached('user_default_quota', 50.megabytes.to_s).to_i
+    return read_attribute(:storage_quota) if read_attribute(:storage_quota)
+    accounts = associated_root_accounts.reject(&:site_admin?)
+    accounts.empty? ?
+      self.class.default_storage_quota :
+      accounts.sum(&:default_user_storage_quota)
+  end
+  
+  def self.default_storage_quota
+    Setting.get_cached('user_default_quota', 50.megabytes.to_s).to_i
   end
 
   def update_last_user_note

@@ -86,14 +86,22 @@ describe "admin settings tab" do
       f("#account_name").should have_value "Admin 1"
     end
 
-    it "should change the default file quota" do
-      mb=300
-      f("#account_default_storage_quota_mb").should have_value "500"
-      replace_content f("#account_default_storage_quota_mb"), mb
+    it "should change the default course file quota" do
+      quota = 300
+      f("#account_default_course_storage_quota").should have_value "500"
+      replace_content f("#account_default_course_storage_quota"), quota
       click_submit
-      bytes = mb*1048576
-      Account.default.default_storage_quota.should eql bytes
-      f("#account_default_storage_quota_mb").should have_value "300"
+      Account.default.default_storage_quota.should eql quota.megabytes
+      f("#account_default_course_storage_quota").should have_value quota.to_s
+    end
+
+    it "should change the default user file quota" do
+      quota = 100
+      f("#account_default_user_storage_quota").should have_value "50"
+      replace_content f("#account_default_user_storage_quota"), quota
+      click_submit
+      Account.default.default_user_storage_quota.should eql quota.megabytes
+      f("#account_default_user_storage_quota").should have_value quota.to_s
     end
 
     it "should change the default language to spanish" do

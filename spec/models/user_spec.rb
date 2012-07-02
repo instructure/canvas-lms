@@ -1689,4 +1689,17 @@ describe User do
       User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
     end
   end
+
+  describe "quota" do
+    it "should default to User.default_storage_quota" do
+      user().quota.should eql User.default_storage_quota
+    end
+
+    it "should sum up associated root account quotas" do
+      user()
+      @user.associated_root_accounts << Account.create! << (a = Account.create!)
+      a.update_attribute :default_user_storage_quota_mb, a.default_user_storage_quota_mb + 10
+      @user.quota.should eql(2 * User.default_storage_quota + 10.megabytes)
+    end
+  end
 end
