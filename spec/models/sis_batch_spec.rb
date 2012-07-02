@@ -228,6 +228,7 @@ s2,test_1,section2,active},
         :batch_mode_term => @term1)
 
       @c1.reload.should be_deleted
+      @c1.stuck_sis_fields.should_not be_include(:workflow_state)
       @c2.reload.should be_available
       @c3.reload.should be_available
       @c4.reload.should be_claimed
