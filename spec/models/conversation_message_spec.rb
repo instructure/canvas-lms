@@ -213,4 +213,53 @@ describe ConversationMessage do
 
     it "should delete the stream_item if the conversation is deleted" # not yet implemented
   end
+
+  context "infer_defaults" do
+    before do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+    end
+
+    it "should set has_attachments if there are attachments" do
+      a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
+      m = @teacher.initiate_conversation([@student.id]).add_message("ohai", :attachment_ids => [a.id])
+      m.read_attribute(:has_attachments).should be_true
+      m.conversation.reload.has_attachments.should be_true
+      m.conversation.conversation_participants.all?(&:has_attachments?).should be_true
+    end
+
+    it "should set has_attachments if there are forwareded attachments" do
+      a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
+      m1 = @teacher.initiate_conversation([user.id]).add_message("ohai", :attachment_ids => [a.id])
+      m2 = @teacher.initiate_conversation([@student.id]).add_message("lulz", :forwarded_message_ids => [m1.id])
+      m2.read_attribute(:has_attachments).should be_true
+      m2.conversation.reload.has_attachments.should be_true
+      m2.conversation.conversation_participants.all?(&:has_attachments?).should be_true
+    end
+
+    it "should set has_media_objects if there is a media comment" do
+      mc = MediaObject.new
+      mc.media_type = 'audio'
+      mc.media_id = 'asdf'
+      mc.context = mc.user = @teacher
+      mc.save
+      m = @teacher.initiate_conversation([@student.id]).add_message("ohai", :media_comment => mc)
+      m.read_attribute(:has_media_objects).should be_true
+      m.conversation.reload.has_media_objects.should be_true
+      m.conversation.conversation_participants.all?(&:has_media_objects?).should be_true
+    end
+
+    it "should set has_media_objects if there are forwarded media comments" do
+      mc = MediaObject.new
+      mc.media_type = 'audio'
+      mc.media_id = 'asdf'
+      mc.context = mc.user = @teacher
+      mc.save
+      m1 = @teacher.initiate_conversation([user.id]).add_message("ohai", :media_comment => mc)
+      m2 = @teacher.initiate_conversation([@student.id]).add_message("lulz", :forwarded_message_ids => [m1.id])
+      m2.read_attribute(:has_media_objects).should be_true
+      m2.conversation.reload.has_media_objects.should be_true
+      m2.conversation.conversation_participants.all?(&:has_media_objects?).should be_true
+    end
+  end
 end

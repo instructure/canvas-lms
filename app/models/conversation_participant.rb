@@ -247,8 +247,8 @@ class ConversationParticipant < ActiveRecord::Base
         older = times.reject!{ |t| t <= last_message_at} || []
         older.first || times.reverse.first
       end
-      self.has_attachments = messages.with_attachments.size > 0
-      self.has_media_objects = messages.with_media_comments.size > 0
+      self.has_attachments = messages.with_attachments.first.present?
+      self.has_media_objects = messages.with_media_comments.first.present?
       self.visible_last_authored_at = if latest.author_id == user_id
         latest.created_at
       elsif latest_authored = last_authored_message

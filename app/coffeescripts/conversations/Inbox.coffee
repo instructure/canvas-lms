@@ -213,7 +213,7 @@ define [
           $ul.append @buildMessage(submessage)
         $message.append $ul
 
-      $ul = $message.find('ul.message_attachments').detach()
+      $ul = $message.find('ul.message_attachments').first().detach()
       $mediaObjectBlank = $ul.find('.media_object_blank').detach()
       $attachmentBlank = $ul.find('.attachment_blank').detach()
       if data.media_comment? or data.attachments?.length

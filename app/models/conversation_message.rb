@@ -33,8 +33,8 @@ class ConversationMessage < ActiveRecord::Base
   attr_accessible
 
   named_scope :human, :conditions => "NOT generated"
-  named_scope :with_attachments, :conditions => "attachment_ids <> ''"
-  named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL"
+  named_scope :with_attachments, :conditions => "attachment_ids <> '' OR has_attachments" # TODO: simplify post-migration
+  named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL OR has_media_objects" # TODO: simplify post-migration
   named_scope :by_user, lambda { |user_or_id|
     user_or_id = user_or_id.id if user_or_id.is_a?(User)
     {:conditions => {:author_id => user_or_id}}
@@ -105,8 +105,12 @@ class ConversationMessage < ActiveRecord::Base
       self.media_comment_type = @media_comment.media_type if @media_comment
     end
     self.media_comment_type = nil unless self.media_comment_id
+    self.has_attachments = attachment_ids.present? || forwarded_messages.any?(&:has_attachments?)
+    self.has_media_objects = media_comment_id.present? || forwarded_messages.any?(&:has_media_objects?)
+    true
   end
 
+  # override AR association magic 
   def attachment_ids
     read_attribute :attachment_ids
   end
@@ -122,8 +126,18 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 
-  def has_media_comment?
-    !self.media_comment_id.nil?
+  # TODO: remove once data has been migrated
+  def has_attachments?
+    ret = read_attribute(:has_attachments)
+    return ret unless ret.nil?
+    attachment_ids.present? || forwarded_messages.any?(&:has_attachments?)
+  end
+
+  # TODO: remove once data has been migrated
+  def has_media_objects?
+    ret = read_attribute(:has_media_objects)
+    return ret unless ret.nil?
+    media_comment_id.present? || forwarded_messages.any?(&:has_media_objects?)
   end
 
   def media_comment
@@ -203,7 +217,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= forwarded_message_ids && self.class.find_all_by_id(forwarded_message_ids.split(','), :order => 'created_at DESC') || []
+    @forwarded_messages ||= forwarded_message_ids && self.class.send(:with_exclusive_scope){ self.class.find_all_by_id(forwarded_message_ids.split(','), :order => 'created_at DESC')} || []
   end
 
   def all_forwarded_messages

@@ -362,12 +362,12 @@ class Conversation < ActiveRecord::Base
     conversation_participants.update_all(updates.join(", "), ["user_id IN (?)", skip_ids])
 
     updated = false
-    if message.attachment_ids.present?
+    if message.has_attachments?
       self.has_attachments = true
       conversation_participants.update_all({:has_attachments => true}, "NOT has_attachments")
       updated = true
     end
-    if message.media_comment_id.present?
+    if message.has_media_objects?
       self.has_media_objects = true
       conversation_participants.update_all({:has_media_objects => true}, "NOT has_media_objects")
       updated = true
