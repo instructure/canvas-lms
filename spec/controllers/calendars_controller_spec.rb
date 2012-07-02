@@ -24,6 +24,10 @@ describe CalendarsController do
     @event = @course.calendar_events.create(:title => "some assignment", :start_at => date, :end_at => date)
   end
 
+  def disable_calendar2
+    Account.default.update_attribute(:settings, {:enable_scheduler => false})
+  end
+
   describe "GET 'show'" do
     it "should redirect if no contexts are found" do
       course_with_student(:active_all => true)
@@ -34,7 +38,6 @@ describe CalendarsController do
     end
 
     it "should redirect if the user should be on the new calendar" do
-      Account.default.update_attribute(:settings, {:enable_scheduler => true})
       course_with_student_logged_in(:active_all => true)
       get 'show', :user_id => @user.id
       response.should be_redirect
@@ -42,6 +45,7 @@ describe CalendarsController do
     end
 
     it "should assign variables" do
+      disable_calendar2
       course_with_student_logged_in(:active_all => true)
       course_event
       get 'show', :user_id => @user.id
@@ -55,6 +59,7 @@ describe CalendarsController do
     end
 
     it "should retrieve multiple contexts for user" do
+      disable_calendar2
       course_with_student_logged_in(:active_all => true)
       course_event
       e = @user.calendar_events.create(:title => "my event")
@@ -68,6 +73,7 @@ describe CalendarsController do
     end
 
     it "should retrieve events for a given month and year" do
+      disable_calendar2
       course_with_student_logged_in(:active_all => true)
       e1 = course_event("Jan 1 2008")
       e2 = course_event("Feb 15 2008")
@@ -81,6 +87,7 @@ describe CalendarsController do
 
   describe "GET 'show2'" do
     it "should redirect if the user should be on the old calendar" do
+      disable_calendar2
       course_with_student_logged_in(:active_all => true)
       get 'show2', :user_id => @user.id
       response.should be_redirect
@@ -88,7 +95,6 @@ describe CalendarsController do
     end
 
     it "should assign variables" do
-      Account.default.update_attribute(:settings, {:enable_scheduler => true})
       course_with_student_logged_in(:active_all => true)
       course_event
       get 'show2', :user_id => @user.id
@@ -150,7 +156,6 @@ describe CalendarsController do
 
   describe "POST 'switch_calendar'" do
     it "should switch to the old calendar" do
-      Account.default.update_attribute(:settings, {:enable_scheduler => true})
       course_with_student_logged_in(:active_all => true)
       @user.preferences[:use_calendar1].should be_nil
 
@@ -161,6 +166,7 @@ describe CalendarsController do
     end
 
     it "should not switch to the new calendar if not allowed" do
+      disable_calendar2
       course_with_student_logged_in(:active_all => true)
       @user.preferences[:use_calendar1].should be_nil
 
@@ -171,7 +177,6 @@ describe CalendarsController do
     end
 
     it "should switch to the new calendar if allowed" do
-      Account.default.update_attribute(:settings, {:enable_scheduler => true})
       course_with_student_logged_in(:active_all => true)
       @user.update_attribute(:preferences, {:use_calendar1 => true})
 

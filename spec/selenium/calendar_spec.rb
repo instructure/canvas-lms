@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "calendar" do
   it_should_behave_like "in-process server selenium tests"
 
+  before (:each) do
+    Account.default.update_attribute(:settings, {:enable_scheduler => false})
+  end
+
   context "student view" do
     before (:each) do
       course_with_student_logged_in

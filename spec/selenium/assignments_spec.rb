@@ -9,6 +9,7 @@ describe "assignments" do
     end
 
     it "should display assignment on calendar and link to assignment" do
+      Account.default.update_attribute(:settings, {:enable_scheduler => false})
       assignment_name = 'first assignment'
       current_date = Time.now.utc
       due_date = current_date + 2.days

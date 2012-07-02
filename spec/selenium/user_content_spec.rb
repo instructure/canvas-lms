@@ -31,6 +31,7 @@ describe "user_content" do
   end
 
   it "should iframe calendar json requests" do
+    Account.default.update_attribute(:settings, {:enable_scheduler => false})
     e = factory_with_protected_attributes(CalendarEvent, :context => @course, :title => "super fun party", :description => message_body, :start_at => 5.minutes.ago, :end_at => 5.minutes.from_now)
     get "/calendar"
 
