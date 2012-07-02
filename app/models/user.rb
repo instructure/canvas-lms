@@ -2370,8 +2370,20 @@ class User < ActiveRecord::Base
     pseudonym
   end
 
-  def flag_as_admin(account, role=nil)
+  # Public: Add this user as an admin in the given account.
+  #
+  # account - The account model to create the admin in.
+  # role - String name of the role to add the user to. If nil,
+  #        'AccountAdmin' will be used (default: nil).
+  # send_notification - If set to false, do not send any email
+  #                     notifications (default: true).
+  #
+  # Returns an AccountUser model object.
+  def flag_as_admin(account, role=nil, send_notification = true)
     admin = account.add_user(self, role)
+
+    return admin unless send_notification
+
     if self.registered?
       admin.account_user_notification!
     else
