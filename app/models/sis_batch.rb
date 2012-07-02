@@ -169,6 +169,7 @@ class SisBatch < ActiveRecord::Base
       # delete courses that weren't in this batch, in the selected term
       scope = Course.active.for_term(self.batch_mode_term).scoped(:conditions => ["courses.root_account_id = ?", self.account.id])
       scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id]).find_each do |course|
+        course.clear_sis_stickiness(:workflow_state)
         course.destroy
       end
     end
