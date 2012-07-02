@@ -28,9 +28,8 @@
 
 define [
   'jquery'
-  'compiled/fn/preventDefault'
   'compiled/jquery/fixDialogButtons'
-], ($, preventDefault) ->
+], ($) ->
 
   updateTextToState = (newStateOfRegion) ->
     return ->
@@ -76,8 +75,12 @@ define [
 
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 
-  $(document).delegate '.element_toggler[aria-controls]', 'click', preventDefault ->
+  $(document).on 'click change', '.element_toggler[aria-controls]', (event) ->
+    event.preventDefault() if event.type is 'click'
     $this = $(this)
+
+    if $this.is('input[type="checkbox"]')
+      force = $this.prop('checked')
 
     # allow .links inside .user_content to be elementTogglers, but only for other elements inside of
     # that .user_content area
@@ -85,4 +88,4 @@ define [
     $parent = $(document.body) unless $parent.length
 
     $region = $parent.find("##{$this.attr('aria-controls')}")
-    toggleRegion($region) if $region.length
+    toggleRegion($region, force) if $region.length

@@ -121,3 +121,13 @@ require [
     @$trigger.click()
     equal @$target.dialog('isOpen'), false
 
+  test 'checkboxes can be used as trigger', ->
+    @$trigger = $('<input type="checkbox" class="element_toggler" aria-controls="thing">').appendTo('body')
+
+    @$target = $('<div id="thing" style="display:none">thing</div>').appendTo('body')
+
+    @$trigger.prop('checked', true).trigger('change')
+    ok @$target.is(':visible'), "target is shown"
+
+    @$trigger.prop('checked', false).trigger('change')
+    ok @$target.is(':hidden'), "target is hidden"
