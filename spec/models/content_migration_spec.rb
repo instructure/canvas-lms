@@ -166,6 +166,19 @@ describe ContentMigration do
       @copy_to.grading_standard.should == gs
     end
 
+    it "should copy a course grading standard not owned by the copy_from course" do
+      @other_course = course_model
+      gs = make_grading_standard(@other_course)
+      @copy_from.grading_standard = gs
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.grading_standard_enabled.should be_true
+      @copy_to.grading_standard.data.should == gs.data
+    end
+
     it "should create a warning if an account grading standard can't be found" do
       gs = make_grading_standard(@copy_from.root_account)
       @copy_from.grading_standard = gs
