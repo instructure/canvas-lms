@@ -20,12 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SubmissionComment do
   before(:each) do
-    @user = factory_with_protected_attributes(User, :name => "some student", :workflow_state => "registered")
-    @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
-    @context.enroll_student(@user)
-    @assignment = @context.assignments.new(:title => "some assignment")
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+    @assignment = @course.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
-    @assignment.save
+    @assignment.save!
     @submission = @assignment.submit_homework(@user)
     @valid_attributes = {
       :submission => @submission,
@@ -558,5 +557,28 @@ This text has a http://www.google.com link in it...
         tconvo.messages.first.created_at.to_i.should eql message.created_at.to_i
       end
     end
+  end
+
+  it "should prevent peer reviewer from seeing other comments" do
+    @student1 = @student
+    @student2 = student_in_course(:active_all => true).user
+    @student3 = student_in_course(:active_all => true).user
+
+    @assignment.peer_reviews = true
+    @assignment.save!
+    @assignment.assign_peer_review(@student2, @student1)
+    @assignment.assign_peer_review(@student3, @student1)
+
+    @teacher_comment = @submission.add_comment(:author => @teacher, :comment => "some comment from teacher")
+    @reviewer_comment = @submission.add_comment(:author => @student2, :comment => "some comment from peer reviewer")
+    @my_comment = @submission.add_comment(:author => @student3, :comment => "some comment from me")
+
+    @teacher_comment.grants_right?(@student3, :read).should be_false
+    @reviewer_comment.grants_right?(@student3, :read).should be_false
+    @my_comment.grants_right?(@student3, :read).should be_true
+
+    @teacher_comment.grants_right?(@student1, :read).should be_true
+    @reviewer_comment.grants_right?(@student1, :read).should be_true
+    @my_comment.grants_right?(@student1, :read).should be_true
   end
 end
