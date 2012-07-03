@@ -264,6 +264,51 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
+    it "should not allow peer reviewers to see turnitin scores/reports" do
+      @student1 = @user
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+      filename, fullpath, data = get_file("testfile1.txt")
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      f('.submission_attachment input').send_keys(fullpath)
+      f('#submission_comment').send_keys("hello comment")
+      expect_new_page_load { f('#submit_file_button').click }
+      @submission = @assignment.reload.submissions.last
+
+      user_logged_in(:username => "assessor@example.com")
+      @student2 = @user
+      student_in_course(:active_enrollment => true, :user => @student2)
+
+      @assignment.peer_reviews = true
+      @assignment.assign_peer_review(@student2, @student1)
+      @assignment.turnitin_enabled = true
+      @assignment.due_at = 1.day.ago
+      @assignment.save!
+
+      asset = @submission.turnitin_assets.first.asset_string
+      @submission.turnitin_data = {
+        "#{asset}" => {
+          :object_id => "123456",
+          :publication_overlap => 5,
+          :similarity_score => 100,
+          :state => "failure",
+          :status => "scored",
+          :student_overlap => 44,
+          :web_overlap => 100
+        },
+        :last_processed_attempt => 1
+      }
+      @submission.turnitin_data_changed!
+      @submission.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}"
+      in_frame('preview_frame') do
+        ff('.turnitin_score_container').should be_empty
+      end
+    end
+
     it "should submit an assignment and validate confirmation information" do
       pending "BUG 6783 - Coming Up assignments update error" do
         @assignment.update_attributes(:submission_types => 'online_url')
@@ -282,5 +327,3 @@ describe "submissions" do
     end
   end
 end
-
-
