@@ -83,5 +83,12 @@ describe CC::CCHelper do
       translated = @exporter.html_content(orig)
       translated.should =~ /users\/#{@teacher.id}/
     end
+
+    it "should interpret links to the files page as normal course pages" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
+      html = %{<a href="/courses/#{@course.id}/files">File page index</a>}
+      translated = @exporter.html_content(html)
+      translated.should match %r{\$CANVAS_COURSE_REFERENCE\$/files}
+    end
   end
 end

@@ -161,13 +161,20 @@ module CCHelper
         end
       end
       @rewriter.set_handler('files') do |match|
-        obj = match.obj_class.find_by_id(match.obj_id)
-        next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
-        folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
-        @referenced_files[obj.id] = CCHelper.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
-        # for files, turn it into a relative link by path, rather than by file id
-        # we retain the file query string parameters
-        "#{folder}/#{URI.escape(obj.display_name)}#{CCHelper.file_query_string(match.rest)}"
+        # If match.obj_id is nil, it's because we're actually linking to a page
+        # (the /courses/:id/files page) and not to a specific file. In this case,
+        # just pass it straight through.
+        if match.obj_id.nil?
+          "#{COURSE_TOKEN}/files"
+        else
+          obj = match.obj_class.find_by_id(match.obj_id)
+          next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
+          folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+          @referenced_files[obj.id] = CCHelper.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
+          # for files, turn it into a relative link by path, rather than by file id
+          # we retain the file query string parameters
+          "#{folder}/#{URI.escape(obj.display_name)}#{CCHelper.file_query_string(match.rest)}"
+        end
       end
       @rewriter.set_handler('wiki') do |match|
         "#{WIKI_TOKEN}/#{match.type}#{match.rest}"
