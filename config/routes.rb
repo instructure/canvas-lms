@@ -481,7 +481,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.menu_courses 'menu_courses', :controller => 'users', :action => 'menu_courses'
   map.all_menu_courses 'all_menu_courses', :controller => 'users', :action => 'all_menu_courses'
-  map.resources :favorites, :only => [:create, :destroy]
 
   map.grades "grades", :controller => "users", :action => "grades"
 
@@ -886,6 +885,13 @@ ActionController::Routing::Routes.draw do |map|
 
     api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
     api.get 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
+
+    api.with_options(:controller => :favorites) do |favorites|
+      favorites.get "users/self/favorites/courses", :action => :list_favorite_courses
+      favorites.post "users/self/favorites/courses/:id", :action => :add_favorite_course
+      favorites.delete "users/self/favorites/courses/:id", :action => :remove_favorite_course
+      favorites.delete "users/self/favorites/courses", :action => :reset_course_favorites
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
