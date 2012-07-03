@@ -159,7 +159,7 @@ class Submission < ActiveRecord::Base
     can :read and can :comment
     
     given { |user, session|
-      grants_right?(user, session, :read) &&
+      grants_right?(user, session, :read_grade) &&
       turnitin_data &&
       (assignment.cached_context_grants_right?(user, session, :manage_grades) ||
         case assignment.turnitin_settings[:originality_report_visibility]
