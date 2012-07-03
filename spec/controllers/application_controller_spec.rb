@@ -138,4 +138,11 @@ describe ApplicationController do
       @controller.instance_variable_get(:@context).should == @section
     end
   end
+
+  describe "#complete_request_uri" do
+    it "should filter sensitive parameters from the query string" do
+      @controller.stubs(:request).returns(mock(:protocol => "https://", :host => "example.com", :request_uri => "/api/v1/courses?password=abcd&test=5&Xaccess_token=13&access_token=sekrit"))
+      @controller.send(:complete_request_uri).should == "https://example.com/api/v1/courses?password=[FILTERED]&test=5&Xaccess_token=13&access_token=[FILTERED]"
+    end
+  end
 end
