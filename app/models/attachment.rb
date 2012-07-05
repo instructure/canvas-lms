@@ -155,11 +155,13 @@ class Attachment < ActiveRecord::Base
     existing ||= self.cloned_item_id ? context.attachments.find_by_cloned_item_id(self.cloned_item_id) : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :uuid, :folder_id, :user_id, :filename].include?(k.to_sym) }.each do |key, val|
+    self.attributes.delete_if{|k,v| [:id, :root_attachment_id, :uuid, :folder_id, :user_id, :filename].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
     dup.write_attribute(:filename, self.filename)
-    dup.root_attachment_id = self.root_attachment_id || self.id
+    # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
+    root_id = ([self.root_attachment_id, self.id] - [dup.id, nil]).first
+    dup.root_attachment_id = root_id
     dup.context = context
     dup.migration_id = CC::CCHelper.create_key(self)
     context.log_merge_result("File \"#{dup.folder.full_name rescue ''}/#{dup.display_name}\" created") if context.respond_to?(:log_merge_result)

@@ -491,8 +491,33 @@ describe Attachment do
       new_a.thumbnail_url.should_not be_nil
       new_a.thumbnail_url.should == a.thumbnail_url
     end
+
+    it "should not create root_attachment_id cycles or self-references" do
+      a = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
+      a.root_attachment_id.should be_nil
+      coursea = @course
+      @context = courseb = course
+      b = a.clone_for(courseb, nil, :overwrite => true)
+      b.context.should == courseb
+      b.root_attachment.should == a
+
+      new_a = b.clone_for(coursea, nil, :overwrite => true)
+      new_a.should == a
+      new_a.root_attachment_id.should be_nil
+
+      new_b = new_a.clone_for(courseb, nil, :overwrite => true)
+      new_b.root_attachment_id.should == a.id
+
+      new_b = b.clone_for(courseb, nil, :overwrite => true)
+      new_b.root_attachment_id.should == a.id
+
+      # pretend b's content changed so it got disconnected
+      b.update_attribute(:root_attachment_id, nil)
+      new_b = b.clone_for(courseb, nil, :overwrite => true)
+      new_b.root_attachment_id.should be_nil
+    end
   end
-  
+
   context "adheres_to_policy" do
     it "should not allow unauthorized users to read files" do
       user = user_model
