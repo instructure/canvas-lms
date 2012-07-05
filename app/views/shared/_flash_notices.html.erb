@@ -17,26 +17,3 @@ end %>
     </div>
   </div>
 </div>
-<% if flash[:scary_warning].present? %>
-<style>
-  #flash_scary_warning {
-    position: fixed;
-    z-index: 100000;
-    bottom: 0;
-    top: auto;
-    left: 0;
-    background-color: #FDD;
-    border-width: 2px 0 0 0;
-    border-style: solid;
-    border-color: black;
-    width: 100%;
-    padding: 15px;
-    opacity: 0.90;
-    color: black;
-  }
-</style>
-<div id="flash_scary_warning">
-  <img src="/images/warning.png" style="padding-right: 10px;" />
-  <b><%= flash[:scary_warning] %></b>
-</div>
-<% end %>

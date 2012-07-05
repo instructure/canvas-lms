@@ -8,13 +8,8 @@
     <% end %>
   <% else %>
     <li class="user_name"><%= link_to @current_user.short_name, user_profile_path(@current_user) %></li>
-    <% if @real_current_user && @real_current_user != @current_user %>
-      <% if @current_user.fake_student? %>
-        <% student_view_course = @current_user.all_courses.first %>
-        <li class="stop_masquerading"><%= link_to t('links.leave_student_view', "[Leave Student View]"), course_student_view_path(student_view_course), :method => :delete %></li>
-      <% else %>
-        <li class="stop_masquerading"><%= link_to t('links.stop_masquerading', "[Stop Masquerading]"), user_masquerade_url(@real_current_user.id), :method => :post %></li>
-      <% end %>
+    <% if @real_current_user && @real_current_user != @current_user && !@current_user.fake_student? %>
+      <li class="stop_masquerading"><%= link_to t('links.stop_masquerading', "[Stop Masquerading]"), user_masquerade_url(@real_current_user.id), :method => :post %></li>
     <% end %>
     <% unless @current_user.fake_student? %>
       <li class="first inbox"><a href="<%= conversations_path %>"><span><%= t 'links.inbox', "Inbox" %></span>
