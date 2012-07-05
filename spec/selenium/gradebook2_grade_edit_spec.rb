@@ -150,6 +150,29 @@ describe "edititing grades" do
     find_slick_cells(1, f('#gradebook_grid'))[0].text.should == curved_grade_text
   end
 
+  it "should optionally assign zeroes to unsubmitted assignments during curving" do
+    get "/courses/#{@course.id}/gradebook2"
+
+    wait_for_ajaximations
+
+    edit_grade(f('#gradebook_grid [row="1"] .l0'), '')
+
+    open_assignment_options(0)
+    f('#ui-menu-1-4').click
+
+    find_with_jquery('#assign_blanks').click
+    find_with_jquery('.ui-dialog-buttonpane button:visible').click
+
+    keep_trying_until do
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.dismiss
+      true
+    end
+
+    driver.switch_to.default_content
+    find_slick_cells(1, f('#gradebook_grid'))[0].text.should == '0'
+  end
+
   it "should correctly set default grades for a specific section" do
       pending("intermittently fails")
       def open_section_menu_and_click(menu_item_css)
