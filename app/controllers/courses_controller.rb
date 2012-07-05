@@ -1053,11 +1053,7 @@ class CoursesController < ApplicationController
   def student_view
     get_context
     if authorized_action(@context, @current_user, :use_student_view)
-      @fake_student = @context.student_view_student
-      session[:become_user_id] = @fake_student.id
-      return_url = course_path(@context)
-      session.delete(:masquerade_return_to)
-      return return_to(return_url, request.referer || dashboard_url)
+      enter_student_view
     end
   end
 
@@ -1067,4 +1063,24 @@ class CoursesController < ApplicationController
     session.delete(:masquerade_return_to)
     return return_to(return_url, request.referer || dashboard_url)
   end
+
+  def reset_test_student
+    get_context
+    if @current_user.fake_student? && authorized_action(@context, @real_current_user, :use_student_view)
+      # destroy the exising student
+      @fake_student = @context.student_view_student
+      @fake_student.destroy
+      flash[:notice] = t('notices.reset_test_student', "The test student has been reset successfully.")
+      enter_student_view
+    end
+  end
+
+  def enter_student_view
+    @fake_student = @context.student_view_student
+    session[:become_user_id] = @fake_student.id
+    return_url = course_path(@context)
+    session.delete(:masquerade_return_to)
+    return return_to(return_url, request.referer || dashboard_url)
+  end
+  protected :enter_student_view
 end

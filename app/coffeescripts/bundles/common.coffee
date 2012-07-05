@@ -13,6 +13,7 @@ require [
   'reminders'
   'jquery.instructure_forms'
   'instructure'
+  'fixed_warning'
   'ajax_errors'
   'page_views'
   'compiled/license_help'
