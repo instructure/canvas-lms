@@ -7,11 +7,11 @@ EDIT_LOCATION = 'edited location'
 describe "scheduler" do
   it_should_behave_like "calendar2 selenium tests"
 
-  def fill_out_appointment_group_form(new_appointment_text, opts={})
-    driver.find_element(:css, '.create_link').click
+  def fill_out_appointment_group_form(new_appointment_text, opts = {})
+    f('.create_link').click
     edit_form = f('#edit_appointment_form')
     keep_trying_until { edit_form.should be_displayed }
-    replace_content(find_with_jquery('input[name="title"]'), new_appointment_text)
+    replace_content(fj('input[name="title"]'), new_appointment_text)
     f('.ag_contexts_selector').click
     f('.ag_sections_toggle').click
     if opts[:section_codes]
@@ -23,7 +23,7 @@ describe "scheduler" do
     date_field = edit_form.find_element(:css, '.date_field')
     date_field.click
     wait_for_animations
-    find_with_jquery('.ui-datepicker-trigger:visible').click
+    fj('.ui-datepicker-trigger:visible').click
     datepicker_next
     replace_content(edit_form.find_element(:css, '.start_time'), '1')
     replace_content(edit_form.find_element(:css, '.end_time'), '3')
@@ -36,54 +36,54 @@ describe "scheduler" do
     else
       save.click
     end
+    wait_for_ajaximations
   end
 
   def create_appointment_group_manual(opts = {})
     opts = {
-      :publish => true,
-      :new_appointment_text => 'new appointment group'
+        :publish => true,
+        :new_appointment_text => 'new appointment group'
     }.with_indifferent_access.merge(opts)
 
     expect {
       fill_out_appointment_group_form(opts[:new_appointment_text], opts)
       submit_appointment_group_form(opts[:publish])
-      wait_for_ajaximations
-      driver.find_element(:css, '.view_calendar_link').text.should == opts[:new_appointment_text]
+      f('.view_calendar_link').text.should == opts[:new_appointment_text]
     }.to change(AppointmentGroup, :count).by(1)
   end
 
   def click_scheduler_link
-    header_buttons = driver.find_elements(:css, '.ui-buttonset > label')
+    header_buttons = ff('.ui-buttonset > label')
     header_buttons[2].click
     wait_for_ajaximations
   end
 
   def click_appointment_link
-    driver.find_element(:css, '.view_calendar_link').click
-    driver.find_element(:css, '.scheduler-mode').should be_displayed
+    f('.view_calendar_link').click
+    f('.scheduler-mode').should be_displayed
   end
 
   def click_al_option(option_selector, offset=0)
-    find_all_with_jquery('.al-trigger')[offset].click
-    options = find_all_with_jquery('.al-options')[offset]
+    ffj('.al-trigger')[offset].click
+    options = ffj('.al-options')[offset]
     options.should be_displayed
     options.find_element(:css, option_selector).click
   end
 
   def delete_appointment_group
-    delete_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Delete")')
+    delete_button = fj('.ui-dialog-buttonset .ui-button:contains("Delete")')
     delete_button.click
     wait_for_ajaximations
   end
 
   def edit_appointment_group(appointment_name = EDIT_NAME, location_name = EDIT_LOCATION)
-    driver.find_element(:id, 'edit_appointment_form').should be_displayed
-    replace_content(find_with_jquery('input[name="title"]'), appointment_name)
-    replace_content(find_with_jquery('input[name="location"]'), location_name)
-    driver.find_element(:css, '.ui-dialog-buttonset .ui-button').click
+    f('#edit_appointment_form').should be_displayed
+    replace_content(fj('input[name="title"]'), appointment_name)
+    replace_content(fj('input[name="location"]'), location_name)
+    f('.ui-dialog-buttonset .ui-button').click
     wait_for_ajaximations
-    driver.find_element(:css, '.view_calendar_link').text.should == appointment_name
-    driver.find_element(:css, '.ag-location').should include_text(location_name)
+    f('.view_calendar_link').text.should == appointment_name
+    f('.ag-location').should include_text(location_name)
   end
 
   context "as a teacher" do
@@ -99,6 +99,34 @@ describe "scheduler" do
       create_appointment_group_manual
     end
 
+    it "should split time slots" do
+      start_time_text = '01'
+      end_time_text = '05'
+      get "/calendar2"
+      click_scheduler_link
+
+      f('.create_link').click
+      fj('.ui-datepicker-trigger:visible').click
+      datepicker_next
+      set_value(f('.start_time'), start_time_text)
+      end_time = f('.end_time')
+      set_value(end_time, end_time_text)
+      end_time.send_keys(:tab)
+      f('.splitter a').click
+      start_fields = ff('.time-block-list .start_time')
+      times = %W(1:00 1:30 2:00 2:30 3:00 3:30 4:00 4:30)
+      start_fields.each_with_index do |start_field, i|
+        start_field.attribute(:value).should == times[i] + "PM" unless i == 8
+      end
+      f('.ag_contexts_selector').click
+      f("#option_course_#{@course.id}").click
+      f('.ag_contexts_done').click
+      submit_appointment_group_form
+      last_group = AppointmentGroup.last
+      last_group.start_at.strftime("%I").should == start_time_text
+      last_group.end_at.strftime("%I").should == end_time_text
+    end
+
     it "should create appointment group and go back and publish it" do
       get "/calendar2"
       click_scheduler_link
@@ -109,9 +137,9 @@ describe "scheduler" do
       f('.ag-x-of-x-signed-up').should include_text('unpublished')
       driver.action.move_to(f('.appointment-group-item')).perform
       click_al_option('.edit_link')
-      edit_form = driver.find_element(:id, 'edit_appointment_form')
+      edit_form = f('#edit_appointment_form')
       keep_trying_until { edit_form.should be_displayed }
-      driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+      f('.ui-dialog-buttonset .ui-button-primary').click
       wait_for_ajaximations
       new_appointment_group.reload
       new_appointment_group.workflow_state.should == 'active'
@@ -122,11 +150,11 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
 
-      appointment_group = driver.find_element(:css, '.appointment-group-item')
+      appointment_group = f('.appointment-group-item')
       driver.action.move_to(appointment_group).perform
       click_al_option('.delete_link')
       delete_appointment_group
-      driver.find_element(:css, '.list-wrapper').should include_text('You have not created any appointment groups')
+      f('.list-wrapper').should include_text('You have not created any appointment groups')
     end
 
     it "should edit an appointment group" do
@@ -134,7 +162,7 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
 
-      appointment_group = driver.find_element(:css, '.appointment-group-item')
+      appointment_group = f('.appointment-group-item')
       driver.action.move_to(appointment_group).perform
       click_al_option('.edit_link')
       edit_appointment_group
@@ -155,9 +183,9 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
       # first create the group
-      create_appointment_group_manual :section_codes => ["course_section_#{section.id}"]
+      create_appointment_group_manual :section_codes => %W(course_section_#{section.id})
       # then open it's edit dialog
-      appointment_group = driver.find_element(:css, '.appointment-group-item')
+      appointment_group = f('.appointment-group-item')
       driver.action.move_to(appointment_group).perform
       click_al_option('.edit_link')
       # expect only section1 to be selected
@@ -173,7 +201,7 @@ describe "scheduler" do
 
       click_al_option('.delete_link')
       delete_appointment_group
-      driver.find_element(:css, '.list-wrapper').should include_text('You have not created any appointment groups')
+      f('.list-wrapper').should include_text('You have not created any appointment groups')
     end
 
     it "should send messages to appropriate participants" do
@@ -198,12 +226,12 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
 
-      appointment_groups = find_all_with_jquery('.appointment-group-item')
+      appointment_groups = ffj('.appointment-group-item')
       appointment_groups.each_with_index do |ag, i|
         driver.execute_script("$('.appointment-group-item:index(#{i}').addClass('ui-state-hover')")
-        ["all", "registered", "unregistered"].each do |registration_status|
+        %w(all registered unregistered).each do |registration_status|
           click_al_option('.message_link', i)
-          form = keep_trying_until { find_with_jquery('.ui-dialog:visible') }
+          form = keep_trying_until { fj('.ui-dialog:visible') }
           wait_for_ajaximations
 
           set_value form.find_element(:css, 'select'), registration_status
@@ -214,7 +242,7 @@ describe "scheduler" do
           submit_dialog(form, '.ui-button')
 
           assert_flash_notice_message /Messages Sent/
-          keep_trying_until { find_with_jquery('.ui-dialog:visible').should be_nil }
+          keep_trying_until { fj('.ui-dialog:visible').should be_nil }
         end
       end
 
@@ -238,9 +266,9 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
       click_appointment_link
-      calendar_event = driver.find_element(:css, '.fc-event-bg')
+      calendar_event = f('.fc-event-bg')
       calendar_event.click
-      popup = driver.find_element(:css, '.event-details')
+      popup = f('.event-details')
       popup.find_element(:css, '.delete_event_link').click
       delete_appointment_group
       keep_trying_until { element_exists('.fc-event-bg').should be_false }
@@ -255,13 +283,11 @@ describe "scheduler" do
       max_appointments_input = f('[name="max_appointments_per_participant"]')
       replace_content(max_appointments_input, '0')
       submit_appointment_group_form
-      wait_for_ajaximations
       ffj('.errorBox[id!="error_box_template"]').size.should eql 1
 
       replace_content(max_appointments_input, 3)
       expect {
         submit_appointment_group_form
-        wait_for_ajaximations
       }.to change(AppointmentGroup, :count).by 1
 
       ag_id = f('#appointment-group-list li:last-child')['data-appointment-group-id']
@@ -372,7 +398,7 @@ describe "scheduler" do
       section_box.click
       course_box[:checked].should be_true
 
-      driver.find_element(:css, '.ui-dialog-buttonset .ui-button-primary').click
+      f('.ui-dialog-buttonset .ui-button-primary').click
       wait_for_ajaximations
       ag = AppointmentGroup.first
       ag.contexts.should include course1
@@ -389,8 +415,8 @@ describe "scheduler" do
     end
 
     def reserve_appointment_manual(n)
-      driver.find_elements(:css, '.fc-event')[n].click
-      driver.find_element(:css, '.event-details .reserve_event_link').click
+      ff('.fc-event')[n].click
+      f('.event-details .reserve_event_link').click
       wait_for_ajax_requests
     end
 
@@ -407,7 +433,7 @@ describe "scheduler" do
       click_appointment_link
 
       reserve_appointment_manual(0)
-      driver.find_element(:css, '.fc-event').should include_text "Reserved"
+      f('.fc-event').should include_text "Reserved"
     end
 
     it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do
@@ -423,14 +449,14 @@ describe "scheduler" do
       click_appointment_link
 
       reserve_appointment_manual(0)
-      driver.find_element(:css, '.fc-event').should include_text "Reserved"
+      f('.fc-event').should include_text "Reserved"
 
       # try to reserve the second appointment
       reserve_appointment_manual(1)
-      find_with_jquery('.ui-button:contains(Reschedule)').click
+      fj('.ui-button:contains(Reschedule)').click
       wait_for_ajax_requests
 
-      event1, event2 = driver.find_elements(:css, '.fc-event')
+      event1, event2 = ff('.fc-event')
       event1.should include_text "Available"
       event2.should include_text "Reserved"
     end
@@ -439,10 +465,10 @@ describe "scheduler" do
       tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 2,
                                :new_appointments => [
-                                 [tomorrow + ' 12:00:00', current_date = tomorrow + ' 13:00:00'],
-                                 [tomorrow + ' 14:00:00', current_date = tomorrow + ' 15:00:00'],
-                                 [tomorrow + ' 16:00:00', current_date = tomorrow + ' 17:00:00'],
-        ])
+                                   [tomorrow + ' 12:00:00', current_date = tomorrow + ' 13:00:00'],
+                                   [tomorrow + ' 14:00:00', current_date = tomorrow + ' 15:00:00'],
+                                   [tomorrow + ' 16:00:00', current_date = tomorrow + ' 17:00:00'],
+                               ])
       get "/calendar2"
       wait_for_ajaximations
       click_scheduler_link
