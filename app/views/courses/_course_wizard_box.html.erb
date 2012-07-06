@@ -111,7 +111,7 @@ $(document).ready(function() {
           <% else %>
             <%= mt 'details.publish.form', %{All finished?  Time to publish your course!  Click the button below to make it official!
 
-Publishing will send out email invitations to all the course users so they can sign up and start participating.} %>
+Publishing will allow the users to begin participating in the course.} %>
             <% form_for @context, :url => course_path(@context), :html => {:method => :put} do |f| %>
               <input type="hidden" name="course[event]" value="offer"/>
               <div class="button-container" style="text-align: center;">
