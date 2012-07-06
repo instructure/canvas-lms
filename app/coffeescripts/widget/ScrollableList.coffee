@@ -72,7 +72,7 @@ define [
       @updateItems([item])
 
     updatedItem: (item, currOffset, newOffset) ->
-      @prepareItems(newOffset - 1) # ensure enough li's are created if we're moving it toward the bottom
+      @prepareItems(Math.max(newOffset - 1, currOffset)) # ensure enough li's are created if we're moving it toward (or from) the bottom
       @$itemAt(currOffset).replaceWith(@itemTemplate(item))
       $items = @$items()
       $item = $items.eq(currOffset)

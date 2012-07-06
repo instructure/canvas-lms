@@ -201,7 +201,7 @@ define [
     _updateItem: (item, updateUi=true, overridePos=null) ->
       currPos = @itemMap[item.id]
       newPos = overridePos ? @positionOrReload(item, currPos)
-      item = @items[currPos].set(item.toJSON())
+      item = @items[currPos].set(item.toJSON()) if @items[currPos]
       return unless newPos?
       @_moveItem(item, currPos, newPos) if newPos isnt currPos
       @list.updatedItem(item, currPos, newPos) if updateUi

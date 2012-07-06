@@ -263,6 +263,28 @@ define [
     @server.respond()
     equal @$container.find('li').text(), ("item #{i}" for i in [4,6,8,10,12,14,16,18,20,22,24,2,26,28,30]).join('')
 
+  test 'should move an item from an unloaded section', ->
+    @server.respondWith(/.+/, @fakeApi())
+    @list = new ScrollableList @$container, $.extend({}, @defaults, sortKey: 'sortBy')
+    @server.respond()
+
+    equal @requestCount, 2
+    equal @$container.find('li').text(), ("item #{i*2}" for i in [1..10]).join('')
+
+    # now move it up
+    item = @items.splice(19, 1)[0]
+    item.sortBy = 1
+    @itemIds.splice(19, 1)
+    @itemIds.splice(0, 0, item.id)
+    @items.splice(0, 0, item)
+    @list.updateItems [item]
+
+    # visible at old location during transition
+    equal @$container.find('li').text(), ("item #{i}" for i in [40,2,4,6,8,10,12,14,16,18,20,40]).join('')
+    @clock.tick 500
+    # yay, moved up!
+    equal @$container.find('li').text(), ("item #{i}" for i in [40,2,4,6,8,10,12,14,16,18,20]).join('')
+
   test 'should disable while initializing or resetting', ->
     @server.respondWith(/.+/, @fakeApi())
     @list = new ScrollableList @$container, @defaults
