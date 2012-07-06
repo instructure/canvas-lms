@@ -62,7 +62,6 @@ describe "calendar2" do
     keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(event_title) }
   end
 
-
   context "as a teacher" do
 
     before (:each) do
