@@ -18,8 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe ConferencesController do
-    before(:all) do
+describe ConferencesController, :type => :integration do
+  before(:all) do
     WebConference.instance_eval do
       def plugins
         [OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true, :enabled? => true)]
@@ -69,5 +69,27 @@ describe ConferencesController do
 
     response.body.should_not match(/conference_#{course_conference.id}/)
     response.body.should match(/conference_#{group_conference.id}/)
+  end
+
+  it "shouldn't show concluded users" do
+    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym(:username => "teacher@example.com"))
+    @teacher = @user
+    @teacher.register!
+    @enroll1 = student_in_course(:active_all => true, :course => @course, :user => user_with_pseudonym(:username => "student1@example.com"))
+    @student1 = @enroll1.user
+    @student1.register!
+    @enroll2 = student_in_course(:active_all => true, :course => @course, :user => user_with_pseudonym(:username => "student2@example.com"))
+    @student2 = @enroll2.user
+    @student2.register!
+
+    @enroll1.attributes['workflow_state'].should == 'active' 
+    @enroll2.attributes['workflow_state'].should == 'active' 
+    @enroll2.update_attributes('workflow_state' => 'completed')
+    @enroll2.attributes['workflow_state'].should == 'completed'
+
+    get "/courses/#{@course.id}/conferences"
+    assigns['users'].member?(@teacher).should be_false
+    assigns['users'].member?(@student1).should be_true
+    assigns['users'].member?(@student2).should be_false
   end
 end

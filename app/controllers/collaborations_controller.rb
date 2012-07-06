@@ -38,8 +38,8 @@ class CollaborationsController < ApplicationController
       @google_docs = google_docs_verify_access_token rescue false
 
       scope = @context.users
-      if @context.respond_to?(:all_real_users)
-        scope = @context.all_real_users
+      if @context.respond_to?(:participating_typical_users)
+        scope = @context.participating_typical_users
       end
       @users = scope.scoped({
         :conditions => ["users.id <> ?", @current_user.id],

@@ -72,6 +72,7 @@ class Course < ActiveRecord::Base
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", :include => :user
+  has_many :typical_current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')", :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
   has_many :students, :through => :student_enrollments, :source => :user
   has_many :all_students, :through => :all_student_enrollments, :source => :user
@@ -100,6 +101,7 @@ class Course < ActiveRecord::Base
   has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment') and enrollments.workflow_state = 'active'"
   has_many :student_view_students, :through => :student_view_enrollments, :source => :user
   has_many :student_view_enrollments, :class_name => 'StudentViewEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
+  has_many :participating_typical_users, :through => :typical_current_enrollments, :source => :user
 
   has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content, :conditions => "content_tags.content_type = 'LearningOutcome'"
   has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
