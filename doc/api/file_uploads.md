@@ -22,7 +22,9 @@ Arguments:
   <dt>name</dt> <dd>The filename of the file. Any UTF-8 name is allowed. Path components such as `/` and `\` will be treated as part of the filename, not a path to a sub-folder.</dd>
   <dt>size</dt> <dd>The size of the file, in bytes.</dd>
   <dt>content_type</dt> <dd>The content type of the file. If not given, it will be guessed based on the file extension.</dd>
-  <dt>folder</dt> <dd>The path of the folder to store the file in. The path separator is the forward slash `/`, never a back slash. The folder will be created if it does not already exist. This parameter only applies to file uploads in a context that has folders, such as a user, a course, or a group. If not given, a default folder will be used.</dd>
+  <dt>parent_folder_id</dt><dd>The id of the folder to store the file in. If this and parent_folder_path are sent an error will be returned. If neither is given, a default folder will be used.</dd>
+  <dt>parent_folder_path</dt> <dd>The path of the folder to store the file in. The path separator is the forward slash `/`, never a back slash. The folder will be created if it does not already exist. This parameter only applies to file uploads in a context that has folders, such as a user, a course, or a group. If this and parent_folder_id are sent an error will be returned. If neither is given, a default folder will be used.</dd>
+  <dt>folder</dt> <dd>[deprecated] Use parent_folder_path instead.</dd>
   <dt>on_duplicate</dt> <dd>How to handle duplicate filenames. If `overwrite`, then this file upload will overwrite any other file in the folder with the same name. If `rename`, then this file will be renamed if another file in the folder exists with the given name. If no parameter is given, the default is `overwrite`. This doesn't apply to file uploads in a context that doesn't have folders.</dd>
 </dl>
 
@@ -32,7 +34,7 @@ Example Request:
          -F 'name=profile_pic.jpg' \
          -F 'size=302185' \
          -F 'content_type=image/jpeg' \
-         -F 'folder=my_files/section1' \
+         -F 'parent_folder_path=my_files/section1' \
          -H "Authorization: Bearer <token>"
 
 Example Response:
@@ -124,6 +126,5 @@ Example Response:
       'url': '...url to download the file...',
       'content-type': 'image/jpeg',
       'display_name': 'profile_pic.jpg',
-      'filename': 'profile_pic.jpg',
       'size': 302185
     }

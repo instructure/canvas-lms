@@ -26,7 +26,8 @@ describe FoldersController do
   end
   
   def course_folder
-    @folder = @course.folders.create(:name => "some folder")
+    @root = Folder.root_folders(@course).first
+    @folder = @root.sub_folders.create!(:name => "some folder", :context => @course)
   end
   
   describe "GET 'show'" do
@@ -53,7 +54,7 @@ describe FoldersController do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       course_folder
-      put 'update', :course_id => @course.id, :id => @folder.id
+      put 'update', :course_id => @course.id, :id => @folder.id, :folder => {:name => "hi"}
       assert_unauthorized
     end
     

@@ -66,12 +66,12 @@ HEREDOC
     <% if @context.folders.active.length > 0 && @context.attachments.active.length > 0 %>
       <h3><%= image_tag 'download.png' %> <%= t('labels.files', "Files for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
-        <% @context.folders.active.sort_by{|f| f.full_name}.each do |folder| %>
+        <% @context.folders.by_name.active.sort_by{|f| f.full_name}.each do |folder| %>
           <% if folder.attachments.length > 0 %>
             <li>
               <h4 class="<%= 'added' if @copies.include?(folder.asset_string) %>"><%= folder.full_name %></h4>
               <ul class="unstyled_list asset_list">
-                <% folder.attachments.each do |file| %>
+                <% folder.attachments.by_display_name.each do |file| %>
                   <li class="<%= 'added' if @copies.include?(file.asset_string) %>"><%= file.display_name %></li>
                 <% end %>
               </ul>

@@ -525,7 +525,7 @@ module ApplicationHelper
       child_folders = if opts[:all_folders]
                         opts[:all_folders].select {|f| f.parent_folder_id == folder.id }
                       else
-                        folder.active_sub_folders
+                        folder.active_sub_folders.by_position
                       end
       if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
         folders_as_options(child_folders, opts.merge({:depth => opts[:depth] + 1}))

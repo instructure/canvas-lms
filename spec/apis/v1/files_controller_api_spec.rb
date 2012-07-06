@@ -97,4 +97,177 @@ describe "Files API", :type => :integration do
       response.status.to_i.should == 400
     end
   end
+
+  describe "#index" do
+    append_before do
+      @root = Folder.root_folders(@course).first
+      @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
+      @a1 = Attachment.create!(:filename => 'ztest.txt', :display_name => "ztest.txt", :position => 1, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course)
+      @a3 = Attachment.create(:filename => 'atest3.txt', :display_name => "atest3.txt", :position => 2, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course)
+      @a3.hidden = true
+      @a3.save!
+      @a2 = Attachment.create!(:filename => 'mtest2.txt', :display_name => "mtest2.txt", :position => 3, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course, :locked => true)
+
+      @files_path = "/api/v1/folders/#{@f1.id}/files"
+      @files_path_options = { :controller => "files", :action => "api_index", :format => "json", :id => @f1.id.to_param }
+    end
+
+    it "should list files in alphabetical order" do
+      json = api_call(:get, @files_path, @files_path_options, {})
+      res = json.map{|f|f['display_name']}
+      res.should == %w{atest3.txt mtest2.txt ztest.txt}
+    end
+
+    it "should list files in saved order if flag set" do
+      json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(:sort_by => 'position'), {})
+      res = json.map{|f|f['display_name']}
+      res.should == %w{ztest.txt atest3.txt mtest2.txt}
+    end
+
+    it "should not list locked file if not authed" do
+      course_with_student(:course => @course)
+      json = api_call(:get, @files_path, @files_path_options, {})
+      json.any?{|f|f[:id] == @a2.id}.should == false
+    end
+
+    it "should not list hidden files if not authed" do
+      course_with_student(:course => @course)
+      json = api_call(:get, @files_path, @files_path_options, {})
+
+      json.any?{|f|f[:id] == @a3.id}.should == false
+    end
+
+    it "should not list locked folder if not authed" do
+      @f1.locked = true
+      @f1.save!
+      course_with_student(:course => @course)
+      raw_api_call(:get, @files_path, @files_path_options, {}, {}, :expected_status => 401)
+    end
+
+    it "should 404 for no folder found" do
+      raw_api_call(:get, "/api/v1/folders/0/files", @files_path_options.merge(:id => "0"), {}, {}, :expected_status => 404)
+    end
+
+    it "should paginate" do
+      7.times {|i| Attachment.create!(:filename => "test#{i}.txt", :display_name => "test#{i}.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course) }
+      json = api_call(:get, "/api/v1/folders/#{@root.id}/files?per_page=3", @files_path_options.merge(:id => @root.id.to_param, :per_page => '3'), {})
+      json.length.should == 3
+      response.headers['Link'].should == [
+        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=2&per_page=3>; rel="next"},
+        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=1&per_page=3>; rel="first"},
+        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=3&per_page=3>; rel="last"}
+      ].join(',')
+
+      json = api_call(:get, "/api/v1/folders/#{@root.id}/files?per_page=3&page=3", @files_path_options.merge(:id => @root.id.to_param, :per_page => '3', :page => '3'), {})
+      json.length.should == 1
+      response.headers['Link'].should == [
+        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=2&per_page=3>; rel="prev"},
+        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=1&per_page=3>; rel="first"},
+        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=3&per_page=3>; rel="last"}
+      ].join(',')
+    end
+  end
+
+  describe "#show" do
+    append_before do
+      @root = Folder.root_folders(@course).first
+      @att = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+      @file_path = "/api/v1/files/#{@att.id}"
+      @file_path_options = { :controller => "files", :action => "api_show", :format => "json", :id => @att.id.to_param }
+    end
+
+    it "should return expected json" do
+      json = api_call(:get, @file_path, @file_path_options, {})
+      json.should == {
+              'id' => @att.id,
+              'url' => file_download_url(@att, :verifier => @att.uuid, :download => '1', :download_frd => '1'),
+              'content-type' => "unknown/unknown",
+              'display_name' => 'test.txt',
+              'filename' => @att.filename,
+              'size' => @att.size,
+      }
+    end
+
+    it "should return not found error" do
+      api_call(:get, "/api/v1/files/0", @file_path_options.merge(:id => '0'), {}, {}, :expected_status => 404)
+    end
+
+    it "should return not found for deleted attachment" do
+      @att.destroy
+      api_call(:get, @file_path, @file_path_options, {}, {}, :expected_status => 404)
+    end
+
+    it "should return no permissions error for no context enrollment" do
+      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      api_call(:get, @file_path, @file_path_options, {}, {}, :expected_status => 401)
+    end
+
+    it "should return a hidden file" do
+      course_with_student(:course => @course)
+      @att.hidden = true
+      @att.save!
+      api_call(:get, @file_path, @file_path_options, {}, {}, :expected_status => 200)
+    end
+  end
+
+  describe "#destroy" do
+    append_before do
+      @root = Folder.root_folders(@course).first
+      @att = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+      @file_path = "/api/v1/files/#{@att.id}"
+      @file_path_options = { :controller => "files", :action => "destroy", :format => "json", :id => @att.id.to_param }
+    end
+
+    it "should delete a file" do
+      api_call(:delete, @file_path, @file_path_options)
+      @att.reload
+      @att.file_state.should == 'deleted'
+    end
+
+    it "should return 404" do
+      api_call(:delete, "/api/v1/files/0", @file_path_options.merge(:id => '0'), {}, {}, :expected_status => 404)
+    end
+
+    it "should return unauthorized error if not authorized to delete" do
+      course_with_student(:course => @course)
+      api_call(:delete, @file_path, @file_path_options, {}, {}, :expected_status => 401)
+    end
+  end
+
+  describe "#update" do
+    append_before do
+      @root = Folder.root_folders(@course).first
+      @att = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+      @file_path = "/api/v1/files/#{@att.id}"
+      @file_path_options = { :controller => "files", :action => "api_update", :format => "json", :id => @att.id.to_param }
+    end
+
+    it "should update" do
+      api_call(:put, @file_path, @file_path_options, {:name => "newname.txt", :locked => 'true'}, {}, :expected_status => 200)
+      @att.reload
+      @att.display_name.should == "newname.txt"
+      @att.locked.should == true
+    end
+
+    it "should move to another folder" do
+      @sub = @root.sub_folders.create!(:name => "sub", :context => @course)
+      api_call(:put, @file_path, @file_path_options, {:parent_folder_id => @sub.id.to_param}, {}, :expected_status => 200)
+      @att.reload
+      @att.folder_id.should == @sub.id
+    end
+
+    it "should return unauthorized error" do
+      course_with_student(:course => @course)
+      api_call(:put, @file_path, @file_path_options, {:name => "new name"}, {}, :expected_status => 401)
+    end
+
+    it "should 404 with invalid parent id" do
+      api_call(:put, @file_path, @file_path_options, {:parent_folder_id => 0}, {}, :expected_status => 404)
+    end
+
+    it "should not allow moving to different context" do
+      user_root = Folder.root_folders(@user).first
+      api_call(:put, @file_path, @file_path_options, {:parent_folder_id => user_root.id.to_param}, {}, :expected_status => 404)
+    end
+  end
 end

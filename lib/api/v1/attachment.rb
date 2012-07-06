@@ -19,6 +19,12 @@
 module Api::V1::Attachment
   include Api::V1::Json
 
+  def attachments_json(files)
+    files.map do |f|
+      attachment_json(f)
+    end
+  end
+
   def attachment_json(attachment, url_options = {}, options = {})
     url = if options[:thumbnail_url]
       # this thumbnail url is a route that redirects to local/s3 appropriately
@@ -43,13 +49,23 @@ module Api::V1::Attachment
     @attachment = Attachment.new
     @attachment.context = context
     @attachment.filename = request.params[:name]
+    atts = process_attachment_params(params)
+    atts.delete(:display_name)
+    @attachment.attributes = atts
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
     @attachment.content_type = request.params[:content_type].presence || Attachment.mimetype(@attachment.filename)
+    # Handle deprecated folder path
+    request.params[:parent_folder_path] ||= request.params[:folder]
     if opts.key?(:folder)
       @attachment.folder = folder
-    elsif context.respond_to?(:folders) && request.params[:folder].is_a?(String)
-      @attachment.folder = Folder.assert_path(request.params[:folder], context)
+    elsif request.params[:parent_folder_path] && request.params[:parent_folder_id]
+      render :json => {:message => I18n.t('lib.api.attachments.only_one_folder', "Can't set folder path and folder id")}, :status => 400
+      return
+    elsif request.params[:parent_folder_id]
+      @attachment.folder = context.folders.find(request.params.delete(:parent_folder_id))
+    elsif context.respond_to?(:folders) && request.params[:parent_folder_path].is_a?(String)
+      @attachment.folder = Folder.assert_path(request.params[:parent_folder_path], context)
     end
     duplicate_handling = check_duplicate_handling_option(request)
     duplicate_handling = nil if duplicate_handling == 'overwrite'
@@ -68,4 +84,15 @@ module Api::V1::Attachment
     end
     duplicate_handling
   end
+
+  def process_attachment_params(params)
+    new_atts = {}
+    new_atts[:display_name] = params[:name] if params.has_key?(:name)
+    new_atts[:lock_at] = params[:lock_at] if params.has_key?(:lock_at)
+    new_atts[:un_lock_at] = params[:un_lock_at] if params.has_key?(:unlock_lock_at)
+    new_atts[:locked] = Canvas::Plugin::value_to_boolean(params[:locked]) if params.has_key?(:locked)
+    new_atts[:hidden] = Canvas::Plugin::value_to_boolean(params[:hidden]) if params.has_key?(:hidden)
+    new_atts
+  end
+
 end
