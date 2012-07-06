@@ -104,10 +104,24 @@ end
 shared_examples_for "file uploads api with folders" do
   it_should_behave_like "file uploads api"
 
-  it "should allow specifying a folder" do
+  it "should allow specifying a folder with deprecated argument name" do
     preflight({ :name => "with_path.txt", :folder => "files/a/b/c/mypath" })
     attachment = Attachment.last(:order => :id)
     attachment.folder.should == Folder.assert_path("/files/a/b/c/mypath", context)
+  end
+
+  it "should allow specifying a folder" do
+    preflight({ :name => "with_path.txt", :parent_folder_path => "files/a/b/c/mypath" })
+    attachment = Attachment.last(:order => :id)
+    attachment.folder.should == Folder.assert_path("/files/a/b/c/mypath", context)
+  end
+
+  it "should allow specifying a parent folder by id" do
+    root = Folder.root_folders(context).first
+    sub = root.sub_folders.create!(:name => "folder1", :context => context)
+    preflight({ :name => "with_path.txt", :parent_folder_id => sub.id.to_param })
+    attachment = Attachment.last(:order => :id)
+    attachment.folder_id.should == sub.id
   end
 
   it "should upload to an existing folder" do

@@ -666,6 +666,8 @@ ActionController::Routing::Routes.draw do |map|
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
       courses.post 'courses/:course_id/files', :action => :create_file
+      courses.post 'courses/:course_id/folders', :controller => :folders, :action => :create
+      courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show
     end
 
     api.with_options(:controller => :sections) do |sections|
@@ -776,6 +778,9 @@ ActionController::Routing::Routes.draw do |map|
 
       users.put 'users/:id', :action => :update
       users.post 'users/:user_id/files', :action => :create_file
+
+      users.post 'users/:user_id/folders', :controller => :folders, :action => :create
+      users.get 'users/:user_id/folders/:id', :controller => :folders, :action => :show
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
@@ -864,6 +869,9 @@ ActionController::Routing::Routes.draw do |map|
       groups.with_options(:controller => :group_memberships) do |memberships|
         memberships.resources :memberships, :path_prefix => "groups/:group_id", :name_prefix => "group_", :controller => :group_memberships, :except => [:show]
       end
+
+      groups.post 'groups/:group_id/folders', :controller => :folders, :action => :create
+      groups.get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show
     end
 
     api.with_options(:controller => :collections) do |collections|
@@ -886,6 +894,22 @@ ActionController::Routing::Routes.draw do |map|
     api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
     api.get 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
 
+    api.with_options(:controller => :files) do |files|
+      files.post 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
+      files.get 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
+      files.get 'files/:id', :action => :api_show
+      files.delete 'files/:id', :action => :destroy
+      files.put 'files/:id', :action => :api_update
+    end
+
+    api.with_options(:controller => :folders) do |folders|
+      folders.get 'folders/:id', :action => :show
+      folders.get 'folders/:id/folders', :action => :api_index, :path_name => 'list_folders'
+      folders.get 'folders/:id/files', :controller => :files, :action => :api_index, :path_name => 'list_files'
+      folders.delete 'folders/:id', :action => :destroy
+      folders.put 'folders/:id', :action => :update
+    end
+    
     api.with_options(:controller => :favorites) do |favorites|
       favorites.get "users/self/favorites/courses", :action => :list_favorite_courses
       favorites.post "users/self/favorites/courses/:id", :action => :add_favorite_course

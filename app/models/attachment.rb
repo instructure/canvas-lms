@@ -18,6 +18,10 @@
 
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
+  def self.display_name_order_by_clause(table = nil)
+    col = table ? "#{table}.display_name" : 'display_name'
+    best_unicode_collation_key(col)
+  end
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data
   include HasContentTags
   include ContextModuleItem
@@ -1328,7 +1332,9 @@ class Attachment < ActiveRecord::Base
   named_scope :needing_scribd_conversion_status, :conditions => ['attachments.workflow_state = ? AND attachments.updated_at < ?', 'processing', 30.minutes.ago], :limit => 50
   named_scope :uploadable, :conditions => ['workflow_state = ?', 'pending_upload']
   named_scope :active, :conditions => ['file_state = ?', 'available']
-  named_scope :thumbnailable?, :conditions => {:content_type => Technoweenie::AttachmentFu.content_types}  
+  named_scope :thumbnailable?, :conditions => {:content_type => Technoweenie::AttachmentFu.content_types}
+  named_scope :by_display_name, :order => display_name_order_by_clause('attachments')
+  named_scope :by_position_then_display_name, :order => "attachments.position, #{display_name_order_by_clause('attachments')}"
   def self.serialization_excludes; [:uuid, :namespace]; end
   def set_serialization_options
     if self.scribd_doc

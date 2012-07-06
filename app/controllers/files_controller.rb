@@ -16,9 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Files
+# An API for managing files and folders
+# See the File Upload Documentation for details on the file upload workflow.
+#
+# @object File
+#     {
+#       "size":4,
+#       "content-type":"text/plain",
+#       "url":"http://www.example.com/files/569/download?download_frd=1\u0026verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
+#       "id":569,
+#       "display_name":"file.txt"
+#     }
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success]
+  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
   skip_before_filter :verify_authenticity_token, :only => :api_create
@@ -70,9 +82,9 @@ class FilesController < ApplicationController
         if !@current_folder || authorized_action(@current_folder, @current_user, :read)
           if params[:folder_id]
             if @context.grants_right?(@current_user, session, :manage_files)
-              @current_attachments = @current_folder.active_file_attachments
+              @current_attachments = @current_folder.active_file_attachments.by_position_then_display_name
             else
-              @current_attachments = @current_folder.visible_file_attachments
+              @current_attachments = @current_folder.visible_file_attachments.by_position_then_display_name
             end
             @current_attachments = @current_attachments.scoped(:include => [:thumbnail, :media_object])
             render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked, :thumbnail_url], :permissions => {:user => @current_user, :session => session})
@@ -83,6 +95,41 @@ class FilesController < ApplicationController
       end
     else
       full_index
+    end
+  end
+
+  # @API List files
+  # Returns the paginated list of files for the folder.
+  #
+  # @argument sort_by Either 'alphabetical' (default) or 'position'
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/folders/<folder_id>/files' \ 
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/folders/<folder_id>/files?sort_by=position' \ 
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @returns [File]
+  def api_index
+    folder = Folder.find(params[:id])
+    if authorized_action(folder, @current_user, :read_contents)
+      @context = folder.context
+      if @context.grants_right?(@current_user, session, :manage_files)
+        scope = folder.active_file_attachments
+      else
+        scope = folder.visible_file_attachments
+      end
+      if params[:sort_by] == 'position'
+        scope = scope.by_position_then_display_name
+      else
+        scope = scope.by_display_name
+      end
+      @files = Api.paginate(scope, self, api_v1_list_files_url(@folder))
+      render :json => attachments_json(@files)
     end
   end
 
@@ -157,6 +204,24 @@ class FilesController < ApplicationController
           render :json  => { :public_url => @attachment.authenticated_s3_url(:protocol => request.protocol) }
         end
       end
+    end
+  end
+
+  # @API Get file
+  # Returns the standard attachment json object
+  #
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/files/<file_id>' \ 
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @returns File
+  def api_show
+    @attachment = Attachment.find(params[:id])
+    raise ActiveRecord::RecordNotFound if @attachment.deleted?
+    if authorized_action(@attachment,@current_user,:read)
+      render :json => attachment_json(@attachment)
     end
   end
   
@@ -620,25 +685,80 @@ class FilesController < ApplicationController
       end
     end
   end
+
+  # @API Update file
+  # Update some settings on the specified file
+  #
+  # @argument name The new display name of the file
+  # @argument parent_folder_id The id of the folder to move this file into. 
+  #   The new folder must be in the same context as the original parent folder. 
+  #   If the file is in a context without folders this does not apply.
+  # @argument lock_at The datetime to lock the file at
+  # @argument unlock_at The datetime to unlock the file at
+  # @argument locked Flag the file as locked
+  # @argument hidden Flag the file as hidden
+  #
+  # @example_request
+  #
+  #   curl -XPUT 'http://<canvas>/api/v1/files/<file_id>' \ 
+  #        -F 'name=<new_name>' \ 
+  #        -F 'locked=true' \ 
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns File
+  def api_update
+    @attachment = Attachment.find(params[:id])
+    if authorized_action(@attachment,@current_user,:update)
+      @context = @attachment.context
+      if @context && params[:parent_folder_id]
+        folder = @context.folders.active.find(params[:parent_folder_id])
+        if authorized_action(folder, @current_user, :update)
+          @attachment.folder = folder
+        else
+          return
+        end
+      end
+
+      @attachment.attributes = process_attachment_params(params)
+      if @attachment.save
+        render :json => attachment_json(@attachment)
+      else
+        render :json => @attachment.errors.to_json, :status => :bad_request
+      end
+    end
+  end
   
   def reorder
     @folder = @context.folders.active.find(params[:folder_id])
     if authorized_action(@context, @current_user, :manage_files)
-      @folders = @folder.sub_folders.active
+      @folders = @folder.active_sub_folders.by_position
       @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
-      @folder.file_attachments.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
+      @folder.file_attachments.by_position.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
       @folder.reload
       render :json => @folder.subcontent.to_json(:methods => :readable_size, :permissions => {:user => @current_user, :session => session})
     end
   end
-  
+
+
+  # @API Delete file
+  # Remove the specified file
+  # 
+  #   curl -XDELETE 'http://<canvas>/api/v1/files/<file_id>' \ 
+  #        -H 'Authorization: Bearer <token>'
   def destroy
     @attachment = Attachment.find(params[:id])
     if authorized_action(@attachment, @current_user, :delete)
       @attachment.destroy
       respond_to do |format|
-        format.html { redirect_to named_context_url(@context, :context_files_url) }# show.rhtml
-        format.json { render :json => @attachment.to_json }
+        format.html {
+          require_context
+          redirect_to named_context_url(@context, :context_files_url)
+        }
+        if api_request?
+          format.json { render :json => attachment_json(@attachment) }
+        else
+          format.json { render :json => @attachment.to_json }
+        end
       end
     end
   end
