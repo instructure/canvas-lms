@@ -182,7 +182,7 @@ class CoursesController < ApplicationController
   def create_file
     @attachment = Attachment.new(:context => @context)
     if authorized_action(@attachment, @current_user, :create)
-      api_attachment_preflight(@context, request)
+      api_attachment_preflight(@context, request, :check_quota => true)
     end
   end
 

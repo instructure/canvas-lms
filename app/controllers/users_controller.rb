@@ -487,7 +487,8 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:user_id])
     @attachment = Attachment.new(:context => @user)
     if authorized_action(@attachment, @current_user, :create)
-      api_attachment_preflight(@current_user, request)
+      @context = @user
+      api_attachment_preflight(@current_user, request, :check_quota => true)
     end
   end
 

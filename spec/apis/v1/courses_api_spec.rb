@@ -674,6 +674,11 @@ describe CoursesController, :type => :integration do
 
   context "course files" do
     it_should_behave_like "file uploads api with folders"
+    it_should_behave_like "file uploads api with quotas"
+    
+    before :each do
+      @context = @course
+    end
 
     def preflight(preflight_params)
       @user = @teacher
@@ -682,6 +687,10 @@ describe CoursesController, :type => :integration do
         preflight_params)
     end
 
+    def has_query_exemption?
+      false
+    end
+      
     def context
       @course
     end

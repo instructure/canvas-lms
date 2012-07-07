@@ -625,7 +625,12 @@ describe "Users API", :type => :integration do
   end
 
   context "user files" do
+    before :each do
+      @context = @user
+    end
+    
     it_should_behave_like "file uploads api with folders"
+    it_should_behave_like "file uploads api with quotas"
 
     def preflight(preflight_params)
       api_call(:post, "/api/v1/users/self/files",
@@ -633,6 +638,10 @@ describe "Users API", :type => :integration do
         preflight_params)
     end
 
+    def has_query_exemption?
+      false
+    end
+      
     def context
       @user
     end

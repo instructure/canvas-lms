@@ -54,6 +54,7 @@ describe "Groups API", :type => :integration do
     @community.add_user(@moderator, 'accepted', true)
     @community_path = "/api/v1/groups/#{@community.id}"
     @community_path_options = { :controller => "groups", :format => "json" }
+    @context = @community
   end
 
   it "should allow a member to retrieve the group" do
@@ -336,6 +337,7 @@ describe "Groups API", :type => :integration do
 
   context "group files" do
     it_should_behave_like "file uploads api with folders"
+    it_should_behave_like "file uploads api with quotas"
 
     before do
       @user = @member
@@ -347,6 +349,10 @@ describe "Groups API", :type => :integration do
         preflight_params)
     end
 
+    def has_query_exemption?
+      false
+    end
+      
     def context
       @community
     end

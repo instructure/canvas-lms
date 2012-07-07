@@ -561,6 +561,22 @@ class Attachment < ActiveRecord::Base
     CGI::unescape(self.filename || t(:default_filename, "File"))
   end
   
+  def quota_exemption_key
+    assign_uuid
+    Canvas::Security.hmac_sha1(uuid + "quota_exempt")[0,10]
+  end
+  
+  def self.get_quota(context)
+    quota = 0
+    quota_used = 0
+    if context
+      quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
+      quota = context.quota if (context.respond_to?("quota") && context.quota)
+      quota_used = context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
+    end
+    {:quota => quota, :quota_used => quota_used}
+  end
+  
   def handle_duplicates(method)
     return [] unless method.present? && self.folder
     method = method.to_sym

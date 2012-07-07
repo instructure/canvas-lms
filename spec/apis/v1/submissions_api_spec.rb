@@ -1588,11 +1588,13 @@ describe 'Submissions API', :type => :integration do
         @assignment.update_attributes(:submission_types => 'online_upload')
         @student1 = @student
         course_with_student(:course => @course)
+        @context = @course
         @student2 = @student
         @user = @student1
       end
 
       it_should_behave_like "file uploads api"
+      it_should_behave_like "file uploads api without quotas"
 
       def preflight(preflight_params)
         api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}/files",
@@ -1600,6 +1602,10 @@ describe 'Submissions API', :type => :integration do
           preflight_params)
       end
 
+      def has_query_exemption?
+        true
+      end
+      
       it "should reject uploading files to other students' submissions" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
                         { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student2.to_param }, {}, {}, { :expected_status => 401 })

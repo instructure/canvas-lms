@@ -516,12 +516,9 @@ class ApplicationController < ActionController::Base
   
   # Calculates the file storage quota for @context
   def get_quota
-    @quota = 0
-    @quota_used = 0
-    return unless @context
-    @quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
-    @quota = @context.quota if (@context.respond_to?("quota") && @context.quota)
-    @quota_used = @context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
+    quota_params = Attachment.get_quota(@context)
+    @quota = quota_params[:quota]
+    @quota_used = quota_params[:quota_used]
   end
   
   # Renders a quota exceeded message if the @context's quota is exceeded
