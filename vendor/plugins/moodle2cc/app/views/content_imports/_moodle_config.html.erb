@@ -1,0 +1,20 @@
+<div class="migration_config"></div>
+
+<% js_block do %>
+  <script>
+    require(['jquery', 'content_migration'], function($){
+      $(function() {
+
+        $("#plugin_moodle_converter").bind("pluginShown", function(event, enableFileUpload) {
+          enableFileUpload();
+          $(".migration_part_selection").hide();
+        });
+
+        $("#plugin_moodle_converter").bind("pluginHidden", function(event) {
+          $(".migration_part_selection").show();
+        });
+
+      });
+    });
+  </script>
+<% end %>
