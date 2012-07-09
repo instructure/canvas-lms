@@ -231,7 +231,7 @@
           <% end %>
         </fieldset>
 
-        <fieldset id="account_settings_global_includes_settings" style="<%= hidden unless @account.settings[:global_includes] %>">
+        <fieldset id="account_settings_global_includes_settings" style="<%= hidden unless @account.allow_global_includes? %>">
           <legend><%= t(:global_js_and_css_includes_title, "Global JavaScript and CSS Includes") %></legend>
           <p style="font-size: 0.9em;"><%= t(:global_js_and_css_includes_description, "These files will be included on all page loads for your account") %></p>
           <% f.fields_for :settings do |settings| %>
@@ -245,6 +245,10 @@
                 <td><%= settings.text_field :global_stylesheet, :value => @account.settings[:global_stylesheet] %></td>
               </tr>
             </table>
+            <div>
+              <%= settings.check_box :sub_account_includes, :checked => @account.settings[:sub_account_includes] %>
+              <%= settings.label :sub_account_includes, :en => "Let sub-accounts define additional includes" %>
+            </div>
           <% end %>
         </fieldset>
 

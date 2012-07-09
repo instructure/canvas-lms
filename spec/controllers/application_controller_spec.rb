@@ -138,7 +138,4 @@ describe ApplicationController do
       @controller.instance_variable_get(:@context).should == @section
     end
   end
-
 end
-
-

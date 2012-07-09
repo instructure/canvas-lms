@@ -237,11 +237,11 @@ describe Conversation do
 
       subscription_guy.reload.unread_conversations_count.should eql 1
       subscription_guy.conversations.unread.size.should eql 1
-      subscription_guy.conversations.first.last_message_at.should eql last_message_at
+      subscription_guy.conversations.first.last_message_at.to_i.should eql last_message_at.to_i
 
       archive_guy.reload.unread_conversations_count.should eql 1
       archive_guy.conversations.unread.size.should eql 1
-      subscription_guy.conversations.first.last_message_at.should eql last_message_at
+      subscription_guy.conversations.first.last_message_at.to_i.should eql last_message_at.to_i
     end
 
     it "should not toggle read/unread until the subscription change is saved" do

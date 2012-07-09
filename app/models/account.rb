@@ -130,8 +130,9 @@ class Account < ActiveRecord::Base
   # these settings either are or could be easily added to
   # the account settings page
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
-  add_setting :global_javascript, :condition => :global_includes, :root_only => true
-  add_setting :global_stylesheet, :condition => :global_includes, :root_only => true
+  add_setting :global_javascript, :condition => :allow_global_includes
+  add_setting :global_stylesheet, :condition => :allow_global_includes
+  add_setting :sub_account_includes, :condition => :allow_global_includes, :boolean => true, :default => false
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
@@ -176,6 +177,10 @@ class Account < ActiveRecord::Base
       end
     end
     settings
+  end
+
+  def allow_global_includes?
+    self.global_includes? || self.parent_account.try(:sub_account_includes?)
   end
 
   def ip_filters=(params)

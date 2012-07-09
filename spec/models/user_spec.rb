@@ -1711,4 +1711,58 @@ describe User do
     profile.save!
     user.profile.should == profile
   end
+
+  describe "common_account_chain" do
+    before do
+      user_with_pseudonym
+    end
+
+    it "work for just root accounts" do
+      root_acct1 = Account.create!
+      root_acct2 = Account.create!
+
+      @user.user_account_associations.create!(:account_id => root_acct2.id)
+      @user.reload
+      @user.common_account_chain(root_acct1).should be_nil
+      @user.common_account_chain(root_acct2).should eql [root_acct2]
+    end
+
+    it "should work for one level of sub accounts" do
+      root_acct = Account.create!
+      sub_acct1 = Account.create!(:parent_account => root_acct)
+      sub_acct2 = Account.create!(:parent_account => root_acct)
+
+      @user.user_account_associations.create!(:account_id => root_acct.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+
+      @user.user_account_associations.create!(:account_id => sub_acct1.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+
+      @user.user_account_associations.create!(:account_id => sub_acct2.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+    end
+
+    it "should work for two levels of sub accounts" do
+      root_acct = Account.create!
+      sub_acct1 = Account.create!(:parent_account => root_acct)
+      sub_sub_acct1 = Account.create!(:parent_account => sub_acct1)
+      sub_sub_acct2 = Account.create!(:parent_account => sub_acct1)
+      sub_acct2 = Account.create!(:parent_account => root_acct)
+
+      @user.user_account_associations.create!(:account_id => root_acct.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+
+      @user.user_account_associations.create!(:account_id => sub_acct1.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+
+      @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1, sub_sub_acct1]
+
+      @user.user_account_associations.create!(:account_id => sub_sub_acct2.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+
+      @user.user_account_associations.create!(:account_id => sub_acct2.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+    end
+  end
 end

@@ -23,25 +23,4 @@ describe "layouts/application" do
     assigns[:domain_root_account] = Account.default
     render "layouts/application"
   end
-
-  it "should include site admin css" do
-    account = Account.site_admin
-    account.settings[:global_includes] = true
-    account.settings[:global_stylesheet] = 'somewhereoutthere'
-    account.save!
-    assigns[:domain_root_account] = Account.default
-    render "layouts/application"
-    response.body.should match /somewhereoutthere/
-  end
-
-  it "should include site admin css once" do
-    account = Account.site_admin
-    account.settings[:global_includes] = true
-    account.settings[:global_stylesheet] = 'somewhereoutthere'
-    account.save!
-    assigns[:domain_root_account] = Account.site_admin
-    render "layouts/application"
-    response.body.should match /somewhereoutthere/
-    response.body.scan(/somewhereoutthere/).length.should == 1
-  end
 end

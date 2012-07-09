@@ -20,8 +20,7 @@
   <%= include_css_bundles %>
   <!--[if lte IE 8]> <%= javascript_include_tag "vendor/html5.js" %> <![endif]-->
   <%= yield :stylesheets %>
-  <%= stylesheet_link_tag(Account.site_admin.settings[:global_stylesheet], :media => 'all') if @domain_root_account != Account.site_admin && Account.site_admin.settings[:global_stylesheet].present? %>
-  <%= stylesheet_link_tag(@domain_root_account.settings[:global_stylesheet], :media => 'all') if @domain_root_account && @domain_root_account.settings[:global_stylesheet].present? %>
+  <%= include_account_css %>
   <script>
     // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.
       _earlyClick = function(e){
