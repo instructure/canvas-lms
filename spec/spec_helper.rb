@@ -798,3 +798,7 @@ Spec::Runner.configure do |config|
       expected_post_lines[expected_post_lines.index(""),-1]
   end
 end
+
+Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
+  require f
+end

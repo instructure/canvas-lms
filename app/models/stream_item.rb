@@ -162,6 +162,7 @@ class StreamItem < ActiveRecord::Base
         hash['user_short_name'] = comment.author.short_name if comment.author
         hash
       end
+      res[:course_id] = object.context.id
     when Collaboration
       res = object.attributes
       res['users'] = object.users.map{|u| prepare_user(u)}

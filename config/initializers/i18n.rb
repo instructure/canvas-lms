@@ -100,11 +100,19 @@ I18n.class_eval do
     end
     alias_method_chain :localize, :whitespace_removal
 
-    def translate_with_default_and_count_magic(key, *args)
+    # Public: If a localizer has been set, use it to set the locale and then
+    # delete it.
+    #
+    # Returns nothing.
+    def set_locale_with_localizer
       if @localizer
         self.locale = @localizer.call
         @localizer = nil
       end
+    end
+
+    def translate_with_default_and_count_magic(key, *args)
+      set_locale_with_localizer
 
       default = args.shift if args.first.is_a?(String) || args.size > 1
       options = args.shift || {}

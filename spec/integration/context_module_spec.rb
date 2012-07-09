@@ -132,7 +132,7 @@ describe ContextModule do
 
         get next_link
         response.should be_redirect
-        response.location.ends_with?(@test_url).should be_true
+        response.location.ends_with?(@test_url + "?module_item_id=#{@tag2.id}").should be_true
             
         get @test_url
         response.should be_success

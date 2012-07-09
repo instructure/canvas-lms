@@ -144,14 +144,23 @@ module Delayed
           scope.by_priority
         end
 
-        # Clear all pending jobs for a specified strand
-        #
-        # Note that it *does* not clear out currently running or held jobs, for
-        # synchronization purposes: If you're using a strand for a "singleton" job,
-        # the currently running instance should complete, before the next instance
-        # starts.
-        def self.clear_strand!(strand_name)
-          self.delete_all(['strand=? AND locked_at IS NULL', strand_name])
+        # Create the job on the specified strand, but only if there aren't any
+        # other non-running jobs on that strand.
+        # (in other words, the job will still be created if there's another job
+        # on the strand but it's already running)
+        def self.create_singleton(options)
+          strand = options[:strand]
+
+          self.transaction do
+            if adapter_name == 'PostgreSQL'
+              connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
+              job = self.first(:conditions => ["run_at <= ? AND strand = ? AND locked_at IS NULL", db_time_now, strand])
+              job || self.create(options)
+            else
+              self.delete_all(['strand=? AND locked_at IS NULL', strand])
+              self.create(options)
+            end
+          end
         end
 
         # Lock this job for this worker.

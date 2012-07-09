@@ -17,6 +17,8 @@ define [
   'jquery.disableWhileLoading'
 ], (I18n, helpDialogTemplate, $, _, INST, htmlEscape, preventDefault) ->
 
+  showEmail = not ENV.current_user_id
+
   helpDialog =
     defaultLinks: [
       {
@@ -60,7 +62,7 @@ define [
             role is 'user' or
             (ENV.current_user_roles and role in ENV.current_user_roles)
         locals =
-          showEmail: not ENV.current_user_id
+          showEmail: showEmail
           helpLinks: links
           showBadBrowserMessage: INST.browser.ie
           browserVersion: INST.browser.version
@@ -75,7 +77,10 @@ define [
     initTicketForm: ->
       $form = @$dialog.find('#create_ticket').formSubmit
         disableWhileLoading: true
-        required: ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
+        required: ->
+          requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
+          requiredFields.push 'error[email]' if showEmail
+          requiredFields
         success: =>
           @$dialog.dialog('close')
           $form.find(':input').val('')

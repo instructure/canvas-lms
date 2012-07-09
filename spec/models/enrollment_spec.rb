@@ -168,46 +168,50 @@ describe Enrollment do
     end
 
     it "should drop high scores for groups when specified" do
+      @enrollment = @user.enrollments.first
       @group.update_attribute(:rules, "drop_highest:1")
-      @user.enrollments.first.computed_current_score.should eql(nil)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(nil)
       @submission = @assignment.grade_student(@user, :grade => "9")
       @submission[0].score.should eql(9.0)
-      @user.enrollments.should_not be_empty
-      @user.enrollments.first.computed_current_score.should eql(90.0)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(90.0)
       @submission2 = @assignment2.grade_student(@user, :grade => "20")
       @submission2[0].score.should eql(20.0)
-      @user.reload
-      @user.enrollments.first.computed_current_score.should eql(50.0)
-      @group.reload
-      @group.rules = nil
-      @group.save
-      @user.reload
-      @user.enrollments.first.computed_current_score.should eql(58.0)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(50.0)
+      @group.update_attribute(:rules, nil)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(58.0)
     end
 
     it "should drop low scores for groups when specified" do
-      @user.enrollments.first.computed_current_score.should eql(nil)
+      @enrollment = @user.enrollments.first
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(nil)
       @submission = @assignment.grade_student(@user, :grade => "9")
       @submission2 = @assignment2.grade_student(@user, :grade => "20")
       @submission2[0].score.should eql(20.0)
-      @user.reload
-      @user.enrollments.first.computed_current_score.should eql(90.0)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(90.0)
       @group.update_attribute(:rules, "")
-      @user.reload
-      @user.enrollments.first.computed_current_score.should eql(58.0)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(58.0)
     end
 
     it "should not drop the last score for a group, even if the settings say it should be dropped" do
+      @enrollment = @user.enrollments.first
       @group.update_attribute(:rules, "drop_lowest:2")
-      @user.enrollments.first.computed_current_score.should eql(nil)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(nil)
       @submission = @assignment.grade_student(@user, :grade => "9")
       @submission[0].score.should eql(9.0)
-      @user.enrollments.should_not be_empty
-      @user.enrollments.first.computed_current_score.should eql(90.0)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(90.0)
       @submission2 = @assignment2.grade_student(@user, :grade => "20")
       @submission2[0].score.should eql(20.0)
-      @user.reload
-      @user.enrollments.first.computed_current_score.should eql(90.0)
+      run_transaction_commit_callbacks
+      @enrollment.reload.computed_current_score.should eql(90.0)
     end
   end
 

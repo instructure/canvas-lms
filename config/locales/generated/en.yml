@@ -45,11 +45,9 @@ en:
   account_authorization_configs: 
     account_required: "must be LDAP-authenticated"
     cas_settings: 
-      alternate_login_url_description: "An alternate URL for logging into CAS. You probably should not set this."
       labels: 
         auth_base: "CAS URL"
         auth_type: Type
-        log_in_url: "Alternate Login URL"
         login_handle_name: "Login Label"
       login_handle_name_description: "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc."
       save_button: "Save Authentication Settings"
@@ -479,7 +477,6 @@ en:
       started_at_message: "Started: %{started_at}"
       title: "SIS Import"
       try_import_again_link: "Try import again"
-    sis_import_in_process_notice: "An SIS import is already in process."
     statistics: 
       concluded_at: "concluded %{at}"
       created_at: "created %{at}"
@@ -3463,7 +3460,6 @@ en:
       headings: 
         assignments: "Assignments Usage Report"
         files: "File Storage"
-        page_views: "Page views over time"
         stats: "Statistics for %{course}"
         students: "Recently Logged-In Users"
         totals: "Running Totals"
@@ -3478,7 +3474,6 @@ en:
       num_assignments: "# Assignments"
       num_submissions: "# Submissions"
       page_title: "Course Statistics"
-      page_views: "'Page Views'"
       quiz: Quiz
       quiz_questions: "Quiz Questions"
       quiz_submissions: "Quiz Submissions"
@@ -5367,7 +5362,7 @@ en:
     somethings_broken_but_i_can_work_around_it_for_now: "Something's broken but I can work around it for now"
     subject: Subject
     submit_this_support_request: "Submit Ticket"
-    wait_a_better_browser_may_help_solve_the_problem: "Wait! A *better browser* may help solve the problem."
+    wait_a_different_browser_may_help_solve_the_problem: "Wait! A *different browser* may help solve the problem."
     which_course_is_this_question_about: "Which course is this question about?"
     you_are_using_browser_version_version_try_again_using_the_latest_version_of_chrome_or_firefox: "You are using Internet Explorer version %{browserVersion}, Try again using the latest version of *Chrome* or **Firefox**"
     your_email_address: "Your email address"
@@ -9285,23 +9280,6 @@ en:
       participant: 
         one: "1 participant"
         other: "%{count} participants"
-    context_module_legend: 
-      content_part_of_module: "This content is part of the module, %{module_name}"
-      labels: 
-        module: module
-      max_score: "maximum score"
-      max_score_required: "Students must get no more than a %{max_score} on this item before the module is considered complete"
-      min_score_required: "Students must get at least a %{min_score} on this item before the module is considered complete"
-      minimum_score: "minimum score"
-      module_completed: "This module is completed"
-      module_not_unlocked: "This module hasn't been unlocked yet"
-      must_contribute: "must contribute"
-      must_contribute_title: "Students must contribute to this item before the module is considered complete"
-      must_submit: "must submit"
-      must_submit_title: "Students must submit this assignment before the module is considered complete"
-      must_view: "must view"
-      must_view_title: "Students must view this item before the module is considered complete"
-      view_modules: "View Modules"
     current_enrollment: 
       course_unpublished: "This course hasn't been published yet"
       enrolled_as_designer: "Enrolled as a designer"
@@ -9375,8 +9353,6 @@ en:
       nothing_two_weeks: "Nothing for the next two weeks"
       titles: 
         events: Events
-    exit_frame: 
-      redirecting: Redirecting...
     find_outcome: 
       buttons: 
         add_outcome: "Add Outcome"
@@ -10013,6 +9989,7 @@ en:
   sis_imports_api: 
     errors: 
       invalid_content_type: "Invalid content type, UTF-8 required"
+    sis_import_in_process_notice: "An SIS import is already in process."
   site_admin: 
     columns: 
       date: Date

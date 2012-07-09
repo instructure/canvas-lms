@@ -37,6 +37,8 @@ module YARD::Templates::Helpers::BaseHelper
       else
         raise "couldn't find API link for #{args.first}"
       end
+    elsif args.first.is_a?(String) && args.first =~ %r{^api:([^:]+):(.*)}
+      link_url("#{$1.downcase}.html##{$2.gsub('+', ' ')}", args[1])
     else
       linkify_without_api(*args)
     end

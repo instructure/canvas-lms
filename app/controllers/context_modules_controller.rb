@@ -269,16 +269,25 @@ class ContextModulesController < ApplicationController
       @modules = @context.context_modules.active
       @tags = @context.context_module_tags.active.sort_by{|t| t.position ||= 999}
       result = {}
-      result[:current_item] = @tags.detect{|t| t.content_type == type && t.content_id == id }
-      if !result[:current_item]
-        obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
-        
-        if obj.is_a?(ContentTag)
-          result[:current_item] = @tags.detect{|t| t.id == obj.id }
-        elsif obj.is_a?(DiscussionTopic) && obj.assignment_id
-          result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
-        elsif obj.is_a?(Quiz) && obj.assignment_id
-          result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
+      possible_tags = @tags.find_all {|t| t.content_type == type && t.content_id == id }
+      if possible_tags.size > 1
+        # if there's more than one tag for the item, but the caller didn't
+        # specify which one they want, we don't want to return any information.
+        # this way the module item prev/next links won't appear with misleading navigation info.
+        if params[:module_item_id]
+          result[:current_item] = possible_tags.detect { |t| t.id == params[:module_item_id].to_i }
+        end
+      else
+        result[:current_item] = possible_tags.first
+        if !result[:current_item]
+          obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
+          if obj.is_a?(ContentTag)
+            result[:current_item] = @tags.detect{|t| t.id == obj.id }
+          elsif obj.is_a?(DiscussionTopic) && obj.assignment_id
+            result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
+          elsif obj.is_a?(Quiz) && obj.assignment_id
+            result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
+          end
         end
       end
       result[:current_item].evaluate_for(@current_user) rescue nil

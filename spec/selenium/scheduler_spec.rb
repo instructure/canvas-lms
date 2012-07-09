@@ -7,13 +7,19 @@ EDIT_LOCATION = 'edited location'
 describe "scheduler" do
   it_should_behave_like "calendar2 selenium tests"
 
-  def fill_out_appointment_group_form(new_appointment_text)
+  def fill_out_appointment_group_form(new_appointment_text, opts={})
     driver.find_element(:css, '.create_link').click
     edit_form = f('#edit_appointment_form')
     keep_trying_until { edit_form.should be_displayed }
     replace_content(find_with_jquery('input[name="title"]'), new_appointment_text)
     f('.ag_contexts_selector').click
-    f('[name="context_codes[]"]').click
+    f('.ag_sections_toggle').click
+    if opts[:section_codes]
+      opts[:section_codes].each { |code| f("[name='sections[]'][value='#{code}']").click }
+    else
+      f('[name="context_codes[]"]').click
+    end
+    f('.ag_contexts_done').click
     date_field = edit_form.find_element(:css, '.date_field')
     date_field.click
     wait_for_animations
@@ -39,7 +45,7 @@ describe "scheduler" do
     }.with_indifferent_access.merge(opts)
 
     expect {
-      fill_out_appointment_group_form(opts[:new_appointment_text])
+      fill_out_appointment_group_form(opts[:new_appointment_text], opts)
       submit_appointment_group_form(opts[:publish])
       wait_for_ajaximations
       driver.find_element(:css, '.view_calendar_link').text.should == opts[:new_appointment_text]
@@ -141,6 +147,22 @@ describe "scheduler" do
       click_appointment_link
       click_al_option('.edit_link')
       edit_appointment_group
+    end
+
+    it "should select the correct course sections when editing an appointment group" do
+      section = @course.course_sections.create! :name => 'section1'
+      @course.course_sections.create! :name => 'section2'
+      get "/calendar2"
+      click_scheduler_link
+      # first create the group
+      create_appointment_group_manual :section_codes => ["course_section_#{section.id}"]
+      # then open it's edit dialog
+      appointment_group = driver.find_element(:css, '.appointment-group-item')
+      driver.action.move_to(appointment_group).perform
+      click_al_option('.edit_link')
+      # expect only section1 to be selected
+      f('.ag_contexts_selector').click
+      ffj('.ag_sections input:checked').size.should == 1
     end
 
     it "should delete an appointment group after clicking appointment group link" do
@@ -333,9 +355,10 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
       fill_out_appointment_group_form('multiple contexts')
+      f('.ag_contexts_selector').click
+      ff('.ag_sections_toggle').last.click
       course_box = f("[value=#{@course.asset_string}]")
       course_box.click
-      ff('.ag_sections_toggle').last.click
 
       # sections should get checked by their parent
       section_box = f("[value=#{@course.course_sections.first.asset_string}]")

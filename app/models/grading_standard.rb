@@ -62,7 +62,9 @@ class GradingStandard < ActiveRecord::Base
   # e.g. convert 89.7 to B+
   def self.score_to_grade(scheme, score)
     score = 0 if score < 0
-    scheme.max_by {|s| score >= s[1] * 100 ? s[1] : -1 }[0]
+    # assign the highest grade whose min cutoff is less than the score
+    # if score is less than all scheme cutoffs, assign the lowest grade
+    scheme.max_by {|s| score >= s[1] * 100 ? s[1] : -s[1] }[0]
   end
 
   # e.g. convert B to 86

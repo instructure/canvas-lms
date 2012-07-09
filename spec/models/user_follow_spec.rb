@@ -68,6 +68,21 @@ describe "UserFollow" do
       expect { @uf.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
+    it "should unfollow private collections on group unfollow" do
+      @shard1.activate do
+        @group = Group.create!(:group_category => GroupCategory.communities_for(Account.default), :is_public => true, :join_level => 'parent_context_auto_join')
+        @coll = @group.collections.create!(:name => 'col1', :visibility => 'private')
+      end
+      @membership = @group.add_user(@user1)
+      @follow = @group.following_user_follows.first
+      @follow.following_user.should == @user1
+      run_jobs
+      @coll.reload.following_user_follows.map(&:following_user).should == [@user1]
+      @membership.destroy
+      run_jobs
+      @coll.reload.following_user_follows.map(&:following_user).should == []
+    end
+
     def verify
       yield
       @shard1.activate { yield }

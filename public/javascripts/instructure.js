@@ -911,12 +911,6 @@ define([
       });
     }
 
-    $(".module_legend_link").click(function(event) {
-      var $mod = $(this).parents(".module_legend");
-      $mod.hide();
-      $mod.next(".module_legend").show();
-    });
-
     var $wizard_box = $("#wizard_box");
 
     function setWizardSpacerBoxDispay(action){

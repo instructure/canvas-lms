@@ -71,13 +71,13 @@ class Course < ActiveRecord::Base
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
-  has_many :current_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'rejected', 'completed', 'deleted', 'inactive'], :include => :user
+  has_many :current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
   has_many :students, :through => :student_enrollments, :source => :user
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') and enrollments.workflow_state = 'active'"
-  has_many :student_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", 'deleted', 'completed', 'rejected', 'inactive'], :include => :user
-  has_many :all_student_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state != ? AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", 'deleted'], :include => :user
+  has_many :student_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", :include => :user
+  has_many :all_student_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state != 'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", :include => :user
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
   has_many :all_real_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ["enrollments.workflow_state != ?", 'deleted'], :include => :user
   has_many :detailed_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => {:user => {:pseudonym => :communication_channel}}
@@ -231,6 +231,7 @@ class Course < ActiveRecord::Base
 
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
+    infer_root_account unless self.root_account_id
     existing_course = self.root_account.all_courses.find_by_sis_source_id(self.sis_source_id)
     return true if !existing_course || existing_course.id == self.id
 
@@ -554,6 +555,19 @@ class Course < ActiveRecord::Base
     self.enrollments.find_by_user_id(user && user.id)
   end
 
+  def infer_root_account
+    # This is a bit tricky.  Basically, it ensures a is the current account;
+    # if account is not loaded, it will not double load (because it's
+    # already cached). If it's already loaded, and correct, it again will
+    # only use the cache.  If it's already loaded and the wrong one, it will
+    # force reload
+    a = self.account(self.account && self.account.id != self.account_id)
+    self.root_account_id = a.root_account_id if a
+    self.root_account_id ||= a.id if a
+    # Ditto
+    self.root_account(self.root_account && self.root_account.id != self.root_account_id)
+  end
+
   def assert_defaults
     Hashtag.find_or_create_by_hashtag(self.hashtag) if self.hashtag && self.hashtag != ""
     self.tab_configuration ||= [] unless self.tab_configuration == []
@@ -570,16 +584,7 @@ class Course < ActiveRecord::Base
     @group_weighting_scheme_changed = self.group_weighting_scheme_changed?
     self.indexed = nil unless self.is_public
     if self.account_id && self.account_id_changed?
-      # This is a bit tricky.  Basically, it ensures a is the current account;
-      # if account is not loaded, it will not double load (because it's
-      # already cached). If it's already loaded, and correct, it again will
-      # only use the cache.  If it's already loaded and the wrong one, it will
-      # force reload
-      a = self.account(self.account && self.account.id != self.account_id)
-      self.root_account_id = a.root_account_id if a
-      self.root_account_id ||= a.id if a
-      # Ditto
-      self.root_account(self.root_account && self.root_account.id != self.root_account_id)
+      infer_root_account
     end
     if self.root_account_id && self.root_account_id_changed?
       a = self.account(self.account && self.account.id != self.account_id)
@@ -598,7 +603,7 @@ class Course < ActiveRecord::Base
   def update_course_section_names
     return if @course_name_was == self.name || !@course_name_was
     sections = self.course_sections
-    fields_to_possibly_rename = [:name, :section_code, :long_section_code]
+    fields_to_possibly_rename = [:name, :section_code]
     sections.each do |section|
       something_changed = false
       fields_to_possibly_rename.each do |field|
@@ -686,7 +691,7 @@ class Course < ActiveRecord::Base
 
   def update_final_scores_on_weighting_scheme_change
     if @group_weighting_scheme_changed
-      Enrollment.send_later_if_production(:recompute_final_score, self.students.map(&:id), self.id)
+      connection.after_transaction_commit { self.recompute_student_scores }
     end
   end
 
@@ -1254,7 +1259,8 @@ class Course < ActiveRecord::Base
     single = assignments.length == 1
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
-    student_enrollments = self.student_enrollments.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
+    student_enrollments = scope.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
     # remove duplicate enrollments for students enrolled in multiple sections
     seen_users = []
     student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
@@ -2332,17 +2338,32 @@ class Course < ActiveRecord::Base
 
   # returns a scope, not an array of users/enrollments
   def students_visible_to(user, include_priors=false)
-    enrollments_visible_to(user, include_priors, true)
+    enrollments_visible_to(user, :include_priors => include_priors, :return_users => true)
   end
-  def enrollments_visible_to(user, include_priors=false, return_users=false, limit_to_section_ids=nil)
+  def enrollments_visible_to(user, opts = {})
     visibilities = section_visibilities_for(user)
-    if return_users
-      scope = include_priors ? self.all_students : self.students
+    relation = []
+    relation << 'all' if opts[:include_priors]
+    if opts[:type] == :all
+      relation << 'user' if opts[:return_users]
     else
-      scope = include_priors ? self.all_student_enrollments : self.student_enrollments
+      relation << (opts[:type].try(:to_s) || 'student')
     end
-    if limit_to_section_ids
-      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => limit_to_section_ids.to_a })
+    if opts[:return_users]
+      relation.last << 's'
+    else
+      relation << 'enrollments'
+    end
+    relation = relation.join('_')
+    # our relations don't all follow the same pattern
+    relation = case relation
+                 when 'all_enrollments'; 'enrollments'
+                 when 'enrollments'; 'current_enrollments'
+                 else; relation
+               end
+    scope = self.send(relation.to_sym)
+    if opts[:section_ids]
+      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => opts[:section_ids].to_a })
     end
     unless visibilities.any?{|v|v[:admin]}
       scope = scope.scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'")
@@ -2350,7 +2371,7 @@ class Course < ActiveRecord::Base
     # See also Users#messageable_users (same logic used to get users across multiple courses)
     case enrollment_visibility_level_for(user, visibilities)
       when :full then scope
-      when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      when :sections then scope.scoped(:conditions => ["enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false])
       when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
       else scope.scoped({:conditions => "FALSE"})
     end

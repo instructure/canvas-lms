@@ -110,6 +110,31 @@ describe ApplicationController do
     end
   end
 
+  describe "get_context" do
+    it "should find user with api_find for api requests" do
+      user_with_pseudonym
+      @pseudonym.update_attribute(:sis_user_id, 'test1')
+      @controller.instance_variable_set(:@domain_root_account, Account.default)
+      @controller.stubs(:named_context_url).with(@user, :context_url).returns('')
+      @controller.stubs(:params).returns({ :user_id => 'sis_user_id:test1' })
+      @controller.stubs(:api_request?).returns(true)
+      @controller.send(:get_context)
+      @controller.instance_variable_get(:@context).should == @user
+    end
+
+    it "should find course section with api_find for api requests" do
+      course_model
+      @section = @course.course_sections.first
+      @section.update_attribute(:sis_source_id, 'test1')
+      @controller.instance_variable_set(:@domain_root_account, Account.default)
+      @controller.stubs(:named_context_url).with(@section, :context_url).returns('')
+      @controller.stubs(:params).returns({ :course_section_id => 'sis_section_id:test1' })
+      @controller.stubs(:api_request?).returns(true)
+      @controller.send(:get_context)
+      @controller.instance_variable_get(:@context).should == @section
+    end
+  end
+
 end
 
 

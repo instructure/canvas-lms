@@ -20,8 +20,7 @@
 #
 # Group memberships are the objects that tie users and groups together. 
 #
-# A Group Membership object looks like:
-#     !!!javascript
+# @object Group Membership
 #     {
 #       // The id of the membership object
 #       id: 92
@@ -62,6 +61,8 @@ class GroupMembershipsController < ApplicationController
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \ 
   #          -F 'filter_states[]=invited&filter_states[]=requested' \ 
   #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Group Membership]
   def index
     if authorized_action(@group, @current_user, :read_roster)
       memberships_route = polymorphic_url([:api_v1, @group, :memberships])
@@ -91,14 +92,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'user_id=self'
   #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     {
-  #       id: 102,
-  #       group_id: 6,
-  #       user_id: 3,
-  #       workflow_state: "requested",
-  #       moderator: false
-  #     }
+  # @returns Group Membership
   def create
     @user = api_find(User, params[:user_id])
     if authorized_action(GroupMembership.new(:group => @group, :user => @user), @current_user, :create)
@@ -123,14 +117,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'moderator=true'
   #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     {
-  #       id: 102,
-  #       group_id: 6,
-  #       user_id: 3,
-  #       workflow_state: "accepted",
-  #       moderator: true
-  #     }
+  # @returns Group Membership
   def update
     find_membership
     if authorized_action(@membership, @current_user, :update)

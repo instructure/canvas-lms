@@ -50,6 +50,7 @@ namespace :i18n do
 
   desc "Verifies all translation calls"
   task :check => :environment do
+    Bundler.require :i18n_tools
     only = if ENV['ONLY']
       ENV['ONLY'].split(',').map{ |path|
         path = '**/' + path if path =~ /\*/

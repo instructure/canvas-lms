@@ -59,15 +59,17 @@ class PseudonymsController < ApplicationController
   def forgot_password
     email = params[:pseudonym_session][:unique_id_forgot] if params[:pseudonym_session]
     @ccs = []
-    @ccs = CommunicationChannel.find_all_by_path_and_path_type_and_workflow_state(email, 'email', 'active')
-    if @ccs.empty?
-      @ccs += CommunicationChannel.find_all_by_path_and_path_type(email, 'email') if email and !email.empty?
-    end
-    if @domain_root_account && email && !email.empty?
-      @domain_root_account.pseudonyms.active.custom_find_by_unique_id(email, :all).each do |p|
-        cc = p.communication_channel if p.communication_channel && p.user
-        cc ||= p.user.communication_channel rescue nil
-        @ccs << cc
+    if email.present?
+      @ccs = CommunicationChannel.email.by_path(email).active.all
+      if @ccs.empty?
+        @ccs += CommunicationChannel.email.by_path(email).all
+      end
+      if @domain_root_account
+        @domain_root_account.pseudonyms.active.custom_find_by_unique_id(email, :all).each do |p|
+          cc = p.communication_channel if p.communication_channel && p.user
+          cc ||= p.user.communication_channel rescue nil
+          @ccs << cc
+        end
       end
     end
     @ccs = @ccs.flatten.compact.uniq.select do |cc|

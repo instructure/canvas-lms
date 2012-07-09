@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-describe "admin question banks" do
+describe "account admin question banks" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
@@ -10,10 +10,13 @@ describe "admin question banks" do
 
   def add_question_bank(title = 'bank 1')
     f(".add_bank_link").click
-    question_bank_title = fj("#assessment_question_bank_title")
-    question_bank_title.should be_displayed
+    question_bank_title = keep_trying_until do
+      question_bank_title = f("#assessment_question_bank_title")
+      question_bank_title.should be_displayed
+      question_bank_title
+    end
     question_bank_title.send_keys(title, :return)
-    wait_for_ajax_requests
+    wait_for_ajaximations
     question_bank = AssessmentQuestionBank.find_by_title(title)
     question_bank.should be_present
     question_bank.workflow_state.should == "active"

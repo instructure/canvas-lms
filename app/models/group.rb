@@ -134,15 +134,18 @@ class Group < ActiveRecord::Base
   end
 
   def membership_for_user(user)
-    self.group_memberships.find_by_user_id(user && user.id)
+    return nil unless user.present?
+    self.shard.activate { self.group_memberships.find_by_user_id(user.id) }
   end
 
   def has_member?(user)
-    self.participating_group_memberships.find_by_user_id(user && user.id)
+    return nil unless user.present?
+    self.shard.activate { self.participating_group_memberships.find_by_user_id(user.id) }
   end
 
   def has_moderator?(user)
-    self.participating_group_memberships.moderators.find_by_user_id(user && user.id)
+    return nil unless user.present?
+    self.shard.activate { self.participating_group_memberships.moderators.find_by_user_id(user.id) }
   end
 
   def should_add_creator?

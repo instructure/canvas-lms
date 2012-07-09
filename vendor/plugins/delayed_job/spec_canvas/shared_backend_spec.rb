@@ -1,6 +1,6 @@
 shared_examples_for 'a backend' do
   def create_job(opts = {})
-    @backend.create(opts.merge(:payload_object => SimpleJob.new))
+    @backend.enqueue(SimpleJob.new, { :queue => nil }.merge(opts))
   end
 
   before do
@@ -287,21 +287,42 @@ shared_examples_for 'a backend' do
       @backend.get_and_lock_next_available('w3', 60).should == nil
     end
 
-    context 'clear' do
-      it "should clear all jobs" do
-        create_job(:strand => 'myjobs')
-        @backend.clear_strand!('myjobs')
-        @backend.get_and_lock_next_available('w1', 60).should be_nil
+    context 'singleton' do
+      it "should create if there's no jobs on the strand" do
+        @job = create_job(:singleton => 'myjobs')
+        @job.should be_present
+        @backend.get_and_lock_next_available('w1', 60).should == @job
       end
 
-      it "should not clear running jobs" do
-        job1 = create_job(:strand => 'myjobs')
-        @backend.get_and_lock_next_available('w1', 60).should == job1
-        @backend.clear_strand!('myjobs')
-        job2 = create_job(:strand => 'myjobs')
-        # returns nil, because job1 is still running and job2 shouldn't
-        # start yet
-        @backend.get_and_lock_next_available('w1', 60).should be_nil
+      it "should create if there's another job on the strand, but it's running" do
+        @job = create_job(:singleton => 'myjobs')
+        @job.should be_present
+        @backend.get_and_lock_next_available('w1', 60).should == @job
+
+        @job2 = create_job(:singleton => 'myjobs')
+        @job.should be_present
+        @job2.should_not == @job
+      end
+
+      it "should not create if there's another non-running job on the strand" do
+        @job = create_job(:singleton => 'myjobs')
+        @job.should be_present
+
+        @job2 = create_job(:singleton => 'myjobs')
+        @job2.should == @job
+      end
+
+      it "should not create if there's a job running and one waiting on the strand" do
+        @job = create_job(:singleton => 'myjobs')
+        @job.should be_present
+        @backend.get_and_lock_next_available('w1', 60).should == @job
+
+        @job2 = create_job(:singleton => 'myjobs')
+        @job2.should be_present
+        @job2.should_not == @job
+
+        @job3 = create_job(:singleton => 'myjobs')
+        @job3.should == @job2
       end
     end
 

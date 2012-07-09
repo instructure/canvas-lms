@@ -113,14 +113,15 @@ describe Turnitin::Client do
     end
 
     it "should store errors in the turnitin_data hash" do
-      example_error = '<rerror><rcode>1001</rcode><rmessage>You may not submit a paper to this assignment until the assignment start date</rmessage></rerror>'
+      example_error = '<rerror><rcode>216</rcode><rmessage>I am a random turnitin error message.</rmessage></rerror>'
       @turnitin_api.expects(:sendRequest).with(:submit_paper, '2', has_entries(:pdata => :my_stub)).returns(Nokogiri(example_error))
       status = @submission.submit_to_turnitin
 
       status.should be_false
       @submission.turnitin_data[@attachment.asset_string][:object_id].should be_nil
-      @submission.turnitin_data[@attachment.asset_string][:error_code].should eql 1001
-      @submission.turnitin_data[@attachment.asset_string][:error_message].should eql "You may not submit a paper to this assignment until the assignment start date"
+      @submission.turnitin_data[@attachment.asset_string][:error_code].should eql 216
+      @submission.turnitin_data[@attachment.asset_string][:error_message].should eql "I am a random turnitin error message."
+      @submission.turnitin_data[@attachment.asset_string][:public_error_message].should eql "The student limit for this account has been reached. Please contact your account administrator."
     end
   end
 

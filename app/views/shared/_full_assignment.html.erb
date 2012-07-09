@@ -47,9 +47,6 @@
     <% if @locked %>
       <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t('messages.locked', "This assignment is currently locked.") %>
     <% end %>
-    <% if @assignment && @assignment.context_module_tag && @assignment.context_module_tag.context_module %>
-      <%= render :partial => "shared/context_module_legend", :object => @assignment.context_module_tag.context_module %>
-    <% end %>
     <div class="quiz_content reminder" style="text-align: center; <%= "display: none;" unless assignment && assignment.submission_types == "online_quiz" && assignment.quiz %>">
       <div class="body">
         <%= before_label :grades_from_quiz, "Grades for this assignment come from the quiz" %> <span class="quiz_title"><%= assignment.submission_types == 'online_quiz' && assignment.quiz.title rescue nbsp %></span><br/>

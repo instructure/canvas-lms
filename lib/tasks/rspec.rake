@@ -87,7 +87,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     desc "Run all specs in spec directory with RCov (excluding plugin specs)"
     Spec::Rake::SpecTask.new(:rcov) do |t|
       t.spec_opts = ['--options', "\"#{RAILS_ROOT}/spec/spec.opts\""]
-      t.spec_files = FileList['spec/**/*/*_spec.rb'].exclude('spec/selenium/*_spec.rb')
+      t.spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
       t.rcov = true
       t.rcov_opts = lambda do
         IO.readlines("#{RAILS_ROOT}/spec/rcov.opts").map { |l| l.chomp.split " " }.flatten

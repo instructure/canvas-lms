@@ -6,9 +6,12 @@ define [
   class TimeBlockRow
     constructor: (@TimeBlockList, data={}) ->
       @locked = data.locked
+      timeoutId = null
       @$row = $(timeBlockRowTemplate(data)).bind
-        focusin: @focus
-        focusout: => @$row.removeClass('focused')
+        focusin: =>
+          clearTimeout timeoutId
+          @focus()
+        focusout: => timeoutId = setTimeout((=> @$row.removeClass('focused')), 50)
       @inputs = {}
       unless @locked
         @$row.find('.date_field').date_field()

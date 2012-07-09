@@ -355,7 +355,7 @@ describe Submission do
           :student_overlap => 33
         })
 
-        @submission.check_turnitin_status(@submission.asset_string)
+        @submission.check_turnitin_status
         @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'scored'
       end
 
@@ -365,12 +365,28 @@ describe Submission do
         @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
         @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({})
 
-        @submission.check_turnitin_status(@submission.asset_string, Submission::TURNITIN_RETRY-1)
+        @submission.check_turnitin_status(Submission::TURNITIN_RETRY-1)
         @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
         Delayed::Job.find_by_tag('Submission#check_turnitin_status').should_not be_nil
 
-        @submission.check_turnitin_status(@submission.asset_string, Submission::TURNITIN_RETRY)
+        @submission.check_turnitin_status(Submission::TURNITIN_RETRY)
         @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
+      end
+
+      it "should check status for all assets" do
+        init_turnitin_api
+        @submission.turnitin_data ||= {}
+        @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
+        @submission.turnitin_data["other_asset"] = { :object_id => 'xxyy', :status => 'pending' }
+        @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({
+          :similarity_score => 56, :web_overlap => 22, :publication_overlap => 0, :student_overlap => 33
+        })
+        @turnitin_api.expects(:generateReport).with(@submission, "other_asset").returns({ :similarity_score => 20 })
+
+        @submission.check_turnitin_status
+        @submission.reload
+        @submission.turnitin_data[@submission.asset_string][:status].should == 'scored'
+        @submission.turnitin_data["other_asset"][:status].should == 'scored'
       end
     end
 

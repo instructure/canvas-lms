@@ -9,7 +9,7 @@
       <%= image_tag "forward.png" %> <span class="text"><%= t(:next, "Next") %></span>
       <span class="title ellipsis"></span>
     </a>
-    <a href="<%= context_url(context, :context_context_modules_item_details_url, asset.asset_string) %>" style="display: none;" class="sequence_details_url">&nbsp;</a>
+    <a href="<%= context_url(context, :context_context_modules_item_details_url, asset.asset_string, :module_item_id => params[:module_item_id]) %>" style="display: none;" class="sequence_details_url">&nbsp;</a>
     <a href="<%= context_url(context, :context_context_modules_item_redirect_url, "{{ id }}") %>" class="module_item_url" style="display: none;">&nbsp;</a>
     <a href="<%= context_url(context, :context_context_module_url, "{{ id }}") %>" class="module_url" style="display: none;">&nbsp;</a>
     <div class="all">

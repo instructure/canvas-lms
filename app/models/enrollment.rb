@@ -29,19 +29,20 @@ class Enrollment < ActiveRecord::Base
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
 
-  validates_presence_of :user_id
-  validates_presence_of :course_id
+  validates_presence_of :user_id, :course_id
+  validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
 
   before_save :assign_uuid
   before_save :assert_section
   before_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
+  before_validation :infer_privileges
   after_create :create_linked_enrollments
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
 
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :limit_privileges_to_course_section
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section
 
   def self.active_student_conditions(prefix = 'enrollments')
     "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
@@ -353,6 +354,24 @@ class Enrollment < ActiveRecord::Base
   def assert_section
     self.course_section ||= self.course.default_section if self.course
     self.root_account_id = self.course_section.root_account_id rescue nil
+  end
+
+  def infer_privileges
+    # limit_privileges_to_course_section affects whether this user can see
+    # users from other sections (for any purpose - messaging, roster, grading)
+    # admins (teacher, ta, designer) that have this flag are also visible TO
+    # users from any section (but not students/observers).
+    # currently, this flag is actually only configurable for teachers and
+    # TAs; designers are always course-wide, and so are students.
+    # In the future, we should probably allow configuring it for students,
+    # possibly section-wide (i.e. "Students in this section can see students
+    # from all other sections")
+    if self.is_a?(TeacherEnrollment) || self.is_a?(TaEnrollment)
+      self.limit_privileges_to_course_section = false if self.limit_privileges_to_course_section.nil?
+    else
+      self.limit_privileges_to_course_section = false
+    end
+    true
   end
 
   def course_name
@@ -809,20 +828,6 @@ class Enrollment < ActiveRecord::Base
       self.update_attribute(:uuid, AutoHandle.generate_securish_uuid)
     end
     read_attribute(:uuid)
-  end
-
-  # overwrite the accessors to limit_priveleges and limit_privileges to return the value wherever
-  # it exists.
-  [:limit_privileges_to_course_section, :limit_priveleges_to_course_section].each do |method_name|
-    define_method(method_name) do
-      read_attribute(:limit_privileges_to_course_section).nil? ?
-        read_attribute(:limit_priveleges_to_course_section) :
-        read_attribute(:limit_privileges_to_course_section)
-    end
-  end
-
-  def limit_priveleges_to_course_section=(value)
-    self.limit_privileges_to_course_section = value
   end
 
   def self.limit_privileges_to_course_section!(course, user, limit)

@@ -91,6 +91,36 @@ class CollectionItem < ActiveRecord::Base
     end
   end
 
+  trigger.after(:insert) do |t|
+    t.where("NEW.workflow_state = 'active'") do
+      <<-SQL
+      UPDATE collections
+      SET items_count = items_count + 1
+      WHERE id = NEW.collection_id;
+      SQL
+    end
+  end
+
+  trigger.after(:update) do |t|
+    t.where("NEW.workflow_state <> OLD.workflow_state") do
+      <<-SQL
+      UPDATE collections
+      SET items_count = items_count + CASE WHEN (NEW.workflow_state = 'active') THEN 1 ELSE -1 END
+      WHERE id = NEW.collection_id;
+      SQL
+    end
+  end
+
+  trigger.after(:delete) do |t|
+    t.where("OLD.workflow_state = 'active'") do
+      <<-SQL
+      UPDATE collections
+      SET items_count = items_count - 1
+      WHERE id = OLD.collection_id;
+      SQL
+    end
+  end
+
   set_policy do
     given { |user, session| self.collection.grants_right?(user, session, :read) }
     can :read

@@ -18,7 +18,8 @@
 module CC
   module GradingStandards
     def create_grading_standards(document=nil)
-      return nil unless @course.grading_standards.count > 0
+      standards_to_copy = (@course.grading_standards.to_a + [@course.grading_standard]).compact
+      return nil unless standards_to_copy.size > 0
       
       if document
         standards_file = nil
@@ -35,7 +36,7 @@ module CC
               "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |standards_node|
-        @course.grading_standards.each do |standard|
+        standards_to_copy.each do |standard|
           migration_id = CCHelper.create_key(standard)
           standards_node.gradingStandard(:identifier=>migration_id, :version=>standard.version) do |standard_node|
             standard_node.title standard.title unless standard.title.blank?

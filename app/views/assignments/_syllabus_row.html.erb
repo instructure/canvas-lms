@@ -19,7 +19,7 @@
           <% elsif e.is_a?(AppointmentGroup) %>
             <a href="<%= appointment_group_url(e.id) %>"><%= e.title %></a>
           <% else %>
-            <a href="<%= context_url(@context, :context_calendar_event_url, e.parent_calendar_event_id || e.id) %>"><%= e.title %></a>
+            <a href="<%= calendar_url_for(e.effective_context, :event => e) %>"><%= e.title %></a>
           <% end %>
         </td>
         <td class="dates <%= "not_last" unless idx == events.length - 1 %>">

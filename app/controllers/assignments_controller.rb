@@ -67,7 +67,7 @@ class AssignmentsController < ApplicationController
       end
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @unlocked = !@locked || @assignment.grants_rights?(@current_user, session, :update)[:update]
-      @assignment_module = @assignment.context_module_tag
+      @assignment_module = ContextModuleItem.find_tag_with_preferred([@assignment], params[:module_item_id])
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
       if @assignment.grants_right?(@current_user, session, :grade)
         visible_student_ids = @context.enrollments_visible_to(@current_user).find(:all, :select => 'user_id').map(&:user_id)

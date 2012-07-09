@@ -27,7 +27,10 @@ class ErrorReport < ActiveRecord::Base
 
   before_save :guess_email
 
+  # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
+  # Setup callback to default behavior.
+  on_send_to_external :send_via_email_or_post
 
   attr_accessible
 
@@ -141,12 +144,14 @@ class ErrorReport < ActiveRecord::Base
     distinct('category')
   end
 
-  on_send_to_external do |error_report|
+  # Send the error report based on configuration either via a POST or email to an external location.
+  def send_via_email_or_post
+    error_report = self
     config = Canvas::Plugin.find('error_reporting').try(:settings) || {}
 
     message_type = (error_report.backtrace || "").split("\n").first.match(/\APosted as[^_]*_([A-Z]*)_/)[1] rescue nil
     message_type ||= "ERROR"
-    
+
     body = %{From #{error_report.email}, #{(error_report.user.name rescue "")}
 #{message_type} #{error_report.comments + "\n" if error_report.comments}
 #{"url: " + error_report.url + "\n" if error_report.url }
@@ -173,4 +178,6 @@ error_id: #{error_report.id}
       )
     end
   end
+  private :send_via_email_or_post
+
 end

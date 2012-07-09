@@ -20,12 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SubmissionComment do
   before(:each) do
-    @user = factory_with_protected_attributes(User, :name => "some student", :workflow_state => "registered")
-    @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
-    @context.enroll_student(@user)
-    @assignment = @context.assignments.new(:title => "some assignment")
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+    @assignment = @course.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
-    @assignment.save
+    @assignment.save!
     @submission = @assignment.submit_homework(@user)
     @valid_attributes = {
       :submission => @submission,
@@ -237,13 +236,11 @@ This text has a http://www.google.com link in it...
         @submission1.add_comment(:author => @student1, :comment => "hello")
         tconvo = @teacher1.conversations.first
         tconvo.should be_unread
+        tconvo.update_attribute :workflow_state, 'read' 
         @submission1.add_comment(:author => @teacher1, :comment => "hi")
         sconvo = @student1.conversations.first
         sconvo.should be_unread
-
-        tconvo.remove_messages(:all)
-        sconvo.workflow_state = :read
-        sconvo.save!
+        tconvo.reload.should be_read
       end
 
       context "with no_submission_comments_inbox" do
@@ -280,14 +277,19 @@ This text has a http://www.google.com link in it...
             @teacher1.preferences[:no_submission_comments_inbox] = true
             @teacher1.save!
           end
-          it "should not show up in conversations" do
+          it "should not create new conversations" do
             @teacher1.conversations.count.should == 0
-            # Disable notification with existing conversation
-            @teacher1.preferences[:no_submission_comments_inbox] = true
-            @teacher1.save!
-            # Student adds another comment
             @submission1.add_comment(:author => @student1, :comment => 'New comment')
             @teacher1.conversations.count.should == 0
+          end
+          it "should create conversations after re-enabling the notification" do
+            @submission1.add_comment(:author => @student1, :comment => 'New comment')
+            @teacher1.conversations.count.should == 0
+            @teacher1.preferences[:no_submission_comments_inbox] = false
+            @teacher1.save!
+            # Student adds another comment
+            @submission1.add_comment(:author => @student1, :comment => 'Another comment')
+            @teacher1.conversations.count.should == 1
           end
           it "should show teacher comment as new to student" do
             @submission1.add_comment(:author => @student1, :comment => 'Test comment')
@@ -298,6 +300,17 @@ This text has a http://www.google.com link in it...
             convo = Conversation.initiate([@student1.id, @teacher.id], false)
             convo.add_message(@student1, 'My direct message')
             @teacher.conversations.unread.count.should == 1
+          end
+          it "should add submission comments to existing conversations" do
+            convo = Conversation.initiate([@student1.id, @teacher1.id], true)
+            convo.add_message(@student1, 'My direct message')
+            c = @teacher1.conversations.unread.first
+            c.should_not be_nil
+            c.update_attribute(:workflow_state, 'read')
+            @submission1.add_comment(:author => @student1, :comment => 'A comment')
+            c.reload
+            c.should be_read # still read, since we don't care to be notified
+            c.messages.size.should eql 2 # but the submission is visible
           end
         end
       end
@@ -352,6 +365,29 @@ This text has a http://www.google.com link in it...
         @assignment.unmute!
 
         t1convo.reload.should be_unread
+        t2convo.reload.should be_unread
+        @student1.reload.conversations.size.should eql 2
+        @student1.conversations.first.should be_unread
+        @student1.conversations.last.should be_unread
+      end
+
+      it "should respect the no_submission_comments_inbox setting" do
+        @teacher1.preferences[:no_submission_comments_inbox] = true
+        @teacher1.save!
+        c1 = @submission1.add_comment(:author => @student1, :comment => "help!")
+        c2 = @submission1.add_comment(:author => @teacher1, :comment => "ok", :hidden => true)
+        c3 = @submission1.add_comment(:author => @teacher2, :comment => "no", :hidden => true)
+        @student1.conversations.size.should eql 0
+        @teacher1.conversations.size.should eql 0
+        t2convo = @teacher2.conversations.first
+        t2convo.workflow_state = :read
+        t2convo.save!
+
+        @assignment.unmute!
+
+        t1convo = @teacher1.reload.conversations.first
+        t1convo.should_not be_nil
+        t1convo.should be_read
         t2convo.reload.should be_unread
         @student1.reload.conversations.size.should eql 2
         @student1.conversations.first.should be_unread
@@ -521,5 +557,28 @@ This text has a http://www.google.com link in it...
         tconvo.messages.first.created_at.to_i.should eql message.created_at.to_i
       end
     end
+  end
+
+  it "should prevent peer reviewer from seeing other comments" do
+    @student1 = @student
+    @student2 = student_in_course(:active_all => true).user
+    @student3 = student_in_course(:active_all => true).user
+
+    @assignment.peer_reviews = true
+    @assignment.save!
+    @assignment.assign_peer_review(@student2, @student1)
+    @assignment.assign_peer_review(@student3, @student1)
+
+    @teacher_comment = @submission.add_comment(:author => @teacher, :comment => "some comment from teacher")
+    @reviewer_comment = @submission.add_comment(:author => @student2, :comment => "some comment from peer reviewer")
+    @my_comment = @submission.add_comment(:author => @student3, :comment => "some comment from me")
+
+    @teacher_comment.grants_right?(@student3, :read).should be_false
+    @reviewer_comment.grants_right?(@student3, :read).should be_false
+    @my_comment.grants_right?(@student3, :read).should be_true
+
+    @teacher_comment.grants_right?(@student1, :read).should be_true
+    @reviewer_comment.grants_right?(@student1, :read).should be_true
+    @my_comment.grants_right?(@student1, :read).should be_true
   end
 end

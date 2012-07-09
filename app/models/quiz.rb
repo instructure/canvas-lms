@@ -24,6 +24,8 @@ class Quiz < ActiveRecord::Base
   include CopyAuthorizedLinks
   include ActionView::Helpers::SanitizeHelper
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
+  include ContextModuleItem
+
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
@@ -36,7 +38,6 @@ class Quiz < ActiveRecord::Base
   has_many :quiz_questions, :dependent => :destroy, :order => 'position'
   has_many :quiz_submissions, :dependent => :destroy
   has_many :quiz_groups, :dependent => :destroy, :order => 'position'
-  has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:context_module_progressions, :content_tags]}
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
@@ -218,8 +219,8 @@ class Quiz < ActiveRecord::Base
   attr_accessor :saved_by
   def update_assignment
     send_later_if_production(:set_unpublished_question_count) if self.id
-    if !self.assignment_id && @old_assignment_id && self.context_module_tag
-      self.context_module_tag.confirm_valid_module_requirements
+    if !self.assignment_id && @old_assignment_id
+      self.context_module_tags.each { |tag| tag.confirm_valid_module_requirements }
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
       Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
@@ -588,9 +589,8 @@ class Quiz < ActiveRecord::Base
   alias_method :to_s, :quiz_title
   
   def locked_for?(user=nil, opts={})
-    @locks ||= {}
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && self.unlock_at > Time.now)
         sub = user && quiz_submissions.find_by_user_id(user.id)
@@ -607,10 +607,10 @@ class Quiz < ActiveRecord::Base
         if !sub || !sub.manually_unlocked
           locked = l
         end
-      elsif (self.context_module_tag && !self.context_module_tag.available_for?(user, opts[:deep_check_if_needed]))
+      elsif item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         sub = user && quiz_submissions.find_by_user_id(user.id)
         if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
+          locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
         end
       end
       locked
@@ -618,8 +618,11 @@ class Quiz < ActiveRecord::Base
   end
   
   def context_module_action(user, action, points=nil)
-    self.context_module_tag.context_module_action(user, action, points) if self.context_module_tag
-    self.assignment.context_module_tag.context_module_action(user, action, points) if self.assignment && self.assignment.context_module_tag
+    tags_to_update = self.context_module_tags.to_a
+    if self.assignment
+      tags_to_update += self.assignment.context_module_tags
+    end
+    tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
 
   # virtual attribute

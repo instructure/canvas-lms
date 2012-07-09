@@ -1134,7 +1134,15 @@ define([
             cnt++;
           }
           if(cnt === 0) {
-            $curve_grade_dialog.errorBox(I18n.t('errors.none_to_update', 'None to Update'));
+            var errorBox = $curve_grade_dialog.errorBox(
+              I18n.t('errors.none_to_update', 'None to Update'));
+
+            setTimeout(function() {
+              errorBox.fadeOut(function() {
+                errorBox.remove();
+              });
+            }, 3500);
+
             return false;
           }
           return data;

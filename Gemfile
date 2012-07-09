@@ -48,7 +48,7 @@ gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.14'
+gem 'ruby-saml-mod',  '0.1.15'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '2.0.3'
@@ -102,10 +102,13 @@ group :development do
   else
     gem 'ruby-debug',   '0.10.4'
   end
+  gem 'guard', '1.0.3'
+end
+
+group :i18n_tools do
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
-  gem 'guard', '1.0.3'
 end
 
 group :redis do

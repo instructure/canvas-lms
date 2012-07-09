@@ -136,6 +136,22 @@ describe ContextModule do
       @tag.content.should eql(@file)
       @module.content_tags.should be_include(@tag)
     end
+
+    it "should allow adding items more than once" do
+      course_module
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag1 = @module.add_item(:id => @assignment.id, :type => "assignment")
+      @tag2 = @module.add_item(:id => @assignment.id, :type => "assignment")
+      @tag1.should_not == @tag2
+      @module.content_tags.should be_include(@tag1)
+      @module.content_tags.should be_include(@tag2)
+
+      @mod2 = @course.context_modules.create!(:name => "mod2")
+      @tag3 = @mod2.add_item(:id => @assignment.id, :type => "assignment")
+      @tag3.should_not == @tag1
+      @tag3.should_not == @tag2
+      @mod2.content_tags.should == [@tag3]
+    end
   end
   
   describe "completion_requirements=" do
@@ -247,6 +263,32 @@ describe ContextModule do
       @progression = @module2.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_locked
+    end
+
+    describe "multi-items" do
+      it "should be locked if all tags are locked" do
+        course_module
+        @user = User.create!(:name => "some name")
+        @course.enroll_student(@user)
+        @a1 = @course.assignments.create!(:title => "some assignment")
+        @tag1 = @module.add_item({:id => @a1.id, :type => 'assignment'})
+        @module.require_sequential_progress = true
+        @module.completion_requirements = {@tag1.id => {:type => 'must_submit'}}
+        @module.save!
+        @a2 = @course.assignments.create!(:title => "locked assignment")
+        @a2.locked_for?(@user).should be_false
+        @tag2 = @module.add_item({:id => @a2.id, :type => 'assignment'})
+        @a2.reload.locked_for?(@user).should be_true
+
+        @mod2 = @course.context_modules.create!(:name => "mod2")
+        @tag3 = @mod2.add_item({:id => @a2.id, :type => 'assignment'})
+        # not locked, because the second tag allows access
+        @a2.reload.locked_for?(@user).should be_false
+        @mod2.prerequisites = "module_#{@module.id}"
+        @mod2.save!
+        # now locked, because mod2 is locked
+        @a2.reload.locked_for?(@user).should be_true
+      end
     end
 
     it "should not be available if previous module is incomplete" do
@@ -448,7 +490,7 @@ describe ContextModule do
       @progression.current_position.should eql(@tag2.position)
       @assignment.reload; @assignment2.reload
       @assignment.locked_for?(@user).should eql(false)
-      @assignment2.locked_for?(@user).should_not eql(false)
+      @assignment2.locked_for?(@user).should eql(false)
       
       @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 5}}
       @module.save

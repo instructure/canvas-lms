@@ -20,7 +20,8 @@
 class Attachment < ActiveRecord::Base
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data
   include HasContentTags
-  
+  include ContextModuleItem
+
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
   belongs_to :folder
@@ -29,7 +30,6 @@ class Attachment < ActiveRecord::Base
   has_one :media_object
   has_many :submissions
   has_many :attachment_associations
-  has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => :context_module_progressions}
   belongs_to :root_attachment, :class_name => 'Attachment'
   belongs_to :scribd_mime_type
   belongs_to :scribd_account
@@ -112,7 +112,8 @@ class Attachment < ActiveRecord::Base
       send_later_enqueue_args(:submit_to_scribd!, { :n_strand => 'scribd', :max_attempts => 1 })
     end
 
-    send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/
+    # try an infer encoding if it would be useful to do so
+    send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/ && self.context_type != 'SisBatch'
     if respond_to?(:process_attachment_with_processing) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
       temp_file = temp_path || create_temp_file
       self.class.attachment_options[:thumbnails].each { |suffix, size| send_later_if_production(:create_thumbnail_size, suffix) }
@@ -990,17 +991,16 @@ class Attachment < ActiveRecord::Base
   end
   
   def locked_for?(user, opts={})
-    @locks ||= {}
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     return {:manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && Time.now < self.unlock_at)
         locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
       elsif (self.lock_at && Time.now > self.lock_at)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
-      elsif (self.could_be_locked && self.context_module_tag && !self.context_module_tag.available_for?(user, opts[:deep_check_if_needed]))
-        locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
+      elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
+        locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       end
       locked
     end
@@ -1033,7 +1033,7 @@ class Attachment < ActiveRecord::Base
   end
   
   def context_module_action(user, action)
-    self.context_module_tag.context_module_action(user, action) if self.context_module_tag
+    self.context_module_tags.each { |tag| tag.context_module_action(user, action) }
   end
 
   include Workflow

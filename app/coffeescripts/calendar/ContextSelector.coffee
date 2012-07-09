@@ -93,10 +93,6 @@ define [
         item.render($contextsList)
         @contextSelectorItems[item.context.asset_string] = item
 
-      for contextCode in @apptGroup.context_codes when @contextSelectorItems[contextCode]
-        @contextSelectorItems[contextCode].setState('on')
-        @contextSelectorItems[contextCode].lock()
-
       if @apptGroup.sub_context_codes.length > 0
         if @apptGroup.sub_context_codes[0].match /^group_category_/
           for c, item of @contextSelectorItems
@@ -113,6 +109,10 @@ define [
             item = @contextSelectorItems[context]
             item.sectionChange()
             item.lock()
+      else
+        for contextCode in @apptGroup.context_codes when @contextSelectorItems[contextCode]
+          @contextSelectorItems[contextCode].setState('on')
+          @contextSelectorItems[contextCode].lock()
 
       $('.ag_contexts_done').click preventDefault closeCB
 

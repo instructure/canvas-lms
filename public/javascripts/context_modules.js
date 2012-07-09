@@ -182,6 +182,14 @@ define([
         }, function() {
         });
       },
+      itemClass: function(content_tag) {
+        return content_tag.content_type + "_" + content_tag.content_id;
+      },
+      updateAllItemInstances: function(content_tag) {
+        $(".context_module_item."+modules.itemClass(content_tag)+" .title").each(function() {
+          $(this).text(content_tag.title);
+        });
+      },
       editModule: function($module) {
         var $form = $("#add_context_module_form");
         $form.data('current_module', $module);
@@ -279,6 +287,7 @@ define([
           $item.removeClass('indent_' + idx);
         }
         $item.addClass('indent_' + (data.indent || 0));
+        $item.addClass(modules.itemClass(data));
         // don't just tack onto the bottom, put it in its correct position
         var $before = null;
         $module.find(".context_module_items").children().each(function() {
@@ -663,6 +672,7 @@ define([
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         var $item = modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items").sortable('refresh');
+        modules.updateAllItemInstances(data.content_tag);
         modules.updateAssignmentData();
         $(this).dialog('close');
       },

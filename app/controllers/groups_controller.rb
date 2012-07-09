@@ -30,9 +30,7 @@
 # context for many other types of functionality and interaction, such as
 # collections, discussions, wikis, and shared files.
 #
-# A Group object looks like:
-#
-#     !!!javascript
+# @object Group
 #     {
 #       // The ID of the group.
 #       id: 17,
@@ -168,17 +166,7 @@ class GroupsController < ApplicationController
   #     curl https://<canvas>/api/v1/groups/<group_id> \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     {
-  #       id: 13,
-  #       name: "Mary's Group",
-  #       description: "A group for my friends",
-  #       is_public: false,
-  #       join_level: "parent_context_request",
-  #       members_count: 3,
-  #       avatar_url: "https://<canvas>/files/avatar_image.png",
-  #       group_category_id: 2,
-  #     }
+  # @returns Group
   def show
     find_group
     respond_to do |format|
@@ -252,17 +240,7 @@ class GroupsController < ApplicationController
   #          -F 'join_level=parent_context_auto_join' \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     {
-  #       id: 25,
-  #       name: "Math Teachers",
-  #       description: "A place to gather resources for our classes.",
-  #       is_public: true,
-  #       join_level: "parent_context_auto_join",
-  #       members_count: 13,
-  #       avatar_url: "https://<canvas>/files/avatar_image.png",
-  #       group_category_id: 7
-  #     }
+  # @returns Group
   def create
     # only allow community groups from the api right now
     if api_request?
@@ -328,17 +306,7 @@ class GroupsController < ApplicationController
   #          -F 'join_level=parent_context_request' \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     {
-  #       id: 25,
-  #       name: "Algebra Teachers",
-  #       description: "A place to gather resources for our classes.",
-  #       is_public: true,
-  #       join_level: "parent_context_request",
-  #       members_count: 13,
-  #       avatar_url: "https://<canvas>/files/avatar_image.png",
-  #       group_category_id: 7
-  #     }
+  # @returns Group
   def update
     find_group
     if !api_request? && params[:group] && params[:group][:group_category_id]
@@ -376,17 +344,7 @@ class GroupsController < ApplicationController
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #     {
-  #       id: 144,
-  #       name: "My Group",
-  #       description: null,
-  #       is_public: false,
-  #       join_level: "invitation_only",
-  #       members_count: 0,
-  #       avatar_url: "https://<canvas>/files/avatar_image.png",
-  #       group_category_id: 9
-  #     }
+  # @returns Group
   def destroy
     find_group
     if authorized_action(@group, @current_user, :delete)

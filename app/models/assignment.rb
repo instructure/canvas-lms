@@ -24,6 +24,7 @@ class Assignment < ActiveRecord::Base
   include HasContentTags
   include CopyAuthorizedLinks
   include Mutable
+  include ContextModuleItem
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
@@ -40,7 +41,6 @@ class Assignment < ActiveRecord::Base
   has_one :quiz
   belongs_to :assignment_group
   has_one :discussion_topic, :conditions => ['discussion_topics.root_topic_id IS NULL'], :order => 'created_at'
-  has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:context_module_progressions, :content_tags]}
   has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_one :rubric_association, :as => :association, :conditions => ['rubric_associations.purpose = ?', "grading"], :order => :created_at, :include => :rubric
   has_one :rubric, :through => :rubric_association
@@ -115,7 +115,8 @@ class Assignment < ActiveRecord::Base
                 :process_if_quiz,
                 :default_values,
                 :update_submissions_if_details_changed,
-                :maintain_group_category_attribute
+                :maintain_group_category_attribute,
+                :process_if_topic
 
   after_save    :update_grades_if_details_changed,
                 :generate_reminders_if_changed,
@@ -172,11 +173,7 @@ class Assignment < ActiveRecord::Base
 
   def update_grades_if_details_changed
     if @points_possible_was != self.points_possible || @grades_affected || @muted_was != self.muted
-      begin
-        self.context.recompute_student_scores
-      rescue
-        ErrorReport.log_exception(:grades, $!)
-      end
+      connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
   end
@@ -335,12 +332,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def context_module_action(user, action, points=nil)
-    self.context_module_tag.context_module_action(user, action, points) if self.context_module_tag
-    if self.submission_types == 'discussion_topic' && self.discussion_topic && self.discussion_topic.context_module_tag
-      self.discussion_topic.context_module_tag.context_module_action(user, action, points)
-    elsif self.submission_types == 'online_quiz' && self.quiz && self.quiz.context_module_tag
-      self.quiz.context_module_tag.context_module_action(user, action, points)
+    tags_to_update = self.context_module_tags.to_a
+    if self.submission_types == 'discussion_topic' && self.discussion_topic
+      tags_to_update += self.discussion_topic.context_module_tags
+    elsif self.submission_types == 'online_quiz' && self.quiz
+      tags_to_update += self.quiz.context_module_tags
     end
+    tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
 
   set_broadcast_policy do |p|
@@ -493,6 +491,15 @@ class Assignment < ActiveRecord::Base
     end
   end
   protected :process_if_quiz
+
+  def process_if_topic
+    if self.submission_types == "discussion_topic"
+      #8569: discussion topics don't have lock-after date, so clear this on conversion 
+      self.lock_at = nil
+    end
+    self
+  end
+  protected :process_if_topic
 
   def grading_scheme
     if self.grading_standard
@@ -680,17 +687,16 @@ class Assignment < ActiveRecord::Base
   end
 
   def locked_for?(user=nil, opts={})
-    @locks ||= {}
     locked = false
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
-    @locks[user ? user.id : 0] ||= Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && self.unlock_at > Time.now)
         locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
       elsif (self.lock_at && self.lock_at <= Time.now)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
-      elsif (self.could_be_locked && self.context_module_tag && self.context_module_tag.locked_for?(user, opts[:deep_check_if_needed]))
-        locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
+      elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
+        locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       end
       locked
     end
@@ -797,11 +803,12 @@ class Assignment < ActiveRecord::Base
         end
       end
     end
-    Enrollment.send_later_if_production(:recompute_final_score, context.students.map(&:id), self.context_id) rescue nil
-    send_later_if_production(:multiple_module_actions, context.students.map(&:id), :scored, score)
 
     changed_since_publish = !!self.available?
     Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
+
+    self.context.recompute_student_scores 
+    send_later_if_production(:multiple_module_actions, context.students.map(&:id), :scored, score)
   end
 
   def update_user_from_rubric(user, assessment)
@@ -1236,10 +1243,6 @@ class Assignment < ActiveRecord::Base
   }
 
   named_scope :no_graded_quizzes_or_topics, :conditions=>"submission_types NOT IN ('online_quiz', 'discussion_topic')"
-
-  named_scope :with_context_module_tags, lambda {
-    {:include => :context_module_tag }
-  }
 
   named_scope :with_submissions, lambda {
     {:include => :submissions }

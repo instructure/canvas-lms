@@ -13,6 +13,7 @@ module ParallelExclude
       'spec/apis/general_api_spec.rb',
       'spec/apis/user_content_spec.rb',
       'spec/apis/v1/groups_api_spec.rb',
+      'spec/apis/v1/courses_api_spec.rb',
       'spec/apis/auth_spec.rb',
       'spec/integration/files_spec.rb',
       'spec/lib/acts_as_list.rb',
@@ -23,7 +24,10 @@ module ParallelExclude
       'spec/models/eportfolio_entry_spec.rb',
       'spec/models/media_object_spec.rb',
       'spec/models/zip_file_import_spec.rb',
-      'spec/models/content_migration_spec.rb'
+      'spec/models/content_migration_spec.rb',
+      'spec/models/collections_spec.rb',
+      'spec/lib/canvas/http_spec.rb',
+      'spec/migrations/count_existing_collection_items_and_followers_spec.rb'
   ]
 
   test_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')

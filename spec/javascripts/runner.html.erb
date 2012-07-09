@@ -42,20 +42,10 @@
 
       baseUrl: '../../public/javascripts',
 
-      paths: {
-        jqueryui: 'vendor/jqueryui',
-        use: 'vendor/use'
-      },
+      paths: <%= paths %>,
 
       // non-amd shims
-      use: {
-        'vendor/backbone': {
-          deps: ['underscore', 'jquery'],
-          attach: function(_, $){
-            return Backbone;
-          }
-        }
-      },
+      use: <%= shims %>,
 
       packages: [
         {

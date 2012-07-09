@@ -310,7 +310,7 @@ class SubmissionsApiController < ApplicationController
 
   def visible_user_ids
     scope = if @section
-      @context.enrollments_visible_to(@current_user, false, false, [@section.id])
+      @context.enrollments_visible_to(@current_user, :section_ids => [@section.id])
     else
       @context.enrollments_visible_to(@current_user)
     end

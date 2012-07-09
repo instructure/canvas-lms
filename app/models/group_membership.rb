@@ -112,7 +112,7 @@ class GroupMembership < ActiveRecord::Base
     if (self.id_changed? || self.workflow_state_changed?) && self.active?
       UserFollow.create_follow(self.user, self.group)
     elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
-      user_follow = self.user.user_follows.find(:first, :conditions => { :followed_item_id => self.group_id, :followed_item_type => 'Group' })
+      user_follow = self.user.shard.activate { self.user.user_follows.find(:first, :conditions => { :followed_item_id => self.group_id, :followed_item_type => 'Group' }) }
       user_follow.try(:destroy)
     end
   end
