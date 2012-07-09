@@ -77,7 +77,8 @@ class ApplicationController < ActionController::Base
       :current_user => user_display_json(@current_user),
       :current_user_roles => @current_user.try(:roles),
       :context_asset_string => @context.try(:asset_string),
-      :AUTHENTICITY_TOKEN => form_authenticity_token
+      :AUTHENTICITY_TOKEN => form_authenticity_token,
+      :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
     }
 
     hash.each do |k,v|
@@ -1022,7 +1023,7 @@ class ApplicationController < ActionController::Base
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
   def safe_domain_file_url(attachment, host=nil, verifier = nil, download = false) # TODO: generalize this
-    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default, request.host)}"
+    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port)}"
     ts, sig = @current_user && @current_user.access_verifier
 
     # add parameters so that the other domain can create a session that 
@@ -1166,7 +1167,7 @@ class ApplicationController < ActionController::Base
     return nil unless str
     return str.html_safe unless str.match(/object|embed|equation_image/)
 
-    UserContent.escape(str)
+    UserContent.escape(str, request.host_with_port)
   end
   helper_method :user_content
 

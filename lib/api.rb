@@ -252,6 +252,14 @@ module Api
       anchor.replace(node)
     end
 
+    UserContent.find_user_content(doc) do |node, uc|
+      node['class'] = "instructure_user_content #{node['class']}"
+      node['data-uc_width'] = uc.width
+      node['data-uc_height'] = uc.height
+      node['data-uc_snippet'] = uc.node_string
+      node['data-uc_sig'] = uc.node_hmac
+    end
+
     # rewrite any html attributes that are urls but just absolute paths, to
     # have the canvas domain prepended to make them a full url
     #
