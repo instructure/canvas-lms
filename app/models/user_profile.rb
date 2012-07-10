@@ -31,11 +31,14 @@ class UserProfile
     unless @tabs
       @tabs = [
         { :id => TAB_HOME, :label => I18n.t('#tabs.home', "Home"), :css_class => 'home', :href => :dashboard_path, :no_args => true },
-        { :id => TAB_PROFILE, :label => I18n.t('#user_profile.tabs.profile', "Profile"), :css_class => 'profile', :href => :user_profile_path, :args => [user] },
         { :id => TAB_COMMUNICATION_PREFERENCES, :label => I18n.t('#user_profile.tabs.notifications', "Notifications"), :css_class => 'notifications', :href => :communication_profile_path, :no_args => true },
         { :id => TAB_FILES, :label => I18n.t('#tabs.files', "Files"), :css_class => 'files', :href => :dashboard_files_path, :no_args => true },
         { :id => TAB_PROFILE_SETTINGS, :label => I18n.t('#user_profile.tabs.settings', 'Settings'), :css_class => 'edit_profile', :href => :edit_profile_path, :no_args => true },
       ]
+      if user && user.instance_variable_get(:@show_profile_tab)
+        @tabs.insert 1, {:id => TAB_PROFILE, :label => I18n.t('#user_profile.tabs.profile', "Profile"), :css_class => 'profile', :href => :user_profile_path, :args => [user]}
+      end
+
       @tabs << { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true } if @user.eportfolios_enabled?
       if user && opts[:root_account]
         opts[:root_account].context_external_tools.active.having_setting('user_navigation').each do |tool|

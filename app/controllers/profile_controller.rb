@@ -28,6 +28,14 @@ class ProfileController < ApplicationController
   include TextHelper
 
   def show
+    if @current_user && @domain_root_account.enable_profiles?
+      # this is ghetto and we should get rid of this as soon as possible
+      @current_user.instance_variable_set(:@show_profile_tab, true)
+    else
+      edit
+      return
+    end
+
     @user ||= @current_user
 
     @active_tab = "profile"
@@ -83,6 +91,10 @@ class ProfileController < ApplicationController
   #     'calendar': { 'ics' => '..url..' }
   #   }
   def edit
+    if @current_user && @domain_root_account.enable_profiles?
+      @current_user.instance_variable_set(:@show_profile_tab, true)
+    end
+
     if api_request?
       # allow querying this basic profile data for the current user, or any
       # user the current user has view_statistics access to
