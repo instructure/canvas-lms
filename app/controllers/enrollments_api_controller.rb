@@ -138,7 +138,10 @@ class EnrollmentsApiController < ApplicationController
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
     scope_arguments = { :conditions => @conditions,
       :order => 'enrollments.type ASC, users.sortable_name ASC',
-      :include => [:user, :course, :course_section] }
+      :include => {:user => [], :course => [], :course_section => []} }
+    if user_json_is_admin?
+      scope_arguments[:include][:user] = :pseudonyms
+    end
 
     return unless enrollments = @context.is_a?(Course) ?
       course_index_enrollments(scope_arguments) :
