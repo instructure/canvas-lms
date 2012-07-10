@@ -221,60 +221,6 @@ class CoursesController < ApplicationController
 
   include Api::V1::User
 
-  # @API List course sections
-  # Returns the list of sections for this course.
-  #
-  # @argument include[] [optional, "students"] Associations to include with the group.
-  # @argument include[] [optional, "avatar_url"] Include the avatar URLs for students returned.
-  #
-  # @response_field id The unique identifier for the course section.
-  # @response_field name The name of the section.
-  # @response_field sis_section_id The sis id of the section.
-  #
-  # @example_response
-  #
-  #   [
-  #     {
-  #       "id": 1,
-  #       "name": "Section A",
-  #       "sis_section_id": null,
-  #       "students": [...]
-  #     },
-  #     {
-  #       "id": 2,
-  #       "name": "Section B",
-  #       "sis_section_id": "section-b",
-  #       "students": [...]
-  #     }
-  #   ]
-  def sections
-    get_context
-    if authorized_action(@context, @current_user, :read_roster)
-      includes = Array(params[:include])
-      include_students = includes.include?('students')
-      include_avatar_urls = includes.include?('avatar_url') || nil
-
-      result = @context.active_course_sections.map do |section|
-        res = section.as_json(:include_root => false,
-                              :only => %w(id name))
-        res['sis_section_id'] = section.sis_source_id
-        if include_students
-          proxy = section.enrollments
-          if user_json_is_admin?
-            proxy = proxy.scoped(:include => { :user => :pseudonyms })
-          else
-            proxy = proxy.scoped(:include => :user)
-          end
-          res['students'] = proxy.all(:conditions => "type = 'StudentEnrollment'").
-            map { |e| user_json(e.user, @current_user, session, include_avatar_urls && ['avatar_url']) }
-        end
-        res
-      end
-
-      render :json => result
-    end
-  end
-
   # @API List students
   #
   # Returns the list of students enrolled in this course.

@@ -658,7 +658,6 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses', :action => :index
       courses.post 'accounts/:account_id/courses', :action => :create
       courses.get 'courses/:id', :action => :show
-      courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
@@ -667,6 +666,12 @@ ActionController::Routing::Routes.draw do |map|
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
       courses.post 'courses/:course_id/files', :action => :create_file
+    end
+
+    api.with_options(:controller => :sections) do |sections|
+      sections.get 'courses/:course_id/sections', :action => :index, :path_name => 'course_sections'
+      sections.get 'courses/:course_id/sections/:id', :action => :show, :path_name => 'course_section'
+      sections.get 'sections/:id', :action => :show
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
