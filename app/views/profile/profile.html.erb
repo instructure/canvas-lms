@@ -50,13 +50,6 @@
       <%= f.date_select :birthdate, {:order => [:day, :month, :year]}, :class => 'edit_data' %>
     </td>
   </tr>
-  <tr>
-    <td><%= f.blabel :bio, :en => "Bio" %></td>
-    <td>
-      <span class="display_data"><%= format_message(@user.bio).first.html_safe %></span>
-      <%= f.text_area :bio, :class => :edit_data, :id => 'user_bio' %>
-    </td>
-  </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
   <% if active_email_channels.length > 1 %>
     <tr>
