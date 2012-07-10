@@ -527,9 +527,9 @@ ActionController::Routing::Routes.draw do |map|
     user.resources :messages, :only => [:index]
   end
 
-  map.resource :profile, :only => %w(show edit update),
+  map.resource :profile, :only => %w(show update),
                          :controller => "profile",
-                         :member => { :communication => :get, :update_communication => :post } do |profile|
+                         :member => { :communication => :get, :update_communication => :post, :settings => :get } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
     profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'
@@ -811,7 +811,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
-    api.get 'users/:user_id/profile', :controller => :profile, :action => :edit
+    api.get 'users/:user_id/profile', :controller => :profile, :action => :settings
     api.get 'users/:user_id/avatars', :controller => :profile, :action => :profile_pics
 
     api.with_options(:controller => :conversations) do |conversations|

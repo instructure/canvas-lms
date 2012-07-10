@@ -32,7 +32,7 @@ class ProfileController < ApplicationController
       # this is ghetto and we should get rid of this as soon as possible
       @current_user.instance_variable_set(:@show_profile_tab, true)
     else
-      edit
+      settings
       return
     end
 
@@ -90,7 +90,7 @@ class ProfileController < ApplicationController
   #     'avatar_url': '..url..',
   #     'calendar': { 'ics' => '..url..' }
   #   }
-  def edit
+  def settings
     if @current_user && @domain_root_account.enable_profiles?
       @current_user.instance_variable_set(:@show_profile_tab, true)
     end
@@ -112,10 +112,10 @@ class ProfileController < ApplicationController
     @pseudonyms = @user.pseudonyms.active
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
     @context = UserProfile.new(@user)
-    @active_tab = "edit_profile"
+    @active_tab = "profile_settings"
     respond_to do |format|
       format.html do
-        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), edit_profile_path )
+        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), settings_profile_path )
         render :action => "profile"
       end
       format.json do
