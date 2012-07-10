@@ -354,4 +354,34 @@ describe SIS::CSV::EnrollmentImporter do
     @course.observer_enrollments.map(&:user).should == [@observer, @observer]
     @course.observer_enrollments.map(&:associated_user_id).sort.should == [@user1.id, @user2.id].sort
   end
+
+  it "should find manually xlisted sections when enrolling by course id" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active",
+      "test_2,TC 102,Test Course 102,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+      "user_2,user2,User,Uno,user@example.com,active",
+      "user_3,user3,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,active,",
+      "test_2,user_1,student,,active,"
+    )
+    @course1 = Course.find_by_sis_source_id('test_1')
+    @course2 = Course.find_by_sis_source_id('test_2')
+    @course1.default_section.crosslist_to_course(@course2)
+    @course2.course_sections.count.should == 2
+
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_3,student,,active,"
+    )
+    @course2.enrollments.count.should == 3
+    @course1.enrollments.count.should == 0
+  end
 end
