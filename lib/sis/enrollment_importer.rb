@@ -133,7 +133,7 @@ module SIS
 
             # reset cached/inferred course and section if they don't match with the opposite piece that was
             # explicitly provided
-            @section = @course.default_section if @section.nil? || section_id.blank? && !@section.default_section
+            @section = @course.default_section(:include_xlists => true) if @section.nil? || section_id.blank? && !@section.default_section
             @course = @section.course if @course.nil? || (course_id.blank? && @course.id != @section.course_id) || (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
 
             if @course.id != @section.course_id

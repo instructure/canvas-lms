@@ -1518,12 +1518,19 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def default_section
-    init_method = (new_record? ? :find_or_initialize_by_default_section : :find_or_create_by_default_section)
-    course_sections.active.send(init_method, true) do |section|
+  def default_section(opts = {})
+    section = course_sections.active.find_by_default_section(true)
+    if !section && opts[:include_xlists]
+      section = CourseSection.active.find(:first, :conditions => { :nonxlist_course_id => self.id }, :order => 'id')
+    end
+    if !section
+      section = course_sections.build
+      section.default_section = true
       section.course = self
       section.root_account = self.root_account
+      section.save unless new_record?
     end
+    section
   end
 
   def assert_section
