@@ -64,6 +64,13 @@ class Handlebars
       end
 
       dependencies = ['compiled/handlebars_helpers']
+
+      if css = get_css(id)
+        dependencies << "compiled/util/registerTemplateCss"
+        # arguments[1] will be the registerTemplateCss function
+        css_registration = "\narguments[1]('#{id}', #{css.to_json});\n"
+      end
+
       prepared = prepare_i18n(source, id)
       dependencies << "i18n!#{normalize(id)}" if prepared[:keys].size > 0
 
@@ -82,6 +89,7 @@ define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{dependencies.to_json}, functi
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['#{id}'] = template(#{template});
   #{partial_registration}
+  #{css_registration}
   return templates['#{id}'];
 });
 JS
@@ -102,6 +110,11 @@ JS
         "{{{t #{data[:key].inspect} #{data[:value].inspect} scope=#{scope.inspect}#{wrappers}#{data[:options]}}}}"
       end
       {:content => content, :keys => keys}
+    end
+
+    def get_css(file_path)
+      css_file_name = "public/stylesheets/compiled/jst/#{file_path}.css"
+      File.read(css_file_name) if File.exists?(css_file_name)
     end
 
     protected
