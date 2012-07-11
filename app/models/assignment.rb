@@ -1625,6 +1625,12 @@ class Assignment < ActiveRecord::Base
     submission_types == 'on_paper' || submission_types == 'external_tool'
   end
 
+  def allow_google_docs_submission?
+    self.submission_types && 
+      self.submission_types.match(/online_upload/) && 
+      (self.allowed_extensions.blank? || self.allowed_extensions.grep(/doc|xls|ppt/).present?)
+  end
+
   def <=>(comparable)
     sort_key <=> comparable.sort_key
   end

@@ -21,18 +21,36 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 class GoogleDocsTest
   include GoogleDocs
 
-  attr_accessor :user
+  attr_accessor :user, :current_user, :real_current_user
 
-  def initialize(user)
+  def initialize(user, current_user, real_current_user)
     @user = user
+    @current_user = current_user
+    @real_current_user = real_current_user
   end
 end
 
 describe GoogleDocs do
 
+  def google_doc_settings
+    path = RAILS_ROOT + "/config/google_docs.yml"
+    if File.exists?(path)
+      YAML.load_file(path)[RAILS_ENV]
+    else
+      {
+        'test_user_token' => 'u_token',
+        'test_user_secret' => 'u_secret',
+        'test_user_id' => 'u_id',
+        'test_user_name' => 'u_name',
+        'api_key' => 'key',
+        'secret_key' => 'secret'
+      }
+    end
+  end
+
   before(:each) do
     @user = User.create!
-    PluginSetting.create!(:name => 'google_docs', :settings => YAML.load_file(RAILS_ROOT + "/config/google_docs.yml")[RAILS_ENV])
+    PluginSetting.create!(:name => 'google_docs', :settings => google_doc_settings)
     UserService.register(
       :service => "google_docs",
       :token => GoogleDocs.config["test_user_token"],
@@ -42,10 +60,10 @@ describe GoogleDocs do
       :service_user_id => GoogleDocs.config["test_user_id"],
       :service_user_name => GoogleDocs.config["test_user_name"]
     )
-    @lib = GoogleDocsTest.new @user
   end
 
   it 'should add and remove documents' do
+    @lib = GoogleDocsTest.new @user, nil, nil
     unless use_remote_services
       consumer = mock()
       OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
@@ -142,4 +160,36 @@ describe GoogleDocs do
     @lib.google_doc_list.files.map(&:document_id).include?(new_document.document_id).should be_false
   end
 
+  it "should use the real_current_user if possible" do
+    @user2 = User.create!
+    @lib = GoogleDocsTest.new nil, @user, @user2
+    unless use_remote_services
+      consumer = mock()
+      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
+          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
+          :request_token_path => '/accounts/OAuthGetRequestToken',
+          :site => 'https://www.google.com',
+          :authorize_path => '/accounts/OAuthAuthorizeToken',
+          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
+    end
+    lambda { @lib.google_docs_retrieve_access_token }.should raise_error
+  end
+
+  it "should use the current_user if no real_current_user" do
+    @lib = GoogleDocsTest.new nil, @user, nil
+    unless use_remote_services
+      consumer = mock()
+      OAuth::Consumer.expects(:new).with(GoogleDocs.config["api_key"],
+          GoogleDocs.config["secret_key"], {:signature_method => 'HMAC-SHA1',
+          :request_token_path => '/accounts/OAuthGetRequestToken',
+          :site => 'https://www.google.com',
+          :authorize_path => '/accounts/OAuthAuthorizeToken',
+          :access_token_path => '/accounts/OAuthGetAccessToken'}).returns(consumer)
+      access_token = mock()
+      OAuth::AccessToken.expects(:new).with(consumer,
+          GoogleDocs.config["test_user_token"],
+          GoogleDocs.config["test_user_secret"]).returns(access_token)
+    end
+    @lib.google_docs_retrieve_access_token.should eql access_token
+  end
 end

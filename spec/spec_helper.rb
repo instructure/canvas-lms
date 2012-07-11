@@ -208,7 +208,7 @@ Spec::Runner.configure do |config|
   end
 
   def site_admin_user(opts={})
-    user(opts)
+    @user = opts[:user] || user(opts)
     @admin = @user
     Account.site_admin.add_user(@user, opts[:membership_type] || 'AccountAdmin')
     @user

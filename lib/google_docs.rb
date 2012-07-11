@@ -22,9 +22,9 @@ module GoogleDocs
 
   def google_docs_retrieve_access_token
     consumer = google_consumer
-    if retrieve_current_user
-      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', @current_user].cache_key) do
-        service = @current_user.user_services.find_by_service("google_docs")
+    if google_docs_user
+      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', google_docs_user].cache_key) do
+        service = google_docs_user.user_services.find_by_service("google_docs")
         service && [service.token, service.secret]
       end
       raise "User does not have valid Google Docs token" unless service_token && service_secret
@@ -35,8 +35,11 @@ module GoogleDocs
     access_token
   end
 
-  def retrieve_current_user
-    @current_user ||= (self.respond_to?(:user) && self.user.is_a?(User) && self.user) || nil
+  # @real_current_user first ensures that a masquerading user never sees the
+  # masqueradee's files, but in general you may want to block access to google
+  # docs for masqueraders earlier in the request
+  def google_docs_user
+    @real_current_user || @current_user || (self.respond_to?(:user) && self.user.is_a?(User) && self.user) || nil
   end
 
   def google_docs_get_service_user(access_token)
@@ -83,7 +86,7 @@ module GoogleDocs
       :secret => request_token.secret,
       :user_secret => AutoHandle.generate(nil, 16),
       :return_url => return_to,
-      :user => @current_user,
+      :user => google_docs_user,
       :original_host_with_port => request.host_with_port
     )
     request_token.authorize_url

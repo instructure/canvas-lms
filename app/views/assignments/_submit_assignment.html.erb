@@ -1,5 +1,5 @@
 <%
-  show_google_docs = @assignment.submission_types && @assignment.submission_types.match(/online_upload/) && @domain_root_account && feature_and_service_enabled?(:google_docs) && (@assignment.allowed_extensions.blank? || @assignment.allowed_extensions.grep(/doc|xls|ppt/).present?)
+  show_google_docs = @assignment.allow_google_docs_submission? && @real_current_user.blank? && @domain_root_account && feature_and_service_enabled?(:google_docs)
 -%>
 <%
   js_bundle :submit_assignment

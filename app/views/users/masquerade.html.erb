@@ -20,7 +20,7 @@ HEREDOC
 
   <div style="float: right">
     <%= link_to t('#buttons.cancel', "Cancel"), :back %> &nbsp; &nbsp;
-    <%= link_to link_text, user_masquerade_url(@user.id), { :method => :post, :class => 'button' } %>
+    <%= link_to link_text, user_masquerade_url(@user.id), { :method => :post, :class => 'button masquerade_button' } %>
   </div>
 
   <div style="clear: both; padding-top: 15px"></div>
