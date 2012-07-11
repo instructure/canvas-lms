@@ -18,7 +18,8 @@
 
 # @API Users
 class ProfileController < ApplicationController
-  before_filter :require_user, :except => :show
+  before_filter :require_registered_user, :except => [:show, :settings]
+  before_filter :require_user, :only => :settings
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
 

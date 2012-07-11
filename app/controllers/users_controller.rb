@@ -30,7 +30,8 @@ class UsersController < ApplicationController
   include Twitter
   include LinkedIn
   include DeliciousDiigo
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
+  before_filter :require_user, :only => [:grades, :confirm_merge, :merge, :kaltura_session, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
+  before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
   before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :user_dashboard, :masquerade]
   before_filter :require_open_registration, :only => [:new, :create]
 
@@ -219,6 +220,10 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    if @current_user && @current_user.registered? && params[:registration_success]
+      # user just joined with a course code
+      return redirect_to @current_user.courses.first if @current_user.courses.size == 1
+    end
     get_context
 
     # dont show crubms on dashboard because it does not make sense to have a breadcrumb
@@ -234,11 +239,16 @@ class UsersController < ApplicationController
     end
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
 
+    incomplete_registration = @current_user && @current_user.pre_registered? && params[:registration_success]
+    base_env = {:INCOMPLETE_REGISTRATION => incomplete_registration, :USER_EMAIL => @current_user.email}
+
     if show_new_dashboard?
       @use_new_styles = true
       load_all_contexts
-      js_env :CONTEXTS => @contexts, :DASHBOARD_PATH => dashboard_path
+      js_env base_env.merge(:CONTEXTS => @contexts, :DASHBOARD_PATH => dashboard_path)
       return render :action => :new_user_dashboard
+    else
+      js_env base_env
     end
 
   end
@@ -681,9 +691,11 @@ class UsersController < ApplicationController
 
     if @user.valid? && @pseudonym.valid? && @observee.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
-      # save_without_session_maintenance directly. we only want to auto-log-in
-      # if a student is self enrolling in a course
-      @pseudonym.send(:skip_session_maintenance=, true) unless self_enrollment # automagically logged in
+      # save_without_session_maintenance directly. we don't want to auto-log-in
+      # unless the user is registered/pre_registered (if the latter, he still
+      # needs to confirm his email and set a password, otherwise he can't get
+      # back in once his session expires)
+      @pseudonym.send(:skip_session_maintenance=, true) unless @user.registered? || @user.pre_registered? # automagically logged in
       @user.save!
       message_sent = false
       if notify == :self_registration

@@ -183,7 +183,7 @@ describe "Users API", :type => :integration do
 
   before do
     @admin = account_admin_user
-    course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
+    course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com', :active_user => true))
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
     @user = @admin
     Account.default.tap { |a| a.enable_service(:avatars) }.save

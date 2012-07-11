@@ -200,7 +200,7 @@ Spec::Runner.configure do |config|
     account_admin_user(opts)
   end
 
-  def account_admin_user(opts={})
+  def account_admin_user(opts={:active_user => true})
     @user = opts[:user] || user(opts)
     @admin = @user
     @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')

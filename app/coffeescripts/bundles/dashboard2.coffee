@@ -11,7 +11,8 @@ require [
   'compiled/views/Dashboard/TodoView'
   'compiled/views/Dashboard/ComingUpView'
   'compiled/dashboardToggle'
-], ($, {View}, DashboardView, QuickStartBarView, allViews, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView, dashboardToggle) ->
+  'compiled/registration/incompleteRegistrationWarning'
+], ($, {View}, DashboardView, QuickStartBarView, allViews, ActivityFeedView, SideBarView, ActivityFeedFilterView, ActivityFeedItemsView, TodoView, ComingUpView, dashboardToggle, incompleteRegistrationWarning) ->
 
   $ ->
     window.dashboard = new DashboardView
@@ -30,3 +31,4 @@ require [
             comingUp: new ComingUpView
 
     $('#right-side').prepend(dashboardToggle('disable'))
+    incompleteRegistrationWarning(ENV.USER_EMAIL) if ENV.INCOMPLETE_REGISTRATION

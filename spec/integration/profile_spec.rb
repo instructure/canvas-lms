@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe ProfileController do
   it "should respect account setting for editing names" do
     a = Account.create!
-    u = user_with_pseudonym(:account => a)
+    u = user_with_pseudonym(:account => a, :active_user => true)
     u.short_name = 'Bracken'
     u.save!
     user_session(u, u.pseudonyms.first)

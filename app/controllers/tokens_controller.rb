@@ -1,5 +1,5 @@
 class TokensController < ApplicationController
-  before_filter :require_user
+  before_filter :require_registered_user
   before_filter { |c| c.active_tab = "profile" }
   
   def create

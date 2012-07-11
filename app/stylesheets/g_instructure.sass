@@ -60,6 +60,9 @@
     &.ui-state-error, &.ui-state-warning
       i
         background-image: url(/images/warning_16.png)
+    &.no_close
+      a.close_link
+        display: none
     &.xlarge
       font-size: 1.5em
       height: 58px
@@ -71,6 +74,19 @@
       &.ui-state-error, &.ui-state-warning
         i
           background-image: url(/images/warning_36.png)
+      &.confirm-email
+        text-align: left
+        font-size: 1em
+        line-height: 1.25
+        strong
+          font-weight: normal
+          font-size: 1.4em
+          display: block
+          margin-top: 8px
+          color: #000
+        i
+          float: left
+          margin: 8px 16px 0 24px
 
 #unauthorized_message
   border: 1px solid #000

@@ -1145,6 +1145,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_registered_user
+    return false if require_user == false
+    unless @current_user.registered?
+      respond_to do |format|
+        format.html { render :template => "shared/registration_incomplete", :layout => "application", :status => :unauthorized }
+        format.json { render :json => { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, :status => :unauthorized }
+      end
+      return false
+    end
+  end
+
   def page_views_enabled?
     PageView.page_views_enabled?
   end
