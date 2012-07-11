@@ -37,6 +37,15 @@
   @include single-transition(background-image, 0.1s, linear, 0);
 
 }
+
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight  {border: 1px solid $borderColorHighlight; background: $bgColorHighlight; color: $fcHighlight;
+  @include background-image(linear-gradient(#fceec1, #eedc94));
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: #eedc94 #eedc94 #e4c652; border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.ui-state-highlight a, .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: $fcHighlight; }
+
 .ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: $fcDefault; text-decoration: none; }
 .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid $borderColorHover; font-weight: normal;
   // enabling this breaks button focus in dialogs
@@ -52,14 +61,6 @@
 
 /* Interaction Cues
 ----------------------------------*/
-
-.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight  {border: 1px solid $borderColorHighlight; background: $bgColorHighlight; color: $fcHighlight;
-  @include background-image(linear-gradient(#fceec1, #eedc94));
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  border-color: #eedc94 #eedc94 #e4c652; border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-.ui-state-highlight a, .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: $fcHighlight; }
 
 .ui-state-error, .ui-widget-content .ui-state-error, .ui-widget-header .ui-state-error {border: 1px solid $borderColorError; background: $bgColorError; color: $fcError;
   @include background-image(linear-gradient(#ee5f5b, #c43c35));

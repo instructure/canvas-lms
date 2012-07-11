@@ -52,7 +52,7 @@
 }
 
 // Active state
-.btn.active, .btn:active, .button.active, .ui-button.ui-state-active {
+.btn.active, .btn:active, .button.active, .button:active, .ui-button.ui-state-active {
   background-color: darken($white, 10%);
   background-color: darken($white, 15%) \9;
   background-image: none;
@@ -179,7 +179,10 @@
  *
  * http://docs.jquery.com/UI/Button#theming
  */
-.ui-button-icon-only { width: 2.2em; } /* to make room for the icon, a width needs to be set here */
+.ui-button-icon-only { width: 2.2em; /* to make room for the icon, a width needs to be set here */
+  padding-left: 0;
+  padding-right: 0;
+}
 button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a little more width */
 .ui-button-icons-only { width: 3.4em; }
 button.ui-button-icons-only { width: 3.7em; }
@@ -192,7 +195,7 @@ button.ui-button-icons-only { width: 3.7em; }
   }
 }
 
-.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: .4em; text-indent: -9999999px; }
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { display: inline-block; text-indent: -9999999px; }
 .ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
 .ui-button-text-icon-secondary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
 .ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
