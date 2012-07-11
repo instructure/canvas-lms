@@ -1,7 +1,9 @@
 {{#if appointment_groups}}
-  <button class="button single_item_done_button">Done, Go Back To List</button>
-  <h2 id="appointment-group-list-header">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
-  <ul id="appointment-group-list">
+  <div class="scheduler-header">
+    <h2 id="appointment-group-list-header">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
+    <button class="button single_item_done_button">Done, Go Back To List</button>
+  </div>
+  <ul class="scheduler-content" id="appointment-group-list">
     {{#each appointment_groups}}
       <li class='appointment-group-item admin-link-hover-area {{#if requiring_action}}requiring-action{{/if}} {{#unless published}}unpublished-ag{{/unless}}' data-appointment-group-id='{{id}}'>
         {{#if is_manageable}}
@@ -62,57 +64,60 @@
     {{/each}}
   </ul>
 {{else}}
-  {{#if canManageAGroup}}
-    <h2>
-      {{#t "scheduler_explanation_teacher_header"}}
-        You have not created any appointment groups, and there are none you can sign up for
-      {{/t}}
-    </h2>
-    <p>
-      {{#t "scheduler_explanation_teacher_paragraph_1"}}
-        This is the Scheduler Tool.  You can use it to create appointment groups for your students to sign up for.
-      {{/t}}
-    </p>
-    <p>
-      {{#t "scheduler_explanation_teacher_paragraph_2"}}
-        For example, lets say you want to go over the midterm paper assignment with each of the students in your course.
-        You would create a new appointment group, specify the dates and times that you're available,
-        tell it to split that time into 15 minute blocks and only allow one student per time-block.
-      {{/t}}
-    </p>
-    <p>
-      {{#t "scheduler_explanation_teacher_paragraph_3"}}
-        Then students would get notified and see that they need to sign up for one of the specified
-        time blocks.  They will be shown a calendar with the available time blocks overlaid on top of
-        everything on their other calendars so they can pick a time that works for them.
-      {{/t}}
-    </p>
-    <p>
-      {{#t "scheduler_explanation_teacher_paragraph_4"}}
-        <strong>
-          Get started now by clicking the "Create an appointment group" button to the right
-        </strong>
-      {{/t}}
-    </p>
-  {{else}}
-    <h2>
-      {{#t "scheduler_explanation_student_header"}}
-        You do not have any appointment groups to sign up for
-      {{/t}}
-    </h2>
-    <p>
-      {{#t "scheduler_explanation_student_paragraph_1"}}
-        Teachers can use this scheduler tool to schedule things for their students to
-        sign up for.  Things like: "office hours", "group presentation time-slots" or "lunch with
-        an alumnus".
-      {{/t}}
-    </p>
-    <p>
-      {{#t "scheduler_explanation_student_paragraph_2"}}
-        None of your teachers have made any appointments you can sign up for so there is not anything
-        for you do to now. You will be notified if anyone does create something so
-        you can come sign up for it.
-      {{/t}}
-    </p>
-  {{/if}}
+  <div class="scheduler-header"></div>
+  <div class="scheduler-content">
+    {{#if canManageAGroup}}
+      <h2>
+        {{#t "scheduler_explanation_teacher_header"}}
+          You have not created any appointment groups, and there are none you can sign up for
+        {{/t}}
+      </h2>
+      <p>
+        {{#t "scheduler_explanation_teacher_paragraph_1"}}
+          This is the Scheduler Tool.  You can use it to create appointment groups for your students to sign up for.
+        {{/t}}
+      </p>
+      <p>
+        {{#t "scheduler_explanation_teacher_paragraph_2"}}
+          For example, lets say you want to go over the midterm paper assignment with each of the students in your course.
+          You would create a new appointment group, specify the dates and times that you're available,
+          tell it to split that time into 15 minute blocks and only allow one student per time-block.
+        {{/t}}
+      </p>
+      <p>
+        {{#t "scheduler_explanation_teacher_paragraph_3"}}
+          Then students would get notified and see that they need to sign up for one of the specified
+          time blocks.  They will be shown a calendar with the available time blocks overlaid on top of
+          everything on their other calendars so they can pick a time that works for them.
+        {{/t}}
+      </p>
+      <p>
+        {{#t "scheduler_explanation_teacher_paragraph_4"}}
+          <strong>
+            Get started now by clicking the "Create an appointment group" button to the right
+          </strong>
+        {{/t}}
+      </p>
+    {{else}}
+      <h2>
+        {{#t "scheduler_explanation_student_header"}}
+          You do not have any appointment groups to sign up for
+        {{/t}}
+      </h2>
+      <p>
+        {{#t "scheduler_explanation_student_paragraph_1"}}
+          Teachers can use this scheduler tool to schedule things for their students to
+          sign up for.  Things like: "office hours", "group presentation time-slots" or "lunch with
+          an alumnus".
+        {{/t}}
+      </p>
+      <p>
+        {{#t "scheduler_explanation_student_paragraph_2"}}
+          None of your teachers have made any appointments you can sign up for so there is not anything
+          for you do to now. You will be notified if anyone does create something so
+          you can come sign up for it.
+        {{/t}}
+      </p>
+    {{/if}}
+  </div>
 {{/if}}
