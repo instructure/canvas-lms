@@ -7,5 +7,5 @@ require ['compiled/util/deparam'], (deparam) ->
   module "deparam"
   
   test "deparam", ->
-    same deparam(params_str), params_obj, "deparam( String )"
-    same deparam(params_str, true), params_obj_coerce, "deparam( String, true )"
+    deepEqual deparam(params_str), params_obj, "deparam( String )"
+    deepEqual deparam(params_str, true), params_obj_coerce, "deparam( String, true )"
