@@ -235,7 +235,6 @@ class Assignment < ActiveRecord::Base
     self.all_day_date = (zoned_due_at.to_date rescue nil) if !self.all_day_date || self.due_at_changed? || self.all_day_date_changed?
     self.submission_types ||= "none"
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
-    self.anonymous_peer_reviews = true if self.peer_reviews
     @workflow_state_was = self.workflow_state_was
     @points_possible_was = self.points_possible_was
     @muted_was = self.muted_was
@@ -923,7 +922,6 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     opts[:unique_key] = Time.now.to_s
     opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by_id(opts[:user_id])
-    opts[:anonymous] = opts[:author] != original_student && self.anonymous_peer_reviews && !self.grants_right?(opts[:author], nil, :grade)
 
     if opts[:comment] && opts[:assessment_request]
       # if there is no rubric the peer review is complete with just a comment

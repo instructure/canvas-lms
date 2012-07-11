@@ -46,9 +46,6 @@ define([
         if($("#submission_comment_" + comment.id).length > 0) { continue; }
         var $comment = $("#comment_blank").clone(true).removeAttr('id');
         comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
-        if(comment.anonymous) {
-          comment.author_name = I18n.t("anonymous", "Anonymous");
-        }
         $comment.fillTemplateData({
           data: comment,
           id: 'submission_comment_' + comment.id
