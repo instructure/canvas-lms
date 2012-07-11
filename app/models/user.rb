@@ -158,6 +158,9 @@ class User < ActiveRecord::Base
   has_many :collections, :as => :context
   has_many :collection_items, :through => :collections
 
+  has_one :profile, :class_name => 'UserProfile'
+  alias :orig_profile :profile
+
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
 
@@ -2449,5 +2452,9 @@ class User < ActiveRecord::Base
 
   def default_collection_name
     t :default_collection_name, "%{user_name}'s Collection", :user_name => self.short_name
+  end
+
+  def profile(force_reload = false)
+    orig_profile(force_reload) || build_profile
   end
 end

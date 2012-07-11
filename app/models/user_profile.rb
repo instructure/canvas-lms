@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class UserProfile
-  attr_accessor :user
-  def initialize(user)
-    @user = user
-  end
+class UserProfile < ActiveRecord::Base
 
-  delegate :id, :short_name, :name, :asset_string, :opaque_identifier, :to => :@user
+  belongs_to :user
+
+  delegate :short_name, :name, :asset_string, :opaque_identifier, :to => :user
+
+  attr_accessible :title, :bio
 
   TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS,
     TAB_HOME, TAB_PROFILE_SETTINGS = *0..10
@@ -39,7 +39,7 @@ class UserProfile
         @tabs.insert 1, {:id => TAB_PROFILE, :label => I18n.t('#user_profile.tabs.profile', "Profile"), :css_class => 'profile', :href => :user_profile_path, :args => [user]}
       end
 
-      @tabs << { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true } if @user.eportfolios_enabled?
+      @tabs << { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true } if user.eportfolios_enabled?
       if user && opts[:root_account]
         opts[:root_account].context_external_tools.active.having_setting('user_navigation').each do |tool|
           @tabs << {

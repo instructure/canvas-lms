@@ -1109,7 +1109,7 @@ describe User do
       tool.save!
       tool.has_user_navigation.should == false
       user_model
-      tabs = UserProfile.new(@user).tabs_available(@user, :root_account => Account.default)
+      tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
     end
     
@@ -1119,7 +1119,7 @@ describe User do
       tool.save!
       tool.has_user_navigation.should == true
       user_model
-      tabs = UserProfile.new(@user).tabs_available(@user, :root_account => Account.default)
+      tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
       tab = tabs.detect{|t| t[:id] == tool.asset_string }
       tab[:href].should == :user_external_tool_path
@@ -1701,5 +1701,14 @@ describe User do
       a.update_attribute :default_user_storage_quota_mb, a.default_user_storage_quota_mb + 10
       @user.quota.should eql(2 * User.default_storage_quota + 10.megabytes)
     end
+  end
+
+  it "should build a profile if one doesn't already exist" do
+    user = User.create! :name => "John Johnson"
+    profile = user.profile
+    profile.id.should be_nil
+    profile.bio = "bio!"
+    profile.save!
+    user.profile.should == profile
   end
 end

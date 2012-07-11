@@ -570,7 +570,7 @@ class UsersController < ApplicationController
     @resource_title = @tool.label_for(:user_navigation)
     @resource_url = @tool.settings[:user_navigation][:url]
     @opaque_id = @current_user.opaque_identifier(:asset_string)
-    @context = UserProfile.new(@current_user)
+    @context = @current_user.profile
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)
     @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)

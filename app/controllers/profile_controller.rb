@@ -39,7 +39,7 @@ class ProfileController < ApplicationController
     @user ||= @current_user
 
     @active_tab = "profile"
-    @context = UserProfile.new(@current_user) if @user == @current_user
+    @context = @user.profile if @user == @current_user
 
     js_env :USER_ID => @user.id
 
@@ -111,7 +111,7 @@ class ProfileController < ApplicationController
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
-    @context = UserProfile.new(@user)
+    @context = @user.profile
     @active_tab = "profile_settings"
     respond_to do |format|
       format.html do
@@ -159,7 +159,7 @@ class ProfileController < ApplicationController
     @current_user.used_feature(:cc_prefs)
     @notification_categories = Notification.dashboard_categories(@user)
     @policies = NotificationPolicy.for(@user).scoped(:include => [:communication_channel, :notification]).to_a
-    @context = UserProfile.new(@user)
+    @context = @user.profile
     @active_tab = "communication-preferences"
 
     # build placeholder notification policies for categories the user does not have policies for already
