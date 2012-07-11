@@ -243,11 +243,14 @@ class ApplicationController < ActionController::Base
         store_location if request.get?
         return if !@current_user && initiate_delegated_login(request.host_with_port)
         if @context.is_a?(Course) && @context_enrollment
-          @unauthorized_message = t('#application.errors.unauthorized.unpublished', "This course has not been published by the instructor yet.") if @context.claimed?
-
           start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
-          @unauthorized_message = t('#application.errors.unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now.utc
-          @unauthorized_reason = :unpublished
+          if @context.claimed?
+            @unauthorized_message = t('#application.errors.unauthorized.unpublished', "This course has not been published by the instructor yet.")
+            @unauthorized_reason = :unpublished
+          elsif start_date && start_date > Time.now.utc
+            @unauthorized_message = t('#application.errors.unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date))
+            @unauthorized_reason = :unpublished
+          end
         end
 
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 

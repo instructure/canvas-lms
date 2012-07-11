@@ -60,7 +60,7 @@
     <% if can_do(@context, @current_user, :read) %>
       <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export_content', %{Export Course Content}) %></a>
     <% end %>
-    <% if can_do(@context, @current_user, :manage_content) %>
+    <% if can_do(@context, @current_user, :reset_content) %>
       <a href="<%= context_url(@context, :course_reset_url) %>" class="button button-sidebar-wide reset_course_content_button"><%= image_tag "delete.png" %><%= t('links.reset', %{Reset Course Content}) %></a>
       <div id="reset_course_content_dialog" style="display: none;">
           <%= mt 'help.reset_course_content', %{Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content.  This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?} %>

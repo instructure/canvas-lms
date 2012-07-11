@@ -347,6 +347,10 @@ class Enrollment < ActiveRecord::Base
     self.admin? && self.participating?
   end
 
+  def participating_content_admin?
+    self.content_admin? && self.participating?
+  end
+
   def associated_user_name
     self.associated_user && self.associated_user.short_name
   end
@@ -752,6 +756,10 @@ class Enrollment < ActiveRecord::Base
 
   def admin?
     instructor? || designer?
+  end
+
+  def content_admin?
+    teacher? || designer?
   end
 
   def to_atom

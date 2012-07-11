@@ -294,17 +294,15 @@ describe "people" do
   context "people as a TA" do
 
     before (:each) do
-      course_with_ta_logged_in
+      course_with_ta_logged_in(:active_all => true)
     end
 
     it "should validate that the TA cannot delete / conclude or reset course" do
-      pending "Bug #6227 - should not allow a TA to delete / conclude / reset course content" do
-        get "/courses/#{@course.id}/settings"
-        driver.find_element(:css, '.delete_course_link').should be_nil
-        driver.find_element(:css, '.reset_course_content_button').should be_nil
-        get "/courses/#{@course.id}/confirm_action?event=conclude"
-        driver.find_element(:css, '.ui-state-error').should include_text('Unauthorized')
-      end
+      get "/courses/#{@course.id}/settings"
+      f('.delete_course_link').should be_nil
+      f('.reset_course_content_button').should be_nil
+      get "/courses/#{@course.id}/confirm_action?event=conclude"
+      f('.ui-state-error').should include_text('Unauthorized')
     end
 
     it "should validate that a TA cannot rename a teacher" do

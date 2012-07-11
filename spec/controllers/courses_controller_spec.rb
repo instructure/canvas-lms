@@ -887,4 +887,21 @@ describe CoursesController do
       feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
+
+  describe "POST 'reset_content'" do
+    it "should allow teachers to reset" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'reset_content', :course_id => @course.id
+      response.should be_redirect
+      @course.reload.should be_deleted
+    end
+
+    it "should not allow TAs to reset" do
+      course_with_ta(:active_all => true)
+      user_session(@user)
+      post 'reset_content', :course_id => @course.id
+      response.status.to_i.should == 401
+      @course.reload.should be_available
+    end
+  end
 end

@@ -330,13 +330,13 @@ class CoursesController < ApplicationController
       return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }.to_json, :status => :bad_request)
     end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
-      return unless authorized_action(@context, @current_user, :delete)
+      return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
       @context.workflow_state = 'deleted'
       @context.sis_source_id = nil
       @context.save
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
-      return unless authorized_action(@context, @current_user, :change_course_state)
+      return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
       @context.complete
       flash[:notice] = t('notices.concluded', "Course successfully concluded")
     end
@@ -752,9 +752,8 @@ class CoursesController < ApplicationController
   
   def confirm_action
     get_context
-    if authorized_action(@context, @current_user, :update)
-      params[:event] ||= (@context.claimed? || @context.created? || @context.completed?) ? 'delete' : 'conclude'
-    end
+    params[:event] ||= (@context.claimed? || @context.created? || @context.completed?) ? 'delete' : 'conclude'
+    return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
   end
 
   def conclude_user
@@ -1045,7 +1044,7 @@ class CoursesController < ApplicationController
 
   def reset_content
     get_context
-    return unless authorized_action(@context, @current_user, :manage_content)
+    return unless authorized_action(@context, @current_user, :reset_content)
     @new_course = @context.reset_content
     redirect_to course_settings_path(@new_course.id)
   end
@@ -1083,4 +1082,15 @@ class CoursesController < ApplicationController
     return return_to(return_url, request.referer || dashboard_url)
   end
   protected :enter_student_view
+
+  def permission_for_event(event)
+    case event
+    when 'conclude'
+      :change_course_state
+    when 'delete'
+      :delete
+    else
+      :nothing
+    end
+  end
 end
