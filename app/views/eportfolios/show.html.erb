@@ -2,6 +2,7 @@
 <%
   js_bundle :eportfolio
   jammit_css :tinymce
+  @no_left_side_list_view = true
 %>
 
 <% content_for :auto_discovery do %>
@@ -13,8 +14,10 @@
 <% end %>
 
 <% content_for :left_side do %>
-  <h3 id="section-tabs-header"><%= @portfolio.name %></h3>
-  <a href="<%= url_for(@portfolio.user) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @portfolio.user.name %></a>
+  <div class="eportfolio-name">
+    <h3><%= @portfolio.name %></h3>
+    <a href="<%= url_for(@portfolio.user) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @portfolio.user.name %></a>
+  </div>
   <%= render :partial => "eportfolios/section_list" %>
 <% end %>
 

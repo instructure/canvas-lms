@@ -123,7 +123,8 @@
 <div id="wrapper-container">
   <div id="wrapper">
     <% if @show_left_side %>
-    <div id="left-side" class="list-view">
+      <%# @left_side_list_view is temporary until we redo eportfolios %>
+      <div id="left-side" class="<% if !@no_left_side_list_view %>list-view<% end %>">
       <% if left_side %>
         <%= left_side %>
       <% else %>
