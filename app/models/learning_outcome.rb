@@ -21,8 +21,7 @@ class LearningOutcome < ActiveRecord::Base
   attr_accessible :context, :description, :short_description, :rubric_criterion
   belongs_to :context, :polymorphic => true
   has_many :learning_outcome_results
-  has_many :content_tags, :order => :position
-  has_many :learning_outcome_group_associations, :as => :content, :class_name => 'ContentTag'
+  has_many :alignments, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted']
   serialize :data
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -41,8 +40,8 @@ class LearningOutcome < ActiveRecord::Base
   end
   
   def align(asset, context, opts={})
-    tag = self.content_tags.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
-    tag ||= self.content_tags.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
+    tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
+    tag ||= self.alignments.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
     mastery_type = opts[:mastery_type]
     if mastery_type == 'points'
       mastery_type = 'points_mastery'
@@ -50,7 +49,8 @@ class LearningOutcome < ActiveRecord::Base
       mastery_type = 'explicit_mastery'
     end
     tag.tag = mastery_type
-    tag.position = (self.content_tags.map(&:position).compact.max || 1) + 1
+    tag.position = (self.alignments.map(&:position).compact.max || 1) + 1
+    tag.mastery_score = opts[:mastery_score] if opts[:mastery_score]
     tag.save
     tag
   end
@@ -58,7 +58,7 @@ class LearningOutcome < ActiveRecord::Base
   def reorder_alignments(context, order)
     order_hash = {}
     order.each_with_index{|o, i| order_hash[o.to_i] = i; order_hash[o] = i }
-    tags = self.content_tags.find_all_by_context_id_and_context_type_and_tag_type(context.id, context.class.to_s, 'learning_outcome')
+    tags = self.alignments.find_all_by_context_id_and_context_type_and_tag_type(context.id, context.class.to_s, 'learning_outcome')
     tags = tags.sort_by{|t| order_hash[t.id] || order_hash[t.content_asset_string] || 999 }
     updates = []
     tags.each_with_index do |tag, idx|
@@ -71,9 +71,30 @@ class LearningOutcome < ActiveRecord::Base
   end
   
   def remove_alignment(asset, context, opts={})
-    tag = self.content_tags.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
+    tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
     tag.destroy if tag
     tag
+  end
+
+  def self.update_alignments(asset, context, new_outcome_ids)
+    old_alignments = asset.learning_outcome_alignments
+    old_outcome_ids = old_alignments.map(&:learning_outcome_id).compact.uniq
+
+    defunct_outcome_ids = old_outcome_ids - new_outcome_ids
+    unless defunct_outcome_ids.empty?
+      asset.learning_outcome_alignments.update_all({:workflow_state => 'deleted'}, {:learning_outcome_id => defunct_outcome_ids})
+    end
+
+    missing_outcome_ids = new_outcome_ids - old_outcome_ids
+    unless missing_outcome_ids.empty?
+      LearningOutcome.find_all_by_id(missing_outcome_ids).each do |learning_outcome|
+        learning_outcome.align(asset, context)
+      end
+    end
+  end
+
+  def title
+    self.short_description
   end
   
   workflow do
@@ -139,33 +160,17 @@ class LearningOutcome < ActiveRecord::Base
   end
   
   def clone_for(context, parent)
-    lo = context.learning_outcomes.new
+    lo = context.created_learning_outcomes.new
     lo.context = context
     lo.short_description = self.short_description
     lo.description = self.description
     lo.data = self.data
     lo.save
-    parent.add_item(lo)
+    parent.add_outcome(lo)
     
     lo
   end
-  
-  def self.available_in_context(context, ids=[])
-    account_contexts = context.associated_accounts rescue []
-    codes = account_contexts.map(&:asset_string)
-    order = {}
-    codes.each_with_index{|c, idx| order[c] = idx }
-    outcomes = []
-    ([context] + account_contexts).uniq.each do |context|
-      outcomes += LearningOutcomeGroup.default_for(context).try(:sorted_all_outcomes, ids) || []
-    end
-    outcomes.uniq
-  end
-  
-  def self.non_rubric_outcomes?
-    false
-  end
-  
+
   def self.delete_if_unused(ids)
     tags = ContentTag.active.find_all_by_content_id_and_content_type(ids, 'LearningOutcome')
     to_delete = []
@@ -175,10 +180,6 @@ class LearningOutcome < ActiveRecord::Base
     LearningOutcome.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => to_delete})
   end
   
-  def self.enabled?
-    true
-  end
-
   def self.process_migration(data, migration)
     outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
     outcomes.each do |outcome|
@@ -197,7 +198,7 @@ class LearningOutcome < ActiveRecord::Base
   def self.import_from_migration(hash, context, item=nil)
     hash = hash.with_indifferent_access
     item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.learning_outcomes.new
+    item ||= context.created_learning_outcomes.new
     item.context = context
     item.migration_id = hash[:migration_id]
     item.workflow_state = 'active' if item.deleted?
@@ -215,8 +216,8 @@ class LearningOutcome < ActiveRecord::Base
     item.save!
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     
-    log = hash[:learning_outcome_group] || LearningOutcomeGroup.default_for(context)
-    log.add_item(item)
+    log = hash[:learning_outcome_group] || context.root_outcome_group
+    log.add_outcome(item)
 
     item
   end

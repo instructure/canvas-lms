@@ -20,12 +20,12 @@
   <h2 id="aligned_outcomes"><%= t 'headings.aligned_outcomes', "Aligned Outcomes" %></h2>
   <div class="rs-margin-lr rs-margin-bottom">
     <ul class="unstyled_list" id="aligned_outcomes_list">
-      <% @outcome_tags.each do |tag| %>
-        <li class="outcome" data-id="<%= tag.learning_outcome_id %>">
-          <span class="short_description"><%= tag.learning_outcome.short_description %></span>
+      <% @alignments.each do |alignment| %>
+        <li class="outcome" data-id="<%= alignment.learning_outcome_id %>">
+          <span class="short_description"><%= alignment.learning_outcome.short_description %></span>
           <a href="#" class="delete_outcome_link no-hover"><%= image_tag "delete_circle.png" %></a>
           <span class="clear"></span>
-          <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">#{(tag.mastery_score || 0) * 100.0}</span>%") %></span>
+          <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">#{(alignment.mastery_score || 0) * 100.0}</span>%") %></span>
         </li>
       <% end %>
       <li class="blank outcome" style="display: none;">

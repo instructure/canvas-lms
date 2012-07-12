@@ -24,9 +24,9 @@ class Rubric < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
-  has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+  has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   before_save :default_values
-  after_save :update_outcome_tags
+  after_save :update_alignments
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   
   serialize :data
@@ -118,21 +118,11 @@ class Rubric < ActiveRecord::Base
       self.destroy
     end
   end
-  
-  def update_outcome_tags
-    return unless @outcomes_changed
-    ids = (self.data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
-    tags = self.learning_outcome_tags
-    tag_outcome_ids = tags.map(&:learning_outcome_id).compact.uniq
-    outcomes = LearningOutcome.find(ids)
-    missing_ids = ids.select{|id| !tag_outcome_ids.include?(id) }
-    tags_to_delete = tags.select{|t| !ids.include?(t.learning_outcome_id) }
-    missing_ids.each do |id|
-      lot = self.learning_outcome_tags.build(:context => self.context, :tag_type => 'learning_outcome')
-      lot.learning_outcome_id = id
-      lot.save!
-    end
-    tags_to_delete.each{|t| t.destroy }
+
+  def update_alignments
+    return unless @alignments_changed
+    outcome_ids = (self.data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
+    LearningOutcome.update_alignments(self, context, outcome_ids)
     true
   end
   
@@ -233,7 +223,7 @@ class Rubric < ActiveRecord::Base
       if criterion_data[:learning_outcome_id].present?
         outcome = LearningOutcome.find_by_id(criterion_data[:learning_outcome_id])
         if outcome
-          @outcomes_changed = true
+          @alignments_changed = true
           criterion[:learning_outcome_id] = outcome.id
           criterion[:mastery_points] = ((criterion_data[:mastery_points] || outcome.data[:rubric_criterion][:mastery_points]).to_f rescue nil)
           criterion[:ignore_for_scoring] = criterion_data[:ignore_for_scoring] == '1'
@@ -295,7 +285,7 @@ class Rubric < ActiveRecord::Base
     item.data = hash[:data]
     item.data.each do |crit|
       if crit[:learning_outcome_migration_id]
-        if lo = context.learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
+        if lo = context.created_learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
           crit[:learning_outcome_id] = lo.id
         end
         crit.delete :learning_outcome_migration_id

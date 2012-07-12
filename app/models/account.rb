@@ -39,7 +39,6 @@ class Account < ActiveRecord::Base
   has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
   has_many :account_users, :dependent => :destroy
   has_many :course_sections, :foreign_key => 'root_account_id'
-  has_many :learning_outcomes, :as => :context
   has_many :sis_batches
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
@@ -75,12 +74,9 @@ class Account < ActiveRecord::Base
     AssessmentQuestionBank.scoped :conditions => conds
   end
   
+  include LearningOutcomeContext
+
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
-  has_many :learning_outcomes, :as => :context
-  has_many :learning_outcome_groups, :as => :context
-  has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
-  has_many :learning_outcome_tags, :class_name => 'ContentTag', :as => :context, :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'learning_outcome_association', 'deleted']
-  has_many :associated_learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome
   has_many :error_reports
   has_many :announcements, :class_name => 'AccountNotification'
   has_many :alerts, :as => :context, :include => :criteria
@@ -407,10 +403,6 @@ class Account < ActiveRecord::Base
     self.default_user_storage_quota = val.try(:to_i).try(:megabytes)
   end
 
-  def has_outcomes?
-    self.learning_outcomes.count > 0
-  end
-  
   def turnitin_shared_secret=(secret)
     return if secret.blank?
     self.turnitin_crypted_secret, self.turnitin_salt = Canvas::Security.encrypt_password(secret, 'instructure_turnitin_secret_shared')

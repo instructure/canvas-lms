@@ -50,8 +50,8 @@ describe Rubric do
       @rubric.instance_variable_set('@outcomes_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.first.learning_outcome_id.should eql(@outcome.id)
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
     end
     
     it "should delete learning outcome tags when they no longer exist" do
@@ -83,8 +83,8 @@ describe Rubric do
       @rubric.instance_variable_set('@outcomes_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.first.learning_outcome_id.should eql(@outcome.id)
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @rubric.data = [{
         :points => 5,
         :description => "Row",
@@ -105,7 +105,7 @@ describe Rubric do
         ]
       }]
       @rubric.save!
-      @rubric.learning_outcome_tags.active.should be_empty
+      @rubric.learning_outcome_alignments.active.should be_empty
     end
     it "should create learning outcome associations for multiple outcome rows" do
       assignment_model
@@ -157,8 +157,8 @@ describe Rubric do
       @rubric.instance_variable_set('@outcomes_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
     end
     it "should create outcome results when outcome-aligned rubrics are assessed" do
       assignment_model
@@ -189,13 +189,13 @@ describe Rubric do
       @rubric.instance_variable_set('@outcomes_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.first.learning_outcome_id.should eql(@outcome.id)
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
-      @assignment.learning_outcome_tags.should_not be_empty
+      @assignment.learning_outcome_alignments.should_not be_empty
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @assessment = @a.assess({
         :user => @user,

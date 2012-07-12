@@ -25,6 +25,7 @@ class RubricAssociation < ActiveRecord::Base
   attr_accessible :rubric, :association, :context, :use_for_grading, :title, :description, :summary_data, :purpose, :url, :hide_score_total, :bookmarked
   belongs_to :rubric
   belongs_to :association, :polymorphic => true
+
   belongs_to :context, :polymorphic => true
   has_many :rubric_assessments, :dependent => :destroy
   has_many :assessment_requests, :dependent => :destroy
@@ -99,24 +100,19 @@ class RubricAssociation < ActiveRecord::Base
     end
   end
   
-  def update_outcome_relations
-    if self.association && self.association.is_a?(Assignment)
-      assignment = self.association
-      tags = assignment.learning_outcome_tags
-      rubric_tags = self.rubric.learning_outcome_tags rescue []
-      rubric_outcome_ids = rubric_tags.map(&:learning_outcome_id).compact.uniq
-      existing_outcome_ids = tags.map(&:learning_outcome_id)
-      tags_to_delete = tags.select{|t| t.rubric_association_id && !rubric_outcome_ids.include?(t.learning_outcome_id) }
-      ids_to_add = rubric_outcome_ids.select{|id| !existing_outcome_ids.include?(id) }
-      tags_to_delete.each{|t| t.destroy }
-      tags_to_update = tags.select{|t| rubric_outcome_ids.include?(t.learning_outcome_id) }
-      ContentTag.update_all({:rubric_association_id => self.id}, {:id => tags_to_update.map(&:id)})
-      ids_to_add.each do |id|
-        lot = assignment.learning_outcome_tags.build(:context => assignment.context, :rubric_association => self, :tag_type => 'learning_outcome')
-        lot.learning_outcome_id = id
-        lot.save
-      end
+  def assignment
+    if self.association.is_a?(Assignment)
+      self.association
+    else
+      nil
     end
+  end
+
+  def update_outcome_relations
+    return unless assignment
+    outcome_ids = rubric.learning_outcome_alignments.map(&:learning_outcome_id)
+    LearningOutcome.update_alignments(assignment, context, outcome_ids)
+    true
   end
   
   def update_old_rubric

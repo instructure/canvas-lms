@@ -300,8 +300,8 @@ describe "Canvas Cartridge importing" do
     lo.workflow_state = 'active'
     lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
     lo.save!
-    default = LearningOutcomeGroup.default_for(@copy_from)
-    default.add_item(lo)
+    default = @copy_from.root_outcome_group
+    default.add_outcome(lo)
     lo
   end
   
@@ -337,11 +337,11 @@ describe "Canvas Cartridge importing" do
     lo2.workflow_state = 'active'
     lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
     lo2.save!
-    lo_g.add_item(lo2)
+    lo_g.add_outcome(lo2)
     
-    default = LearningOutcomeGroup.default_for(@copy_from)
-    default.add_item(lo_g)
-    default.add_item(lo_g2)
+    default = @copy_from.root_outcome_group
+    default.adopt_outcome_group(lo_g)
+    default.adopt_outcome_group(lo_g2)
     
     import_learning_outcomes
     
@@ -358,12 +358,12 @@ describe "Canvas Cartridge importing" do
     lo_g_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g))
     lo_g_2.title.should == lo_g.title
     lo_g_2.description.should == lo_g.description
-    lo_g_2.sorted_content.length.should == 1
+    lo_g_2.child_outcome_links.length.should == 1
     
     lo_g2_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g2))
     lo_g2_2.title.should == lo_g2.title
     lo_g2_2.description.should == lo_g2.description
-    lo_g2_2.sorted_content.length.should == 0
+    lo_g2_2.child_outcome_links.length.should == 0
   end
   
   it "should import rubrics" do

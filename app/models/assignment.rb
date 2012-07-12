@@ -41,7 +41,7 @@ class Assignment < ActiveRecord::Base
   has_one :quiz
   belongs_to :assignment_group
   has_one :discussion_topic, :conditions => ['discussion_topics.root_topic_id IS NULL'], :order => 'created_at'
-  has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+  has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_one :rubric_association, :as => :association, :conditions => ['rubric_associations.purpose = ?', "grading"], :order => :created_at, :include => :rubric
   has_one :rubric, :through => :rubric_association
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ['enrollments.workflow_state = ?', 'active']
@@ -836,7 +836,6 @@ class Assignment < ActiveRecord::Base
       :unique_key => Time.now.to_s
     }
     submissions = []
-    tags = self.learning_outcome_tags.select{|t| !t.rubric_association_id }
 
     students.each do |student|
       submission_updated = false
@@ -866,8 +865,11 @@ class Assignment < ActiveRecord::Base
         submission.group = group
         submission.graded_at = Time.now if did_grade
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
-        tags.each do |tag|
-          tag.create_outcome_result(student, self, submission)
+
+        unless self.rubric_association
+          self.learning_outcome_alignments.each do |alignment|
+            submission.create_outcome_result(alignment)
+          end
         end
       end
       submission.add_comment(comment) if comment && (group_comment == "1" || student == original_student)

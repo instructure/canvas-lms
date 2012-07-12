@@ -304,25 +304,25 @@ describe ContentMigration do
       rub2.data = data
       rub2.save!
       rub2.associate_with(@copy_from, @copy_from)
-      default = LearningOutcomeGroup.default_for(@copy_from)
+      default = @copy_from.root_outcome_group
       log = @copy_from.learning_outcome_groups.new
       log.context = @copy_from
       log.title = "outcome group"
       log.description = "<p>Groupage</p>"
       log.save!
-      default.add_item(log)
+      default.adopt_outcome_group(log)
       log2 = @copy_from.learning_outcome_groups.new
       log2.context = @copy_from
       log2.title = "empty group"
       log2.description = "<p>Groupage</p>"
       log2.save!
-      default.add_item(log2)
+      default.adopt_outcome_group(log2)
       log3 = @copy_from.learning_outcome_groups.new
       log3.context = @copy_from
       log3.title = "empty group"
       log3.description = "<p>Groupage</p>"
       log3.save!
-      default.add_item(log3)
+      default.adopt_outcome_group(log3)
       lo = @copy_from.learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
@@ -342,9 +342,9 @@ describe ContentMigration do
       lo3.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo3.save!
 
-      default.add_item(lo)
-      log.add_item(lo2)
-      default.add_item(lo3)
+      default.add_outcome(lo)
+      log.add_outcome(lo2)
+      default.add_outcome(lo3)
 
       # only select one of each type
       @cm.copy_options = {
@@ -402,14 +402,14 @@ describe ContentMigration do
       rub1.data = data
       rub1.save!
       rub1.associate_with(@copy_from, @copy_from)
-      default = LearningOutcomeGroup.default_for(@copy_from)
+      default = @copy_from.root_outcome_group
       lo = @copy_from.learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
       lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo.save!
-      default.add_item(lo)
+      default.add_outcome(lo)
       gs = @copy_from.grading_standards.new
       gs.title = "Standard eh"
       gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
@@ -460,15 +460,15 @@ describe ContentMigration do
       lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
       lo.save!
 
-      old_root = LearningOutcomeGroup.default_for(@copy_from)
-      old_root.add_item(lo)
+      old_root = @copy_from.root_outcome_group
+      old_root.add_outcome(lo)
 
       lo_g = @copy_from.learning_outcome_groups.new
       lo_g.context = @copy_from
       lo_g.title = "Lone outcome group"
       lo_g.description = "<p>Groupage</p>"
       lo_g.save!
-      old_root.add_item(lo_g)
+      old_root.adopt_outcome_group(lo_g)
 
       lo2 = @copy_from.learning_outcomes.new
       lo2.context = @copy_from
@@ -476,31 +476,32 @@ describe ContentMigration do
       lo2.workflow_state = 'active'
       lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo2.save!
-      lo_g.add_item(lo2)
+      lo_g.add_outcome(lo2)
       old_root.reload
 
       # copy outcomes into new course
-      new_root = LearningOutcomeGroup.default_for(@copy_to)
+      new_root = @copy_to.root_outcome_group
 
       run_course_copy
 
       @copy_to.learning_outcomes.count.should == @copy_from.learning_outcomes.count
       @copy_to.learning_outcome_groups.count.should == @copy_from.learning_outcome_groups.count
-      new_root.sorted_content.count.should == old_root.sorted_content.count
+      new_root.child_outcome_links.count.should == old_root.child_outcome_links.count
+      new_root.child_outcome_groups.count.should == old_root.child_outcome_groups.count
 
-      lo_2 = new_root.sorted_content.first
+      lo_2 = new_root.child_outcome_links.first.content
       lo_2.short_description.should == lo.short_description
       lo_2.description.should == lo.description
       lo_2.data.should == lo.data
 
-      lo_g_2 = new_root.sorted_content.last
+      lo_g_2 = new_root.child_outcome_groups.last
       lo_g_2.title.should == lo_g.title
       lo_g_2.description.should == lo_g.description
-      lo_g_2.sorted_content.length.should == 1
+      lo_g_2.child_outcome_links.length.should == 1
       lo_g_2.root_learning_outcome_group_id.should == new_root.id
       lo_g_2.learning_outcome_group_id.should == new_root.id
 
-      lo_2 = lo_g_2.sorted_content.first
+      lo_2 = lo_g_2.child_outcome_links.first.content
       lo_2.short_description.should == lo2.short_description
       lo_2.description.should == lo2.description
       lo_2.data.should == lo2.data

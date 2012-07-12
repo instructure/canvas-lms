@@ -21,9 +21,6 @@
       <% end %>
       <a href="#" class="edit_full_assignment_link button button-sidebar-wide"><%= image_tag "edit.png" %> <%= t 'links.edit_assignment', "Edit Assignment" %></a>
     <% end %>
-    <% if LearningOutcome.non_rubric_outcomes? && can_do(@context, @current_user, :manage_outcomes) && @context && @context.has_outcomes %>
-      <a href="#" class="align_outcomes_link button button-sidebar-wide"><%= image_tag "ball.png" %> <%= t 'links.align_outcomes', "Align Outcomes" %></a>
-    <% end %>
   </div>
   
   <% unless @assignment.new_record? %>

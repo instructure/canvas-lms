@@ -471,9 +471,8 @@ describe QuizSubmission do
       @q2 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
       @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
       @bank = @q1.assessment_question.assessment_question_bank
-      @bank.outcomes = {@outcome.id => 0.7}
-      @bank.save!
-      @bank.learning_outcome_tags.length.should eql(1)
+      @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
+      @bank.learning_outcome_alignments.length.should eql(1)
       @q2.assessment_question.assessment_question_bank.should eql(@bank)
       answer_1 = @q1.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
       answer_2 = @q2.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
@@ -503,9 +502,8 @@ describe QuizSubmission do
       @q2 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
       @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
       @bank = @q1.assessment_question.assessment_question_bank
-      @bank.outcomes = {@outcome.id => 0.7}
-      @bank.save!
-      @bank.learning_outcome_tags.length.should eql(1)
+      @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
+      @bank.learning_outcome_alignments.length.should eql(1)
       @q2.assessment_question.assessment_question_bank.should eql(@bank)
       answer_1 = @q1.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
       answer_2 = @q2.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]

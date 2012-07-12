@@ -217,12 +217,12 @@ describe "account admin question bank" do
       mastery_points = @outcome[:data][:rubric_criterion][:mastery_points]
       possible_points = @outcome[:data][:rubric_criterion][:points_possible]
       percentage = mastery_points.to_f/possible_points.to_f
-      @question_bank.learning_outcome_tags.count.should == 0
+      @question_bank.learning_outcome_alignments.count.should == 0
       add_outcome_to_bank(@outcome)
       f("[data-id = '#{@outcome.id}']").should include_text("#{(percentage*100).to_i}%")
       @question_bank.reload
-      @question_bank.learning_outcome_tags.count.should be > 0
-      learning_outcome_tag = @question_bank.learning_outcome_tags.find_by_mastery_score(percentage)
+      @question_bank.learning_outcome_alignments.count.should be > 0
+      learning_outcome_tag = @question_bank.learning_outcome_alignments.find_by_mastery_score(percentage)
       learning_outcome_tag.should be_present
     end
 
@@ -235,7 +235,7 @@ describe "account admin question bank" do
       f(".outcome_#{@outcome.id} .select_outcome_link").click
       wait_for_ajax_requests
       f("[data-id = '#{@outcome.id}'] .content").should include_text("mastery at #{percentage}%")
-      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_tags.find_by_mastery_score(0.4)
+      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.find_by_mastery_score(0.4)
       learning_outcome_tag.should be_present
     end
 
