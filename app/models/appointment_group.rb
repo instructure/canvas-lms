@@ -89,22 +89,22 @@ class AppointmentGroup < ActiveRecord::Base
     super
   end
 
-  # TODO: someday this should become context_codes= for consistency
+  # TODO: someday this should become context_codes= for consistency (in
+  # conjunction with checking permissions in update_contexts_and_sub_contexts)
   def contexts=(new_contexts)
     @new_contexts ||= []
-    @new_contexts  += new_contexts.compact
+    @new_contexts += new_contexts.compact
   end
 
   def sub_context_codes=(codes)
     @new_sub_context_codes ||= []
-    @new_sub_context_codes   += codes.compact
+    @new_sub_context_codes += codes.compact
   end
 
   def update_contexts_and_sub_contexts
     # TODO: validate the updating user has manage rights for all contexts /
-    # sub_contexts
-    #
-    # sub contexts
+    # sub_contexts. currently this is done in the controller level, since
+    # we validate contexts beforehand
     @new_sub_context_codes -= sub_context_codes if @new_sub_context_codes
     if @new_sub_context_codes.present?
       if new_record? &&

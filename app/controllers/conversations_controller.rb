@@ -168,7 +168,7 @@ class ConversationsController < ApplicationController
     return render_error('recipients', 'invalid') if @recipients.blank?
     return render_error('body', 'blank') if params[:body].blank?
 
-    batch_private_messages = !Canvas::Plugin.value_to_boolean(params[:group_conversation]) && @recipients.size > 1
+    batch_private_messages = !value_to_boolean(params[:group_conversation]) && @recipients.size > 1
     recipient_ids = @recipients.keys
 
     # whether it's a bulk private message, or a big group conversation,
@@ -995,6 +995,6 @@ class ConversationsController < ApplicationController
   # TODO API v2: default to false, like we do in the UI
   def auto_mark_as_read?
     params[:auto_mark_as_read] ||= api_request?
-    Canvas::Plugin.value_to_boolean(params[:auto_mark_as_read])
+    value_to_boolean(params[:auto_mark_as_read])
   end
 end
