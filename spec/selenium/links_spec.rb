@@ -125,8 +125,7 @@ describe "links" do
       end
 
       it "should navigate user to the calendar page after calender link is clicked" do
-        expect_new_page_load { f('#calendar_menu_item a').click }
-        fj("h2:contains('#{Time.now.strftime('%B %Y')}')").should_not be_nil
+        validate_link(driver.find_element(:css, '#calendar_menu_item a'), 'My Calendar')
       end
     end
   end
