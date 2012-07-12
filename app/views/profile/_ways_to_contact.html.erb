@@ -140,12 +140,16 @@
   <tr>
     <td style="white-space: nowrap"><%= label :communication_channel, :address, before_label(:email_address, "Email Address") %></td>
     <td><%= text_field :communication_channel, :address %></td>
-  </tr><tr>
+  </tr>
+  <% if @domain_root_account == Account.default %>
+  <tr>
     <td colspan="2">
       <input type="checkbox" id="build_pseudonym_for_email" name="build_pseudonym" value="1"/>
       <label for="build_pseudonym_for_email"><%= t('labels.enable_login_for_email', "I want to log in to Canvas using this email address") %></label>
     </td>
-  </tr><tr>
+  </tr>
+  <% end %>
+  <tr>
     <td colspan="2">
       <button type="submit" class="button"><%= t('buttons.register_email', "Register Email") %></button>
     </td>
