@@ -37,7 +37,7 @@ describe "profile" do
   it "should give error - wrong old password" do
     user_with_pseudonym({:active_user => true})
     login_as
-    get '/profile/edit'
+    get '/profile/settings'
     old_password = 'oldpassword'
     wrong_old_password = 'wrongoldpassword'
     new_password = 'newpassword'
