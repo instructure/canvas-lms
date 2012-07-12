@@ -8,10 +8,6 @@ describe "calendar" do
     wait_for_ajaximations
   end
 
-  before (:each) do
-    Account.default.update_attribute(:settings, {:enable_scheduler => false})
-  end
-
   context "teacher view" do
     before (:each) do
       course_with_teacher_logged_in
