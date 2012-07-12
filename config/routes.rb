@@ -529,7 +529,7 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.resource :profile, :only => %w(show update),
                :controller => "profile",
-               :member => { :communication => :get, :communication_update => :put, :settings => :get } do |profile|
+               :member => { :update_profile => :put, :communication => :get, :communication_update => :put, :settings => :get } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
     profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'

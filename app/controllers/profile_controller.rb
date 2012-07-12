@@ -23,7 +23,7 @@ class ProfileController < ApplicationController
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
 
-  include Api::V1::User
+  include Api::V1::UserProfile
   include Api::V1::Avatar
   include Api::V1::Notification
   include Api::V1::NotificationPolicy
@@ -86,8 +86,9 @@ class ProfileController < ApplicationController
   #   {
   #     'id': 1234,
   #     'name': 'Sample User',
+  #     'short_name': 'Sample User'
   #     'sortable_name': 'user, sample',
-  #     'email': 'sample_user@example.com',
+  #     'primary_email': 'sample_user@example.com',
   #     'login_id': 'sample_user@example.com',
   #     'sis_user_id': 'sis1',
   #     'sis_login_id': 'sis1-login',
@@ -123,13 +124,7 @@ class ProfileController < ApplicationController
         render :action => "profile"
       end
       format.json do
-        hash = user_json(@user, @current_user, session, 'avatar_url')
-        hash[:primary_email] = @default_email_channel.try(:path)
-        hash[:login_id] ||= @default_pseudonym.try(:unique_id)
-        if @user == @current_user
-          hash[:calendar] = { :ics => "#{feeds_calendar_url(@user.feed_code)}.ics" }
-        end
-        render :json => hash
+        render :json => user_profile_json(@user.profile, @current_user, session, params[:include])
       end
     end
   end
@@ -283,6 +278,51 @@ class ProfileController < ApplicationController
       else
         format.html
         format.json { render :json => @user.errors.to_json }
+      end
+    end
+  end
+
+  # TODO: the current update method needs to get moved to the UsersController
+  # (since it is not concerned with profiles), then this should get renamed
+  #
+  # not doing API docs until we can move this to PUT /profile
+  def update_profile
+    @user = @current_user
+    @profile = @user.profile
+    @context = @profile
+
+    short_name = params[:user] && params[:user][:short_name]
+    @user.short_name = short_name if short_name
+    @profile.attributes = params[:user_profile]
+
+    if params[:link_urls] && params[:link_titles]
+      # TODO: make links dependent => destroy
+      links = params[:link_urls].zip(params[:link_titles]).map { |url, title|
+        UserProfileLink.new :url => url, :title => title
+      }
+      @profile.links = links
+    end
+
+    if @user.valid? && @profile.valid?
+      @user.save!
+      @profile.save!
+
+      if params[:user_services]
+        visible, invisible = params[:user_services].partition { |service,bool|
+          value_to_boolean(bool)
+        }
+        @user.user_services.update_all("visible = TRUE", :service => visible.map(&:first))
+        @user.user_services.update_all("visible = FALSE", :service => invisible.map(&:first))
+      end
+
+      respond_to do |format|
+        format.html { redirect_to user_profile_path(@user) }
+        format.json { render :json => user_profile_json(@user.profile, @current_user, session, params[:includes]) }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to user_profile_path(@user) } # FIXME: need to go to edit path
+        format.json { render :json => 'TODO' }
       end
     end
   end

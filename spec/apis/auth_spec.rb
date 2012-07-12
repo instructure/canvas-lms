@@ -535,6 +535,8 @@ describe "API Authentication", :type => :integration do
         'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'title' => nil,
+        'bio' => nil,
       }
 
       # as_user_id is ignored if it's not allowed
@@ -552,6 +554,8 @@ describe "API Authentication", :type => :integration do
         'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'bio' => nil,
+        'title' => nil,
       }
 
       # as_user_id is ignored if it's blank
@@ -567,6 +571,8 @@ describe "API Authentication", :type => :integration do
         'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'title' => nil,
+        'bio' => nil,
       }
     end
 
@@ -589,6 +595,8 @@ describe "API Authentication", :type => :integration do
         'sis_login_id' => 'blah@example.com',
         'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
+        'bio' => nil,
+        'title' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end

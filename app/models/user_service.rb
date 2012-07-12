@@ -21,7 +21,7 @@ class UserService < ActiveRecord::Base
   
   belongs_to :user
   attr_accessor :password
-  attr_accessible :user, :service, :protocol, :token, :secret, :service_user_url, :service_user_id, :service_user_name, :service_domain
+  attr_accessible :user, :service, :protocol, :token, :secret, :service_user_url, :service_user_id, :service_user_name, :service_domain, :visible
   
   before_save :infer_defaults
   after_save :assert_relations
@@ -89,6 +89,7 @@ class UserService < ActiveRecord::Base
       { :conditions => ['user_services.service = ?', service.to_s]}
     end
   }
+  named_scope :visible, {:conditions => 'visible'}
   
   def service_name
     self.service.titleize rescue ""

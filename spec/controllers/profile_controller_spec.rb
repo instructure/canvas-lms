@@ -74,4 +74,56 @@ describe ProfileController do
       response.should be_success
     end
   end
+
+  describe "update_profile" do
+    before do
+      user_with_pseudonym
+      @user.register
+      user_session(@user, @pseudonym)
+    end
+
+    it "should let you change your short_name and profile information" do
+      put 'update_profile',
+          :user => {:short_name => 'Monsturd', :name => 'Jenkins'},
+          :user_profile => {:bio => '...', :title => '!!!'},
+          :format => 'json'
+      response.should be_success
+
+      @user.reload
+      @user.short_name.should eql 'Monsturd'
+      @user.name.should_not eql 'Jenkins'
+      @user.profile.bio.should eql '...'
+      @user.profile.title.should eql '!!!'
+    end
+
+    it "should let you set visibility on user_services" do
+      @user.user_services.create! :service => 'skype', :service_user_name => 'user', :visible => true
+      @user.user_services.create! :service => 'twitter', :service_user_name => 'user', :visible => false
+
+      put 'update_profile',
+        :user_profile => {:bio => '...'},
+        :user_services => {:twitter => "1", :skype => "false"},
+        :format => 'json'
+      response.should be_success
+
+      @user.reload
+      @user.user_services.find_by_service('skype').visible?.should be_false
+      @user.user_services.find_by_service('twitter').visible?.should be_true
+    end
+
+    it "should let you set your profile links" do
+      put 'update_profile',
+        :user_profile => {:bio => '...'},
+        :link_urls => %w(example.com foo.com),
+        :link_titles => %w(Example.com Foo),
+        :format => 'json'
+      response.should be_success
+
+      @user.reload
+      @user.profile.links.map { |l| [l.url, l.title] }.should == [
+        %w(example.com Example.com),
+        %w(foo.com Foo)
+      ]
+    end
+  end
 end

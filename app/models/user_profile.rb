@@ -17,7 +17,6 @@
 #
 
 class UserProfile < ActiveRecord::Base
-
   belongs_to :user
 
   delegate :short_name, :name, :asset_string, :opaque_identifier, :to => :user
