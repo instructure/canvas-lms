@@ -41,6 +41,9 @@ class ApplicationController < ActionController::Base
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
+  # Yes, we're calling this before and after so that we get the user id logged
+  # on events that log someone in and log someone out.
+  after_filter :set_user_id_header
   before_filter :fix_xhr_requests
   before_filter :init_body_classes
   before_filter :set_ua_header
@@ -116,8 +119,8 @@ class ApplicationController < ActionController::Base
   end
 
   def set_user_id_header
-    headers['X-Canvas-User-Id'] = @current_user.global_id.to_s if @current_user
-    headers['X-Canvas-Real-User-Id'] = @real_current_user.global_id.to_s if @real_current_user
+    headers['X-Canvas-User-Id'] ||= @current_user.global_id.to_s if @current_user
+    headers['X-Canvas-Real-User-Id'] ||= @real_current_user.global_id.to_s if @real_current_user
   end
 
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
