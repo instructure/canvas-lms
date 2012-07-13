@@ -33,7 +33,7 @@
   <%= text_field_tag :name %>
 <% end %>
 
-<% form_for :course, Course.new, :url => api_v1_account_courses_path(@domain_root_account.manually_created_courses_account.id), :html => {:class => 'hide create_course_form'} do |f| %>
+<% form_for :course, c = Course.new, :url => api_v1_account_courses_path(@domain_root_account.manually_created_courses_account.id), :html => {:class => 'hide create_course_form'} do |f| %>
   <div>
     <%= f.blabel :name, :en => "Enter a name for your course" %>
     <%= f.text_field :name %>
@@ -53,4 +53,5 @@
       <div style="padding-left: 15px; margin-top: -5px; font-size: 0.8em;"><%= t :student_data_privacy, "(student data will remain private)" %></div>
     </div>
   </div>
+  <%= hidden_field_tag "course[self_enrollment]", @domain_root_account.manually_created_courses_account.self_enrollment_allowed?(c) %>
 <% end %>
