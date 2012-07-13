@@ -5,13 +5,17 @@ define [
   'compiled/registration/registrationSuccessDialog'
   'compiled/models/User'
   'compiled/models/Pseudonym'
-  'compiled/loadDir!jst/registration teacherDialog studentDialog studentHigherEdDialog parentDialog'
+  'jst/registration/teacherDialog'
+  'jst/registration/studentDialog'
+  'jst/registration/studentHigherEdDialog'
+  'jst/registration/parentDialog'
   'compiled/object/flatten'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], (_, I18n, preventDefault, registrationSuccessDialog, User, Pseudonym, templates, flatten) ->
+], (_, I18n, preventDefault, registrationSuccessDialog, User, Pseudonym, teacherDialog, studentDialog, studentHigherEdDialog, parentDialog, flatten) ->
 
   $nodes = {}
+  templates = {teacherDialog, studentDialog, studentHigherEdDialog, parentDialog}
 
   signupDialog = (id, title) ->
     return unless templates[id]
