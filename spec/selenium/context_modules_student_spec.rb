@@ -57,6 +57,9 @@ describe "context_modules" do
     it "should validate that course modules show up correctly" do
       go_to_modules
 
+      # shouldn't show the teacher's "show student progression" button
+      ff('.module_progressions_link').should_not be_present
+
       context_modules = driver.find_elements(:css, '.context_module')
       #initial check to make sure everything was setup correctly
       validate_context_module_status_text(0, IN_PROGRESS_TEXT)

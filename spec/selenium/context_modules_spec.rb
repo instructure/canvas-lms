@@ -71,6 +71,8 @@ describe "context_modules" do
 
     it "should add a module" do
       add_module('New Module')
+      # should always show the student progressions button for teachers
+      f('.module_progressions_link').should be_displayed
     end
 
     it "should delete a module" do
