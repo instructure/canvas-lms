@@ -982,7 +982,9 @@ define([
     // this is for things like the to-do, recent items and upcoming, it
     // happend a lot so rather than duplicating it everywhere I stuck it here
     $(".more_link").click(function(event) {
-      var $children = $(this).closest("li").slideUp().parents("ul").children(":hidden").slideDown();
+      var $this = $(this);
+      var $children = $this.parents("ul").children().show();
+      $this.closest('li').remove();
 
       // if they are using the keyboard to navigate (they hit enter on the link instead of actually
       // clicking it) then put focus on the first of the now-visible items--otherwise, since the
