@@ -542,14 +542,12 @@ define [
           width: 510
           title: I18n.t('title.forward_messages', 'Forward Messages')
           buttons: [
-            {
-              text: I18n.t('buttons.send_message', 'Send')
-              click: -> $(this).submit()
-            }
-            {
-              text: I18n.t('#buttons.cancel', 'Cancel')
-              click: -> $(this).dialog('close')
-            }
+            text: I18n.t('#buttons.cancel', 'Cancel')
+            click: -> $(this).dialog('close')
+          ,
+            text: I18n.t('buttons.send_message', 'Send')
+            click: -> $(this).submit()
+            class: 'btn-primary'
           ]
           open: =>
             @$forwardForm.attr action: '/conversations?' + $.param(@conversations.baseData())
