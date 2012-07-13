@@ -48,7 +48,7 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   before_filter :set_ua_header
 
-  add_crumb(proc { I18n.t('links.dashboard', "Home") }, :root_path, :class => "home")
+  add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
 
   ##
   # Sends data from rails to JavaScript

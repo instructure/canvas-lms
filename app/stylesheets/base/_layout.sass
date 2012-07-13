@@ -107,13 +107,21 @@ body
     li
       float: left
       height: 27px
-      line-height: 27px
-      &:before // :after would be better, but ie8 can't do :last-child to take the '/' of the last
-        content: '/' // works in ie8+
-        padding: 0 10px
+      line-height: 29px
+      padding-left: 12px
+      margin-left: 8px
+      background: url(/images/breadcrumb-chevron.png) left 50% no-repeat
       &:first-child
-        &:before
-          content: none
+        background: none
+        padding-left: 0
+        margin-left: 0
+    .home a
+      background: url(/images/breadcrumb-home.png) no-repeat left 50%
+      display: block
+      width: 10px
+      height: 26px
+      text-indent: -999px
+
   .ellipsis
     display: inline-block
 
