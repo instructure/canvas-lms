@@ -41,21 +41,12 @@ require [
 
     $registration_form.find(":text:first").focus().select()
     $registration_form.submit (event) ->
-      data = $$registration_form.getFormData()
+      data = $registration_form.getFormData()
       success = true
-      if !data["user[name]"]
-        $registration_form.formErrors "user[name]": I18n.t("#pseudonyms.registration_confirmation_form.errors.user_name_required", "User name is required")
-        success = false
-      else if !data["user[short_name]"]
-        $registration_form.formErrors "unique_id": I18n.t("#pseudonyms.registration_confirmation_form.errors.short_name_required", "Short name is required")
-        success = false
-      else if !data["pseudonym[password]"] || !data["pseudonym[password]"].length
+      if !data["pseudonym[password]"] || !data["pseudonym[password]"].length
         $registration_form.formErrors "pseudonym[password]": I18n.t("#pseudonyms.registration_confirmation_form.errors.password_required", "Password required")
         success = false
       else if data["pseudonym[password]"].length < 6
         $registration_form.formErrors "pseudonym[password]": I18n.t("#pseudonyms.registration_confirmation_form.errors.password_too_short", "Password too short")
-        success = false
-      else unless data["pseudonym[password]"] is data["pseudonym[password_confirmation]"]
-        $registration_form.formErrors "pseudonym[password_confirmation]": I18n.t("#pseudonyms.registration_confirmation_form.errors.passwords_dont_match", "Passwords don't match")
         success = false
       success

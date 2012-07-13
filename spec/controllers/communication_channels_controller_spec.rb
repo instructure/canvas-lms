@@ -119,7 +119,7 @@ describe CommunicationChannelsController do
         @user.reload
         @user.should_not be_registered
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
         @user.reload
         @user.should be_registered
@@ -137,7 +137,7 @@ describe CommunicationChannelsController do
         @user.reload
         @user.should_not be_registered
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should render_template('confirm')
         assigns[:pseudonym].account_id.should_not be_nil
         @user.reload
@@ -152,7 +152,7 @@ describe CommunicationChannelsController do
         @pseudonym.account.should == @account
         @user.should be_pre_registered
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
         @user.reload
         @user.should be_registered
@@ -196,7 +196,7 @@ describe CommunicationChannelsController do
         assigns[:pseudonym].should be_new_record
         assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
         response.should redirect_to(course_url(@course))
         @user.reload
@@ -224,7 +224,7 @@ describe CommunicationChannelsController do
         assigns[:pseudonym].should be_new_record
         assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
         response.should redirect_to(dashboard_url)
         @user.reload
@@ -255,7 +255,7 @@ describe CommunicationChannelsController do
         assigns[:pseudonym].account.should == @account
         assigns[:root_account].should == @account
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
         @user.reload
         @user.should be_registered
@@ -286,7 +286,7 @@ describe CommunicationChannelsController do
         assigns[:pseudonym].account.should == @account
         assigns[:root_account].should == @account
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
         @user.reload
         @user.should be_registered
@@ -314,7 +314,7 @@ describe CommunicationChannelsController do
         response.should be_success
         assigns[:pseudonym].should == @pseudonym
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
         response.should redirect_to(course_url(@course))
         @user.reload
@@ -345,7 +345,7 @@ describe CommunicationChannelsController do
         assigns[:pseudonym].should be_new_record
         assigns[:pseudonym].unique_id.should be_blank
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_success
         assigns[:pseudonym].errors.should_not be_empty
       end
@@ -484,7 +484,7 @@ describe CommunicationChannelsController do
         assigns[:pseudonym].should be_new_record
         assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1
+        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
         response.should redirect_to(course_url(@course))
         @enrollment.reload

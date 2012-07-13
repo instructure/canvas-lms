@@ -62,6 +62,7 @@ class Pseudonym < ActiveRecord::Base
     # blank.
     password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
+  attr_accessor :require_email_unique_id
 
   acts_as_list :scope => :user_id
   
@@ -188,7 +189,7 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def validate_unique_id
-    if (!self.account || self.account.email_pseudonyms) && !self.deleted?
+    if (!self.account || self.account.email_pseudonyms || self.require_email_unique_id) && !self.deleted?
       unless self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
         self.errors.add(:unique_id, t('errors.invalid_email_address', "\"%{email}\" is not a valid email address", :email => self.unique_id))
         return false

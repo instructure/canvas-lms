@@ -5,7 +5,7 @@
   content_for :page_title, t(:page_title, "Registration Confirmation Failed")
 %>
 
-<div id="modal-box" style="padding-top:127px;">
+<div id="modal-box">
   <h2><%= t 'titles.problems_with_registration', "Problem with Registration" %></h2>
     <p><%= t :details, %{It looks like you may have already confirmed your registration.  Try
     *logging in*
@@ -14,8 +14,8 @@
     that you can use to log in and re-set your password.},
     :wrapper => %{<a href="#{login_url}"><b>\\1</b></a>} %></p>
     <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
-      <p><%= t :feedback, %{If you keep having problems, click the "Feedback" tab at the top right
-      and let us know what's going on.} %>
+      <p><%= t :feedback, %{If you keep having problems, click the "Help" link below to search the guides
+      or to let us know what's going on.} %>
     <% end %>
     </p>
 </div>

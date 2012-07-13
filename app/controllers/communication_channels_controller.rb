@@ -243,13 +243,12 @@ class CommunicationChannelsController < ApplicationController
           @pseudonym.attributes = params[:pseudonym]
           @pseudonym.communication_channel = cc
 
-          # trick pseudonym into validating the e-mail address
-          @pseudonym.account = nil
-          unless @pseudonym.valid?
-            @pseudonym.account = @root_account
-            return
-          end
-          @pseudonym.account = @root_account
+          # validate the e-mail address
+          @pseudonym.require_email_unique_id = true
+          # ensure the password gets validated
+          @pseudonym.require_password = true
+          # don't require confirmation
+          @pseudonym.password_confirmation = params[:pseudonym][:password] if params[:pseudonym]
 
           return unless @pseudonym.valid?
 
