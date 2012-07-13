@@ -27,8 +27,6 @@ class SubmissionComment < ActiveRecord::Base
   has_many :associated_attachments, :class_name => 'Attachment', :as => :context
   has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
-  # too bad, this wont work.
-  # has_many :comments_in_group, :class_name => "SubmissionComment", :foreign_key => "group_comment_id", :primary_key => "group_comment_id", :dependent => :destroy, :conditions => lambda{|sc| "id !=#{sc.id}"}
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
@@ -37,6 +35,7 @@ class SubmissionComment < ActiveRecord::Base
 
   before_save :infer_details
   after_save :update_submission
+  after_save :check_for_media_object
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
   after_create { |c| c.submission.create_or_update_conversations!(:create) if c.send_to_conversations? }
@@ -60,6 +59,15 @@ class SubmissionComment < ActiveRecord::Base
 
   def media_comment?
     self.media_comment_id && self.media_comment_type
+  end
+
+  def check_for_media_object
+    if self.media_comment? && self.media_comment_id_changed?
+      MediaObject.ensure_media_object(self.media_comment_id, {
+        :user => self.author,
+        :context => self.author,
+      })
+    end
   end
 
   on_create_send_to_streams do
@@ -209,8 +217,4 @@ class SubmissionComment < ActiveRecord::Base
   named_scope :for_context, lambda{|context|
     {:conditions => ['submission_comments.context_id = ? AND submission_comments.context_type = ?', context.id, context.class.to_s] }
   }
-  # protected :infer_details
-  # named_scope :for, lambda {|user|
-    # {:conditions => ['(submission_comments.recipient_id IS NULL OR submission_comments.recipient_id = ?)', (user ? user.id : 0)]}
-  # }
 end

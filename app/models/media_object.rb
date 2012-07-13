@@ -155,7 +155,27 @@ class MediaObject < ActiveRecord::Base
       build_media_objects(res, root_account_id)
     end
   end
-  
+
+  def self.media_id_exists?(media_id)
+    client = Kaltura::ClientV3.new
+    client.startSession(Kaltura::SessionType::ADMIN)
+    info = client.mediaGet(media_id)
+    return !!info[:id]
+  end
+
+  def self.ensure_media_object(media_id, create_opts = {})
+    if !by_media_id(media_id).any?
+      self.send_later_enqueue_args(:create_if_id_exists, { :priority => Delayed::LOW_PRIORITY }, media_id, create_opts)
+    end
+  end
+
+  # typically call this in a delayed job, since it has to contact kaltura
+  def self.create_if_id_exists(media_id, create_opts = {})
+    if media_id_exists?(media_id) && !by_media_id(media_id).any?
+      create!(create_opts.merge(:media_id => media_id))
+    end
+  end
+
   def update_title_on_kaltura
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)
@@ -251,7 +271,6 @@ class MediaObject < ActiveRecord::Base
   def data
     self.read_attribute(:data) || self.write_attribute(:data, {})
   end
-  
 
   def viewed!
     send_later(:updated_viewed_at_and_retrieve_details, Time.now) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago

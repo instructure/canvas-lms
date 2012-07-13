@@ -239,8 +239,7 @@ class SubmissionsController < ApplicationController
   #   one or more previously uploaded files residing in the submitting user's
   #   files section (or the group's files section, for group assignments).
   #
-  #   There is not yet an API for listing a user's or group's files, or
-  #   uploading files for submission. This API is coming soon.
+  #   To upload a new file to submit, see the submissions {api:SubmissionsApiController#create_file Upload a file API}.
   #
   #   Requires a submission_type of "online_upload".
   #
