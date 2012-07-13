@@ -362,6 +362,8 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def successful_login(user, pseudonym)
+    @current_user = user
+    @current_pseudonym = pseudonym
     respond_to do |format|
       flash[:notice] = t 'notices.login_success', "Login successful." unless flash[:error]
       if session[:oauth2]
