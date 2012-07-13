@@ -135,12 +135,12 @@ define([
           close: onContinue,
           buttons: [
             {
-              text: I18n.t('#buttons.delete', 'Delete'),
-              'class': 'ui-button-primary',
-              click: function() { result = true; $(this).dialog('close'); }
-            }, {
               text: I18n.t('#buttons.cancel', 'Cancel'),
               click: function() { $(this).dialog('close'); } // ; onContinue();
+            }, {
+              text: I18n.t('#buttons.delete', 'Delete'),
+              'class': 'btn-primary',
+              click: function() { result = true; $(this).dialog('close'); }
             }
           ]
         }, dialog_options));

@@ -49,12 +49,12 @@ define [
       createCourseForm.dialog
         title: I18n.t('creating_course', 'Creating a course...')
         buttons: [
-          text: I18n.t 'create', 'Create'
-          'class' : 'ui-button-primary'
-          click: -> createCourseForm.submit()
-        ,
           text: I18n.t 'cancel', 'Cancel'
           click: -> createCourseForm.data('dialog').close()
+        ,
+          text: I18n.t 'create', 'Create'
+          'class' : 'btn-primary'
+          click: -> createCourseForm.submit()
         ]
       dialog = createCourseForm.data('dialog')
       createCourseForm.formSubmit

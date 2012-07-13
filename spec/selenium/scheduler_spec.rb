@@ -41,7 +41,7 @@ describe "scheduler" do
   end
 
   def submit_appointment_group_form(publish = true)
-    save_and_publish, save = ff('.ui-dialog-buttonset .ui-button')
+    save, save_and_publish = ff('.ui-dialog-buttonset .ui-button')
     if publish
       save_and_publish.click
     else
@@ -154,7 +154,7 @@ describe "scheduler" do
       open_edit_dialog
       edit_form = f('#edit_appointment_form')
       keep_trying_until { edit_form.should be_displayed }
-      f('.ui-dialog-buttonset .ui-button-primary').click
+      f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       new_appointment_group.reload
       new_appointment_group.workflow_state.should == 'active'
@@ -427,7 +427,7 @@ describe "scheduler" do
       section_box.click
       course_box[:checked].should be_true
 
-      f('.ui-dialog-buttonset .ui-button-primary').click
+      f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       ag = AppointmentGroup.first
       ag.contexts.should include course1

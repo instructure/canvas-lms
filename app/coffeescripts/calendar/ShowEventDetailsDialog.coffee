@@ -57,14 +57,14 @@ define [
           width: 450
           buttons: if error.reschedulable
                      [
+                       text: I18n.t 'do_nothing', 'Do Nothing'
+                       click: -> $dialog.dialog('close')
+                     ,
                        text: I18n.t 'reschedule', 'Reschedule'
-                       'class': 'ui-button-primary'
+                       'class': 'btn-primary'
                        click: =>
                          $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
                            $dialog.dialog('close')
-                     ,
-                       text: I18n.t 'do_nothing', 'Do Nothing'
-                       click: -> $dialog.dialog('close')
                      ]
                    else
                      [

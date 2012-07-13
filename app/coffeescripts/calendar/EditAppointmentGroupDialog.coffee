@@ -33,12 +33,12 @@ define [
         ]
       else
         [
-          text: I18n.t 'save_and_publish', 'Save & Publish'
-          'class' : 'ui-button-primary'
-          click: @appointmentGroupsForm.saveClick
-        ,
           text: I18n.t 'save', 'Save'
           click: @appointmentGroupsForm.saveWithoutPublishingClick
+        ,
+          text: I18n.t 'save_and_publish', 'Save & Publish'
+          'class' : 'btn-primary'
+          click: @appointmentGroupsForm.saveClick
         ]
 
       dialog.dialog('option', 'buttons', buttons).dialog('open')
