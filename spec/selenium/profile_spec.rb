@@ -47,6 +47,7 @@ describe "profile" do
     edit_form.find_element(:id, 'pseudonym_password').send_keys(new_password)
     edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
     submit_form(edit_form)
+    wait_for_ajaximations
     # check to see if error box popped up
     errorboxes = ff('.error_text')
     errorboxes.length.should > 1
@@ -65,7 +66,7 @@ describe "profile" do
     edit_form.find_element(:id, 'pseudonym_password').send_keys(new_password)
     edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
     submit_form(edit_form)
-    wait_for_ajax_requests
+    wait_for_ajaximations
     #login with new password
     login_as('nobody@example.com', new_password)
     #check message to make sure the user was logged in successfully with the new password
