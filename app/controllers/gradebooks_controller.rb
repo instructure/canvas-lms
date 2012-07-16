@@ -335,6 +335,7 @@ class GradebooksController < ApplicationController
       respond_to do |format|
         format.html {
           @headers = false
+          @outer_frame = true
           log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
           render :action => "speed_grader"
         }

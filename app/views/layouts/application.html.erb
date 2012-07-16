@@ -6,10 +6,10 @@
   right_side = yield :right_side
   wizard = yield :wizard_box
   top_nav = yield :top_nav
-  show_fixed_bottom = @fixed_warnings.present? || @current_user.try(:fake_student?)
 
   content_for :pre_html do
     @body_class_no_headers = @headers == false
+    @show_fixed_bottom = @fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user && (!@body_class_no_headers || @outer_frame))
     @body_classes << "no-headers" if @body_class_no_headers
     unless (@body_classes.include? "no-headers") || (@show_left_side == false)
       left_side = yield :left_side
@@ -20,7 +20,7 @@
     #we dont want to render a right side unless there is actually content in it.
     @body_classes << "with-right-side" if right_side and not right_side.strip.empty?
     @body_classes << "padless-content" if @padless
-    @body_classes << 'with-fixed-bottom' if show_fixed_bottom
+    @body_classes << 'with-fixed-bottom' if @show_fixed_bottom
     @body_classes << @active_tab
   end
 
@@ -176,7 +176,7 @@
   </div>
 </div>
 
-<% if show_fixed_bottom %>
+<% if @show_fixed_bottom %>
   <%= render :partial => 'layouts/fixed_bottom' %>
 <% end %>
 

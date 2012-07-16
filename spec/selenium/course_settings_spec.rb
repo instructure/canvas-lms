@@ -297,7 +297,7 @@ describe "course settings" do
 
     it "should allow leaving student view" do
       enter_student_view
-      stop_link = f("#sv_bar .leave_student_view")
+      stop_link = f("#masquerade_bar .leave_student_view")
       stop_link.should include_text "Leave Student View"
       stop_link.click
       wait_for_dom_ready
@@ -307,7 +307,7 @@ describe "course settings" do
     it "should allow resetting student view" do
       @fake_student_before = @course.student_view_student
       enter_student_view
-      reset_link = f("#sv_bar .reset_test_student")
+      reset_link = f("#masquerade_bar .reset_test_student")
       reset_link.should include_text "Reset Student"
       reset_link.click
       wait_for_dom_ready

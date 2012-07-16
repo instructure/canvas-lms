@@ -805,6 +805,7 @@ define([
       };
       var templateHTML = $("#gradebook_entry_template").html();
       datagrid.init($("#gradebook_table"), {
+        paddingBottom: $("#fixed_bottom").height(),
         templateCellHTML: function(row, col) {
           var user_id = id_maps["row_" + row],
               assignment_id = id_maps["column_" + col],

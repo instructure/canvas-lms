@@ -336,7 +336,7 @@ define([
     function fillWindowWithThisElement(){
       $toResize.height(0);
       var spaceLeftForThis = $window.height()
-                             - ($wrapper_container.offset().top + $wrapper_container.height())
+                             - ($wrapper_container.offset().top + $wrapper_container.outerHeight())
                              + ($main.height() - $not_right_side.height()),
           newHeight = Math.max(400, spaceLeftForThis);
 
