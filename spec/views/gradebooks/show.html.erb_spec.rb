@@ -27,6 +27,7 @@ describe "/gradebooks/show" do
     assigns[:assignments] = [a]
     assigns[:students] = [@user]
     assigns[:submissions] = []
+    assigns[:body_classes] = []
     assigns[:gradebook_upload] = @course.build_gradebook_upload
     render "gradebooks/show"
     response.should_not be_nil
