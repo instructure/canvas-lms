@@ -408,6 +408,17 @@ describe LtiApiController, :type => :integration do
         make_call('body' => update_result("OHAI SCORES"))
         check_failure('Failure')
       end
+
+      it "should set the grader to nil" do
+        # don't call id on nil, because it'll return 4 instead of nil.
+        nil.expects(:id).never
+
+        make_call('body' => update_result('1.0'))
+
+        check_success
+        submission = @assignment.submissions.find_by_user_id(@student.id)
+        submission.grader_id.should be_nil
+      end
     end
 
     describe "basic-lis-readresult" do

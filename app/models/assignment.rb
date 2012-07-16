@@ -846,7 +846,7 @@ class Assignment < ActiveRecord::Base
         submission.attributes = opts
         submission.assignment_id = self.id
         submission.user_id = student.id
-        submission.grader_id = grader.id rescue nil
+        submission.grader_id = grader.try(:id)
         if !opts[:grade] || opts[:grade] == ""
           submission.score = nil
           submission.grade = nil
