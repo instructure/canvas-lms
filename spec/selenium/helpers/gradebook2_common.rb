@@ -20,7 +20,7 @@ shared_examples_for "gradebook2 selenium tests" do
 
   def set_default_grade(cell_index, points = "5")
     open_assignment_options(cell_index)
-    f('#ui-menu-1-3').click
+    f('[data-action="setDefaultGrade"]').click
     dialog = find_with_jquery('.ui-dialog:visible')
     f('.grading_value').send_keys(points)
     submit_dialog(dialog, '.ui-button')
@@ -42,8 +42,9 @@ shared_examples_for "gradebook2 selenium tests" do
   def open_assignment_options(cell_index)
     assignment_cell = ff('#gradebook_grid .slick-header-column')[cell_index]
     driver.action.move_to(assignment_cell).perform
-    assignment_cell.find_element(:css, '.gradebook-header-drop').click
-    f('#ui-menu-1').should be_displayed
+    trigger = assignment_cell.find_element(:css, '.gradebook-header-drop')
+    trigger.click
+    f("##{trigger['aria-owns']}").should be_displayed
   end
 
   def find_slick_cells(row_index, element)
@@ -70,7 +71,7 @@ shared_examples_for "gradebook2 selenium tests" do
 
   def open_gradebook_settings(element_to_click = nil)
     f('#gradebook_settings').click
-    f('#ui-menu-0').should be_displayed
+    ff('#gradebook-toolbar ul.ui-kyle-menu').last.should be_displayed
     element_to_click.click if element_to_click != nil
   end
 

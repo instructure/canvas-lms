@@ -18,6 +18,7 @@
 define([
   'i18n!course_settings',
   'jquery' /* $ */,
+  'underscore',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
@@ -34,7 +35,7 @@ define([
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $) {
+], function(I18n, $, _) {
 
   var GradePublishing = {
     status: null,
@@ -116,9 +117,13 @@ define([
         $course_form = $("#course_form"),
         $hashtag_form = $(".hashtag_form"),
         $course_hashtag = $("#course_hashtag"),
-        $enrollment_dialog = $("#enrollment_dialog");
+        $enrollment_dialog = $("#enrollment_dialog"),
+        $tabBar = $("#course_details_tabs"),
+        // as of jqueryui 1.9, the cookie trumps the fragment :(. so we hack
+        // around that here
+        initialTab = _.indexOf(_.pluck($tabBar.find('> ul a'), 'hash'), location.hash);
 
-    $("#course_details_tabs").tabs({cookie: {}}).show();
+    $tabBar.tabs({cookie: {}, active: initialTab >= 0 ? initialTab : null}).show();
 
     $add_section_form.formSubmit({
       required: ['course_section[name]'],

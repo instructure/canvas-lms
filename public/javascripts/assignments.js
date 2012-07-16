@@ -604,7 +604,7 @@ define([
       $group.find(".padding").show();
       var doWeighting = $("#class_weighting_policy").attr('checked');
       $group.find(".assignment_list").sortable(assignment_sortable_options);
-      $(".assignment_group .assignment_list").sortable('option', 'connectWith', '.assignment_group .assignment_list');
+      $("#groups.groups_editable .assignment_group .assignment_list").sortable('option', 'connectWith', '.assignment_group .assignment_list');
       editGroup($group);
     });
     $(".edit_group_link").click(function(event) {

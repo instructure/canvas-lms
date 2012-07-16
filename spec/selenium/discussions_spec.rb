@@ -194,7 +194,7 @@ describe "discussions" do
       it "should validate editing a discussion" do
         edit_text = 'title edited'
         create_and_go_to_topic
-        expect_new_page_load { click_topic_option('#discussion_topic', '#ui-menu-0-0') }
+        expect_new_page_load { click_topic_option('#discussion_topic', '.al-options:visible a') }
         replace_content(f('#discussion_topic_title'), edit_text)
         type_in_tiny(".topic_content", ' new message')
         submit_form('.add_topic_form_new')
@@ -212,19 +212,6 @@ describe "discussions" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
         get_all_replies.first.should include_text @fake_student.name
-      end
-
-      it "should validate editing a discussion" do
-        edit_text = 'title edited'
-        create_and_go_to_topic
-        expect_new_page_load { click_topic_option('#discussion_topic', '#ui-menu-0-0') }
-        wait_for_ajaximations
-        d_title= keep_trying_until { f("#discussion_topic_title") }
-        replace_content(d_title, edit_text)
-        type_in_tiny("textarea", 'other message')
-        submit_form(".add_topic_form_new")
-        wait_for_ajaximations
-        f(".discussion_topic").should include_text(edit_text)
       end
 
       it "should validate the deletion of a discussion" do

@@ -34,7 +34,7 @@ describe "gradebook2" do
       # borrowed this code from set_default_grade method. not calling it directly because
       # we need to assert the content of the alert box.
       open_assignment_options(0)
-      f('#ui-menu-1-3').click
+      f('[data-action="setDefaultGrade"]').click
       dialog = find_with_jquery('.ui-dialog:visible')
       f('.grading_value').send_keys(5)
       submit_dialog(dialog, '.ui-button')
@@ -201,7 +201,7 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       open_assignment_options(1)
-      f('#ui-menu-1-0').click
+      f('[data-action="showAssignmentDetails"]').click
       wait_for_ajaximations
       details_dialog = f('#assignment-details-dialog')
       details_dialog.should be_displayed
@@ -249,7 +249,7 @@ describe "gradebook2" do
         wait_for_ajaximations
 
         open_assignment_options(2)
-        f('#ui-menu-1-2').click
+        f('[data-action="messageStudentsWho"]').click
         expect {
           message_form = f('#message_assignment_recipients')
           message_form.find_element(:css, '#body').send_keys(message_text)
@@ -266,7 +266,7 @@ describe "gradebook2" do
         open_assignment_options(2)
 
         # expect dialog to show 1 fewer student with the "Haven't been graded" option
-        f('#ui-menu-1-2').click
+        f('[data-action="messageStudentsWho"]').click
         find_all_with_jquery('.student_list li:visible').size.should eql 2
         # select option
         select = f('#message_assignment_recipients select.message_types')

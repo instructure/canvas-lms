@@ -637,7 +637,7 @@ define([
         $item.loadingImage('remove');
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         modules.addItemToModule($module, data.content_tag);
-        $module.find(".context_module_items").sortable('refresh');
+        $module.find(".context_module_items.ui-sortable").sortable('refresh');
         modules.updateAssignmentData();
       }, function(data) {
       });
@@ -666,7 +666,7 @@ define([
         $(this).loadingImage('remove');
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         var $item = modules.addItemToModule($module, data.content_tag);
-        $module.find(".context_module_items").sortable('refresh');
+        $module.find(".context_module_items.ui-sortable").sortable('refresh');
         if (data.content_tag.content_id != 0) {
           modules.updateAllItemInstances(data.content_tag);
         }
@@ -700,8 +700,8 @@ define([
       var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
       $("#context_modules").append($module);
         $module.find(".context_module_items").sortable(modules.sortable_module_options);
-        $("#context_modules").sortable('refresh');
-        $("#context_modules .context_module .context_module_items").each(function() {
+        $("#context_modules.ui-sortable").sortable('refresh');
+        $("#context_modules .context_module .context_module_items.ui-sortable").each(function() {
           $(this).sortable('refresh');
           $(this).sortable('option', 'connectWith', '.context_module_items');
         });
@@ -725,7 +725,7 @@ define([
         options.submit = function(item_data) {
           var $module = $("#context_module_" + module.id);
           var $item = modules.addItemToModule($module, item_data);
-          $module.find(".context_module_items").sortable('refresh');
+          $module.find(".context_module_items.ui-sortable").sortable('refresh');
           var url = $module.find(".add_module_item_link").attr('rel');
           $item.loadingImage({image_size: 'small'});
           $.ajaxJSON(url, 'POST', item_data, function(data) {
@@ -733,7 +733,7 @@ define([
             $item.remove();
             data.content_tag.type = item_data['item[type]'];
             modules.addItemToModule($module, data.content_tag);
-            $module.find(".context_module_items").sortable('refresh');
+            $module.find(".context_module_items.ui-sortable").sortable('refresh');
             modules.updateAssignmentData();
           });
         };
@@ -990,7 +990,7 @@ define([
               modules.addItemToModule($module, item.content_tag);
               next();
             } else {
-              $module.find(".context_module_items").sortable('refresh');
+              $module.find(".context_module_items.ui-sortable").sortable('refresh');
               toggle(true);
               modules.updateProgressionState($module);
               $("#context_modules").triggerHandler('slow_load');
@@ -1003,7 +1003,7 @@ define([
             for(var idx in data) {
               modules.addItemToModule($module, data[idx].content_tag);
             }
-            $module.find(".context_module_items").sortable('refresh');
+            $module.find(".context_module_items.ui-sortable").sortable('refresh');
             toggle();
             modules.updateProgressionState($module);
           }

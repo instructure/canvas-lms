@@ -76,6 +76,7 @@ describe "jquery ui" do
 
       driver.execute_script(<<-JS).should == "\302\240"
         return $('#jqueryui_test')
+          .dialog()
           .dialog('option', 'title', 'foo')
           .dialog('option', 'title', '')
           .parent('.ui-dialog')
@@ -97,6 +98,7 @@ describe "jquery ui" do
       new_title = "and now <i>this</i> is the title"
       driver.execute_script(<<-JS).should == new_title
         return $('#jqueryui_test')
+          .dialog()
           .dialog('option', 'title', #{new_title.inspect})
           .parent('.ui-dialog')
           .find('.ui-dialog-title')
@@ -118,6 +120,7 @@ describe "jquery ui" do
       new_title = "<i>i <b>still</b> want formatting</i>"
       driver.execute_script(<<-JS).should == new_title
         return $('#jqueryui_test')
+          .dialog()
           .dialog('option', 'title', $(#{new_title.inspect}))
           .parent('.ui-dialog')
           .find('.ui-dialog-title')

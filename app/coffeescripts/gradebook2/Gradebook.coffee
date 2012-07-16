@@ -494,8 +494,8 @@ define [
           @buildRows()
 
       # don't show the "show attendance" link in the dropdown if there's no attendance assignments
-      unless (_.detect @gradeGrid.getColumns(), (col) -> col.object?.submission_types == "attendance")
-        $settingsMenu.find('#show_attendance').hide()
+      unless (_.detect @assignments, (a) -> (''+a.submission_types) == "attendance")
+        $settingsMenu.find('#show_attendance').closest('li').hide()
 
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
         event.preventDefault()

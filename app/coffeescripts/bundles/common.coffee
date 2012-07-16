@@ -26,7 +26,6 @@ require [
   # other stuff several bundles use
   'media_comments'
   'order'
-  'jqueryui/effects/core'
   'jqueryui/effects/drop'
   'jqueryui/progressbar'
   'jqueryui/tabs'

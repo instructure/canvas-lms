@@ -324,7 +324,8 @@ define([
 
       $editor_tabs.find("#pages_accordion").accordion({
         header: ".header",
-        autoHeight: false
+        autoHeight: false,
+        heightStyle: 'content'
       });
 
       $("#new_page_drop_down").submit(function(event){

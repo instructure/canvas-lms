@@ -28,7 +28,7 @@ shared_examples_for "discussions selenium tests" do
   end
 
   def edit_entry(entry, text)
-    click_entry_option(entry, '#ui-menu-0-1')
+    click_entry_option(entry, '.al-options:visible li:eq(1) a')
     type_in_tiny 'textarea', text
     f('.edit-html-done').click
     wait_for_ajax_requests
@@ -37,7 +37,7 @@ shared_examples_for "discussions selenium tests" do
 
   def delete_entry(entry)
     keep_trying_until do
-      click_entry_option(entry, '#ui-menu-0-2')
+      click_entry_option(entry, '.al-options:visible li:last-child a')
       validate_entry_text(entry, "This entry has been deleted")
       entry.save!
       entry.reload
@@ -88,7 +88,7 @@ shared_examples_for "discussions selenium tests" do
   def click_topic_option(topic_selector, menu_item_selector)
     topic = f(topic_selector)
     topic.find_element(:css, '.al-trigger').click
-    f(menu_item_selector).click
+    fj(menu_item_selector).click
     topic
   end
 end

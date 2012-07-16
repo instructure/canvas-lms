@@ -155,7 +155,7 @@ define([
         $("#outcomes .outcome_group:first").append($group.show());
         $("#outcomes .outcome_group:first .child_outcomes").sortable('refresh');
         $group.find('.child_outcomes').sortable(outcomes.sortableOptions);
-        $(".outcome_group .child_outcomes").sortable('option', 'connectWith', '.child_outcomes');
+        $("#outcomes .outcome_group .child_outcomes").sortable('option', 'connectWith', '.child_outcomes');
       }
       group.asset_string = $.underscore("learning_outcome_group_" + group.id);
       $group.find("textarea.description").val(group.description);
@@ -183,10 +183,10 @@ define([
       outcomes.hideEditOutcomeGroup();
       if(!$group || $group.length === 0) {
         $group = $("#group_blank").clone(true).attr('id', 'group_new');
-        $("#outcomes .child_outcomes:first").append($group.show());
         $("#outcomes .outcome_group:first .child_outcomes").sortable('refresh');
+        $("#outcomes .child_outcomes:first").append($group.show());
         $group.find('.child_outcomes').sortable(outcomes.sortableOptions);
-        $(".outcome_group .child_outcomes").sortable('option', 'connectWith', '.child_outcomes');
+        $("#outcomes .outcome_group .child_outcomes").sortable('option', 'connectWith', '.child_outcomes');
       }
       var $form = $("#edit_outcome_group_form");
       $form.attr('action', $group.find(".edit_group_link").attr('href'));
