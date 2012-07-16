@@ -151,6 +151,21 @@ describe "Accounts API", :type => :integration do
     end
   end
 
+  it "should return courses filtered by state[]" do
+    @me = @user
+    [:c1, :c2].each do |course|
+      instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
+    end
+    @c2.destroy
+    @user = @me
+
+    json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=deleted",
+      { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[deleted] })
+
+    json.length.should eql 1
+    json.first['name'].should eql 'c2'
+  end
+
   it "should limit the maximum per-page returned" do
     @me = @user
     15.times { |i| course_model(:name => "c#{i}", :account => @a1, :root_account => @a1) }
