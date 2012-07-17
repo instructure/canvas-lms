@@ -117,7 +117,6 @@ end
 
 describe 'shared settings specs' do
   describe "settings" do
-    let(:url) { "/accounts/#{Account.default.id}/statistics" }
     let(:account) { Account.default }
     let(:account_settings_url) { "/accounts/#{Account.default.id}/settings" }
     let(:admin_tab_url) { "/accounts/#{Account.default.id}/settings#tab-users" }
