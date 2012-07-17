@@ -4,7 +4,7 @@
   <div class="rs-margin-lr rs-margin-top">
     <% if @context.allow_student_organized_groups %>
       <% if can_do(@context, @current_user, :participate_in_groups) %>
-        <a href="#" class="button button-sidebar-wide add add_group_link"><%= image_tag "add.png" %> <%= t 'actions.add', 'Start a New Group' %></a>
+        <a href="#" class="button button-sidebar-wide add_group_link"><%= image_tag "add.png" %> <%= t 'actions.add', 'Start a New Group' %></a>
       <% end %>
     <% else %>
       <%= t :groups_disabled, 'Student-organized groups have been disabled for this course, so you\'ll have to be content with the groups the teacher makes for you.' %>
