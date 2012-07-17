@@ -11,7 +11,7 @@ define [
 
     # options.requestParams are merged with UserCollection#fetch request params
     initialize: (options) ->
-      @fetchOptions = data: $.extend ENV.USER_PARAMS, options.requestParams
+      @fetchOptions = data: $.extend {}, ENV.USER_PARAMS, options.requestParams
       @collection = new UserCollection()
       @collection.url = options.url
       @collection.on 'add', @renderUser
