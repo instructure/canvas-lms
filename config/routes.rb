@@ -920,7 +920,7 @@ ActionController::Routing::Routes.draw do |map|
       folders.get 'folders/:id', :action => :show
       folders.get 'folders/:id/folders', :action => :api_index, :path_name => 'list_folders'
       folders.get 'folders/:id/files', :controller => :files, :action => :api_index, :path_name => 'list_files'
-      folders.delete 'folders/:id', :action => :destroy
+      folders.delete 'folders/:id', :action => :api_destroy
       folders.put 'folders/:id', :action => :update
     end
     

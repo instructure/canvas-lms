@@ -27,8 +27,8 @@
 #       "files_count":0,
 #       "position":3,
 #       "updated_at":"2012-07-06T14:58:50Z",
-#       "folders_url":"http://www.example.com/api/v1/folders/2937/folders",
-#       "files_url":"http://www.example.com/api/v1/folders/2937/files",
+#       "folders_url":"https://www.example.com/api/v1/folders/2937/folders",
+#       "files_url":"https://www.example.com/api/v1/folders/2937/files",
 #       "full_name":"course files/11folder",
 #       "lock_at":null,
 #       "id":2937,
@@ -41,7 +41,7 @@
 class FoldersController < ApplicationController
   include Api::V1::Folders
 
-  before_filter :require_context, :except => [:api_index, :show, :destroy, :update]
+  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update]
 
   def index
     if authorized_action(@context, @current_user, :read)
@@ -58,12 +58,12 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/folders/<folder_id>/folders' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \ 
   #        -H 'Authorization: Bearer <token>'
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/folders/<folder_id>/folders?sort_by=position' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders?sort_by=position' \ 
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns [Folder]
@@ -92,11 +92,11 @@ class FoldersController < ApplicationController
   # For example, you could get the root folder for a course like:
   #
   # @example_request
-  #   curl 'http://<canvas>/api/v1/courses/1337/folders/root' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1337/folders/root' \ 
   #        -H 'Authorization: Bearer <token>'
   #
   # @example_request
-  #   curl 'http://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>' \ 
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns Folder
@@ -208,7 +208,7 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XPUT 'http://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl -XPUT 'https://<canvas>/api/v1/folders/<folder_id>' \ 
   #        -F 'name=<new_name>' \ 
   #        -F 'locked=true' \ 
   #        -H 'Authorization: Bearer <token>'
@@ -268,7 +268,7 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/files/<file_id>' \ 
+  #   curl 'https://<canvas>/api/v1/files/<file_id>' \ 
   #        -F 'name=<new_name>' \ 
   #        -F 'locked=true' \ 
   #        -H 'Authorization: Bearer <token>'
@@ -326,6 +326,17 @@ class FoldersController < ApplicationController
                         :hidden, :context, :position, :just_hide)
   end
   private :process_folder_params
+  
+  def destroy
+    @folder = Folder.find(params[:id])
+    if authorized_action(@folder, @current_user, :delete)
+      @folder.destroy
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_files_url) }# show.rhtml
+        format.json { render :json => @folder.to_json }
+      end
+    end
+  end
 
   # @API Delete folder
   # @subtopic Folders
@@ -336,9 +347,9 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XDELETE 'http://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \ 
   #        -H 'Authorization: Bearer <token>'
-  def destroy
+  def api_destroy
     @folder = Folder.find(params[:id])
     if authorized_action(@folder, @current_user, :delete)
       if @folder.root_folder?
@@ -348,11 +359,9 @@ class FoldersController < ApplicationController
       else
         @context = @folder.context
         @folder.destroy
-        respond_to do |format|
-          format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.json { render :json => folder_json(@folder, @current_user, session) }
-        end
+        render :json => folder_json(@folder, @current_user, session)
       end
     end
   end
+  
 end

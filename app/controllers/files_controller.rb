@@ -105,12 +105,12 @@ class FilesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/folders/<folder_id>/files' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files' \ 
   #         -H 'Authorization: Bearer <token>'
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/folders/<folder_id>/files?sort_by=position' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files?sort_by=position' \ 
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns [File]
@@ -213,7 +213,7 @@ class FilesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/files/<file_id>' \ 
+  #   curl 'https://<canvas>/api/v1/files/<file_id>' \ 
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns File
@@ -701,7 +701,7 @@ class FilesController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XPUT 'http://<canvas>/api/v1/files/<file_id>' \ 
+  #   curl -XPUT 'https://<canvas>/api/v1/files/<file_id>' \ 
   #        -F 'name=<new_name>' \ 
   #        -F 'locked=true' \ 
   #        -H 'Authorization: Bearer <token>'
@@ -744,7 +744,7 @@ class FilesController < ApplicationController
   # @API Delete file
   # Remove the specified file
   # 
-  #   curl -XDELETE 'http://<canvas>/api/v1/files/<file_id>' \ 
+  #   curl -XDELETE 'https://<canvas>/api/v1/files/<file_id>' \ 
   #        -H 'Authorization: Bearer <token>'
   def destroy
     @attachment = Attachment.find(params[:id])
