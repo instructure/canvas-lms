@@ -160,7 +160,7 @@ stylesheets:
   facebook:
     - public/stylesheets/compiled/facebook.css
   speed_grader:
-    - public/stylesheets/static/ui.selectmenu.css
+    - public/stylesheets/compiled/ui.selectmenu.css
     - public/stylesheets/compiled/speed_grader.css
   plugins:
     - public/stylesheets/compiled/plugins.css
@@ -180,7 +180,7 @@ stylesheets:
     - public/stylesheets/compiled/external_tools.css
     - public/stylesheets/compiled/grading_standards.css
   discussions:
-    - public/stylesheets/static/ui.selectmenu.css
+    - public/stylesheets/compiled/ui.selectmenu.css
     - public/stylesheets/compiled/discussions.css
   full_files:
     - public/stylesheets/compiled/full_files.css
@@ -202,7 +202,7 @@ stylesheets:
   quizzes:
     - public/stylesheets/compiled/quizzes.css
     - public/stylesheets/compiled/message_students.css
-    - public/stylesheets/static/ui.selectmenu.css
+    - public/stylesheets/compiled/ui.selectmenu.css
   moderate_quiz:
     - public/stylesheets/compiled/moderate_quiz.css
   full_assignment:
