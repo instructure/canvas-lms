@@ -169,13 +169,13 @@ describe "Folders API", :type => :integration do
   describe "#destroy" do
     it "should delete an empty folder" do
       @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
-      api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "destroy", :id => @f1.id.to_param), {})
+      api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param), {})
       @f1.reload
       @f1.workflow_state.should == 'deleted'
     end
 
     it "should not allow deleting root folder of context" do
-      json = api_call(:delete, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "destroy", :id => @root.id.to_param), {}, {}, :expected_status => 400)
+      json = api_call(:delete, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "api_destroy", :id => @root.id.to_param), {}, {}, :expected_status => 400)
       json['message'].should == "Can't delete the root folder"
       @root.reload
       @root.workflow_state.should == 'visible'
@@ -185,7 +185,7 @@ describe "Folders API", :type => :integration do
       @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
       @f2 = @f1.sub_folders.create!(:name => "folder2", :context => @course)
       att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course)
-      json = api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "destroy", :id => @f1.id.to_param), {}, {}, :expected_status => 400)
+      json = api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param), {}, {}, :expected_status => 400)
       json['message'].should == "Can't delete a folder with content"
       @f1.reload
       @f1.workflow_state.should == 'visible'
@@ -198,7 +198,7 @@ describe "Folders API", :type => :integration do
     it "should allow deleting folders with contents with force flag" do
       @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
       @f2 = @f1.sub_folders.create!(:name => "folder2", :context => @course)
-      api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "destroy", :id => @f1.id.to_param), {:force => true})
+      api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param), {:force => true})
       @f1.reload
       @f1.workflow_state.should == 'deleted'
       @f2.reload
@@ -208,7 +208,7 @@ describe "Folders API", :type => :integration do
     it "should return unauthorized error" do
       course_with_student(:course => @course)
       @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
-      raw_api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "destroy", :id => @f1.id.to_param), {})
+      raw_api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param), {})
       response.code.should == '401'
       @f1.reload
       @f1.workflow_state.should == 'visible'
