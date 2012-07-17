@@ -689,6 +689,22 @@ class CoursesController < ApplicationController
   end
   protected :check_unknown_user
 
+  def check_for_xlist
+    return false unless @current_user.present? && @context_enrollment.blank?
+    xlist_enrollment = @current_user.enrollments.scoped({
+      :joins => :course_section,
+      :conditions => { :course_sections => { :nonxlist_course_id => @context.id } },
+    }).first
+    if xlist_enrollment.present?
+      redirect_params = {}
+      redirect_params[:invitation] = params[:invitation] if params[:invitation].present?
+      redirect_to course_path(xlist_enrollment.course_id, redirect_params)
+      return true
+    end
+    false
+  end
+  protected :check_for_xlist
+
   # @API Get a single course
   # Return information on a single course.
   #
@@ -718,6 +734,7 @@ class CoursesController < ApplicationController
     end
 
     @context_enrollment = @context.enrollments.find_by_user_id(@current_user.id) if @context && @current_user
+    return if check_for_xlist
     @unauthorized_message = t('unauthorized.invalid_link', "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.") if params[:invitation]
     claim_course if session[:claim_course_uuid] || params[:verification]
     @context.claim if @context.created?

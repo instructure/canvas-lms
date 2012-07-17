@@ -472,6 +472,17 @@ describe CoursesController do
       xhr :get, 'show', :id => @course.id
       response.status.should == '200 OK'
     end
+
+    it "should redirect to the xlisted course" do
+      course_with_student_logged_in(:active_all => true)
+      @course1 = @course
+      @course2 = course(:active_all => true)
+      @course1.default_section.crosslist_to_course(@course2, :run_jobs_immediately => true)
+
+      get 'show', :id => @course1.id
+      response.should be_redirect
+      response.location.should match(%r{/courses/#{@course2.id}})
+    end
   end
   
   describe "POST 'unenroll'" do
