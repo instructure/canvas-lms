@@ -225,6 +225,40 @@ describe "context_modules" do
       @assignment.context_module_tags.each { |tag| tag.title.should == 'again' }
     end
 
+    it "should not rename every text header when you rename one" do
+      add_module('TestModule')
+
+      # add a text header
+      driver.find_element(:css, '.add_module_item_link').click
+      select_module_item('#add_module_item_select', 'Text Header')
+      wait_for_ajaximations
+      title_input = find_with_jquery('input[name="title"]:visible')
+      replace_content(title_input, 'First text header')
+      driver.find_element(:css, '.add_item_button').click
+      wait_for_ajaximations
+      tag1 = ContentTag.last
+
+      # and another one
+      driver.find_element(:css, '.add_module_item_link').click
+      select_module_item('#add_module_item_select', 'Text Header')
+      wait_for_ajaximations
+      title_input = find_with_jquery('input[name="title"]:visible')
+      replace_content(title_input, 'Second text header')
+      driver.find_element(:css, '.add_item_button').click
+      wait_for_ajaximations
+      tag2 = ContentTag.last
+
+      # rename the second
+      item2 = driver.find_element(:id, "context_module_item_#{tag2.id}")
+      edit_module_item(item2) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
+      end
+
+      # verify the first did not change
+      item1 = driver.find_element(:id, "context_module_item_#{tag1.id}")
+      item1.should_not include_text('Renamed!')
+    end
+
     it "should add a quiz to a module" do
       add_existing_module_item('#quizs_select', 'Quiz', @quiz.title)
     end
