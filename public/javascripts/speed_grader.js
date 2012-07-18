@@ -35,7 +35,6 @@ define([
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
-  'jquery.shake' /* /\.shake/ */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */,
   'vendor/jquery.ba-hashchange' /* hashchange */,
@@ -628,7 +627,6 @@ define([
         EG.toggleFullRubric();
       }
     });
-    $(window).shake($.proxy(EG.next, EG));
   }
   
   function resizingFunction(){
