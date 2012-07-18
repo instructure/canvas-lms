@@ -24,6 +24,8 @@ class UserProfile < ActiveRecord::Base
 
   attr_accessible :title, :bio
 
+  has_many :links, :class_name => 'UserProfileLink'
+
   TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS,
     TAB_HOME, TAB_PROFILE_SETTINGS = *0..10
 
