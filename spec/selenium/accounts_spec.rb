@@ -133,6 +133,14 @@ describe "account" do
       assert_flash_notice_message /Test Course successfully added/
     end
 
+    it "should be able to create a new course when no other courses exist" do
+      Account.default.courses.each { |c| c.destroy! }
+
+      get "/accounts/#{Account.default.to_param}"
+      driver.find_element(:css, '.add_course_link').click
+      driver.find_element(:css, '#add_course_form').should be_displayed
+    end
+
     it "should be able to update term dates" do
 
       def verify_displayed_term_dates(term, dates)
