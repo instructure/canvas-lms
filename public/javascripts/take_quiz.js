@@ -25,7 +25,7 @@ define([
   'jquery.instructure_forms' /* getFormData, errorBox */,
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
-  'jquery.rails_flash_notifications' /* flashMessage */,
+  'compiled/jquery.rails_flash_notifications',
   'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,

@@ -197,21 +197,20 @@ span.field-with-fancyplaceholder
   #modal-box.login-box
     margin: 0
     box-shadow: none
-  .ui-state-error
+  #unauthorized_message
+    margin: 0
+    width: auto
     padding: 15px $modal_box_padding
-    border-color: #bf3828 #83271b #83271b #83271b
-    font-size: 1.25em
     line-height: 1.2
-    position: relative
-    z-index: 1
-    box-shadow: 0 3px 3px -1px rgba(0,0,0,0.25)
+    &.ui-state-error:before
+      top: 15px
     h2
-      background: transparent url(/images/warning_36.png) 0 4px no-repeat
       height: 41px
       margin: 0 0 -15px 0
       padding: 0 0 0 60px
       color: #000
-      font-size: 1.25em
     p
       padding: 0 0 0 60px
       margin: 0
+      font-size: 1.25em
+      font-weight: normal

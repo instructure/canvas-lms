@@ -69,8 +69,6 @@ describe "profile" do
     wait_for_ajaximations
     #login with new password
     login_as('nobody@example.com', new_password)
-    #check message to make sure the user was logged in successfully with the new password
-    assert_flash_notice_message /Login successful/
   end
 
   context "non password tests" do

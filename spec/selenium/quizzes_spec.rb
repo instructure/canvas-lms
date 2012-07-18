@@ -423,7 +423,7 @@ describe "quizzes" do
       q.update_quiz_submission_end_at_times
 
       keep_trying_until do
-        driver.find_element(:id, 'flash_notice_message').text.should match 'You have been given extra time on this attempt'
+        assert_flash_notice_message /You have been given extra time on this attempt/
         driver.find_element(:css, '.time_running').text.should match /^[19]{2}\sMinutes/
       end
 
@@ -473,7 +473,7 @@ describe "quizzes" do
       submission.save!
 
       keep_trying_until do
-        driver.find_element(:id, 'flash_notice_message').text.should match 'You have been given extra time on this attempt'
+        assert_flash_notice_message /You have been given extra time on this attempt/
         driver.find_element(:css, '.time_running').text.should match /^[19]{2}\sMinutes/
         true
       end

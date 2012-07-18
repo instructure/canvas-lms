@@ -77,7 +77,6 @@ describe PseudonymSessionsController do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty', :account => account)
       post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
       response.should redirect_to(dashboard_url(:login_success => 1))
-      flash[:notice].should == "Login successful."
     end
 
     it "should login for a user with multiple identical pseudonyms" do
@@ -88,7 +87,6 @@ describe PseudonymSessionsController do
       response.should redirect_to(dashboard_url(:login_success => 1))
       # it should have preferred the site admin pseudonym
       assigns[:pseudonym].should == @pseudonym
-      flash[:notice].should == "Login successful."
     end
 
     it "should not login for multiple users with identical pseudonyms" do

@@ -15,40 +15,96 @@
   :height 300px
   :overflow auto
 
+#fixed_bottom, #flash_message_holder
+  position: fixed
+  z-index: 100000
+  left: 0
+  width: 100%
+
 #flash_message_holder
-  :position fixed
-  :top -5px
-  :z-index 9999
-  width: 100%
+  top: 0
+  list-style: none
+  margin: 0
+  padding: 0
   height: 0
-  a
-    :color #ddd
-#flash_message_wrapper
-  width: 350px
-  max-height: 200px
-  margin: auto
+  li
+    box-shadow: 0 1px 1px rgba(0,0,0,0.25)
+    border-bottom-color: rgba(0,0,0,0.5)
+    margin: 0
+    padding: 0
+    height: 28px
+    line-height: 28px
+    vertical-align: middle
+    text-align: center
+    font-weight: bold
+    position: relative
+    z-index: 2
+    width: 400px
+    margin: 0 auto
+    &.static_message
+      width: auto
+      margin: 0
+    a.close_link
+      position: absolute
+      right: 10px
+      top: 50%
+      margin-top: -8px
+    i
+      display: inline-block
+      vertical-align: middle
+      margin-right: 0
+      width: 20px
+      height: 20px
+      background-image: url(/images/check_16.png)
+      background-repeat: no-repeat
+    &.ui-state-error, &.ui-state-warning
+      i
+        background-image: url(/images/warning_16.png)
+    &.xlarge
+      font-size: 1.5em
+      height: 58px
+      line-height: 58px
+      i
+        width: 40px
+        height: 40px
+        background-image: url(/images/check_36.png)
+      &.ui-state-error, &.ui-state-warning
+        i
+          background-image: url(/images/warning_36.png)
 
-body.no-headers #flash_message_wrapper
-  width: 100%
-
-#flash_notice_message, #flash_error_message
-  :text-align center
-  :background-color #308b4f
-  :color #fff
-  :font-weight bold
-  :overflow auto
-  :padding 6px 30px 4px 15px
-  :cursor pointer
-  box-shadow: 3px 3px 6px rgba(0,0,0,0.5)
-  position: relative
-  a.close-link
-    position: absolute
-    right: 4px
-    top: 8px
-
-#flash_error_message
-  :background-color #b4302d
-
+#unauthorized_message
+  border: 1px solid #000
+  margin: 4em auto
+  width: 500px
+  .ui-state-error, &.ui-state-error
+    position: relative
+    z-index: 1
+    border-style: solid
+    border-width: 1px
+    border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.3) rgba(0,0,0,0.5)
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 3px 3px -1px rgba(0,0,0,0.25)
+    &:before
+      content: " "
+      background: transparent url(/images/warning_36.png) 0 4px no-repeat
+      position: absolute
+      top: 6px
+      left: 22px
+      width: 42px
+      height: 42px
+  h2
+    font-size: 1.5em
+    &.ui-state-error
+      padding: 15px
+      margin: -1px
+      color: #fff
+      height: 60px
+      line-height: 60px
+      padding: 0 0 0 80px
+  p
+    font-size: 1.1em
+    padding: 2em 3em
+    font-weight: bold
+    margin: 0
 
 .user_content,.mceContentBody
   position: relative
@@ -1446,12 +1502,7 @@ form.user_content_post_form
   padding-bottom: 60px
 
 #fixed_bottom
-  position: fixed
-  z-index: 100000
   bottom: 0
-  top: auto
-  left: 0
-  width: 100%
   i
     vertical-align: middle
     margin-right: 10px

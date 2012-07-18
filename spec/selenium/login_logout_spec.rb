@@ -26,25 +26,25 @@ describe "login logout" do
   end
 
   it "should show error message if logging in with wrong credentials" do
-    login_as("blah@blah.com", "somepassword")
+    login_as("blah@blah.com", "somepassword", false)
     assert_flash_error_message /Incorrect username/
   end
 
   it "should show invalid password message if logging in with no password" do
     expected_error = "Invalid password"
-    login_as(USERNAME, nil)
+    login_as(USERNAME, nil, false)
     should_show_message(expected_error, LOGIN_ERROR_BOX)
   end
 
   it "should show invalid login message if logging in with no username" do
     expected_error = "Invalid login"
-    login_as(nil, VALID_PASSWORD)
+    login_as(nil, VALID_PASSWORD, false)
     should_show_message(expected_error, LOGIN_ERROR_BOX)
   end
 
   it "should show invalid password message if logging in with no username and password" do
     expected_error = "Invalid login"
-    login_as(nil, nil)
+    login_as(nil, nil, false)
     should_show_message(expected_error, LOGIN_ERROR_BOX)
   end
 
@@ -52,11 +52,6 @@ describe "login logout" do
     user_with_pseudonym({:active_user => true})
     login_as
     driver.find_element(:css, '.user_name').text.should == USERNAME
-  end
-
-  it "should login and test that the correct success message shows up" do
-    verify_logout
-    assert_flash_notice_message /You are currently logged out/
   end
 
   it "should test logging out with the correct page and navigating to a page after being logged out" do

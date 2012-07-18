@@ -26,7 +26,7 @@ define([
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* showIf */,
-  'jquery.rails_flash_notifications' /* flashMessage */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData */,
   'vendor/date' /* Date.parse */
 ], function(I18n, $, timing) {

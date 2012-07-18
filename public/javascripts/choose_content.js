@@ -7,7 +7,7 @@ define([
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* .dim, showIf */,
-  'jquery.rails_flash_notifications' /* flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */
 ], function($, I18n, processMigrationItemSelections){

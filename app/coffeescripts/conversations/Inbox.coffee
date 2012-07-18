@@ -32,7 +32,7 @@ define [
   'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'jquery.disableWhileLoading'
-  'jquery.rails_flash_notifications'
+  'compiled/jquery.rails_flash_notifications'
   'media_comments'
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'

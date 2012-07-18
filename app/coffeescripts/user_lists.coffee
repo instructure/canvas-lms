@@ -7,7 +7,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'jquery.loadingImg'
-  'jquery.rails_flash_notifications'
+  'compiled/jquery.rails_flash_notifications'
   'jquery.scrollToVisible'
   'jquery.templateData'
   'vendor/jquery.scrollTo'

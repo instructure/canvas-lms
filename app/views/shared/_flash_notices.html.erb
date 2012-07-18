@@ -1,19 +1,11 @@
-<% if session[:from_pilot]
-  session.delete(:from_pilot)
-  @from_pilot = true
-  flash[:notice] = t 'notices.redirected_from_pilot', "You've been redirected to the new version of Instructure Canvas.  Welcome!"
-end %>
-<div id="flash_message_holder">
-  <div id="flash_message_wrapper">
-    <div id="flash_notice_message" class="<%= 'long_show' if @from_pilot %>" style="<%= "display: none;" if !flash[:notice] && !flash[:html_notice] %>">
-      <a href="#" class="close-link"><%= t 'links.close', "close" %></a>
-      <%= flash[:html_notice] ? raw(flash[:html_notice]) : flash[:notice] %>
-      <% flash.delete(:notice); flash.delete(:html_notice) %>
-    </div>
-    <div id="flash_error_message" style="<%= "display: none;" if !flash[:error] %>">
-      <a href="#" class="close-link"><%= t 'links.close', "close" %></a>
-      <%= flash[:error]%>
-      <% flash.delete(:error) %>
-    </div>
-  </div>
-</div>
+<% notices = flash_notices() %>
+<div id="flash_message_buffer" style="height:<%= notices.sum{ |n| n[:size] == 'xlarge' ? 60 : 30 } %>px;"></div>
+<ul id="flash_message_holder">
+  <% notices.each do |notice| %>
+    <li class="static_message ui-state-<%= notice[:type] || 'warning' %> <%= notice[:size] %> <%= notice[:classes] %>">
+      <i></i>
+      <%= notice[:content] %>
+      <a href='#' class='close_link'><%= t "close", "Close" %></a>
+    </li>
+  <% end %>
+</ul>

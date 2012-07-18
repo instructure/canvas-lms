@@ -261,7 +261,7 @@ describe "zip file uploads" do
         job = Delayed::Job.last(:order => :id)
         job.tag.should == 'ZipFileImport#process_without_send_later'
         run_job(job)
-        upload_file(true) if f("#flash_error_message").displayed? && refresh != true
+        upload_file(true) if refresh != true && f("#flash_message_holder .ui-state-error").present?
         zfi
       end
 

@@ -26,7 +26,7 @@ define([
   'jquery.instructure_date_and_time' /* date_field, time_field, datetime_field */,
   'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.log\(/ */,
-  'jquery.rails_flash_notifications' /* flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(INST, I18n, $, _) {

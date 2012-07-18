@@ -22,7 +22,7 @@ define([
   'str/htmlEscape',
   'jquery.ajaxJSON', // ajaxJSON
   'jquery.instructure_forms', // defaultAjaxError
-  'jquery.rails_flash_notifications', // flashError
+  'compiled/jquery.rails_flash_notifications', // flashError
   'jqueryui/effects/drop'
 ], function(INST, I18n, $, htmlEscape) {
 
@@ -163,22 +163,6 @@ define([
     $(".close_instructure_ajax_error_box_link").click(function(event) {
       event.preventDefault();
       $("#instructure_ajax_error_box").hide();
-    });
-
-    $("#flash_notice_message,#flash_error_message").each(function(){
-      var $this = $(this);
-      if($this.css('display') != 'none') {
-        var time = $("#flash_notice_message").hasClass('long_show') ? 30000 : 7000;
-        $("#flash_notice_message").removeClass('long_show')
-        $this.delay(time).hide('drop', { direction: "up" }, 2000, function() {
-          $this.empty().hide();
-        });
-      }
-      $this.click(function() {
-        $this.stop(true, true).hide('drop', { direction: "up" }, 'fast', function() {
-          $this.empty().hide();
-        });
-      });
     });
 
   });

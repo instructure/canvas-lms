@@ -6,7 +6,7 @@ define [
   'jst/quickStartBar/pin'
   'compiled/models/KollectionItem'
   'jquery.instructure_date_and_time'
-  'jquery.rails_flash_notifications'
+  'compiled/jquery.rails_flash_notifications'
 ], (_, KollectionItemSaveView, BaseItemView, Pin, template, KollectionItem) ->
 
   class QuickStartKollectionItemSaveView extends KollectionItemSaveView

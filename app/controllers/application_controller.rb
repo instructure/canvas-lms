@@ -1355,5 +1355,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
-
+  def flash_notices
+    @notices ||= begin
+      notices = []
+      if error = flash.delete(:error)
+        notices << {:type => 'error', :content => error}
+      end
+      if notice = (flash[:html_notice] ? raw(flash.delete(:html_notice)) : flash.delete(:notice))
+        notices << {:type => 'success', :content => notice}
+      end
+      notices
+    end
+  end
+  helper_method :flash_notices
 end

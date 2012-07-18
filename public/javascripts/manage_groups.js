@@ -26,7 +26,7 @@ define([
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
-  'jquery.rails_flash_notifications' /* flashMessage, flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/droppable' /* /\.droppable/ */,

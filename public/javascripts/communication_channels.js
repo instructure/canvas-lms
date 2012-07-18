@@ -7,7 +7,7 @@ require([
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
-  'jquery.rails_flash_notifications' /* flashMessage */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'jqueryui/tabs' /* /\.tabs/ */
 ], function(I18n, $) {

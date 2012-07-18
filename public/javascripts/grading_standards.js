@@ -5,7 +5,7 @@ define([
   'jquery.instructure_forms' /* fillFormData, getFormData */,
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* ifExists, .dim, undim, confirmDelete */,
-  'jquery.rails_flash_notifications' /* flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(I18n, $) {

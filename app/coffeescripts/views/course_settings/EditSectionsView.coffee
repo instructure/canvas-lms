@@ -6,7 +6,7 @@ define [
   'jst/courses/settings/EditSectionsView'
   'compiled/widget/ContextSearch'
   'str/htmlEscape'
-  'jquery.rails_flash_notifications'
+  'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, DialogBaseView, editSectionsViewTemplate, ContextSearch, h) ->
 

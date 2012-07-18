@@ -5,7 +5,7 @@ require([
   'jquery.instructure_forms' /* getFormData */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.loadingImg' /* loadingImage */,
-  'jquery.rails_flash_notifications' /* flashMessage, flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* getTemplateData */
 ], function(I18n, $) {
 

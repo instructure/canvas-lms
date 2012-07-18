@@ -30,7 +30,7 @@ define([
   'jquery.instructure_misc_helpers' /* encodeToHex, decodeFromHex, replaceTags */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
-  'jquery.rails_flash_notifications' /* flashMessage */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
