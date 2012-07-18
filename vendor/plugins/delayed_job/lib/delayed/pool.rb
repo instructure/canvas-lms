@@ -123,6 +123,7 @@ class Pool
 
     pid = fork do
       Delayed::Job.connection.reconnect!
+      Delayed::Periodic.load_periodic_jobs_config
       worker.start
     end
     workers[pid] = worker
