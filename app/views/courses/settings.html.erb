@@ -263,13 +263,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </tr><tr>
         <td style="width: 10%;"><%= f.blabel :locale, :language, :en => "Language" %></td>
         <td>
-          <span class="course_form">
+          <div class="course_form">
             <% no_language = t(:no_language_preference, "Not set (user-configurable, defaults to %{language})", :language => available_locales[infer_locale(:context => @context.account)]) %>
             <%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.locale %>
             <div style="font-size: 0.8em;">
               <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>
             </div>
-          </span>
+          </div>
           <span class="course_info locale"><%= @context.locale ? available_locales[@context.locale] : no_language %></span>
         </td>
       <% end %>
@@ -303,13 +303,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <span class="course_info grading_scheme_set">
             <%= @context.grading_standard_enabled? ? (@context.grading_standard_title || t('grading_standard_currently_set', "Currently Set")) : t('grading_standard_not_set', "Not Set") %>
           </span>
-          <span class="course_form">
+          <div class="course_form">
             <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox" %>
             <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
             <div class="grading_standard_link" style="margin-left: 20px;">
               <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
             </div>
-          </span>
+          </div>
         </td>
       </tr>
       <tr>
