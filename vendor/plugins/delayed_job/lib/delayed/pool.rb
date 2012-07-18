@@ -123,7 +123,6 @@ class Pool
 
     pid = fork do
       Delayed::Job.connection.reconnect!
-      Delayed::Periodic.load_periodic_jobs_config
       worker.start
     end
     workers[pid] = worker
@@ -153,6 +152,7 @@ class Pool
     pid = fork do
       # we want to avoid db connections in the main pool process
       $0 = "delayed_periodic_audit_scheduler"
+      Delayed::Periodic.load_periodic_jobs_config
       Delayed::Periodic.audit_queue
     end
     workers[pid] = :periodic_audit
