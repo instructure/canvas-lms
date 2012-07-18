@@ -43,6 +43,7 @@ class Attachment < ActiveRecord::Base
 
   before_save :infer_display_name
   before_save :default_values
+  before_save :set_need_notify
   
   before_validation :assert_attachment
   before_destroy :delete_scribd_doc
@@ -231,7 +232,7 @@ class Attachment < ActiveRecord::Base
       item.locked = true if hash[:locked]
       item.file_state = 'hidden' if hash[:hidden]
       item.display_name = hash[:display_name] if hash[:display_name]
-      item.save!
+      item.save_without_broadcasting!
       context.imported_migration_items << item if context.imported_migration_items
     end
     item
@@ -785,6 +786,67 @@ class Attachment < ActiveRecord::Base
     filename
   end
 
+  def save_without_broadcasting
+    @skip_broadcasts = true
+    save
+    @skip_broadcasts = false
+  end
+
+  def save_without_broadcasting!
+    @skip_broadcasts = true
+    save!
+    @skip_broadcasts = false
+  end
+
+  # called before save
+  # notification is not sent until file becomes 'available'
+  # (i.e., don't notify before it finishes uploading)
+  def set_need_notify
+    self.need_notify = true if !@skip_broadcasts &&
+        file_state_changed? &&
+        file_state == 'available' &&
+        context && context.state == :available &&
+        folder.visible?
+  end
+
+  # generate notifications for recent file operations
+  # (this should be run in a delayed job)
+  def self.do_notifications
+    # consider a batch complete when no uploads happen in this time
+    quiet_period = Setting.get("attachment_notify_quiet_period_minutes", "5").to_i.minutes.ago
+
+    # if a batch is older than this, just drop it rather than notifying
+    discard_older_than = Setting.get("attachment_notify_discard_older_than_hours", "120").to_i.hours.ago
+
+    while true
+      file_batches = Attachment.connection.select_rows(sanitize_sql([<<-SQL, quiet_period]))
+        SELECT COUNT(attachments.id), MIN(attachments.id), MAX(updated_at), context_id, context_type
+        FROM attachments WHERE need_notify GROUP BY context_id, context_type HAVING MAX(updated_at) < ? LIMIT 500
+      SQL
+      break if file_batches.empty?
+      file_batches.each do |count, attachment_id, last_updated_at, context_id, context_type|
+        # clear the need_notify flag for this batch
+        Attachment.update_all("need_notify = NULL",
+            ["updated_at <= ? AND context_id = ? AND context_type = ?", last_updated_at, context_id, context_type])
+
+        # skip the notification if this batch is too old to be timely
+        next if last_updated_at.to_time < discard_older_than
+
+        # now generate the notification
+        record = Attachment.find(attachment_id)
+        notification = Notification.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
+        to_list = record.context.participants - [record.user]
+        recipient_keys = (to_list || []).compact.map(&:asset_string)
+        asset_context = record.context
+        data = { :count => count }
+        DelayedNotification.send_later_if_production_enqueue_args(
+            :process,
+            { :priority => Delayed::LOW_PRIORITY },
+            record, notification, recipient_keys, asset_context, data)
+      end
+    end
+  end
+
   def infer_display_name
     self.display_name ||= unencoded_filename
   end
@@ -1138,10 +1200,6 @@ class Attachment < ActiveRecord::Base
   
   def self.skip_scribd_submits(skip=true)
     @skip_scribd_submits = skip
-  end
-  
-  def self.skip_broadcast_messages(skip=true)
-    @skip_broadcast_messages = skip
   end
   
   def self.skip_scribd_submits?

@@ -1987,7 +1987,7 @@ class Course < ActiveRecord::Base
           new_folder_id = merge_mapped_id(file.folder)
         end
         new_file.folder_id = new_folder_id
-        new_file.save!
+        new_file.save_without_broadcasting!
         map_merge(file, new_file)
       end
     end

@@ -330,10 +330,6 @@ class Notification < ActiveRecord::Base
   end
   
   def show_in_feed?
-   self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
-  end
-  
-  def show_in_feed?
     self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
   end
   
@@ -388,6 +384,8 @@ class Notification < ActiveRecord::Base
     when 'Appointment Cancelations'
       'immediately'
     when 'Course Content'
+      'never'
+    when 'Files'
       'never'
     when 'Discussion'
       'never'
@@ -476,6 +474,8 @@ class Notification < ActiveRecord::Base
     t 'names.new_discussion_entry', 'New Discussion Entry'
     t 'names.new_discussion_topic', 'New Discussion Topic'
     t 'names.new_event_created', 'New Event Created'
+    t 'names.new_file_added', 'New File Added'
+    t 'names.new_files_added', 'New Files Added'
     t 'names.new_student_organized_group', 'New Student Organized Group'
     t 'names.new_teacher_registration', 'New Teacher Registration'
     t 'names.new_user', 'New User'
@@ -517,6 +517,7 @@ class Notification < ActiveRecord::Base
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
     t 'categories.due_date', 'Due Date'
+    t 'categories.files', 'Files'
     t 'categories.grading', 'Grading'
     t 'categories.grading_policies', 'Grading Policies'
     t 'categories.invitiation', 'Invitation'
@@ -535,6 +536,8 @@ class Notification < ActiveRecord::Base
       t(:announcement_description, "For new announcements")
     when 'Course Content'
       t(:course_content_description, "For changes to course pages")
+    when 'Files'
+      t(:files_description, "For new files")
     when 'Discussion'
       t(:discussion_description, "For new topics")
     when 'DiscussionEntry'
