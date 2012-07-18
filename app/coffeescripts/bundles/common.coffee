@@ -22,6 +22,7 @@ require [
   'compiled/behaviors/upvote-item'
   'compiled/behaviors/repin-item'
   'compiled/behaviors/follow'
+  'compiled/behaviors/tooltip'
 
   # other stuff several bundles use
   'media_comments'

@@ -266,7 +266,10 @@ $.fn.position = function( options ) {
 				if ( targetHeight < elemHeight && abs( top + bottom ) < targetHeight ) {
 					feedback.vertical = "middle";
 				}
-				if ( max( abs( left ), abs( right ) ) > max( abs( top ), abs( bottom ) ) ) {
+				//if ( max( abs( left ), abs( right ) ) > max( abs( top ), abs( bottom ) ) ) {
+				// INSTRUCTURE: We changed the previous line to this line because it was using an incorrect calculation
+				// to figure out which axis is important.
+				if ( abs(left + right) / 2 > abs(top + bottom) / 2 ) {
 					feedback.important = "horizontal";
 				} else {
 					feedback.important = "vertical";
