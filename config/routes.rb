@@ -527,10 +527,9 @@ ActionController::Routing::Routes.draw do |map|
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
     user.resources :messages, :only => [:index]
   end
-
   map.resource :profile, :only => %w(show update),
-                         :controller => "profile",
-                         :member => { :communication => :get, :update_communication => :post, :settings => :get } do |profile|
+               :controller => "profile",
+               :member => { :communication => :get, :communication_update => :put, :settings => :get } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
     profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'

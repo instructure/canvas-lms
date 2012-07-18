@@ -6,10 +6,10 @@
   <%= t :subject, "Recent Canvas Notifications" %>
 <% end %>
 
-<% m = (delayed_messages || []).find{|m| m.frequency == 'weekly'} || delayed_messages.first %>
-<% if !m || m.frequency == 'daily' %>
+<% m = (delayed_messages || []).find{|m| m.frequency == Notification::FREQ_WEEKLY} || delayed_messages.first %>
+<% if !m || m.frequency == Notification::FREQ_DAILY %>
   <%= t :daily_body, "You're signed up to receive a daily report of some notifications from your Canvas account.  Below is the report for %{date}:", :date => (date_string(force_zone(m.send_at), :no_words) rescue t("#date.days.today_lower", "today")) %>
-<% elsif m.frequency == 'weekly' %>
+<% elsif m.frequency == Notification::FREQ_WEEKLY %>
   <%= t :weekly_body, "You're signed up to receive a weekly report of some notifications from your Canvas account.  Below is the report for the week ending %{date}:", :date => (date_string(force_zone(m.send_at), :no_words) rescue t("#date.days.today_lower", "today")) %>
 <% end %>
 

@@ -266,17 +266,6 @@ describe CommunicationChannel do
     @cc3.position.should eql(1)
   end
   
-  it "should have a proper type formatted for the screen" do
-    communication_channel_model
-    @cc.proper_type.should eql("Email Address")
-    @cc.path_type = 'sms'
-    @cc.proper_type.should eql("Cell Number")
-    @cc.path_type = 'chat'
-    @cc.proper_type.should eql("Chat")
-    @cc.path_type= 'not valid'
-    @cc.proper_type.should eql("Email Address")
-  end
-  
   context "can_notify?" do
     it "should normally be able to be used" do
       communication_channel_model

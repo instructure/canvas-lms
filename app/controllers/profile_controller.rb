@@ -25,6 +25,9 @@ class ProfileController < ApplicationController
 
   include Api::V1::User
   include Api::V1::Avatar
+  include Api::V1::Notification
+  include Api::V1::NotificationPolicy
+  include Api::V1::CommunicationChannel
 
   include TextHelper
 
@@ -131,61 +134,61 @@ class ProfileController < ApplicationController
     end
   end
 
-  def update_communication
-    params[:root_account] = @domain_root_account
-    @policies = NotificationPolicy.setup_for(@current_user, params)
-    render :json => @policies.to_json
-  end
-  
   def communication
     @user = @current_user
     @user = User.find(params[:id]) if params[:id]
-
-    add_crumb(@user.short_name, user_profile_path(@current_user) )
-    add_crumb(t(:crumb_notification_preferences, "Notification Preferences"), communication_profile_path )
-
-    if @user.communication_channel.blank?
-      flash[:error] = t('errors.no_channels', "Please define at least one email address or other way to be contacted before setting notification preferences.")
-      redirect_to user_profile_url(@current_user)
-      return
-    end
-
-    # Add communication channel for users that already had Twitter
-    # integrated before we started offering it as a cc
-    twitter_service = @user.user_services.find_by_service('twitter')
-    twitter_service.assert_communication_channel if twitter_service
-    @default_pseudonym = @user.primary_pseudonym
-    @pseudonyms = @user.pseudonyms.active
-    @channels = @user.communication_channels.unretired
-    @current_user.used_feature(:cc_prefs)
-    @notification_categories = Notification.dashboard_categories(@user)
-    @policies = NotificationPolicy.for(@user).scoped(:include => [:communication_channel, :notification]).to_a
     @context = @user.profile
-    @active_tab = "communication-preferences"
+    @active_tab = 'notifications'
 
-    # build placeholder notification policies for categories the user does not have policies for already
-    # Note that currently a NotificationPolicy might not have a Notification attached to it.
-    # See the relevant spec in profile_controller_spec.rb for more details.
-    user_categories = @policies.map {|np| np.notification.try(:category) }
-    @notification_categories.each do |category|
-      # category is actually a Notification
-      next if user_categories.include?(category.category)
-      policy = @user.communication_channel.notification_policies.build
-      policy.notification = category
-      policy.frequency = category.default_frequency
-      policy.save!
-      @policies << policy
-    end
-
-    has_facebook_installed = !@current_user.user_services.for_service('facebook').empty?
-    has_twitter_installed = !@current_user.user_services.for_service('twitter').empty?
-    @email_channels = @channels.select{|c| c.path_type == "email"}
-    @sms_channels = @channels.select{|c| c.path_type == 'sms'}
-    @other_channels = @channels.select{|c| c.path_type != "email"}
-    @other_channels.reject! { |c| c.path_type == 'facebook' } unless has_facebook_installed
-    @other_channels.reject! { |c| c.path_type == 'twitter' } unless has_twitter_installed
+    js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
+      :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
+      :policies => NotificationPolicy.for(@user).map{ |p| notification_policy_json(p, @user, session) },
+      :categories => Notification.dashboard_categories(@user).map{ |c| notification_category_json(c, @user, session) },
+      :update_url => communication_update_profile_path
+    }
   end
-  
+
+  def communication_update
+    params[:root_account] = @domain_root_account
+    @user = @current_user
+    @user = User.find(params[:id]) if params[:id]
+    # if text/setting is not in the authorized list, set to "never". Block invalid values. If Never, delete the entry?
+    # frequency, channel_id, category_id - use to load, create or delete the specified entry
+
+    # Check for user preference settings first. Some communication related options are available on the page.
+    # Handle those if given.
+    user_prefs = params['user']
+    if user_prefs
+      # save the preference as a symbol (convert from string))
+      user_prefs.each_pair do |key, value|
+        @user.preferences[key.to_sym] = (value == 'true')
+      end
+      @user.save!
+      render :json => {:user_id => @user.id}, :status => :ok
+    else
+      # Look for frequency settings and record those.
+      frequency = case params[:frequency]
+        when Notification::FREQ_IMMEDIATELY, Notification::FREQ_DAILY, Notification::FREQ_WEEKLY, Notification::FREQ_NEVER
+          params[:frequency]
+        else
+          Notification::FREQ_NEVER
+      end
+      p = NotificationPolicy.scoped(:include => :communication_channel,
+                                    :conditions => ['communication_channels.user_id = ?', @current_user.id] ).
+        find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], params[:category_id])
+      # if "never", delete the entry; otherwise set the value
+      if frequency == Notification::FREQ_NEVER
+        # Destroy is safe on a new unsaved item too
+        p.destroy
+      else
+        # Set the frequency and save
+        p.frequency = frequency
+        p.save!
+      end
+      render :json => {:id => p.id}, :status => :ok
+    end
+  end
+
   # @API List avatar options
   # Retrieve the possible user avatar options that can be set with the user update endpoint. The response will be an array of avatar records. If the 'type' field is 'attachment', the record will include all the normal attachment json fields; otherwise it will include only the 'url' and 'display_name' fields. Additionally, all records will include a 'type' field and a 'token' field. The following explains each field in more detail
   # type:: ["gravatar"|"twitter"|"linked_in"|"attachment"|"no_pic"] The type of avatar record, for categorization purposes.
