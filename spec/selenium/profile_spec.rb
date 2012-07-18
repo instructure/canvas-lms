@@ -81,79 +81,28 @@ describe "profile" do
       f('#right-side .add_email_link').click
     end
 
-    ['with link', 'with drop down', 'on profile page'].each do |add_with|
-      it "should add a new email address #{add_with}" do
-        notification_model(:category => 'Grading')
-        notification_policy_model(:notification_id => @notification.id)
-        if add_with == 'on profile page'
-          get '/profile/settings'
-          add_email_link
-        else
-          get "/profile/communication"
-
-          add_email_link if add_with == 'with link'
-          click_option('.notification_preferences .email_select', 'new', :value) if add_with == 'with drop down'
-        end
-        f('#communication_channels a[href="#register_sms_number"]').click
-        replace_content(f('#register_sms_number #communication_channel_address'), 'test@example.com')
-        f('#register_sms_number button[type="submit"]').should be_displayed
-        f('#communication_channels a[href="#register_email_address"]').click
-        form = f("#register_email_address")
-        test_email = 'nobody+1234@example.com'
-        form.find_element(:id, 'communication_channel_address').send_keys(test_email)
-        submit_form(form)
-
-        confirmation_dialog = f("#confirm_email_channel")
-        keep_trying_until { confirmation_dialog.should be_displayed }
-        driver.execute_script("return INST.errorCount;").should == 0
-        submit_dialog(confirmation_dialog, '.cancel_button')
-        confirmation_dialog.should_not be_displayed
-        f('.email_channels').should include_text(test_email)
-      end
-    end
-
-    it "should modify user notification policies" do
-      second_email = 'nobody+1234@example.com'
-      communication_channel_model(:user_id => @user.id, :path => second_email, :path_type => 'email')
-
+    it "should add a new email address on profile settings page" do
       notification_model(:category => 'Grading')
+      notification_policy_model(:notification_id => @notification.id)
 
-      get "/profile/settings"
-      #Test modifying notifications
-      driver.find_element(:css, '#section-tabs .notifications').click
-      content_tbody = driver.find_element(:css, '#content > table > tbody')
-      content_tbody.find_elements(:css, 'tr.preference').length.should == 1
+      get '/profile/settings'
+      add_email_link
 
-      content_tbody.find_element(:css, 'tr:nth-child(2) > td').
-          should include_text(I18n.t(:grading_description, 'For course grading alerts'))
-      #add new notification and select different email
-      content_tbody.find_element(:css, '.add_notification_link').click
-      wait_for_animations
-      email_select_css = '#content > table > tbody > tr:nth-child(3) > td > span > select'
-      click_option(email_select_css, second_email)
-      #change notification setting for first notification
-      daily_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(3) > div')
-      daily_select.click
-      daily_select.find_element(:xpath, '..').should have_class('selected_pending')
-      #change notification setting for second notification
-      weekly_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(4) > div')
-      weekly_select.click
-      weekly_select.find_element(:xpath, '..').should have_class('selected_pending')
-      driver.find_element(:css, '#content .save_preferences_button').click
-      wait_for_ajax_requests
-      refresh_page
+      f('#communication_channels a[href="#register_sms_number"]').click
+      replace_content(f('#register_sms_number #communication_channel_address'), 'test@example.com')
+      f('#register_sms_number button[type="submit"]').should be_displayed
+      f('#communication_channels a[href="#register_email_address"]').click
+      form = f("#register_email_address")
+      test_email = 'nobody+1234@example.com'
+      form.find_element(:id, 'communication_channel_address').send_keys(test_email)
+      submit_form(form)
 
-      select_rows = [driver.find_element(:css, '#content > table > tbody > tr:nth-child(3)'),
-                     driver.find_element(:css, '#content > table > tbody > tr:nth-child(4)')]
-      select_rows.each do |row|
-        if row.find_element(:css, 'td:nth-child(3)').attribute('class').match(/selected/)
-          # the daily
-          row.find_element(:css, 'td > span > select > option:checked').text.should == @user.email
-        else
-          # the weekly
-          row.find_element(:css, 'td > span > select > option:checked').text.should == second_email
-        end
-      end
+      confirmation_dialog = f("#confirm_email_channel")
+      keep_trying_until { confirmation_dialog.should be_displayed }
+      driver.execute_script("return INST.errorCount;").should == 0
+      submit_dialog(confirmation_dialog, '.cancel_button')
+      confirmation_dialog.should_not be_displayed
+      f('.email_channels').should include_text(test_email)
     end
 
     it "should display file uploader link on files page" do
@@ -278,38 +227,6 @@ describe "profile" do
       driver.switch_to.alert.accept
       wait_for_ajaximations
       driver.find_element(:id, 'access_tokens').should_not be_displayed
-    end
-  end
-
-  context "notification preferences" do
-    before (:each) do
-      course_with_teacher_logged_in
-
-      @immediate = notification_model(:name => "Immediate", :category => "TestImmediately")
-      @daily = notification_model(:name => "Daily", :category => "TestDaily")
-      @weekly = notification_model(:name => "Weekly", :category => "TestWeekly")
-      @never = notification_model(:name => "Never", :category => "TestNever")
-    end
-
-    it "should show the correct defaults when there are no policies set" do
-      get "/profile/communication"
-
-      driver.find_element(:css, ".preference_#{@immediate.id}").find_elements(:css, ".frequency.immediately.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{@daily.id}").find_elements(:css, ".frequency.daily.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{@weekly.id}").find_elements(:css, ".frequency.weekly.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{@never.id}").find_elements(:css, ".frequency.never.selected").length.should == 1
-    end
-
-    it "should show the correct defaults for the rest of the policies when at least one is set" do
-      @user.email_channel.notification_policies.create!(:notification => @immediate, :frequency => "immediately")
-      @user.email_channel.notification_policies.create!(:notification => @daily, :frequency => "immediately")
-
-      get "/profile/communication"
-
-      driver.find_element(:css, ".preference_#{@immediate.id}").find_elements(:css, ".frequency.immediately.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{@daily.id}").find_elements(:css, ".frequency.immediately.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{@weekly.id}").find_elements(:css, ".frequency.weekly.selected").length.should == 1
-      driver.find_element(:css, ".preference_#{@never.id}").find_elements(:css, ".frequency.never.selected").length.should == 1
     end
   end
 end

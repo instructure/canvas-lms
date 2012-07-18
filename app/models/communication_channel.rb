@@ -43,6 +43,13 @@ class CommunicationChannel < ActiveRecord::Base
   attr_reader :request_password
   attr_reader :send_confirmation
 
+  # Constants for the different supported communication channels
+  TYPE_EMAIL    = 'email'
+  TYPE_SMS      = 'sms'
+  TYPE_CHAT     = 'chat'
+  TYPE_TWITTER  = 'twitter'
+  TYPE_FACEBOOK = 'facebook'
+
   def pseudonym
     self.user.pseudonyms.find_by_unique_id(self.path)
   end
@@ -60,7 +67,7 @@ class CommunicationChannel < ActiveRecord::Base
       @send_confirmation and
       (record.workflow_state == 'active' || 
         (record.workflow_state == 'unconfirmed' and (self.user.pre_registered? || self.user.creation_pending?))) and
-      self.path_type == 'email'
+      self.path_type == TYPE_EMAIL
     }
 
     p.dispatch :confirm_email_communication_channel
@@ -68,7 +75,7 @@ class CommunicationChannel < ActiveRecord::Base
     p.whenever { |record| 
       @send_confirmation and
       record.workflow_state == 'unconfirmed' and self.user.registered? and
-      self.path_type == 'email'
+      self.path_type == TYPE_EMAIL
     }
     p.context { @root_account }
     
@@ -76,7 +83,7 @@ class CommunicationChannel < ActiveRecord::Base
     p.to { self }
     p.whenever {|record|
       @send_merge_notification and
-      self.path_type == 'email'
+      self.path_type == TYPE_EMAIL
     }
     
     p.dispatch :confirm_sms_communication_channel
@@ -84,7 +91,7 @@ class CommunicationChannel < ActiveRecord::Base
     p.whenever { |record|
       @send_confirmation and
       record.workflow_state == 'unconfirmed' and
-      self.path_type == 'sms' and
+      self.path_type == TYPE_SMS and
       !self.user.creation_pending?
     }
     p.context { @root_account }
@@ -108,15 +115,17 @@ class CommunicationChannel < ActiveRecord::Base
       self.errors.add(:path, :taken, :value => path)
     end
   end
-  
+
+  # Return the 'path' for simple communication channel types like email and sms. For
+  # Facebook and Twitter, return the user's configured user_name for the service.
   def path_description
-    if self.path_type == 'facebook'
-      res = self.user.user_services.for_service('facebook').first.service_user_name rescue nil
-      res ||= t :default_facebook_account, "Facebook Account"
+    if self.path_type == TYPE_FACEBOOK
+      res = self.user.user_services.for_service(TYPE_FACEBOOK).first.service_user_name rescue nil
+      res ||= t :default_facebook_account, 'Facebook Account'
       res
-    elsif self.path_type == 'twitter'
-      res = self.user.user_services.for_service('twitter').first.service_user_name rescue nil
-      res ||= t :default_twitter_handle, "Twitter Handle"
+    elsif self.path_type == TYPE_TWITTER
+      res = self.user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
+      res ||= t :default_twitter_handle, 'Twitter Handle'
       res
     else
       self.path
@@ -150,7 +159,7 @@ class CommunicationChannel < ActiveRecord::Base
   # confirmation code in place. 
   def set_confirmation_code(reset=false)
     self.confirmation_code = nil if reset
-    if self.path_type == 'email' or self.path_type.nil?
+    if self.path_type == TYPE_EMAIL or self.path_type.nil?
       self.confirmation_code ||= AutoHandle.generate(nil, 25)
     else
       self.confirmation_code ||= AutoHandle.generate
@@ -176,14 +185,30 @@ class CommunicationChannel < ActiveRecord::Base
     end
   }
 
-  named_scope :email, :conditions => { :path_type => 'email' }
+  named_scope :email, :conditions => { :path_type => TYPE_EMAIL }
   named_scope :active, :conditions => { :workflow_state => 'active' }
   named_scope :unretired, :conditions => ['communication_channels.workflow_state<>?', 'retired']
 
   named_scope :for_notification_frequency, lambda {|notification, frequency|
     { :include => [:notification_policies], :conditions => ['notification_policies.notification_id = ? and notification_policies.frequency = ?', notification.id, frequency] }
   }
-  
+
+  # Get the list of communication channels that overrides an association's default order clause.
+  # This returns an unretired and properly ordered already fetch array of CommunicationChannel objects ready for usage.
+  def self.all_ordered_for_display(user)
+    # Add communication channel for users that already had Twitter
+    # integrated before we started offering it as a cc
+    twitter_service = user.user_services.for_service(CommunicationChannel::TYPE_TWITTER).first
+    twitter_service.assert_communication_channel if twitter_service
+
+    rank_order = [TYPE_EMAIL, TYPE_SMS]
+    # Add facebook and twitter (in that order) if the user's account is setup for them.
+    rank_order << TYPE_FACEBOOK unless user.user_services.for_service(CommunicationChannel::TYPE_FACEBOOK).empty?
+    rank_order << TYPE_TWITTER if twitter_service
+    self.unretired.scoped(:conditions => ['communication_channels.path_type IN (?)', rank_order]).
+      find(:all, :order => "#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")
+  end
+
   named_scope :include_policies, :include => :notification_policies
 
   named_scope :in_state, lambda { |state| { :conditions => ["communication_channels.workflow_state = ?", state.to_s]}}
@@ -233,20 +258,6 @@ class CommunicationChannel < ActiveRecord::Base
       "SELECT distinct communication_channel_id
          FROM delayed_messages
         WHERE workflow_state = 'pending' AND send_at <= '#{Time.now.to_s(:db)}'")
-  end
-  
-  
-  # A formatted path_type
-  def proper_type
-    assert_path_type
-    case path_type
-    when "email"
-      "Email Address"
-    when "sms"
-      "Cell Number"
-    else
-      path_type.capitalize
-    end
   end
   
   def move_to_user(user, migrate=true)
@@ -310,7 +321,7 @@ class CommunicationChannel < ActiveRecord::Base
   # This is setup as a default in the database, but this overcomes misspellings.
   def assert_path_type
     pt = self.path_type
-    self.path_type = 'email' unless pt == 'email' or pt == 'sms' or pt == 'chat' or pt == 'facebook' or pt == 'twitter'
+    self.path_type = TYPE_EMAIL unless pt == TYPE_EMAIL or pt == TYPE_SMS or pt == TYPE_CHAT or pt == TYPE_FACEBOOK or pt == TYPE_TWITTER
   end
   protected :assert_path_type
     

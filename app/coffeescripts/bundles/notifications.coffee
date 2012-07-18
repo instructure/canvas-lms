@@ -1,1 +1,1 @@
-require ['notification_preferences', 'communication_channels']
+require ['communication_channels']

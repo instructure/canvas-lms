@@ -62,7 +62,7 @@ class User < ActiveRecord::Base
     :creation_pending => "enrollments.workflow_state = 'creation_pending'",
     :inactive => "enrollments.workflow_state = 'inactive'" }
 
-  has_many :communication_channels, :order => 'position', :dependent => :destroy
+  has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
   has_one :communication_channel, :order => 'position'
   has_many :enrollments, :dependent => :destroy
 

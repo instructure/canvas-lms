@@ -66,6 +66,21 @@ describe NotificationPolicy do
     m.should be_nil
   end
 
+  it "should prevent message dispatches if no policy setting exists" do
+    policy_setup
+    @assignment.unpublish!
+    @cc = @student.communication_channels.create(:path => "secondary@example.com")
+    @cc.confirm!
+    NotificationPolicy.delete_all(:notification_id => @notif.id, :communication_channel_id => @cc.id)
+    @assignment.previously_published = false
+    @assignment.save
+    @assignment.publish!
+    m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "default@example.com"}
+    m.should be_nil
+    m = @assignment.messages_sent["Assignment Graded"].find{|m| m.to == "secondary@example.com"}
+    m.should be_nil
+  end
+
   it "should pass 'data' to the message" do
     Notification.create! :name => "Hello",
                          :subject => "Hello",
