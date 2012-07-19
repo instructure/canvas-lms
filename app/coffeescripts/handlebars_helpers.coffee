@@ -51,9 +51,11 @@ define [
       $dummy = $('<div />').html(html)
       # finds any <video/audio class="instructure_inline_media_comment"> and turns them into media comment thumbnails
       $dummy.find('video.instructure_inline_media_comment,audio.instructure_inline_media_comment').replaceWith ->
-        $("<a id='media_comment_#{$(this).data('media_comment_id')}'
+        $node = $("<a id='media_comment_#{$(this).data('media_comment_id')}'
               data-media_comment_type='#{$(this).data('media_comment_type')}'
               class='instructure_inline_media_comment' />")
+        $node.html $(this).html()
+        $node
 
       # remove any embed tags inside an object tag, to avoid repeated translations
       $dummy.find('object.instructure_user_content embed').remove()

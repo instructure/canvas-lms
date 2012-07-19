@@ -10,11 +10,11 @@ define [
   'compiled/calendar/MessageParticipantsDialog'
   'compiled/fn/preventDefault'
   'underscore'
+  'vendor/jquery.ba-tinypubsub'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-  'vendor/jquery.ba-tinypubsub'
-], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _) ->
+], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, {publish}) ->
 
   destroyArguments = (fn) => -> fn.apply(this, [])
 
@@ -168,3 +168,5 @@ define [
 
       @popover.el.find('.message_students').click preventDefault =>
         new MessageParticipantsDialog(timeslot: @event.calendarEvent).show()
+
+      publish('userContent/change')

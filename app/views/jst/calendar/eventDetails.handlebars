@@ -31,7 +31,7 @@
       {{#if description}}
         <tr>
           <th scope="row">{{#t "details"}}Details{{/t}}</th>
-          <td>{{{description}}}</td>
+          <td class="user_content">{{convertApiUserContent description}}</td>
         </tr>
       {{/if}}
       {{#if reservations}}
