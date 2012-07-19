@@ -371,6 +371,23 @@ describe "calendar2" do
         end
       end
     end
+
+    context "week view" do
+      it "should render assignments due just before midnight" do
+        assignment_model :course => @course,
+                         :title => "super important",
+                         :due_at => Time.zone.now.beginning_of_week + 1.day - 1.minute
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=week]').click
+        wait_for_ajaximations
+
+        events = ff('.fc-event').select{ |e| e.text == "super important" }
+        # shows on monday night and tuesday morning, and doesn't have the time
+        events.size.should eql 2
+      end
+    end
   end
 
   context "as a student" do
