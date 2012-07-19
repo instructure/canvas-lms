@@ -203,9 +203,10 @@ describe "files local tests" do
     it_should_behave_like "in-process server selenium tests"
 
     before (:each) do
-      course_with_teacher_logged_in
+      user_with_pseudonym(:active_user => true)
+      course_with_teacher(:user => @user, :active_course => true, :active_enrollment => true)
       group_category = @course.group_categories.create(:name => "groupage")
-      @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
+      @group = group_category.groups.create!(:name => "group1", :context => @course)
     end
 
     def load_collab_folder
@@ -217,13 +218,17 @@ describe "files local tests" do
       message_node.text
     end
 
-    it "should not show 'add collaboration' paragraph to teacher not participating in group" do
+    it "should show 'add collaboration' paragraph to teacher of a course group" do
+      create_session(@pseudonym, false)
       message = load_collab_folder
-      message.should_not include_text("New collaboration")
+      message.should include_text("New collaboration")
     end
 
     it "should show 'add collaboration' paragraph to participating user" do
-      @group.participating_users << @user
+      user_with_pseudonym(:active_user => true)
+      student_in_course(:user => @user, :active_enrollment => true)
+      create_session(@pseudonym, false)
+      @group.add_user(@user, 'accepted')
       message = load_collab_folder
       message.should include_text("New collaboration")
     end

@@ -64,6 +64,16 @@ describe CollaborationsController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "should work with groups" do
+      course_with_student_logged_in(:active_all => true)
+      gc = @course.group_categories.create!
+      group = gc.groups.create!(:context => @course)
+      group.add_user(@student, 'accepted')
+
+      get 'index', :group_id => group.id
+      response.should be_success
+    end
   end
   
   describe "POST 'create'" do
