@@ -57,6 +57,9 @@ class Announcement < DiscussionTopic
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
     can :reply
     
+    given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :post_to_forum) }
+    can :create
+
     given { |user, session| self.context.grants_right?(user, session, :moderate_forum) } #admins.include?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
   end

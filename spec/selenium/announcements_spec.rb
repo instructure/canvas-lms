@@ -62,7 +62,6 @@ describe "announcements" do
   end
 
   context "announcements as a student" do
-
     before (:each) do
       course_with_student_logged_in
     end
@@ -89,6 +88,20 @@ describe "announcements" do
       refresh_page # in order to see the announcement
       f('#no_topics_message').should_not be_displayed
       f("#topic_#{Announcement.find_by_title(announcement_title).id}").should include_text(announcement_title)
+    end
+
+    it "should allow a group member to create an announcment" do
+      gc = @course.group_categories.create!
+      group = gc.groups.create!(:context => @course)
+      group.add_user(@student, 'accepted')
+
+      get "/groups/#{group.id}/announcements"
+      wait_for_ajaximations
+      expect {
+        announce_form = create_announcement_manual(nil)
+        submit_form(announce_form)
+        wait_for_ajaximations
+      }.to change(Announcement, :count).by 1
     end
   end
 
