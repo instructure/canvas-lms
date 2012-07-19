@@ -99,6 +99,24 @@ describe ImportedHtmlConverter do
       test_string = %{<a href="relative/path/to/file%20with%20space.html">Linkage</a>}
       ImportedHtmlConverter.convert(test_string, @course).should == %{<a href="#{@path}file_contents/course%20files/relative/path/to/file%20with%20space.html">Linkage</a>}
     end
+    
+    it "should preserve media comment links" do
+      test_string = <<-HTML.strip
+      <p>
+        with media object url: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        with file content url: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@course.id}/file_contents/course%20files/media_objects/0_bq09qam2">this is a media comment</a>
+      </p>
+      HTML
+
+      ImportedHtmlConverter.convert(test_string, @course).should == test_string.gsub("/courses/#{course.id}/file_contents/course%20files",'')
+    end
+    
+    it "should handle and repair half broken media links" do
+      test_string = %{<p><a href="/courses/#{@course.id}/file_contents/%24IMS_CC_FILEBASE%24/#" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
+      
+      ImportedHtmlConverter.convert(test_string, @course).should == %{<p><a href="/media_objects/0_l4l5n0wt" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
+    end
+    
   end
   
   context ".relative_url?" do

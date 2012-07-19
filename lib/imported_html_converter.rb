@@ -171,10 +171,14 @@ class ImportedHtmlConverter
         return
       end
     end
-    node['href'] = replace_relative_file_url(rel_path, context, course_path)
-    node.delete('class')
-    node.delete('id')
-    node.delete('style')
+    if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
+      node['href'] = "/media_objects/#{$1}"
+    else
+      node['href'] = replace_relative_file_url(rel_path, context, course_path)
+      node.delete('class')
+      node.delete('id')
+      node.delete('style')
+    end
   end
   
   def self.relative_url?(url)
