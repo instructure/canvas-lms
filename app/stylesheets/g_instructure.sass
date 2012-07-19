@@ -396,38 +396,43 @@ table.formtable td
   vertical-align: top
   padding: 2px 3px
 
-
-.courses,
-.groups,
-.accounts
+.courses, .groups, .accounts
   .name
     font-size: 1.1em
     font-weight: bold
-  .unpublished .name a
-    :color #888
-  .details
-    margin-left: 10px
-    font-size: 0.8em
-    color: #888
-  .info
-    :font-size 0.8em
-    :clear left
-    :visibility hidden
-    :margin-bottom 5px
-    :margin-left 10px
-    &.info_hover
-      :visibility visible
-      .links
-        :color #ccc
-        a
-          :color #666
-    .links
-      :color #eee
-      a
-        :color #bbb
 
-    a
-      :color #888
+  .unpublished .name a
+    color: #888
+
+  .details
+    color: #888
+    font-size: 0.8em
+    margin: 0 0 0 10px
+
+  .info
+    clear: left
+    font-size: 0.8em
+    margin: 0 0 5px 10px
+    visibility: hidden
+
+    .links
+      color: #eee
+      a
+        color: #bbb
+
+.touch .course,
+.touch .group,
+.touch .account,
+.course:hover,
+.group:hover,
+.account:hover
+  .course, .group, .account
+    .info
+      visibility: visible
+      .links
+        color: #ccc
+        a
+          color: #666
 
 span.hint
   :color #666
