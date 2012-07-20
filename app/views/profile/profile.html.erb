@@ -46,10 +46,10 @@
     </td>
   </tr>
   <tr>
-    <td><%= f.blabel :birthdate, :en => "Birthday" %></td>
+    <td><%= f.blabel :birthdate, :en => "Birth Date" %></td>
     <td>
-      <span class="display_data"><%= @user.birthdate ? @user.birthdate.strftime('%m/%d/%Y') : "" %></span>
-      <%= f.date_select :birthdate, {:order => [:day, :month, :year]}, :class => 'edit_data' %>
+      <span class="birthdate display_data"><%= @user.birthdate ? date_string(@user.birthdate) : "-" %></span>
+      <%= f.date_select :birthdate, {:start_year => Time.now.year - 1, :end_year => Time.now.year - 125, :include_blank => true}, :class => 'edit_data' %>
     </td>
   </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>

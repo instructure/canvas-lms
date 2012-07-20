@@ -3477,9 +3477,9 @@ es:
       - Noviembre
       - Diciembre
     order: 
-      - !ruby/symbol año
-      - !ruby/symbol mes
-      - !ruby/symbol día
+      - !ruby/symbol year
+      - !ruby/symbol month
+      - !ruby/symbol day
   datetime: 
     distance_in_words: 
       about_x_hours: 
