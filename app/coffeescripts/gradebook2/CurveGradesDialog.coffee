@@ -68,7 +68,7 @@ define [
       for idx, student of @gradebook.students
         score = student["assignment_#{@assignment.id}"].score
         score = @assignment.points_possible if score > @assignment.points_possible
-        score = 0 if score < 0 or score is null and should_assign_blanks
+        score = 0 if score < 0 or !score? and should_assign_blanks
         users_for_score[parseInt(score, 10)] = users_for_score[parseInt(score, 10)] or []
         users_for_score[parseInt(score, 10)].push [ idx, (score or 0) ]
         scoreCount++
