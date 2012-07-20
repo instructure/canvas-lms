@@ -116,6 +116,7 @@ define([
           full_name: user.name,
           sortable_name: user.sortable_name,
           time_zone: user.time_zone,
+          birthdate: (user.birthdate ? $.parseFromISO(user.birthdate).date_formatted : '-'),
           locale: $("#user_locale option[value='" + user.locale + "']").text()
         };
         if (templateData.locale != $update_profile_form.find('.locale').text()) {
