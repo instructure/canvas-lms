@@ -2,8 +2,8 @@ class AddConversationMessageProperties < ActiveRecord::Migration
   tag :predeploy
 
   def self.up
-    add_column :conversation_messages, :has_attachments, :boolean, :default => false
-    add_column :conversation_messages, :has_media_objects, :boolean, :default => false
+    add_column :conversation_messages, :has_attachments, :boolean
+    add_column :conversation_messages, :has_media_objects, :boolean
   end
 
   def self.down
