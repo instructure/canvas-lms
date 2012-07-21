@@ -2028,7 +2028,7 @@ class User < ActiveRecord::Base
   end
 
   def enrollment_visibility
-    Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.day) do
+    Rails.cache.fetch([self, 'enrollment_visibility_with_sections_2'].cache_key, :expires_in => 1.day) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
@@ -2149,9 +2149,9 @@ class User < ActiveRecord::Base
 
     limited_id = {}
     enrollment_type_sql = " AND enrollments.type != 'StudentViewEnrollment'"
-    if student_in_course_ids.any?
+    if student_in_course_ids.present?
       enrollment_type_sql += " AND (enrollments.type != 'ObserverEnrollment' OR course_id NOT IN (#{student_in_course_ids.join(',')})"
-      enrollment_type_sql += "  OR user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.any? 
+      enrollment_type_sql += "  OR user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.present?
       enrollment_type_sql += ")"
     end
     
