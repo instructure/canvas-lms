@@ -36,7 +36,7 @@ class WikiPagesController < ApplicationController
           view_count = (page.view_count || 0) + 1
           WikiPage.connection.execute("UPDATE wiki_pages SET view_count=#{view_count} WHERE id=#{page.id}")
         end
-        log_asset_access(@page, "wiki", @namespace)
+        log_asset_access(@page, "wiki", @wiki)
       end
       respond_to do |format|
         format.html {render :action => "show" }
@@ -59,7 +59,7 @@ class WikiPagesController < ApplicationController
       end
       @page.workflow_state = 'active' if @page.deleted?
       if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
-        log_asset_access(@page, "wiki", @namespace, 'participate')
+        log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
         flash[:notice] = t('notices.page_updated', 'Page was successfully updated.')
         respond_to do |format|
@@ -107,8 +107,6 @@ class WikiPagesController < ApplicationController
 
   def context_wiki_page_url(opts={})
     page_name = @page.url
-    namespace = WikiNamespace.find_by_wiki_id_and_context_id_and_context_type(@page.wiki_id, @context.id, @context.class.to_s)
-    page_name = namespace.namespace_name + page_name if namespace && !namespace.default?
     res = named_context_url(@context, :context_wiki_page_url, page_name)
     if opts && opts[:edit]
       res += "#edit"

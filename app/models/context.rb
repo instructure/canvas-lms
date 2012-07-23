@@ -55,7 +55,6 @@ module Context
     Submission = ::Submission
     WebConference = ::WebConference
     Wiki = ::Wiki
-    WikiNamespace = ::WikiNamespace
     WikiPage = ::WikiPage
     
     def self.get_for_string(str)

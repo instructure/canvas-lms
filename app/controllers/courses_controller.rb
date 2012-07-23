@@ -1105,7 +1105,7 @@ class CoursesController < ApplicationController
     @entries.concat @context.assignments.active
     @entries.concat @context.calendar_events.active
     @entries.concat @context.discussion_topics.active.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
-    @entries.concat WikiNamespace.default_for_context(@context).wiki.wiki_pages.select{|p| !p.new_record?}
+    @entries.concat @context.wiki.wiki_pages
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)

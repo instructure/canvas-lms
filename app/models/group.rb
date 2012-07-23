@@ -53,7 +53,6 @@ class Group < ActiveRecord::Base
   belongs_to :wiki
   has_many :default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages
   has_many :active_default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages, :conditions => ['wiki_pages.workflow_state = ?', 'active']
-  has_many :wiki_namespaces, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
@@ -80,15 +79,10 @@ class Group < ActiveRecord::Base
       participating_users_association
   end
 
-  def wiki
-    res = self.wiki_id && Wiki.find_by_id(self.wiki_id)
-    unless res
-      res = WikiNamespace.default_for_context(self).wiki
-      self.wiki_id = res.id if res
-      self.save
-    end
-    res
+  def wiki_with_create
+    Wiki.wiki_for_context(self)
   end
+  alias_method_chain :wiki, :create
 
   def auto_accept?(user)
     self.group_category && 

@@ -145,7 +145,6 @@ class ContentTag < ActiveRecord::Base
   def update_asset_name!
     return if !self.sync_title_to_asset_title?
     correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
-    correct_context ||= self.context && self.content.is_a?(WikiPage) && self.content.wiki && self.content.wiki.wiki_namespaces.length == 1 && self.content.wiki.wiki_namespaces.map(&:context_code).include?(self.context_code)
     if correct_context
       if self.content.respond_to?("name=") && self.content.respond_to?("name") && self.content.name != self.title
         self.content.update_attribute(:name, self.title)

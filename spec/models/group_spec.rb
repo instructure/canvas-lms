@@ -31,8 +31,8 @@ describe Group do
     end
   end
   
-  it "should have a wiki as the default WikiNamespace wiki" do
-    @group.wiki.should eql(WikiNamespace.default_for_context(@group).wiki)
+  it "should have a wiki" do
+    @group.wiki.should_not be_nil
   end
   
   it "should be private by default" do
@@ -179,7 +179,7 @@ describe Group do
     course.grants_right?(teacher, nil, :manage_groups).should be_true
     group.grants_right?(teacher, nil, :manage_wiki).should be_true
     group.grants_right?(teacher, nil, :manage_files).should be_true
-    WikiNamespace.default_for_context(group).grants_right?(teacher, nil, :update_page).should be_true
+    group.wiki.grants_right?(teacher, nil, :update_page).should be_true
     attachment = group.attachments.build
     attachment.grants_right?(teacher, nil, :create).should be_true
   end

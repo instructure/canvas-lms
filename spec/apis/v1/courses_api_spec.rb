@@ -816,12 +816,12 @@ describe ContentImportsController, :type => :integration do
     @copy_from.context_modules.create!(:name => "a module")
     @copy_from.quizzes.create!(:title => 'quiz')
     LearningOutcomeGroup.default_for(@copy_from).add_item(@copy_from.learning_outcomes.create!(:short_description => 'oi', :context => @copy_from))
-    @copy_from.save
+    @copy_from.save!
     
     course_with_teacher(:active_all => true, :name => 'whatever', :user => @user)
     @copy_to = @course
     @copy_to.sis_source_id = 'to_course'
-    @copy_to.save
+    @copy_to.save!
   end
   
   def run_copy(to_id=nil, from_id=nil, options={})

@@ -137,7 +137,6 @@ class Course < ActiveRecord::Base
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   belongs_to :wiki
   has_many :default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages, :conditions => ['wiki_pages.workflow_state != ?', 'deleted'], :order => 'wiki_pages.view_count DESC'
-  has_many :wiki_namespaces, :as => :context, :dependent => :destroy
   has_many :quizzes, :as => :context, :dependent => :destroy, :order => 'lock_at, title'
   has_many :active_quizzes, :class_name => 'Quiz', :as => :context, :include => :assignment, :conditions => ['quizzes.workflow_state != ?', 'deleted'], :order => 'created_at'
   has_many :assessment_questions, :through => :assessment_question_banks
@@ -712,7 +711,7 @@ class Course < ActiveRecord::Base
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
 
   def home_page
-    WikiNamespace.default_for_context(self).wiki.wiki_page
+    self.wiki.wiki_page
   end
 
   def context_code
@@ -734,15 +733,10 @@ class Course < ActiveRecord::Base
   # Allows the account to be set directly
   belongs_to :account
 
-  def wiki
-    res = self.wiki_id && Wiki.find_by_id(self.wiki_id)
-    unless res
-      res = WikiNamespace.default_for_context(self).wiki
-      self.wiki_id = res.id if res
-      self.save
-    end
-    res
+  def wiki_with_create
+    Wiki.wiki_for_context(self)
   end
+  alias_method_chain :wiki, :create
 
   # A universal lookup for all messages.
   def messages
@@ -1072,10 +1066,6 @@ class Course < ActiveRecord::Base
     @teacherless_course ||= Rails.cache.fetch(['teacherless_course', self].cache_key) do
       !self.sis_source_id && self.teacher_enrollments.empty?
     end
-  end
-
-  def wiki_namespace
-    WikiNamespace.default_for_context(self)
   end
 
   def grade_publishing_status_translation(status, message)
@@ -2130,22 +2120,20 @@ class Course < ActiveRecord::Base
         map_merge(quiz, new_quiz)
       end
     end
-    course.wiki_namespaces.each do |wiki_namespace|
-      wiki_namespace.wiki.wiki_pages.each do |page|
-        course_import.tick(70) if course_import
-        if bool_res(options[:everything] ) || bool_res(options[:all_wiki_pages] ) || bool_res(options[page.asset_string.to_sym] )
-          if page.title.blank?
-            next if page.body.blank?
-            page.title = t('#wiki_page.missing_name', "Unnamed Page")
-          end
-          new_page = page.clone_for(self, nil, :migrate => false, :old_context => course)
-          added_items << new_page
-          new_page.wiki_id = self.wiki.id
-          new_page.ensure_unique_title
-          log_merge_result("Wiki Page \"#{page.title}\" renamed to \"#{new_page.title}\"") if new_page.title != page.title
-          new_page.save_without_broadcasting!
-          map_merge(page, new_page)
+    course.wiki.wiki_pages.each do |page|
+      course_import.tick(70) if course_import
+      if bool_res(options[:everything] ) || bool_res(options[:all_wiki_pages] ) || bool_res(options[page.asset_string.to_sym] )
+        if page.title.blank?
+          next if page.body.blank?
+          page.title = t('#wiki_page.missing_name', "Unnamed Page")
         end
+        new_page = page.clone_for(self, nil, :migrate => false, :old_context => course)
+        added_items << new_page
+        new_page.wiki_id = self.wiki.id
+        new_page.ensure_unique_title
+        log_merge_result("Wiki Page \"#{page.title}\" renamed to \"#{new_page.title}\"") if new_page.title != page.title
+        new_page.save_without_broadcasting!
+        map_merge(page, new_page)
       end
     end
     course.context_modules.active.each do |mod|

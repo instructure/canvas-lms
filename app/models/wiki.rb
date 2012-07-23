@@ -28,13 +28,12 @@
   
 class Wiki < ActiveRecord::Base
   attr_accessible :title
-  
-  has_many :wiki_namespaces, :dependent => :destroy
+
   has_many :wiki_pages, :dependent => :destroy
   after_save :update_contexts
-  
+
   def update_contexts
-    self.wiki_namespaces.each{|n| n.touch_context }
+    self.context.try(:touch)
   end
 
   def to_atom
@@ -62,5 +61,46 @@ class Wiki < ActiveRecord::Base
     t :front_page_name, "Front Page"
     self.wiki_pages.find_by_url("front-page") || self.wiki_pages.build(:title => "Front Page", :url => 'front-page')
   end
-  
+
+  def context
+    @context ||= Course.find_by_wiki_id(self.id) || Group.find_by_wiki_id(self.id)
+  end
+
+  def context_type
+    context.class.to_s
+  end
+
+  def context_id
+    context.id
+  end
+
+  set_policy do
+    given {|user| self.context.is_public }
+    can :read
+
+    given {|user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    can :read
+
+    given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
+    can :contribute and can :read and can :update and can :delete and can :create and can :create_page and can :update_page
+
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki) }#admins.include?(user) }
+    can :manage and can :read and can :update and can :create and can :delete and can :create_page and can :update_page
+  end
+
+  def self.wiki_for_context(context)
+    return context.wiki_without_create if context.wiki_id
+    context.transaction do
+      # otherwise we lose dirty changes
+      context.save! if context.changed?
+      context.lock!
+      return context.wiki_without_create if context.wiki_id
+      # TODO i18n
+      t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
+      t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
+      context.wiki = wiki = Wiki.create!(:title => "#{context.name} Wiki")
+      context.save!
+      wiki
+    end
+  end
 end

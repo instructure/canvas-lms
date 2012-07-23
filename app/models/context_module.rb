@@ -230,13 +230,9 @@ class ContextModule < ActiveRecord::Base
   end
 
   def add_item(params, added_item=nil, opts={})
-    association_id = nil
     position = opts[:position] || (self.content_tags.active.map(&:position).compact.max || 0) + 1
     if params[:type] == "wiki_page"
-      item = opts[:wiki_page] || WikiPage.find_by_id(params[:id])
-      item_namespace = item.wiki.wiki_namespaces.find_by_context_id_and_context_type(self.context_id, self.context_type)
-      item = nil unless item && item_namespace
-      association_id = item_namespace.id rescue nil
+      item = opts[:wiki_page] || self.context.wiki.wiki_pages.find_by_id(params[:id])
     elsif params[:type] == "attachment"
       item = opts[:attachment] || self.context.attachments.active.find_by_id(params[:id])
     elsif params[:type] == "assignment"
@@ -313,7 +309,6 @@ class ContextModule < ActiveRecord::Base
         :position => position
       }
       added_item.context_module_id = self.id
-      added_item.context_module_association_id = association_id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'active'
       added_item.save

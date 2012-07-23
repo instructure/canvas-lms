@@ -25,11 +25,7 @@ describe 'updated_wiki_page.sms' do
     @object = @page
     @object.reload
     @object.wiki.should_not be_nil
-    @object.wiki_with_participants.should_not be_nil
-    @object.wiki_with_participants.wiki_namespaces.should_not be_empty
-    @object.wiki_with_participants.wiki_namespaces.first.context.participants.should be_include(@user)
-    @object.wiki.wiki_namespaces.should_not be_empty
-    @object.find_namespace_for_user(@user).should_not be_nil
+    @object.context.participants.should be_include(@user)
     generate_message(:updated_wiki_page, :sms, @object, :user => @user)
   end
 end

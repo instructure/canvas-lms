@@ -28,7 +28,7 @@ class WikiPageRevisionsController < ApplicationController
         format.html {
           add_crumb(@page.title, named_context_url(@context, :context_wiki_page_url, @page))
           add_crumb(t("#crumbs.revisions", "Revisions"))
-          log_asset_access(@page, "wiki", @namespace)
+          log_asset_access(@page, "wiki", @wiki)
         }
         format.json { render :json => @page.version_history.to_json(:methods => :version_number) }
       end
@@ -63,7 +63,7 @@ class WikiPageRevisionsController < ApplicationController
       respond_to do |format|
         format.html {
           add_crumb(@page.title, named_context_url(@context, :context_wiki_page_url, @page))
-          log_asset_access(@page, "wiki", @namespace)
+          log_asset_access(@page, "wiki", @wiki)
         }
         @model = @revision.model rescue nil
         format.json { render :json => @model.to_json(:methods => :version_number) }

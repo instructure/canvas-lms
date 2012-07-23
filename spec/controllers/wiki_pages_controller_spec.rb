@@ -46,7 +46,6 @@ describe WikiPagesController do
       get 'show', :course_id => @course.id, :id => 'front-page'
       response.should be_success
       assigns[:wiki].should_not be_nil
-      assigns[:namespace].should_not be_nil
       assigns[:page].should_not be_nil
     end
     
@@ -55,22 +54,18 @@ describe WikiPagesController do
       get 'show', :course_id => @course.id, :id => 'front-page'
       response.should be_success
       assigns[:wiki].should_not be_nil
-      assigns[:namespace].should_not be_nil
-      assigns[:namespace].context.should eql(@course)
       assigns[:page].should_not be_nil
       assigns[:page].title.should eql("Front Page")
     end
     
     it "should retrieve existing entities" do
       course_with_teacher_logged_in(:active_all => true)
-      page = WikiNamespace.default_for_context(@course).wiki.wiki_page
+      page = @course.wiki.wiki_page
       page.save!
       get 'show', :course_id => @course.id, :id => 'front-page'
       response.should be_success
       assigns[:wiki].should_not be_nil
       assigns[:wiki].should eql(page.wiki)
-      assigns[:namespace].should_not be_nil
-      assigns[:namespace].context.should eql(@course)
       assigns[:page].should_not be_nil
       assigns[:page].title.should eql("Front Page")
       assigns[:page].should eql(page)
@@ -90,7 +85,6 @@ describe WikiPagesController do
       get 'show', :course_id => @course.id, :id => "some-page"
       response.should be_success
       assigns[:wiki].should_not be_nil
-      assigns[:namespace].should_not be_nil
       assigns[:page].should_not be_nil
       assigns[:page].title.should eql("Some Page")
     end
@@ -111,7 +105,6 @@ describe WikiPagesController do
       get 'show', :course_id => @course.id, :id => page.wiki_id
       response.should be_success
       assigns[:wiki].should_not be_nil
-      assigns[:namespace].should_not be_nil
       assigns[:page].should_not be_nil
       assigns[:page].title.should eql("Some Secret Page")
       page.hide_from_students = true
@@ -134,7 +127,6 @@ describe WikiPagesController do
   #     get 'revisions', :course_id => @course.id, :id => "some-page", :format => 'html'
   #     response.should be_success
   #     assigns[:wiki].should_not be_nil
-  #     assigns[:namespace].should_not be_nil
   #     assigns[:page].should_not be_nil
   #     assigns[:page].title.should eql("some_page")
   #   end

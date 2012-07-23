@@ -247,7 +247,7 @@ class GroupsController < ApplicationController
           #  js_env :GROUP_ID => @group.id
           #  return render :action => :dashboard
           #else
-          @home_page = WikiNamespace.default_for_context(@group).wiki.wiki_page
+          @home_page = @group.wiki.wiki_page
           #end
         end
       end
@@ -605,7 +605,7 @@ class GroupsController < ApplicationController
     @entries = []
     @entries.concat @context.calendar_events.active
     @entries.concat @context.discussion_topics.active
-    @entries.concat WikiNamespace.default_for_context(@context).wiki.wiki_pages.select{|p| !p.new_record?}
+    @entries.concat @context.wiki.wiki_pages
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)

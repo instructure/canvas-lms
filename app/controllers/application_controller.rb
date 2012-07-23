@@ -890,9 +890,7 @@ class ApplicationController < ActionController::Base
   end
   
   # Retrieving wiki pages needs to search either using the id or 
-  # the page title.  We've also got it in here to have more than one
-  # wiki per context, although we've never actually used that yet.
-  # And maybe we won't.  See models/wiki_namespace.rb for more though.
+  # the page title.
   def get_wiki_page
     page_name = (params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title]) || "front-page")
     if(params[:format] && !['json', 'html'].include?(params[:format]))
@@ -900,8 +898,7 @@ class ApplicationController < ActionController::Base
       params[:format] = 'html'
     end
     return @page if @page 
-    @namespace = WikiNamespace.default_for_context(@context)
-    @wiki = @namespace.wiki
+    @wiki = @context.wiki
     if params[:action] != 'create'
       @page = @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s) ||
               @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
@@ -911,7 +908,6 @@ class ApplicationController < ActionController::Base
       :title => page_name.titleize,
       :url => page_name.to_url
     )
-    @page.current_namespace = @namespace
     if page_name == "front-page" && @page.new_record?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
@@ -920,8 +916,6 @@ class ApplicationController < ActionController::Base
   
   def context_wiki_page_url
     page_name = @page.url
-    namespace = WikiNamespace.find_by_wiki_id_and_context_id_and_context_type(@page.wiki_id, @context.id, @context.class.to_s)
-    page_name = namespace.namespace + page_name if namespace && !namespace.default?
     named_context_url(@context, :context_wiki_page_url, page_name)
   end
 
