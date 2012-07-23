@@ -51,6 +51,7 @@ class AccountsController < ApplicationController
     respond_to do |format|
       format.html do
         return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, nil, :read_course_list)
+        js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
         load_course_right_side
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
         build_course_stats
@@ -96,6 +97,7 @@ class AccountsController < ApplicationController
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
         global_includes = !!params[:account][:settings].try(:delete, :global_includes)
+        params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin? 
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
             @account.set_service_availability(key, value == '1')

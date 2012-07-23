@@ -1,50 +1,9 @@
 #left-side
   float: left
   width: $left_side_width
-  background-color: $section_tabs_bg_color
+  border-bottom: solid 1px #ddd
   display: none
-  font-size: 12px
-  
-  .left-side-inner
-    padding: 10px
-    margin-left: 5px
-    
-  #section-tabs-header
-    padding: 12px
-    margin: 0
-    font-size: 20px
-    line-height: 1
-  #section-tabs-header-subtitle
-    color: #777
-    font-size: 11px
-    font-style: italic
-    margin: -16px 12px 5px
-    display: block
-    text-decoration: none
-    
-#section-tabs
-  margin: 0
-  padding: 0
-  list-style: none
-  border-top: 1px solid $section_tabs_border_top_color
-  
-  li
-    a
-      color: $section_tabs_color
-      display: block
-      font-size: 14px
-      padding: 5px 0 5px 25px
-      border-bottom: 1px solid $section_tabs_border_bottom_color
-      +text-shadow(1px, 2px, 3px, #CBCBCB)
-              
-      &:hover, &:focus
-        background-color: $section_tabs_hover_background_color
-        // color: #fff
-        z-index: 0
-        position: static
-        text-decoration: none
 
-  li.hidden
-    a
-      color: $section_tabs_hidden_color
+#section-tabs li.hidden a
+  color: #bbb
 

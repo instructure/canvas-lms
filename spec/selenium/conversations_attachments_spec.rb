@@ -83,6 +83,33 @@ shared_examples_for "conversations attachments selenium tests" do
     find_with_jquery("#{message} .message_attachments li:first a .title").text.should == file1[0]
     find_with_jquery("#{message} .message_attachments li:last a .title").text.should == file2[0]
   end
+
+  it "should show forwarded attachments" do
+    student_in_course
+    @course.enroll_user(User.create(:name => 'student1'))
+    @course.enroll_user(User.create(:name => 'student2'))
+
+    filename, fullpath, data = get_file('testfile1.txt')
+    new_conversation
+    add_recipient('student1')
+    submit_message_form(:attachments => [fullpath], :add_recipient => false)
+
+    get_messages(false).first.click
+    wait_for_animations
+    f('#action_forward').click
+
+    add_recipient('student2', 'forward_recipients')
+    f('#forward_body').send_keys('ohai look an attachment')
+    f('#forward_message_form').submit
+
+    wait_for_ajaximations
+
+    ff('img.attachments').size.should eql 2
+    messages = get_messages(false) # new conversation auto-selected
+    messages.size.should == 1
+    messages.first.text.should include "ohai look an attachment"
+    messages.first.text.should include filename
+  end
 end
 
 describe "conversations attachments local tests" do

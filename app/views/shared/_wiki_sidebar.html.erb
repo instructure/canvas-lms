@@ -1,15 +1,31 @@
 <% @context ||= @current_user %>
-<% cache(['wiki_sidebar_render_', @context.cache_key, can_do(@context, @current_user, :manage_content).to_s, can_do(@context, @current_user, :manage_files).to_s].cache_key.to_s) do %>
+<% cache(['wiki_sidebar_render_', @context.cache_key, @current_user].cache_key.to_s) do %>
+<% collections = @current_user && @current_user.collections.all %>
 <% load_wiki_sidebar %>
 <div id="editor_tabs" style="display: none;">
 
-  <h4 style="font-size: 1.3em; font-weight: bold; padding-left: 10px; margin-bottom: 0.3em; color: #666;"><%= t('headings.insert_content', %{Insert Content into the Page}) %></h4>
+  <h4><%= t('headings.insert_content', %{Insert Content into the Page}) %></h4>
   <ul>
-    <li><a href="#editor_tabs_1"><%= t('tabs.links', %{Links}) %></a></li>
-    <li><a href="#editor_tabs_2"><%= t('tabs.files', %{Files}) %></a></li>
-    <li><a href="#editor_tabs_3"><%= t('tabs.images', %{Images}) %></a></li>
+    <% if collections.present? %>
+    <li><a href="#editor_tabs_1"><%= t('tabs.collections', %{Collections}) %></a></li>
+    <% end %>
+    <li><a href="#editor_tabs_2"><%= t('tabs.links', %{Links}) %></a></li>
+    <li><a href="#editor_tabs_3"><%= t('tabs.files', %{Files}) %></a></li>
+    <li><a href="#editor_tabs_4"><%= t('tabs.images', %{Images}) %></a></li>
   </ul>
+  <% if collections.present? %>
   <div id="editor_tabs_1">
+    <div id="wiki_sidebar_collections">
+      <select>
+        <% collections.each do |collection| %>
+          <option value="<%= collection.id %>"><%= collection.name %></option>
+        <% end %>
+      </select>
+      <ul></ul>
+    </div>
+  </div>
+  <% end %>
+  <div id="editor_tabs_2">
     <%= @context.is_a?(Group) ? t('group_links', 'Link to other content in the group.') : t('course_links', 'Link to other content in the course.') %>
     <% if @context.is_a?(Course) || @context.is_a?(Group) %>
       <a href="<%= context_url(@context, :retrieve_context_external_tools_url, :url => "{{ url }}") %>" id="external_tool_retrieve_url" style="display: none;">&nbsp;</a>
@@ -150,7 +166,7 @@
     </div>
 
   </div>
-  <div id="editor_tabs_2">
+  <div id="editor_tabs_3">
     <%= t('files_tab', %{Click any file to insert a download link for that file.}) %>
     <div id="wiki_sidebar_file_uploads" class="uploading_file_list" style="display: none;">
       <div class="uploading">
@@ -214,7 +230,7 @@
       <% end %>
     <% end %>
   </div>
-  <div id="editor_tabs_3">
+  <div id="editor_tabs_4">
     <%= t('images_tab', %{Click any image to embed the image in the page.}) %>
     <% if can_do(@context, @current_user, :manage_files) %>
       <div><a href="#" class="upload_new_image_link add" style="padding-top:2px;"><%= t('links.upload_image', %{Upload a new image}) %></a></div>

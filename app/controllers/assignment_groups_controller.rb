@@ -80,7 +80,7 @@ class AssignmentGroupsController < ApplicationController
             # note that 'rules_hash' gets to_jsoned as just 'rules' because that is what GradeCalculator expects. 
             hash['rules'] = group.rules_hash
             if include_assignments
-              hash['assignments'] = group.assignments.active.map { |a| assignment_json(a, @current_user, session, [], @context.user_is_teacher?(@current_user)) }
+              hash['assignments'] = group.assignments.active.map { |a| assignment_json(a, @current_user, session) }
             end
             hash
           end

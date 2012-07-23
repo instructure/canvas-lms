@@ -1,16 +1,16 @@
 <div>
   <div id="calendar-header">
-    <div style="float: right">
-      <a href="#" id="refresh_calendar_link">{{#t "refresh"}}Refresh{{/t}}</a>
-    </div>
-    
+    <a href="#" id="refresh_calendar_link">{{#t "refresh"}}Refresh{{/t}}</a>
+    <a id="change-calendar-version" href="/switch_calendar/1" data-method="post" rel="nofollow" class="btn btn-mini btn-primary">{{#t "use_old_calendar"}}Go back to the old calendar{{/t}}</a>
+    <a href="http://guides.instructure.com/s/2204/m/4152/l/59600-how-is-the-new-calendar-different-from-the-old-calendar" class="whats-new">What's new?</a>
+
     <span id="calendar_views">
       <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
       <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
       <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
     </div>
   </span>
-  
+
   <div class="scheduler-wrapper" style="display: none">
     <div class="appointment-list">
       <div class="list-wrapper"></div>

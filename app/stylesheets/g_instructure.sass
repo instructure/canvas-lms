@@ -174,10 +174,8 @@ body.no-headers #flash_message_wrapper
     :margin-bottom 20px
     .event-list-view-calendar
       float: right
-      font-size: 0.8em
-      +transparent
-    &:hover .event-list-view-calendar, &:focus .event-list-view-calendar
-      +opaque
+      font-size: 10px
+      font-weight: normal
 
   table.assignments
     :width 100%
@@ -516,20 +514,6 @@ body .disabled_link
   :font-size 0.8em
   :color #888
   :padding-left 10px
-.datepicker-time
-  :padding 0 0 4px
-  :text-align center
-  input
-    :border 1px solid #aaa
-    :padding 1px 2px
-  select
-    :border 1px solid #aaa
-  button.button
-    font-weight: normal
-
-
-#ui-datepicker-div
-  :z-index 9999
 
 #submission_preview
   :margin 20px auto
@@ -1193,25 +1177,6 @@ body > #ui-datepicker-div
       margin-top: 0.2em
       margin-right: 2px
 
-.editor_box_resizer
-  position: relative
-  height: 1px
-  width: 100%
-  border-bottom: 1px solid #ccc
-  cursor: s-resize !important
-  -moz-user-select: none
-  div.ui-icon
-    display: block
-    position: absolute
-    background-color: !important
-    height: 16px
-    width: 13px
-    right: 0
-    top: -13px
-    background-position: -64px -224px !important
-    background-image: url(/images/jqueryui/ui-icons_222222_256x240.png) !important
-    cursor: se-resize !important
-
 .communication_message .media_comment_thumbnail
   margin: 3px 0
 .media_comment_thumbnail
@@ -1433,19 +1398,65 @@ form.user_content_post_form
 #change_gradebook_version_link_holder, #change_calendar_version_link_holder
   float: right !important
   background: none !important
-  a
+#change_gradebook_version_link_holder a, #change_calendar_version_link_holder a, .dashboard-toggle a
+  margin-right: 10px
+  padding: 1px 10px
+  +border-radius(3px)
+  +vertical-gradient(#0abdff, #008fd6)
+  text-decoration: none !important
+  &:hover
+    border-color: #165A92
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5)
+  font-size: 12px
+  font-family: GillSans,Calibri,Trebuchet,sans-serif
+
+  border: 1px solid #1e7eca
+  color: white !important
+  text-shadow: rgba(0,0,0,0.5) 1px 0 1px
+
+  -moz-user-select: none
+  cursor: pointer
+
+.dashboard-toggle
+  display: block
+  padding: 10px 0 0
+#breadcrumbs .dashboard-toggle
+  margin: 4px 0
+
+.with-fixed-bottom #wrapper-container
+  padding-bottom: 60px
+
+#fixed_bottom
+  position: fixed
+  z-index: 100000
+  bottom: 0
+  top: auto
+  left: 0
+  width: 100%
+  i
+    vertical-align: middle
     margin-right: 10px
-    padding: 1px 10px
-    +border-radius(3px)
-    +vertical-gradient(#0abdff, #008fd6)
-    text-decoration: none !important
-    &:hover
-      border-color: #165A92
-      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5)
-    font-size: 12px
+  b
+    vertical-align: middle
 
-    border: 1px solid #1e7eca
-    color: white
-    text-shadow: rgba(0,0,0,0.5) 1px 0 1px
+.fixed_warning
+  background-color: #FDD
+  border-width: 2px 0 0 0
+  border-style: solid
+  border-color: black
+  padding: 15px
+  opacity: 0.90
+  color: black
 
-    -moz-user-select: none
+#sv_bar
+  padding: 15px 15px 20px 15px
+  .buttons
+    float: right
+    .btn
+      margin-left: 10px
+    .btn-primary
+      color: white
+  .button-explanation
+    float: right
+    font-size: 10px
+    text-align: right

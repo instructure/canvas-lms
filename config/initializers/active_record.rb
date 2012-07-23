@@ -264,7 +264,7 @@ class ActiveRecord::Base
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
       @collkey ||= connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i
-      @collkey == 0 ? "CAST(LOWER(#{col}) AS bytea)" : "collkey(#{col}, 'root', true, 2, true)"
+      @collkey == 0 ? "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)" : "collkey(#{col}, 'root', true, 2, true)"
     else
       # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
       # SQLite can have custom collations inserted, but probably not worth the effort

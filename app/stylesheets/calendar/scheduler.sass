@@ -7,6 +7,14 @@
   .fc-event.current-appointment-group
     opacity: 1.0
 
+.scheduler-content
+  padding: 1em
+  background-color: $main_background_color
+  border: 1px solid $listBorderColor
+.scheduler-header
+  min-height: 27px
+  margin-bottom: 10px
+
 /* the 'button' part is to beat g_util_button's specificity */
 button.single_item_done_button
   display: none
@@ -26,9 +34,8 @@ button.single_item_done_button
 
 #appointment-group-list
   list-style: none
-  padding: 0
 #appointment-group-list-header
-  margin-bottom: 40px
+  font-size: 18px
 .appointment-group-item
   border-top: 1px solid #ccc
   padding: 6px 0 26px
@@ -38,6 +45,8 @@ button.single_item_done_button
   .alert
     float: right
     width: auto
+  &:first-child
+    border-top: none
 .unpublished-ag
   background-color: #f2f2f2
 .ag-context

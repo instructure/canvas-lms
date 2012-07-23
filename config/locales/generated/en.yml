@@ -6,10 +6,17 @@ en:
     bad_max_appts: "You must allow at least one appointment per participant"
     context_required: "You need to select a calendar"
     select_calendars: "Select Calendars"
+  accont: 
+    feedback_pricing_sub: "Get the numbers for your institution"
   account: 
     default_account_name: "Default Account"
     default_site_administrator_account_name: "Site Admin"
     default_term_name: "Default Term"
+    feedback_coach: "Ask the Community"
+    feedback_coach_sub: "Get help from a Canvas expert"
+    feedback_feature_request: "Request a Feature"
+    feedback_feature_request_sub: "Have an idea to improve Canvas?"
+    feedback_pricing: "Canvas Pricing Information"
     manually_created_courses: "Manually-Created Courses"
     root_account_cant_have_sis_id: "SIS IDs cannot be set on root accounts"
     sis_id_in_use: "SIS ID \"%{sis_id}\" is already in use"
@@ -45,9 +52,11 @@ en:
   account_authorization_configs: 
     account_required: "must be LDAP-authenticated"
     cas_settings: 
+      alternate_login_url_description: "An alternate URL for logging into CAS. You probably should not set this."
       labels: 
         auth_base: "CAS URL"
         auth_type: Type
+        log_in_url: "Alternate Login URL"
         login_handle_name: "Login Label"
       login_handle_name_description: "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc."
       save_button: "Save Authentication Settings"
@@ -229,6 +238,19 @@ en:
     add_user_dialog_title: "Add a New User"
     adding_course_message: "Adding Course..."
     adding_user_message: "Adding User..."
+    additional_settings: 
+      labels: 
+        file_quota_in_gb: "File Storage"
+        media_quota_in_gb: "Media Storage"
+        student_quota: Students
+    additional_settings_right_side: 
+      links: 
+        suspend: "Suspend Account"
+        unsuspend: "Unsuspend Account"
+      title: 
+        suspend: "Suspend Account"
+      titles: 
+        unsuspend: "Unsuspend Account"
     avatars: 
       all_link: 
         one: "All %{count}"
@@ -298,6 +320,9 @@ en:
       page_title: Accounts
       title: "Accounts I Manage"
     no_user_message: "No user found with that id"
+    root_accounts: 
+      labels: 
+        name: "Account Name"
     settings: 
       about_google_docs: |-
           In order to make it easier for users, rather than forcing them to download things like Word docs, PDFs, Excel spreadsheets, and open office documents (In addition to requiring that those programs be installed on their on their computer), in many areas throughout Canvas, it will allow you an inline preview of the document.
@@ -477,6 +502,9 @@ en:
       started_at_message: "Started: %{started_at}"
       title: "SIS Import"
       try_import_again_link: "Try import again"
+    sis_import_in_process_notice: "An SIS import is already in process."
+    site_admin_statistics: 
+      page_title: "Statistics for %{account}"
     statistics: 
       concluded_at: "concluded %{at}"
       created_at: "created %{at}"
@@ -604,6 +632,25 @@ en:
       criteria_required: "At least one trigger is required"
       recipients_required: "At least one recipient is required"
       threshold_should_be_numeric: "This should be a positive number"
+  analytics: 
+    course: 
+      analytics: Analytics
+      page_title: "Analytics: %{course}"
+    crumb: 
+      completed: "Completed Courses"
+      current: "Current Courses"
+    department: 
+      analytics: Analytics
+    filters: 
+      completed: "Completed Courses"
+      current: "Current Courses"
+    page_title: 
+      completed: "Analytics: %{account} -- Completed Courses"
+      current: "Analytics: %{account} -- Current Courses"
+      term: "Analytics: %{account} -- %{term}"
+    student_in_course: 
+      analytics: Analytics
+      page_title: "Analytics: %{course} -- %{student}"
   announcement: 
     no_title: "No Title"
   announcements: 
@@ -686,6 +733,11 @@ en:
       page_disabled_for_account: "That page has been disabled for this account"
       page_disabled_for_course: "That page has been disabled for this course"
       page_disabled_for_group: "That page has been disabled for this group"
+    warnings: 
+      details: 
+        suspended: "This institution's Canvas account has been suspended. Only Account Administrators may log in to correct any problems."
+      titles: 
+        suspended: "Institution Suspended"
     wiki_front_page_default_content_course: "Welcome to your new course wiki!"
     wiki_front_page_default_content_group: "Welcome to your new group wiki!"
   appointment_group: 
@@ -3460,6 +3512,7 @@ en:
       headings: 
         assignments: "Assignments Usage Report"
         files: "File Storage"
+        page_views: "Page views over time"
         stats: "Statistics for %{course}"
         students: "Recently Logged-In Users"
         totals: "Running Totals"
@@ -3474,6 +3527,7 @@ en:
       num_assignments: "# Assignments"
       num_submissions: "# Submissions"
       page_title: "Course Statistics"
+      page_views: "'Page Views'"
       quiz: Quiz
       quiz_questions: "Quiz Questions"
       quiz_submissions: "Quiz Submissions"
@@ -5137,7 +5191,6 @@ en:
     titles: 
       grading_scheme_info: "View/Edit Grading Scheme"
   group: 
-    default_collection_name: "%{group_name}'s Collection"
     tabs: 
       chat: Chat
       discussions: Discussions
@@ -5314,7 +5367,6 @@ en:
       delete_category_success: "Category successfully deleted"
       delete_success: "Group successfully deleted"
       goodbye: "You have removed yourself from the group %{group_name}."
-      invalid_invitation: ""
       no_students_assigned: "Nothing to do."
       students_assigned: "Students assigned to groups."
       update_category_success: "Category was successfully updated."
@@ -5362,7 +5414,7 @@ en:
     somethings_broken_but_i_can_work_around_it_for_now: "Something's broken but I can work around it for now"
     subject: Subject
     submit_this_support_request: "Submit Ticket"
-    wait_a_different_browser_may_help_solve_the_problem: "Wait! A *different browser* may help solve the problem."
+    wait_a_better_browser_may_help_solve_the_problem: "Wait! A *better browser* may help solve the problem."
     which_course_is_this_question_about: "Which course is this question about?"
     you_are_using_browser_version_version_try_again_using_the_latest_version_of_chrome_or_firefox: "You are using Internet Explorer version %{browserVersion}, Try again using the latest version of *Chrome* or **Firefox**"
     your_email_address: "Your email address"
@@ -5655,6 +5707,10 @@ en:
     message_student: "Message Students for %{course_name}"
     send_message: "Send Message"
   messages: 
+    account_suspended: 
+      email: 
+        body: "%{institution} has been suspended.  Please contact your Site Admin to find out why."
+        subject: "Institution Suspended"
     account_user_notification: 
       email: 
         subject: "Account Admin Notification"
@@ -8903,6 +8959,7 @@ en:
       become_user: "Become other users"
       change_course_state: "Change course state"
       comment_on_others_submissions: "View all students' submissions and make comments on them"
+      create_accounts: "Create new root accounts"
       create_collaborations: "Create student collaborations"
       create_conferences: "Create web conferences"
       manage_account_memberships: "Add/remove other admins for the account"
@@ -8918,6 +8975,7 @@ en:
       manage_grades: "Edit grades (includes assessing rubrics)"
       manage_groups: "Manage (create / edit / delete) groups"
       manage_interaction_alerts: "Manage alerts"
+      manage_links: "Manage role and trust links"
       manage_outcomes: "Manage learning outcomes"
       manage_role_overrides: "Manage permissions"
       manage_sections: "Manage (create / edit / delete) course sections"
@@ -8938,7 +8996,9 @@ en:
       read_reports: "View usage reports for the course"
       read_roster: "See the list of users"
       send_messages: "Send messages to course members"
+      suspend_accounts: "Suspend accounts"
       view_all_grades: "View all grades"
+      view_analytics: "View analytics pages"
       view_error_reports: "View error reports"
       view_group_pages: "View the group pages of all student groups"
       view_statistics: "View statistics"
@@ -9280,6 +9340,23 @@ en:
       participant: 
         one: "1 participant"
         other: "%{count} participants"
+    context_module_legend: 
+      content_part_of_module: "This content is part of the module, %{module_name}"
+      labels: 
+        module: module
+      max_score: "maximum score"
+      max_score_required: "Students must get no more than a %{max_score} on this item before the module is considered complete"
+      min_score_required: "Students must get at least a %{min_score} on this item before the module is considered complete"
+      minimum_score: "minimum score"
+      module_completed: "This module is completed"
+      module_not_unlocked: "This module hasn't been unlocked yet"
+      must_contribute: "must contribute"
+      must_contribute_title: "Students must contribute to this item before the module is considered complete"
+      must_submit: "must submit"
+      must_submit_title: "Students must submit this assignment before the module is considered complete"
+      must_view: "must view"
+      must_view_title: "Students must view this item before the module is considered complete"
+      view_modules: "View Modules"
     current_enrollment: 
       course_unpublished: "This course hasn't been published yet"
       enrolled_as_designer: "Enrolled as a designer"
@@ -9353,6 +9430,8 @@ en:
       nothing_two_weeks: "Nothing for the next two weeks"
       titles: 
         events: Events
+    exit_frame: 
+      redirecting: Redirecting...
     find_outcome: 
       buttons: 
         add_outcome: "Add Outcome"
@@ -9989,11 +10068,16 @@ en:
   sis_imports_api: 
     errors: 
       invalid_content_type: "Invalid content type, UTF-8 required"
-    sis_import_in_process_notice: "An SIS import is already in process."
   site_admin: 
     columns: 
       date: Date
       value: Value
+    institution_suspended: 
+      body: "Your school's Canvas account is temporarily suspended. Please contact your Canvas administrator."
+      links: 
+        logout: Logout
+        stop_masquerading: "[Stop Masquerading]"
+      page_title: "Institution Suspended"
     links: 
       over_time: "over time"
     status: 
@@ -10317,7 +10401,6 @@ en:
   unknown_question_bank: "Unknown question bank"
   unknown_quiz: "Unknown quiz"
   user: 
-    default_collection_name: "%{user_name}'s Collection"
     default_user_name: User
   user_follow: 
     errors: 

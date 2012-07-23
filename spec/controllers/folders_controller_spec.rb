@@ -26,7 +26,8 @@ describe FoldersController do
   end
   
   def course_folder
-    @folder = @course.folders.create(:name => "some folder")
+    @root = Folder.root_folders(@course).first
+    @folder = @root.sub_folders.create!(:name => "some folder", :context => @course)
   end
   
   describe "GET 'show'" do
@@ -53,7 +54,7 @@ describe FoldersController do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       course_folder
-      put 'update', :course_id => @course.id, :id => @folder.id
+      put 'update', :course_id => @course.id, :id => @folder.id, :folder => {:name => "hi"}
       assert_unauthorized
     end
     
@@ -109,9 +110,10 @@ describe FoldersController do
       assert_unauthorized
     end
     
-    it "should delete folder" do
+    def delete_folder
       course_with_teacher_logged_in(:active_all => true)
       course_folder
+      yield if block_given?
       delete 'destroy', :course_id => @course.id, :id => @folder.id
       response.should be_redirect
       assigns[:folder].should_not be_frozen
@@ -119,6 +121,16 @@ describe FoldersController do
       @course.reload
       @course.folders.should be_include(@folder)
       @course.folders.active.should_not be_include(@folder)
+    end
+    
+    it "should delete folder" do
+      delete_folder
+    end
+    
+    it "should delete folder with contents" do
+      delete_folder do
+        @folder.sub_folders.create!(:name => "folder2", :context => @course)
+      end
     end
   end
 end

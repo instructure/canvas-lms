@@ -26,6 +26,22 @@ module TextHelper
     text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| puts m; m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "")
   end
 
+  # Converts a string of html to plain text, preserving as much of the
+  # formatting and information as possible
+  #
+  # This is still a pretty basic implementation, I'm sure we'll find ways to
+  # tweak and improve it as time goes on.
+  def html_to_text(html_str)
+    doc = Nokogiri::HTML::DocumentFragment.parse(html_str.squeeze(" ").squeeze("\n"))
+    # translate anchor tags into a markdown-style name/link combo
+    doc.css('a').each { |node| next if node.text.strip == node['href']; node.replace("[#{node.text}](#{node['href']})") }
+    # translate img tags into just a url to the image
+    doc.css('img').each { |node| node.replace(node['src']) }
+    # append a line break to br and p tags, so they retain a line break after stripping tags
+    doc.css('br, p').each { |node| node.after("\n\n") }
+    doc.text.strip
+  end
+
   def quote_clump(quote_lines)
     txt = "<div class='quoted_text_holder'><a href='#' class='show_quoted_text_link'>#{TextHelper.escape_html(I18n.t('lib.text_helper.quoted_text_toggle', "show quoted text"))}</a><div class='quoted_text' style='display: none;'>"
     txt += quote_lines.join("\n")
@@ -66,6 +82,7 @@ module TextHelper
     # insert placeholders for the links we're going to generate, before we go and escape all the html
     links = []
     placeholder_blocks = []
+    message ||= ''
     message = message.gsub(AUTO_LINKIFY_REGEX) do |match|
       placeholder_blocks << if match == AUTO_LINKIFY_PLACEHOLDER
         AUTO_LINKIFY_PLACEHOLDER

@@ -36,6 +36,8 @@ define [
       .focus (e) =>
         @pane.openConversationMenu($(e.currentTarget))
 
+      $(window).unload => clearTimeout @markAsUnread
+
     baseData: ->
       {scope: @scope, filter: @filters}
 
@@ -64,6 +66,7 @@ define [
       @emptyCheck()
       if @isActive(conversation.id) and conversation.get('workflow_state') is 'unread'
         @markAsUnread = setTimeout =>
+          return unless @isActive(conversation.id) and @$item(conversation.id)
           conversation.inboxAction
             method: 'PUT'
             data: {conversation: {workflow_state: 'read'}}

@@ -47,7 +47,7 @@ describe ContextExternalTool do
       @tool.settings[:editor_button] = {
         "icon_url"=>"http://www.example.com/favicon.ico", 
         "text"=>"Example",
-        "url"=>"http://www.example.com", 
+        "url"=>"http://www.example.com",
         "selection_height"=>400, 
         "selection_width"=>600
       }
@@ -55,7 +55,47 @@ describe ContextExternalTool do
       @tool.should_not be_new_record
       @tool.errors.should be_empty
     end
-    
+
+    def url_test(nav_url=nil)
+      course_with_teacher(:active_all => true)
+      @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret', :url => "http://www.example.com")
+      [:course_navigation, :account_navigation, :user_navigation, :resource_selection, :editor_button].each do |type|
+        @tool.send "#{type}=", {
+                :url => nav_url,
+                :text => "Example",
+                :icon_url => "http://www.example.com/image.ico",
+                :selection_width => 50,
+                :selection_height => 50
+        }
+        @tool.save!
+        launch = @tool.create_launch(@course, @user, "http://test.com", type)
+        launch.resource_type.should == type
+
+        if nav_url
+          launch.url.should == nav_url
+        else
+          launch.url.should == @tool.url
+        end
+      end
+    end
+
+    it "should allow extension to not have a url if the main config has a url" do
+      url_test
+    end
+
+    it "should prefer the extension url to the main config url" do
+      url_test(nav_url="https://example.com/special_launch_of_death")
+    end
+
+    it "should not allow extension with no custom url and a domain match" do
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.course_navigation = {
+                :text => "Example"
+      }
+      @tool.save!
+      @tool.has_course_navigation.should == false
+    end
+
     it "should not validate with no domain or url setting" do
       @tool = @course.context_external_tools.create(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.should be_new_record
@@ -63,6 +103,25 @@ describe ContextExternalTool do
       @tool.errors['domain'].should == "Either the url or domain should be set."
     end
   end
+
+  it "should allow extension with only 'enabled' key" do
+    @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    @tool.course_navigation = {
+              :enabled => "true"
+    }
+    @tool.save!
+    @tool.has_course_navigation.should == true
+  end
+
+  it "should clear disabled extensions" do
+    @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    @tool.course_navigation = {
+              :enabled => "false"
+    }
+    @tool.save!
+    @tool.has_course_navigation.should == false
+  end
+
   describe "find_external_tool" do
     it "should match on the same domain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -217,8 +276,34 @@ describe ContextExternalTool do
       tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'a' => '123', 'b' => '456'})
       tool.custom_fields_string.should == "a=123\nb=456"
     end
-    
-    
+
+    it "should merge custom fields for extension launches" do
+      course_with_teacher(:active_all => true)
+      @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'a' => "1", 'b' => "2"}, :url =>"http://www.example.com")
+      [:course_navigation, :account_navigation, :user_navigation, :resource_selection, :editor_button].each do |type|
+        @tool.send "#{type}=",  {
+          :text =>"Example",
+          :url =>"http://www.example.com",
+          :icon_url => "http://www.example.com/image.ico",
+          :custom_fields => {"b" => "5", "c" => "3"},
+          :selection_width => 50,
+          :selection_height => 50
+        }
+        @tool.save!
+
+        hash = @tool.create_launch(@course, @user, "http://test.com", type).generate
+        hash["custom_a"].should == "1"
+        hash["custom_b"].should == "5"
+        hash["custom_c"].should == "3"
+
+        @tool.settings[type.to_sym][:custom_fields] = nil
+        @tool.save!
+        hash = @tool.create_launch(@course, @user, "http://test.com", type).generate
+        hash["custom_a"].should == "1"
+        hash["custom_b"].should == "2"
+        hash.has_key?("custom_c").should == false
+      end
+    end
   end
   
   describe "all_tools_for" do
@@ -362,53 +447,56 @@ describe ContextExternalTool do
   end
   
   describe "label_for" do
+    append_before(:each) do
+      @tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
+    end
+
     it "should return the tool name if nothing else is configured and no key is sent" do
-      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
-      tool.save!
-      tool.label_for(nil).should == 'tool'
+      @tool.save!
+      @tool.label_for(nil).should == 'tool'
     end
     
     it "should return the tool name if nothing is configured on the sent key" do
-      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
-      tool.settings = {:course_navigation => {:bob => 'asfd'}}
-      tool.save!
-      tool.label_for(:course_navigation).should == 'tool'
+      @tool.settings = {:course_navigation => {:bob => 'asfd'}}
+      @tool.save!
+      @tool.label_for(:course_navigation).should == 'tool'
     end
     
     it "should return the tool's 'text' value if no key is sent" do
-      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
-      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
-      tool.save!
-      tool.label_for(nil).should == 'tool label'
+      @tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
+      @tool.save!
+      @tool.label_for(nil).should == 'tool label'
     end
     
     it "should return the tool's 'text' value if no 'text' value is set for the sent key" do
-      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
-      tool.settings = {:text => 'tool label', :course_navigation => {:bob => 'asdf'}}
-      tool.save!
-      tool.label_for(:course_navigation).should == 'tool label'
+      @tool.settings = {:text => 'tool label', :course_navigation => {:bob => 'asdf'}}
+      @tool.save!
+      @tool.label_for(:course_navigation).should == 'tool label'
+    end
+
+    it "should return the tool's locale-specific 'text' value if no 'text' value is set for the sent key" do
+      @tool.settings = {:text => 'tool label', :labels => {'en' => 'translated tool label'}, :course_navigation => {:bob => 'asdf'}}
+      @tool.save!
+      @tool.label_for(:course_navigation, 'en').should == 'translated tool label'
     end
     
     it "should return the setting's 'text' value for the sent key if available" do
-      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
-      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
-      tool.save!
-      tool.label_for(:course_navigation).should == 'course nav'
+      @tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
+      @tool.save!
+      @tool.label_for(:course_navigation).should == 'course nav'
     end
     
     it "should return the locale-specific label if specified and matching exactly" do
-      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
-      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}}
-      tool.save!
-      tool.label_for(:course_navigation, 'en-US').should == 'english nav'
-      tool.label_for(:course_navigation, 'es').should == 'course nav'
+      @tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}}
+      @tool.save!
+      @tool.label_for(:course_navigation, 'en-US').should == 'english nav'
+      @tool.label_for(:course_navigation, 'es').should == 'course nav'
     end
     
     it "should return the locale-specific label if specified and matching based on general locale" do
-      tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
-      tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en' => 'english nav'}}}
-      tool.save!
-      tool.label_for(:course_navigation, 'en-US').should == 'english nav'
+      @tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en' => 'english nav'}}}
+      @tool.save!
+      @tool.label_for(:course_navigation, 'en-US').should == 'english nav'
     end
   end
   

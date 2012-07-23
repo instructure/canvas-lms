@@ -32,10 +32,12 @@ class AdminsController < ApplicationController
   # @argument role [Optional] The user's admin relationship with the
   #   account will be created with the given role. Defaults to
   #   'AccountAdmin'.
+  #
+  # @argument send_confirmation [Optional] [0|1] Send a notification email to the new admin if set to '1'; send no email if set to '0'. Default is '1'.
   def create
     if authorized_action(@context, @current_user, :manage_account_memberships)
       user = api_find(User, params[:user_id])
-      admin = user.flag_as_admin(@context, params[:role])
+      admin = user.flag_as_admin(@context, params[:role], !(params[:send_confirmation] == '0'))
       render :json => admin_json(admin, @current_user, session)
     end
   end

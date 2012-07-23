@@ -78,6 +78,8 @@ class Course < ActiveRecord::Base
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') and enrollments.workflow_state = 'active'"
   has_many :student_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", :include => :user
   has_many :all_student_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state != 'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", :include => :user
+  has_many :all_real_users, :through => :all_real_enrollments, :source => :user
+  has_many :all_real_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state != 'deleted' AND enrollments.type <> 'StudentViewEnrollment'"], :include => :user
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
   has_many :all_real_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ["enrollments.workflow_state != ?", 'deleted'], :include => :user
   has_many :detailed_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => {:user => {:pseudonym => :communication_channel}}
@@ -188,13 +190,18 @@ class Course < ActiveRecord::Base
   has_a_broadcast_policy
 
   def events_for(user)
-    CalendarEvent.
-      active.
-      for_user_and_context_codes(user, [asset_string]).
-      all(:include => :child_events).
-      reject(&:hidden?) +
-    AppointmentGroup.manageable_by(user, [asset_string]) +
-    assignments.active
+    if user
+      CalendarEvent.
+        active.
+        for_user_and_context_codes(user, [asset_string]).
+        all(:include => :child_events).
+        reject(&:hidden?) +
+      AppointmentGroup.manageable_by(user, [asset_string]) +
+      assignments.active
+    else
+      calendar_events.active.all(:include => :child_events).reject(&:hidden?) +
+      assignments.active
+    end
   end
 
   def self.skip_updating_account_associations(&block)
@@ -1407,6 +1414,17 @@ class Course < ActiveRecord::Base
     enroll_user(user, 'StudentEnrollment', opts)
   end
 
+  def self_enroll_student(user, opts = {})
+    enrollment = enroll_student(user, opts.merge(:no_notify => true))
+    enrollment.self_enrolled = true
+    enrollment.accept
+    unless opts[:skip_pseudonym]
+      new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
+      new_pseudonym.save if new_pseudonym && new_pseudonym.changed?
+    end
+    enrollment
+  end
+
   def enroll_ta(user)
     enroll_user(user, 'TaEnrollment')
   end
@@ -1500,11 +1518,19 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def default_section
-    self.course_sections.active.find_or_create_by_default_section(true) do |section|
+  def default_section(opts = {})
+    section = course_sections.active.find_by_default_section(true)
+    if !section && opts[:include_xlists]
+      section = CourseSection.active.find(:first, :conditions => { :nonxlist_course_id => self.id }, :order => 'id')
+    end
+    if !section
+      section = course_sections.build
+      section.default_section = true
       section.course = self
       section.root_account = self.root_account
+      section.save unless new_record?
     end
+    section
   end
 
   def assert_section
@@ -2700,6 +2726,9 @@ class Course < ActiveRecord::Base
       self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration].include?(k.to_sym) }.each do |key, val|
         new_course.write_attribute(key, val)
       end
+      # there's a unique constraint on this, so we need to clear it out
+      self.self_enrollment_code = nil
+      self.self_enrollment = false
       # The order here is important; we have to set our sis id to nil and save first
       # so that the new course can be saved, then we need the new course saved to
       # get its id to move over sections and enrollments.  Setting this course to

@@ -672,7 +672,9 @@ define([
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         var $item = modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items").sortable('refresh');
-        modules.updateAllItemInstances(data.content_tag);
+        if (data.content_tag.content_id != 0) {
+          modules.updateAllItemInstances(data.content_tag);
+        }
         modules.updateAssignmentData();
         $(this).dialog('close');
       },

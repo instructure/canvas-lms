@@ -118,7 +118,7 @@ class AssignmentsApiController < ApplicationController
           :order => 'assignment_groups.position, assignments.position')
 
       hashes = @assignments.map { |assignment|
-        assignment_json(assignment, @current_user, session, [], @context.user_is_teacher?(@current_user)) }
+        assignment_json(assignment, @current_user, session) }
 
       render :json => hashes.to_json
     end
@@ -129,7 +129,7 @@ class AssignmentsApiController < ApplicationController
       @assignment = @context.active_assignments.find(params[:id],
           :include => [:assignment_group, :rubric_association, :rubric])
 
-      render :json => assignment_json(@assignment, @current_user, session, [], @context.user_is_teacher?(@current_user)).to_json
+      render :json => assignment_json(@assignment, @current_user, session).to_json
     end
   end
 
@@ -151,7 +151,7 @@ class AssignmentsApiController < ApplicationController
 
     if authorized_action(@assignment, @current_user, :create)
       if @assignment.save
-        render :json => assignment_json(@assignment, @current_user, session, [], @context.user_is_teacher?(@current_user)).to_json, :status => 201
+        render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
       else
         # TODO: we don't really have a strategy in the API yet for returning
         # errors.
@@ -173,7 +173,7 @@ class AssignmentsApiController < ApplicationController
         update_api_assignment(@assignment, params[:assignment])
 
         if @assignment.save
-          render :json => assignment_json(@assignment, @current_user, session, [], @context.user_is_teacher?(@current_user)).to_json, :status => 201
+          render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
         else
           # TODO: we don't really have a strategy in the API yet for returning
           # errors.

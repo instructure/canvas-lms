@@ -107,27 +107,13 @@ css_compressor_options:
 javascripts:
 
 stylesheets:
-  new_common:
-    - public/stylesheets/compiled/blue/application.css
-    - public/stylesheets/static/jquery-ui-theme.css
-    - public/stylesheets/compiled/jquery-ui-button.css
-    - public/stylesheets/compiled/jquery-ui-menu.css
-    - public/stylesheets/compiled/g_util_buttons.css
-    - public/stylesheets/compiled/helpDialog.css
-    - public/stylesheets/compiled/print.css
-
   common:
     - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/g_base.css
-    - public/stylesheets/static/jquery-ui-theme.css
-    - public/stylesheets/compiled/jquery-ui-button.css
-    - public/stylesheets/compiled/jquery-ui-menu.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css
     - public/stylesheets/compiled/g_util_fancy_links.css
-    - public/stylesheets/compiled/g_bootstrap_parts.css
-    - public/stylesheets/compiled/g_util_buttons.css
     - public/stylesheets/compiled/g_util_inst_tree.css
     - public/stylesheets/compiled/g_util_chevron_crumbs.css
     - public/stylesheets/compiled/g_util_ui_listview.css
@@ -148,14 +134,33 @@ stylesheets:
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/helpDialog.css
     - public/stylesheets/compiled/print.css
+  collection_item_save:
+    - public/stylesheets/compiled/collection_item_save.css
+  collections_app:
+    - public/stylesheets/compiled/views/KollectionItems/ShowView.css
+    - public/stylesheets/compiled/views/CommentsView.css
   dashboard:
     - public/stylesheets/compiled/dashboard.css
-  profile:
-    - public/stylesheets/compiled/profile.css
+    - public/stylesheets/compiled/quick_start_bar.css
+    - public/stylesheets/compiled/activity_feed.css
+  registration:
+    - public/stylesheets/compiled/registration.css
+  profile_show:
+    - public/stylesheets/compiled/profile/show.css
+  profile_edit:
+    - public/stylesheets/compiled/profile/edit.css
+  group_dashboard:
+    - public/stylesheets/compiled/quick_start_bar.css
+    - public/stylesheets/compiled/activity_feed.css
+    - public/stylesheets/compiled/groups/dashboard.css
+  group_settings:
+    - public/stylesheets/compiled/groups/edit.css
+  group_profile:
+    - public/stylesheets/compiled/groups/profile.css
   facebook:
     - public/stylesheets/compiled/facebook.css
   speed_grader:
-    - public/stylesheets/static/ui.selectmenu.css
+    - public/stylesheets/compiled/ui.selectmenu.css
     - public/stylesheets/compiled/speed_grader.css
   plugins:
     - public/stylesheets/compiled/plugins.css
@@ -175,7 +180,7 @@ stylesheets:
     - public/stylesheets/compiled/external_tools.css
     - public/stylesheets/compiled/grading_standards.css
   discussions:
-    - public/stylesheets/static/ui.selectmenu.css
+    - public/stylesheets/compiled/ui.selectmenu.css
     - public/stylesheets/compiled/discussions.css
   full_files:
     - public/stylesheets/compiled/full_files.css
@@ -197,7 +202,7 @@ stylesheets:
   quizzes:
     - public/stylesheets/compiled/quizzes.css
     - public/stylesheets/compiled/message_students.css
-    - public/stylesheets/static/ui.selectmenu.css
+    - public/stylesheets/compiled/ui.selectmenu.css
   moderate_quiz:
     - public/stylesheets/compiled/moderate_quiz.css
   full_assignment:
@@ -218,6 +223,9 @@ stylesheets:
     - public/stylesheets/compiled/context_list.css
   prior_users:
     - public/stylesheets/compiled/prior_users.css
+  popup:
+    - public/stylesheets/compiled/g_reset.css
+    - public/stylesheets/compiled/popup/main.css
   reports:
     - public/stylesheets/compiled/reports.css
   statistics:

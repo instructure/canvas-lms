@@ -1,0 +1,13 @@
+input[disabled],
+select[disabled],
+textarea[disabled],
+input[readonly],
+select[readonly],
+textarea[readonly] {
+  @include opacity(0.5);
+}
+
+.ui-datepicker-trigger.disabled {
+  display: none;
+}
+

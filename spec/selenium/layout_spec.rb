@@ -9,31 +9,34 @@ describe "layout" do
   end
 
   it "should auto-scroll the sidebar when $.scrollSidebar is called" do
-    driver.execute_script('$("#not_right_side").height(10000)')
-    driver.execute_script('$("#right-side-wrapper").height(5000)')
-    driver.execute_script('$.scrollSidebar()')
-    body = driver.find_element(:tag_name, 'body')
-    body.attribute(:class).should_not match /with-scrolling-right-side/
-    body.attribute(:class).should_not match /with-sidebar-pinned-to-bottom/
+    exec_cs  <<-CS
+      $("#content").height(10000)
+      $("#right-side").height(5000)
+      $.scrollSidebar()
+    CS
 
-    driver.find_element(:id, 'footer').location_once_scrolled_into_view
+    rs_wrapper = f('#right-side-wrapper')
+    rs_wrapper.should_not have_class 'with-scrolling-right-side'
+    rs_wrapper.should_not have_class 'with-sidebar-pinned-to-bottom'
+
+    f('#footer').location_once_scrolled_into_view
     # We sleep here because the window scroll triggers a call to scrollSidebar that might
     # be slightly throttled. We don't want to actually call scrollSidebar() ourselves
     # because that's subverting part of the test. The throttle shouldn't be more than 50ms,
     # so sleeping 100ms should be sufficient for it to fire.
     sleep 0.1
-    body.attribute(:class).should_not match /with-scrolling-right-side/
-    body.attribute(:class).should match /with-sidebar-pinned-to-bottom/
+    rs_wrapper.should_not have_class 'with-scrolling-right-side'
+    rs_wrapper.should have_class 'with-sidebar-pinned-to-bottom'
 
-    driver.find_element(:id, 'topic_list').location_once_scrolled_into_view
+    f('#topic_list').location_once_scrolled_into_view
     sleep 0.1
-    body.attribute(:class).should match /with-scrolling-right-side/
-    body.attribute(:class).should_not match /with-sidebar-pinned-to-bottom/
+    rs_wrapper.should have_class 'with-scrolling-right-side'
+    rs_wrapper.should_not have_class 'with-sidebar-pinned-to-bottom'
 
-    driver.find_element(:id, 'header').location_once_scrolled_into_view
+    f('#header').location_once_scrolled_into_view
     sleep 0.1
-    body.attribute(:class).should_not match /with-scrolling-right-side/
-    body.attribute(:class).should_not match /with-sidebar-pinned-to-bottom/
+    rs_wrapper.should_not have_class 'with-scrolling-right-side'
+    rs_wrapper.should_not have_class 'with-sidebar-pinned-to-bottom'
   end
 
   it "should have ENV available to the JavaScript from js_env" do

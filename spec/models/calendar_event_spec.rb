@@ -110,21 +110,17 @@ describe CalendarEvent do
     it ".to_ics should return a plain-text description" do
       calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
       <p>
-        This assignment is due December 16th. Plz discuss the reading.
-        <p> </p>
-        <p> </p>
-        <p> </p>
-        <p> </p>
-        <p>Test.</p>
+        This assignment is due December 16th. <b>Please</b> do the reading.
+        <br/>
+        <a href="www.example.com">link!</a>
       </p>
       HTML
       ev = @event.to_ics(false)
-      ev.description.should == "This assignment is due December 16th. Plz discuss the reading.
-         
-         
-         
-         
-        Test."
+      ev.description.should == "This assignment is due December 16th. Please do the reading.
+ 
+
+[link!](www.example.com)"
+      ev.x_alt_desc.should == @event.description
     end
   end
 

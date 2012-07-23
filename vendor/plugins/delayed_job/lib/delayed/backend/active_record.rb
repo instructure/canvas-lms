@@ -19,11 +19,6 @@ module Delayed
       class Job < ::ActiveRecord::Base
         include Delayed::Backend::Base
         set_table_name :delayed_jobs
-        attr_writer :current_shard
-
-        def current_shard
-          @current_shard || Shard.default
-        end
 
         # be aware that some strand functionality is controlled by triggers on
         # the database. see
@@ -42,12 +37,8 @@ module Delayed
         # this means that deleting the first job from a strand from
         # outside rails is *not* safe when using mysql for the queue.
         after_destroy :update_strand_on_destroy
-        cattr_accessor :adapter_name
         def update_strand_on_destroy
-          if adapter_name.nil?
-            self.class.adapter_name = connection.adapter_name
-          end
-          if strand.present? && next_in_strand? && adapter_name == 'MySQL'
+          if strand.present? && next_in_strand? && self.class.connection.adapter_name == 'MySQL'
             # this funky sub-sub-select is to force mysql to create a temporary
             # table, otherwise it fails complaining that you can't select from
             # the same table you are updating
@@ -60,16 +51,10 @@ module Delayed
         # to raise the lock level
         before_create :lock_strand_on_create
         def lock_strand_on_create
-          if adapter_name.nil?
-            self.class.adapter_name = connection.adapter_name
-          end
-          if strand.present? && adapter_name == 'PostgreSQL'
+          if strand.present? && self.class.connection.adapter_name == 'PostgreSQL'
             connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
           end
         end
-
-        cattr_accessor :default_priority
-        self.default_priority = Delayed::NORMAL_PRIORITY
 
         named_scope :current, lambda {
           { :conditions => ["run_at <= ?", db_time_now] }
@@ -88,7 +73,7 @@ module Delayed
         # 500.times { |i| "ohai".send_later_enqueue_args(:reverse, { :run_at => (12.hours.ago + (rand(24.hours.to_i))) }) }
         # then fire up your workers
         # you can check out strand correctness: diff test1.txt <(sort -n test1.txt)
-        named_scope :ready_to_run, lambda {|worker_name, max_run_time|
+        named_scope :ready_to_run, lambda {
           { :conditions => ["run_at <= ? AND locked_at IS NULL AND next_in_strand = ?", db_time_now, true] }
         }
         named_scope :by_priority, :order => 'priority ASC, run_at ASC'
@@ -103,7 +88,6 @@ module Delayed
         end
 
         def self.get_and_lock_next_available(worker_name,
-                                             max_run_time,
                                              queue = nil,
                                              min_priority = nil,
                                              max_priority = nil)
@@ -113,35 +97,62 @@ module Delayed
 
           @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
           loop do
-            jobs = find_available(worker_name, @batch_size, max_run_time, queue, min_priority, max_priority)
+            jobs = find_available(@batch_size, queue, min_priority, max_priority)
             return nil if jobs.empty?
             job = jobs.detect do |job|
-              job.lock_exclusively!(max_run_time, worker_name)
+              job.lock_exclusively!(worker_name)
             end
             return job if job
           end
         end
 
-        def self.find_available(worker_name,
-                                limit,
-                                max_run_time,
+        def self.find_available(limit,
                                 queue = nil,
                                 min_priority = nil,
                                 max_priority = nil)
-          all_available(worker_name, max_run_time, queue, min_priority, max_priority).all(:limit => limit)
+          all_available(queue, min_priority, max_priority).all(:limit => limit)
         end
 
-        def self.all_available(worker_name,
-                               max_run_time,
-                               queue = nil,
+        def self.all_available(queue = nil,
                                min_priority = nil,
                                max_priority = nil)
-          scope = self.ready_to_run(worker_name, max_run_time)
+          scope = self.ready_to_run
           scope = scope.scoped(:conditions => ['priority >= ?', min_priority]) if min_priority
           scope = scope.scoped(:conditions => ['priority <= ?', max_priority]) if max_priority
           scope = scope.scoped(:conditions => ['queue = ?', queue]) if queue
           scope = scope.scoped(:conditions => ['queue is null']) unless queue
           scope.by_priority
+        end
+
+        # used internally by create_singleton to take the appropriate lock
+        # depending on the db driver
+        def self.transaction_for_singleton(strand)
+          case self.connection.adapter_name
+          when 'PostgreSQL'
+            self.transaction do
+              connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
+              yield
+            end
+          when 'MySQL'
+            self.transaction do
+              begin
+                connection.execute("LOCK TABLES #{table_name} WRITE")
+                yield
+              ensure
+                connection.execute("UNLOCK TABLES")
+              end
+            end
+          when 'SQLite'
+            # can't use BEGIN EXCLUSIVE TRANSACTION here, since we might already be in a txn
+            self.transaction do
+              begin
+                connection.execute("PRAGMA locking_mode = EXCLUSIVE")
+                yield
+              ensure
+                connection.execute("PRAGMA locking_mode = NORMAL")
+              end
+            end
+          end
         end
 
         # Create the job on the specified strand, but only if there aren't any
@@ -150,16 +161,9 @@ module Delayed
         # on the strand but it's already running)
         def self.create_singleton(options)
           strand = options[:strand]
-
-          self.transaction do
-            if adapter_name == 'PostgreSQL'
-              connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
-              job = self.first(:conditions => ["run_at <= ? AND strand = ? AND locked_at IS NULL", db_time_now, strand])
-              job || self.create(options)
-            else
-              self.delete_all(['strand=? AND locked_at IS NULL', strand])
-              self.create(options)
-            end
+          transaction_for_singleton(strand) do
+            job = self.first(:conditions => ["strand = ? AND locked_at IS NULL", strand], :order => :id)
+            job || self.create(options)
           end
         end
 
@@ -169,7 +173,7 @@ module Delayed
         # It's important to note that for performance reasons, this method does
         # not re-check the strand constraints -- so you could manually lock a
         # job using this method that isn't the next to run on its strand.
-        def lock_exclusively!(max_run_time, worker)
+        def lock_exclusively!(worker)
           now = self.class.db_time_now
           # We don't own this job so we will update the locked_by name and the locked_at
           affected_rows = self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and locked_at is null and run_at <= ?", id, now])
@@ -222,13 +226,6 @@ module Delayed
         def self.unhold!
           now = db_time_now
           update_all(["locked_by = NULL, locked_at = NULL, attempts = 0, run_at = (CASE WHEN run_at > ? THEN run_at ELSE ? END), failed_at = NULL", now, now])
-        end
-
-        # Get the current time (GMT or local depending on DB)
-        # Note: This does not ping the DB to get the time, so all your clients
-        # must have syncronized clocks.
-        def self.db_time_now
-          Time.now.in_time_zone
         end
 
         class Failed < Job

@@ -14,20 +14,18 @@
   font-size: 24px
 #gradebook_header
   background: url("/images/canvas/header_bg.png") repeat-x left -28px
-  :border-bottom 1px solid #aaa
   :padding 8px 25px 2px 8px
   :font-size 11px
   :text-align center
-  :color #666
+  color: #fff
   height: 31px
   position: relative
   min-width: 960px
+  .ui-icon
+    background-image: $iconsActive
   a
-    :color #666
+    :color #fff
     :font-weight bold
-    &:hover, &:focus
-      :text-decoration underline
-      :background-color transparent
   #avatar
     width: 32px
     display: block
@@ -383,7 +381,8 @@ body .ui-selectmenu-dropdown
     :width 17px
     :height 22px
     :border 0
-    :background transparent url("/images/inst_combo/trigger.gif") no-repeat 0 0
+    background-image: url("/images/inst_combo/trigger.gif") !important
+    background-position: 0 0
     :cursor pointer
     :border-bottom 1px solid #B5B8C8
     :position absolute

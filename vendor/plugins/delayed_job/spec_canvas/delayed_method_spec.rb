@@ -1,10 +1,10 @@
-require File.expand_path("../spec_helper", __FILE__)
-
-describe 'random ruby objects' do
-   before :each do
-     Delayed::Worker.queue = nil
-     Delayed::Job.delete_all
-   end
+shared_examples_for 'random ruby objects' do
+  def set_queue(name)
+    old_name = Delayed::Worker.queue
+    Delayed::Worker.queue = name
+  ensure
+    Delayed::Worker.queue = old_name
+  end
 
   it "should respond_to :send_later method" do
     Object.new.respond_to?(:send_later)
@@ -281,13 +281,10 @@ describe 'random ruby objects' do
 
   it "should call send later on methods which are wrapped with handle_asynchronously" do
     story = Story.create :text => 'Once upon...'
-  
-    Delayed::Job.count.should == 0
-  
-    story.whatever(1, 5)
-  
-    Delayed::Job.count.should == 1
-    job =  Delayed::Job.find(:first)
+
+    job = nil
+    expect { job = story.whatever(1, 5) }.to change(Delayed::Job, :count).by(1)
+
     job.payload_object.class.should   == Delayed::PerformableMethod
     job.payload_object.method.should  == :whatever_without_send_later
     job.payload_object.args.should    == [1, 5]
@@ -296,29 +293,29 @@ describe 'random ruby objects' do
 
   it "should call send later on methods which are wrapped with handle_asynchronously_with_queue" do
     story = Story.create :text => 'Once upon...'
-  
-    Delayed::Job.count.should == 0
-  
-    story.whatever_else(1, 5)
-  
-    Delayed::Job.count.should == 1
-    job =  Delayed::Job.find(:first)
+
+    job = nil
+    expect { job = story.whatever_else(1, 5) }.to change(Delayed::Job, :count).by(1)
+
     job.payload_object.class.should   == Delayed::PerformableMethod
     job.payload_object.method.should  == :whatever_else_without_send_later
     job.payload_object.args.should    == [1, 5]
     job.payload_object.perform.should == 'Once upon...'
   end
-  
+
   context "send_later" do
     it "should use the default queue if there is one" do
-      Delayed::Worker.queue = "testqueue"
-      job = "string".send_later :reverse
-      job.queue.should == "testqueue"
+      set_queue("testqueue") do
+        job = "string".send_later :reverse
+        job.queue.should == "testqueue"
+      end
     end
-    
+
     it "should have nil queue if there is not a default" do
-      job = "string".send_later :reverse
-      job.queue.should == nil
+      set_queue(nil) do
+        job = "string".send_later :reverse
+        job.queue.should == nil
+      end
     end
   end
 
@@ -344,14 +341,17 @@ describe 'random ruby objects' do
     end
     
     it "should use the default queue if there is one" do
-      Delayed::Worker.queue = "testqueue"
-      job = "string".send_at 1.hour.from_now, :reverse
-      job.queue.should == "testqueue"
+      set_queue("testqueue") do
+        job = "string".send_at 1.hour.from_now, :reverse
+        job.queue.should == "testqueue"
+      end
     end
     
     it "should have nil queue if there is not a default" do
-      job = "string".send_at 1.hour.from_now, :reverse
-      job.queue.should == nil
+      set_queue(nil) do
+        job = "string".send_at 1.hour.from_now, :reverse
+        job.queue.should == nil
+      end
     end
   end
 
@@ -369,9 +369,10 @@ describe 'random ruby objects' do
     end
     
     it "should override the default queue" do
-      Delayed::Worker.queue = "default_queue"
-      job = "string".send_at_with_queue(1.hour.from_now, :length, "testqueue")
-      job.queue.should == "testqueue"
+      set_queue("default_queue") do
+        job = "string".send_at_with_queue(1.hour.from_now, :length, "testqueue")
+        job.queue.should == "testqueue"
+      end
     end
     
     it "should store payload as PerformableMethod" do

@@ -18,6 +18,10 @@
 
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
+  def self.display_name_order_by_clause(table = nil)
+    col = table ? "#{table}.display_name" : 'display_name'
+    best_unicode_collation_key(col)
+  end
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data
   include HasContentTags
   include ContextModuleItem
@@ -600,8 +604,6 @@ class Attachment < ActiveRecord::Base
     # Return existing value, even if nil, as long as it's defined
     @file_store_config ||= YAML.load_file(RAILS_ROOT + "/config/file_store.yml")[RAILS_ENV] rescue nil
     @file_store_config ||= { 'storage' => 'local' }
-    # default the secure setting to true only in production
-    @file_store_config['secure'] = Rails.env.production? unless @file_store_config.has_key?('secure')
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
     if RAILS_ENV == "test"
       # yes, a rescue nil; the problem is that in an automated test environment, this may be
@@ -642,8 +644,7 @@ class Attachment < ActiveRecord::Base
     def authenticated_s3_url(*args)
       return root_attachment.authenticated_s3_url(*args) if root_attachment
       protocol = args[0].is_a?(Hash) && args[0][:protocol]
-      protocol ||= self.class.file_store_config['secure'] ? "https://" : "http://"
-      protocol ||= "//"
+      protocol ||= "#{HostUrl.protocol}://"
       "#{protocol}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
     end
 
@@ -1329,7 +1330,9 @@ class Attachment < ActiveRecord::Base
   named_scope :needing_scribd_conversion_status, :conditions => ['attachments.workflow_state = ? AND attachments.updated_at < ?', 'processing', 30.minutes.ago], :limit => 50
   named_scope :uploadable, :conditions => ['workflow_state = ?', 'pending_upload']
   named_scope :active, :conditions => ['file_state = ?', 'available']
-  named_scope :thumbnailable?, :conditions => {:content_type => Technoweenie::AttachmentFu.content_types}  
+  named_scope :thumbnailable?, :conditions => {:content_type => Technoweenie::AttachmentFu.content_types}
+  named_scope :by_display_name, :order => display_name_order_by_clause('attachments')
+  named_scope :by_position_then_display_name, :order => "attachments.position, #{display_name_order_by_clause('attachments')}"
   def self.serialization_excludes; [:uuid, :namespace]; end
   def set_serialization_options
     if self.scribd_doc

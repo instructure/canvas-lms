@@ -1,0 +1,12 @@
+<li>
+  {{#if image_url}}
+    <img src="{{image_url}}"/>
+  {{else}}
+    <i class="{{iconClass}}"></i>
+  {{/if}}
+  {{#if title}}
+    {{title}}
+  {{else}}
+    {{#t "no_title"}}No title{{/t}}
+  {{/if}}
+</li>

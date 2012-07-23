@@ -32,7 +32,13 @@ class RequestContextGenerator
     }
     
     status, headers, body = @app.call(env)
+
+    # The session id may have been reset in the request, in which case
+    # we want to log the new one,
+    session_id = (env['rack.session.options'] || {})[:id]
+    headers['X-Session-Id'] = session_id if session_id
     headers['X-Request-Context-Id'] = request_id
+
     [ status, headers, body ]
   end
 

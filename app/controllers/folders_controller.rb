@@ -16,33 +16,128 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Files
+# @subtopic Folders
+#
+# @object Folder
+#     {
+#       "context_type":"Course",
+#       "context_id":1401,
+#       "locked":null,
+#       "files_count":0,
+#       "position":3,
+#       "updated_at":"2012-07-06T14:58:50Z",
+#       "folders_url":"https://www.example.com/api/v1/folders/2937/folders",
+#       "files_url":"https://www.example.com/api/v1/folders/2937/files",
+#       "full_name":"course files/11folder",
+#       "lock_at":null,
+#       "id":2937,
+#       "folders_count":0,
+#       "name":"11folder",
+#       "parent_folder_id":2934,
+#       "created_at":"2012-07-06T14:58:50Z",
+#       "unlock_at":null
+#     }
 class FoldersController < ApplicationController
-  before_filter :require_context
-  
+  include Api::V1::Folders
+
+  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update]
+
   def index
     if authorized_action(@context, @current_user, :read)
       render :json => Folder.root_folders(@context).to_json(:permissions => {:user => @current_user, :session => session})
     end
   end
+
   
+  # @API List folders
+  # @subtopic Folders
+  # Returns the paginated list of folders in the folder.
+  #
+  # @argument sort_by Either 'alphabetical' (default) or 'position'
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \ 
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders?sort_by=position' \ 
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Folder]
+  def api_index
+    folder = Folder.find(params[:id])
+    if authorized_action(folder, @current_user, :read_contents)
+      scope = folder.active_sub_folders
+      if !folder.grants_right?(@current_user, session, :update)
+        scope = scope.not_hidden
+      end
+      if params[:sort_by] == 'position'
+        scope = scope.by_position
+      else
+        scope = scope.by_name
+      end
+      @folders = Api.paginate(scope, self, api_v1_list_folders_url(@context))
+      render :json => folders_json(@folders, @current_user, session)
+    end
+  end
+  
+  # @API Get folder
+  # @subtopic Folders
+  # Returns the details for a folder
+  #
+  # You can get the root folder from a context by using 'root' as the :id.
+  # For example, you could get the root folder for a course like:
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/courses/1337/folders/root' \ 
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns Folder
   def show
-    @folder = @context.folders.find(params[:id])
+    if api_request?
+      if params[:id] == 'root'
+        require_context
+        @folder = Folder.root_folders(@context).first
+      else
+        get_context
+        if @context
+          @folder = @context.folders.active.find(params[:id])
+        else
+          @folder = Folder.find(params[:id])
+        end
+      end
+    else
+      require_context
+      @folder = @context.folders.find(params[:id])
+    end
+    raise ActiveRecord::RecordNotFound if @folder.deleted?
     if authorized_action(@folder, @current_user, :read_contents)
-      respond_to do |format|
-        format.html { redirect_to named_context_url(@context, :context_files_url, :folder_id => @folder.id) }
-        files = if @context.grants_right?(@current_user, session, :manage_files)
-                  @folder.active_file_attachments
-                else
-                  @folder.visible_file_attachments
-                end
-        files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size, :scribdable?], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :scribd_doc, :filename]}
-        folders_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class], :only => [:id, :context_id, :context_type, :lock_at, :last_lock_at, :last_unlock_at, :name, :parent_folder_id, :position, :unlock_at]}
-        res = {
-          :actual_folder => @folder.as_json(folders_options),
-          :sub_folders => @folder.active_sub_folders.map { |f| f.as_json(folders_options) },
-          :files => files.map { |f| f.as_json(files_options)}
-        }
-        format.json { render :json => res }
+      if api_request?
+        render :json => folder_json(@folder, @current_user, session)
+      else
+        respond_to do |format|
+          format.html { redirect_to named_context_url(@context, :context_files_url, :folder_id => @folder.id) }
+          files = if @context.grants_right?(@current_user, session, :manage_files)
+                    @folder.active_file_attachments.by_position_then_display_name
+                  else
+                    @folder.visible_file_attachments.by_position_then_display_name
+                  end
+          files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size, :scribdable?], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :scribd_doc, :filename]}
+          folders_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class], :only => [:id, :context_id, :context_type, :lock_at, :last_lock_at, :last_unlock_at, :name, :parent_folder_id, :position, :unlock_at]}
+          res = {
+            :actual_folder => @folder.as_json(folders_options),
+            :sub_folders => @folder.active_sub_folders.by_position.map { |f| f.as_json(folders_options) },
+            :files => files.map { |f| f.as_json(files_options)}
+          }
+          format.json { render :json => res }
+        end
       end
     end
   end
@@ -61,7 +156,7 @@ class FoldersController < ApplicationController
                                 sort_by{|a| a.created_at }
       @attachment = @attachments.pop
       @attachments.each{|a| a.destroy! }
-      last_date = (@folder.active_file_attachments.map(&:updated_at) + @folder.active_sub_folders.map(&:updated_at)).compact.max
+      last_date = (@folder.active_file_attachments.map(&:updated_at) + @folder.active_sub_folders.by_position.map(&:updated_at)).compact.max
       if @attachment && last_date && @attachment.created_at < last_date
         @attachment.destroy!
         @attachment = nil
@@ -98,27 +193,58 @@ class FoldersController < ApplicationController
       end
     end
   end
-  
+
+  # @API Update folder
+  # @subtopic Folders
+  # Updates a folder
+  #
+  # @argument name The new name of the folder
+  # @argument parent_folder_id The id of the folder to move this folder into. The new folder must be in the same context as the original parent folder.
+  # @argument lock_at The datetime to lock the folder at
+  # @argument unlock_at The datetime to unlock the folder at
+  # @argument locked Flag the folder as locked
+  # @argument hidden Flag the folder as hidden
+  # @argument position Set an explicit sort position for the folder
+  #
+  # @example_request
+  #
+  #   curl -XPUT 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #        -F 'name=<new_name>' \ 
+  #        -F 'locked=true' \ 
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns Folder
   def update
-    @folder = @context.folders.find(params[:id])
+    folder_params = process_folder_params(params, api_request?)
+    if api_request?
+      @folder = Folder.find(params[:id])
+      @context = @folder.context
+    else
+      require_context
+      @folder = @context.folders.find(params[:id])
+    end
     if authorized_action(@folder, @current_user, :update)
       respond_to do |format|
-        just_hide = params[:folder].delete(:just_hide)
+        just_hide = folder_params.delete(:just_hide)
         if just_hide == '1'
-          params[:folder][:locked] = false
-          params[:folder][:hidden] = true
+          folder_params[:locked] = false
+          folder_params[:hidden] = true
         end
-        if parent_folder_id = params[:folder].delete(:parent_folder_id)
-          params[:folder][:parent_folder] = @context.folders.active.find(parent_folder_id)
+        if parent_folder_id = folder_params.delete(:parent_folder_id)
+          folder_params[:parent_folder] = @context.folders.active.find(parent_folder_id)
         end
-        if @folder.update_attributes(params[:folder])
+        if @folder.update_attributes(folder_params)
           if !@folder.parent_folder_id || !@context.folders.find_by_id(@folder)
             @folder.parent_folder = Folder.root_folders(@context).first
             @folder.save
           end
           flash[:notice] = t :event_updated, 'Event was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.json { render :json => @folder.to_json(:methods => [:currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
+          if api_request?
+            format.json { render :json => folder_json(@folder, @current_user, session) }
+          else
+            format.json { render :json => @folder.to_json(:methods => [:currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
+          end
         else
           format.html { render :action => "edit" }
           format.json { render :json => @folder.errors.to_json, :status => :bad_request }
@@ -126,15 +252,49 @@ class FoldersController < ApplicationController
       end
     end
   end
-  
-  def create
-    source_folder_id = params[:folder].delete(:source_folder_id)
-    if parent_folder_id = params[:folder].delete(:parent_folder_id)
-      parent_folder = @context.folders.find(parent_folder_id)
-      params[:folder][:parent_folder] = parent_folder
-    end
 
-    @folder = @context.folders.build(params[:folder])
+  # @API Create folder
+  # @subtopic Folders
+  # Creates a folder in the specified context
+  #
+  # @argument name The name of the folder
+  # @argument parent_folder_id The id of the folder to store the file in. If this and parent_folder_path are sent an error will be returned. If neither is given, a default folder will be used.
+  # @argument parent_folder_path The path of the folder to store the new folder in. The path separator is the forward slash `/`, never a back slash. The parent folder will be created if it does not already exist. This parameter only applies to new folders in a context that has folders, such as a user, a course, or a group. If this and parent_folder_id are sent an error will be returned. If neither is given, a default folder will be used.
+  # @argument lock_at The datetime to lock the folder at
+  # @argument unlock_at The datetime to unlock the folder at
+  # @argument locked Flag the folder as locked
+  # @argument hidden Flag the folder as hidden
+  # @argument position Set an explicit sort position for the folder
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/files/<file_id>' \ 
+  #        -F 'name=<new_name>' \ 
+  #        -F 'locked=true' \ 
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns Folder
+  def create
+    folder_params = process_folder_params(params, api_request?)
+
+    source_folder_id = folder_params.delete(:source_folder_id)
+
+    if folder_params[:parent_folder_path] && folder_params[:parent_folder_id]
+      render :json => {:message => t('only_one_folder', "Can't set folder path and folder id")}, :status => 400
+      return
+    elsif folder_params[:parent_folder_id]
+      parent_folder = @context.folders.find(folder_params.delete(:parent_folder_id))
+    elsif @context.respond_to?(:folders) && folder_params[:parent_folder_path].is_a?(String)
+      root = Folder.root_folders(@context).first
+      if authorized_action(root, @current_user, :create)
+        parent_folder = Folder.assert_path(folder_params.delete(:parent_folder_path), @context)
+      else
+        return
+      end
+    end
+    folder_params[:parent_folder] = parent_folder
+
+    @folder = @context.folders.build(folder_params)
     if authorized_action(@folder, @current_user, :create)
       if !@folder.parent_folder_id || !@context.folders.find_by_id(@folder.parent_folder_id)
         @folder.parent_folder_id = Folder.unfiled_folder(@context).id
@@ -146,7 +306,11 @@ class FoldersController < ApplicationController
         if @folder.save
           flash[:notice] = t :folder_created, 'Folder was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.json { render :json => @folder.to_json(:permissions => {:user => @current_user, :session => session}) }
+          if api_request?
+            format.json { render :json => folder_json(@folder, @current_user, session) }
+          else
+            format.json { render :json => @folder.to_json(:permissions => {:user => @current_user, :session => session}) }
+          end
         else
           format.html { render :action => "new" }
           format.json { render :json => @folder.errors.to_json }
@@ -154,6 +318,14 @@ class FoldersController < ApplicationController
       end
     end
   end
+
+  def process_folder_params(parameters, api_request)
+    folder_params = (api_request ? parameters : parameters[:folder]) || {}
+    folder_params.slice(:name, :parent_folder_id, :parent_folder_path, 
+                        :source_folder_id, :lock_at, :unlock_at, :locked, 
+                        :hidden, :context, :position, :just_hide)
+  end
+  private :process_folder_params
   
   def destroy
     @folder = Folder.find(params[:id])
@@ -165,4 +337,31 @@ class FoldersController < ApplicationController
       end
     end
   end
+
+  # @API Delete folder
+  # @subtopic Folders
+  # Remove the specified folder. You can only delete empty folders unless you
+  # set the 'force' flag
+  #
+  # @argument force Set to 'true' to allow deleting a non-empty folder
+  #
+  # @example_request
+  #
+  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #        -H 'Authorization: Bearer <token>'
+  def api_destroy
+    @folder = Folder.find(params[:id])
+    if authorized_action(@folder, @current_user, :delete)
+      if @folder.root_folder?
+        render :json => {:message => t('no_deleting_root', "Can't delete the root folder")}, :status => 400
+      elsif @folder.has_contents? && params[:force] != 'true'
+        render :json => {:message => t('no_deleting_folders_with_content', "Can't delete a folder with content")}, :status => 400
+      else
+        @context = @folder.context
+        @folder.destroy
+        render :json => folder_json(@folder, @current_user, session)
+      end
+    end
+  end
+  
 end

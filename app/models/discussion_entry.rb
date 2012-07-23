@@ -28,7 +28,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
   has_many :discussion_entry_participants
-  belongs_to :discussion_topic, :touch => true
+  belongs_to :discussion_topic
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
   # also null if a root entry
@@ -166,7 +166,12 @@ class DiscussionEntry < ActiveRecord::Base
 
   def update_discussion
     if %w(workflow_state message attachment_id editor_id).any? { |a| self.changed.include?(a) }
-      self.discussion_topic.touch
+      dt = self.discussion_topic
+      loop do
+        dt.touch
+        dt = dt.root_topic
+        break if dt.blank?
+      end
       connection.after_transaction_commit { self.discussion_topic.update_materialized_view }
     end
   end

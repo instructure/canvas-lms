@@ -104,7 +104,7 @@ describe "links" do
 
       it "should navigate user to user profile page after profile link is clicked" do
         link = find_dashboard_link('#identity', 'Profile')
-        validate_link(link, 'profile')
+        expect_new_page_load { link.click }
       end
     end
 

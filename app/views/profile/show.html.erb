@@ -1,0 +1,46 @@
+<%
+  jammit_css :profile_show
+  js_bundle :profile_show
+  @body_classes << 'no-page-block'
+  content_for :page_title, @user.short_name
+%>
+<div class="image-block">
+  <div class="image-block-image profile-avatar-wrapper">
+    <%= avatar_image @user.id, 100 %>
+  </div>
+  <div class="image-block-content">
+    <h1><%= @user.short_name %></h1>
+    <p><%= format_message(@user.bio || "").first.html_safe %></p>
+    <% if @can_follow %>
+      <p><button id="follow_user" class="button">Follow</button></p>
+    <% end %>
+  </div>
+</div>
+
+<% content_for :right_side do %>
+  <div class="rs-margin-all">
+    <table class="stats">
+      <tr class="stats-header">
+        <th colspan="2">Stats</th>
+      </tr>
+      <tr>
+        <th>Followers</th>
+        <td><%= @followers_count %></td>
+      </tr><tr>
+        <th>Collections</th>
+        <td><%= @user.collections.public.count %></td>
+      </tr><tr>
+        <th>Items</th>
+        <td><%= @items_count %></td>
+    </table>
+
+    <% if @user.show_user_services? && @services.present? %>
+      <div class="social-header border border-b">Find Me On</div>
+      <ul class="social-links">
+        <% @services.each do |s| %>
+          <li><a href="<%= s.service_user_link %>" class="social <%= s.service %>"><%= s.service_name %></a></li>
+          <% end %>
+      </ul>
+    <% end %>
+  </div>
+<% end %>

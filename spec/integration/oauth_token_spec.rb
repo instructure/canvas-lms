@@ -27,7 +27,7 @@ describe integration do
   it "should error if the service isn't enabled" do
     UsersController.any_instance.expects(:feature_and_service_enabled?).with(integration.underscore).returns(false)
     get "/oauth?service=#{integration.underscore}"
-    response.should redirect_to(profile_url)
+    response.should redirect_to(user_profile_url(@user))
     flash[:error].should be_present
   end
 
@@ -50,7 +50,7 @@ describe integration do
     oreq.token.should == "test_token"
     oreq.secret.should == "test_secret"
     oreq.user.should == @user
-    oreq.return_url.should == profile_url
+    oreq.return_url.should == user_profile_url(@user)
   end
 
   describe "oauth_success" do
@@ -59,7 +59,7 @@ describe integration do
         :service => integration.underscore,
         :token => "test_token",
         :secret => "test_secret",
-        :return_url => profile_url,
+        :return_url => user_profile_url(@user),
         :user => @user,
         :original_host_with_port => "www.example.com",
       })
@@ -67,14 +67,14 @@ describe integration do
 
     it "should fail without a valid token" do
       get "/oauth_success?service=#{integration.underscore}&oauth_token=wrong&oauth_verifier=test_verifier"
-      response.should redirect_to(profile_url)
+      response.should redirect_to(user_profile_url(@user))
       flash[:error].should be_present
     end
 
     it "should fail with the wrong user" do
       OauthRequest.last.update_attribute(:user, User.create!)
       get "/oauth_success?service=#{integration.underscore}&oauth_token=test_token&oauth_verifier=test_verifier"
-      response.should redirect_to(profile_url)
+      response.should redirect_to(user_profile_url(@user))
       flash[:error].should be_present
     end
 
@@ -91,7 +91,7 @@ describe integration do
       UsersController.any_instance.expects("#{integration.underscore}_get_service_user").with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
 
       get "/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}"
-      response.should redirect_to(profile_url)
+      response.should redirect_to(user_profile_url(@user))
       flash[:error].should be_blank
       flash[:notice].should be_present
       us = UserService.find_by_service_and_user_id(integration.underscore, @user.id)
@@ -111,7 +111,7 @@ describe integration do
       # pretend that somehow we think we got a valid auth token, but we actually didn't
       UsersController.any_instance.expects("#{integration.underscore}_get_service_user").with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
       get "/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}"
-      response.should redirect_to(profile_url)
+      response.should redirect_to(user_profile_url(@user))
       flash[:error].should be_present
       flash[:notice].should be_blank
       us = UserService.find_by_service_and_user_id(integration.underscore, @user.id)

@@ -1,0 +1,36 @@
+<div class="registration-dialog">
+  <form class="form-horizontal bootstrap-form" method="post" action="/users">
+    <div class="control-group">
+      <label class="control-label" for="student_higher_ed_name">{{#t "labels.name"}}Full Name{{/t}}</label>
+      <div class="controls">
+        <input type="text" id="student_higher_ed_name" name="user[name]" class="input-xlarge">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="student_higher_ed_email">{{#t "labels.email"}}Email{{/t}}</label>
+      <div class="controls">
+        <input type="text" id="student_higher_ed_email" name="pseudonym[unique_id]" class="input-xlarge">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="student_higher_ed_birthdate">{{#t "labels.birthdate"}}Birth Date{{/t}}</label>
+      <div class="controls">
+        <input type="text" id="student_higher_ed_birthdate" name="user[birthdate]" class="input-small date-field">
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox">
+          <input type="checkbox" name="user[terms_of_use]" value="1">
+          {{#t "agree_to_terms"}}You agree to the <a href="{{terms_url}}" target="_new">terms of use</a>.{{/t}}
+        </label>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <input type="hidden" name="enrollment_type" value="student">
+        <button class="button btn-primary" type="submit">{{#t "buttons.start_learning"}}Start Learning{{/t}}</button>
+      </div>
+    </div>
+  </form>
+</div>

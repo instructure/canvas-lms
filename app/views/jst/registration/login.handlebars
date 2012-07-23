@@ -1,0 +1,16 @@
+<form method="post" action="/login" id="login_form" class="bootstrap-form">
+  <input type="hidden" name="redirect_to_ssl" value="1"/>
+  <div>
+    <input name="pseudonym_session[unique_id]" class="login-input" type="text" placeholder="{{login_handle_name}}">
+  </div>
+  <div>
+    <input name="pseudonym_session[password]" class="login-input" type="password" placeholder="{{#t "password"}}Password{{/t}}">
+  </div>
+  <div>
+    <button type="submit">{{#t "sign_in"}}Sign In{{/t}}</button> 
+  </div>
+  <label class="checkbox">
+    <input name="pseudonym_session[remember_me]" type="checkbox">
+    {{#t "remember_me"}}Remember Me{{/t}}
+  </label>
+</form>

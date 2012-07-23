@@ -1,6 +1,4 @@
-require File.expand_path("../spec_helper", __FILE__)
-
-describe Delayed::PerformableMethod do
+shared_examples_for 'Delayed::PerformableMethod' do
   
   it "should not ignore ActiveRecord::RecordNotFound errors because they are not always permanent" do
     story = Story.create :text => 'Once upon...'

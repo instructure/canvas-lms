@@ -1,0 +1,66 @@
+@import 'environment'
+
+.profile-avatar-wrapper
+  margin-right: 30px
+
+.stats
+  text-align: left
+  width: 100%
+
+  tr
+    border-bottom: 1px solid #dfdfdf
+
+  .stats-header
+    border-bottom: 1px solid $borderColor
+
+  td
+    text-align: right
+    color: $linkColor
+    font-weight: bold
+
+.social-header
+  font-weight: bold
+  margin: $gridGutterWidth 0 5px
+
+.social-links
+  list-style-type: none
+  margin: 0
+  padding: 0
+
+.social
+  display: inline-block
+  width: 30px
+  height: 30px
+  margin-right: 20px
+  background-image: url(/images/social-icons.png)
+  +accessible_text_replacement
+
+.facebook
+  background-position: 0 0
+  &:hover
+    background-position: 0 -32px
+
+.twitter
+  background-position: -34px 0
+  &:hover
+    background-position: -34px -32px
+
+.linked_in
+  background-position: -97px 0
+  &:hover
+    background-position: -97px -32px
+
+.delicious
+  background-position: -129px 0
+  &:hover
+    background-position: -129px -32px
+
+.diigo
+  background-position: -160px 0
+  &:hover
+    background-position: -160px -32px
+
+.skype
+  background-position: -193px 0
+  &:hover
+    background-position: -193px -32px

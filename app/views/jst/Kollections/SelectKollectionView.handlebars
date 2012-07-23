@@ -1,0 +1,7 @@
+<select name="collection_id">
+  <option value="">-- {{#t "choose_a_collection"}}Choose A Collection{{/t}} --</option>
+  {{#each this}}
+    <option value="{{cid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+  {{/each}}
+  <option value="new">+ {{#t "add_new_collection"}}Add New Collection{{/t}}</option>
+</select>

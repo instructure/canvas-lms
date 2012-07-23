@@ -117,7 +117,35 @@ describe UserContent, :type => :integration do
       :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
-    doc.at_css('img')['src'].should == "/courses/#{@course.id}/files/#{@attachment.id}/preview"
+    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
+  end
+
+  it "should prepend the hostname to all absolute-path links" do
+    course_with_teacher(:active_all => true)
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
+    <p>
+      Hello, students.<br>
+      <img src='/equation_images/1234'>
+      <a href='/help'>click for teh help</a>
+      <a href='//example.com/quiz'>a quiz</a>
+      <a href='http://example.com/test1'>moar</a>
+      <a href='invalid url'>broke</a>
+    </p>
+    HTML
+
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+    { :controller => 'assignments_api', :action => 'show',
+      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc.at_css('img')['src'].should == "http://www.example.com/equation_images/1234"
+    doc.css('a').map { |e| e['href'] }.should == [
+      "http://www.example.com/help",
+      "//example.com/quiz",
+      "http://example.com/test1",
+      "invalid%20url",
+    ]
   end
 end
 

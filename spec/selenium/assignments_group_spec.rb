@@ -70,6 +70,24 @@ describe "assignment groups" do
     keep_trying_until { find_with_jquery('#group_weight_total').text.should == '50%' }
   end
 
+  it "should reorder assignment groups with drag and drop" do
+    ags = []
+    4.times do |i|
+      ags << @course.assignment_groups.create!(:name => "group_#{i}")
+    end
+    ags.collect(&:position).should eql([1,2,3,4])
+
+    get "/courses/#{@course.id}/assignments"
+
+    second_group = fj("#group_#{ags[1].id} .group_move_icon")
+    third_group = fj("#group_#{ags[2].id} .group_move_icon")
+    driver.action.drag_and_drop(third_group, second_group).perform
+    wait_for_ajaximations
+    
+    ags.each {|ag| ag.reload}
+    ags.collect(&:position).should eql([1,3,2,4])
+  end
+  
   it "should round assignment groups percentages to 2 decimal places" do
     pending("bug 7387 - Assignment group weight should be rounded to 2 decimal places. Not 10") do
       3.times do |i|

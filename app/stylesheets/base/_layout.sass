@@ -3,7 +3,8 @@
 body, html
   height: 100%
 body
-  background: url("/images/body-bg.png") repeat-x top #e0e0e0
+  background-image: url("/images/blue/bg.jpg")
+  min-width: $min_main_width
 
   &.no-headers
     background: #fff
@@ -31,30 +32,32 @@ body
   // the sole purpose of this div is to make it so the shadow on #wrapper does not cause the page to have scroll bars.
   overflow: hidden
 #wrapper
-  margin: 0 21px
   +pie-clearfix
-
-
 
 #main
   position: relative
   z-index: 10
-  background-color: $main_background_color  
-  border-left: 1px solid #ddd
-  border-top: 0px solid #ddd
-  border-bottom: 1px solid #ccc
-  border-right: 1px solid #ccc
+  background-color: $main_background_color
+  border: 1px solid $listBorderColor
+  border-top: 0
   margin-bottom: 40px
   +pie-clearfix
   min-height: 450px
-  
+  max-width: $max_main_width
+
 #content
   padding: 1em
   overflow: hidden
-body.padless-content #content,#content.padless
+
+
+// **********************************************************************************
+// all of the following are classes that should be applied to 'body' when appropriate
+
+.padless-content #content, #content.padless
   padding: 0
-  
-body.with-left-side
+
+.with-left-side
+  min-width: $left_side_width + $min_main_width
   #footer
     margin-left: $left_side_width
   #wrapper
@@ -63,83 +66,82 @@ body.with-left-side
     display: block
   #main
     margin-left: $left_side_width
-body.with-right-side.with-left-side
+  #header-inner
+    max-width: $left_side_width + $max_main_width
+
+.with-right-side
+  min-width: $right_side_width + $min_main_width
+  #right-side-wrapper
+    display: block
+    float: right
+  #main
+    margin-right: $right_side_width
+  #header-inner
+    max-width: $right_side_width + $max_main_width
+
+
+
+.with-right-side.with-left-side
   min-width: $right_side_width + $left_side_width + $min_main_width
-body
-  &.with-right-side
-    #right-side-wrapper
-      display: block
-      float: right
-  &.with-scrolling-right-side, &.with-sidebar-pinned-to-bottom
-    #content
-      padding-right: $right_side_width + 29px
-    #right-side-wrapper
-      position: absolute
-      right: 0
-      width: $right_side_width + 16px
-  &.with-scrolling-right-side
-    #right-side
-      position: fixed
-      top: 0
-  &.with-sidebar-pinned-to-bottom
-    #right-side, #right-side-wrapper
-      bottom: 0
-      
-    
-    
+  #header-inner
+    max-width: $right_side_width + $left_side_width + $max_main_width
+
+.full-width
+  #header-inner, #main
+    max-width: none
+
+
+// **********************************************************************************
+// end classes applied to body
+
 #breadcrumbs
-  border-bottom: 1px solid #ccc
-  background-color: #F9F9F9
-  box-shadow: 0 0 36px #F2F2F2
+  border-bottom: 1px solid #efefef
+  overflow: hidden
+  background-color: #fff
   ul
     +reset-list
     +clearfix
-    margin: 0 0 0 10px
-    color: #595959
-    font-size: 13px
-    font-family: GillSans,Calibri,Trebuchet,sans-serif
-
+    margin-left: 10px
+    color: #637178
+    font-size: 12px
     li
       float: left
       height: 27px
-      line-height: 2.1em
-      padding-left: 18px
-      margin: 0
-      margin-left: 1px
-      background: url(/images/breadcrumb-right-chevron.png) left 50% no-repeat
-
+      line-height: 29px
+      padding-left: 12px
+      margin-left: 8px
+      background: url(/images/breadcrumb-chevron.png) left 50% no-repeat
       &:first-child
         background: none
         padding-left: 0
         margin-left: 0
-        
+    .home a
+      background: url(/images/breadcrumb-home.png) no-repeat left 50%
+      display: block
+      width: 10px
+      height: 26px
+      text-indent: -999px
 
-  a
-    color: inherit
-    &:hover, &:focus
-      background-color: transparent
-      text-decoration: underline
-      
   .ellipsis
     display: inline-block
 
-  ul li.home a
-    background: url(/images/breadcrumb-home.png) no-repeat left 50%
-    display: block
-    width: 10px
-    height: 27px
-    span
-      display: none
 
-// pasted from themes/warehouse screen.sass
-
-.hightlight
-  background-color: #ffc
-
-
-.small
+#footer
+  color: #5c5c5c
   font-size: 11px
+  margin: 0 15px 34px
+  img
+    vertical-align: bottom
+    padding: 0 20px 3px 0
 
-
-.gray
-  color: #999
+#footer-links
+  a
+    border-left: 1px solid #5C5C5C
+    color: #5C5C5C
+    margin-right: 0.4em
+    padding-left: 0.4em
+    &:hover, &:focus
+      text-decoration: underline
+    // ie7 supports :first-child so this will work on everything we support.
+    &:first-child
+      border-left: none

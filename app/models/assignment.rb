@@ -301,6 +301,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_quiz_or_discussion_topic
+    return true if self.deleted?
     if self.submission_types == "online_quiz" && @saved_by != :quiz
       quiz = Quiz.find_by_assignment_id(self.id) || self.context.quizzes.build
       quiz.assignment_id = self.id
@@ -315,7 +316,7 @@ class Assignment < ActiveRecord::Base
       quiz.saved_by = :assignment
       quiz.save
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
-      topic = DiscussionTopic.find_by_assignment_id(self.id) || self.context.discussion_topics.build
+      topic = self.discussion_topic || self.context.discussion_topics.build
       topic.assignment_id = self.id
       topic.title = self.title
       topic.message = self.description
@@ -323,6 +324,7 @@ class Assignment < ActiveRecord::Base
       topic.updated_at = Time.now
       topic.workflow_state = 'active' if topic.deleted?
       topic.save
+      self.discussion_topic = topic
     end
   end
   attr_writer :saved_by
@@ -406,6 +408,7 @@ class Assignment < ActiveRecord::Base
 
   def remove_assignment_updated_flag
     @assignment_changed = false
+    true
   end
 
   attr_accessor :suppress_broadcast
@@ -441,11 +444,12 @@ class Assignment < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
-    self.quiz.destroy if self.quiz && !self.quiz.deleted?
     ContentTag.delete_for(self)
     @grades_affected = true
     self.save
+
+    self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
+    self.quiz.destroy if self.quiz && !self.quiz.deleted?
   end
 
   def time_zone_edited
@@ -646,40 +650,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def to_ics(in_own_calendar=true)
-    cal = Icalendar::Calendar.new
-    # to appease Outlook
-    cal.custom_property("METHOD","PUBLISH")
-
-    event = Icalendar::Event.new
-    event.klass = "PUBLIC"
-    event.start = self.due_at.utc_datetime if self.due_at
-    event.start.icalendar_tzid = 'UTC' if event.start
-    event.end = event.start if event.start
-    event.end.icalendar_tzid = 'UTC' if event.end
-    if self.all_day
-      event.start = Date.new(self.all_day_date.year, self.all_day_date.month, self.all_day_date.day)
-      event.start.ical_params = {"VALUE"=>["DATE"]}
-      event.end = event.start
-      event.end.ical_params = {"VALUE"=>["DATE"]}
-    end
-    event.summary = self.title
-    event.description = strip_tags(self.description).strip
-    event.location = self.location
-    event.dtstamp = self.updated_at.utc_datetime if self.updated_at
-    event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
-    # This will change when there are other things that have calendars...
-    # can't call calendar_url or calendar_url_for here, have to do it manually
-    event.url           "http://#{HostUrl.context_host(self.context)}/calendar?include_contexts=#{self.context.asset_string}&month=#{self.due_at.strftime("%m") rescue ""}&year=#{self.due_at.strftime("%Y") rescue ""}#assignment_#{self.id.to_s}"
-    event.uid           "event-assignment-#{self.id.to_s}"
-    event.sequence      0
-    event = nil unless self.due_at
-
-    return event unless in_own_calendar
-
-    cal.add_event(event) if event
-
-    return cal.to_ical
-
+    return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
   end
 
   def all_day
@@ -1585,6 +1556,11 @@ class Assignment < ActiveRecord::Base
         assoc = rubric.associate_with(item, context, :purpose => 'grading')
         assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
         assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
+        if hash[:saved_rubric_comments]
+          assoc.summary_data ||= {}
+          assoc.summary_data[:saved_comments] ||= {}
+          assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
+        end
         assoc.save
       end
     end

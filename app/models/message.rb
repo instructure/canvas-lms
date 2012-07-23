@@ -41,6 +41,7 @@ class Message < ActiveRecord::Base
   validates_length_of :transmission_errors, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   def polymorphic_url_with_context_host(record_or_hash_or_array, options = {})
+    options[:protocol] = HostUrl.protocol
     if record_or_hash_or_array.is_a? Array
       options[:host] = HostUrl.context_host(record_or_hash_or_array.first)
     else

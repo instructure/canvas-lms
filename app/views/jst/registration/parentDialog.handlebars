@@ -1,0 +1,42 @@
+<div class="registration-dialog">
+  <form class="form-horizontal bootstrap-form" method="post" action="/users">
+    <div class="control-group">
+      <label class="control-label" for="parent_name">{{#t "labels.name"}}Your Name{{/t}}</label>
+      <div class="controls">
+        <input type="text" id="student_name" name="user[name]" class="input-xlarge">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="parent_email">{{#t "labels.email"}}Your Email{{/t}}</label>
+      <div class="controls">
+        <input type="text" id="parent_email" name="pseudonym[unique_id]" class="input-xlarge">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="parent_child_username">{{#t "labels.username"}}Child's Username{{/t}}</label>
+      <div class="controls">
+        <input type="text" id="parent_child_username" name="observee[unique_id]" class="input-medium">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="parent_child_password">{{#t "labels.password"}}Child's Password{{/t}}</label>
+      <div class="controls">
+        <input type="password" id="parent_child_password" name="observee[password]" class="input-medium">
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox">
+          <input type="checkbox" name="user[terms_of_use]" value="1">
+          {{#t "agree_to_terms"}}You agree to the <a href="{{terms_url}}" target="_new">terms of use</a>.{{/t}}
+        </label>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <input type="hidden" name="enrollment_type" value="observer">
+        <button class="button btn-primary" type="submit">{{#t "buttons.start_participating"}}Start Participating{{/t}}</button>
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,359 @@
+i[class*=icon-], i[class^=icon-] {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  background-image: url(/images/blue/canvas-icons-16x16-dkgrey.png);
+  background-repeat: no-repeat;
+
+  a:hover &,
+  a:focus &,
+  .hover & { background-image: url(../../../images/blue/canvas-icons-16x16-blue.png); }
+
+  a:active &,
+  .active & { background-image: url(../../../images/blue/canvas-icons-16x16-ltgrey.png); }
+
+}
+
+.quickStartBar {
+  i[class*=icon-], i[class^=icon-] {
+    background-image: url(/images/blue/quickstart-icons.png) !important;
+  }
+}
+
+i[class*=icon-large-], i[class^=icon-large-] {
+  width: 46px;
+  height: 46px;
+  line-height: 46px;
+  display: inline-block;
+}
+
+.icon-stats {
+  background-position: -50px -150px;
+}
+
+.icon-paperclip {
+  background-position: -116px -150px;
+}
+
+.icon-media {
+  background-position: -182px -150px;
+}
+
+.icon-address-book {
+  background-position: -248px -150px;
+}
+
+.icon-reset {
+  background-position: -314px -150px;
+}
+
+.icon-announcement {
+  background-position: -380px -150px;
+}
+
+.icon-analytics {
+  background-position: -446px -150px;
+}
+
+.icon-student-view {
+  background-position: -50px -216px;
+}
+
+.icon-calendar-day {
+  background-position: -116px -216px;
+}
+
+.icon-trash {
+  background-position: -182px -216px;
+}
+
+.icon-speed-grader {
+  background-position: -248px -216px;
+}
+
+.icon-copy-course {
+  background-position: -314px -216px;
+}
+
+.icon-import-content {
+  background-position: -380px -216px;
+}
+
+.icon-export-content {
+  background-position: -446px -216px;
+}
+
+.icon-discussion {
+  background-position: -50px -282px;
+}
+
+.icon-peer-review {
+  background-position: -116px -282px;
+}
+
+.icon-discussion-reply {
+  background-position: -182px -282px;
+}
+
+.icon-discussion-new {
+  background-position: -248px -282px;
+}
+
+.icon-edit {
+  background-position: -314px -282px;
+}
+
+.icon-home {
+  background-position: -380px -282px;
+}
+
+.icon-settings {
+  background-position: -446px -282px;
+}
+
+.icon-compose {
+  background-position: -50px -348px;
+}
+
+.icon-flag {
+  background-position: -116px -348px;
+}
+
+.icon-video {
+  background-position: -182px -348px;
+}
+
+.icon-audio {
+  background-position: -248px -348px;
+}
+
+.icon-outdent {
+  background-position: -314px -348px;
+}
+
+.icon-outdent2 {
+  background-position: -380px -348px;
+}
+
+.icon-indent {
+  background-position: -446px -348px;
+}
+
+.icon-forward {
+  background-position: -50px -414px;
+}
+
+.icon-warning {
+  background-position: -116px -414px;
+}
+
+.icon-filmstrip {
+  background-position: -182px -414px;
+}
+
+.icon-rubric {
+  background-position: -248px -414px;
+}
+
+.icon-check-plus {
+  background-position: -314px -414px;
+}
+
+.icon-rss {
+  background-position: -380px -414px;
+}
+
+.icon-rss-add {
+  background-position: -446px -414px;
+}
+
+.icon-quiz {
+  background-position: -50px -480px;
+}
+
+.icon-question {
+  background-position: -116px -480px;
+}
+
+.icon-drop-down {
+  background-position: -182px -480px;
+}
+
+.icon-minimize {
+  background-position: -248px -480px;
+}
+
+.icon-end {
+  background-position: -314px -480px;
+}
+
+.icon-add {
+  background-position: -380px -480px;
+}
+
+.icon-info {
+  background-position: -446px -480px;
+}
+
+.icon-check {
+  background-position: -50px -546px;
+}
+
+.icon-clock {
+  background-position: -116px -546px;
+}
+
+.icon-calendar-month {
+  background-position: -182px -546px;
+}
+
+.icon-x {
+  background-position: -248px -546px;
+}
+
+.icon-refresh {
+  background-position: -314px -546px;
+}
+
+.icon-off {
+  background-position: -380px -546px;
+}
+
+.icon-updown {
+  background-position: -446px -546px;
+}
+
+.icon-user-add {
+  background-position: -50px -612px;
+}
+
+.icon-group {
+  background-position: -116px -612px;
+}
+
+.icon-star {
+  background-position: -182px -612px;
+}
+
+.icon-replied {
+  background-position: -248px -612px;
+}
+
+.icon-hour-glass {
+  background-position: -314px -612px;
+}
+
+.icon-assignment {
+  background-position: -380px -612px;
+}
+
+.icon-message {
+  background-position: -446px -612px;
+}
+
+.icon-note-dark {
+  background-position: -50px -678px;
+}
+
+.icon-note-light {
+  background-position: -116px -678px;
+}
+
+.icon-tag {
+  background-position: -182px -678px;
+}
+
+.icon-next-unread {
+  background-position: -248px -678px;
+}
+
+.icon-search {
+  background-position: -314px -678px;
+}
+
+.icon-lock {
+  background-position: -380px -678px;
+}
+
+.icon-unlock {
+  background-position: -446px -678px;
+}
+
+.icon-rubric-dark {
+  background-position: -50px -744px;
+}
+
+.icon-folder {
+  background-position: -116px -744px;
+}
+
+.icon-toggle-right {
+  background-position: -182px -744px;
+}
+
+.icon-toggle-left {
+  background-position: -248px -744px;
+}
+
+.icon-link {
+  background-position: -314px -744px;
+}
+
+.icon-lti {
+  background-position: -380px -744px;
+}
+
+.icon-text {
+  background-position: -446px -744px;
+}
+
+.icon-timer {
+  background-position: -50px -810px;
+}
+
+.icon-pin {
+  background-position: -116px -810px;
+}
+
+.icon-like {
+  background-position: -182px -810px;
+}
+
+.icon-collection-save {
+  background-position: -248px -810px;
+}
+
+.icon-collection {
+  background-position: -314px -810px;
+}
+
+.icon-group-new {
+  background-position: -380px -810px;
+}
+
+.icon-group-new-dark {
+  background-position: -446px -810px;
+}
+
+.quickStartBar {
+  .icon-assignment {
+    background-position: -160px -10px;
+  }
+  .icon-discussion {
+    background-position: -72px -10px;
+  }
+  .icon-announcement {
+    background-position: -43px -10px;
+  }
+  .icon-message {
+    background-position: -12px -10px;
+  }
+  .icon-pin {
+    background-position: -102px -10px;
+  }
+  .icon-calendar-day, .icon-event {
+    background-position: -132px -10px;
+  }
+}
+

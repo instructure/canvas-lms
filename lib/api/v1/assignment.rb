@@ -20,8 +20,7 @@ module Api::V1::Assignment
   include Api::V1::Json
   include Api::V1::DiscussionTopics
 
-  def assignment_json(assignment, user, session, includes = [], show_admin_fields = false)
-    # no includes supported right now
+  def assignment_json(assignment, user, session)
     hash = api_json(assignment, user, session, :only => %w(id grading_type points_possible position due_at description assignment_group_id group_category_id))
 
     hash['course_id'] = assignment.context_id
@@ -29,7 +28,7 @@ module Api::V1::Assignment
     hash['description'] = api_user_content(hash['description'], @context || assignment.context)
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
 
-    if show_admin_fields
+    if assignment.grants_right?(user, :grade)
       hash['needs_grading_count'] = assignment.needs_grading_count
     end
 

@@ -519,6 +519,37 @@ describe Submission do
     # the real test, quiz_submission_version shouldn't care about usecs
     submission.quiz_submission_version.should == 2
   end
+
+  it "should return only comments readable by the user" do
+    course_with_teacher(:active_all => true)
+    @student1 = student_in_course(:active_user => true).user
+    @student2 = student_in_course(:active_user => true).user
+
+    @assignment = @course.assignments.new(:title => "some assignment")
+    @assignment.submission_types = "online_text_entry"
+    @assignment.workflow_state = "published"
+    @assignment.save
+
+    @submission = @assignment.submit_homework(@student1, :body => 'some message')
+    sc1 = SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "a")
+    sc2 = SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "b", :hidden => true)
+    sc3 = SubmissionComment.create!(:submission => @submission, :author => @student1, :comment => "c")
+    sc4 = SubmissionComment.create!(:submission => @submission, :author => @student2, :comment => "d")
+    @submission.reload
+
+    @submission.limit_comments(@teacher)
+    @submission.submission_comments.count.should eql 4
+    @submission.visible_submission_comments.count.should eql 3
+
+    @submission.limit_comments(@student1)
+    @submission.submission_comments.count.should eql 3
+    @submission.visible_submission_comments.count.should eql 3
+
+    @submission.limit_comments(@student2)
+    @submission.submission_comments.count.should eql 1
+    @submission.visible_submission_comments.count.should eql 1
+  end
+  
 end
 
 def submission_spec_model(opts={})

@@ -1,11 +1,4 @@
-@import environment.sass
-//styles just to override default site styles, TODO remove when switched to kyle theme
-#right-side
-  background-color: #e6e7e9
-  box-shadow: none
-#breadcrumbs
-  box-shadow: none
-
+@import environment
 
 // This hides stuff till the javascript has done it's stuff,
 // Calendar.cofffee sets the '.calendar-loaded' class when it is done
@@ -17,15 +10,28 @@
   .calendar-loaded &
     +opacity(1)
 
-#not_right_side
-  background: url('/images/black-header-bg.png') repeat-x 0 27px
+#main
+  background-color: transparent
+  border: none
+
+#content
+  padding-right: 0
+
+
+#calendar-app
+  position: relative
 
 #calendar-header
-  text-align: center
-  height: 28px
-  padding: 8px 0
-  margin: -13px 0 0
+  position: absolute
+  right: 0
+  top: 0
+  width: 58%
+#change-calendar-version
+  float: right
+
 .calendar
+  .fc-content
+    background-color: white
   .fc-view-month .fc-widget-header
     color: #627382
     font-size: 14px
@@ -34,9 +40,9 @@
   .fc-widget-header, .fc-widget-content
     border-color: #dadada
   .fc-header
-    margin-top: 20px
     h2
-      margin-bottom: 0
+      font-size: 18px
+      padding: 0 16px
   .fc-other-month
     color: #b4b3b3
     background-color: #f8f9f9
@@ -86,13 +92,8 @@
       color: #9da5ab
 
 .fc-event.assignment
-  border-color: transparent
-  background-color: transparent
-  overflow-x: hidden
-  *
-    display: inline
-  &:hover .fc-event-title
-    text-decoration: underline
+  background-color: white
+
 .counter-badge
   +border-radius(8px)
   background-color: #3cb5fb
@@ -105,10 +106,12 @@
   +accessible_text_replacement
   width: 20px
   height: 20px
-  margin-top: 4px
-  background-image: url('/images/ajax-loader-white-on-black copy-static.gif')
+  float: right
+  background-image: url('/images/ajax-loader-black-on-white-static.gif')
+  background-position: 50% 50%
+  margin-left: 10px
   &.loading
-    background-image: url('/images/ajax-loader-white-on-black.gif')
+    background-image: url('/images/ajax-loader-black-on-white.gif')
 
 
 .event-details
@@ -165,10 +168,18 @@
 /*replicate button styles to work for fullcalendar */
 .calendar .fc-button
   +unselectable
-  +vertical-gradient(#f3f3f3, #cecece)
-  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.5)
-  border: 1px solid #bdbdbd
-  padding: 3px 15px
+  padding: $buttonPadding
+
+  //these are just ui-state-default colors
+  font-size: 12px
+  border: 1px solid $borderColorDefault
+  color: $fcDefault
+  font-weight: normal
+  @include background-image(linear-gradient(white, #ffffff 25%, #e6e6e6))
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75)
+  border-bottom-color: #bbb
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
+
   & ~ .fc-button
     border-left: 0
     margin-left: 0
@@ -179,11 +190,10 @@
   &.fc-state-disabled
     opacity: 0.7 // purposely not handling ie8 because having transparency makes it  look weird
   .fc-button-content
-    font-weight: bold
     color: $button-text-color
     text-shadow: #fff 0 1px 1px
   &.fc-corner-left
-    +border-left-radius($buttonset-border-radius)
+    +border-left-radius(4px)
   &.fc-corner-right
     +border-right-radius($buttonset-border-radius)
 
@@ -199,3 +209,7 @@
     height: 100px
   .max-participants
     width: 40px
+
+.whats-new
+  float: right
+  margin-right: 10px

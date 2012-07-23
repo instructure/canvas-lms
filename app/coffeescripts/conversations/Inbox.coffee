@@ -213,7 +213,7 @@ define [
           $ul.append @buildMessage(submessage)
         $message.append $ul
 
-      $ul = $message.find('ul.message_attachments').detach()
+      $ul = $message.find('ul.message_attachments').first().detach()
       $mediaObjectBlank = $ul.find('.media_object_blank').detach()
       $attachmentBlank = $ul.find('.attachment_blank').detach()
       if data.media_comment? or data.attachments?.length
@@ -542,14 +542,12 @@ define [
           width: 510
           title: I18n.t('title.forward_messages', 'Forward Messages')
           buttons: [
-            {
-              text: I18n.t('buttons.send_message', 'Send')
-              click: -> $(this).submit()
-            }
-            {
-              text: I18n.t('#buttons.cancel', 'Cancel')
-              click: -> $(this).dialog('close')
-            }
+            text: I18n.t('#buttons.cancel', 'Cancel')
+            click: -> $(this).dialog('close')
+          ,
+            text: I18n.t('buttons.send_message', 'Send')
+            click: -> $(this).submit()
+            class: 'btn-primary'
           ]
           open: =>
             @$forwardForm.attr action: '/conversations?' + $.param(@conversations.baseData())

@@ -1,5 +1,5 @@
 <% content_for :page_title do %>
-  <%= join_title t(:page_title, "Profile"), @user.name %>
+  <%= join_title t(:page_title, "Profile Settings"), @user.name %>
 <% end %>
 
 <% content_for :right_side do %>
@@ -11,7 +11,7 @@
 <% end %>
 
 <% js_bundle :profile %>
-<% jammit_css :profile %>
+<% jammit_css :profile_edit %>
 
 <% if service_enabled?(:avatars) %>
   <a href="#" class="profile_pic_link <%= @user.avatar_state %>" title="<%= t('titles.click_to_change_profile_pic', "Click to change profile pic") %>" style="float: left; margin-right: 5px; min-width: 50px; min-height: 50px; display: inline-block;">
@@ -20,7 +20,7 @@
 <% end %>
 <h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Profile", :user => @user.short_name) %></h2>
 <div class="clear"></div>
-<% form_for @user, :url => profile_url, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;"} do |f| %>
+<% form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;"} do |f| %>
 <table class="profile_table">
   <tr>
     <% editable_name = @user.user_can_edit_name? %>
@@ -41,6 +41,13 @@
     <td><span class="sortable_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.sortable_name %></span>
       <%= f.text_field :sortable_name, :class => "edit_data"  if editable_name %>
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
+    </td>
+  </tr>
+  <tr>
+    <td><%= f.blabel :birthdate, :en => "Birth Date" %></td>
+    <td>
+      <span class="birthdate display_data"><%= @user.birthdate ? date_string(@user.birthdate) : "-" %></span>
+      <%= f.date_select :birthdate, {:start_year => Time.now.year - 1, :end_year => Time.now.year - 125, :include_blank => true}, :class => 'edit_data' %>
     </td>
   </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
@@ -223,7 +230,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; margin-top: 10px;">
-            <a class='button' href="<%= oauth_url(:service => "google_docs", :return_to => profile_url) %>"><%= t('buttons.authorize_google_docs', "Authorize Google Docs Access") %></a>
+            <a class='button' href="<%= oauth_url(:service => "google_docs", :return_to => user_profile_url(@current_user)) %>"><%= t('buttons.authorize_google_docs', "Authorize Google Docs Access") %></a>
           </div>
         </div>
       </li>
@@ -274,7 +281,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <a class="button" href="<%= oauth_url(:service => "facebook", :return_to => profile_url) %>"><%= t('buttons.register_facebook_account', "Register Your Facebook Account") %></a>
+            <a class="button" href="<%= oauth_url(:service => "facebook", :return_to => user_profile_url(@current_user)) %>"><%= t('buttons.register_facebook_account', "Register Your Facebook Account") %></a>
           </div>
         </div>
       </li>
@@ -296,7 +303,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <a class="button" href="<%= oauth_url(:service => "linked_in", :return_to => profile_url) %>"><%= t('buttons.register_linkedin_account', "Register Your LinkedIn Account") %></a>
+            <a class="button" href="<%= oauth_url(:service => "linked_in", :return_to => user_profile_url(@current_user)) %>"><%= t('buttons.register_linkedin_account', "Register Your LinkedIn Account") %></a>
           </div>
         </div>
       </li>
@@ -320,7 +327,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; margin-top: 10px;">
-            <a class="button" href="<%= oauth_url(:service => "twitter", :return_to => profile_url) %>"><%= t('buttons.authorize_twitter', "Authorize Twitter Access") %></a>
+            <a class="button" href="<%= oauth_url(:service => "twitter", :return_to => user_profile_url(@current_user)) %>"><%= t('buttons.authorize_twitter', "Authorize Twitter Access") %></a>
           </div>
         </div>
       </li>

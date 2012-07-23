@@ -68,10 +68,18 @@
             <% end %>
             <tr>
               <td>
-                <%= f.blabel :default_storage_quota, :en => "Default File Quota" %>
+                <%= f.blabel :default_course_storage_quota, :en => "Default Course File Quota" %>
               </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota_mb, :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
+              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
             </tr>
+            <% if @account.root_account? && !@account.site_admin? %>
+            <tr>
+              <td>
+                <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
+              </td>
+              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
+            </tr>
+            <% end %>
             <% if available_locales.size > 1 %>
             <tr>
               <td><%= f.blabel :default_locale, :default_language, :en => "Default Language" %></td>

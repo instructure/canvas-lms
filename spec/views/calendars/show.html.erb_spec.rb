@@ -32,6 +32,7 @@ describe "/calendars/show" do
     assigns[:last_day] = today + 30
     assigns[:current] = today + 2
     assigns[:assignment_groups_for] = {}
+    assigns[:body_classes] = []
     render 'calendars/show'
     response.should_not be_nil
   end

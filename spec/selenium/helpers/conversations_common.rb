@@ -26,10 +26,10 @@ shared_examples_for "conversations selenium tests" do
     @elements = nil
   end
 
-  def add_recipient(search)
-    input = find_with_jquery("#create_message_form input:visible")
+  def add_recipient(search, input_id = "recipients")
+    input = driver.execute_script("return $('\##{input_id}').data('token_input').$input[0]")
     input.send_keys(search)
-    keep_trying_until { driver.execute_script("return $('#recipients').data('token_input').selector.lastSearch") == search }
+    keep_trying_until { driver.execute_script("return $('\##{input_id}').data('token_input').selector.lastSearch") == search }
     input.send_keys(:return)
   end
 
@@ -173,7 +173,7 @@ shared_examples_for "conversations selenium tests" do
     end
     elements = nil
     keep_trying_until {
-      elements = ff("div#messages ul.messages > li")
+      elements = ff("div#messages > ul.messages > li")
       elements.size > 0
     }
     elements

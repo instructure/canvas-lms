@@ -20,6 +20,7 @@ define([
   'i18n!wiki.sidebar',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'jst/wikiSidebar/collectionItem',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData */,
@@ -33,7 +34,7 @@ define([
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'vendor/scribd.view' /* scribd */
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape, collectionItem) {
 
   var $editor_tabs,
       $tree1,
@@ -41,21 +42,33 @@ define([
       $course_show_secondary, 
       $sidebar_upload_image_form,
       $sidebar_upload_file_form,
-      $wiki_sidebar_select_folder_dialog;
+      $wiki_sidebar_select_folder_dialog,
+      $collectionItems;
 
   // unlikely, but there's a chance this domready call will happen after other
   // scripts try to call methods on wikiSidebar, need to re-architect this a bit
   $(function(){
     $editor_tabs = $("#editor_tabs");
     $tree1 = $editor_tabs.find('ul#tree1');
-    $image_list = $editor_tabs.find('#editor_tabs_3 .image_list');
+    $image_list = $editor_tabs.find('#editor_tabs_4 .image_list');
     $course_show_secondary = $("#course_show_secondary");
     $sidebar_upload_image_form = $("form#sidebar_upload_image_form");
     $sidebar_upload_file_form = $("form#sidebar_upload_file_form");
     $wiki_sidebar_select_folder_dialog = $("#wiki_sidebar_select_folder_dialog");
+    $collectionItems = $('#wiki_sidebar_collections ul');
   });
 
   var wikiSidebar = {
+    itemSelected: function(item) {
+      switch(item.item_type) {
+        case 'image':
+          wikiSidebar.editor.editorBox('insert_code', '<img alt="' + item.title + '" src="' + item.link_url + '"/>');
+          break;
+        default: // we'll rely on enhance-user-content to create youtube thumbnails, etc.
+          wikiSidebar.editor.editorBox('create_link', {title: (item.title || I18n.t("no_title", "No title")), url: item.link_url});
+          break;
+      }
+    },
     fileSelected: function(node) {
       var $span = node.find('span.text'),
           url = $span.attr('rel'),
@@ -109,7 +122,7 @@ define([
       }
       if(newUpload && (attachment.mime_class == 'image' || attachment.content_type.match(/^image/)) &&
         $image_list.hasClass('initialized')) {
-        var url = $.replaceTags($("#editor_tabs_3 .file_url").attr('href'), 'id', attachment.id);
+        var url = $.replaceTags($("#editor_tabs_4 .file_url").attr('href'), 'id', attachment.id);
         var $img = $editor_tabs.find("#wiki_sidebar_image_uploads .img_link").clone();
         $img.find(".img")
             .attr({'src': attachment.thumbnail_url || url, 'alt': attachment.display_name})
@@ -141,7 +154,7 @@ define([
     },
     loadFolder: function(node) {
       node.data('includes_files', true);
-      var url = $.replaceTags($("#editor_tabs_2 #folder_url").attr('href'), 'id', node.data('id'));
+      var url = $.replaceTags($("#editor_tabs_3 #folder_url").attr('href'), 'id', node.data('id'));
       $loading = $tree1.find(">.loading").clone();
       $loading.show();
       node.append($loading);
@@ -241,8 +254,7 @@ define([
       
       $editor_tabs.bind( "tabsshow tagselect", function(event, ui) { 
         // defer loading everything in the "files" tree until we click on that tab
-        // if ui.index is 1 then we are on the "files" tab
-        if (ui.index === 1 && !$tree1.hasClass('initialized')) {
+        if (ui.panel.id === 'editor_tabs_3' && !$tree1.hasClass('initialized')) {
           $tree1.addClass('initialized unstyled_list');
           $tree1.instTree({
             multi: false,
@@ -262,7 +274,7 @@ define([
           });
         }
         // defer setting up the <img>es until we click the "images" tab
-        if (ui.index === 2 && !$image_list.hasClass('initialized')) {
+        if (ui.panel.id === 'editor_tabs_4' && !$image_list.hasClass('initialized')) {
           $image_list.addClass('initialized')
           $image_list.pageless({
             container: $image_list,
@@ -280,6 +292,31 @@ define([
       });
 
       $editor_tabs.tabs();
+
+      var $collectionsSelect = $('#wiki_sidebar_collections select');
+      if ($collectionsSelect.length) {
+        $collectionsSelect.change(function() {
+          $.ajaxJSON('/api/v1/collections/' + $(this).val() + '/items', 'GET', {}, function(items) {
+            $collectionItems.html();
+            for (var i = 0; i < items.length; i++) {
+              var item = items[i];
+              item.iconClass = "icon-" + ({url: 'link', image: 'analytics'}[item.item_type] || item.item_type); 
+              var $node = $(collectionItem(item));
+              $node.data('item', item);
+              if (i % 2 == 1)
+                $node.addClass('even');
+              if (i == items.length - 1)
+                $node.addClass('last');
+              $collectionItems.append($node);
+            }
+          });
+        }).change();
+      }
+
+      $collectionItems.on('click', 'li', function() {
+        wikiSidebar.itemSelected($(this).data('item'));
+      });
+
       $('.wiki_pages li a').live('click', function(event){
         event.preventDefault();
         wikiSidebar.editor.editorBox('create_link', {title: $(this).text(), url: $(this).attr('href')});
@@ -306,7 +343,7 @@ define([
         wikiSidebar.imageSelected($(this).find(".img"));
       });
       if($.handlesHTML5Files) {
-        $("#editor_tabs_2 .file_list_holder").bind('dragenter dragover', function(event) {
+        $("#editor_tabs_3 .file_list_holder").bind('dragenter dragover', function(event) {
           if(!$(this).hasClass('file_drop')) { return; }
           event.preventDefault();
           event.stopPropagation();
@@ -363,7 +400,7 @@ define([
           $wiki_sidebar_select_folder_dialog.dialog('close');
         });
 
-        $("#editor_tabs_3 .image_list_holder").bind('dragenter dragover', function(event) {
+        $("#editor_tabs_4 .image_list_holder").bind('dragenter dragover', function(event) {
           if(!$(this).hasClass('file_drop')) { return; }
           event.preventDefault();
           event.stopPropagation();

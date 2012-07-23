@@ -35,7 +35,6 @@ define([
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
-  'jquery.shake' /* /\.shake/ */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */,
   'vendor/jquery.ba-hashchange' /* hashchange */,
@@ -139,12 +138,13 @@ define([
       // this is for backwards compatability, we used to store the value as
       // strings "true" or "false", but now we store boolean true/false values.
       var settingVal = userSettings.get("eg_hide_student_names");
-      return settingVal === true || settingVal === "true";
+      return settingVal === true || settingVal === "true" || window.anonymousAssignment;
     }
   };
 
   function mergeStudentsAndSubmission(){
     jsonData.studentsWithSubmissions = jsonData.context.students;
+    jsonData.studentMap = {};
     $.each(jsonData.studentsWithSubmissions, function(i, student){
       this.section_ids = $.map($.grep(jsonData.context.enrollments, function(enrollment, i){
           return enrollment.user_id === student.id;
@@ -157,6 +157,7 @@ define([
       this.rubric_assessments = $.grep(visibleRubricAssessments, function(rubricAssessment, i){
         return rubricAssessment.user_id === student.id;
       });
+      jsonData.studentMap[student.id] = student;
     });
 
     // handle showing students only in a certain section.
@@ -227,11 +228,7 @@ define([
   }
   
   function initDropdown(){
-    var hideStudentNames;
-
-    if (utils.shouldHideStudentNames() || window.anonymousAssignment) {
-      hideStudentNames = true;
-    }
+    var hideStudentNames = utils.shouldHideStudentNames();
     $("#hide_student_names").attr('checked', hideStudentNames);
     var options = $.map(jsonData.studentsWithSubmissions, function(s, idx){
       var name = htmlEscape(s.name),
@@ -630,7 +627,6 @@ define([
         EG.toggleFullRubric();
       }
     });
-    $(window).shake($.proxy(EG.next, EG));
   }
   
   function resizingFunction(){
@@ -930,8 +926,7 @@ define([
 
       //if there is not a valid student_id in the location.hash then force it to be the first student in the class with an assignment to grade.
       if (typeof(hash.student_id) != "number" ||
-          !$.grep(jsonData.studentsWithSubmissions, function(s){
-            return hash.student_id == s.id;}).length) {
+          !jsonData.studentMap[hash.student_id]) {
         hash.student_id = jsonData.studentsWithSubmissions[0].id;
         for (var i = 0, max = jsonData.studentsWithSubmissions.length; i < max; i++){
           if (typeof jsonData.studentsWithSubmissions[i].submission !== 'undefined' && jsonData.studentsWithSubmissions[i].submission.workflow_state !== 'graded'){
@@ -945,9 +940,8 @@ define([
     },
 
     goToStudent: function(student_id){
-      var student = $.grep(jsonData.studentsWithSubmissions, function(o){
-        return o.id === student_id;
-      })[0];
+      var hideStudentNames = utils.shouldHideStudentNames();
+      var student = jsonData.studentMap[student_id];
 
       if (student) {
         $selectmenu.selectmenu("value", student.id);
@@ -955,12 +949,14 @@ define([
         if (!this.currentStudent || (this.currentStudent.id != student.id)) {
           $selectmenu.change();
         }
-        if (student.avatar_path) { 
+        if (student.avatar_path && !hideStudentNames) { 
           // If there's any kind of delay in loading the user's avatar, it's
           // better to show a blank image than the previous student's image.
-          $new_image = $avatar_image.clone();
+          $new_image = $avatar_image.clone().show();
           $avatar_image.after($new_image.attr('src', student.avatar_path)).remove();
           $avatar_image = $new_image;
+        } else {
+          $avatar_image.hide();
         }
       }
     },
@@ -971,9 +967,7 @@ define([
 
     handleStudentChanged: function(){
       var id = parseInt( $selectmenu.val(), 10 );
-      this.currentStudent = $.grep(jsonData.studentsWithSubmissions, function(o){
-  	    return o.id === id;
-  	  })[0];
+      this.currentStudent = jsonData.studentMap[id];
   	  document.location.hash = "#" + encodeURIComponent(JSON.stringify({
   	    "student_id": this.currentStudent.id
   	  }));
@@ -1270,7 +1264,9 @@ define([
               this.currentStudent.submission.currentSelectedIndex != null ?
               '&version=' + this.currentStudent.submission.currentSelectedIndex :
               ''
-            ) +'" frameborder="0"></iframe>')
+            ) + (
+              utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
+            ) + '" frameborder="0"></iframe>')
             .show();
 	      }
   	  }
@@ -1320,6 +1316,7 @@ define([
     },
 
     showDiscussion: function(){
+      var hideStudentNames = utils.shouldHideStudentNames();
       $comments.html("");
       if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
         $.each(this.currentStudent.submission.submission_comments, function(i, comment){
@@ -1327,10 +1324,11 @@ define([
           if(comment.submission_comment) { comment = comment.submission_comment; }
           comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
 
-          // if(comment.anonymous) { comment.author_name = "Anonymous"; }
+          var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
+          if (hideStudentName) { comment.author_name = I18n.t('student', "Student"); }
           var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
           $comment.find('span.comment').html(htmlEscape(comment.comment).replace(/\n/g, "<br />"));
-          if(comment.avatar_path) {
+          if (comment.avatar_path && !hideStudentName) {
             $comment.find(".avatar").attr('src', comment.avatar_path).show();
           } 
           // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
@@ -1426,7 +1424,7 @@ define([
     
     setOrUpdateSubmission: function(submission){
       // find the student this submission belongs to and update their submission with this new one, if they dont have a submission, set this as their submission.
-      var student =  $.grep(jsonData.studentsWithSubmissions, function(s){ return s.id === submission.user_id; })[0];
+      var student =  jsonData.studentMap[submission.user_id];
       student.submission = student.submission || {};
 
       // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange

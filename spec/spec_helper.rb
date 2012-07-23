@@ -32,7 +32,7 @@ ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
       model = File.basename(file, ".*").camelize.constantize
       next unless model < ActiveRecord::Base
       model
-    }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || model == Tableless }
+    }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || (model.respond_to?(:tableless?) && model.tableless?) }
 ALL_MODELS << Version
 ALL_MODELS << Delayed::Backend::ActiveRecord::Job::Failed
 ALL_MODELS << Delayed::Backend::ActiveRecord::Job
@@ -62,7 +62,9 @@ def truncate_table(model)
         model.connection.raw_connection.set_notice_processor(&old_proc)
       end
     else
+      model.connection.execute("SET FOREIGN_KEY_CHECKS=0")
       model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
+      model.connection.execute("SET FOREIGN_KEY_CHECKS=1")
   end
 end
 
@@ -455,6 +457,20 @@ Spec::Runner.configure do |config|
     @quiz_submission.submission_data = yield if block_given?
   end
 
+  def group_discussion_assignment
+    course = @course || course(:active_all => true)
+    group_category = course.group_categories.create!(:name => "category")
+    @group1 = course.groups.create!(:name => "group 1", :group_category => group_category)
+    @group2 = course.groups.create!(:name => "group 2", :group_category => group_category)
+
+    @topic = course.discussion_topics.build(:title => "topic")
+    @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
+    @assignment.infer_due_at
+    @assignment.saved_by = :discussion_topic
+    @topic.assignment = @assignment
+    @topic.save!
+  end
+
   def rubric_for_course
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [
@@ -759,7 +775,6 @@ Spec::Runner.configure do |config|
   def run_jobs
     while job = Delayed::Job.get_and_lock_next_available(
       'spec run_jobs',
-      1.hour,
       Delayed::Worker.queue,
       0,
       Delayed::MAX_PRIORITY)

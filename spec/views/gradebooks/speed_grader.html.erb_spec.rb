@@ -27,6 +27,7 @@ describe "/gradebooks/speed_grader" do
     assigns[:assignment] = @course.assignments.create!(:title => "some assignment")
     assigns[:submissions] = []
     assigns[:assessments] = []
+    assigns[:body_classes] = []
     render "gradebooks/speed_grader"
     
     response.should_not be_nil

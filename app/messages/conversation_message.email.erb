@@ -12,7 +12,7 @@
 <%= asset.body %>
 
 
-<% if asset.has_media_comment? %>
+<% if asset.has_media_objects? %>
 <%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %>
 <% else %>
 <%= t :reply_message, "To reply to this message, click the link below:" %>

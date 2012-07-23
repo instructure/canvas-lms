@@ -110,7 +110,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
-  #         -H 'Authorization: Bearer <token>'
+  #          -H 'Authorization: Bearer <token>'
   def index
     @context.assert_assignment_group rescue nil
     @all_topics = @context.discussion_topics.active
@@ -420,7 +420,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # @example_request
   #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
-  #         -H 'Authorization: Bearer <token>'
+  #          -H 'Authorization: Bearer <token>'
   def destroy
     @topic = @context.all_discussion_topics.find(params[:id] || params[:topic_id])
     if authorized_action(@topic, @current_user, :delete)

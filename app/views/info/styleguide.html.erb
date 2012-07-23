@@ -1,14 +1,52 @@
+<% js_bundle :styleguide %>
+<style>
+  /* don't ever do inline styles, or inline stylesheets like this */
+  .demo-icons {
+    display: inline-block;
+    margin: 4px;
+    width: 200px;
+  }
+  code,pre{padding:0 3px 2px;font-family:Menlo,Monaco,"Courier New",monospace;font-size:12px;color:#505354;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px}
+  code{padding:2px 4px;color:#d14;background-color:#f7f7f9;border:1px solid #e1e1e8}
+
+  #icons { margin: 0; padding: 0;}
+  #icons li { margin: 2px; position: relative; padding: 4px 0; cursor: pointer; float: left; list-style: none; }
+  #icons span.ui-icon { float: left; margin: 0 4px; }
+
+  #toolbar {
+  padding: 10px 4px;
+  }
+
+</style>
+
+
 <div class="container v-gutter">
 
+  <h2 class="v-gutter">Forms?!</h2>
+  <div class="row-fluid">
+    <form class="form-vertical">
+      <fieldset>
+        <legend>Legend text</legend>
+        <div class="control-group">
+          <label class="control-label" for="input01">Text input</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" id="input01">
+            <p class="help-block">Supporting help text</p>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+
   <h2>Grid</h2>
-  <p>Regular bootstrap 12 column grid. Use <code>.spanX</code> to have an element span 'X' number of columns.</p>
-  <div class="row">
+  <p>Since our interface is resizable you can only use a fluid grid.  we just have the default bootstrap fluid grid.  <a href="http://twitter.github.com/bootstrap/scaffolding.html#fluidGridSystem">see their docs for more info</a>. Use <code>.spanX</code> to have an element span 'X' number of columns.</p>
+  <div class="row-fluid">
     <div class="span2"><div class="content-box border border-trbl"><p>span 2</p></div></div>
     <div class="span2"><div class="content-box border border-trbl"><p>span 2</p></div></div>
     <div class="span8"><div class="content-box border border-trbl"><p>span 8</p></div></div>
   </div>
 
-  <div class="row v-gutter">
+  <div class="row-fluid v-gutter">
     <div class="span4">
       <h2>Content Box</h2>
       <div class="content-box">
@@ -19,14 +57,18 @@
 
     <div class="span4">
       <h2>Content Box with Toolbar</h2>
-      <div class="content-box border border-trbl border-round">
-        <header class="toolbar">Toolbar</header>
-        <p>
-          The first element of a this content box is a <code>.toolbar</code>.
-        </p>
-        <p>
-          It also has the classes <code>border border-trbl border-round</code> to make the borders.
-        </p>
+      <div class="content-box border-round">
+        <div class="toolbar">
+          <h2 class="header">Toolbar Header</h2>
+        </div>
+        <div class="border border-rbl">
+          <p>
+            The first element of a this content box is a <code>.toolbar</code>.
+          </p>
+          <p>
+            It also has the classes <code>border border-trbl border-round</code> to make the borders.
+          </p>
+        </div>
       </div>
     </div>
 
@@ -38,7 +80,7 @@
     </div>
   </div>
 
-  <div class="row v-gutter">
+  <div class="row-fluid v-gutter">
     <div class="span4">
       <h2>List View</h2>
       <div class="list-view border border-trbl" style="height: 200px">
@@ -77,7 +119,7 @@
   </div>
 
   <h2>ImageBlock</h2>
-  <div class="row">
+  <div class="row-fluid">
     <div class="span6">
       <div class="image-block">
         <a href="#" class="image-block-image"><img class="border-round box-shadow" src="http://www.gravatar.com/avatar/749001c9fe6927c4b069a45c2a3d68f7?s=100"></a>
@@ -107,11 +149,1208 @@
     </div>
   </div>
 
-  <h2 class="v-gutter"></h2>
-  <div class="row-fluid">
-    <div class="span4">span 2</div>
-    <div class="span8">span 8</div>
+
+  <h2>.triangle-box</h2>
+  <section class="image-block">
+    <div class="image-block-image">
+      <img src="http://placekitten.com/42/42/">
+    </div>
+    <div class="image-block-content triangle-box-with-header">
+      <header class="box-header">
+        put the title here
+        <div class="box-subheader">put the subheader here</div>
+      </header>
+      <div class="box-content">
+        this is where all the content would go
+      </div>
+    </div>
+  </section>
+
+
+  <h2>.box-with-header</h2>
+  <div class="box-with-header">
+    <header class="box-header">
+      <div class="box-header-column">
+        put the title here
+        <div class="box-subheader">put the subheader here</div>
+      </div>
+      <a class="box-header-column" href="#">
+        <i class="icon-like"></i>
+        <div>167</div>
+      </a>
+      <a class="box-header-column" href="#">
+        <i class="icon-pin"></i>
+        <div>167</div>
+      </a>
+      <a class="box-header-column" href="#">
+        <i class="icon-discussion"></i>
+        <div>167</div>
+      </a>
+    </header>
+    <div class="box-content">
+      this is where all the content would go
+    </div>
   </div>
+
+  <div class="row-fluid v-gutter">
+    <div class="span4">
+      <h2>Page Action List</h2>
+      <ul class="page-action-list">
+        <li><a href="#"><i class="icon-add"></i> <%= t 'new_course', 'Add a new course' %></a></li>
+        <li><a href="#"><i class="icon-search"></i> <%= t 'find_people', 'Find people on Canvas' %></a></li>
+        <li><a href="#"><i class="icon-group-new"></i> <%= t 'start_a_group', 'Start a group' %></a></li>
+        <li><a href="#"><i class="icon-collection"></i> <%= t 'create_collection', 'Create a collection' %></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Admin Links</h2>
+  <div class="admin-link-hover-area">
+    <div class="admin-links">
+      <button class="al-trigger"><span class="al-trigger-inner">Manage (will be accessibly hidden)</span></button>
+      <ul class="al-options">
+        <li><a href="#"><span class="ui-icon ui-icon-pencil"></span>Edit</a></li>
+        <li><a href="#"><span class="ui-icon ui-icon-trash"></span>Delete (from database)</a></li>
+        <li><a href="#"><span class="ui-icon ui-icon-trash"></span>Hide from this screen</a></li>
+        <li><a href="#">an option with no icon</a></li>
+      </ul>
+    </div>
+    <p>This is an example of using <code>.admin-links</code></p>
+    <p>here is what the code should look like:</p>
+      <pre class="prettyprint linenums">
+      &lt;div class=&quot;admin-link-hover-area&quot;&gt;
+        &lt;div class=&quot;admin-links&quot;&gt;
+          &lt;button class=&quot;al-trigger&quot;&gt;&lt;span class=&quot;al-trigger-inner&quot;&gt;Manage (will be accessibly hidden)&lt;/span&gt;&lt;/button&gt;
+          &lt;ul class=&quot;al-options&quot;&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&lt;span class=&quot;ui-icon ui-icon-pencil&quot;&gt;&lt;/span&gt;Edit&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&lt;span class=&quot;ui-icon ui-icon-trash&quot;&gt;&lt;/span&gt;Delete (from database)&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&lt;span class=&quot;ui-icon ui-icon-trash&quot;&gt;&lt;/span&gt;Hide from this screen&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;an option with no icon&lt;/a&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/div&gt;
+        put all of the content here
+      &lt;/div&gt;
+      </pre>
+  </div>
+  
+
+  <h2 class="v-gutter">Icons</h2>
+  <span class="demo-icons"><i class="icon-stats"></i> icon-stats</span>
+  <span class="demo-icons"><i class="icon-paperclip"></i> icon-paperclip</span>
+  <span class="demo-icons"><i class="icon-media"></i> icon-media</span>
+  <span class="demo-icons"><i class="icon-address-book"></i> icon-address-book</span>
+  <span class="demo-icons"><i class="icon-announcement"></i> icon-announcement</span>
+  <span class="demo-icons"><i class="icon-reset"></i> icon-reset</span>
+  <span class="demo-icons"><i class="icon-analytics"></i> icon-analytics</span>
+  <span class="demo-icons"><i class="icon-student-view"></i> icon-student-view</span>
+  <span class="demo-icons"><i class="icon-calendar-day"></i> icon-calendar-day</span>
+  <span class="demo-icons"><i class="icon-trash"></i> icon-trash</span>
+  <span class="demo-icons"><i class="icon-speed-grader"></i> icon-speed-grader</span>
+  <span class="demo-icons"><i class="icon-copy-course"></i> icon-copy-course</span>
+  <span class="demo-icons"><i class="icon-import-content"></i> icon-import-content</span>
+  <span class="demo-icons"><i class="icon-export-content"></i> icon-export-content</span>
+  <span class="demo-icons"><i class="icon-discussion"></i> icon-discussion</span>
+  <span class="demo-icons"><i class="icon-peer-review"></i> icon-peer-review</span>
+  <span class="demo-icons"><i class="icon-discussion-reply"></i> icon-discussion-reply</span>
+  <span class="demo-icons"><i class="icon-discussion-new"></i> icon-discussion-new</span>
+  <span class="demo-icons"><i class="icon-edit"></i> icon-edit</span>
+  <span class="demo-icons"><i class="icon-home"></i> icon-home</span>
+  <span class="demo-icons"><i class="icon-settings"></i> icon-settings</span>
+  <span class="demo-icons"><i class="icon-compose"></i> icon-compose</span>
+  <span class="demo-icons"><i class="icon-flag"></i> icon-flag</span>
+  <span class="demo-icons"><i class="icon-video"></i> icon-video</span>
+  <span class="demo-icons"><i class="icon-audio"></i> icon-audio</span>
+  <span class="demo-icons"><i class="icon-outdent"></i> icon-outdent</span>
+  <span class="demo-icons"><i class="icon-outdent2"></i> icon-outdent2</span>
+  <span class="demo-icons"><i class="icon-indent"></i> icon-indent</span>
+  <span class="demo-icons"><i class="icon-forward"></i> icon-forward</span>
+  <span class="demo-icons"><i class="icon-warning"></i> icon-warning</span>
+  <span class="demo-icons"><i class="icon-filmstrip"></i> icon-filmstrip</span>
+  <span class="demo-icons"><i class="icon-rubric"></i> icon-rubric</span>
+  <span class="demo-icons"><i class="icon-check-plus"></i> icon-check-plus</span>
+  <span class="demo-icons"><i class="icon-rss"></i> icon-rss</span>
+  <span class="demo-icons"><i class="icon-rss-add"></i> icon-rss-add</span>
+  <span class="demo-icons"><i class="icon-quiz"></i> icon-quiz</span>
+  <span class="demo-icons"><i class="icon-question"></i> icon-question</span>
+  <span class="demo-icons"><i class="icon-drop-down"></i> icon-drop-down</span>
+  <span class="demo-icons"><i class="icon-minimize"></i> icon-minimize</span>
+  <span class="demo-icons"><i class="icon-end"></i> icon-end</span>
+  <span class="demo-icons"><i class="icon-add"></i> icon-add</span>
+  <span class="demo-icons"><i class="icon-info"></i> icon-info</span>
+  <span class="demo-icons"><i class="icon-check"></i> icon-check</span>
+  <span class="demo-icons"><i class="icon-clock"></i> icon-clock</span>
+  <span class="demo-icons"><i class="icon-calendar-month"></i> icon-calendar-month</span>
+  <span class="demo-icons"><i class="icon-x"></i> icon-x</span>
+  <span class="demo-icons"><i class="icon-refresh"></i> icon-refresh</span>
+  <span class="demo-icons"><i class="icon-off"></i> icon-off</span>
+  <span class="demo-icons"><i class="icon-updown"></i> icon-updown</span>
+  <span class="demo-icons"><i class="icon-user-add"></i> icon-user-add</span>
+  <span class="demo-icons"><i class="icon-group"></i> icon-group</span>
+  <span class="demo-icons"><i class="icon-star"></i> icon-star</span>
+  <span class="demo-icons"><i class="icon-replied"></i> icon-replied</span>
+  <span class="demo-icons"><i class="icon-hour-glass"></i> icon-hour-glass</span>
+  <span class="demo-icons"><i class="icon-assignment"></i> icon-assignment</span>
+  <span class="demo-icons"><i class="icon-message"></i> icon-message</span>
+  <span class="demo-icons"><i class="icon-note-dark"></i> icon-note-dark</span>
+  <span class="demo-icons"><i class="icon-note-light"></i> icon-note-light</span>
+  <span class="demo-icons"><i class="icon-tag"></i> icon-tag</span>
+  <span class="demo-icons"><i class="icon-next-unread"></i> icon-next-unread</span>
+  <span class="demo-icons"><i class="icon-search"></i> icon-search</span>
+  <span class="demo-icons"><i class="icon-lock"></i> icon-lock</span>
+  <span class="demo-icons"><i class="icon-unlock"></i> icon-unlock</span>
+  <span class="demo-icons"><i class="icon-rubric-dark"></i> icon-rubric-dark</span>
+  <span class="demo-icons"><i class="icon-folder"></i> icon-folder</span>
+  <span class="demo-icons"><i class="icon-toggle-right"></i> icon-toggle-right</span>
+  <span class="demo-icons"><i class="icon-toggle-left"></i> icon-toggle-left</span>
+  <span class="demo-icons"><i class="icon-link"></i> icon-link</span>
+  <span class="demo-icons"><i class="icon-lti"></i> icon-lti</span>
+  <span class="demo-icons"><i class="icon-text"></i> icon-text</span>
+  <span class="demo-icons"><i class="icon-timer"></i> icon-timer</span>
+  <span class="demo-icons"><i class="icon-pin"></i> icon-pin</span>
+  <span class="demo-icons"><i class="icon-like"></i> icon-like</span>
+  <span class="demo-icons"><i class="icon-collection-save"></i> icon-collection-save</span>
+  <span class="demo-icons"><i class="icon-collection"></i> icon-collection</span>
+  <span class="demo-icons"><i class="icon-group-new"></i> icon-group-new</span>
+  <span class="demo-icons"><i class="icon-group-new-dark"></i> icon-group-new-dark</span>
+
+
+  <!-- Forms
+  ================================================== -->
+  <hr>
+  <section id="forms">
+    <div class="page-header">
+      <h1>Forms</h1>
+    </div>
+    <div class="row-fluid">
+      <div class="span4">
+        <h2>Flexible HTML and CSS</h2>
+        <p>The best part about forms in Bootstrap is that all your inputs and controls look great no matter how you build them in your markup. No superfluous HTML is required, but we provide the patterns for those who require it.</p>
+        <p>More complicated layouts come with succinct and scalable classes for easy styling and event binding, so you're covered at every step.</p>
+      </div>
+      <div class="span4">
+        <h2>Four layouts included</h2>
+        <p>Bootstrap comes with support for four types of form layouts:</p>
+        <ul>
+          <li>Vertical (default)</li>
+          <li>Search</li>
+          <li>Inline</li>
+          <li>Horizontal</li>
+        </ul>
+        <p>Different types of form layouts require some changes to markup, but the controls themselves remain and behave the same.</p>
+      </div>
+      <div class="span4">
+        <h2>Control states and more</h2>
+        <p>Bootstrap's forms include styles for all the base form controls like input, textarea, and select you'd expect. But it also comes with a number of custom components like appended and prepended inputs and support for lists of checkboxes.</p>
+        <p>States like error, warning, and success are included for each type of form control. Also included are styles for disabled controls.</p>
+      </div>
+    </div>
+
+    <h2>Four types of forms</h2>
+    <p>Bootstrap provides simple markup and styles for four styles of common web forms.</p>
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Class</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Vertical (default)</th>
+          <td><code>.form-vertical</code> <span class="muted">(not required)</span></td>
+          <td>Stacked, left-aligned labels over controls</td>
+        </tr>
+        <tr>
+          <th>Inline</th>
+          <td><code>.form-inline</code></td>
+          <td>Left-aligned label and inline-block controls for compact style</td>
+        </tr>
+        <tr>
+          <th>Search</th>
+          <td><code>.form-search</code></td>
+          <td>Extra-rounded text input for a typical search aesthetic</td>
+        </tr>
+        <tr>
+          <th>Horizontal</th>
+          <td><code>.form-horizontal</code></td>
+          <td>Float left, right-aligned labels on same line as controls</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <h2>Example forms <small>using just form controls, no extra markup</small></h2>
+    <div class="row-fluid">
+      <div class="span6">
+        <h3>Basic form</h3>
+        <p>Smart and lightweight defaults without extra markup.</p>
+        <form class="well bootstrap-form">
+          <label>Label name</label>
+          <input type="text" class="span3" placeholder="Type something…">
+          <p class="help-block">Example block-level help text here.</p>
+          <label class="checkbox">
+            <input type="checkbox"> Check me out
+          </label>
+          <button type="submit" class="btn">Submit</button>
+        </form>
+        <pre class="prettyprint linenums">
+  &lt;form class="well bootstrap-form"&gt;
+    &lt;label&gt;Label name&lt;/label&gt;
+    &lt;input type="text" class="span3" placeholder="Type something…"&gt;
+    &lt;span class="help-block"&gt;Example block-level help text here.&lt;/span&gt;
+    &lt;label class="checkbox"&gt;
+      &lt;input type="checkbox"&gt; Check me out
+    &lt;/label&gt;
+    &lt;button type="submit" class="btn"&gt;Submit&lt;/button&gt;
+  &lt;/form&gt;
+        </pre>
+      </div>
+      <div class="span6">
+        <h3>Search form</h3>
+        <p>Add <code>.form-search</code> to the form and <code>.search-query</code> to the <code>input</code>.</p>
+        <form class="well form-search bootstrap-form">
+          <input type="text" class="input-medium search-query">
+          <button type="submit" class="btn">Search</button>
+        </form>
+        <pre class="prettyprint linenums">
+  &lt;form class="well form-search bootstrap-form"&gt;
+    &lt;input type="text" class="input-medium search-query"&gt;
+    &lt;button type="submit" class="btn"&gt;Search&lt;/button&gt;
+  &lt;/form&gt;
+        </pre>
+
+        <h3>Inline form</h3>
+        <p>Add <code>.form-inline</code> to finesse the vertical alignment and spacing of form controls.</p>
+        <form class="well form-inline bootstrap-form">
+          <input type="text" class="input-small" placeholder="Email">
+          <input type="password" class="input-small" placeholder="Password">
+          <label class="checkbox">
+            <input type="checkbox"> Remember me
+          </label>
+          <button type="submit" class="btn">Sign in</button>
+        </form>
+  <pre class="prettyprint linenums">
+  &lt;form class="well form-inline bootstrap-form"&gt;
+    &lt;input type="text" class="input-small" placeholder="Email"&gt;
+    &lt;input type="password" class="input-small" placeholder="Password"&gt;
+    &lt;label class="checkbox"&gt;
+      &lt;input type="checkbox"&gt; Remember me
+    &lt;/label&gt;
+    &lt;button type="submit" class="btn"&gt;Sign in&lt;/button&gt;
+  &lt;/form&gt;
+  </pre>
+      </div><!-- /.span -->
+    </div><!-- /row -->
+
+    <br>
+
+    <h2>Horizontal forms</h2>
+    <div class="row-fluid">
+      <div class="span4">
+        <p></p>
+        <p>Shown on the right are all the default form controls we support. Here's the bulleted list:</p>
+        <ul>
+          <li>text inputs (text, password, email, etc)</li>
+          <li>checkbox</li>
+          <li>radio</li>
+          <li>select</li>
+          <li>multiple select</li>
+          <li>file input</li>
+          <li>textarea</li>
+        </ul>
+      </div><!-- /.span -->
+      <div class="span8">
+        <form class="form-horizontal bootstrap-form">
+          <fieldset>
+            <div class="control-group">
+              <label class="control-label" for="input01">Text input</label>
+              <div class="controls">
+                <input type="text" class="input-xlarge" id="input01">
+                <p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="optionsCheckbox">Checkbox</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="optionsCheckbox" value="option1">
+                  Option one is this and that&mdash;be sure to include why it's great
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="select01">Select list</label>
+              <div class="controls">
+                <select id="select01">
+                  <option>something</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="multiSelect">Multicon-select</label>
+              <div class="controls">
+                <select multiple="multiple" id="multiSelect">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="fileInput">File input</label>
+              <div class="controls">
+                <input class="input-file" id="fileInput" type="file">
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="textarea">Textarea</label>
+              <div class="controls">
+                <textarea class="input-xlarge" id="textarea" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save changes</button>
+              <button class="btn">Cancel</button>
+            </div>
+          </fieldset>
+        </form>
+        <h3>Example markup</h3>
+        <p>Given the above example form layout, here's the markup associated with the first input and control group. The <code>.control-group</code>, <code>.control-label</code>, and <code>.controls</code> classes are all required for styling.</p>
+  <pre class="prettyprint linenums">
+  &lt;form class="form-horizontal bootstrap-form"&gt;
+    &lt;fieldset&gt;
+      &lt;legend&gt;Legend text&lt;/legend&gt;
+      &lt;div class="control-group"&gt;
+        &lt;label class="control-label" for="input01"&gt;Text input&lt;/label&gt;
+        &lt;div class="controls"&gt;
+          &lt;input type="text" class="input-xlarge" id="input01"&gt;
+          &lt;p class="help-block"&gt;Supporting help text&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/fieldset&gt;
+  &lt;/form&gt;
+  </pre>
+      </div>
+    </div>
+
+    <br>
+
+    <h2>Form control states</h2>
+    <div class="row-fluid">
+      <div class="span4">
+        <p>Bootstrap features styles for browser-supported focused and <code>disabled</code> states. We remove the default Webkit <code>outline</code> and apply a <code>box-shadow</code> in its place for <code>:focus</code>.</p>
+        <hr>
+        <h3>Form validation</h3>
+        <p>It also includes validation styles for errors, warnings, and success. To use, add the error class to the surrounding <code>.control-group</code>.</p>
+  <pre class="prettyprint linenums">
+  &lt;fieldset
+    class="control-group error"&gt;
+    …
+  &lt;/fieldset&gt;
+  </pre>
+      </div>
+      <div class="span8">
+        <form class="form-horizontal bootstrap-form">
+          <fieldset>
+            <div class="control-group">
+              <label class="control-label" for="focusedInput">Focused input</label>
+              <div class="controls">
+                <input class="input-xlarge focused" id="focusedInput" type="text" value="This is focused…">
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Uneditable input</label>
+              <div class="controls">
+                <span class="input-xlarge uneditable-input">Some value here</span>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="disabledInput">Disabled input</label>
+              <div class="controls">
+                <input class="input-xlarge disabled" id="disabledInput" type="text" placeholder="Disabled input here…" disabled>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="optionsCheckbox2">Disabled checkbox</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" id="optionsCheckbox2" value="option1" disabled>
+                  This is a disabled checkbox
+                </label>
+              </div>
+            </div>
+            <div class="control-group warning">
+              <label class="control-label" for="inputWarning">Input with warning</label>
+              <div class="controls">
+                <input type="text" id="inputWarning">
+                <span class="help-inline">Something may have gone wrong</span>
+              </div>
+            </div>
+            <div class="control-group error">
+              <label class="control-label" for="inputError">Input with error</label>
+              <div class="controls">
+                <input type="text" id="inputError">
+                <span class="help-inline">Please correct the error</span>
+              </div>
+            </div>
+            <div class="control-group success">
+              <label class="control-label" for="inputSuccess">Input with success</label>
+              <div class="controls">
+                <input type="text" id="inputSuccess">
+                <span class="help-inline">Woohoo!</span>
+              </div>
+            </div>
+            <div class="control-group success">
+              <label class="control-label" for="selectError">Select with success</label>
+              <div class="controls">
+                <select id="selectError">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+                <span class="help-inline">Woohoo!</span>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save changes</button>
+              <button class="btn">Cancel</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+
+    <br>
+
+    <h2>Extending form controls</h2>
+    <div class="row-fluid">
+      <div class="span4">
+        <h3>Prepend &amp; append inputs</h3>
+        <p>Input groups&mdash;with appended or prepended text&mdash;provide an easy way to give more context for your inputs. Great examples include the @ sign for Twitter usernames or $ for finances.</p>
+        <hr>
+        <h3>Checkboxes and radios</h3>
+        <p>Up to v1.4, Bootstrap required extra markup around checkboxes and radios to stack them. Now, it's a simple matter of repeating the <code>&lt;label class="checkbox"&gt;</code> that wraps the <code>&lt;input type="checkbox"&gt;</code>.</p>
+        <p>Inline checkboxes and radios are also supported. Just add <code>.inline</code> to any <code>.checkbox</code> or <code>.radio</code> and you're done.</p>
+        <hr>
+        <h4>Inline forms and append/prepend</h4>
+        <p>To use prepend or append inputs in an inline form, be sure to place the <code>.add-on</code> and <code>input</code> on the same line, without spaces.</p>
+        <hr>
+        <h4>Form help text</h4>
+        <p>To add help text for your form inputs, include inline help text with <code>&lt;span class="help-inline"&gt;</code> or a help text block with <code>&lt;p class="help-block"&gt;</code> after the input element.</p>
+      </div>
+      <div class="span8">
+        <form class="form-horizontal bootstrap-form">
+          <fieldset>
+            <div class="control-group">
+              <label class="control-label">Form grid sizes</label>
+              <div class="controls docs-input-sizes">
+                <input class="span1" type="text" placeholder=".span1">
+                <input class="span2" type="text" placeholder=".span2">
+                <input class="span3" type="text" placeholder=".span3">
+                <select class="span1">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+                <select class="span2">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+                <select class="span3">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+                <p class="help-block">Use the same <code>.span*</code> classes from the grid system for input sizes.</p>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Alternate sizes</label>
+              <div class="controls docs-input-sizes">
+                <input class="input-mini" type="text" placeholder=".input-mini">
+                <input class="input-small" type="text" placeholder=".input-small">
+                <input class="input-medium" type="text" placeholder=".input-medium">
+                <p class="help-block">You may also use static classes that don't map to the grid, adapt to the responsive CSS styles, or account for varying types of controls (e.g., <code>input</code> vs. <code>select</code>).</p>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="prependedInput">Prepended text</label>
+              <div class="controls">
+                <div class="input-prepend">
+                  <span class="add-on">@</span><input class="span2" id="prependedInput" size="16" type="text">
+                </div>
+                <p class="help-block">Here's some help text</p>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="appendedInput">Appended text</label>
+              <div class="controls">
+                <div class="input-append">
+                  <input class="span2" id="appendedInput" size="16" type="text"><span class="add-on">.00</span>
+                </div>
+                <span class="help-inline">Here's more help text</span>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="appendedPrependedInput">Append and prepend</label>
+              <div class="controls">
+                <div class="input-prepend input-append">
+                  <span class="add-on">$</span><input class="span2" id="appendedPrependedInput" size="16" type="text"><span class="add-on">.00</span>
+                </div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="appendedInputButton">Append with button</label>
+              <div class="controls">
+                <div class="input-append">
+                  <input class="span2" id="appendedInputButton" size="16" type="text"><button class="btn" type="button">Go!</button>
+                </div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="appendedInputButtons">Two-button append</label>
+              <div class="controls">
+                <div class="input-append">
+                  <input class="span2" id="appendedInputButtons" size="16" type="text"><button class="btn" type="button">Search</button><button class="btn" type="button">Options</button>
+                </div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="inlineCheckboxes">Inline checkboxes</label>
+              <div class="controls">
+                <label class="checkbox inline">
+                  <input type="checkbox" id="inlineCheckbox1" value="option1"> 1
+                </label>
+                <label class="checkbox inline">
+                  <input type="checkbox" id="inlineCheckbox2" value="option2"> 2
+                </label>
+                <label class="checkbox inline">
+                  <input type="checkbox" id="inlineCheckbox3" value="option3"> 3
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="optionsCheckboxList">Checkboxes</label>
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" name="optionsCheckboxList1" value="option1">
+                  Option one is this and that&mdash;be sure to include why it's great
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="optionsCheckboxList2" value="option2">
+                  Option two can also be checked and included in form results
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="optionsCheckboxList3" value="option3">
+                  Option three can&mdash;yes, you guessed it&mdash;also be checked and included in form results
+                </label>
+                <p class="help-block"><strong>Note:</strong> Labels surround all the options for much larger click areas and a more usable form.</p>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Radio buttons</label>
+              <div class="controls">
+                <label class="radio">
+                  <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+                  Option one is this and that&mdash;be sure to include why it's great
+                </label>
+                <label class="radio">
+                  <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                  Option two can be something else and selecting it will deselect option one
+                </label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save changes</button>
+              <button class="btn">Cancel</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div><!-- /row -->
+  </section>
+
+  <h1 class="v-gutter">TODO</h1>
+  <h2>`input.wide, textarea.wide`</h2>
+  <h2>`.triangle-box, .triangle-box-with-header`</h2>
+
+  <hr>
+  <section id="jqueryUI">
+    <h1>jQuery UI</h1>
+    <p>This page demonstrates all available components of our jQuery UI port.</p>
+
+    <!-- Highlight / Error -->
+    <h2 class="demoHeaders">Highlight / Error</h2>
+    <p class="ui-widget">
+      <div class="ui-state-highlight ui-corner-all">
+        <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+        <strong>Hey!</strong> Sample ui-state-highlight style.</p>
+      </div>
+    </p>
+
+    <p class="ui-widget">
+      <div class="ui-state-error ui-corner-all">
+        <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+        <strong>Alert:</strong> Sample ui-state-error style.</p>
+      </div>
+    </p>
+
+
+    <p class="ui-widget">
+      <div class="ui-state-default ui-corner-all">
+        <p><span class="ui-icon ui-icon-mail-closed" style="float: left; margin-right: .3em;"></span>
+        <strong>Hello:</strong> Sample ui-state-default style.</p>
+      </div>
+    </p>
+    <!--end highlights-->
+
+    <!--start toolbar-->
+
+    <div class="demo">
+      <p>&nbsp;</p>
+      <h2 class="demoHeaders">Simple toolbar</h2>
+      <p></p>
+      <span id="toolbar" class="ui-toolbar ui-widget-header ui-corner-all">
+
+        <input type="checkbox" id="shuffle" /><label for="shuffle">Shuffle</label>
+
+        <span id="repeat">
+          <input type="radio" id="repeat0" name="repeat" checked="checked" /><label for="repeat0">No Repeat</label>
+          <input type="radio" id="repeat1" name="repeat" /><label for="repeat1">Once</label>
+          <input type="radio" id="repeatall" name="repeat" /><label for="repeatall">All</label>
+        </span>
+
+      </span>
+    </div><!-- End demo -->
+    <!--end toolbar-->
+
+
+
+    <!-- Autocomplete -->
+    <h2 class="demoHeaders">Autocomplete</h2>
+    <div class="ui-widget">
+      <label for="countries">Countries: </label>
+      <input id="countries">
+    </div>
+
+    <!-- Button -->
+    <h2 class="demoHeaders">UI Button</h2>
+    <p>
+      <a class="styleguide-turnIntoUiButton" href="#">&lt;A href="#"&gt; .ui-button</a>
+      <button class="styleguide-turnIntoUiButton">button.ui-button</button>
+      <a href="#" class="button">a.button</a>
+      <a href="#" class="btn">a.btn</a>
+      <button class="button">button.button</button>
+    </p>
+
+    <h6>.ui-button</h6>
+    <p class="styleguide-turnAllIntoUiButton">
+      <button>Default</button>
+      <button class="btn-primary">.btn-primary</button>
+      <a class="btn-warning">a.btn-warning</a>
+      <button class="btn-danger">.btn-danger</button>
+      <button class="btn-success">.btn-success</button>
+      <button class="btn-info">.btn-info</button>
+      <button class="btn-inverse">.btn-inverse</button>
+    </p>
+
+    <h6>.btn</h6>
+    <p>
+      <button class="btn">Default</button>
+      <button class="btn btn-primary">.btn-primary</button>
+      <a href="#" class="btn btn-warning">a.btn-warning</a>
+      <button class="btn btn-danger">.btn-danger</button>
+      <button class="btn btn-success">.btn-success</button>
+      <button class="btn btn-info">.btn-info</button>
+      <button class="btn btn-inverse">.btn-inverse</button>
+    </p>
+
+    <div class="row-fluid">
+      <div class="span4">
+        <h3>Multiple sizes</h3>
+        <p>Fancy larger or smaller buttons? Add <code>.btn-large</code>, <code>.btn-small</code>, or <code>.btn-mini</code> for two additional sizes.</p>
+        <p>
+          <button class="btn btn-large btn-primary">Primary action</button>
+          <button class="btn btn-large">Action</button>
+        </p>
+        <p>
+          <button class="btn btn-small btn-primary">Primary action</button>
+          <button class="btn btn-small">Action</button>
+        </p>
+        <p>
+          <button class="btn btn-mini btn-primary">Primary action</button>
+          <button class="btn btn-mini">Action</button>
+        </p>
+      </div>
+      <div class="span4">
+        <h3>Disabled state</h3>
+        <p>For disabled buttons, add the <code>.disabled</code> class to links and the <code>disabled</code> attribute for <code>&lt;button&gt;</code> elements.</p>
+        <p>
+          <a href="#" class="btn btn-large btn-primary disabled">Primary link</a>
+          <a href="#" class="btn btn-large disabled">Link</a>
+        </p>
+        <p>
+          <button class="btn btn-large btn-primary disabled" disabled="disabled">Primary button</button>
+          <button class="btn btn-large" disabled="">Button</button>
+        </p>
+        <p>
+          <span class="label label-info">Heads up!</span>
+          We use <code>.disabled</code> as a utility class here, similar to the common <code>.active</code> class, so no prefix is required.
+        </p>
+
+      </div>
+    </div>
+
+
+
+    <!-- Icon Buttons -->
+    <h2 class="demoHeaders">Icon Buttons</h2>
+    <div id="leftIconButton">Left Icon</div> <br /><br />
+    <div id="bothIconButton">Left & Right Icons</div>
+
+    <!-- Button Set -->
+    <h2 class="demoHeaders">Button Toggle</h2>
+    <div id="radio1">
+      <input type="radio" id="radio1" name="radio" /><label for="radio1">Choice 1</label>
+      <input type="radio" id="radio2" name="radio" checked="checked" /><label for="radio2">Choice 2</label>
+      <input type="radio" id="radio3" name="radio" /><label for="radio3">Choice 3</label>
+    </div>
+
+    <!-- Horizontal Slider -->
+    <h2 class="demoHeaders">Horizontal Slider</h2>
+    <div id="horizSlider"></div>
+
+    <!-- Vertical Slider -->
+    <h2 class="demoHeaders">Vertical Slider</h2>
+    <div class="columnbox">
+      <div id="eq">
+        <span>88</span>
+        <span>77</span>
+        <span>55</span>
+        <span>33</span>
+        <span>40</span>
+        <span>45</span>
+        <span>70</span>
+      </div>
+    </div>
+    <br clear="all" />
+
+
+    <!-- Accordion -->
+    <h2 class="demoHeaders">Accordion</h2>
+    <div class="columnbox">
+
+      <div class="accordion">
+
+          <h3><a href="#">Section 1</a></h3>
+          <div>
+            <p>
+            Mauris mauris ante, blandit et, ultrices a, suscipit eget, quam. Integer
+            ut neque. Vivamus nisi metus, molestie vel, gravida in, condimentum sit
+            amet, nunc. Nam a nibh. Donec suscipit eros. Nam mi. Proin viverra leo ut
+            odio. Curabitur malesuada. Vestibulum a velit eu ante scelerisque vulputate.
+            </p>
+          </div>
+          <h3><a href="#">Section 2</a></h3>
+          <div>
+            <p>
+            Sed non urna. Donec et ante. Phasellus eu ligula. Vestibulum sit amet
+            purus. Vivamus hendrerit, dolor at aliquet laoreet, mauris turpis porttitor
+            velit, faucibus interdum tellus libero ac justo. Vivamus non quam. In
+            suscipit faucibus urna.
+            </p>
+          </div>
+          <h3><a href="#">Section 3</a></h3>
+          <div>
+            <p>
+            Nam enim risus, molestie et, porta ac, aliquam ac, risus. Quisque lobortis.
+            Phasellus pellentesque purus in massa. Aenean in pede. Phasellus ac libero
+            ac tellus pellentesque semper. Sed ac felis. Sed commodo, magna quis
+            lacinia ornare, quam ante aliquam nisi, eu iaculis leo purus venenatis dui.
+            </p>
+            <ul>
+              <li>List item one</li>
+              <li>List item two</li>
+              <li>List item three</li>
+            </ul>
+          </div>
+          <h3><a href="#">Section 4</a></h3>
+          <div>
+            <p>
+            Cras dictum. Pellentesque habitant morbi tristique senectus et netus
+            et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in
+            faucibus orci luctus et ultrices posuere cubilia Curae; Aenean lacinia
+            mauris vel est.
+            </p>
+            <p>
+            Suspendisse eu nisl. Nullam ut libero. Integer dignissim consequat lectus.
+            Class aptent taciti sociosqu ad litora torquent per conubia nostra, per
+            inceptos himenaeos.
+            </p>
+          </div>
+
+      </div>
+
+    </div>
+
+    <!-- Tabs -->
+    <h2 class="demoHeaders">Tabs</h2>
+    <div id="tabs">
+      <ul>
+        <li><a href="#tabs-1">First</a></li>
+        <li><a href="#tabs-2">Second</a></li>
+        <li><a href="#tabs-3">Third</a></li>
+      </ul>
+      <div id="tabs-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eget diam nec urna hendrerit tempus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum aliquam ligula non nulla cursus volutpat. Aliquam malesuada felis nec turpis auctor interdum. Cras et lobortis dolor. Nam sodales, dolor eu cursus faucibus, justo leo vestibulum turpis, id malesuada erat ipsum et leo. Integer id aliquam augue. Proin quis risus magna. Vivamus eget accumsan mauris. Vivamus justo ligula, blandit et consequat nec, vulputate a elit. Morbi feugiat metus in ante scelerisque a pulvinar quam condimentum. Suspendisse potenti. Pellentesque convallis scelerisque nunc eget dapibus. Pellentesque ut enim justo. Fusce egestas urna sed nulla placerat iaculis. Cras dignissim tincidunt molestie. Suspendisse rutrum dignissim tortor quis mollis. Sed tempor feugiat ligula in imperdiet. Quisque molestie viverra erat in adipiscing. </div>
+      <div id="tabs-2">Donec porta malesuada massa, at fermentum nunc tincidunt ac. Integer nisi ligula, sodales bibendum interdum id, sodales sit amet orci. In rhoncus libero in purus vestibulum consequat. Aenean vel purus molestie leo pharetra sagittis. In hac habitasse platea dictumst. Quisque bibendum, metus a egestas convallis, est orci dapibus odio, vel pretium ante erat quis ipsum. Praesent at est in odio rhoncus cursus in sollicitudin velit. Aenean auctor molestie hendrerit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec volutpat nisl eget nisi consequat pretium. Nullam dui purus, commodo a vestibulum nec, semper varius nulla. </div>
+      <div id="tabs-3">Mauris tempor urna non quam tincidunt aliquam. Proin venenatis metus eu purus interdum a vehicula ipsum sollicitudin. Mauris sed dignissim odio. Nam id odio sed diam dapibus dignissim. Nulla vestibulum nisl ac magna scelerisque adipiscing. Nam pellentesque sapien vulputate nisi scelerisque ut vehicula orci luctus. Sed rhoncus tempor metus vitae egestas. Proin pharetra tristique justo ac rutrum. Vestibulum ac pharetra dolor. Cras nibh arcu, bibendum eget luctus id, rhoncus nec augue. Integer ornare rhoncus nulla, eu aliquam mi ornare ullamcorper. Praesent egestas auctor orci, non rhoncus sapien eleifend at. Quisque eget purus sem, ut dignissim ligula. Etiam sollicitudin dui libero, id ullamcorper metus. </div>
+    </div>
+
+    <!-- ui-dialog -->
+    <h2 class="demoHeaders">Modal Dialog</h2>
+    <button class="button element_toggler" aria-controls="testdialog">Show Dialog</button>
+
+    <form id="testdialog" data-turn-into-dialog='{"width":600,"modal":true}' style="display:none" title="Dialog Title">
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <a href="#" id="buttonInModal" class="uibutton">Change</a>
+      <div class="button-container">
+        <button type="submit" class="button btn-primary">This will Submit the form</button>
+        <a class="button dialog_closer">close dialog</a>
+      </div>
+    </form>
+
+    <!-- Datepicker -->
+    <h2 class="demoHeaders">Datepicker</h2>
+    <div id="datepicker"></div>
+
+    <!-- Progress Bar -->
+    <h2 class="demoHeaders">Progress Bar</h2>
+    <div id="progressbar"></div>
+    <br />
+    <a id="animateProgress" href="#">Animate to random number</a>
+
+
+    <h2 class="demoHeaders">Jquery UI Icons</h2>
+    <p>DONT USE, use a kyle icon if you are going to introduce a new icon. but i am just making sure we don't break them</p>
+    <br /> <br />
+    <ul id="icons" class="ui-widget ui-helper-clearfix">
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-1-n"><span class="ui-icon ui-icon-carat-1-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-1-ne"><span class="ui-icon ui-icon-carat-1-ne"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-1-e"><span class="ui-icon ui-icon-carat-1-e"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-1-se"><span class="ui-icon ui-icon-carat-1-se"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-1-s"><span class="ui-icon ui-icon-carat-1-s"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-1-sw"><span class="ui-icon ui-icon-carat-1-sw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-1-w"><span class="ui-icon ui-icon-carat-1-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-1-nw"><span class="ui-icon ui-icon-carat-1-nw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-2-n-s"><span class="ui-icon ui-icon-carat-2-n-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-carat-2-e-w"><span class="ui-icon ui-icon-carat-2-e-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-1-n"><span class="ui-icon ui-icon-triangle-1-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-1-ne"><span class="ui-icon ui-icon-triangle-1-ne"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-1-e"><span class="ui-icon ui-icon-triangle-1-e"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-1-se"><span class="ui-icon ui-icon-triangle-1-se"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-1-s"><span class="ui-icon ui-icon-triangle-1-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-1-sw"><span class="ui-icon ui-icon-triangle-1-sw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-1-w"><span class="ui-icon ui-icon-triangle-1-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-1-nw"><span class="ui-icon ui-icon-triangle-1-nw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-2-n-s"><span class="ui-icon ui-icon-triangle-2-n-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-triangle-2-e-w"><span class="ui-icon ui-icon-triangle-2-e-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-1-n"><span class="ui-icon ui-icon-arrow-1-n"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-1-ne"><span class="ui-icon ui-icon-arrow-1-ne"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-1-e"><span class="ui-icon ui-icon-arrow-1-e"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-1-se"><span class="ui-icon ui-icon-arrow-1-se"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-1-s"><span class="ui-icon ui-icon-arrow-1-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-1-sw"><span class="ui-icon ui-icon-arrow-1-sw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-1-w"><span class="ui-icon ui-icon-arrow-1-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-1-nw"><span class="ui-icon ui-icon-arrow-1-nw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-2-n-s"><span class="ui-icon ui-icon-arrow-2-n-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-2-ne-sw"><span class="ui-icon ui-icon-arrow-2-ne-sw"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-2-e-w"><span class="ui-icon ui-icon-arrow-2-e-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-2-se-nw"><span class="ui-icon ui-icon-arrow-2-se-nw"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowstop-1-n"><span class="ui-icon ui-icon-arrowstop-1-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowstop-1-e"><span class="ui-icon ui-icon-arrowstop-1-e"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowstop-1-s"><span class="ui-icon ui-icon-arrowstop-1-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowstop-1-w"><span class="ui-icon ui-icon-arrowstop-1-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-1-n"><span class="ui-icon ui-icon-arrowthick-1-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-1-ne"><span class="ui-icon ui-icon-arrowthick-1-ne"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-1-e"><span class="ui-icon ui-icon-arrowthick-1-e"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-1-se"><span class="ui-icon ui-icon-arrowthick-1-se"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-1-s"><span class="ui-icon ui-icon-arrowthick-1-s"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-1-sw"><span class="ui-icon ui-icon-arrowthick-1-sw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-1-w"><span class="ui-icon ui-icon-arrowthick-1-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-1-nw"><span class="ui-icon ui-icon-arrowthick-1-nw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-2-n-s"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-2-ne-sw"><span class="ui-icon ui-icon-arrowthick-2-ne-sw"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-2-e-w"><span class="ui-icon ui-icon-arrowthick-2-e-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthick-2-se-nw"><span class="ui-icon ui-icon-arrowthick-2-se-nw"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthickstop-1-n"><span class="ui-icon ui-icon-arrowthickstop-1-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthickstop-1-e"><span class="ui-icon ui-icon-arrowthickstop-1-e"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthickstop-1-s"><span class="ui-icon ui-icon-arrowthickstop-1-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowthickstop-1-w"><span class="ui-icon ui-icon-arrowthickstop-1-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowreturnthick-1-w"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowreturnthick-1-n"><span class="ui-icon ui-icon-arrowreturnthick-1-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowreturnthick-1-e"><span class="ui-icon ui-icon-arrowreturnthick-1-e"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowreturnthick-1-s"><span class="ui-icon ui-icon-arrowreturnthick-1-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowreturn-1-w"><span class="ui-icon ui-icon-arrowreturn-1-w"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowreturn-1-n"><span class="ui-icon ui-icon-arrowreturn-1-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowreturn-1-e"><span class="ui-icon ui-icon-arrowreturn-1-e"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowreturn-1-s"><span class="ui-icon ui-icon-arrowreturn-1-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowrefresh-1-w"><span class="ui-icon ui-icon-arrowrefresh-1-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowrefresh-1-n"><span class="ui-icon ui-icon-arrowrefresh-1-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowrefresh-1-e"><span class="ui-icon ui-icon-arrowrefresh-1-e"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrowrefresh-1-s"><span class="ui-icon ui-icon-arrowrefresh-1-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-4"><span class="ui-icon ui-icon-arrow-4"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-arrow-4-diag"><span class="ui-icon ui-icon-arrow-4-diag"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-extlink"><span class="ui-icon ui-icon-extlink"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-newwin"><span class="ui-icon ui-icon-newwin"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-refresh"><span class="ui-icon ui-icon-refresh"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-shuffle"><span class="ui-icon ui-icon-shuffle"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-transfer-e-w"><span class="ui-icon ui-icon-transfer-e-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-transferthick-e-w"><span class="ui-icon ui-icon-transferthick-e-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-folder-collapsed"><span class="ui-icon ui-icon-folder-collapsed"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-folder-open"><span class="ui-icon ui-icon-folder-open"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-document"><span class="ui-icon ui-icon-document"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-document-b"><span class="ui-icon ui-icon-document-b"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-note"><span class="ui-icon ui-icon-note"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-mail-closed"><span class="ui-icon ui-icon-mail-closed"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-mail-open"><span class="ui-icon ui-icon-mail-open"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-suitcase"><span class="ui-icon ui-icon-suitcase"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-comment"><span class="ui-icon ui-icon-comment"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-person"><span class="ui-icon ui-icon-person"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-print"><span class="ui-icon ui-icon-print"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-trash"><span class="ui-icon ui-icon-trash"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-locked"><span class="ui-icon ui-icon-locked"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-unlocked"><span class="ui-icon ui-icon-unlocked"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-bookmark"><span class="ui-icon ui-icon-bookmark"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-tag"><span class="ui-icon ui-icon-tag"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-home"><span class="ui-icon ui-icon-home"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-flag"><span class="ui-icon ui-icon-flag"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-calculator"><span class="ui-icon ui-icon-calculator"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-cart"><span class="ui-icon ui-icon-cart"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-pencil"><span class="ui-icon ui-icon-pencil"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-clock"><span class="ui-icon ui-icon-clock"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-disk"><span class="ui-icon ui-icon-disk"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-calendar"><span class="ui-icon ui-icon-calendar"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-zoomin"><span class="ui-icon ui-icon-zoomin"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-zoomout"><span class="ui-icon ui-icon-zoomout"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-search"><span class="ui-icon ui-icon-search"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-wrench"><span class="ui-icon ui-icon-wrench"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-gear"><span class="ui-icon ui-icon-gear"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-heart"><span class="ui-icon ui-icon-heart"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-star"><span class="ui-icon ui-icon-star"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-link"><span class="ui-icon ui-icon-link"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-cancel"><span class="ui-icon ui-icon-cancel"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-plus"><span class="ui-icon ui-icon-plus"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-plusthick"><span class="ui-icon ui-icon-plusthick"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-minus"><span class="ui-icon ui-icon-minus"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-minusthick"><span class="ui-icon ui-icon-minusthick"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-close"><span class="ui-icon ui-icon-close"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-closethick"><span class="ui-icon ui-icon-closethick"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-key"><span class="ui-icon ui-icon-key"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-lightbulb"><span class="ui-icon ui-icon-lightbulb"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-scissors"><span class="ui-icon ui-icon-scissors"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-clipboard"><span class="ui-icon ui-icon-clipboard"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-copy"><span class="ui-icon ui-icon-copy"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-contact"><span class="ui-icon ui-icon-contact"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-image"><span class="ui-icon ui-icon-image"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-video"><span class="ui-icon ui-icon-video"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-script"><span class="ui-icon ui-icon-script"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-alert"><span class="ui-icon ui-icon-alert"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-info"><span class="ui-icon ui-icon-info"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-notice"><span class="ui-icon ui-icon-notice"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-help"><span class="ui-icon ui-icon-help"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-check"><span class="ui-icon ui-icon-check"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-bullet"><span class="ui-icon ui-icon-bullet"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-radio-off"><span class="ui-icon ui-icon-radio-off"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-radio-on"><span class="ui-icon ui-icon-radio-on"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-pin-w"><span class="ui-icon ui-icon-pin-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-pin-s"><span class="ui-icon ui-icon-pin-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-play"><span class="ui-icon ui-icon-play"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-pause"><span class="ui-icon ui-icon-pause"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-seek-next"><span class="ui-icon ui-icon-seek-next"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-seek-prev"><span class="ui-icon ui-icon-seek-prev"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-seek-end"><span class="ui-icon ui-icon-seek-end"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-seek-first"><span class="ui-icon ui-icon-seek-first"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-stop"><span class="ui-icon ui-icon-stop"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-eject"><span class="ui-icon ui-icon-eject"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-volume-off"><span class="ui-icon ui-icon-volume-off"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-volume-on"><span class="ui-icon ui-icon-volume-on"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-power"><span class="ui-icon ui-icon-power"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-signal-diag"><span class="ui-icon ui-icon-signal-diag"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-signal"><span class="ui-icon ui-icon-signal"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-battery-0"><span class="ui-icon ui-icon-battery-0"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-battery-1"><span class="ui-icon ui-icon-battery-1"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-battery-2"><span class="ui-icon ui-icon-battery-2"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-battery-3"><span class="ui-icon ui-icon-battery-3"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-plus"><span class="ui-icon ui-icon-circle-plus"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-minus"><span class="ui-icon ui-icon-circle-minus"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-close"><span class="ui-icon ui-icon-circle-close"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-triangle-e"><span class="ui-icon ui-icon-circle-triangle-e"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-triangle-s"><span class="ui-icon ui-icon-circle-triangle-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-triangle-w"><span class="ui-icon ui-icon-circle-triangle-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-triangle-n"><span class="ui-icon ui-icon-circle-triangle-n"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-arrow-e"><span class="ui-icon ui-icon-circle-arrow-e"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-arrow-s"><span class="ui-icon ui-icon-circle-arrow-s"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-arrow-w"><span class="ui-icon ui-icon-circle-arrow-w"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-arrow-n"><span class="ui-icon ui-icon-circle-arrow-n"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-zoomin"><span class="ui-icon ui-icon-circle-zoomin"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-zoomout"><span class="ui-icon ui-icon-circle-zoomout"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circle-check"><span class="ui-icon ui-icon-circle-check"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circlesmall-plus"><span class="ui-icon ui-icon-circlesmall-plus"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circlesmall-minus"><span class="ui-icon ui-icon-circlesmall-minus"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-circlesmall-close"><span class="ui-icon ui-icon-circlesmall-close"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-squaresmall-plus"><span class="ui-icon ui-icon-squaresmall-plus"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-squaresmall-minus"><span class="ui-icon ui-icon-squaresmall-minus"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-squaresmall-close"><span class="ui-icon ui-icon-squaresmall-close"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-grip-dotted-vertical"><span class="ui-icon ui-icon-grip-dotted-vertical"></span></li>
+
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-grip-dotted-horizontal"><span class="ui-icon ui-icon-grip-dotted-horizontal"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-grip-solid-vertical"><span class="ui-icon ui-icon-grip-solid-vertical"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-grip-solid-horizontal"><span class="ui-icon ui-icon-grip-solid-horizontal"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-gripsmall-diagonal-se"><span class="ui-icon ui-icon-gripsmall-diagonal-se"></span></li>
+      <li class="ui-state-default ui-corner-all" title=".ui-icon-grip-diagonal-se"><span class="ui-icon ui-icon-grip-diagonal-se"></span></li>
+    </ul>
+
+
+    <h2 class="demoHeaders">Overlay and Shadow Classes <em>(not currently used in UI widgets)</em></h2>
+    <div style="position: relative; width: 70%; height: 200px; padding:1% 4%; overflow:hidden;" class="fakewindowcontain">
+      <p>Lorem ipsum dolor sit amet,  Nulla nec tortor. Donec id elit quis purus consectetur consequat. </p><p>Nam congue semper tellus. Sed erat dolor, dapibus sit amet, venenatis ornare, ultrices ut, nisi. Aliquam ante. Suspendisse scelerisque dui nec velit. Duis augue augue, gravida euismod, vulputate ac, facilisis id, sem. Morbi in orci. </p><p>Nulla purus lacus, pulvinar vel, malesuada ac, mattis nec, quam. Nam molestie scelerisque quam. Nullam feugiat cursus lacus.orem ipsum dolor sit amet, consectetur adipiscing elit. Donec libero risus, commodo vitae, pharetra mollis, posuere eu, pede. Nulla nec tortor. Donec id elit quis purus consectetur consequat. </p><p>Nam congue semper tellus. Sed erat dolor, dapibus sit amet, venenatis ornare, ultrices ut, nisi. Aliquam ante. Suspendisse scelerisque dui nec velit. Duis augue augue, gravida euismod, vulputate ac, facilisis id, sem. Morbi in orci. Nulla purus lacus, pulvinar vel, malesuada ac, mattis nec, quam. Nam molestie scelerisque quam. </p><p>Nullam feugiat cursus lacus.orem ipsum dolor sit amet, consectetur adipiscing elit. Donec libero risus, commodo vitae, pharetra mollis, posuere eu, pede. Nulla nec tortor. Donec id elit quis purus consectetur consequat. Nam congue semper tellus. Sed erat dolor, dapibus sit amet, venenatis ornare, ultrices ut, nisi. Aliquam ante. </p><p>Suspendisse scelerisque dui nec velit. Duis augue augue, gravida euismod, vulputate ac, facilisis id, sem. Morbi in orci. Nulla purus lacus, pulvinar vel, malesuada ac, mattis nec, quam. Nam molestie scelerisque quam. Nullam feugiat cursus lacus.orem ipsum dolor sit amet, consectetur adipiscing elit. Donec libero risus, commodo vitae, pharetra mollis, posuere eu, pede. Nulla nec tortor. Donec id elit quis purus consectetur consequat. Nam congue semper tellus. Sed erat dolor, dapibus sit amet, venenatis ornare, ultrices ut, nisi. </p>
+
+      <!-- ui-dialog -->
+      <div class="ui-overlay"><div class="ui-widget-overlay"></div><div class="ui-widget-shadow ui-corner-all" style="width: 302px; height: 152px; position: absolute; left: 50px; top: 30px;"></div></div>
+      <div style="position: absolute; width: 280px; height: 130px;left: 50px; top: 30px; padding: 10px;" class="ui-widget ui-widget-content ui-corner-all">
+        <div class="ui-dialog-content ui-widget-content" style="background: none; border: 0;">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+      </div>
+
+    </div>
+    <h2 class="demoHeaders">Combination examples</h2>
+    <div class="columnbox" style="height: 200px;">
+      <div id="tabs2">
+        <ul>
+          <li><a href="#tabs2-1">First</a></li>
+          <li><a href="#tabs2-2">Second</a></li>
+          <li><a href="#tabs2-3">Third</a></li>
+        </ul>
+        <div id="tabs2-1">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eget diam nec urna hendrerit tempus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum aliquam ligula non nulla cursus volutpat. Aliquam malesuada felis nec turpis auctor interdum. Cras et lobortis dolor. Nam sodales, dolor eu cursus faucibus, justo leo vestibulum turpis, id malesuada erat ipsum et leo. Integer id aliquam augue. Proin quis risus magna.</p>
+          <a href="#" id="nestedButtonTest_1">Change</a>
+        </div>
+        <div id="tabs2-2">Tab 2</div>
+        <div id="tabs2-3">Tab 3</div>
+      </div>
+    </div>
+
+    <br />
+
+    <div class="columnbox" style="height: 200px;">
+      <div id="accordion2">
+        <div>
+          <h4><a href="#">First</a></h4>
+          <div>
+            <p>Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</p>
+            <a href="#" id="nestedButtonTest_2">Change</a>
+          </div>
+        </div>
+        <div>
+          <h4><a href="#">Second</a></h4>
+          <div>Phasellus mattis tincidunt nibh.</div>
+        </div>
+        <div>
+          <h4><a href="#">Third</a></h4>
+          <div>Mauris tempor urna non quam tincidunt aliquam. Proin venenatis metus eu purus interdum a vehicula ipsum sollicitudin. Mauris sed dignissim odio. Nam id odio sed diam dapibus dignissim. Nulla vestibulum nisl ac magna scelerisque adipiscing. Nam pellentesque sapien vulputate nisi scelerisque ut vehicula orci luctus. Sed rhoncus tempor metus vitae egestas. Proin pharetra tristique justo ac rutrum. Vestibulum ac pharetra dolor. Cras nibh arcu, bibendum eget luctus id, rhoncus nec augue. Integer ornare rhoncus nulla, eu aliquam mi ornare ullamcorper. Praesent egestas auctor orci, non rhoncus sapien eleifend at. Quisque eget purus sem, ut dignissim ligula. Etiam sollicitudin dui libero, id ullamcorper metus. </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="clear:both;">&nbsp;</div>
+
+    <h2 class="demoHeaders">Common Input Fields</h2>
+    <p>
+      <strong>Input (type: 'text')</strong><br />
+      <input type="text" />
+    </p>
+    <p>
+      <strong>Input (type: 'email' and 'password')</strong><br />
+      <input type="email" /><input type="password" />
+    </p>
+    <p>
+      <strong>Text Area</strong><br />
+      <textarea cols="30"></textarea>
+    </p>
+    <p>
+      <strong>Other Inputs Remain Fine</strong><br />
+      <input type="radio" /> <br />
+      <input type="checkbox" /> <br />
+      <input type="range" /> <br />
+      <input type="file" /> <br />
+      <input type="submit" /> <br />
+      <input type="button" value="Button" /> <br />
+    </p>
+
+
+  </section><!-- end jqueryUI -->
+
+
 
 </div>
 
+<% js_block do %>
+  <script>
+
+  </script>
+<% end %>

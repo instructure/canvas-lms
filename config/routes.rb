@@ -319,6 +319,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :alerts
     course.student_view 'student_view', :controller => 'courses', :action => 'student_view', :conditions => {:method => :post}
     course.student_view 'student_view', :controller => 'courses', :action => 'leave_student_view', :conditions => {:method => :delete}
+    course.test_student 'test_student', :controller => 'courses', :action => 'reset_test_student', :conditions => {:method => :delete}
   end
 
   map.resources :page_views, :only => [:update,:index]
@@ -404,6 +405,7 @@ ActionController::Routing::Routes.draw do |map|
     group.resources :collaborations
     group.resources :short_messages
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
+    group.profile 'profile', :controller => :groups, :action => 'profile', :conditions => {:method => :get}
   end
 
   map.resources :accounts, :member => { :statistics => :get } do |account|
@@ -525,18 +527,24 @@ ActionController::Routing::Routes.draw do |map|
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
     user.resources :messages, :only => [:index]
   end
-  map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
+
+  map.resource :profile, :only => %w(show edit update),
+                         :controller => "profile",
+                         :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
     profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'
     profile.user_service "user_services/:id", :controller => "users", :action => "delete_user_service", :conditions => {:method => :delete}
     profile.create_user_service "user_services", :controller => "users", :action => "create_user_service", :conditions => {:method => :post}
   end
+  map.user_profile 'about/:id', :controller => :profile, :action => :show
+
   map.resources :communication_channels
   map.resource :pseudonym_session
 
   # dashboard_url is / , not /dashboard
   map.dashboard '', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+  map.toggle_dashboard 'toggle_dashboard', :controller => 'users', :action => 'toggle_dashboard', :conditions => {:method => :post}
   map.styleguide 'styleguide', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
   map.root :dashboard
   # backwards compatibility with the old /dashboard url
@@ -660,6 +668,8 @@ ActionController::Routing::Routes.draw do |map|
       courses.post 'courses/:course_id/course_copy', :controller => :content_imports, :action => :copy_course_content
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
       courses.post 'courses/:course_id/files', :action => :create_file
+      courses.post 'courses/:course_id/folders', :controller => :folders, :action => :create
+      courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
@@ -678,6 +688,7 @@ ActionController::Routing::Routes.draw do |map|
       assignments.get 'courses/:course_id/assignments/:id', :action => :show
       assignments.post 'courses/:course_id/assignments', :action => :create
       assignments.put 'courses/:course_id/assignments/:id', :action => :update
+      assignments.delete 'courses/:course_id/assignments/:id', :action => :destroy, :controller => :assignments
     end
 
     api.with_options(:controller => :submissions_api) do |submissions|
@@ -753,6 +764,9 @@ ActionController::Routing::Routes.draw do |map|
       users.delete "users/:user_id/followers/self", :action => :unfollow
 
       users.get 'users/self/todo', :action => :todo_items
+      users.get 'users/self/coming_up', :action => :coming_up_items
+      users.get 'users/self/recent_feedback', :action => :recent_feedback
+
       users.delete 'users/self/todo/:asset_string/:purpose', :action => :ignore_item, :path_name => 'users_todo_ignore'
       users.post 'accounts/:account_id/users', :action => :create
       users.get 'accounts/:account_id/users', :action => :index, :path_name => 'account_users'
@@ -760,6 +774,9 @@ ActionController::Routing::Routes.draw do |map|
 
       users.put 'users/:id', :action => :update
       users.post 'users/:user_id/files', :action => :create_file
+
+      users.post 'users/:user_id/folders', :controller => :folders, :action => :create
+      users.get 'users/:user_id/folders/:id', :controller => :folders, :action => :show
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
@@ -781,6 +798,14 @@ ActionController::Routing::Routes.draw do |map|
       roles.put 'accounts/:account_id/roles/:role', :action => :update
     end
 
+    api.with_options(:controller => :account_reports) do |reports|
+      reports.get 'accounts/:account_id/reports/:report', :action => :index
+      reports.get 'accounts/:account_id/reports', :action => :available_reports
+      reports.get 'accounts/:account_id/reports/:report/:id', :action => :show
+      reports.post 'accounts/:account_id/reports/:report', :action => :create
+      reports.delete 'accounts/:account_id/reports/:report/:id', :action => :destroy
+    end
+
     api.with_options(:controller => :admins) do |admins|
       admins.post 'accounts/:account_id/admins', :action => :create
     end
@@ -790,7 +815,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
-    api.get 'users/:user_id/profile', :controller => :profile, :action => :show
+    api.get 'users/:user_id/profile', :controller => :profile, :action => :edit
     api.get 'users/:user_id/avatars', :controller => :profile, :action => :profile_pics
 
     api.with_options(:controller => :conversations) do |conversations|
@@ -848,6 +873,9 @@ ActionController::Routing::Routes.draw do |map|
       groups.with_options(:controller => :group_memberships) do |memberships|
         memberships.resources :memberships, :path_prefix => "groups/:group_id", :name_prefix => "group_", :controller => :group_memberships, :except => [:show]
       end
+
+      groups.post 'groups/:group_id/folders', :controller => :folders, :action => :create
+      groups.get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show
     end
 
     api.with_options(:controller => :collections) do |collections|
@@ -869,6 +897,22 @@ ActionController::Routing::Routes.draw do |map|
 
     api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
     api.get 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
+
+    api.with_options(:controller => :files) do |files|
+      files.post 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
+      files.get 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
+      files.get 'files/:id', :action => :api_show
+      files.delete 'files/:id', :action => :destroy
+      files.put 'files/:id', :action => :api_update
+    end
+
+    api.with_options(:controller => :folders) do |folders|
+      folders.get 'folders/:id', :action => :show
+      folders.get 'folders/:id/folders', :action => :api_index, :path_name => 'list_folders'
+      folders.get 'folders/:id/files', :controller => :files, :action => :api_index, :path_name => 'list_files'
+      folders.delete 'folders/:id', :action => :api_destroy
+      folders.put 'folders/:id', :action => :update
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
@@ -905,7 +949,14 @@ ActionController::Routing::Routes.draw do |map|
   map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
 
+  # commenting out all collection urls until collections are live
+  # map.resources :collection_items, :only => [:new]
+  # map.get_bookmarklet 'get_bookmarklet', :controller => 'collection_items', :action => 'get_bookmarklet'
   map.collection_item_link_data 'collection_items/link_data', :controller => 'collection_items', :action => 'link_data', :conditions => { :method => :post }
+  # 
+  # map.resources :collections, :only => [:show, :index] do |collection|
+  #   collection.resources :collection_items, :only => [:show, :index]
+  # end
 
   # See how all your routes lay out with "rake routes"
 end

@@ -55,8 +55,8 @@ define [
 
       fullCalendarParams =
         header:
-          left:   'prev,today,next'
-          center: 'title'
+          left:   'prev,today,next,title'
+          center: ''
           right:  ''
         editable: true
         columnFormat:
@@ -199,6 +199,7 @@ define [
           cb(filterEvents(events))
 
     eventRender: (event, element, view) =>
+      $element = $(element)
       if event.isAppointmentGroupEvent() && @displayAppointmentEvents &&
           @displayAppointmentEvents.id == event.calendarEvent.appointment_group_id
         # We are in the scheduler view, and this event is part of the currently
@@ -214,7 +215,8 @@ define [
           status = "Filled" # TODO: i18n
         if event.calendarEvent.reserved == true
           status = "Reserved" # TODO: i18n
-        $(element).find(".fc-event-title").text(status)
+        $element.find('.fc-event-title').text(status)
+      $element.attr('title', $.trim("#{$element.find('.fc-event-time').text()}\n#{$element.find('.fc-event-title').text()}"))
       true
 
     eventAfterRender: (event, element, view) =>

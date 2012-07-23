@@ -509,7 +509,7 @@ describe Group do
         Group::TAB_DISCUSSIONS,
         Group::TAB_CHAT,
         Group::TAB_FILES,
-        Group::TAB_CONFERENCES
+        Group::TAB_CONFERENCES,
       ]
     end
 
@@ -522,7 +522,8 @@ describe Group do
         Group::TAB_DISCUSSIONS,
         Group::TAB_CHAT,
         Group::TAB_FILES,
-        Group::TAB_CONFERENCES
+        Group::TAB_CONFERENCES,
+        Group::TAB_SETTINGS
       ]
     end
 

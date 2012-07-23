@@ -1226,15 +1226,16 @@ class Quiz < ActiveRecord::Base
     if hash[:assignment] && hash[:available]
       assignment = Assignment.import_from_migration(hash[:assignment], context)
       item.assignment = assignment
-      item.generate_quiz_data
-      item.workflow_state = 'available'
-      item.published_at = Time.now
     elsif !item.assignment && grading = hash[:grading]
       # The actual assignment will be created when the quiz is published
       item.quiz_type = 'assignment'
       hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
-    elsif hash[:available]
+    end
+
+    if hash[:available]
+      item.generate_quiz_data
       item.workflow_state = 'available'
+      item.published_at = Time.now
     end
     
     if hash[:assignment_group_migration_id]

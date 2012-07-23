@@ -142,7 +142,8 @@ describe CoursesController, :type => :integration do
           'account_id' => @account.id,
           'root_account_id' => @account.id,
           'start_at' => '2011-01-01T07:00:00Z',
-          'end_at' => '2011-05-01T07:00:00Z'
+          'end_at' => '2011-05-01T07:00:00Z',
+          'workflow_state' => 'available',
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])

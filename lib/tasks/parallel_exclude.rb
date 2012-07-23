@@ -14,6 +14,7 @@ module ParallelExclude
       'spec/apis/user_content_spec.rb',
       'spec/apis/v1/groups_api_spec.rb',
       'spec/apis/v1/courses_api_spec.rb',
+      'spec/apis/v1/collections_spec.rb',
       'spec/apis/auth_spec.rb',
       'spec/integration/files_spec.rb',
       'spec/lib/acts_as_list.rb',

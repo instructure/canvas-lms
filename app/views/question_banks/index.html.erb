@@ -38,7 +38,7 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if !@context.is_a?(User) %>
-      <a href="#" class="add_bank_link button button-sidebar button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'add_bank', 'Add Question Bank' %></a>
+      <a href="#" class="add_bank_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'add_bank', 'Add Question Bank' %></a>
     <% end %>
     <% if @current_user && @context != @current_user %>
       <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="button button-sidebar-wide see_bookmarked_banks"><%= image_tag "bookmark.png" %> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>

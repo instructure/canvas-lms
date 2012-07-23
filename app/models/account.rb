@@ -21,7 +21,8 @@ class Account < ActiveRecord::Base
   attr_accessible :name, :turnitin_account_id,
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
-    :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale
+    :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
+    :default_user_storage_quota_mb
 
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'
@@ -147,6 +148,7 @@ class Account < ActiveRecord::Base
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true, :default => false
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
+  add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -175,7 +177,7 @@ class Account < ActiveRecord::Base
     end
     settings
   end
-  
+
   def ip_filters=(params)
     filters = {}
     require 'ipaddr'
@@ -380,7 +382,26 @@ class Account < ActiveRecord::Base
     end
     write_attribute(:default_storage_quota, val)
   end
+
+  def default_user_storage_quota
+    read_attribute(:default_user_storage_quota) ||
+    User.default_storage_quota
+  end
+
+  def default_user_storage_quota=(val)
+    val = val.to_i
+    val = nil if val == User.default_storage_quota || val <= 0
+    write_attribute(:default_user_storage_quota, val)
+  end
+
+  def default_user_storage_quota_mb
+    default_user_storage_quota / 1.megabyte
+  end
   
+  def default_user_storage_quota_mb=(val)
+    self.default_user_storage_quota = val.try(:to_i).try(:megabytes)
+  end
+
   def has_outcomes?
     self.learning_outcomes.count > 0
   end
@@ -1013,4 +1034,8 @@ class Account < ActiveRecord::Base
   named_scope :limit, lambda {|limit|
     {:limit => limit}
   }
+
+  def canvas_network_enabled?
+    false
+  end
 end

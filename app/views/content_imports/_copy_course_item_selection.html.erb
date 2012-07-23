@@ -99,12 +99,12 @@
 <% if @source_course.folders.active.length > 0 && @source_course.attachments.active.length > 0 %>
   <h3><%= check_box :copy, :all_attachments, :class => "copy_all", :checked => true %><%= label :copy, :all_attachments, image_tag('download.png') + " " + t('labels.files', "Files for %{course}", :course => @source_course.name) %></h3>
   <ul class="unstyled_list root_asset_list">
-    <% @source_course.folders.active.sort_by { |f| f.full_name }.each do |folder| %>
+    <% @source_course.folders.by_name.active.sort_by { |f| f.full_name }.each do |folder| %>
       <% if folder.attachments.active.length > 0 %>
         <li>
           <h4><%= check_box "copy[folders]", mig_id(folder), :class => "copy_all" %><%= label "copy[folders]", mig_id(folder), folder.full_name %></h4>
           <ul class="unstyled_list asset_list">
-            <% folder.attachments.active.each do |file| %>
+            <% folder.attachments.by_display_name.active.each do |file| %>
               <li><%= check_box "copy[attachments]", mig_id(file) %><%= label "copy[attachments]", mig_id(file), file.display_name %></li>
             <% end %>
           </ul>

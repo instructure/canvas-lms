@@ -1,5 +1,83 @@
 @mixin bevelText {
-  text-shadow: 0 1px 1px rgba(255,255,255,.75);
+  text-shadow: 0 1px 1px hsla(0, 100%, 100%, 0.75);
 }
 
+@mixin header-text {
+  color: $fcHeader;
+  text-shadow: 0 1px 1px $textShadowHeader;
+}
+@mixin header-bg {
+  @include vertical-gradient($gradientTopHeader, $gradientBottomHeader);
+  box-shadow: inset 0 1px 0 hsla(0, 100%, 100%, 0.75);
+}
 
+@mixin ui-widget-header-bg-and-text {
+  border: 1px solid $borderColorHeader;
+  @include header-text;
+  @include header-bg;
+}
+
+@mixin content-callout {
+  @include gradient-vertical(lighten($contentCalloutColor, 4%), $contentCalloutColor);
+  color: $blueDark;
+}
+
+@mixin ellipsis {
+  white-space: nowrap;
+  overflow: hidden;              /* "overflow" value must be different from "visible" */
+  text-overflow: ellipsis;
+}
+
+@mixin box-with-header {
+  border: solid 1px $borderColor;
+  border-radius: 3px;
+  @include box-shadow(0 1px 1px 0px lighten($borderColor, 20%));
+  @include gradient-vertical($white, $lightBackground);
+
+  .box-header {
+    & > * {
+      padding: 8px 20px;
+    }
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    @include content-callout();
+    border-bottom: solid 1px $listBorderColor;
+    color: $blueDark;
+
+    .box-subheader {
+      color: $grayDark;
+      font-size: 11px;
+    }
+  }
+
+
+  .box-content {
+    padding: 10px 20px;
+  }
+  .box-header-column {
+    display: table-cell;
+    width: 100000px;
+    vertical-align: middle;
+  }
+  a.box-header-column {
+    width: 0;
+    color: #9babb6;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    border-left: 1px solid #c3ccd5;
+    text-align: center;
+    font-size: 14px;
+    &:hover {
+      @include box-shadow(inset 0 1px 1px white);
+      @include gradient-vertical($contentCalloutColor, darken($contentCalloutColor, 8%));
+      text-decoration: none;
+      border-left-color: $borderColor;
+    }
+    &:last-child {
+      border-top-right-radius: 3px; // prevent my corner from bleeding out when the hover bg is applied
+    }
+    i[class*="icon-"], i[class^="icon-"] {
+      margin: 0 auto;
+      opacity: .5;
+    }
+  }
+}

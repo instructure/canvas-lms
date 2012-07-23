@@ -17,13 +17,13 @@
   <div id="sidebar_content">
   <p>
     <% if can_do(@context.discussion_topics.new, @current_user, :create) %>
-      <a href="#" class="add_topic_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_topic', %{Start a New Topic}) %></a>
+      <a href="#" class="add_topic_link button button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_topic', %{Start a New Topic}) %></a>
     <% end %>
     <% if can_do(@context.web_conferences.new, @current_user, :create) %>
-      <a href="#" class="add_collaboration_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_collaboration', %{Start a Collaboration}) %></a>
+      <a href="#" class="add_collaboration_link button button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_collaboration', %{Start a Collaboration}) %></a>
     <% end %>
     <% if can_do(@context.collaborations.new, @current_user, :create) %>
-      <a href="#" class="add_conference_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_conference', %{Start a Web Conference}) %></a>
+      <a href="#" class="add_conference_link button button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_conference', %{Start a Web Conference}) %></a>
     <% end %>
   </p>
   </div>

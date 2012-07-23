@@ -883,15 +883,18 @@ class Submission < ActiveRecord::Base
     @comment_limiting_session = session
   end
 
-  [:submission_comments, :visible_submission_comments].each do |method|
-    alias_method "old_#{method}", method
-    instance_eval <<-CODE
-      def #{method}(options = {})
-        res = old_#{method}(options)
-        res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
-        res
-      end
-    CODE
+  alias_method :old_submission_comments, :submission_comments
+  def submission_comments(options = {})
+    res = old_submission_comments(options)
+    res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
+    res
+  end
+
+  alias_method :old_visible_submission_comments, :visible_submission_comments
+  def visible_submission_comments(options = {})
+    res = old_visible_submission_comments(options)
+    res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
+    res
   end
 
   def assessment_request_count
@@ -1024,23 +1027,18 @@ class Submission < ActiveRecord::Base
   end
   
   def self.json_serialization_full_parameters(additional_parameters={})
-    additional_parameters[:comments] ||= :submission_comments
-    includes = {:attachments => {}, :quiz_submission => {}}
-    if additional_parameters[:comments]
-      includes[additional_parameters[:comments]] = additional_parameters[:avatars] ? {:methods => [:avatar_path]} : {}
-    end
-    res = {
-      :methods => [:scribdable?,:conversion_status,:scribd_doc,:formatted_body,:submission_history],
-      :include => includes
-    }.merge(additional_parameters || {})
-    if additional_parameters[:except]
-      additional_parameters[:except].each do |key|
+    includes = { :attachments => {}, :quiz_submission => {} }
+    methods = [ :scribdable?, :conversion_status, :scribd_doc, :formatted_body, :submission_history ]
+    methods << (additional_parameters.delete(:comments) || :submission_comments)
+    excepts = additional_parameters.delete :except
+
+    res = { :methods => methods, :include => includes }.merge(additional_parameters)
+    if excepts
+      excepts.each do |key|
         res[:methods].delete key
         res[:include].delete key
       end
     end
-    res.delete :except
-    res.delete :comments
     res
   end
 

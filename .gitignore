@@ -1,6 +1,7 @@
 .rvmrc
 .rdebug_hist
 .DS_Store
+.powrc
 Gemfile.lock
 log/*.log
 log/*.pid

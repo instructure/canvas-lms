@@ -36,6 +36,7 @@ define [
         @change?(@tokenValues())
 
       @added = @options.added
+      @change = @options.change
 
       @$placeholder = $('<span />')
       @$placeholder.text(@options.placeholder)
@@ -99,8 +100,12 @@ define [
 
       @resize()
 
+    teardown: ->
+      @selector.teardown()
+
     resize: () ->
-      @$fakeInput.css('width', @$node.css('width'))
+      width = @options.fakeInputWidth or @$node.css 'width'
+      @$fakeInput.css('width', width)
 
     addToken: (data) ->
       val = data?.value ? @val()
@@ -170,7 +175,7 @@ define [
         [$li.find('input').val(), $li.find('div').attr('title')]
 
     tokenValues: ->
-      input.value for input in @$tokens.find('input')
+      input.value for input in @$tokens.find("[name='#{@nodeName}[]']")
 
     inputKeyUp: (e) ->
       @reposition()
@@ -216,3 +221,6 @@ define [
   $.fn.tokenInput = (options) ->
     @each ->
       new TokenInput $(this), $.extend(true, {}, options)
+
+  TokenInput
+

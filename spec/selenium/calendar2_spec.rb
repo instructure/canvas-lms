@@ -19,23 +19,23 @@ describe "calendar2" do
   end
 
   def find_middle_day
-    driver.find_element(:css, '.calendar .fc-week1 .fc-wed')
+    f('.calendar .fc-week1 .fc-wed')
   end
 
   def change_calendar(css_selector = '.fc-button-next')
-    driver.find_element(:css, '.calendar .fc-header-left ' + css_selector).click
+    f('.calendar .fc-header-left ' + css_selector).click
     wait_for_ajax_requests
   end
 
   def add_date(middle_number)
-    find_with_jquery('.ui-datepicker-trigger:visible').click
+    fj('.ui-datepicker-trigger:visible').click
     datepicker_current(middle_number)
   end
 
   def create_assignment_event(assignment_title, should_add_date = false)
     middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
     find_middle_day.click
-    edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+    edit_event_dialog = f('#edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_dialog.find_element(:css, '.edit_assignment_option').click
     edit_assignment_form = edit_event_dialog.find_element(:id, 'edit_assignment_form')
@@ -44,13 +44,12 @@ describe "calendar2" do
     add_date(middle_number) if should_add_date
     submit_form(edit_assignment_form)
     wait_for_ajax_requests
-    #find_with_jquery(".fc-day-number:contains(#{middle_number})").click
-    keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(assignment_title) }
+    keep_trying_until { f('.fc-view-month .fc-event-title').should include_text(assignment_title) }
   end
 
   def create_calendar_event(event_title, should_add_date = false)
     middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
-    edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+    edit_event_dialog = f('#edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
     title = edit_event_form.find_element(:id, 'calendar_event_title')
@@ -58,10 +57,8 @@ describe "calendar2" do
     add_date(middle_number) if should_add_date
     submit_form(edit_event_form)
     wait_for_ajax_requests
-    #find_with_jquery(".fc-day-number:contains(#{middle_number})").click
-    keep_trying_until { driver.find_element(:css, '.fc-view-month .fc-event-title').should include_text(event_title) }
+    keep_trying_until { f('.fc-view-month .fc-event-title').should include_text(event_title) }
   end
-
 
   context "as a teacher" do
 
@@ -76,12 +73,12 @@ describe "calendar2" do
       Account.default.add_user(@user)
       CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
       get "/courses/#{unrelated_course.id}/settings"
-      expect_new_page_load { driver.find_element(:css, "#course_calendar_link").click() }
+      expect_new_page_load { f("#course_calendar_link").click() }
       wait_for_ajax_requests
       # only the explicit context should be selected
-      driver.find_element(:css, "#context-list li[data-context=course_#{unrelated_course.id}]").should have_class('checked')
-      driver.find_element(:css, "#context-list li[data-context=course_#{@course.id}]").should have_class('not-checked')
-      driver.find_element(:css, "#context-list li[data-context=user_#{@user.id}]").should have_class('not-checked')
+      f("#context-list li[data-context=course_#{unrelated_course.id}]").should have_class('checked')
+      f("#context-list li[data-context=course_#{@course.id}]").should have_class('not-checked')
+      f("#context-list li[data-context=user_#{@user.id}]").should have_class('not-checked')
     end
 
     describe "sidebar" do
@@ -93,7 +90,7 @@ describe "calendar2" do
           get "/calendar2"
           wait_for_ajax_requests
 
-          events = driver.find_elements(:css, "#minical .event")
+          events = ff("#minical .event")
           events.size.should == 1
           events.first.text.strip.should == c.start_at.day.to_s
         end
@@ -102,10 +99,10 @@ describe "calendar2" do
           title_selector = "#calendar-app .fc-header-title"
           get "/calendar2"
 
-          orig_title = driver.find_element(:css, title_selector).text
-          driver.find_element(:css, "#minical .fc-other-month").click
+          orig_title = f(title_selector).text
+          f("#minical .fc-other-month").click
 
-          orig_title.should_not == driver.find_element(:css, title_selector)
+          orig_title.should_not == f(title_selector)
         end
       end
 
@@ -113,7 +110,7 @@ describe "calendar2" do
         it "should have a menu for adding stuff" do
           get "/calendar2"
 
-          contexts = driver.find_elements(:css, "#context-list > li")
+          contexts = ff("#context-list > li")
 
           # first context is the user
           actions = contexts[0].find_elements(:css, "li > a")
@@ -133,9 +130,9 @@ describe "calendar2" do
           wait_for_ajaximations
 
           driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          find_with_jquery('ul#context-list li:nth-child(2) button').click
-          driver.find_element(:id, "ui-menu-1-0").click
-          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          fj('ul#context-list li:nth-child(2) button').click
+          f("#ui-menu-1-0").click
+          edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
           create_calendar_event(event_title, true)
         end
@@ -146,9 +143,9 @@ describe "calendar2" do
           wait_for_ajaximations
 
           driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          find_with_jquery('ul#context-list li:nth-child(2) button').click
-          driver.find_element(:id, "ui-menu-1-1").click
-          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          fj('ul#context-list li:nth-child(2) button').click
+          f("#ui-menu-1-1").click
+          edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
           create_assignment_event(assignment_title, true)
         end
@@ -157,10 +154,10 @@ describe "calendar2" do
           make_event :context => @course, :start => Time.now
           get "/calendar2"
 
-          driver.find_element(:css, '.context_list_context').click
-          context_course_item = find_with_jquery('.context_list_context:nth-child(2)')
+          f('.context_list_context').click
+          context_course_item = fj('.context_list_context:nth-child(2)')
           context_course_item.should have_class('checked')
-          driver.find_element(:css, '.fc-event').should be_displayed
+          f('.fc-event').should be_displayed
 
           context_course_item.click
           context_course_item.should have_class('not-checked')
@@ -170,8 +167,8 @@ describe "calendar2" do
         it "should validate calendar feed display" do
           get "/calendar2"
 
-          driver.find_element(:link, 'Calendar Feed').click
-          driver.find_element(:id, 'calendar_feed_box').should be_displayed
+          f('#calendar-feed a').click
+          f('#calendar_feed_box').should be_displayed
         end
       end
 
@@ -180,9 +177,9 @@ describe "calendar2" do
           e = make_event :start => nil, :title => "pizza party"
           get "/calendar2"
 
-          driver.find_element(:css, ".undated-events-link").click
+          f(".undated-events-link").click
           wait_for_ajaximations
-          undated_events = driver.find_elements(:css, "#undated-events > ul > li")
+          undated_events = ff("#undated-events > ul > li")
           undated_events.size.should == 1
           undated_events.first.text.should =~ /#{e.title}/
         end
@@ -192,48 +189,61 @@ describe "calendar2" do
     describe "main calendar" do
 
       def get_header_text
-        header = driver.find_element(:css, '.calendar .fc-header .fc-header-title')
+        header = f('.calendar .fc-header .fc-header-title')
         header.text
       end
 
-      it "should create an event through clicking on a calendar day" do
+      def create_middle_day_event(name = 'new event')
         get "/calendar2"
         find_middle_day.click
-        create_calendar_event('new event')
+        create_calendar_event(name)
+      end
+
+      def create_middle_day_assignment(name = 'new assignment')
+        get "/calendar2"
+        find_middle_day.click
+        create_assignment_event(name)
+      end
+
+      it "should create an event through clicking on a calendar day" do
+        create_middle_day_event
+      end
+
+      it "should drag and drop an event" do
+        create_middle_day_event
+        driver.action.drag_and_drop(f('.calendar .fc-event'), f('.calendar .fc-week2 .fc-last')).perform
+        wait_for_ajaximations
+        CalendarEvent.last.start_at.strftime('%d').should == f('.calendar .fc-week2 .fc-last .fc-day-number').text
       end
 
       it "should create an assignment by clicking on a calendar day" do
-        get "/calendar2"
-        find_middle_day.click
-        create_assignment_event('new assignment')
+        create_middle_day_assignment
       end
 
-      it "more options link should go to calendar_event edit page" do
-        get "/calendar2"
-        find_middle_day.click
-        create_calendar_event('new event')
+      it "more options link should go to calendar event edit page" do
+        create_middle_day_event
 
-        driver.find_element(:css, '.fc-event').click
-        find_with_jquery('.popover-links-holder:visible').should_not be_nil
+        f('.fc-event').click
+        fj('.popover-links-holder:visible').should_not be_nil
         f('.event-details-links .edit_event_link').click
         expect_new_page_load { f('#edit_calendar_event_form .more_options_link').click }
         f('#breadcrumbs').text.should include 'Calendar Events'
       end
 
       it "more options link on assignments should go to assignment edit page" do
-        get "/calendar2"
-        create_assignment_event('super big assignment')
+        name = 'super big assignment'
+        create_middle_day_assignment(name)
         f('.fc-event.assignment').click
         f('.edit_event_link').click
         expect_new_page_load { f('.more_options_link').click }
-        f('h2.title').text.should include "super big assignment"
+        f('h2.title').text.should include(name)
       end
 
       it "should let me message students who have signed up for an appointment" do
         date = Date.today.to_s
         create_appointment_group :new_appointments => [
-          ["#{date} 12:00:00", "#{date} 13:00:00"],
-          ["#{date} 13:00:00", "#{date} 14:00:00"],
+            ["#{date} 12:00:00", "#{date} 13:00:00"],
+            ["#{date} 13:00:00", "#{date} 14:00:00"],
         ]
         student1, student2 = 2.times.map do
           student_in_course :course => @course, :active_all => true
@@ -265,7 +275,7 @@ describe "calendar2" do
 
         get "/calendar2"
 
-        events = driver.find_elements(:css, '.fc-event')
+        events = ff('.fc-event')
         event1 = events.detect { |e| e.text =~ /Assignment 1/ }
         event2 = events.detect { |e| e.text =~ /Assignment 2/ }
         event1.should_not be_nil
@@ -273,18 +283,16 @@ describe "calendar2" do
         event1.should_not == event2
 
         event1.click
-        driver.find_element(:css, '.popover-links-holder .edit_event_link').click
-        select = driver.find_element(:css, '#edit_assignment_form .assignment_group')
-        select = Selenium::WebDriver::Support::Select.new(select)
-        select.first_selected_option.attribute(:value).to_i.should == group1.id
+        f('.popover-links-holder .edit_event_link').click
+        select = f('#edit_assignment_form .assignment_group')
+        first_selected_option(select).attribute(:value).to_i.should == group1.id
         close_visible_dialog
 
         event2.click
-        driver.find_element(:css, '.popover-links-holder .edit_event_link').click
-        select = driver.find_element(:css, '#edit_assignment_form .assignment_group')
-        select = Selenium::WebDriver::Support::Select.new(select)
-        select.first_selected_option.attribute(:value).to_i.should == group2.id
-        driver.find_element(:css, 'div.ui-dialog #assignment_title').tap { |tf| tf.clear; tf.send_keys("Assignment 2!") }
+        f('.popover-links-holder .edit_event_link').click
+        select = f('#edit_assignment_form .assignment_group')
+        first_selected_option(select).attribute(:value).to_i.should == group2.id
+        replace_content(  f('div.ui-dialog #assignment_title'), "Assignment 2!")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
         assignment2.reload.title.should == "Assignment 2!"
@@ -300,7 +308,7 @@ describe "calendar2" do
 
       it "should change the week" do
         get "/calendar2"
-        header_buttons = driver.find_elements(:css, '.ui-buttonset > label')
+        header_buttons = ff('.ui-buttonset > label')
         header_buttons[0].click
         wait_for_ajaximations
         old_header_title = get_header_text
@@ -315,7 +323,7 @@ describe "calendar2" do
 
         change_calendar
         get_header_text.should_not == current_month
-        driver.find_element(:css, '.fc-button-today').click
+        f('.fc-button-today').click
         get_header_text.should == (current_month + ' ' + Time.now.year.to_s)
       end
 
@@ -324,10 +332,10 @@ describe "calendar2" do
         s2 = @course.course_sections.create!(:name => "other section!")
         date = Date.today
         e1 = @course.calendar_events.build :title => "ohai",
-          :child_event_data => [
-            {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string},
-            {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string},
-          ]
+                                           :child_event_data => [
+                                               {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string},
+                                               {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string},
+                                           ]
         e1.updating_user = @user
         e1.save!
 
@@ -364,7 +372,6 @@ describe "calendar2" do
         end
       end
     end
-
   end
 
   context "as a student" do
@@ -381,12 +388,12 @@ describe "calendar2" do
 
         keep_trying_until do
           driver.execute_script(%{$(".context_list_context:nth-child(1)").addClass('hovering')})
-          find_with_jquery('ul#context-list li:nth-child(1) button').click
-          driver.find_element(:id, "ui-menu-0-0").click
-          edit_event_dialog = driver.find_element(:id, 'edit_event_tabs')
+          fj('ul#context-list li:nth-child(1) button').click
+          f("#ui-menu-0-0").click
+          edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
         end
-        tabs = find_all_with_jquery('.tab_list > li')
+        tabs = ffj('.tab_list > li')
         tabs.count.should == 1
         tabs[0].should include_text('Event')
       end
@@ -399,8 +406,8 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajaximations
 
-        driver.find_element(:css, '.fc-event-title').click
-        driver.find_element(:id, "popover-0").should be_displayed
+        f('.fc-event-title').click
+        f("#popover-0").should be_displayed
         element_exists('.edit_event_link').should be_false
         element_exists('.delete_event_link').should be_false
       end
@@ -413,13 +420,13 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajaximations
 
-        driver.find_element(:css, '.fc-event-title').click
-        popover = driver.find_element(:id, "popover-0")
+        f('.fc-event-title').click
+        popover = f("#popover-0")
         popover.should be_displayed
         expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
         wait_for_ajaximations
         is_checked('#scheduler').should be_true
-        driver.find_element(:id, 'appointment-group-list').should include_text(ag.title)
+        f('#appointment-group-list').should include_text(ag.title)
       end
 
       it "should show section-level events for the student's section" do
@@ -427,10 +434,10 @@ describe "calendar2" do
         s2 = @course.course_sections.create!(:name => "other section!")
         date = Date.today
         e1 = @course.calendar_events.build :title => "ohai",
-          :child_event_data => [
-            {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => s2.asset_string},
-            {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => @course.default_section.asset_string},
-          ]
+                                           :child_event_data => [
+                                               {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => s2.asset_string},
+                                               {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => @course.default_section.asset_string},
+                                           ]
         e1.updating_user = @teacher
         e1.save!
 

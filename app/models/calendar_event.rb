@@ -40,6 +40,7 @@ class CalendarEvent < ActiveRecord::Base
   validates_presence_of :context
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
@@ -456,44 +457,9 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def to_ics(in_own_calendar=true)
-    cal = Icalendar::Calendar.new
-    # to appease Outlook
-    cal.custom_property("METHOD","PUBLISH")
-
-    loc_string = ""
-    loc_string << self.location_name + ", " if !self.location_name.blank?
-    loc_string << self.location_address if !self.location_address.blank?
-
-    event = Icalendar::Event.new
-    event.klass = "PUBLIC"
-    event.start = self.start_at.utc_datetime if self.start_at
-    event.start.icalendar_tzid = 'UTC' if event.start
-    event.end = self.end_at.utc_datetime if self.end_at
-    event.end.icalendar_tzid = 'UTC' if event.end
-    if self.all_day
-      event.start = Date.new(self.all_day_date.year, self.all_day_date.month, self.all_day_date.day)
-      event.start.ical_params = {"VALUE"=>["DATE"]}
-      event.end = event.start
-      event.end.ical_params = {"VALUE"=>["DATE"]}
-    end
-    event.summary = self.title
-    event.description = strip_tags(self.description).strip
-    event.location = loc_string
-    event.dtstamp = self.updated_at.utc_datetime if self.updated_at
-    event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
-    # This will change when there are other things that have calendars...
-    # can't call calendar_url or calendar_url_for here, have to do it manually
-    event.url           "http://#{HostUrl.context_host(self.context)}/calendar?include_contexts=#{self.context.asset_string}&month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{self.id.to_s}"
-    event.uid           "event-calendar-event-#{self.id.to_s}"
-    event.sequence      0
-    event = nil unless self.start_at
-
-    return event unless in_own_calendar
-
-    cal.add_event(event) if event
-
-    return cal.to_ical
+    return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
   end
+
   def self.search(query)
     find(:all, :conditions => wildcard('title', 'description', query))
   end
@@ -620,6 +586,81 @@ class CalendarEvent < ActiveRecord::Base
 
     given { |user, session| !deleted? && self.cached_context_grants_right?(user, session, :manage_calendar) }
     can :delete
+  end
+
+  class IcalEvent
+    include Api
+    include ActionController::UrlWriter
+    include TextHelper
+
+    def initialize(event)
+      @event = event
+    end
+
+    def location
+    end
+
+    def to_ics(in_own_calendar)
+      cal = Icalendar::Calendar.new
+      # to appease Outlook
+      cal.custom_property("METHOD","PUBLISH")
+
+      event = Icalendar::Event.new
+      event.klass = "PUBLIC"
+
+      start_at = @event.is_a?(CalendarEvent) ? @event.start_at : @event.due_at
+      end_at = @event.is_a?(CalendarEvent) ? @event.end_at : @event.due_at
+
+      if start_at
+        event.start = start_at.utc_datetime
+        event.start.icalendar_tzid = 'UTC'
+      end
+
+      if end_at
+        event.end = end_at.utc_datetime
+        event.end.icalendar_tzid = 'UTC'
+      end
+
+      if @event.all_day
+        event.start = Date.new(@event.all_day_date.year, @event.all_day_date.month, @event.all_day_date.day)
+        event.start.ical_params = {"VALUE"=>["DATE"]}
+        event.end = event.start
+        event.end.ical_params = {"VALUE"=>["DATE"]}
+      end
+      event.summary = @event.title
+      if @event.description
+        html = api_user_content(@event.description, @event.context)
+        event.description html_to_text(html)
+        event.x_alt_desc(html, { 'FMTTYPE' => 'text/html' })
+      end
+
+      if @event.is_a?(CalendarEvent)
+        loc_string = ""
+        loc_string << @event.location_name + ", " if @event.location_name.present?
+        loc_string << @event.location_address if @event.location_address.present?
+      else
+        loc_string = @event.location
+      end
+
+      event.location = loc_string
+      event.dtstamp = @event.updated_at.utc_datetime if @event.updated_at
+      event.dtstamp.icalendar_tzid = 'UTC' if event.dtstamp
+
+      tag_name = @event.class.name.underscore
+
+      # This will change when there are other things that have calendars...
+      # can't call calendar_url or calendar_url_for here, have to do it manually
+      event.url           "http://#{HostUrl.context_host(@event.context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id.to_s}"
+      event.uid           "event-#{tag_name.gsub('_', '-')}-#{@event.id.to_s}"
+      event.sequence      0
+      event = nil unless start_at
+
+      return event unless in_own_calendar
+
+      cal.add_event(event) if event
+
+      return cal.to_ical
+    end
   end
 end
 

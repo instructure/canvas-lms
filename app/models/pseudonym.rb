@@ -28,7 +28,11 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   validates_length_of :unique_id, :maximum => maximum_string_length
-  validates_presence_of :account_id, :user_id
+  validates_presence_of :account_id
+  # allows us to validate the user and pseudonym together, before saving either
+  validates_each :user_id do |record, attr, value|
+    record.errors.add(attr, "blank?") unless value || record.user
+  end
   before_validation :validate_unique_id
   before_destroy :retire_channels
   
@@ -51,11 +55,12 @@ class Pseudonym < ActiveRecord::Base
     config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| p.unique_id_changed? && p.active? } }
   end
 
+  attr_writer :require_password
   def require_password?
     # Change from auth_logic: don't require a password just because new_record?
     # is true. just check if the pw has changed or crypted_password_field is
     # blank.
-    password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?)
+    password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
 
   acts_as_list :scope => :user_id
@@ -128,7 +133,7 @@ class Pseudonym < ActiveRecord::Base
   
   def infer_defaults
     self.account ||= Account.default
-    if !crypted_password || crypted_password == ""
+    if (!crypted_password || crypted_password == "") && !@require_password
       self.generate_temporary_password
     end
     self.sis_user_id = nil if self.sis_user_id.blank?
@@ -371,27 +376,44 @@ class Pseudonym < ActiveRecord::Base
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
-  def self.find_all_by_arbitrary_credentials(credentials, account_ids)
+  def self.find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
     return [] if credentials[:unique_id].blank? ||
                  credentials[:password].blank?
-    Shard.partition_by_shard(account_ids) do |account_ids|
+    too_many_attempts = false
+    pseudonyms = Shard.partition_by_shard(account_ids) do |account_ids|
       active.
         by_unique_id(credentials[:unique_id]).
         where(:account_id => account_ids).
         all(:include => :user).
         select { |p|
-          p.valid_arbitrary_credentials?(credentials[:password])
+          valid = p.valid_arbitrary_credentials?(credentials[:password])
+          too_many_attempts = true if p.audit_login(remote_ip, valid) == :too_many_attempts
+          valid
         }
     end
+    return :too_many_attempts if too_many_attempts
+    pseudonyms
   end
 
-  def self.authenticate(credentials, account_ids)
-    pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids)
+  def self.authenticate(credentials, account_ids, remote_ip = nil)
+    pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
+    return :too_many_attempts if pseudonyms == :too_many_attempts
     site_admin = pseudonyms.find { |p| p.account_id == Account.site_admin.id }
     # only log them in if these credentials match a single user OR if it matched site admin
     if pseudonyms.map(&:user).uniq.length == 1 || site_admin
       # prefer a pseudonym from Site Admin if possible, otherwise just choose one
       site_admin || pseudonyms.first
     end
+  end
+
+  def audit_login(remote_ip, valid_password)
+    return :too_many_attempts unless Canvas::Security.allow_login_attempt?(self, remote_ip)
+
+    if valid_password
+      Canvas::Security.successful_login!(self, remote_ip)
+    else
+      Canvas::Security.failed_login!(self, remote_ip)
+    end
+    nil
   end
 end

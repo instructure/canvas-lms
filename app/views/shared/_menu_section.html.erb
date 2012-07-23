@@ -5,7 +5,7 @@
     <ul class="menu-item-drop-column-list">
       <%= render :partial => partial, :collection => max_to_show ? collection.first(max_to_show) : collection, :locals => {:title => title } %>
       <% if link_text %>
-        <li><%= link_to("#{link_text} (#{(collection_size || collection.size)})", more_link_for_over_max, :class => "menu-item-drop-float-right" ) %></li>
+        <li class="menu-item-view-all"><%= link_to("#{link_text} (#{(collection_size || collection.size)})", more_link_for_over_max) %></li>
       <% end %>
     </ul>
   </td>

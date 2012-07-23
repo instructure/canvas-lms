@@ -13,11 +13,16 @@ require [
   'reminders'
   'jquery.instructure_forms'
   'instructure'
+  'fixed_warning'
   'ajax_errors'
   'page_views'
   'compiled/license_help'
   'compiled/behaviors/ujsLinks'
+  'compiled/behaviors/admin-links'
   'compiled/behaviors/elementToggler'
+  'compiled/behaviors/upvote-item'
+  'compiled/behaviors/repin-item'
+  'compiled/behaviors/follow'
 
   # other stuff several bundles use
   'media_comments'

@@ -27,7 +27,7 @@ define [
       @popover.hide()
       (new EditEventDetailsDialog(@event)).show()
 
-    deleteEvent: (event) =>
+    deleteEvent: (event, opts={}) =>
       event ?= @event
 
       return if @event.isNewEvent()
@@ -39,8 +39,8 @@ define [
 
       $("<div />").confirmDelete
         url: url
-        message: $ deleteItemTemplate(message: event.deleteConfirmation, hide_reason: event.object.workflow_state isnt 'locked')
-        dialog: {title: I18n.t('confirm_deletion', "Confirm Deletion")}
+        message: $ deleteItemTemplate(message: opts.message || event.deleteConfirmation, hide_reason: event.object.workflow_state isnt 'locked')
+        dialog: {title: opts.dialogTitle || I18n.t('confirm_deletion', "Confirm Deletion")}
         prepareData: ($dialog) => {cancel_reason: $dialog.find('#cancel_reason').val() }
         confirmed: () =>
           @popover.hide()
@@ -57,14 +57,14 @@ define [
           width: 450
           buttons: if error.reschedulable
                      [
+                       text: I18n.t 'do_nothing', 'Do Nothing'
+                       click: -> $dialog.dialog('close')
+                     ,
                        text: I18n.t 'reschedule', 'Reschedule'
-                       'class': 'ui-button-primary'
+                       'class': 'btn-primary'
                        click: =>
                          $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
                            $dialog.dialog('close')
-                     ,
-                       text: I18n.t 'do_nothing', 'Do Nothing'
-                       click: -> $dialog.dialog('close')
                      ]
                    else
                      [
@@ -88,7 +88,7 @@ define [
     unreserveEvent: =>
       for e in @event.childEvents
         if e.object?.own_reservation
-          @deleteEvent(e)
+          @deleteEvent(e, dialogTitle: I18n.t('confirm_unreserve', "Confirm Reservation Removal"), message: I18n.t('prompts.unreserve_event', "Are you sure you want to delete your reservation to this event?"))
           return
 
     cancelAppointment: ($appt) =>

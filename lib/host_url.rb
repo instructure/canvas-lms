@@ -23,17 +23,35 @@ class HostUrl
     @@default_host = nil
     @@file_host = nil
     @@domain_config = nil
+    @@protocol = nil
 
     def reset_cache!
-      @@default_host = @@file_host = @@domain_config = nil
+      @@default_host = @@file_host = @@domain_config = @@protocol = nil
     end
 
     def domain_config
       if !@@domain_config
-        @@domain_config = File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].try(:with_indifferent_access)
+        @@domain_config = Setting.from_config("domain")
         @@domain_config ||= {}
       end
       @@domain_config
+    end
+
+    # returns "http" or "https" depending on whether this instance of canvas runs over ssl
+    def protocol
+      if !@@protocol
+        if domain_config.key?('ssl')
+          is_secure = domain_config['ssl']
+        elsif Attachment.file_store_config.key?('secure')
+          is_secure = Attachment.file_store_config['secure']
+        else
+          is_secure = Rails.env.production?
+        end
+
+        @@protocol = is_secure ? "https" : "http"
+      end
+
+      @@protocol
     end
 
     def context_host(context=nil, current_host=nil)

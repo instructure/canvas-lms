@@ -43,24 +43,16 @@ class Periodic
   end
 
   def self.audit_queue
-    if 0 == Delayed::Job.count(:conditions => ['tag = ?', 'Delayed::Periodic.perform_audit!'])
-      # this isn't running in a delayed job, so there are race conditions -- but
-      # that's ok, because having the audit performed twice is safe (due to the
-      # strand), just a bit of extra work.
-      self.send_later_enqueue_args(:perform_audit!, { :strand => STRAND })
-    end
+    # we used to queue up a job in a strand here, and perform the audit inside that job
+    # however, now that we're using singletons for scheduling periodic jobs,
+    # it's fine to just do the audit in-line here without risk of creating duplicates
+    perform_audit!
   end
 
   # make sure all periodic jobs are scheduled for their next run in the job queue
   # this auditing should run on the strand
   def self.perform_audit!
-    self.scheduled.each { |name, periodic| periodic.schedule_if_unscheduled(0) }
-  end
-
-  def schedule_if_unscheduled(compare_count)
-    if compare_count >= Delayed::Job.count(:conditions => ['tag = ?', self.tag])
-      self.enqueue
-    end
+    self.scheduled.each { |name, periodic| periodic.enqueue }
   end
 
   def initialize(name, cron_line, job_args, block)
@@ -71,24 +63,14 @@ class Periodic
   end
 
   def enqueue
-    Delayed::Job.enqueue(self, @job_args.merge(:max_attempts => 1, :run_at => @cron.next_time, :strand => tag))
+    Delayed::Job.enqueue(self, @job_args.merge(:max_attempts => 1, :run_at => @cron.next_time(Delayed::Periodic.now), :singleton => tag))
   end
 
   def perform
     @block.call()
   ensure
     begin
-      # delete any duplicate jobs for this periodic job.
-      # since each periodic job type has its own strand, we know that any dups
-      # won't be running here, so we can blow them away and re-schedule for the
-      # correct time.
-      Delayed::Job.delete_all('tag' => self.tag, 'locked_at' => nil)
-      # only schedule again if there's 1 job for this tag current scheduled (1
-      # because of this job).  this shouldn't normally happen, but we implement
-      # this self-healing behavior to protect against error conditions.  worst
-      # case is we don't schedule when we should've, and the auditor will catch
-      # that.
-      schedule_if_unscheduled(1)
+      enqueue
     rescue
       # double fail! the auditor will have to catch this.
       Rails.logger.error "Failure enqueueing periodic job! #{@name} #{$!.inspect}"
@@ -99,5 +81,9 @@ class Periodic
     "periodic: #{@name}"
   end
   alias_method :display_name, :tag
+
+  def self.now
+    Time.now
+  end
 end
 end

@@ -26,7 +26,7 @@ class User < ActiveRecord::Base
   include Context
   include UserFollow::FollowedItem
 
-  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
+  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code
   attr_accessor :original_id, :menu_data
 
   before_save :infer_defaults
@@ -65,6 +65,9 @@ class User < ActiveRecord::Base
   has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
+  has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
+           :conditions => [ENROLLMENT_CONDITIONS[:active], ENROLLMENT_CONDITIONS[:completed]].join(' OR '), :order => 'enrollments.created_at'
+  has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments, :uniq => true
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
 
@@ -136,6 +139,7 @@ class User < ActiveRecord::Base
   has_many :user_follows, :foreign_key => 'following_user_id'
 
   has_many :collections, :as => :context
+  has_many :collection_items, :through => :collections
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
@@ -194,13 +198,44 @@ class User < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
+    :require_self_enrollment_code, :require_birthdate, :self_enrollment_code,
+    :self_enrollment_course, :validation_root_account
+
+  # users younger than this age can't sign up without a course join code
+  def self.self_enrollment_min_age
+    13
+  end
+
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  validates_presence_of :name, :if => :require_presence_of_name
   validates_locale :locale, :browser_locale, :allow_nil => true
+  validates_acceptance_of :terms_of_use, :if => :require_acceptance_of_terms, :allow_nil => false
+  validates_each :birthdate do |record, attr, value|
+    next unless record.require_birthdate
+    if value
+      record.errors.add(attr, "too_young") if !record.require_self_enrollment_code && value > self_enrollment_min_age.years.ago
+    else
+      record.errors.add(attr, "blank")
+    end
+  end
+  validates_each :self_enrollment_code do |record, attr, value|
+    next unless record.require_self_enrollment_code
+    if value.blank?
+      record.errors.add(attr, "blank")
+    elsif record.validation_root_account
+      record.self_enrollment_course = record.validation_root_account.all_courses.find_by_self_enrollment_code(value)
+      record.errors.add(attr, "invalid") unless record.self_enrollment_course
+    else
+      record.errors.add(attr, "account_required")
+    end
+  end
 
   before_save :assign_uuid
   before_save :update_avatar_image
   after_save :generate_reminders_if_changed
   after_save :update_account_associations_if_necessary
+  after_save :self_enroll_if_necessary
 
   def self.skip_updating_account_associations(&block)
     @skip_updating_account_associations = true
@@ -1188,7 +1223,7 @@ class User < ActiveRecord::Base
   def avatar_approved?
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
-  
+
   def self.avatar_key(user_id)
     user_id = user_id.to_s
     if !user_id.blank? && user_id != '0'
@@ -1197,7 +1232,7 @@ class User < ActiveRecord::Base
       "0"
     end
   end
-  
+
   def self.user_id_from_avatar_key(key)
     user_id, sig = key.to_s.split(/-/, 2)
     (Canvas::Security.hmac_sha1(user_id.to_s)[0, 10] == sig) ? user_id : nil
@@ -1245,11 +1280,11 @@ class User < ActiveRecord::Base
     @avatar_url ||= gravatar_url(size, fallback, request) if avatar_setting == 'enabled'
     @avatar_url ||= fallback
   end
-  
+
   def avatar_path
     "/images/users/#{User.avatar_key(self.id)}"
   end
-  
+
   def self.default_avatar_fallback
     "/images/messages/avatar-50.png"
   end
@@ -1282,7 +1317,7 @@ class User < ActiveRecord::Base
       self.save
     end
   end
-  
+
   named_scope :with_avatar_state, lambda{|state|
     if state == 'any'
       {
@@ -1508,6 +1543,11 @@ class User < ActiveRecord::Base
     save
   end
 
+  def self_enroll_if_necessary
+    return unless @self_enrollment_course
+    @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
+  end
+
   def time_difference_from_date(hash)
     n = hash[:number].to_i
     n = nil if n == 0
@@ -1541,13 +1581,15 @@ class User < ActiveRecord::Base
   end
   memoize :account
 
-  def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil)
-    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association].cache_key, :expires_in => 15.minutes) do
+  def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
+    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
       courses = send(association).distinct_on(["courses.id"],
         :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
         :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
-      date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
-      courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
+      unless options[:include_completed_courses]
+        date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
+        courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
+      end
       courses
     end.dup
     if association == :current_and_invited_courses
@@ -1857,7 +1899,15 @@ class User < ActiveRecord::Base
   end
 
   def quota
-    read_attribute(:storage_quota) || Setting.get_cached('user_default_quota', 50.megabytes.to_s).to_i
+    return read_attribute(:storage_quota) if read_attribute(:storage_quota)
+    accounts = associated_root_accounts.reject(&:site_admin?)
+    accounts.empty? ?
+      self.class.default_storage_quota :
+      accounts.sum(&:default_user_storage_quota)
+  end
+  
+  def self.default_storage_quota
+    Setting.get_cached('user_default_quota', 50.megabytes.to_s).to_i
   end
 
   def update_last_user_note
@@ -1923,13 +1973,15 @@ class User < ActiveRecord::Base
   end
 
   def enrollment_visibility
-    Rails.cache.fetch([self, 'enrollment_visibility_with_sections'].cache_key, :expires_in => 1.day) do
+    Rails.cache.fetch([self, 'enrollment_visibility_with_sections_2'].cache_key, :expires_in => 1.day) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
       user_counts = {}
       section_user_counts = {}
-      (courses + concluded_courses).each do |course|
+      student_in_course_ids = []
+      linked_observer_ids = observee_enrollments.collect {|e| e.user_id}.uniq
+      courses_with_primary_enrollment(:current_and_concluded_courses, nil, :include_completed_courses => true).each do |course|
         section_visibilities = course.section_visibilities_for(self)
         conditions = nil
         case course.enrollment_visibility_level_for(self, section_visibilities)
@@ -1947,6 +1999,12 @@ class User < ActiveRecord::Base
         end
         base_conditions = messageable_enrollment_clause
         base_conditions << " AND " << messageable_enrollment_user_clause
+        if course.primary_enrollment == 'StudentEnrollment'
+          student_in_course_ids << course.id
+          base_conditions << " AND (enrollments.type != 'ObserverEnrollment'"
+          base_conditions << "  OR enrollments.user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.any?
+          base_conditions << ")"
+        end
         user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").count("DISTINCT user_id")
 
         sections = course.sections_visible_to(self)
@@ -1961,7 +2019,9 @@ class User < ActiveRecord::Base
        :section_id_hash => section_id_hash,
        :restricted_course_hash => restricted_course_hash,
        :user_counts => user_counts,
-       :section_user_counts => section_user_counts
+       :section_user_counts => section_user_counts,
+       :student_in_course_ids => student_in_course_ids,
+       :linked_observer_ids => linked_observer_ids
       }
     end
   end
@@ -2028,11 +2088,18 @@ class User < ActiveRecord::Base
     group_hash = group_membership_visibility
     full_group_ids = group_hash[:full_group_ids]
     group_section_ids = []
-
+    student_in_course_ids = course_hash[:student_in_course_ids]
+    linked_observer_ids = course_hash[:linked_observer_ids]
     account_ids = []
 
     limited_id = {}
     enrollment_type_sql = " AND enrollments.type != 'StudentViewEnrollment'"
+    if student_in_course_ids.present?
+      enrollment_type_sql += " AND (enrollments.type != 'ObserverEnrollment' OR course_id NOT IN (#{student_in_course_ids.join(',')})"
+      enrollment_type_sql += "  OR user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.present?
+      enrollment_type_sql += ")"
+    end
+    
     include_concluded_students = true
 
     if options[:context]
@@ -2333,8 +2400,20 @@ class User < ActiveRecord::Base
     pseudonym
   end
 
-  def flag_as_admin(account, role=nil)
+  # Public: Add this user as an admin in the given account.
+  #
+  # account - The account model to create the admin in.
+  # role - String name of the role to add the user to. If nil,
+  #        'AccountAdmin' will be used (default: nil).
+  # send_notification - If set to false, do not send any email
+  #                     notifications (default: true).
+  #
+  # Returns an AccountUser model object.
+  def flag_as_admin(account, role=nil, send_notification = true)
     admin = account.add_user(self, role)
+
+    return admin unless send_notification
+
     if self.registered?
       admin.account_user_notification!
     else

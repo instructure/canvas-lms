@@ -1,0 +1,46 @@
+<script>
+  window.JSON || document.write('<%= (javascript_include_tag "#{js_base_url}/vendor/json2.js").gsub("</script>", "<\\/script>") %>');
+
+  INST = <%= raw(inst_env.to_json) %>;
+  ENV = <%= raw js_env.to_json %>;
+
+  // TODO: move this out when we have a single require call
+  require = {
+    translate: <%= use_optimized_js? %>,
+    baseUrl: '<%= js_base_url %>',
+    paths: <%= raw Canvas::RequireJs.paths %>,
+    use: <%= raw Canvas::RequireJs.shims %>
+  };
+</script>
+
+<%= javascript_include_tag "#{js_base_url}/vendor/require.js" %>
+<%= javascript_include_tag "#{js_base_url}/compiled/bundles/common" if include_common_bundle %>
+<%= include_js_bundles %>
+<%= include_account_js %>
+<%= render_js_blocks %>
+<%= render_hidden_dialogs %>
+
+<script>
+// Determines if the scripts are loaded.
+// When we get everything out of the views, and have a single top-level
+// `require`, this becomes meaningless and will be abandoned.
+(function() {
+  var attempts = 0;
+  var timeout = 10;
+  var check = function() {
+    attempts++;
+    var done = require.resourcesDone === true
+    var giveup = attempts === 100; // 1 second
+    if (done || giveup) {
+      var className = document.documentElement.className;
+      document.documentElement.className = className.replace(/scripts-not-loaded/, '');
+      return;
+    }
+    setTimeout(check, timeout);
+  };
+
+  check();
+}).call(this);
+</script>
+</body>
+</html>

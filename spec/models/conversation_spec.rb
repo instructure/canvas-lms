@@ -423,7 +423,7 @@ describe Conversation do
         conversation = Conversation.initiate([u1.id, u2.id], true)
 
         conversation.current_context_strings(1).should eql [course1.asset_string]
-        u1.conversation_context_codes.sort.should eql [course1.asset_string, course2.asset_string] # just once
+        u1.conversation_context_codes.sort.should eql [course1.asset_string, course2.asset_string].sort # just once
       end
     end
 

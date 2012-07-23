@@ -1,0 +1,33 @@
+<h1>{{name}}</h1>
+
+<button class="button" data-{{#if followed_by_user}}un{{/if}}follow='{"id":{{id}}, "type": "collection"}' type="button">
+  {{#if followed_by_user}}
+    Unfollow
+  {{else}}
+    Follow
+  {{/if}}
+</button>
+
+<br>
+Have something cool to share? Save it to this collection, it’s easy.<br>
+<button class="button" type="button" data-event="createNewItem">Pin Something to this Collection</button>
+
+<div class="v-gutter content-box border border-trbl border-round box-shadow">
+  <header class="toolbar border border-trbl border-round-t">
+    <div class="row-fluid">
+      <div class="span5">
+        <h2 class="header">Collection Items</h2>
+      </div>
+      <!-- <div class="span7">
+        <ul class="activityFeedItemsFilter nav nav-links">
+          <li><a href="#" class="active">All</a>
+          </li><li><a href="#">Links</a>
+          </li><li><a href="#">Videos</a>
+          </li><li><a href="#">Images</a>
+        </li></ul>
+      </div> -->
+    </div>
+  </header>
+  <div class="kollectionItemsHolder"></div>
+</div>
+

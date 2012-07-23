@@ -1,62 +1,65 @@
+@import "blue/variables"
+
 #right-side-wrapper
   display: none
+  position: relative
+  width: 0
+  right: 0
 
 #right-side
-  width: $right_side_width
-  margin-bottom: 1em
-  padding-bottom: 20px
-  box-shadow: -3px 3px 32px #E8E8E8
-  margin-left: 15px
-  background-color: #f3f4f5
-  border-left: 1px solid #ccc
-  border-bottom: 1px solid #ccc
-  +border-bottom-left-radius(5px)
+  width: $right_side_width - ($right_side_margin * 2)
   color: $right_side_text_color
   min-height: 20px
   z-index: 10 // puts it equal with #main, used so datepickers that pop up from #right-side pop up on top
+  margin: $right_side_margin $right_side_margin 0
 
   hr
     border: dotted #aaa
     border-width: 1px 0 0
     margin: 17px 0 20px
   h2
-    font-size: 1.12em
-    padding: 7px 10px 7px 15px
-    font-weight: normal
-    color: $right_side_header_color
-    background-color: #8a8a8a
-    margin-bottom: 8px
-    +text-shadow(-1px, -1px, rgba(100, 100, 100, 0.4))
-    a
-      color: $right_side_header_color
+    font-size: 14px
+    color: $gray
+    font-weight: bold
+    border-bottom: solid 1px $grayLight
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85)
+    margin: $right_side_margin 0 0
+
 .rs-match-list-indent
   padding-left: 31px
-.rs-margin-lr
-  margin: 0 20px
-.rs-margin-all
-  margin: 0 20px 20px
-  padding-top: 20px
+
+// .rs-margin-lr was removed because it is not needed since #right-side has it's own margin
 .rs-margin-top
-  padding-top: 20px
+  margin-top: $right_side_margin
+.rs-margin-all
+  margin-top: $right_side_margin
+  margin-bottom: $right_side_margin
+
 .rs-margin-bottom
-  margin-bottom: 20px
+  margin-bottom: $right_side_margin
 .right-side-list
   +reset-list
-  margin-left: 15px
-  margin-right: 15px
-  margin-bottom: 19px
-  li 
+  margin: 10px 0
+  li
     a
-      padding: 3px 0 0px 31px
+      font-size: 12px
+      padding: 0 4px
       display: block
-      background-position: left 7px
-      
+      border-bottom: 1px solid #ddd
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85)
+      // override fancy links grade checkmark
+      background: transparent
+
       &:hover, &:focus
         text-decoration: none
         b, &.more_link
           text-decoration: underline
         em
           color: #666
+    &:last-child a
+      border-bottom: none
+      box-shadow: none
+      
     small // this is for things like "nothing for the next week"
       padding: 3px 0 0px 31px
       display: block
@@ -67,13 +70,11 @@
       display: block  
     em, .more_link
       font:
-        family: "ff-clifford-eighteen-web-pro-1","ff-clifford-eighteen-web-pro-2",Georgia,"Times New Roman",Times,serif
         style: italic
-      font-size: 10px
+        size: 10px
       line-height: 13px
     em
       color: #bcbcbc
-      border-bottom: 1px dotted #aaa
       padding-bottom: 5px
     .more_link
       padding-top: 6px
@@ -112,7 +113,24 @@
         right: 0
         top: 0
         z-index: 2
+        border-bottom: none
+        box-shadow: none
       &:hover
         a.disable_item_link
           +opacity(1.0)
         
+
+
+// these are the classes that get applied to #right-side-wrapper to handle $.scrollSidebar
+// NOTE: they used to get applied to body but were moved to #right side to not force a repaint
+// of the entire page and be less jumpy going in and out display modes.
+.with-scrolling-right-side
+  #right-side
+    position: fixed
+    top: 0
+    margin-top: 0
+
+#right-side-wrapper.with-sidebar-pinned-to-bottom
+  position: absolute
+  bottom: 0
+

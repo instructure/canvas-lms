@@ -18,12 +18,58 @@
 
 # @API Users
 class ProfileController < ApplicationController
-  before_filter :require_user
+  before_filter :require_user, :except => :show
+  before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
-  before_filter { |c| c.active_tab = "profile" }
 
   include Api::V1::User
   include Api::V1::Avatar
+
+  include TextHelper
+
+  def show
+    if @current_user && @domain_root_account.enable_profiles?
+      # this is ghetto and we should get rid of this as soon as possible
+      @current_user.instance_variable_set(:@show_profile_tab, true)
+    else
+      edit
+      return
+    end
+
+    @user ||= @current_user
+
+    @active_tab = "profile"
+    @context = UserProfile.new(@current_user) if @user == @current_user
+
+    js_env :USER_ID => @user.id
+
+    @items_count = @user.collection_items.scoped(:conditions => {'collections.visibility' => 'public'}).count
+    @followers_count = @user.following_user_follow_ids.count
+
+    @following_user = @current_user &&
+      UserFollow.followed_by_user([@user], @current_user).present?
+
+    @can_follow = !@following_user &&
+      @current_user &&
+      @user.grants_right?(@current_user, :follow)
+
+    @services = @user.user_services.where(
+      :service => %w(facebook twitter linked_in delicious diigo skype)
+    ).sort_by { |s| UserService.sort_position(s.service) }
+
+    if @user.private? && @user != @current_user
+      if @user.grants_right?(@current_user, :view_statistics)
+        return render :action => :show
+      elsif @current_user.messageable_users(:ids => [@user.id]) == [@user]
+        return render :action => :show_limited
+      # TODO: also show full profile if user is following other user?
+      else
+        return render :action => :unauthorized
+      end
+    end
+
+    render :action => :show
+  end
 
   # @API Get user profile
   # Returns user profile data, including user id, name, and profile pic.
@@ -44,7 +90,11 @@ class ProfileController < ApplicationController
   #     'avatar_url': '..url..',
   #     'calendar': { 'ics' => '..url..' }
   #   }
-  def show
+  def edit
+    if @current_user && @domain_root_account.enable_profiles?
+      @current_user.instance_variable_set(:@show_profile_tab, true)
+    end
+
     if api_request?
       # allow querying this basic profile data for the current user, or any
       # user the current user has view_statistics access to
@@ -62,9 +112,10 @@ class ProfileController < ApplicationController
     @pseudonyms = @user.pseudonyms.active
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
     @context = UserProfile.new(@user)
+    @active_tab = "edit_profile"
     respond_to do |format|
       format.html do
-        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), profile_path )
+        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), edit_profile_path )
         render :action => "profile"
       end
       format.json do
@@ -89,12 +140,12 @@ class ProfileController < ApplicationController
     @user = @current_user
     @user = User.find(params[:id]) if params[:id]
 
-    add_crumb(@user.short_name, profile_path )
+    add_crumb(@user.short_name, user_profile_path(@current_user) )
     add_crumb(t(:crumb_notification_preferences, "Notification Preferences"), communication_profile_path )
 
     if @user.communication_channel.blank?
       flash[:error] = t('errors.no_channels', "Please define at least one email address or other way to be contacted before setting notification preferences.")
-      redirect_to profile_url
+      redirect_to user_profile_url(@current_user)
       return
     end
 
@@ -204,7 +255,7 @@ class ProfileController < ApplicationController
           if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             pseudonymed = true
             flash[:error] = t('errors.invalid_old_password', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
-            format.html { redirect_to profile_url }
+            format.html { redirect_to user_profile_url(@current_user) }
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
           if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
@@ -215,13 +266,13 @@ class ProfileController < ApplicationController
           if !params[:pseudonym].empty? && pseudonym_to_update && !pseudonym_to_update.update_attributes(params[:pseudonym])
             pseudonymed = true
             flash[:error] = t('errors.profile_update_failed', "Login failed to update")
-            format.html { redirect_to profile_url }
+            format.html { redirect_to user_profile_url(@current_user) }
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
         end
         unless pseudonymed
           flash[:notice] = t('notices.updated_profile', "Profile successfully updated")
-          format.html { redirect_to profile_url }
+          format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @user.to_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path]}, :pseudonym => {:only => [:id, :unique_id]} }) }
         end
       else
@@ -230,4 +281,13 @@ class ProfileController < ApplicationController
       end
     end
   end
+
+  def require_user_for_private_profile
+    if params[:id]
+      @user = User.find(params[:id])
+      return if @user.public?
+    end
+    require_user
+  end
+  private :require_user_for_private_profile
 end

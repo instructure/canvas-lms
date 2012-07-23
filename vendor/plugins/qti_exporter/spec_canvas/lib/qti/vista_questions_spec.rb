@@ -5,15 +5,30 @@ describe "Converting Blackboard Vista qti" do
   before(:all) do
     archive_file_path = File.join(BASE_FIXTURE_DIR, 'bb_vista', 'vista_archive.zip')
     unzipped_file_path = File.join(File.dirname(archive_file_path), "qti_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    export_folder = File.join(File.dirname(archive_file_path), "qti_vista_archive")
-    @exporter = Qti::Converter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path, :flavor => Qti::Flavors::WEBCT)
-    @exporter.export
-    @exporter.delete_unzipped_archive
-    @assessment = @exporter.course[:assessments][:assessments].first
-    @questions = @exporter.course[:assessment_questions][:assessment_questions]
-    if File.exists?(export_folder)
-      FileUtils::rm_rf(export_folder)
+    @export_folder = File.join(File.dirname(archive_file_path), "qti_vista_archive")
+    @converter = Qti::Converter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path, :flavor => Qti::Flavors::WEBCT)
+    @converter.export
+    @converter.delete_unzipped_archive
+    @assessment = @converter.course[:assessments][:assessments].first
+    @questions = @converter.course[:assessment_questions][:assessment_questions]
+
+    @course_data = @converter.course.with_indifferent_access
+    @course_data['all_files_export'] ||= {}
+    @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+  end
+
+  after(:all) do
+    @converter.delete_unzipped_archive
+    if File.exists?(@export_folder)
+      FileUtils::rm_rf(@export_folder)
     end
+  end
+
+  def import_into_course
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_settings[:migration_ids_to_import] = {:copy=>{:everything => true}}
+    @course.import_from_migration(@course_data, nil, @migration)
   end
 
   def get_question(id, clear_ids=true)
@@ -121,6 +136,26 @@ describe "Converting Blackboard Vista qti" do
   it "should mark jumbled sentence as not supported" do
     hash = get_question("ID_4609842882341")
     hash.should == VistaExpected::JUMBLED_SENTENCE
+  end
+
+  it "should correctly reference associated files" do
+    import_into_course
+
+    q = @course.assessment_questions.find_by_migration_id("ID_81847332876966484848484950729496134337732113114455")
+    q.should_not be_nil
+    q.attachments.count.should == 3
+
+    a = q.attachments.find_by_display_name("f11g1_r.jpg")
+    a.file_state.should == 'available'
+    q.question_data[:question_text].should =~ %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
+    
+    a = q.attachments.find_by_display_name("f11g2_r.jpg")
+    a.file_state.should == 'available'
+    q.question_data[:answers][0][:html].should =~ %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
+
+    a = q.attachments.find_by_display_name("f11g3_r.jpg")
+    a.file_state.should == 'available'
+    q.question_data[:answers][1][:html].should =~ %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
   end
 
 

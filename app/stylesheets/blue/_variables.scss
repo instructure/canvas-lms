@@ -4,17 +4,22 @@ $black:                         #000 !default;
 $gray:                          rgb(100, 103, 105) !default;
 $grayDarker:                    darken($gray, 15%) !default;
 $grayDark:                      darken($gray, 8%) !default;
-$grayLight:                     lighten($gray, 7%) !default;
-$grayLighter:                   lighten($gray, 1%) !default;
+$grayLight:                     lighten($gray, 20%) !default;
+$grayLighter:                   lighten($gray, 50%) !default;
 $white:                         #fff !default;
+$activeBG:                      #D6ECFC;
+$blue:                          #4B92E9;
+$blueDark:                      #244979;
+$blueGray:                      #94ABB9;
+$inputDisabledBackground:       transparent;
 
 // canvas stuff
 $lightBackground:               rgb(248, 250, 251);
 $borderColor:                   #a8adb3;
 $borderRadius:                  4px;
 $contentCalloutColor:           #dceaf7;
-$toolbarBackground:             #D4E0E6;
-$toolbarBackgroundLight:        lighten($toolbarBackground, 5%);
+$toolbarBackground:             #D7E7F5;
+$toolbarBackgroundLight:        #E8F1F9;
 $listViewHeaderBackground:      rgb(225, 230, 235);
 $listViewHeaderBackgroundLight: lighten($listViewHeaderBackground, 5%);
 $contentBoxPadding:             8px;

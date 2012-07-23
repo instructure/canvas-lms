@@ -6,7 +6,7 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if LearningOutcome.non_rubric_outcomes? && @context.is_a?(Course) %>
-    <a href="#" class="add_outcome_alignment_link button button-sidebar button-sidebar-wide"><%= image_tag "add.png" %> <%= t "#buttons.align_to_this_outcome", "Align to this Outcome" %></a>  
+    <a href="#" class="add_outcome_alignment_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t "#buttons.align_to_this_outcome", "Align to this Outcome" %></a>
     <% end %>
     <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_outcomes_url) %>"><%= image_tag "back.png" %> <%= t "#buttons.back_to_outcomes", "Back to Outcomes" %></a>
   </div>

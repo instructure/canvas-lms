@@ -1,0 +1,56 @@
+<%
+  js_bundle :dashboard2
+  jammit_css :dashboard, :tinymce, :collection_item_save
+  @body_classes << "no-page-block"
+  @show_left_side = false
+%>
+
+<% content_for :page_title do %><%= t('user_dashboard', 'User Dashboard') %><% end %>
+
+<% content_for :auto_discovery do %>
+  <% if @current_user %>
+      <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")}) %>
+  <% end %>
+<% end %>
+
+<% content_for :right_side do %>
+  <div class="dashboardActions">
+    <ul class="page-action-list">
+      <li><a href="#" class="make_course"><i class="icon-add"></i> <%= t 'new_course', 'Add a new course' %></a></li>
+      <li><a href="#"><i class="icon-search"></i> <%= t 'find_people', 'Find people on Canvas' %></a></li>
+      <li><a href="#" class="make_group"><i class="icon-group-new"></i> <%= t 'start_a_group', 'Start a group' %></a></li>
+      <li><a href="#"><i class="icon-collection"></i> <%= t 'create_collection', 'Create a collection' %></a></li>
+    </ul>
+  </div>
+  <div class="dashboardAside"></div>
+<% end %>
+
+<div class="quickStartBar not-expanded border border-rbl border-round-b content-callout"></div>
+<div class="activityFeed"></div>
+
+<% form_tag api_v1_groups_path, :class => 'hide create_group_form' do %>
+  <%= label_tag :name, t('group_name', 'Group Name') %>
+  <%= text_field_tag :name %>
+<% end %>
+
+<% form_for :course, Course.new, :url => api_v1_account_courses_path(@domain_root_account.manually_created_courses_account.id), :html => {:class => 'hide create_course_form'} do |f| %>
+  <div>
+    <%= f.blabel :name, :en => "Enter a name for your course" %>
+    <%= f.text_field :name %>
+  </div>
+  <div>
+    <%= f.blabel :course_code, :en => "And a shorter reference code" %>
+    <%= f.text_field :course_code %>
+    <div style="padding-left: 15px; margin-top: -5px; margin-bottom:10px; font-weight: normal; font-size: 0.8em;"><%= t :course_code_example, "(something like BIO 100, ENG 315, etc.)" %></div>
+  </div>
+  <div style="<%= hidden unless @domain_root_account == Account.default %>">
+    <%= f.blabel :license, :en => "License for course content" %>
+    <%= f.select :license, Course.licenses.map { |id, attrs| [attrs[:readable_license], id] } , {} %>
+    <%= license_help_link %>
+    <div style="margin-top: 10px;">
+      <%= f.check_box :is_public, :class => "is_public_checkbox" %>
+      <%= f.label :is_public, :en => "Make this course publicly visible", :style => "display:inline" %>
+      <div style="padding-left: 15px; margin-top: -5px; font-size: 0.8em;"><%= t :student_data_privacy, "(student data will remain private)" %></div>
+    </div>
+  </div>
+<% end %>

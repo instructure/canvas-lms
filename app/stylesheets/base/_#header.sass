@@ -16,7 +16,7 @@
     height: auto
     z-index: 1
 // the #header.no-user #header-logo part here is so that it overrides the byuh logo
-#header-logo, #header.no-user #header-logo 
+#header-logo, #header.no-user #header-logo
   background: url("/images/canvas/header_canvas_logo.png") no-repeat
   width: 135px
   height: 26px
@@ -34,80 +34,78 @@
   bottom: 6px
   position: absolute
 
+#header-inner
+  padding-top: 26px
+  max-width: $max_main_width
+  position: relative
+
 #header
   position: relative
   z-index: 11 /* IE7 needs this o so the menu-item-drops get stuck above #main */
-  padding-top: 26px
-  background: url("/images/canvas/header_bg.png") 0 0 repeat-x 
+  background: #6a7177 url("/images/canvas/header_bg.png") repeat-x left bottom
   &.no-user
     background-position: 0 -25px
-    min-height: 20px
+    min-height: 45px
     #header-logo
       top: 11px
       left: 6px
     #header-logo-secondary
       display: none
-    
+
 #topbar
   position: absolute
   top: 0
   right: 0
   width: 100%
   overflow: hidden
-  
+
 #identity
   +reset-list
   float: right
   font-size: 12px
-  margin-right: 22px
+  margin-right: $right_side_margin
   margin-bottom: 4px /*make room for the drop shadow*/
-  padding: 1px 11px
-  box-shadow: 2px 2px 4px rgba(0,0,0, 0.2)
-  background-color: $identity_background_color
-  
-  
+  padding: 0 11px
+  background: transparent url('/images/canvas/top_bar_bg.png') repeat-x
+  box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 1px
+  border-bottom-left-radius: 6px
+  border-bottom-right-radius: 5px
+  border: 1px solid rgba(0,0,0, 0.3)
+  border-top: 0
+
+
   li
     float: left
-    border-left: 1px solid darken($identity_background_color, 5%)
     line-height: 1em
     margin: 5px 8px 5px 0
     padding-left: 8px
     &.first, &#identity-help-container
       border-left: none
-  .no-left-border
-    border-left: none
   .user_name
-    border-left: none
     margin-right: 15px
     a
-      color: #444 !important
       text-decoration: none !important
-      
   a
     color: $identity_link_color
-    
+
   .inbox a
     text-decoration: none
     &:hover, &:active
       span
         text-decoration: underline
-    
+
     .unread-messages-count
+      text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25)
       +border-radius(8px)
-      background-color: $identity_link_color
-      color: $identity_background_color
+      background-color: $highlight-color
       padding: 1px 6px
   #identity-help-container a
-    color: #fff !important
-    background-color: orange
-    +border-radius(5px)
+    color: $help-link-color
     padding: 1px 8px
-    border: 1px solid #E79900
 
 #menu
   +pie-clearfix
   +reset-list
-  color: black
   padding-top: 3px
   margin-left: $left_side_width
 .menu-item
@@ -115,42 +113,41 @@
   float: left
   position: relative
   .menu-item-title, .menu-item-no-drop
+    text-shadow: 0px 0px 1px #000 /*this gives it the effect of looking thinner*/
+    color: #fff
+    font-size: 16px
     border: 1px solid transparent
     border-bottom: 0 none
-    color: $menu_text_color
     display: block
     padding: 6px 17px 5px
     text-decoration: none
     position: relative
     z-index: 100
     height: 29px
-    font-size: 17px
-  
+    font-size: 15px
+
   .menu-item-no-drop:hover
     text-decoration: underline
   .menu-item-title
-    background: url("/images/canvas/menu_arrow.png") no-repeat  right 17px
+    background: url("/images/canvas/menu_arrow_white.png") no-repeat right 17px
     padding-right: 27px
   &.hover
     .menu-item-title
-      border-top-color: $menu_border_color
-      border-left-color: $menu_border_color
-      border-right-color: $menu_border_color 
-      background-color: $menu_background_color
-      
+      background-image: url("/images/canvas/menu_arrow.png")
+      text-shadow: none
+      color: $menu-text-color
+      border-top-color: $menu-border-color
+      border-left-color: $menu-border-color
+      border-right-color: $menu-border-color
+      background-color: $menu-background-color
+
     .menu-item-drop
-      // bring it back on screen so you can see it
-      left: 0
+      left: 0 // bring it back on screen so you can see it
 
   .menu-item-drop
-    border: 1px solid $menu_border_color
-    +vertical-gradient($menu_background_color, $menu_background_color_bottom)
+    border: 1px solid $menu-border-color
+    background-color: $menu-background-color
     box-shadow: 7px 7px 9px rgba(0, 0, 0, 0.25)
-    background:
-      color: $menu_background_color
-      repeat: repeat-x
-      position: top left
-    padding: 6px 0
     top: 40px
     z-index: 99
     font-size: 13px
@@ -158,47 +155,51 @@
     overflow: hidden
     position: absolute
     left: -999999px
-    
-    .menu-item-drop-padded
-      padding:
-        top: 6px
-        left: 12px
-        right: 12px
-        
-    .menu-item-drop-float-right
-      font:
-        family: "ff-clifford-eighteen-web-pro-1","ff-clifford-eighteen-web-pro-2",Georgia,"Times New Roman",Times,serif
-        style: italic
-      float: right
+
+    .menu-item-view-all
+      border-bottom: none
+      font-size: 11px
+      text-align: right
       white-space: nowrap
-      
-    
+      &:hover
+        background-color: transparent
+      a
+        &:hover, &:focus
+          text-decoration: underline
+
     .menu-item-drop-column
-      padding: 0 12px
-      border-left: 1px dotted #ccc
+      padding: 0
+      border-left: 1px solid lighten($borderColor, 22%)
+
       min-width: 270px
       width: 270px
       vertical-align: top
       h2
-        font-size: 1.2em
-        margin-top: 0
-      &:first-child /* :first-child works in IE 7+ but not :last-child */
+        padding: 9px 12px 3px
+        border-bottom: 1px solid lighten($borderColor, 22%)
+        color: $menu-text-color
+        font-size: 1.1em
+        margin: 0
+      &:first-child
         border-left: none
     li
-      font-size: 15px
       line-height: .9em
       .secondary-right, .subtitle
         font:
-          family: "ff-clifford-eighteen-web-pro-1","ff-clifford-eighteen-web-pro-2",Georgia,"Times New Roman",Times,serif
           style: italic
-        color: #888
+        color: #555
       .subtitle
         display: block
         color: #bcbcbc
         font-size: 9px
-      &:hover 
+      .menu-item-drop-float-right
+        float: right
+        white-space: nowrap
+      &:hover
+        background-color: $activeBG
+
         .secondary-right, .subtitle
-          color: #555
+          color: #666
       .name-right-wrapper
         width: 100%
         display: block
@@ -210,39 +211,34 @@
       .name
         display: block
 
+
+.customListContent li.customListItem:hover
+  background-color: transparent
+
 .menu-item-drop-column-list, .customListGhost
   +reset-list
   width: 270px
   li
-    border-top: 1px dashed #ccc
+    border-top: 1px solid #FAFAFA
+    border-bottom: 1px solid lighten($borderColor, 22%)
     &:hover
-      // do this instead of a specific bg color because the drop-down has a gradient, so it would look wierd with a color, 
-      // but this just makes any li a little darker than it normally would so it works with the gradient
-      background-image: url('/images/4_percent_opacity.png')
       .name
-        color: darken($menu_link_color, 12%)
+        color: darken($link_color, 12%)
     a
       display: block
-      font-size: 15px
-      line-height: 19px
-      padding-top: 2px
+      line-height: 1.2
+      padding: 4px 12px 8px
       text-decoration: none
-      color: $menu_link_color
 
 .menu-item-drop.menuCustomListEditing
   min-width: 589px
 
 #menu_enrollments
-  li:hover
-    background-image: none
-    .subtitle
-      color: #bcbcbc
-
   .customListWrapper
     background: #fff
     padding: 10px
     border: solid 1px #ccc
-    
+
     position: absolute
     left: 0
     opacity: 0
@@ -281,18 +277,19 @@
         background-position: -8px -41px
 
   .customListOpen
-    color: darken($menu_link_color, 12%)
+    color: $link_color
     float: right
+    font-size: 11px
 
 .customListEditing ul
-  min-height: 400px
+  min-height: 350px
 
 .customListEditing .customListWrapper ul
   min-height: 300px
 
 #menu_enrollments.customListEditing .customListWrapper
   +transform(scale(1))
-  left: 295px
+  left: 270px
   opacity: 1
 
 .menu-item-drop .customListOpen
@@ -303,22 +300,3 @@
   position: absolute
   z-index: 100
 
-#footer
-  color: #5c5c5c
-  font-size: 11px
-  margin: 0 15px 34px
-  img
-    vertical-align: bottom
-    padding: 0 20px 3px 0
-
-#footer-links
-  a
-    border-left: 1px solid #5C5C5C
-    color: #5C5C5C
-    margin-right: 0.4em
-    padding-left: 0.4em
-    &:hover, &:focus
-      text-decoration: underline
-    // ie7 supports :first-child so this will work on everything we support.
-    &:first-child
-      border-left: none

@@ -1,0 +1,27 @@
+<div id="fixed_bottom">
+  <% if @fixed_warnings.present? %>
+    <% @fixed_warnings.each_with_index do |warning, index| %>
+      <div id="element_toggler_<%= index %>" class="element_toggler fixed_warning" role="button" aria-controls="element_toggler_<%= index %>">
+        <i class=<%= "icon-#{warning[:icon]}" %>></i>
+        <b><%= warning[:title] %></b>
+        <div style="float: right;"><%= warning[:message] %></div>
+      </div>
+    <% end %>
+  <% end %>
+<% if @current_user.try(:fake_student?) %>
+  <div id="sv_bar" class="ui-widget ui-state-default">
+    <% student_view_course = @current_user.all_courses.first %>
+    <i class="icon-student-view"></i>
+    <b><%= t('student_view.warning_title', "You are currently logged into Student View") %></b>
+    <div class="buttons">
+      <%= link_to t('student_view.reset', "Reset Student"), course_test_student_path(student_view_course), 'data-method' => :delete, :rel => 'nofollow', :class => 'btn reset_test_student'%>
+      <%= link_to t('student_view.leave', "Leave Student View"), course_student_view_path(student_view_course), 'data-method' => :delete, :rel => 'nofollow', :class => 'btn btn-primary leave_student_view'%>
+    </div>
+    <div class="button-explanation">
+      <span>
+        <%= t('student_view.reset_explanation', "Resetting the test student will clear all history for this student, %{line_break}allowing you to view the course as a brand new student.", :line_break => raw("<br />")) %>
+      </span>
+    </div>
+  </div>
+<% end %>
+</div>

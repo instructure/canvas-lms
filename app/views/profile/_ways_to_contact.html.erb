@@ -45,7 +45,7 @@
   <% @email_channels.each do |c| %>
     <tr class="channel <%= "default" if c.position && c.position <= 1 %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
       <td style="padding: 0; text-align: center;">
-        <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
+        <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
       </td>
       <td><div style="overflow: hidden; position: relative;">&nbsp;
       <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="<%=h c.path %>">
@@ -67,7 +67,7 @@
   <% end %>
   <tr class="channel blank unconfirmed" style="display: none;">
     <td style="padding: 0; text-align: center;">
-      <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
+      <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
     </td>
     <td><div style="overflow: hidden; position: relative;">&nbsp;
     <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="">
@@ -140,12 +140,16 @@
   <tr>
     <td style="white-space: nowrap"><%= label :communication_channel, :address, before_label(:email_address, "Email Address") %></td>
     <td><%= text_field :communication_channel, :address %></td>
-  </tr><tr>
+  </tr>
+  <% if @domain_root_account == Account.default %>
+  <tr>
     <td colspan="2">
       <input type="checkbox" id="build_pseudonym_for_email" name="build_pseudonym" value="1"/>
       <label for="build_pseudonym_for_email"><%= t('labels.enable_login_for_email', "I want to log in to Canvas using this email address") %></label>
     </td>
-  </tr><tr>
+  </tr>
+  <% end %>
+  <tr>
     <td colspan="2">
       <button type="submit" class="button"><%= t('buttons.register_email', "Register Email") %></button>
     </td>

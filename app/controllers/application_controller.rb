@@ -25,6 +25,7 @@ class ApplicationController < ActionController::Base
 
   include Api
   include LocaleSelection
+  include Api::V1::User
   around_filter :set_locale
 
   helper :all
@@ -40,6 +41,9 @@ class ApplicationController < ActionController::Base
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
+  # Yes, we're calling this before and after so that we get the user id logged
+  # on events that log someone in and log someone out.
+  after_filter :set_user_id_header
   before_filter :fix_xhr_requests
   before_filter :init_body_classes
   before_filter :set_ua_header
@@ -73,6 +77,7 @@ class ApplicationController < ActionController::Base
     # set some defaults
     @js_env ||= {
       :current_user_id => @current_user.try(:id),
+      :current_user => user_display_json(@current_user),
       :current_user_roles => @current_user.try(:roles),
       :context_asset_string => @context.try(:asset_string),
       :AUTHENTICITY_TOKEN => form_authenticity_token
@@ -113,8 +118,8 @@ class ApplicationController < ActionController::Base
   end
 
   def set_user_id_header
-    headers['X-Canvas-User-Id'] = @current_user.global_id.to_s if @current_user
-    headers['X-Canvas-Real-User-Id'] = @real_current_user.global_id.to_s if @real_current_user
+    headers['X-Canvas-User-Id'] ||= @current_user.global_id.to_s if @current_user
+    headers['X-Canvas-Real-User-Id'] ||= @real_current_user.global_id.to_s if @real_current_user
   end
 
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
@@ -169,7 +174,7 @@ class ApplicationController < ActionController::Base
   
   def user_url(*opts)
     opts[0] == @current_user && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
-      profile_url :
+      user_profile_url(@current_user) :
       super
   end
 
@@ -867,7 +872,7 @@ class ApplicationController < ActionController::Base
         redirect_to(login_url(:needs_cookies => '1'))
         return false
       else
-        raise(ActionController::InvalidAuthenticityToken) unless form_authenticity_token == form_authenticity_param
+        raise(ActionController::InvalidAuthenticityToken) unless (form_authenticity_token == form_authenticity_param) || (form_authenticity_token == request.headers['X-CSRF-Token'])
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
@@ -1103,6 +1108,10 @@ class ApplicationController < ActionController::Base
   end
   helper_method :feature_and_service_enabled?
   
+  def show_new_dashboard?
+    @current_user && @current_user.preferences[:new_dashboard]
+  end
+
   def temporary_user_code(generate=true)
     if generate
       session[:temporary_user_code] ||= "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i.to_s}_#{rand.to_s}")}"
@@ -1128,7 +1137,9 @@ class ApplicationController < ActionController::Base
     unless Account.site_admin.grants_right?(@current_user, permission)
       flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
       store_location
-      redirect_to @current_user ? root_url : login_url
+      opts = {}
+      opts[:canvas_login] = 1 if params[:canvas_login]
+      redirect_to @current_user ? root_url : login_url(opts)
       return false
     end
   end
@@ -1274,4 +1285,74 @@ class ApplicationController < ActionController::Base
     @context = Account.site_admin
     add_crumb t('#crumbs.site_admin', "Site Admin"), url_for(Account.site_admin)
   end
+
+  def can_add_notes_to?(course)
+    course.enable_user_notes && course.grants_right?(@current_user, nil, :manage_user_notes)
+  end
+
+  ##
+  # Loads all the contexts the user belongs to into instance variable @contexts
+  # Used for TokenInput.coffee instances
+  def load_all_contexts
+    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user].cache_key, :expires_in => 10.minutes) do
+      contexts = {:courses => {}, :groups => {}, :sections => {}}
+
+      term_for_course = lambda do |course|
+        course.enrollment_term.default_term? ? nil : course.enrollment_term.name
+      end
+
+      @current_user.concluded_courses.each do |course|
+        contexts[:courses][course.id] = {
+          :id => course.id,
+          :url => course_url(course),
+          :name => course.name,
+          :type => :course,
+          :term => term_for_course.call(course),
+          :state => course.recently_ended? ? :recently_active : :inactive,
+          :can_add_notes => can_add_notes_to?(course)
+        }
+      end
+
+      @current_user.courses.each do |course|
+        contexts[:courses][course.id] = {
+          :id => course.id,
+          :url => course_url(course),
+          :name => course.name,
+          :type => :course,
+          :term => term_for_course.call(course),
+          :state => :active,
+          :can_add_notes => can_add_notes_to?(course)
+        }
+      end
+
+      section_ids = @current_user.enrollment_visibility[:section_user_counts].keys
+      CourseSection.find(:all, :conditions => {:id => section_ids}).each do |section|
+        contexts[:sections][section.id] = {
+          :id => section.id,
+          :name => section.name,
+          :type => :section,
+          :term => contexts[:courses][section.course_id][:term],
+          :state => contexts[:courses][section.course_id][:state],
+          :parent => {:course => section.course_id},
+          :context_name =>  contexts[:courses][section.course_id][:name]
+        }
+      end if section_ids.present?
+
+      @current_user.messageable_groups.each do |group|
+        contexts[:groups][group.id] = {
+          :id => group.id,
+          :name => group.name,
+          :type => :group,
+          :state => group.active? ? :active : :inactive,
+          :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
+          :context_name => group.context.name,
+          :category => group.category
+        }
+      end
+
+      contexts
+    end
+  end
+
+
 end

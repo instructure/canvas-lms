@@ -1,0 +1,125 @@
+/*
+ * jQuery UI Menu @VERSION
+ *
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Menu#theming
+ */
+.ui-menu { list-style:none; padding: 0; margin: 0; display:block; outline: none; }
+.ui-menu .ui-menu { margin-top: -3px; position: absolute; }
+.ui-menu .ui-menu-item { margin: 0; padding: 0; zoom: 1; width: 100%; }
+.ui-menu .ui-menu-item a { text-decoration: none; display: block; padding: 6px .4em; line-height: 1.5; zoom: 1; }
+.ui-menu .ui-menu-item a.ui-state-focus,
+.ui-menu .ui-menu-item a.ui-state-active { margin: -1px; }
+
+.ui-menu li.ui-state-disabled { padding: 0.7em 0.4em 0.5em; margin: .4em 0 .2em; line-height: 1.5; }
+
+/* icon support */
+.ui-menu-icons { position: relative; }
+.ui-menu-icons .ui-menu-item a { position: relative; padding-left: 2em; }
+
+/* left-aligned */
+.ui-menu .ui-icon { position: absolute; top: .5em; left: .4em; }
+
+/* right-aligned */
+.ui-menu .ui-menu-icon { position: static; float: right; }
+
+
+.ui-menu .ui-menu-input-group {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #000;
+  font-size: 12px;
+}
+
+.ui-menu-item span.ui-menu-input-group { padding-left: 2em; }
+
+.ui-menu-item label { cursor: pointer; }
+
+.ui-menu .ui-corner-all { border-radius: 0; }
+
+$kyle-menu-bg-color: #e6e7e9;
+$kyle-menu-border-color: #b0afaf;
+$kyle-menu-carat-size: 10px;
+$kyle-menu-border-radius: 8px;
+
+
+// the .ui-menu-carat is the outer border of the carat to make it match the border of the popup
+// and the span inside it is the same
+.ui-menu-carat, .ui-menu-carat span {
+  border-style: solid;
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: 50%;
+  content: "";
+
+  border-color: $kyle-menu-border-color transparent;
+  border-width: 0px $kyle-menu-carat-size+1px $kyle-menu-carat-size+1px;
+  top: -$kyle-menu-carat-size - 1px;
+  margin-left: -$kyle-menu-carat-size - 1px;
+}
+.ui-menu-carat span {
+  border-color: $kyle-menu-bg-color transparent;
+  border-width: 0px $kyle-menu-carat-size $kyle-menu-carat-size;
+  top: 1px;
+  margin-left: -$kyle-menu-carat-size;
+}
+.carat-bottom {
+  .ui-menu-carat, .ui-menu-carat span {
+    top: auto;
+    bottom: -$kyle-menu-carat-size - 1px;
+    border-width: $kyle-menu-carat-size+1px $kyle-menu-carat-size+1px 0;
+  }
+  .ui-menu-carat span {
+    top: auto;
+    bottom: 1px;
+    border-width: $kyle-menu-carat-size $kyle-menu-carat-size 0;
+  }
+}
+.ui-kyle-menu {
+  margin-top: $kyle-menu-carat-size;
+  background-color: $kyle-menu-bg-color;
+  border: 1px solid $kyle-menu-border-color;
+  font-size: 12px;
+  font-weight: bold;
+  color: #525252;
+  position: absolute; // take it out of the "flow" so that it pops on top and doesnt push things down
+  z-index: 9999;
+  border-radius:  $kyle-menu-border-radius;
+  box-shadow: 0px 2px 4px -1px rgba(0,0,0,.4);
+
+  a { color: #525252}
+  .ui-menu-item {
+    hr {
+      margin: 0 2px;
+      height: 0;
+      border: 0;
+      border-top: 1px solid #d4d5d7;
+      border-bottom: 1px solid #f2f2f3;
+    }
+  }
+  // have to use first-of-type instead of :first-child because the carat that gets inserted becomes
+  // :first-child but the carat is not an <li>, so this gets the first <li> which is what we want.
+  // doesn't work in ie8- but that's ok because neither does the border radius we are trying to fix.
+  li:first-of-type a { border-top-left-radius: $kyle-menu-border-radius; border-top-right-radius:$kyle-menu-border-radius; }
+  li:last-child a { border-bottom-left-radius: $kyle-menu-border-radius; border-bottom-right-radius:$kyle-menu-border-radius; }
+  .ui-state-focus {
+    @include vertical-gradient(#0abdff, #008fd6);
+    border-top: 1px solid #d5f1fe;
+    border-bottom: 1px solid #1e7eca;
+    color: white;
+    font-weight: bold;
+    text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
+  }
+}
+
+.ui-menu-small {
+  font-size: 11px;
+  font-weight: normal;
+  white-space: nowrap;
+  .ui-state-focus {font-weight: normal; text-shadow: none;}
+  .ui-menu-item a {padding: 3px 5px}
+}

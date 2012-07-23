@@ -11,14 +11,14 @@
   contexts_to_link_to ||= nil
 %>
 <div class="events_list">
-  <h2><a class='event-list-view-calendar small-calendar' href='<%= calendar_url_for(contexts_to_link_to) %>'><%= t 'links.view_calendar', "View Calendar" %></a> <%= title %></h2>
+  <h2><% unless is_recent_feedback %><a class='event-list-view-calendar small-calendar' href='<%= calendar_url_for(contexts_to_link_to) %>'><%= t 'links.view_calendar', "View Calendar" %></a><% end %> <%= title %></h2>
   <ul class="right-side-list events">
   <% if !event_list || event_list.empty? %>
     <li>
       <small>
         <% if period == :one_week %>
           <%= t('nothing_one_week', 'Nothing for the next week') %>
-        <% elsif period == :two_weeks %>
+        <% elsif period == :two_weeks && !is_recent_feedback %>
           <%= t('nothing_two_weeks', 'Nothing for the next two weeks') %>
         <% else %>
           <%= t('nothing_for_now', 'Nothing for now') %>

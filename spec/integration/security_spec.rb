@@ -374,6 +374,11 @@ describe "security" do
         response.body.should match(/Incorrect username/)
         bad_login("5.5.5.5")
         response.body.should match(/Too many failed login attempts/)
+        # should still fail
+        post_via_redirect "/login",
+          { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
+          { "REMOTE_ADDR" => "5.5.5.5" }
+        response.body.should match(/Too many failed login attempts/)
       end
 
       it "should have a higher limit for other ips" do
@@ -382,6 +387,11 @@ describe "security" do
         bad_login("5.5.5.6") # different IP, so allowed
         response.body.should match(/Incorrect username/)
         bad_login("5.5.5.7") # different IP, but too many total failures
+        response.body.should match(/Too many failed login attempts/)
+        # should still fail
+        post_via_redirect "/login",
+          { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
+          { "REMOTE_ADDR" => "5.5.5.7" }
         response.body.should match(/Too many failed login attempts/)
       end
 
@@ -396,6 +406,24 @@ describe "security" do
           { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
           { "REMOTE_ADDR" => "5.5.5.5" }
         path.should eql("/?login_success=1")
+      end
+
+      it "should apply limitations correctly for cross-account logins" do
+        account = Account.create!
+        Account.any_instance.stubs(:trusted_account_ids).returns([account.id])
+        @pseudonym.account = account
+        @pseudonym.save!
+        bad_login("5.5.5.5")
+        response.body.should match(/Incorrect username/)
+        bad_login("5.5.5.6") # different IP, so allowed
+        response.body.should match(/Incorrect username/)
+        bad_login("5.5.5.7") # different IP, but too many total failures
+        response.body.should match(/Too many failed login attempts/)
+        # should still fail
+        post_via_redirect "/login",
+          { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
+          { "REMOTE_ADDR" => "5.5.5.5" }
+        response.body.should match(/Too many failed login attempts/)
       end
     end
   end

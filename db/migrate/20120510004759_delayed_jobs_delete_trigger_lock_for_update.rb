@@ -2,7 +2,7 @@ class DelayedJobsDeleteTriggerLockForUpdate < ActiveRecord::Migration
   tag :predeploy
 
   def self.connection
-    Delayed::Job.connection
+    Delayed::Backend::ActiveRecord::Job.connection
   end
 
   def self.up

@@ -34,35 +34,5 @@
     <%= render :partial => "course" %>
   </ul>
 <% end %>
-<% js_block do %>
-<script type="text/javascript">
-require([
-  'jquery' /* $ */,
-  'jqueryui/autocomplete' /* /\.autocomplete/ */
-], function($) {
 
-$(document).ready(function() {
-  
-  $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
-    $(this).find(".info").addClass('info_hover');
-  });
-  $(".courses .course,.groups .group").bind('blur mouseout', function(event) {
-    $(this).find(".info").removeClass('info_hover');
-  });
-  if($("#new_course").length > 0) {
-    var reEscape = new RegExp('(\\' + ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'].join('|\\') + ')', 'g');
-    var $newCourseForm = $("#new_course"),
-        $courseName = $("#course_name");
-    $courseName.autocomplete({
-      minLength: 4,
-      delay: 150, //miliseconds
-      source: $newCourseForm[0].action + ".json",
-      select: function(event, ui){
-        window.location = $newCourseForm[0].action + "/" + ui.item.id
-      }
-    });
-  }
-});
-});
-</script>
-<% end %>
+<% js_bundle :account_show %>

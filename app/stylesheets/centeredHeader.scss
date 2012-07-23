@@ -1,0 +1,30 @@
+#header {
+  padding-top: 0;
+}
+
+#main {
+  background: none;
+  border: none;
+}
+
+#content, #wrapper {
+  padding: 0;
+  margin: 0;
+}
+
+/* center the header as window resizes */
+#header-inner {
+  position: relative;
+  width: 964px;
+  margin: auto;
+  padding-top: 26px;
+}
+
+#identity {
+  margin-right: 0;
+}
+
+#header-logo {
+  left: 0;
+}
+

@@ -1,0 +1,312 @@
+// Base styles
+// --------------------------------------------------
+
+// Core
+.btn, .ui-button, .button {
+  display: inline-block;
+  position: relative;
+  padding: $buttonPadding;
+  margin: 0;
+  font-size: $baseFontSize;
+  line-height: $baseLineHeight;
+  color: $grayDark;
+
+  //needed? (from stock jqueryui)
+  text-decoration: none !important;
+  zoom: 1;
+  overflow: visible; /* the overflow property removes extra width in IE */
+
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  font-family: "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
+
+
+  text-shadow: 0 1px 1px rgba(255,255,255,.75);
+  @include buttonBackground($btnBackground, $btnBackgroundHighlight);
+  border: 1px solid $btnBorder;
+  border-bottom-color: darken($btnBorder, 10%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+
+}
+.btn, .button {
+  // jqueryui uses ui-corner-* classes to manage border radii
+  border-radius: 4px;
+}
+
+// Hover state
+.btn:hover, .button:hover, .ui-button.ui-state-hover  {
+  color: $grayDark;
+  text-decoration: none;
+  background-color: darken($white, 10%);
+  background-position: 0 -15px;
+
+  // transition is only when going to hover, otherwise the background
+  // behind the gradient (there for IE<=9 fallback) gets mismatched
+  @include transition(background-position .1s linear);
+}
+
+// Focus state for keyboard and accessibility
+.btn:focus, .button:focus, .ui-button.ui-state-focus {
+  @include tab-focus();
+}
+
+// Active state
+.btn.active, .btn:active, .button.active, .button:active, .ui-button.ui-state-active {
+  background-color: darken($white, 10%);
+  background-color: darken($white, 15%) \9;
+  background-image: none;
+  outline: 0;
+  @include box-shadow(#{inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)});
+
+  border: 1px solid $btnBorder;
+  border-bottom-color: darken($btnBorder, 10%);
+  color: $grayDark;
+  text-shadow: 0 1px 1px rgba(255,255,255,.75);
+
+}
+
+// Disabled state
+.btn.disabled, .btn[disabled], .button.disabled, .button[disabled], .ui-button.ui-state-disabled {
+  cursor: default;
+  background-color: darken($white, 10%);
+  background-image: none;
+  @include opacity(0.65);
+  @include box-shadow(none);
+}
+
+
+// Button Sizes
+// --------------------------------------------------
+
+// Large
+.btn-large {
+  padding: 9px 14px;
+  font-size: $baseFontSize + 2px;
+  line-height: normal;
+  @include border-radius(5px);
+}
+.btn-large [class^="icon-"] {
+  margin-top: 1px;
+}
+
+// Small
+.btn-small {
+  padding: 3px 9px;
+  font-size: $baseFontSize - 2px;
+  line-height: $baseLineHeight - 2px;
+}
+.btn-small [class^="icon-"] {
+  margin-top: -1px;
+}
+
+// Mini
+.btn-mini {
+  padding: 2px 6px;
+  font-size: $baseFontSize - 2px;
+  line-height: $baseLineHeight - 4px;
+}
+
+
+// Alternate buttons
+// --------------------------------------------------
+
+// Set text color
+// -------------------------
+.btn-primary, .btn-warning, .btn-danger, .btn-success, .btn-info, .btn-inverse {
+  &, &:hover {
+    color: $white;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+  }
+}
+// Provide *some* extra contrast for those who can get it
+.btn-primary, .btn-warning, .btn-danger, .btn-success, .btn-info, .btn-inverse {
+  .active { color: rgba(255,255,255,.75); }
+}
+
+// Set the backgrounds
+// -------------------------
+.btn {
+  // reset here as of 2.0.3 due to Recess property order
+  border-color: #ccc;
+  border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) rgba(0,0,0,.25);
+}
+.btn-primary {
+  @include buttonBackground($btnPrimaryBackground, $btnPrimaryBackgroundHighlight);
+}
+// Warning appears are orange
+.btn-warning {
+  @include buttonBackground($btnWarningBackground, $btnWarningBackgroundHighlight);
+}
+// Danger and error appear as red
+.btn-danger {
+  @include buttonBackground($btnDangerBackground, $btnDangerBackgroundHighlight);
+}
+// Success appears as green
+.btn-success {
+  @include buttonBackground($btnSuccessBackground, $btnSuccessBackgroundHighlight);
+}
+// Info appears as a neutral blue
+.btn-info {
+  @include buttonBackground($btnInfoBackground, $btnInfoBackgroundHighlight);
+}
+.btn-inverse {
+  @include buttonBackground($btnInverseBackground, $btnInverseBackgroundHighlight);
+}
+
+
+//// Cross-browser Jank
+//// --------------------------------------------------
+//
+//button.btn, input[type="submit"].btn {
+//
+//  // Firefox 3.6 only I believe
+//  &::-moz-focus-inner {
+//    padding: 0;
+//    border: 0;
+//  }
+//
+//}
+
+
+
+/*!
+ * jQuery UI Button 1.8.21
+ *
+ * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Button#theming
+ */
+.ui-button-icon-only { width: 2.2em; /* to make room for the icon, a width needs to be set here */
+  padding-left: 0;
+  padding-right: 0;
+}
+button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a little more width */
+.ui-button-icons-only { width: 3.4em; }
+button.ui-button-icons-only { width: 3.7em; }
+
+//jqueryui expects the padding to be on the .ui-button-text not the button
+.ui-button-text-only {
+  padding: 0;
+  .ui-button-text { display: block; //line-height: 1.4;
+    padding: $buttonPadding;
+  }
+}
+
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { display: inline-block; text-indent: -9999999px; }
+.ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
+.ui-button-text-icon-secondary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
+.ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
+
+// we dont support input.button
+// /* no icon support for input elements, provide padding by default */
+// input.ui-button { padding: .4em 1em; }
+
+/*button icon element(s) */
+.ui-button-icon-only .ui-icon, .ui-button-text-icon-primary .ui-icon, .ui-button-text-icon-secondary .ui-icon, .ui-button-text-icons .ui-icon, .ui-button-icons-only .ui-icon { position: absolute; top: 50%; margin-top: -8px; }
+.ui-button-icon-only .ui-icon { left: 50%; margin-left: -8px; }
+.ui-button-text-icon-primary .ui-button-icon-primary, .ui-button-text-icons .ui-button-icon-primary, .ui-button-icons-only .ui-button-icon-primary { left: .5em; }
+.ui-button-text-icon-secondary .ui-button-icon-secondary, .ui-button-text-icons .ui-button-icon-secondary, .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
+.ui-button-text-icons .ui-button-icon-secondary, .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
+
+/*button sets*/
+.ui-buttonset { margin-right: 7px; }
+.ui-buttonset .ui-button { margin-left: 0;
+  margin-right: -5px;
+}
+
+/* workarounds */
+button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
+
+
+
+
+////
+// Relics from g_util_buttons that I would like to phase out support for,
+// but because there is a ton of stuff that uses it all over the app, we can't yet.
+// PLEASE DONT USE!!
+// --------------------------------------------------------------------------------
+
+a.button, button.button {
+  img {
+    margin: 0 3px -3px 0 !important;
+    vertical-align: baseline;
+  }
+  em {
+    font-weight: normal;
+    font-style: normal;
+  }
+}
+
+.small-button {
+  @extend .btn-small;
+  img { margin: 0 1px 0px 0 !important; }
+}
+.big-button { @extend .btn-large; }
+.button-default { @extend .btn-primary; }
+
+.button-container { margin-top: 0.5em; }
+
+.button-container-right-aligned {
+  text-align: right;
+  a.button, button.button {
+    margin-right: 0;
+    margin-left: 0.7em;
+  }
+}
+
+a.button-secondary,
+button.button-secondary {
+  &, &:hover, &:active, &:focus {
+    float: none;
+    margin: 0 0.7em 0 0 !important;
+    background: transparent none !important;
+    border: 0px none !important;
+    padding: 0 0 0 1em !important;
+    display: inline;
+    display: inline-block;
+    cursor: pointer;
+    color: #d15545 !important;
+    box-shadow: none;
+    @include border-radius(0); }
+  &:hover, &:active, &:focus {
+    text-decoration: underline !important;
+    color: #d12f19;
+    outline: none; }
+  &.disabled {
+    text-decoration: none !important;
+    cursor: default; }
+}
+
+.textfield-inline-with-button {
+  .small-button { margin: 0 0 0 2px; }
+  input { width: 80%; }
+}
+
+
+#right-side {
+  a, button {
+    &.button-sidebar-wide {
+      text-align: left;
+      margin: 5px auto;
+      display: block;
+      /* 12px is the size of the padding on the button */
+      // width: $right_side_width - $right_side_margin - $right_side_margin - 2px - 12px - 12px;
+    }
+  }
+  button.button-sidebar-wide { width: $right_side_width - $right_side_margin - $right_side_margin; }
+}
+
+
+$triangle-edge-size: 5px;
+.ui-icon-droparrow {
+  background-image: none;
+  border: solid transparent;
+  border-width: $triangle-edge-size $triangle-edge-size 0 $triangle-edge-size;
+  width: 0;
+  height: 0;
+  border-top-color: $button-text-color;
+  margin-top: -$triangle-edge-size / 2 !important;
+}

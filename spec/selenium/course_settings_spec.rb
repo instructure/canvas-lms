@@ -320,11 +320,26 @@ describe "course settings" do
       f(".student_view_button").click
       wait_for_dom_ready
       f("#identity .user_name").should include_text @fake_student.name
-      stop_link = f("#identity .stop_masquerading a")
-      stop_link.should include_text "[Leave Student View]"
+    end
+
+    it "should allow leaving student view" do
+      enter_student_view
+      stop_link = f("#sv_bar .leave_student_view")
+      stop_link.should include_text "Leave Student View"
       stop_link.click
       wait_for_dom_ready
       f("#identity .user_name").should include_text @teacher.name
+    end
+
+    it "should allow resetting student view" do
+      @fake_student_before = @course.student_view_student
+      enter_student_view
+      reset_link = f("#sv_bar .reset_test_student")
+      reset_link.should include_text "Reset Student"
+      reset_link.click
+      wait_for_dom_ready
+      @fake_student_after = @course.student_view_student
+      @fake_student_before.id.should_not eql @fake_student_after.id
     end
 
     it "should not include student view student in the statistics count" do

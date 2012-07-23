@@ -424,3 +424,7 @@ define [
       postData.context = @stack[@stack.length - 1][0].data('id') if @listExpanded()
       postData.per_page ?= @options.limiter?(level: @stack.length)
       postData
+
+    teardown: ->
+      @$container.remove()
+

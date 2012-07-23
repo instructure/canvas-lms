@@ -524,6 +524,35 @@ describe ContentMigration do
       @copy_to.quizzes.find_by_migration_id(mig_id(@quiz)).should_not be_nil
     end
 
+    it "should have correct question count on copied surveys and practive quizzes" do
+      pending unless Qti.qti_enabled?
+      sp = @copy_from.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
+      data = {
+                          :question_type => "multiple_choice_question",
+                          :question_name => "test fun",
+                          :name => "test fun",
+                          :points_possible => 10,
+                          :question_text => "<strong>html for fun</strong>",
+                          :answers =>
+                                  [{:migration_id => "QUE_1016_A1", :text => "<br />", :weight => 100, :id => 8080},
+                                   {:migration_id => "QUE_1017_A2", :text => "<pre>", :weight => 0, :id => 2279}]}.with_indifferent_access
+      qq = sp.quiz_questions.create!
+      qq.write_attribute(:question_data, data)
+      qq.save!
+      sp.generate_quiz_data
+      sp.published_at = Time.now
+      sp.workflow_state = 'available'
+      sp.save!
+
+      sp.question_count.should == 1
+
+      run_course_copy
+
+      q = @copy_to.quizzes.find_by_migration_id(mig_id(sp))
+      q.should_not be_nil
+      q.question_count.should == 1
+    end
+
     it "should copy quizzes as published if they were published before" do
       pending unless Qti.qti_enabled?
       g = @copy_from.assignment_groups.create!(:name => "new group")
@@ -654,14 +683,17 @@ describe ContentMigration do
       @rubric.save!
 
       @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)
-      assoc = @rubric.associate_with(@assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
-      assoc.hide_score_total = true
-      assoc.use_for_grading = true
-      assoc.save!
+      @assoc = @rubric.associate_with(@assignment, @copy_from, :purpose => 'grading', :use_for_grading => true)
+      @assoc.hide_score_total = true
+      @assoc.use_for_grading = true
+      @assoc.save!
     end
 
     it "should still associate rubrics and assignments and copy rubric association properties" do
       create_rubric_asmnt
+      @assoc.summary_data = {:saved_comments=>{"309_6312"=>["what the comment", "hey"]}}
+      @assoc.save!
+
       run_course_copy
 
       rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
@@ -670,6 +702,7 @@ describe ContentMigration do
       asmnt2.rubric.id.should == rub.id
       asmnt2.rubric_association.use_for_grading.should == true
       asmnt2.rubric_association.hide_score_total.should == true
+      asmnt2.rubric_association.summary_data.should == @assoc.summary_data
     end
 
     it "should copy rubrics associated with assignments when rubric isn't selected" do

@@ -86,6 +86,8 @@ class GroupsController < ApplicationController
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment)
 
+  include TextHelper
+
   def context_group_members
     @group = @context
     if authorized_action(@group, @current_user, :read_roster)
@@ -205,7 +207,13 @@ class GroupsController < ApplicationController
           end
         end
         if authorized_action(@group, @current_user, :read)
+          #if show_new_dashboard?
+          #  @use_new_styles = true
+          #  js_env :GROUP_ID => @group.id
+          #  return render :action => :dashboard
+          #else
           @home_page = WikiNamespace.default_for_context(@group).wiki.wiki_page
+          #end
         end
       end
       format.json do
@@ -325,7 +333,7 @@ class GroupsController < ApplicationController
       respond_to do |format|
         if @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
-          format.html { redirect_to group_url(@group) }
+          format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
           format.json { render :json => group_json(@group, @current_user, session) }
         else
           format.html { render :action => "edit" }
@@ -518,6 +526,37 @@ class GroupsController < ApplicationController
       @group.touch
       render :json => @membership.to_json
     end
+  end
+
+  def edit
+    @use_new_styles = true
+    @group = (@context ? @context.groups : Group).find(params[:id])
+    @context = @group
+
+    folder   = @group.folders.active.first
+    folder ||= @group.folders.active.create! :name => 'Group Pictures'
+    js_env :GROUP_ID => @group.id, :FOLDER_ID => folder.id
+
+    if authorized_action(@group, @current_user, :update)
+      render :action => :edit
+    end
+  end
+
+  def profile
+    account = @context.root_account
+    raise ActiveRecord::RecordNotFound unless account.canvas_network_enabled?
+
+    @use_new_styles = true
+    @active_tab = 'profile'
+    @group = Group.find(params[:group_id])
+
+    # FIXME: there are probably some permissions that could override the
+    # public/private setting on groups (school admins or something?)
+    @can_join = %(parent_context_auto_join
+                  parent_context_request).include? @group.join_level
+    @in_group = @current_user && @current_user.groups.include?(@group)
+
+    render :action => :profile
   end
 
   def public_feed

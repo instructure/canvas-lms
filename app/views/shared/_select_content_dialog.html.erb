@@ -148,9 +148,9 @@
             <optgroup label="<%= folder.full_name %>">
               <% 
               attachments = if @context.grants_right?(@current_user, session, :manage_files)
-                              folder.active_file_attachments
+                              folder.active_file_attachments.by_position_then_display_name
                             else
-                              folder.visible_file_attachments
+                              folder.visible_file_attachments.by_position_then_display_name
                             end
               %>
               <% attachments.sort_by{|file| file.display_name }.each do |file| %>
@@ -172,7 +172,7 @@
                 <%= before_label :folder, "Folder" %>
               </td><td>
                 <% Folder.root_folders(@context) %>
-                <% folders = @context.active_folders_with_sub_folders %>
+                <% folders = @context.active_folders_with_sub_folders.by_position %>
                 <% root_folders = folders.select{|f| f.parent_folder_id == nil} %>
                 <select name="attachment[folder_id]" id="attachment_folder_id">
                   <%= folders_as_options(root_folders, :all_folders => folders, :max_depth => 1) %>

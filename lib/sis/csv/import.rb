@@ -267,7 +267,9 @@ module SIS
         end
         # logger doesn't serialize well
         @logger = nil
-        @csvs[importer].each { |csv| self.send_later_enqueue_args(:run_single_importer, { :queue => @queue, :priority => Delayed::LOW_PRIORITY }, importer, csv) }
+        enqueue_args = { :priority => Delayed::LOW_PRIORITY }
+        enqueue_args[:queue] = @queue if @queue
+        @csvs[importer].each { |csv| self.send_later_enqueue_args(:run_single_importer, enqueue_args, importer, csv) }
       end
 
 

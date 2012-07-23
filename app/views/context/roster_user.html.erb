@@ -9,7 +9,7 @@
   <h2><%= context_user_name(@context, @user) %></h2>
   <div class="rs-margin-rl" id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
-      <a class="button button-sidebar button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><%= image_tag "grading_icon.png" %> <%= t 'links.user_grades', "Grades for %{user}", :user => context_user_name(@context, @user) %></a>
+      <a class="button button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><%= image_tag "grading_icon.png" %> <%= t 'links.user_grades', "Grades for %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :send_messages) %>
       <a class="button button-sidebar-wide" href="<%= message_user_path(@user) %>"><%= image_tag "email.png" %> <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %></a>
@@ -34,7 +34,7 @@
       <a href="<%= user_path(@user.id) %>" class="button button-sidebar-wide"><%= image_tag "information.png" %> <%= t('links.user_account_details', %{User Account Details}) %></a>
     <% end %>
   </div>
-  <a href="<%= profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
+  <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
   <h2><%= t 'headings.user_services', "%{user}'s Services", :user => @user.short_name %></h2>
   <div class="rs-margin-lr">
     <% if can_do(@membership, @current_user, :read_services) && !@membership.user.user_services.empty? %>
@@ -59,7 +59,7 @@
         <%= t 'help.services', %{You haven't linked your user profile to any external services. You can link your Canvas account to services like Facebook and Twitter. This will make it easier for fellow course and group members to link up with you outside of class.} %>
       </p>
       <p>
-        <a href="<%= profile_path %>#registered_web_services" class="button"><%= t('links.link_services', %{Link web services to my account}) %></a>
+        <a href="<%= user_profile_path(@current_user) %>#registered_web_services" class="button"><%= t('links.link_services', %{Link web services to my account}) %></a>
       </p>
     <% elsif @current_user && @current_user == @user && !@current_user.show_user_services %>
       <p>

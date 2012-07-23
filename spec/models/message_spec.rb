@@ -17,13 +17,20 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper')
 
 describe Message do
 
-  it "should create a new instance given valid attributes" do
-    message_model
+  describe "parse!" do
+    it "should use https when the domain is configured as ssl" do
+      pending("switch messages to use url writing, rather than hard-coded strings")
+      HostUrl.stubs(:protocol).returns("https")
+      @au = AccountUser.create(:account => account_model)
+      msg = generate_message(:account_user_notification, :email, @au)
+      msg.body.should match(%r{https://www.example.com})
+    end
   end
-  
+
   context "named scopes" do
     it "should be able to get messages in any state" do
       m1 = message_model(:workflow_state => 'bounced', :user => user)

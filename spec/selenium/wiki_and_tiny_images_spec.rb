@@ -78,7 +78,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       get "/courses/#{new_course.id}/wiki"
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       keep_trying_until do
-        images = ffj('#editor_tabs_3 .image_list img.img')
+        images = ffj('#editor_tabs_4 .image_list img.img')
         images.length.should == 2
         #images.each { |i| i.attribute('complete').should == 'true' } - commented out because it is breaking with
         #webdriver 2.22 and firefox 12
@@ -151,7 +151,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
       @image_list.find_elements(:css, 'img.img').length.should == 2
       keep_trying_until do
-        driver.find_elements(:css, '#editor_tabs_3 .image_list img.img').first.click
+        driver.find_elements(:css, '#editor_tabs_4 .image_list img.img').first.click
         in_frame "wiki_page_body_ifr" do
           driver.find_element(:css, '#tinymce img').should be_displayed
         end

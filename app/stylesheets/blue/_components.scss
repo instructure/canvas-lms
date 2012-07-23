@@ -1,20 +1,23 @@
+
+
 .toolbar {
-  padding: $contentBoxPadding;
+  @extend .ui-widget-header;
+
+  padding: $contentBoxPadding / 2;
   font-size: $baseFontSize;
   line-height: $baseLineHeight;
-  @include bevelText;
-  @include buttonBackground($toolbarBackgroundLight, $toolbarBackground);
-  $shadow: inset 0 1px 0 rgba(255,255,255,0.75);
-  @include box-shadow($shadow);
+
+  .header {
+    font-size: 16px;
+  }
 }
 
 .content-callout {
-  background-color: $contentCalloutColor !important;
-  color: $blueDark;
+  @include content-callout();
 }
 
 .content-box {
-  background: $lightBackground;
+  background-color: $lightBackground;
 
   & > * {
     padding-left: $contentBoxPadding;
@@ -61,11 +64,12 @@
 
 // List View
 .list-view {
-
-  background: $lightBackground;
+  background-color: $lightBackground;
   overflow: auto;
 
-  & > header {
+  & > header,
+  // oldskool compat
+  #section-tabs-header {
     @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground);
     padding: 4px 12px;
     font-weight: bold;
@@ -74,13 +78,27 @@
     border-bottom: 1px solid $listBorderColor;
     @include bevelText;
     border-top: 1px solid $listBorderColor;
+
+    // oldskool overrides
+    font-size: $baseFontSize;
+    font-weight: normal;
+    margin-bottom: 0;
+    line-height: 19px;
+  }
+  #section-tabs-header-subtitle {
+    display: block;
+    font-size: 11px;
+    font-style: italic;
+    color: inherit;
   }
 
   & > *:first-child {
-    border-top: 0;
+    border-top: 0 !important; // oldskool important
   }
 
-  & > ul {
+  & > ul,
+  // oldskool overrides
+  & > nav > ul {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -112,30 +130,43 @@
   & > ul + ul {
     border-top: 1px solid $listBorderColor;
   }
+
+  a.active {
+    background-color: $activeBG;
+    border-bottom-color: lighten($borderColor, 15%);
+    border-top-color: lighten($activeBG, 2%);
+    &:hover {
+      background-color: $activeBG;
+    }
+  }
 }
 
 .nav-links {
   @include clearfix();
+  overflow: visible;
   padding-left:0;
-}
-.nav-links > li {
-  float: left;
-}
-.nav-links > li > a {
-  padding-right: 8px;
-  padding-left: 8px;
-  margin-right: 2px;
-  line-height: 4px; // keeps the overall height an even number
-  color: $gray;
-  font-size: 11px;
-  font-weight: bold;
 
-  &.active, &:hover {
-    color: $black;
-  }
+  & > li {
+    float: left;
 
-  &:first-child {
-    padding-left: 0;
+    & > a {
+      padding-right: 8px;
+      padding-left: 8px;
+      margin-right: 2px;
+      line-height: 4px; // keeps the overall height an even number
+      color: $gray;
+      font-size: 11px;
+      font-weight: bold;
+
+      &.active, &:hover {
+        color: $black;
+        background: none;
+      }
+
+      &:first-child {
+        padding-left: 0;
+      }
+    }
   }
 }
 
@@ -154,4 +185,84 @@
   }
 }
 
+.box-shadow {
+  @include box-shadow(0 2px 4px rgba(0,0,0,.25))
+}
+
+.box-with-header,
+.triangle-box,
+.triangle-box-with-header {
+  @include box-with-header;
+}
+
+.triangle-box,
+.triangle-box-with-header {
+  position: relative; // for the triangle
+  margin-left: 20px;
+
+  .box-header {
+    // relative position to sit on top of the triangle
+    position: relative;
+    z-index: 1;
+  }
+
+  // the triangle
+  &:before {
+    content: ' ';
+    display: block;
+    height: 16px;
+    width: 16px;
+    position: absolute;
+    top: 15px;
+    left: -9px;
+    @include rotate(45deg);
+    border: solid 1px $borderColor;
+    border-right: none;
+    border-top: none;
+    background: $white;
+    .ie & {
+      display: none;
+    }
+  }
+}
+
+.triangle-box-with-header:before {
+  @include box-shadow(0 1px 1px 0px lighten($borderColor, 30%));
+  @include gradient-directional(lighten($contentCalloutColor, 4%), $contentCalloutColor, 45deg);
+}
+
+.checkbox-inline {
+  padding-top: 4px;
+}
+
+.page-action-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  > li {
+    > a {
+      display: block;
+      color: $gray;
+      font-weight: bold;
+      border-bottom: solid 1px lighten($grayLight, 10%);
+      @include box-shadow(0 1px 0px rgba(255, 255, 255, 0.85));
+      padding: 8px 0;
+
+      &:hover {
+        text-decoration: none;
+        color: $blue;
+        i {
+          background-image: url(../../../images/blue/canvas-icons-16x16-blue.png);
+        }
+      }
+
+      &:active {
+        color: $grayLight;
+        i {
+          background-image: url(../../../images/blue/canvas-icons-16x16-ltgrey.png);
+        }
+      }
+    }
+  }
+}
 

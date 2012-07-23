@@ -1,0 +1,53 @@
+{{#ifEqual state "loaded"}}
+  <div class="image-block">
+    <div class="image-block-image">
+      {{#if image_url}}
+      <img class="thumbnail" src="{{image_url}}"/>
+      {{/if}}
+    </div>
+
+    <div class="attributes image-block-content">
+      <a data-event="editTitle" class="title" href="#">{{title}}</a>
+      <input style='display:none' class="title" placeholder="Title" value="{{title}}">
+      <div class="not-important">{{link_url}}</div>
+      <p>
+        <a data-event="editDescription" class="description" href="#">
+          {{#if description}}
+            {{description}}
+          {{else}}
+            {{#t "add_a_description_of_this_here"}}Add a description of this here.{{/t}}
+          {{/if}}
+        </a>
+        <textarea style='display:none' class="description">{{description}}</textarea>
+      </p>
+      <p class="thumbnail-controls">
+        {{#if showThumbForwardAndBack}}
+          <div class="choose-thumbnail clearfix">
+            <span class="btn-group">
+              <button class="btn btn-mini" title="Previous Thumbnail" data-event="prevImage">&#9664;</button>
+              <button class="btn btn-mini" title="Next Thumbnail" data-event="nextImage">&#9654;</button>
+            </span>
+            <span class="not-important">{{#t "choose_a_thumbnail"}}Choose a Thumbnail{{/t}}</span>
+          </div>
+
+          <!-- preload all the images -->
+          {{#each images}}<img src="{{url}}" style="display:none"/>{{/each}}
+
+        {{/if}}
+        <label class="checkbox">
+          <input {{#unless images}}disabled{{/unless}} {{#unless image_url}}checked{{/unless}} data-event="toggleThumbnail" type="checkbox">
+          <span class="not-important">{{#t "no_thumbnail"}}No Thumbnail{{/t}}</span>
+        </label>
+      </p>
+    </div>
+  </div>
+{{/ifEqual}}
+
+{{#ifEqual state "loading"}}
+  <h5>{{#t "loading..."}}Loading...{{/t}}</h5>
+{{/ifEqual}}
+
+{{#ifEqual state "noData"}}
+  <h5>{{#t "no_data"}}Hmm, nothing there...{{/t}}</h5>
+{{/ifEqual}}
+

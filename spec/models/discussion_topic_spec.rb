@@ -211,36 +211,23 @@ describe DiscussionTopic do
   end
 
   context "refresh_subtopics" do
-    def topic_for_group_assignment
-      course_with_student(:active_all => true)
-      group_category = @course.group_categories.create(:name => "category")
-      @group1 = @course.groups.create(:name => "group 1", :group_category => group_category)
-      @group2 = @course.groups.create(:name => "group 2", :group_category => group_category)
-
-      @topic = @course.discussion_topics.build(:title => "topic")
-      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
-      @assignment.infer_due_at
-      @assignment.saved_by = :discussion_topic
-      @topic.assignment = @assignment
-      @topic.save
-    end
-
     it "should be a no-op unless there's an assignment and it has a group_category" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "topic")
-      @topic.refresh_subtopics.should be_nil
+      @topic.refresh_subtopics
       @topic.reload.child_topics.should be_empty
 
       @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
       @topic.assignment.saved_by = :discussion_topic
       @topic.save
-      @topic.refresh_subtopics.should be_nil
+      @topic.refresh_subtopics
       @topic.reload.child_topics.should be_empty
     end
 
     it "should create a topic per active group in the category otherwise" do
-      topic_for_group_assignment
-      subtopics = @topic.refresh_subtopics
+      group_discussion_assignment
+      @topic.refresh_subtopics
+      subtopics = @topic.reload.child_topics
       subtopics.should_not be_nil
       subtopics.size.should == 2
       subtopics.each { |t| t.root_topic.should == @topic }
@@ -248,31 +235,18 @@ describe DiscussionTopic do
       @group2.reload.discussion_topics.should_not be_empty
     end
 
-    it "should only save the subtopic if it is new or has changed and not spawn new jobs" do
-      topic_for_group_assignment
-      @topic.refresh_subtopics
-
-      count_before = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).count
-      ids_before = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).map(&:id)
-      @topic.refresh_subtopics
-      count_after = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).count
-      ids_after = Delayed::Job.find(:all, :conditions => {:tag => "DiscussionTopic#refresh_subtopics"}).map(&:id)
-
-      count_before.should eql count_after
-      ids_before.sort.should eql ids_after.sort
-    end
-
     it "should copy appropriate attributes from the parent topic to subtopics on updates to the parent" do
-      topic_for_group_assignment
-      subtopics = @topic.refresh_subtopics
+      group_discussion_assignment
+      @topic.refresh_subtopics
+      subtopics = @topic.reload.child_topics
       subtopics.each {|st| st.discussion_type.should == 'side_comment' }
       @topic.discussion_type = 'threaded'
-      @topic.save
+      @topic.save!
       subtopics.each {|st| st.reload.discussion_type.should == 'threaded' }
     end
 
     it "should not rename the assignment to match a subtopic" do
-      topic_for_group_assignment
+      group_discussion_assignment
       original_name = @assignment.title
       @assignment.reload
       @assignment.title.should == original_name
@@ -739,6 +713,24 @@ describe DiscussionTopic do
       new_topic.should be_new_record
       new_topic.materialized_view.should == [ "[]", [], [], "[]" ]
       Delayed::Job.find_all_by_strand("materialized_discussion:#{new_topic.id}").size.should == 0
+    end
+  end
+
+  context "destroy" do
+    it "should destroy the assignment and associated child topics" do
+      group_discussion_assignment
+      @topic.destroy
+      @topic.reload.should be_deleted
+      @topic.child_topics.each{ |ct| ct.reload.should be_deleted }
+      @assignment.reload.should be_deleted
+    end
+
+    it "should not revive the assignment if updated when deleted" do
+      group_discussion_assignment
+      @topic.destroy
+      @assignment.reload.should be_deleted
+      @topic.touch
+      @assignment.reload.should be_deleted
     end
   end
 end

@@ -64,6 +64,7 @@ describe UsersController, :type => :integration do
           'course_id' => @teacher_course.id,
           'muted' => false,
           'points_possible' => 15,
+          'needs_grading_count' => 1,
           'submission_types' => ['online_text_entry'],
           'due_at' => @a2.due_at.as_json,
           'html_url' => course_assignment_url(@a2.context_id, @a2),
@@ -143,6 +144,7 @@ describe UsersController, :type => :integration do
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
     @a2_json['needs_grading_count'] = 2
+    @a2_json['assignment']['needs_grading_count'] = 2
     json.should == [@a2_json]
   end
 end

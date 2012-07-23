@@ -201,6 +201,9 @@ module Api
   # See User.submissions_for_given_assignments and SubmissionsApiController#for_students
   mattr_accessor :assignment_ids_for_students_api
 
+  # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
+  UrlAttributes = Instructure::SanitizeField::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
+
   def api_user_content(html, context = @context, user = @current_user)
     return html if html.blank?
 
@@ -208,15 +211,17 @@ module Api
     # figure out what host is appropriate
     if self.is_a?(ApplicationController)
       host = request.host_with_port
+      protocol = request.ssl? ? 'https' : 'http'
     else
       host = HostUrl.context_host(context, @account_domain.try(:host))
+      protocol = HostUrl.protocol
     end
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
       obj = match.obj_class.find_by_id(match.obj_id)
       next unless obj && rewriter.user_can_view_content?(obj)
-      file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host)
+      file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
     end
     html = rewriter.translate_content(html)
 
@@ -233,7 +238,7 @@ module Api
         node['data-media_comment_type'] = 'audio'
       else
         node = Nokogiri::XML::Node.new('video', doc)
-        thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host)
+        thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host, :protocol => protocol)
         node['poster'] = thumbnail
         node['data-media_comment_type'] = 'video'
       end
@@ -241,10 +246,33 @@ module Api
       node['preload'] = 'none'
       node['class'] = 'instructure_inline_media_comment'
       node['data-media_comment_id'] = media_id
-      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1', :host => host)
+      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1', :host => host, :protocol => protocol)
       node['controls'] = 'controls'
       node['src'] = media_redirect
       anchor.replace(node)
+    end
+
+    # rewrite any html attributes that are urls but just absolute paths, to
+    # have the canvas domain prepended to make them a full url
+    #
+    # relative urls and invalid urls are currently ignored
+    UrlAttributes.each do |tag, attributes|
+      doc.css(tag).each do |element|
+        attributes.each do |attribute|
+          url_str = element[attribute]
+          begin
+            url = URI.parse(url_str)
+            # if the url_str is "//example.com/a", the parsed url will have a host set
+            # otherwise if it starts with a slash, it's a path that needs to be
+            # made absolute with the canvas hostname prepended
+            if !url.host && url_str[0] == '/'[0]
+              element[attribute] = "#{protocol}://#{host}#{url_str}"
+            end
+          rescue URI::InvalidURIError => e
+            # leave it as is
+          end
+        end
+      end
     end
 
     return doc.to_s

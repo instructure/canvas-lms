@@ -359,10 +359,11 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         <td></td>
         <td colspan="3">
           <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment %>">
-            <%= t 'course_open_enrollment', <<-TEXT, :url => course_self_enrollment_url(@context, @context.self_enrollment_code || '{{ self_enrollment_code }}'), :wrapper => '<b>\1</b>'
+            <%= t 'course_open_enrollment', <<-TEXT, :url => course_self_enrollment_url(@context, @context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
                   This course has enabled open enrollment. Students can
                   self-enroll in the course once you share with them this URL:
-                  *%{url}*
+                  *%{url}*. Alternatively, they can sign up at *%{url2}* and
+                  use the following join code: *%{code}*
                 TEXT
             %>
           </span>

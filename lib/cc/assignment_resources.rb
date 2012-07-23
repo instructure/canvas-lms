@@ -92,6 +92,15 @@ module CC
         node.rubric_identifierref CCHelper.create_key(assignment.rubric)
         node.rubric_use_for_grading assoc.use_for_grading
         node.rubric_hide_score_total assoc.hide_score_total
+        if assoc.summary_data && assoc.summary_data[:saved_comments]
+          node.saved_rubric_comments do |sc_node|
+            assoc.summary_data[:saved_comments].each_pair do |key, vals|
+              vals.each do |val|
+                sc_node.comment(:criterion_id => key){|a|a << val}
+              end
+            end
+          end
+        end
       end
       node.quiz_identifierref CCHelper.create_key(assignment.quiz) if assignment.quiz
       node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?

@@ -4,7 +4,7 @@ class AddJobsRunAtIndex < ActiveRecord::Migration
   self.transactional = false
 
   def self.connection
-    Delayed::Job.connection
+    Delayed::Backend::ActiveRecord::Job.connection
   end
 
   def self.up

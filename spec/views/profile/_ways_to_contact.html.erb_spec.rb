@@ -89,5 +89,18 @@ describe "/profile/_ways_to_contact" do
     render :partial => "profile/ways_to_contact"
     response.body.should match /confirm_channel_link/
   end
+
+  it 'should not show the "I want to log in" for non-default accounts' do
+    course_with_student
+    view_context
+    assigns[:email_channels] = []
+    assigns[:other_channels] = []
+    assigns[:sms_channels] = []
+    assigns[:user] = @user
+    assigns[:domain_root_account] = Account.create!
+
+    render :partial => "profile/ways_to_contact"
+    response.body.should_not match /I want to log in to Canvas using this email address/
+  end
 end
 

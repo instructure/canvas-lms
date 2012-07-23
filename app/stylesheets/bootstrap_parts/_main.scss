@@ -1,0 +1,27 @@
+//add variable modifications to the global _variables.sass
+//they will override bootstrap styles
+@import 'environment';
+
+
+// Grid system and page structure
+@include gridFluid($fluidGridColumnWidth, $fluidGridGutterWidth);
+
+// Base CSS
+@import "forms";
+
+// Components: common
+@import "bootstrap/close";
+@import "bootstrap/wells";
+
+// Components: Buttons & Alerts
+@import "bootstrap/alerts"; // Note: alerts share common CSS with buttons and thus have styles in buttons.less
+
+// Components: Nav
+@import "bootstrap/navs"; // look at nav links on styleguide and on dashboard
+
+// Components: Popovers
+//@import "bootstrap/tooltip"; //want
+//@import "bootstrap/popovers"; //want
+
+
+@import "overrides";

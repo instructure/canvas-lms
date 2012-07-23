@@ -48,7 +48,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'
   belongs_to :old_assignment, :class_name => 'Assignment'
-  belongs_to :root_topic, :class_name => 'DiscussionTopic', :touch => true
+  belongs_to :root_topic, :class_name => 'DiscussionTopic'
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
   has_many :discussion_entry_participants, :through => :discussion_entries
@@ -113,28 +113,35 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_subtopics
-    if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.has_group_category?
+    if !self.deleted? && self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.has_group_category?
       send_later_if_production :refresh_subtopics
     end
   end
 
   def refresh_subtopics
-    category = self.assignment && self.assignment.group_category
-    return unless category && self.context && self.context.respond_to?(:groups)
-    category.groups.active.map do |group|
-      topic = group.discussion_topics.active.find_or_initialize_by_root_topic_id(self.id)
-      topic.message = self.message
-      topic.title = "#{self.title} - #{group.name}"
-      topic.assignment_id = self.assignment_id
-      topic.user_id = self.user_id
-      topic.discussion_type = self.discussion_type
-      topic.save if topic.changed?
-      topic
+    return if self.deleted?
+    category = self.assignment.try(:group_category)
+    return unless category && self.root_topic_id.blank?
+    category.groups.active.each do |group|
+      group.shard.activate do
+        DiscussionTopic.unique_constraint_retry do
+          topic = DiscussionTopic.scoped(:conditions => { :context_id => group.id, :context_type => 'Group', :root_topic_id => self.id }).first
+          topic ||= group.discussion_topics.build{ |dt| dt.root_topic = self }
+          topic.message = self.message
+          topic.title = "#{self.title} - #{group.name}"
+          topic.assignment_id = self.assignment_id
+          topic.user_id = self.user_id
+          topic.discussion_type = self.discussion_type
+          topic.save if topic.changed?
+          topic
+        end
+      end
     end
   end
 
   attr_accessor :saved_by
   def update_assignment
+    return if self.deleted?
     if !self.assignment_id && @old_assignment_id
       self.context_module_tags.each { |tag| tag.confirm_valid_module_requirements }
     end
@@ -420,8 +427,13 @@ class DiscussionTopic < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
     self.save
-    if self.for_assignment?
+
+    if self.for_assignment? && self.root_topic_id.blank?
       self.assignment.destroy unless self.assignment.deleted?
+    end
+
+    self.child_topics.each do |child|
+      child.destroy
     end
   end
 

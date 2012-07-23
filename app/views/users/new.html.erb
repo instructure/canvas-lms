@@ -1,81 +1,30 @@
-<% 
-  jammit_css :login
-  @headers = false
-  @body_classes << "modal" if @body_classes
-  content_for :page_title, t('register_as_teacher', "Register as a Teacher")
-  @errors = [] 
-  [@user, @pseudonym].each do |obj|
-    obj.errors.full_messages.each do |m| 
-      if !["Pseudonyms is invalid"].include?(m) 
-        @errors << m.gsub("Unique", "Login")
-      end
-    end
-  end
-%>
-<% js_block do %>
-<script type="text/javascript">
-require([
-  'i18nObj' /* I18n.t */,
-  'jquery' /* $ */,
-  'jquery.fancyplaceholder' /* fancyPlaceholder */,
-  'jquery.instructure_forms' /* getFormData, formErrors */,
-  'jquery.rails_flash_notifications' /* flashError */
-], function(I18n, $) {
-
-$(function(){
-  $(".field-with-fancyplaceholder input").fancyPlaceholder();
-  var $form = $("#register_form");
-  $form.find(':text:first').focus();
-  $form.submit(function(event) {
-    var data = $form.getFormData({object_name: 'pseudonym'}),
-        success = true;
-    
-    if(!data['user[name]']) {
-      $form.formErrors({
-        'user[name]': <%= jt("username_required", "User name is required") %>
-      });
-      success = false;
-    } 
-    if(!data.unique_id || !data.unique_id.length || data.unique_id.length < 3 || !data.unique_id.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,10}$/i)) {
-      $form.formErrors({
-        unique_id: <%= jt("invalid_email", "Invalid Email Address") %>
-      });
-      success = false;
-    } 
-    return success;
-  });
-  var errors = <%= raw(@errors.join(', ').to_json) %>;
-  if (errors) {
-    $.flashError(<%= jt("problems_with_fields", 'There were problems with the following fields: %{errors}', '{errors: errors}') %>);
+<%
+  js_bundle :registration
+  jammit_css :registration
+  js_env :USER => {
+    :LOGIN_HANDLE_NAME => (@domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name),
+    :MIN_AGE => User.self_enrollment_min_age
   }
-});
-});
-</script>
+%>
+<% content_for :head do %>
+  <%= include_stylesheets :common, :media => "all" %>
 <% end %>
-<div id="modal-box-top"></div>
-<div id="modal-box-arbitrary-size">
-  <div style="margin: 30px 80px 0; position: relative;">
-    <h2><%= t('register_for_new_account', 'Register for a new account') %></h2>
-    <% form_for @pseudonym, :url => users_path, :html => {:id => "register_form", :method => :post} do |form|  %>
-      <table>
-        <tr>
-          <td colspan="2">
-            <input type="hidden" name="new_teacher" value="1"/>
-            <span class="field-with-fancyplaceholder"><%= label :user, :name, t('your_name', "Your name") %><%= text_field :user, :name, :class => "text" %></span>
-            <span class="field-with-fancyplaceholder"><%= form.label :unique_id, t('email_address', "Email address") %><%= form.text_field :unique_id, :class => "text", :value => @pseudonym.try(:unique_id) %></span>
-          </td>
-        </tr>
-        <% Canvas::Plugin.all_for_tag('registration_form').each do |plugin| %>
-          <%= render :partial => plugin.settings[:registration_partial] %>
-        <% end %>
-        <tr>
-          <td colspan="2">
-            <button type="submit" class="button"><%= t('buttons.register', 'Register') %></button>
-          </td>
-        </tr>
-      </table>
-    <% end %>
+
+<div id="registration_header">
+  <div class="registration-content">
+    <h1><a href="http://www.instructure.com">Instructure</a></h1>
+    <a id="registration_login" href="/login">Login</a>
   </div>
-  <div class="clear"></div>
 </div>
-<div id="modal-box-bottom"></div>
+
+<div id="registration_content">
+  <div class="registration-content">
+    <h2 id="registration_video"><a href="http://vimeo.com/35336470" title="Play the Canvas introduction video">Watch a Video</a></h2>
+    <div id="registration_options">
+      <h2>Sign up now, it's free!</h2>  
+      <a href="#" id="signup_teacher" class="signup_link" data-template="teacherDialog" title="Teacher Signup">I'm a Teacher</a>
+      <a href="#" id="signup_student" class="signup_link" data-template="studentDialog" title="Student Signup">I'm a Student</a>
+      <a href="#" class="signup_link" data-template="parentDialog" title="Parent Signup">Parents sign up here</a>
+    </div>
+  </div>
+</div>
