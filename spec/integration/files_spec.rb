@@ -270,4 +270,15 @@ describe FilesController do
     thumb = @attachment.thumbnails.find_by_thumbnail(CollectionItemData::THUMBNAIL_SIZE)
     response.should redirect_to(thumb.authenticated_s3_url)
   end
+  
+  it "should reorder files" do
+    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
+    att1 = attachment_model(:uploaded_data => stub_png_data, :context => @course)
+    att2 = attachment_model(:uploaded_data => stub_png_data("file2.png"), :context => @course)
+    
+    post "/courses/#{@course.id}/files/reorder", {:order => "#{att2.id}, #{att1.id}", :folder_id => @folder.id}
+    response.should be_success
+    
+    @folder.file_attachments.by_position_then_display_name.should == [att2, att1]
+  end
 end
