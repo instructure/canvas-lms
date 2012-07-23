@@ -735,7 +735,7 @@ class FilesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_files)
       @folders = @folder.active_sub_folders.by_position
       @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
-      @folder.file_attachments.by_position.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
+      @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
       @folder.reload
       render :json => @folder.subcontent.to_json(:methods => :readable_size, :permissions => {:user => @current_user, :session => session})
     end
