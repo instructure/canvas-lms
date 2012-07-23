@@ -52,7 +52,8 @@ module Api::V1::Course
     if include_description
       hash['public_description'] = course.public_description
     end
-    hash['html_url'] = course_url(course, :host => HostUrl.context_host(course)) if include_url
+    request = self.respond_to?(:request) ? self.request : nil
+    hash['html_url'] = course_url(course, :host => HostUrl.context_host(course, request.try(:host_with_port))) if include_url
     hash
   end
 
