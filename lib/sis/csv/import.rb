@@ -144,6 +144,8 @@ module SIS
               rebalance_csvs(importer)
             end
             @batch.data[:importers][importer] = @csvs[importer].length
+            @batch.data[:counts] = {}
+            @batch.data[:current_row] = 0
           end
           @batch.save!
           @rows = nil
@@ -212,7 +214,7 @@ module SIS
           if @parallelism > 1
             SisBatch.transaction do
               @batch.reload(:select => 'data, progress', :lock => true)
-              @current_row += @batch.data[:current_row] if @batch.data[:current_row]
+              @current_row += @batch.data[:current_row]
               @batch.data[:current_row] = @current_row
               @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
               @batch.save
