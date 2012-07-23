@@ -44,11 +44,15 @@ define [
             class: 'btn-primary'
           ]
           return
-        $form.formErrors flatten
+        errors = flatten
           user: User::normalizeErrors(errors.user)
           pseudonym: Pseudonym::normalizeErrors(errors.pseudonym)
           observee: Pseudonym::normalizeErrors(errors.observee)
         , arrays: false
+        if errors['user[birthdate]']
+          errors['user[birthdate(1)]'] = errors['user[birthdate]']
+          delete errors['user[birthdate]']
+        $form.formErrors errors
 
     $node.dialog
       resizable: false

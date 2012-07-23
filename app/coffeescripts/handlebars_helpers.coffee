@@ -6,10 +6,11 @@ define [
   'underscore'
   'str/htmlEscape'
   'compiled/util/semanticDateRange'
+  'compiled/util/dateSelect'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (ENV, Handlebars, I18n, $, _, htmlEscape, semanticDateRange) ->
+], (ENV, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (key, defaultValue, options) ->
@@ -162,5 +163,9 @@ define [
     toSentence: (context, options) ->
       results = _.map(context, (c) -> options.fn(c))
       $.toSentence(results)
+
+    dateSelect: (name, options) ->
+      new Handlebars.SafeString dateSelect(name, options.hash).html()
+      
   }
   return Handlebars

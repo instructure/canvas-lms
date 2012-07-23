@@ -129,7 +129,9 @@ describe "user selenium tests" do
       form = fj('.ui-dialog:visible form')
       f('#student_join_code').send_keys(@course.self_enrollment_code)
       f('#student_name').send_keys('student!')
-      f('#student_birthdate').send_keys('1/1/1980')
+      form.find_element(:css, "select[name='user[birthdate(1)]'] option[value='#{Time.now.year - 20}']").click
+      form.find_element(:css, "select[name='user[birthdate(2)]'] option[value='1']").click
+      form.find_element(:css, "select[name='user[birthdate(3)]'] option[value='1']").click
       f('#student_username').send_keys('student')
       f('#student_password').send_keys('asdfasdf')
       f('#student_password_confirmation').send_keys('asdfasdf')
@@ -147,7 +149,9 @@ describe "user selenium tests" do
       form = fj('.ui-dialog:visible form')
       f('#student_higher_ed_name').send_keys('student!')
       f('#student_higher_ed_email').send_keys('student@example.com')
-      f('#student_higher_ed_birthdate').send_keys('1/1/1980')
+      form.find_element(:css, "select[name='user[birthdate(1)]'] option[value='#{Time.now.year - 20}']").click
+      form.find_element(:css, "select[name='user[birthdate(2)]'] option[value='1']").click
+      form.find_element(:css, "select[name='user[birthdate(3)]'] option[value='1']").click
       form.find_element(:css, 'input[name="user[terms_of_use]"]').click
 
       expect_new_page_load { form.submit }

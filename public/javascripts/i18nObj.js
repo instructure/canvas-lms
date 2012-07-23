@@ -563,6 +563,9 @@ I18n.scope.prototype = {
   },
   toPercentage: function(number, options) {
     return I18n.toPercentage(number, options);
+  },
+  lookup: function(scope, options) {
+    return I18n.lookup(this.resolveScope(scope), options);
   }
 };
 I18n.scope.prototype.t = I18n.scope.prototype.translate;
