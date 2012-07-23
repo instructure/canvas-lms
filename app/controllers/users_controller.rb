@@ -914,6 +914,7 @@ class UsersController < ApplicationController
     pending_user_id = params[:pending_user_id] || session[:pending_user_id]
     @pending_other_user = User.find_by_id(pending_user_id) if pending_user_id.present?
     @pending_other_user = nil if @pending_other_user == @user
+    @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
     @other_user = User.find_by_id(params[:new_user_id]) if params[:new_user_id].present?
     if authorized_action(@user, @current_user, :manage_logins)
       if @user && (params[:clear] || !@pending_other_user)

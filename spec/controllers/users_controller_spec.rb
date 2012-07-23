@@ -602,4 +602,16 @@ describe UsersController do
       feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
+
+  describe "GET 'admin_merge'" do
+    it "should not allow you to view any user by id" do
+      account_admin_user
+      user_session(@admin)
+      user_with_pseudonym(:account => Account.create!)
+
+      get 'admin_merge', :user_id => @admin.id, :pending_user_id => @user.id
+      response.should be_success
+      assigns[:pending_other_user].should be_nil
+    end
+  end
 end

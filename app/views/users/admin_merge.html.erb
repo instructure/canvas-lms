@@ -72,7 +72,7 @@
         <tr>
           <td style="vertical-align: top; padding: 10px 30px 10px;">
             <h3><%= t('titles.find_user', 'Find a User') %></h3>
-            <% accounts = @current_user.associated_accounts.sort_by(&:name).uniq %>
+            <% accounts = @current_user.associated_accounts.sort_by(&:name).uniq.select { |a| a.grants_rights?(@current_user, session, :manage_user_logins, :read_roster).values.all? } %>
             <% if accounts.empty? %>
               <%= t('no_permission', "You don't have permission to search any accounts") %>
             <% else %>
