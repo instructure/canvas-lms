@@ -10,7 +10,7 @@
   <h2><%= t(:title, "SIS Import") %></h2>
 
   <div class="sis_messages" style="<%= hidden %>">
-    <div class="ui-state-error error_message"></div>
+    <div class="ui-state-error sis_error_message" style="padding: 0.5em 1em"></div>
     <%= link_to t(:try_import_again_link, "Try import again"), account_sis_import_path %>
   </div>
   
