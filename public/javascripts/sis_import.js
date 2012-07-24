@@ -134,14 +134,14 @@ $(document).ready(function(event) {
           $(".progress_bar_holder").hide();
           $("#sis_importer").hide();
           var message = I18n.t('errors.import_failed_code', "There was an error importing your SIS data. No records were imported.  Please notify your system administrator and give them the following code: \"%{code}\"", {code: code});
-          $(".sis_messages .error_message").html(message);
+          $(".sis_messages .sis_error_message").html(message);
           $(".sis_messages").show();
         } else if(sis_batch.workflow_state == 'failed_with_messages') {
           $(".progress_bar_holder").hide();
           $("#sis_importer").hide();
           var message = I18n.t('errors.import_failed_messages', "No SIS records were imported. The import failed with these messages:");
           message += createMessageHtml(sis_batch);
-          $(".sis_messages .error_message").html(message);
+          $(".sis_messages .sis_error_message").html(message);
           $(".sis_messages").show();
         } else if(sis_batch.workflow_state == 'imported_with_messages') {
           $(".progress_bar_holder").hide();
@@ -174,7 +174,7 @@ $(document).ready(function(event) {
        startPoll();
      } else {
        //show error message
-       $(".sis_messages .error_message").text(data.error_message);
+       $(".sis_messages .sis_error_message").text(data.error_message);
        $(".sis_messages").show();
        if(data.batch_in_progress){
          startPoll();
