@@ -34,5 +34,24 @@ describe "/quizzes/_question_statistic" do
     response.should_not be_nil
     response.body.should =~ /title of glory/
   end
+
+  it "should not show the submitter's name on anonymous surveys" do
+    course_with_student
+    view_context
+    assigns[:quiz] = @course.quizzes.create! :anonymous_submissions => true,
+                                             :quiz_type => 'graded_survey'
+    question = {
+      :essay_responses => [
+        {:text => "Bacon is delicious", :user_id => @student.id}
+      ],
+      :question_name => "Question",
+      :id => 1,
+      :unexpected_response_values => [],
+    }
+
+    render :partial => 'quizzes/question_statistic', :object => question
+    response.should_not be_nil
+    response.body.should_not include @student.name
+  end
 end
 
