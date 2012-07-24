@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -367,18 +367,19 @@ class GradebooksController < ApplicationController
   end
 
   def change_gradebook_version
-    if params[:reset]
-      @current_user.preferences.delete :use_gradebook2
-    else
-      @current_user.preferences[:use_gradebook2] = true
-    end
+    @current_user.preferences[:use_gradebook2] = params[:version] == '2'
     @current_user.save!
     redirect_to_appropriate_gradebook_version
   end
 
   def redirect_to_appropriate_gradebook_version
-    gradebook_version_to_use = @current_user.preferences[:use_gradebook2] ? 'gradebook2' : 'gradebook'
-    redirect_to named_context_url(@context, "context_#{gradebook_version_to_use}_url")
+    if @current_user.preferences[:use_gradebook2].nil?
+      gradebook_version = :gradebook2
+    else
+      gradebook_version = @current_user.preferences[:use_gradebook2] ? :gradebook2 : :gradebook
+    end
+
+    redirect_to named_context_url(@context, "context_#{gradebook_version}_url")
   end
   protected :redirect_to_appropriate_gradebook_version
 
