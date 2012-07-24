@@ -220,6 +220,18 @@ describe "gradebook2" do
       end
     end
 
+    it "should give a quiz submission 30 extra seconds before making it late" do
+      submission = Submission.last
+      assignment = submission.assignment
+      assignment.update_attribute(:due_at, Time.now)
+      submission.update_attribute(:submitted_at, assignment.due_at + 30.seconds)
+      submission.update_attribute(:submission_type, 'online_quiz')
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      ff('.late').count.should == 0
+    end
+
     describe "message students who" do
       it "should send messages" do
         message_text = "This is a message"

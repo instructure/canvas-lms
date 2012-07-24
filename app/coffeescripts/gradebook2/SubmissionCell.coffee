@@ -1,8 +1,9 @@
 define [
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
+  'underscore'
   'jquery.ajaxJSON'
-], (GRADEBOOK_TRANSLATIONS, $) ->
+], (GRADEBOOK_TRANSLATIONS, $, _) ->
 
   class SubmissionCell
 
@@ -76,7 +77,9 @@ define [
     @classesBasedOnSubmission: (submission={}, assignment={}) ->
       classes = []
       classes.push('resubmitted') if submission.grade_matches_current_submission == false
-      classes.push('late') if assignment.due_at && submission.submitted_at && (submission.submitted_at.timestamp > assignment.due_at.timestamp)
+      if assignment.due_at && submission.submitted_at
+        classes.push('late') if submission.submission_type isnt 'online_quiz' && (submission.submitted_at.timestamp > assignment.due_at.timestamp)
+        classes.push('late') if submission.submission_type is 'online_quiz' && ((submission.submitted_at.timestamp - assignment.due_at.timestamp) > 30)
       classes.push('dropped') if submission.drop
       classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
       classes.push('muted') if assignment.muted
