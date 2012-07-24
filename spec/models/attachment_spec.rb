@@ -498,6 +498,7 @@ describe Attachment do
       coursea = @course
       @context = courseb = course
       b = a.clone_for(courseb, nil, :overwrite => true)
+      b.save
       b.context.should == courseb
       b.root_attachment.should == a
 
@@ -510,6 +511,14 @@ describe Attachment do
 
       new_b = b.clone_for(courseb, nil, :overwrite => true)
       new_b.root_attachment_id.should == a.id
+
+      @context = coursec = course
+      c = b.clone_for(coursec, nil, :overwrite => true)
+      c.root_attachment.should == a
+
+      new_a = c.clone_for(coursea, nil, :overwrite => true)
+      new_a.should == a
+      new_a.root_attachment_id.should be_nil
 
       # pretend b's content changed so it got disconnected
       b.update_attribute(:root_attachment_id, nil)
