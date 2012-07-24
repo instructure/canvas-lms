@@ -165,8 +165,9 @@ class Attachment < ActiveRecord::Base
     end
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
-    root_id = ([self.root_attachment_id, self.id] - [dup.id, nil]).first
-    dup.root_attachment_id = root_id
+    if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
+      dup.root_attachment_id = self.root_attachment_id || self.id
+    end
     dup.context = context
     dup.migration_id = CC::CCHelper.create_key(self)
     context.log_merge_result("File \"#{dup.folder.full_name rescue ''}/#{dup.display_name}\" created") if context.respond_to?(:log_merge_result)
