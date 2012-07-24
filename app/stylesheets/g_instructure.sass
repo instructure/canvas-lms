@@ -1214,28 +1214,32 @@ html > body .new_activity_message form textarea
     .ui-widget
       margin: 0 8px 8px 0
     .person
-      float: left
+      display: inline-block
+      position: relative
       background: #FFF
       margin: 0 8px 8px 0
-      padding: 8px
+      padding: 4px
       font-size: 11px
-      height: 20px
+      min-height: 21px
       -webkit-box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
       -moz-box-shadow:    inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
       box-shadow:         inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
       div
         margin: 2px 0 0 33px
+      .name::after
+        content: "\a0"
       .address, .login
         font-weight: normal
-      span
-        height: 20px
-        width: 20px
-        float: left
-        background: #F7F7F7 url(/images/circle-plus.png) no-repeat center center
-      &.existing-user
-        span
-          background: #F7F7F7 url(/images/circle-check.png) no-repeat center center
-
+      &::before
+        content: ""
+        display: block
+        height: 100%
+        background: url(/images/circle-plus.png) no-repeat center center
+        position: absolute
+        margin: -4px
+        width: 33px
+      &.existing-user::before
+        background-image: url(/images/circle-check.png)
 
 body > #ui-datepicker-div
   display: none
