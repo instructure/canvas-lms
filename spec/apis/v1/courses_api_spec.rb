@@ -202,6 +202,94 @@ describe CoursesController, :type => :integration do
     end
   end
 
+  describe "course update" do
+    before do
+      Course.any_instance.unstub(:start_at, :end_at)
+      account_admin_user
+      @path   = "/api/v1/courses/#{@course.id}"
+      @params = { :controller => 'courses', :action => 'update', :format => 'json', :id => @course.to_param }
+      @new_values = { 'course' => {
+        'name' => 'New Name',
+        'course_code' => 'NEW-001',
+        'sis_course_id' => 'NEW12345',
+        'start_at' => '2012-03-01T00:00:00Z',
+        'end_at' => '2012-03-30T23:59:59Z',
+        'license' => 'public_domain',
+        'is_public' => true,
+        'public_description' => 'new description',
+        'allow_student_assignment_edits' => true,
+        'allow_wiki_comments' => true,
+        'allow_student_forum_attachments' => true,
+        'open_enrollment' => true,
+        'self_enrollment' => true,
+        'restrict_enrollments_to_course_dates' => true
+      }, 'offer' => true }
+    end
+
+    context "an account admin" do
+      it "should be able to update a course" do
+        json = api_call(:put, @path, @params, @new_values)
+        @course.reload
+
+        json['name'].should eql @new_values['course']['name']
+        json['course_code'].should eql @new_values['course']['course_code']
+        json['start_at'].should eql @new_values['course']['start_at']
+        json['end_at'].should eql @new_values['course']['end_at']
+        json['sis_course_id'].should eql @new_values['course']['sis_course_id']
+
+        @course.name.should eql @new_values['course']['name']
+        @course.course_code.should eql @new_values['course']['course_code']
+        @course.start_at.strftime('%Y-%m-%dT%H:%M:%SZ').should eql @new_values['course']['start_at']
+        @course.end_at.strftime('%Y-%m-%dT%H:%M:%SZ').should eql @new_values['course']['end_at']
+        @course.sis_course_id.should eql @new_values['course']['sis_course_id']
+        @course.license.should == 'public_domain'
+        @course.is_public.should be_true
+        @course.public_description.should == 'new description'
+        @course.allow_student_assignment_edits.should be_true
+        @course.allow_wiki_comments.should be_true
+        @course.allow_student_forum_attachments.should be_true
+        @course.open_enrollment.should be_true
+        @course.self_enrollment.should be_true
+        @course.restrict_enrollments_to_course_dates.should be_true
+        @course.workflow_state.should == 'available'
+      end
+    end
+
+    context "a teacher" do
+      before do
+        user
+        enrollment = @course.enroll_teacher(@user)
+        enrollment.accept!
+        @new_values['course'].delete('sis_course_id')
+      end
+
+      it "should be able to update a course" do
+        json = api_call(:put, @path, @params, @new_values)
+
+        json['name'].should eql @new_values['course']['name']
+        json['course_code'].should eql @new_values['course']['course_code']
+        json['start_at'].should eql @new_values['course']['start_at']
+        json['end_at'].should eql @new_values['course']['end_at']
+      end
+
+      it "should not be able to update the sis id" do
+        original_sis = @course.sis_source_id
+        raw_api_call(:put, @path, @params, @new_values.merge(:sis_course_id => 'NEW123'))
+        @course.reload
+        @course.sis_source_id.should eql original_sis
+      end
+    end
+
+    context "an unauthorized user" do
+      before { user }
+
+      it "should return 401 unauthorized" do
+         raw_api_call(:put, @path, @params, @new_values)
+         response.code.should eql '401'
+      end
+    end
+  end
+
   describe "course deletion" do
     before do
       account_admin_user

@@ -657,6 +657,7 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :courses) do |courses|
       courses.get 'courses', :action => :index
       courses.post 'accounts/:account_id/courses', :action => :create
+      courses.put 'courses/:id', :action => :update
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'

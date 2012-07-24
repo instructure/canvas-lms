@@ -1004,8 +1004,28 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Update a course
+  # Update an existing course.
+  #
+  # For possible arguments, see the Courses#create documentation (note: the enroll_me param is not allowed in the update action).
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id> \ 
+  #     -X PUT \ 
+  #     -H 'Authorization: Bearer <token>' \ 
+  #     -d 'course[name]=New course name' \ 
+  #     -d 'course[start_at]=2012-05-05T00:00:00Z'
+  #
+  # @example_response
+  #   {
+  #     "name": "New course name",
+  #     "course_code": "COURSE-001",
+  #     "start_at": "2012-05-05T00:00:00Z",
+  #     "end_at": "2012-08-05T23:59:59Z",
+  #     "sis_course_id": "12345"
+  #   }
   def update
-    @course = Course.find(params[:id])
+    @course = api_find(Course, params[:id])
     if authorized_action(@course, @current_user, :update)
       root_account_id = params[:course].delete :root_account_id
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
@@ -1036,6 +1056,7 @@ class CoursesController < ApplicationController
           params[:course].delete :course_code
         end
       end
+      params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
       if sis_id = params[:course].delete(:sis_source_id)
         if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
           if sis_id == ''
@@ -1045,7 +1066,9 @@ class CoursesController < ApplicationController
           end
         end
       end
-      @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+   params[:course][:event] = :offer if params[:offer].present?
+   @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+      params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request?
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
         if @course.update_attributes(params[:course])
@@ -1055,7 +1078,13 @@ class CoursesController < ApplicationController
           end
           flash[:notice] = t('notices.updated', 'Course was successfully updated.')
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
-          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok }
+          format.json do
+            if api_request?
+              render :json => course_json(@course, @current_user, session, [], nil)
+            else
+             render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok 
+            end
+          end
         else
           format.html { render :action => "edit" }
           format.json { render :json => @course.errors.to_json, :status => :bad_request }
