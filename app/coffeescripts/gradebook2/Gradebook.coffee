@@ -406,6 +406,13 @@ define [
     fixMaxHeaderWidth: ->
       @$grid.find('.slick-header-columns').width(1000000)
 
+    # SlickGrid doesn't have a blur event for the grid, so this mimics it in
+    # conjunction with a click listener on <body />. When we 'blur' the grid
+    # by clicking outside of it, save the current field.
+    onGridBlur: (e) =>
+      return if e.target.className.match(/cell|slick/) or !@gradeGrid.getActiveCell?
+      @gradeGrid.getEditorLock().commitCurrentEdit()
+
     onGridInit: () ->
       @fixColumnReordering()
       tooltipTexts = {}
@@ -660,6 +667,8 @@ define [
       @gradeGrid.onCellChange.subscribe (event, data) =>
         @calculateStudentGrade(data.item)
         @gradeGrid.invalidate()
+      # this is a faux blur event for SlickGrid.
+      $('body').on('click', @onGridBlur)
       sortRowsBy = (sortFn) =>
         @rows.sort(sortFn)
         student.row = i for student, i in @rows

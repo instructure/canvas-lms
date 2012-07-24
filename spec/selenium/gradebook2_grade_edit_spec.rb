@@ -129,6 +129,21 @@ describe "edititing grades" do
     end
   end
 
+  it "should update a grade when clicking outside of slickgrid" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    first_cell = f('#gradebook_grid [row="0"] .l0')
+    grade_input = keep_trying_until do
+      first_cell.click
+      first_cell.find_element(:css, '.grade')
+    end
+    set_value(grade_input, 3)
+    ff('body')[0].click
+    wait_for_ajax_requests
+    ff('.gradebook_cell_editable').count.should eql 0
+  end
+
   it "should validate curving grades option" do
     curved_grade_text = "8"
 
