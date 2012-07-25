@@ -287,7 +287,7 @@ class AssessmentItemConverter
     text = node.inner_html.strip
     # Clear WebCT-specific relative paths
     text.gsub!(WEBCT_REL_REGEX, '')
-    text.gsub(%r{/webct/urw/[^/]+/RelativeResourceManager\?contentID=(\d*)}, "$CANVAS_OBJECT_REFERENCE$/attachments/\\1")
+    text.gsub(%r{/?webct/urw/[^/]+/RelativeResourceManager\?contentID=(\d*)}, "$CANVAS_OBJECT_REFERENCE$/attachments/\\1")
   end
 
   KNOWN_META_CLASSES = ['FORMATTED_TEXT_BLOCK', 'flow_1']
