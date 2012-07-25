@@ -31,9 +31,8 @@
     box-shadow: 0 1px 1px rgba(0,0,0,0.25)
     border-bottom-color: rgba(0,0,0,0.5)
     margin: 0
-    padding: 0
-    height: 28px
-    line-height: 28px
+    padding: 4px 40px 4px 8px
+    min-height: 20px
     vertical-align: middle
     text-align: center
     font-weight: bold
@@ -65,8 +64,8 @@
         display: none
     &.xlarge
       font-size: 1.5em
-      height: 58px
-      line-height: 58px
+      padding: 8px 40px 8px 8px
+      min-height: 42px
       i
         width: 40px
         height: 40px
@@ -74,19 +73,6 @@
       &.ui-state-error, &.ui-state-warning
         i
           background-image: url(/images/warning_36.png)
-      &.confirm-email
-        text-align: left
-        font-size: 1em
-        line-height: 1.25
-        strong
-          font-weight: normal
-          font-size: 1.4em
-          display: block
-          margin-top: 8px
-          color: #000
-        i
-          float: left
-          margin: 8px 16px 0 24px
 
 #unauthorized_message
   border: 1px solid #000
