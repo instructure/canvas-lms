@@ -429,7 +429,6 @@ define [
       @gradeGrid.getEditorLock().commitCurrentEdit()
 
     onGridInit: () ->
-      @fixColumnReordering()
       tooltipTexts = {}
       $(@spinner.el).remove()
       $('#gradebook_wrapper').show()
