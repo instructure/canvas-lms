@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2">
+  <item title="STAT11T 3.2.4-5" ident="671049711211610111432484848525149733018163906733893135949:dYTcaqL.a1TY4_wctopcode">
+    <itemmetadata>
+      <qtimetadata>
+        <vocabulary uri="imsqtiv1p2_metadata.txt" vocab_type="text/plain" />
+        <qtimetadatafield>
+          <fieldlabel>qmd_questiontype</fieldlabel>
+          <fieldentry>Multiple-choice</fieldentry>
+        </qtimetadatafield>
+      </qtimetadata>
+      <qtimetadata>
+        <vocabulary uri="webct_imsqti_metadatav1p0.txt" vocab_type="text/plain" />
+        <qtimetadatafield>
+          <fieldlabel>wct_question_labelledletter</fieldlabel>
+          <fieldentry>Yes</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>layoutHorizontal</fieldlabel>
+          <fieldentry>false</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_usedbyassessment</fieldlabel>
+          <fieldentry>Final ExaminationExtra CreditModule 1 Assessment</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_questiontype</fieldlabel>
+          <fieldentry>WCT_MultipleChoice</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_questioncategory</fieldlabel>
+          <fieldentry>Chapter 3</fieldentry>
+        </qtimetadatafield>
+      </qtimetadata>
+    </itemmetadata>
+    <presentation>
+      <flow>
+        <material>
+          <mattext xml:space="preserve" label="wct_question_label_1" texttype="TEXT/HTML" charset="US-ASCII">&lt;strong&gt;Find the midrange for the given sample data.&lt;br /&gt;&lt;br /&gt;&lt;/strong&gt;Listed below are the amounts of time (in months) that the employees of an electronics company have been working at the company. Find the midrange. &lt;br /&gt; 12  21  26  37  46  53  61  66  75  76  85  91  132  155&#xD;
+</mattext>
+          <matbreak />
+          <matimage label="wct_image_label_1" uri="/webct/urw/lc66740624001.tp66740649001/RelativeResourceManager?contentID=67320753001">f133g1_r.jpg</matimage>
+          <matbreak />
+        </material>
+        <response_lid ident="RESP_MC" rcardinality="Single">
+          <render_choice shuffle="Yes">
+            <flow_label class="Row">
+              <response_label ident="MC0" rshuffle="Yes">
+                <material>
+                  <mattext xml:space="preserve" label="wct_mc_answer_text0" texttype="TEXT/HTML" charset="US-ASCII">63.5 months</mattext>
+                  <matbreak />
+                </material>
+              </response_label>
+              <response_label ident="MC1" rshuffle="Yes">
+                <material>
+                  <mattext xml:space="preserve" label="wct_mc_answer_text1" texttype="TEXT/HTML" charset="US-ASCII">83.5 months</mattext>
+                  <matbreak />
+                </material>
+              </response_label>
+              <response_label ident="MC2" rshuffle="Yes">
+                <material>
+                  <mattext xml:space="preserve" label="wct_mc_answer_text2" texttype="TEXT/HTML" charset="US-ASCII">71.5 months</mattext>
+                  <matbreak />
+                </material>
+              </response_label>
+              <response_label ident="MC3" rshuffle="Yes">
+                <material>
+                  <mattext xml:space="preserve" label="wct_mc_answer_text3" texttype="TEXT/HTML" charset="US-ASCII">66.9 months</mattext>
+                  <matbreak />
+                </material>
+              </response_label>
+            </flow_label>
+          </render_choice>
+        </response_lid>
+      </flow>
+    </presentation>
+    <resprocessing scoremodel="AllorNothing">
+      <outcomes>
+        <decvar vartype="Decimal" varname="SCORE" minvalue="0.0" defaultval="0.0" />
+        <decvar vartype="Decimal" varname="answerValue" />
+      </outcomes>
+      <respcondition continue="Yes">
+        <conditionvar>
+          <varequal respident="RESP_MC" case="Yes">MC0</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Add">0.0</setvar>
+        <setvar varname="answerValue" action="Add">0.0</setvar>
+        <displayfeedback feedbacktype="Response" linkrefid="wct_mc_answer_fb0" />
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar>
+          <varequal respident="RESP_MC" case="Yes">MC1</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Add">100.0</setvar>
+        <setvar varname="answerValue" action="Add">100.0</setvar>
+        <displayfeedback feedbacktype="Response" linkrefid="wct_mc_answer_fb1" />
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar>
+          <varequal respident="RESP_MC" case="Yes">MC2</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Add">0.0</setvar>
+        <setvar varname="answerValue" action="Add">0.0</setvar>
+        <displayfeedback feedbacktype="Response" linkrefid="wct_mc_answer_fb2" />
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar>
+          <varequal respident="RESP_MC" case="Yes">MC3</varequal>
+        </conditionvar>
+        <setvar varname="SCORE" action="Add">0.0</setvar>
+        <setvar varname="answerValue" action="Add">0.0</setvar>
+        <displayfeedback feedbacktype="Response" linkrefid="wct_mc_answer_fb3" />
+      </respcondition>
+      <respcondition continue="Yes" title="genFeedback">
+        <conditionvar>
+          <other />
+        </conditionvar>
+        <displayfeedback feedbacktype="Response" linkrefid="wct_general_feedback_ref_1" />
+      </respcondition>
+      <respcondition continue="Yes" title="allOrNothing">
+        <conditionvar>
+          <other />
+        </conditionvar>
+        <setvar varname="SCORE" action="Add">0.0</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+</questestinterop>
+

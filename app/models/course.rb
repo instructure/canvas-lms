@@ -1694,12 +1694,14 @@ class Course < ActiveRecord::Base
     return unless File.exist?(data['all_files_export']['file_path'])
 
     self.attachment_path_id_lookup ||= {}
+    self.attachment_path_id_lookup_lower ||= {}
     params = migration.migration_settings[:migration_ids_to_import]
     valid_paths = []
     (data['file_map'] || {}).each do |id, file|
       if !migration.context.attachments.detect { |f| f.migration_id == file['migration_id'] } || migration.migration_settings[:files_import_allow_rename]
         path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
         self.attachment_path_id_lookup[path] = file['migration_id']
+        self.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
         if params[:copy][:files]
           valid_paths << path if (bool_res(params[:copy][:files][file['migration_id'].to_sym]) rescue false)
         else
@@ -1848,7 +1850,7 @@ class Course < ActiveRecord::Base
     @imported_migration_items
   end
   attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash, :content_migration
-  attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :assignment_group_no_drop_assignments
+  attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :assignment_group_no_drop_assignments
 
   def import_settings_from_migration(data, migration)
     return unless data[:course]
