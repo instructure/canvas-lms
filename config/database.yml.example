@@ -1,12 +1,12 @@
 test:
-  adapter: mysql
+  adapter: postgresql
   encoding: utf8
   database: canvas_test
   host: localhost
   username: canvas
   timeout: 5000
   queue:
-    adapter: mysql
+    adapter: postgresql
     encoding: utf8
     database: canvas_queue_test
     host: localhost
@@ -20,14 +20,14 @@ test-in-memory:
   pool: 1
 
 development:
-  adapter: mysql
+  adapter: postgresql
   encoding: utf8
   database: canvas_development
   host: localhost
   username: canvas
   timeout: 5000
   queue:
-    adapter: mysql
+    adapter: postgresql
     encoding: utf8
     database: canvas_queue_development
     host: localhost
@@ -35,7 +35,7 @@ development:
     timeout: 5000
     
 production:
-  adapter: mysql
+  adapter: postgresql
   encoding: utf8
   database: canvas_production
   host: localhost
@@ -43,7 +43,7 @@ production:
   password: your_password
   timeout: 5000
   queue:
-    adapter: mysql
+    adapter: postgresql
     encoding: utf8
     database: canvas_queue_production
     host: localhost
