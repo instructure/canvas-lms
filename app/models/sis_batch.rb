@@ -43,11 +43,14 @@ class SisBatch < ActiveRecord::Base
       }
   end
 
+  # If you are going to change any settings on the batch before it's processed,
+  # do it in the block passed into this method, so that the changes are saved
+  # before the batch is marked created and eligible for processing.
   def self.create_with_attachment(account, import_type, attachment)
     batch = SisBatch.new
     batch.account = account
     batch.progress = 0
-    batch.workflow_state = :created
+    batch.workflow_state = :initializing
     batch.data = {:import_type => import_type}
     batch.save
 
@@ -56,15 +59,19 @@ class SisBatch < ActiveRecord::Base
     att.context = batch
     att.uploaded_data = attachment
     att.display_name = t :upload_filename, "sis_upload_%{id}.zip", :id => batch.id
-    att.save
+    att.save!
     Attachment.skip_scribd_submits(false)
     batch.attachment = att
-    batch.save
+
+    yield batch if block_given?
+    batch.workflow_state = :created
+    batch.save!
 
     batch
   end
 
   workflow do
+    state :initializing
     state :created
     state :importing
     state :imported

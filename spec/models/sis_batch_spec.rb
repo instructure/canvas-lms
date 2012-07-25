@@ -65,6 +65,19 @@ describe SisBatch do
     create_csv_data(['abc']) { |batch| batch.attachment.position.should be_nil}
   end
 
+  it "should keep the batch in initializing state during create_with_attachment" do
+    batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text')) do |batch|
+      batch.attachment.should_not be_new_record
+      batch.workflow_state.should == 'initializing'
+      batch.options = { :override_sis_stickiness => true }
+    end
+
+    batch.workflow_state.should == 'created'
+    batch.should_not be_new_record
+    batch.changed?.should be_false
+    batch.options[:override_sis_stickiness].should == true
+  end
+
   describe ".process_all_for_account" do
     it "should process all non-processed batches for the account" do
       b1 = create_csv_data(['abc'])
