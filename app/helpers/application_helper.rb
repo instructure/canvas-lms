@@ -149,11 +149,11 @@ module ApplicationHelper
     end
   end
 
-  def avatar_image(user_id, height=50)
+  def avatar_image(user_id, width=50)
     if session["reported_#{user_id}"]
       image_tag "messages/avatar-50.png"
     else
-      image_tag(avatar_image_url(User.avatar_key(user_id || 0), :bust => Time.now.to_i), :style => "height: #{height}px; max-width: #{height}px;", :alt => '')
+      image_tag(avatar_image_url(User.avatar_key(user_id || 0), :bust => Time.now.to_i), :style => "width: #{width}px;", :alt => '')
     end
   end
 

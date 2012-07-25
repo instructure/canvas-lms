@@ -20,12 +20,12 @@
 module Api::V1::UserProfile
   include Api::V1::User
 
-  def user_profile_json(profile, current_user, session, includes = [])
+  def user_profile_json(profile, current_user, session, includes = [], context = @context)
     includes ||= []
 
     user = profile.user
 
-    json = user_json(user, current_user, session, 'avatar_url')
+    json = user_json(user, current_user, session, 'avatar_url', context)
     # don't unintentionally include stuff added to user_json
     json.slice! :id, :name, :short_name, :sortable_name, :sis_user_id,
                 :sis_login_id, :login_id, :avatar_url

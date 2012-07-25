@@ -379,6 +379,13 @@ class ContextController < ApplicationController
       @enrollments = @context.enrollments.for_user(@user) rescue []
       @messages = @entries
       @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }.sort_by{|e| e.created_at }.reverse
+
+      @user_data = profile_data(
+        @user.profile,
+        @current_user,
+        session,
+        ['links', 'user_services']
+      )
     end
   end
     

@@ -102,8 +102,8 @@ describe "links" do
         validate_link(link, 'Conversations')
       end
 
-      it "should navigate user to user profile page after profile link is clicked" do
-        link = find_dashboard_link('#identity', 'Profile')
+      it "should navigate user to user settings page after settings link is clicked" do
+        link = find_dashboard_link('#identity', 'Settings')
         expect_new_page_load { link.click }
       end
     end

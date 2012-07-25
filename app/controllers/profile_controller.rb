@@ -23,11 +23,11 @@ class ProfileController < ApplicationController
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
 
-  include Api::V1::UserProfile
   include Api::V1::Avatar
   include Api::V1::Notification
   include Api::V1::NotificationPolicy
   include Api::V1::CommunicationChannel
+  include Api::V1::UserProfile
 
   include TextHelper
 
@@ -40,39 +40,24 @@ class ProfileController < ApplicationController
       return
     end
 
-    @user ||= @current_user
-
+    @user = User.find(params[:id])
     @active_tab = "profile"
     @context = @user.profile if @user == @current_user
 
-    js_env :USER_ID => @user.id
+    @user_data = profile_data(
+      @user.profile,
+      @current_user,
+      session,
+      ['links', 'user_services']
+    )
 
-    @items_count = @user.collection_items.scoped(:conditions => {'collections.visibility' => 'public'}).count
-    @followers_count = @user.following_user_follow_ids.count
-
-    @following_user = @current_user &&
-      UserFollow.followed_by_user([@user], @current_user).present?
-
-    @can_follow = !@following_user &&
-      @current_user &&
-      @user.grants_right?(@current_user, :follow)
-
-    @services = @user.user_services.where(
-      :service => %w(facebook twitter linked_in delicious diigo skype)
-    ).sort_by { |s| UserService.sort_position(s.service) }
-
-    if @user.private? && @user != @current_user
-      if @user.grants_right?(@current_user, :view_statistics)
-        return render :action => :show
-      elsif @current_user.messageable_users(:ids => [@user.id]) == [@user]
-        return render :action => :show_limited
-      # TODO: also show full profile if user is following other user?
-      else
-        return render :action => :unauthorized
-      end
+    known_user = @user_data[:common_contexts].present?
+    if @user_data[:known_user] # if you can message them, you can see the profile
+      add_crumb(t('crumbs.profile_frd', "%{user}'s profile", :user => @user.short_name), user_profile_path(@user))
+      return render :action => :show
+    else
+      return render :action => :unauthorized
     end
-
-    render :action => :show
   end
 
   # @API Get user profile

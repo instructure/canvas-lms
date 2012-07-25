@@ -61,3 +61,4 @@ class UserProfile < ActiveRecord::Base
     @tabs
   end
 end
+

@@ -1379,4 +1379,38 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :flash_notices
+
+  def profile_data(profile, viewer, session, includes)
+    extend Api::V1::UserProfile
+    extend Api::V1::Course
+    extend Api::V1::Group
+    includes ||= []
+    data = user_profile_json(profile, viewer, session, includes, profile)
+    data[:can_edit] = viewer == profile.user
+    known_user = viewer.messageable_users(:ids => [profile.user.id]).first
+    common_courses = []
+    common_groups = []
+    if viewer != profile.user
+      if known_user
+        common_courses = known_user.common_courses.map do |course_id, roles|
+          next if course_id.zero?
+          c = course_json(Course.find(course_id), @current_user, session, ['html_url'], false)
+          c[:roles] = roles.map { |role| Enrollment.readable_type(role) }
+          c
+        end.compact
+        common_groups = known_user.common_groups.map do |group_id, roles|
+          next if group_id.zero?
+          g = group_json(Group.find(group_id), @current_user, session, :include => ['html_url'])
+          # in the future groups will have more roles and we'll need soemthing similar to
+          # the roles.map above in courses
+          g[:roles] = [t('#group.memeber', "Member")]
+          g
+        end.compact
+      end
+    end
+    data[:common_contexts] = [] + common_courses + common_groups
+    data[:known_user] = known_user
+    data
+  end
+
 end

@@ -2275,7 +2275,6 @@ class User < ActiveRecord::Base
     return [] if user_sql.empty?
 
     concat_sql = connection.adapter_name =~ /postgres/i ? :"course_id::text || ':' || roles::text" : :"course_id || ':' || roles"
-
     users = User.find_by_sql(<<-SQL)
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL},
         #{connection.func(:group_concat, concat_sql)} AS common_courses,
