@@ -509,6 +509,16 @@ define [
               $('#gradebook-upload-help').show()
         $upload_modal.dialog('open')
 
+      $settingsMenu.find('.student_names_toggle').click (e) ->
+        $wrapper = $('.grid-canvas')
+        $wrapper.toggleClass('hide-students')
+
+        if $wrapper.hasClass('hide-students')
+          $(this).text I18n.t('show_student_names', 'Show Student Names')
+        else
+          $(this).text I18n.t('hide_student_names', 'Hide Student Names')
+
+
     getVisibleGradeGridColumns: ->
       res = []
       for column in @allAssignmentColumns

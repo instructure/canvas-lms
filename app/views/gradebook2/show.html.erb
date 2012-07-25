@@ -18,6 +18,7 @@
       <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url, :fragment => "tab-grade-publishing") %>"><%= t('publish_to_sis', 'Publish grades to SIS') %></a></li>
       <% end %>
       <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('set_group_weights', 'Set Group Weights') %></a></li>
+      <li><a class="student_names_toggle" href="#" role="button"><%= t('hide_student_names', 'Hide Student Names') %></a></li>
       <li><a data-arrange-columns-by="due_date" href="#"><label><%= t('arrange_columns_by_due_date', 'Arrange columns by due date') %><input type="radio" name="arrange-columns-by" /></label></a></li>
       <li><a data-arrange-columns-by="assignment_group" href="#"><label><%= t('arrange_columns_by_group', 'Arrange columns by assignment group') %><input type="radio" name="arrange-columns-by" /></label></a></li>
       <li><a href="#"><label><%= t('show_attendance_columns', 'Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>

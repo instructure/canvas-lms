@@ -42,6 +42,8 @@ $cell_height: 33px
     img
       max-width: 30px
       height: 30px
+  .student-placeholder
+    display: none
   .student-section
     font-size: 10px
     color: #aaa
@@ -50,6 +52,15 @@ $cell_height: 33px
     font-size: 10px
     text-align: center
     line-height: 35px
+
+  // show and hide student names using a parent css class.
+  .hide-students
+    .student-name, .avatar
+      display: none
+    .student-placeholder
+      display: block
+    .secondary_identifier_cell
+      text-indent: -9999em
 
 // override the default jquery ui top border
 .slick-header.ui-state-default

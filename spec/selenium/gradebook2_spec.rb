@@ -297,5 +297,23 @@ describe "gradebook2" do
 
       ff('.student-name').map(&:text).join(" ").should match @fake_student.name
     end
+
+    it "should hide and show student names" do
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      menu   = f('#gradebook_settings')
+      toggle = f('.student_names_toggle')
+
+      menu.click
+      toggle.click
+      find_with_jquery('.student-name:visible').should be_nil
+      find_all_with_jquery('.student-placeholder:visible').length.should be > 0
+
+      menu.click
+      toggle.click
+      find_all_with_jquery('.student-name:visible').length.should be > 0
+      find_with_jquery('.student-placeholder:visible').should be_nil
+    end
   end
 end
