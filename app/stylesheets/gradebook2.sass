@@ -216,6 +216,25 @@ $cell_height: 33px
   &.resubmitted
     background-image: url("/images/gradebook-resubmitted-indicator.png")
 
+.gradebook-cell-turnitin
+  position: absolute
+  top: 2px
+  right: 2px
+  z-index: 1
+  width: 20px
+  height: 16px
+  &.no-score
+    background-image: url(/images/turnitin_no_score.png)
+  &.none-score
+    background-image: url(/images/turnitin_none_score.png)
+  &.acceptable-score
+    background-image: url(/images/turnitin_acceptable_score.png)
+  &.warning-score
+    background-image: url(/images/turnitin_warning_score.png)
+  &.problem-score
+    background-image: url(/images/turnitin_problem_score.png)
+  &.failure-score
+    background-image: url(/images/turnitin_failure_score.png)
 
 .gradebook-cell-comment
   position: absolute
@@ -225,7 +244,7 @@ $cell_height: 33px
   height: 12px
   width: 12px
   visibility: hidden
-  z-index: 1 //needs to be above "normal but below tooltips"
+  z-index: 2 //needs to be above "normal but below tooltips"
   overflow: hidden
 
   &:hover,

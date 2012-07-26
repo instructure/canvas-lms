@@ -315,5 +315,30 @@ describe "gradebook2" do
       find_all_with_jquery('.student-name:visible').length.should be > 0
       find_with_jquery('.student-placeholder:visible').should be_nil
     end
+
+    context "turnitin" do
+      it "should show turnitin data" do
+        s1 = @first_assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'asdf')
+        s1.update_attribute :turnitin_data, {"submission_#{s1.id}" => {:similarity_score => 0.0, :web_overlap => 0.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'none'}}
+        a = attachment_model(:context => @student_2, :content_type => 'text/plain')
+        s2 = @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
+        s2.update_attribute :turnitin_data, {"attachment_#{a.id}" => {:similarity_score => 1.0, :web_overlap => 5.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'acceptable'}}
+    
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        icons = ffj('.gradebook-cell-turnitin')
+        icons.size.should eql 2
+
+        # make sure it appears in each submission dialog
+        icons.each do |icon|
+          cell = icon.find_element(:xpath, '..')
+          driver.action.move_to(cell).perform
+          cell.find_element(:css, "a").click
+          wait_for_ajaximations
+          fj('.turnitin_similarity_score:visible').should be_present
+          fj('.ui-icon-closethick:visible').click
+        end
+      end
+    end
   end
 end

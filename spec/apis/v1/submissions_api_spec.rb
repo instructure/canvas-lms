@@ -374,7 +374,9 @@ describe 'Submissions API', :type => :integration do
                       :assignment_id => a1.id.to_s, :id => student1.id.to_s },
                     { :include => %w(submission_comments) })
 
-    json.should == {"grade"=>"A-",
+    json.should == {
+        "id"=>sub1.id,
+        "grade"=>"A-",
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -492,7 +494,8 @@ describe 'Submissions API', :type => :integration do
           { :include => %w(submission_history submission_comments rubric_assessment) })
 
     res =
-      [{"grade"=>"A-",
+      [{"id"=>sub1.id,
+        "grade"=>"A-",
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -508,7 +511,8 @@ describe 'Submissions API', :type => :integration do
              "size" => sub1.attachments.first.size },
          ],
         "submission_history"=>
-         [{"grade"=>nil,
+         [{"id"=>sub1.id,
+           "grade"=>nil,
            "body"=>"test!",
            "assignment_id" => a1.id,
            "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -520,8 +524,9 @@ describe 'Submissions API', :type => :integration do
            "grade_matches_current_submission"=>nil,
            "score"=>nil,
            "workflow_state" => "submitted"},
-          {"grade"=>nil,
-            "assignment_id" => a1.id,
+          {"id"=>sub1.id,
+           "grade"=>nil,
+           "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
               "media_id"=>"54321",
@@ -538,8 +543,9 @@ describe 'Submissions API', :type => :integration do
            "grade_matches_current_submission"=>nil,
            "score"=>nil,
            "workflow_state" => "submitted"},
-          {"grade"=>"A-",
-            "assignment_id" => a1.id,
+          {"id"=>sub1.id,
+           "grade"=>"A-",
+           "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
               "media_id"=>"54321","content-type" => "video/mp4",
@@ -588,14 +594,16 @@ describe 'Submissions API', :type => :integration do
            "display_name" => nil },
         "score"=>13.5,
         "workflow_state"=>"graded"},
-       {"grade"=>"F",
+       {"id"=>sub2.id,
+        "grade"=>"F",
         "assignment_id" => a1.id,
         "body"=>nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1",
         "grade_matches_current_submission"=>true,
         "submitted_at"=>"1970-01-01T04:00:00Z",
         "submission_history"=>
-         [{"grade"=>"F",
+         [{"id"=>sub2.id,
+           "grade"=>"F",
            "assignment_id" => a1.id,
            "body"=>nil,
            "submitted_at"=>"1970-01-01T04:00:00Z",

@@ -163,7 +163,7 @@ shared_examples_for "gradebook2 selenium tests" do
                                              :name => 'A name that would not reasonably fit in the header cell which should have some limit set',
                                              :due_at => nil,
                                              :points_possible => ASSIGNMENT_1_POINTS,
-                                             :submission_types => 'online_text_entry',
+                                             :submission_types => 'online_text_entry,online_upload',
                                              :assignment_group => @group
                                          })
     rubric_model

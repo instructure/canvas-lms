@@ -25,6 +25,7 @@ define([
   'datagrid',
   'compiled/grade_calculator',
   'str/htmlEscape',
+  'compiled/gradebook2/Turnitin',
   'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
   'jquery.dropdownList' /* dropdownList */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
@@ -40,7 +41,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/position' /* /\.position\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function(INST, I18n, $, _, userSettings, datagrid, GradeCalculator, htmlEscape) {
+], function(INST, I18n, $, _, userSettings, datagrid, GradeCalculator, htmlEscape, Turnitin) {
 
   var grading_scheme = window.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
@@ -1474,37 +1475,7 @@ define([
       $submission_grade.after($("#gradebook_urls .pending_review").clone());
       $submission_pending_review.addClass('showable').showIf(!$submission.find(".grading_value:visible").length);
     }
-    var turnitin_data = null;
-    if(submission.turnitin_data) {
-      if(submission.attachments && submission.submission_type == 'online_upload') {
-        for(var idx in submission.attachments) {
-          var attachment = submission.attachments[idx].attachment;
-          var turnitin = submission.turnitin_data && submission.turnitin_data['attachment_' + attachment.id];
-          if(turnitin) {
-            turnitin_data = turnitin_data || {};
-            turnitin_data.items = turnitin.items || [];
-            turnitin_data.items.push(turnitin);
-          }
-        }
-      } else if(submission.submission_type == "online_text_entry") {
-        var turnitin = submission.turnitin_data && submission.turnitin_data['submission_' + submission.id];
-        if(turnitin) {
-          turnitin_data = turnitin_data || {};
-          turnitin_data.items = turnitin.items || [];
-          turnitin_data.items.push(turnitin);
-        }
-      }
-      if(turnitin_data) {
-        var states_hash = {'failure': 4, 'problem': 3, 'warning': 2, 'acceptable': 1};
-        var states_lookup = {'0': 'none', '1': 'acceptable', '2': 'warning', '3': 'problem', '4': 'failure'};
-        var tally = 0;
-        for(var idx = 0; idx < turnitin_data.items.length; idx++) {
-          tally = tally + states_hash[turnitin_data.items[idx].state];
-        }
-        var avg = tally / turnitin_data.items.length;
-        turnitin_data.state = states_lookup[Math.floor(avg)] || "no";
-      }
-    }
+    var turnitin_data = Turnitin.extractData(submission);
     if(!turnitin_data) {
       $submission_turnitin.remove();
     } else if(!$submission_turnitin.length) { 
