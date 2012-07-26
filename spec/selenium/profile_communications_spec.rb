@@ -91,8 +91,6 @@ describe "/profile/communication" do
       @user.save!
       get "/profile/communication"
       f('.user-pref-check[name=send_scores_in_emails]').click
-      # Test flash message
-      assert_flash_notice_message /Communication setting updated/
       # test data stored
       @user.reload
       @user.preferences[:send_scores_in_emails].should == true
@@ -115,8 +113,6 @@ describe "/profile/communication" do
       mouse_leave_cell(@sub_comment.id, channel.id)
       # Change to a different value and verify flash and the save. (click on the radio)
       cell.text.should == 'ASAP'
-      # Test flash message
-      assert_flash_notice_message /Communication setting updated/
 
       # test data stored
       policy.reload
