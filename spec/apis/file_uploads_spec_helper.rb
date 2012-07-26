@@ -54,6 +54,14 @@ shared_examples_for "file uploads api" do
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
       'size' => tmpfile.size,
+      'unlock_at' => nil,
+      'locked' => false,
+      'hidden' => false,
+      'lock_at' => nil,
+      'locked_for_user' => false,
+      'hidden_for_user' => false,
+      'created_at' => attachment.created_at.as_json,
+      'updated_at' => attachment.updated_at.as_json,
     }
 
     attachment.file_state.should == 'available'
@@ -96,6 +104,14 @@ shared_examples_for "file uploads api" do
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
       'size' => 1234,
+      'unlock_at' => nil,
+      'locked' => false,
+      'hidden' => false,
+      'lock_at' => nil,
+      'locked_for_user' => false,
+      'hidden_for_user' => false,
+      'created_at' => attachment.created_at.as_json,
+      'updated_at' => attachment.updated_at.as_json,
     }
 
     attachment.file_state.should == 'available'

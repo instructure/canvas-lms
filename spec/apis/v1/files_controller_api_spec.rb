@@ -51,6 +51,7 @@ describe "Files API", :type => :integration do
       upload_data
       json = api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                    { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
+      @attachment.reload
       json.should == {
         'id' => @attachment.id,
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
@@ -58,8 +59,16 @@ describe "Files API", :type => :integration do
         'display_name' => 'test.txt',
         'filename' => @attachment.filename,
         'size' => @attachment.size,
+        'unlock_at' => nil,
+        'locked' => false,
+        'hidden' => false,
+        'lock_at' => nil,
+        'locked_for_user' => false,
+        'hidden_for_user' => false,
+        'created_at' => @attachment.created_at.as_json,
+        'updated_at' => @attachment.updated_at.as_json,
       }
-      @attachment.reload.file_state.should == 'available'
+      @attachment.file_state.should == 'available'
     end
 
     it "should set the attachment to available (s3 storage)" do
@@ -78,6 +87,14 @@ describe "Files API", :type => :integration do
         'display_name' => 'test.txt',
         'filename' => @attachment.filename,
         'size' => @attachment.size,
+        'unlock_at' => nil,
+        'locked' => false,
+        'hidden' => false,
+        'lock_at' => nil,
+        'locked_for_user' => false,
+        'hidden_for_user' => false,
+        'created_at' => @attachment.created_at.as_json,
+        'updated_at' => @attachment.updated_at.as_json,
       }
       @attachment.reload.file_state.should == 'available'
     end
@@ -185,7 +202,54 @@ describe "Files API", :type => :integration do
               'display_name' => 'test.txt',
               'filename' => @att.filename,
               'size' => @att.size,
+              'unlock_at' => nil,
+              'locked' => false,
+        'hidden' => false,
+              'lock_at' => nil,
+              'locked_for_user' => false,
+              'hidden_for_user' => false,
+              'created_at' => @att.created_at.as_json,
+              'updated_at' => @att.updated_at.as_json,
       }
+    end
+
+    it "should return lock information" do
+      one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
+      att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
+      att3 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :unlock_at => one_month_ago, :lock_at => one_month_from_now)
+
+      json = api_call(:get, "/api/v1/files/#{att2.id}", {:controller => "files", :action => "api_show", :format => "json", :id => att2.id.to_param}, {})
+      json['locked'].should be_true
+      json['unlock_at'].should be_nil
+      json['lock_at'].should be_nil
+
+      json = api_call(:get, "/api/v1/files/#{att3.id}", {:controller => "files", :action => "api_show", :format => "json", :id => att3.id.to_param}, {})
+      json['locked'].should be_false
+      json['unlock_at'].should == one_month_ago.as_json
+      json['lock_at'].should == one_month_from_now.as_json
+    end
+    
+    it "should not be locked/hidden for a teacher" do
+      att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
+      att2.hidden = true
+      att2.save!
+      json = api_call(:get, "/api/v1/files/#{att2.id}", {:controller => "files", :action => "api_show", :format => "json", :id => att2.id.to_param}, {})
+      json['locked'].should be_true
+      json['hidden'].should be_true
+      json['hidden_for_user'].should be_false
+      json['locked_for_user'].should be_false
+    end
+    
+    it "should be locked/hidden for a student" do
+      course_with_student(:course => @course)
+      att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
+      att2.hidden = true
+      att2.save!
+      json = api_call(:get, "/api/v1/files/#{att2.id}", {:controller => "files", :action => "api_show", :format => "json", :id => att2.id.to_param}, {})
+      json['locked'].should be_true
+      json['hidden'].should be_true
+      json['hidden_for_user'].should be_true
+      json['locked_for_user'].should be_true
     end
 
     it "should return not found error" do

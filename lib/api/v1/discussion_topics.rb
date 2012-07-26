@@ -29,7 +29,7 @@ module Api::V1::DiscussionTopics
   def discussion_topic_api_json(topic, context, user, session)
     attachments = []
     if topic.attachment
-      attachments << attachment_json(topic.attachment)
+      attachments << attachment_json(topic.attachment, user)
     end
 
     url = nil
@@ -80,7 +80,7 @@ module Api::V1::DiscussionTopics
         json[:editor_id] = entry.editor_id if entry.editor_id && entry.editor_id != entry.user_id
         json[:message] = api_user_content(entry.message, context, user)
         if entry.attachment
-          json[:attachment] = attachment_json(entry.attachment, :host => HostUrl.context_host(context))
+          json[:attachment] = attachment_json(entry.attachment, user, :host => HostUrl.context_host(context))
           # this is for backwards compatibility, and can go away if we make an api v2
           json[:attachments] = [json[:attachment]]
         end

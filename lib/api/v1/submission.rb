@@ -44,7 +44,7 @@ module Api::V1::Submission
           sc_hash['media_comment'] = media_comment_json(:media_id => sc.media_comment_id, :media_type => sc.media_comment_type)
         end
         sc_hash['attachments'] = sc.attachments.map do |a|
-          attachment_json(a)
+          attachment_json(a, user)
         end unless sc.attachments.blank?
         sc_hash
       end
@@ -120,7 +120,7 @@ module Api::V1::Submission
       attachments = attempt.versioned_attachments.dup
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
       hash['attachments'] = attachments.map do |attachment|
-        attachment_json(attachment)
+        attachment_json(attachment, user)
       end.compact unless attachments.blank?
     end
 

@@ -19,19 +19,21 @@
 module Api::V1::Attachment
   include Api::V1::Json
 
-  def attachments_json(files)
+  def attachments_json(files, user, url_options = {}, options = {})
     files.map do |f|
-      attachment_json(f)
+      attachment_json(f, user, url_options, options)
     end
   end
 
-  def attachment_json(attachment, url_options = {}, options = {})
+  def attachment_json(attachment, user, url_options = {}, options = {})
+    can_manage_files = options.has_key?(:can_manage_files) ? options[:can_manage_files] : attachment.grants_right?(user, nil, :update)
     url = if options[:thumbnail_url]
       # this thumbnail url is a route that redirects to local/s3 appropriately
       thumbnail_image_url(attachment.id, attachment.uuid)
     else
       file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
     end
+    
     {
       'id' => attachment.id,
       'content-type' => attachment.content_type,
@@ -39,6 +41,14 @@ module Api::V1::Attachment
       'filename' => attachment.filename,
       'url' => url,
       'size' => attachment.size,
+      'created_at' => attachment.created_at,
+      'updated_at' => attachment.updated_at,
+      'unlock_at' => attachment.unlock_at,
+      'locked' => !!attachment.locked,
+      'hidden' => !!attachment.hidden?,
+      'lock_at' => attachment.lock_at,
+      'locked_for_user' => can_manage_files ? false : !!attachment.currently_locked,
+      'hidden_for_user' => can_manage_files ? false : !!attachment.hidden?
     }
   end
 
