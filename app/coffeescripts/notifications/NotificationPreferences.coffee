@@ -7,6 +7,7 @@ define [
   'compiled/notifications/NotificationGroupMappings'
   'jst/profiles/notification_preferences'
   'jst/profiles/notifications/_policy_cell'
+  'jquery.disableWhileLoading'
   'jquery.ajaxJSON'
   'compiled/jquery.rails_flash_notifications'
 ], (I18n, $, _, userSettings, NotificationGroupMappings, notificationPreferencesTemplate, policyCellTemplate) ->
@@ -52,6 +53,7 @@ define [
           when 'facebook' then I18n.t('communication.facebook.display', 'Facebook')
       # Setup the mappings
       @mappings = new NotificationGroupMappings()
+      @$notificationSaveStatus = $('#notifications_save_status')
       @initGrid()
 
     # Display the frequency selection buttons. Optionally set the focus to the control if desired.
@@ -177,16 +179,12 @@ define [
       channelId = $cell.attr('data-channelId')
       # Send value to server
       data = {category_id: categoryId, channel_id: channelId, frequency: value}
-      $.ajaxJSON(@updateUrl, 'PUT', data,
-        # Success callback
-        ((data) =>
-          $.flashMessage(I18n.t('communication.notices.communication_preferences_updated', 'Communication setting updated'))
-        ),
+      @$notificationSaveStatus.disableWhileLoading $.ajaxJSON(@updateUrl, 'PUT', data, null,
         # Error callback
         ((data) =>
           $.flashError(I18n.t('communication.errors.saving_preferences_failed', 'Oops! Something broke.  Please try again'))
         )
-      )
+      ), @spinOpts
 
     # Setup event bindings.
     setupEventBindings: =>
@@ -197,13 +195,13 @@ define [
           icons:
             primary: data['image']
 
-      $notification_prefs = $('#notification-preferences')
+      $notificationPrefs = $('#notification-preferences')
 
       # Setup the buttons as a buttonset
-      $notification_prefs.find('.event-option-buttons').buttonset()
+      $notificationPrefs.find('.event-option-buttons').buttonset()
 
       # Catch mouse over and auto-toggle for faster interactions.
-      $notification_prefs.find('.notification-prefs-table.no-touch').on
+      $notificationPrefs.find('.notification-prefs-table.no-touch').on
         mouseenter: (e) =>
           @cellButtonsShow($(e.currentTarget), false)
         mouseleave: (e) =>
@@ -211,7 +209,7 @@ define [
         , '.comm-event-option'
 
       # Setup current selection click event to display selection changing buttons
-      $notification_prefs.find('.notification-prefs-table.no-touch a.change-selection').on 'click', (e) =>
+      $notificationPrefs.find('.notification-prefs-table.no-touch a.change-selection').on 'click', (e) =>
         # Hide any/all other showing buttons
         e.preventDefault()
         cell = $(e.currentTarget).closest('td')
@@ -219,7 +217,7 @@ define [
         @cellButtonsShow(cell, true)
 
       # When selection button is clicked, the hidden radio button is changed. React to that change. Hide the control and focus the selection
-      $notification_prefs.find('.frequency').on 'change', (e) =>
+      $notificationPrefs.find('.frequency').on 'change', (e) =>
         radio = $(e.currentTarget)
         cell = radio.closest('td')
         # Record the selected value in data attribute and update image class to reflect new state
@@ -227,7 +225,7 @@ define [
         @saveNewCellValue(cell, val)
 
       # When selection option is changed. (Used for mobile users)
-      $notification_prefs.find('.mobile-select').on 'change', (e) =>
+      $notificationPrefs.find('.mobile-select').on 'change', (e) =>
         select = $(e.currentTarget)
         cell = $(e.currentTarget).closest('td')
         # Record the selected value in data attribute and update image class to reflect new state
@@ -235,23 +233,22 @@ define [
         @saveNewCellValue(cell, val)
 
       # Catch the change for a user preference and record it at the server.
-      $notification_prefs.find('.user-pref-check').on 'change', (e)=>
+      $notificationPrefs.find('.user-pref-check').on 'change', (e)=>
         check = $(e.currentTarget)
         checkStatus = (check.attr('checked') == 'checked')
         # Send user prefernce value to server
         data = {user: {}}
         data['user'][check.attr('name')] = checkStatus
-        $.ajaxJSON(@updateUrl, 'PUT', data,
-          # Success callback
-          ((data) =>
-            $.flashMessage(I18n.t('communication.notices.communication_preferences_updated', 'Communication setting updated'))
-          ),
+        @$notificationSaveStatus.disableWhileLoading $.ajaxJSON(@updateUrl, 'PUT', data, null,
           # Error callback
           ((data) =>
             $.flashError(I18n.t('communication.errors.saving_preferences_failed', 'Oops! Something broke.  Please try again'))
           )
-        )
+        ), @spinOpts
         null
+
+    # Options for the save spinner
+    spinOpts: length: 4, radius: 5, width: 3
 
     # Initialize the grid.
     initGrid: =>
