@@ -21,7 +21,7 @@ define [
       super fetchOptions: @fetchOptions
 
     render: ->
-      @collection.each (user) => @renderUser user
+      @collection.each @renderUser
       super
 
     renderUser: (user) =>
