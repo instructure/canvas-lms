@@ -26,7 +26,9 @@ define [
 
     @create_group_sum: (group, submissions, ignore_ungraded) ->
       sum = { submissions: [], score: 0, possible: 0, submission_count: 0 }
-      for assignment in group.assignments
+      # Never include 'not_graded' assignments in the totals. The submission_types is an array (always?), adding a ''
+      # to it converts it to a string and will correctly evaluate if it is an array of multiple entries.
+      for assignment in group.assignments when (''+ assignment.submission_types != 'not_graded')
         data = { score: 0, possible: 0, percent: 0, drop: false, submitted: false }
 
         submission = null

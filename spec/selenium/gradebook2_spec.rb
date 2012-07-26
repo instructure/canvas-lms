@@ -307,6 +307,41 @@ describe "gradebook2" do
       ff('.student-name').map(&:text).join(" ").should match @fake_student.name
     end
 
+    it "should not include non-graded group assignment in group total" do
+      graded_assignment = assignment_model({
+                                             :course => @course,
+                                             :name => 'group assignment 1',
+                                             :due_at => (Time.now + 1.week),
+                                             :points_possible => 10,
+                                             :submission_types => 'online_text_entry',
+                                             :assignment_group => @group,
+                                             :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                             :grade_group_students_individually => true
+                                           })
+      group_assignment = assignment_model({
+                                            :course => @course,
+                                            :name => 'group assignment 2',
+                                            :due_at => (Time.now + 1.week),
+                                            :points_possible => 0,
+                                            :submission_types => 'not_graded',
+                                            :assignment_group => @group,
+                                            :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                            :grade_group_students_individually => true
+                                          })
+      project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      project_group.users << @student_1
+      #project_group.users << @student_2
+      graded_assignment.submissions.create(:user => @student)
+      graded_assignment.grade_student @student_1, :grade => 10   # 10 points possible
+      group_assignment.submissions.create(:user => @student)
+      group_assignment.grade_student @student_1, :grade => 2     # 0 points possible
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      f('#gradebook_grid [row="0"] .assignment-group-cell .percentage').should include_text('100%')  # otherwise 108%
+      f('#gradebook_grid [row="0"] .total-cell .percentage').should include_text('100%')             # otherwise 108%
+    end
+
     it "should hide and show student names" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations

@@ -209,17 +209,15 @@ describe "edititing grades" do
   end
 
   it "should not factor non graded assignments into group total" do
-    pending("bug 7558 - Non-Graded Assignments are being factored in the Assignment Group's total") do
-      expected_totals = [STUDENT_1_TOTAL_IGNORING_UNGRADED, STUDENT_2_TOTAL_IGNORING_UNGRADED]
-      ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
-      @ungraded_assignment.grade_student(@student_1, :grade => 20)
-      ungraded_submission.save!
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      assignment_group_cells = ff('.assignment-group-cell')
-      assignment_group_cells.each_with_index do |agc, i|
-        validate_cell_text(agc, expected_totals[i])
-      end
+    expected_totals = [STUDENT_1_TOTAL_IGNORING_UNGRADED, STUDENT_2_TOTAL_IGNORING_UNGRADED]
+    ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
+    @ungraded_assignment.grade_student(@student_1, :grade => 20)
+    ungraded_submission.save!
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    assignment_group_cells = ff('.assignment-group-cell')
+    assignment_group_cells.each_with_index do |agc, i|
+      validate_cell_text(agc, expected_totals[i])
     end
   end
 
