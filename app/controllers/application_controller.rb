@@ -1372,7 +1372,7 @@ class ApplicationController < ActionController::Base
       if error = flash.delete(:error)
         notices << {:type => 'error', :content => error}
       end
-      if notice = (flash[:html_notice] ? raw(flash.delete(:html_notice)) : flash.delete(:notice))
+      if notice = (flash[:html_notice] ? flash.delete(:html_notice).html_safe : flash.delete(:notice))
         notices << {:type => 'success', :content => notice}
       end
       notices
