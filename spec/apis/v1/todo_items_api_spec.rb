@@ -114,6 +114,15 @@ describe UsersController, :type => :integration do
     json.should == [@a2_json]
   end
 
+  it "should return a list for users who are both teachers and students" do
+    @student_course.enroll_teacher(@user)
+    @teacher_course.enroll_student(@user)
+    json = api_call(:get, "/api/v1/users/self/todo",
+                    :controller => "users", :action => "todo_items", :format => "json")
+    @a1_json.deep_merge!({ 'assignment' => { 'needs_grading_count' => 0 } })
+    json.sort_by { |t| t['assignment']['id'] }.should == [@a1_json, @a2_json]
+  end
+
   it "should ignore a todo item permanently" do
     api_call(:delete, @a2_json['ignore_permanently'],
              :controller => "users", :action => "ignore_item", :format => "json", :purpose => "grading", :asset_string => "assignment_#{@a2.id}", :permanent => "1")
