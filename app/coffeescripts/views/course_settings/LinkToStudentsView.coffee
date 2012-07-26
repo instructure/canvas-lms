@@ -66,10 +66,13 @@ define [
       newLinks = _.difference @students, currentLinks
       removeLinks = _.difference currentLinks, @students
 
+      if newLinks.length
+        newDfd = $.Deferred()
+        dfds.push newDfd.promise()
+        dfdsDone = 0
+
       # create new links
       for id in newLinks
-        dfd = $.Deferred()
-        dfds.push dfd.promise()
         @getUserData(id).done (user) =>
           udfds = []
           sections = _.map user.enrollments, (en) -> en.course_section_id
@@ -78,11 +81,14 @@ define [
             data =
               enrollment:
                 user_id: @model.get('id')
-                associated_user_id: id
+                associated_user_id: user.id
                 type: enrollment.type
                 limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
             udfds.push $.ajaxJSON url, 'POST', data
-          $.when(udfds...).done -> dfd.resolve()
+          $.when(udfds...).done ->
+            dfdsDone += 1
+            if dfdsDone == newLinks.length
+              newDfd.resolve()
 
       # delete old links
       unenrolls = _.filter enrollments, (en) -> _.include removeLinks, en.associated_user_id
