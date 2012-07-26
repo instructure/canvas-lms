@@ -554,6 +554,13 @@ class Course < ActiveRecord::Base
   end
   memoize :user_has_been_student?
 
+  # Public: Determine if a group weighting scheme should be applied.
+  #
+  # Returns boolean.
+  def apply_group_weights?
+    group_weighting_scheme == 'percent'
+  end
+
   def grade_weight_changed!
     @grade_weight_changed = true
     self.save!

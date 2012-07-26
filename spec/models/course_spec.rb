@@ -23,6 +23,15 @@ describe Course do
   before(:each) do
     @course = Course.new
   end
+
+  it "should propery determine if group weights are active" do
+    @course.update_attribute(:group_weighting_scheme, nil)
+    @course.apply_group_weights?.should == false
+    @course.update_attribute(:group_weighting_scheme, 'equal')
+    @course.apply_group_weights?.should == false
+    @course.update_attribute(:group_weighting_scheme, 'percent')
+    @course.apply_group_weights?.should == true
+  end
   
   context "validation" do
     it "should create a new instance given valid attributes" do
