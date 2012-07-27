@@ -114,8 +114,8 @@ describe ProfileController do
     it "should let you set your profile links" do
       put 'update_profile',
         :user_profile => {:bio => '...'},
-        :link_urls => %w(example.com foo.com),
-        :link_titles => %w(Example.com Foo),
+        :link_urls => ['example.com', 'foo.com', ''],
+        :link_titles => ['Example.com', 'Foo', ''],
         :format => 'json'
       response.should be_success
 
