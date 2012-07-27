@@ -11,7 +11,7 @@ class AddAttachmentIndexesForSorting < ActiveRecord::Migration
       end
       execute("CREATE INDEX CONCURRENTLY index_attachments_on_folder_id_and_file_state_and_position ON attachments (folder_id, file_state, position) WHERE folder_id IS NOT NULL")
     else
-      add_index :attachments, [:folder_id, :file_state, :display_name], :name =>"index_attachments_on_folder_id_and_file_state_and_display_name"
+      add_index :attachments, [:folder_id, :file_state, :display_name], :name =>"index_attachments_on_folder_id_and_file_state_and_display_name", :length => { :display_name => 20 }
       add_index :attachments, [:folder_id, :file_state, :position], :name =>"index_attachments_on_folder_id_and_file_state_and_position"
     end
     
