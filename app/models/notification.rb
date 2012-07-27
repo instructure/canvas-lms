@@ -377,7 +377,7 @@ class Notification < ActiveRecord::Base
     case self.category
       when 'Submission Comment'
         setting = {:name => :no_submission_comments_inbox, :value => user.preferences[:no_submission_comments_inbox],
-                   :label => t(:submission_new_as_unread, 'Mark new as unread.')}
+                   :label => t(:submission_new_as_unread, 'Mark new submission comments as unread.')}
       when 'Grading'
         setting = {:name => :send_scores_in_emails, :value => user.preferences[:send_scores_in_emails],
                    :label => t(:grading_notify_include_grade, 'Include scores when alerting about grade changes.')}
