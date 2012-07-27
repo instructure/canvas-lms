@@ -828,7 +828,7 @@ class Attachment < ActiveRecord::Base
       file_batches.each do |count, attachment_id, last_updated_at, context_id, context_type|
         # clear the need_notify flag for this batch
         Attachment.update_all("need_notify = NULL",
-            ["updated_at <= ? AND context_id = ? AND context_type = ?", last_updated_at, context_id, context_type])
+            ["need_notify AND updated_at <= ? AND context_id = ? AND context_type = ?", last_updated_at, context_id, context_type])
 
         # skip the notification if this batch is too old to be timely
         next if last_updated_at.to_time < discard_older_than
