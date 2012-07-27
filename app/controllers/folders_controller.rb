@@ -40,8 +40,9 @@
 #     }
 class FoldersController < ApplicationController
   include Api::V1::Folders
+  include Api::V1::Attachment
 
-  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update]
+  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file]
 
   def index
     if authorized_action(@context, @current_user, :read)
@@ -268,20 +269,36 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/files/<file_id>' \ 
-  #        -F 'name=<new_name>' \ 
-  #        -F 'locked=true' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \
+  #        -F 'name=<new_name>' \
+  #        -F 'locked=true' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/folders' \
+  #        -F 'name=<new_name>' \
+  #        -F 'locked=true' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns Folder
   def create
     folder_params = process_folder_params(params, api_request?)
-
     source_folder_id = folder_params.delete(:source_folder_id)
+    if folder_params[:folder_id]
+      parent_folder = Folder.find(folder_params[:folder_id])
+      @context = parent_folder.context
+    else
+      require_context
+    end
 
-    if folder_params[:parent_folder_path] && folder_params[:parent_folder_id]
+    if (folder_params[:folder_id] && (folder_params[:parent_folder_path] || folder_params[:parent_folder_id])) ||
+            (folder_params[:parent_folder_path] && folder_params[:parent_folder_id])
       render :json => {:message => t('only_one_folder', "Can't set folder path and folder id")}, :status => 400
       return
+    elsif folder_params[:folder_id]
+      folder_params.delete(:folder_id)
     elsif folder_params[:parent_folder_id]
       parent_folder = @context.folders.find(folder_params.delete(:parent_folder_id))
     elsif @context.respond_to?(:folders) && folder_params[:parent_folder_path].is_a?(String)
@@ -321,7 +338,7 @@ class FoldersController < ApplicationController
 
   def process_folder_params(parameters, api_request)
     folder_params = (api_request ? parameters : parameters[:folder]) || {}
-    folder_params.slice(:name, :parent_folder_id, :parent_folder_path, 
+    folder_params.slice(:name, :parent_folder_id, :parent_folder_path, :folder_id,
                         :source_folder_id, :lock_at, :unlock_at, :locked, 
                         :hidden, :context, :position, :just_hide)
   end
@@ -363,5 +380,24 @@ class FoldersController < ApplicationController
       end
     end
   end
-  
+
+  # @API Upload a file
+  #
+  # Upload a file to a folder.
+  #
+  # This API endpoint is the first step in uploading a file.
+  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # the file upload workflow.
+  #
+  # Only those with the "Manage Files" permission on a course or group can
+  # upload files to a folder in that course or group.
+  def create_file
+    @folder = Folder.find(params[:folder_id])
+    params[:parent_folder_id] = @folder.id
+    @context = @folder.context
+    @attachment = Attachment.new(:context => @context)
+    if authorized_action(@attachment, @current_user, :create)
+      api_attachment_preflight(@context, request, :check_quota => true)
+    end
+  end
 end

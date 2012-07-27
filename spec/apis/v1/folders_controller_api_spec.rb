@@ -246,6 +246,46 @@ describe "Folders API", :type => :integration do
       sub1.locked.should == true
     end
 
+    it "should create by folder id in the path" do
+      group_model(:context => @course)
+      @root = Folder.root_folders(@group).first
+      @f1 = @root.sub_folders.create!(:name => "folder1", :context => @group)
+
+      json = api_call(:post, "/api/v1/folders/#{@f1.id}/folders",
+               @folders_path_options.merge(:folder_id => @f1.id.to_param),
+               { :name => "sub1",  :locked => 'true' }, {})
+      @f1.reload
+      sub1 = @f1.sub_folders.first
+      sub1.name.should == 'sub1'
+      sub1.locked.should == true
+    end
+
+    it "should error with invalid folder id" do
+      api_call(:post, "/api/v1/folders/0/folders",
+               @folders_path_options.merge(:folder_id => "0"),
+               {:name => "sub1",  :locked => 'true'},
+               {},
+               :expected_status => 404)
+    end
+
+    it "should give error folder is used and path sent" do
+      json = api_call(:post, "/api/v1/folders/#{@root.id}/folders",
+               @folders_path_options.merge(:folder_id => @root.id.to_param),
+               { :name => "sub1",  :locked => 'true', :parent_folder_path => 'haha/fool'},
+               {},
+               :expected_status => 400)
+      json['message'].should == "Can't set folder path and folder id"
+    end
+
+    it "should give error folder is used and id sent" do
+      json = api_call(:post, "/api/v1/folders/#{@root.id}/folders",
+               @folders_path_options.merge(:folder_id => @root.id.to_param),
+               { :name => "sub1",  :locked => 'true', :parent_folder_id =>  @root.id.to_param},
+               {},
+               :expected_status => 400)
+      json['message'].should == "Can't set folder path and folder id"
+    end
+
     it "should create by folder path" do
       json = api_call(:post, "/api/v1/courses/#{@course.id}/folders",
                @folders_path_options.merge(:course_id => @course.id.to_param),
@@ -318,5 +358,16 @@ describe "Folders API", :type => :integration do
     end
   end
 
-
+  describe "#create_file" do
+    it "should create a file in the correct folder" do
+      @context = course_with_teacher
+      @user = @teacher
+      @root_folder = Folder.root_folders(@course).first
+      api_call(:post, "/api/v1/folders/#{@root_folder.id}/files",
+        { :controller => "folders", :action => "create_file", :format => "json", :folder_id => @root_folder.id.to_param, },
+        :name => "with_path.txt")
+      attachment = Attachment.last(:order => :id)
+      attachment.folder_id.should == @root_folder.id
+    end
+  end
 end
