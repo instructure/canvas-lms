@@ -170,6 +170,7 @@ describe ApplicationHelper do
 
         @sub_account1 = account_model(:root_account => @domain_root_account)
         @sub_account1.settings = @sub_account1.settings.merge({ :global_stylesheet => '/path/to/sub1/css' })
+        @sub_account1.settings = @sub_account1.settings.merge({ :sub_account_includes => true })
         @sub_account1.save!
 
         @sub_account2 = account_model(:root_account => @domain_root_account)
@@ -229,6 +230,32 @@ describe ApplicationHelper do
         output = include_account_css
         output.should have_tag 'link'
         output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/']]
+      end
+
+      it "should include multiple levesl of sub-account css in the right order for course page" do
+        @sub_sub_account1 = account_model(:parent_account => @sub_account1, :root_account => @domain_root_account)
+        @sub_sub_account1.settings = @sub_sub_account1.settings.merge({ :global_stylesheet => '/path/to/subsub1/css' })
+        @sub_sub_account1.save!
+
+        @context = @sub_sub_account1.courses.create!
+        output = include_account_css
+        output.should have_tag 'link'
+        output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
+      end
+
+      it "should include multiple levesl of sub-account css in the right order" do
+        @sub_sub_account1 = account_model(:parent_account => @sub_account1, :root_account => @domain_root_account)
+        @sub_sub_account1.settings = @sub_sub_account1.settings.merge({ :global_stylesheet => '/path/to/subsub1/css' })
+        @sub_sub_account1.save!
+
+        @course = @sub_sub_account1.courses.create!
+        @course.offer!
+        student_in_course(:active_all => true)
+        @context = @user
+        @current_user = @user
+        output = include_account_css
+        output.should have_tag 'link'
+        output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
       end
     end
   end
