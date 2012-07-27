@@ -1,6 +1,6 @@
 <% 
   content_for :page_title, join_title(t(:page_title, "Files"), @context && @context.name)
-  jammit_css :full_files
+  jammit_css :full_files, :tinymce
   js_bundle :full_files 
   showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]
 %>
@@ -332,14 +332,16 @@
   <% end %>
 </div>
 <div id="edit_content_dialog" style="display: none;" title="<%= t 'titles.edit_file_contents', "Edit File Contents" %>">
+  <a href="#" class="switch_views" style="display:none; float: right"><%= t('switch_views', "Switch Views") %></a>
   <h2><%= t 'titles.edit_file', "Edit %{file}", :file => '<span class="display_name">&nbsp;</span>'.html_safe %></h2>
   <div class="loading_message">
   </div>
   <div class="content">
     <textarea id="edit_content_textarea" style="width: 550px; height: 270px"></textarea>
     <div class="button-container">
-      <button type="button" class="button save_button"><%= t 'buttons.update', "Update File" %></button>
-      <button type="button" class="button button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+      <div class="html_edit_warning alert" style="display: none;">
+        <%= t('edit_html_warning', "The HTML editor alters your HTML, you should download a backup before saving changes.") %>
+      </div>
     </div>
   </div>
 </div>
