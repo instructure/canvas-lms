@@ -663,7 +663,7 @@ module ApplicationHelper
     @include_accounts = [Account.site_admin, @domain_root_account]
     if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding
-      common_chain = account_context(@context).try(:account_chain)
+      common_chain = account_context(@context).try(:account_chain).try(:reverse)
       common_chain ||= @current_user.common_account_chain(@domain_root_account) if @current_user.present?
       @include_accounts.concat(common_chain) if common_chain.present?
     end
