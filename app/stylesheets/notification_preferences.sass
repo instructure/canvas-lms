@@ -15,7 +15,7 @@ $hover_row: #F5F5F5
 
 #notification-preferences
   td.comm-event-option > select
-    opacity: 0
+    +opacity(0)
 
   .notification-prefs-table
     border: 1px solid #DDD
@@ -27,7 +27,7 @@ $hover_row: #F5F5F5
     caption
       color: $grey
       line-height: 0
-      opacity: 0
+      +opacity(0)
 
     h3.group-name
       font-weight: bold
@@ -108,7 +108,7 @@ $hover_row: #F5F5F5
             &:hover, &:focus, &:active
               text-decoration: none
         select
-          opacity: 0
+          +opacity(0)
           outline: 0
           position: absolute
           top: 0px
@@ -125,9 +125,9 @@ $hover_row: #F5F5F5
 
   .notification-prefs-table.no-touch
     td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection
-      opacity: 0
+      +opacity(0)
       &:hover, &:focus
-        opacity: 0.35
+        +opacity(0.35)
 
   .notification-prefs-table.touch
     td.comm-event-option .event-option-selection a.change-selection
@@ -135,7 +135,7 @@ $hover_row: #F5F5F5
         float: right
 
     td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection span
-      opacity: 0.35
+      +opacity(0.35)
 
 h2
   position: relative
