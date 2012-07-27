@@ -83,10 +83,10 @@ define [
     buildPolicyCellsHtml: (category) =>
       fragments = for c in @channels
         policy = _.find @policies, (p) ->
-          p.channel_id is c.id and p.category_id is category.id
+          p.channel_id is c.id and p.category is category.category
         frequency = 'never'
         frequency = policy['frequency'] if policy
-        @policyCellHtml(category.id, c.id, frequency)
+        @policyCellHtml(category, c.id, frequency)
       fragments.join ''
 
     hideButtonsExceptCell: ($notCell) =>
@@ -154,17 +154,17 @@ define [
       @setupEventBindings()
 
     # Generate and return the HTML for an option cell with the with the sepecified value set/reflected.
-    policyCellHtml: (categoryId, channelId, selectedValue = 'never') =>
+    policyCellHtml: (category, channelId, selectedValue = 'never') =>
       # Reset all buttons to not be active by default. Set their ID to be unique to the data combination.
       _.each(@buttonData, (b) ->
         b['active'] = false
-        b['coordinate'] = "cat_#{categoryId}_ch_#{channelId}"
+        b['coordinate'] = "cat_#{category.id}_ch_#{channelId}"
         b['id'] = "#{b['coordinate']}_#{b['code']}"
       )
       selected = @findButtonDataForCode(selectedValue)
       selected['active'] = true
 
-      policyCellTemplate(touch: @touch, categoryId: categoryId, channelId: channelId, selected: selected, allButtons: @buttonData)
+      policyCellTemplate(touch: @touch, category: category.category, channelId: channelId, selected: selected, allButtons: @buttonData)
 
     # Record and display the value for the cell.
     saveNewCellValue: ($cell, value) =>
@@ -175,10 +175,10 @@ define [
       $cell.find('a.change-selection span.ui-icon').attr('class', 'ui-icon '+btnData['image'])
       $cell.find('a.change-selection span.img-text').text(btnData['text'])
       # Get category and channel values
-      categoryId = $cell.attr('data-categoryId')
+      category = $cell.attr('data-category')
       channelId = $cell.attr('data-channelId')
       # Send value to server
-      data = {category_id: categoryId, channel_id: channelId, frequency: value}
+      data = {category: category, channel_id: channelId, frequency: value}
       @$notificationSaveStatus.disableWhileLoading $.ajaxJSON(@updateUrl, 'PUT', data, null,
         # Error callback
         ((data) =>

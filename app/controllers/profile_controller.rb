@@ -122,7 +122,7 @@ class ProfileController < ApplicationController
 
     js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
       :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
-      :policies => NotificationPolicy.for(@user).map{ |p| notification_policy_json(p, @user, session) },
+      :policies => NotificationPolicy.scoped(:include => :notification).for(@user).map{ |p| notification_policy_json(p, @user, session) },
       :categories => Notification.dashboard_categories(@user).map{ |c| notification_category_json(c, @user, session) },
       :update_url => communication_update_profile_path
     }
@@ -130,43 +130,8 @@ class ProfileController < ApplicationController
 
   def communication_update
     params[:root_account] = @domain_root_account
-    @user = @current_user
-    @user = User.find(params[:id]) if params[:id]
-    # if text/setting is not in the authorized list, set to "never". Block invalid values. If Never, delete the entry?
-    # frequency, channel_id, category_id - use to load, create or delete the specified entry
-
-    # Check for user preference settings first. Some communication related options are available on the page.
-    # Handle those if given.
-    user_prefs = params['user']
-    if user_prefs
-      # save the preference as a symbol (convert from string))
-      user_prefs.each_pair do |key, value|
-        @user.preferences[key.to_sym] = (value == 'true')
-      end
-      @user.save!
-      render :json => {:user_id => @user.id}, :status => :ok
-    else
-      # Look for frequency settings and record those.
-      frequency = case params[:frequency]
-        when Notification::FREQ_IMMEDIATELY, Notification::FREQ_DAILY, Notification::FREQ_WEEKLY, Notification::FREQ_NEVER
-          params[:frequency]
-        else
-          Notification::FREQ_NEVER
-      end
-      p = NotificationPolicy.scoped(:include => :communication_channel,
-                                    :conditions => ['communication_channels.user_id = ?', @current_user.id] ).
-        find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], params[:category_id])
-      # if "never", delete the entry; otherwise set the value
-      if frequency == Notification::FREQ_NEVER
-        # Destroy is safe on a new unsaved item too
-        p.destroy
-      else
-        # Set the frequency and save
-        p.frequency = frequency
-        p.save!
-      end
-      render :json => {:id => p.id}, :status => :ok
-    end
+    @policies = NotificationPolicy.setup_for(@current_user, params)
+    render :json => {}, :status => :ok
   end
 
   # @API List avatar options

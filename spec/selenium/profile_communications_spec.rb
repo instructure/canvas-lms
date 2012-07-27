@@ -29,18 +29,18 @@ describe "profile communication settings" do
   end
 
   # Using javascript, trigger a mouseenter event to hide text and display buttons.
-  def mouse_enter_cell(category_id, channel_id)
-    driver.execute_script("$('#notification-preferences .comm-event-option[data-categoryid=#{category_id}][data-channelid=#{channel_id}]').trigger('mouseenter')")
+  def mouse_enter_cell(category, channel_id)
+    driver.execute_script("$('#notification-preferences .comm-event-option[data-category=#{category}][data-channelid=#{channel_id}]').trigger('mouseenter')")
   end
 
   # Using javascript, trigger a mouseleave event to hide buttons and display text.
-  def mouse_leave_cell(category_id, channel_id)
-    driver.execute_script("$('#notification-preferences .comm-event-option[data-categoryid=#{category_id}][data-channelid=#{channel_id}]').trigger('mouseleave')")
+  def mouse_leave_cell(category, channel_id)
+    driver.execute_script("$('#notification-preferences .comm-event-option[data-category=#{category}][data-channelid=#{channel_id}]').trigger('mouseleave')")
   end
 
   # Find the frequency cell for the category and channel.
-  def find_frequency_cell(category_id, channel_id)
-    fj("td.comm-event-option[data-categoryid=#{category_id}][data-channelid=#{channel_id}]")
+  def find_frequency_cell(category, channel_id)
+    fj("td.comm-event-option[data-category='#{category}'][data-channelid=#{channel_id}]")
   end
 
   it "should render" do
@@ -55,20 +55,18 @@ describe "profile communication settings" do
 
   it "should display the user's email address as channel" do
     get "/profile/communication"
-    keep_trying_until do
-      fj('th.comm-channel:first').should include_text('Email Address')
-      fj('th.comm-channel:first').should include_text('somebody@example.com')
-    end
+    wait_for_ajaximations
+    fj('th.comm-channel:first').should include_text('Email Address')
+    fj('th.comm-channel:first').should include_text('somebody@example.com')
   end
 
   it "should display an SMS number as channel" do
     channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "sms")
     channel.confirm
     get "/profile/communication"
-    keep_trying_until do
-      fj('tr.grouping:first th.comm-channel:last').should include_text('Cell Number')
-      fj('tr.grouping:first th.comm-channel:last').should include_text('8011235555@vtext.com')
-    end
+    wait_for_ajaximations
+    fj('tr.grouping:first th.comm-channel:last').should include_text('Cell Number')
+    fj('tr.grouping:first th.comm-channel:last').should include_text('8011235555@vtext.com')
   end
 
   it "should load the initial state of a user-pref checkbox" do
@@ -77,13 +75,15 @@ describe "profile communication settings" do
     @user.preferences[:no_submission_comments_inbox] = true
     @user.save!
     get "/profile/communication"
-    keep_trying_until do
-      is_checked('.user-pref-check[name=send_scores_in_emails]').should be_false
-      is_checked('.user-pref-check[name=no_submission_comments_inbox]').should be_true
-    end
+    wait_for_ajaximations
+    is_checked('.user-pref-check[name=send_scores_in_emails]').should be_false
+    is_checked('.user-pref-check[name=no_submission_comments_inbox]').should be_true
   end
 
   it "should save a user-pref checkbox change" do
+    # Enable the setting to be changed first...
+    Account.default.settings[:allow_sending_scores_in_emails] = true
+    Account.default.save!
     # set the user's initial user preference and verify checked or unchecked
     @user.preferences[:send_scores_in_emails] = false
     @user.save!
@@ -105,13 +105,13 @@ describe "profile communication settings" do
     policy.frequency = Notification::FREQ_DAILY
     policy.save!
     get "/profile/communication"
-    cell = find_frequency_cell(@sub_comment.id, channel.id)
+    cell = find_frequency_cell(@sub_comment.category, channel.id)
     # validate existing text is shown correctly (text display and button state)
     cell.text.should == 'Daily'
 
-    mouse_enter_cell(@sub_comment.id, channel.id)
+    mouse_enter_cell(@sub_comment.category, channel.id)
     cell.find_element(:css, '.immediately-label').click
-    mouse_leave_cell(@sub_comment.id, channel.id)
+    mouse_leave_cell(@sub_comment.category, channel.id)
     # Change to a different value and verify flash and the save. (click on the radio)
     cell.text.should == 'ASAP'
 

@@ -203,6 +203,27 @@ describe NotificationPolicy do
       params[:root_account].settings[:allow_sending_scores_in_emails] = false
       NotificationPolicy.setup_for(user, params)
     end
+
+    it "should set all notification entries within the same category" do
+      user_model
+      communication_channel_model(:user_id => @user.id)
+      notify1 = notification_model(:name => 'Setting 1', :category => 'MultiCategory')
+      notify2 = notification_model(:name => 'Setting 2', :category => 'MultiCategory')
+
+      NotificationPolicy.delete_all
+
+      trifecta_opts = {
+        :communication_channel => @communication_channel,
+        :frequency => Notification::FREQ_NEVER
+      }
+      n1 = notification_policy_model(trifecta_opts.merge(:notification => notify1) )
+      n2 = notification_policy_model(trifecta_opts.merge(:notification => notify2) )
+      params = {:category => 'MultiCategory', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY}
+      NotificationPolicy.setup_for(@user, params)
+      n1.reload; n2.reload
+      n1.frequency.should == Notification::FREQ_IMMEDIATELY
+      n2.frequency.should == Notification::FREQ_IMMEDIATELY
+    end
   end
 end
 

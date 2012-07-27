@@ -37,8 +37,9 @@ module Api::V1::NotificationPolicy
   #   :frequency
   def notification_policy_json(policy, user, session)
     api_json(policy, user, session, JSON_OPTS).tap do |json|
+      # Add the category from the linked notification
+      json[:category] = policy.notification.try(:category)
       # Rename some attributes for more friendly usage
-      json[:category_id] = json.delete(:notification_id)
       json[:channel_id] = json.delete(:communication_channel_id)
     end
   end
