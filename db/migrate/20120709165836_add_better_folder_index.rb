@@ -10,7 +10,7 @@ class AddBetterFolderIndex < ActiveRecord::Migration
         execute("CREATE INDEX CONCURRENTLY index_folders_on_parent_folder_id_and_workflow_state_and_name ON folders (parent_folder_id, workflow_state, CAST(LOWER(replace(name, '\\', '\\\\')) AS bytea))")
       end
     else
-      add_index :folders, [:parent_folder_id, :workflow_state, :name], :name =>"index_folders_on_parent_folder_id_and_workflow_state_and_name"
+      add_index :folders, [:parent_folder_id, :workflow_state, :name], :name =>"index_folders_on_parent_folder_id_and_workflow_state_and_name", :length => { :name => 20 }
     end
     
     add_index :folders, [:parent_folder_id, :workflow_state, :position], :name =>"index_folders_on_parent_folder_id_and_workflow_state_an_position", :concurrently => true
