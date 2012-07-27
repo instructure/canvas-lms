@@ -931,6 +931,8 @@ ActionController::Routing::Routes.draw do |map|
       folders.get 'folders/:id/files', :controller => :files, :action => :api_index, :path_name => 'list_files'
       folders.delete 'folders/:id', :action => :api_destroy
       folders.put 'folders/:id', :action => :update
+      folders.post 'folders/:folder_id/folders', :action => :create, :path_name => 'create_folder'
+      folders.post 'folders/:folder_id/files', :action => :create_file
     end
     
     api.with_options(:controller => :favorites) do |favorites|
