@@ -143,21 +143,20 @@ class SisImportsApiController < ApplicationController
         end
       end
 
-      batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj)
-      if batch_mode_term
-        batch.batch_mode = true
-        batch.batch_mode_term = batch_mode_term
-      end
+      batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj) do |batch|
+        if batch_mode_term
+          batch.batch_mode = true
+          batch.batch_mode_term = batch_mode_term
+        end
 
-      batch.options ||= {}
-      if params[:override_sis_stickiness].to_i > 0
-        batch.options[:override_sis_stickiness] = true
-        [:add_sis_stickiness, :clear_sis_stickiness].each do |option|
-          batch.options[option] = true if params[option].to_i > 0
+        batch.options ||= {}
+        if params[:override_sis_stickiness].to_i > 0
+          batch.options[:override_sis_stickiness] = true
+          [:add_sis_stickiness, :clear_sis_stickiness].each do |option|
+            batch.options[option] = true if params[option].to_i > 0
+          end
         end
       end
-
-      batch.save!
 
       unless Setting.get('skip_sis_jobs_account_ids', '').split(',').include?(@account.global_id.to_s)
         batch.process

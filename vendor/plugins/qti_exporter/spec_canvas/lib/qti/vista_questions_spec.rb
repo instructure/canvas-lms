@@ -73,12 +73,17 @@ describe "Converting Blackboard Vista qti" do
     hash[:answers].each { |a| a.delete(:id) }
     hash.should == VistaExpected::TRUE_FALSE2
   end
+  
+  it "should convert image reference" do 
+    hash = get_question_hash(vista_question_dir, 'mc', delete_answer_ids=true, opts={})
+    hash[:question_text].should =~ %r{\$CANVAS_OBJECT_REFERENCE\$/attachments/67320753001}
+  end
 
   it "should convert true/false questions" do
     hash = get_question("ID_4609865577341")
     hash.should == VistaExpected::TRUE_FALSE
   end
-
+  
   it "should convert multiple choice questions with multiple correct answers (multiple answer)" do
     hash = get_question("ID_4609865392341")
     hash.should == VistaExpected::MULTIPLE_ANSWER

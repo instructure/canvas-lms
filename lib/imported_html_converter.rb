@@ -94,7 +94,7 @@ class ImportedHtmlConverter
           else
             begin
               if relative_url?(node[attr])
-                node[attr] = replace_relative_file_url(node[attr], context, course_path)
+                node[attr] = replace_relative_file_url(val, context, course_path)
               end
             rescue URI::InvalidURIError
               Rails.logger.warn "attempting to translate invalid url: #{node[attr]}"
@@ -116,40 +116,45 @@ class ImportedHtmlConverter
   rescue
     ""
   end
+  
+  def self.find_file_in_context(rel_path, context)
+    mig_id = nil
+    # This is for backward-compatibility: canvas attachment filenames are escaped
+    # with '+' for spaces and older exports have files with that instead of %20
+    alt_rel_path = rel_path.gsub('+', ' ')
+    if context.respond_to?(:attachment_path_id_lookup) && context.attachment_path_id_lookup
+      mig_id ||= context.attachment_path_id_lookup[rel_path]
+      mig_id ||= context.attachment_path_id_lookup[alt_rel_path]
+    end
+    if !mig_id && context.respond_to?(:attachment_path_id_lookup_lower) && context.attachment_path_id_lookup_lower
+      mig_id ||= context.attachment_path_id_lookup_lower[rel_path.downcase]
+      mig_id ||= context.attachment_path_id_lookup_lower[alt_rel_path.downcase]
+    end
+    
+    mig_id && context.attachments.find_by_migration_id(mig_id)
+  end
 
   def self.replace_relative_file_url(rel_path, context, course_path)
     new_url = nil
     rel_path, qs = rel_path.split('?', 2)
-    # This is for backward-compatibility: canvas attachment filenames are escaped
-    # with '+' for spaces and older exports have files with that instead of %20
-    alt_rel_path = rel_path.gsub('+', ' ')
-    if context.respond_to?(:attachment_path_id_lookup) &&
-        context.attachment_path_id_lookup &&
-        (context.attachment_path_id_lookup[rel_path] || context.attachment_path_id_lookup[alt_rel_path])
-      if context.attachment_path_id_lookup[rel_path]
-        file = context.attachments.find_by_migration_id(context.attachment_path_id_lookup[rel_path])
-      else
-        file = context.attachments.find_by_migration_id(context.attachment_path_id_lookup[alt_rel_path])
+    if file = find_file_in_context(rel_path, context)
+      new_url = "/courses/#{context.id}/files/#{file.id}"
+      # support other params in the query string, that were exported from the
+      # original path components and query string. see
+      # CCHelper::file_query_string
+      params = Rack::Utils.parse_nested_query(qs.presence || "")
+      qs = []
+      params.each do |k,v|
+        case k
+        when /canvas_qs_(.*)/
+          qs << "#{Rack::Utils.escape($1)}=#{Rack::Utils.escape(v)}"
+        when /canvas_(.*)/
+          new_url += "/#{$1}"
+        end
       end
-      if file
-        new_url = "/courses/#{context.id}/files/#{file.id}"
-        # support other params in the query string, that were exported from the
-        # original path components and query string. see
-        # CCHelper::file_query_string
-        params = Rack::Utils.parse_nested_query(qs.presence || "")
-        qs = []
-        params.each do |k,v|
-          case k
-          when /canvas_qs_(.*)/
-            qs << "#{Rack::Utils.escape($1)}=#{Rack::Utils.escape(v)}"
-          when /canvas_(.*)/
-            new_url += "/#{$1}"
-          end
-        end
-        new_url += "?#{qs.join("&")}" if qs.present?
-        if params.blank?
-          new_url += "/preview"
-        end
+      new_url += "?#{qs.join("&")}" if qs.present?
+      if params.blank?
+        new_url += "/preview"
       end
     end
     unless new_url
