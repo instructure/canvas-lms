@@ -264,9 +264,11 @@ class SubmissionsApiController < ApplicationController
         submission[:grade] = params[:submission].delete(:posted_grade)
       end
       if submission[:grade]
-        @submission = @assignment.grade_student(@user, submission).first
+        @submissions = @assignment.grade_student(@user, submission)
+        @submission = @submissions.first
       else
         @submission ||= @assignment.find_or_create_submission(@user)
+        @submissions ||= [@submission]
       end
 
       assessment = params[:rubric_assessment]
@@ -294,7 +296,9 @@ class SubmissionsApiController < ApplicationController
       # fix this at some point.
       @submission.reload
 
-      render :json => submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments)).to_json
+      json = submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments))
+      json[:all_submissions] = @submissions.map { |submission| submission_json(submission, @assignment, @current_user, session, @context) }
+      render :json => json.to_json
     end
   end
 

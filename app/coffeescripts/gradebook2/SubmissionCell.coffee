@@ -41,7 +41,7 @@ define [
       url = @opts.grid.getOptions().change_grade_url
       url = url.replace(":assignment", submission.assignment_id).replace(":submission", submission.user_id)
       $.ajaxJSON url, "PUT", { "submission[posted_grade]": state }, (submission) =>
-        $.publish 'submissions_updated', [[submission]]
+        $.publish 'submissions_updated', [submission.all_submissions]
 
     isValueChanged: () ->
       @val != @$input.val()
