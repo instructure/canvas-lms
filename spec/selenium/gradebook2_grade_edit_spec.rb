@@ -113,20 +113,18 @@ describe "edititing grades" do
   end
 
   it "should edit a grade, move to the next cell and validate focus is not lost" do
-    pending('bug 7375 - server response causes active cell in same row to loose focus') do
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
 
-      first_cell = f('#gradebook_grid [row="0"] .l0')
-      grade_input = keep_trying_until do
-        first_cell.click
-        first_cell.find_element(:css, '.grade')
-      end
-      set_value(grade_input, 3)
-      first_cell.send_keys(:tab)
-      wait_for_ajax_requests
-      f('#gradebook_grid [row="0"] .l1').should have_class('editable')
+    first_cell = f('#gradebook_grid [row="0"] .l0')
+    grade_input = keep_trying_until do
+      first_cell.click
+      first_cell.find_element(:css, '.grade')
     end
+    set_value(grade_input, 3)
+    first_cell.send_keys(:tab)
+    wait_for_ajax_requests
+    f('#gradebook_grid [row="0"] .l1').should have_class('editable')
   end
 
   it "should update a grade when clicking outside of slickgrid" do

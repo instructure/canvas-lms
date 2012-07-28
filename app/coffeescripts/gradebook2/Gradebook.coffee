@@ -241,13 +241,27 @@ define [
     # It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
     # where each student has an array of submissions.  This one just expects an array of submissions,
     # they are not grouped by student.
-    updateSubmissionsFromExternal: (submissions) =>
+    updateSubmissionsFromExternal: (submissions, submissionCell) =>
+      activeCell = @gradeGrid.getActiveCell()
+      editing = $(@gradeGrid.getActiveCellNode()).hasClass('editable')
+      columns = @gradeGrid.getColumns()
       for submission in submissions
         student = @students[submission.user_id]
+        idToMatch = "assignment_#{submission.assignment_id}"
+        cell = index for column, index in columns when column.id is idToMatch
+        thisCellIsActive = activeCell? and
+          editing and
+          activeCell.row is student.row and
+          activeCell.cell is cell
         @updateSubmission(submission)
-        @multiGrid.invalidateRow(student.row)
         @calculateStudentGrade(student)
-      @multiGrid.render()
+        @gradeGrid.updateCell student.row, cell unless thisCellIsActive
+        @updateRowTotals student.row
+
+    updateRowTotals: (rowIndex) ->
+      columns = @gradeGrid.getColumns()
+      for column, columnIndex in columns
+        @gradeGrid.updateCell rowIndex, columnIndex if column.type isnt 'assignment'
 
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
