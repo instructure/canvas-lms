@@ -410,6 +410,11 @@ describe "Users API", :type => :integration do
         user.time_zone.should eql 'Tijuana'
       end
 
+      it "should allow updating without any params" do
+        json = api_call(:put, @path, @path_options, {})
+        json.should_not be_nil
+      end
+
       it "should update the user's avatar with a token" do
         json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
                         :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')

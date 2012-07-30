@@ -775,6 +775,7 @@ class UsersController < ApplicationController
   #     "avatar_url":"http://<canvas>/images/users/133-..."
   #   }
   def update
+    params[:user] ||= {}
     @user = api_request? ?
       api_find(User, params[:id]) :
       params[:id] ? User.find(params[:id]) : @current_user
