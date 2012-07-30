@@ -604,7 +604,7 @@ define [
       @aggregateColumns = for id, group of @assignmentGroups
         html = "#{group.name}"
         if group.group_weight?
-          percentage =  I18n.toPercentage(group.group_weight, precision: 0)
+          percentage =  I18n.toPercentage(group.group_weight, precision: 2)
           html += """
             <div class='assignment-points-possible'>
               #{I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}
