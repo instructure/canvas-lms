@@ -17,7 +17,7 @@
 #
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "/profile/communication" do
+describe "profile communication settings" do
   it_should_behave_like "in-process server selenium tests"
   before :each do
     user_logged_in(:username => 'somebody@example.com')
@@ -32,6 +32,7 @@ describe "/profile/communication" do
   def mouse_enter_cell(category_id, channel_id)
     driver.execute_script("$('#notification-preferences .comm-event-option[data-categoryid=#{category_id}][data-channelid=#{channel_id}]').trigger('mouseenter')")
   end
+
   # Using javascript, trigger a mouseleave event to hide buttons and display text.
   def mouse_leave_cell(category_id, channel_id)
     driver.execute_script("$('#notification-preferences .comm-event-option[data-categoryid=#{category_id}][data-channelid=#{channel_id}]').trigger('mouseleave')")
@@ -47,7 +48,7 @@ describe "/profile/communication" do
     # Page title should match expected
     f('title').text.should == 'Notification Preferences'
     # Expect breadcrumbs to correctly display page name
-    f('nav#breadcrumbs').text.should match(/Notification Preferences/)
+    f('nav#breadcrumbs').should include_text('Notification Preferences')
     # Expect h2 with
     f('#content > h2').text.should == 'Notification Preferences'
   end
@@ -55,8 +56,8 @@ describe "/profile/communication" do
   it "should display the user's email address as channel" do
     get "/profile/communication"
     keep_trying_until do
-      fj('th.comm-channel:first').text.should match(/Email Address/)
-      fj('th.comm-channel:first').text.should match(/somebody@example.com/)
+      fj('th.comm-channel:first').should include_text('Email Address')
+      fj('th.comm-channel:first').should include_text('somebody@example.com')
     end
   end
 
@@ -65,73 +66,68 @@ describe "/profile/communication" do
     channel.confirm
     get "/profile/communication"
     keep_trying_until do
-      fj('tr.grouping:first th.comm-channel:last').text.should match(/Cell Number/)
-      fj('tr.grouping:first th.comm-channel:last').text.should match(/8011235555@vtext.com/)
+      fj('tr.grouping:first th.comm-channel:last').should include_text('Cell Number')
+      fj('tr.grouping:first th.comm-channel:last').should include_text('8011235555@vtext.com')
     end
   end
 
-  context "no-touch usage" do
-    # behaves this way by default
-
-    it "should load the initial state of a user-pref checkbox" do
-      # set the user's initial user preference and verify checked or unchecked
-      @user.preferences[:send_scores_in_emails] = false
-      @user.preferences[:no_submission_comments_inbox] = true
-      @user.save!
-      get "/profile/communication"
-      keep_trying_until do
-        f('.user-pref-check[name=send_scores_in_emails]').attribute('checked').should be_nil
-        f('.user-pref-check[name=no_submission_comments_inbox]').attribute('checked').should == 'true'
-      end
+  it "should load the initial state of a user-pref checkbox" do
+    # set the user's initial user preference and verify checked or unchecked
+    @user.preferences[:send_scores_in_emails] = false
+    @user.preferences[:no_submission_comments_inbox] = true
+    @user.save!
+    get "/profile/communication"
+    keep_trying_until do
+      is_checked('.user-pref-check[name=send_scores_in_emails]').should be_false
+      is_checked('.user-pref-check[name=no_submission_comments_inbox]').should be_true
     end
+  end
 
-    it "should save a user-pref checkbox change" do
-      # set the user's initial user preference and verify checked or unchecked
-      @user.preferences[:send_scores_in_emails] = false
-      @user.save!
-      get "/profile/communication"
-      f('.user-pref-check[name=send_scores_in_emails]').click
+  it "should save a user-pref checkbox change" do
+    # set the user's initial user preference and verify checked or unchecked
+    @user.preferences[:send_scores_in_emails] = false
+    @user.save!
+    get "/profile/communication"
+    f('.user-pref-check[name=send_scores_in_emails]').click
 
-      wait_for_ajaximations
+    wait_for_ajaximations
 
-      # test data stored
-      @user.reload
-      @user.preferences[:send_scores_in_emails].should == true
-    end
+    # test data stored
+    @user.reload
+    @user.preferences[:send_scores_in_emails].should == true
+  end
 
-    it "should load an existing frequency setting and save a change" do
-      channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "sms")
-      channel.confirm
-      # Create a notification policy entry as an existing setting.
-      policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)
-      policy.frequency = Notification::FREQ_DAILY
-      policy.save!
-      get "/profile/communication"
-      cell = find_frequency_cell(@sub_comment.id, channel.id)
-      # validate existing text is shown correctly (text display and button state)
-      cell.text.should == 'Daily'
+  it "should load an existing frequency setting and save a change" do
+    channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "sms")
+    channel.confirm
+    # Create a notification policy entry as an existing setting.
+    policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)
+    policy.frequency = Notification::FREQ_DAILY
+    policy.save!
+    get "/profile/communication"
+    cell = find_frequency_cell(@sub_comment.id, channel.id)
+    # validate existing text is shown correctly (text display and button state)
+    cell.text.should == 'Daily'
 
-      mouse_enter_cell(@sub_comment.id, channel.id)
-      cell.find_element(:css, '.immediately-label').click
-      mouse_leave_cell(@sub_comment.id, channel.id)
-      # Change to a different value and verify flash and the save. (click on the radio)
-      cell.text.should == 'ASAP'
+    mouse_enter_cell(@sub_comment.id, channel.id)
+    cell.find_element(:css, '.immediately-label').click
+    mouse_leave_cell(@sub_comment.id, channel.id)
+    # Change to a different value and verify flash and the save. (click on the radio)
+    cell.text.should == 'ASAP'
 
-      wait_for_ajaximations
+    wait_for_ajaximations
 
-      # test data stored
-      policy.reload
-      policy.frequency.should == Notification::FREQ_IMMEDIATELY
-    end
+    # test data stored
+    policy.reload
+    policy.frequency.should == Notification::FREQ_IMMEDIATELY
+  end
 
-    context "accessibility usage" do
-      it "should be navigable by keyboard only"
-    end
+  context "accessibility usage" do
+    it "should be navigable by keyboard only"
   end
 
   context "touch usage" do
     it "should create a select with options instead of radio buttons"
     it "should save the frequency change for select" #flash - test data
   end
-
 end

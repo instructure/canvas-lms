@@ -154,7 +154,7 @@ describe "edititing grades" do
     f('#ui-menu-1-4').click
     curve_form = f('#curve_grade_dialog')
     set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
-    find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
+    fj('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.dismiss
@@ -174,8 +174,8 @@ describe "edititing grades" do
     open_assignment_options(0)
     f('#ui-menu-1-4').click
 
-    find_with_jquery('#assign_blanks').click
-    find_with_jquery('.ui-dialog-buttonpane button:visible').click
+    fj('#assign_blanks').click
+    fj('.ui-dialog-buttonpane button:visible').click
 
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
