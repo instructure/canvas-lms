@@ -29,12 +29,10 @@ define [
 
     $node.appendTo($holder).
       css('z-index', 1).
-      show('drop', direction: "up", 'fast').
-      slideDown('fast', -> $(this).css('z-index', 2)).
+      show('drop', direction: "up", 'fast', -> $(this).css('z-index', 2)).
       delay(timeout || 7000).
       animate({'z-index': 1}, 0).
       fadeOut('slow', -> $(this).slideUp('fast', -> $(this).remove()))
-      #hide('drop', { direction: "up" }, 'fast', -> $(this).remove())
   
   # Pops up a small notification box at the top of the screen.
   $.flashMessage = (content, timeout = 3000) ->
