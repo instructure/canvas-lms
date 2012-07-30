@@ -34,7 +34,7 @@ describe "Favorites API", :type => :integration do
       json[0]['id'].should eql @courses[0].id
       json[0]['name'].should eql @courses[0].name
       json[0]['course_code'].should eql @courses[0].course_code
-      json[0]['primary_enrollment'].should eql 'StudentEnrollment'
+      json[0]['enrollments'][0]['type'].should eql 'student'
       json.collect {|row| row["id"]}.sort.should eql(@user.menu_courses.collect{|c| c[:id]}.sort)
     end
 
@@ -80,7 +80,7 @@ describe "Favorites API", :type => :integration do
       json[0]['id'].should eql @courses[0].id
       json[0]['name'].should eql @courses[0].name
       json[0]['course_code'].should eql @courses[0].course_code
-      json[0]['primary_enrollment'].should eql 'StudentEnrollment'
+      json[0]['enrollments'][0]['type'].should eql 'student'
       json.collect {|row| row["id"]}.sort.should eql(@user.favorites.by('Course').collect{|c| c[:context_id]}.sort)
     end
 

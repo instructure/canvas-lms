@@ -19,8 +19,56 @@
 require 'set'
 
 # @API Courses
-#
 # API for accessing course information.
+#
+# @object Course
+#   {
+#       // the unique identifier for the course
+#       id: 370663,
+#
+#       // the SIS identifier for the course, if defined
+#       sis_course_id: null,
+#
+#       // the full name of the course
+#       name: "InstructureCon 2012",
+#
+#       // the course code
+#       course_code: "INSTCON12",
+#
+#       // the account associated with the course
+#       account_id: 81259,
+#
+#       // the start date for the course, if applicable
+#       start_at: "2012-06-01T00:00:00-06:00",
+#
+#       // the end date for the course, if applicable
+#       end_at: null,
+#
+#       // A list of enrollments linking the current user to the course.
+#       // for student enrollments, grading information may be included
+#       // if include[]=total_scores
+#       enrollments: [
+#         {
+#           type: student,
+#           computed_final_score: 41.5,
+#           computed_current_score: 90,
+#           computed_final_grade: 'A-'
+#         }
+#       ],
+#
+#       // course calendar
+#       calendar: {
+#         ics: "https:\/\/canvas.instructure.com\/feeds\/calendars\/course_abcdef.ics"
+#       }
+#
+#       // optional: user-generated HTML for the course syllabus
+#       syllabus_body: "<p>syllabus html goes here<\/p>",
+#
+#       // optional: the number of submissions needing grading
+#       // returned only if the current user has grading rights
+#       // and include[]=needs_grading_count
+#       needs_grading_count: '17'
+#   }
 class CoursesController < ApplicationController
   include SearchHelper
 
@@ -56,20 +104,7 @@ class CoursesController < ApplicationController
   #   calculated_final_score (if available). This argument is ignored if the
   #   course is configured to hide final grades.
   #
-  # @response_field id The unique identifier for the course.
-  # @response_field name The name of the course.
-  # @response_field course_code The course code.
-  # @response_field enrollments A list of enrollments linking the current user
-  #   to the course.
-  # @response_field sis_course_id The SIS id of the course, if defined.
-  #
-  # @response_field needs_grading_count Number of submissions needing grading
-  #   for all the course assignments. Only returned if
-  #   include[]=needs_grading_count
-  #
-  # @example_response
-  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'enrollments': [{'type': 'student', 'computed_current_score': 84.8, 'computed_final_score': 62.9, 'computed_final_grade': 'D-'}], 'calendar': { 'ics': '..url..' } },
-  #     { 'id': 2, 'name': 'second course', 'course_code': 'second', 'enrollments': [{'type': 'teacher'}], 'calendar': { 'ics': '..url..' } } ]
+  # @returns [Course]
   def index
     respond_to do |format|
       format.html {
@@ -119,6 +154,7 @@ class CoursesController < ApplicationController
   # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
   # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
   #
+  # @returns Course
   def create
     @account = Account.find(params[:account_id])
     if authorized_action(@account, @current_user, :manage_courses)
@@ -710,6 +746,8 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action, and returns a
   # single course with the same fields as that action.
+  #
+  # @returns Course
   def show
     if api_request?
       @context = api_find(Course, params[:id])
