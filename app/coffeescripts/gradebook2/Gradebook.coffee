@@ -210,8 +210,9 @@ define [
       @multiGrid.invalidate()
 
     getSubmissionsChunks: =>
+      allStudents = (s for k, s of @students)
       loop
-        students = @rows[@chunk_start...(@chunk_start+@options.chunk_size)]
+        students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
         unless students.length
           @allSubmissionsLoaded = true
           break

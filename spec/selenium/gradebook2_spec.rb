@@ -92,20 +92,29 @@ describe "gradebook2" do
     it "should allow showing only a certain section" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
+      # grade the first assignment
+      edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
+      edit_grade(f('#gradebook_grid [row="1"] .l0'), 1)
+
       button = f('#section_to_show')
       button.should include_text "All Sections"
       switch_to_section(@other_section)
       button.should include_text @other_section.name
+      validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # verify that it remembers the section to show across page loads
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       button = f('#section_to_show')
       button.should include_text @other_section.name
+      validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # now verify that you can set it back
       switch_to_section()
       button.should include_text "All Sections"
+      # validate all grades (i.e. submissions) were loaded
+      validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '0')
+      validate_cell_text(f('#gradebook_grid [row="1"] .l0'), '1')
     end
 
 
