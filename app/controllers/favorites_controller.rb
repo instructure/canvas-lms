@@ -36,18 +36,21 @@ class FavoritesController < ApplicationController
   # Retrieve the list of favorite courses for the current user. If the user has not chosen
   # any favorites, then a selection of currently enrolled courses will be returned.
   #
+  # See the {api:CoursesController#index List courses API} for details on accepted include[] parameters.
+  #
+  # @returns [Course]
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/users/self/favorites/courses \ 
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
-  # @example_response
-  #     [{"id":1170, "course_code":"HIST 411", "name":"Ancient History", "primary_enrollment":"StudentEnrollment", ...},
-  #      {"id":1337, "course_code":"PHYS 301", "name":"Modern Physics", "primary_enrollment":"StudentEnrollment", ...}]
-  #
   def list_favorite_courses
+    includes = Set.new(Array(params[:include]))
     courses = Api.paginate(@current_user.menu_courses, self, '/api/v1/users/self/favorite/courses')
     render :json => courses.map { |course|
-      course_json(course, @current_user, session, ['primary_enrollment'], nil) }
+      enrollments = course.current_enrollments.all(:conditions => { :user_id => @current_user.id })
+      course_json(course, @current_user, session, includes, enrollments)
+    }
   end
 
   # @API Add course to favorites
