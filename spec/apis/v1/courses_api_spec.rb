@@ -253,6 +253,22 @@ describe CoursesController, :type => :integration do
         @course.restrict_enrollments_to_course_dates.should be_true
         @course.workflow_state.should == 'available'
       end
+
+      it "should not change dates that aren't given" do
+        @course.update_attribute(:conclude_at, '2012-01-01T23:59:59Z')
+        @new_values['course'].delete('end_at')
+        api_call(:put, @path, @params, @new_values)
+        @course.reload
+        @course.end_at.strftime('%Y-%m-%dT%T%z').should == '2012-01-01T23:59:59+0000'
+      end
+
+      it "should allow a date to be deleted" do
+        @course.update_attribute(:conclude_at, Time.now)
+        @new_values['course']['end_at'] = nil
+        api_call(:put, @path, @params, @new_values)
+        @course.reload
+        @course.end_at.should be_nil
+      end
     end
 
     context "a teacher" do

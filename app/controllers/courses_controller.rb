@@ -1150,9 +1150,9 @@ class CoursesController < ApplicationController
           end
         end
       end
-   params[:course][:event] = :offer if params[:offer].present?
-   @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
-      params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request?
+      params[:course][:event] = :offer if params[:offer].present?
+      @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+      params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
         if @course.update_attributes(params[:course])
