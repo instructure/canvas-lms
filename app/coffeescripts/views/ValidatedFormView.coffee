@@ -24,7 +24,8 @@ define [
 
     className: 'validated-form-view'
 
-    events: {'submit'}
+    events:
+      submit: 'submit'
 
     ##
     # When the form submits, the model's attributes are set from the form
@@ -35,13 +36,15 @@ define [
     ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
+    # set @saveOpts in your vew to to pass opts to Backbone.sync (like multipart: true if you have
+    # a file attachment)
     #
     # @api public
     # @returns jqXHR
     submit: (event) ->
       event.preventDefault() if event
       data = @getFormData()
-      dfd = @model.save(data).then @onSaveSuccess, @onSaveFail
+      dfd = @model.save(data, @saveOpts).then @onSaveSuccess, @onSaveFail
       @$el.disableWhileLoading dfd
       @trigger 'submit'
       dfd
