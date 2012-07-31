@@ -98,6 +98,9 @@ module Api::V1::Submission
     end
 
     hash = api_json(attempt, user, session, :only => json_fields)
+    if hash['body'].present?
+      hash['body'] = api_user_content(hash['body'], context, user)
+    end
 
     hash['preview_url'] = course_assignment_submission_url(
       context, assignment, attempt[:user_id], 'preview' => '1',

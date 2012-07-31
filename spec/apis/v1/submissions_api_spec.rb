@@ -413,6 +413,21 @@ describe 'Submissions API', :type => :integration do
     JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
 
+  it "should api translate online_text_entry submissions" do
+    student1 = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student1).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    should_translate_user_content(@course) do |content|
+      sub1 = submit_homework(a1, student1, :body => content)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
+                    { :controller => "submissions_api", :action => "show",
+                      :format => "json", :course_id => @course.id.to_s,
+                      :assignment_id => a1.id.to_s, :id => student1.id.to_s })
+      json["body"]
+    end
+  end
+
   it "should allow retrieving attachments without a session" do
     student1 = user(:active_all => true)
     course_with_teacher(:active_all => true)
