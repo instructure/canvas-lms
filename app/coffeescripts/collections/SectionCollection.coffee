@@ -17,10 +17,12 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/User'
-], (PaginatedCollection, User) ->
+  'Backbone'
+  'compiled/models/Section'
+], ({Collection}, Section) ->
 
-  class UserCollection extends PaginatedCollection
+  # A collection for working with course sections returned from
+  # CoursesController#sections.
+  class SectionCollection extends Collection
 
-    model: User
+    model: Section

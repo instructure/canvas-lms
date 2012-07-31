@@ -69,7 +69,7 @@ shared_examples_for "discussions selenium tests" do
   end
 
   def validate_entry_text(discussion_entry, text)
-    li_selector = %([data-id$="#{discussion_entry.id}"])
+    li_selector = %(.discussion-entries [data-id$="#{discussion_entry.id}"])
     keep_trying_until do
       fj(li_selector).should include_text(text)
     end

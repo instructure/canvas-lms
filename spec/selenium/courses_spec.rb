@@ -112,6 +112,72 @@ describe "courses" do
 
       driver.current_url.should match %r{/courses/#{course2.id}/grades}
     end
+
+    it "should load the users page using ajax" do
+      course_with_teacher_logged_in
+
+      # Setup the course with > 50 users (to test scrolling)
+      100.times do |n|
+        @course.enroll_student(user).accept!
+      end
+
+      # Test that the page loads properly the first time.
+      get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
+      ff('.ui-state-error').length.should    == 0
+      ff('.student_roster .user').length.should == 50
+      ff('.teacher_roster .user').length.should == 1
+
+      # Test the infinite scroll.
+      driver.execute_script <<-END
+        var $wrapper = $('.student_roster .fill_height_div'),
+            $list    = $('.student_list'),
+            scroll   = $list.height() - $wrapper.height();
+
+        $wrapper.scrollTo(scroll);
+      END
+      wait_for_ajaximations
+      ff('.student_roster li').length.should == 100
+    end
+
+    it "should only show users that a user has permissions to view" do
+      # Set up the test
+      course(:active_course => true)
+      %w[One Two].each do |name|
+        section = @course.course_sections.create!(:name => name)
+        @course.enroll_student(user, :section => section).accept!
+      end
+      user_logged_in
+      enrollment = @course.enroll_ta(@user)
+      enrollment.accept!
+      enrollment.update_attributes(:limit_privileges_to_course_section => true,
+                                   :course_section => CourseSection.find_by_name('Two'))
+
+      # Test that only users in the approved section are displayed.
+      get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
+      ff('.student_roster .user').length.should == 1
+    end
+
+    it "should display users' section name" do
+      course_with_teacher_logged_in(:active_all => true)
+      user1, user2 = [user, user]
+      section1 = @course.course_sections.create!(:name => 'One')
+      section2 = @course.course_sections.create!(:name => 'Two')
+      @course.enroll_student(user1, :section => section1).accept!
+      [section1, section2].each do |section|
+        e = user2.student_enrollments.build
+        e.workflow_state = 'active'
+        e.course = @course
+        e.course_section = section
+        e.save!
+      end
+
+      get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
+      sections = ff('.student_roster .section')
+      sections.map(&:text).sort.should == %w{One One Two}
+    end
   end
 
   context "course as a student" do

@@ -16,11 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/User'
-], (PaginatedCollection, User) ->
+define ['Backbone'], ({Model}) ->
 
-  class UserCollection extends PaginatedCollection
-
-    model: User
+  class Section extends Model

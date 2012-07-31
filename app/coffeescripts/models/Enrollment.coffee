@@ -16,19 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+define ['Backbone'], ({Model}) ->
 
-describe ContextController do
-  it "should show multiple enrollment sections on the users page" do
-    course_with_teacher_logged_in(:active_all => true)
-    student_in_course(:active_all => true, :name => "Test User")
-    add_section("Other Section")
-    multiple_student_enrollment(@student, @course_section)
-
-    get "/courses/#{@course.id}/users"
-    response.should be_success
-    student_div = Nokogiri::HTML(response.body).at_css("#user_#{@student.id}")
-    student_div.text.should match @course.default_section.name
-    student_div.text.should match /Other Section/
-  end
-end
+  class Enrollment extends Model

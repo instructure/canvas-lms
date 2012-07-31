@@ -25,46 +25,15 @@ describe ContextController do
       get 'roster', :course_id => @course.id
       assert_unauthorized
     end
-    
-    it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
-      get 'roster', :course_id => @course.id
-      assigns[:students].should_not be_nil
-      assigns[:teachers].should_not be_nil
-    end
-    
-    it "should retrieve students and teachers" do
-      course_with_student_logged_in(:active_all => true)
-      @student = @user
-      @teacher = user(:active_all => true)
-      @teacher = @course.enroll_teacher(@teacher)
-      @teacher.accept!
-      @teacher = @teacher.user
-      get 'roster', :course_id => @course.id
-      assigns[:students].should_not be_nil
-      assigns[:students].should_not be_empty
-      assigns[:students].should be_include(@student) #[0].should eql(@user)
-      assigns[:teachers].should_not be_nil
-      assigns[:teachers].should_not be_empty
-      assigns[:teachers].should be_include(@teacher) #[0].should eql(@teacher)
-    end
-
-    it "should not include designers as teachers" do
-      course_with_student_logged_in(:active_all => true)
-      @designer = user(:active_all => true)
-      @course.enroll_designer(@designer).accept!
-      get 'roster', :course_id => @course.id
-      assigns[:teachers].should_not be_include(@designer)
-    end
   end
-  
+
   describe "GET 'roster_user'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       get 'roster_user', :course_id => @course.id, :id => @user.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       @enrollment = @course.enroll_student(user(:active_all => true))
@@ -86,14 +55,14 @@ describe ContextController do
       get 'chat', :course_id => @course.id, :id => @user.id
       response.should be_redirect
     end
-    
+
     it "should require authorization" do
       PluginSetting.create!(:name => "tinychat", :settings => {})
       course_with_teacher(:active_all => true)
       get 'chat', :course_id => @course.id, :id => @user.id
       assert_unauthorized
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       PluginSetting.create!(:name => "tinychat", :settings => {})
       course_with_student_logged_in(:active_all => true)

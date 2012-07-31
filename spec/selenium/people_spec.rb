@@ -87,6 +87,7 @@ describe "people" do
       @test_observer = create_user('observer@test.com')
 
       get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
     end
 
     it "should validate the main page" do

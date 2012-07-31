@@ -426,6 +426,19 @@ module ApplicationHelper
     @domain_root_account.manually_created_courses_account.grants_rights?(user, session, :create_courses, :manage_courses).values.any?
   end
 
+  # Public: Create HTML for a sidebar button w/ icon.
+  #
+  # url - The url the button should link to.
+  # img - The path to an image (e.g. 'icon.png')
+  # label - The text to display on the button (should already be internationalized).
+  #
+  # Returns an HTML string.
+  def sidebar_button(url, label, img = nil)
+    link_to(url, :class => 'button button-sidebar-wide') do
+      img ? image_tag(img) + label : label
+    end
+  end
+
   def hash_get(hash, key, default=nil)
     if hash
       if hash[key.to_s] != nil
