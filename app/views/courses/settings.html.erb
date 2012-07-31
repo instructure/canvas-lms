@@ -41,8 +41,8 @@
     <% form_for @context, :html => {:id => "course_form"} do |f| %>
     <table class="formtable">
       <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.blabel :name, :course_name, :en => "Name" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
+        <td><%= f.blabel :name, :course_name, :en => "Name" %></td>
+        <td class="nobr">
           <% if can_rename_course %>
             <%= f.text_field :name, :class => "course_form", :style => "width: 150px;" %>
           <% else %>
@@ -63,7 +63,7 @@
         <% end %>
       </tr>
       <tr>
-        <td style="width: 10%; white-space: nowrap;"><%= f.blabel :course_code, :en => "Course Code" %></td>
+        <td class="nobr"><%= f.blabel :course_code, :en => "Course Code" %></td>
         <td class="nobr">
           <% if can_rename_course %>
             <span class="course_form"><%= f.text_field :course_code, :style => "width: 100px;" %></span>
@@ -217,7 +217,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         </td>
       <% if @context.turnitin_enabled? %>
       </tr><tr>
-        <td style="width: 10%;"><%= f.blabel :turnitin_comments, :en => "Turnitin Submission Comments" %></td>
+        <td style="width: 10%;"><%= f.blabel :turnitin_comments, :en => "Turnitin Comments" %></td>
         <td class="nobr">
           <span class="course_form"><span style="font-size: 0.8em;"><%= t('turnitin', %{these comments will be shown to students when submitting a Turnitin-enabled assignment}) %></span><br/><%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %></span>
           <span class="course_info turnitin_comments"><%= @context.turnitin_comments %></span>
