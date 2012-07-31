@@ -1,4 +1,4 @@
-define(['jquery'], function ($){
+define(['jquery', 'compiled/jquery/serializeForm'], function ($){
 
   var patterns = {
     validate: /^[a-zA-Z][a-zA-Z0-9_]*(?:\[(?:\d*|[a-zA-Z0-9_]+)\])*$/,
@@ -30,7 +30,7 @@ define(['jquery'], function ($){
       }
     };
 
-    $.each($(this).serializeArray(), function(){
+    $.each($(this).serializeForm(), function(){
 
       // skip invalid keys
       if(!patterns.validate.test(this.name)){
