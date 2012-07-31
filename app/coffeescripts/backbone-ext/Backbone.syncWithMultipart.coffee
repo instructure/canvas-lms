@@ -1,3 +1,5 @@
+# copied from: https://gist.github.com/1998897
+
 define [
   'use!vendor/backbone'
   'underscore'
@@ -15,6 +17,9 @@ define [
     httpMethod = {create: 'POST', update: 'PUT', delete: 'DELETE', read: 'GET'}[method]
     toForm = (object, nested) ->
       inputs = _.map object, (attr, key) ->
+
+        key = "#{nested}[#{key}]" if nested
+
         if _.isElement(attr)
           # leave a copy in the original form, since we're moving it
           $orig = $(attr)

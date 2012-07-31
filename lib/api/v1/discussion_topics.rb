@@ -18,6 +18,7 @@
 
 module Api::V1::DiscussionTopics
   include Api::V1::Json
+  include Api::V1::User
   include Api::V1::Attachment
 
   def discussion_topics_api_json(topics, context, user, session)
@@ -26,7 +27,7 @@ module Api::V1::DiscussionTopics
     end
   end
 
-  def discussion_topic_api_json(topic, context, user, session)
+  def discussion_topic_api_json(topic, context, user, session, include_assignment = true)
     attachments = []
     if topic.attachment
       attachments << attachment_json(topic.attachment, user)
@@ -41,8 +42,8 @@ module Api::V1::DiscussionTopics
     children = topic.child_topics.scoped(:select => 'id').map(&:id)
 
     api_json(topic, user, session, {
-                  :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at root_topic_id),
-                  :methods => [:user_name, :discussion_subentry_count], }, [:attach]
+                  :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at root_topic_id podcast_has_student_posts),
+                  :methods => [:user_name, :discussion_subentry_count], }, [:attach, :update, :delete]
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
                   :discussion_type => topic.discussion_type,
@@ -52,12 +53,18 @@ module Api::V1::DiscussionTopics
                   :unread_count => topic.unread_count(user),
                   :topic_children => children,
                   :attachments => attachments,
+                  :locked => topic.locked?,
+                  :author => user_display_json(topic.user, topic.context),
                   :html_url => context.is_a?(CollectionItem) ? nil :
                           named_context_url(context,
                                             :context_discussion_topic_url,
                                             topic,
                                             :include_host => true)
       json[:url] = json[:html_url] # deprecated
+      if include_assignment && topic.assignment
+        json[:assignment] = assignment_json(topic.assignment, user, session, !:include_discussion_topic)
+      end
+      json
     end
   end
 

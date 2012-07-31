@@ -23,9 +23,7 @@ describe "/announcements/index" do
   it "should render" do
     course_with_teacher
     view_context(@course, @user)
-    announcements = []
-    announcements << @course.announcements.create!(:title => "some announcement", :message => "some message")
-    assigns[:announcements] = announcements.paginate(:page => params[:page])
+    assigns[:body_classes] = []
     render 'announcements/index'
     response.should_not be_nil
   end

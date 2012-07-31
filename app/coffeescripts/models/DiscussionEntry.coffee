@@ -6,12 +6,12 @@ define [
 
   UNKOWN_AUTHOR =
     avatar_image_url: null
-    display_name: 'Unknown Author'
+    display_name: I18n.t 'unknown_author', 'Unknown Author'
     id: null
 
   ##
   # Model representing an entry in discussion topic
-  class Entry extends Backbone.Model
+  class DiscussionEntry extends Backbone.Model
 
     author: ->
       @findParticipant @get('user_id')

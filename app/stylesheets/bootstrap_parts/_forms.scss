@@ -110,6 +110,11 @@ input[type="url"], input[type="search"], input[type="tel"], input[type="color"],
     width: auto; // Override of generic input selector
   }
 
+  input[type="search"] {
+    -webkit-appearance: none;
+    height: 28px;
+  }
+
 
   // Make uneditable textareas behave like a textarea
   .uneditable-textarea {
@@ -404,7 +409,7 @@ input[type="url"], input[type="search"], input[type="tel"], input[type="color"],
 // -----------------
 
 .form-search, .form-inline, .form-horizontal {
-  
+
   input,
   input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"],
   input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"],

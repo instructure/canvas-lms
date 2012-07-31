@@ -1,14 +1,5 @@
 @import environment
 
-// This hides stuff till the javascript has done it's stuff,
-// Calendar.cofffee sets the '.calendar-loaded' class when it is done
-// note: this is not using display: none, because fullcalendar throws an error
-// if the element it is rendering to is not displayed.
-#content, #right-side-wrapper
-  +opacity(0)
-  +single-transition(opacity, 0.3s)
-  .calendar-loaded &
-    +opacity(1)
 
 #main
   background-color: transparent

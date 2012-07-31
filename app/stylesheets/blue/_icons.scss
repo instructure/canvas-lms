@@ -13,6 +13,8 @@ i[class*=icon-], i[class^=icon-] {
   a:active &,
   .active & { background-image: url(../../../images/blue/canvas-icons-16x16-ltgrey.png); }
 
+  .btn & { margin-bottom: -3px;}
+
 }
 
 .quickStartBar {

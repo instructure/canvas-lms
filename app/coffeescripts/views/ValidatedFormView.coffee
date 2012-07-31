@@ -1,9 +1,11 @@
 define [
   'Backbone'
-  'formToJSON'
+  'jquery'
+  'compiled/fn/preventDefault'
+  'jquery.toJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], ({View, Model}, formToJSON) ->
+], (Backbone, $, preventDefault) ->
 
   ##
   # Sets model data from a form, saves it, and displays errors returned in a
@@ -18,7 +20,7 @@ define [
   #
   # @event success
   #   @signature `(response, status, jqXHR)`
-  class ValidatedFormView extends View
+  class ValidatedFormView extends Backbone.View
 
     tagName: 'form'
 
@@ -31,23 +33,32 @@ define [
     # When the form submits, the model's attributes are set from the form
     # and saved to the server. Make sure to pass in `model` to the options on
     # initialize
-    model: Model.extend()
+    model: Backbone.Model.extend()
 
     ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
     # set @saveOpts in your vew to to pass opts to Backbone.sync (like multipart: true if you have
-    # a file attachment)
+    # a file attachment).  if you want the form not to be re-enabled after save success (because you
+    # are navigating to a new page, set dontRenableAfterSaveSuccess to true on your view)
     #
     # @api public
     # @returns jqXHR
-    submit: (event) ->
-      event.preventDefault() if event
+    submit: preventDefault ->
       data = @getFormData()
-      dfd = @model.save(data, @saveOpts).then @onSaveSuccess, @onSaveFail
-      @$el.disableWhileLoading dfd
+
+      disablingDfd = new $.Deferred()
+      saveDfd = @model
+        .save(data, @saveOpts)
+        .then(@onSaveSuccess, @onSaveFail)
+        .fail -> disablingDfd.reject()
+
+      unless @dontRenableAfterSaveSuccess
+        saveDfd.done -> disablingDfd.resolve()
+
+      @$el.disableWhileLoading disablingDfd
       @trigger 'submit'
-      dfd
+      saveDfd
 
     ##
     # Converts the form to an object. Override this if the form's input names
@@ -120,5 +131,8 @@ define [
 
     findField: (field) ->
       selector = @fieldSelectors?[field] or "[name=#{field}]"
-      @$ selector
+      $el = @$(selector)
+      if $el.data('rich_text')
+        $el = $el.next('.mceEditor').find(".mceIframeContainer")
+      $el
 

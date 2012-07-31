@@ -32,10 +32,21 @@ define [
 
     friendlyDatetime : (datetime, {hash: {pubdate}}) ->
       return unless datetime?
+
+      # if datetime is already a date convert it back into an ISO string to parseFromISO,
+      # TODO: be smarter about this
+      datetime = $.dateToISO8601UTC(datetime) if _.isDate datetime
+
       parsed = $.parseFromISO(datetime)
       new Handlebars.SafeString "<time title='#{parsed.datetime_formatted}' datetime='#{parsed.datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(parsed.datetime)}</time>"
 
+    # expects: a Date object
+    formattedDate : (datetime, format, {hash: {pubdate}}) ->
+      return unless datetime?
+      new Handlebars.SafeString "<time title='#{datetime}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
+
     datetimeFormatted : (isoString) ->
+      return '' unless isoString
       isoString = $.parseFromISO(isoString) unless isoString.datetime
       isoString.datetime_formatted
 
@@ -98,18 +109,31 @@ define [
         previousArg = arg
       fn(this)
 
-    # runs block if all arguments are true-ish
+    # runs block if *ALL* arguments are truthy
     # usage:
     # {{#ifAll arg1 arg2 arg3 arg}}
-    #   everything was true-ish
+    #   everything was truthy
     # {{else}}
-    #   something was false-y
-    # {{/ifEqual}}
+    #   something was falsey
+    # {{/ifAll}}
     ifAll: ->
       [args..., {fn, inverse}] = arguments
       for arg in args
         return inverse(this) unless arg
       fn(this)
+
+    # runs block if *ANY* arguments are truthy
+    # usage:
+    # {{#ifAny arg1 arg2 arg3 arg}}
+    #   something was truthy
+    # {{else}}
+    #   all were falsy
+    # {{/ifAny}}
+    ifAny: ->
+      [args..., {fn, inverse}] = arguments
+      for arg in args
+        return fn(this) if arg
+      inverse(this)
 
     eachWithIndex: (context, options) ->
       fn = options.fn

@@ -1,7 +1,7 @@
 define [
   'compiled/views/QuickStartBar/BaseItemView'
   'underscore'
-  'compiled/models/Discussion'
+  'compiled/models/DiscussionTopic'
   'jst/quickStartBar/discussion'
   'jquery.instructure_date_and_time'
   'vendor/jquery.placeholder'

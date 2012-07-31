@@ -57,6 +57,8 @@ describe Api::V1::DiscussionTopics do
 end
 
 describe DiscussionTopicsController, :type => :integration do
+  include Api::V1::User
+
   before(:each) do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
@@ -124,7 +126,7 @@ describe DiscussionTopicsController, :type => :integration do
     end
   end
 
-  context "show topic(s)" do
+  context "With item" do
     before do
       @attachment = create_attachment(@course)
       @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => @attachment)
@@ -146,6 +148,7 @@ describe DiscussionTopicsController, :type => :integration do
                   "root_topic_id"=>nil,
                   "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                   "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                  "podcast_has_student_posts" => nil,
                   "attachments"=>[{"content-type"=>"unknown/unknown",
                                    "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                                    "filename"=>"content.txt",
@@ -163,32 +166,171 @@ describe DiscussionTopicsController, :type => :integration do
                   }],
                   "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
-                  "permissions" => { "attach" => true }}
+                  "locked"=>false,
+                  "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
+                  "permissions" => { "delete"=>true, "attach"=>true, "update"=>true }}
     end
 
-    it "should return discussion topic list" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                      {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+    describe "GET 'index'" do
+      it "should return discussion topic list" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
 
-      json.size.should == 2
-      # get rid of random characters in podcast url
-      json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-      json.last.should == @response_json
+        json.size.should == 2
+        # get rid of random characters in podcast url
+        json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+        json.last.should == @response_json
+      end
+    end
+    describe "GET 'show'" do
+      it "should return an individual topic" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+
+        # get rid of random characters in podcast url
+        json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+        json.should == @response_json
+      end
     end
 
-    it "should return an individual topic" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                      {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+    describe "PUT 'update'" do
+      it "should require authorization" do
+        @user = user(:active_all => true)
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :title => "hai", :message => "test message" }, {}, :expected_status => 401)
+      end
 
-      # get rid of random characters in podcast url
-      json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-      json.should == @response_json
+      it "should update the entry" do
+        post_at = 1.month.from_now
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :title => "test title",
+                   :message => "test <b>message</b>",
+                   :discussion_type => "threaded",
+                   :delayed_post_at => post_at.as_json,
+                   :podcast_has_student_posts => '1',
+                   :require_initial_post => '1' })
+        @topic.reload
+        @topic.title.should == "test title"
+        @topic.message.should == "test <b>message</b>"
+        @topic.threaded?.should == true
+        @topic.post_delayed?.should == true
+        @topic.delayed_post_at.to_i.should == post_at.to_i
+        @topic.podcast_enabled?.should == true
+        @topic.podcast_has_student_posts?.should == true
+        @topic.require_initial_post?.should == true
+      end
+
+      it "should set the editor_id to whoever edited to entry" do
+        @original_user = @user
+        @editing_user = user_model
+        @course.enroll_teacher(@editing_user).accept
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :title => "edited by someone else"})
+        @topic.reload
+        @topic.editor.should eql(@editing_user)
+        @topic.user.should eql(@original_user)
+      end
+
+      it "should not drift when saving delayed_post_at with user-preferred timezone set" do
+        @user.time_zone = 'Alaska'
+        @user.save
+
+        user_tz = Time.use_zone(@user.time_zone) { Time.zone }
+        expected_time = user_tz.parse("Fri Aug 26, 2031 8:39AM")
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :delayed_post_at => expected_time.as_json})
+
+        @topic.reload
+        @topic.delayed_post_at.should == expected_time
+      end
+
+      it "should allow creating assignment on update" do
+        due_date = 1.week.ago
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :assignment => { :points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!" } })
+        @topic.reload
+
+        @topic.title.should == "Topic 1"
+        @topic.assignment.should be_present
+        @topic.assignment.points_possible.should == 15
+        @topic.assignment.grading_type.should == "percent"
+        @topic.assignment.due_at.to_i.should == due_date.to_i
+        @topic.assignment.submission_types.should == "discussion_topic"
+        @topic.assignment.title.should == "Topic 1"
+      end
+
+      it "should allow unlocking a locked topic" do
+        @topic.lock!
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :locked => false})
+
+        @topic.reload
+        @topic.should_not be_locked
+      end
+
+      it "should allow locking a topic after due date" do
+        due_date = 1.week.ago
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :assignment => { :due_at => due_date.as_json } })
+        @topic.reload
+        @topic.assignment.due_at.to_i.should == due_date.to_i
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :locked => true})
+
+        @topic.reload
+        @topic.should be_locked
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :locked => false})
+
+        @topic.reload
+        @topic.should_not be_locked
+      end
+
+      it "should not allow locking a topic before due date" do
+        due_date = 1.week.from_now
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :assignment => { :due_at => due_date.as_json } })
+        @topic.reload
+        @topic.assignment.due_at.to_i.should == due_date.to_i
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :locked => true}, {}, :expected_status => 500)
+
+        @topic.reload
+        @topic.should_not be_locked
+      end
     end
 
-    it "should delete a topic" do
-        json = api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                        {:controller => 'discussion_topics', :action => 'destroy', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+    describe "DELETE 'destroy'" do
+      it "should require authorization" do
+        @user = user(:active_all => true)
+        api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "destroy", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 {}, {}, :expected_status => 401)
+        @topic.reload.should_not be_deleted
+      end
+
+      it "should delete the topic" do
+        api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "destroy", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param })
         @topic.reload.should be_deleted
+      end
     end
   end
 
@@ -234,42 +376,48 @@ describe DiscussionTopicsController, :type => :integration do
     gtopic = create_topic(group, :title => "Group Topic 1", :message => "<p>content here</p>", :attachment => attachment)
 
     json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics.json",
-                    {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s})
-    json.first.should == {"read_state"=>"read",
-                          "unread_count"=>0,
-                          "podcast_url"=>nil,
-                          "require_initial_post"=>nil,
-                          "title"=>"Group Topic 1",
-                          "discussion_subentry_count"=>0,
-                          "assignment_id"=>nil,
-                          "delayed_post_at"=>nil,
-                          "id"=>gtopic.id,
-                          "user_name"=>@user.name,
-                          "last_reply_at"=>gtopic.last_reply_at.as_json,
-                          "message"=>"<p>content here</p>",
-                          "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
-                          "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
-                          "attachments"=>
-                                  [{"content-type"=>"unknown/unknown",
-                                    "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
-                                    "filename"=>"content.txt",
-                                    "display_name"=>"content.txt",
-                                    "id" => attachment.id,
-                                    "size" => attachment.size,
-                                    'unlock_at' => nil,
-                                    'locked' => false,
-                                    'hidden' => false,
-                                    'lock_at' => nil,
-                                    'locked_for_user' => false,
-                                    'hidden_for_user' => false,
-                                    'created_at' => attachment.created_at.as_json,
-                                    'updated_at' => attachment.updated_at.as_json,
-                                  }],
-                          "posted_at"=>gtopic.posted_at.as_json,
-                          "root_topic_id"=>nil,
-                          "topic_children"=>[],
-                          "discussion_type" => 'side_comment',
-                          "permissions" => { "attach" => true }}
+                    {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s}).first
+    expected = {
+      "read_state"=>"read",
+      "unread_count"=>0,
+      "podcast_url"=>nil,
+      "podcast_has_student_posts"=>nil,
+      "require_initial_post"=>nil,
+      "title"=>"Group Topic 1",
+      "discussion_subentry_count"=>0,
+      "assignment_id"=>nil,
+      "delayed_post_at"=>nil,
+      "id"=>gtopic.id,
+      "user_name"=>@user.name,
+      "last_reply_at"=>gtopic.last_reply_at.as_json,
+      "message"=>"<p>content here</p>",
+      "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+      "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+      "attachments"=>
+              [{"content-type"=>"unknown/unknown",
+                "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
+                "filename"=>"content.txt",
+                "display_name"=>"content.txt",
+                "id" => attachment.id,
+                "size" => attachment.size,
+                'unlock_at' => nil,
+                'locked' => false,
+                'hidden' => false,
+                'lock_at' => nil,
+                'locked_for_user' => false,
+                'hidden_for_user' => false,
+                'created_at' => attachment.created_at.as_json,
+                'updated_at' => attachment.updated_at.as_json,
+              }],
+      "posted_at"=>gtopic.posted_at.as_json,
+      "root_topic_id"=>nil,
+      "topic_children"=>[],
+      "discussion_type" => 'side_comment',
+      "permissions" => {"delete"=>true, "attach"=>true, "update"=>true},
+      "locked" => false,
+      "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!
+    }
+    json.should == expected
   end
 
   it "should paginate and return proper pagination headers for groups" do
@@ -777,6 +925,32 @@ describe DiscussionTopicsController, :type => :integration do
                { :controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, {}, {}, :expected_status => 204)
       @entry.reload.should be_deleted
       @entry.editor.should == @teacher
+    end
+  end
+
+  context "observer" do
+    it "should allow observer by default" do
+      course_with_teacher
+      create_topic(@course, :title => "topic", :message => "topic")
+      course_with_observer_logged_in(:course => @course)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      { :controller => 'discussion_topics', :action => 'index', :format => 'json',
+                        :course_id => @course.id.to_s })
+
+      json.should_not be_nil
+      json.should_not be_empty
+    end
+
+    it "should reject observer if read_forum role is false" do
+      course_with_teacher
+      @topic = create_topic(@course, :title => "topic", :message => "topic")
+      course_with_observer_logged_in(:course => @course)
+      RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
+                           :enrollment_type => "ObserverEnrollment", :enabled => false)
+
+      lambda { api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      { :controller => 'discussion_topics', :action => 'index', :format => 'json',
+                        :course_id => @course.id.to_s }) }.should raise_error
     end
   end
 

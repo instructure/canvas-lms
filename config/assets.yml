@@ -127,7 +127,6 @@ stylesheets:
     - public/stylesheets/compiled/g_files.css
     - public/stylesheets/compiled/g_wiki.css
     - public/stylesheets/compiled/g_conference.css
-    - public/stylesheets/compiled/g_forum.css
     - public/stylesheets/compiled/g_rubrics.css
     - public/stylesheets/compiled/g_wiki_sidebar.css
     - public/stylesheets/compiled/g_syllabus.css

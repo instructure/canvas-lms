@@ -1,9 +1,9 @@
 define [
-  'Backbone',
+  'Backbone'
   'i18n!dashboard'
   'underscore'
   'jst/quickStartBar/QuickStartBarView'
-  'formToJSON'
+  'jquery.toJSON'
 ], ({View, Model}, I18n, _, template) ->
 
   capitalize = (str) ->

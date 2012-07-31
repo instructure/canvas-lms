@@ -109,9 +109,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   def add_discussions(context)
-    context.resources :discussion_topics, :collection => {:reorder => :post} do |topic|
-      topic.permissions 'permissions', :controller => 'discussion_topics', :action => 'permissions'
-    end
+    context.resources :discussion_topics, :only => [:index, :show, :new, :edit, :destroy]
     context.resources :discussion_entries
   end
 
@@ -724,6 +722,7 @@ ActionController::Routing::Routes.draw do |map|
       def topic_routes(topics, context)
         topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :action => :show, :path_name => "#{context}_discussion_topic"
         topics.post "#{context.pluralize}/:#{context}_id/discussion_topics", :controller => :discussion_topics, :action => :create
+        topics.put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :controller => :discussion_topics, :action => :update
         topics.delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :controller => :discussion_topics, :action => :destroy
 
         topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/view", :action => :view, :path_name => "#{context}_discussion_topic_view"
@@ -758,6 +757,16 @@ ActionController::Routing::Routes.draw do |map|
       end
       et_routes(tools, "course")
       et_routes(tools, "account")
+    end
+
+    api.with_options(:controller => :external_feeds) do |feeds|
+      def ef_routes(route_object, context)
+        route_object.get "#{context}s/:#{context}_id/external_feeds", :action => :index, :path_name => "#{context}_external_feeds"
+        route_object.post "#{context}s/:#{context}_id/external_feeds", :action => :create, :path_name => "#{context}_external_feeds_create"
+        route_object.delete "#{context}s/:#{context}_id/external_feeds/:external_feed_id", :action => :destroy, :path_name => "#{context}_external_feeds_delete"
+      end
+      ef_routes(feeds, "course")
+      ef_routes(feeds, "group")
     end
 
     api.with_options(:controller => :sis_imports_api) do |sis|
@@ -907,7 +916,7 @@ ActionController::Routing::Routes.draw do |map|
         items.delete "collections/items/:item_id/upvotes/self", :action => :remove_upvote
       end
     end
-    
+
     api.with_options(:controller => :developer_keys) do |keys|
       keys.get 'developer_keys', :action => :index
       keys.get 'developer_keys/:id', :action => :show
@@ -942,7 +951,7 @@ ActionController::Routing::Routes.draw do |map|
       folders.post 'folders/:folder_id/folders', :action => :create, :path_name => 'create_folder'
       folders.post 'folders/:folder_id/files', :action => :create_file
     end
-    
+
     api.with_options(:controller => :favorites) do |favorites|
       favorites.get "users/self/favorites/courses", :action => :list_favorite_courses
       favorites.post "users/self/favorites/courses/:id", :action => :add_favorite_course
@@ -991,7 +1000,7 @@ ActionController::Routing::Routes.draw do |map|
     app.comments 'comments', :controller => 'apps', :action => 'comments', :conditions => {:method => :get}
     app.post_comment 'comments', :controller => 'apps', :action => 'comment', :conditions => {:method => :post}
   end
-  
+
   map.resources :developer_keys, :only => [:index]
 
   map.resources :rubrics do |rubric|
@@ -1004,7 +1013,7 @@ ActionController::Routing::Routes.draw do |map|
   # map.resources :collection_items, :only => [:new]
   # map.get_bookmarklet 'get_bookmarklet', :controller => 'collection_items', :action => 'get_bookmarklet'
   map.collection_item_link_data 'collection_items/link_data', :controller => 'collection_items', :action => 'link_data', :conditions => { :method => :post }
-  # 
+  #
   # map.resources :collections, :only => [:show, :index] do |collection|
   #   collection.resources :collection_items, :only => [:show, :index]
   # end

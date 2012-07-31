@@ -19,12 +19,11 @@ shared_examples_for "discussions selenium tests" do
     @course.discussion_topics.create!(:title => discussion_name, :discussion_type => discussion_type)
   end
 
-  def edit_discussion(discussion_name, message)
-    replace_content(f('#discussion_topic_title'), discussion_name)
-    type_in_tiny 'textarea', message
-    submit_form('.add_topic_form_new')
-    wait_for_ajaximations
-    f('.discussion_topic .title').text.should == discussion_name
+  def edit_topic(discussion_name, message)
+    replace_content(f('input[name=title]'), discussion_name)
+    type_in_tiny('textarea[name=message]', message)
+    expect_new_page_load { submit_form('.form-actions') }
+    f('#discussion_topic .discussion-title').text.should == discussion_name
   end
 
   def edit_entry(entry, text)
@@ -69,10 +68,8 @@ shared_examples_for "discussions selenium tests" do
   end
 
   def validate_entry_text(discussion_entry, text)
-    li_selector = %(.discussion-entries [data-id$="#{discussion_entry.id}"])
-    keep_trying_until do
-      fj(li_selector).should include_text(text)
-    end
+    li_selector = %([data-id$="#{discussion_entry.id}"])
+    keep_trying_until { fj(li_selector).should include_text(text) }
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)

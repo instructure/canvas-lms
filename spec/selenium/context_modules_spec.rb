@@ -49,18 +49,18 @@ describe "context_modules" do
 
       refresh_page
 
-      keep_trying_until {
+      keep_trying_until do
         hover_and_click('#context_modules .edit_module_link')
         wait_for_ajax_requests
-        driver.find_element(:id, 'add_context_module_form').should be_displayed
-      }
-      assignment_picker = keep_trying_until {
-        driver.find_element(:css, '.add_completion_criterion_link').click
-        find_with_jquery('.assignment_picker:visible')
-      }
+        f('#add_context_module_form').should be_displayed
+      end
+      assignment_picker = keep_trying_until do
+        f('.add_completion_criterion_link').click
+        fj('.assignment_picker:visible')
+      end
 
       assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
-      requirement_picker = find_with_jquery('.assignment_requirement_picker:visible')
+      requirement_picker = fj('.assignment_requirement_picker:visible')
       requirement_picker.find_element(:css, 'option[value="min_score"]').click
       driver.execute_script('return $(".points_possible_parent:visible").length').should > 0
 
@@ -78,27 +78,27 @@ describe "context_modules" do
     it "should delete a module" do
       add_module('Delete Module')
       driver.execute_script("$('.context_module').addClass('context_module_hover')")
-      driver.find_element(:css, '.delete_module_link').click
+      f('.delete_module_link').click
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
       refresh_page
-      driver.find_element(:id, 'no_context_modules_message').should be_displayed
+      f('#no_context_modules_message').should be_displayed
     end
 
     it "should edit a module" do
       edit_text = 'Module Edited'
       add_module('Edit Module')
-      context_module = driver.find_element(:css, '.context_module')
+      context_module = f('.context_module')
       driver.action.move_to(context_module).perform
-      driver.find_element(:css, '.edit_module_link').click
-      driver.find_element(:css, '.ui-dialog').should be_displayed
-      edit_form = driver.find_element(:id, 'add_context_module_form')
+      f('.edit_module_link').click
+      f('.ui-dialog').should be_displayed
+      edit_form = f('#add_context_module_form')
       edit_form.find_element(:id, 'context_module_name').send_keys(edit_text)
       submit_form(edit_form)
       edit_form.should_not be_displayed
       wait_for_ajaximations
-      driver.find_element(:css, '.context_module > .header').should include_text(edit_text)
+      f('.context_module > .header').should include_text(edit_text)
     end
 
     it "should add and remove completion criteria" do
@@ -109,7 +109,7 @@ describe "context_modules" do
       driver.action.move_to(context_module).perform
       f('.edit_module_link').click
       f('.ui-dialog').should be_displayed
-      edit_form = driver.find_element(:id, 'add_context_module_form')
+      edit_form = f('#add_context_module_form')
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
@@ -129,7 +129,7 @@ describe "context_modules" do
       driver.action.move_to(context_module).perform
       f('.edit_module_link').click
       f('.ui-dialog').should be_displayed
-      edit_form = driver.find_element(:id, 'add_context_module_form')
+      edit_form = f('#add_context_module_form')
       f('.completion_entry .delete_criterion_link', edit_form).click
       wait_for_ajaximations
       f('.cancel_button', edit_form).click
@@ -140,7 +140,7 @@ describe "context_modules" do
       driver.action.move_to(context_module).perform
       f('.edit_module_link').click
       f('.ui-dialog').should be_displayed
-      edit_form = driver.find_element(:id, 'add_context_module_form')
+      edit_form = f('#add_context_module_form')
       f('.completion_entry .delete_criterion_link', edit_form).click
       wait_for_ajaximations
       submit_form(edit_form)
@@ -154,19 +154,19 @@ describe "context_modules" do
       driver.action.move_to(context_module).perform
       f('.edit_module_link').click
       f('.ui-dialog').should be_displayed
-      edit_form = driver.find_element(:id, 'add_context_module_form')
+      edit_form = f('#add_context_module_form')
       ff('.completion_entry .delete_criterion_link', edit_form).should be_empty
     end
 
     it "should delete a module item" do
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       driver.execute_script("$('.context_module_item').addClass('context_module_item_hover')")
-      driver.find_element(:css, '.delete_item_link').click
+      f('.delete_item_link').click
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
       keep_trying_until do
-        driver.find_element(:css, '.context_module_items').should_not include_text(@assignment.title)
+        f('.context_module_items').should_not include_text(@assignment.title)
         true
       end
     end
@@ -178,14 +178,14 @@ describe "context_modules" do
       edit_module_item(module_item) do |edit_form|
         replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
       end
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item = f("#context_module_item_#{tag.id}")
       module_item.should include_text(item_edit_text)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      driver.find_element(:css, 'h2.title').text.should == item_edit_text
+      f('h2.title').text.should == item_edit_text
 
-      expect_new_page_load { driver.find_element(:css, '.modules').click }
-      driver.find_element(:css, "#context_module_item_#{tag.id} .title").text.should == item_edit_text
+      expect_new_page_load { f('.modules').click }
+      f("#context_module_item_#{tag.id} .title").text.should == item_edit_text
     end
 
     it "should add an assignment to a module" do
@@ -231,33 +231,33 @@ describe "context_modules" do
       add_module('TestModule')
 
       # add a text header
-      driver.find_element(:css, '.add_module_item_link').click
+      f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
       wait_for_ajaximations
-      title_input = find_with_jquery('input[name="title"]:visible')
+      title_input = fj('input[name="title"]:visible')
       replace_content(title_input, 'First text header')
-      driver.find_element(:css, '.add_item_button').click
+      f('.add_item_button').click
       wait_for_ajaximations
       tag1 = ContentTag.last
 
       # and another one
-      driver.find_element(:css, '.add_module_item_link').click
+      f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
       wait_for_ajaximations
-      title_input = find_with_jquery('input[name="title"]:visible')
+      title_input = fj('input[name="title"]:visible')
       replace_content(title_input, 'Second text header')
-      driver.find_element(:css, '.add_item_button').click
+      f('.add_item_button').click
       wait_for_ajaximations
       tag2 = ContentTag.last
 
       # rename the second
-      item2 = driver.find_element(:id, "context_module_item_#{tag2.id}")
+      item2 = f("#context_module_item_#{tag2.id}")
       edit_module_item(item2) do |edit_form|
         replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
       end
 
       # verify the first did not change
-      item1 = driver.find_element(:id, "context_module_item_#{tag1.id}")
+      item1 = f("#context_module_item_#{tag1.id}")
       item1.should_not include_text('Renamed!')
     end
 
@@ -284,16 +284,16 @@ describe "context_modules" do
     it "should add a text header to a module" do
       header_text = 'new header text'
       add_module('Text Header Module')
-      driver.find_element(:css, '.add_module_item_link').click
+      f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
       keep_trying_until do
-        replace_content(driver.find_element(:id, 'sub_header_title'), header_text)
+        replace_content(f('#sub_header_title'), header_text)
         true
       end
-      driver.find_element(:css, '.add_item_button').click
+      f('.add_item_button').click
       wait_for_ajaximations
       tag = ContentTag.last
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item = f("#context_module_item_#{tag.id}")
       module_item.should include_text(header_text)
     end
 
@@ -307,9 +307,9 @@ describe "context_modules" do
 
     it "should hide module contents" do
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-      driver.find_element(:css, '.collapse_module_link').click
+      f('.collapse_module_link').click
       wait_for_animations
-      driver.find_element(:css, '.context_module .content').should_not be_displayed
+      f('.context_module .content').should_not be_displayed
     end
 
     it "should add 2 modules with the first one as a prerequisite" do
@@ -321,19 +321,19 @@ describe "context_modules" do
         #adding second module - can't use add_module method because a prerequisite needs to be added to this module
         add_form = new_module_form
         replace_content(add_form.find_element(:id, 'context_module_name'), second_module_name)
-        driver.find_element(:css, '.ui-dialog .add_prerequisite_link').click
+        f('.ui-dialog .add_prerequisite_link').click
         wait_for_animations
         #have to do it this way because the select has no css attributes on it
         click_option('.criterion select', "the module, #{first_module_name}")
         submit_form(add_form)
         wait_for_ajaximations
         db_module = ContextModule.last
-        context_module = driver.find_element(:id, "context_module_#{db_module.id}")
+        context_module = f("#context_module_#{db_module.id}")
         driver.action.move_to(context_module).perform
-        driver.find_element(:css, "#context_module_#{db_module.id} .edit_module_link").click
-        driver.find_element(:css, '.ui-dialog').should be_displayed
+        f("#context_module_#{db_module.id} .edit_module_link").click
+        f('.ui-dialog').should be_displayed
         wait_for_ajaximations
-        prereq_select = find_with_jquery('.criterion select')
+        prereq_select = fj('.criterion select')
         option = first_selected_option(prereq_select)
         option.text.should == 'the module, ' + first_module_name
       end
@@ -347,8 +347,8 @@ describe "context_modules" do
       refresh_page
       sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
-      m1_img = find_with_jquery('#context_modules .context_module:first-child .reorder_module_link img')
-      m2_img = find_with_jquery('#context_modules .context_module:last-child .reorder_module_link img')
+      m1_img = fj('#context_modules .context_module:first-child .reorder_module_link img')
+      m2_img = fj('#context_modules .context_module:last-child .reorder_module_link img')
       driver.action.drag_and_drop(m2_img, m1_img).perform
       wait_for_ajax_requests
 
@@ -375,7 +375,7 @@ describe "context_modules" do
 
       driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
       wait_for_ajaximations
-      driver.find_element(:id, "context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+      f("#context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
 
       tag.reload
       tag.indent.should == 1
@@ -389,7 +389,7 @@ describe "context_modules" do
       click_option("#content_tag_indent_select", "Indent 1 Level")
       submit_form("#edit_item_form")
       wait_for_ajaximations
-      driver.find_element(:id, "context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+      f("#context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
 
       tag.reload
       tag.indent.should == 1
@@ -406,7 +406,7 @@ describe "context_modules" do
       driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
       wait_for_ajaximations
 
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item = f("#context_module_item_#{tag.id}")
       module_item.find_element(:css, ".due_date_display").text.should_not be_blank
       module_item.find_element(:css, ".points_possible_display").should include_text "10"
 
@@ -416,20 +416,20 @@ describe "context_modules" do
       submit_form("#edit_item_form")
       wait_for_ajaximations
 
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item = f("#context_module_item_#{tag.id}")
       module_item.find_element(:css, ".due_date_display").text.should_not be_blank
       module_item.find_element(:css, ".points_possible_display").should include_text "10"
     end
 
     it "should preserve completion criteria after indent change" do
-      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       tag = ContentTag.last
 
       # add completion criterion
       context_module = f('.context_module')
       driver.action.move_to(context_module).perform
       f('.edit_module_link').click
-      edit_form = driver.find_element(:id, 'add_context_module_form')
+      edit_form = f('#add_context_module_form')
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
       click_option('#add_context_module_form .assignment_picker', @assignment2.title, :text)
@@ -438,7 +438,7 @@ describe "context_modules" do
       wait_for_ajax_requests
 
       # verify it shows up (both visually and in the template data)
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item = f("#context_module_item_#{tag.id}")
       module_item.attribute('class').split.should include 'must_contribute_requirement'
       f('.criterion', module_item).attribute('class').split.should include 'defined'
       driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
@@ -448,7 +448,7 @@ describe "context_modules" do
       wait_for_ajaximations
 
       # make sure the completion criterion was preserved
-      module_item = driver.find_element(:id, "context_module_item_#{tag.id}")
+      module_item = f("#context_module_item_#{tag.id}")
       module_item.attribute('class').split.should include 'must_contribute_requirement'
       f('.criterion', module_item).attribute('class').split.should include 'defined'
       driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
@@ -478,13 +478,13 @@ describe "context_modules" do
         @module.add_item({:id => @file.id, :type => 'attachment'})
         get "/courses/#{@course.id}/modules"
 
-        driver.find_element(:css, '.context_module_item').should include_text(FILE_NAME)
+        f('.context_module_item').should include_text(FILE_NAME)
         file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
         file.context = @course
         file.save!
         Attachment.last.handle_duplicates(:overwrite)
         refresh_page
-        driver.find_element(:css, '.context_module_item').should include_text(FILE_NAME)
+        f('.context_module_item').should include_text(FILE_NAME)
       end
     end
   end
