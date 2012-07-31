@@ -766,11 +766,7 @@ Spec::Runner.configure do |config|
     Attachment.local_storage?.should eql(true)
   end
 
-  def run_job(job = Delayed::Job.last(:order => :id))
-    case job
-    when Hash
-      job = Delayed::Job.first(:conditions => job, :order => :id)
-    end
+  def run_job(job)
     Delayed::Worker.new.perform(job)
   end
 
@@ -782,6 +778,21 @@ Spec::Runner.configure do |config|
       Delayed::MAX_PRIORITY)
       run_job(job)
     end
+  end
+
+  def track_jobs
+    @jobs_tracking = Delayed::JobTracking.track { yield }
+  end
+
+  def created_jobs
+    @jobs_tracking.created
+  end
+
+  def expects_job_with_tag(tag, count = 1)
+    track_jobs do
+      yield
+    end
+    created_jobs.count { |j| j.tag == tag }.should == count
   end
 
   # send a multipart post request in an integration spec post_params is

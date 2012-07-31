@@ -274,7 +274,7 @@ describe "Collections API", :type => :integration do
             @item.data.image_pending.should == true
             @att = Attachment.new(:uploaded_data => stub_png_data)
             CutyCapt.expects(:snapshot_attachment_for_url).with(@item.data.link_url).returns(@att)
-            run_job()
+            run_jobs()
 
             @att.reload.context.should == Account.default
 
@@ -292,7 +292,7 @@ describe "Collections API", :type => :integration do
             @item.data.image_pending.should == true
             http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
             Canvas::HTTP.expects(:get).with("http://www.example.com/my/image.png").returns(http_res)
-            run_job()
+            run_jobs()
 
             @item.reload.data.image_pending.should == false
             @att = @item.data.image_attachment
@@ -311,7 +311,7 @@ describe "Collections API", :type => :integration do
             Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'test', :images => [{'url' => 'http://www.example.com/image1'}], :html => "<iframe>test</iframe>"))
             http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
             Canvas::HTTP.expects(:get).with("http://www.example.com/image1").returns(http_res)
-            run_job()
+            run_jobs()
 
             @item.reload.data.image_pending.should == false
             @att = @item.data.image_attachment
@@ -330,27 +330,27 @@ describe "Collections API", :type => :integration do
           it "should use the embeldy description and title if none are given" do
             Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :description => 'e desc', :title => 'e title'))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "e title", 'description' => "e desc" }
 
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item', :title => "custom title" })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "custom title", 'description' => "e desc" }
 
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item', :description => "custom description" })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.attributes.slice('title', 'description').should == { 'title' => "e title", 'description' => "custom description" }
           end
 
           it "should use the embedly item type if valid" do
             Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'video'))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.item_type.should == 'video'
 
             Canvas::Embedly.any_instance.stubs(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'rtf'))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.item_type.should == 'url'
           end
 
@@ -360,12 +360,12 @@ describe "Collections API", :type => :integration do
 
             Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :html => iframe_html))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.html_preview.should == iframe_html
 
             Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'html', :html => div_html))
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-            run_job()
+            run_jobs()
             CollectionItem.find(json['id']).data.html_preview.should be_blank
           end
         end
