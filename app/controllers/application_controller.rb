@@ -194,8 +194,18 @@ class ApplicationController < ActionController::Base
     end
     true
   end
-  
-  # checks the authorization policy for the given object using 
+
+  def require_password_session
+    if session[:used_remember_me_token]
+      flash[:notice] = t "#application.notices.please_log_in", "Please enter your password to continue"
+      store_location
+      redirect_to login_url
+      return false
+    end
+    true
+  end
+
+  # checks the authorization policy for the given object using
   # the vendor/plugins/adheres_to_policy plugin.  If authorized,
   # returns true, otherwise renders unauthorized messages and returns
   # false.  To be used as follows:

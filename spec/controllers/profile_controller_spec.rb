@@ -19,6 +19,24 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ProfileController do
+  describe "show" do
+    it "should chain to settings when it's the same user" do
+      user
+      user_session(@user)
+
+      get 'show', :user_id => @user.id
+      response.should render_template('profile')
+    end
+
+    it "should require a password session when chaining to settings" do
+      user
+      user_session(@user)
+      session[:used_remember_me_token] = true
+
+      get 'show', :user_id => @user.id
+      response.should redirect_to(login_url)
+    end
+  end
 
   describe "update" do
     it "should allow changing the default e-mail address and nothing else" do

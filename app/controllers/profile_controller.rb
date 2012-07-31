@@ -22,6 +22,7 @@ class ProfileController < ApplicationController
   before_filter :require_user, :only => :settings
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
+  before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
 
   include Api::V1::Avatar
   include Api::V1::Notification
@@ -36,6 +37,7 @@ class ProfileController < ApplicationController
       # this is ghetto and we should get rid of this as soon as possible
       @current_user.instance_variable_set(:@show_profile_tab, true)
     else
+      return unless require_password_session
       settings
       return
     end

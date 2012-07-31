@@ -1,6 +1,7 @@
 class TokensController < ApplicationController
   before_filter :require_registered_user
   before_filter { |c| c.active_tab = "profile" }
+  before_filter :require_password_session
   
   def create
     params[:access_token].delete :token

@@ -21,7 +21,7 @@ class PseudonymSessionsController < ApplicationController
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
 
   def new
-    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id]
+    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
       redirect_to dashboard_url
       return
     end
@@ -34,6 +34,11 @@ class PseudonymSessionsController < ApplicationController
     session[:expected_user_id] = params[:expected_user_id].to_i if params[:expected_user_id]
     session[:confirm] = params[:confirm] if params[:confirm]
     session[:enrollment] = params[:enrollment] if params[:enrollment]
+
+    if @current_pseudonym
+      params[:pseudonym_session] ||= {}
+      params[:pseudonym_session][:unique_id] ||= @current_pseudonym.unique_id
+    end
 
     @pseudonym_session = PseudonymSession.new
     @headers = false

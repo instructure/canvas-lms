@@ -204,6 +204,7 @@ class UsersController < ApplicationController
     end
   end
 
+  before_filter :require_password_session, :only => [:masquerade]
   def masquerade
     @user = User.find(:first, :conditions => {:id => params[:user_id]})
     return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
