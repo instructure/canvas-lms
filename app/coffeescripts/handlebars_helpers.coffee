@@ -168,6 +168,46 @@ define [
 
     dateSelect: (name, options) ->
       new Handlebars.SafeString dateSelect(name, options.hash).html()
-      
+
+    ##
+    # usage:
+    #   if 'this' is {human: true}
+    #   and you do: {{checkbox "human"}}
+    #   you'll get: <input type="checkbox"
+    #                      value="1"
+    #                      id="human"
+    #                      checked="true"
+    #                      name="human" >
+    # you can pass custom attributes and use nested properties:
+    #   if 'this' is {likes: {tacos: true}}
+    #   and you do: {{checkbox "likes.tacos" class="foo bar"}}
+    #   you'll get: <input type="checkbox"
+    #                      value="1"
+    #                      id="likes_tacos"
+    #                      checked="true"
+    #                      name="likes[tacos]"
+    #                      class="foo bar" >
+    checkbox : (propertyName, {hash}) ->
+      splitPropertyName = propertyName.split(/\./)
+      snakeCase = splitPropertyName.join('_')
+      bracketNotation = splitPropertyName[0] + _.chain(splitPropertyName)
+                                                .rest()
+                                                .map((prop) -> "[#{prop}]")
+                                                .value()
+                                                .join('')
+      inputProps = _.extend
+        type: 'checkbox'
+        value: 1
+        id: snakeCase
+        name: bracketNotation
+      , hash
+
+      unless inputProps.checked
+        value = _.reduce splitPropertyName, ((memo, key) -> memo[key]), this
+        inputProps.checked = true if value
+
+      attributes = _.map inputProps, (val, key) -> "#{htmlEscape key}=\"#{htmlEscape val}\""
+      new Handlebars.SafeString "<input #{attributes.join ' '}>"
+
   }
   return Handlebars
