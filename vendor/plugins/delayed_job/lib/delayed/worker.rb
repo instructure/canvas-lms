@@ -11,6 +11,12 @@ class Worker
 
   self.max_attempts = 15
   self.max_run_time = 4.hours
+
+  def self.queue=(queue_name)
+    raise(ArgumentError, "queue_name must not be blank") if queue_name.blank?
+    @@queue = queue_name
+  end
+
   self.queue = "canvas_queue"
 
   attr_reader :config, :queue, :min_priority, :max_priority, :sleep_delay, :sleep_delay_stagger

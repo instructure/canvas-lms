@@ -636,7 +636,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :interaction_tests, :collection => {:next => :get, :register => :get, :groups => :post}
 
-  map.resources :delayed_jobs, :only => :index, :controller => 'jobs'
   map.object_snippet 'object_snippet', :controller => 'context', :action => 'object_snippet', :conditions => { :method => :post }
   map.saml_consume "saml_consume", :controller => "pseudonym_sessions", :action => "saml_consume"
   map.saml_logout "saml_logout", :controller => "pseudonym_sessions", :action => "saml_logout"

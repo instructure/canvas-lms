@@ -8,13 +8,15 @@ define [
 
   class FlavorGrid
     constructor: (@options, @type_name, @grid_name) ->
-      @data = @options.data
+      @data = []
       @$element = $(@grid_name)
-      @setTimer() if @options.refresh_rate
+      @setTimer()
       @query = ''
 
     setTimer: () =>
-      setTimeout (=> @refresh(@setTimer)), @options.refresh_rate
+      setTimeout @refresh, 0
+      if @options.refresh_rate
+        setTimeout (=> @refresh(@setTimer)), @options.refresh_rate
 
     refresh: (cb) =>
       @$element.queue () =>
@@ -49,10 +51,23 @@ define [
       super(options, type_name, grid_name)
       if options.starting_query
         @query = options.starting_query
+      @show_search($('#jobs-flavor').val())
 
     search: (query) ->
       @query = query
       @refresh()
+
+    show_search: (flavor) =>
+      switch flavor
+        when "id", "strand", "tag"
+          $('#jobs-search').show()
+          $('#jobs-search').attr('placeholder', flavor)
+        else
+          $('#jobs-search').hide()
+
+    change_flavor: (flavor) =>
+      @show_search(flavor)
+      super(flavor)
 
     attempts_formatter: (r,c,d) =>
       return '' unless @data[r].id
@@ -133,10 +148,7 @@ define [
         $('#show-job .show-field').each (idx, field) =>
           field_name = field.id.replace("job-", '')
           $(field).text(job[field_name] || '')
-        $('#job-id-link').attr('href', "/jobs?id=#{job.id}&flavor=#{@options.flavor}")
-      if @data.length == 1 && @type_name == 'jobs'
-        @grid.setSelectedRows [0]
-        @grid.onSelectedRowsChanged.notify()
+        $('#job-id-link').attr('href', "/jobs?flavor=id&q=#{job.id}")
       this
 
     selectAll: () ->
@@ -173,6 +185,9 @@ define [
 
     updated: () ->
       $('#jobs-total').text @data.length
+      if @data.length == 1 && @type_name == 'jobs'
+        @grid.setSelectedRows [0]
+        @grid.onSelectedRowsChanged.notify()
 
   class Workers extends Jobs
     constructor: (options) ->

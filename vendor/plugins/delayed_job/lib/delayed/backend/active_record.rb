@@ -87,13 +87,111 @@ module Delayed
           update_all("locked_by = null, locked_at = null", ["locked_by <> 'on hold' AND locked_at < ?", db_time_now - max_run_time])
         end
 
+        def self.strand_size(strand)
+          self.scoped(:conditions => { :strand => strand }).count
+        end
+
+        def self.running_jobs()
+          self.running.scoped(:order => "locked_at asc")
+        end
+
+        def self.scope_for_flavor(flavor, query)
+          scope = case flavor.to_s
+          when 'current'
+            self.current
+          when 'future'
+            self.future
+          when 'failed'
+            Delayed::Job::Failed
+          when 'strand'
+            self.scoped(:conditions => { :strand => query })
+          when 'tag'
+            self.scoped(:conditions => { :tag => query })
+          else
+            raise ArgumentError, "invalid flavor: #{flavor.inspect}"
+          end
+
+          if %w(current future).include?(flavor.to_s)
+            queue = query.presence || Delayed::Worker.queue
+            scope = scope.scoped(:conditions => { :queue => queue })
+          end
+
+          scope
+        end
+
+        # get a list of jobs of the given flavor in the given queue
+        # flavor is :current, :future, :failed, :strand or :tag
+        # depending on the flavor, query has a different meaning:
+        # for :current and :future, it's the queue name (defaults to Delayed::Worker.queue)
+        # for :strand it's the strand name
+        # for :tag it's the tag name
+        # for :failed it's ignored
+        def self.list_jobs(flavor,
+                           limit,
+                           offset = 0,
+                           query = nil)
+          scope = self.scope_for_flavor(flavor, query)
+          order = flavor.to_s == 'future' ? 'run_at' : 'id desc'
+          scope.all(:order => order, :limit => limit, :offset => offset)
+        end
+
+        # get the total job count for the given flavor
+        # see list_jobs for documentation on arguments
+        def self.jobs_count(flavor,
+                            query = nil)
+          scope = self.scope_for_flavor(flavor, query)
+          scope.count
+        end
+
+        # perform a bulk update of a set of jobs
+        # action is :hold, :unhold, or :destroy
+        # to specify the jobs to act on, either pass opts[:ids] = [list of job ids]
+        # or opts[:flavor] = <some flavor> to perform on all jobs of that flavor
+        def self.bulk_update(action, opts)
+          scope = if opts[:flavor]
+            raise("Can't bulk update failed jobs") if opts[:flavor].to_s == 'failed'
+            self.scope_for_flavor(opts[:flavor], opts[:query])
+          elsif opts[:ids]
+            self.scoped(:conditions => { :id => opts[:ids] })
+          end
+
+          return 0 unless scope
+
+          case action.to_s
+          when 'hold'
+            scope.update_all({ :locked_by => ON_HOLD_LOCKED_BY, :locked_at => db_time_now, :attempts => ON_HOLD_COUNT })
+          when 'unhold'
+            now = db_time_now
+            scope.update_all(["locked_by = NULL, locked_at = NULL, attempts = 0, run_at = (CASE WHEN run_at > ? THEN run_at ELSE ? END), failed_at = NULL", now, now])
+          when 'destroy'
+            scope.delete_all
+          end
+        end
+
+        # returns a list of hashes { :tag => tag_name, :count => current_count }
+        # in descending count order
+        # flavor is :current or :all
+        def self.tag_counts(flavor,
+                            limit,
+                            offset = 0)
+          raise(ArgumentError, "invalid flavor: #{flavor}") unless %w(current all).include?(flavor.to_s)
+          scope = case flavor.to_s
+            when 'current'
+              self.current
+            when 'all'
+              self
+            end
+
+          scope.count(:group => 'tag', :limit => limit, :offset => offset, :order => 'count(tag) desc', :select => 'tag').map { |t,c| { :tag => t, :count => c } }
+        end
+
         def self.get_and_lock_next_available(worker_name,
-                                             queue = nil,
+                                             queue = Delayed::Worker.queue,
                                              min_priority = nil,
                                              max_priority = nil)
 
-          min_priority ||= Delayed::MIN_PRIORITY
-          max_priority ||= Delayed::MAX_PRIORITY
+          check_queue(queue)
+          check_priorities(min_priority, max_priority)
 
           @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
           loop do
@@ -107,20 +205,25 @@ module Delayed
         end
 
         def self.find_available(limit,
-                                queue = nil,
+                                queue = Delayed::Worker.queue,
                                 min_priority = nil,
                                 max_priority = nil)
           all_available(queue, min_priority, max_priority).all(:limit => limit)
         end
 
-        def self.all_available(queue = nil,
+        def self.all_available(queue = Delayed::Worker.queue,
                                min_priority = nil,
                                max_priority = nil)
+          min_priority ||= Delayed::MIN_PRIORITY
+          max_priority ||= Delayed::MAX_PRIORITY
+
+          check_queue(queue)
+          check_priorities(min_priority, max_priority)
+
           scope = self.ready_to_run
-          scope = scope.scoped(:conditions => ['priority >= ?', min_priority]) if min_priority
-          scope = scope.scoped(:conditions => ['priority <= ?', max_priority]) if max_priority
-          scope = scope.scoped(:conditions => ['queue = ?', queue]) if queue
-          scope = scope.scoped(:conditions => ['queue is null']) unless queue
+          scope = scope.scoped(:conditions => ['priority >= ?', min_priority])
+          scope = scope.scoped(:conditions => ['priority <= ?', max_priority])
+          scope = scope.scoped(:conditions => ['queue = ?', queue])
           scope.by_priority
         end
 
@@ -216,16 +319,6 @@ module Delayed
           self.destroy
           # re-raise so the worker logs the error, at least
           raise
-        end
-
-        # hold/unhold jobs with a scope
-        def self.hold!
-          update_all({ :locked_by => ON_HOLD_LOCKED_BY, :locked_at => db_time_now, :attempts => ON_HOLD_COUNT })
-        end
-
-        def self.unhold!
-          now = db_time_now
-          update_all(["locked_by = NULL, locked_at = NULL, attempts = 0, run_at = (CASE WHEN run_at > ? THEN run_at ELSE ? END), failed_at = NULL", now, now])
         end
 
         class Failed < Job
