@@ -1,13 +1,15 @@
 define [
   'use!vendor/backbone'
   'underscore'
-], (Backbone, _) ->
+  'jquery'
+], (Backbone, _, $) ->
 
   Backbone.syncWithoutMultipart = Backbone.sync
   Backbone.syncWithMultipart = (method, model, options) ->
     # Create a hidden iframe
-    iframeId = 'file_upload_iframe_' + (new Date()).getTime()
+    iframeId = _.uniqueId 'file_upload_iframe_'
     $iframe = $("<iframe id='#{iframeId}' name='#{iframeId}' ></iframe>").hide()
+    dfd = new $.Deferred()
 
     # Create a hidden form
     httpMethod = {create: 'POST', update: 'PUT', delete: 'DELETE', read: 'GET'}[method]
@@ -18,9 +20,9 @@ define [
           $orig = $(attr)
           $orig.after($orig.clone(true))
           attr
-        else if not _.isEmpty(attr) and (_.isArray(attr) or typeof attr is 'object')
+        else if !_.isEmpty(attr) and (_.isArray(attr) or typeof attr is 'object')
           toForm(attr, key)
-        else if not "#{key}".match(/^_/) and attr? and typeof attr isnt 'object' and typeof attr isnt 'function'
+        else if !"#{key}".match(/^_/) and attr? and typeof attr isnt 'object' and typeof attr isnt 'function'
           $el = $ "<input/>",
             name: key
             value: attr
@@ -32,7 +34,9 @@ define [
         <input type='hidden' name='authenticity_token' value='#{ENV.AUTHENTICITY_TOKEN}' />
       </form>
     """).hide()
-    $form.prepend(el for el in toForm(model) when el)
+
+    _.each toForm(model.attributes), (el) ->
+      $form.prepend(el) if el
 
     $(document.body).prepend($iframe, $form)
 
@@ -46,8 +50,10 @@ define [
 
       if iframeBody.className is "error"
         options.error?(response)
+        dfd.reject(response)
       else
         options.success?(response)
+        dfd.resolve(response)
 
       $iframe.remove()
       $form.remove()
@@ -60,6 +66,7 @@ define [
     $iframe[0].onload = callback
 
     $form[0].submit()
+    dfd
 
   Backbone.sync = (method, model, options) ->
     if options?.multipart
