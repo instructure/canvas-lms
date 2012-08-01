@@ -50,6 +50,8 @@ class ErrorReport < ActiveRecord::Base
       # sanitize invalid encodings
       @opts[:message] = Iconv.conv('UTF-8//IGNORE', 'UTF-8', @opts[:message]) if @opts[:message]
       @opts[:exception_message] = Iconv.conv('UTF-8//IGNORE', 'UTF-8', @opts[:exception_message]) if @opts[:exception_message]
+      Canvas::Statsd.increment("errors.all")
+      Canvas::Statsd.increment("errors.#{category}")
       run_callbacks :on_log_error
       create_error_report(opts)
     end
@@ -68,21 +70,17 @@ class ErrorReport < ActiveRecord::Base
       report.assign_data(opts)
       report.save
       report
-    # rescue
-      # we're really hosed here
     end
   end
 
   # returns the new error report
   def self.log_error(category, opts = {})
     Reporter.new.log_error(category, opts)
-  # rescue
   end
 
   # returns the new error report
   def self.log_exception(category, exception, opts = {})
     Reporter.new.log_exception(category, exception, opts)
-  # rescue
   end
 
   # assigns data attributes to the column if there's a column with that name,

@@ -121,6 +121,10 @@ group :embedly do
   gem 'embedly', '1.5.5'
 end
 
+group :statsd do
+  gem 'statsd-ruby', '1.0.0', :require => 'statsd'
+end
+
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from
 # plugins.
 Dir[File.join(File.dirname(__FILE__),'vendor/plugins/*/Gemfile')].each do |g|
