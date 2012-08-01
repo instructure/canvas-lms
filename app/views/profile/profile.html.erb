@@ -440,9 +440,11 @@ TEXT
       </tbody>
     </table>
   </div>
-  <div style="margin-top: 10px;">
-    <a href="#" class="button add_access_token_link"><%= image_tag "add.png" %> <%= t('buttons.new_access_token', "New Access Token") %></a>
-  </div>
+  <% unless @real_current_user %>
+    <div style="margin-top: 10px;">
+      <a href="#" class="button add_access_token_link"><%= image_tag "add.png" %> <%= t('buttons.new_access_token', "New Access Token") %></a>
+    </div>
+  <% end %>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">
     <p><%= t(:access_token_description, <<-TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
       Access tokens can be used to allow other applications to make API calls
@@ -481,13 +483,16 @@ TEXT
         </tr><tr>
           <th><%= before_label(:token_expires, "Expires") %></th>
           <td class="expires">&nbsp;</td>
-        </tr><tr class="refresh_token">
-          <td colspan="2">
-            <div class="button-container">
-              <button class="button regenerate_token"><%= t('buttons.regenerate_token', "Regenerate Token") %></button>
-            </div>
-          </td>
         </tr>
+        <% unless @real_current_user %>
+          <tr class="refresh_token">
+            <td colspan="2">
+              <div class="button-container">
+                <button class="button regenerate_token"><%= t('buttons.regenerate_token', "Regenerate Token") %></button>
+              </div>
+            </td>
+          </tr>
+        <% end %>
       </table>
     </div>
   </div>

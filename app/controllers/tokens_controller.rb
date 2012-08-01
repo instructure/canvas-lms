@@ -2,7 +2,12 @@ class TokensController < ApplicationController
   before_filter :require_registered_user
   before_filter { |c| c.active_tab = "profile" }
   before_filter :require_password_session
-  
+  before_filter :require_non_masquerading, :except => :show
+
+  def require_non_masquerading
+    render_unauthorized_action if @real_current_user
+  end
+
   def create
     params[:access_token].delete :token
     params[:access_token][:developer_key] = DeveloperKey.default
