@@ -48,8 +48,8 @@ ID and client secret. To obtain these application credentials, you will
 need to register your application.  The client secret should never be shared.
 
 For open source Canvas users, you will need to generate a client\_id and
-client\_secret for your application. There isn't yet any UI for
-generating these keys, so you will need to generate an API key from the Rails console:
+client\_secret for your application. You can either do it from the Developer
+Keys section of Site admin, or from the Rails console:
 
     $ script/console
     > key = DeveloperKey.create! { |k|
