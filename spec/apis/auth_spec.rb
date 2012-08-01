@@ -487,6 +487,17 @@ describe "API Authentication", :type => :integration do
       json['message'].should == "Invalid access token."
     end
 
+    it "should be able to log out" do
+      get "/api/v1/courses?access_token=#{@token.token}"
+      response.should be_success
+
+      delete "/login/oauth2/token?access_token=#{@token.token}"
+      response.should be_success
+
+      get "/api/v1/courses?access_token=#{@token.token}"
+      response.status.to_i.should == 401
+    end
+
     context "sharding" do
       it_should_behave_like "sharding"
 

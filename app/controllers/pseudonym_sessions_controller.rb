@@ -457,6 +457,12 @@ class PseudonymSessionsController < ApplicationController
     }
   end
 
+  def oauth2_logout
+    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
+    @access_token.destroy
+    render :json => {}
+  end
+
   def final_oauth2_redirect(redirect_uri, opts = {})
     if redirect_uri == OAUTH2_OOB_URI
       redirect_to oauth2_auth_url(opts)

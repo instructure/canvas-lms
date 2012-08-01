@@ -36,6 +36,20 @@ simplest option is to generate an access token on the user's profile page.
      have to generate a new token if you forget it. Remember that access
      tokens are password equivalent, so keep it secret.
 
+Logging Out
+-----------
+
+<div class="method_details">
+
+If your application supports logout functionality, you can revoke your own
+access token. This is useful for security reasons, as well as removing your
+application from the list of tokens on the user's profile page. Simply make
+an authenticated request to the following endpoint:
+
+<h3 class="endpoint">DELETE /login/oauth2/token</h3>
+
+</div>
+
 OAuth2 Token Request Flow
 -------------------------
 

@@ -954,6 +954,7 @@ ActionController::Routing::Routes.draw do |map|
   map.oauth2_auth_confirm 'login/oauth2/confirm', :controller => 'pseudonym_sessions', :action => 'oauth2_confirm', :conditions => { :method => :get }
   map.oauth2_auth_accept 'login/oauth2/accept', :controller => 'pseudonym_sessions', :action => 'oauth2_accept', :conditions => { :method => :post }
   map.oauth2_auth_deny 'login/oauth2/deny', :controller => 'pseudonym_sessions', :action => 'oauth2_deny', :conditions => { :method => :get }
+  map.oauth2_logout 'login/oauth2/token', :controller => 'pseudonym_sessions', :action => 'oauth2_logout', :conditions => { :method => :delete }
 
   ApiRouteSet.route(map, "/api/lti/v1") do |lti|
     lti.post "tools/:tool_id/grade_passback", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
