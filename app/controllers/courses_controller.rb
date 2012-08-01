@@ -796,7 +796,7 @@ class CoursesController < ApplicationController
   # @returns Course
   def show
     if api_request?
-      @context = api_find(Course, params[:id])
+      @context = api_find(Course.active, params[:id])
       if authorized_action(@context, @current_user, :read)
         enrollments = @context.current_enrollments.all(:conditions => { :user_id => @current_user.id })
         includes = Set.new(Array(params[:include]))
@@ -805,7 +805,7 @@ class CoursesController < ApplicationController
       return
     end
 
-    @context = Course.find(params[:id])
+    @context = Course.active.find(params[:id])
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
         if is_authorized_action?(@context, @current_user, [:manage_students, :manage_admin_users])

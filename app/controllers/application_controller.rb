@@ -314,7 +314,7 @@ class ApplicationController < ActionController::Base
     unless @context
       if params[:course_id]
         @context = api_request? ?
-          api_find(Course, params[:course_id]) : Course.find(params[:course_id])
+          api_find(Course.active, params[:course_id]) : Course.active.find(params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && session[:enrollment_uuid_course_id] == @context.id
