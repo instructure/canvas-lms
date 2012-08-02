@@ -30,7 +30,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   attr_accessor :building_default
   
   def infer_defaults
-    self.context ||= self.learning_outcome_group && self.learning_outcome_group.context
+    self.context ||= self.parent_outcome_group && self.parent_outcome_group.context
     if self.context && !self.context.learning_outcome_groups.empty? && !building_default
       default = self.context.root_outcome_group
       self.learning_outcome_group_id ||= default.id unless self == default
@@ -126,7 +126,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     # create new link and in this group
     child_outcome_links.create(
       :content => outcome,
-      :context => self.context)
+      :context => self.context || self)
   end
 
   # copies an existing outcome group, form this context or another, into this
@@ -198,7 +198,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
     save!
   end
   
-  def self.import_from_migration(hash, context, item=nil)
+  def self.import_from_migration(hash, migration, item=nil)
+    context = migration.context
     hash = hash.with_indifferent_access
     item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
     item ||= context.learning_outcome_groups.new
@@ -207,21 +208,27 @@ class LearningOutcomeGroup < ActiveRecord::Base
     item.title = hash[:title]
     item.description = hash[:description]
     
-    # make sure the root group is created before saving the new group
-    log = context.root_outcome_group
     item.save!
+    if hash[:parent_group]
+      hash[:parent_group].adopt_outcome_group(item)
+    else
+      context.root_outcome_group.adopt_outcome_group(item)
+    end
     
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
 
     if hash[:outcomes]
-      hash[:outcomes].each do |outcome|
-        outcome[:learning_outcome_group] = item
-        LearningOutcome.import_from_migration(outcome, context)
+      hash[:outcomes].each do |child|
+        if child[:type] == 'learning_outcome_group'
+          child[:parent_group] = item
+          LearningOutcomeGroup.import_from_migration(child, migration)
+        else
+          child[:learning_outcome_group] = item
+          LearningOutcome.import_from_migration(child, migration)
+        end
       end
     end
     
-    log.adopt_outcome_group(item)
-
     item
   end
   

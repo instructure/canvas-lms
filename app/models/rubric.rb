@@ -254,10 +254,11 @@ class Rubric < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     rubrics = data['rubrics'] ? data['rubrics']: []
+    migration.outcome_to_id_map ||= {}
     rubrics.each do |rubric|
       if migration.import_object?("rubrics", rubric['migration_id'])
         begin
-          import_from_migration(rubric, migration.context)
+          import_from_migration(rubric, migration)
         rescue
           migration.add_warning(t('errors.could_not_import', "Couldn't import rubric %{rubric}", :rubric => rubric[:title]), $!)
         end
@@ -265,7 +266,8 @@ class Rubric < ActiveRecord::Base
     end
   end
   
-  def self.import_from_migration(hash, context, item=nil)
+  def self.import_from_migration(hash, migration, item=nil)
+    context = migration.context
     hash = hash.with_indifferent_access
     return nil if hash[:migration_id] && hash[:rubrics_to_import] && !hash[:rubrics_to_import][hash[:migration_id]]
     item ||= find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
@@ -285,7 +287,9 @@ class Rubric < ActiveRecord::Base
     item.data = hash[:data]
     item.data.each do |crit|
       if crit[:learning_outcome_migration_id]
-        if lo = context.created_learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
+        if migration.respond_to?(:outcome_to_id_map) && id = migration.outcome_to_id_map[crit[:learning_outcome_migration_id]]
+          crit[:learning_outcome_id] = id
+        elsif lo = context.created_learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
           crit[:learning_outcome_id] = lo.id
         end
         crit.delete :learning_outcome_migration_id

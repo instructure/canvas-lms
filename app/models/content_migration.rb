@@ -54,6 +54,7 @@ class ContentMigration < ActiveRecord::Base
           'wikis' => false
   }
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options
+  attr_accessor :outcome_to_id_map
 
   workflow do
     state :created

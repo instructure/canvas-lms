@@ -39,7 +39,7 @@ class ContentTag < ActiveRecord::Base
   include CustomValidations
   validates_as_url :url
 
-  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab
+  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab, :content_type
 
   set_policy do
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}

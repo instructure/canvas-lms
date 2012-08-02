@@ -18,10 +18,10 @@
 module CC
   module LearningOutcomes
     def create_learning_outcomes(document=nil)
-      return nil unless LearningOutcome.active.find_all_by_context_id_and_context_type(@course.id, 'Course').count > 0
-      return nil unless @course.learning_outcome_groups.find_by_learning_outcome_group_id(nil)
-
-      root_group = @course.learning_outcome_groups.find_by_learning_outcome_group_id(nil)
+      return nil unless @course.has_outcomes?
+      return nil unless @course.root_outcome_group
+      
+      root_group = @course.root_outcome_group
       
       if document
         outcomes_file = nil
@@ -57,23 +57,26 @@ module CC
     end
 
     def process_outcome_group_content(node, group)
-      group.child_outcome_links.each do |link|
-        outcome = link.content
-        next unless export_object?(outcome)
-        process_learning_outcome(node, outcome)
+      group.child_outcome_groups.each do |item|
+        next unless export_object?(item)
+        process_outcome_group(node, item)
       end
-
-      group.child_outcome_groups.each do |group|
-        next unless export_object?(group) || group.child_outcome_links.any?{ |l| export_object?(l.content) }
-        process_outcome_group(node, group)
+      group.child_outcome_links.each do |item|
+        item = item.content
+        next unless export_object?(item)
+        process_learning_outcome(node, item, group)
       end
     end
-
-    def process_learning_outcome(node, item)
+    
+    def process_learning_outcome(node, item, group)
       migration_id = CCHelper.create_key(item)
       node.learningOutcome(:identifier=>migration_id) do |out_node|
         out_node.title item.short_description unless item.short_description.blank?
         out_node.description @html_exporter.html_content(item.description) unless item.description.blank?
+        if item.context != @course
+          out_node.is_global_outcome !item.context
+          out_node.external_identifier item.id
+        end
         if item.data && criterion = item.data[:rubric_criterion]
           out_node.points_possible criterion[:points_possible] if criterion[:points_possible]
           out_node.mastery_points criterion[:mastery_points] if criterion[:mastery_points]

@@ -182,12 +182,13 @@ class LearningOutcome < ActiveRecord::Base
   
   def self.process_migration(data, migration)
     outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
+    migration.outcome_to_id_map = {}
     outcomes.each do |outcome|
       begin
         if outcome[:type] == 'learning_outcome_group'
-          LearningOutcomeGroup.import_from_migration(outcome, migration.context)
+          LearningOutcomeGroup.import_from_migration(outcome, migration)
         else
-          import_from_migration(outcome, migration.context)
+          LearningOutcome.import_from_migration(outcome, migration)
         end
       rescue
         migration.add_warning("Couldn't import learning outcome \"#{outcome[:title]}\"", $!)
@@ -195,29 +196,54 @@ class LearningOutcome < ActiveRecord::Base
     end
   end
 
-  def self.import_from_migration(hash, context, item=nil)
+  def self.import_from_migration(hash, migration, item=nil)
+    context = migration.context
     hash = hash.with_indifferent_access
-    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.created_learning_outcomes.new
-    item.context = context
-    item.migration_id = hash[:migration_id]
-    item.workflow_state = 'active' if item.deleted?
-    item.short_description = hash[:title]
-    item.description = hash[:description]
-    
-    if hash[:ratings]
-      item.data = {:rubric_criterion=>{}}
-      item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
-      item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
-      item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
-      item.data[:rubric_criterion][:description] = item.short_description || item.description
+    outcome = nil
+    if !item && hash[:external_identifier]
+      if hash[:is_global_outcome]
+        outcome = LearningOutcome.active.find_by_id_and_context_id(hash[:external_identifier], nil)
+      else
+        outcome = context.available_outcome(hash[:external_identifier])
+      end
+      
+      if outcome
+        # Help prevent linking to the wrong outcome if copying into a different install of canvas
+        outcome = nil if outcome.short_description != hash[:title]
+      end
+      
+      if !outcome
+        migration.add_warning(t('no_context_found', %{The external Learning Outcome couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
+      end
     end
     
-    item.save!
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+    if !outcome
+      item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+      item ||= context.created_learning_outcomes.new
+      item.context = context
+      item.migration_id = hash[:migration_id]
+      item.workflow_state = 'active' if item.deleted?
+      item.short_description = hash[:title]
+      item.description = hash[:description]
+      
+      if hash[:ratings]
+        item.data = {:rubric_criterion=>{}}
+        item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
+        item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
+        item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
+        item.data[:rubric_criterion][:description] = item.short_description || item.description
+      end
+      
+      item.save!
+      context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+    else
+      item = outcome
+    end
     
     log = hash[:learning_outcome_group] || context.root_outcome_group
     log.add_outcome(item)
+    
+    migration.outcome_to_id_map[hash[:migration_id]] = item.id
 
     item
   end

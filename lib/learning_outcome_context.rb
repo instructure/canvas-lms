@@ -19,7 +19,7 @@ module LearningOutcomeContext
         created_learning_outcomes.find_by_id(outcome_id)
       return outcome if outcome
 
-      associated_accounts.uniq.map do |context|
+      (associated_accounts.uniq - [self]).each do |context|
         outcome = context.available_outcome(outcome_id)
         return outcome if outcome
       end
