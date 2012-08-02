@@ -612,7 +612,7 @@ class Notification < ActiveRecord::Base
     when 'Announcement'
       t(:announcement_description, "For new announcements")
     when 'Course Content'
-      t(:course_content_description, "For changes to course pages")
+      t(:course_content_description, "For changes to course pages and assignments")
     when 'Files'
       t(:files_description, "For new files")
     when 'Discussion'
