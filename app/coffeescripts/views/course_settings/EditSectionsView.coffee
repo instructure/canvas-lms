@@ -34,7 +34,7 @@ define [
         selector:
           baseData:
             type: 'section'
-            context: "course_#{ENV.COURSE_ID}"
+            context: "course_#{ENV.COURSE_ID}_sections"
             exclude: _.map(@model.get('enrollments'), (e) -> "section_#{e.course_section_id}")
           preparer: (postData, data, parent) ->
             row.noExpand = true for row in data

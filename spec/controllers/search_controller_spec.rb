@@ -51,6 +51,22 @@ describe SearchController do
       response.body.should include('bob')
       response.body.should_not include('billy')
     end
+
+    it "should optionally show users who haven't finished registration" do
+      course_with_student_logged_in(:active_all => true)
+      @user.update_attribute(:name, 'billy')
+      other = User.create(:name => 'bob')
+      other.update_attribute(:workflow_state, 'creation_pending')
+      @course.enroll_student(other).tap{ |e| e.workflow_state = 'invited'; e.save! }
+
+      get 'recipients', {
+        :search => 'b', :type => 'user', :skip_visibility_checks => true,
+        :synthetic_contexts => true, :context => "course_#{@course.id}_students"
+      }
+      response.should be_success
+      response.body.should include('bob')
+      response.body.should include('billy')
+    end
   end
 
 end
