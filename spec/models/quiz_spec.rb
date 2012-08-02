@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -577,6 +577,38 @@ describe Quiz do
         stats.first.length.should == 3
       end
 
+      it 'should have sections in quiz statistics_csv' do
+        #enroll user in multiple sections
+        pseudonym = pseudonym(@student)
+        @student.pseudonym.sis_user_id = "user_sis_id_01"
+        @student.pseudonym.save!
+        section1 = @course.course_sections.first
+        section1.sis_source_id = 'SISSection01'
+        section1.save!
+        section2 = CourseSection.new(:course => @course, :name => "section2")
+        section2.sis_source_id = 'SISSection02'
+        section2.save!
+        @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active', :allow_multiple_enrollments => true, :section => section2)
+        # one complete submission
+        qs = @quiz.generate_submission(@student)
+        qs.grade_submission
+
+        stats = FasterCSV.parse(@quiz.statistics_csv(:include_all_versions => true))
+        # format for row is row_name, '', data1, data2, ...
+        stats[0].should == ["name", "", "nobody@example.com"]
+        stats[1].should == ["id", "", @student.id.to_s]
+        stats[2].should == ["sis_id", "", "user_sis_id_01"]
+        expect_multi_value_row(stats[3], "section", ["section2", "Unnamed Course"])
+        expect_multi_value_row(stats[4], "section_id", [section1.id, section2.id])
+        expect_multi_value_row(stats[5], "section_sis_id", ["SISSection02", "SISSection01"])
+        stats.first.length.should == 3
+      end
+
+      def expect_multi_value_row(row, expected_name, expected_values)
+        row[0..1].should == [expected_name, ""]
+        row[2].split(', ').sort.should == expected_values.map(&:to_s).sort
+      end
+
       it 'should not include previous versions by default' do
         # two complete submissions
         qs = @quiz.generate_submission(@student)
@@ -611,9 +643,9 @@ describe Quiz do
         }
         qs.grade_submission
         stats = FasterCSV.parse(@quiz.statistics_csv)
-        stats.size.should == 12 # 3 questions * 2 lines + six more (name, id, submitted, correct, incorrect, score)
-        stats[7].size.should == 3
-        stats[7][2].should == ',baz'
+        stats.size.should == 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
+        stats[11].size.should == 3
+        stats[11][2].should == ',baz'
       end
     end
 
@@ -652,8 +684,8 @@ describe Quiz do
 
       # csv statistics
       stats = FasterCSV.parse(q.statistics_csv)
-      stats[3][2].should == "zero"
-      stats[5][2].should == "lolcats,lolrus"
+      stats[7][2].should == "zero"
+      stats[9][2].should == "lolcats,lolrus"
     end
   end
 

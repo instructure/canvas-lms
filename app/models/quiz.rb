@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -798,6 +798,10 @@ class Quiz < ActiveRecord::Base
     columns = []
     columns << t('statistics.csv_columns.name', 'name') unless options[:anonymous]
     columns << t('statistics.csv_columns.id', 'id')
+    columns << t('statistics.csv_columns.sis_id', 'sis_id')
+    columns << t('statistics.csv_columns.section', 'section')
+    columns << t('statistics.csv_columns.section_id', 'section_id')
+    columns << t('statistics.csv_columns.section_sis_id', 'section_sis_id')
     columns << t('statistics.csv_columns.submitted', 'submitted')
     columns << t('statistics.csv_columns.attempt', 'attempt') if options[:include_all_versions]
     first_question_index = columns.length
@@ -823,6 +827,18 @@ class Quiz < ActiveRecord::Base
       row = []
       row << submission.user.name unless options[:anonymous]
       row << submission.user_id
+      row << submission.user.sis_pseudonym_for(context.account).try(:sis_user_id)
+      section_name = []
+      section_id = []
+      section_sis_id = []
+      enrollments = submission.quiz.context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
+        section_name << enrollment.course_section.name
+        section_id << enrollment.course_section.id
+        section_sis_id << enrollment.course_section.try(:sis_source_id)
+      end
+      row << section_name.join(", ")
+      row << section_id.join(", ")
+      row << section_sis_id.join(", ")
       row << submission.finished_at
       row << submission.attempt if options[:include_all_versions]
       columns[first_question_index..last_question_index].each do |id|
