@@ -123,17 +123,12 @@ class NotificationPolicy < ActiveRecord::Base
           p = NotificationPolicy.scoped(:include => :communication_channel,
                                         :conditions => ['communication_channels.user_id = ?', user.id] ).
             find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
-          # if "never", delete the entry; otherwise set the value
-          if frequency == Notification::FREQ_NEVER
-            # Destroy is safe on a new unsaved item too
-            p.destroy
-          else
-            # Set the frequency and save
-            p.frequency = frequency
-            p.save!
-          end
+          # Set the frequency and save
+          p.frequency = frequency
+          p.save!
         end
       end # transaction
     end #if..else
+    nil
   end
 end
