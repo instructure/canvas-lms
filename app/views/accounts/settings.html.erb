@@ -97,8 +97,18 @@
                   <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
                 </td>
               </tr>
-              <% unless @account.site_admin? %>
-                <% f.fields_for :settings do |settings| %>
+              <% f.fields_for :settings do |settings| %>
+                <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
+                  <tr>
+                    <td><%= settings.blabel :mfa_settings, :en => "Multi-Factor Authentication" %></td>
+                    <td><%= settings.select :mfa_settings, [[t('select.mfa.disabled', "Disabled"), :disabled],
+                                                            [t('select.mfa.optional', "Optional"), :optional],
+                                                            [t('select.mfa.required_for_admins', "Required for Admins"), :required_for_admins],
+                                                            [t('select.mfa.required', "Required"), :required]], :selected => @account.mfa_settings %>
+                    </td>
+                  </tr>
+                <% end %>
+                <% unless @account.site_admin? %>
                   <tr>
                     <td><%= settings.blabel :self_enrollment, :en => "Allow Self-Enrollment" %></td>
                     <td>

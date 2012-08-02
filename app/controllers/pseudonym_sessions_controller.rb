@@ -19,6 +19,8 @@
 class PseudonymSessionsController < ApplicationController
   protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
+  before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
+  before_filter :require_user, :only => [ :otp_login ]
 
   def new
     if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
@@ -365,9 +367,105 @@ class PseudonymSessionsController < ApplicationController
     true
   end
 
-  def successful_login(user, pseudonym)
+  def otp_remember_me_cookie_domain
+    ActionController::Base.session_options[:domain]
+  end
+
+  def otp_login(send_otp = false)
+    if !@current_user.otp_secret_key || request.method == :get
+      session[:pending_otp_secret_key] ||= ROTP::Base32.random_base32
+    end
+    if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :otp_communication_channel_id)
+      @cc = @current_user.communication_channels.sms.unretired.find(params[:otp_login][:otp_communication_channel_id])
+      session[:pending_otp_communication_channel_id] = @cc.id
+      send_otp = true
+    end
+    if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :phone_number)
+      path = "#{params[:otp_login][:phone_number].gsub(/[^\d]/, '')}@#{params[:otp_login][:carrier]}"
+      @cc = @current_user.communication_channels.sms.by_path(path).first
+      @cc ||= @current_user.communication_channels.sms.create!(:path => path)
+      if @cc.retired?
+        @cc.workflow_state = 'unconfirmed'
+        @cc.save!
+      end
+      session[:pending_otp_communication_channel_id] = @cc.id
+      send_otp = true
+    end
+    secret_key = session[:pending_otp_secret_key] || @current_user.otp_secret_key
+    if send_otp
+      @cc ||= @current_user.otp_communication_channel
+      @cc.try(:send_later_if_production_enqueue_args, :send_otp!, { :priority => Delayed::HIGH_PRIORITY, :max_attempts => 1 }, ROTP::TOTP.new(secret_key).now)
+    end
+
+    return render :action => 'otp_login' unless params[:otp_login].try(:[], :verification_code)
+
+    drift = 30
+    # give them 5 minutes to enter an OTP sent via SMS
+    drift = 300 if session[:pending_otp_communication_channel_id] ||
+        (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
+
+    if ROTP::TOTP.new(secret_key).verify_with_drift(params[:otp_login][:verification_code], drift)
+      if session[:pending_otp_secret_key]
+        @current_user.otp_secret_key = session.delete(:pending_otp_secret_key)
+        @current_user.otp_communication_channel_id = session.delete(:pending_otp_communication_channel_id)
+        @current_user.otp_communication_channel.try(:confirm)
+        @current_user.save!
+      end
+
+      if params[:otp_login][:remember_me] == '1'
+        now = Time.now.utc
+        self.cookies['canvas_otp_remember_me'] = {
+              :value => @current_user.otp_secret_key_remember_me_cookie(now),
+              :expires => now + 30.days,
+              :domain => otp_remember_me_cookie_domain,
+              :httponly => true,
+              :secure => ActionController::Base.session_options[:secure],
+              :path => '/login'
+            }
+      end
+      if session.delete(:pending_otp)
+        successful_login(@current_user, @current_pseudonym, true)
+      else
+        flash[:notice] = t 'notices.mfa_complete', "Multi-factor authentication configured"
+        redirect_to settings_profile_url
+      end
+    else
+      @cc ||= @current_user.otp_communication_channel if !session[:pending_otp_secret_key]
+      flash.now[:error] = t 'errors.invalid_otp', "Invalid verification code, please try again"
+    end
+  end
+
+  def disable_otp_login
+    if params[:user_id] == 'self'
+      @user = @current_user
+    else
+      @user = User.find(params[:user_id])
+      return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
+    end
+    return render_unauthorized_action if @user == @current_user && @user.mfa_settings == :required
+
+    @user.otp_secret_key = nil
+    @user.otp_communication_channel = nil
+    @user.save!
+
+    render :json => {}
+  end
+
+  def successful_login(user, pseudonym, otp_passed = false)
     @current_user = user
     @current_pseudonym = pseudonym
+
+    otp_passed ||= cookies['canvas_otp_remember_me'] &&
+        @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'])
+    if !otp_passed
+      mfa_settings = @current_pseudonym.mfa_settings
+      if (@current_user.otp_secret_key && mfa_settings == :optional) ||
+          mfa_settings == :required
+        session[:pending_otp] = true
+        return otp_login(true)
+      end
+    end
+
     respond_to do |format|
       if session[:oauth2]
         return redirect_to(oauth2_auth_confirm_url)

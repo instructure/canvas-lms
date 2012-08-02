@@ -1806,4 +1806,71 @@ describe User do
       @user.reload.common_account_chain(root_acct).should eql [root_acct]
     end
   end
+
+  describe "mfa_settings" do
+    it "should be :disabled for unassociated users" do
+      user = User.new
+      user.mfa_settings.should == :disabled
+    end
+
+    it "should inherit from the account" do
+      user = User.create!
+      user.pseudonyms.create!(:account => Account.default, :unique_id => 'user')
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+
+      user.mfa_settings.should == :required
+
+      Account.default.settings[:mfa_settings] = :optional
+      Account.default.save!
+      user.reload
+      user.mfa_settings.should == :optional
+    end
+
+    it "should be the most-restrictive if associated with multiple accounts" do
+      user = User.create!
+      disabled_account = Account.create!(:settings => { :mfa_settings => :disabled })
+      optional_account = Account.create!(:settings => { :mfa_settings => :optional })
+      required_account = Account.create!(:settings => { :mfa_settings => :required })
+
+      p1 = user.pseudonyms.create!(:account => disabled_account, :unique_id => 'user')
+      user.mfa_settings.should == :disabled
+
+      p2 = user.pseudonyms.create!(:account => optional_account, :unique_id => 'user')
+      user.mfa_settings.should == :optional
+
+      p3 = user.pseudonyms.create!(:account => required_account, :unique_id => 'user')
+      user.mfa_settings.should == :required
+
+      p1.destroy
+      user.reload
+      user.mfa_settings.should == :required
+
+      p2.destroy
+      user.reload
+      user.mfa_settings.should == :required
+    end
+
+    it "should be required if admin and required_for_admins" do
+      user = User.create!
+      account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
+      user.pseudonyms.create!(:account => account, :unique_id => 'user')
+
+      user.mfa_settings.should == :optional
+      account.add_user(user)
+      user.reload
+      user.mfa_settings.should == :required
+    end
+
+    it "required_for_admins shouldn't get confused by admins in other accounts" do
+      user = User.create!
+      account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
+      user.pseudonyms.create!(:account => account, :unique_id => 'user')
+      user.pseudonyms.create!(:account => Account.default, :unique_id => 'user')
+
+      Account.default.add_user(user)
+
+      user.mfa_settings.should == :optional
+    end
+  end
 end

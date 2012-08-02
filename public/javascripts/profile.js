@@ -27,7 +27,8 @@ define([
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData */,
-  'jqueryui/sortable' /* /\.sortable/ */
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'compiled/jquery.rails_flash_notifications'
 ], function(INST, I18n, $, BackoffPoller) {
 
   var $profile_table = $(".profile_table"),
@@ -515,4 +516,13 @@ define([
     }
   };
   setTimeout(checkImage, 500);
+
+  $("#disable_mfa_link").click(function(event) {
+    var $disable_mfa_link = $(this);
+    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', null, function() {
+      $.flashMessage(I18n.t('notices.mfa_disabled', "Multi-factor authentication disabled"));
+      $disable_mfa_link.remove();
+    });
+    event.preventDefault();
+  });
 });

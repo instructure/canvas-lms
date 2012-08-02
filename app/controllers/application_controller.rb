@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include AuthenticationMethods
   protect_from_forgery
   before_filter :load_account, :load_user
+  before_filter :check_pending_otp
   before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :clear_cached_contexts
@@ -151,6 +152,13 @@ class ApplicationController < ActionController::Base
       response['X-Frame-Options'] = 'SAMEORIGIN'
     end
     @domain_root_account
+  end
+
+  def check_pending_otp
+    if session[:pending_otp] && !(params[:action] == 'otp_login' && request.method == :post)
+      reset_session
+      redirect_to login_url
+    end
   end
 
   # used to generate context-specific urls without having to

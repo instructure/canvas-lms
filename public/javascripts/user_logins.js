@@ -142,5 +142,14 @@ $(document).ready(function() {
     $form.find(".account_id_select").change();
     $form.data('unique_id_text', null);
   });
+
+  $(".reset_mfa_link").click(function(event) {
+    var $disable_mfa_link = $(this);
+    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', null, function() {
+      $.flashMessage(I18n.t('notices.mfa_reset', "Multi-factor authentication reset"));
+      $disable_mfa_link.parent().remove();
+    });
+    event.preventDefault();
+  });
 });
 });

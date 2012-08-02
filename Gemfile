@@ -8,6 +8,7 @@ gem 'authlogic',      '2.1.3'
 # use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
 # is merged into mainline. gem built from https://github.com/lukfugl/aws-s3
 gem "aws-s3-instructure", "~> 0.6.2.1319643167",  :require => 'aws/s3'
+gem 'barby',          '0.5.0'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
 gem 'daemons',        '1.1.0'
@@ -46,6 +47,8 @@ end
 gem 'rdiscount',      '1.6.8'
 gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
+gem 'rotp',           '1.4.1'
+gem 'rqrcode',        '0.4.2'
 gem 'rscribd',        '1.2.0'
 gem 'net-ldap',       '0.3.1',  :require => 'net/ldap'
 gem 'ruby-saml-mod',  '0.1.17'

@@ -60,6 +60,11 @@
         <tr class="add_holder">
           <td colspan="4" style="font-size: 0.8em;">
             <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" class="add_pseudonym_link"><%= t('add_login', 'Add Login') %></a>
+            <% if @user.otp_secret_key && (@user.mfa_settings != :required || @user != @current_user) %>
+              <span>|
+                <a href="<%= disable_mfa_path(@user) %>" class="reset_mfa_link"><%=  t('reset_mfa', "Reset Multi-Factor Authentication") %></a>
+              </span>
+            <% end %>
           </td>
         </tr>
       <% end %>

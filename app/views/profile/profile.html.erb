@@ -8,6 +8,13 @@
   <div class="rs-margin-lr">
     <hr />
     <a href="#" class="edit_profile_link button button-sidebar-wide"><%= image_tag "edit.png" %> <%= t('links.edit_profile', "Edit Profile") %></a>
+    <% mfa_settings = @user.mfa_settings %>
+    <% if mfa_settings != :disabled %>
+      <a href="<%= otp_login_path %>" class="button button-sidebar-wide"><%= image_tag "lock.png" %> <%= @user.otp_secret_key ? t('links.reconfigure_mfa', "Reconfigure Multi-Factor Authentication") : t('links.configure_mfa', "Set Up Multi-Factor Authentication") %></a>
+    <% end %>
+    <% if mfa_settings == :optional && @user.otp_secret_key %>
+      <a href="<%= disable_mfa_path('self') %>" class="button button-sidebar-wide" id="disable_mfa_link"><%= image_tag "unlock.png" %> <%= t('links.disable_mfa', "Disable Multi-Factor Authentication") %></a>
+    <% end %>
   </div>
   <% end %>
 <% end %>

@@ -416,4 +416,13 @@ class Pseudonym < ActiveRecord::Base
     end
     nil
   end
+
+  def mfa_settings
+    case self.account.mfa_settings
+    when :required_for_admins
+      self.account.all_account_users_for(self.user).empty? ? :optional : :required
+    else
+      self.account.mfa_settings
+    end
+  end
 end

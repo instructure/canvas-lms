@@ -444,4 +444,336 @@ describe PseudonymSessionsController do
       Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
     end
   end
+
+  context "otp login cookie" do
+    before do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+
+      user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.save!
+    end
+
+    it "should skip otp verification for a valid cookie" do
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc)
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should redirect_to dashboard_url(:login_success => 1)
+    end
+
+    it "should ignore a bogus cookie" do
+      cookies['canvas_otp_remember_me'] = 'bogus'
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should render_template('otp_login')
+    end
+
+    it "should ignore an expired cookie" do
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago)
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should render_template('otp_login')
+    end
+
+    it "should ignore a cookie from an old secret_key" do
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago)
+
+      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.save!
+
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should render_template('otp_login')
+    end
+  end
+
+  describe 'create' do
+    context 'otp' do
+      it "should show enrollment for unenrolled, required user" do
+        Account.default.settings[:mfa_settings] = :required
+        Account.default.save!
+
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+        response.should render_template('otp_login')
+        session[:pending_otp_secret_key].should_not be_nil
+      end
+
+      it "should ask for verification of enrolled, optional user" do
+        Account.default.settings[:mfa_settings] = :optional
+        Account.default.save!
+
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        @user.otp_secret_key = ROTP::Base32.random_base32
+        @user.save!
+
+        post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+        response.should render_template('otp_login')
+        session[:pending_otp_secret_key].should be_nil
+      end
+
+      it "should not ask for verification of unenrolled, optional user" do
+        Account.default.settings[:mfa_settings] = :optional
+        Account.default.save!
+
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+
+        post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+        response.should redirect_to dashboard_url(:login_success => 1)
+      end
+
+      it "should send otp to sms channel" do
+        CommunicationChannel.any_instance.expects(:send_otp!).once
+
+        Account.default.settings[:mfa_settings] = :required
+        Account.default.save!
+
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        @user.otp_secret_key = ROTP::Base32.random_base32
+        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
+        @user.save!
+
+        post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+        response.should render_template('otp_login')
+        session[:pending_otp_secret_key].should be_nil
+        assigns[:cc].should == cc
+      end
+    end
+  end
+
+  describe 'otp_login' do
+    before do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+
+      user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+    end
+
+    context "verification" do
+      before do
+        CommunicationChannel.any_instance.expects(:send_otp!).never
+
+        @user.otp_secret_key = ROTP::Base32.random_base32
+        @user.save!
+        user_session(@user)
+        session[:pending_otp] = true
+      end
+
+      it "should verify a code" do
+        post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now }
+        response.should redirect_to dashboard_url(:login_success => 1)
+        cookies['canvas_otp_remember_me'].should be_nil
+      end
+
+      it "should set a cookie" do
+        post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now, :remember_me => '1' }
+        response.should redirect_to dashboard_url(:login_success => 1)
+        cookies['canvas_otp_remember_me'].should_not be_nil
+      end
+
+      it "should fail for an incorrect token" do
+        post 'otp_login', :otp_login => { :verification_code => '123456' }
+        response.should render_template('otp_login')
+      end
+
+      it "should allow 30 seconds of drift by default" do
+        ROTP::TOTP.any_instance.expects(:verify_with_drift).with('123456', 30).once.returns(false)
+        post 'otp_login', :otp_login => { :verification_code => '123456' }
+        response.should render_template('otp_login')
+        assigns[:cc].should be_nil
+      end
+
+      it "should allow 5 minutes of drift for SMS" do
+        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
+        @user.save!
+
+        ROTP::TOTP.any_instance.expects(:verify_with_drift).with('123456', 300).once.returns(false)
+        post 'otp_login', :otp_login => { :verification_code => '123456' }
+        response.should render_template('otp_login')
+        assigns[:cc].should == cc
+      end
+    end
+
+    context "enrollment" do
+      before do
+        user_session(@user)
+      end
+
+      it "should generate a secret key" do
+        get 'otp_login'
+        session[:pending_otp_secret_key].should_not be_nil
+        @user.reload.otp_secret_key.should be_nil
+      end
+
+      it "should generate a new secret key for re-enrollment" do
+        @user.otp_secret_key = ROTP::Base32.random_base32
+        @user.save!
+
+        get 'otp_login'
+        session[:pending_otp_secret_key].should_not be_nil
+        session[:pending_otp_secret_key].should_not == @user.reload.otp_secret_key
+      end
+
+      context "selecting sms" do
+        it "should send a message to an existing channel" do
+          @cc = @user.communication_channels.sms.create!(:path => 'bob')
+          @cc.any_instantiation.expects(:send_otp!).once
+          post 'otp_login', :otp_login => { :otp_communication_channel_id => @cc.id }
+          response.should render_template('otp_login')
+          session[:pending_otp_communication_channel_id].should == @cc.id
+          assigns[:cc].should == @cc
+        end
+
+        it "should create a new channel" do
+          CommunicationChannel.any_instance.expects(:send_otp!).once
+          post 'otp_login', :otp_login => { :phone_number => '(800) 555-5555', :carrier => 'instructure.com' }
+          response.should render_template('otp_login')
+          @cc = @user.communication_channels.sms.first
+          @cc.should be_unconfirmed
+          @cc.path.should == '8005555555@instructure.com'
+          session[:pending_otp_communication_channel_id].should == @cc.id
+          assigns[:cc].should == @cc
+        end
+
+        it "should re-use an existing channel" do
+          @cc = @user.communication_channels.sms.create!(:path => '8005555555@instructure.com')
+          @cc.any_instantiation.expects(:send_otp!).once
+          post 'otp_login', :otp_login => { :phone_number => '(800) 555-5555', :carrier => 'instructure.com' }
+          response.should render_template('otp_login')
+          session[:pending_otp_communication_channel_id].should == @cc.id
+          assigns[:cc].should == @cc
+        end
+
+        it "should re-use an existing retired channel" do
+          @cc = @user.communication_channels.sms.create!(:path => '8005555555@instructure.com')
+          @cc.retire!
+          @cc.any_instantiation.expects(:send_otp!).once
+          post 'otp_login', :otp_login => { :phone_number => '(800) 555-5555', :carrier => 'instructure.com' }
+          response.should render_template('otp_login')
+          @cc.should be_unconfirmed
+          session[:pending_otp_communication_channel_id].should == @cc.id
+          assigns[:cc].should == @cc
+        end
+      end
+
+      context "verification" do
+        before do
+          @secret_key = session[:pending_otp_secret_key] = ROTP::Base32.random_base32
+        end
+
+        it "should save the pending key" do
+          @user.otp_communication_channel_id = @user.communication_channels.sms.create!(:path => 'bob')
+
+          post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@secret_key).now }
+          response.should redirect_to settings_profile_url
+          @user.reload.otp_secret_key.should == @secret_key
+          @user.otp_communication_channel.should be_nil
+
+          session[:pending_otp_secret_key].should be_nil
+        end
+
+        it "should continue to the dashboard if part of the login flow" do
+          session[:pending_otp] = true
+          post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@secret_key).now }
+          response.should redirect_to dashboard_url(:login_success => 1)
+          session[:pending_otp].should be_nil
+        end
+
+        it "should save a pending sms" do
+          @cc = @user.communication_channels.sms.create!(:path => 'bob')
+          session[:pending_otp_communication_channel_id] = @cc.id
+          code = ROTP::TOTP.new(@secret_key).now
+          # make sure we get 5 minutes of drift
+          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code, 300).once.returns(true)
+          post 'otp_login', :otp_login => { :verification_code => code }
+          response.should redirect_to settings_profile_url
+          @user.reload.otp_secret_key.should == @secret_key
+          @user.otp_communication_channel.should == @cc
+          @cc.reload.should be_active
+          session[:pending_otp_secret_key].should be_nil
+          session[:pending_otp_communication_channel_id].should be_nil
+        end
+
+        it "shouldn't fail if the sms is already active" do
+          @cc = @user.communication_channels.sms.create!(:path => 'bob')
+          @cc.confirm!
+          session[:pending_otp_communication_channel_id] = @cc.id
+          post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@secret_key).now }
+          response.should redirect_to settings_profile_url
+          @user.reload.otp_secret_key.should == @secret_key
+          @user.otp_communication_channel.should == @cc
+          @cc.reload.should be_active
+          session[:pending_otp_secret_key].should be_nil
+          session[:pending_otp_communication_channel_id].should be_nil
+        end
+      end
+    end
+  end
+
+  describe 'disable_otp_login' do
+    before do
+      Account.default.settings[:mfa_settings] = :optional
+      Account.default.save!
+
+      user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
+      @user.save!
+      user_session(@user)
+    end
+
+    it "should delete self" do
+      post 'disable_otp_login', :user_id => 'self'
+      response.should be_success
+      @user.reload.otp_secret_key.should be_nil
+      @user.otp_communication_channel.should be_nil
+    end
+
+    it "should delete self as id" do
+      post 'disable_otp_login', :user_id => @user.id
+      response.should be_success
+      @user.reload.otp_secret_key.should be_nil
+      @user.otp_communication_channel.should be_nil
+    end
+
+    it "should not be able to delete self if required" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      post 'disable_otp_login', :user_id => 'self'
+      response.should_not be_success
+      @user.reload.otp_secret_key.should_not be_nil
+      @user.otp_communication_channel.should_not be_nil
+    end
+
+    it "should not be able to delete self as id if required" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      post 'disable_otp_login', :user_id => @user.id
+      response.should_not be_success
+      @user.reload.otp_secret_key.should_not be_nil
+      @user.otp_communication_channel.should_not be_nil
+    end
+
+    it "should not be able to delete another user" do
+      @other_user = @user
+      @admin = user_with_pseudonym(:active_all => 1, :unique_id => 'user2')
+      user_session(@admin)
+      post 'disable_otp_login', :user_id => @other_user.id
+      response.should_not be_success
+      @other_user.reload.otp_secret_key.should_not be_nil
+      @other_user.otp_communication_channel.should_not be_nil
+    end
+
+    it "should be able to delete another user as admin" do
+      # even if required
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+
+      @other_user = @user
+      @admin = user_with_pseudonym(:active_all => 1, :unique_id => 'user2')
+      Account.default.add_user(@admin)
+      user_session(@admin)
+      post 'disable_otp_login', :user_id => @other_user.id
+      response.should be_success
+      @other_user.reload.otp_secret_key.should be_nil
+      @other_user.otp_communication_channel.should be_nil
+    end
+  end
 end

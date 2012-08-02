@@ -294,5 +294,24 @@ describe Pseudonym do
       u.email_channel.should be_active
     end
   end
+
+  describe "mfa_settings" do
+    it "should inherit from the account" do
+      account = Account.create!
+      user = User.create!
+      p = user.pseudonyms.create!(:account => account, :unique_id => 'user')
+      Account.default.add_user(user)
+
+      p.mfa_settings.should == :disabled
+      p.account.settings[:mfa_settings] = :optional
+      p.mfa_settings.should == :optional
+      p.account.settings[:mfa_settings] = :required
+      p.mfa_settings.should == :required
+      p.account.settings[:mfa_settings] = :required_for_admins
+      p.mfa_settings.should == :optional
+      account.add_user(user)
+      p.mfa_settings.should == :required
+    end
+  end
 end
 

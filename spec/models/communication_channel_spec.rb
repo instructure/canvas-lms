@@ -316,4 +316,14 @@ describe CommunicationChannel do
       message.body.should match /someserver.com/
     end
   end
+
+  it "should not allow deleting sms channels that are the otp channel" do
+    user_with_pseudonym(:active_all => 1)
+    @cc = @user.communication_channels.sms.create!(:path => 'bob')
+    @cc.confirm!
+    @user.otp_communication_channel = @cc
+    @user.save!
+    @cc.destroy.should be_false
+    @cc.reload.should be_active
+  end
 end

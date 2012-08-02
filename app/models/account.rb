@@ -151,6 +151,7 @@ class Account < ActiveRecord::Base
   add_setting :open_registration, :boolean => true, :root_only => true, :default => false
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
+  add_setting :mfa_settings, :root_only => true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -182,6 +183,10 @@ class Account < ActiveRecord::Base
 
   def allow_global_includes?
     self.global_includes? || self.parent_account.try(:sub_account_includes?)
+  end
+
+  def mfa_settings
+    settings[:mfa_settings].try(:to_sym) || :disabled
   end
 
   def ip_filters=(params)
