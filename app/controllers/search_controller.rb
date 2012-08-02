@@ -111,7 +111,7 @@ class SearchController < ApplicationController
                                                                    :exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX),
                                                                    :search_all_contexts => params[:search_all_contexts],
                                                                    :types => types[:context])) : []
-      participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i))) : []
+      participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i), :skip_visibility_checks => params[:skip_visibility_checks])) : []
       if max_results
         if types[:user] ^ types[:context]
           recipients = contexts + participants
