@@ -76,7 +76,7 @@ define [
             percent: @parse(s.score / s.total)
             possible: s.total
             score: @parse(s.score)
-            submission: s.submission
+            submission: _.extend(s.submission, drop: s.drop)
             submitted: s.submitted
 
     # I'm not going to pretend that this code is understandable.
