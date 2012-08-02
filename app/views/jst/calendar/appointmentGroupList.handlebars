@@ -8,7 +8,7 @@
       <li class='appointment-group-item admin-link-hover-area {{#if requiring_action}}requiring-action{{/if}} {{#unless published}}unpublished-ag{{/unless}}' data-appointment-group-id='{{id}}'>
         {{#if is_manageable}}
           <div class="admin-links">
-            <button class="al-trigger"><span class="al-trigger-inner">Manage</span></button>
+            <button class="al-trigger ui-button"><span class="al-trigger-inner">Manage</span></button>
             <ul class="al-options">
               <li><a class="edit_link" href="#"><span class="ui-icon ui-icon-pencil" />Edit</a></li>
               <li><a class="message_link" href="#"><span class="ui-icon ui-icon-mail-closed" />{{#ifEqual participant_type "Group"}}{{#t "message_groups"}}Message Groups Who...{{/t}}{{else}}{{#t "message_students"}}Message Students Who...{{/t}}{{/ifEqual}}</a></li>
