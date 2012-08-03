@@ -22,6 +22,29 @@ OAuth2 Token sent in query string:
 
     curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
 
+Storing Tokens
+--------------
+
+When appropriate, applications should store the token locally, rather
+the requesting a new token for the same user each time the user uses the
+application. If the token is deleted or expires, the application will
+get a 401 Unauthorized error from the API, in which case the application should
+perform the OAuth flow again to receive a new token.
+
+Storing a token is in many ways equivalent to storing the user's
+password, so tokens should be stored and used in a secure manner,
+including but not limited to:
+
+  * Don't embed tokens in web pages.
+  * Don't pass tokens or session IDs around in URLs.
+  * Properly secure the database or other data store containing the
+    tokens.
+  * For web applications, practice proper techniques to avoid session
+    attacks such as cross-site scripting, request forgery, replay
+    attacks, etc.
+  * For native applications, take advantage of user keychain stores and
+    other operating system functionality for securely storing passwords.
+
 Manual Token Generation
 -----------------------
 
@@ -82,7 +105,7 @@ This is the OAuth flow for third-party web applications.
 
 <div class="method_details">
 
-<h3>GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
+<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
 
 <h4>Parameters</h4>
 
@@ -140,7 +163,7 @@ parameter, rather than a `code` parameter, in the query string.
 
 <div class="method_details">
 
-<h3>POST /login/oauth2/token</h3>
+<h3 class="endpoint">POST /login/oauth2/token</h3>
 
 <h4>Parameters</h4>
 
@@ -205,7 +228,7 @@ read the out-of-band code response.
 
 <div class="method_details">
 
-<h3>GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
+<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
 
 <h4>Parameters</h4>
 
@@ -265,7 +288,7 @@ parameter, rather than a `code` parameter, to the query string.
 
 <div class="method_details">
 
-<h3>POST /login/oauth2/token</h3>
+<h3 class="endpoint">POST /login/oauth2/token</h3>
 
 <h4>Parameters</h4>
 
