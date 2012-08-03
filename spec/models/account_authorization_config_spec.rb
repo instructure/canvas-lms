@@ -46,7 +46,6 @@ describe AccountAuthorizationConfig do
         :tech_contact_name => 'Admin Dude',
         :tech_contact_email => 'admindude@example.com',
         :encryption => {
-          :xmlsec_binary => file_that_exists,
           :private_key => file_that_exists,
           :certificate => file_that_exists
         }
