@@ -97,7 +97,8 @@ describe ProfileController do
     before do
       user_with_pseudonym
       @user.register
-      user_session(@user, @pseudonym)
+      # reload to catch the user change
+      user_session(@user, @pseudonym.reload)
     end
 
     it "should let you change your short_name and profile information" do
