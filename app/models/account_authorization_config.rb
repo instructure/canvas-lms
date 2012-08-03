@@ -144,7 +144,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     end
     
     encryption = app_config[:encryption]
-    if encryption.is_a?(Hash) && File.exists?(encryption[:xmlsec_binary])
+    if encryption.is_a?(Hash)
       resolve_path = lambda { |path|
         if path.nil?
           nil
@@ -158,11 +158,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       private_key_path = resolve_path.call(encryption[:private_key])
       certificate_path = resolve_path.call(encryption[:certificate])
 
-      if File.exists?(private_key_path) && File.exists?(certificate_path)
-        settings.xmlsec1_path = encryption[:xmlsec_binary]
-        settings.xmlsec_certificate = certificate_path
-        settings.xmlsec_privatekey = private_key_path
-      end
+      settings.xmlsec_certificate = certificate_path if certificate_path.present? && File.exists?(certificate_path)
+      settings.xmlsec_privatekey = private_key_path if private_key_path.present? && File.exists?(private_key_path)
     end
     
     settings
