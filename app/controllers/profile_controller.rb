@@ -119,13 +119,16 @@ class ProfileController < ApplicationController
   def communication
     @user = @current_user
     @user = User.find(params[:id]) if params[:id]
+    @current_user.used_feature(:cc_prefs)
     @context = @user.profile
     @active_tab = 'notifications'
 
+    # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
+    full_category_list = Notification.dashboard_categories(@user)
     js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
       :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
-      :policies => NotificationPolicy.scoped(:include => :notification).for(@user).map{ |p| notification_policy_json(p, @user, session) },
-      :categories => Notification.dashboard_categories(@user).map{ |c| notification_category_json(c, @user, session) },
+      :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map{ |p| notification_policy_json(p, @user, session) },
+      :categories => full_category_list.map{ |c| notification_category_json(c, @user, session) },
       :update_url => communication_update_profile_path
     }
   end
