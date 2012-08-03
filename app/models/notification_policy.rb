@@ -131,4 +131,33 @@ class NotificationPolicy < ActiveRecord::Base
     end #if..else
     nil
   end
+
+  # Fetch the user's NotificationPolicies but whenever a category is not represented, create a NotificationPolicy on the primary
+  # CommunicationChannel with a default frequency set.
+  # Returns the full list of policies for the user
+  #
+  # ===== Arguments
+  # * <tt>user</tt> - The User instance to load the values for.
+  # * <tt>full_category_list</tt> - An array of Notification models that represent the unique list of categories that should be displayed for the user.
+  #
+  # ===== Returns
+  # A list of NotificationPolicy entries for the user. May include newly created entries if defaults were needed.
+  def self.setup_with_default_policies(user, full_category_list)
+    categories = {}
+    # Get the list of notification categories and its default. Like this: {"Announcement" => 'immediately'}
+    full_category_list.each {|c| categories[c.category] = c.default_frequency}
+    default_channel_id = user.communication_channel.try(:id)
+    # Load unique list of categories that the user currently has settings for.
+    user_categories = NotificationPolicy.for(user).scoped(:joins => :notification,
+                                                          :select => 'DISTINCT notifications.category').all.map{|c| c.category}
+    missing_categories = (categories.keys - user_categories)
+    missing_categories.each do |need_category|
+      # Create the settings for a completely unrepresented category. Use default communication_channel (primary email)
+      self.setup_for(user, {:category => need_category,
+                            :channel_id => default_channel_id,
+                            :frequency => categories[need_category]})
+    end
+    # Load and return user's policies after defaults may or may not have been set.
+    NotificationPolicy.scoped(:include => :notification).for(user)
+  end
 end

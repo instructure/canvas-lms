@@ -225,6 +225,48 @@ describe NotificationPolicy do
       n2.frequency.should == Notification::FREQ_IMMEDIATELY
     end
   end
+
+  describe "setup_with_default_policies" do
+    before :each do
+      user_model
+      communication_channel_model(:user_id => @user.id)
+      @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
+    end
+    it "should create default NotificationPolicy entries if missing" do
+      # Ensure no existing policies
+      NotificationPolicy.delete_all
+
+      policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      policies.length.should == 1
+      policies.first.frequency.should == @announcement.default_frequency
+    end
+    it "should not overwrite an existing setting with a default" do
+      # Create an existing policy entry
+      NotificationPolicy.delete_all
+      n1 = notification_policy_model({:communication_channel => @communication_channel,
+                                      :notification => @announcement,
+                                      :frequency => Notification::FREQ_NEVER})
+
+      @announcement.default_frequency.should_not == Notification::FREQ_NEVER # verify that it differs from the default
+      policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      policies.length.should == 1
+      policies.first.frequency.should == Notification::FREQ_NEVER
+    end
+    it "should not set defaults on secondary communication channel" do
+      NotificationPolicy.delete_all
+      # Setup the second channel (higher position)
+      primary_channel   = @user.communication_channel
+      secondary_channel = communication_channel_model(:user_id => @user.id, :path => 'secondary@example.com')
+      # start out with 0 on primary and secondary
+      primary_channel.notification_policies.count.should == 0
+      secondary_channel.notification_policies.count.should == 0
+      # Load data
+      NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      # Primary should have 1 created and secondary should be left alone.
+      primary_channel.notification_policies.count.should == 1
+      secondary_channel.notification_policies.count.should == 0
+    end
+  end
 end
 
 def policy_setup
