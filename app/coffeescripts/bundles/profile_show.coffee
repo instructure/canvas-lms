@@ -66,9 +66,7 @@ require [
         $row.find('input:first').focus()
 
     removeLinkRow: (event, $el) ->
-      console.log('hi')
       $el.parents('tr').remove()
-
 
   new ProfileShow ENV.PROFILE
 
