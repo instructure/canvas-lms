@@ -68,7 +68,7 @@ define [
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
         opacity: 0.5
-        top: '50%'
+        top: '55px'
         left: '50%'
       ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
 
