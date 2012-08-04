@@ -2450,6 +2450,13 @@ define([
     swfFileError: function(event, id, file, error, cancelable) { // onError
       cancelable = typeof(cancelable) != 'undefined' ? cancelable : true;
       file.id = id;
+      if (error.info == 201 && error.type == "HTTP") {
+        // As of Chrome 21 on Windows, uploadify seems to be calling the error callback when
+        // the upload succeeds. Luckily we can see the success in the error code here and
+        // intercept it.
+        fileUpload.s3Success(file);
+        return;
+      }
       var $file = fileUpload.initFile(file);
       setTimeout(function() {
         $file.addClass('error_cancelled');
@@ -2480,11 +2487,8 @@ define([
       $file.find(".cancel_upload_link").showIf(data.percentage < 100);
       $file.find(".progress_bar").progressbar('value', data.percentage);
     },
-    swfFileComplete: function(event, id, file, response, data) { // onComplete
-      file.id = id;
+    s3Success: function(file) {
       var $file = fileUpload.initFile(file);
-      if(response.indexOf("<PostResponse>") >= 0) {
-        // we just got back XML stuff from S3. do the s3 success url
         $file.find(".status").text(I18n.t('messages.finalizing', "Finalizing"));
         var errored = function() {
           fileUpload.swfFileError({}, file.id, file, {type: "server", info: I18n.t('errors.unexpected_response', "didn't get back expected response")});
@@ -2499,8 +2503,15 @@ define([
             errored();
           }
         }, errored);
+    },
+    swfFileComplete: function(event, id, file, response, data) { // onComplete
+      file.id = id;
+      if(response.indexOf("<PostResponse>") >= 0) {
+        // we just got back XML stuff from S3. that means success (?)
+        fileUpload.s3Success(file);
         return;
       }
+      var $file = fileUpload.initFile(file);
       fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
       $file.find(".status").text(I18n.t('messages.upload_complete', "Done uploading"));
       $file.find(".cancel_upload_link").remove();
