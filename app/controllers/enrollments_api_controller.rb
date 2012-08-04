@@ -314,7 +314,7 @@ class EnrollmentsApiController < ApplicationController
 
     if state.present?
       state.map(&:to_sym).each do |s|
-        conditions[0] << User::ENROLLMENT_CONDITIONS[s]
+        conditions[0] << User.enrollment_conditions(s)
       end
     end
 

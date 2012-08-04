@@ -1079,6 +1079,21 @@ describe User do
           [@this_section_user.id]
       end
     end
+
+    context "skip_visibility_checks" do
+      it "should optionally show invited enrollments" do
+        course(:active_all => true)
+        student_in_course(:user_state => 'creation_pending')
+        @teacher.messageable_users(:skip_visibility_checks => true).map(&:id).should include @student.id
+      end
+
+      it "should optionally show pending enrollments in unpublished courses" do
+        course()
+        teacher_in_course(:active_user => true)
+        student_in_course()
+        @teacher.messageable_users(:skip_visibility_checks => true, :admin_context => @course).map(&:id).should include @student.id
+      end
+    end
   end
   
   context "lti_role_types" do
