@@ -21,7 +21,6 @@ class SearchController < ApplicationController
 
   before_filter :get_context
   before_filter :set_avatar_size
-  before_filter :load_all_contexts, :only => :recipients
 
   def rubrics
     contexts = @current_user.management_contexts rescue []
@@ -76,6 +75,12 @@ class SearchController < ApplicationController
   # @response_field common_groups Only set for users. Hash of group ids and
   #   enrollment types for each group to show what they share with this user
   def recipients
+
+    # admins may not be able to see the course listed at the top level (since
+    # they aren't enrolled in it), but if they search within it, we want
+    # things to work, so we set everything up here
+    load_all_contexts get_admin_search_context(params[:context])
+
     types = (params[:types] || [] + [params[:type]]).compact
     types |= [:course, :section, :group] if types.delete('context')
     types = if types.present?
@@ -145,7 +150,7 @@ class SearchController < ApplicationController
   private
 
   def matching_participants(options)
-    jsonify_users(@current_user.messageable_users(options), options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
+    jsonify_users(@current_user.messageable_users(options.merge(:admin_context => @admin_context)), options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
   end
 
   def matching_contexts(options)
@@ -251,6 +256,17 @@ class SearchController < ApplicationController
     result << {:id => "#{context}_students", :name => t(:enrollments_students, "Students"), :user_count => enrollment_counts['StudentEnrollment'], :avatar_url => avatar_url, :type => :context} if enrollment_counts['StudentEnrollment'].to_i > 0
     result << {:id => "#{context}_observers", :name => t(:enrollments_observers, "Observers"), :user_count => enrollment_counts['ObserverEnrollment'], :avatar_url => avatar_url, :type => :context} if enrollment_counts['ObserverEnrollment'].to_i > 0
     result
+  end
+
+  def get_admin_search_context(asset_string)
+    return unless asset_string
+    return unless asset_string =~ (/\A((\w+)_(\d+))/)
+    asset_string = $1
+    asset_type = $2.to_sym
+    return unless [:course, :section, :group].include?(asset_type)
+    return unless context = Context.find_by_asset_string(asset_string)
+    return unless context.grants_right?(@current_user, nil, :read_as_admin)
+    @admin_context = context
   end
 
   def context_state_ranks

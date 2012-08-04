@@ -67,6 +67,47 @@ describe SearchController do
       response.body.should include('bob')
       response.body.should include('billy')
     end
+
+    context "with admin_context" do
+      it "should return nothing if the user doesn't have rights" do
+        user_session(user)
+        course(:active_all => true).course_sections.create(:name => "other section")
+        response.should be_success
+
+        get 'recipients', {
+          :type => 'section', :skip_visibility_checks => true,
+          :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
+        }
+        response.body.should =~ /\[\]\z/
+      end
+
+      it "should return sub-contexts" do
+        account_admin_user()
+        user_session(@user)
+        course(:active_all => true).course_sections.create(:name => "other section")
+
+        get 'recipients', {
+          :type => 'section', :skip_visibility_checks => true,
+          :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
+        }
+        response.should be_success
+        response.body.should include('other section')
+      end
+
+      it "should return sub-users" do
+        account_admin_user
+        user_session(@user)
+        course(:active_all => true).course_sections.create(:name => "other section")
+        course_with_student(:active_all => true)
+
+        get 'recipients', {
+          :type => 'user', :skip_visibility_checks => true,
+          :synthetic_contexts => true, :context => "course_#{@course.id}_all"
+        }
+        response.body.should include(@teacher.name)
+        response.body.should include(@student.name)
+      end
+    end
   end
 
 end

@@ -2153,11 +2153,18 @@ class User < ActiveRecord::Base
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
 
+    # provides a mechanism for admins to search within a context, even if not
+    # enrolled in it
+    admin_context = options[:admin_context]
+
     course_hash = enrollment_visibility
+    course_hash[:full_course_ids] << admin_context.id if admin_context.is_a?(Course)
+    course_hash[:full_course_ids] << admin_context.course_id if admin_context.is_a?(CourseSection)
     full_course_ids = course_hash[:full_course_ids]
     restricted_course_hash = course_hash[:restricted_course_hash]
 
     group_hash = group_membership_visibility
+    group_hash[:full_group_ids] << admin_context.id if admin_context.is_a?(Group)
     full_group_ids = group_hash[:full_group_ids]
     group_section_ids = []
     student_in_course_ids = course_hash[:student_in_course_ids]
