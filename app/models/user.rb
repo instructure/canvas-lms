@@ -53,25 +53,48 @@ class User < ActiveRecord::Base
   # Internal: SQL fragments used to return enrollments in their respective workflow
   # states. Where needed, these consider the state of the course to ensure that
   # students do not see their enrollments on unpublished courses.
-  ENROLLMENT_CONDITIONS = {
-    :active => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment'))) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )",
-    :invited => "( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')))))",
-    :deleted => "enrollments.workflow_state = 'deleted'",
-    :rejected => "enrollments.workflow_state = 'rejected'",
-    :completed => "enrollments.workflow_state = 'completed'",
-    :creation_pending => "enrollments.workflow_state = 'creation_pending'",
-    :inactive => "enrollments.workflow_state = 'inactive'" }
+  # 
+  # strict_course_state can be used to bypass the course state checks. This is
+  # useful in places like the course settings UI, where we use these conditions
+  # to search users in the course (rather than as an association on a
+  # particular user)
+  def self.enrollment_conditions(state, strict_course_state = true)
+    #strict_course_state = true
+    case state
+      when :active
+        if strict_course_state
+          "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')) or (courses.workflow_state = 'available')) )"
+        else
+          "( enrollments.workflow_state = 'active' and courses.workflow_state != 'deleted' )"
+        end
+      when :invited
+        if strict_course_state
+          "( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')))))"
+        else
+          "( enrollments.workflow_state IN ('invited', 'creation_pending') and courses.workflow_state != 'deleted' )"
+        end
+      when :deleted;          "enrollments.workflow_state = 'deleted'"
+      when :rejected;         "enrollments.workflow_state = 'rejected'"
+      when :completed;        "enrollments.workflow_state = 'completed'"
+      when :creation_pending; "enrollments.workflow_state = 'creation_pending'"
+      when :inactive;         "enrollments.workflow_state = 'inactive'"
+      when :current_and_invited
+        enrollment_conditions(:active, strict_course_state) +
+        " OR " +
+        enrollment_conditions(:invited, strict_course_state)
+    end
+  end
 
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
   has_one :communication_channel, :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => ENROLLMENT_CONDITIONS[:active], :order => 'enrollments.created_at'
-  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => ENROLLMENT_CONDITIONS[:invited], :order => 'enrollments.created_at'
+  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
+  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => [ENROLLMENT_CONDITIONS[:active], ENROLLMENT_CONDITIONS[:invited]].join(' OR ')
+           :conditions => enrollment_conditions(:current_and_invited)
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :order => 'enrollments.created_at'
-  has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => ENROLLMENT_CONDITIONS[:completed], :order => 'enrollments.created_at'
+  has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, :dependent => :delete_all
@@ -83,7 +106,7 @@ class User < ActiveRecord::Base
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
-           :conditions => [ENROLLMENT_CONDITIONS[:active], ENROLLMENT_CONDITIONS[:completed]].join(' OR '), :order => 'enrollments.created_at'
+           :conditions => [enrollment_conditions(:active), enrollment_conditions(:completed)].join(' OR '), :order => 'enrollments.created_at'
   has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments, :uniq => true
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
@@ -2033,13 +2056,14 @@ class User < ActiveRecord::Base
     "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{messageable_user_clause})"
   end
 
-  def messageable_enrollment_clause(include_concluded_students=false)
+  def messageable_enrollment_clause(options={})
+    options = {:strict_course_state => true}.merge(options)
     <<-SQL
     (
-      #{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
+      #{self.class.enrollment_conditions(:current_and_invited, options[:strict_course_state])}
       OR
-      #{self.class.reflections[:concluded_enrollments].options[:conditions]}
-      #{include_concluded_students ? "" : "AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')"}
+      #{self.class.enrollment_conditions(:completed, options[:strict_course_state])}
+      #{options[:include_concluded_students] ? "" : "AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')"}
     )
     SQL
   end
@@ -2130,7 +2154,7 @@ class User < ActiveRecord::Base
           elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
             section_id_hash[group.id] = sections
             user_counts[group.id] = group.context.enrollments.scoped(:conditions => [
-              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND #{messageable_enrollment_clause(true)}",
+              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND #{messageable_enrollment_clause(:include_concluded_students => true)}",
               group.group_memberships.map(&:user_id),
               sections
             ]).size
@@ -2245,7 +2269,7 @@ class User < ActiveRecord::Base
       FROM users, enrollments, courses
       WHERE course_id IN (#{all_course_ids.join(', ')})
         AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
-        AND #{messageable_enrollment_clause(include_concluded_students)}
+        AND #{messageable_enrollment_clause(:include_concluded_students => include_concluded_students, :strict_course_state => !options[:skip_visibility_checks])}
         #{enrollment_type_sql}
         #{user_condition_sql}
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
@@ -2266,7 +2290,7 @@ class User < ActiveRecord::Base
       FROM enrollments, courses
       WHERE
         user_id = users.id AND courses.id = course_id
-        AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]})
+        AND (#{self.class.enrollment_conditions(:current_and_invited)})
       ORDER BY #{Enrollment.type_rank_sql}
       LIMIT 1
     SQL
