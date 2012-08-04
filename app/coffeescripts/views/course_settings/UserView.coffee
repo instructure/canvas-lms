@@ -10,6 +10,7 @@ define [
   'jst/courses/settings/UserView'
   'compiled/str/underscore'
   'str/htmlEscape'
+  'compiled/jquery.whenAll'
   'compiled/jquery.kylemenu'
 ], (I18n, $, _, Backbone, EditSectionsView, InvitationsView, LinkToStudentsView, User, userViewTemplate, toUnderscore, h) ->
 
@@ -66,7 +67,10 @@ define [
               section = ENV.CONTEXTS['sections'][en.course_section_id]
               ob.sectionTitle += h(I18n.t('#support.array.words_connector') + section.name) if section
             data.enrollments.push ob
-      $.when(dfds...).done -> dfd.resolve data
+      # if a dfd fails (e.g. observee was removed from course), we still want
+      # the observer to render (possibly with other observees)
+      $.whenAll(dfds...).then ->
+        dfd.resolve(data)
       dfd.promise()
 
     reload: =>

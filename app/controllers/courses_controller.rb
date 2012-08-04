@@ -395,7 +395,7 @@ class CoursesController < ApplicationController
         User.send(:preload_associations, users, :not_ended_enrollments,
                   :conditions => ['enrollments.course_id = ?', @context.id])
       end
-      user = users.first
+      user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments if includes.include?('enrollments')
       render :json => user_json(user, @current_user, session, includes, @context, enrollments)
     end

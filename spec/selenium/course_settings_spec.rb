@@ -279,6 +279,32 @@ describe "course settings" do
       obs.reload.not_ended_enrollments.map {|e| e.associated_user_id}.sort.should include(students[2].id)
     end
 
+    it "should handle deleted observees" do
+      students = []
+      obs = user_model(:name => "The Observer")
+      student_in_course(:name => "Student 1", :active_all => true)
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      student_in_course(:name => "Student 2", :active_all => true)
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :allow_multiple_enrollments => true)
+
+      # bye bye Student 2
+      @enrollment.destroy
+
+      go_to_users_tab
+
+      observeds = ff("#user_#{obs.id} .enrollment_type")
+      observeds.length.should == 1
+      observeds.first.text.should include "Student 1"
+      observeds.first.text.should_not include "Student 2"
+
+      # dialog loads too
+      use_link_dialog(obs) do
+        input = fj("#link_students")
+        input.text.should include "Student 1"
+        input.text.should_not include "Student 2"
+      end
+    end
+
     it "should not show the student view student" do
       @fake_student = @course.student_view_student
       go_to_users_tab
