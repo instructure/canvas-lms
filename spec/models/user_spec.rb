@@ -1057,6 +1057,28 @@ describe User do
         @student.group_membership_visibility[:user_counts][@group.id].should eql 1
       end
     end
+
+    context "admin_context" do
+      before do
+        set_up_course_with_users
+        account_admin_user
+      end
+
+      it "should find users in the course" do
+        @admin.messageable_users(:context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
+          [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
+      end
+
+      it "should find users in the section" do
+        @admin.messageable_users(:context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort.should ==
+          [@this_section_teacher.id, @this_section_user.id]
+      end
+
+      it "should find users in the group" do
+        @admin.messageable_users(:context => @group.asset_string, :admin_context => @group).map(&:id).sort.should ==
+          [@this_section_user.id]
+      end
+    end
   end
   
   context "lti_role_types" do
