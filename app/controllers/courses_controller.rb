@@ -518,8 +518,8 @@ class CoursesController < ApplicationController
              :CONTEXTS => @contexts,
              :USER_PARAMS => {:include => ['email', 'enrollments', 'locked']},
              :PERMISSIONS => {
-               :manage_students => (@context.grants_right?(@current_user, session, :manage_students) ||
-                                    @context.grants_right?(@current_user, session, :manage_admin_users)),
+               :manage_students => @context.grants_right?(@current_user, session, :manage_students),
+               :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
                :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
              })
 

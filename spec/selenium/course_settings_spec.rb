@@ -305,6 +305,23 @@ describe "course settings" do
       end
     end
 
+    %w[ta designer].each do |et|
+      it "should not let #{et}s remove admins from the course" do
+        send "course_with_#{et}", :course => @course, :active_all => true
+        user_session @user
+        student_in_course :course => @course
+
+        go_to_users_tab
+
+        # should NOT see remove link for teacher
+        cog = open_kyle_menu @teacher
+        f('a[data-event="removeFromCourse"]', cog).should be_nil
+        # should see remove link for student
+        cog = open_kyle_menu @student
+        f('a[data-event="removeFromCourse"]', cog).should_not be_nil
+      end
+    end
+
     it "should not show the student view student" do
       @fake_student = @course.student_view_student
       go_to_users_tab
