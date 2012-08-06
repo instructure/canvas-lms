@@ -766,6 +766,14 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  def assert_flash_warning_message(okay_message_regex)
+    keep_trying_until do
+      text = f("#flash_message_holder .ui-state-warning").text rescue ''
+      raise "server error" if text =~ /The last request didn't work out/
+      text =~ okay_message_regex
+    end
+  end
+
   def assert_flash_error_message(fail_message_regex)
     keep_trying_until do
       text = f("#flash_message_holder .ui-state-error").text rescue ''

@@ -209,7 +209,7 @@ module AuthenticationMethods
       else
         format.html {
           store_location
-          flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
+          flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
           opts = {}
           opts[:canvas_login] = 1 if params[:canvas_login]
           redirect_to login_url(opts) # should this have :no_auto => 'true' ?

@@ -609,7 +609,7 @@ Spec::Runner.configure do |config|
 
   def assert_require_login
     response.should be_redirect
-    flash[:notice].should eql("You must be logged in to access this page")
+    flash[:warning].should eql("You must be logged in to access this page")
   end
 
   def default_uploaded_data
