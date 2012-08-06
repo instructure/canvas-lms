@@ -44,13 +44,14 @@ class PseudonymsController < ApplicationController
   def index
     return unless get_user && authorized_action(@user, @current_user, :read)
 
+    scope = @user.pseudonyms.active
     if @context.is_a?(Account)
       return unless context_is_root_account?
       @pseudonyms = Api.paginate(
-        @user.pseudonyms.scoped(:conditions => { :account_id => @context.id }),
+        scope.scoped(:conditions => { :account_id => @context.id }),
         self, api_v1_account_pseudonyms_path)
     else
-      @pseudonyms = Api.paginate(@user.pseudonyms, self, api_v1_user_pseudonyms_path)
+      @pseudonyms = Api.paginate(scope, self, api_v1_user_pseudonyms_path)
     end
 
     render :json => @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }
@@ -221,12 +222,12 @@ class PseudonymsController < ApplicationController
   # @argument login[sis_user_id] SIS ID for the login. To set this parameter, the caller must be able to manage SIS permissions on the account.
   def update
     if api_request?
-      @pseudonym          = Pseudonym.find(params[:id])
+      @pseudonym          = Pseudonym.active.find(params[:id])
       return unless @user = @pseudonym.user
       params[:pseudonym]  = params[:login]
     else
       return unless get_user
-      @pseudonym = @user.pseudonyms.find(params[:id])
+      @pseudonym = @user.pseudonyms.active.find(params[:id])
     end
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     return render(:json => nil, :status => :bad_request) if params[:pseudonym].blank?
@@ -284,7 +285,7 @@ class PseudonymsController < ApplicationController
   def destroy
     return unless get_user
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
-    @pseudonym = @user.pseudonyms.find(params[:id])
+    @pseudonym = @user.pseudonyms.active.find(params[:id])
     if @user.pseudonyms.active.length < 2
       @pseudonym.errors.add_to_base(t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors.to_json, :status => :bad_request
