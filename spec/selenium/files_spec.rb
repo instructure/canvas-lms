@@ -139,13 +139,21 @@ describe "files local tests" do
 
     context 'tinyMCE html editing' do
 
-      def click_edit_link
-        get "/courses/#{@course.id}/files"
+      def click_edit_link(page_refresh = true)
+        get "/courses/#{@course.id}/files" if page_refresh
         link = keep_trying_until { f("li.editable_folder_item div.header a.edit_item_content_link") }
         link.should be_displayed
         link.text.should == "edit content"
         link.click
         keep_trying_until { fj("#edit_content_dialog").should be_displayed }
+      end
+
+      def switch_html_edit_views
+        f('.switch_views').click
+      end
+
+      def save_html_content
+        f(".ui-dialog .btn-primary").click
       end
 
       before (:each) do
@@ -178,6 +186,37 @@ describe "files local tests" do
         f('.switch_views').click
         f('.switch_views').click
         driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<fake>lol<\/fake>/
+      end
+
+      it "should save changes from HTML view" do
+        click_edit_link
+        switch_html_edit_views
+        type_in_tiny('#edit_content_textarea', 'I am typing')
+        save_html_content
+        wait_for_ajax_requests
+        click_edit_link
+        keep_trying_until { f('#edit_content_textarea')[:value].should =~ /I am typing/ }
+      end
+
+      it "should save changes from code view" do
+        click_edit_link
+        driver.execute_script("$('#edit_content_textarea')[0].value = 'I am typing';")
+        save_html_content
+        wait_for_ajax_requests
+        click_edit_link
+        keep_trying_until { f('#edit_content_textarea')[:value].should =~ /I am typing/ }
+      end
+
+      it "should allow you to open and close the dialog and switch views" do
+        click_edit_link
+        keep_trying_until { driver.execute_script("return $('#edit_content_textarea').is(':visible');").should == true }
+        switch_html_edit_views
+        driver.execute_script("return $('#edit_content_textarea').is(':hidden');").should == true
+        close_visible_dialog
+        click_edit_link(false)
+        keep_trying_until { driver.execute_script("return $('#edit_content_textarea').is(':visible');").should == true }
+        switch_html_edit_views
+        driver.execute_script("return $('#edit_content_textarea').is(':hidden');").should == true
       end
     end
 
