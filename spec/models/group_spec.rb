@@ -523,7 +523,6 @@ describe Group do
         Group::TAB_CHAT,
         Group::TAB_FILES,
         Group::TAB_CONFERENCES,
-        Group::TAB_SETTINGS
       ]
     end
 
