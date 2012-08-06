@@ -8,8 +8,6 @@ module LearningOutcomeContext
       klass.send :include, InstanceMethods
     end
   end
-
-
   module InstanceMethods
     # create a shim for plugins that use the old association name. this is
     # TEMPORARY. the plugins should update to use the new association name, and
@@ -20,15 +18,22 @@ module LearningOutcomeContext
 
     # return the outcome but only if it's available in either the context or one
     # of the context's associated accounts.
-    def available_outcome(outcome_id)
+    def available_outcome(outcome_id, opts={})
+      if opts[:allow_global]
+        outcome = LearningOutcome.global.find_by_id(outcome_id)
+        return outcome if outcome
+      end
+
       outcome =
         linked_learning_outcomes.find_by_id(outcome_id) ||
         created_learning_outcomes.find_by_id(outcome_id)
       return outcome if outcome
 
-      (associated_accounts.uniq - [self]).each do |context|
-        outcome = context.available_outcome(outcome_id)
-        return outcome if outcome
+      unless opts[:recurse] == false
+        (associated_accounts.uniq - [self]).each do |context|
+          outcome = context.available_outcome(outcome_id, :recurse => false)
+          return outcome if outcome
+        end
       end
 
       return nil
@@ -46,14 +51,8 @@ module LearningOutcomeContext
       end
     end
 
-    def root_outcome_group
-      group = learning_outcome_groups.find_by_learning_outcome_group_id(nil)
-      unless group
-        group = learning_outcome_groups.build
-        group.building_default = true
-        group.save!
-      end
-      group
+    def root_outcome_group(force=true)
+      LearningOutcomeGroup.find_or_create_root(self, force)
     end
   end
 end

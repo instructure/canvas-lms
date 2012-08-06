@@ -189,20 +189,19 @@ describe "account admin question bank" do
     end
 
     def create_outcome (short_description = "good student")
-      ratings = [{:description => "Exceeds Expectations", :points => 5},
-                 {:description => "Meets Expectations", :points => 3},
-                 {:description => "Does Not Meet Expectations", :points => 0}]
-      rubric_criterion =
-          {:ratings => ratings,
-           :description => "test description", :points_possible => 10, :mastery_points => 9}
-      data = {:rubric_criterion => rubric_criterion}
-
       outcome = Account.default.created_learning_outcomes.build(:short_description => short_description)
-      outcome.data = data
+      outcome.rubric_criterion = {
+        :description => "test description",
+        :points_possible => 10,
+        :mastery_points => 9,
+        :ratings => [
+          { :description => "Exceeds Expectations", :points => 5 },
+          { :description => "Meets Expectations", :points => 3 },
+          { :description => "Does Not Meet Expectations", :points => 0 }
+        ]
+      }
       outcome.save!
-
       Account.default.root_outcome_group.add_outcome(outcome)
-
       outcome
     end
 

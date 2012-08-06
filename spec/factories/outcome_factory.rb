@@ -35,22 +35,13 @@ def valid_outcome_attributes
 end
 
 def valid_outcome_data
-    {
-          :enable => '1',
-          :points_possible => 3,
-          :mastery_points => 3,
-          :description => "Outcome row",
-          :ratings => {
-             'first_rating' =>
-            {
-              :points => 3,
-              :description => "Rockin"
-            },
-            'second_rating' =>
-            {
-              :points => 0,
-              :description => "Lame"
-            }
-          }
-   }
+  {
+    :description => "Outcome row",
+    :points_possible => 3,
+    :mastery_points => 3,
+    :ratings => [
+      { :points => 3, :description => "Rockin" },
+      { :points => 0, :description => "Lame" }
+    ]
+  }
 end

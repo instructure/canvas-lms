@@ -1,4 +1,4 @@
-<%= outcome_link = outcome; outcome = outcome_link && outcome_link.content %>
+<% outcome_link = outcome; outcome = outcome_link && outcome_link.content %>
 <div class="learning_outcome outcome_item <%= 'out_of_context' if outcome && (outcome.context_id != @context.id || outcome.context_type != @context.class.to_s) %>" id="outcome_<%= outcome ? outcome.id : "blank" %>" style="<%= hidden unless outcome %>">
   <div class="header">
     <a href="#" class="reorder_link no-hover"><%= image_tag "move.png" %></a>

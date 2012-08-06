@@ -19,7 +19,7 @@
 class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :title, :description, :learning_outcome_group
-  belongs_to :parent_outcome_group, :class_name => 'LearningOutcomeGroup', :primary_key => "learning_outcome_group_id"
+  belongs_to :learning_outcome_group
   has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup', :foreign_key => "learning_outcome_group_id"
   has_many :child_outcome_links, :class_name => 'ContentTag', :as => :associated_asset, :conditions => {:tag_type => 'learning_outcome_association', :content_type => 'LearningOutcome'}
   belongs_to :context, :polymorphic => true
@@ -28,7 +28,12 @@ class LearningOutcomeGroup < ActiveRecord::Base
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
 
   attr_accessor :building_default
-  
+
+  # we prefer using parent_outcome_group over learning_outcome_group,
+  # but when I tried naming the association parent_outcome_group, things
+  # didn't quite work.
+  alias :parent_outcome_group :learning_outcome_group
+
   def infer_defaults
     self.context ||= self.parent_outcome_group && self.parent_outcome_group.context
     if self.context && !self.context.learning_outcome_groups.empty? && !building_default
@@ -108,7 +113,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
         
         new_ids = []
         ids_to_check.each do |id|
-          group = self.context.learning_outcome_groups.active.find_by_id(id)
+          group = LearningOutcomeGroup.for_context(self.context).active.find_by_id(id)
           new_ids += group.parent_ids if group
         end
         
@@ -131,7 +136,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # adds a new link to an outcome to this group. does nothing if a link already
   # exists (an outcome can be linked into a context multiple times by multiple
   # groups, but only once per group).
-  def add_outcome(outcome, opts={})
+  def add_outcome(outcome)
     # no-op if the outcome is already linked under this group
     outcome_link = child_outcome_links.find_by_content_id(outcome.id)
     return outcome_link if outcome_link
@@ -149,7 +154,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # TODO: this is certainly not the behavior we want, but it matches existing
   # behavior, and I'm not getting into a full refactor of copy course in this
   # commit!
-  def add_outcome_group(group, opts={})
+  def add_outcome_group(original, opts={})
     # copy group into this group
     copy = child_outcome_groups.build
     copy.title = original.title
@@ -158,12 +163,12 @@ class LearningOutcomeGroup < ActiveRecord::Base
     copy.save!
 
     # copy the group contents
-    group.child_outcome_groups.each_with_index do |group|
+    original.child_outcome_groups.each_with_index do |group|
       next if opts[:only] && opts[:only][group.asset_string] != "1"
       copy.add_outcome_group(group, opts)
     end
 
-    group.child_outcome_links.each_with_index do |link|
+    original.child_outcome_links.each_with_index do |link|
       next if opts[:only] && opts[:only][link.asset_string] != "1"
       copy.add_outcome(link.content)
     end
@@ -203,12 +208,14 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   alias_method :destroy!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
-    ContentTag.delete_for(self)
-    # also delete any tags for held outcomes
-    # if we really do multi-nesting, you'll need it for sub-groups as well
-    LearningOutcome.delete_if_unused(self.child_outcome_links.map(&:content_id))
-    save!
+    transaction do
+      # delete the children of the group, both links and subgroups, then delete
+      # the group itself
+      self.child_outcome_links.active.scoped(:include => :content).each{ |outcome_link| outcome_link.destroy }
+      self.child_outcome_groups.active.each{ |outcome_group| outcome_group.destroy }
+      self.workflow_state = 'deleted'
+      save!
+    end
   end
   
   def self.import_from_migration(hash, migration, item=nil)
@@ -249,4 +256,61 @@ class LearningOutcomeGroup < ActiveRecord::Base
   named_scope :active, lambda{
     {:conditions => ['learning_outcome_groups.workflow_state != ?', 'deleted'] }
   }
+
+  named_scope :global, lambda{
+    {:conditions => {:context_id => nil} }
+  }
+
+  named_scope :root, lambda{
+    {:conditions => {:learning_outcome_group_id => nil} }
+  }
+
+  def self.for_context(context)
+    context ? context.learning_outcome_groups : LearningOutcomeGroup.global
+  end
+
+  def self.find_or_create_root(context, force)
+    scope = for_context(context)
+    # do this in a transaction, so parallel calls don't create multiple roots
+    # TODO: clean up contexts that already have multiple root outcome groups
+    transaction do
+      group = scope.active.root.first
+      if !group && force
+        group = scope.build
+        group.building_default = true
+        group.save!
+      end
+      group
+    end
+  end
+
+  def self.global_root_outcome_group(force=true)
+    find_or_create_root(nil, force)
+  end
+
+  def self.title_order_by_clause(table = nil)
+    col = table ? "#{table}.title" : "title"
+    best_unicode_collation_key(col)
+  end
+
+  module TitleExtension
+    # only works with scopes i.e. named_scopes and scoped()
+    def find(*args)
+      options = args.last.is_a?(::Hash) ? args.last : {}
+      scope = scope(:find)
+      select = if options[:select]
+                 options[:select]
+               elsif scope[:select]
+                 scope[:select]
+               else
+                 "#{proxy_scope.quoted_table_name}.*"
+               end
+      options[:select] = select + ', ' + LearningOutcomeGroup.title_order_by_clause
+      super args.first, options
+    end
+  end
+
+  def self.order_by_title
+    scoped(:order => title_order_by_clause, :extend => TitleExtension)
+  end
 end

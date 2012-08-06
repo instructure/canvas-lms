@@ -18,7 +18,7 @@
 
 class LearningOutcome < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :description, :short_description, :rubric_criterion
+  attr_accessible :context, :description, :short_description, :title, :rubric_criterion
   belongs_to :context, :polymorphic => true
   has_many :learning_outcome_results
   has_many :alignments, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted']
@@ -96,6 +96,10 @@ class LearningOutcome < ActiveRecord::Base
   def title
     self.short_description
   end
+
+  def title=(new_title)
+    self.short_description = new_title
+  end
   
   workflow do
     state :active
@@ -114,32 +118,45 @@ class LearningOutcome < ActiveRecord::Base
   end
   
   def rubric_criterion=(hash)
-    criterion = {}
-    if hash[:enable] != '1'
-      self.data ||= {}
-      self.data[:rubric_criterion] = nil
-      return
-    end
-    criterion[:description] = hash[:description] || t(:no_description, "No Description")
-    criterion[:ratings] = []
-    (hash[:ratings] || []).each do |key, rating|
-      criterion[:ratings] << {
-        :description => rating[:description] || t(:no_comment, "No Comment"),
-        :points => rating[:points].to_f || 0
-      }
-    end
-    criterion[:ratings] = criterion[:ratings].sort_by{|r| r[:points] }.reverse
-    criterion[:mastery_points] = (hash[:mastery_points] || criterion[:ratings][0][:points]).to_f
-    criterion[:points_possible] = criterion[:ratings][0][:points] rescue 0
     self.data ||= {}
+
+    if hash
+      criterion = {}
+      criterion[:description] = hash[:description] || t(:no_description, "No Description")
+      criterion[:ratings] = []
+      ratings = hash[:enable] ? hash[:ratings].values : (hash[:ratings] || [])
+      ratings.each do |rating|
+        criterion[:ratings] << {
+          :description => rating[:description] || t(:no_comment, "No Comment"),
+          :points => rating[:points].to_f || 0
+        }
+      end
+      criterion[:ratings] = criterion[:ratings].sort_by{|r| r[:points] }.reverse
+      criterion[:mastery_points] = (hash[:mastery_points] || criterion[:ratings][0][:points]).to_f
+      criterion[:points_possible] = criterion[:ratings][0][:points] rescue 0
+    else
+      criterion = nil
+    end
+
     self.data[:rubric_criterion] = criterion
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
+    # delete any remaining links to the outcome. in case of UI, this was
+    # triggered by ContentTag#destroy and the checks have already run, we don't
+    # need to do it again. in case of console, we don't care to force the
+    # checks. so just an update_all of workflow_state will do.
+    ContentTag.learning_outcome_links.active.update_all({:workflow_state => 'deleted'}, {:content_id => self.id})
+
+    # in case this got called in a console, delete the alignments also. the UI
+    # won't (shouldn't) allow deleting the outcome if there are still
+    # alignments, so this will be a no-op in that case. either way, these are
+    # not outcome links, so ContentTag#destroy is just changing the
+    # workflow_state; use update_all for efficiency.
+    ContentTag.learning_outcome_alignments.active.update_all({:workflow_state => 'deleted'}, {:learning_outcome_id => self.id})
+
     self.workflow_state = 'deleted'
-    ContentTag.delete_for(self)
-    ContentTag.find_all_by_learning_outcome_id(self.id).each{|t| t.destroy }
     save!
   end
   
@@ -259,5 +276,9 @@ class LearningOutcome < ActiveRecord::Base
      :conditions => ['learning_outcomes.id = learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id = ?', user.id],
      :order => 'short_description'
     }
+  }
+
+  named_scope :global, lambda{
+    {:conditions => {:context_id => nil} }
   }
 end

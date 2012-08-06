@@ -25,7 +25,6 @@ class OutcomesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_OUTCOMES)
       @root_outcome_group = @context.root_outcome_group
-      @outcomes = @context.linked_learning_outcomes
     end
   end
   

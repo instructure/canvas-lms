@@ -111,7 +111,7 @@ shared_examples_for "outcome tests" do
       # g2
       # o1
       # o2->
-      drag_with_js('.reorder_link:eq(3)', 0, -205)
+      drag_with_js('.reorder_link:eq(3)', 0, -165)
       wait_for_ajax_requests
       get outcome_url
       only_first_level_items_selector = '#outcomes > .outcome_group > .child_outcomes > .outcome_item'

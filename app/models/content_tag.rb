@@ -166,18 +166,52 @@ class ContentTag < ActiveRecord::Base
       end
     end
   end
-  
+
   def self.delete_for(asset)
     ContentTag.find_all_by_content_id_and_content_type(asset.id, asset.class.to_s).each{|t| t.destroy }
     ContentTag.find_all_by_context_id_and_context_type(asset.id, asset.class.to_s).each{|t| t.destroy }
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
+    # if it's a learning outcome link...
+    if self.tag_type == 'learning_outcome_association'
+      # and there are no other links to the same outcome in the same context...
+      outcome = self.content
+      other_link = ContentTag.learning_outcome_links.active.
+        scoped(:conditions => {:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome.id}).
+        scoped(:conditions => ["id != ?", self.id]).first
+      if !other_link
+        # and there are alignments to the outcome (in the link's context for
+        # foreign links, in any context for native links)
+        alignment_conditions = { :learning_outcome_id => outcome.id }
+        native = outcome.context_type == self.context_type && outcome.context_id == self.context_id
+        if !native
+          alignment_conditions[:context_id] = self.context_id
+          alignment_conditions[:context_type] = self.context_type
+        end
+        alignment = ContentTag.learning_outcome_alignments.scoped(:conditions => alignment_conditions).first
+        if alignment
+          # then don't let them delete the link
+          raise ActiveRecord::RecordNotSaved
+        end
+      end
+    end
+
     self.workflow_state = 'deleted'
-    self.save
+    self.save!
+
+    # after deleting the last native link to an unaligned outcome, delete the
+    # outcome. we do this here instead of in LearningOutcome#destroy because
+    # (a) LearningOutcome#destroy *should* only ever be called from here, and
+    # (b) we've already determined other_link and native
+    if self.tag_type == 'learning_outcome_association' && !other_link && native
+      outcome.destroy
+    end
+
+    true
   end
-  
+
   def locked_for?(user, deep_check=false)
     self.context_module.locked_for?(user, self, deep_check)
   end
@@ -295,4 +329,33 @@ class ContentTag < ActiveRecord::Base
   named_scope :learning_outcome_alignments, lambda{
     { :conditions => {:tag_type => 'learning_outcome'} }
   }
+  named_scope :learning_outcome_links, lambda{
+    { :conditions => {:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome'} }
+  }
+
+  # only intended for learning outcome links
+  def self.outcome_title_order_by_clause
+    best_unicode_collation_key("learning_outcomes.short_description")
+  end
+
+  module OutcomeTitleExtension
+    # only works with scopes i.e. named_scopes and scoped()
+    def find(*args)
+      options = args.last.is_a?(::Hash) ? args.last : {}
+      scope = scope(:find)
+      select = if options[:select]
+                 options[:select]
+               elsif scope[:select]
+                 scope[:select]
+               else
+                 "#{proxy_scope.quoted_table_name}.*"
+               end
+      options[:select] = select + ', ' + ContentTag.outcome_title_order_by_clause
+      super args.first, options
+    end
+  end
+
+  def self.order_by_outcome_title
+    scoped(:include => :learning_outcome_content, :order => outcome_title_order_by_clause, :extend => OutcomeTitleExtension)
+  end
 end

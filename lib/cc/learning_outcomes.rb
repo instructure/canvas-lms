@@ -19,10 +19,9 @@ module CC
   module LearningOutcomes
     def create_learning_outcomes(document=nil)
       return nil unless @course.has_outcomes?
-      return nil unless @course.root_outcome_group
-      
-      root_group = @course.root_outcome_group
-      
+      root_group = @course.root_outcome_group(false)
+      return nil unless root_group
+
       if document
         outcomes_file = nil
         rel_path = nil

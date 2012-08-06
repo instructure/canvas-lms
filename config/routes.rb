@@ -963,6 +963,34 @@ ActionController::Routing::Routes.draw do |map|
       wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_page'
       wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_page'
     end
+
+    api.with_options(:controller => :outcome_groups_api) do |outcome_groups|
+      def og_routes(route_object, context)
+        prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
+        route_object.get "#{prefix}/root_outcome_group", :action => :redirect, :path_name => "#{context}_redirect"
+        route_object.get "#{prefix}/outcome_groups/:id", :action => :show, :path_name => "#{context}_outcome_group"
+        route_object.put "#{prefix}/outcome_groups/:id", :action => :update
+        route_object.delete "#{prefix}/outcome_groups/:id", :action => :destroy
+        route_object.get "#{prefix}/outcome_groups/:id/outcomes", :action => :outcomes, :path_name => "#{context}_outcome_group_outcomes"
+        route_object.post "#{prefix}/outcome_groups/:id/outcomes", :action => :link
+        route_object.put "#{prefix}/outcome_groups/:id/outcomes/:outcome_id", :action => :link, :path_name => "#{context}_outcome_link"
+        route_object.delete "#{prefix}/outcome_groups/:id/outcomes/:outcome_id", :action => :unlink
+        route_object.get "#{prefix}/outcome_groups/:id/subgroups", :action => :subgroups, :path_name => "#{context}_outcome_group_subgroups"
+        route_object.post "#{prefix}/outcome_groups/:id/subgroups", :action => :create
+        route_object.post "#{prefix}/outcome_groups/:id/import", :action => :import, :path_name => "#{context}_outcome_group_import"
+        route_object.post "#{prefix}/outcome_groups/:id/batch", :action => :batch, :path_name => "#{context}_outcome_group_batch"
+      end
+
+      og_routes(outcome_groups, 'global')
+      og_routes(outcome_groups, 'account')
+      og_routes(outcome_groups, 'course')
+    end
+
+    api.with_options(:controller => :outcomes_api) do |outcomes|
+      outcomes.get "outcomes/:id", :action => :show, :path_name => "outcome"
+      outcomes.put "outcomes/:id", :action => :update
+      outcomes.delete "outcomes/:id", :action => :destroy
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
@@ -1004,7 +1032,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :rubrics do |rubric|
     rubric.resources :rubric_assessments, :as => 'assessments'
   end
-  map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
 
   # commenting out all collection urls until collections are live
