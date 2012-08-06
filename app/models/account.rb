@@ -99,6 +99,7 @@ class Account < ActiveRecord::Base
   scopes_custom_fields
 
   validates_locale :default_locale, :allow_nil => true
+  validate :account_chain_loop, :if => :parent_account_id_changed?
 
   include StickySisFields
   are_sis_sticky :name
@@ -423,14 +424,36 @@ class Account < ActiveRecord::Base
   
   def account_chain(opts = {})
     res = [self]
-    account = self
-    while account.parent_account
-      account = account.parent_account
-      res << account
+
+    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+      res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
+          WITH RECURSIVE t AS (
+            SELECT * FROM accounts WHERE id=#{self.parent_account_id}
+            UNION
+            SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+          )
+          SELECT * FROM t
+        SQL
+    else
+      account = self
+      while account.parent_account
+        account = account.parent_account
+        res << account
+      end
     end
-    res << self.root_account unless res.include?(self.root_account)
+    res << self.root_account unless res.map(&:id).include?(self.root_account_id)
     res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     res.compact
+  end
+
+  def account_chain_loop
+    # this record hasn't been saved to the db yet, so if the the chain includes
+    # this account, it won't point to the new parent yet, and should still be
+    # valid
+    if self.parent_account.account_chain_ids.include?(self.id)
+      errors.add(:parent_account_id,
+                 "Setting account #{self.sis_source_id || self.id}'s parent to #{self.parent_account.sis_source_id || self.parent_account_id} would create a loop")
+    end
   end
 
   def associated_accounts
