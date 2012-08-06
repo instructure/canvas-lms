@@ -447,22 +447,6 @@ describe GroupsController do
     end
   end
 
-  describe "GET edit" do
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      @group = @course.groups.create!(:name => "some group")
-      get 'edit', :course_id => @course.id, :id => @group.id
-      assert_unauthorized
-    end
-
-    it "should assign variables" do
-      course_with_teacher_logged_in(:active_all => true)
-      @group = @course.groups.create!(:name => "some group")
-      get 'edit', :course_id => @course.id, :id => @group.id
-      assigns[:group].should eql(@group)
-    end
-  end
-
   describe "PUT update" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
