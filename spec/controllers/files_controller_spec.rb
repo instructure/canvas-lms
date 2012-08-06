@@ -161,7 +161,7 @@ describe FilesController do
     end
     
     it "should work for a group context, too" do
-      group_with_user_logged_in
+      group_with_user_logged_in(:group_context => Account.default)
       get 'index', :group_id => @group.id
       response.should be_success
     end

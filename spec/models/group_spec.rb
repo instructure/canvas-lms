@@ -525,7 +525,6 @@ describe Group do
         Group::TAB_FILES,
         Group::TAB_CONFERENCES,
         Group::TAB_COLLABORATIONS,
-        Group::TAB_SETTINGS
       ]
     end
 
