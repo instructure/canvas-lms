@@ -98,7 +98,7 @@ define [
       linkToStudentsDialog.render().show()
 
     removeFromCourse: (e) ->
-      return unless confirm I18n.t('links.unenroll_user_course', 'Remove User from Course')
+      return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this user?')
       @$el.hide()
       success = =>
         for e in @model.get('enrollments')
