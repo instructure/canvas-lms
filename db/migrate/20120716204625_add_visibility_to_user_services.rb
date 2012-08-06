@@ -1,5 +1,5 @@
 class AddVisibilityToUserServices < ActiveRecord::Migration
-  tag :postdeploy
+  tag :predeploy
 
   def self.up
     add_column :user_services, :visible, :boolean
