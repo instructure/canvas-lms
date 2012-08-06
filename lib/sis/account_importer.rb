@@ -67,8 +67,8 @@ module SIS
 
         account ||= @root_account.sub_accounts.new
 
-        account.root_account_id = @root_account.id
-        account.parent_account_id = parent ? parent.id : @root_account.id
+        account.root_account = @root_account
+        account.parent_account = parent ? parent : @root_account
 
         # only update the name on new records, and ones that haven't been changed since the last sis import
         account.name = name if name.present? && (account.new_record? || (!account.stuck_sis_fields.include?(:name)))
@@ -85,11 +85,14 @@ module SIS
         end
 
         update_account_associations = account.root_account_id_changed? || account.parent_account_id_changed?
-        account.save
-        account.update_account_associations if update_account_associations
-        @accounts_cache[account.sis_source_id] = account
+        if account.save
+          account.update_account_associations if update_account_associations
+          @accounts_cache[account.sis_source_id] = account
 
-        @success_count += 1
+          @success_count += 1
+        else
+          raise ImportError, account.errors.first.last
+        end
       end
     end
   end
