@@ -74,9 +74,10 @@ class WikiPageRevisionsController < ApplicationController
   def update
     if authorized_action(@page, @current_user, :update)
       @revision = @page.versions.find(params[:id])
-      @page.revert_to_version @revision
+      except_fields = [:id] + WikiPage.new.attributes.keys - WikiPage.accessible_attributes.to_a
+      @page.revert_to_version @revision, :except => except_fields
       flash[:notice] = t('notices.page_rolled_back', 'Page was successfully rolled-back to previous version.')
-      redirect_to course_wiki_page_url( @context.id, @page)
+      redirect_to polymorphic_url([@context, @page])
     end
   end
 end
