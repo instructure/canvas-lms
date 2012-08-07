@@ -110,6 +110,30 @@ describe "user selenium tests" do
       @student_1.workflow_state.should == 'registered'
       @student_2.workflow_state.should == 'registered'
     end
+
+    it "should show an error if the user id entered is the current users" do
+      get "/users/#{@student_1.id}/admin_merge"
+      f('.static_message').should be_false
+      f('#manual_user_id').send_keys(@student_1.id)
+      expect_new_page_load { f('button[type="submit"]').click }
+      f('.static_message').text.should =~ /You can't merge an account with itself./
+    end
+
+    it "should show an error if invalid text is entered in the id box" do
+      get "/users/#{@student_1.id}/admin_merge"
+      f('.static_message').should be_false
+      f('#manual_user_id').send_keys("azxcvbytre34567uijmm23456yhj")
+      expect_new_page_load { f('button[type="submit"]').click }
+      f('.static_message').text.should =~ /Invalid input. Please enter a valid ID./
+    end
+    
+    it "should show an error if the user id doesnt exist" do
+      get "/users/#{@student_1.id}/admin_merge"
+      f('.static_message').should be_false
+      f('#manual_user_id').send_keys(1234567809)
+      expect_new_page_load { f('button[type="submit"]').click }
+      f('.static_message').text.should =~ /No active user with that ID was found./
+    end
   end
 
   context "registration" do
