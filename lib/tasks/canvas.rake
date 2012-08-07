@@ -35,11 +35,11 @@ def check_syntax(files)
       end
 
       raise "jsl needs to be in your $PATH, download from: javascriptlint.com" if `which jsl`.empty?
-      puts " --> Checking #{js_file} using jsl:"
       jsl_output = `jsl -process "#{file_path}" -nologo -conf "#{File.join(Rails.root, 'config', 'jslint.conf')}"`
       exit_status = $?.exitstatus
       if exit_status != 0
-        if jsl_output.match("warning: trailing comma is not legal in ECMA-262 object initializers")
+        puts " --> Error checking #{js_file} using jsl:"
+        if jsl_output.match("warning: trailing comma is not legal in ECMA-262 object initializers") || jsl_output.match("extra comma is not recommended in array initializers")
           exit_status = 2
           jsl_output << "fatal trailing comma found. Stupid IE!"
         end
