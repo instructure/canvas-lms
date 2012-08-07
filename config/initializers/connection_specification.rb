@@ -18,7 +18,19 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
       @current_config[:username] = self.class.explicit_user
       @current_config.delete(:password)
     end
+
+    @current_config.instance_variable_set(:@spec, self)
+    def @current_config.[]=(key, value)
+      @spec.instance_variable_set(:@current_config_key, nil)
+      @spec.instance_variable_get(:@config)[key] = value
+    end
+
     @current_config
+  end
+
+  def config=(value)
+    @config = value
+    @current_config_key = nil
   end
 
   def self.with_environment(environment)
