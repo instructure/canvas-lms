@@ -240,8 +240,10 @@ describe "people" do
       end
 
       get "/courses/#{@course.id}/users/#{@obs.id}"
-      enrollments = driver.find_elements(:css, ".enrollment")
+      f('.more_user_information_link').click
+      enrollments = ff(".enrollment")
       enrollments.length.should == 2
+
       enrollments[0].should include_text @students[0].name
       enrollments[1].should include_text @students[1].name
 

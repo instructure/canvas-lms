@@ -380,12 +380,16 @@ class ContextController < ApplicationController
       @messages = @entries
       @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }.sort_by{|e| e.created_at }.reverse
 
-      @user_data = profile_data(
-        @user.profile,
-        @current_user,
-        session,
-        ['links', 'user_services']
-      )
+      if @domain_root_account.enable_profiles?
+        @user_data = profile_data(
+          @user.profile,
+          @current_user,
+          session,
+          ['links', 'user_services']
+        )
+        return render :action => :new_roster_user
+      end
+      true
     end
   end
     
