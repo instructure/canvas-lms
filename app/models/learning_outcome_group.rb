@@ -43,6 +43,19 @@ class LearningOutcomeGroup < ActiveRecord::Base
     state :deleted
   end
 
+  # create a shim for plugins that use this defunct method. this is TEMPORARY.
+  # the plugins should update to use the new layout, and once they're updated,
+  # this shim removed. DO NOT USE in new code.
+  def sorted_content
+    # the existing code that requires this shim only occurs when there are
+    # either subgroups or outcomes under the group, but not both. and they're
+    # from a migration, so the expected order is the migration order.
+    subgroups = self.child_outcome_groups.sort_by{ |group| group.migration_id }
+    return subgroups unless subgroups.empty?
+
+    self.child_outcome_links.map{ |link| link.content }.sort_by{ |outcome| outcome.migration_id }
+  end
+
   def reorder_content(orders)
     orders ||= {}
     orders = orders.map{|asset_string, position| asset_string}
@@ -65,14 +78,14 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
 
     # update outcome groups
-    unless update_outcome_groups.empty?
+    unless outcome_group_ids.empty?
       sql = "UPDATE learning_outcome_groups SET learning_outcome_group_id=#{self.id} WHERE id IN (#{outcome_group_ids.join(",")}) AND context_type='#{self.context_type}' AND context_id='#{self.context_id}'"
       ContentTag.connection.execute(sql)
     end
 
     # update outcome links
-    unless update_outcome_links.empty?
-      sql = "UPDATE content_tags SET associated_asset_id=#{self.id} WHERE id IN (#{outcome_link_ids.map(&:id).join(",")}) AND context_type='#{self.context_type}' AND context_id='#{self.context_id}'"
+    unless outcome_link_ids.empty?
+      sql = "UPDATE content_tags SET associated_asset_id=#{self.id} WHERE id IN (#{outcome_link_ids.join(",")}) AND context_type='#{self.context_type}' AND context_id='#{self.context_id}'"
       ContentTag.connection.execute(sql)
     end
 
@@ -200,6 +213,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   
   def self.import_from_migration(hash, migration, item=nil)
     context = migration.context
+    root_outcome_group = context.root_outcome_group
     hash = hash.with_indifferent_access
     item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
     item ||= context.learning_outcome_groups.new
@@ -212,7 +226,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     if hash[:parent_group]
       hash[:parent_group].adopt_outcome_group(item)
     else
-      context.root_outcome_group.adopt_outcome_group(item)
+      root_outcome_group.adopt_outcome_group(item)
     end
     
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?

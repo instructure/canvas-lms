@@ -11,6 +11,13 @@ module LearningOutcomeContext
 
 
   module InstanceMethods
+    # create a shim for plugins that use the old association name. this is
+    # TEMPORARY. the plugins should update to use the new association name, and
+    # once they're updated, this shim removed. DO NOT USE in new code.
+    def learning_outcomes
+      created_learning_outcomes
+    end
+
     # return the outcome but only if it's available in either the context or one
     # of the context's associated accounts.
     def available_outcome(outcome_id)

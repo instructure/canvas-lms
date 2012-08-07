@@ -26,10 +26,10 @@
     <div style="display: block; height: 10px;"></div>
     <div class="child_outcomes">
       <% if outcome_group %>
-        <% outcome_group.child_outcome_groups.each do |group| %>
+        <% outcome_group.child_outcome_groups.active.sort_by{ |g| g.title }.each do |group| %>
           <%= render :partial => "outcome_group", :object => group %>
         <% end %>
-        <% outcome_group.child_outcome_links.each do |link| %>
+        <% outcome_group.child_outcome_links.active.sort_by{ |l| l.content.title }.each do |link| %>
           <%= render :partial => "outcome", :object => link %>
         <% end %>
       <% end %>

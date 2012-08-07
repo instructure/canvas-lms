@@ -106,33 +106,12 @@ shared_examples_for "outcome tests" do
       driver.execute_script('return INST.errorCount;').should eql 0
     end
 
-    it "re-order sibling outcomes" do
-      #   <-
-      # g1
-      # g2
-      # o1
-      # o2->
-      driver.action.drag_and_drop(@oh2, @gh1).perform
-      wait_for_js
-      wait_for_ajax_requests
-      get outcome_url
-
-      # get the elements in the order we expect
-      o2, g1, g2, o1 = ff('#outcomes > .outcome_group .outcome_item')
-
-      # verify they are in the order we expect
-      g1.attribute(:id).should == "group_#{@group1.id}"
-      g2.attribute(:id).should == "group_#{@group2.id}"
-      o1.attribute(:id).should == "outcome_#{@outcome1.id}"
-      o2.attribute(:id).should == "outcome_#{@outcome2.id}"
-    end
-
     it "should nest an outcome into a group" do
       # g1<-
       # g2
       # o1
       # o2->
-      drag_with_js('.reorder_link:eq(3)', 0, -165)
+      drag_with_js('.reorder_link:eq(3)', 0, -205)
       wait_for_ajax_requests
       get outcome_url
       only_first_level_items_selector = '#outcomes > .outcome_group > .child_outcomes > .outcome_item'
@@ -147,48 +126,6 @@ shared_examples_for "outcome tests" do
       # check that the outcome is nested
       o2 = g1.find_element(:id, "outcome_#{@outcome2.id}")
       o2.should be_displayed
-    end
-
-    it 'should re-order groups with children' do
-      # first we have to nest the outcomes
-      #   g1<-
-      # ->g2
-      #   o1->
-      # <-o2
-
-      # drag o1 into g1
-      drag_with_js('.reorder_link:eq(2)', 0, -100)
-      wait_for_ajax_requests
-
-      # drag o2 into g2
-      drag_with_js('.reorder_link:eq(3)', 0, -30)
-      wait_for_ajax_requests
-
-      # re-order the groups
-      # ->
-      #   g1
-      #     o1
-      # <-g2
-      #     o2
-      driver.action.drag_and_drop(@gh2, @gh1).perform
-      drag_with_js('.reorder_link:eq(2)', 0, -200)
-      wait_for_ajax_requests
-
-      get outcome_url
-      only_first_level_items_selector = '#outcomes > .outcome_group > .child_outcomes > .outcome_item'
-
-      # get them in the order we expect
-      g2, g1, *extras = ff(only_first_level_items_selector)
-
-      # make sure we only have two
-      extras.length.should == 0
-
-      # verify they're in order
-      g1.attribute(:id).should == "group_#{@group1.id}"
-      g2.attribute(:id).should == "group_#{@group2.id}"
-
-      g1.find_element(:id, "outcome_#{@outcome1.id}").should be_displayed
-      g2.find_element(:id, "outcome_#{@outcome2.id}").should be_displayed
     end
   end
 

@@ -18,7 +18,7 @@
 
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :title, :user, :outcomes
+  attr_accessible :context, :title, :user, :alignments
   belongs_to :context, :polymorphic => true
   has_many :assessment_questions, :order => 'name, position, created_at'
   has_many :assessment_question_bank_users
@@ -69,7 +69,34 @@ class AssessmentQuestionBank < ActiveRecord::Base
   def infer_defaults
     self.title = t(:default_title, "No Name - %{course}", :course => self.context.name) if self.title.blank?
   end
-  
+
+  def alignments=(alignments)
+    # empty string from controller or empty hash
+    if alignments.empty?
+      outcomes = []
+    else
+      outcomes = context.linked_learning_outcomes.find_all_by_id(alignments.keys.map(&:to_i))
+    end
+
+    # delete alignments that aren't in the list anymore
+    if outcomes.empty?
+      learning_outcome_alignments.update_all(:workflow_state => 'deleted')
+    else
+      learning_outcome_alignments.
+        scoped(:conditions => ["learning_outcome_id NOT IN (?)", outcomes.map(&:id)]).
+        update_all(:workflow_state => 'deleted')
+    end
+
+    # add/update current alignments
+    unless outcomes.empty?
+      alignments.each do |outcome_id, mastery_score|
+        outcome = outcomes.detect{ |outcome| outcome.id == outcome_id.to_i }
+        next unless outcome
+        outcome.align(self, context, :mastery_score => mastery_score)
+      end
+    end
+  end
+
   def bookmark_for(user, do_bookmark=true)
     if do_bookmark
       question_bank_user = self.assessment_question_bank_users.find_by_user_id(user.id)

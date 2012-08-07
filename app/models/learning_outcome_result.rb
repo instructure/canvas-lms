@@ -108,4 +108,8 @@ class LearningOutcomeResult < ActiveRecord::Base
   named_scope :for_associated_asset, lambda{|associated_asset|
     {:conditions => {:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id} }
   }
+  named_scope :for_user, lambda{|user|
+    user_id = user.is_a?(User) ? user.id : user
+    {:conditions => {:user_id => user_id} }
+  }
 end

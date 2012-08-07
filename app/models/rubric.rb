@@ -120,7 +120,10 @@ class Rubric < ActiveRecord::Base
   end
 
   def update_alignments
-    return unless @alignments_changed
+    # including @outcomes_changed is a shim for some plugin specs. this is
+    # TEMPORARY, the plugins should update to use the new variable, and, once
+    # they're updated, this shim removed. DO NOT USE in new code.
+    return unless @alignments_changed || @outcomes_changed
     outcome_ids = (self.data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
     LearningOutcome.update_alignments(self, context, outcome_ids)
     true

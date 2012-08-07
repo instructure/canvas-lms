@@ -138,7 +138,7 @@ define([
     deleteOutcome: function($outcome) {
       $outcome.confirmDelete({
         message: I18n.t("remove_learning_outcome", "Are you sure you want to remove this learning outcome?"),
-        url: $outcome.find(".delete_outcome_link").attr('href'),
+        url: $outcome.find(".delete_outcome_link:visible").attr('href'),
         success: function() {
           $(this).slideUp(function() {
             $(this).remove();

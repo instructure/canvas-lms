@@ -293,7 +293,7 @@ describe "Canvas Cartridge importing" do
   end
   
   def create_learning_outcome
-    lo = @copy_from.learning_outcomes.new
+    lo = @copy_from.created_learning_outcomes.new
     lo.context = @copy_from
     lo.short_description = "Lone outcome"
     lo.description = "<p>Descriptions are boring</p>"
@@ -331,7 +331,7 @@ describe "Canvas Cartridge importing" do
     lo_g2.title = "Empty Group"
     lo_g2.save!
     
-    lo2 = @copy_from.learning_outcomes.new
+    lo2 = @copy_from.created_learning_outcomes.new
     lo2.context = @copy_from
     lo2.short_description = "outcome in group"
     lo2.workflow_state = 'active'
@@ -345,12 +345,12 @@ describe "Canvas Cartridge importing" do
     
     import_learning_outcomes
     
-    lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.short_description.should == lo.short_description
     lo_2.description.should == lo.description
     lo_2.data.with_indifferent_access.should == lo.data.with_indifferent_access
     
-    lo2_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo2))
+    lo2_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo2))
     lo2_2.short_description.should == lo2.short_description
     lo2_2.description.should == lo2.description
     lo2_2.data.with_indifferent_access.should == lo2.data.with_indifferent_access
@@ -400,7 +400,7 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
 
     @copy_to.rubric_associations.count.should == 2
-    lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.should_not be_nil
     rubric_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric))
     rubric_2.title.should == rubric.title

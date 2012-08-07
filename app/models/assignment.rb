@@ -68,6 +68,13 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  # create a shim for plugins that use the old association name. this is
+  # TEMPORARY. the plugins should update to use the new association name, and
+  # once they're updated, this shim removed. DO NOT USE in new code.
+  def learning_outcome_tags
+    learning_outcome_alignments
+  end
+
   def external_tool?
     self.submission_types == 'external_tool'
   end

@@ -23,7 +23,7 @@ describe Rubric do
   context "outcomes" do
     it "should allow learning outcome rows in the rubric" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -47,16 +47,16 @@ describe Rubric do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments(true).should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
     end
     
     it "should delete learning outcome tags when they no longer exist" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -80,10 +80,10 @@ describe Rubric do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments(true).should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @rubric.data = [{
         :points => 5,
@@ -109,8 +109,8 @@ describe Rubric do
     end
     it "should create learning outcome associations for multiple outcome rows" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
-      @outcome2 = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!
+      @outcome2 = @course.created_learning_outcomes.create!
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -154,15 +154,15 @@ describe Rubric do
           :learning_outcome_id => @outcome2.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments(true).should_not be_empty
       @rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
     end
     it "should create outcome results when outcome-aligned rubrics are assessed" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -186,10 +186,10 @@ describe Rubric do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments(true).should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
@@ -216,7 +216,7 @@ describe Rubric do
       @result.possible.should eql(3.0)
       @result.original_score.should eql(2.0)
       @result.original_possible.should eql(3.0)
-      @result.mastery.should eql(nil)
+      @result.mastery.should be_false
       n = @result.version_number
       @assessment = @a.assess({
         :user => @user,
@@ -235,7 +235,7 @@ describe Rubric do
       @result.score.should eql(3.0)
       @result.possible.should eql(3.0)
       @result.original_score.should eql(2.0)
-      @result.mastery.should eql(true)
+      @result.mastery.should be_true
     end
   end
 

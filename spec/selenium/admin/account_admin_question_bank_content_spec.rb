@@ -196,10 +196,13 @@ describe "account admin question bank" do
           {:ratings => ratings,
            :description => "test description", :points_possible => 10, :mastery_points => 9}
       data = {:rubric_criterion => rubric_criterion}
-      outcome = LearningOutcome.create!(:short_description => short_description)
+
+      outcome = Account.default.created_learning_outcomes.build(:short_description => short_description)
       outcome.data = data
-      outcome.save
-      Account.default.learning_outcomes << outcome
+      outcome.save!
+
+      Account.default.root_outcome_group.add_outcome(outcome)
+
       outcome
     end
 

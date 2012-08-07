@@ -69,10 +69,10 @@ describe "Common Cartridge exporting" do
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
       @log = @course.root_outcome_group
-      @lo = @course.learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
+      @lo = @course.created_learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
       @lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
       @lo.save
-      @lo2 = @course.learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
+      @lo2 = @course.created_learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
       @lo2.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
       @lo2.save
       @log2 = @course.learning_outcome_groups.create!(:title => 'groupage', :context => @course)

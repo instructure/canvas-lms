@@ -117,7 +117,7 @@ class QuizSubmission < ActiveRecord::Base
     return unless user_id
 
     question_ids = (self.quiz_data || []).map{|q| q[:assessment_question_id] }.compact.uniq
-    questions, alignments = outcome_tags_for_questions(question_ids)
+    questions, alignments = questions_and_alignments(question_ids)
     return if questions.empty? || alignments.empty?
 
     tagged_bank_ids = Set.new(alignments.map(&:content_id))
@@ -147,14 +147,14 @@ class QuizSubmission < ActiveRecord::Base
     result = alignment.learning_outcome_results.
       for_association(quiz).
       for_associated_asset(question).
-      find_or_initialize_by_user(user)
+      find_or_initialize_by_user_id(user.id)
 
     # force the context and artifact
     result.artifact = self
     result.context = quiz.context || alignment.context
 
     # update the result with stuff from the quiz submission's question result
-    cached_question = quiz_data.detect{|q| q[:assessment_question_id] == opts[:assessment_question].id }
+    cached_question = quiz_data.detect{|q| q[:assessment_question_id] == question.id }
     cached_answer = submission_data.detect{|q| q[:question_id] == cached_question[:id] }
     raise "Could not find valid question" unless cached_question
     raise "Could not find valid answer" unless cached_answer

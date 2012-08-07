@@ -553,9 +553,9 @@ Spec::Runner.configure do |config|
                                       }
                                   }
                               })
-    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.instance_variable_set('@alignments_changed', true)
     @rubric.save!
-    @rubric.update_outcome_tags
+    @rubric.update_alignments
   end
 
   def grading_standard_for(context)
