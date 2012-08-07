@@ -76,11 +76,13 @@ define [
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 
   $(document).on 'click change', '.element_toggler[aria-controls]', (event) ->
-    event.preventDefault() if event.type is 'click'
     $this = $(this)
 
     if $this.is('input[type="checkbox"]')
+      return if event.type is 'click'
       force = $this.prop('checked')
+
+    event.preventDefault() if event.type is 'click'
 
     # allow .links inside .user_content to be elementTogglers, but only for other elements inside of
     # that .user_content area
