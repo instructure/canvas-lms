@@ -45,11 +45,10 @@ window.rubricAssessment = {
             .fillTemplateData({data: data, htmlValues: ( is_learning_outcome ? ['long_description'] : [] )})
             .find(".editing").hide().end()
             .find(".displaying").show().end()
-            .dialog('close').dialog({
-              autoOpen: false,
+            .dialog({
               title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
               width: 400
-            }).dialog('open');
+            });
         }
       })
       .delegate(".criterion .saved_custom_rating", 'change', function() {
@@ -75,11 +74,10 @@ window.rubricAssessment = {
         $rubric_criterion_comments_dialog.fillFormData(data);
         $rubric_criterion_comments_dialog.find(".editing").showIf(editing);
         $rubric_criterion_comments_dialog.find(".displaying").showIf(!editing);
-        $rubric_criterion_comments_dialog.dialog('close').dialog({
-          autoOpen: false,
+        $rubric_criterion_comments_dialog.dialog({
           title: I18n.t('titles.additional_comments', "Additional Comments"),
           width: 400
-        }).dialog('open');
+        });
       })
       // cant use a .delegate because up above when we delegate '.rating' 'click' it calls .change() and that doesnt bubble right so it doesen't get caught
       .find(".criterion_points").bind('keypress change blur', function(event) {
@@ -124,11 +122,10 @@ window.rubricAssessment = {
       $rubric_criterion_comments_dialog.fillFormData(data);
       $rubric_criterion_comments_dialog.find(".editing").hide();
       $rubric_criterion_comments_dialog.find(".displaying").show();
-      $rubric_criterion_comments_dialog.dialog('close').dialog({
-        autoOpen: false,
+      $rubric_criterion_comments_dialog.dialog({
         title: I18n.t('titles.additional_comments', "Additional Comments"),
         width: 400
-      }).dialog('open');
+      });
     });
 
 

@@ -168,10 +168,9 @@ define([
   
   $("#unregistered_services li.service").click(function(event) {
     event.preventDefault();
-    $("#" + $(this).attr('id') + "_dialog").dialog('close').dialog({
-      width: 350,
-      autoOpen: false
-    }).dialog('open');
+    $("#" + $(this).attr('id') + "_dialog").dialog({
+      width: 350
+    });
   });
   $(".create_user_service_form").formSubmit({
     object_name: 'user_service',
@@ -291,10 +290,9 @@ define([
     event.preventDefault();
     var $dialog = $("#token_details_dialog");
     var url = $(this).attr('rel');
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
+    $dialog.dialog({
       width: 600
-    }).dialog('open');
+    });
     var $token = $(this).parents(".access_token");
     $dialog.data('token', $token);
     $dialog.find(".loading_message").show().end()
@@ -498,12 +496,11 @@ define([
         $dialog.find(".profile_pic_list h3").text(I18n.t('errors.loading_images_failed', "Loading Images Failed, please try again"));
       });
     }
-    $("#profile_pic_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#profile_pic_dialog").dialog({
       title: I18n.t('titles.select_profile_pic', "Select Profile Pic"),
       width: 500,
       height: 300
-    }).dialog('open');
+    });
   });
   var checkImage = function() {
     var img = $(".profile_pic_link img")[0];

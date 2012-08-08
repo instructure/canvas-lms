@@ -40,11 +40,10 @@ define([
       });
     });
     function populateDialog(data_points, axis) {
-      $("#over_time_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#over_time_dialog").dialog({
         width: 630,
         height: 330
-      }).dialog('open').dialog('option', 'title', I18n.t('titles.value_over_time', "%{value} Over Time", {value: axis}));
+      }).dialog('option', 'title', I18n.t('titles.value_over_time', "%{value} Over Time", {value: axis}));
       var data = new google.visualization.DataTable();
       data.addColumn('date', I18n.t('columns.date', 'Date'));
       data.addColumn('number', axis || I18n.t('columns.value', "Value"));

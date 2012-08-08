@@ -139,10 +139,9 @@ define([
       $("#new_assignment_dialog :text:not(.points_possible)").each(function() {
         $(this).val("");
       });
-      $("#new_assignment_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#new_assignment_dialog").dialog({
         title: I18n.t('titles.new_attendance_column', "New Attendance Column")
-      }).dialog('open');
+      });
     });
     $("#new_assignment_dialog .cancel_button").click(function(event) {
       $("#new_assignment_dialog").dialog('close');
@@ -194,11 +193,10 @@ define([
     $(".datetime_field").datetime_field();
     $(".help_link").click(function(event) {
       event.preventDefault();
-      $("#attendance_how_to_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#attendance_how_to_dialog").dialog({
         width: 400,
         title: I18n.t('titles.attendance_help', "Attendance Help")
-      }).dialog('open');
+      });
     });
     $(".submission").addClass('loading');
     var getClump = function(url, assignment_ids, user_ids) {

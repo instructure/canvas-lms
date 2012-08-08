@@ -124,10 +124,9 @@ define([
           });
         }
         $dialog.find(".lock_reason_content").empty().append($reason);
-        $dialog.dialog('close').dialog({
-          autoOpen: false,
+        $dialog.dialog({
           title: I18n.t('titles.content_is_locked', "Content Is Locked")
-        }).dialog('open');
+        });
       }
     });
   });

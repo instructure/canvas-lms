@@ -106,11 +106,10 @@ require([
 
   function testLDAP() {
     clearTestLDAP();
-    $("#test_ldap_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#test_ldap_dialog").dialog({
       title: <%= jt('#accounts.test_ldap_dialog_title', "Test LDAP Settings") %>,
       width: 500
-    }).dialog('open');
+    });
     <%= ldap_tests.first.js_function %>();
   }
   function clearTestLDAP() {

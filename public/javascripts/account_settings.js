@@ -73,19 +73,17 @@ define([
     }
     $(".ip_help_link").click(function(event) {
       event.preventDefault();
-      $("#ip_filters_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#ip_filters_dialog").dialog({
         title: I18n.t('titles.what_are_quiz_ip_filters', "What are Quiz IP Filters?"),
         width: 400
-      }).dialog('open');
+      });
     });
     $(".open_registration_delegated_warning_link").click(function(event) {
       event.preventDefault();
-      $("#open_registration_delegated_warning_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#open_registration_delegated_warning_dialog").dialog({
         title: I18n.t('titles.open_registration_delegated_warning_dialog', "An External Identity Provider is Enabled"),
         width: 400
-      }).dialog('open');
+      });
     });
 
 
@@ -165,7 +163,7 @@ define([
     $(".open_report_description_link").click(function(event) {
       event.preventDefault();
       var title = $(this).parents(".title").find("span.title").text();
-      $(this).parent(".reports").find(".report_description").dialog('close').dialog({
+      $(this).parent(".reports").find(".report_description").dialog({
         title: title,
         width: 800
       });

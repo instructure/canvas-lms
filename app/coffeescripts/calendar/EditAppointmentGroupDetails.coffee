@@ -128,12 +128,9 @@ define [
 
     openHelpDialog: (e) =>
       e.preventDefault()
-      $("#options_help_dialog").dialog('close').dialog(
-        autoOpen: false
+      $("#options_help_dialog").dialog
         title: I18n.t('affect_reservations', "How will this affect reservations?")
         width: 400
-      ).dialog('open')
-
 
     saveWithoutPublishingClick: (jsEvent) =>
       jsEvent.preventDefault()

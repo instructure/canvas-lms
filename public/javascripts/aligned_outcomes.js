@@ -85,11 +85,10 @@ $(document).ready(function() {
     });
     $("#align_outcomes_dialog .outcome_checkbox").each(function() { $(this).change(); });
     $("#aligned_outcomes_mastery_score").val(mastery);
-    $("#align_outcomes_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#align_outcomes_dialog").dialog({
       title: I18n.t('buttons.align_outcomes', 'Align Outcomes'),
       width: 500
-    }).dialog('open');
+    });
   });
   $("#align_outcomes_dialog .cancel_button").click(function() {
     $("#align_outcomes_dialog").dialog('close');

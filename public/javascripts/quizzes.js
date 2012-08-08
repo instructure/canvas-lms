@@ -1071,11 +1071,10 @@ define([
     $(".ip_filtering_link").click(function(event) {
       event.preventDefault();
       var $dialog = $("#ip_filters_dialog");
-      $dialog.dialog('close').dialog({
-        autoOpen: false,
+      $dialog.dialog({
         width: 400,
         title: I18n.t('titles.ip_address_filtering', "IP Address Filtering")
-      }).dialog('open');
+      });
       if (!$dialog.hasClass('loaded')) {
         $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
         var url = $("#quiz_urls .filters_url").attr('href');
@@ -1563,12 +1562,11 @@ define([
       }
       $dialog.find(".bank.selected").removeClass('selected');
       $dialog.find(".submit_button").attr('disabled', true);
-      $dialog.dialog('close').dialog({
-        autoOpen: false,
+      $dialog.dialog({
         title: I18n.t('titles.find_question_bank', "Find Question Bank"),
         width: 600,
         height: 400
-      }).dialog('open');
+      });
     });
 
     $findBankDialog.delegate('.bank', 'click', function() {
@@ -1622,8 +1620,7 @@ define([
         });
       }
       $dialog.data('add_source', '');
-      $dialog.dialog('close').dialog({
-        autoOpen: false,
+      $dialog.dialog({
         title: I18n.t('titles.find_quiz_question', "Find Quiz Question"),
         open: function() {
           if ($dialog.find(".selected_side_tab").length == 0) {
@@ -1632,7 +1629,7 @@ define([
         },
         width: 600,
         height: 400
-      }).dialog('open');
+      });
     });
 
     var updateFindQuestionDialogQuizGroups = function(id) {
@@ -1667,10 +1664,9 @@ define([
         });
         $dialog.find(".questions_count").text(question_ids.length);
         $dialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.create_group', "Create Group"));
-        $dialog.dialog('close').dialog({
-          width: 400,
-          autoOpen: false
-        }).dialog('open');
+        $dialog.dialog({
+          width: 400
+        });
       }
     });
 
@@ -1809,10 +1805,10 @@ define([
         question_ids.push($(this).parents(".found_question").data('question_data').id);
       });
       $dialog.find(".questions_count").text(question_ids.length);
-      $dialog.dialog('close').dialog({
+      $dialog.dialog({
         autoOpen: false,
         title: I18n.t('titles.add_questions_as_group', "Add Questions as a Group")
-      }).dialog('open');
+      });
     }).delegate('.submit_button', 'click', function(event) {
       var question_ids = [];
       $findQuestionDialog.find(".question_list :checkbox:checked").each(function() {
@@ -2765,11 +2761,10 @@ define([
         $("#calc_helper_methods").append($option);
       }
       $("#calc_helper_methods").change();
-      $("#help_with_equations_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#help_with_equations_dialog").dialog({
         title: I18n.t('titles.help_with_formulas', "Help with Quiz Question Formulas"),
         width: 500
-      }).dialog('open');
+      });
     });
     $question.find(".combinations_option").attr('disabled', true);
     $question.find(".question_content").bind('keypress', function(event) {

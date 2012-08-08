@@ -237,11 +237,10 @@ define([
   $(document).ready(function() {
     $("#outcome_information_link").click(function(event) {
       event.preventDefault();
-      $("#outcome_criterion_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#outcome_criterion_dialog").dialog({
         title: I18n.t("outcome_criterion", "Learning Outcome Criterion"),
         width: 400
-      }).dialog('open');
+      });
     });
     $(".show_details_link,.hide_details_link").click(function(event, callback) {
       event.preventDefault();
@@ -338,12 +337,11 @@ define([
     $(".find_outcome_link").click(function(event) {
       var $dialog = $("#find_outcome_dialog");
       event.preventDefault();
-      $dialog.dialog('close').dialog({
-        autoOpen: true,
+      $dialog.dialog({
         width: 600,
         height: 350,
         title: I18n.t("find_existing_outcome", 'Find Existing Outcome')
-      }).dialog('open');
+      });
       if(!$dialog.hasClass('loaded')) {
         $dialog.find(".loading_message").text(I18n.t("loading_outcomes", "Loading outcomes..."));
         var url = $dialog.find(".outcomes_url").attr('href');

@@ -390,11 +390,7 @@ define([
     },
 
     showSettingsModal: function(e){
-      this.elements.settings.form.dialog('close').dialog({
-        modal: true,
-        resizeable: false,
-        width: 400
-      }).dialog('open');
+      this.elements.settings.form.dialog('open');
     },
 
     onMuteClick: function(e){

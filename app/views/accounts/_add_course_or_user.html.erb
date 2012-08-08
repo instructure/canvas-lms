@@ -122,11 +122,10 @@ require([
     $(".add_user_link").click(function(event) {
       event.preventDefault();
       $("#add_user_form :text").val("");
-      $("#add_user_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#add_user_dialog").dialog({
         title: <%= jt('#accounts.add_user_dialog_title', "Add a New User") %>,
         width: 500
-      }).dialog('open');
+      });
       $("#add_user_form :text:visible:first").focus().select();
     });
     $("#add_user_form").formSubmit({
@@ -160,11 +159,10 @@ require([
     $(".add_course_link").click(function(event) {
       event.preventDefault();
       $("#add_course_form :text").val("");
-      $("#add_course_dialog").dialog('close').dialog({
+      $("#add_course_dialog").dialog({
         title: <%= jt('#accounts.add_course_dialog_title', "Add a New Course") %>,
-        autoOpen: false,
         width: 500
-      }).dialog('open');
+      });
       $("#add_course_form :text:visible:first").focus().select();
     });
     $("#add_course_form").formSubmit({

@@ -536,7 +536,7 @@ define [
             $(this).closest('li').data('id')
         $preview.find('> li').last().addClass('last')
         @$forwardForm.css('max-height', ($(window).height() - 300) + 'px')
-        .dialog('close').dialog
+        .dialog
           position: 'center'
           height: 'auto'
           width: 510
@@ -565,7 +565,7 @@ define [
         return unless @conversations.active()?
         @$addForm
           .attr('action', @conversations.actionUrlFor($(e.currentTarget)))
-          .dialog('close').dialog
+          .dialog
             width: 420
             title: I18n.t('title.add_recipients', 'Add Recipients')
             buttons: [

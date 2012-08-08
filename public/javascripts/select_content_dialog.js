@@ -74,11 +74,10 @@ $(document).ready(function() {
     $("#select_context_content_dialog #context_module_sub_headers_select :text").val("");
     $('#add_module_item_select').change();
     $("#select_context_content_dialog .module_item_select").change();
-    $("#select_context_content_dialog").dialog('close').dialog({
-      autoOpen: true,
+    $("#select_context_content_dialog").dialog({
       title: dialog_title,
       width: 400
-    }).dialog('open');
+    });
     $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
   }
   $("#select_context_content_dialog .cancel_button").click(function() {

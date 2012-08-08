@@ -265,7 +265,7 @@ describe "admin settings tab" do
 
     it "should click on the google help dialog" do
       f("a.help").click
-      f("#ui-dialog-title-google_docs_previews_help_dialog").should include_text("About Google Docs Previews")
+      fj(".ui-dialog-title:visible").should include_text("About Google Docs Previews")
     end
 
     it "should unclick and then click on skype" do

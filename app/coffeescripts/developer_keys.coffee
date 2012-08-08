@@ -65,14 +65,14 @@ define [
     $key = $(this).closest(".key")
     key = $key.data('key')
     $form = buildForm(key, $key)
-    $("#edit_dialog").empty().append($form).dialog('close').dialog('open')
+    $("#edit_dialog").empty().append($form).dialog('open')
   )
   $(".add_key").click((event) ->
     event.preventDefault()
     $form = buildForm()
-    $("#edit_dialog").empty().append($form).dialog('close').dialog('open')
+    $("#edit_dialog").empty().append($form).dialog('open')
   )
-  $("#edit_dialog").html(developer_key_form({})).dialog('close').dialog({
+  $("#edit_dialog").html(developer_key_form({})).dialog({
     autoOpen: false,
     width: 350
   }).on('click', '.cancel', () ->

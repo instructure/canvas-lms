@@ -105,10 +105,9 @@ require([
 
 $(document).ready(function() {
   $(".self_unenrollment_link").click(function(event) {
-    $("#self_unenrollment_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#self_unenrollment_dialog").dialog({
       title: <%= raw t('titles.drop_course', "Drop this Course").to_json %>
-    }).dialog('open');
+    });
   });
   $("#self_unenrollment_dialog .action").click(function() {
     $("#self_unenrollment_dialog a.button").attr('disabled', true);
@@ -118,10 +117,9 @@ $(document).ready(function() {
     $("#self_enrollment_dialog").dialog('close');
   });
   $(".self_enrollment_link").click(function(event) {
-    $("#self_enrollment_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#self_enrollment_dialog").dialog({
       title: <%= raw t('titles.join_course', "Join this Course").to_json %>
-    }).dialog('open');
+    });
   });
   $("#self_enrollment_dialog .action").click(function() {
     $("#self_enrollment_dialog a.button").attr('disabled', true);

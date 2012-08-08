@@ -253,12 +253,11 @@ define([
     }
     $(".reorder_topics_link").click(function(event) {
       event.preventDefault();
-      $("#reorder_topics_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#reorder_topics_dialog").dialog({
         title: I18n.t('titles.reorder_discussions', "Reorder Discussions"),
         width: 400,
         modal: true
-      }).dialog('open');
+      });
     });
     $("#topics_reorder_list").sortable({
       axis: 'y'

@@ -320,14 +320,13 @@ define([
     $dialog.data('reference_url', url);
     $dialog.find(".results").empty().end()
       .find(".query").val("");
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
+    $dialog.dialog({
       title: I18n.t('titles.bookmark_search', "Bookmark Search: %{service_name}", {service_name: $.titleize(service_type)}),
       open: function() {
         $dialog.find("input:visible:first").focus().select();
       },
       width: 400
-    }).dialog('open');
+    });
   };
 
   $.findImageForService = function(service_type, callback) {

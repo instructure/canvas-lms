@@ -277,25 +277,23 @@ define([
       }
       function ready() {
         $dialog = $("#rubrics.rubric_dialog");
-        $dialog.dialog('close').dialog({
+        $dialog.dialog({
           title: I18n.t('titles.assignment_rubric_details', "Assignment Rubric Details"),
           width: 600,
           modal: false,
-          resizable: true,
-          autoOpen: false
-        }).dialog('open');
+          resizable: true
+        });
       }
     });
     $(".add_topic_rubric_link").click(function(event) {
       event.preventDefault();
       var $dialog = $("#rubrics.rubric_dialog");
-      $dialog.dialog('close').dialog({
+      $dialog.dialog({
         title: I18n.t('titles.assignment_rubric_details', "Assignment Rubric Details"),
         width: 600,
         modal: false,
-        resizable: true,
-        autoOpen: false
-      }).dialog('open');
+        resizable: true
+      });
       $(".add_rubric_link").click();
     });
     $("#add_entry_form .add_attachment_link").click(function(event) {

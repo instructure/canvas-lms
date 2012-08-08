@@ -79,13 +79,12 @@ var find_outcome = (function() {
       } else {
         find_outcome_title = I18n.t('titles.find_outcome', "Find Outcome");
       }
-      $dialog.dialog('close').dialog({
-        autoOpen: false,
+      $dialog.dialog({
         modal: true,
         title: find_outcome_title,
         width: 700,
         height: 400
-      }).dialog('open');
+      });
     }
   }
 })();

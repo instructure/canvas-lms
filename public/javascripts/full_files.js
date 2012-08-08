@@ -155,8 +155,7 @@ define([
                 var $progress = $dialog.find(".progress");
                 $progress.css('margin', '10px');
                 $progress.progressbar();
-                $dialog.dialog('close').dialog({
-                  autoOpen: false,
+                $dialog.dialog({
                   title: I18n.t('titles.extracting', "Extracting Files into Folder"),
                   close: function() {
                     $dialog.data('closed', true);
@@ -164,7 +163,7 @@ define([
                       $dialog.detach();
                     }, 500);
                   }
-                }).dialog('open');
+                });
                 
                 var importFailed = function(errors) {
                   $dialog.text(I18n.t('errors.extracting', "There were errors extracting the zip file.  Please try again."));
@@ -269,11 +268,10 @@ define([
               duplicatesHtml += "<span class='duplicate_filename'>" + htmlEscape(data.duplicates[idx]) + "</span>";
             }
             $dialog.find(".duplicate_filenames").html(duplicatesHtml);
-            $dialog.dialog('close').dialog({
-              autoOpen: false,
+            $dialog.dialog({
               title: '',
               width: 500
-            }).dialog('open');
+            });
             $dialog.find("button").unbind('click');
             $dialog.find(".cancel_button").click(function() {
               on_cancel();
@@ -1329,10 +1327,9 @@ define([
       });
       $("#file_uploads_dialog_link").click(function(event) {
         event.preventDefault();
-        $("#file_uploads").dialog('close').dialog({
-          autoOpen: false,
+        $("#file_uploads").dialog({
           title: I18n.t('titles.file_uplaods_queue', "File Uploads Queue")
-        }).dialog('open');
+        });
       });
       setTimeout(function() {
         $files_structure.find(".folder > .text").droppable(files.droppable_options);
@@ -1725,11 +1722,10 @@ define([
         });
 
         $("#edit_collaboration_dialog .collaborator_list").empty().append($users);
-        $("#edit_collaboration_dialog").dialog('close').dialog({
-          autoOpen: false,
+        $("#edit_collaboration_dialog").dialog({
           title: I18n.t('titles.edit_collaboration', 'Edit Collaboration'),
           width: 500
-        }).dialog('open');
+        });
       });
       $("#collaborations_panel .add_collaboration_link").click(function(event) {
         event.preventDefault();
@@ -1751,11 +1747,10 @@ define([
           $(this).attr('id', $(this).attr('class'));
         });
         $("#edit_collaboration_dialog .collaborator_list").empty().append($users);
-        $("#edit_collaboration_dialog").dialog('close').dialog({
-          autoOpen: false,
+        $("#edit_collaboration_dialog").dialog({
           title: I18n.t('titles.add_collaboration', 'Add New Collaboration'),
           width: 500
-        }).dialog('open');
+        });
       });
       $("#folder_panel .download_zip").click(function(event) {
         event.preventDefault();
@@ -2120,12 +2115,11 @@ define([
         });
         $form.find("#folder_just_hide,#attachment_just_hide").attr('checked', false).change();
         $form.find(".item_type").text(item_type);
-        $("#lock_item_dialog").dialog('close').dialog({
-          autoOpen: true,
+        $("#lock_item_dialog").dialog({
           modal: true,
           width: 350,
           title: item_type == 'folder' ? I18n.t('titles.lock_folder', "Lock Folder") : I18n.t('titles.lock_file', 'Lock File')
-        }).dialog('open');
+        });
       });
       $("#folder_just_hide,#attachment_just_hide").change(function() {
         $(this).parents("form").find(".full_lock").showIf(!$(this).attr('checked'));

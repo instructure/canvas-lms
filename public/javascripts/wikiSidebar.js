@@ -379,10 +379,9 @@ define([
           $wiki_sidebar_select_folder_dialog.find(".file_count").text(filesToUpload.length);
           $wiki_sidebar_select_folder_dialog.find(".folder_id").empty();
           wikiSidebar.loadFolders();
-          $wiki_sidebar_select_folder_dialog.dialog('close').dialog({
-            autoOpen: false,
+          $wiki_sidebar_select_folder_dialog.dialog({
             title: I18n.t('titles.select_folder_for_uploads', "Select folder for file uploads")
-          }).dialog('open');
+          });
           return false;
         }, false);
         $wiki_sidebar_select_folder_dialog.find(".select_button").click(function(event) {  
@@ -436,10 +435,9 @@ define([
           $wiki_sidebar_select_folder_dialog.find(".file_count").text(images.length);
           $wiki_sidebar_select_folder_dialog.find(".folder_id").empty();
           wikiSidebar.loadFolders();
-          $wiki_sidebar_select_folder_dialog.dialog('close').dialog({
-            autoOpen: false,
+          $wiki_sidebar_select_folder_dialog.dialog({
             title: I18n.t('titles.select_folder_for_uploads', "Select folder for file uploads")
-          }).dialog('open');
+          });
           return false;
         }, false);
       }

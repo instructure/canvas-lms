@@ -19,12 +19,11 @@ define([
     });
     $(".edit_letter_grades_link").click(function(event) {
       event.preventDefault();
-      $("#edit_letter_grades_form").dialog('close').dialog({
+      $("#edit_letter_grades_form").dialog({
         title: I18n.t('titles.grading_scheme_info', "View/Edit Grading Scheme"),
-        autoOpen: false,
         width: 600,
         height: 310
-      }).dialog('open');
+      });
     });
     $(".grading_standard .delete_grading_standard_link").click(function(event) {
       event.preventDefault();
