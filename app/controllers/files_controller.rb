@@ -109,16 +109,9 @@ class FilesController < ApplicationController
   # @API List files
   # Returns the paginated list of files for the folder.
   #
-  # @argument sort_by Either 'alphabetical' (default) or 'position'
-  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files' \ 
-  #         -H 'Authorization: Bearer <token>'
-  #
-  # @example_request
-  #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files?sort_by=position' \ 
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns [File]
