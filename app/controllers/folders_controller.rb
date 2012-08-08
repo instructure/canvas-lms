@@ -58,16 +58,9 @@ class FoldersController < ApplicationController
   # @subtopic Folders
   # Returns the paginated list of folders in the folder.
   #
-  # @argument sort_by Either 'alphabetical' (default) or 'position'
-  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \ 
-  #        -H 'Authorization: Bearer <token>'
-  #
-  # @example_request
-  #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders?sort_by=position' \ 
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns [Folder]
