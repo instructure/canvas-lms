@@ -2301,6 +2301,12 @@ class User < ActiveRecord::Base
         AND user_account_associations.user_id = users.id
         #{user_condition_sql}
     SQL
+    user_sql << <<-SQL unless options[:context]
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
+      FROM users
+      WHERE id = #{self.id}
+        #{user_condition_sql}
+    SQL
 
     if options[:ids]
       # provides a way for this user to start a conversation with someone

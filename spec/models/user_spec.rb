@@ -791,6 +791,10 @@ describe User do
       @deleted_user.destroy
     end
 
+    it "should include yourself even when not enrolled in courses" do
+      @student.messageable_users(:ids => [@student.id]).should eql [@student]
+    end
+
     it "should only return users from the specified context and type" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
