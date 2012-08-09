@@ -34,7 +34,7 @@ class WikiPage < ActiveRecord::Base
   
   before_save :set_revised_at
   before_validation :ensure_unique_title
-  
+
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
   
   def ensure_unique_title
@@ -170,6 +170,9 @@ class WikiPage < ActiveRecord::Base
   def not_deleted
     !deleted?
   end
+
+  named_scope :visible_to_students, :conditions => { :hide_from_students => false }
+  named_scope :order_by_id, :order => "id"
 
   def locked_for?(context, user, opts={})
     return false unless self.could_be_locked

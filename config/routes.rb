@@ -941,6 +941,13 @@ ActionController::Routing::Routes.draw do |map|
       favorites.delete "users/self/favorites/courses/:id", :action => :remove_favorite_course
       favorites.delete "users/self/favorites/courses", :action => :reset_course_favorites
     end
+
+    api.with_options(:controller => :wiki_pages) do |wiki_pages|
+      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_pages'
+      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_pages'
+      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show
+      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
