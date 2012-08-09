@@ -262,6 +262,22 @@ describe "profile" do
       lambda { click_option('#user_birthdate_1i', '') }.should raise_error(Selenium::WebDriver::Error::NoSuchElementError)
     end
   end
+
+  context "services test" do
+    before (:each) do
+      course_with_teacher_logged_in
+    end
+
+    it "should link back to profile/settings in oauth callbacks" do
+      get "/profile/settings"
+      links = ffj('#unregistered_services .service .content a')
+      links.each do |l|
+        url = l.attribute('href')
+        query = URI.parse(url).query
+        CGI.unescape(query).should match /profile\/settings/
+      end
+    end
+  end
 end
 
 shared_examples_for "profile pictures selenium tests" do
