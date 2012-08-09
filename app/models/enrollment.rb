@@ -498,8 +498,11 @@ class Enrollment < ActiveRecord::Base
       return state unless global_start_at
       if global_start_at < Time.now
         :completed
-      else
+      # Allow student view students to use course before the term starts
+      elsif !self.fake_student?
         :inactive
+      else
+        state
       end
     else
       state

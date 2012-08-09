@@ -2796,6 +2796,12 @@ describe Course, "student_view_student" do
     @fake_student1.id.should_not eql @fake_student2.id
     @fake_student1.pseudonym.id.should_not eql @fake_student2.pseudonym.id
   end
+
+  it "should give fake student active student permissions even if enrollment wouldn't otherwise be active" do
+    @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
+    @fake_student = @course.student_view_student
+    @course.grants_right?(@fake_student, nil, :read_forum).should be_true
+  end
 end
 
 describe Course do
