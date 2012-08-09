@@ -348,27 +348,30 @@ define([
       this.elements.mute.link.append(this.elements.spinner.el);
     },
     createModals: function(){
-      var cancelLabel = I18n.t('cancel_button', 'Cancel'),
-          muteLabel   = I18n.t('mute_assignment', 'Mute Assignment'),
-          buttons     = {};
-      var buttons = {};
-      buttons[muteLabel] = $.proxy(function(){
-        this.toggleMute();
-        this.elements.mute.modal.dialog('close');
-      }, this);
-      buttons[cancelLabel] = $.proxy(function(){ this.elements.mute.modal.dialog('close'); }, this);
       this.elements.settings.form.dialog({
         autoOpen: false,
         modal: true,
         resizable: false,
         width: 400
-      });
+      }).fixDialogButtons();
       // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
       // button. So here we'll manually re-enable it.
       this.elements.settings.form.find(".submit_button").removeAttr('disabled')
       this.elements.mute.modal.dialog({
         autoOpen: false,
-        buttons: buttons,
+        buttons: [{
+          text: I18n.t('cancel_button', 'Cancel'),
+          click: $.proxy(function(){
+            this.elements.mute.modal.dialog('close');
+          }, this)
+        },{
+          text: I18n.t('mute_assignment', 'Mute Assignment'),
+          'class': 'btn-primary',
+          click: $.proxy(function(){
+            this.toggleMute();
+            this.elements.mute.modal.dialog('close');
+          }, this)
+        }],
         modal: true,
         resizable: false,
         title: this.elements.mute.modal.data('title'),

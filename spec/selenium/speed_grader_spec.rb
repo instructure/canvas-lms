@@ -248,7 +248,7 @@ describe "speed grader" do
     f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load {
-      submit_form('#settings_form')
+      fj('.ui-dialog-buttonset .ui-button:visible:last').click
     }
     wait_for_animations
 
@@ -321,7 +321,7 @@ describe "speed grader" do
     f('select#eg_sort_by option[value="submitted_at"]').click
     f('#hide_student_names').click
     expect_new_page_load {
-      submit_form('#settings_form')
+      fj('.ui-dialog-buttonset .ui-button:visible:last').click
     }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
 
@@ -329,7 +329,7 @@ describe "speed grader" do
     f("#settings_link").click
     f('select#eg_sort_by option[value="alphabetically"]').click
     expect_new_page_load {
-      submit_form('#settings_form')
+      fj('.ui-dialog-buttonset .ui-button:visible:last').click
     }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
 
@@ -337,7 +337,7 @@ describe "speed grader" do
     f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load {
-      submit_form('#settings_form')
+      fj('.ui-dialog-buttonset .ui-button:visible:last').click
     }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "student@example.com" }
   end
