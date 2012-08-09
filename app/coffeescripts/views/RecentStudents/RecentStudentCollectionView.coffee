@@ -8,10 +8,10 @@ define [
   class RecentStudentCollectionView extends PaginatedView
 
     initialize: (options) ->
-      super
       @collection.on 'add', @renderUser
       @collection.on 'reset', @render
       @paginationScrollContainer = @$el
+      super
 
     render: =>
       ret = super
