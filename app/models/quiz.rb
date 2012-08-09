@@ -797,8 +797,8 @@ class Quiz < ActiveRecord::Base
     options ||= {}
     columns = []
     columns << t('statistics.csv_columns.name', 'name') unless options[:anonymous]
-    columns << t('statistics.csv_columns.id', 'id')
-    columns << t('statistics.csv_columns.sis_id', 'sis_id')
+    columns << t('statistics.csv_columns.id', 'id') unless options[:anonymous]
+    columns << t('statistics.csv_columns.sis_id', 'sis_id') unless options[:anonymous]
     columns << t('statistics.csv_columns.section', 'section')
     columns << t('statistics.csv_columns.section_id', 'section_id')
     columns << t('statistics.csv_columns.section_sis_id', 'section_sis_id')
@@ -826,8 +826,8 @@ class Quiz < ActiveRecord::Base
     submissions.each do |submission|
       row = []
       row << submission.user.name unless options[:anonymous]
-      row << submission.user_id
-      row << submission.user.sis_pseudonym_for(context.account).try(:sis_user_id)
+      row << submission.user_id unless options[:anonymous]
+      row << submission.user.sis_pseudonym_for(context.account).try(:sis_user_id) unless options[:anonymous]
       section_name = []
       section_id = []
       section_sis_id = []

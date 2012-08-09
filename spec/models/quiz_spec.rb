@@ -577,6 +577,20 @@ describe Quiz do
         stats.first.length.should == 3
       end
 
+      it 'should not include user data for anonymous surveys' do
+        # one complete submission
+        qs = @quiz.generate_submission(@student)
+        qs.grade_submission
+
+        # and one in progress
+        @quiz.generate_submission(@student)
+
+        stats = FasterCSV.parse(@quiz.statistics_csv(:include_all_versions => true, :anonymous => true))
+        # format for row is row_name, '', data1, data2, ...
+        stats.first.length.should == 3
+        stats[0][0].should == "section"
+      end
+
       it 'should have sections in quiz statistics_csv' do
         #enroll user in multiple sections
         pseudonym = pseudonym(@student)
