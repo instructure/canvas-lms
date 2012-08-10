@@ -337,6 +337,7 @@ class AssignmentsController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id> \ 
   #          -X DELETE \ 
   #          -H 'Authorization: Bearer <token>'
+  # @returns Assignment
   def destroy
     @assignment = @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, :delete)
