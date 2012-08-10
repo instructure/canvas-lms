@@ -52,11 +52,12 @@ client\_secret for your application. There isn't yet any UI for
 generating these keys, so you will need to generate an API key from the Rails console:
 
     $ script/console
-    > key = DeveloperKey.create!(
-        :email => 'your_email',
-        :user_name => 'your name',
-        :account => Account.default)
-    > puts "client_id: #{key.id} client_secret: #{key.api_key}"
+    > key = DeveloperKey.create! { |k|
+        k.email = 'your_email'
+        k.user_name = 'your name'
+        k.account = Account.default
+      }
+    > puts "client_id: #{key.global_id} client_secret: #{key.api_key}"
 
 Web Application Flow
 --------------------

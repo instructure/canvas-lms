@@ -83,68 +83,81 @@ class NotificationPolicy < ActiveRecord::Base
     false
   end
 
-  def self.refresh_for(user)
-    categories = Notification.dashboard_categories
-    policies = NotificationPolicy.for(user).to_a
-    params = {}
-    categories.each do |category|
-      ps = policies.select{|p| p.notification_id == category.id }
-      params["category_#{category.category_slug}".to_sym] = {}
-      ps.each do |p|
-        params["category_#{category.category_slug}".to_sym]["channel_#{p.communication_channel_id}"] = p.frequency
-      end
-    end
-    setup_for(user, params)
-  end
-  
   def self.setup_for(user, params)
-    @user = user
-    user.preferences[:send_scores_in_emails] = params[:root_account] && 
-        params[:root_account].settings[:allow_sending_scores_in_emails] != false && 
-        params[:user] && params[:user][:send_scores_in_emails] == '1'
-    params[:user].try(:delete, :send_scores_in_emails)
-    @user.update_attributes(params[:user])
-    @channels = @user.communication_channels
-    categories = Notification.dashboard_categories
-    prefs_to_save = []
-    categories.each do |category|
-      category_data = params["category_#{category.category_slug}".to_sym]
-      channels = []
-      if category_data
-        category_data.each do |key, value|
-          tag, id = key.split("_", 2)
-          channels << @channels.find(id) if tag == "channel" rescue nil
-        end
-        channels.compact!
-        notifications = Notification.find_all_by_category(category.category)
-        notifications.each do |notification|
-          if channels.empty?
-            channels << @user.communication_channel
-          end
-          if category.category == 'Message'
-            found_immediately = channels.any?{|c| category_data["channel_#{c.id}".to_sym] == 'immediately' }
-            unless found_immediately
-              channels << @user.communication_channel
-              category_data["channel_#{@user.communication_channel.id}".to_sym] = 'immediately'
+    # Check for user preference settings first. Some communication related options are available on the page.
+    # Handle those if given.
+    user_prefs = params[:user]
+    # If have user preference settings and this is a root account, check further to see if settings can be changed
+    if user_prefs && params[:root_account]
+      user_prefs.each_pair do |key, value|
+        bool_val = (value == 'true')
+        # save the preference as a symbol (convert from string)
+        case key.to_sym
+          when :send_scores_in_emails
+            # Only set if a root account and the root account allows the setting.
+            if params[:root_account].settings[:allow_sending_scores_in_emails] != false
+              user.preferences[:send_scores_in_emails] = bool_val
             end
-          end
-          channels.uniq.each do |channel|
-            frequency = category_data["channel_#{channel.id}".to_sym] || 'never'
-            pref = channel.notification_policies.new
-            pref.notification_id = notification.id
-            pref.frequency = frequency
-            prefs_to_save << pref
-          end
+          when :no_submission_comments_inbox
+            user.preferences[:no_submission_comments_inbox] = bool_val
         end
       end
+      user.save!
+    else
+      # User preference change not being made. Make a notification policy change.
+
+      # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
+      notifications = Notification.scoped(:select => :id, :conditions => {:category => params[:category]}).all.map(&:id)
+      # Look for frequency settings and only recognize a valid value.
+      frequency = case params[:frequency]
+        when Notification::FREQ_IMMEDIATELY, Notification::FREQ_DAILY, Notification::FREQ_WEEKLY, Notification::FREQ_NEVER
+          params[:frequency]
+        else
+          Notification::FREQ_NEVER
+      end
+
+      # Find any existing NotificationPolicies for the category and the channel. If frequency is 'never', delete the
+      # entry. If other than than, create or update the entry.
+      NotificationPolicy.transaction do
+        notifications.each do |notification_id|
+          p = NotificationPolicy.scoped(:include => :communication_channel,
+                                        :conditions => ['communication_channels.user_id = ?', user.id] ).
+            find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
+          # Set the frequency and save
+          p.frequency = frequency
+          p.save!
+        end
+      end # transaction
+    end #if..else
+    nil
+  end
+
+  # Fetch the user's NotificationPolicies but whenever a category is not represented, create a NotificationPolicy on the primary
+  # CommunicationChannel with a default frequency set.
+  # Returns the full list of policies for the user
+  #
+  # ===== Arguments
+  # * <tt>user</tt> - The User instance to load the values for.
+  # * <tt>full_category_list</tt> - An array of Notification models that represent the unique list of categories that should be displayed for the user.
+  #
+  # ===== Returns
+  # A list of NotificationPolicy entries for the user. May include newly created entries if defaults were needed.
+  def self.setup_with_default_policies(user, full_category_list)
+    categories = {}
+    # Get the list of notification categories and its default. Like this: {"Announcement" => 'immediately'}
+    full_category_list.each {|c| categories[c.category] = c.default_frequency}
+    default_channel_id = user.communication_channel.try(:id)
+    # Load unique list of categories that the user currently has settings for.
+    user_categories = NotificationPolicy.for(user).scoped(:joins => :notification,
+                                                          :select => 'DISTINCT notifications.category').all.map{|c| c.category}
+    missing_categories = (categories.keys - user_categories)
+    missing_categories.each do |need_category|
+      # Create the settings for a completely unrepresented category. Use default communication_channel (primary email)
+      self.setup_for(user, {:category => need_category,
+                            :channel_id => default_channel_id,
+                            :frequency => categories[need_category]})
     end
-    NotificationPolicy.transaction do
-      NotificationPolicy.delete_all({:communication_channel_id => user.communication_channels.map(&:id)})
-      prefs_to_save.each{|p| p.save! }
-    end
-    categories = Notification.dashboard_categories
-    @user.reload
-    @policies = NotificationPolicy.for(@user).scoped(:conditions => { :notification_id => categories.map(&:id)})
-    @policies
+    # Load and return user's policies after defaults may or may not have been set.
+    NotificationPolicy.scoped(:include => :notification).for(user)
   end
 end

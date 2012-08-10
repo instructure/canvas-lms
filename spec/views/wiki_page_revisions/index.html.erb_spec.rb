@@ -20,14 +20,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/wiki_page_revisions/index" do
-  it "should render" do
+  it "should show user editing link and content import name" do
     course_with_student
     view_context
     assigns[:wiki] = WikiNamespace.default_for_context(@course).wiki
     assigns[:page] = assigns[:wiki].wiki_page
     assigns[:page].save!
+    assigns[:page].update_attributes(:body => "oi", :user_id => @user.id)
     render "wiki_page_revisions/index"
-    response.should_not be_nil
+    response.body.should =~ /Content Importer/
+    response.body.should =~ %r{/users/#{@user.id}}
   end
 end
 

@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "submissions" do
   it_should_behave_like "in-process server selenium tests"
@@ -194,7 +195,7 @@ describe "submissions" do
       wait_for_ajaximations
       f('#submit_file_button').click
       wait_for_ajaximations
-      f('#flash_error_message').should be_displayed
+      f('#flash_message_holder .ui-state-error').should be_displayed
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -289,16 +290,16 @@ describe "submissions" do
 
       asset = @submission.turnitin_assets.first.asset_string
       @submission.turnitin_data = {
-        "#{asset}" => {
-          :object_id => "123456",
-          :publication_overlap => 5,
-          :similarity_score => 100,
-          :state => "failure",
-          :status => "scored",
-          :student_overlap => 44,
-          :web_overlap => 100
-        },
-        :last_processed_attempt => 1
+          "#{asset}" => {
+              :object_id => "123456",
+              :publication_overlap => 5,
+              :similarity_score => 100,
+              :state => "failure",
+              :status => "scored",
+              :student_overlap => 44,
+              :web_overlap => 100
+          },
+          :last_processed_attempt => 1
       }
       @submission.turnitin_data_changed!
       @submission.save!
@@ -323,6 +324,42 @@ describe "submissions" do
         tooltip_text_elements = ff('.tooltip_text > span')
         f('.tooltip_text').should be_displayed
         tooltip_text_elements[1].text.should == 'submitted'
+      end
+    end
+  end
+
+  describe 'uploaded files for submission' do
+    it_should_behave_like "forked server selenium tests"
+    it_should_behave_like "files selenium shared"
+
+    it "should allow uploaded files to be used for submission" do
+
+      Setting.set("file_storage_test_override", "local")
+      user_with_pseudonym :username => "nobody2@example.com",
+                          :password => "asdfasdf2"
+      course_with_student_logged_in :user => @user
+      login "nobody2@example.com", "asdfasdf2"
+      add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
+               @user, "html-editing-test.html")
+      File.read(fixture_file_path("files/html-editing-test.html"))
+      assignment = @course.assignments.create!(:title => 'assignment 1',
+                                               :name => 'assignment 1',
+                                               :submission_types => "online_upload")
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      f('.submit_assignment_link').click
+      f('.toggle_uploaded_files_link').click
+
+      # traverse the tree
+      f('#uploaded_files > ul > li.folder > .sign').click
+      wait_for_animations
+      f('#uploaded_files > ul > li.folder .file .name').click
+      wait_for_animations
+
+      expect_new_page_load { f('#submit_file_button').click }
+
+      keep_trying_until do
+        f('.details .header').should include_text "Turned In!"
+        f('.details .file-big').should include_text "html-editing-test.html"
       end
     end
   end

@@ -73,6 +73,23 @@
 .ui-priority-secondary, .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { @include opacity(.7); font-weight: normal; }
 .ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { @include opacity(.35); background-image: none; }
 
+// instructure additions
+.ui-state-success, .ui-state-warning {
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: $white;
+  text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+}
+.ui-state-success {
+  @include vertical-gradient($btnSuccessBackground, $btnSuccessBackgroundHighlight);
+}
+.ui-state-warning {
+  @include vertical-gradient($btnWarningBackground, $btnWarningBackgroundHighlight);
+}
+
+
 /* Icons
 ----------------------------------*/
 
@@ -181,10 +198,10 @@
 .ui-icon-tag { background-position: -240px -96px; }
 .ui-icon-home { background-position: 0 -112px; }
 .ui-icon-flag { background-position: -16px -112px; }
-.ui-icon-calendar { background-position: -32px -112px; }
+.ui-icon-calendar { background-position: -182px -546px; }
 .ui-icon-cart { background-position: -48px -112px; }
 .ui-icon-pencil { background-position: -64px -112px; }
-.ui-icon-clock { background-position: -80px -112px; }
+.ui-icon-clock { background-position: -116px -546px; }
 .ui-icon-disk { background-position: -96px -112px; }
 .ui-icon-calculator { background-position: -112px -112px; }
 .ui-icon-zoomin { background-position: -128px -112px; }
@@ -200,7 +217,7 @@
 .ui-icon-plusthick { background-position: -32px -128px; }
 .ui-icon-minus { background-position: -48px -128px; }
 .ui-icon-minusthick { background-position: -64px -128px; }
-.ui-icon-close { background-position: -80px -128px; }
+.ui-icon-close { background-position: -248px -546px; }
 .ui-icon-closethick { background-position: -96px -128px; }
 .ui-icon-key { background-position: -112px -128px; }
 .ui-icon-lightbulb { background-position: -128px -128px; }
@@ -216,7 +233,7 @@
 .ui-icon-info { background: url(images/icon_sprite.png) 0 0 no-repeat !important; }
 .ui-icon-notice { background-position: -32px -144px; }
 .ui-icon-help { background-position: -48px -144px; }
-.ui-icon-check { background-position: -64px -144px; }
+.ui-icon-check { background-position: -50px -546px; }
 .ui-icon-bullet { background-position: -80px -144px; }
 .ui-icon-radio-off { background-position: -96px -144px; }
 .ui-icon-radio-on { background-position: -112px -144px; }
@@ -245,7 +262,7 @@
 .ui-icon-circle-minus { background-position: -16px -192px; }
 .ui-icon-circle-close { background-position: -32px -192px; }
 .ui-icon-circle-triangle-e { background-position: -48px -192px; }
-.ui-icon-circle-triangle-s { background-position: -64px -192px; }
+.ui-icon-circle-triangle-s { background-position: -182px -480px; }
 .ui-icon-circle-triangle-w { background-position: -80px -192px; }
 .ui-icon-circle-triangle-n { background-position: -96px -192px; }
 .ui-icon-circle-arrow-e { background-position: -112px -192px; }
@@ -273,7 +290,11 @@
 .ui-icon-sections { background: url(/images/jqueryui/ui-icon-sections.png) 0 0 no-repeat !important; }
 .ui-icon-cog { background: url(/images/jqueryui/ui-icon-cog.png) 0 0 no-repeat !important; }
 
-
+.ui-icon {
+  &.ui-icon-check, &.ui-icon-calendar, &.ui-icon-clock, &.ui-icon-close, &.ui-icon-circle-triangle-s {
+    background-image: url(/images/blue/canvas-icons-16x16-dkgrey.png)
+  }
+}
 /* Misc visuals
 ----------------------------------*/
 

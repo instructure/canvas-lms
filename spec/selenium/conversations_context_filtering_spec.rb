@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations context filtering" do
@@ -27,7 +26,7 @@ describe "conversations context filtering" do
     browse("the course", "Student Groups", "the group") { click "Select All" }
     submit_message_form(:add_recipient => false)
 
-    audience = find_with_jquery("#create_message_form ul.conversations .audience")
+    audience = fj("#create_message_form ul.conversations .audience")
     audience.text.should include @course1.name
     audience.text.should_not include @course2.name
     audience.text.should include @group.name
@@ -40,7 +39,7 @@ describe "conversations context filtering" do
     browse("the course") { search("stu") { click "student1" } }
     submit_message_form(:add_recipient => false)
 
-    audience = find_with_jquery("#create_message_form ul.conversations .audience")
+    audience = fj("#create_message_form ul.conversations .audience")
     audience.text.should include @course1.name
     audience.text.should_not include @course2.name
     audience.text.should_not include @group.name
@@ -49,7 +48,7 @@ describe "conversations context filtering" do
   it "should order by active-ness before name or type" do
     @course2.complete!
     new_conversation
-    @input = find_with_jquery("#context_tags_filter input:visible")
+    @input = fj("#context_tags_filter input:visible")
     search("th", "context_tags") do
       menu.should eql ["the course", "the group", "that course"]
     end
@@ -96,16 +95,16 @@ describe "conversations context filtering" do
 
     get_conversations.size.should eql 2
 
-    @input = find_with_jquery("#context_tags_filter input:visible")
+    @input = fj("#context_tags_filter input:visible")
     search("the course", "context_tags") { browse("the course") { click("the course") } }
 
-    keep_trying_until {
+    keep_trying_until do
       conversations = get_conversations
       conversations.size.should eql 1
       conversations.first.find_element(:css, 'p').text.should eql 'asdf'
-    }
+    end
 
-    # filtered course should be first in the audience's contexts
+    #filtered course should be first in the audience's contexts
     get_conversations.first.find_element(:css, '.audience em').text.should eql 'the course and that course'
   end
 
@@ -126,8 +125,8 @@ describe "conversations context filtering" do
     @course1.update_attribute :conclude_at, 1.year.ago
 
     get "/conversations/sent"
-    
-    @input = find_with_jquery("#context_tags_filter input:visible")
+
+    @input = fj("#context_tags_filter input:visible")
     search("the course", "context_tags") { browse("the course") { click("the course") } }
 
     keep_trying_until {
@@ -148,14 +147,14 @@ describe "conversations context filtering" do
     browse("that course", "Everyone") { click "Select All" }
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
-    @input = find_with_jquery("#context_tags_filter input:visible")
+    @input = fj("#context_tags_filter input:visible")
     search("student2", "context_tags") { click("student2") }
 
-    keep_trying_until {
+    keep_trying_until do
       conversations = get_conversations
       conversations.size.should eql 1
       conversations.first.find_element(:css, 'p').text.should eql 'asdf'
-    }
+    end
 
     # filtered student should be first in the audience
     get_conversations.first.find_element(:css, '.audience').text.should eql 'student2 and student1 the course'
@@ -172,18 +171,18 @@ describe "conversations context filtering" do
     browse("the group") { click "Select All" }
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
-    @input = find_with_jquery("#context_tags_filter input:visible")
+    @input = fj("#context_tags_filter input:visible")
     search("the group", "context_tags") {
       menu.should eql ["the group"]
       elements.first.first.text.should include "the course" # make sure the group context is shown
       browse("the group") { click("the group") }
     }
 
-    keep_trying_until {
+    keep_trying_until do
       conversations = get_conversations
       conversations.size.should eql 1
       conversations.first.find_element(:css, 'p').text.should eql 'qwerty'
-    }
+    end
   end
 
   it "should show the term name by the course" do
@@ -193,9 +192,9 @@ describe "conversations context filtering" do
     browse("the course") { search("stu") { click "student1" } }
     submit_message_form(:add_recipient => false)
 
-    @input = find_with_jquery("#context_tags_filter input:visible")
+    @input = fj("#context_tags_filter input:visible")
     search("the course", "context_tags") do
-      term_info = driver.find_element(:css, '.autocomplete_menu .name .context_info')
+      term_info = f('.autocomplete_menu .name .context_info')
       term_info.text.should == "(#{@course1.enrollment_term.name})"
     end
   end
@@ -207,9 +206,9 @@ describe "conversations context filtering" do
     browse("the course") { search("stu") { click "student1" } }
     submit_message_form(:add_recipient => false)
 
-    @input = find_with_jquery("#context_tags_filter input:visible")
+    @input = fj("#context_tags_filter input:visible")
     search("that course", "context_tags") do
-      term_info = driver.find_element(:css, '.autocomplete_menu .name')
+      term_info = f('.autocomplete_menu .name')
       term_info.text.should == "that course"
     end
   end

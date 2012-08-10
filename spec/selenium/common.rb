@@ -305,15 +305,23 @@ shared_examples_for "all selenium tests" do
 
   alias_method :driver, :selenium_driver
 
-  def login_as(username = "nobody@example.com", password = "asdfasdf")
+  def login_as(username = "nobody@example.com", password = "asdfasdf", expect_success = true)
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
 
-    user_element = driver.find_element(:css, '#pseudonym_session_unique_id')
-    user_element.send_keys(username)
-    password_element = driver.find_element(:css, '#pseudonym_session_password')
-    password_element.send_keys(password)
-    password_element.submit
+    log_in = lambda do
+      user_element = f('#pseudonym_session_unique_id')
+      user_element.send_keys(username)
+      password_element = f('#pseudonym_session_password')
+      password_element.send_keys(password)
+      password_element.submit
+    end
+    if expect_success
+      expect_new_page_load &log_in
+      f('#identity .logout').should be_present
+    else
+      log_in.call
+    end
   end
 
   alias_method :login, :login_as
@@ -599,9 +607,21 @@ shared_examples_for "all selenium tests" do
     driver.execute_script('return $("'+css_selector+'").prop("checked")')
   end
 
+  def get_value(selector)
+    driver.execute_script("return $(#{selector.inspect}).val()")
+  end
+
   def set_value(input, value)
-    if input.tag_name == 'select'
+    case input.tag_name
+    when 'select'
       input.find_element(:css, "option[value='#{value}']").click
+    when 'input'
+      case input.attribute(:type)
+      when 'checkbox'
+        input.click if (!input.selected? && value) || (input.selected? && !value)
+      else
+        replace_content(input, value)
+      end
     else
       replace_content(input, value)
     end
@@ -741,7 +761,7 @@ shared_examples_for "all selenium tests" do
 
   def assert_flash_notice_message(okay_message_regex)
     keep_trying_until do
-      text = driver.find_element(:id, "flash_notice_message").text
+      text = f("#flash_message_holder .ui-state-success").text rescue ''
       raise "server error" if text =~ /The last request didn't work out/
       text =~ okay_message_regex
     end
@@ -749,7 +769,7 @@ shared_examples_for "all selenium tests" do
 
   def assert_flash_error_message(fail_message_regex)
     keep_trying_until do
-      text = driver.find_element(:id, "flash_error_message").text
+      text = f("#flash_message_holder .ui-state-error").text rescue ''
       raise "server error" if text =~ /The last request didn't work out/
       text =~ fail_message_regex
     end

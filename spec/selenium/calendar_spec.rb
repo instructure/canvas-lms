@@ -45,7 +45,11 @@ describe "calendar" do
 
       f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day .calendar_event").click
       f('.delete_event_link').click
-      driver.switch_to.alert.accept
+      keep_trying_until do
+        driver.switch_to.alert.should_not be nil
+        driver.switch_to.alert.accept
+        true
+      end
       wait_for_ajaximations
       f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day").should_not include_text(event_title)
       CalendarEvent.find_by_title(event_title).workflow_state.should == 'deleted'

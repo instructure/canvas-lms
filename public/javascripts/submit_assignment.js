@@ -19,7 +19,7 @@
 define([
   'i18n!assignments' /* I18n.t */,
   'jquery' /* $ */,
-  'jquery.rails_flash_notifications' /* $.flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.ajaxJSON' /* ajaxJSONPreparedFiles, ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* getFormData */,

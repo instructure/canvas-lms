@@ -58,7 +58,7 @@ describe PageView do
 
     it "should store directly to the db if redis is down" do
       Canvas::Redis.patch
-      Redis::Client.any_instance.expects(:ensure_connected).raises(Timeout::Error)
+      Redis::Client.any_instance.expects(:ensure_connected).raises(Redis::TimeoutError)
       @page_view.store.should be_true
       PageView.count.should == 1
       PageView.first.attributes.except('created_at', 'updated_at').should == @page_view.attributes.except('created_at', 'updated_at')

@@ -158,6 +158,14 @@ This text has a http://www.google.com link in it...
     @item.data.submission_comments[0].formatted_body.should eql(@comment.formatted_body(250))
   end
 
+  it "should ensure the media object exists" do
+    assignment_model
+    se = @course.enroll_student(user)
+    @submission = @assignment.submit_homework(se.user, :body => 'some message')
+    MediaObject.expects(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
+    @comment = @submission.add_comment(:author => se.user, :media_comment_type => 'audio', :media_comment_id => 'fake')
+  end
+
   context "conversations" do
     before do
       assignment_model

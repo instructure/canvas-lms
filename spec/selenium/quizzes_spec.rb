@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes" do
@@ -326,6 +325,7 @@ describe "quizzes" do
         in_frame f('.essay_question iframe')[:id] do
           f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
         end
+        wait_for_ajax_requests
         ff('#question_list .answered').size.should eql 1
         input[:value].should eql "1.0000"
       end
@@ -423,7 +423,7 @@ describe "quizzes" do
       q.update_quiz_submission_end_at_times
 
       keep_trying_until do
-        driver.find_element(:id, 'flash_notice_message').text.should match 'You have been given extra time on this attempt'
+        assert_flash_notice_message /You have been given extra time on this attempt/
         driver.find_element(:css, '.time_running').text.should match /^[19]{2}\sMinutes/
       end
 
@@ -473,7 +473,7 @@ describe "quizzes" do
       submission.save!
 
       keep_trying_until do
-        driver.find_element(:id, 'flash_notice_message').text.should match 'You have been given extra time on this attempt'
+        assert_flash_notice_message /You have been given extra time on this attempt/
         driver.find_element(:css, '.time_running').text.should match /^[19]{2}\sMinutes/
         true
       end

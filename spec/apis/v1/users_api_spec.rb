@@ -21,11 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 
 class TestUserApi
   include Api::V1::User
-  attr_accessor :services_enabled, :context, :current_user
+  attr_accessor :services_enabled, :context, :current_user, :params, :request
   def service_enabled?(service); @services_enabled.include? service; end
-  def avatar_image_url(user_id); "avatar_image_url(#{user_id})"; end
+  def avatar_image_url(*args); "avatar_image_url(#{args.first})"; end
   def initialize
     @domain_root_account = Account.default
+    @params = {}
+    @request = OpenStruct.new
   end
 end
 
@@ -175,9 +177,13 @@ describe Api::V1::User do
 end
 
 describe "Users API", :type => :integration do
+  def avatar_url(id)
+    "http://www.example.com/images/users/#{User.avatar_key(id)}?fallback=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png"
+  end
+
   before do
     @admin = account_admin_user
-    course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
+    course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com', :active_user => true))
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
     @user = @admin
     Account.default.tap { |a| a.enable_service(:avatars) }.save
@@ -186,7 +192,7 @@ describe "Users API", :type => :integration do
 
   it "should return another user's profile, if allowed" do
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-             :controller => "profile", :action => "edit", :user_id => @student.to_param, :format => 'json')
+             :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
     json.should == {
       'id' => @student.id,
       'name' => 'Student',
@@ -196,7 +202,7 @@ describe "Users API", :type => :integration do
       'sis_user_id' => 'sis-user-id',
       'sis_login_id' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}",
+      'avatar_url' => avatar_url(@student.id),
     }
   end
 
@@ -213,7 +219,7 @@ describe "Users API", :type => :integration do
     @course.enroll_user(new_user, 'ObserverEnrollment')
     Account.site_admin.add_user(@user)
     json = api_call(:get, "/api/v1/users/#{new_user.id}/profile",
-             :controller => "profile", :action => "edit", :user_id => new_user.to_param, :format => 'json')
+             :controller => "profile", :action => "settings", :user_id => new_user.to_param, :format => 'json')
     json.should == {
       'id' => new_user.id,
       'name' => 'new guy',
@@ -221,7 +227,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'new guy',
       'login_id' => nil,
       'primary_email' => nil,
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(new_user.id)}",
+      'avatar_url' => avatar_url(new_user.id),
     }
 
     get("/courses/#{@course.id}/students")
@@ -229,7 +235,7 @@ describe "Users API", :type => :integration do
 
   it "should return this user's profile" do
     json = api_call(:get, "/api/v1/users/self/profile",
-             :controller => "profile", :action => "edit", :user_id => 'self', :format => 'json')
+             :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json')
     json.should == {
       'id' => @admin.id,
       'name' => 'User',
@@ -237,7 +243,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'User',
       'primary_email' => 'nobody@example.com',
       'login_id' => 'nobody@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@admin.id)}",
+      'avatar_url' => avatar_url(@admin.id),
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
     }
   end
@@ -245,7 +251,7 @@ describe "Users API", :type => :integration do
   it "should return this user's profile (non-admin)" do
     @user = @student
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-             :controller => "profile", :action => "edit", :user_id => @student.to_param, :format => 'json')
+             :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
     json.should == {
       'id' => @student.id,
       'name' => 'Student',
@@ -253,7 +259,7 @@ describe "Users API", :type => :integration do
       'short_name' => 'Student',
       'primary_email' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}",
+      'avatar_url' => avatar_url(@student.id),
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
     }
   end
@@ -268,7 +274,7 @@ describe "Users API", :type => :integration do
   it "shouldn't return disallowed profiles" do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
-             :controller => "profile", :action => "edit", :user_id => @admin.to_param, :format => 'json')
+             :controller => "profile", :action => "settings", :user_id => @admin.to_param, :format => 'json')
     response.status.should == "401 Unauthorized"
     JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
@@ -619,7 +625,12 @@ describe "Users API", :type => :integration do
   end
 
   context "user files" do
+    before :each do
+      @context = @user
+    end
+    
     it_should_behave_like "file uploads api with folders"
+    it_should_behave_like "file uploads api with quotas"
 
     def preflight(preflight_params)
       api_call(:post, "/api/v1/users/self/files",
@@ -627,6 +638,10 @@ describe "Users API", :type => :integration do
         preflight_params)
     end
 
+    def has_query_exemption?
+      false
+    end
+      
     def context
       @user
     end

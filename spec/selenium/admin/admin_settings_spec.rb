@@ -1,47 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/settings_specs')
 
 describe "admin settings tabs" do
   it_should_behave_like "external tools tests"
   before (:each) do
     course_with_admin_logged_in
     get "/accounts/#{Account.default.id}/settings"
-  end
-
-  context "admins tab" do
-    def add_account
-      address = "student1@example.com"
-      f(".add_users_link.button").click
-      f("textarea.user_list").send_keys(address)
-      f(".verify_syntax_button").click
-      wait_for_ajax_requests
-      f("#user_lists_processed_people .person").text.should eql address
-      f(".add_users_button").click
-      wait_for_ajax_requests
-      user = User.find_by_name(address)
-      user.should be_present
-      admin = AccountUser.find_by_user_id(user.id)
-      admin.should be_present
-      admin.membership_type.should eql "AccountAdmin"
-      f("#enrollment_#{admin.id} .email").text.should eql address
-      admin.id
-    end
-
-    before (:each) do
-      f("#tab-users-link").click
-    end
-
-    it "should add an account admin" do
-      add_account
-    end
-
-    it "should delete an account admin" do
-      admin_id = add_account
-      f("#enrollment_#{admin_id} .remove_account_user_link").click
-      driver.switch_to.alert.accept
-      wait_for_ajax_requests
-      AccountUser.find_by_id(admin_id).should be_nil
-    end
   end
 
   context "external tools tab" do
@@ -75,7 +40,7 @@ describe "admin settings tabs" do
       driver.switch_to.alert.accept
       wait_for_ajax_requests
       tool = ContextExternalTool.last
-      tool.workflow_state.should eql "deleted"
+      tool.workflow_state.should == "deleted"
       f("#external_tool#{tool.id} .name").should be_nil
     end
 
@@ -87,17 +52,17 @@ describe "admin settings tabs" do
       f(".save_button").click
       wait_for_ajax_requests
       tool = ContextExternalTool.last
-      tool.description.should eql new_description
-      f("#external_tool_#{tool.id} .description").text.should eql new_description
+      tool.description.should == new_description
+      f("#external_tool_#{tool.id} .description").text.should == new_description
     end
   end
 
   context "announcements tab" do
-    def date_chooser(date="n")
+    def date_chooser(date = "n")
       today = f(".ui-datepicker-calendar .ui-state-highlight").text.to_i
       days = ff("#ui-datepicker-div .ui-state-default").count
       time= Time.now
-      if (date.eql? "t")
+      if (date == "t")
         if (today == days)
           ff("#ui-datepicker-div .ui-icon")[1].click
           ff("#ui-datepicker-div .ui-state-default")[0].click
@@ -129,7 +94,7 @@ describe "admin settings tabs" do
       notification.subject.should include_text(subject)
       notification.start_at.to_s.should include_text today
       notification.end_at.to_s.should include_text tomorrow
-      f("#tab-announcements .user_content").text.should eql "this is a message"
+      f("#tab-announcements .user_content").text.should == "this is a message"
     end
 
     before (:each) do
@@ -145,7 +110,16 @@ describe "admin settings tabs" do
       f(".delete_notification_link").click
       driver.switch_to.alert.accept
       wait_for_animations
-      AccountNotification.count.should eql 0
+      AccountNotification.count.should == 0
     end
+  end
+end
+
+describe 'shared settings specs' do
+  describe "settings" do
+    let(:account) { Account.default }
+    let(:account_settings_url) { "/accounts/#{Account.default.id}/settings" }
+    let(:admin_tab_url) { "/accounts/#{Account.default.id}/settings#tab-users" }
+    it_should_behave_like "settings basic tests"
   end
 end

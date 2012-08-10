@@ -1,13 +1,13 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/rubrics_specs')
-describe "course rubrics" do
-  it_should_behave_like "rubric tests"
 
-  describe "shared rubric specs" do
-    let(:rubric_url) { "/courses/#{@course.id}/rubrics" }
-    let(:who_to_login) { 'teacher' }
-    it_should_behave_like "rubric specs"
-  end
+describe "shared rubric specs" do
+  let(:rubric_url) { "/courses/#{@course.id}/rubrics" }
+  let(:who_to_login) { 'teacher' }
+  it_should_behave_like "rubric tests"
+end
+
+describe "course rubrics" do
+  it_should_behave_like "in-process server selenium tests"
 
   context "importing" do
     it "should create a allow immediate editing when adding an imported rubric to a new assignment" do

@@ -239,8 +239,7 @@ class SubmissionsController < ApplicationController
   #   one or more previously uploaded files residing in the submitting user's
   #   files section (or the group's files section, for group assignments).
   #
-  #   There is not yet an API for listing a user's or group's files, or
-  #   uploading files for submission. This API is coming soon.
+  #   To upload a new file to submit, see the submissions {api:SubmissionsApiController#create_file Upload a file API}.
   #
   #   Requires a submission_type of "online_upload".
   #
@@ -262,7 +261,7 @@ class SubmissionsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return
       end
-      @group = @assignment.group_category.groups.active.to_a.find{|g| g.users.include?(@current_user)} if @assignment.has_group_category?
+      @group = @assignment.group_category.group_for(@current_user) if @assignment.has_group_category?
 
       if api_request?
         # Verify submission_type is valid, and allowed by the assignment.

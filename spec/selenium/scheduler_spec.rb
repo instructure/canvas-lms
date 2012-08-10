@@ -20,6 +20,17 @@ describe "scheduler" do
       f('[name="context_codes[]"]').click
     end
     f('.ag_contexts_done').click
+    if opts[:checkable_options]
+      if opts[:checkable_options].has_key?(:per_slot_option)
+        set_value f('[name="per_slot_option"]'), true
+      end
+      if opts[:checkable_options].has_key?(:participant_visibility)
+        set_value f('[name="participant_visibility"]'), true
+      end
+      if opts[:checkable_options].has_key?(:max_appointments_per_participant_option)
+        set_value f('[name="max_appointments_per_participant_option"]'), true
+      end
+    end
     date_field = edit_form.find_element(:css, '.date_field')
     date_field.click
     wait_for_animations
@@ -86,6 +97,11 @@ describe "scheduler" do
     f('.ag-location').should include_text(location_name)
   end
 
+  def open_edit_dialog
+    driver.action.move_to(f('.appointment-group-item')).perform
+    click_al_option('.edit_link')
+  end
+
   context "as a teacher" do
 
     before (:each) do
@@ -135,8 +151,7 @@ describe "scheduler" do
       new_appointment_group = AppointmentGroup.last
       new_appointment_group.workflow_state.should == 'pending'
       f('.ag-x-of-x-signed-up').should include_text('unpublished')
-      driver.action.move_to(f('.appointment-group-item')).perform
-      click_al_option('.edit_link')
+      open_edit_dialog
       edit_form = f('#edit_appointment_form')
       keep_trying_until { edit_form.should be_displayed }
       f('.ui-dialog-buttonset .btn-primary').click
@@ -162,9 +177,7 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
 
-      appointment_group = f('.appointment-group-item')
-      driver.action.move_to(appointment_group).perform
-      click_al_option('.edit_link')
+      open_edit_dialog
       edit_appointment_group
     end
 
@@ -185,12 +198,37 @@ describe "scheduler" do
       # first create the group
       create_appointment_group_manual :section_codes => %W(course_section_#{section.id})
       # then open it's edit dialog
-      appointment_group = f('.appointment-group-item')
-      driver.action.move_to(appointment_group).perform
-      click_al_option('.edit_link')
+      open_edit_dialog
       # expect only section1 to be selected
       f('.ag_contexts_selector').click
       ffj('.ag_sections input:checked').size.should == 1
+    end
+
+    it "should allow checkboxes in the options section to be edited" do
+      get "/calendar2"
+      click_scheduler_link
+      create_appointment_group_manual :checkable_options => {
+        :per_slot_option => true,
+        :participant_visibility => true,
+        :max_appointments_per_participant_option => true
+      }
+      # assert options are checked
+      open_edit_dialog
+      f('[name="per_slot_option"]').selected?.should be_true
+      f('[name="participant_visibility"]').selected?.should be_true
+      f('[name="max_appointments_per_participant_option"]').selected?.should be_true
+
+      # uncheck the options
+      f('[name="per_slot_option"]').click
+      f('[name="participant_visibility"]').click
+      f('[name="max_appointments_per_participant_option"]').click
+      driver.find_element(:css, '.ui-dialog-buttonset .ui-button').click
+      wait_for_ajaximations
+      # assert options are not checked
+      open_edit_dialog
+      f('[name="per_slot_option"]').selected?.should be_false
+      f('[name="participant_visibility"]').selected?.should be_false
+      f('[name="max_appointments_per_participant_option"]').selected?.should be_false
     end
 
     it "should delete an appointment group after clicking appointment group link" do
@@ -274,7 +312,7 @@ describe "scheduler" do
       keep_trying_until { element_exists('.fc-event-bg').should be_false }
     end
 
-    it "should allow limiting the max appointments per participant" do
+    it "should not allow limiting the max appointments per participant to less than 1" do
       get "/calendar2"
       click_scheduler_link
       fill_out_appointment_group_form('max appointments')
@@ -282,16 +320,7 @@ describe "scheduler" do
       # invalid max_appointments
       max_appointments_input = f('[name="max_appointments_per_participant"]')
       replace_content(max_appointments_input, '0')
-      submit_appointment_group_form
-      ffj('.errorBox[id!="error_box_template"]').size.should eql 1
-
-      replace_content(max_appointments_input, 3)
-      expect {
-        submit_appointment_group_form
-      }.to change(AppointmentGroup, :count).by 1
-
-      ag_id = f('#appointment-group-list li:last-child')['data-appointment-group-id']
-      AppointmentGroup.find(ag_id).max_appointments_per_participant.should == 3
+      get_value('[name="max_appointments_per_participant"]').to_i.should > 0
     end
 
     it "should allow removing individual appointments" do

@@ -248,8 +248,12 @@ stylesheets:
     - public/stylesheets/compiled/slideshow.css
   alerts:
     - public/stylesheets/compiled/alerts.css
+  developer_keys:
+    - public/stylesheets/compiled/developer_keys.css
   edit_calendar_event_full:
     - public/stylesheets/compiled/calendar/editCalendarEventFull.css
+  notification_preferences:
+    - public/stylesheets/compiled/notification_preferences.css
   tinymce:
     - public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css
     - public/stylesheets/compiled/tiny_like_ck_with_external_tools.css

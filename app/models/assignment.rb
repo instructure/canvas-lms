@@ -235,7 +235,6 @@ class Assignment < ActiveRecord::Base
     self.all_day_date = (zoned_due_at.to_date rescue nil) if !self.all_day_date || self.due_at_changed? || self.all_day_date_changed?
     self.submission_types ||= "none"
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
-    self.anonymous_peer_reviews = true if self.peer_reviews
     @workflow_state_was = self.workflow_state_was
     @points_possible_was = self.points_possible_was
     @muted_was = self.muted_was
@@ -803,7 +802,7 @@ class Assignment < ActiveRecord::Base
     group = nil
     students = [student]
     if self.has_group_category?
-      group = self.group_category.groups.active.to_a.find{|g| g.users.include?(student)}
+      group = self.group_category.group_for(student)
       students = (group.users & self.context.students) if group
     end
     [group, students]
@@ -847,7 +846,7 @@ class Assignment < ActiveRecord::Base
         submission.attributes = opts
         submission.assignment_id = self.id
         submission.user_id = student.id
-        submission.grader_id = grader.id rescue nil
+        submission.grader_id = grader.try(:id)
         if !opts[:grade] || opts[:grade] == ""
           submission.score = nil
           submission.grade = nil
@@ -923,7 +922,6 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     opts[:unique_key] = Time.now.to_s
     opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by_id(opts[:user_id])
-    opts[:anonymous] = opts[:author] != original_student && self.anonymous_peer_reviews && !self.grants_right?(opts[:author], nil, :grade)
 
     if opts[:comment] && opts[:assessment_request]
       # if there is no rubric the peer review is complete with just a comment
@@ -1623,6 +1621,12 @@ class Assignment < ActiveRecord::Base
 
   def expects_external_submission?
     submission_types == 'on_paper' || submission_types == 'external_tool'
+  end
+
+  def allow_google_docs_submission?
+    self.submission_types && 
+      self.submission_types.match(/online_upload/) && 
+      (self.allowed_extensions.blank? || self.allowed_extensions.grep(/doc|xls|ppt/).present?)
   end
 
   def <=>(comparable)

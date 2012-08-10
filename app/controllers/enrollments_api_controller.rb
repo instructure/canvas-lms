@@ -163,6 +163,7 @@ class EnrollmentsApiController < ApplicationController
   # @argument enrollment[enrollment_state] [String] [Optional, active|invited] [String] If set to 'active,' student will be immediately enrolled in the course. Otherwise they will be required to accept a course invitation. Default is 'invited.'
   # @argument enrollment[course_section_id] [Integer] [Optional] The ID of the course section to enroll the student in. If the section-specific URL is used, this argument is redundant and will be ignored
   # @argument enrollment[limit_privileges_to_course_section] [Boolean] [Optional] If a teacher or TA enrollment, teacher/TA will be restricted to the section given by course_section_id.
+  # @argument enrollment[notify] [Boolean] [Optional] If false (0 or "false"), a notification will not be sent to the enrolled user. Notifications are sent by default.
   def create
     # error handling
     errors = []
@@ -178,6 +179,7 @@ class EnrollmentsApiController < ApplicationController
 
     # create enrollment
     type = params[:enrollment].delete(:type)
+    params[:enrollment][:no_notify] = true unless params[:enrollment][:notify].nil? && value_to_boolean(params[:enrollment][:notify])
     type = 'StudentEnrollment' unless @@valid_types.include?(type)
     unless @current_user.can_create_enrollment_for?(@context, session, type)
       render_unauthorized_action(@context) && return
@@ -187,7 +189,7 @@ class EnrollmentsApiController < ApplicationController
       params[:enrollment][:section] = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
     end
     user = api_find(User, params[:enrollment].delete(:user_id))
-    @enrollment = @context.enroll_user(user, type, params[:enrollment])
+    @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
       render(:json => enrollment_json(@enrollment, @current_user, session).to_json) :
       render(:json => @enrollment.errors.to_json)
@@ -312,7 +314,7 @@ class EnrollmentsApiController < ApplicationController
 
     if state.present?
       state.map(&:to_sym).each do |s|
-        conditions[0] << User::ENROLLMENT_CONDITIONS[s]
+        conditions[0] << User.enrollment_conditions(s)
       end
     end
 

@@ -12,7 +12,7 @@
 <% end %></textarea>
   </div>
   <div id="user_list_parsed" style="z-index: 1; display:none;">
-    <div class="ui-helper-reset ui-widget-content ui-corner-all" id="user_lists_processed_people">
+    <div class="ui-helper-reset" id="user_lists_processed_people">
       <div id="user_list_duplicates_found" class="ui-widget">
         <div class="ui-state-highlight ui-corner-all">
           <p>
@@ -38,10 +38,9 @@
         </div>
       </div>
 
-      <div class="person ui-helper-reset ui-state-default ui-corner-all" id="user_lists_processed_person_template" style="display:none;">
+      <div class="person ui-helper-reset ui-state-default ui-corner-all" id="user_lists_processed_person_template" title="<%= t 'titles.new_user','New user' %>" style="display:none;">
         <div class="name"></div>
         <div class="address"></div>
-        <div class="login"></div>
       </div>
     </div>
   </div>

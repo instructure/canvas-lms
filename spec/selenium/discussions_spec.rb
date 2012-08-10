@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 
 describe "discussions" do
@@ -292,6 +291,47 @@ describe "discussions" do
       entry = @topic.discussion_entries.create!(:user => @student, :message => 'new entry from student')
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       fj("[data-id=#{entry.id}]").should include_text('new entry from student')
+    end
+
+    it "should embed user content in an iframe" do
+      message = %{<p><object width="425" height="350" data="http://www.example.com/swf/software/flash/about/flash_animation.swf" type="application/x-shockwave-flash</object></p>"}
+      @topic.discussion_entries.create!(:user => nil, :message => message)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      f('#content object').should_not be_present
+      iframe = f('#content iframe.user_content_iframe')
+      iframe.should be_present
+      # the sizing isn't exact due to browser differences
+      iframe.size.width.should be_between(405, 445)
+      iframe.size.height.should be_between(330, 370)
+      form = f('form.user_content_post_form')
+      form.should be_present
+      form['target'].should == iframe['name']
+      in_frame(iframe) do
+        keep_trying_until do
+          src = driver.page_source
+          doc = Nokogiri::HTML::DocumentFragment.parse(src)
+          obj = doc.at_css('body object')
+          obj.name.should == 'object'
+          obj['data'].should == "http://www.example.com/swf/software/flash/about/flash_animation.swf"
+        end
+      end
+    end
+
+    it "should strip embed tags inside user content object tags" do
+      # this avoids the js translation of user content trying to embed the same content twice
+      message = %{<object width="560" height="315"><param name="movie" value="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="560" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>}
+      @topic.discussion_entries.create!(:user => nil, :message => message)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajax_requests
+      f('#content object').should_not be_present
+      f('#content embed').should_not be_present
+      iframe = f('#content iframe.user_content_iframe')
+      iframe.should be_present
+      forms = ff('form.user_content_post_form')
+      forms.size.should == 1
+      form = forms.first
+      form['target'].should == iframe['name']
     end
 
     context "side comments" do

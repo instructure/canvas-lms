@@ -22,7 +22,7 @@ describe ProfileController do
 
   describe "update" do
     it "should allow changing the default e-mail address and nothing else" do
-      user_with_pseudonym
+      user_with_pseudonym(:active_user => true)
       user_session(@user, @pseudonym)
       @cc.position.should == 1
       @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
@@ -37,7 +37,7 @@ describe ProfileController do
       @account = Account.default
       @account.settings = { :users_can_edit_name => false }
       @account.save!
-      user_with_pseudonym
+      user_with_pseudonym(:active_user => true)
       user_session(@user, @pseudonym)
       @cc.position.should == 1
       @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
@@ -65,6 +65,7 @@ describe ProfileController do
       # works, but for now we just make sure that that state does not cause an error for the
       # user when they go to their notification preferences.
       user_model
+      @user.update_attribute :workflow_state, 'registered'
       user_session(@user)
       cc = @user.communication_channels.create!(:path => 'user@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       cc.notification_policies.create!(:notification => nil, :frequency => 'daily')

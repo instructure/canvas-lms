@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "calendar2" do
@@ -372,6 +371,23 @@ describe "calendar2" do
         end
       end
     end
+
+    context "week view" do
+      it "should render assignments due just before midnight" do
+        assignment_model :course => @course,
+                         :title => "super important",
+                         :due_at => Time.zone.now.beginning_of_week + 1.day - 1.minute
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=week]').click
+        wait_for_ajaximations
+
+        events = ff('.fc-event').select{ |e| e.text == "super important" }
+        # shows on monday night and tuesday morning, and doesn't have the time
+        events.size.should eql 2
+      end
+    end
   end
 
   context "as a student" do
@@ -400,17 +416,6 @@ describe "calendar2" do
     end
 
     describe "main calendar" do
-
-      it "should validate that a student cannot edit an assignment" do
-        @course.active_assignments.create(:name => "Assignment 1", :due_at => Time.zone.now)
-        get "/calendar2"
-        wait_for_ajaximations
-
-        f('.fc-event-title').click
-        f("#popover-0").should be_displayed
-        element_exists('.edit_event_link').should be_false
-        element_exists('.delete_event_link').should be_false
-      end
 
       it "should validate appointment group popup link functionality" do
         create_appointment_group

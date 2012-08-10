@@ -92,6 +92,8 @@
       color: #9da5ab
 
 .fc-event.assignment
+  .fc-event-inner div
+    display: inline
   background-color: white
 
 .counter-badge
@@ -153,7 +155,7 @@
 .event-details-footer
   padding: 10px 20px
   border-bottom: 1px solid #eee
-  overflow: auto
+  word-wrap: normal
   max-height: 225px
   &:last-child
     border-bottom: none
@@ -161,6 +163,10 @@
   font-size: 0.8em
   font-style: italic
   color: #666
+
+.x-close-link
+  padding-right: 5px
+  opacity: .5
 
 #attendees li
   +name_bubbles

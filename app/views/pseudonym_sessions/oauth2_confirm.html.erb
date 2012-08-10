@@ -4,10 +4,14 @@
   @body_classes << "modal"
   content_for :page_title, t(:page_title, "App Login")
 %>
-<div id="modal-box-top"></div>
-<div id="modal-box-arbitrary-size" class="modal-box-more-padding">
-  <h2><%= @app_name %></h2>
-  <p class="modal-box-content">
+<div id="modal-box">
+  <h2>
+    <% if @key.icon_url %>
+      <%= image_tag @key.icon_url, :alt => '', :class => 'icon_url' %>
+    <% end %>
+    <%= @app_name %>
+  </h2>
+  <p>
   <%= mt 'details.allow_application', "%{app_name} is requesting access to your account.", :app_name => @app_name %>
     <br/><br/>
     <%= mt 'details.login_name', "You are logging into this app as %{user_name}.", :user_name => link_to(@current_user.short_name, user_profile_url(@current_user), :popup => true) %>
@@ -18,7 +22,6 @@
   </p>
   <div class="button_box">
     <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "button") %>
-    <%= link_to(t(:log_in, "Login"), oauth2_auth_accept_path, :method => :post, :class => "button button-default") %>
+    <%= link_to(t(:log_in, "Log in"), oauth2_auth_accept_path, :method => :post, :class => "button btn-primary") %>
   </div>
 </div>
-<div id="modal-box-bottom"></div>

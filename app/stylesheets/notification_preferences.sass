@@ -1,0 +1,147 @@
+@import 'environment'
+@import 'bootstrap/_tables'
+
+$grey: #888
+$darker_grey: darken($grey, 9%)
+$category_name: #08C    //#668
+$stripe_color: #eff3f4
+$hover_row: #F5F5F5
+
+/* Column striping */
+.table-columns-striped tr
+  td:nth-child(2n),
+  th:nth-child(2n)
+    background: none repeat scroll 0 0 $stripe_color
+
+#notification-preferences
+  td.comm-event-option > select
+    +opacity(0)
+
+  .notification-prefs-table
+    border: 1px solid #DDD
+    border-collapse: separate
+    -webkit-border-radius: 4px
+    -moz-border-radius: 4px
+    border-radius: 4px
+
+    caption
+      color: $grey
+      line-height: 0
+      +opacity(0)
+
+    h3.group-name
+      font-weight: bold
+      margin-bottom: 0
+
+    a.change-selection > span.ui-icon
+      display: inline-block
+      vertical-align: text-top
+
+    tr
+      th > div
+        display: none
+      th.channel-add a
+        display: none
+    // First row in table
+    tr:first-child
+      th > div
+        display: block
+      th.channel-add a
+        display: block
+      td, th
+        border: none
+
+    // Grouping rows should be solid color but still support hover
+    tr.grouping:not(:first-child) th
+      background-color: inherit
+    tr.grouping:hover
+      background-color: $hover_row
+
+    th.comm-channel
+      text-align: center
+
+    .user-preference > label
+      display: inline
+
+    .channel-addr
+      font-weight: normal
+      font-size: 0.8em
+      color: $grey
+
+    h3.group-name
+      padding-top: 1em
+      line-height: 1em
+      color: $grey
+
+    td.comm-event
+      font-size: 1.1em
+      vertical-align: bottom
+
+      div.row-title-cell
+        position: relative
+
+      label
+        font-size: 13px
+
+    td.comm-event-option
+      text-align: left
+      width: 110px
+
+      // By default, hide buttons and show selection text
+      .event-option-selection
+        display: block
+      .event-option-buttons
+        float: left
+        display: none
+        label.ui-button
+          padding: 0
+
+      div.comm-event-option-contents
+        position: relative
+
+        .event-option-selection
+          padding-top: 2px
+          margin-left: 10px
+
+          a
+            color: $darker_grey
+            &:hover, &:focus, &:active
+              text-decoration: none
+        select
+          +opacity(0)
+          outline: 0
+          position: absolute
+          top: 0px
+          left: 0px
+
+    span.category-name
+      color: $category_name
+
+    div.user-preference
+      margin-left: 1.1em
+
+      .user-pref-check, label
+        vertical-align: bottom
+
+  .notification-prefs-table.no-touch
+    td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection
+      +opacity(0)
+      &:hover, &:focus
+        +opacity(0.35)
+
+  .notification-prefs-table.touch
+    td.comm-event-option .event-option-selection a.change-selection
+      span.drop-arrow
+        float: right
+
+    td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection span
+      +opacity(0.35)
+
+h2
+  position: relative
+  #notifications_save_status
+    position: absolute
+    right: 0
+    top: 0
+    width: 40px
+    height: 40px

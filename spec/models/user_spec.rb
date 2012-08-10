@@ -1057,6 +1057,43 @@ describe User do
         @student.group_membership_visibility[:user_counts][@group.id].should eql 1
       end
     end
+
+    context "admin_context" do
+      before do
+        set_up_course_with_users
+        account_admin_user
+      end
+
+      it "should find users in the course" do
+        @admin.messageable_users(:context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
+          [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
+      end
+
+      it "should find users in the section" do
+        @admin.messageable_users(:context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort.should ==
+          [@this_section_teacher.id, @this_section_user.id]
+      end
+
+      it "should find users in the group" do
+        @admin.messageable_users(:context => @group.asset_string, :admin_context => @group).map(&:id).sort.should ==
+          [@this_section_user.id]
+      end
+    end
+
+    context "skip_visibility_checks" do
+      it "should optionally show invited enrollments" do
+        course(:active_all => true)
+        student_in_course(:user_state => 'creation_pending')
+        @teacher.messageable_users(:skip_visibility_checks => true).map(&:id).should include @student.id
+      end
+
+      it "should optionally show pending enrollments in unpublished courses" do
+        course()
+        teacher_in_course(:active_user => true)
+        student_in_course()
+        @teacher.messageable_users(:skip_visibility_checks => true, :admin_context => @course).map(&:id).should include @student.id
+      end
+    end
   end
   
   context "lti_role_types" do
@@ -1109,7 +1146,7 @@ describe User do
       tool.save!
       tool.has_user_navigation.should == false
       user_model
-      tabs = UserProfile.new(@user).tabs_available(@user, :root_account => Account.default)
+      tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
     end
     
@@ -1119,7 +1156,7 @@ describe User do
       tool.save!
       tool.has_user_navigation.should == true
       user_model
-      tabs = UserProfile.new(@user).tabs_available(@user, :root_account => Account.default)
+      tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
       tab = tabs.detect{|t| t[:id] == tool.asset_string }
       tab[:href].should == :user_external_tool_path
@@ -1700,6 +1737,69 @@ describe User do
       @user.associated_root_accounts << Account.create! << (a = Account.create!)
       a.update_attribute :default_user_storage_quota_mb, a.default_user_storage_quota_mb + 10
       @user.quota.should eql(2 * User.default_storage_quota + 10.megabytes)
+    end
+  end
+
+  it "should build a profile if one doesn't already exist" do
+    user = User.create! :name => "John Johnson"
+    profile = user.profile
+    profile.id.should be_nil
+    profile.bio = "bio!"
+    profile.save!
+    user.profile.should == profile
+  end
+
+  describe "common_account_chain" do
+    before do
+      user_with_pseudonym
+    end
+
+    it "work for just root accounts" do
+      root_acct1 = Account.create!
+      root_acct2 = Account.create!
+
+      @user.user_account_associations.create!(:account_id => root_acct2.id)
+      @user.reload
+      @user.common_account_chain(root_acct1).should be_nil
+      @user.common_account_chain(root_acct2).should eql [root_acct2]
+    end
+
+    it "should work for one level of sub accounts" do
+      root_acct = Account.create!
+      sub_acct1 = Account.create!(:parent_account => root_acct)
+      sub_acct2 = Account.create!(:parent_account => root_acct)
+
+      @user.user_account_associations.create!(:account_id => root_acct.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+
+      @user.user_account_associations.create!(:account_id => sub_acct1.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+
+      @user.user_account_associations.create!(:account_id => sub_acct2.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+    end
+
+    it "should work for two levels of sub accounts" do
+      root_acct = Account.create!
+      sub_acct1 = Account.create!(:parent_account => root_acct)
+      sub_sub_acct1 = Account.create!(:parent_account => sub_acct1)
+      sub_sub_acct2 = Account.create!(:parent_account => sub_acct1)
+      sub_acct2 = Account.create!(:parent_account => root_acct)
+
+      @user.user_account_associations.create!(:account_id => root_acct.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+
+      @user.user_account_associations.create!(:account_id => sub_acct1.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+
+      @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1, sub_sub_acct1]
+
+      @user.user_account_associations.create!(:account_id => sub_sub_acct2.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+
+      @user.user_account_associations.create!(:account_id => sub_acct2.id)
+      @user.reload.common_account_chain(root_acct).should eql [root_acct]
     end
   end
 end

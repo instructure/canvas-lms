@@ -263,4 +263,30 @@ describe GroupCategory do
       category.should_not have_heterogenous_group
     end
   end
+
+  describe "group_for" do
+    before :each do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      @category = @course.group_categories.create
+    end
+
+    it "should return nil if no groups in category" do
+      @category.group_for(@student).should be_nil
+    end
+
+    it "should return nil if no active groups in category" do
+      group = @category.groups.create(:context => @course)
+      group.add_user(@student)
+      group.destroy!
+      @category.group_for(@student).should be_nil
+    end
+
+    it "should return the group the student is in" do
+      group1 = @category.groups.create(:context => @course)
+      group2 = @category.groups.create(:context => @course)
+      group2.add_user(@student)
+      @category.group_for(@student).should == group2
+    end
+  end
 end

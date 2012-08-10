@@ -606,7 +606,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
-    self.user.name rescue t '#discussion_topic.default_user_name', "User Name"
+    self.user ? self.user.name : nil
   end
 
   def locked_for?(user=nil, opts={})
@@ -656,7 +656,7 @@ class DiscussionTopic < ActiveRecord::Base
     if !dup.attachment_id && self.attachment
       attachment = self.attachment.clone_for(context)
       attachment.folder_id = nil
-      attachment.save!
+      attachment.save_without_broadcasting!
       context.map_merge(self.attachment, attachment)
       context.warn_merge_result("Added file \"#{attachment.folder.full_name}/#{attachment.display_name}\" which is needed for the topic \"#{self.title}\"")
       dup.attachment_id = attachment.id

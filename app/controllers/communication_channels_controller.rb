@@ -243,13 +243,9 @@ class CommunicationChannelsController < ApplicationController
           @pseudonym.attributes = params[:pseudonym]
           @pseudonym.communication_channel = cc
 
-          # trick pseudonym into validating the e-mail address
-          @pseudonym.account = nil
-          unless @pseudonym.valid?
-            @pseudonym.account = @root_account
-            return
-          end
-          @pseudonym.account = @root_account
+          # ensure the password gets validated, but don't require confirmation
+          @pseudonym.require_password = true
+          @pseudonym.password_confirmation = @pseudonym.password = params[:pseudonym][:password] if params[:pseudonym]
 
           return unless @pseudonym.valid?
 
@@ -308,7 +304,7 @@ class CommunicationChannelsController < ApplicationController
     if @enrollment && (@enrollment.invited? || @enrollment.active?)
       @enrollment.re_send_confirmation!
     else
-      @cc = @user.communication_channels.find(params[:id])
+      @cc = params[:id].present? ? @user.communication_channels.find(params[:id]) : @user.communication_channel
       @cc.send_confirmation!(@domain_root_account)
     end
     render :json => {:re_sent => true}

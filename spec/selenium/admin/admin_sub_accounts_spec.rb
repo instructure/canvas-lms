@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin sub accounts" do
+  it_should_behave_like "in-process server selenium tests"
   DEFAULT_ACCOUNT_ID = Account.default.id
 
   def create_sub_account(name = 'sub account', number_to_create = 1, parent_account = Account.default)
@@ -29,7 +30,6 @@ describe "admin sub accounts" do
     wait_for_ajaximations
   end
 
-  it_should_behave_like "in-process server selenium tests"
   before (:each) do
     course_with_admin_logged_in
   end

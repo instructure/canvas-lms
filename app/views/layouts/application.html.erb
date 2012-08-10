@@ -32,6 +32,8 @@
   <% end %>
 <% end %>
 <%= render :partial => "layouts/head" %>
+<%= render :partial => 'shared/flash_notices' %>
+
 <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
   <div id="header-inner">
     <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
@@ -118,7 +120,6 @@
   <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link"><%= t('links.close', 'Close') %></a></div>
   <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;"></iframe>
 </div>
-<%= render :partial => 'shared/flash_notices' %>
 
 <div id="wrapper-container">
   <div id="wrapper">
@@ -187,7 +188,7 @@
     <div class="shadow shadow_5"></div>
     <div class="wizard_content">
       <div class="links">
-        <a href="#" class="close_wizard_link close-link"><%= t('links.close', 'Close') %></a>
+        <a href="#" class="close_wizard_link close_link"><%= t('links.close', 'Close') %></a>
       </div>
       <%= wizard %>
     </div>

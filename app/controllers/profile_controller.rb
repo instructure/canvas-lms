@@ -18,12 +18,16 @@
 
 # @API Users
 class ProfileController < ApplicationController
-  before_filter :require_user, :except => :show
+  before_filter :require_registered_user, :except => [:show, :settings]
+  before_filter :require_user, :only => :settings
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
 
   include Api::V1::User
   include Api::V1::Avatar
+  include Api::V1::Notification
+  include Api::V1::NotificationPolicy
+  include Api::V1::CommunicationChannel
 
   include TextHelper
 
@@ -32,14 +36,14 @@ class ProfileController < ApplicationController
       # this is ghetto and we should get rid of this as soon as possible
       @current_user.instance_variable_set(:@show_profile_tab, true)
     else
-      edit
+      settings
       return
     end
 
     @user ||= @current_user
 
     @active_tab = "profile"
-    @context = UserProfile.new(@current_user) if @user == @current_user
+    @context = @user.profile if @user == @current_user
 
     js_env :USER_ID => @user.id
 
@@ -90,7 +94,7 @@ class ProfileController < ApplicationController
   #     'avatar_url': '..url..',
   #     'calendar': { 'ics' => '..url..' }
   #   }
-  def edit
+  def settings
     if @current_user && @domain_root_account.enable_profiles?
       @current_user.instance_variable_set(:@show_profile_tab, true)
     end
@@ -111,11 +115,11 @@ class ProfileController < ApplicationController
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
-    @context = UserProfile.new(@user)
-    @active_tab = "edit_profile"
+    @context = @user.profile
+    @active_tab = "profile_settings"
     respond_to do |format|
       format.html do
-        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), edit_profile_path )
+        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), settings_profile_path )
         render :action => "profile"
       end
       format.json do
@@ -130,61 +134,29 @@ class ProfileController < ApplicationController
     end
   end
 
-  def update_communication
-    params[:root_account] = @domain_root_account
-    @policies = NotificationPolicy.setup_for(@current_user, params)
-    render :json => @policies.to_json
-  end
-  
   def communication
     @user = @current_user
     @user = User.find(params[:id]) if params[:id]
-
-    add_crumb(@user.short_name, user_profile_path(@current_user) )
-    add_crumb(t(:crumb_notification_preferences, "Notification Preferences"), communication_profile_path )
-
-    if @user.communication_channel.blank?
-      flash[:error] = t('errors.no_channels', "Please define at least one email address or other way to be contacted before setting notification preferences.")
-      redirect_to user_profile_url(@current_user)
-      return
-    end
-
-    # Add communication channel for users that already had Twitter
-    # integrated before we started offering it as a cc
-    twitter_service = @user.user_services.find_by_service('twitter')
-    twitter_service.assert_communication_channel if twitter_service
-    @default_pseudonym = @user.primary_pseudonym
-    @pseudonyms = @user.pseudonyms.active
-    @channels = @user.communication_channels.unretired
     @current_user.used_feature(:cc_prefs)
-    @notification_categories = Notification.dashboard_categories(@user)
-    @policies = NotificationPolicy.for(@user).scoped(:include => [:communication_channel, :notification]).to_a
-    @context = UserProfile.new(@user)
-    @active_tab = "communication-preferences"
+    @context = @user.profile
+    @active_tab = 'notifications'
 
-    # build placeholder notification policies for categories the user does not have policies for already
-    # Note that currently a NotificationPolicy might not have a Notification attached to it.
-    # See the relevant spec in profile_controller_spec.rb for more details.
-    user_categories = @policies.map {|np| np.notification.try(:category) }
-    @notification_categories.each do |category|
-      # category is actually a Notification
-      next if user_categories.include?(category.category)
-      policy = @user.communication_channel.notification_policies.build
-      policy.notification = category
-      policy.frequency = category.default_frequency
-      policy.save!
-      @policies << policy
-    end
-
-    has_facebook_installed = !@current_user.user_services.for_service('facebook').empty?
-    has_twitter_installed = !@current_user.user_services.for_service('twitter').empty?
-    @email_channels = @channels.select{|c| c.path_type == "email"}
-    @sms_channels = @channels.select{|c| c.path_type == 'sms'}
-    @other_channels = @channels.select{|c| c.path_type != "email"}
-    @other_channels.reject! { |c| c.path_type == 'facebook' } unless has_facebook_installed
-    @other_channels.reject! { |c| c.path_type == 'twitter' } unless has_twitter_installed
+    # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
+    full_category_list = Notification.dashboard_categories(@user)
+    js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
+      :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
+      :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map{ |p| notification_policy_json(p, @user, session) },
+      :categories => full_category_list.map{ |c| notification_category_json(c, @user, session) },
+      :update_url => communication_update_profile_path
+    }
   end
-  
+
+  def communication_update
+    params[:root_account] = @domain_root_account
+    @policies = NotificationPolicy.setup_for(@current_user, params)
+    render :json => {}, :status => :ok
+  end
+
   # @API List avatar options
   # Retrieve the possible user avatar options that can be set with the user update endpoint. The response will be an array of avatar records. If the 'type' field is 'attachment', the record will include all the normal attachment json fields; otherwise it will include only the 'url' and 'display_name' fields. Additionally, all records will include a 'type' field and a 'token' field. The following explains each field in more detail
   # type:: ["gravatar"|"twitter"|"linked_in"|"attachment"|"no_pic"] The type of avatar record, for categorization purposes.
@@ -253,10 +225,11 @@ class ProfileController < ApplicationController
           old_password = params[:pseudonym].delete :old_password
           pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id]) if params[:pseudonym][:password_id] && change_password
           if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
+            error_msg = t('errors.invalid_old_passowrd', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
             pseudonymed = true
-            flash[:error] = t('errors.invalid_old_password', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
+            flash[:error] = error_msg
             format.html { redirect_to user_profile_url(@current_user) }
-            format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
+            format.json { render :json => {:errors => {:old_password => error_msg}}.to_json, :status => :bad_request }
           end
           if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             params[:pseudonym].delete :password

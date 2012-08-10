@@ -43,6 +43,7 @@ define([
           disabled = true;
           $inputsToDisable.prop('disabled', true);
           $spinHolder.show().spin(options);
+          $($spinHolder.data().spinner.el).css({'max-width':'100px'});
           $disabledArea.css('opacity', function(i, currentOpacity){
             $(this).data(dataKey+'opacityBefore', this.style.opacity);
             return opts.opacity;
@@ -68,8 +69,9 @@ define([
             $spinHolder.css('display', previousSpinHolderDisplay).spin(false); // stop spinner
             $disabledArea.css('opacity', function(){ return $(this).data(dataKey+'opacityBefore') });
             $inputsToDisable.prop('disabled', false);
-            $.each(opts.buttons, function() {
-              $disabledArea.find(''+this).text(function() { return $(this).data(dataKey) });
+            $.each(opts.buttons, function(selector, text) {
+              if(typeof selector === 'number') var selector = ''+this; // for arrays
+              $disabledArea.find(selector).text(function() { return $(this).data(dataKey) });
             });
             thingsToWaitOn.erase(myDeferred); //speed up so that $.when doesn't have to look at myDeferred any more
             myDeferred.resolve();

@@ -53,7 +53,12 @@ class Notification < ActiveRecord::Base
     "Appointment Group Updated",
     "Appointment Reserved For User",
   ].freeze
-  
+
+  FREQ_IMMEDIATELY = 'immediately'
+  FREQ_DAILY = 'daily'
+  FREQ_WEEKLY = 'weekly'
+  FREQ_NEVER = 'never'
+
   has_many :messages
   has_many :notification_policies, :dependent => :destroy
   before_save :infer_default_content
@@ -330,10 +335,6 @@ class Notification < ActiveRecord::Base
   end
   
   def show_in_feed?
-   self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
-  end
-  
-  def show_in_feed?
     self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
   end
   
@@ -370,65 +371,83 @@ class Notification < ActiveRecord::Base
     end
     res.sort_by{|n| n.category == "Other" ? "zzzz" : n.category }
   end
+
+  # Return a hash with information for a related user option if one exists.
+  def related_user_setting(user)
+    case self.category
+      when 'Submission Comment'
+        setting = {:name => :no_submission_comments_inbox, :value => user.preferences[:no_submission_comments_inbox],
+                   :label => t(:submission_new_as_read, 'Mark new submission comments as read.')}
+      when 'Grading'
+        setting = {:name => :send_scores_in_emails, :value => user.preferences[:send_scores_in_emails],
+                   :label => t(:grading_notify_include_grade, 'Include scores when alerting about grade changes.')}
+      else
+        nil
+    end
+    setting[:id] = "cat_#{self.id}_option" if setting
+    setting
+  end
   
   def default_frequency
     case category
     when 'All Submissions'
-      'never'
+      FREQ_NEVER
     when 'Announcement'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Calendar'
-      'never'
+      FREQ_NEVER
     when 'Student Appointment Signups'
-      'never'
+      FREQ_NEVER
     when 'Appointment Availability'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Appointment Signups'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Appointment Cancelations'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Course Content'
-      'never'
+      FREQ_NEVER
+    when 'Files'
+      FREQ_NEVER
     when 'Discussion'
-      'never'
+      FREQ_NEVER
     when 'DiscussionEntry'
-      'daily'
+      FREQ_DAILY
     when 'Due Date'
-      'weekly'
+      FREQ_WEEKLY
     when 'Grading'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Grading Policies'
-      'weekly'
+      FREQ_WEEKLY
     when 'Invitation'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Late Grading'
-      'daily'
+      FREQ_DAILY
     when 'Membership Update'
-      'daily'
+      FREQ_DAILY
     when 'Other'
-      'daily'
+      FREQ_DAILY
     when 'Registration'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Migration'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Submission Comment'
-      'daily'
+      FREQ_DAILY
     when 'Reminder'
-      'daily'
+      FREQ_DAILY
     when 'TestImmediately'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'TestDaily'
-      'daily'
+      FREQ_DAILY
     when 'TestWeekly'
-      'weekly'
+      FREQ_WEEKLY
     when 'TestNever'
-      'never'
+      FREQ_NEVER
     when 'Conversation Message'
-      'immediately'
+      FREQ_IMMEDIATELY
     when 'Added To Conversation'
-      'immediately'
+      FREQ_IMMEDIATELY
     else
-      'daily'
+      FREQ_DAILY
     end
   end
   
@@ -476,6 +495,8 @@ class Notification < ActiveRecord::Base
     t 'names.new_discussion_entry', 'New Discussion Entry'
     t 'names.new_discussion_topic', 'New Discussion Topic'
     t 'names.new_event_created', 'New Event Created'
+    t 'names.new_file_added', 'New File Added'
+    t 'names.new_files_added', 'New Files Added'
     t 'names.new_student_organized_group', 'New Student Organized Group'
     t 'names.new_teacher_registration', 'New Teacher Registration'
     t 'names.new_user', 'New User'
@@ -517,6 +538,7 @@ class Notification < ActiveRecord::Base
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
     t 'categories.due_date', 'Due Date'
+    t 'categories.files', 'Files'
     t 'categories.grading', 'Grading'
     t 'categories.grading_policies', 'Grading Policies'
     t 'categories.invitiation', 'Invitation'
@@ -529,12 +551,70 @@ class Notification < ActiveRecord::Base
     t 'categories.submission_comment', 'Submission Comment'
   end
 
+  # Translatable display text to use when representing the category to the user.
+  # NOTE: If you add a new notification category, update the mapping file for groupings to show up
+  #       on notification preferences page. /app/coffeescripts/notifications/NotificationGroupMappings.coffee
+  def category_display_name
+    case category
+      when 'Announcement'
+        t(:announcement_display, 'Announcement')
+      when 'Course Content'
+        t(:course_content_display, 'Course Content')
+      when 'Files'
+        t(:files_display, 'Files')
+      when 'Discussion'
+        t(:discussion_display, 'Discussion')
+      when 'DiscussionEntry'
+        t(:discussion_entry_display, 'Discussion Entry')
+      when 'Due Date'
+        t(:due_date_display, 'Due Date')
+      when 'Grading'
+        t(:grading_display, 'Grading')
+      when 'Late Grading'
+        t(:late_grading_display, 'Late Grading')
+      when 'All Submissions'
+        t(:all_submissions_display, 'All Submissions')
+      when 'Submission Comment'
+        t(:submission_comment_display, 'Submission Comment')
+      when 'Grading Policies'
+        t(:grading_policies_display, 'Grading Policies')
+      when 'Invitation'
+        t(:invitation_display, 'Invitation')
+      when 'Other'
+        t(:other_display, 'Administrative Notifications')
+      when 'Calendar'
+        t(:calendar_display, 'Calendar')
+      when 'Student Appointment Signups'
+        t(:student_appointment_display, 'Student Appointment Signups')
+      when 'Appointment Availability'
+        t(:appointment_availability_display, 'Appointment Availability')
+      when 'Appointment Signups'
+        t(:appointment_signups_display, 'Appointment Signups')
+      when 'Appointment Cancelations'
+        t(:appointment_cancelations_display, 'Appointment Cancelations')
+      when 'Conversation Message'
+        t(:conversation_message_display, 'Conversation Message')
+      when 'Added To Conversation'
+        t(:added_to_conversation_display, 'Added To Conversation')
+      when 'Alert'
+        t(:alert_display, 'Alert')
+      when 'Membership Update'
+        t(:membership_update_display, 'Membership Update')
+      when 'Reminder'
+        t(:reminder_display, 'Reminder')
+      else
+        t(:missing_display_display, "For %{category} notifications", :category => category)
+    end
+  end
+
   def category_description
     case category
     when 'Announcement'
       t(:announcement_description, "For new announcements")
     when 'Course Content'
-      t(:course_content_description, "For changes to course pages")
+      t(:course_content_description, "For changes to course pages and assignments")
+    when 'Files'
+      t(:files_description, "For new files")
     when 'Discussion'
       t(:discussion_description, "For new topics")
     when 'DiscussionEntry'
@@ -569,6 +649,12 @@ class Notification < ActiveRecord::Base
       t(:conversation_message_description, "For new conversation messages")
     when 'Added To Conversation'
       t(:added_to_conversation_description, "For conversations to which you're added")
+    when 'Alert'
+      t(:alert_description, "For alert notifications")
+    when 'Membership Update'
+      t(:membership_update_description, "For membership change notifications")
+    when 'Reminder'
+      t(:reminder_description, "For reminder messages")
     else
       t(:missing_description_description, "For %{category} notifications", :category => category)
     end

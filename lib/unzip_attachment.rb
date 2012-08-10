@@ -91,7 +91,6 @@ class UnzipAttachment
     cnt = 0
     Attachment.skip_touch_context(true)
     Attachment.skip_scribd_submits(true)
-    Attachment.skip_broadcast_messages(true)
     FileInContext.queue_files_to_delete(true)
     paths = []
     Zip::ZipFile.open(self.filename).each do |entry|
@@ -152,7 +151,6 @@ class UnzipAttachment
       updates << "WHEN id=#{id} THEN #{position}" if id && position
     end
     Attachment.connection.execute("UPDATE attachments SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{id_positions.keys.join(",")})") unless updates.empty?
-    Attachment.skip_broadcast_messages(false)
     Attachment.skip_touch_context(false)
     Attachment.skip_scribd_submits(false)
     FileInContext.queue_files_to_delete(false)

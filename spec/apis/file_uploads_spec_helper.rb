@@ -26,7 +26,9 @@ shared_examples_for "file uploads api" do
     local_storage!
     # step 1, preflight
     json = preflight({ :name => filename })
-    json['upload_url'].should == "http://www.example.com/files_api"
+    attachment = Attachment.last(:order => :id)
+    exemption_string = has_query_exemption? ? ("?quota_exemption=" + attachment.quota_exemption_key) : ""
+    json['upload_url'].should == "http://www.example.com/files_api#{exemption_string}"
 
     # step 2, upload
     tmpfile = Tempfile.new(["test", File.extname(filename)])
@@ -37,7 +39,8 @@ shared_examples_for "file uploads api" do
 
     attachment = Attachment.last(:order => :id)
     attachment.should be_deleted
-    response.should redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?uuid=#{attachment.uuid}")
+    exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
+    response.should redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}")
 
     # step 3, confirmation
     post response['Location'], {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
@@ -70,7 +73,8 @@ shared_examples_for "file uploads api" do
     json['upload_url'].should == "http://no-bucket.s3.amazonaws.com/"
     attachment = Attachment.last(:order => :id)
     redir = json['upload_params']['success_action_redirect']
-    redir.should == "http://www.example.com/api/v1/files/#{attachment.id}/create_success?uuid=#{attachment.uuid}"
+    exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
+    redir.should == "http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}"
     attachment.should be_deleted
 
     # step 2, upload
@@ -194,3 +198,85 @@ shared_examples_for "file uploads api with folders" do
     proc { preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'killall' }) }.should raise_error
   end
 end
+
+shared_examples_for "file uploads api with quotas" do
+  it "should return successful preflight for files within quota limits" do
+    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context.save!
+    json = preflight({ :name => "test.txt", :size => 3.megabytes })
+    attachment = Attachment.last(:order => :id)
+    attachment.workflow_state.should == 'unattached'
+    attachment.filename.should == 'test.txt'
+  end
+  
+  it "should return unsuccessful preflight for files exceeding quota limits" do
+    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context.save!
+    json = {}
+    begin
+      preflight({ :name => "test.txt", :size => 10.megabytes })
+    rescue => e
+      json = JSON.parse(e.message)
+    end
+    json['message'].should == "file size exceeds quota"
+  end
+  
+  it "should return successful create_success for files within quota" do
+    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context.save!
+    attachment = @context.attachments.new
+    attachment.filename = "smaller_file.txt"
+    attachment.file_state = 'deleted'
+    attachment.workflow_state = 'unattached'
+    attachment.content_type = 'text/plain'
+    attachment.size = 4.megabytes
+    attachment.save!
+    json = api_call(:get, "/api/v1/files/#{attachment.id}/create_success", {:id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json'}, {:uuid => attachment.uuid})
+    json['id'].should == attachment.id
+    attachment.reload
+    attachment.file_state.should == 'available'
+  end
+  
+  it "should return unsuccessful create_success for files exceeding quota limits" do
+    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context.save!
+    attachment = @context.attachments.new
+    attachment.filename = "bigger_file.txt"
+    attachment.file_state = 'deleted'
+    attachment.workflow_state = 'unattached'
+    attachment.content_type = 'text/plain'
+    attachment.size = 6.megabytes
+    attachment.save!
+    json = {}
+    begin
+      api_call(:get, "/api/v1/files/#{attachment.id}/create_success", {:id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json'}, {:uuid => attachment.uuid})
+    rescue => e
+      json = JSON.parse(e.message)
+    end
+    json['message'].should == 'file size exceeds quota limits'
+    attachment.reload
+    attachment.file_state.should == 'deleted'
+  end
+  
+end
+
+shared_examples_for "file uploads api without quotas" do
+  it "should ignore context-related quotas in preflight" do
+    @context.write_attribute(:storage_quota, 0)
+    @context.save!
+    json = preflight({ :name => "test.txt", :size => 1.megabyte })
+    attachment = Attachment.last(:order => :id)
+    json['upload_url'].should match(/#{attachment.quota_exemption_key}/)
+  end
+  it "should ignore context-related quotas in preflight" do
+    s3_storage!
+    @context.write_attribute(:storage_quota, 0)
+    @context.save!
+    json = preflight({ :name => "test.txt", :size => 1.megabyte })
+    attachment = Attachment.last(:order => :id)
+    json['upload_params']['success_action_redirect'].should match(/#{attachment.quota_exemption_key}/)
+  end
+end
+
+
+

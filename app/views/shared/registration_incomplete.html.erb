@@ -1,0 +1,23 @@
+<% content_for :page_title do %>
+  <%= t('headings.confirm_email', %{Confirm Your Email Address}) %>
+<% end %>
+
+<% js_bundle :confirm_email %>
+
+<% @show_left_side = false %>
+<div id="unauthorized_holder">
+  <div id="unauthorized_message">
+    <h2 class="ui-state-error">
+      <%= t('headings.confirm_email', %{Confirm Your Email Address}) %>
+    </h2>
+    <p style="font-weight: normal">
+      <%= t "confirm_email_instructions", <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<b>\1</b>', '**' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
+        Before you can view this page, you need to *verify your email address*
+        (%{email}). Click the link in your email to finish setting up your account.
+        If you don't see the email, **click to re-send it**, and make sure to check your
+        spam box.
+      TEXT
+      %>
+    </p>
+  </div>
+</div>

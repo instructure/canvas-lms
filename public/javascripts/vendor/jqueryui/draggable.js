@@ -1,4 +1,4 @@
-define(['jquery', 'jqueryui/draggable-unpatched'], function ($, returnValueOfUnpatchedDraggable) {
+define(['jquery', 'jqueryui/draggable-unpatched', 'vendor/jquery.ui.touch-punch'], function ($, returnValueOfUnpatchedDraggable) {
 
   var _mouseMove = $.ui.draggable.prototype._mouseMove;
   $.ui.draggable.prototype._mouseMove = function() {

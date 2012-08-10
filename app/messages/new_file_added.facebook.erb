@@ -1,0 +1,8 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.id %>
+<% end %>
+
+A new file has been added for the course, <%= asset.context.name %>:
+
+<b><a href="<%= content :link %>"><%= asset.title %></a></b> -- 
+<%= asset.readable_size %>

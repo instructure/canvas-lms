@@ -1,2 +1,1 @@
-require ['user_lists']
-
+require ['compiled/user_lists']

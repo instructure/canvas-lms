@@ -38,9 +38,13 @@ module Api::V1::CommunicationChannel
   #   :workflow_state
   def communication_channel_json(channel, current_user, session)
     api_json(channel, current_user, session, JSON_OPTS).tap do |json|
+      # Replace "path" with "path_description" and rename as "address". Reason for path_description is for when the
+      # path_type is facebook or twitter, it goes and fetches tha user's account name with a fallback display value.
+      json.delete(:path)
+      json[:address] = channel.path_description
       # Rename attributes for mass-consumption
-      json[:address] = json.delete(:path)
       json[:type]    = json.delete(:path_type)
     end
   end
+
 end

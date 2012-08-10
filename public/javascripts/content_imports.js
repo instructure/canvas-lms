@@ -5,7 +5,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
   'jquery.instructure_misc_plugins' /* showIf */,
-  'jquery.rails_flash_notifications' /* flashMessage, flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'vendor/date' /* Date.parse */,
   'jqueryui/progressbar' /* /\.progressbar/ */
 ], function(I18n, processMigrationItemSelections, $) {

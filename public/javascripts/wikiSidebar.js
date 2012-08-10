@@ -27,7 +27,7 @@ define([
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* /\.log\(/ */,
-  'jquery.rails_flash_notifications' /* flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData */,
   'tinymce.editor_box',
   'vendor/jquery.pageless' /* pageless */,

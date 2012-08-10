@@ -99,6 +99,7 @@ class Account < ActiveRecord::Base
   scopes_custom_fields
 
   validates_locale :default_locale, :allow_nil => true
+  validate :account_chain_loop, :if => :parent_account_id_changed?
 
   include StickySisFields
   are_sis_sticky :name
@@ -130,8 +131,9 @@ class Account < ActiveRecord::Base
   # these settings either are or could be easily added to
   # the account settings page
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
-  add_setting :global_javascript, :condition => :global_includes, :root_only => true
-  add_setting :global_stylesheet, :condition => :global_includes, :root_only => true
+  add_setting :global_javascript, :condition => :allow_global_includes
+  add_setting :global_stylesheet, :condition => :allow_global_includes
+  add_setting :sub_account_includes, :condition => :allow_global_includes, :boolean => true, :default => false
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
@@ -176,6 +178,10 @@ class Account < ActiveRecord::Base
       end
     end
     settings
+  end
+
+  def allow_global_includes?
+    self.global_includes? || self.parent_account.try(:sub_account_includes?)
   end
 
   def ip_filters=(params)
@@ -418,14 +424,36 @@ class Account < ActiveRecord::Base
   
   def account_chain(opts = {})
     res = [self]
-    account = self
-    while account.parent_account
-      account = account.parent_account
-      res << account
+
+    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+      res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
+          WITH RECURSIVE t AS (
+            SELECT * FROM accounts WHERE id=#{self.parent_account_id}
+            UNION
+            SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+          )
+          SELECT * FROM t
+        SQL
+    else
+      account = self
+      while account.parent_account
+        account = account.parent_account
+        res << account
+      end
     end
-    res << self.root_account unless res.include?(self.root_account)
+    res << self.root_account unless res.map(&:id).include?(self.root_account_id)
     res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     res.compact
+  end
+
+  def account_chain_loop
+    # this record hasn't been saved to the db yet, so if the the chain includes
+    # this account, it won't point to the new parent yet, and should still be
+    # valid
+    if self.parent_account.account_chain_ids.include?(self.id)
+      errors.add(:parent_account_id,
+                 "Setting account #{self.sis_source_id || self.id}'s parent to #{self.parent_account.sis_source_id || self.parent_account_id} would create a loop")
+    end
   end
 
   def associated_accounts
@@ -786,6 +814,7 @@ class Account < ActiveRecord::Base
   # site admin tabs
   TAB_PLUGINS = 14
   TAB_JOBS = 15
+  TAB_DEVELOPER_KEYS = 16
 
   def external_tool_tabs(opts)
     tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
@@ -810,6 +839,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if manage_settings
       tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if self.grants_right?(user, nil, :manage_site_settings)
       tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if self.grants_right?(user, nil, :manage_jobs)
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if self.grants_right?(user, nil, :manage_site_settings)
     else
       tabs = []
       tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, nil, :read_course_list)

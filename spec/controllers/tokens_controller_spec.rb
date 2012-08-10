@@ -27,7 +27,7 @@ describe TokensController do
     end
     
     it "should allow creating an access token" do
-      user
+      user(:active_user => true)
       user_session(@user)
       post 'create', :access_token => {:purpose => "test", :expires_at => "jun 1 2011"}
       response.should be_success
@@ -38,7 +38,7 @@ describe TokensController do
     end
     
     it "should not allow explicitly setting the token value" do
-      user
+      user(:active_user => true)
       user_session(@user)
       post 'create', :access_token => {:purpose => "test", :expires_at => "jun 1 2011", :token => "mytoken"}
       response.should be_success
@@ -57,7 +57,7 @@ describe TokensController do
     end
     
     it "should allow deleting an access token" do
-      user
+      user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.create!
       token.user_id.should == @user.id
@@ -68,7 +68,7 @@ describe TokensController do
     
     it "should not allow deleting someone else's access token" do
       rescue_action_in_public!
-      user
+      user(:active_user => true)
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!
@@ -83,7 +83,7 @@ describe TokensController do
     end
     
     it "should allow retrieving an access token, but not give the full token string" do
-      user
+      user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
@@ -98,7 +98,7 @@ describe TokensController do
     end
     
     it "should not include token for protected tokens" do
-      user
+      user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.create!
       token.user_id.should == @user.id
@@ -111,7 +111,7 @@ describe TokensController do
     
     it "should not allow retrieving someone else's access token" do
       rescue_action_in_public!
-      user
+      user(:active_user => true)
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!
@@ -121,7 +121,7 @@ describe TokensController do
     end
     
     it "should allow updating a token" do
-      user
+      user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
@@ -136,7 +136,7 @@ describe TokensController do
     end
     
     it "should allow regenerating an unprotected token" do
-      user
+      user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
@@ -151,7 +151,7 @@ describe TokensController do
     end
     
     it "should not allow regenerating a protected token" do
-      user
+      user(:active_user => true)
       user_session(@user)
       token = @user.access_tokens.new
       token.save!
@@ -166,7 +166,7 @@ describe TokensController do
     
     it "should not allow updating someone else's token" do
       rescue_action_in_public!
-      user
+      user(:active_user => true)
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!

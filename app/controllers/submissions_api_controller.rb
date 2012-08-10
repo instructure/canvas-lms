@@ -181,7 +181,7 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  # @API Grade a submission
+  # @API Grade or comment on a submission
   #
   # Comment on and/or update the grading for a student's assignment submission.
   # If any submission or rubric_assessment arguments are provided, the user
@@ -191,6 +191,13 @@ class SubmissionsApiController < ApplicationController
   # @argument comment[text_comment] Add a textual comment to the submission.
   #
   # @argument comment[group_comment] [Boolean] Whether or not this comment should be sent to the entire group (defaults to false). Ignored if this is not a group assignment or if no text_comment is provided.
+  #
+  # @argument comment[media_comment_id] Add an audio/video comment to the submission.
+  #   Media comments can be added via this API, however, note that there
+  #   is not yet an API to generate or list existing media comments, so this
+  #   functionality is currently of limited use.
+  #
+  # @argument comment[media_comment_type] ["audio"|"video"] The type of media comment being added.
   #
   # @argument submission[posted_grade] Assign a score to the submission,
   #   updating both the "score" and "grade" fields on the submission record.
@@ -278,11 +285,6 @@ class SubmissionsApiController < ApplicationController
       if comment.is_a?(Hash)
         comment = {
           :comment => comment[:text_comment], :author => @current_user }.merge(
-          # Undocumented API feature: adding media comments given the kaltura
-          # media id. Eventually we'll expose a public API for media comments,
-          # but we need to implement a way to abstract it away from kaltura and
-          # make it generic. This will probably involve a proxy outside of
-          # rails.
           comment.slice(:media_comment_id, :media_comment_type, :group_comment)
         ).with_indifferent_access
         @assignment.update_submission(@submission.user, comment)

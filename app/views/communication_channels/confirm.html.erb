@@ -6,19 +6,18 @@
   content_for :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
 %>
 
-<div id="modal-box-top"></div>
-<div id="modal-box-arbitrary-size" class="modal-box-more-padding">
-  <h2><%= t 'titles.welcome_aboard', "Welcome aboard!" %></h2>
+<div id="modal-box">
+  <h2><%= t 'titles.welcome_aboard', "Welcome Aboard!" %></h2>
   <% if @current_user && @current_user != @user && @user.registered? && @enrollment %>
-    <p class="modal-box-content"><%= mt 'details.wrong_account', "The invitation for %{course} was sent to **%{invited_user}**, but you are currently logged in as **%{current_user}**", :course => @course.name, :invited_user => @user.name, :current_user => @current_user.name %></p>
+    <p><%= mt 'details.wrong_account', "The invitation for %{course} was sent to **%{invited_user}**, but you are currently logged in as **%{current_user}**", :course => @course.name, :invited_user => @user.name, :current_user => @current_user.name %></p>
     <div class="button_box">
       <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="button" id='transfer'><%=  t 'buttons.transfer_enrollment', "Transfer Enrollment" %></a>
-      <a href="<%= login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id) %>" class="button" id="login"><%=  t 'buttons.login_as', "Login as %{invited_user}", :invited_user => @user.name %></a>
+      <a href="<%= login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id) %>" class="button" id="login"><%=  t 'buttons.login_as', "Log in as %{invited_user}", :invited_user => @user.name %></a>
     </div>
   <% elsif !@merge_opportunities.empty? %>
     <div class="disambiguation_box" <%= hidden(true) if params[:register] %>>
       <% if @merge_opportunities.length == 1 && (@user.registered? || !@current_user || @current_user.communication_channels.active.email.by_path(@communication_channel.path).first) %>
-        <div class="modal-box-content">
+        <div>
           <% if !@enrollment && @user.registered? %>
             <%= mt 'details.merge_one', "Would you like to combine the user accounts **%{current_user}** and **%{other_user}**?", :current_user => friendly_name(@user, @merge_opportunities), :other_user => friendly_name(@merge_opportunities.first.last.find { |p| p.account == @root_account } || @merge_opportunities.first.last.first, @merge_opportunities) %>
           <% else %>
@@ -29,66 +28,60 @@
         </div>
         <div class="button_box">
           <% if @pseudonym %><a href="#" class="button" id="register"><%= t 'buttons.no', 'No' %></a><% end %>
-          <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="button not_external button-default" id="merge"><%= @user.registered? ? t('buttons.merge', "Combine") : t('buttons.yes', "Yes") %></a>
+          <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="button not_external btn-primary" id="merge"><%= @user.registered? ? t('buttons.merge', "Combine") : t('buttons.yes', "Yes") %></a>
         </div>
         <% if !@current_user && @merge_opportunities.first.last.length > 1 %>
           </div><!-- Close #disambiguation_box -->
           <div id="where_to_log_in" style="display:none;">
-            <div class="modal-box-content">
-              <p><strong><%=  t 'details.choose_login', "Select where you would like to log in at." %></strong></p>
-              <ul>
-                <% @merge_opportunities.first.last.each_with_index do |pseudonym, i| %>
-                  <li><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonym) %>"<%= ' checked="checked"' if i == 0 %>>&nbsp;<%= pseudonym.account.name %> (<%= pseudonym.unique_id %>)</li>
-                <% end %>
-              </ul>
-            </div>
+            <p><strong><%=  t 'details.choose_login', "Select where you would like to log in at." %></strong></p>
+            <ul>
+              <% @merge_opportunities.first.last.each_with_index do |pseudonym, i| %>
+                <li><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonym) %>"<%= ' checked="checked"' if i == 0 %>>&nbsp;<%= pseudonym.account.name %> (<%= pseudonym.unique_id %>)</li>
+              <% end %>
+            </ul>
             <div class="button_box">
               <a href="#" class="button" id="back"><%= t 'buttons.back', "Back" %></a>
-              <a href="#" class="button button-default" id="merge_if_clicked"><%= t 'buttons.continue', 'Continue' %></a>
+              <a href="#" class="button btn-primary" id="merge_if_clicked"><%= t 'buttons.continue', 'Continue' %></a>
             </div>
           <!-- Purposely not closing div because it is closed below -->
         <% end %>
       <% elsif @merge_opportunities.length == 1 && @current_user %>
-        <div class="modal-box-content">
-          <p><% if @enrollment %>
-            <%= mt 'details.logged_in_other_user_course', "The invitation for %{course} was sent to **%{email}**, but you are currently logged in as **%{user}**.", :course => @course.name, :email => @communication_channel.path, :user => (@current_pseudonym && @current_pseudonym.user == @current_user ? @current_pseudonym : @current_user.pseudonym).unique_id %>
-          <% else %>
-            <%= mt 'details.logged_in_other_user', "**%{email}** is a new account, but you are currently logged in as **%{user}**.", :email => @communication_channel.path, :user => (@current_pseudonym && @current_pseudonym.user == @current_user ? @current_pseudonym : @current_user.pseudonym).unique_id %>
-          <% end %></p>
-          <p><strong><%=  t 'details.add_email', "Would you like to add this email address to your current account?" %></strong></p>
-        </div>
+        <p><% if @enrollment %>
+          <%= mt 'details.logged_in_other_user_course', "The invitation for %{course} was sent to **%{email}**, but you are currently logged in as **%{user}**.", :course => @course.name, :email => @communication_channel.path, :user => (@current_pseudonym && @current_pseudonym.user == @current_user ? @current_pseudonym : @current_user.pseudonym).unique_id %>
+        <% else %>
+          <%= mt 'details.logged_in_other_user', "**%{email}** is a new account, but you are currently logged in as **%{user}**.", :email => @communication_channel.path, :user => (@current_pseudonym && @current_pseudonym.user == @current_user ? @current_pseudonym : @current_user.pseudonym).unique_id %>
+        <% end %></p>
+        <p><strong><%=  t 'details.add_email', "Would you like to add this email address to your current account?" %></strong></p>
         <div class="button_box">
           <a href="#" class="button" id="register"><%= t 'buttons.new_account', 'No' %></a>
-          <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1) %>" class="button button-default" id='merge'><%=  t 'buttons.add_email_address', "Yes, Add Email Address" %></a>
+          <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1) %>" class="button btn-primary" id='merge'><%=  t 'buttons.add_email_address', "Yes, Add Email Address" %></a>
         </div>
       <% else %>
-        <div class="modal-box-content">
-          <% if !@enrollment && @user.registered? %>
-            <%= mt 'details.merge_multiple', "Select the account you would like to combine with **%{current_user}**.", :current_user => friendly_name(@user, @merge_opportunities) %>
-          <% else %>
-            <%= mt 'details.multiple_accounts_course', "There are already %{count} accounts associated with this email address.
+        <% if !@enrollment && @user.registered? %>
+          <%= mt 'details.merge_multiple', "Select the account you would like to combine with **%{current_user}**.", :current_user => friendly_name(@user, @merge_opportunities) %>
+        <% else %>
+          <%= mt 'details.multiple_accounts_course', "There are already %{count} accounts associated with this email address.
 
 Which is you?", :count => @merge_opportunities.length %>
+        <% end %>
+        <ul>
+          <% @merge_opportunities.each_with_index do |(user, pseudonyms), i| %>
+            <% if pseudonyms.length == 1 || user == @current_user %>
+              <li><span class="radio_spacer"><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonyms.first) %>"<%= ' checked="checked"' if i == 0 %> /></span><%= friendly_name(pseudonyms.first, @merge_opportunities) %></li>
+            <% else %>
+              <li><span class="radio_spacer"></span><%= user.name %>
+                <ul>
+                  <% pseudonyms.each_with_index do |pseudonym, j| %>
+                    <li><span class="radio_spacer"><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonym) %>"<%= ' checked="checked"' if i == 0 && j == 0 %> /></span><%= pseudonym.account.name %> (<%= pseudonym.unique_id %>)</li>
+                  <% end %>
+                </ul>
+              </li>
+            <% end %>
           <% end %>
-          <ul>
-            <% @merge_opportunities.each_with_index do |(user, pseudonyms), i| %>
-              <% if pseudonyms.length == 1 || user == @current_user %>
-                <li><span class="radio_spacer"><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonyms.first) %>"<%= ' checked="checked"' if i == 0 %> /></span><%= friendly_name(pseudonyms.first, @merge_opportunities) %></li>
-              <% else %>
-                <li><span class="radio_spacer"></span><%= user.name %>
-                  <ul>
-                    <% pseudonyms.each_with_index do |pseudonym, j| %>
-                      <li><span class="radio_spacer"><input type="radio" name="pseudonym_select" value="<%= merge_or_login_link(pseudonym) %>"<%= ' checked="checked"' if i == 0 && j == 0 %> /></span><%= pseudonym.account.name %> (<%= pseudonym.unique_id %>)</li>
-                    <% end %>
-                  </ul>
-                </li>
-              <% end %>
-            <% end %>
-            <% if @pseudonym %>
-              <li><span class="radio_spacer"><input type="radio" name="pseudonym_select" value="new_user_account" /></span><%= t 'details.none_of_these', "None of these, I'm a new user" %></li>
-            <% end %>
-          </ul>
-        </div>
+          <% if @pseudonym %>
+            <li><span class="radio_spacer"><input type="radio" name="pseudonym_select" value="new_user_account" /></span><%= t 'details.none_of_these', "None of these, I'm a new user" %></li>
+          <% end %>
+        </ul>
         <div class="button_box">
           <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="button not_external" id="merge"><%= t 'buttons.continue', "Continue" %></a>
         </div>
@@ -96,76 +89,64 @@ Which is you?", :count => @merge_opportunities.length %>
     </div>
   <% elsif @enrollment && @pseudonym %>
     <div class="disambiguation_box"<%= ' style="display: none;"'.html_safe if params[:register] %>>
-      <p class="modal-box-content"><%= mt 'details.account_needed', "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account.", :course => @course.name %></p>
+      <p><%= mt 'details.account_needed', "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account.", :course => @course.name %></p>
       <div class="button_box">
-        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="button"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
+        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="button not_external"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
         <a href="#" class="button" id="register"><%= t 'buttons.create_account', 'Create My Account' %></a>
       </div>
     </div>
   <% end %>
 
   <% if @pseudonym %>
-    <% form_for :pseudonym, :url => registration_confirmation_url(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid)), :html => {:id => "registration_confirmation_form", :style => ((!@merge_opportunities.empty? || @enrollment) && !params[:register]) ? hidden : '' } do |form| %>
-      <p><%= if @enrollment
-          mt 'details.register_with_course', "In order to finish signing you up for the course **%{course}**, we'll need a few more pieces of information.", :course => @course.name
+    <% form_for :pseudonym, :url => registration_confirmation_url(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid)), :html => {:id => "registration_confirmation_form", :class => 'form-horizontal bootstrap-form', :style => ((!@merge_opportunities.empty? || @enrollment) && !params[:register]) ? hidden : '' } do |form| %>
+      <p class="instructions"><%= if @enrollment
+          mt 'details.register_with_course', "In order to finish signing you up for the course **%{course}**, we'll need a little more information.", :course => @course.name
         else
-          t 'details.register', "In order to finish signing you up, we'll need a few more pieces of information."
+          t 'details.register', "In order to set up your account, we'll need a little more information."
         end %></p>
       <%= (error_messages_for :object => [@user, @pseudonym], :header_message => nil).gsub("Unique", "Login") %>
       <input type="hidden" name="register" value="1"/>
-      <table class="formtable">
-        <tr>
-          <td><%= form.blabel :unique_id, :en => "Email Address" %></td>
-          <td>
+      <div class="control-group">
+        <%= form.blabel :unique_id, :en => "Login", :class => 'control-label' %>
+        <div class="controls" style="padding-top: 5px">
+          <% if @pseudonym.unique_id.blank? || @pseudonym.errors && @pseudonym.errors[:unique_id] %>
             <%= form.text_field :unique_id %>
-            <div style="font-size: 0.8em;"><%= t 'tips.login', "This is the email address you will use to login." %></div>
-          </td>
-        </tr>
-        <tr>
-          <td><%= blabel :user, :name, :en => "Full Name" %></td>
-          <td>
-            <%= text_field :user, :name, :value => @user.name %>
-            <div style="font-size: 0.8em;"><%= t 'tips.name', "Teachers will use this name for grading." %></div>
-          </td>
-        </tr><tr>
-          <td><%= blabel :user, :short_name, :en => "Display Name" %></td>
-          <td>
-            <%= text_field :user, :short_name, :value => @user.short_name %>
-            <div style="font-size: 0.8em;"><%= t 'tips.short_name', "People will see this name in discussions, messages and comments." %></div>
-          </td>
-        </tr><tr>
-          <td><%= blabel :user, :sortable_name, :en => "Sortable Name" %></td>
-          <td>
-            <%= text_field :user, :sortable_name, :value => @user.sortable_name %>
-            <div style="font-size: 0.8em;"><%= t 'tips.sortable_name', "This name appears in sorted lists." %></div>
-          </td>
-        </tr><tr>
-          <td><%= blabel :user, :time_zone, :en => "Time Zone" %></td>
-          <td><%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, :default => ((@pseudonym.account.default_time_zone) || "Mountain Time (US & Canada)"), :value => @user.time_zone %></td>
-        </tr><tr>
-          <td><%= form.blabel :password, :en => "Password" %></td>
-          <td><%= form.password_field :password, :value => '' %></td>
-        </tr><tr>
-          <td><%= form.blabel :password_confirmation, :en => "Confirm Password"%></td>
-          <td><%= form.password_field :password_confirmation, :value => '' %></td>
-        </tr>
-        <% if @pseudonym.account == Account.default %>
-          <tr>
-            <td colspan="2">
-              <%= check_box :user, :subscribe_to_emails, :checked => true %>
-              <%= label :user, :subscribe_to_emails, :en => "I want to receive information, news and tips from Instructure" %>
-            </td>
-          </tr>
-        <% end %>
-      </table>
-      <div class='button_box'>
-        <% unless @merge_opportunities.empty? %>
-          <a href="#" class="button" id="back"><%= t 'buttons.back', "Back" %></a>
-        <% end %>
-        <button type="submit" class="button button-default"><%= t 'buttons.register', "Register" %></button>
+          <% else %>
+            <%= @pseudonym.unique_id %>
+          <% end %>
+        </div>
+      </div>
+      <div class="control-group">
+        <%= form.blabel :password, :en => "Password", :class => 'control-label' %>
+        <div class="controls">
+          <%= form.password_field :password, :value => '' %>
+        </div>
+      </div>
+      <div class="control-group">
+        <%= blabel :user, :time_zone, :en => "Time Zone", :class => 'control-label' %>
+        <div class="controls">
+          <%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, {:default => ((@pseudonym.account.default_time_zone) || "Mountain Time (US & Canada)"), :value => @user.time_zone} %>
+        </div>
+      </div>
+      <% if @pseudonym.account == Account.default %>
+      <div class="control-group">
+        <div class="controls">
+          <label for="user_subscribe_to_emails">
+            <%= check_box :user, :subscribe_to_emails, :checked => true %>
+            <%= t "labels.subscribe_to_emails", "I want to receive information, news and tips from Instructure" %>
+          </label>
+        </div>
+      </div>
+      <% end %>
+      <div class="control-group">
+        <div class="controls">
+          <% unless @merge_opportunities.empty? %>
+            <a href="#" class="button" id="back"><%= t 'buttons.back', "Back" %></a>
+          <% end %>
+          <button type="submit" class="button btn-primary btn-large"><%= t 'buttons.register', "Register" %></button>
+        </div>
       </div>
     <% end %>
   <% end %>
 
 </div>
-<div id="modal-box-bottom"></div>

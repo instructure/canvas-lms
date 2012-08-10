@@ -170,7 +170,7 @@ class QuizzesController < ApplicationController
     submission_ids = {}
     @submissions.each{|s| submission_ids[s.user_id] = s.id }
     submission_users = @submissions.map{|s| s.user_id}
-    students = @context.students.find(:all, :order => User.sortable_name_order_by_clause).to_a
+    students = @context.students.order_by_sortable_name.to_a
     @submitted_students = students.select{|stu| submission_ids[stu.id] }
     if @quiz.survey? && @quiz.anonymous_submissions
       @submitted_students = @submitted_students.sort_by{|stu| submission_ids[stu.id] }

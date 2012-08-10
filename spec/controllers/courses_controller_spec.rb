@@ -472,6 +472,17 @@ describe CoursesController do
       xhr :get, 'show', :id => @course.id
       response.status.should == '200 OK'
     end
+
+    it "should redirect to the xlisted course" do
+      course_with_student_logged_in(:active_all => true)
+      @course1 = @course
+      @course2 = course(:active_all => true)
+      @course1.default_section.crosslist_to_course(@course2, :run_jobs_immediately => true)
+
+      get 'show', :id => @course1.id
+      response.should be_redirect
+      response.location.should match(%r{/courses/#{@course2.id}})
+    end
   end
   
   describe "POST 'unenroll'" do
@@ -609,7 +620,7 @@ describe CoursesController do
       user
       user_session(@user, @pseudonym)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
       response.should redirect_to(course_url(@course))
       flash[:notice].should_not be_empty
       @user.enrollments.length.should == 1
@@ -644,7 +655,7 @@ describe CoursesController do
       @new_pseudonym = Pseudonym.new(:account => @account2, :unique_id => 'jt@instructure.com', :user => @user)
       User.any_instance.stubs(:find_or_initialize_pseudonym_for_account).with(@account2).once.returns(@new_pseudonym)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
       response.should redirect_to(course_url(@course))
       flash[:notice].should_not be_empty
       @user.enrollments.length.should == 1
@@ -671,7 +682,7 @@ describe CoursesController do
       user
       user_session(@user)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code.dup
       response.should redirect_to(course_url(@course))
       @user.enrollments.length.should == 0
     end
@@ -681,7 +692,7 @@ describe CoursesController do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
       response.should redirect_to(login_url)
     end
 
@@ -689,7 +700,7 @@ describe CoursesController do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
       response.should be_success
       response.should render_template('open_enrollment')
     end
@@ -698,7 +709,7 @@ describe CoursesController do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
 
-      post 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code, :email => 'bracken@instructure.com'
+      post 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup, :email => 'bracken@instructure.com'
       response.should be_success
       response.should render_template('open_enrollment_confirmed')
       @course.student_enrollments.length.should == 1
@@ -885,6 +896,23 @@ describe CoursesController do
       feed.should_not be_nil
       feed.entries.should_not be_empty
       feed.entries.all?{|e| e.authors.present?}.should be_true
+    end
+  end
+
+  describe "POST 'reset_content'" do
+    it "should allow teachers to reset" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'reset_content', :course_id => @course.id
+      response.should be_redirect
+      @course.reload.should be_deleted
+    end
+
+    it "should not allow TAs to reset" do
+      course_with_ta(:active_all => true)
+      user_session(@user)
+      post 'reset_content', :course_id => @course.id
+      response.status.to_i.should == 401
+      @course.reload.should be_available
     end
   end
 end

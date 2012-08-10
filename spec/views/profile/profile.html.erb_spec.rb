@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/profile/profile" do
   it "should render" do
-    course_with_student
+    course_with_student(:active_user => true)
     view_context
 
     assigns[:user] = @user
@@ -38,7 +38,7 @@ describe "/profile/profile" do
   end
 
   it "should not show the delete link for SIS pseudonyms" do
-    course_with_student
+    course_with_student(:active_user => true)
     view_context
 
     assigns[:user] = @user

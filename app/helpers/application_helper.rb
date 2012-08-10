@@ -648,9 +648,33 @@ module ApplicationHelper
     end
   end
 
+  def account_context(context)
+    if context.is_a?(Account)
+      context
+    elsif context.is_a?(Course) || context.is_a?(CourseSection)
+      account_context(context.account)
+    elsif context.is_a?(Group)
+      account_context(context.context)
+    end
+  end
+
+  def get_include_accounts
+    return @include_accounts if @include_accounts.present?
+    @include_accounts = [Account.site_admin, @domain_root_account]
+    if @domain_root_account.try(:sub_account_includes?)
+      # get the deepest account to start looking for branding
+      common_chain = account_context(@context).try(:account_chain).try(:reverse)
+      common_chain ||= @current_user.common_account_chain(@domain_root_account) if @current_user.present?
+      @include_accounts.concat(common_chain) if common_chain.present?
+    end
+    @include_accounts.uniq!
+    @include_accounts.compact!
+    @include_accounts
+  end
+
   def include_account_js
-    includes = [Account.site_admin, @domain_root_account].uniq.inject([]) do |js_includes, account|
-      if account && account.settings[:global_includes] && account.settings[:global_javascript].present?
+    includes = get_include_accounts.inject([]) do |js_includes, account|
+      if account && account.allow_global_includes? && account.settings[:global_javascript].present?
         js_includes << "'#{account.settings[:global_javascript]}'"
       end
       js_includes
@@ -676,6 +700,16 @@ module ApplicationHelper
     end
   end
 
+  def include_account_css
+    includes = get_include_accounts.inject([]) do |css_includes, account|
+      if account && account.allow_global_includes? && account.settings[:global_stylesheet].present?
+        css_includes << account.settings[:global_stylesheet]
+      end
+      css_includes
+    end
+    includes << { :media => 'all' }
+    stylesheet_link_tag *includes
+  end
 
   # this should be the same as friendlyDatetime in handlebars_helpers.coffee
   def friendly_datetime(datetime, opts={})

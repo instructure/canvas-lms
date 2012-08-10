@@ -4,7 +4,7 @@ describe "course settings" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
-    course_with_teacher_logged_in
+    course_with_teacher_logged_in :limit_privileges_to_course_section => false
   end
 
   describe "course details" do
@@ -136,13 +136,36 @@ describe "course settings" do
   end
 
   describe "course users" do
+    def select_from_auto_complete(text, input_id)
+      fj(".token_input input:visible").send_keys(text)
+      keep_trying_until do
+        driver.execute_script("return $('##{input_id}').data('token_input').selector.lastSearch") == text
+      end
+      elements = driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
+        [e, (e.find_element(:tag_name, :b).text rescue e.text)]
+      }
+      element = elements.detect { |e| e.last == text } or raise "menu item does not exist"
+
+      element.first.click
+    end
+
+    def go_to_users_tab
+      get "/courses/#{@course.id}/settings#tab-users"
+      wait_for_ajaximations
+    end
+
+    def open_kyle_menu(user)
+      cog = f("#user_#{user.id} .admin-links")
+      f('button', cog).click
+      cog
+    end
 
     it "should add a user to a section" do
       user = user_with_pseudonym(:active_user => true, :username => 'user@example.com', :name => 'user@example.com')
       section_name = 'Add User Section'
       add_section(section_name)
-      get "/courses/#{@course.id}/settings#tab-users"
 
+      get "/courses/#{@course.id}/settings#tab-users"
       add_button = driver.find_element(:css, '.add_users_link')
       keep_trying_until { add_button.should be_displayed }
       add_button.click
@@ -159,157 +182,133 @@ describe "course settings" do
       new_section.find_element(:css, '.users_count').should include_text("1")
     end
 
-    it "should remove a user from a section" do
+    it "should remove a user from the course" do
       username = "user@example.com"
       student_in_course(:name => username)
-      @enrollment.course_section = @course_section; @enrollment.save
+      add_section('Section1')
+      @enrollment.course_section = @course_section; @enrollment.save!
 
-      get "/courses/#{@course.id}/settings#tab-users"
-      driver.execute_script("$('#enrollment_#{@enrollment.id} .unenroll_user_link').click()")
+      go_to_users_tab
+      f('#tab-users').should include_text(username)
+
+      cog = open_kyle_menu(@student)
+      f('a[data-event="removeFromCourse"]', cog).click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      driver.find_element(:id, 'tab-users').should_not include_text(username)
+      f('#tab-users').should_not include_text(username)
     end
 
-    it "should move a user to a new section" do
-      section_name = 'Move to Course Section'
+    it "should add a user to another section" do
+      section_name = 'Another Section'
       add_section(section_name)
       student_in_course
-      @enrollment.course_section = @course_section; @enrollment.save
-
-      get "/courses/#{@course.id}/settings#tab-users"
-      driver.execute_script("$('#enrollment_#{@enrollment.id} .edit_section_link').click()")
-      click_option("#enrollment_#{@enrollment.id} .course_section_id", section_name)
+      # open tab
+      go_to_users_tab
+      f("#user_#{@student.id} .section").should_not include_text(section_name)
+      # open dialog
+      cog = open_kyle_menu(@student)
+      f('a[data-event="editSections"]', cog).click
       wait_for_ajaximations
-      driver.find_element(:css, "#enrollment_#{@enrollment.id} .section").should include_text(section_name)
+      # choose section
+      select_from_auto_complete(section_name, 'section_input')
+      f('.ui-dialog-buttonpane .btn-primary').click
+      wait_for_ajaximations
+      # expect
+      f("#user_#{@student.id} .sections").should include_text(section_name)
+      ff("#user_#{@student.id} .section").length.should == 2
     end
 
     it "should view the users enrollment details" do
       username = "user@example.com"
+      # add_section 'foo'
       student_in_course(:name => username, :active_all => true)
-      @enrollment.course_section = @course_section; @enrollment.save
 
-      get "/courses/#{@course.id}/settings#tab-users"
-      driver.execute_script("$('#enrollment_#{@enrollment.id} .user_information_link').click()")
-      enrollment_dialog = driver.find_element(:id, 'enrollment_dialog')
-      enrollment_dialog.should be_displayed
-      enrollment_dialog.should include_text(username + ' has already received and accepted the invitation')
+      go_to_users_tab
+      # open dialog
+      open_kyle_menu(@student)
+      # when
+      link = driver.find_element(:link, 'User Details')
+      href = link['href']
+      link.click
+      wait_for_ajax_requests
+      # expect
+      driver.current_url.should include(href)
     end
 
-    def link_to_student(link, student)
-      assoc_links = link.find_elements(:css, ".associated_user_link")
-      if assoc_links[0].displayed? then
-        assoc_links[0].click
-      else
-        assoc_links[1].click
-      end
-      wait_for_ajax_requests
-      click_option("#student_enrollment_link_option", student.try(:name) || "[ No Link ]")
-      submit_form("#link_student_dialog_form")
-      wait_for_ajax_requests
+    def use_link_dialog(observer)
+      cog = open_kyle_menu(observer)
+      f('a[data-event="linkToStudents"]', cog).click
+      wait_for_ajaximations
+      yield
+      f('.ui-dialog-buttonpane .btn-primary').click
+      wait_for_ajaximations
     end
 
     it "should deal with observers linked to multiple students" do
-      @students = []
-      @obs = user_model(:name => "The Observer")
+      students = []
+      obs = user_model(:name => "The Observer")
       2.times do |i|
         student_in_course(:name => "Student #{i}")
-        @students << @student
-        e = @course.observer_enrollments.create!(:user => @obs, :workflow_state => 'active')
+        students << @student
+        e = @course.observer_enrollments.create!(:user => obs, :workflow_state => 'active')
         e.associated_user_id = @student.id
         e.save!
       end
+      student_in_course(:name => "Student 3")
+      students << @student
 
-      2.times do |i|
-        student_in_course(:name => "Student #{i+2}")
-        @students << @student
+      go_to_users_tab
+
+      observeds = ff("#user_#{obs.id} .enrollment_type")
+      observeds.length.should == 2
+      observeds_txt = observeds.map(&:text).join(',')
+      observeds_txt.should include_text students[0].name
+      observeds_txt.should include_text students[1].name
+      # remove an observer
+      use_link_dialog(obs) do
+        fj("#link_students input:visible").send_keys(:backspace)
       end
+      # expect
+      obs.reload.not_ended_enrollments.count.should == 1
+      # add an observer
+      use_link_dialog(obs) do
+        select_from_auto_complete(students[2].name, 'student_input')
+      end
+      # expect
+      obs.reload.not_ended_enrollments.count.should == 2
+      obs.reload.not_ended_enrollments.map {|e| e.associated_user_id}.sort.should include(students[2].id)
+    end
 
-      get "/courses/#{@course.id}/settings#tab-users"
+    it "should handle deleted observees" do
+      students = []
+      obs = user_model(:name => "The Observer")
+      student_in_course(:name => "Student 1", :active_all => true)
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      student_in_course(:name => "Student 2", :active_all => true)
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :allow_multiple_enrollments => true)
 
-      links = driver.find_elements(:css, ".user_#{@obs.id} .enrollment_link")
-      links.length.should == 2
-      links[0].find_element(:css, ".associated_user_name").should include_text @students[0].name
-      links[1].find_element(:css, ".associated_user_name").should include_text @students[1].name
+      # bye bye Student 2
+      @enrollment.destroy
 
-      link_to_student(links[0], @students[2])
-      links[0].find_element(:css, ".associated_user_name").should include_text @students[2].name
-      links[1].find_element(:css, ".associated_user_name").should include_text @students[1].name
+      go_to_users_tab
 
-      link_to_student(links[1], @students[3])
-      links[0].find_element(:css, ".associated_user_name").should include_text @students[2].name
-      links[1].find_element(:css, ".associated_user_name").should include_text @students[3].name
+      observeds = ff("#user_#{obs.id} .enrollment_type")
+      observeds.length.should == 1
+      observeds.first.text.should include "Student 1"
+      observeds.first.text.should_not include "Student 2"
 
-      @obs.reload
-      @obs.enrollments.map { |e| e.associated_user_id }.sort.should == [@students[2].id, @students[3].id]
-
-      link_to_student(links[0], nil)
-      link_to_student(links[1], nil)
-      links[0].find_element(:css, ".unassociated").should include_text "link to"
-      links[1].find_element(:css, ".unassociated").should include_text "link to"
-
-      link_to_student(links[0], @students[0])
-      link_to_student(links[1], @students[1])
-      links[0].find_element(:css, ".associated_user_name").should include_text @students[0].name
-      links[1].find_element(:css, ".associated_user_name").should include_text @students[1].name
-
-      @obs.reload
-      @obs.enrollments.map { |e| e.associated_user_id }.sort.should == [@students[0].id, @students[1].id]
+      # dialog loads too
+      use_link_dialog(obs) do
+        input = fj("#link_students")
+        input.text.should include "Student 1"
+        input.text.should_not include "Student 2"
+      end
     end
 
     it "should not show the student view student" do
       @fake_student = @course.student_view_student
-      get "/courses/#{@course.id}/settings#tab-users"
-      ff(".student_enrollments .user_#{@fake_student.id}").should be_empty
-    end
-  end
-
-  context "course users multiple enrollments" do
-    before (:each) do
-      @username = "multiple@example.com"
-      add_section("Section 1")
-      @old_section = @course_section
-      student_in_course(:name => @username)
-      @enrollment.course_section = @course_section; @enrollment.save
-      add_section("Section 2")
-      multiple_student_enrollment(@user, @course_section)
-    end
-
-    it "should coalesce multiple enrollments under a single student" do
-      get "/courses/#{@course.id}/settings#tab-users"
-
-      driver.find_elements(:css, ".user_#{@user.id} .section").length.should == 2
-      driver.find_elements(:css, ".user_#{@user.id} .links .unenroll_user_link").length.should == 0
-    end
-
-    it "should show individual course section remove icons" do
-      get "/courses/#{@course.id}/settings#tab-users"
-
-      driver.execute_script("$('.user_#{@user.id} .edit_section_link').click()")
-      find_all_with_jquery(".user_#{@user.id} .sections .unenroll_user_link:visible").length.should == 2
-    end
-
-    it "should only remove a user from a single section" do
-      get "/courses/#{@course.id}/settings#tab-users"
-
-      driver.execute_script("$('.user_#{@user.id} .section_#{@course_section.id} .unenroll_user_link').click()")
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
-      driver.find_element(:id, 'tab-users').should include_text(@username)
-      driver.find_element(:css, ".user_#{@user.id}").should include_text(@old_section.name)
-    end
-
-    it "should change the correct section when editing" do
-      add_section("Section 3")
-
-      get "/courses/#{@course.id}/settings#tab-users"
-
-      driver.execute_script("$('.user_#{@user.id} .edit_section_link').click()")
-      click_option(".user_#{@user.id} .section_#{@old_section.id} .course_section_id", @course_section.name)
-      wait_for_ajaximations
-
-      driver.find_element(:css, ".user_#{@user.id}").should_not include_text(@old_section.name)
-      driver.find_element(:css, ".user_#{@user.id}").should include_text(@course_section.name)
+      go_to_users_tab
+      ff(".student_enrollments #user_#{@fake_student.id}").should be_empty
     end
   end
 

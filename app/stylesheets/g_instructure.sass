@@ -15,40 +15,97 @@
   :height 300px
   :overflow auto
 
+#fixed_bottom, #flash_message_holder
+  position: fixed
+  z-index: 100000
+  left: 0
+  width: 100%
+
 #flash_message_holder
-  :position fixed
-  :top -5px
-  :z-index 9999
-  width: 100%
+  top: 0
+  list-style: none
+  margin: 0
+  padding: 0
   height: 0
-  a
-    :color #ddd
-#flash_message_wrapper
-  width: 350px
-  max-height: 200px
-  margin: auto
+  li, .ui-effects-wrapper
+    margin: 0 auto !important
+  li
+    box-shadow: 0 1px 1px rgba(0,0,0,0.25)
+    border-bottom-color: rgba(0,0,0,0.5)
+    padding: 4px 40px 4px 8px
+    min-height: 20px
+    vertical-align: middle
+    text-align: center
+    font-weight: bold
+    position: relative
+    z-index: 2
+    width: 400px
+    &.static_message
+      width: auto
+    a.close_link
+      position: absolute
+      right: 10px
+      top: 50%
+      margin-top: -8px
+    i
+      display: inline-block
+      vertical-align: middle
+      margin-right: 0
+      width: 20px
+      height: 20px
+      background-image: url(/images/check_16.png)
+      background-repeat: no-repeat
+    &.ui-state-error, &.ui-state-warning
+      i
+        background-image: url(/images/warning_16.png)
+    &.no_close
+      a.close_link
+        display: none
+    &.xlarge
+      font-size: 1.5em
+      padding: 8px 40px 8px 8px
+      min-height: 42px
+      i
+        width: 40px
+        height: 40px
+        background-image: url(/images/check_36.png)
+      &.ui-state-error, &.ui-state-warning
+        i
+          background-image: url(/images/warning_36.png)
 
-body.no-headers #flash_message_wrapper
-  width: 100%
-
-#flash_notice_message, #flash_error_message
-  :text-align center
-  :background-color #308b4f
-  :color #fff
-  :font-weight bold
-  :overflow auto
-  :padding 6px 30px 4px 15px
-  :cursor pointer
-  box-shadow: 3px 3px 6px rgba(0,0,0,0.5)
-  position: relative
-  a.close-link
-    position: absolute
-    right: 4px
-    top: 8px
-
-#flash_error_message
-  :background-color #b4302d
-
+#unauthorized_message
+  border: 1px solid #000
+  margin: 4em auto
+  width: 500px
+  .ui-state-error, &.ui-state-error
+    position: relative
+    z-index: 1
+    border-style: solid
+    border-width: 1px
+    border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.3) rgba(0,0,0,0.5)
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 3px 3px -1px rgba(0,0,0,0.25)
+    &:before
+      content: " "
+      background: transparent url(/images/warning_36.png) 0 4px no-repeat
+      position: absolute
+      top: 6px
+      left: 22px
+      width: 42px
+      height: 42px
+  h2
+    font-size: 1.5em
+    &.ui-state-error
+      padding: 15px
+      margin: -1px
+      color: #fff
+      height: 60px
+      line-height: 60px
+      padding: 0 0 0 80px
+  p
+    font-size: 1.1em
+    padding: 2em 3em
+    font-weight: bold
+    margin: 0
 
 .user_content,.mceContentBody
   position: relative
@@ -324,38 +381,43 @@ table.formtable td
   vertical-align: top
   padding: 2px 3px
 
-
-.courses,
-.groups,
-.accounts
+.courses, .groups, .accounts
   .name
     font-size: 1.1em
     font-weight: bold
-  .unpublished .name a
-    :color #888
-  .details
-    margin-left: 10px
-    font-size: 0.8em
-    color: #888
-  .info
-    :font-size 0.8em
-    :clear left
-    :visibility hidden
-    :margin-bottom 5px
-    :margin-left 10px
-    &.info_hover
-      :visibility visible
-      .links
-        :color #ccc
-        a
-          :color #666
-    .links
-      :color #eee
-      a
-        :color #bbb
 
-    a
-      :color #888
+  .unpublished .name a
+    color: #888
+
+  .details
+    color: #888
+    font-size: 0.8em
+    margin: 0 0 0 10px
+
+  .info
+    clear: left
+    font-size: 0.8em
+    margin: 0 0 5px 10px
+    visibility: hidden
+
+    .links
+      color: #eee
+      a
+        color: #bbb
+
+.touch .course,
+.touch .group,
+.touch .account,
+.course:hover,
+.group:hover,
+.account:hover
+  .course, .group, .account
+    .info
+      visibility: visible
+      .links
+        color: #ccc
+        a
+          color: #666
 
 span.hint
   :color #666
@@ -1135,6 +1197,7 @@ html > body .new_activity_message form textarea
 #user_list_boxes
   position: relative
   height: 152px
+  margin-top: 10px
   #user_list_textarea_container, #user_list_processing, #user_list_parsed
     height: 152px
     width: 100%
@@ -1148,15 +1211,34 @@ html > body .new_activity_message form textarea
     overflow: auto
     height: 126px
     .ui-widget
-      margin: 2px
+      margin: 0 8px 8px 0
     .person
-      float: left
-      margin: 2px
+      display: inline-block
+      position: relative
+      background: #FFF
+      margin: 0 8px 8px 0
+      padding: 4px
       font-size: 11px
-      height: 33px
-      padding: 0 4px
+      min-height: 21px
+      -webkit-box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
+      -moz-box-shadow:    inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
+      box-shadow:         inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
+      div
+        margin: 2px 0 0 33px
+      .name::after
+        content: "\a0"
       .address, .login
         font-weight: normal
+      &::before
+        content: ""
+        display: block
+        height: 100%
+        background: url(/images/circle-plus.png) no-repeat center center
+        position: absolute
+        margin: -4px
+        width: 33px
+      &.existing-user::before
+        background-image: url(/images/circle-check.png)
 
 body > #ui-datepicker-div
   display: none
@@ -1417,6 +1499,9 @@ form.user_content_post_form
   -moz-user-select: none
   cursor: pointer
 
+.equation_image
+  vertical-align: middle
+
 .dashboard-toggle
   display: block
   padding: 10px 0 0
@@ -1427,12 +1512,7 @@ form.user_content_post_form
   padding-bottom: 60px
 
 #fixed_bottom
-  position: fixed
-  z-index: 100000
   bottom: 0
-  top: auto
-  left: 0
-  width: 100%
   i
     vertical-align: middle
     margin-right: 10px

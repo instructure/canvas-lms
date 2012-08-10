@@ -53,6 +53,25 @@ describe ConferencesController do
       get 'index', :group_id => @group.id
       response.should be_success
     end
+    
+    it "should not include the student view student" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course(:active_user => true)
+      @student_view_student = @course.student_view_student
+      get 'index', :course_id => @course.id
+      assigns[:users].include?(@student).should be_true
+      assigns[:users].include?(@student_view_student).should be_false
+    end
+
+    it "should not allow the student view student to access collaborations" do
+      course_with_teacher_logged_in(:active_user => true)
+      @course.should_not be_available
+      @fake_student = @course.student_view_student
+      session[:become_user_id] = @fake_student.id
+      
+      get 'index', :course_id => @course.id
+      assert_unauthorized
+    end
   end
 
   describe "POST 'create'" do

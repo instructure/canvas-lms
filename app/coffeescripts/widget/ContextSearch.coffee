@@ -25,16 +25,10 @@ define [
 
   class ContextSearch extends TokenInput
 
-    i18n:
-      placeholderText: I18n.t('context_search_placeholder', 'Enter a name, course, or group')
-      noResultsText: I18n.t('no_results', 'No results found')
-      everyoneText: I18n.t('enrollments_everyone', 'Everyone')
-      selectAllText: I18n.t('select_all', 'Select All')
-
     defaults: ->
-      placeholder: @i18n.placeholderText
+      placeholder: I18n.t('context_search_placeholder', 'Enter a name, course, or group')
       selector:
-        messages: {noResults: @i18n.noResultsText}
+        messages: {noResults: I18n.t('no_results', 'No results found')}
         limiter: (o) => 5
         populator: @populator()
         preparer: @preparer
@@ -101,7 +95,7 @@ define [
           # i.e. we are listing synthetic contexts under a course or section
           data.unshift
             id: "#{context}_all"
-            name: @i18n.everyoneText
+            name: I18n.t('enrollments_everyone', 'Everyone')
             user_count: parent.data('user_data').user_count
             type: 'context'
             avatar_url: parent.data('user_data').avatar_url
@@ -110,7 +104,7 @@ define [
           # i.e. we are listing all users in a group or synthetic context
           data.unshift
             id: context
-            name: @i18n.selectAllText
+            name: I18n.t('select_all', 'Select All')
             user_count: parent.data('user_data').user_count
             type: 'context'
             avatar_url: parent.data('user_data').avatar_url
@@ -154,8 +148,6 @@ define [
 
   $.fn.contextSearch = (options) ->
     @each ->
-      $el = $ this
-      $el.data 'contextSearch', new ContextSearch($(this), $.extend(true, {}, options))
+      new ContextSearch $(this), $.extend(true, {}, options)
 
   ContextSearch
-

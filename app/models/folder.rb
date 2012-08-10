@@ -224,7 +224,7 @@ class Folder < ActiveRecord::Base
           if item.is_a?(Attachment)
             file = item.clone_for(context)
             file.folder_id = dup.id
-            file.save!
+            file.save_without_broadcasting!
           elsif item.is_a?(Folder)
             sub = item.clone_for(context, nil, options)
             sub.parent_folder_id = dup.id

@@ -26,7 +26,7 @@ define([
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
-  'jquery.rails_flash_notifications' /* flashError */,
+  'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'link_enrollment' /* link_enrollment */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish/ */,
@@ -116,7 +116,6 @@ define([
         $course_form = $("#course_form"),
         $hashtag_form = $(".hashtag_form"),
         $course_hashtag = $("#course_hashtag"),
-        $enroll_users_form = $("#enroll_users_form"),
         $enrollment_dialog = $("#enrollment_dialog");
 
     $("#course_details_tabs").tabs({cookie: {}}).show();
@@ -363,14 +362,6 @@ define([
     .find(":text:not(.date_entry)").keycodes('esc', function() {
       $course_form.find(".cancel_button:first").click();
     });
-    $enroll_users_form.hide();
-    $(".add_users_link").click(function(event) {
-      $(this).hide();
-      event.preventDefault();
-      $enroll_users_form.show();
-      $("html,body").scrollTo($enroll_users_form);
-      $enroll_users_form.find("textarea").focus().select();
-    });
     $(".associated_user_link").click(function(event) {
       event.preventDefault();
       var $user = $(this).parents(".user");
@@ -401,69 +392,8 @@ define([
       event.preventDefault();
       $(".course_form_more_options").slideToggle();
     });
-    $(".user_list").delegate('.user', 'mouseover', function(event) {
-      var $this = $(this),
-          title = $this.attr('title'),
-          pending_message = I18n.t('details.re_send_invitation', "This user has not yet accepted their invitation.  Click to re-send invitation.");
-
-      if(title != pending_message) {
-        $this.data('real_title', title);
-      }
-      if($this.hasClass('pending')) {
-        $this.attr('title', pending_message).css('cursor', 'pointer');
-      } else {
-        $this.attr('title', $(this).data('real_title') || I18n.t('defaults.user_name', "User")).css('cursor', '');
-      }
-    });
-    $enrollment_dialog.find(".cancel_button").click(function() {
+   $enrollment_dialog.find(".cancel_button").click(function() {
       $enrollment_dialog.dialog('close');
-    });
-
-    $(".user_list").delegate('.user_information_link', 'click', function(event) {
-      var $this = $(this),
-          $user = $this.closest('.user'),
-          pending = $user.hasClass('pending'),
-          data = $user.getTemplateData({textValues: ['name', 'invitation_sent_at']}),
-          admin = $user.parents(".teacher_enrollments,.ta_enrollments").length > 0;
-
-      data.re_send_invitation_link = I18n.t('links.re_send_invitation', "Re-Send Invitation");
-      $enrollment_dialog
-        .data('user', $user)
-        .find(".re_send_invitation_link")
-          .attr('href', $user.find(".re_send_confirmation_url").attr('href')).end()
-        .find(".student_enrollment_re_send").showIf(pending && !admin).end()
-        .find(".admin_enrollment_re_send").showIf(pending && admin).end()
-        .find(".accepted_enrollment_re_send").showIf(!pending).end()
-        .find(".invitation_sent_at").showIf(pending).end()
-        .fillTemplateData({data: data})
-        .dialog('close')
-        .dialog({ autoOpen: false, title: I18n.t('titles.enrollment_details', "Enrollment Details") })
-        .dialog('open');
-      return false;
-    });
-    $('.user_list .edit_section_link').click(function(event) {
-      event.preventDefault();
-      var $this = $(this);
-      var $user = $this.parents('.user');
-      var $sections = $user.find('.sections');
-      $sections.find('.section_name').toggle();
-      $sections.find('.enrollment_course_section_form').toggle();
-    });
-    $('.user_list .enrollment_course_section_form .course_section_id').change(function (event) {
-      var $this = $(this);
-      var $sections = $this.parents('.sections');
-      var $form = $this.parent('form');
-      var $section_name = $form.prev('.section_name');
-      $.ajaxJSON($form.attr('action'), 'POST', $form.getFormData(), function(data) {
-        $section_name.html($this.find('option[value="' + $this.val() + '"]').html());
-        $sections.find('.section_name').toggle();
-        $sections.find('.enrollment_course_section_form').toggle();
-      }, function(data) {
-        if (data && data.enrollment) {
-          $this.val(data.enrollment.course_section_id);
-        }
-        $.flashError(I18n.t('errors.move_user', "Something went wrong moving the user to the new section. Please try again later."));
-      });
     });
 
     $enrollment_dialog.find(".re_send_invitation_link").click(function(event) {

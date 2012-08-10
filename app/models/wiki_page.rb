@@ -337,7 +337,7 @@ class WikiPage < ActiveRecord::Base
   end
   
   def user_name
-    (user && user.name) || t('anonymous_user_name', "Anonymous")
+    (user && user.name) || t('unknown_user_name', "Unknown")
   end
   
   def to_param

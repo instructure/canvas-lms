@@ -1,0 +1,7 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files
+<% end %>
+
+<% define_content :subject do %>
+  <%= data.count %> New Files Added to <%= asset.context.name %>
+<% end %>

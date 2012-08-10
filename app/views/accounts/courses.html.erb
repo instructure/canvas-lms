@@ -13,19 +13,3 @@
   <%= render :partial => "course", :collection => @courses %>
   <%= render :partial => "course", :object => nil %>
 </ul>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */
-], function($) {
-  $(document).ready(function() {
-    $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
-      $(this).find(".info").addClass('info_hover');
-    });
-    $(".courses .course,.groups .group").bind('blur mouseout', function(event) {
-      $(this).find(".info").removeClass('info_hover');
-    });
-  });
-});
-</script>
-<% end %>

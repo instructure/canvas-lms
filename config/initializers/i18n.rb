@@ -29,7 +29,7 @@ module I18nUtilities
       text = "labels.#{text}" unless text.to_s =~ /\A#/
       text = t(text, options.delete(:en))
     end
-    text = before_label(text) if options[:before]
+    text = before_label(text) if options.delete(:before)
     return text, options
   end
 end

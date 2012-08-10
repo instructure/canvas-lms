@@ -109,7 +109,7 @@
                           <div class="user_content">
                             <%= user_content(response[:text]) %>
                           </div>
-                          <% if @quiz.graded? %>
+                          <% if @quiz.graded? && !@quiz.anonymous_submissions? %>
                             <div class="user_name" style="text-align: right; font-style: italic;">
                               <%= context_user_name(@context, response[:user_id]) %>
                             </div>

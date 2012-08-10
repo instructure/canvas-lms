@@ -53,6 +53,8 @@ describe Course do
       course.grants_right?(user, nil, :manage).should be_true
     end
 
+    # we have to reload the users after each course change here to catch the
+    # enrollment changes that are applied directly to the db with update_all
     it "should grant delete to the proper individuals" do
       account_admin_user_with_role_changes(:membership_type => 'managecourses', :role_changes => {:manage_courses => true})
       @admin1 = @admin
@@ -61,26 +63,100 @@ describe Course do
       course_with_teacher(:active_all => true)
       @designer = user(:active_all => true)
       @course.enroll_designer(@designer).accept!
+      @ta = user(:active_all => true)
+      @course.enroll_ta(@ta).accept!
 
+      # active, non-sis course
       @course.grants_right?(@teacher, nil, :delete).should be_true
       @course.grants_right?(@designer, nil, :delete).should be_true
+      @course.grants_right?(@ta, nil, :delete).should be_false
       @course.grants_right?(@admin1, nil, :delete).should be_true
       @course.grants_right?(@admin2, nil, :delete).should be_false
 
-      @course.complete!
-
-      @course.grants_right?(@teacher, nil, :delete).should be_true
-      @course.grants_right?(@designer, nil, :delete).should be_true
-      @course.grants_right?(@admin1, nil, :delete).should be_true
-      @course.grants_right?(@admin2, nil, :delete).should be_false
-
+      # active, sis course
       @course.sis_source_id = 'sis_id'
       @course.save!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
       @course.grants_right?(@teacher, nil, :delete).should be_false
       @course.grants_right?(@designer, nil, :delete).should be_false
+      @course.grants_right?(@ta, nil, :delete).should be_false
       @course.grants_right?(@admin1, nil, :delete).should be_true
       @course.grants_right?(@admin2, nil, :delete).should be_true
+
+      # completed, non-sis course
+      @course.sis_source_id = nil
+      @course.complete!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      @course.grants_right?(@teacher, nil, :delete).should be_true
+      @course.grants_right?(@designer, nil, :delete).should be_true
+      @course.grants_right?(@ta, nil, :delete).should be_false
+      @course.grants_right?(@admin1, nil, :delete).should be_true
+      @course.grants_right?(@admin2, nil, :delete).should be_false
+
+      # completed, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      @course.grants_right?(@teacher, nil, :delete).should be_false
+      @course.grants_right?(@designer, nil, :delete).should be_false
+      @course.grants_right?(@ta, nil, :delete).should be_false
+      @course.grants_right?(@admin1, nil, :delete).should be_true
+      @course.grants_right?(@admin2, nil, :delete).should be_true
+    end
+
+    it "should grant reset_content to the proper individuals" do
+      account_admin_user_with_role_changes(:membership_type => 'managecourses', :role_changes => {:manage_courses => true})
+      @admin1 = @admin
+      account_admin_user_with_role_changes(:membership_type => 'managesis', :role_changes => {:manage_sis => true})
+      @admin2 = @admin
+      course_with_teacher(:active_all => true)
+      @designer = user(:active_all => true)
+      @course.enroll_designer(@designer).accept!
+      @ta = user(:active_all => true)
+      @course.enroll_ta(@ta).accept!
+
+      # active, non-sis course
+      @course.grants_right?(@teacher, nil, :reset_content).should be_true
+      @course.grants_right?(@designer, nil, :reset_content).should be_true
+      @course.grants_right?(@ta, nil, :reset_content).should be_false
+      @course.grants_right?(@admin1, nil, :reset_content).should be_true
+      @course.grants_right?(@admin2, nil, :reset_content).should be_false
+
+      # active, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      @course.grants_right?(@teacher, nil, :reset_content).should be_true
+      @course.grants_right?(@designer, nil, :reset_content).should be_true
+      @course.grants_right?(@ta, nil, :reset_content).should be_false
+      @course.grants_right?(@admin1, nil, :reset_content).should be_true
+      @course.grants_right?(@admin2, nil, :reset_content).should be_false
+
+      # completed, non-sis course
+      @course.sis_source_id = nil
+      @course.complete!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      @course.grants_right?(@teacher, nil, :reset_content).should be_false
+      @course.grants_right?(@designer, nil, :reset_content).should be_false
+      @course.grants_right?(@ta, nil, :reset_content).should be_false
+      @course.grants_right?(@admin1, nil, :reset_content).should be_true
+      @course.grants_right?(@admin2, nil, :reset_content).should be_false
+
+      # completed, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      @course.grants_right?(@teacher, nil, :reset_content).should be_false
+      @course.grants_right?(@designer, nil, :reset_content).should be_false
+      @course.grants_right?(@ta, nil, :reset_content).should be_false
+      @course.grants_right?(@admin1, nil, :reset_content).should be_true
+      @course.grants_right?(@admin2, nil, :reset_content).should be_false
     end
 
     def make_date_completed
@@ -2479,6 +2555,11 @@ describe Course, "section_visibility" do
 
     it "should return user's sections if a student" do
       @course.sections_visible_to(@student1).should eql [@course.default_section]
+    end
+
+    it "should return users from all sections" do
+      @course.users_visible_to(@teacher).sort_by(&:id).should eql [@teacher, @ta, @student1, @student2, @observer]
+      @course.users_visible_to(@ta).sort_by(&:id).should      eql [@teacher, @ta, @student1, @observer]
     end
   end
 

@@ -599,34 +599,6 @@ describe CoursesController, :type => :integration do
     end
   end
 
-  it "should return the list of sections for the course" do
-    user1 = @user
-    user2 = User.create!(:name => 'Zombo')
-    section1 = @course2.default_section
-    section2 = @course2.course_sections.create!(:name => 'Section B')
-    section2.update_attribute :sis_source_id, 'sis-section'
-    @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
-    RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
-
-    @user = @me
-    json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
-                    { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
-    json.size.should == 2
-    json.find { |s| s['name'] == section2.name }['sis_section_id'].should == 'sis-section'
-    json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => USER_API_FIELDS)
-    json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => USER_API_FIELDS)
-  end
-
-  it "should not return deleted sections" do
-    section1 = @course2.default_section
-    section2 = @course2.course_sections.create!(:name => 'Section B')
-    section2.destroy
-    section2.save!
-    json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
-                    { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
-    json.size.should == 1
-  end
-
   it "should allow sis id in hex packed format" do
     sis_id = 'This.Sis/Id\\Has Nasty?Chars'
     # sis_id.unpack('H*').first
@@ -702,6 +674,11 @@ describe CoursesController, :type => :integration do
 
   context "course files" do
     it_should_behave_like "file uploads api with folders"
+    it_should_behave_like "file uploads api with quotas"
+    
+    before :each do
+      @context = @course
+    end
 
     def preflight(preflight_params)
       @user = @teacher
@@ -710,6 +687,10 @@ describe CoursesController, :type => :integration do
         preflight_params)
     end
 
+    def has_query_exemption?
+      false
+    end
+      
     def context
       @course
     end

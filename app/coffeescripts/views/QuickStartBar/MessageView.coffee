@@ -3,7 +3,7 @@ define [
   'compiled/views/QuickStartBar/BaseItemView'
   'compiled/models/Message'
   'jst/quickStartBar/message'
-  'jquery.rails_flash_notifications'
+  'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
 ], (I18n, BaseItemView, Message, template) ->
 

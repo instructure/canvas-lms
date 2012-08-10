@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations group" do
@@ -19,8 +18,8 @@ describe "conversations group" do
     @group.users << s1
 
     new_conversation
-    @input = find_with_jquery("#create_message_form input:visible")
-    @checkbox = driver.find_element(:id, "group_conversation")
+    @input = fj("#create_message_form input:visible")
+    @checkbox = f("#group_conversation")
   end
 
   def choose_recipient(*names)
@@ -30,7 +29,7 @@ describe "conversations group" do
     @input.send_keys(name)
     wait_for_ajaximations(150)
     loop do
-      keep_trying_until { find_all_with_jquery('.autocomplete_menu:visible .list').size == level }
+      keep_trying_until { ffj('.autocomplete_menu:visible .list').size == level }
       driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").detect { |e|
         (e.find_element(:tag_name, :b).text rescue e.text) == name
       }.click
@@ -41,7 +40,7 @@ describe "conversations group" do
       level += 1
       name = names.shift
     end
-    keep_trying_until { find_with_jquery('.autocomplete_menu:visible').nil? }
+    keep_trying_until { fj('.autocomplete_menu:visible').nil? }
   end
 
   it "should not be an option with no recipients" do

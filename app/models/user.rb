@@ -23,6 +23,23 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
+  module SortableNameExtension
+    # only works with scopes i.e. named_scopes and scoped()
+    def find(*args)
+      options = args.last.is_a?(::Hash) ? args.last : {}
+      scope = scope(:find)
+      select = if options[:select]
+                 options[:select]
+               elsif scope[:select]
+                 scope[:select]
+               else
+                 "#{proxy_scope.quoted_table_name}.*"
+               end
+      options[:select] = select + ', ' + User.sortable_name_order_by_clause
+      super args.first, options
+    end
+  end
+
   include Context
   include UserFollow::FollowedItem
 
@@ -36,25 +53,48 @@ class User < ActiveRecord::Base
   # Internal: SQL fragments used to return enrollments in their respective workflow
   # states. Where needed, these consider the state of the course to ensure that
   # students do not see their enrollments on unpublished courses.
-  ENROLLMENT_CONDITIONS = {
-    :active => "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment'))) or (enrollments.workflow_state = 'active' and courses.workflow_state = 'available')) )",
-    :invited => "( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')))))",
-    :deleted => "enrollments.workflow_state = 'deleted'",
-    :rejected => "enrollments.workflow_state = 'rejected'",
-    :completed => "enrollments.workflow_state = 'completed'",
-    :creation_pending => "enrollments.workflow_state = 'creation_pending'",
-    :inactive => "enrollments.workflow_state = 'inactive'" }
+  # 
+  # strict_course_state can be used to bypass the course state checks. This is
+  # useful in places like the course settings UI, where we use these conditions
+  # to search users in the course (rather than as an association on a
+  # particular user)
+  def self.enrollment_conditions(state, strict_course_state = true)
+    #strict_course_state = true
+    case state
+      when :active
+        if strict_course_state
+          "( enrollments.workflow_state = 'active' and ((courses.workflow_state = 'claimed' and enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')) or (courses.workflow_state = 'available')) )"
+        else
+          "( enrollments.workflow_state = 'active' and courses.workflow_state != 'deleted' )"
+        end
+      when :invited
+        if strict_course_state
+          "( enrollments.workflow_state = 'invited' and ((courses.workflow_state = 'available' and (enrollments.type = 'StudentEnrollment' or enrollments.type = 'ObserverEnrollment')) or (courses.workflow_state != 'deleted' and (enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')))))"
+        else
+          "( enrollments.workflow_state IN ('invited', 'creation_pending') and courses.workflow_state != 'deleted' )"
+        end
+      when :deleted;          "enrollments.workflow_state = 'deleted'"
+      when :rejected;         "enrollments.workflow_state = 'rejected'"
+      when :completed;        "enrollments.workflow_state = 'completed'"
+      when :creation_pending; "enrollments.workflow_state = 'creation_pending'"
+      when :inactive;         "enrollments.workflow_state = 'inactive'"
+      when :current_and_invited
+        enrollment_conditions(:active, strict_course_state) +
+        " OR " +
+        enrollment_conditions(:invited, strict_course_state)
+    end
+  end
 
-  has_many :communication_channels, :order => 'position', :dependent => :destroy
+  has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
   has_one :communication_channel, :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => ENROLLMENT_CONDITIONS[:active], :order => 'enrollments.created_at'
-  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => ENROLLMENT_CONDITIONS[:invited], :order => 'enrollments.created_at'
+  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
+  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => [ENROLLMENT_CONDITIONS[:active], ENROLLMENT_CONDITIONS[:invited]].join(' OR ')
-  has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]
-  has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => ENROLLMENT_CONDITIONS[:completed], :order => 'enrollments.created_at'
+           :conditions => enrollment_conditions(:current_and_invited)
+  has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :order => 'enrollments.created_at'
+  has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, :dependent => :delete_all
@@ -66,7 +106,7 @@ class User < ActiveRecord::Base
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
-           :conditions => [ENROLLMENT_CONDITIONS[:active], ENROLLMENT_CONDITIONS[:completed]].join(' OR '), :order => 'enrollments.created_at'
+           :conditions => [enrollment_conditions(:active), enrollment_conditions(:completed)].join(' OR '), :order => 'enrollments.created_at'
   has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments, :uniq => true
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
@@ -141,6 +181,9 @@ class User < ActiveRecord::Base
   has_many :collections, :as => :context
   has_many :collection_items, :through => :collections
 
+  has_one :profile, :class_name => 'UserProfile'
+  alias :orig_profile :profile
+
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
 
@@ -185,7 +228,7 @@ class User < ActiveRecord::Base
   named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
 
   def self.order_by_sortable_name
-    scoped(:order => sortable_name_order_by_clause)
+    scoped(:order => sortable_name_order_by_clause, :extend => SortableNameExtension)
   end
 
   named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at|
@@ -1581,6 +1624,41 @@ class User < ActiveRecord::Base
   end
   memoize :account
 
+
+  # this finds the reverse account chain starting at in_root_account and ending
+  # at the lowest account such that all of the accounts to which the user is
+  # associated which descend from in_root_account, descend from one of the
+  # accounts in the chain.  In other words, if the users associated accounts
+  # made a tree, it would be the chain between the root and the first branching
+  # point.
+  #
+  # NOTE: this is currently used for computing sub-account branding, and as
+  # such we can afford rudimentary caching. More precise caching may be
+  # necessary for future uses.
+  def common_account_chain(in_root_account)
+    Rails.cache.fetch([self.id, 'common_account_chain', in_root_account.id].cache_key, :expires_in => 15.minutes) do
+      rid = in_root_account.id
+      accts = self.associated_accounts.scoped(:conditions => ["accounts.id = ? OR accounts.root_account_id = ?", rid, rid])
+      return nil if accts.blank?
+      children = accts.inject({}) do |hash,acct| 
+        pid = acct.parent_account_id
+        if pid.present?
+          hash[pid] ||= []
+          hash[pid] << acct
+        end
+        hash
+      end
+
+      longest_chain = [in_root_account]
+      while true
+        next_children = children[longest_chain.last.id]
+        break unless next_children.present? && next_children.count == 1
+        longest_chain << next_children.first
+      end
+      longest_chain
+    end
+  end
+
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
     res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
       courses = send(association).distinct_on(["courses.id"],
@@ -1961,13 +2039,14 @@ class User < ActiveRecord::Base
     "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{messageable_user_clause})"
   end
 
-  def messageable_enrollment_clause(include_concluded_students=false)
+  def messageable_enrollment_clause(options={})
+    options = {:strict_course_state => true}.merge(options)
     <<-SQL
     (
-      #{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
+      #{self.class.enrollment_conditions(:current_and_invited, options[:strict_course_state])}
       OR
-      #{self.class.reflections[:concluded_enrollments].options[:conditions]}
-      #{include_concluded_students ? "" : "AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')"}
+      #{self.class.enrollment_conditions(:completed, options[:strict_course_state])}
+      #{options[:include_concluded_students] ? "" : "AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')"}
     )
     SQL
   end
@@ -2058,7 +2137,7 @@ class User < ActiveRecord::Base
           elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
             section_id_hash[group.id] = sections
             user_counts[group.id] = group.context.enrollments.scoped(:conditions => [
-              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND #{messageable_enrollment_clause(true)}",
+              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND #{messageable_enrollment_clause(:include_concluded_students => true)}",
               group.group_memberships.map(&:user_id),
               sections
             ]).size
@@ -2081,11 +2160,18 @@ class User < ActiveRecord::Base
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
 
+    # provides a mechanism for admins to search within a context, even if not
+    # enrolled in it
+    admin_context = options[:admin_context]
+
     course_hash = enrollment_visibility
+    course_hash[:full_course_ids] << admin_context.id if admin_context.is_a?(Course)
+    course_hash[:full_course_ids] << admin_context.course_id if admin_context.is_a?(CourseSection)
     full_course_ids = course_hash[:full_course_ids]
     restricted_course_hash = course_hash[:restricted_course_hash]
 
     group_hash = group_membership_visibility
+    group_hash[:full_group_ids] << admin_context.id if admin_context.is_a?(Group)
     full_group_ids = group_hash[:full_group_ids]
     group_section_ids = []
     student_in_course_ids = course_hash[:student_in_course_ids]
@@ -2136,7 +2222,11 @@ class User < ActiveRecord::Base
     end
 
     user_conditions = []
-    user_conditions << messageable_user_clause unless options[:skip_visibility_checks] && options[:ids]
+    if options[:skip_visibility_checks]
+      user_conditions << "users.workflow_state != 'deleted'" if options[:ids].blank?
+    else
+      user_conditions << messageable_user_clause
+    end
     user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
     user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
@@ -2162,7 +2252,7 @@ class User < ActiveRecord::Base
       FROM users, enrollments, courses
       WHERE course_id IN (#{all_course_ids.join(', ')})
         AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
-        AND #{messageable_enrollment_clause(include_concluded_students)}
+        AND #{messageable_enrollment_clause(:include_concluded_students => include_concluded_students, :strict_course_state => !options[:skip_visibility_checks])}
         #{enrollment_type_sql}
         #{user_condition_sql}
       GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
@@ -2183,7 +2273,7 @@ class User < ActiveRecord::Base
       FROM enrollments, courses
       WHERE
         user_id = users.id AND courses.id = course_id
-        AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]})
+        AND (#{self.class.enrollment_conditions(:current_and_invited)})
       ORDER BY #{Enrollment.type_rank_sql}
       LIMIT 1
     SQL
@@ -2432,5 +2522,9 @@ class User < ActiveRecord::Base
 
   def default_collection_name
     t :default_collection_name, "%{user_name}'s Collection", :user_name => self.short_name
+  end
+
+  def profile(force_reload = false)
+    orig_profile(force_reload) || build_profile
   end
 end

@@ -1,0 +1,32 @@
+<form action='/api/v1/developer_keys{{#if id}}/{{id}}{{/if}}' method='{{#if id}}PUT{{else}}POST{{/if}}' class="key_form">
+<table class='formtable'>
+    <tr>
+        <td><label for='key_name'>{{#t "key_name"}}Key Name:{{/t}}</label></td>
+        <td><input type='text' id='key_name' name='developer_key[name]' value='{{ name }}'/>
+    </tr>
+    <tr>
+        <td><label for='email'>{{#t "owner_email"}}Owner Email:{{/t}}</label></td>
+        <td><input type='text' id='email' name='developer_key[email]' value='{{ email }}'/>
+    </tr>
+    <tr>
+        <td><label for='tool_id'>{{#t "tool_id"}}Tool ID:{{/t}}</label></td>
+        <td><input type='text' id='tool_id' name='developer_key[tool_id]' value='{{ tool_id }}'/>
+    </tr>
+    <tr>
+        <td><label for='redirect_uri'>{{#t "redirect_uri"}}Redirect URI:{{/t}}</label></td>
+        <td><input type='text' id='redirect_uri' name='developer_key[redirect_uri]' value='{{ redirect_uri }}'/>
+    </tr>
+    <tr>
+        <td><label for='icon_url'>{{#t "icon_url"}}Icon URL:{{/t}}</label></td>
+        <td><input type='text' id='icon_url' name='developer_key[icon_url]' value='{{ icon_url }}'/>
+    </tr>
+    <tr>
+        <td colspan='2'>
+            <div class='button-container'>
+                <button type='submit' class='button submit'>{{#t "save_key"}}Save Key{{/t}}</button>
+                <button type='button' class='button button-secondary cancel'>{{#t "cancel"}}Cancel{{/t}}</button>
+            </div>
+        </td>
+    </tr>
+</table>
+</form>

@@ -1,3 +1,5 @@
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+
 shared_examples_for "manage groups selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 

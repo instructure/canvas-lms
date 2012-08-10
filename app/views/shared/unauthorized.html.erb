@@ -6,17 +6,12 @@
   <% end %>
 
 <% end %>
-<% content_for :stylesheets do %>
-<style>
-#unauthorized_holder #modal-box {
-  margin-top: 10px;
-}
-</style>
-<% end %>
 <% @show_left_side = false %>
+<% needs_login = (!@current_user && !@files_domain) %>
+<div id="unauthorized_holder">
 <% if (@unauthorized_user && @current_user && @current_user != @unauthorized_user) || @unauthorized_user || @unauthorized_message || @context || @needs_cookies %>
-  <div class="ui-state-error" style="margin:30px auto 0; padding: 1em; width: 640px;" >
-    <h2 style="text-align:center;">
+  <div id="unauthorized_message" class="<%= 'ui-state-error' if needs_login %>">
+    <h2 class="<%= 'ui-state-error' unless needs_login %>">
       <% if @needs_cookies -%>
         <%= t('headings.needs_cookies', %{Cookies Required}) %>
       <% elsif !@files_domain && (!@current_user || @unauthorized_user) -%>
@@ -41,7 +36,7 @@
     <% elsif @files_domain %>
       <p><%= t('needs_login', %{Access to this page is limited to authorized users.  You do not have currently have permission to view this page.}) %></p>
     <% elsif !@current_user %>
-      <p><%= t('unauthorized_action', %{Access to this page is limited to authorized users.  You will need to log in before you can view the content on this page.}) %></p>
+      <p><%= t('unauthorized_action', %{You need to log in before you can view this page.}) %></p>
     <% elsif @context %>
       <p>
         <% if @context.try_rescue(:is_public) %>
@@ -55,8 +50,7 @@
     <% end %>
   </div>
 <% end %>
-<% if !@current_user && !@files_domain %>
-  <div id="unauthorized_holder">
-  <%= render :partial => "shared/login" %>
-  </div>
+<% if needs_login %>
+  <%= render :partial => "shared/login", :locals => {:hide_fft => true} %>
 <% end %>
+</div>

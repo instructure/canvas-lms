@@ -3,11 +3,13 @@
 <% end %>
 
 <% content_for :right_side do %>
+  <% if @current_user.registered? %>
   <%= render :partial => "ways_to_contact" %>
   <div class="rs-margin-lr">
     <hr />
     <a href="#" class="edit_profile_link button button-sidebar-wide"><%= image_tag "edit.png" %> <%= t('links.edit_profile', "Edit Profile") %></a>
   </div>
+  <% end %>
 <% end %>
 
 <% js_bundle :profile %>
@@ -47,7 +49,7 @@
     <td><%= f.blabel :birthdate, :en => "Birth Date" %></td>
     <td>
       <span class="birthdate display_data"><%= @user.birthdate ? date_string(@user.birthdate) : "-" %></span>
-      <%= f.date_select :birthdate, {:start_year => Time.now.year - 1, :end_year => Time.now.year - 125, :include_blank => true}, :class => 'edit_data' %>
+      <%= f.date_select :birthdate, {:start_year => Time.now.year - 1, :end_year => Time.now.year - 125, :include_blank => @user.birthdate.nil?}, :class => 'edit_data' %>
     </td>
   </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
@@ -133,6 +135,7 @@
   </tr>
 </table>
 <% end %>
+<% if @current_user.registered? %>
 <div style="<%= hidden unless @pseudonyms.length > 1 %> margin-bottom: 20px;">
 <h2><%= t('headers.ways_to_log_in', "Ways to Log In") %></h2>
 <table class="summary pseudonym_list">
@@ -540,3 +543,12 @@ TEXT
     <button type="button" class="button cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
   </div>
 </div>
+<% else %>
+  <p class="alert alert-info">
+    <%= t "confirm_email_instructions", <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
+      Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you.
+      If you don't see it, *re-send the email*, and make sure to check your spam box.
+    TEXT
+    %>
+  </p>
+<% end %>

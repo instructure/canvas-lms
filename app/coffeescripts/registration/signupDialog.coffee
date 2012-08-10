@@ -2,7 +2,6 @@ define [
   'underscore'
   'i18n!registration'
   'compiled/fn/preventDefault'
-  'compiled/registration/registrationSuccessDialog'
   'compiled/models/User'
   'compiled/models/Pseudonym'
   'jst/registration/teacherDialog'
@@ -12,7 +11,7 @@ define [
   'compiled/object/flatten'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], (_, I18n, preventDefault, registrationSuccessDialog, User, Pseudonym, teacherDialog, studentDialog, studentHigherEdDialog, parentDialog, flatten) ->
+], (_, I18n, preventDefault, User, Pseudonym, teacherDialog, studentDialog, studentHigherEdDialog, parentDialog, flatten) ->
 
   $nodes = {}
   templates = {teacherDialog, studentDialog, studentHigherEdDialog, parentDialog}
@@ -33,12 +32,8 @@ define [
     $form.formSubmit
       disableWhileLoading: true
       success: (data) =>
-        if data.user.user.workflow_state is 'registered'
-          # they should now be authenticated
-          window.location = "/"
-        else
-          $node.dialog('close')
-          registrationSuccessDialog(data.channel.communication_channel)
+        # they should now be authenticated (either registered or pre_registered)
+        window.location = "/?login_success=1&registration_success=1"
       formErrors: false
       error: (errors) ->
         if _.any(errors.user.birthdate ? [], (e) -> e.type is 'too_young')

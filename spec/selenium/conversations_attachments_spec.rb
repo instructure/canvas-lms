@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 shared_examples_for "conversations attachments selenium tests" do
@@ -6,39 +5,50 @@ shared_examples_for "conversations attachments selenium tests" do
   it_should_behave_like "conversations selenium tests"
 
   it "should be able to add an attachment to the message form" do
+    filename, fullpath, data = get_file("testfile1.txt")
     new_conversation
 
-    add_attachment_link = driver.find_element(:id, "action_add_attachment")
-    add_attachment_link.should_not be_nil
-    find_all_with_jquery("#attachment_list > .attachment:visible").should be_empty
-    add_attachment_link.click
-    keep_trying_until { find_all_with_jquery("#attachment_list > .attachment:visible").should be_present }
+    new_conversation
+    submit_message_form(:attachments => [fullpath])
+    @user.conversations.last.has_attachments.should be_true
+    @user.conversation_attachments_folder.attachments.count.should == 1
   end
 
   it "should be able to add multiple attachments to the message form" do
+    filename1, fullpath1, data1 = get_file("testfile1.txt")
+    filename2, fullpath2, data2 = get_file("testfile2.txt")
+    filename3, fullpath3, data3 = get_file("testfile3.txt")
     new_conversation
 
-    add_attachment_link = driver.find_element(:id, "action_add_attachment")
+    add_attachment_link = f("#action_add_attachment")
     add_attachment_link.click
     wait_for_animations
+    ffj("#create_message_form .file_input:visible")[0].send_keys(fullpath1)
     add_attachment_link.click
     wait_for_animations
+    ffj("#create_message_form .file_input:visible")[1].send_keys(fullpath2)
     add_attachment_link.click
     wait_for_animations
-    find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 3
+    ffj("#create_message_form .file_input:visible")[2].send_keys(fullpath3)
+    ffj("#attachment_list > .attachment:visible").size.should == 3
+    submit_message_form
+    @user.conversation_attachments_folder.attachments.count.should == 3
   end
 
   it "should be able to remove attachments from the message form" do
     new_conversation
 
-    add_attachment_link = driver.find_element(:id, "action_add_attachment")
+    add_attachment_link = f("#action_add_attachment")
     add_attachment_link.click
     wait_for_animations
     add_attachment_link.click
     wait_for_animations
-    find_all_with_jquery("#attachment_list > .attachment:visible .remove_link")[1].click
+    ffj("#attachment_list > .attachment:visible .remove_link")[1].click
     wait_for_animations
-    find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 1
+    ffj("#attachment_list > .attachment:visible").size.should == 1
+    ffj("#attachment_list > .attachment:visible .remove_link")[0].click
+    submit_message_form
+    @user.conversations.last.has_attachments.should be_false
   end
 
   it "should save just one attachment when sending a bulk private message" do
@@ -67,7 +77,7 @@ shared_examples_for "conversations attachments selenium tests" do
     message = submit_message_form(:attachments => [fullpath])
     message = "#message_#{message.id}"
 
-    find_all_with_jquery("#{message} .message_attachments li").size.should == 1
+    ffj("#{message} .message_attachments li").size.should == 1
   end
 
   it "should save multiple attachments" do
@@ -79,9 +89,9 @@ shared_examples_for "conversations attachments selenium tests" do
     message = submit_message_form(:attachments => [file1[1], file2[1]])
     message = "#message_#{message.id}"
 
-    find_all_with_jquery("#{message} .message_attachments li").size.should == 2
-    find_with_jquery("#{message} .message_attachments li:first a .title").text.should == file1[0]
-    find_with_jquery("#{message} .message_attachments li:last a .title").text.should == file2[0]
+    ffj("#{message} .message_attachments li").size.should == 2
+    fj("#{message} .message_attachments li:first a .title").text.should == file1[0]
+    fj("#{message} .message_attachments li:last a .title").text.should == file2[0]
   end
 
   it "should show forwarded attachments" do
@@ -130,9 +140,9 @@ describe "conversations attachments local tests" do
     message = submit_message_form(:attachments => [fullpath])
     message = "#message_#{message.id}"
 
-    find_all_with_jquery("#{message} .message_attachments li").size.should == 1
-    find_with_jquery("#{message} .message_attachments li a .title").text.should == filename
-    download_link = driver.find_element(:css, "#{message} .message_attachments li a")
+    ffj("#{message} .message_attachments li").size.should == 1
+    fj("#{message} .message_attachments li a .title").text.should == filename
+    download_link = f("#{message} .message_attachments li a")
     keep_trying_until do
       file = open(download_link.attribute('href'))
       file.read.should match data

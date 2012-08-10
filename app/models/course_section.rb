@@ -88,6 +88,9 @@ class CourseSection < ActiveRecord::Base
 
     given {|user, session| self.enrollments.find_by_user_id(user.id) && self.cached_context_grants_right?(user, session, :read_roster) }
     can :read
+
+    given {|user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
+    can :read_as_admin
   end
 
   def set_update_account_associations_if_changed

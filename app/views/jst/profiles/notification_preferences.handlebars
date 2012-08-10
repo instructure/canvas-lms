@@ -1,0 +1,35 @@
+<table class="notification-prefs-table table table-columns-striped {{#if touch}}touch{{else}}no-touch{{/if}}" cellspacing="0">
+  <caption>{{#t "captions.notification_preferences"}}List of notification events and your settings for frequency and delivery method.{{/t}}</caption>
+  <tbody>
+    {{#each eventGroups}}
+    <!-- New group -->
+    <tr class='grouping'>
+      <td><h3 class='group-name'>{{ name }}</h3></td>
+      {{#each ../channels}}
+      <th class="comm-channel">
+        <div class='channel-name'>{{ name }}</div>
+        <div class='channel-addr'>{{ address }}</div>
+      </th>
+      {{/each}}
+    </tr>
+      {{#each items}}
+    <tr>
+      <td class='comm-event'>
+        <div class='row-title-cell'>
+          <span class='category-name show-popover' title="{{description}}" data-content="{{description}}">
+            {{title}}
+          </span>
+          {{#if checkName }}
+          <div class="user-preference">
+            <input type="checkbox" id="{{ checkID }}" class='user-pref-check' name="{{ checkName }}" {{# if checkedState }}checked="checked"{{/if}} />
+            <label for="{{ checkID }}">{{ checkLabel }}</label>
+          </div>
+          {{/if}}
+        </div>
+      </td>
+      {{{ policyCells }}}
+    </tr>
+      {{/each}}
+    {{/each}}
+  </tbody>
+</table>

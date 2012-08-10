@@ -1,24 +1,27 @@
-<% content_for :page_title, t('titles.invitation', 'Invitation to %{course}', :course => @context.name) %>
-<% @show_left_side = false %>
+<%
+  jammit_css :login
+  @headers = false
+  @body_classes << "modal"
+  content_for :page_title, t('titles.invitation', 'Invitation to %{course}', :course => @context.name)
+%>
 
 <% content_for :page_header do %>
   <h1><%= t('headings.invitation', %{Course Invitation}) %></h1>
 <% end %>
 
 <div id="modal-box">
-  <div id="modal-box-inner">
-    <h2><%= t('headings.accept_invitation', %{Accept Enrollment Invitation}) %></h2>
+  <h2><%= t('headings.accept_invitation', %{Accept Enrollment Invitation}) %></h2>
+  <p>
     <%= t 'details', %{You've been invited to participate in this course, %{course}.
     To continue the enrollment process, please provide us with your current
     email address.}, :course => content_tag('b', @context.name) %>
-    <div style="margin-top: 20px;">
-      <% form_tag course_self_enrollment_path(@context, @context.self_enrollment_code) do %>
-        <label for="enrollment_email"><%= before_label('email', %{Email Address}) %></label>
-        <input type="text" name="email" id="enrollment_email"/>
-        <div class="button-container">
-          <button type="submit" class="button"><%= t('buttons.enroll', %{Enroll in Course}) %></button>
-        </div>
-      <% end %>
+  </p>
+  <% form_tag course_self_enrollment_path(@context, @context.self_enrollment_code), :class => 'bootstrap-form', :style => 'overflow:hidden' do %>
+    <div style="float:left;padding-top:8px">
+      <label for="enrollment_email" style="display:inline"><%= before_label('email', %{Email Address}) %></label>
+      <input type="text" name="email" id="enrollment_email"/>
     </div>
+    <button type="submit" class="button btn-primary"><%= t('buttons.enroll', %{Enroll in Course}) %></button>
+  <% end %>
   </div>
 </div>

@@ -110,11 +110,11 @@ group :i18n_tools do
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
-  gem 'uglifier'
 end
 
 group :redis do
-  gem 'redis-store', '1.0.0.rc1'
+  gem 'instructure-redis-store', '1.0.0.1.instructure1', :require => 'redis-store'
+  gem 'redis', '3.0.1'
 end
 
 group :embedly do

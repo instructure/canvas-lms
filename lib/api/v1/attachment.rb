@@ -68,12 +68,30 @@ module Api::V1::Attachment
       @attachment.folder = Folder.assert_path(request.params[:parent_folder_path], context)
     end
     duplicate_handling = check_duplicate_handling_option(request)
+    if opts[:check_quota]
+      get_quota
+      if request.params[:size] && @quota < @quota_used + request.params[:size].to_i
+        render(:json => { :message => 'file size exceeds quota' }, :status => :bad_request)
+        return
+      end
+    end
     duplicate_handling = nil if duplicate_handling == 'overwrite'
+    quota_exemption = opts[:check_quota] ? nil : @attachment.quota_exemption_key
     @attachment.save!
     render :json => @attachment.ajax_upload_params(@current_pseudonym,
-      api_v1_files_create_url(:on_duplicate => duplicate_handling),
-      api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => duplicate_handling),
+      api_v1_files_create_url(:on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
+      api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
       :ssl => request.ssl?).slice(:upload_url, :upload_params)
+  end
+  
+  def check_quota_after_attachment(request)
+    quota = Attachment.get_quota(@attachment.context)
+    exempt = request.params[:quota_exemption] == @attachment.quota_exemption_key
+    if !exempt && quota[:quota] < quota[:quota_used] + (@attachment.size || 0)
+      render(:json => {:message => 'file size exceeds quota limits'}, :status => :bad_request)
+      return nil
+    end
+    quota[:quota]
   end
 
   def check_duplicate_handling_option(request)
@@ -90,8 +108,8 @@ module Api::V1::Attachment
     new_atts[:display_name] = params[:name] if params.has_key?(:name)
     new_atts[:lock_at] = params[:lock_at] if params.has_key?(:lock_at)
     new_atts[:un_lock_at] = params[:un_lock_at] if params.has_key?(:unlock_lock_at)
-    new_atts[:locked] = Canvas::Plugin::value_to_boolean(params[:locked]) if params.has_key?(:locked)
-    new_atts[:hidden] = Canvas::Plugin::value_to_boolean(params[:hidden]) if params.has_key?(:hidden)
+    new_atts[:locked] = value_to_boolean(params[:locked]) if params.has_key?(:locked)
+    new_atts[:hidden] = value_to_boolean(params[:hidden]) if params.has_key?(:hidden)
     new_atts
   end
 

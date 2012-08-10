@@ -296,8 +296,8 @@ class ContextController < ApplicationController
         @students = @context.
           students_visible_to(@current_user).
           scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").
-          find(:all, :order => User.sortable_name_order_by_clause).uniq
-        @teachers = @context.instructors.find(:all, :order => User.sortable_name_order_by_clause).uniq
+          order_by_sortable_name.uniq
+        @teachers = @context.instructors.order_by_sortable_name.uniq
         user_ids = @students.map(&:id) + @teachers.map(&:id)
         if @context.visibility_limited_to_course_sections?(@current_user)
           user_ids = @students.map(&:id) + [@current_user.id]
@@ -305,10 +305,10 @@ class ContextController < ApplicationController
         @primary_users = {t('roster.students', 'Students') => @students}
         @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @teachers}
       elsif @context.is_a?(Group)
-        @users = @context.participating_users.find(:all, :order => User.sortable_name_order_by_clause).uniq
+        @users = @context.participating_users.order_by_sortable_name.uniq
         @primary_users = {t('roster.group_members', 'Group Members') => @users}
         if @context.context && @context.context.is_a?(Course)
-          @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @context.context.instructors.find(:all, :order => User.sortable_name_order_by_clause).uniq}
+          @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @context.context.instructors.order_by_sortable_name.uniq}
         end
       end
       @secondary_users ||= {}

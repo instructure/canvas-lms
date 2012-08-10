@@ -65,4 +65,27 @@ describe ActiveRecord::Base::ConnectionSpecification do
     end
     spec.config[:username].should == 'canvas'
   end
+
+  it "should be cache coherent with modifying the config" do
+    conf = {
+        :adapter => 'postgresql',
+        :database => 'master',
+        :username => '{schema}',
+        :schema_search_path => 'canvas',
+        :deploy => {
+            :username => 'deploy'
+        }
+    }
+    spec = ActiveRecord::Base::ConnectionSpecification.new(conf.dup, 'adapter')
+    spec.config[:username].should == 'canvas'
+    spec.config[:schema_search_path] = 'bob'
+    spec.config[:username].should == 'bob'
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:deploy) do
+      spec.config[:schema_search_path].should == 'bob'
+      spec.config[:username].should == 'deploy'
+    end
+
+    spec.config = conf.dup
+    spec.config[:username].should == 'canvas'
+  end
 end

@@ -66,13 +66,11 @@
               <%= label :user, :all, :'labels.all_group_members', :en => "Invite All Group Members" %>
             <% end %>
             <ul id="members_list" style="display: none;">
-              <% @users.find(:all, :order => User.sortable_name_order_by_clause).uniq.each do |user| %>
-                <% if user != @current_user %>
-                  <li class="member user_<%= user.id %>">
-                    <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
-                    <%= label :user, "#{user.id}".to_sym, user.last_name_first %>
-                  </li>
-                <% end %>
+              <% @users.each do |user| %>
+                <li class="member user_<%= user.id %>">
+                  <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
+                  <%= label :user, "#{user.id}".to_sym, user.last_name_first %>
+                </li>
               <% end %>
             </ul>
           </div>

@@ -459,7 +459,8 @@ class FilesController < ApplicationController
     elsif @asset.is_a?(Assignment) && intent == 'submit'
       permission_object = @asset
       permission = (@asset.submission_types || "").match(/online_upload/) ? :submit : :nothing
-      @context = @current_user
+      @group = @asset.group_category.group_for(@current_user) if @asset.has_group_category?
+      @context = @group || @current_user
       @check_quota = false
     elsif @context && intent == 'attach_discussion_file'
       permission_object = @context.discussion_topics.new
@@ -539,7 +540,7 @@ class FilesController < ApplicationController
     @attachment.uploaded_data = params[:file]
     if @attachment.save
       # for consistency with the s3 upload client flow, we redirect to the success url here to finish up
-      redirect_to api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => params[:on_duplicate])
+      redirect_to api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => params[:on_duplicate], :quota_exemption => params[:quota_exemption])
     else
       render(:nothing => true, :status => :bad_request)
     end
@@ -550,6 +551,7 @@ class FilesController < ApplicationController
     return render(:nothing => true, :status => :bad_request) unless @attachment.try(:file_state) == 'deleted'
     duplicate_handling = check_duplicate_handling_option(request)
     return unless duplicate_handling
+    return unless check_quota_after_attachment(request)
     if Attachment.s3_storage?
       return render(:nothing => true, :status => :bad_request) unless @attachment.state == :unattached
       details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name)
@@ -561,7 +563,7 @@ class FilesController < ApplicationController
     @attachment.handle_duplicates(duplicate_handling)
     render :json => attachment_json(@attachment)
   end
-
+  
   def create
     if (folder_id = params[:attachment].delete(:folder_id)) && folder_id.present?
       @folder = @context.folders.active.find_by_id(folder_id)

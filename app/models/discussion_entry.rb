@@ -316,7 +316,7 @@ class DiscussionEntry < ActiveRecord::Base
     if !dup.attachment_id && self.attachment
       attachment = self.attachment.clone_for(context)
       attachment.folder_id = nil
-      attachment.save!
+      attachment.save_without_broadcasting!
       context.map_merge(self.attachment, attachment)
       context.warn_merge_result(t :file_added_warning, "Added file \"%{file_path}\" which is needed for an entry in the topic \"%{discussion_topic_title}\"", :file_path => "%{attachment.folder.full_name}/#{attachment.display_name}", :discussion_topic_title => self.discussion_topic.title)
       dup.attachment_id = attachment.id

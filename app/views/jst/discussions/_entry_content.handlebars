@@ -10,7 +10,7 @@
   {{>avatar author}}
   <div class="discussion-header-content right-of-avatar">
     <div class="hide-if-collapsed admin-links">
-      <button class="al-trigger" data-event="openMenu"><span class="al-trigger-inner">{{#t "manage"}}Manage{{/t}}</span></button>
+      <button class="al-trigger ui-button" data-event="openMenu"><span class="al-trigger-inner">{{#t "manage"}}Manage{{/t}}</span></button>
       <ul class="al-options">
         <li><a href="#{{#if parent_cid}}{{parent_cid}}{{else}}content{{/if}}"><span class="ui-icon ui-icon-arrowreturnthick-1-w" />{{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
         {{#if canModerate}}
@@ -33,7 +33,7 @@
 </header>
 <div class="discussion-section hide-if-collapsed message_wrapper">
   <span class="message-notification" data-bind="messageNotification"></span>
-  <div data-bind="message" class="message user_content">{{convertNativeToMediaCommentThumnail message}}</div>
+  <div data-bind="message" class="message user_content">{{convertApiUserContent message}}</div>
   {{#if editor}}
     <div class="discussion-fyi">This comment was edited by <a {{#if editor.url}} href="{{editor.url}}" {{/if}}>{{editor.display_name}}</a></div>
   {{/if}}

@@ -63,20 +63,24 @@ class AccountsController < ApplicationController
   include Api::V1::Course
 
   # @API List active courses in an account
-  # Retrieve the list of active (non-deleted) courses in this account.
+  # Retrieve the list of courses in this account.
   #
   # @argument hide_enrollmentless_courses [optional] If set, only return courses that have at least one enrollment.
+  # @argument state[] [optional] If set, only return courses that are in the given state[s]. Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
   #
   # @example_response
   #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'sis_course_id': 'first-sis' },
   #     { 'id': 2, 'name': 'second course', 'course_code': 'second', 'sis_course_id': null } ]
   def courses_api
-    if authorized_action(@account, @current_user, :read)
-      @courses = @account.associated_courses.active
-      @courses = @courses.with_enrollments if params[:hide_enrollmentless_courses]
-      @courses = Api.paginate(@courses, self, api_v1_account_courses_path, :order => :id)
-      render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
-    end
+    return unless authorized_action(@account, @current_user, :read)
+
+    params[:state] ||= %w{created claimed available completed}
+
+    @courses = @account.associated_courses.scoped(:conditions => { :workflow_state => params[:state] })
+    @courses = @courses.with_enrollments if params[:hide_enrollmentless_courses]
+    @courses = Api.paginate(@courses, self, api_v1_account_courses_path, :order => :id)
+
+    render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end
 
   def update

@@ -80,7 +80,8 @@ class ApplicationController < ActionController::Base
       :current_user => user_display_json(@current_user),
       :current_user_roles => @current_user.try(:roles),
       :context_asset_string => @context.try(:asset_string),
-      :AUTHENTICITY_TOKEN => form_authenticity_token
+      :AUTHENTICITY_TOKEN => form_authenticity_token,
+      :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
     }
 
     hash.each do |k,v|
@@ -242,11 +243,14 @@ class ApplicationController < ActionController::Base
         store_location if request.get?
         return if !@current_user && initiate_delegated_login(request.host_with_port)
         if @context.is_a?(Course) && @context_enrollment
-          @unauthorized_message = t('#application.errors.unauthorized.unpublished', "This course has not been published by the instructor yet.") if @context.claimed?
-
           start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
-          @unauthorized_message = t('#application.errors.unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date)) if start_date && start_date > Time.now.utc
-          @unauthorized_reason = :unpublished
+          if @context.claimed?
+            @unauthorized_message = t('#application.errors.unauthorized.unpublished', "This course has not been published by the instructor yet.")
+            @unauthorized_reason = :unpublished
+          elsif start_date && start_date > Time.now.utc
+            @unauthorized_message = t('#application.errors.unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date))
+            @unauthorized_reason = :unpublished
+          end
         end
 
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
@@ -348,7 +352,7 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user
-      elsif params[:course_section_id]
+      elsif params[:course_section_id] || (self.is_a?(SectionsController) && params[:course_section_id] = params[:id])
         params[:context_id] = params[:course_section_id]
         params[:context_type] = "CourseSection"
         @context = api_request? ? api_find(CourseSection, params[:course_section_id]) : CourseSection.find(params[:course_section_id])
@@ -512,12 +516,9 @@ class ApplicationController < ActionController::Base
   
   # Calculates the file storage quota for @context
   def get_quota
-    @quota = 0
-    @quota_used = 0
-    return unless @context
-    @quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
-    @quota = @context.quota if (@context.respond_to?("quota") && @context.quota)
-    @quota_used = @context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
+    quota_params = Attachment.get_quota(@context)
+    @quota = quota_params[:quota]
+    @quota_used = quota_params[:quota_used]
   end
   
   # Renders a quota exceeded message if the @context's quota is exceeded
@@ -1025,7 +1026,7 @@ class ApplicationController < ActionController::Base
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
   def safe_domain_file_url(attachment, host=nil, verifier = nil, download = false) # TODO: generalize this
-    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default, request.host)}"
+    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port)}"
     ts, sig = @current_user && @current_user.access_verifier
 
     # add parameters so that the other domain can create a session that 
@@ -1144,6 +1145,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_registered_user
+    return false if require_user == false
+    unless @current_user.registered?
+      respond_to do |format|
+        format.html { render :template => "shared/registration_incomplete", :layout => "application", :status => :unauthorized }
+        format.json { render :json => { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, :status => :unauthorized }
+      end
+      return false
+    end
+  end
+
   def page_views_enabled?
     PageView.page_views_enabled?
   end
@@ -1169,7 +1181,7 @@ class ApplicationController < ActionController::Base
     return nil unless str
     return str.html_safe unless str.match(/object|embed|equation_image/)
 
-    UserContent.escape(str)
+    UserContent.escape(str, request.host_with_port)
   end
   helper_method :user_content
 
@@ -1286,73 +1298,17 @@ class ApplicationController < ActionController::Base
     add_crumb t('#crumbs.site_admin', "Site Admin"), url_for(Account.site_admin)
   end
 
-  def can_add_notes_to?(course)
-    course.enable_user_notes && course.grants_right?(@current_user, nil, :manage_user_notes)
-  end
-
-  ##
-  # Loads all the contexts the user belongs to into instance variable @contexts
-  # Used for TokenInput.coffee instances
-  def load_all_contexts
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user].cache_key, :expires_in => 10.minutes) do
-      contexts = {:courses => {}, :groups => {}, :sections => {}}
-
-      term_for_course = lambda do |course|
-        course.enrollment_term.default_term? ? nil : course.enrollment_term.name
+  def flash_notices
+    @notices ||= begin
+      notices = []
+      if error = flash.delete(:error)
+        notices << {:type => 'error', :content => error}
       end
-
-      @current_user.concluded_courses.each do |course|
-        contexts[:courses][course.id] = {
-          :id => course.id,
-          :url => course_url(course),
-          :name => course.name,
-          :type => :course,
-          :term => term_for_course.call(course),
-          :state => course.recently_ended? ? :recently_active : :inactive,
-          :can_add_notes => can_add_notes_to?(course)
-        }
+      if notice = (flash[:html_notice] ? flash.delete(:html_notice).html_safe : flash.delete(:notice))
+        notices << {:type => 'success', :content => notice}
       end
-
-      @current_user.courses.each do |course|
-        contexts[:courses][course.id] = {
-          :id => course.id,
-          :url => course_url(course),
-          :name => course.name,
-          :type => :course,
-          :term => term_for_course.call(course),
-          :state => :active,
-          :can_add_notes => can_add_notes_to?(course)
-        }
-      end
-
-      section_ids = @current_user.enrollment_visibility[:section_user_counts].keys
-      CourseSection.find(:all, :conditions => {:id => section_ids}).each do |section|
-        contexts[:sections][section.id] = {
-          :id => section.id,
-          :name => section.name,
-          :type => :section,
-          :term => contexts[:courses][section.course_id][:term],
-          :state => contexts[:courses][section.course_id][:state],
-          :parent => {:course => section.course_id},
-          :context_name =>  contexts[:courses][section.course_id][:name]
-        }
-      end if section_ids.present?
-
-      @current_user.messageable_groups.each do |group|
-        contexts[:groups][group.id] = {
-          :id => group.id,
-          :name => group.name,
-          :type => :group,
-          :state => group.active? ? :active : :inactive,
-          :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
-          :context_name => group.context.name,
-          :category => group.category
-        }
-      end
-
-      contexts
+      notices
     end
   end
-
-
+  helper_method :flash_notices
 end

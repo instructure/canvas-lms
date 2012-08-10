@@ -188,7 +188,6 @@ class PseudonymSessionsController < ApplicationController
       flash[:delegated_message] = message if message
     end
 
-    flash[:notice] = t 'notices.logged_out', "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
       session.delete(:return_to)
@@ -365,7 +364,6 @@ class PseudonymSessionsController < ApplicationController
     @current_user = user
     @current_pseudonym = pseudonym
     respond_to do |format|
-      flash[:notice] = t 'notices.login_success', "Login successful." unless flash[:error]
       if session[:oauth2]
         return redirect_to(oauth2_auth_confirm_url)
       elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))

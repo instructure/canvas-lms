@@ -1,86 +1,21 @@
-<% content_for :page_title do %><%= t(:page_title, "Notification Preferences") %><% end %>
+<%
+   content_for :page_title, t(:page_title, 'Notification Preferences')
+   jammit_css :notification_preferences
+   js_bundle :notification_preferences
+   add_crumb(@user.short_name, user_profile_path(@current_user) )
+   add_crumb(t(:crumb_notification_preferences, 'Notification Preferences'), communication_profile_path )
+%>
 
-<% content_for :right_side do %>
-  <%= render :partial => "ways_to_contact" %>
-<% end %>
 <% content_for :stylesheets do %>
-<style>
-.notification_preferences {
-  border-collapse: collapse;
-  width: 100%;
-}
-.notification_preferences .notification_type {
-  font-size: 1.2em;
-}
-.notification_preferences .frequency_header,
-.notification_preferences .frequency {
-  font-size: 0.8em;
-  width: 40px;
-  text-align: center;
-}
-.notification_preferences .frequency  div {
-  border: 1px solid #aaa;
-  width: 40px;
-  margin: 1px;
-  height: 22px;
-  cursor: pointer;
-  -moz-border-radius: 8px;
-  -webkit-border-radius: 8px;
-  background: no-repeat center center;
-}
-.notification_preferences .frequency  div:hover {
-  opacity: 0.7;
-  -moz-opacity: 0.7;
-  background: url(/images/pass.png) #ffffa8 no-repeat center center;
-}
-.notification_preferences .frequency.selected_pending  div,
-.notification_preferences .frequency.selected div {
-  opacity: 1;
-  -moz-opacity: 1;
-  background: url(/images/pass.png) #fe8 no-repeat center center;
-}
-.notification_preferences .frequency.selected div {
-  background-color: #afa;
-}
-.notification_preferences .contact_type_select {
-  /*font-weight:bold;*/
-}
-.notification_preferences .contact_select {
-  opacity:0.8;
-}
-.notification_preferences tr.preference:hover .contact_select, 
-.notification_preferences .contact_select:active, 
-.notification_preferences .contact_select:focus  {
-  opacity:1;
-}
-.notification_preferences td {
-  padding:0;
-}
-/*.contact_type_select, .contact_select {
-  border: 1px solid #fff;
-}
-.contact_type_select:hover, .contact_select:hover {
-  border: 1px solid #ccc;
-}*/
-</style>
+  <style type="text/css">
+  .event-option-buttons label {
+    width: 1.7em;
+    padding: 0;
+  }
+  </style>
 <% end %>
 
-<% js_bundle :notifications %>
+<h2><%= t('headers.notification_preferences', 'Notification Preferences') %><i id="notifications_save_status"></i></h2>
 
-<table class="notification_preferences" cellspacing="0">
-  <tr>
-    <td colspan="2"><h2><%= t('headers.notification_preferences', "Notification Preferences") %></h2></td>
-    <td class="frequency_header"><%= t('frequencies.right_away', "Right Away") %></td>
-    <td class="frequency_header"><%= t('frequencies.daily', "Daily") %></td>
-    <td class="frequency_header"><%= t('frequencies.weekly', "Weekly") %></td>
-    <td class="frequency_header"><%= t('frequencies.never', "Never") %></td>
-    <td>&nbsp;</td>
-  </tr>
-  <% @notification_categories.each do |n| %>
-    <%= render :partial => "notification_preference", :object => n, :locals => {:list => @policies.select{|p| p.notification_id == n.id} } %>
-  <% end %>
-</table>
-<p class="button-container">
-  <button type="button" class="save_preferences_button button"><%= t('buttons.save_preferences', "Save Preferences") %></button>
-</p>
-
+<div id='notification-preferences'>
+</div>

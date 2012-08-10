@@ -29,8 +29,11 @@ describe "Groups API", :type => :integration do
       'join_level' => group.join_level,
       'members_count' => group.members_count,
       'avatar_url' => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
-      'group_category_id' => group.group_category_id,
       'followed_by_user' => group.followers.include?(user),
+      'context_type' => group.context_type,
+      "#{group.context_type.downcase}_id" => group.context_id,
+      'role' => group.group_category.role,
+      'group_category_id' => group.group_category_id,
     }
   end
 
@@ -49,11 +52,22 @@ describe "Groups API", :type => :integration do
     @member = user_with_pseudonym
 
     @communities = GroupCategory.communities_for(Account.default)
-    @community = group_model(:name => "Algebra Teachers", :group_category => @communities)
+    @community = group_model(:name => "Algebra Teachers", :group_category => @communities, :context => Account.default)
     @community.add_user(@member, 'accepted', false)
     @community.add_user(@moderator, 'accepted', true)
     @community_path = "/api/v1/groups/#{@community.id}"
     @community_path_options = { :controller => "groups", :format => "json" }
+    @context = @community
+  end
+
+  it "should allow listing all a user's groups" do
+    course_with_student(:user => @member)
+    @group = @course.groups.create!(:name => "My Group")
+    @group.add_user(@member, 'accepted', true)
+
+    @user = @member
+    json = api_call(:get, "/api/v1/users/self/groups", @community_path_options.merge(:action => "index"))
+    json.should == [group_json(@community, @user), group_json(@group, @user)]
   end
 
   it "should allow a member to retrieve the group" do
@@ -336,6 +350,7 @@ describe "Groups API", :type => :integration do
 
   context "group files" do
     it_should_behave_like "file uploads api with folders"
+    it_should_behave_like "file uploads api with quotas"
 
     before do
       @user = @member
@@ -347,6 +362,10 @@ describe "Groups API", :type => :integration do
         preflight_params)
     end
 
+    def has_query_exemption?
+      false
+    end
+      
     def context
       @community
     end

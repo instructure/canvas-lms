@@ -72,6 +72,18 @@
 #       // The url of the group's avatar
 #       avatar_url: "https://<canvas>/files/avatar_image.png",
 #
+#       // The course or account that the group belongs to. The pattern here is
+#       // that whatever the context_type is, there will be an _id field named
+#       // after that type. So if instead context_type was "account", the
+#       // course_id field would be replaced by an account_id field.
+#       context_type: "Course",
+#       course_id: 3,
+#
+#       // Certain types of groups have special role designations. Currently,
+#       // these include: "communities", "student_organized", and "imported".
+#       // Regular course/account groups have a role of null.
+#       role: null,
+#
 #       // The ID of the group's category.
 #       group_category_id: 4,
 #     }
@@ -123,9 +135,32 @@ class GroupsController < ApplicationController
     end
   end
 
+  # @API List your groups
+  #
+  # Returns a list of active groups for the current user.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/self/groups \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Group]
   def index
     return context_index if @context
-    @groups = @current_user ? @current_user.groups.active : []
+    scope = @current_user.try(:current_groups)
+    respond_to do |format|
+      format.html do
+        @groups = scope || []
+      end
+      format.json do
+        scope = scope.scoped({
+          :include => :group_category,
+          :order => "groups.id ASC",
+        })
+        route = polymorphic_url([:api_v1, :groups])
+        @groups = Api.paginate(scope, self, route)
+        render :json => @groups.map { |g| group_json(g, @current_user, session) }
+      end
+    end
   end
 
   def context_index
@@ -281,13 +316,6 @@ class GroupsController < ApplicationController
           format.json { render :json => @group.errors, :status => :bad_request }
         end
       end
-    end
-  end
-
-  def edit
-    @group = (@context ? @context.groups : Group).find(params[:id])
-    @context = @group
-    if authorized_action(@group, @current_user, :update)
     end
   end
 
@@ -529,7 +557,9 @@ class GroupsController < ApplicationController
   end
 
   def edit
-    @use_new_styles = true
+    account = @context.root_account
+    raise ActiveRecord::RecordNotFound unless account.canvas_network_enabled?
+
     @group = (@context ? @context.groups : Group).find(params[:id])
     @context = @group
 
@@ -618,7 +648,7 @@ class GroupsController < ApplicationController
   def create_file
     @attachment = Attachment.new(:context => @context)
     if authorized_action(@attachment, @current_user, :create)
-      api_attachment_preflight(@context, request)
+      api_attachment_preflight(@context, request, :check_quota => true)
     end
   end
 

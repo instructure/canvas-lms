@@ -200,7 +200,7 @@ Spec::Runner.configure do |config|
     account_admin_user(opts)
   end
 
-  def account_admin_user(opts={})
+  def account_admin_user(opts={:active_user => true})
     @user = opts[:user] || user(opts)
     @admin = @user
     @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
@@ -208,7 +208,7 @@ Spec::Runner.configure do |config|
   end
 
   def site_admin_user(opts={})
-    user(opts)
+    @user = opts[:user] || user(opts)
     @admin = @user
     Account.site_admin.add_user(@user, opts[:membership_type] || 'AccountAdmin')
     @user
@@ -217,7 +217,7 @@ Spec::Runner.configure do |config|
   def user(opts={})
     @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
-    @user.workflow_state = opts[:user_state] if opts[:user_state]
+    @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @user
   end
 
@@ -283,7 +283,7 @@ Spec::Runner.configure do |config|
   def course_with_user(enrollment_type, opts={})
     @course = opts[:course] || course(opts)
     @user = opts[:user] || user(opts)
-    @enrollment = @course.enroll_user(@user, enrollment_type)
+    @enrollment = @course.enroll_user(@user, enrollment_type, opts)
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'

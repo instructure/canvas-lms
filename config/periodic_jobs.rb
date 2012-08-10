@@ -98,3 +98,9 @@ Delayed::Periodic.cron 'Alert.process', '30 11 * * *', :priority => Delayed::LOW
     Alert.process
   end
 end
+
+Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', :priority => Delayed::LOW_PRIORITY do
+  Shard.with_each_shard do
+    Attachment.do_notifications
+  end
+end

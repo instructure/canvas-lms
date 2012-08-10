@@ -98,7 +98,6 @@ define([
           var $user_progression_list = $("#current_user_progression_list");
           var $student_progression_list = $("#progression_list");
           var lists_per_user = {};
-          var any_locked = false;
           var progressions = [];
           for(var idx in data) {
             progressions.push(data[idx]);
@@ -109,7 +108,7 @@ define([
                 modules.updateProgressionState($(this));
               });
             }
-            modules.refreshProgressions(any_locked && !user_id);
+            modules.refreshProgressions(!user_id);
             if(callback) { callback(); }
           }
           var progressionCnt = 0;
@@ -120,9 +119,6 @@ define([
               return;
             }
             var progression = data.context_module_progression;
-            if(progression.workflow_state == "locked") {
-              any_locked = true;
-            }
             if(progression.user_id == current_user_id) {
               var $user_progression = $user_progression_list.find(".progression_" + progression.context_module_id)
   

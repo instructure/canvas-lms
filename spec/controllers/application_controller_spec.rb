@@ -23,12 +23,16 @@ describe ApplicationController do
   before(:each) do
     @controller = ApplicationController.new
     @controller.stubs(:form_authenticity_token).returns('asdf')
+    @controller.stubs(:request).returns(stub(:host_with_port => "www.example.com"))
   end
 
   describe "js_env" do
     it "should set items" do
+      HostUrl.expects(:file_host).with(Account.default, "www.example.com").returns("files.example.com")
       @controller.js_env :FOO => 'bar'
       @controller.js_env[:FOO].should == 'bar'
+      @controller.js_env[:AUTHENTICITY_TOKEN].should == 'asdf'
+      @controller.js_env[:files_domain].should == 'files.example.com'
     end
 
     it "should allow multiple items" do
@@ -66,7 +70,7 @@ describe ApplicationController do
   describe "safe_domain_file_user" do
     before :each do
       # safe_domain_file_url wants to use request.protocol
-      @controller.stubs(:request).returns(mock(:protocol => '', :host => ''))
+      @controller.stubs(:request).returns(mock(:protocol => '', :host_with_port => ''))
 
       @user = User.create!
       @attachment = @user.attachments.new(:filename => 'foo.png')
@@ -134,7 +138,4 @@ describe ApplicationController do
       @controller.instance_variable_get(:@context).should == @section
     end
   end
-
 end
-
-

@@ -82,7 +82,9 @@ class AssignmentsController < ApplicationController
         @current_user_rubric_assessment = @assignment.rubric_association.rubric_assessments.find_by_user_id(@current_user.id) if @current_user && @assignment.rubric_association
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
-      if @assignment.submission_types && @assignment.submission_types.match(/online_upload/)
+
+      # prevent masquerading users from accessing google docs
+      if @assignment.allow_google_docs_submission? && @real_current_user.blank?
         # TODO: make this happen asynchronously via ajax, and only if the user selects the google docs tab
         @google_docs = google_doc_list(nil, @assignment.allowed_extensions) rescue nil
       end

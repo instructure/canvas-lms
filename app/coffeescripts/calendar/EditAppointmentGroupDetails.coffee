@@ -30,7 +30,7 @@ define [
 
       @contextSelector = new ContextSelector('.ag-menu-container', @apptGroup, @contexts, @contextsChanged, @toggleContextsMenu)
 
-      if @apptGroup.id
+      if @editing()
         @form.attr('action', @apptGroup.url)
 
         # Don't let them change a bunch of fields once it's created
@@ -43,6 +43,8 @@ define [
           @form.find(".group_category").val(@apptGroup.sub_context_codes[0])
         else
           @form.find(".group-signup-checkbox").prop('checked', false)
+
+        $(".reservation_help").click @openHelpDialog
       else
         # FIXME: put this url in ENV json or something
         @form.attr('action', '/api/v1/appointment_groups')
@@ -66,33 +68,72 @@ define [
         @form.find(".group-signup").toggle(checked)
       @form.find(".group-signup-checkbox").change()
 
-      @form.find('[name="per_slot_option"]').change (jsEvent) =>
-        checkbox = jsEvent.target
-        input = @form.find('[name="participants_per_appointment"]')
-        if checkbox.checked
-          input.attr('disabled', false)
-          input.val('1') if input.val() == ''
-        else
-          input.attr('disabled', true)
+      $perSlotCheckbox = @form.find('[name="per_slot_option"]')
+      $perSlotInput =    @form.find('[name="participants_per_appointment"]')
+      slotChangeHandler = (e) => @perSlotChange($perSlotCheckbox, $perSlotInput)
+      $.merge($perSlotCheckbox, $perSlotInput).on 'change', slotChangeHandler
       if @apptGroup.participants_per_appointment > 0
-        @form.find('[name="per_slot_option"]').prop('checked', true)
-        @form.find('[name="participants_per_appointment"]').val(@apptGroup.participants_per_appointment)
+        $perSlotCheckbox.prop('checked', true)
+        $perSlotInput.val(@apptGroup.participants_per_appointment)
       else
-        @form.find('[name="participants_per_appointment"]').attr('disabled', true)
+        $perSlotInput.attr('disabled', true)
 
-      maxPerStudentInput = @form.find('[name="max_appointments_per_participant"]')
-      maxAppointmentsPerStudent = @apptGroup.max_appointments_per_participant || 1
-      maxPerStudentInput.val(maxAppointmentsPerStudent)
-      maxPerStudentCheckbox = @form.find('#max-per-student-option')
-      maxPerStudentCheckbox.change ->
-        maxPerStudentInput.prop('disabled', not maxPerStudentCheckbox.prop('checked'))
-      if maxAppointmentsPerStudent > 0
-        maxPerStudentCheckbox.prop('checked', true)
+      $maxPerStudentCheckbox = @form.find('#max-per-student-option')
+      $maxPerStudentInput =    @form.find('[name="max_appointments_per_participant"]')
+      maxApptHandler = (e) => @maxStudentAppointmentsChange($maxPerStudentCheckbox, $maxPerStudentInput)
+      $.merge($maxPerStudentCheckbox, $maxPerStudentInput).on 'change', maxApptHandler
+      maxAppointmentsPerStudent = @apptGroup.max_appointments_per_participant
+      $maxPerStudentInput.val(maxAppointmentsPerStudent)
+      if maxAppointmentsPerStudent > 0 || @creating()
+        $maxPerStudentCheckbox.prop('checked', true)
+        $maxPerStudentInput.val('1') if @creating() and $maxPerStudentInput.val() == ''
       else
-        maxPerStudentInput.attr('disabled', true)
+        $maxPerStudentInput.attr('disabled', true)
 
       if @apptGroup.workflow_state == 'active'
         @form.find("#appointment-blocks-active-button").attr('disabled', true).prop('checked', true)
+
+    creating: ->
+      !@editing()
+    editing: ->
+      @apptGroup.id?
+
+    perSlotChange: (checkbox, input) ->
+      @checkBoxInputChange checkbox, input
+      slotLimit = parseInt(input.val())
+      @helpIconShowIf checkbox, _.any(@apptGroup.appointments, (a) -> a.child_events_count > slotLimit)
+
+    maxStudentAppointmentsChange: (checkbox, input) ->
+      @checkBoxInputChange checkbox, input
+      apptLimit = parseInt(input.val())
+      apptCounts = {}
+      for a in @apptGroup.appointments
+        for e in a.child_events
+          apptCounts[e.user.id] ||= 0
+          apptCounts[e.user.id] += 1
+      @helpIconShowIf checkbox, _.any(apptCounts, (count, userId) -> count > apptLimit)
+
+    # show/hide the help icon
+    helpIconShowIf: (checkbox, show) ->
+      helpIcon = checkbox.closest('li').find('.reservation_help')
+      if show and checkbox.is(':checked')
+        helpIcon.removeClass('hidden')
+      else
+        helpIcon.addClass('hidden')
+
+    # enable/disable the input
+    checkBoxInputChange: (checkbox, input) ->
+      input.val('1') if checkbox.prop('checked') and input.val() == ''
+      input.prop('disabled', not checkbox.prop('checked'))
+
+    openHelpDialog: (e) =>
+      e.preventDefault()
+      $("#options_help_dialog").dialog('close').dialog(
+        autoOpen: false
+        title: I18n.t('affect_reservations', "How will this affect reservations?")
+        width: 400
+      ).dialog('open')
+
 
     saveWithoutPublishingClick: (jsEvent) =>
       jsEvent.preventDefault()
@@ -104,7 +145,6 @@ define [
 
     save: (publish) =>
       data = @form.getFormData(object_name: 'appointment_group')
-      create = @apptGroup.id == undefined
 
       params = {
         'appointment_group[title]': data.title
@@ -130,8 +170,15 @@ define [
           $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(range[1]))
         ])
 
-      if data.per_slot_option == '1' && data.participants_per_appointment
-        params['appointment_group[participants_per_appointment]'] = data.participants_per_appointment
+      if data.per_slot_option
+        if data.participants_per_appointment < 1
+          $('[name="participants_per_appointment"]').errorBox(
+            I18n.t('bad_per_slot', 'You must allow at least one appointment per time slot'))
+          return false
+        else
+          params['appointment_group[participants_per_appointment]'] = data.participants_per_appointment
+      else
+        params['appointment_group[participants_per_appointment]'] = ""
 
       if publish && @apptGroup.workflow_state != 'active'
         params['appointment_group[publish]'] = '1'
@@ -149,7 +196,7 @@ define [
       else
         params['appointment_group[context_codes]'] = contextCodes
 
-      if create
+      if @creating()
         if data.use_group_signup == '1' && data.group_category_id
           params['appointment_group[sub_context_codes]'] = [data.group_category_id]
         else
@@ -160,9 +207,9 @@ define [
         params['appointment_group[min_appointments_per_participant]'] = 1
 
       onSuccess = => @closeCB(true)
-      onError = => 
+      onError = =>
 
-      method = if @apptGroup.id then 'PUT' else 'POST'
+      method = if @editing() then 'PUT' else 'POST'
 
       deferred = $.ajaxJSON @form.attr('action'), method, params, onSuccess, onError
       @form.disableWhileLoading(deferred)

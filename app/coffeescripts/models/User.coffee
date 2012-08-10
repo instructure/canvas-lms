@@ -1,7 +1,8 @@
 define [
   'i18n!user'
+  'underscore'
   'Backbone'
-], (I18n, Backbone) ->
+], (I18n, _, Backbone) ->
 
   class User extends Backbone.Model
 
@@ -17,3 +18,9 @@ define [
         invalid:      I18n.t("errors.invalid_code", "Invalid code")
       terms_of_use:
         accepted:     I18n.t("errors.terms", "You must agree to the terms")
+
+    pending: ->
+      _.any @get('enrollments'), (e) -> e.enrollment_state in ['creation_pending', 'invited']
+
+    hasEnrollmentType: (type) ->
+      _.any @get('enrollments'), (e) -> e.type == type

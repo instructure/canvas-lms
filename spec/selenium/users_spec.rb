@@ -111,4 +111,82 @@ describe "user selenium tests" do
       @student_2.workflow_state.should == 'registered'
     end
   end
+
+  context "registration" do
+    before :each do
+      a = Account.default
+      a.settings = { :open_registration => true, :no_enrollments_can_create_courses => true }
+      a.save!
+    end
+  
+    it "should register a student with a join code" do
+      course(:active_all => true)
+      @course.update_attribute :self_enrollment, true
+
+      get '/register'
+      f('#signup_student').click
+
+      form = fj('.ui-dialog:visible form')
+      f('#student_join_code').send_keys(@course.self_enrollment_code)
+      f('#student_name').send_keys('student!')
+      f('#student_birthdate').send_keys('1/1/1980')
+      f('#student_username').send_keys('student')
+      f('#student_password').send_keys('asdfasdf')
+      f('#student_password_confirmation').send_keys('asdfasdf')
+      form.find_element(:css, 'input[name="user[terms_of_use]"]').click
+
+      expect_new_page_load { form.submit }
+      # confirm the user is authenticated into the dashboard
+      f('#identity .logout').should be_present
+    end
+
+    it "should register a student without a join code" do
+      get '/register'
+      f('#signup_student').click
+
+      f('.registration-dialog .signup_link').click
+
+      form = fj('.ui-dialog:visible form')
+      f('#student_higher_ed_name').send_keys('student!')
+      f('#student_higher_ed_email').send_keys('student@example.com')
+      f('#student_higher_ed_birthdate').send_keys('1/1/1980')
+      form.find_element(:css, 'input[name="user[terms_of_use]"]').click
+
+      expect_new_page_load { form.submit }
+      # confirm the user is authenticated into the dashboard
+      f('#identity .logout').should be_present
+    end
+
+    it "should register a teacher" do
+      get '/register'
+      f('#signup_teacher').click
+
+      form = fj('.ui-dialog:visible form')
+      f('#teacher_name').send_keys('teacher!')
+      f('#teacher_email').send_keys('teacher@example.com')
+      form.find_element(:css, 'input[name="user[terms_of_use]"]').click
+
+      expect_new_page_load { form.submit }
+      # confirm the user is authenticated into the dashboard
+      f('#identity .logout').should be_present
+    end
+
+    it "should register an observer" do
+      user_with_pseudonym(:active_all => true, :password => 'lolwut')
+
+      get '/register'
+      f('#signup_parent').click
+
+      form = fj('.ui-dialog:visible form')
+      f('#parent_name').send_keys('parent!')
+      f('#parent_email').send_keys('parent@example.com')
+      f('#parent_child_username').send_keys(@pseudonym.unique_id)
+      f('#parent_child_password').send_keys('lolwut')
+      form.find_element(:css, 'input[name="user[terms_of_use]"]').click
+
+      expect_new_page_load { form.submit }
+      # confirm the user is authenticated into the dashboard
+      f('#identity .logout').should be_present
+    end
+  end
 end

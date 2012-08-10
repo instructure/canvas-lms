@@ -41,7 +41,7 @@ class UserNotesController < ApplicationController
         @is_course = true
       end
       count = @users.count
-      @users = @users.scoped(:select=> "name, users.id, last_user_note", :order=>"last_user_note ASC, #{User.sortable_name_order_by_clause} ASC")
+      @users = @users.scoped(:select=> "name, users.id, last_user_note", :order=>"last_user_note ASC, #{User.sortable_name_order_by_clause} ASC", :extend => User::SortableNameExtension)
       @users = @users.paginate(:page => params[:page], :per_page => 20, :total_entries=>count)
       # rails gets confused by :include => :courses, because has_current_student_enrollments above references courses in a subquery
       User.send(:preload_associations, @users, :courses)

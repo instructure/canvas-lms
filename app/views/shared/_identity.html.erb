@@ -7,7 +7,7 @@
       <li><%= link_to t('links.log_in', "Log In"), login_path %></li>
     <% end %>
   <% else %>
-    <li class="user_name"><%= link_to @current_user.short_name, edit_profile_path %></li>
+    <li class="user_name"><%= link_to @current_user.short_name, settings_profile_path %></li>
     <% if @real_current_user && @real_current_user != @current_user && !@current_user.fake_student? %>
       <li class="stop_masquerading"><%= link_to t('links.stop_masquerading', "[Stop Masquerading]"), user_masquerade_url(@real_current_user.id), :method => :post %></li>
     <% end %>
@@ -17,7 +17,7 @@
         <b class="unread-messages-count"><%= unread %></b>
       <% end %>
       </a></li>
-    <li><%= link_to t('links.profile', "Profile"), edit_profile_path %></li>
+    <li><%= link_to t('links.profile', "Profile"), settings_profile_path %></li>
     <% end %>
     <li class="user_id" style="display: none;"><%= @current_user.id %></li>
     <li class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></li>

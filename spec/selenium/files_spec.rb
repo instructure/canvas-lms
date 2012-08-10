@@ -1,79 +1,27 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
+
+def make_folder_actions_visible
+  driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
+end
 
 shared_examples_for "files selenium tests" do
   it_should_behave_like "forked server selenium tests"
-
-  def fixture_file_path(file)
-    path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
-    return "#{path}#{file}"
-  end
-
-  def fixture_file_upload(file, mimetype)
-    ActionController::TestUploadedFile.new(fixture_file_path(file), mimetype)
-  end
-
-  def login(username, password)
-    resp, body = SSLCommon.get "#{app_host}/login"
-    resp.code.should == "200"
-    @cookie = resp.response['set-cookie']
-    resp, body = SSLCommon.post_form("#{app_host}/login", {
-        "pseudonym_session[unique_id]" => username,
-        "pseudonym_session[password]" => password,
-        "redirect_to_ssl" => "0",
-        "pseudonym_session[remember_me]" => "0"},
-                                     {"Cookie" => @cookie})
-    resp.code.should == "302"
-    @cookie = resp.response['set-cookie']
-    login_as username, password
-  end
-
-  def add_file(fixture, context, name)
-    if context.is_a?(Course)
-      path = "/courses/#{context.id}/files"
-    elsif context.is_a?(User)
-      path = "/dashboard/files"
-    end
-    context_code = context.asset_string.capitalize
-    resp, body = SSLCommon.get "#{app_host}#{path}",
-                               "Cookie" => @cookie
-    resp.code.should == "200"
-    body.should =~ /<div id="ajax_authenticity_token">([^<]*)<\/div>/
-    authenticity_token = $1
-    resp, body = SSLCommon.post_form("#{app_host}/files/pending", {
-        "attachment[folder_id]" => context.folders.active.first.id,
-        "attachment[filename]" => name,
-        "attachment[context_code]" => context_code,
-        "authenticity_token" => authenticity_token,
-        "no_redirect" => true}, {"Cookie" => @cookie})
-    resp.code.should == "200"
-    data = json_parse(body)
-    data["upload_url"] = data["proxied_upload_url"] || data["upload_url"]
-    data["upload_url"] = "#{app_host}#{data["upload_url"]}" if data["upload_url"] =~ /^\//
-    data["success_url"] = "#{app_host}#{data["success_url"]}" if data["success_url"] =~ /^\//
-    data["upload_params"]["file"] = fixture
-    resp, body = SSLCommon.post_multipart_form(data["upload_url"], data["upload_params"], {"Cookie" => @cookie}, ["bucket", "key", "acl"])
-    resp.code.should =~ /^20/
-    if body =~ /<PostResponse>/
-      resp, body = SSLCommon.get data["success_url"]
-      resp.code.should == "200"
-    end
-  end
+  it_should_behave_like "files selenium shared"
 
   it "should show students link to download zip of folder" do
-    skip_if_ie("Page wouldn't load in IE'")
     user_with_pseudonym :username => "nobody3@example.com",
                         :password => "asdfasdf3"
     course_with_student_logged_in :user => @user
     login_as "nobody3@example.com", "asdfasdf3"
     get "/courses/#{@course.id}/files"
 
-    #link = keep_trying_until { driver.find_element(:css, "div.links a.download_zip_link") }
-    link = keep_trying_until {
-      link = driver.find_element(:css, "div.links a.download_zip_link")
+    link = keep_trying_until do
+      link = f("div.links a.download_zip_link")
       wait_for_ajaximations
       link.should be_displayed
       link
-    }
+    end
     link.attribute('href').should match(%r"/courses/#{@course.id}/folders/\d+/download")
   end
 
@@ -82,14 +30,14 @@ shared_examples_for "files selenium tests" do
     get "/dashboard/files"
     wait_for_ajaximations
 
-    keep_trying_until {
-      driver.find_element(:css, ".add_folder_link").click
+    keep_trying_until do
+      f(".add_folder_link").click
       wait_for_animations
-      driver.find_element(:css, "#files_content .add_folder_form #folder_name").should be_displayed
-    }
-    driver.find_element(:css, "#files_content .add_folder_form #folder_name").send_keys("my folder\n")
+      f("#files_content .add_folder_form #folder_name").should be_displayed
+    end
+    f("#files_content .add_folder_form #folder_name").send_keys("my folder\n")
     wait_for_ajax_requests
-    driver.find_element(:css, ".node.folder span").should have_class('ui-droppable')
+    f(".node.folder span").should have_class('ui-droppable')
 
     # also make sure that it has a tooltip of the file name so that you can read really long names
     f(".node.folder .name[title='my folder']").should_not be_nil
@@ -99,136 +47,186 @@ end
 describe "files without s3 and forked tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  it "should allow renaming folders" do
+  def add_folders(name = 'new folder', number_to_add = 1)
+    1..number_to_add.times do |number|
+      keep_trying_until do
+        f(".add_folder_link").click
+        wait_for_animations
+        f("#files_content .add_folder_form #folder_name").should be_displayed
+      end
+      new_folder = f("#files_content .add_folder_form #folder_name")
+      new_folder.send_keys(name + "#{number}")
+      new_folder.send_keys(:return)
+      wait_for_ajax_requests
+    end
+  end
+
+  before (:each) do
+    @folder_name = "my folder"
     course_with_teacher_logged_in
     get "/dashboard/files"
     wait_for_ajaximations
+    add_folders(@folder_name)
+    Folder.last.name.should == @folder_name + '0'
+    @folder_css = ".folder_#{Folder.last.id}"
+    make_folder_actions_visible
+  end
 
-    keep_trying_until do
-      driver.find_element(:css, ".add_folder_link").click
-      wait_for_animations
-      driver.find_element(:css, "#files_content .add_folder_form #folder_name").should be_displayed
-    end
-    driver.find_element(:css, "#files_content .add_folder_form #folder_name").send_keys("my folder\n")
-    wait_for_ajax_requests
-    Folder.last.name.should == "my folder"
+  it "should allow renaming folders" do
+    edit_folder_name = "my folder 2"
     entry_field = keep_trying_until do
-      driver.find_element(:css, "#files_content .folder_item .rename_item_link").click
-      entry_field = driver.find_element(:css, "#files_content #rename_entry_field")
+      f("#files_content .folder_item .rename_item_link").click
+      entry_field = f("#files_content #rename_entry_field")
       entry_field.should be_displayed
       entry_field
     end
-    entry_field.send_keys("my folder 2\n")
+    entry_field.send_keys(edit_folder_name)
+    entry_field.send_keys(:return)
     wait_for_ajax_requests
-    Folder.last.name.should == "my folder 2"
+    Folder.last.name.should == edit_folder_name
+  end
+
+  it "should allow deleting a folder" do
+    f(@folder_css + ' .delete_item_link').click
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    Folder.last.workflow_state.should == 'deleted'
+    f('#files_content').should_not include_text(@folder_name)
+  end
+
+  it "should allow dragging folders to re-arrange them" do
+    pending('drag and drop not working')
+    expected_folder_text = 'my folder'
+    add_folders('new folder', 2)
+    fj('.folder_item:visible:first').text.should == expected_folder_text
+    make_folder_actions_visible
+    driver.action.drag_and_drop(move_icons[0], move_icons[1]).perform
+    wait_for_ajaximations
+    fj('.folder_item:visible:last').text.should == expected_folder_text
+  end
+
+  it "should allow locking a folder" do
+    f(@folder_css + ' .lock_item_link').click
+    lock_form = f('#lock_folder_form')
+    lock_form.should be_displayed
+    submit_form(lock_form)
+    wait_for_ajaximations
+    f(@folder_css + ' .header img').should have_attribute('alt', 'Locked Folder')
+    Folder.last.locked.should be_true
   end
 end
 
 describe "files local tests" do
   it_should_behave_like "files selenium tests"
+
   prepend_before(:each) do
     Setting.set("file_storage_test_override", "local")
   end
 
-  it "should allow you to edit html files" do
-    skip_if_ie("IE hangs")
-    user_with_pseudonym :username => "nobody2@example.com",
-                        :password => "asdfasdf2"
-    course_with_teacher_logged_in :user => @user
-    login "nobody2@example.com", "asdfasdf2"
-    add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
-             @course, "html-editing-test.html")
-    get "/courses/#{@course.id}/files"
-    link = keep_trying_until { driver.find_element(:css, "li.editable_folder_item div.header a.download_url") }
-    link.should be_displayed
-    link.text.should == "html-editing-test.html"
-    current_content = File.read(fixture_file_path("files/html-editing-test.html"))
-    4.times do
+  context "as a teacher" do
+
+    before (:each) do
+      user_with_pseudonym :username => "nobody2@example.com",
+                          :password => "asdfasdf2"
+      course_with_teacher_logged_in :user => @user
+      login "nobody2@example.com", "asdfasdf2"
+      add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
+               @course, "html-editing-test.html")
       get "/courses/#{@course.id}/files"
-      new_content = "<html>#{ActiveSupport::SecureRandom.hex(10)}</html>"
-      link = keep_trying_until { driver.find_element(:css, "li.editable_folder_item div.header a.edit_item_content_link") }
+      keep_trying_until { fj('.file').should be_displayed }
+      make_folder_actions_visible
+    end
+
+    it "should allow you to edit html files" do
+      link = keep_trying_until { f("li.editable_folder_item div.header a.download_url") }
       link.should be_displayed
-      link.text.should == "edit content"
-      link.click
-      keep_trying_until { driver.find_element(:css, "#edit_content_dialog").displayed? }
-      keep_trying_until(120) { driver.execute_script("return $('#edit_content_textarea')[0].value;") == current_content }
-      driver.execute_script("$('#edit_content_textarea')[0].value = '#{new_content}';")
-      current_content = new_content
-      driver.find_element(:css, "#edit_content_dialog button.save_button").click
-      keep_trying_until { !driver.find_element(:css, "#edit_content_dialog").displayed? }
+      link.text.should == "html-editing-test.html"
+      current_content = File.read(fixture_file_path("files/html-editing-test.html"))
+      4.times do
+        get "/courses/#{@course.id}/files"
+        new_content = "<html>#{ActiveSupport::SecureRandom.hex(10)}</html>"
+        link = keep_trying_until { f("li.editable_folder_item div.header a.edit_item_content_link") }
+        link.should be_displayed
+        link.text.should == "edit content"
+        link.click
+        keep_trying_until { fj("#edit_content_dialog").should be_displayed }
+        keep_trying_until(120) { driver.execute_script("return $('#edit_content_textarea')[0].value;") == current_content }
+        driver.execute_script("$('#edit_content_textarea')[0].value = '#{new_content}';")
+        current_content = new_content
+        f("#edit_content_dialog button.save_button").click
+        keep_trying_until { !f("#edit_content_dialog").displayed? }
+      end
+    end
+
+    it "should allow you to edit a file name" do
+      edit_name = 'edited html file'
+      fj('.file .rename_item_link:visible').click
+      file_name = f('#rename_entry_field')
+      replace_content(file_name, edit_name)
+      file_name.send_keys(:return)
+      wait_for_ajax_requests
+      last_file = Folder.last.attachments.last
+      f('#files_content').should include_text(last_file.display_name)
+    end
+
+    it "should allow you to delete a file" do
+      fj('.file .delete_item_link:visible').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      last_file = Folder.last.attachments.last
+      last_file.file_state == 'deleted'
+      f('#files_content').should_not include_text(last_file.display_name)
+    end
+
+    it "should allow you to lock a file" do
+      fj('.file .lock_item_link:visible').click
+      lock_form = f('#lock_attachment_form')
+      lock_form.should be_displayed
+      submit_form(lock_form)
+      wait_for_ajaximations
+      fj('.file .item_icon:visible').should have_attribute('alt', 'Locked File')
+      Folder.last.attachments.last.locked.should be_true
     end
   end
 
-  it "should allow uploaded files to be used for submission" do
-    skip_if_ie("IE hangs")
-    user_with_pseudonym :username => "nobody2@example.com",
-                        :password => "asdfasdf2"
-    course_with_student_logged_in :user => @user
-    login "nobody2@example.com", "asdfasdf2"
-    add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
-             @user, "html-editing-test.html")
-    current_content = File.read(fixture_file_path("files/html-editing-test.html"))
-    assignment = @course.assignments.create!(:title => 'assignment 1',
-                                             :name => 'assignment 1',
-                                             :submission_types => "online_upload")
-    get "/courses/#{@course.id}/assignments/#{assignment.id}"
-    f('.submit_assignment_link').click
-    f('.toggle_uploaded_files_link').click
-
-    # traverse the tree
-    f('#uploaded_files > ul > li.folder > .sign').click
-    wait_for_animations
-    f('#uploaded_files > ul > li.folder .file .name').click
-    wait_for_animations
-
-    f('#submit_file_button').click
-    wait_for_ajax_requests
-    wait_for_dom_ready
-
-    keep_trying_until {
-      f('.details .header').should include_text "Turned In!"
-      f('.details .file-big').should include_text "html-editing-test.html"
+  describe "files S3 tests" do
+    it_should_behave_like "files selenium tests"
+    prepend_before(:each) {
+      Setting.set("file_storage_test_override", "s3")
+    }
+    prepend_before(:all) {
+      Setting.set("file_storage_test_override", "s3")
     }
   end
-end
 
-describe "files S3 tests" do
-  it_should_behave_like "files selenium tests"
-  prepend_before(:each) {
-    Setting.set("file_storage_test_override", "s3")
-  }
-  prepend_before(:all) {
-    Setting.set("file_storage_test_override", "s3")
-  }
-end
+  describe "collaborations folder in files menu" do
+    it_should_behave_like "in-process server selenium tests"
 
-describe "collaborations folder in files menu" do
-  it_should_behave_like "in-process server selenium tests"
+    before (:each) do
+      course_with_teacher_logged_in
+      group_category = @course.group_categories.create(:name => "groupage")
+      @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
+    end
 
-  before (:each) do
-    course_with_teacher_logged_in
-    group_category = @course.group_categories.create(:name => "groupage")
-    @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
-  end
+    def load_collab_folder
+      get "/groups/#{@group.id}/files"
+      message_node = keep_trying_until do
+        f("li.collaborations span.name").click
+        f("ul.files_content li.message")
+      end
+      message_node.text
+    end
 
-  def load_collab_folder
-    get "/groups/#{@group.id}/files"
-    message_node = keep_trying_until {
-      driver.find_element(:css, "li.collaborations span.name").click
-      driver.find_element(:css, "ul.files_content li.message")
-    }
-    message_node.text
-  end
+    it "should not show 'add collaboration' paragraph to teacher not participating in group" do
+      message = load_collab_folder
+      message.should_not include_text("New collaboration")
+    end
 
-  it "should not show 'add collaboration' paragraph to teacher not participating in group" do
-    message = load_collab_folder
-    message.should_not =~ /click "New collaboration"/
-  end
-
-  it "should show 'add collaboration' paragraph to participating user" do
-    @group.participating_users << @user
-    message = load_collab_folder
-    message.should =~ /click "New collaboration"/
+    it "should show 'add collaboration' paragraph to participating user" do
+      @group.participating_users << @user
+      message = load_collab_folder
+      message.should include_text("New collaboration")
+    end
   end
 end
 
@@ -250,7 +248,7 @@ describe "zip file uploads" do
           refresh_page
         end
         filename, path, data, file = get_file('attachments.zip')
-        first_selected_option(f('#upload_to select')).attribute('value').should == @folder.id.to_s
+        first_selected_option(f('#upload_to select')).should have_value(@folder.id.to_s)
         f('input#zip_file').send_keys(path)
         submit_form('#zip_file_import_form')
 
@@ -258,12 +256,12 @@ describe "zip file uploads" do
         zfi.context.should == @context
         zfi.folder.should == @folder
 
-        f('#uploading_please_wait_dialog') # verify it's visible
+        f('.ui-dialog-title').should include_text('Uploading, Please Wait.') # verify it's visible
 
         job = Delayed::Job.last(:order => :id)
         job.tag.should == 'ZipFileImport#process_without_send_later'
         run_job(job)
-        upload_file(true) if f("#flash_error_message").displayed? && refresh != true
+        upload_file(true) if refresh != true && f("#flash_message_holder .ui-state-error").present?
         zfi
       end
 
@@ -288,7 +286,7 @@ describe "zip file uploads" do
       next unless driver.execute_script("return $.handlesHTML5Files;") == true
 
       folder = Folder.root_folders(@context).first
-      keep_trying_until { !f('#files_content .message.no_content') }
+      keep_trying_until { f('#files_content .message.no_content').should be_nil }
 
       filename, path, data, file = get_file('attachments.zip')
 
@@ -308,13 +306,13 @@ describe "zip file uploads" do
       zfi.context.should == @context
       zfi.folder.should == folder
 
-      f('#uploading_please_wait_dialog') # verify it's visible
+      f('.ui-dialog-title').should include_text('Extracting Files into Folder') # verify it's visible
 
       job = Delayed::Job.last(:order => :id)
       job.tag.should == 'ZipFileImport#process_without_send_later'
       run_job(job)
 
-      keep_trying_until { !f('#uploading_please_wait_dialog') } # wait until it's no longer visible
+      keep_trying_until { f('#uploading_please_wait_dialog').should be_nil } # wait until it's no longer visible
 
       zfi.reload.state.should == :imported
 

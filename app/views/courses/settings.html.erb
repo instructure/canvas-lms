@@ -4,22 +4,7 @@
   js_bundle :course_settings
   @active_tab = "settings"
 
-  enrollment_hashes  = {} 
-  ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].each do |type|
-    enrollment_hashes[type] = {} 
-    list = @context.detailed_enrollments.select{|e| e.type == type && e.active_or_pending?}.sort_by{|e| e.user.sortable_name.downcase rescue 'a' }
-    if type == 'StudentEnrollment' && @context.visibility_limited_to_course_sections?(@current_user)
-      user_ids = @context.students_visible_to(@current_user).map(&:id)
-      list = list.select{|e| user_ids.include?(e.user_id) }
-    end
-    list.each{|e| enrollment_hashes[type][e.user] ||= []; enrollment_hashes[type][e.user] << e }
-  end
   can_rename_course = can_do(@context.account, @current_user, :manage_courses) || !@context.root_account.settings[:prevent_course_renaming_by_teachers]
-  students = enrollment_hashes['StudentEnrollment'].map{|k, v| v[0]}
-  teachers = enrollment_hashes['TeacherEnrollment'].map{|k, v| v[0]}
-  tas = enrollment_hashes['TaEnrollment'].map{|k, v| v[0]}
-  observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]}
-  designers = enrollment_hashes['DesignerEnrollment'].map{|k, v| v[0]}
   has_multiple_sections = @context.course_sections.active.count > 1
 
   publishing_enabled = @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades)
@@ -60,7 +45,7 @@
     <% if can_do(@context, @current_user, :read) %>
       <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export_content', %{Export Course Content}) %></a>
     <% end %>
-    <% if can_do(@context, @current_user, :manage_content) %>
+    <% if can_do(@context, @current_user, :reset_content) %>
       <a href="<%= context_url(@context, :course_reset_url) %>" class="button button-sidebar-wide reset_course_content_button"><%= image_tag "delete.png" %><%= t('links.reset', %{Reset Course Content}) %></a>
       <div id="reset_course_content_dialog" style="display: none;">
           <%= mt 'help.reset_course_content', %{Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content.  This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?} %>
@@ -80,23 +65,23 @@
       </thead>
       <tr>
         <td><%= before_label('students', %{Students}) %></td>
-        <td class="student_count"><%= students.empty? ? t('none', "None") : students.length %></td>
+        <td class="student_count"><%= @user_counts[:student] == 0 ? t('none', "None") : @user_counts[:student] %></td>
       </tr>
       <tr>
         <td><%= before_label('teachers', %{Teachers}) %></td>
-        <td class="teacher_count"><%= teachers.empty? ? t('none', "None") : teachers.length %></td>
+        <td class="teacher_count"><%= @user_counts[:teacher] ? t('none', "None") : @user_counts[:teacher] %></td>
       </tr>
       <tr>
         <td><%= before_label('tas', %{TAs}) %></td>
-        <td class="ta_count"><%= tas.empty? ? t('none', "None") : tas.length %></td>
+        <td class="ta_count"><%= @user_counts[:ta] ? t('none', "None") : @user_counts[:ta] %></td>
       </tr>
       <tr>
         <td><%= before_label('observers', %{Observers}) %></td>
-        <td class="observer_count"><%= observers.empty? ? t('none', "None") : observers.length %></td>
+        <td class="observer_count"><%= @user_counts[:observer] ? t('none', "None") : @user_counts[:observer] %></td>
       </tr>
       <tr>
         <td><%= before_label('designers', %{Designers}) %></td>
-        <td class="designer_count"><%= designers.empty? ? t('none', "None") : designers.length %></td>
+        <td class="designer_count"><%= @user_counts[:designer] ? t('none', "None") : @user_counts[:designer] %></td>
       </tr>
     </table>
   </div>
@@ -278,13 +263,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </tr><tr>
         <td style="width: 10%;"><%= f.blabel :locale, :language, :en => "Language" %></td>
         <td>
-          <span class="course_form">
+          <div class="course_form">
             <% no_language = t(:no_language_preference, "Not set (user-configurable, defaults to %{language})", :language => available_locales[infer_locale(:context => @context.account)]) %>
             <%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.locale %>
             <div style="font-size: 0.8em;">
               <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>
             </div>
-          </span>
+          </div>
           <span class="course_info locale"><%= @context.locale ? available_locales[@context.locale] : no_language %></span>
         </td>
       <% end %>
@@ -318,13 +303,13 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <span class="course_info grading_scheme_set">
             <%= @context.grading_standard_enabled? ? (@context.grading_standard_title || t('grading_standard_currently_set', "Currently Set")) : t('grading_standard_not_set', "Not Set") %>
           </span>
-          <span class="course_form">
+          <div class="course_form">
             <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox" %>
             <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
             <div class="grading_standard_link" style="margin-left: 20px;">
               <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
             </div>
-          </span>
+          </div>
         </td>
       </tr>
       <tr>
@@ -474,8 +459,8 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
   <% if can_see_users %>
   <div id="tab-users">
     <h2 style="margin-top: 10px;"><%= t('headings.current_users', %{Current Users}) %></h2>
-    <div style="margin-bottom: 10px; <%= hidden if (students + teachers + tas + observers).select{|e| e.invited? }.empty? %>">
-      <%= t 'unaccepted_invitations', "%{count} Invitations haven't been accepted.  You can click a user's name to re-send their invitation", :count => %[<span class="unaccepted_invitations">#{(students + teachers + tas + observers).select{|e| e.invited? }.length}</span>].html_safe %>
+    <div style="margin-bottom: 10px; <%= hidden if @user_counts[:invited] == 0 %>">
+      <%= t 'unaccepted_invitations', "%{count} Invitations haven't been accepted.  You can click a user's name to re-send their invitation", :count => %[<span class="unaccepted_invitations">#{@user_counts[:invited]}</span>].html_safe %>
 
       <% if @context.available? %>
         <% ot 're_send_all', 'or *Re-Send All Unaccepted Invitations*', :wrapper => capture { %><div><span><button type="button" href="<%= course_re_send_invitations_url %>" class="button re_send_invitations_link">\1</button></span>
@@ -485,49 +470,28 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     <table style="width: 100%;">
       <tr>
         <td style="vertical-align: top; padding-right: 30px;">
-          <h3><%= t 'headings.students', 'Students' %> <span class="tally">(<span class="student_count"><%= students.length %></span>)</span></h3>
-          <ul class="user_list student_enrollments">
-            <% if students.empty? %>
-              <li class="none"><%= t('no_students', %{No Students Enrolled}) %></li>
-            <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['StudentEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
-            <% end %>
-            <%= render :partial => 'shared/enrollment', :object => nil, :locals => {:show_information_link => true} %>
-          </ul>
-          <h3><%= t('headings.observers', 'Observers') %> <span class="tally">(<span class="observer_count"><%= observers.length %></span>)</span></h3>
-          <ul class="user_list observer_enrollments">
-            <% if observers.empty? %>
-              <li class="none"><%= t('no_observers', %{No Observers Enrolled}) %></li>
-            <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['ObserverEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_information_link => true} %>
-            <% end %>
-          </ul>
+          <div class="users-wrapper">
+            <h3><%= t 'headings.students', 'Students' %> <span class="tally">(<span class="student_count"><%= @user_counts[:student] %></span>)</span></h3>
+            <ul id="student_enrollments" class="user_list student_enrollments"></ul>
+          </div>
+          <div class="users-wrapper">
+            <h3><%= t('headings.observers', 'Observers') %> <span class="tally">(<span class="observer_count"><%= @user_counts[:observer] %></span>)</span></h3>
+            <ul id="observer_enrollments" class="user_list observer_enrollments"></ul>
+          </div>
         </td>
         <td style="vertical-align: top;">
-          <h3><%= t('headings.teachers', %{Teachers}) %> <span class="tally">(<span class="teacher_count"><%= teachers.length %></span>)</span></h3>
-          <ul class="user_list teacher_enrollments">
-            <% if teachers.empty? %>
-              <li class="none"><%= t('no_teachers', %{No Teachers Assigned}) %></li>
-            <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TeacherEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
-            <% end %>
-          </ul>
-          <h3><%= t('headings.designers', %{Designers}) %> <span class="tally">(<span class="designer_count"><%= designers.length %></span>)</span></h3>
-          <ul class="user_list designer_enrollments">
-            <% if designers.empty? %>
-              <li class="none"><%= t('no_designers', %{No Designers Assigned}) %></li>
-            <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['DesignerEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
-            <% end %>
-          </ul>
-          <h3><%= t('headings.tas', %{TAs}) %> <span class="tally">(<span class="ta_count"><%= tas.length %></span>)</span></h3>
-          <ul class="user_list ta_enrollments">
-            <% if tas.empty? %>
-              <li class="none"><%= t('no_tas', %{No TAs Assigned}) %></li>
-            <% else %>
-              <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TaEnrollment'].to_a.sort_by{|e| e[0].sortable_name.downcase rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
-            <% end %>
-          </ul>
+          <div class="users-wrapper">
+            <h3><%= t('headings.teachers', %{Teachers}) %> <span class="tally">(<span class="teacher_count"><%= @user_counts[:teacher] %></span>)</span></h3>
+            <ul id="teacher_enrollments" class="user_list teacher_enrollments"></ul>
+          </div>
+          <div class="users-wrapper">
+            <h3><%= t('headings.designers', %{Designers}) %> <span class="tally">(<span class="designer_count"><%= @user_counts[:designer] %></span>)</span></h3>
+            <ul id="designer_enrollments" class="user_list designer_enrollments"></ul>
+          </div>
+          <div class="users-wrapper">
+            <h3><%= t('headings.tas', %{TAs}) %> <span class="tally">(<span class="ta_count"><%= @user_counts[:ta] %></span>)</span></h3>
+            <ul id="ta_enrollments" class="user_list ta_enrollments"></ul>
+          </div>
         </td>
       </tr>
     </table>
@@ -536,39 +500,41 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     <% end %>
     <% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :style => "display: none;"} do  %>
     <h2><%= t('headings.add_users', %{Add Course Users}) %></h2>
-    <div style="margin-top: 5px;">
-      <div>
-        <%= label_tag :enrollment_type, :en => "Add More" %>
-        <select name="enrollment_type" title="<%= t('titles.enrollment_type', 'Enrollment Type') %>" id="enrollment_type">
-          <% if can_do(@context, @current_user, :manage_students) %>
-            <option value="StudentEnrollment"><%= t('option.students', %{Students}) %></option>
-          <% end %>
-          <% if can_do(@context, @current_user, :manage_admin_users) %>
-            <option value="TeacherEnrollment"><%= t('option.teachers', %{Teachers}) %></option>
-            <option value="TaEnrollment"><%= t('option.tas', %{TAs}) %></option>
-          <% elsif @context.teacherless? %>
-            <option value="TeacherEnrollment" class="teacherless_invite"><%= t('option.teachers', %{Teachers}) %></option>
-          <% end %>
-          <option value="ObserverEnrollment"><%= t('option.observers', %{Observers}) %></option>
-          <option value="DesignerEnrollment"><%= t('option.designers', %{Designers}) %></option>
-        </select>
-      </div>
-      <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
-        <%= label_tag :course_section_id, :en => 'For the section' %>
-        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
-          <% @context.course_sections.active.each do |section| %>
-            <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
-          <% end %>
-        </select>
-      </div>
-      <div>
-        <span id="limit_privileges_to_course_section_holder" style="padding-left: 10px; white-space: nowrap;">
-          <input type="checkbox" id="limit_privileges_to_course_section" name="limit_privileges_to_course_section" value="1"/>
-          <%= label_tag :limit_privileges_to_course_section, :en => 'these admins can only grade students in their section' %>
-        </span>
-      </div>
-      <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
-        <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative privileges for this course.}) %>
+    <div class="add-course-users">
+      <div class="header">
+        <div class="id-holder">
+          <%= label_tag :enrollment_type, :en => "Add More" %>
+          <select name="enrollment_type" title="<%= t('titles.enrollment_type', 'Enrollment Type') %>" id="enrollment_type">
+            <% if can_do(@context, @current_user, :manage_students) %>
+              <option value="StudentEnrollment"><%= t('option.students', %{Students}) %></option>
+            <% end %>
+            <% if can_do(@context, @current_user, :manage_admin_users) %>
+              <option value="TeacherEnrollment"><%= t('option.teachers', %{Teachers}) %></option>
+              <option value="TaEnrollment"><%= t('option.tas', %{TAs}) %></option>
+            <% elsif @context.teacherless? %>
+              <option value="TeacherEnrollment" class="teacherless_invite"><%= t('option.teachers', %{Teachers}) %></option>
+            <% end %>
+            <option value="ObserverEnrollment"><%= t('option.observers', %{Observers}) %></option>
+            <option value="DesignerEnrollment"><%= t('option.designers', %{Designers}) %></option>
+          </select>
+        </div>
+        <div class="id-holder" style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
+          <%= label_tag :course_section_id, :en => 'For the section' %>
+          <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
+            <% @context.course_sections.active.each do |section| %>
+              <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
+            <% end %>
+          </select>
+        </div>
+        <div style="clear:both">
+          <span id="limit_privileges_to_course_section_holder" style="padding-left: 10px; white-space: nowrap;">
+            <input type="checkbox" id="limit_privileges_to_course_section" name="limit_privileges_to_course_section" value="1"/>
+            <%= label_tag :limit_privileges_to_course_section, :en => 'these admins can only grade students in their section' %>
+          </span>
+        </div>
+        <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
+          <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative privileges for this course.}) %>
+        </div>
       </div>
       <%= render :partial => 'shared/user_lists' %>
       <% unless @context.available? %>
@@ -584,38 +550,6 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
     <% end %>
-    <div style="text-align: center; display: none;" id="enrollment_dialog">
-      <% user_snippet = capture { %><span class="name"></span><% } %>
-      <% time_snippet = capture { %><div style="margin: 10px;" class="invitation_sent_at"></div><% } %>
-      <div class="admin_enrollment_re_send">
-        <%= t 'admin_invitation_unaccepted', "%{user} hasn't yet accepted the invitation to join the course.  The invitation was sent: %{time}", :user => user_snippet, :time => time_snippet %>
-      </div>
-      <div class="student_enrollment_re_send">
-        <% if @context.available? %>
-          <%= t 'student_invitation_unaccepted_available', "%{user} hasn't yet accepted the invitation to join the course.  The invitation was sent: %{time}", :user => user_snippet, :time => time_snippet %>
-        <% else %>
-          <%= t 'student_invitation_unaccepted_unavailable', "%{user} was added to the course: %{time}", :user => user_snippet, :time => time_snippet %>
-        <% end %>
-      </div>
-      <div class="accepted_enrollment_re_send">
-        <%= t 'accepted_invitation', "%{user} has already received and accepted the invitation to join the course, but you can still re-send the invitation if they need it.", :user => user_snippet %>
-      </div>
-      <div style="margin: 15px 10px; font-weight: bold;">
-        <div class="admin_enrollment_re_send">
-          <a href="#" class="re_send_invitation_link button"><%= t('links.re_send_invitation', %{Re-Send Invitation}) %></a>
-        </div>
-        <div class="accepted_enrollment_re_send">
-          <a href="#" class="re_send_invitation_link button"><%= t('links.re_send_invitation', %{Re-Send Invitation}) %></a>
-        </div>
-        <div class="student_enrollment_re_send">
-          <% if @context.available? %>
-            <a href="#" class="re_send_invitation_link button"><%= t('links.re_send_invitation', %{Re-Send Invitation}) %></a>
-          <% else %>
-            <%= t 'invitations_pending_publish', "Invitations aren't sent until the course is *published*", :wrapper => %{<a href="#{context_url(@context, :context_url)}">\\1</a>} %>
-          <% end %>
-        </div>
-      </div>
-    </div>
     <%= render :partial => 'link_enrollment' %>
   </div>
   <% end %>

@@ -515,6 +515,12 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
+      :manage_developer_keys => {
+        :label => lambda { t('permissions.manage_developer_keys', "Manage developer keys") },
+        :account_only => :site_admin,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+      },
       :manage_sis => {
         :label => lambda { t('permissions.manage_sis', "Import and manage SIS data") },
         :account_only => true,

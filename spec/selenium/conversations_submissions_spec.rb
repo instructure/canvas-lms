@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations submissions" do
@@ -17,13 +16,13 @@ describe "conversations submissions" do
     conversation(@bob)
     get "/conversations"
     elements = nil
-    keep_trying_until {
+    keep_trying_until do
       elements = get_conversations
       elements.size == 1
-    }
+    end
     elements.first.click
     wait_for_ajaximations
-    subs = driver.find_elements(:css, "div#messages .submission")
+    subs = ff("div#messages .submission")
     subs.size.should == 2
     subs[0].find_element(:css, '.score').text.should == '0.9 / 1.5'
     subs[1].find_element(:css, '.score').text.should == 'no score'

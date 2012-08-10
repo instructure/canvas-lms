@@ -1,4 +1,10 @@
-<% content_for :page_title, t('titles.invitation', 'Invitation to %{course}', :course => @context.name) %>
+<%
+  jammit_css :login
+  @headers = false
+  @body_classes << "modal"
+  content_for :page_title, t('titles.invitation', 'Invitation to %{course}', :course => @context.name)
+%>
+
 <% @show_left_side = false %>
 
 <% content_for :page_header do %>
@@ -6,8 +12,6 @@
 <% end %>
 
 <div id="modal-box">
-  <div id="modal-box-inner">
-    <h2><%= t('headings.received', %{Invitation Received!}) %></h2>
-    <%= t 'details', %{You should get an email at %{email} in the next few minutes.  That email will have a link that you can use to finish the registration process.  Once you've set up your account you'll be able to access content from %{course}. Welcome to Canvas!}, :email => content_tag('b', params[:email]), :course => content_tag('b', @context.name) %>
-  </div>
+  <h2><%= t('headings.received', %{Invitation Received!}) %></h2>
+  <%= t 'details', %{You should get an email at %{email} in the next few minutes.  That email will have a link that you can use to finish the registration process.  Once you've set up your account you'll be able to access content from %{course}. Welcome to Canvas!}, :email => content_tag('b', params[:email]), :course => content_tag('b', @context.name) %>
 </div>

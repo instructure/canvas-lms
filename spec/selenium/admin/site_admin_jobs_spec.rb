@@ -18,7 +18,7 @@ describe "site admin jobs ui" do
     wait_for_ajax_requests
     keep_trying_until do
       Delayed::Job.all.each { |job| job.reload }
-      Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should eql count
+      Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should == count
     end
 
     status_cells = ff('.r2')
@@ -72,7 +72,7 @@ describe "site admin jobs ui" do
       f("#hold-jobs").click
       wait_for_ajax_requests
       j.reload.locked_by.should == 'on hold'
-      Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should eql 1
+      Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should == 1
     end
 
     context "all jobs" do
@@ -83,34 +83,34 @@ describe "site admin jobs ui" do
       it "should check all popular tags" do
         filter_tags(FlavorTags::ALL)
         keep_trying_until do
-          f("#tags-grid div[row='0'] .r0").text.should eql "String#reverse"
-          f("#tags-grid div[row='0'] .r1").text.should eql "2"
-          f("#tags-grid div[row='1'] .r0").text.should eql "String#capitalize"
-          f("#tags-grid div[row='1'] .r1").text.should eql "1"
+          f("#tags-grid div[row='0'] .r0").text.should == "String#reverse"
+          f("#tags-grid div[row='0'] .r1").text.should == "2"
+          f("#tags-grid div[row='1'] .r0").text.should == "String#capitalize"
+          f("#tags-grid div[row='1'] .r1").text.should == "1"
         end
       end
 
       it "should check current popular tags" do
         filter_tags(FlavorTags::CURRENT)
         keep_trying_until do
-          f("#tags-grid div[row='0'] .r0").text.should eql "String#reverse"
-          f("#tags-grid div[row='0'] .r1").text.should eql "2"
+          f("#tags-grid div[row='0'] .r0").text.should == "String#reverse"
+          f("#tags-grid div[row='0'] .r1").text.should == "2"
         end
       end
 
       it "should check future popular tags" do
         filter_tags(FlavorTags::FUTURE)
         keep_trying_until do
-          f("#tags-grid div[row='0'] .r0").text.should eql "String#capitalize"
-          f("#tags-grid div[row='0'] .r1").text.should eql "1"
+          f("#tags-grid div[row='0'] .r0").text.should == "String#capitalize"
+          f("#tags-grid div[row='0'] .r1").text.should == "1"
         end
       end
 
       it "should check failed popular tags" do
         filter_tags(FlavorTags::FAILED)
         keep_trying_until do
-          f("#tags-grid .r0").text.should eql "String#downcase"
-          f("#tags-grid .r1").text.should eql "1"
+          f("#tags-grid .r0").text.should == "String#downcase"
+          f("#tags-grid .r1").text.should == "1"
         end
       end
 
@@ -118,7 +118,7 @@ describe "site admin jobs ui" do
         f("#hold-jobs").click
         driver.switch_to.alert.should_not be_nil
         driver.switch_to.alert.accept
-        Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should eql 0
+        Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should == 0
       end
 
       it "should confirm that all current rows were selected and put on hold" do
@@ -141,9 +141,9 @@ describe "site admin jobs ui" do
         driver.switch_to.alert.accept
         wait_for_ajax_requests
         keep_trying_until do
-          f("#jobs-grid .even .r2").text.should eql "0/ 15"
-          f("#jobs-grid .odd .r2").text.should eql "0/ 15"
-          Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should eql 0
+          f("#jobs-grid .even .r2").text.should == "0/ 15"
+          f("#jobs-grid .odd .r2").text.should == "0/ 15"
+          Delayed::Job.count(:conditions => {:locked_by => 'on hold'}).should == 0
         end
       end
 
@@ -152,7 +152,7 @@ describe "site admin jobs ui" do
         f("#jobs-refresh").click
         wait_for_ajax_requests
         job = Delayed::Job.find_by_tag("String#capitalize")
-        f("#jobs-grid .l0").text.should eql job.id.to_s
+        f("#jobs-grid .l0").text.should == job.id.to_s
       end
 
       it "should confirm that all jobs were selected" do
@@ -160,14 +160,14 @@ describe "site admin jobs ui" do
         f("#jobs-refresh").click
         wait_for_ajax_requests
         job = Delayed::Job.find_by_tag("String#capitalize")
-        f("#jobs-grid .l0").text.should eql job.id.to_s
+        f("#jobs-grid .l0").text.should == job.id.to_s
       end
 
       it "should confirm that failed jobs were selected" do
         filter_jobs(FlavorTags::FAILED)
         f("#jobs-refresh").click
         wait_for_ajax_requests
-        ff("#jobs-grid .slick-row").count.should eql 1
+        ff("#jobs-grid .slick-row").count.should == 1
         f("#jobs-grid .r1").text.should include_text "String#downcase"
       end
 
@@ -176,7 +176,7 @@ describe "site admin jobs ui" do
         validate_all_jobs_selected
         f("#jobs-grid .odd").should be_displayed
         f("#jobs-grid .even").should be_displayed
-        f("#jobs-total").text.should eql "3"
+        f("#jobs-total").text.should == "3"
         keep_trying_until do
           f("#delete-jobs").click
           driver.switch_to.alert.should_not be_nil
@@ -186,7 +186,7 @@ describe "site admin jobs ui" do
         wait_for_ajax_requests
         fj("#jobs-grid .odd").should be_nil # using fj to bypass selenium cache
         fj("#jobs-grid .even").should be_nil #using fj to bypass selenium cache
-        Delayed::Job.count.should eql 0
+        Delayed::Job.count.should == 0
       end
     end
   end
@@ -196,9 +196,9 @@ describe "site admin jobs ui" do
       j = Delayed::Job.first(:order => :id)
       j.lock_exclusively!('my test worker')
       load_jobs_page
-      ffj('#running-grid .slick-row').size.should eql 1
+      ffj('#running-grid .slick-row').size.should == 1
       first_cell = f('#running-grid .slick-cell.l0.r0')
-      first_cell.text.should eql 'my test worker'
+      first_cell.text.should == 'my test worker'
     end
   end
 end

@@ -5,9 +5,8 @@ define [
   'compiled/views/QuickStartBar/BaseItemView'
   'compiled/models/CalendarEvent'
   'jst/quickStartBar/event'
-  'jquery.rails_flash_notifications'
+  'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
-  'jquery.rails_flash_notifications'
 ], (I18n, $, _, BaseItemView, CalendarEvent, template) ->
 
   class EventView extends BaseItemView

@@ -10,9 +10,7 @@ describe "admin settings tab" do
   def get_default_services
     default_services = []
     service_hash = Account.default.allowed_services_hash
-    service_hash.each do |k, v|
-      default_services.push k if  v[:expose_to_ui]
-    end
+    service_hash.each { |k, v| default_services.push k if  v[:expose_to_ui] }
     default_services
   end
 
@@ -24,11 +22,11 @@ describe "admin settings tab" do
     end
   end
 
-  def check_box_verifier (css_selectors, features, checker=true)
+  def check_box_verifier (css_selectors, features, checker = true)
     is_symbol = false
     if features.is_a? Symbol
-      is_symbol =true
-      if features.eql? :all_selectors
+      is_symbol = true
+      if features == :all_selectors
         features = get_default_services
       end
     end
@@ -47,7 +45,7 @@ describe "admin settings tab" do
       f(selector).click
     end
     click_submit
-    if (is_symbol.eql? false)
+    if (is_symbol == false)
       check_state = Account.default.service_enabled?(features[:allowed_services])
       state_checker checker, check_state
     else
@@ -78,54 +76,24 @@ describe "admin settings tab" do
     wait_for_ajax_requests
   end
 
-  context "acccount settings" do
-    it "should change the admins name " do
-      replace_content f("#account_name"), "Admin 1"
-      click_submit
-      Account.default.name.should eql "Admin 1"
-      f("#account_name").should have_value "Admin 1"
-    end
-
-    it "should change the default course file quota" do
-      quota = 300
-      f("#account_default_course_storage_quota").should have_value "500"
-      replace_content f("#account_default_course_storage_quota"), quota
-      click_submit
-      Account.default.default_storage_quota.should eql quota.megabytes
-      f("#account_default_course_storage_quota").should have_value quota.to_s
-    end
-
-    it "should change the default user file quota" do
-      quota = 100
-      f("#account_default_user_storage_quota").should have_value "50"
-      replace_content f("#account_default_user_storage_quota"), quota
-      click_submit
-      Account.default.default_user_storage_quota.should eql quota.megabytes
-      f("#account_default_user_storage_quota").should have_value quota.to_s
-    end
-
-    it "should change the default language to spanish" do
-      f("#account_default_locale option[value='es']").click
-      click_submit
-      Account.default.default_locale.should eql "es"
-      f("label[for='account_name']").text.should include_text("Nombre de Cuenta")
-    end
+  context "account settings" do
 
     it "should change the default time zone to Lima" do
       f("#account_default_time_zone option[value='Lima']").click
       click_submit
-      Account.default.default_time_zone.should eql "Lima"
+      Account.default.default_time_zone.should == "Lima"
       f("#account_default_time_zone option[value='Lima']").attribute("selected").should be_true
     end
+
     describe "allow self-enrollment" do
       def enrollment_helper (value='')
-        if (value.eql? '')
+        if (value == '')
           f("#account_settings_self_enrollment option[value='']").click
         else
           f("#account_settings_self_enrollment option[value=#{value}]").click
         end
         click_submit
-        Account.default[:settings][:self_enrollment].should eql value
+        Account.default[:settings][:self_enrollment].should == value
         f("#account_settings_self_enrollment").should have_value value
       end
 
@@ -148,6 +116,37 @@ describe "admin settings tab" do
 
     it "should uncheck 'students can opt-in to receiving scores in email notifications' " do
       check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, false)
+    end
+  end
+
+  context "global includes" do
+    it "should not have a global includes section by default" do
+      fj('#account_settings_global_includes_settings:visible').should be_nil
+    end
+
+    it "should have a global includes section if enabled" do
+      Account.default.settings = Account.default.settings.merge({ :global_includes => true })
+      Account.default.save!
+      section = f('#account_settings_global_includes_settings')
+      section.find_element(:id, 'account_settings_sub_account_includes').should_not be_nil
+    end
+
+    it "a sub-account should not have a global includes section by default" do
+      Account.default.settings = Account.default.settings.merge({ :global_includes => true })
+      Account.default.save!
+      acct = account_model(:root_account => Account.default)
+      get "/accounts/#{acct.id}/settings"
+      fj('#account_settings_global_includes_settings:visible').should be_nil
+    end
+
+    it "a sub-account should have a global includes section if enabled by the parrent" do
+      Account.default.settings = Account.default.settings.merge({ :global_includes => true })
+      Account.default.settings = Account.default.settings.merge({ :sub_account_includes => true })
+      Account.default.save!
+      acct = account_model(:root_account => Account.default)
+      get "/accounts/#{acct.id}/settings"
+      section = f('#account_settings_global_includes_settings')
+      section.find_element(:id, 'account_settings_sub_account_includes').should_not be_nil
     end
   end
 
@@ -221,8 +220,8 @@ describe "admin settings tab" do
         f("#account_settings_equella_endpoint").send_keys(equella_url)
         f("#account_settings_equella_teaser").send_keys("equella feature")
         click_submit
-        Account.default.settings[:equella_endpoint].should eql equella_url
-        Account.default.settings[:equella_teaser].should eql "equella feature"
+        Account.default.settings[:equella_endpoint].should == equella_url
+        Account.default.settings[:equella_teaser].should == "equella feature"
         f("#account_settings_equella_endpoint").should have_value equella_url
         f("#account_settings_equella_teaser").should have_value "equella feature"
       end
@@ -241,8 +240,8 @@ describe "admin settings tab" do
         replace_content(f("#account_settings_equella_endpoint"), new_equella_url)
         replace_content(f("#account_settings_equella_teaser"), "new equella feature")
         click_submit
-        Account.default.settings[:equella_endpoint].should eql new_equella_url
-        Account.default.settings[:equella_teaser].should eql "new equella feature"
+        Account.default.settings[:equella_endpoint].should == new_equella_url
+        Account.default.settings[:equella_teaser].should == "new equella feature"
         f("#account_settings_equella_endpoint").should have_value new_equella_url
         f("#account_settings_equella_teaser").should have_value "new equella feature"
       end
@@ -254,8 +253,8 @@ describe "admin settings tab" do
         replace_content(f("#account_settings_equella_endpoint"), "")
         replace_content(f("#account_settings_equella_teaser"), "")
         click_submit
-        Account.default.settings[:equella_endpoint].should eql ""
-        Account.default.settings[:equella_teaser].should eql ""
+        Account.default.settings[:equella_endpoint].should == ""
+        Account.default.settings[:equella_teaser].should == ""
         fj("#account_settings_equella_endpoint:visible").should be_nil
         fj("#account_settings_equella_teaser:visible").should be_nil
       end
@@ -303,17 +302,17 @@ describe "admin settings tab" do
     end
 
     it "should enable and disable a plugin service (setting)" do
-      Account.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false })
+      Account.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false})
       get "/accounts/#{Account.default.id}/settings"
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin })
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin})
+      check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin}, false)
     end
 
     it "should enable and disable a plugin service (service)" do
-      Account.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false })
+      Account.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false})
       get "/accounts/#{Account.default.id}/settings"
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin })
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin})
+      check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin}, false)
     end
   end
 

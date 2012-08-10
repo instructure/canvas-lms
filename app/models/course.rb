@@ -72,6 +72,7 @@ class Course < ActiveRecord::Base
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", :include => :user
+  has_many :typical_current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')", :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
   has_many :students, :through => :student_enrollments, :source => :user
   has_many :all_students, :through => :all_student_enrollments, :source => :user
@@ -100,6 +101,7 @@ class Course < ActiveRecord::Base
   has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment') and enrollments.workflow_state = 'active'"
   has_many :student_view_students, :through => :student_view_enrollments, :source => :user
   has_many :student_view_enrollments, :class_name => 'StudentViewEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
+  has_many :participating_typical_users, :through => :typical_current_enrollments, :source => :user
 
   has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content, :conditions => "content_tags.content_type = 'LearningOutcome'"
   has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
@@ -107,7 +109,8 @@ class Course < ActiveRecord::Base
   has_many :learning_outcome_groups, :as => :context
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
-  has_many :users, :through => :enrollments, :source => :user
+  has_many :users, :through => :enrollments, :source => :user, :uniq => true
+  has_many :current_users, :through => :current_enrollments, :source => :user, :uniq => true
   has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
@@ -920,12 +923,15 @@ class Course < ActiveRecord::Base
     given { |user, session| self.available? && self.teacherless? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } && (!session || !session["role_course_#{self.id}"]) }
     can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
 
-    # Active teachers
+    # Active admins (Teacher/TA/Designer)
     given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
     can :read_as_admin and can :read and can :manage and can :update and can :use_student_view
 
-    given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    # Teachers and Designers can delete/reset, but not TAs
+    given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
     can :delete
+    given { |user, session| !self.deleted? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    can :reset_content
 
     # Student view student
     given { |user| user && user.fake_student? && user.cached_not_ended_enrollments.any?{ |e| e.course_id == self.id } }
@@ -935,14 +941,15 @@ class Course < ActiveRecord::Base
     given { |user| (self.available? || self.completed?) && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
     can :read
 
-    # Teacher of a concluded course
+    # Admin (Teacher/TA/Designer) of a concluded course
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.completed? }) }
     can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
 
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? && e.completed? }) }
     can :read_user_notes and can :view_all_grades
 
-    given { |user| !self.deleted? && !self.sis_source_id && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.state_based_on_date == :completed })}
+    # Teacher or Designer of a concluded course
+    given { |user| !self.deleted? && !self.sis_source_id && user && (self.prior_enrollments.select{|e| e.content_admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.content_admin? && e.state_based_on_date == :completed })}
     can :delete
 
     # Student of a concluded course
@@ -958,7 +965,7 @@ class Course < ActiveRecord::Base
     can :read_as_admin
 
     given { |user, session| self.account_membership_allows(user, session, :manage_courses) }
-    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view
+    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content
 
     given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
     can :read
@@ -1181,7 +1188,7 @@ class Course < ActiveRecord::Base
     # 'publish_final_grades'
 
     self.recompute_student_scores_without_send_later
-    enrollments = self.student_enrollments.not_fake.scoped({:include => [:user, :course_section]}).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    enrollments = self.student_enrollments.not_fake.scoped(:include => [:user, :course_section], :order => User.sortable_name_order_by_clause('users'), :extend => User::SortableNameExtension)
 
     errors = []
     posts_to_make = []
@@ -1267,7 +1274,7 @@ class Course < ActiveRecord::Base
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.scoped(:include => includes).find(:all, :order => User.sortable_name_order_by_clause('users'))
+    student_enrollments = scope.scoped(:include => includes, :order => User.sortable_name_order_by_clause('users'), :extend => User::SortableNameExtension)
     # remove duplicate enrollments for students enrolled in multiple sections
     seen_users = []
     student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
@@ -1368,6 +1375,7 @@ class Course < ActiveRecord::Base
     enrollment_state = opts[:enrollment_state]
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
+    associated_user_id = opts[:associated_user_id]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
@@ -1375,7 +1383,9 @@ class Course < ActiveRecord::Base
     else
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
-    if opts[:allow_multiple_enrollments]
+    if opts[:allow_multiple_enrollments] && associated_user_id
+      e = self.enrollments.find_by_user_id_and_type_and_course_section_id_and_associated_user_id(user.id, type, section.id, associated_user_id)
+    elsif opts[:allow_multiple_enrollments]
       e = self.enrollments.find_by_user_id_and_type_and_course_section_id(user.id, type, section.id)
     else
       e = self.enrollments.find_by_user_id_and_type(user.id, type)
@@ -1396,6 +1406,7 @@ class Course < ActiveRecord::Base
         :workflow_state => enrollment_state, 
         :limit_privileges_to_course_section => limit_privileges_to_course_section)
     end
+    e.associated_user_id = associated_user_id
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
@@ -1978,7 +1989,7 @@ class Course < ActiveRecord::Base
           new_folder_id = merge_mapped_id(file.folder)
         end
         new_file.folder_id = new_folder_id
-        new_file.save!
+        new_file.save_without_broadcasting!
         map_merge(file, new_file)
       end
     end
@@ -2401,7 +2412,19 @@ class Course < ActiveRecord::Base
       when :full then scope
       when :sections then scope.scoped(:conditions => ["enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false])
       when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
-      else scope.scoped({:conditions => "FALSE"})
+      else scope.scoped({:conditions => ["?", false]})
+    end
+  end
+
+  def users_visible_to(user, include_priors=false)
+    visibilities = section_visibilities_for(user)
+    scope = include_priors ? users : current_users
+    # See also Users#messageable_users (same logic used to get users across multiple courses)
+    case enrollment_visibility_level_for(user, visibilities)
+      when :full then scope
+      when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
+      else scope.scoped({:conditions => ["?", false]})
     end
   end
 

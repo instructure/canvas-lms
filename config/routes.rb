@@ -12,7 +12,8 @@ ActionController::Routing::Routes.draw do |map|
   map.conversations_starred 'conversations/starred', :controller => 'conversations', :action => 'index', :redirect_scope => 'starred'
   map.conversations_sent 'conversations/sent', :controller => 'conversations', :action => 'index', :redirect_scope => 'sent'
   map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :redirect_scope => 'archived'
-  map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
+  map.connect 'conversations/find_recipients', :controller => 'search', :action => 'recipients' # use search_recipients_url instead
+  map.search_recipients 'search/recipients', :controller => 'search', :action => 'recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
   map.conversations_watched_intro 'conversations/watched_intro', :controller => 'conversations', :action => 'watched_intro', :conditions => {:method => :post}
   map.resources :conversations, :only => [:index, :show, :update, :create, :destroy] do |conversation|
@@ -481,7 +482,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.menu_courses 'menu_courses', :controller => 'users', :action => 'menu_courses'
   map.all_menu_courses 'all_menu_courses', :controller => 'users', :action => 'all_menu_courses'
-  map.resources :favorites, :only => [:create, :destroy]
 
   map.grades "grades", :controller => "users", :action => "grades"
 
@@ -527,10 +527,9 @@ ActionController::Routing::Routes.draw do |map|
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
     user.resources :messages, :only => [:index]
   end
-
-  map.resource :profile, :only => %w(show edit update),
-                         :controller => "profile",
-                         :member => { :communication => :get, :update_communication => :post } do |profile|
+  map.resource :profile, :only => %w(show update),
+               :controller => "profile",
+               :member => { :communication => :get, :communication_update => :put, :settings => :get } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
     profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'
@@ -659,9 +658,9 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses', :action => :index
       courses.post 'accounts/:account_id/courses', :action => :create
       courses.get 'courses/:id', :action => :show
-      courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
+      courses.get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.delete 'courses/:id', :action => :destroy
@@ -670,6 +669,12 @@ ActionController::Routing::Routes.draw do |map|
       courses.post 'courses/:course_id/files', :action => :create_file
       courses.post 'courses/:course_id/folders', :controller => :folders, :action => :create
       courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show
+    end
+
+    api.with_options(:controller => :sections) do |sections|
+      sections.get 'courses/:course_id/sections', :action => :index, :path_name => 'course_sections'
+      sections.get 'courses/:course_id/sections/:id', :action => :show, :path_name => 'course_section'
+      sections.get 'sections/:id', :action => :show
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
@@ -815,13 +820,12 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
-    api.get 'users/:user_id/profile', :controller => :profile, :action => :edit
+    api.get 'users/:user_id/profile', :controller => :profile, :action => :settings
     api.get 'users/:user_id/avatars', :controller => :profile, :action => :profile_pics
 
     api.with_options(:controller => :conversations) do |conversations|
       conversations.get 'conversations', :action => :index
       conversations.post 'conversations', :action => :create
-      conversations.get 'conversations/find_recipients', :action => :find_recipients
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/:id', :action => :show
       conversations.put 'conversations/:id', :action => :update # stars, subscribed-ness, workflow_state
@@ -864,6 +868,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :groups) do |groups|
       groups.resources :groups, :except => [:index]
+      groups.get 'users/self/groups', :action => :index
       groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
@@ -894,6 +899,19 @@ ActionController::Routing::Routes.draw do |map|
         items.delete "collections/items/:item_id/upvotes/self", :action => :remove_upvote
       end
     end
+    
+    api.with_options(:controller => :developer_keys) do |keys|
+      keys.get 'developer_keys', :action => :index
+      keys.get 'developer_keys/:id', :action => :show
+      keys.delete 'developer_keys/:id', :action => :destroy
+      keys.put 'developer_keys/:id', :action => :update
+      keys.post 'developer_keys', :action => :create
+    end
+
+    api.with_options(:controller => :search) do |search|
+      search.get 'search/rubrics', :action => 'rubrics', :path_name => 'search_rubrics'
+      search.get 'search/recipients', :action => 'recipients', :path_name => 'search_recipients'
+    end
 
     api.post 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
     api.get 'files/:id/create_success', :controller => :files, :action => :api_create_success, :path_name => 'files_create_success'
@@ -912,6 +930,15 @@ ActionController::Routing::Routes.draw do |map|
       folders.get 'folders/:id/files', :controller => :files, :action => :api_index, :path_name => 'list_files'
       folders.delete 'folders/:id', :action => :api_destroy
       folders.put 'folders/:id', :action => :update
+      folders.post 'folders/:folder_id/folders', :action => :create, :path_name => 'create_folder'
+      folders.post 'folders/:folder_id/files', :action => :create_file
+    end
+    
+    api.with_options(:controller => :favorites) do |favorites|
+      favorites.get "users/self/favorites/courses", :action => :list_favorite_courses
+      favorites.post "users/self/favorites/courses/:id", :action => :add_favorite_course
+      favorites.delete "users/self/favorites/courses/:id", :action => :remove_favorite_course
+      favorites.delete "users/self/favorites/courses", :action => :reset_course_favorites
     end
   end
 
@@ -942,6 +969,13 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :files do |file|
     file.download 'download', :controller => 'files', :action => 'show', :download => '1'
   end
+
+  map.resources :apps, :only => [:index, :show] do |app|
+    app.comments 'comments', :controller => 'apps', :action => 'comments', :conditions => {:method => :get}
+    app.post_comment 'comments', :controller => 'apps', :action => 'comment', :conditions => {:method => :post}
+  end
+  
+  map.resources :developer_keys, :only => [:index]
 
   map.resources :rubrics do |rubric|
     rubric.resources :rubric_assessments, :as => 'assessments'

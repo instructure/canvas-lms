@@ -18,6 +18,7 @@
 
 module Api::V1::Group
   include Api::V1::Json
+  include Api::V1::Context
 
   API_GROUP_JSON_OPTS = {
     :only => %w(id name description is_public join_level group_category_id),
@@ -30,12 +31,15 @@ module Api::V1::Group
 
   def group_json(group, user, session, options = {})
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS)
+    hash.merge!(context_data(group))
     followed = ::UserFollow.followed_by_user([group], user)
     hash['followed_by_user'] = !!followed.include?(group)
     image = group.avatar_attachment
     hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
+    hash['role'] = group.group_category.role
     include = options[:include] || []
     if include.include?('users')
+      # TODO: this should be switched to user_display_json
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }
     end
     hash
@@ -45,4 +49,3 @@ module Api::V1::Group
     api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
   end
 end
-

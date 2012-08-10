@@ -1,4 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations" do
@@ -15,23 +14,123 @@ describe "conversations" do
     expect {
       f('#body').send_keys(new_message)
       5.times { submit_form('#create_message_form') }
-      keep_trying_until{ get_conversations.size == 1 }
+      keep_trying_until { get_conversations.size == 1 }
     }.to change(ConversationMessage, :count).by(1)
   end
 
-  it "should auto-mark as read" do
-    @me = @user
-    5.times { conversation(@me, user, :workflow_state => 'unread') }
-    get "/conversations/unread"
-    c = get_conversations.first
-    c.click
-    c[:class].should =~ /unread/ # not marked immediately
-    @me.conversations.unread.size.should eql 5
-    keep_trying_until { get_conversations.first[:class] !~ /unread/ }
-    @me.conversations.unread.size.should eql 4
+  describe 'actions' do
+    def create_conversation(workflow_state = 'unread', starred = false, url = '/conversations')
+      @me = @user
+      conversation(@me, user, :workflow_state => workflow_state, :starred => starred)
+      get url unless url == nil
+    end
 
-    get_conversations.last.click
-    get_conversations.size.should eql 4 # removed once deselected
+    it "should auto-mark as read" do
+      @me = @user
+      5.times { conversation(@me, user, :workflow_state => 'unread') }
+      get "/conversations/unread"
+      c = get_conversations.first
+      c.click
+      c.should have_class('unread') # not marked immediately
+      @me.conversations.unread.size.should eql 5
+      keep_trying_until do
+        get_conversations.first.should_not have_class('unread')
+        true
+      end
+      @me.conversations.unread.size.should eql 4
+
+      get_conversations.last.click
+      get_conversations.size.should eql 4 # removed once deselected
+    end
+
+    it "should star a conversation" do
+      create_conversation
+
+      f('#conversations .action_star').click
+      wait_for_ajaximations
+      f('#conversations .action_unstar').should be_displayed
+      f('#conversations .action_star').should_not be_displayed
+    end
+
+    it "should unstar a conversation" do
+      create_conversation('unread', true)
+
+      f('#conversations .action_unstar').click
+      wait_for_ajaximations
+      f('#conversations .action_star').should be_displayed
+      f('#conversations .action_unstar').should_not be_displayed
+    end
+
+    it "should mark a conversation as unread" do
+      create_conversation('read', false)
+
+      f('.action_mark_as_unread').click
+      wait_for_ajaximations
+      f('.action_mark_as_unread').should_not be_displayed
+      f('.action_mark_as_read').should be_displayed
+      expect_new_page_load { get '/conversations/archived' }
+      f('.conversations .audience').should include_text('New Message')
+    end
+
+    it "should delete a conversation" do
+      create_conversation
+
+      driver.execute_script("$('.actions').addClass('selected')")
+      f('.actions a').click
+      f('#action_delete_all').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      f('#no_messages').should be_displayed
+    end
+
+    it "should archive a conversation" do
+      create_conversation
+
+      driver.execute_script("$('.actions').addClass('selected')")
+      f('.actions a').click
+      f('#action_archive').click
+      wait_for_ajaximations
+      f('#no_messages').should be_displayed
+      expect_new_page_load { get '/conversations/archived' }
+      f('.conversations .audience').should include_text('User')
+    end
+
+    it "should allow you to filter a conversation by sent" do
+      create_conversation
+
+      expect_new_page_load { get '/conversations/archived' }
+      f('.conversations .audience').should include_text('New Message')
+    end
+  end
+
+  context 'messages' do
+    before(:each) do
+      @me = @user
+      conversation(@me, user, :workflow_state => 'unread')
+      get '/conversations'
+      f('.unread').click
+      wait_for_ajaximations
+      f(".messages #message_#{ConversationMessage.last.id}").click
+    end
+
+    it "should forward a message" do
+      forward_body_text = 'new forward'
+      f('#action_forward').click
+      fj('#forward_message_form .token_input input').send_keys('nobody')
+      wait_for_ajaximations
+      f('.selectable').click
+      f('#forward_body').send_keys(forward_body_text)
+      f('.btn-primary').click
+      wait_for_ajaximations
+      f('.messages .message').should include_text(forward_body_text)
+    end
+
+    it "should delete a message" do
+      f('#action_delete').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      f('#no_messages').should be_displayed
+    end
   end
 
   context "conversation loading" do
@@ -52,9 +151,12 @@ describe "conversations" do
         @me = @user
         5.times { conversation(@me, user, :workflow_state => 'unread') }
         get_messages # loads the page, clicks the first conversation
-        keep_trying_until { get_conversations.first[:class] !~ /unread/ }
+        keep_trying_until do
+          get_conversations.first.should_not have_class('unread')
+          true
+        end
         get '/conversations'
-        driver.find_element(:css, '.unread-messages-count').text.should eql '4'
+        f('.unread-messages-count').text.should eql '4'
       end
     end
   end
@@ -78,8 +180,8 @@ describe "conversations" do
         message = submit_message_form(:media_comment => [mo.media_id, mo.media_type])
         message = "#message_#{message.id}"
 
-        find_all_with_jquery("#{message} .message_attachments li").size.should == 1
-        find_with_jquery("#{message} .message_attachments li a .title").text.should == mo.title
+        ffj("#{message} .message_attachments li").size.should == 1
+        fj("#{message} .message_attachments li a .title").text.should == mo.title
       end
     end
   end
@@ -108,7 +210,7 @@ describe "conversations" do
     it "should not be a link in the left conversation list panel" do
       new_conversation
 
-      find_all_with_jquery("#conversations .audience a").should be_empty
+      ffj("#conversations .audience a").should be_empty
     end
   end
 
@@ -155,7 +257,7 @@ describe "conversations" do
 
       add_recipient("student1")
       add_recipient("student2")
-      driver.find_element(:id, "body").send_keys "testing testing"
+      f("#body").send_keys "testing testing"
       submit_form('#create_message_form')
 
       wait_for_ajaximations

@@ -576,13 +576,13 @@ describe CalendarEventsApiController, :type => :integration do
                         :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
                         :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-08', :per_page => '10'})
       json.size.should eql 10
-      response.headers['Link'].should match(%r{</api/v1/calendar_events\?type=assignment&.*page=2.*>; rel="next",</api/v1/calendar_events\?type=assignment&.*page=1.*>; rel="first",</api/v1/calendar_events\?type=assignment&.*page=3.*>; rel="last"})
+      response.headers['Link'].should match(%r{</api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="next",</api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",</api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
                         :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
                         :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-08', :per_page => '10', :page => '3'})
       json.size.should eql 5
-      response.headers['Link'].should match(%r{</api/v1/calendar_events\?type=assignment&.*page=2.*>; rel="prev",</api/v1/calendar_events\?type=assignment&.*page=1.*>; rel="first",</api/v1/calendar_events\?type=assignment&.*page=3.*>; rel="last"})
+      response.headers['Link'].should match(%r{</api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="prev",</api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",</api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
     end
 
     it 'should ignore invalid end_dates' do

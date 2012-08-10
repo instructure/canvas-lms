@@ -37,6 +37,6 @@ $(document).ready(function() {
   </div>
 <% end %>
 <%= render :partial => "shared/login" %>
-<% if flash[:logged_out] && HostUrl.file_host(@domain_root_account, @request.host) %>
-  <img class="hidden-readable" src="//<%= HostUrl.file_host(@domain_root_account, @request.host) %>/file_session/clear"/>
+<% if flash[:logged_out] && HostUrl.file_host(@domain_root_account, @request.host_with_port) %>
+  <img class="hidden-readable" src="//<%= HostUrl.file_host(@domain_root_account, @request.host_with_port) %>/file_session/clear"/>
 <% end %>

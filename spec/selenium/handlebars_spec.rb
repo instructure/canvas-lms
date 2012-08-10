@@ -47,5 +47,13 @@ describe "handlebars" do
       welp, see you l8r! dont forget 2 <a href="http://foo.bar">like us</a> on facebook lol
     RESULT
   end
+
+  it "should 'require' partials used within template" do
+    driver.execute_script Handlebars.compile_template("hi from inside partial", "_test_partial")
+    driver.execute_script Handlebars.compile_template("outside partial {{>test_partial}}", "test_template")
+
+    result = require_exec "jst/test_template", "test_template()"
+    result.should eql "outside partial hi from inside partial"
+  end
 end
 

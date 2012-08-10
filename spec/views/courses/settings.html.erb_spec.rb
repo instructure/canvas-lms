@@ -27,6 +27,7 @@ describe "courses/settings.html.erb" do
       @course.workflow_state = 'claimed'
       @course.save
       assigns[:context] = @course
+      assigns[:user_counts] = {}
     end
 
     it "should not show to teacher" do

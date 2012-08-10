@@ -47,7 +47,7 @@
         <label for="context_tags">
           <%= before_label :filter, "Filter" %>
         </label>
-        <%= text_field_tag :context_tags, nil, 'data-finder_url' => conversations_find_recipients_url %>
+        <%= text_field_tag :context_tags, nil, 'data-finder_url' => search_recipients_url %>
       </div>
       <div class="clear"></div>
     </div>
@@ -70,7 +70,7 @@
         </li>
       </ul>
       <table>
-        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, 'data-finder_url' => conversations_find_recipients_url, :class => "recipients" %></td></tr>
+        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, 'data-finder_url' => search_recipients_url, :class => "recipients" %></td></tr>
         <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
         <tr id="group_conversation_info"><th></th><td><%= check_box_tag :group_conversation %> <%= label_tag :group_conversation, :en => "This is a group conversation. Participants will see everyone's replies" %></td></tr>
         <tr id="user_note_info"><th></th><td><%= check_box_tag :user_note, "1", false, :id => :add_to_faculty_journal %> <%= label_tag :add_to_faculty_journal, :en => "Add as a Faculty Journal entry" %></td></tr>
@@ -189,12 +189,12 @@
   <p>
     <%= t :add_recipients_instructions, "People you add to the conversation will see all previous messages." %>
   </p>
-  <%= text_field_tag :recipients, nil, :id => 'add_recipients', 'data-finder_url' => conversations_find_recipients_url, :class => "recipients", :style => "width: 370px" %>
+  <%= text_field_tag :recipients, nil, :id => 'add_recipients', 'data-finder_url' => search_recipients_url, :class => "recipients", :style => "width: 370px" %>
 </form>
 
 <% form_tag conversations_url, :id => 'forward_message_form' do %>
   <table>
-    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, 'data-finder_url' => conversations_find_recipients_url, :class => "recipients" %></td></tr>
+    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, 'data-finder_url' => search_recipients_url, :class => "recipients" %></td></tr>
     <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body, nil, :id => :forward_body %></td></tr>
   </table>
   <ul class="messages"></ul>

@@ -104,6 +104,13 @@ describe Submission do
     @submission.conversation_groups.should eql @submission.conversation_groups.uniq
   end
 
+  it "should ensure the media object exists" do
+    assignment_model
+    se = @course.enroll_student(user)
+    MediaObject.expects(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
+    @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
+  end
+
   context "Discussion Topic" do
     it "should use correct date for its submitted_at value" do
       course_with_student_logged_in(:active_all => true)

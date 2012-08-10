@@ -67,4 +67,8 @@ define [
     if obj.object.appointment_group_id && contextInfo.can_create_calendar_events
       obj.can_edit = true
 
+    # always link to the main assignment page
+    if type == 'assignment'
+      obj.can_edit = true
+
     obj

@@ -106,6 +106,7 @@ class Submission < ActiveRecord::Base
   after_save :update_final_score
   after_save :submit_to_turnitin_later
   after_save :update_admins_if_just_submitted
+  after_save :check_for_media_object
   after_save :update_quiz_submission
 
   def self.needs_grading_trigger_sql
@@ -480,6 +481,15 @@ class Submission < ActiveRecord::Base
       context.send_later_if_production(:resubmission_for, "assignment_#{assignment_id}")
     end
     true
+  end
+
+  def check_for_media_object
+    if self.media_comment_id.present? && self.media_comment_id_changed?
+      MediaObject.ensure_media_object(self.media_comment_id, {
+        :user => self.user,
+        :context => self.user,
+      })
+    end
   end
   
   def submission_history
