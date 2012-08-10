@@ -473,19 +473,17 @@ describe "context_modules" do
     end
 
     it "should not remove the file link in a module when file is overwritten" do
-      pending("bug 6233 - when replacing a file, module links are unexpectedly deleted") do
-        course_module
-        @module.add_item({:id => @file.id, :type => 'attachment'})
-        get "/courses/#{@course.id}/modules"
+      course_module
+      @module.add_item({:id => @file.id, :type => 'attachment'})
+      get "/courses/#{@course.id}/modules"
 
-        f('.context_module_item').should include_text(FILE_NAME)
-        file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
-        file.context = @course
-        file.save!
-        Attachment.last.handle_duplicates(:overwrite)
-        refresh_page
-        f('.context_module_item').should include_text(FILE_NAME)
-      end
+      f('.context_module_item').should include_text(FILE_NAME)
+      file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
+      file.context = @course
+      file.save!
+      Attachment.last.handle_duplicates(:overwrite)
+      refresh_page
+      f('.context_module_item').should include_text(FILE_NAME)
     end
   end
 end

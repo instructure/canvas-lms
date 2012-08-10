@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Attachment do
-  
+
   context "validation" do
     it "should create a new instance given valid attributes" do
       attachment_model
@@ -29,15 +29,15 @@ describe Attachment do
     it "should require a context" do
       lambda{attachment_model(:context => nil)}.should raise_error(ActiveRecord::RecordInvalid, /Validation failed: Context can't be blank/)
     end
-    
+
   end
-  
+
   context "default_values" do
     it "should set the display name to the filename if it is nil" do
       attachment_model(:display_name => nil)
       @attachment.display_name.should eql(@attachment.filename)
     end
-    
+
     context "scribd_mime_type_id" do
       it "should get set given extension" do
         Attachment.clear_cached_mime_ids
@@ -87,7 +87,7 @@ describe Attachment do
         end
       end
     end
-    
+
     it "should create a ScribdAccount if one isn't present" do
       scribd_mime_type_model(:extension => 'pdf')
       course_model
@@ -101,37 +101,37 @@ describe Attachment do
       @attachment.context.scribd_account.should be_is_a(ScribdAccount)
       ScribdAccount.all.size.should eql(previous_scribd_account_count + 1)
     end
-    
+
     it "should set the attachment.scribd_account to the context scribd_account" do
       scribdable_attachment_model
       @attachment.scribd_account.should eql(@attachment.context.scribd_account)
     end
-    
+
   end
 
   it "should be scribdable if scribd_mime_type_id is set" do
     scribdable_attachment_model
     @attachment.should be_scribdable
   end
-  
+
   context "authenticated_s3_url" do
     prepend_before(:each) {
       Setting.set("file_storage_test_override", "local")
     }
-    
+
     it "should return http as the protocol by default" do
       course_model
       attachment_with_context(@course)
       @attachment.authenticated_s3_url.should match(/^http:\/\//)
     end
-    
+
     it "should return the protocol if specified" do
       course_model
       attachment_with_context(@course)
       @attachment.authenticated_s3_url(:protocol => "https://").should match(/^https:\/\//)
     end
   end
-  
+
   context "scribdable_context" do
     it "should be a scribdable_context if the context is Course" do
       course_model
@@ -144,7 +144,7 @@ describe Attachment do
       attachment_with_context(@group)
       @attachment.send(:scribdable_context?).should be_true
     end
-    
+
     it "should be a scribdable_context if the context is User" do
       user_model
       attachment_with_context(@user)
@@ -152,7 +152,7 @@ describe Attachment do
       @attachment.context.should be_is_a(User)
       @attachment.send(:scribdable_context?).should be_true
     end
-    
+
     it "should not be a scribdable_context for non-scribdable contexts (like an Account, for example)" do
       account_model
       attachment_with_context(@account)
@@ -160,48 +160,48 @@ describe Attachment do
       @attachment.context.should be_is_a(Account)
       @attachment.send(:scribdable_context?).should be_false
     end
-    
+
   end
-  
+
   it "should set the uuid" do
     attachment_model
     @attachment.uuid.should_not be_nil
   end
-  
+
   context "workflow" do
     before do
       attachment_model
     end
-    
+
     it "should default to pending_upload" do
       @attachment.state.should eql(:pending_upload)
     end
-    
+
     it "should be able to upload and record the submitted_to_scribd_at" do
       time = Time.now
       @attachment.upload!
       @attachment.submitted_to_scribd_at.to_i.should be_close(time.to_i, 2)
       @attachment.state.should eql(:processing)
     end
-    
+
     it "should be able to take a processing object and complete its process" do
       attachment_model(:workflow_state => 'processing')
       @attachment.process!
       @attachment.state.should eql(:processed)
     end
-    
+
     it "should be able to take a new object and bypass upload with process" do
       @attachment.process!
       @attachment.state.should eql(:processed)
     end
-    
+
     it "should be able to recycle a processed object and re-upload it" do
       attachment_model(:workflow_state => 'processed')
       @attachment.recycle
       @attachment.state.should eql(:pending_upload)
     end
   end
-  
+
   context "submit_to_scribd!" do
     before(:all) do
       ScribdAPI.stubs(:set_user).returns(true)
@@ -225,7 +225,7 @@ describe Attachment do
         @attachment.should be_processed
       end
     end
-    
+
     it "should upload scribdable attachments" do
       scribdable_attachment_model
       @doc_obj = Scribd::Document.new
@@ -235,7 +235,7 @@ describe Attachment do
       @attachment.scribd_doc.should eql(@doc_obj)
       @attachment.state.should eql(:processing)
     end
-    
+
     it "should bypass non-scridbable attachments" do
       attachment_model
       @attachment.should_not be_scribdable
@@ -244,7 +244,7 @@ describe Attachment do
       @attachment.submit_to_scribd!.should be_true
       @attachment.state.should eql(:processed)
     end
-    
+
     it "should not mess with attachments outside the pending_upload state" do
       ScribdAPI.expects(:set_user).never
       ScribdAPI.expects(:upload).never
@@ -263,7 +263,7 @@ describe Attachment do
       a2.destroy
       a1.scribd_doc.should == doc
     end
-    
+
     it "should not send the secret password via to_json" do
       attachment_model
       @attachment.scribd_doc = Scribd::Document.new
@@ -279,7 +279,7 @@ describe Attachment do
       @attachment.scribd_doc.secret_password.should eql('password')
     end
   end
-  
+
   context "conversion_status" do
     before(:each) do
       ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
@@ -313,7 +313,7 @@ describe Attachment do
     end
 
   end
-  
+
   context "download_url" do
     before do
       ScribdAPI.stubs(:set_user).returns(true)
@@ -321,7 +321,7 @@ describe Attachment do
       Scribd::Document.stubs(:find).returns(@doc)
     end
   end
-  
+
   context "named scopes" do
     it "should have a scope for all scribdable attachments, regardless their state" do
       (1..3).each { attachment_model }
@@ -330,7 +330,7 @@ describe Attachment do
       Attachment.all.size.should eql(6)
       Attachment.scribdable?.each {|m| m.should be_scribdable}
     end
-    
+
     it "should have a scope for uploadable models, all models that are in the pending_upload state" do
       attachment_model
       attachments = [@attachment]
@@ -345,14 +345,14 @@ describe Attachment do
       Attachment.uploadable.should be_include(Attachment.find(attachments[2].id))
     end
   end
-  
+
   context "uploaded_data" do
     it "should create with uploaded_date" do
       a = attachment_model(:uploaded_data => default_uploaded_data)
       a.filename.should eql("doc.doc")
     end
   end
-  
+
   context "build_media_object" do
     before :each do
       @course = course
@@ -420,7 +420,7 @@ describe Attachment do
       a.should_not be_frozen
       a.should be_deleted
     end
-    
+
     it "should not probably be possible to actually destroy... somehow" do
       a = attachment_model(:uploaded_data => default_uploaded_data)
       a.filename.should eql("doc.doc")
@@ -430,7 +430,7 @@ describe Attachment do
       a.destroy!
       a.should be_frozen
     end
-    
+
     it "should not show up in the context list after being destroyed" do
       @course = course
       @course.should_not be_nil
@@ -444,7 +444,7 @@ describe Attachment do
       @course.attachments.active.should_not be_include(a)
     end
   end
-  
+
   context "inferred display name" do
     it "should take a normal filename and use it as a diplay name" do
       a = attachment_model(:filename => 'normal_name.ppt')
@@ -470,13 +470,13 @@ describe Attachment do
       a = attachment_model(:filename => 'A long Bulgarian word is neprotifconstitutiondeistveiteneprotifconstitutiondeistveite')
       a.display_name.should eql('A long Bulgarian word is neprotifconstitutiondeistveiteneprotifconstitutiondeistveite')
     end
-    
+
     it "should truncate filenames that are just too freaking big" do
       fn = Attachment.new.sanitize_filename('My new study guide or case study on this evolution on monkeys even in that land of costa rica somewhere my own point of  view going along with the field experiment I would say or try out is to put them not in wet areas like costa rico but try and put it so its not so long.docx')
       fn.should eql("My+new+study+guide+or+case+study+on+this+evolution+on+monkeys+even+in+that+land+of+costa+rica+somewhere+my+own.docx")
     end
   end
-  
+
   context "clone_for" do
     it "should clone to another context" do
       a = attachment_model(:filename => "blech.ppt")
@@ -539,14 +539,14 @@ describe Attachment do
       @course.update_attribute(:is_public, false)
       a.grants_right?(user, nil, :read).should eql(false)
     end
-    
+
     it "should allow anonymous access for public contexts" do
       user = user_model
       a = attachment_model
       @course.update_attribute(:is_public, true)
       a.grants_right?(user, nil, :read).should eql(false)
     end
-    
+
     it "should allow students to read files" do
       a = attachment_model
       @course.update_attribute(:is_public, false)
@@ -556,7 +556,7 @@ describe Attachment do
       a.reload
       a.grants_right?(user, nil, :read).should eql(true)
     end
-    
+
     it "should allow students to download files" do
       a = attachment_model
       @course.offer
@@ -566,7 +566,7 @@ describe Attachment do
       a.reload
       a.grants_right?(user, nil, :download).should eql(true)
     end
-    
+
     it "should allow students to read (but not download) locked files" do
       a = attachment_model
       a.update_attribute(:locked, true)
@@ -578,7 +578,7 @@ describe Attachment do
       a.grants_right?(user, nil, :read).should eql(true)
       a.grants_right?(user, nil, :download).should eql(false)
     end
-    
+
     it "should allow user access based on 'file_access_user_id' and 'file_access_expiration' in the session" do
       a = attachment_model
       @course.offer
@@ -622,7 +622,7 @@ describe Attachment do
       @a2 = attachment_with_context(@course, :display_name => "a2")
       @a = attachment_with_context(@course)
     end
-    
+
     it "should handle overwriting duplicates" do
       @a.display_name = 'a1'
       deleted = @a.handle_duplicates(:overwrite)
@@ -631,7 +631,7 @@ describe Attachment do
       @a1.file_state.should == 'deleted'
       deleted.should == [ @a1 ]
     end
-    
+
     it "should handle renaming duplicates" do
       @a.display_name = 'a1'
       deleted = @a.handle_duplicates(:rename)
@@ -640,6 +640,23 @@ describe Attachment do
       @a1.reload
       @a1.file_state.should == 'available'
       @a.display_name.should == 'a1-1'
+    end
+
+    it "should update ContentTags when overwriting" do
+      mod = @course.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item(:id => @a1.id, :type => 'attachment')
+      tag2 = mod.add_item(:id => @a2.id, :type => 'attachment')
+      mod.save!
+
+      @a.display_name = 'a1'
+      @a.handle_duplicates(:overwrite)
+      tag1.reload
+      tag1.should be_active
+      tag1.content_id.should == @a.id
+
+      @a2.destroy
+      tag2.reload
+      tag2.should be_deleted
     end
   end
 
