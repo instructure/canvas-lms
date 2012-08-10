@@ -227,36 +227,38 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         TCPSocket.open(self.auth_host, self.auth_port)
       end
       return true
+    rescue SocketError
+      self.errors.add(:ldap_connection_test, t(:test_host_unknown, "Unknown host: %{host}", :host => self.auth_host))
     rescue Timeout::Error
-      self.errors.add(
-        :ldap_connection_test,
-        t(:test_connection_timeout, "Timeout when connecting")
-      )
-    rescue
-      self.errors.add(
-        :ldap_connection_test,
-        t(:test_connection_failed, "Failed to connect to host/port")
-        )
+      self.errors.add(:ldap_connection_test, t(:test_connection_timeout, "Timeout when connecting"))
+    rescue => e
+      self.errors.add(:ldap_connection_test, e.message)
     end
     false
   end
 
   def test_ldap_bind
     begin
-      return self.ldap_connection.bind
-    rescue
-      self.errors.add(
-        :ldap_bind_test,
-        t(:test_bind_failed, "Failed to bind")
-      )
+      conn = self.ldap_connection
+      unless res = conn.bind
+        error = conn.get_operation_result
+        self.errors.add(:ldap_bind_test, "Error #{error.code}: #{error.message}")
+      end
+      return res
+    rescue => e
+      self.errors.add(:ldap_bind_test, t(:test_bind_failed, "Failed to bind with the following error: %{error}", :error => e.message))
       return false
     end
   end
 
   def test_ldap_search
     begin
-      res = self.ldap_connection.search {|s| break s}
-      return true if res
+      conn = self.ldap_connection
+      unless res = conn.search {|s| break s}
+        error = conn.get_operation_result
+        self.errors.add(:ldap_search_test, "Error #{error.code}: #{error.message}")
+      end
+      return res.present?
     rescue
       self.errors.add(
         :ldap_search_test,
