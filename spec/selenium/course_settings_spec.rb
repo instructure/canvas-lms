@@ -7,6 +7,11 @@ describe "course settings" do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
   end
 
+  it "should show unused tabs to teachers" do
+    get "/courses/#{@course.id}/settings"
+    ff("#section-tabs .section.hidden").count.should > 0
+  end
+
   describe "course details" do
     def test_select_standard_for(context)
       grading_standard_for context
