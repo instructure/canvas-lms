@@ -1355,7 +1355,7 @@ class User < ActiveRecord::Base
   def self.avatar_fallback_url(fallback=nil, request=nil)
     return fallback if fallback == '%{fallback}'
     if fallback and uri = URI.parse(fallback) rescue nil
-      uri.scheme ||= request ? request.scheme : "https"
+      uri.scheme ||= request ? request.protocol[0..-4] : "https" # -4 to chop off the ://
       if request && !uri.host
         uri.host = request.host
         uri.port = request.port if ![80, 443].include?(request.port)

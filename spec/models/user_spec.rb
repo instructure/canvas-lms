@@ -1205,13 +1205,13 @@ describe User do
         "https://somedomain/path"
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
-      User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :scheme => "http")).should ==
+      User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://")).should ==
         "http://foo/images/messages/avatar-50.png"
-      User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+      User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
         "https://bar/somepath"
-      User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+      User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
         "https://somedomain/path"
-      User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+      User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
         "http://somedomain/path"
       User.avatar_fallback_url('%{fallback}').should ==
         '%{fallback}'
