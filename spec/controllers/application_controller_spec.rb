@@ -115,6 +115,10 @@ describe ApplicationController do
   end
 
   describe "get_context" do
+    after do
+      I18n.localizer = nil
+    end
+
     it "should find user with api_find for api requests" do
       user_with_pseudonym
       @pseudonym.update_attribute(:sis_user_id, 'test1')
@@ -136,6 +140,32 @@ describe ApplicationController do
       @controller.stubs(:api_request?).returns(true)
       @controller.send(:get_context)
       @controller.instance_variable_get(:@context).should == @section
+    end
+
+    # this test is supposed to represent calling I18n.t before a context is set
+    # and still having later localizations that depend on the locale of the
+    # context work.
+    it "should reset the localizer" do
+      # emulate all the locale related work done before/around a request
+      acct = Account.default
+      acct.default_locale = "es"
+      acct.save!
+      @controller.instance_variable_set(:@domain_root_account, acct) 
+      req = mock()
+      req.stubs(:headers).returns({})
+      @controller.stubs(:request).returns(req)
+      @controller.send(:assign_localizer)
+      I18n.set_locale_with_localizer # this is what t() triggers
+      I18n.locale.to_s.should == "es"
+      course_model(:locale => "ru")
+      @controller.stubs(:named_context_url).with(@course, :context_url).returns('')
+      @controller.stubs(:params).returns({ :course_id => @course.id })
+      @controller.stubs(:api_request?).returns(false)
+      @controller.stubs(:session).returns({})
+      @controller.send(:get_context)
+      @controller.instance_variable_get(:@context).should == @course
+      I18n.set_locale_with_localizer # this is what t() triggers
+      I18n.locale.to_s.should == "ru"
     end
   end
 
