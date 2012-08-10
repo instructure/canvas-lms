@@ -658,11 +658,11 @@ class UsersController < ApplicationController
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
       # min age may also be enforced, depending on require_self_enrollment_code
-      @user.require_birthdate = (params[:enrollment_type] == 'student')
+      @user.require_birthdate = (@user.initial_enrollment_type == 'student')
     end
     
     @observee = nil
-    if params[:enrollment_type] == 'observer'
+    if @user.initial_enrollment_type == 'observer'
       # TODO: SAML/CAS support
       if observee = Pseudonym.authenticate(params[:observee] || {},
           [@domain_root_account.id] + @domain_root_account.trusted_account_ids)

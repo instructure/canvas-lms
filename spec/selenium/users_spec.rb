@@ -140,6 +140,7 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
+      User.last.initial_enrollment_type.should eql 'student'
     end
 
     it "should register a student without a join code" do
@@ -159,6 +160,7 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
+      User.last.initial_enrollment_type.should eql 'student'
     end
 
     it "should register a teacher" do
@@ -173,6 +175,7 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
+      User.last.initial_enrollment_type.should eql 'teacher'
     end
 
     it "should register an observer" do
@@ -191,6 +194,7 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
+      User.last.initial_enrollment_type.should eql 'observer'
     end
   end
 
