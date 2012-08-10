@@ -70,7 +70,7 @@
       <%= t('links.reset', 'Reset Course Content') %>
     <% end %>
 
-    <div class="hidden" id="reset_course_content_dialog">
+    <div <%= hidden(true) %> id="reset_course_content_dialog">
       <%= mt('help.reset_course_content', 'Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content. This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?') %>
 
       <% form_for @context, :url => context_url(@context, :course_reset_url), :html => { :method => :post } do %>
