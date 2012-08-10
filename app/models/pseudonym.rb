@@ -288,9 +288,12 @@ class Pseudonym < ActiveRecord::Base
     account = self.account || Account.default
     res = false
     res ||= valid_ldap_credentials?(plaintext_password) if account && account.ldap_authentication?
-    # Only check SIS if they haven't changed their password
-    res ||= valid_ssha?(plaintext_password) if password_auto_generated?
-    res ||= valid_password?(plaintext_password)
+    if account.canvas_authentication?
+      # Only check SIS if they haven't changed their password
+      res ||= valid_ssha?(plaintext_password) if password_auto_generated?
+      res ||= valid_password?(plaintext_password)
+    end
+    res
   end
   
   def generate_temporary_password

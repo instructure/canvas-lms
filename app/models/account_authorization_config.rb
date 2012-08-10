@@ -32,6 +32,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   validates_presence_of :account_id
   validates_presence_of :entity_id, :if => Proc.new{|aac| aac.saml_authentication?}
   after_create :disable_open_registration_if_delegated
+  after_destroy :enable_canvas_authentication
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
 
@@ -290,7 +291,14 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       @account.save!
     end
   end
-  
+
+  def enable_canvas_authentication
+    if self.account.settings[:canvas_authentication] == false
+      self.account.settings[:canvas_authentication] = true
+      self.account.save!
+    end
+  end
+
   def debugging?
     !!Rails.cache.fetch(debug_key(:debugging))
   end

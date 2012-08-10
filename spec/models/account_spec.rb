@@ -724,4 +724,13 @@ describe Account do
       Account.default.grants_right?(@user, :read_sis).should be_true
     end
   end
+
+  describe "canvas_authentication?" do
+    it "should be true if there's not an AAC" do
+      Account.default.settings[:canvas_authentication] = false
+      Account.default.canvas_authentication?.should be_true
+      Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
+      Account.default.canvas_authentication?.should be_false
+    end
+  end
 end

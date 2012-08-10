@@ -148,10 +148,11 @@ class Account < ActiveRecord::Base
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
-  add_setting :open_registration, :boolean => true, :root_only => true, :default => false
+  add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :mfa_settings, :root_only => true
+  add_setting :canvas_authentication, :boolean => true, :root_only => true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -187,6 +188,14 @@ class Account < ActiveRecord::Base
 
   def mfa_settings
     settings[:mfa_settings].try(:to_sym) || :disabled
+  end
+
+  def canvas_authentication?
+    settings[:canvas_authentication] != false || !self.account_authorization_config
+  end
+
+  def open_registration?
+    !!settings[:open_registration] && canvas_authentication?
   end
 
   def ip_filters=(params)
@@ -632,7 +641,7 @@ class Account < ActiveRecord::Base
   end
 
   def delegated_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
+    !canvas_authentication? || !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
   end
 
   def forgot_password_external_url

@@ -313,5 +313,22 @@ describe Pseudonym do
       p.mfa_settings.should == :required
     end
   end
+
+  describe 'valid_arbitrary_credentials?' do
+    it "should ignore password if canvas authentication is disabled" do
+      user_with_pseudonym(:password => 'qwerty')
+      @pseudonym.valid_arbitrary_credentials?('qwerty').should be_true
+
+      Account.default.settings = { :canvas_authentication => false }
+      Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
+
+      @pseudonym.stubs(:valid_ldap_credentials?).returns(false)
+      @pseudonym.valid_arbitrary_credentials?('qwerty').should be_false
+
+      @pseudonym.stubs(:valid_ldap_credentials?).returns(true)
+      @pseudonym.valid_arbitrary_credentials?('anything').should be_true
+    end
+  end
+
 end
 
