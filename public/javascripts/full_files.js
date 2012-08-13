@@ -1854,7 +1854,8 @@ define([
                   $textarea.editorBox({
                     tinyOptions: {
                       valid_elements: '*[*]',
-                      extended_valid_elements: '*[*]'
+                      extended_valid_elements: '*[*]',
+                      plugins: "autolink,instructure_external_tools,instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_equella,media,paste,table,inlinepopups"
                     }
                   });
                   $textarea.data('tinyIsVisible', !tinyIsVisible);
