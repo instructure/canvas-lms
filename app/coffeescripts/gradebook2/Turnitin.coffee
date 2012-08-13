@@ -22,7 +22,7 @@ define [
 
       stateList = ['no', 'none', 'acceptable', 'warning', 'problem', 'failure']
       stateMap = invert(stateList, parseInt)
-      states = (stateMap[item.state] for item in data.items)
+      states = (stateMap[item.state or 'no'] for item in data.items)
       data.state = stateList[max(states)]
       data
 
