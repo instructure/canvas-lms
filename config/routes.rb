@@ -824,6 +824,10 @@ ActionController::Routing::Routes.draw do |map|
     api.get 'users/:user_id/profile', :controller => :profile, :action => :settings
     api.get 'users/:user_id/avatars', :controller => :profile, :action => :profile_pics
 
+    # deprecated routes, second one is solely for YARD. preferred API is api/v1/search/recipients
+    api.get 'conversations/find_recipients', :controller => :search, :action => :recipients
+    api.get 'conversations/find_recipients', :controller => :conversations, :action => :find_recipients
+
     api.with_options(:controller => :conversations) do |conversations|
       conversations.get 'conversations', :action => :index
       conversations.post 'conversations', :action => :create
