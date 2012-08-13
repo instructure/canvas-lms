@@ -869,4 +869,27 @@ describe ConversationsController, :type => :integration do
       })
     end
   end
+
+  context "recipients" do
+    before do
+      @group = @course.groups.create(:name => "the group")
+      @group.users = [@me, @bob, @joe]
+    end
+
+    it "should support the deprecated route" do
+      json = api_call(:get, "/api/v1/conversations/find_recipients.json?search=o",
+              { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'o' })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6},
+        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course"},
+        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course"},
+        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course"},
+        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+      ]
+    end
+  end
 end

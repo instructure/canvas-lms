@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Search
+
 class SearchController < ApplicationController
   include SearchHelper
 
@@ -35,7 +37,8 @@ class SearchController < ApplicationController
 
   # @API Find recipients
   # Find valid recipients (users, courses and groups) that the current user
-  # can send messages to.
+  # can send messages to. The /api/v1/search/recipients path is the preferred
+  # endpoint, /api/v1/conversations/find_recipients is deprecated.
   #
   # Pagination is supported if an explicit type is given (but there is no last
   # link). If no type is given, results will be limited to 10 by default (can

@@ -525,6 +525,11 @@ class ConversationsController < ApplicationController
     end
   end
 
+  # @API Find recipients
+  #
+  # Deprecated, see the Find recipients endpoint in the Search API
+  def find_recipients; end
+
   def public_feed
     return unless get_feed_context(:only => [:user])
     @current_user = @context
