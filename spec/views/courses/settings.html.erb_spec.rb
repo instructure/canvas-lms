@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-12 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -72,17 +72,6 @@ describe "courses/settings.html.erb" do
       render
       response.body.should_not =~ /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
       response.body.should_not =~ /<div id="tab-grade-publishing">/
-    end
-  end
-
-  describe "End this course button" do
-    it "should not display if the course has soft-concluded" do
-      @course.update_attribute(:conclude_at, Time.now - 1.week)
-
-      view_context(@course, @user)
-      assigns[:current_user] = @user
-      render
-      response.body.should_not match(/End this Course/)
     end
   end
 end

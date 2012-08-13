@@ -1011,6 +1011,13 @@ class Course < ActiveRecord::Base
     conclude_at && conclude_at < Time.now.utc && conclude_at > 1.month.ago
   end
 
+  # Public: Return true if the end date for a course or its term has passed.
+  #
+  # Returns boolean or nil.
+  def soft_concluded?
+    end_at.try(:<, Time.now) || enrollment_term.end_at.try(:<, Time.now)
+  end
+
   def state_sortable
     case state
     when :invited

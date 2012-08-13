@@ -28,7 +28,7 @@
           <%= t('buttons.unconclude', 'Un-Conclude Course') %>
         </button>
       <% end %>
-    <% elsif @context.end_at.nil? || @context.end_at > Time.now %>
+    <% elsif !@context.soft_concluded? %>
       <% link_to context_url(@context, :context_confirm_action_url, :event => 'conclude'), :class => 'button button-sidebar-wide' do %>
         <%= image_tag 'delete.png' %>
         <%= t('links.conclude', 'End this Course') %>
