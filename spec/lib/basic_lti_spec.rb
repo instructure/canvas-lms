@@ -259,6 +259,7 @@ describe BasicLTI do
     hash['lis_result_sourcedid'].should == BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @user)
     hash['lis_outcome_service_url'].should == "/my/test/url"
     hash['ext_ims_lis_basic_outcome_url'].should == "/my/other/test/url"
+    hash['ext_outcome_data_values_accepted'].should == 'url,text'
   end
 
   context "sharding" do
