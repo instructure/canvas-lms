@@ -72,11 +72,23 @@ module UserContent
     end
   end
 
+  # TODO: try and discover the motivation behind the "huhs"
   def self.css_size(val)
-    res = val.to_f
-    res = nil if res == 0
-    res = (res + 10).to_s + "px" if res && res.to_s == val
-    res
+    if !val || val.to_f == 0
+      # no value, non-numeric value, or 0 value (whether "0", "0px", "0%",
+      # etc.); ignore
+      nil
+    elsif val == "#{val.to_f.to_s}%" || val == "#{val.to_f.to_s}px"
+      # numeric percentage or specific px value; use as is
+      val
+    elsif val.to_f.to_s == val
+      # unadorned numeric value; make px (after adding 10... huh?)
+      (val.to_f + 10).to_s + "px"
+    else
+      # numeric value embedded, but has additional text we didn't recognize;
+      # just extract the numeric part (without a px... huh?)
+      val.to_f.to_s
+    end
   end
 
   class HtmlRewriter
