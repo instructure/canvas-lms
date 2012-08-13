@@ -927,6 +927,7 @@ ActionController::Routing::Routes.draw do |map|
       files.get 'files/:id', :action => :api_show
       files.delete 'files/:id', :action => :destroy
       files.put 'files/:id', :action => :api_update
+      files.get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
     end
 
     api.with_options(:controller => :folders) do |folders|

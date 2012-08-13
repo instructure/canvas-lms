@@ -19,6 +19,25 @@
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
 shared_examples_for "file uploads api" do
+  def attachment_json(attachment)
+    {
+      'id' => attachment.id,
+      'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
+      'content-type' => attachment.content_type,
+      'display_name' => attachment.display_name,
+      'filename' => attachment.filename,
+      'size' => attachment.size,
+      'unlock_at' => attachment.unlock_at ? attachment.unlock_at.as_json : nil,
+      'locked' => !!attachment.locked,
+      'hidden' => !!attachment.hidden,
+      'lock_at' => attachment.lock_at ? attachment.lock_at.as_json : nil,
+      'locked_for_user' => false,
+      'hidden_for_user' => false,
+      'created_at' => attachment.created_at.as_json,
+      'updated_at' => attachment.updated_at.as_json,
+    }
+  end
+
   it "should upload (local files)" do
     filename = "my_essay.doc"
     content = "this is a test doc"
@@ -97,28 +116,139 @@ shared_examples_for "file uploads api" do
     response.should be_success
     attachment.reload
     json = json_parse(response.body)
-    json.should == {
-      'id' => attachment.id,
-      'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
-      'content-type' => attachment.content_type,
-      'display_name' => attachment.display_name,
-      'filename' => attachment.filename,
-      'size' => 1234,
-      'unlock_at' => nil,
-      'locked' => false,
-      'hidden' => false,
-      'lock_at' => nil,
-      'locked_for_user' => false,
-      'hidden_for_user' => false,
-      'created_at' => attachment.created_at.as_json,
-      'updated_at' => attachment.updated_at.as_json,
-    }
+    json.should == attachment_json(attachment)
 
     attachment.file_state.should == 'available'
     attachment.content_type.should == "application/msword"
     attachment.display_name.should == filename
     attachment
   end
+  
+  it "should allow uploading files from a url" do
+    filename = "delete.png"
+
+    local_storage!
+    # step 1, preflight
+    json = preflight({ :name => filename, :size => 20, :url => "http://www.example.com/images/delete.png" })
+    attachment = Attachment.last(:order => :id)
+    attachment.file_state.should == 'deleted'
+    status_url = json['status_url']
+    status_url.should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    
+    # step 2, download
+    json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+    json['upload_status'].should == 'pending'
+    
+    Canvas::HTTP.expects(:get).with("http://www.example.com/images/delete.png").yields(FakeHttpResponse.new(200, "asdf"))
+    run_download_job
+
+    json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+
+    json.should == {
+      'upload_status' => 'ready',
+      'attachment' => attachment_json(attachment.reload),
+    }
+    attachment.file_state.should == 'available'
+    attachment.size.should == 4
+  end
+  
+  it "should fail gracefully with a malformed url" do
+    filename = "delete.png"
+
+    local_storage!
+    # step 1, preflight
+    json = preflight({ :name => filename, :size => 20, :url => '#@$YA#Y#AGWREG' })
+    attachment = Attachment.last(:order => :id)
+    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    
+    # step 2, download
+    run_download_job
+    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+    json['upload_status'].should == 'errored'
+    json['message'].should == "Could not parse the URL: \#@$YA#Y#AGWREG"
+    attachment.reload.file_state.should == 'errored'
+  end
+  
+  it "should fail gracefully with a relative url" do
+    filename = "delete.png"
+
+    local_storage!
+    # step 1, preflight
+    json = preflight({ :name => filename, :size => 20, :url => '/images/delete.png' })
+    attachment = Attachment.last(:order => :id)
+    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    
+    # step 2, download
+    run_download_job
+    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+    json['upload_status'].should == 'errored'
+    json['message'].should == "No host provided for the URL: /images/delete.png"
+    attachment.reload.file_state.should == 'errored'
+  end
+  
+  it "should fail gracefully with a non-200 and non-300 status return" do
+    filename = "delete.png"
+    url = 'http://www.example.com/images/delete.png'
+
+    local_storage!
+    # step 1, preflight
+    Canvas::HTTP.expects(:get).with(url).yields(FakeHttpResponse.new(404))
+    json = preflight({ :name => filename, :size => 20, :url => url })
+    attachment = Attachment.last(:order => :id)
+    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    
+    # step 2, download
+    run_download_job
+    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+    json['upload_status'].should == 'errored'
+    json['message'].should ==  "Invalid response code, expected 200 got 404"
+    attachment.reload.file_state.should == 'errored'
+  end
+  
+  it "should fail gracefully with a GET request timeout" do
+    filename = "delete.png"
+    url = 'http://www.example.com/images/delete.png'
+
+    local_storage!
+    # step 1, preflight
+    Canvas::HTTP.expects(:get).with(url).raises(Timeout::Error)
+    json = preflight({ :name => filename, :size => 20, :url => url })
+    attachment = Attachment.last(:order => :id)
+    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    
+    # step 2, download
+    run_download_job
+    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+    json['upload_status'].should == 'errored'
+    json['message'].should == "The request timed out: http://www.example.com/images/delete.png"
+    attachment.reload.file_state.should == 'errored'
+  end
+  
+  it "should fail gracefully with too many redirects" do
+    filename = "delete.png"
+    url = 'http://www.example.com/images/delete.png'
+
+    local_storage!
+    # step 1, preflight
+    Canvas::HTTP.expects(:get).with(url).raises(Canvas::HTTP::TooManyRedirectsError)
+    json = preflight({ :name => filename, :size => 20, :url => url })
+    attachment = Attachment.last(:order => :id)
+    attachment.workflow_state.should == 'unattached'
+    json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
+    
+    # step 2, download
+    run_download_job
+    json = api_call(:get, json['status_url'], {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+    json['upload_status'].should == 'errored'
+    json['message'].should == "Too many redirects"
+    attachment.reload.file_state.should == 'errored'
+  end
+  
+  def run_download_job
+    Delayed::Job.strand_size('file_download').should > 0
+    run_jobs
+  end
+
 end
 
 shared_examples_for "file uploads api with folders" do
@@ -169,6 +299,25 @@ shared_examples_for "file uploads api with folders" do
     attachment = Attachment.last(:order => :id)
     a1.reload.should be_deleted
     attachment.reload.should be_available
+    attachment.display_name.should == "test.txt"
+    attachment.folder.should == @folder
+    attachment.open.read.should == "second"
+  end
+
+  it "should overwrite duplicate files by default for URL uploads" do
+    local_storage!
+    @folder = Folder.assert_path("test", context)
+    a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
+    json = preflight({ :name => "test.txt", :folder => "test", :url => "http://www.example.com/test" })
+    attachment = Attachment.last(:order => :id)
+    Canvas::HTTP.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, "second"))
+    run_jobs
+
+    a1.reload.should be_deleted
+    attachment.reload.should be_available
+    attachment.display_name.should == "test.txt"
+    attachment.folder.should == @folder
+    attachment.open.read.should == "second"
   end
 
   it "should allow renaming instead of overwriting duplicate files (local storage)" do
@@ -187,7 +336,25 @@ shared_examples_for "file uploads api with folders" do
     attachment = Attachment.last(:order => :id)
     a1.reload.should be_available
     attachment.reload.should be_available
+    a1.display_name.should == "test.txt"
     attachment.display_name.should == "test-1.txt"
+    attachment.folder.should == @folder
+  end
+
+  it "should allow renaming instead of overwriting duplicate files for URL uploads" do
+    local_storage!
+    @folder = Folder.assert_path("test", context)
+    a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
+    json = preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'rename', :url => "http://www.example.com/test" })
+    attachment = Attachment.last(:order => :id)
+    Canvas::HTTP.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, "second"))
+    run_jobs
+
+    a1.reload.should be_available
+    attachment.reload.should be_available
+    a1.display_name.should == "test.txt"
+    attachment.display_name.should == "test-1.txt"
+    attachment.folder.should == @folder
   end
 
   it "should allow renaming instead of overwriting duplicate files (s3 storage)" do
@@ -236,6 +403,18 @@ shared_examples_for "file uploads api with quotas" do
     end
     json['message'].should == "file size exceeds quota"
   end
+
+  it "should return unsuccessful preflight for files exceeding quota limits (URL uploads)" do
+    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context.save!
+    json = {}
+    begin
+      preflight({ :name => "test.txt", :size => 10.megabytes, :url => "http://www.example.com/test" })
+    rescue => e
+      json = JSON.parse(e.message)
+    end
+    json['message'].should == "file size exceeds quota"
+  end
   
   it "should return successful create_success for files within quota" do
     @context.write_attribute(:storage_quota, 5.megabytes)
@@ -273,7 +452,21 @@ shared_examples_for "file uploads api with quotas" do
     attachment.reload
     attachment.file_state.should == 'deleted'
   end
-  
+
+  it "should fail URL uploads for files exceeding quota limits" do
+    @context.write_attribute(:storage_quota, 1.megabyte)
+    @context.save!
+    json = preflight({ :name => "test.txt", :url => "http://www.example.com/test" })
+    status_url = json['status_url']
+    attachment = Attachment.last(:order => :id)
+    Canvas::HTTP.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, (" " * 2.megabytes)))
+    run_jobs
+
+    json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
+    json['upload_status'].should == 'errored'
+    json['message'].should == "file size exceeds quota limits: #{2.megabytes} bytes"
+    attachment.file_state.should == 'deleted'
+  end
 end
 
 shared_examples_for "file uploads api without quotas" do
@@ -293,6 +486,3 @@ shared_examples_for "file uploads api without quotas" do
     json['upload_params']['success_action_redirect'].should match(/#{attachment.quota_exemption_key}/)
   end
 end
-
-
-

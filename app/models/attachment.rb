@@ -580,7 +580,16 @@ class Attachment < ActiveRecord::Base
     end
     {:quota => quota, :quota_used => quota_used}
   end
-  
+
+  # Returns a boolean indicating whether the given context is over quota
+  # If additional_quota > 0, that'll be added to the current quota used
+  # (for example, to check if a new attachment of size additional_quota would
+  # put the context over quota.)
+  def self.over_quota?(context, additional_quota = nil)
+    quota = self.get_quota(context)
+    return quota[:quota] < quota[:quota_used] + (additional_quota || 0)
+  end
+
   def handle_duplicates(method)
     return [] unless method.present? && self.folder
     method = method.to_sym
@@ -1477,6 +1486,43 @@ class Attachment < ActiveRecord::Base
     tmp = self.create_temp_file
     Attachment.unique_constraint_retry do
       self.create_or_update_thumbnail(tmp, geometry_string, geometry_string)
+    end
+  end
+
+  class OverQuotaError < Exception; end
+
+  def clone_url(url, duplicate_handling, check_quota)
+    begin
+      Canvas::HTTP.clone_url_as_attachment(url, :attachment => self)
+
+      if check_quota
+        self.save! # save to calculate attachment size, otherwise self.size is nil
+        raise(OverQuotaError) if Attachment.over_quota?(self.context, self.size)
+      end
+
+      self.file_state = 'available'
+      self.save!
+      handle_duplicates(duplicate_handling || 'overwrite')
+    rescue Exception, Timeout::Error => e
+      self.file_state = 'errored'
+      case e
+      when Canvas::HTTP::TooManyRedirectsError
+        self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects"
+      when Canvas::HTTP::InvalidResponseCodeError
+        self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code}", :code => e.code
+      when CustomValidations::RelativeUriError
+        self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
+      when URI::InvalidURIError, ArgumentError
+        # assigning all ArgumentError to InvalidUri may be incorrect
+        self.upload_error_message = t :upload_error_invalid_url, "Could not parse the URL: %{url}", :url => url
+      when Timeout::Error
+        self.upload_error_message = t :upload_error_timeout, "The request timed out: %{url}", :url => url
+      when OverQuotaError
+        self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", :bytes => self.size
+      else
+        self.upload_error_message = t :upload_error_unexpected, "An unknown error occured downloading from %{url}", :url => url
+      end
+      self.save!
     end
   end
 end

@@ -825,6 +825,30 @@ Spec::Runner.configure do |config|
     post_lines[post_lines.index(""),-1].should ==
       expected_post_lines[expected_post_lines.index(""),-1]
   end
+
+  class FakeHttpResponse
+    def initialize(code, body = nil, headers={})
+      @code = code
+      @body = body
+      @headers = headers
+    end
+
+    def read_body(io)
+      io << @body
+    end
+
+    def code
+      @code.to_s
+    end
+
+    def [](arg)
+      @headers[arg]
+    end
+
+    def content_type
+      self['content-type']
+    end
+  end
 end
 
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
