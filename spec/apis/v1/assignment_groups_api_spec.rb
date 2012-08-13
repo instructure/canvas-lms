@@ -237,4 +237,19 @@ describe AssignmentGroupsController, :type => :integration do
 
     json.each { |group| group['group_weight'].should be_nil }
   end
+
+  it "should not explode on assignments with <objects> with percentile widths" do
+    course_with_teacher(:active_all => true)
+    group = @course.assignment_groups.create!(:name => 'group')
+    assignment = @course.assignments.create!(:title => "test", :assignment_group => group, :points_possible => 10)
+    assignment.description = '<object width="100%" />'
+    assignment.save!
+
+    api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
+             :controller => 'assignment_groups',
+             :action => 'index',
+             :format => 'json',
+             :course_id => @course.id.to_s,
+             :include => ['assignments'])
+  end
 end
