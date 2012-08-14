@@ -378,7 +378,8 @@ class ContextController < ApplicationController
           session,
           ['links', 'user_services']
         )
-        return render :action => :new_roster_user
+        render :action => :new_roster_user
+        return false
       end
       true
     end
