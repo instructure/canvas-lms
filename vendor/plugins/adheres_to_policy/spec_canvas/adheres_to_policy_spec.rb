@@ -16,17 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'rubygems'
-require 'spec'
-require File.join(File.dirname(__FILE__), "/../lib/adheres_to_policy")
+require File.expand_path(File.dirname(__FILE__)+'/../../../../spec/spec_helper')
 
-include ::Instructure::AdheresToPolicy
-
-describe Policy, "set_policy" do
+describe Instructure::AdheresToPolicy::Policy, "set_policy" do
 
   before(:each) do
     class AnotherModel
-      extend ClassMethods
+      extend Instructure::AdheresToPolicy::ClassMethods
     end
   end
 
@@ -49,10 +45,10 @@ describe Policy, "set_policy" do
   end
 end
 
-describe ClassMethods do
+describe Instructure::AdheresToPolicy::ClassMethods do
   before(:each) do
     class A
-      extend ClassMethods
+      extend Instructure::AdheresToPolicy::ClassMethods
     end
   end
 
@@ -76,7 +72,7 @@ describe ClassMethods do
 
   it "should provide a Policy instance through policy" do
     A.set_policy { 1 }
-    A.policy.should be_is_a(Policy)
+    A.policy.should be_is_a(Instructure::AdheresToPolicy::Policy)
   end
 
   it "should continue to use the same Policy instance (an important check, since this is also a constructor)" do
@@ -100,11 +96,11 @@ describe ClassMethods do
   end
 end
 
-describe InstanceMethods do
+describe Instructure::AdheresToPolicy::InstanceMethods do
   before(:all) do
     class A
       attr_accessor :user
-      extend ClassMethods
+      extend Instructure::AdheresToPolicy::ClassMethods
       set_policy do
         given { |user| self.user == user }
         can :read
@@ -133,7 +129,7 @@ describe InstanceMethods do
 
   it "should allow multiple forms of can statements" do
     class B
-      extend Policy::ClassMethods
+      extend Instructure::AdheresToPolicy::ClassMethods
       set_policy do
         given { |user| user == 1}
         can :read and can :write
@@ -155,7 +151,7 @@ describe InstanceMethods do
   it "should execute all conditions when searching for all rights" do
     class B
       attr_accessor :total
-      extend Policy::ClassMethods
+      extend Instructure::AdheresToPolicy::ClassMethods
       def initialize
         @total = 0
       end
@@ -180,7 +176,7 @@ describe InstanceMethods do
   it "should skip duplicate conditions when searching for all rights" do
     class B
       attr_accessor :total
-      extend ClassMethods
+      extend Instructure::AdheresToPolicy::ClassMethods
       def initialize
         @total = 0
       end
@@ -205,7 +201,7 @@ describe InstanceMethods do
   it "should only execute relevant conditions when searching for specific rights" do
     class B
       attr_accessor :total
-      extend ClassMethods
+      extend Instructure::AdheresToPolicy::ClassMethods
       def initialize
         @total = 0
       end
@@ -230,7 +226,7 @@ describe InstanceMethods do
   it "should skip duplicate conditions when searching for specific rights" do
     class B
       attr_accessor :total
-      extend ClassMethods
+      extend Instructure::AdheresToPolicy::ClassMethods
       def initialize
         @total = 0
       end
