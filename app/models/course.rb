@@ -2483,21 +2483,6 @@ class Course < ActiveRecord::Base
     self.respond_to?(:wiki_is_public) && self.wiki_is_public && !self.is_public
   end
 
-  def reply_from(opts)
-    user = opts[:user]
-    message = opts[:text].strip
-    user = nil unless user && self.context.users.include?(user)
-    if !user
-      raise "Only comment participants may reply to messages"
-    elsif !message || message.empty?
-      raise "Message body cannot be blank"
-    else
-      recipients = self.teachers.map(&:id) - [user.id]
-      conversation = user.initiate_conversation(recipients)
-      conversation.add_message(message, :root_account_id => root_account_id)
-    end
-  end
-
   def tab_configuration
     super.map {|h| h.with_indifferent_access } rescue []
   end

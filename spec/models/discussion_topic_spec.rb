@@ -733,4 +733,15 @@ describe DiscussionTopic do
       @assignment.reload.should be_deleted
     end
   end
+
+  describe "reply_from" do
+    it "should ignore responses in deleted account" do
+      account = Account.create!
+      @teacher = course_with_teacher(:active_all => true, :account => account).user
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+      account.destroy
+      @topic.reply_from(:user => @teacher, :text => "entry").should be_nil
+    end
+  end
 end
