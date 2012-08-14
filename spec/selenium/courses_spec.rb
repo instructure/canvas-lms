@@ -5,6 +5,13 @@ describe "courses" do
 
   context "as a teacher" do
 
+    def create_new_course
+      get "/"
+      f('[aria-controls="new_course_form"]').click
+      f('[name="course[name]"]').send_keys "testing"
+      f('.ui-dialog-buttonpane .btn-primary').click
+    end
+
     before (:each) do
       account = Account.default
       account.settings = {:open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true}
@@ -14,8 +21,8 @@ describe "courses" do
     it "should properly hide the wizard and remember its hidden state" do
       course_with_teacher_logged_in
 
-      get "/getting_started?fresh=1"
-      driver.find_element(:css, ".save_button").click
+      create_new_course
+
       wizard_box = driver.find_element(:id, "wizard_box")
       keep_trying_until { wizard_box.displayed? }
       wizard_box.find_element(:css, ".close_wizard_link").click
@@ -40,9 +47,8 @@ describe "courses" do
       end
 
       course_with_teacher_logged_in
-      get "/getting_started"
+      create_new_course
 
-      expect_new_page_load { driver.find_element(:css, ".save_button").click }
       wait_for_animations
       wizard_box = find_wizard_box
       wizard_box.find_element(:css, ".close_wizard_link").click

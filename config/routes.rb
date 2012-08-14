@@ -565,23 +565,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :plugins, :only => [:index, :show, :update]
 
-  # The getting_started pages are a short wizard used to help
-  # a teacher start a new course from scratch.
-  map.getting_started_assignments 'getting_started/assignments',
-    :controller => 'getting_started', :action => 'assignments', :conditions => { :method => :get }
-  map.getting_started_teacherless 'getting_started/teacherless',
-    :controller => 'getting_started', :action => 'teacherless', :conditions => { :method => :get }
-  map.getting_started_students 'getting_started/students',
-    :controller => 'getting_started', :action => 'students', :conditions => { :method => :get }
-  map.getting_started_setup 'getting_started/setup',
-    :controller => 'getting_started', :action => 'setup', :conditions => { :method => :get }
-  map.getting_started 'getting_started',
-    :controller => 'getting_started', :action => 'name', :conditions => { :method => :get }
-  map.getting_started_name 'getting_started/name',
-    :controller => 'getting_started', :action => 'name', :conditions => { :method => :get }
-  map.getting_started_finalize 'getting_started/finalize',
-    :controller => 'getting_started', :action => 'finalize', :conditions => { :method => :post }
-
   map.calendar 'calendar', :controller => 'calendars', :action => 'show', :conditions => { :method => :get }
   map.calendar2 'calendar2', :controller => 'calendars', :action => 'show2', :conditions => { :method => :get }
   map.course_section_calendar_event 'course_sections/:course_section_id/calendar_events/:id', :controller => :calendar_events, :action => 'show', :conditions => { :method => :get }
