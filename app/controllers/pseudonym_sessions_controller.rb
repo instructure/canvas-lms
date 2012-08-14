@@ -120,6 +120,22 @@ class PseudonymSessionsController < ApplicationController
     @pseudonym_session.remote_ip = request.remote_ip
     found = @pseudonym_session.save
 
+    # look for LDAP pseudonyms where we get the unique_id back from LDAP
+    if !found && !@pseudonym_session.attempted_record
+      @domain_root_account.account_authorization_configs.each do |aac|
+        next unless aac.ldap_authentication?
+        next unless aac.identifier_format.present?
+        res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
+        unique_id = res.first[aac.identifier_format].first if res
+        if unique_id && pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
+          pseudonym.instance_variable_set(:@ldap_result, res)
+          @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
+          found = @pseudonym_session.save
+          break
+        end
+      end
+    end
+
     if !found && params[:pseudonym_session]
       pseudonym = Pseudonym.authenticate(params[:pseudonym_session], @domain_root_account.trusted_account_ids, request.remote_ip)
       if pseudonym && pseudonym != :too_many_attempts

@@ -119,6 +119,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   LDAP search filter. Use !{{login}} as a placeholder for the username
   #   supplied by the user. For example: "(sAMAccountName=!{{login}})".
   #
+  # - identifier_format [Optional]
+  #
+  #   The LDAP attribute to use to look up the Canvas login. Omit to use
+  #   the username supplied by the user.
+  #
   # - auth_username
   #
   #   Username
@@ -314,7 +319,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     when 'ldap'
       [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
         :auth_filter, :auth_username, :auth_password, :change_password_url,
-        :login_handle_name ]
+        :identifier_format, :login_handle_name ]
     when 'saml'
       [ :auth_type, :log_in_url, :log_out_url, :change_password_url, :requested_authn_context,
         :certificate_fingerprint, :identifier_format, :login_handle_name, :login_attribute ]

@@ -70,6 +70,31 @@ describe PseudonymSessionsController do
     assigns[:pseudonym_session].should_not be_nil
   end
 
+  context "ldap" do
+    it "should log in a user with a identifier_format" do
+      user_with_pseudonym(:username => '12345', :active_all => 1)
+      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns([{ 'uid' => ['12345'] }])
+      aac2 = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac.any_instantiation.expects(:ldap_bind_result).never
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      response.should be_redirect
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      assigns[:user].should == @user
+      assigns[:pseudonym].should == @pseudonym
+      assigns[:pseudonym_session].should_not be_nil
+    end
+
+    it "should only query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
+      user_with_pseudonym(:username => 'username', :active_all => 1)
+      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      response.status.should == '400 Bad Request'
+      response.should render_template('new')
+    end
+  end
+
   context "trusted logins" do
     it "should login for a pseudonym from a different account" do
       account = Account.create!
