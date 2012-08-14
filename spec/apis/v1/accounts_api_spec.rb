@@ -51,6 +51,40 @@ describe "Accounts API", :type => :integration do
     ]
   end
 
+  describe 'sub_accounts' do
+    before do
+      root = @a1
+      a1 = root.sub_accounts.create! :name => "Account 1"
+      a2 = root.sub_accounts.create! :name => "Account 2"
+      a1.sub_accounts.create! :name => "Account 1.1"
+      a1_2 = a1.sub_accounts.create! :name => "Account 1.2"
+      a1.sub_accounts.create! :name => "Account 1.2.1"
+      3.times.each { |i|
+        a2.sub_accounts.create! :name => "Account 2.#{i+1}"
+      }
+    end
+
+    it "should return child accounts" do
+      json = api_call(:get,
+        "/api/v1/accounts/#{@a1.id}/sub_accounts",
+        {:controller => 'accounts', :action => 'sub_accounts',
+         :account_id => @a1.id.to_s, :format => 'json'})
+      json.map { |j| j['name'] }.should == ['subby', 'implicit-access',
+        'Account 1', 'Account 2']
+    end
+
+    it "should return sub accounts recursively" do
+      json = api_call(:get,
+        "/api/v1/accounts/#{@a1.id}/sub_accounts?recursive=1",
+        {:controller => 'accounts', :action => 'sub_accounts',
+         :account_id => @a1.id.to_s, :recursive => "1", :format => 'json'})
+
+      json.map { |j| j['name'] }.sort.should == ['subby', 'implicit-access',
+        'Account 1', 'Account 1.1', 'Account 1.2', 'Account 1.2.1',
+        'Account 2', 'Account 2.1', 'Account 2.2', 'Account 2.3'].sort
+    end
+  end
+
   it "should return an individual account" do
     # by id
     json = api_call(:get, "/api/v1/accounts/#{@a1.id}",

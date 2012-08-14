@@ -462,7 +462,7 @@ class Account < ActiveRecord::Base
     return nil unless self.turnitin_salt && self.turnitin_crypted_secret
     Canvas::Security.decrypt_password(self.turnitin_crypted_secret, self.turnitin_salt, 'instructure_turnitin_secret_shared')
   end
-  
+
   def account_chain(opts = {})
     res = [self]
 
@@ -496,6 +496,31 @@ class Account < ActiveRecord::Base
     if self.parent_account.account_chain_ids.include?(self.id)
       errors.add(:parent_account_id,
                  "Setting account #{self.sis_source_id || self.id}'s parent to #{self.parent_account.sis_source_id || self.parent_account_id} would create a loop")
+    end
+  end
+
+  # returns all sub_accounts recursively as far down as they go, in id order
+  # because this uses a custom sql query for postgresql, we can't use a normal
+  # named scope, so we pass the limit and offset into the method instead and
+  # build our own query string
+  def sub_accounts_recursive(limit, offset)
+    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+      Account.find_by_sql([<<-SQL, self.id, limit.to_i, offset.to_i])
+          WITH RECURSIVE t AS (
+            SELECT * FROM accounts WHERE parent_account_id = ?
+            UNION
+            SELECT accounts.* FROM accounts INNER JOIN t ON accounts.parent_account_id = t.id
+          )
+          SELECT * FROM t ORDER BY parent_account_id, id LIMIT ? OFFSET ?
+      SQL
+    else
+      account_descendents = lambda do |id|
+        as = Account.where(:parent_account_id => id).order(:id)
+        as.empty? ?
+          [] :
+          as << as.map { |a| account_descendents.call(a.id) }
+      end
+      account_descendents.call(id).flatten[offset, limit]
     end
   end
 

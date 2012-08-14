@@ -846,6 +846,7 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts/:id', :action => :show
       accounts.put 'accounts/:id', :action => :update
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
+      accounts.get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
     end
 
     api.with_options(:controller => :role_overrides) do |roles|
