@@ -259,7 +259,7 @@ module CC
           end # assessment_node
         end # qti node
       end
-      
+
       def generate_bank(doc, bank, migration_id)
         doc.instruct!
         doc.questestinterop("xmlns" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2",
@@ -269,19 +269,19 @@ module CC
           qti_node.objectbank(
                   :ident => migration_id
           ) do |bank_node|
-            
+
             bank_node.qtimetadata do |meta_node|
               meta_field(meta_node, 'bank_title', bank.title)
             end # meta_node
-            
-            bank.assessment_questions.each do |aq|            
+
+            bank.assessment_questions.active.each do |aq|
               add_question(bank_node, aq.data.with_indifferent_access)
             end
-            
+
           end # bank_node
         end # qti node
       end
-      
+
       def meta_field(node, label, entry)
         node.qtimetadatafield do |meta_node|
           meta_node.fieldlabel label
