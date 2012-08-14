@@ -17,20 +17,20 @@
 #
 
 module AuthenticationMethods
-  
+
   def authorized(*groups)
     authorized_roles = groups
     return true
   end
-  
+
   def authorized_roles
     @authorized_roles ||= []
   end
-  
+
   def consume_authorized_roles
     authorized_roles = []
   end
-  
+
   def load_pseudonym_from_policy
     skip_session_save = false
     if session.to_hash.empty? && # if there's already some session data, defer to normal auth
@@ -201,20 +201,13 @@ module AuthenticationMethods
 
   def redirect_to_login
     respond_to do |format|
-      if request.path.match(/getting_started/)
-        format.html {
-          store_location
-          redirect_to register_url
-        }
-      else
-        format.html {
-          store_location
-          flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
-          opts = {}
-          opts[:canvas_login] = 1 if params[:canvas_login]
-          redirect_to login_url(opts) # should this have :no_auto => 'true' ?
-        }
-      end
+      format.html {
+        store_location
+        flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
+        opts = {}
+        opts[:canvas_login] = 1 if params[:canvas_login]
+        redirect_to login_url(opts) # should this have :no_auto => 'true' ?
+      }
       format.json { render :json => {:errors => {:message => I18n.t('lib.auth.authentication_required', "user authorization required")}}.to_json, :status => :unauthorized}
     end
   end

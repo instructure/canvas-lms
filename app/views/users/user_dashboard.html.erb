@@ -25,7 +25,11 @@
   <% end %>
   <% if show_user_create_course_button(@current_user) %>
   <div class="rs-margin-lr">
-    <a href="<%= getting_started_path(:fresh => 1) %>" id="start_new_course" class="button button-sidebar-wide"><%= t('start_new_course', 'Start a New Course') %></a>
+    <button type="button"
+            id="start_new_course"
+            class="element_toggler button button-sidebar-wide"
+            aria-controls="new_course_form"><%= t('start_new_course', 'Start a New Course') %></button>
+    <%= render :partial => 'shared/new_course_form' %>
   </div>
   <% end %>
 <% end %>
