@@ -614,7 +614,23 @@ describe ContentMigration do
       g.assessment_question_bank_id.should == bank2.id
       g = q.quiz_groups[2]
       g.assessment_question_bank_id.should == nil
+    end
 
+    it "should omit deleted questions in banks" do
+      pending unless Qti.qti_enabled?
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      q1 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      q2 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
+      q3 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}]})
+      q2.destroy
+
+      run_course_copy
+
+      bank2 = @copy_to.assessment_question_banks.first
+      bank2.should be_present
+      # we don't copy over deleted questions at all, not even marked as deleted
+      bank2.assessment_questions.active.size.should == 2
+      bank2.assessment_questions.size.should == 2
     end
 
     it "should copy a discussion topic when assignment is selected" do
