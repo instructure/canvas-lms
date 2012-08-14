@@ -270,6 +270,21 @@ describe ContentMigration do
       new_topic.message.should match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
     end
 
+    it "should keep date-locked files locked" do
+      student = user
+      @copy_from.enroll_student(student)
+      att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from, :lock_at => 1.month.ago, :unlock_at => 1.month.from_now)
+      att.grants_right?(student, :download).should be_false
+
+      run_course_copy
+
+      @copy_to.enroll_student(student)
+      new_att = @copy_to.attachments.find_by_migration_id(CC::CCHelper.create_key(att))
+      new_att.should be_present
+
+      new_att.grants_right?(student, :download).should be_false
+    end
+
     it "should tranlsate links to module items in html content" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")

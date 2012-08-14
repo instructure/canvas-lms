@@ -308,8 +308,6 @@ class FilesController < ApplicationController
           )
           options[:methods] = :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
           log_asset_access(@attachment, "files", "files")
-        else
-          @attachment.scribd_doc = nil
         end
       end
       format.json { render :json => @attachment.to_json(options) }

@@ -1426,7 +1426,10 @@ class Attachment < ActiveRecord::Base
     self.scribd_doc = @scribd_doc_backup
     self.scribd_doc.secret_password = @scribd_password if self.scribd_doc
   end
-  
+  def filter_attributes_for_user(hash, user, session)
+    hash.delete(:scribd_doc) unless grants_right?(user, session, :download)
+  end
+
   def self.process_scribd_conversion_statuses
     # Runs periodically
     @attachments = Attachment.needing_scribd_conversion_status
