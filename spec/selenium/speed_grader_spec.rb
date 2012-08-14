@@ -65,7 +65,7 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
     in_frame('speedgrader_iframe') do
-      question_inputs = ff('.question_input')
+      question_inputs = ff('.header .question_input')
       question_inputs.each { |qi| replace_content(qi, 3) }
       submit_form('#update_history_form')
     end

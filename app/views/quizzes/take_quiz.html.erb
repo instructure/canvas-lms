@@ -41,12 +41,14 @@
 <% end %>
 <% jammit_css :quizzes, :tinymce %>
 
-<h2><%= @quiz.quiz_title || @quiz.readable_type %></h2>
-<% if @submission.preview? %>
-<h3><%= image_tag "warning.png" %> <%= t('headers.draft_preview', "This is a preview of the draft version of the quiz") %></h3>
-<% end %>
-<%= before_label(:started, "Started") %>
-<%= datetime_string(@submission.started_at) %>
+<header class="quiz-header">
+  <h2><%= @quiz.quiz_title || @quiz.readable_type %></h2>
+  <% if @submission.preview? %>
+  <h3><%= image_tag "warning.png" %> <%= t('headers.draft_preview', "This is a preview of the draft version of the quiz") %></h3>
+  <% end %>
+  <%= before_label(:started, "Started") %>
+  <%= datetime_string(@submission.started_at) %>
+</header>
 
 <% js_bundle :take_quiz %>
 <div id="questions" class="assessing">
@@ -70,7 +72,7 @@
 </div>
 <%= render :partial => "display_question", :collection => @submission.questions_as_object, :locals => {:assessing => true } %>
 <div class="button-container">
-  <button type="submit" class="button submit_button"><%= t('buttons.submit_answer', "Submit Answers") %></button>
+  <button type="submit" class="button submit_button btn-primary"><%= t('buttons.submit_answer', "Submit Answers") %></button>
 </div>
 <% end %>
 </div>

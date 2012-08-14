@@ -40,30 +40,32 @@
   <%= render :partial => 'shared/find_outcome', :locals => {:purpose => 'question_bank'}  %>
 <% end %>
 
-<% form_for @bank, :url => context_url(@context, :context_question_bank_url), :html => {:id => "edit_bank_form", :method => :put} do |f| %>
-  <div class="displaying">
-    <h2><%= @bank.title %></h2>
+<div class="quiz-header">
+  <% form_for @bank, :url => context_url(@context, :context_question_bank_url), :html => {:id => "edit_bank_form", :method => :put} do |f| %>
+    <div class="displaying">
+      <h2><%= @bank.title %></h2>
+    </div>
+    <div class="editing" style="display: none;">
+      <b><%= f.label :title, :en => "Bank Name" %></b>
+      <%= f.text_field :title, :class => "bank_name_box" %>
+    </div>
+  <% end %>
+  <p>
+    <%= t('edit_warning', "Remember, changes to question templates won't automatically update quizzes that are already using those questions.") %>
+  </p>
+  <div style="margin-bottom: 5px; <%= hidden if @questions.total_pages > 1 %>">
+    <input type="checkbox" id="show_question_details" <%= 'checked' if @questions.total_pages > 1 %> /><label for="show_question_details"> <%= t('show_details', 'Show Question Details') %></label>
   </div>
-  <div class="editing" style="display: none;">
-    <b><%= f.label :title, :en => "Bank Name" %></b>
-    <%= f.text_field :title, :class => "bank_name_box" %>
+  <div id="bank_urls" style="display: none;">
+    <a href="<%= context_url(@context, :context_question_bank_questions_url, @bank, :page => "{{ page }}") %>" class="more_questions_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_bank_assessment_questions_url, @bank) %>" class="add_question_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_bank_assessment_question_move_question_url, "{{ id }}") %>" class="move_question_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_bank_move_questions_url, @bank.id) %>" class="move_questions_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_banks_url) %>" class="assessment_question_banks_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_banks_url, :managed => '1') %>" class="managed_banks_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_question_bank_reorder_url, @bank.id) %>" class="reorder_questions_url" style="display: none;">&nbsp;</a>
+    <span class="current_question_bank_id"><%= @bank.id %></span>
   </div>
-<% end %>
-<p>
-  <%= t('edit_warning', "Remember, changes to question templates won't automatically update quizzes that are already using those questions.") %>
-</p>
-<div style="margin-bottom: 5px; <%= hidden if @questions.total_pages > 1 %>">
-  <input type="checkbox" id="show_question_details" <%= 'checked' if @questions.total_pages > 1 %> /><label for="show_question_details"> <%= t('show_details', 'Show Question Details') %></label>
-</div>
-<div id="bank_urls" style="display: none;">
-  <a href="<%= context_url(@context, :context_question_bank_questions_url, @bank, :page => "{{ page }}") %>" class="more_questions_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_bank_assessment_questions_url, @bank) %>" class="add_question_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_bank_assessment_question_move_question_url, "{{ id }}") %>" class="move_question_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_bank_move_questions_url, @bank.id) %>" class="move_questions_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_banks_url) %>" class="assessment_question_banks_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_banks_url, :managed => '1') %>" class="managed_banks_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_question_bank_reorder_url, @bank.id) %>" class="reorder_questions_url" style="display: none;">&nbsp;</a>
-  <span class="current_question_bank_id"><%= @bank.id %></span>
 </div>
 <div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank">
   <% if @questions.total_pages <= 1 %>
