@@ -95,7 +95,7 @@ describe "concluded/unconcluded courses" do
     
     html = Nokogiri::HTML(response.body)
     html.css('#fudge_points_entry').length.should == 1
-    html.css('.question_neutral_comment textarea').length.should == 1
+    html.css('.quiz_comment textarea').length.should == 1
     html.css('.user_points .question_input').length.should == 1
   end
   
@@ -107,7 +107,7 @@ describe "concluded/unconcluded courses" do
     
     html = Nokogiri::HTML(response.body)
     html.css('#fudge_points_entry').length.should == 0
-    html.css('.question_neutral_comment textarea').length.should == 0
+    html.css('.quiz_comment textarea').length.should == 0
     html.css('.user_points .question_input').length.should == 0
   end
   

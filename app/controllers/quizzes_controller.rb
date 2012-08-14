@@ -292,6 +292,9 @@ class QuizzesController < ApplicationController
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
       end
+      if params[:score_updated]
+        js_env :SCORE_UPDATED => true
+      end
       if authorized_action(@submission, @current_user, :read)
         dont_show_user_name = @submission.quiz.anonymous_submissions || (!@submission.user || @submission.user == @current_user)
         add_crumb((dont_show_user_name ? t(:default_history_crumb, "History") : @submission.user.name))

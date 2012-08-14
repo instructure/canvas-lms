@@ -43,14 +43,16 @@ define([
 
     $message_students_dialog.find("ul li:not(.blank)").remove();
 
-    for(var idx in settings.students) {
+    for (var i = 0; i < settings.students.length; i++) {
       var $student = $li.clone(true).removeClass('blank');
-      $student.find(".name").text(settings.students[idx].name);
-      $student.find(".score").text(settings.students[idx].score);
-      $student.data('id', settings.students[idx].id);
-      $student.user_data = settings.students[idx]
+
+      $student.find('.name').text(settings.students[i].name);
+      $student.find('.score').text(settings.students[i].score);
+      $student.data('id', settings.students[i].id);
+      $student.user_data = settings.students[i];
+
       $ul.append($student.show());
-      students_hash[settings.students[idx].id] = $student;
+      students_hash[settings.students[i].id] = $student;
     }
     
     $ul.show();

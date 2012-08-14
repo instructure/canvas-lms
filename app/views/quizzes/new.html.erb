@@ -269,6 +269,7 @@ $(document).ready(function() {
 </script>
 <% end %>
 
+<header class="quiz-header">
 <h2><%= @quiz && !@quiz.new_record? ? t('headers.edit_quiz', "Edit Quiz") : t('headers.create_new_quiz', "Create a New Quiz") %></h2>
 <div style="display: none;" id="quiz_urls">
   <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="update_quiz_url">&nbsp;</a>
@@ -306,6 +307,7 @@ $(document).ready(function() {
           :question_count => QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT) %>
   </span>
   <% end %>
+</div>
 </div>
 <div id="questions" class="question_editing brief">
   <% @quiz.root_entries.each do |question| %>

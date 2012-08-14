@@ -110,6 +110,26 @@ module QuizzesHelper
     res
   end
 
+  # Build the question-level comments. Lists in the order of :correct_comments, :incorrect_comments, :neutral_comments.
+  # ==== Arguments
+  # * <tt>user_answer</tt> - The user_answer hash.
+  # * <tt>question</tt> - The question hash.
+  def question_comment(user_answer, question)
+    correct_text   = (hash_get(user_answer, :correct) == true) ? comment_get(question, :correct_comments) : nil
+    incorrect_text = (hash_get(user_answer, :correct) == false) ? comment_get(question, :incorrect_comments) : nil
+    neutral_text   = (hash_get(question, :neutral_comments).present?) ? comment_get(question, :neutral_comments) : nil
+
+    text = []
+    text << content_tag(:p, correct_text, {:class => 'correct_comments'}) if correct_text.present?
+    text << content_tag(:p, incorrect_text, {:class => 'incorrect_comments'}) if incorrect_text.present?
+    text << content_tag(:p, neutral_text, {:class => 'neutral_comments'}) if neutral_text.present?
+    if text.empty?
+      ''
+    else
+      content_tag(:div, text.join('').html_safe, {:class => 'quiz_comment'})
+    end
+  end
+
   def comment_get(hash, field)
     if html = hash_get(hash, "#{field}_html".to_sym)
       raw(html)
@@ -121,19 +141,35 @@ module QuizzesHelper
   def fill_in_multiple_blanks_question(options)
     question = hash_get(options, :question)
     answers  = hash_get(options, :answers).dup
+    answer_list = hash_get(options, :answer_list)
     res      = user_content hash_get(question, :question_text)
-    answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
-    answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
-
-    res.gsub /\{\{question_[^}]+\}\}/, ""
+    if answer_list && !answer_list.empty?
+      index  = 0
+      res.gsub %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
+        a = answer_list[index]
+        index += 1
+        match.sub(/\{\{question_.*?\}\}/, a.to_s)
+      end
+    else
+      answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
+      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
+      res.gsub /\{\{question_[^}]+\}\}/, ""
+    end
   end
 
   def multiple_dropdowns_question(options)
     question = hash_get(options, :question)
     answers  = hash_get(options, :answers)
+    answer_list = hash_get(options, :answer_list)
     res      = user_content hash_get(question, :question_text)
+    index  = 0
     res.gsub %r{<select.*?name=['"](question_.*?)['"].*?>.*?</select>} do |match|
-      a = hash_get(answers, $1)
+      if answer_list && !answer_list.empty?
+        a = answer_list[index]
+        index += 1
+      else
+        a = hash_get(answers, $1)
+      end
       match.sub(%r{(<option.*?value=['"]#{ERB::Util.h(a)}['"])}, '\\1 selected')
     end
   end
