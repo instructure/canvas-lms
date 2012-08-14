@@ -35,10 +35,27 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
 
+  def self.auth_over_tls_setting(value)
+    case value
+      when nil, '', false, 'false', 'f', 0, '0'
+        nil
+      when true, 'true', 't', 1, '1', 'simple_tls', :simple_tls
+        'simple_tls'
+      when 'start_tls', :start_tls
+        'start_tls'
+      else
+        raise ArgumentError("invalid auth_over_tls setting: #{value}")
+    end
+  end
+
+  def auth_over_tls
+    self.class.auth_over_tls_setting(read_attribute(:auth_over_tls))
+  end
+
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
     require 'net/ldap'
-    ldap = Net::LDAP.new(:encryption => (self.auth_over_tls ? :simple_tls : nil))
+    ldap = Net::LDAP.new(:encryption => self.auth_over_tls.try(:to_sym))
     ldap.host = self.auth_host
     ldap.port = self.auth_port
     ldap.base = self.auth_base
