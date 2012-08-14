@@ -670,7 +670,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/course_copy/:id', :controller => :content_imports, :action => :copy_course_status, :path_name => :course_copy_status
       courses.post 'courses/:course_id/files', :action => :create_file
       courses.post 'courses/:course_id/folders', :controller => :folders, :action => :create
-      courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show
+      courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
     end
 
     api.with_options(:controller => :sections) do |sections|
@@ -692,7 +692,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :assignments_api) do |assignments|
       assignments.get 'courses/:course_id/assignments', :action => :index, :path_name => 'course_assignments'
-      assignments.get 'courses/:course_id/assignments/:id', :action => :show
+      assignments.get 'courses/:course_id/assignments/:id', :action => :show, :path_name => 'course_assignment'
       assignments.post 'courses/:course_id/assignments', :action => :create
       assignments.put 'courses/:course_id/assignments/:id', :action => :update
       assignments.delete 'courses/:course_id/assignments/:id', :action => :destroy, :controller => :assignments
@@ -794,7 +794,7 @@ ActionController::Routing::Routes.draw do |map|
       users.post 'users/:user_id/files', :action => :create_file
 
       users.post 'users/:user_id/folders', :controller => :folders, :action => :create
-      users.get 'users/:user_id/folders/:id', :controller => :folders, :action => :show
+      users.get 'users/:user_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'user_folder'
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|
@@ -897,7 +897,7 @@ ActionController::Routing::Routes.draw do |map|
       end
 
       groups.post 'groups/:group_id/folders', :controller => :folders, :action => :create
-      groups.get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show
+      groups.get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'group_folder'
     end
 
     api.with_options(:controller => :collections) do |collections|
@@ -936,7 +936,7 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :files) do |files|
       files.post 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
       files.get 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
-      files.get 'files/:id', :action => :api_show
+      files.get 'files/:id', :action => :api_show, :path_name => 'file'
       files.delete 'files/:id', :action => :destroy
       files.put 'files/:id', :action => :api_update
       files.get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
@@ -962,8 +962,8 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :wiki_pages) do |wiki_pages|
       wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_pages'
       wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_pages'
-      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show
-      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show
+      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_page'
+      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_page'
     end
   end
 

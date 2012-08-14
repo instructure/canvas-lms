@@ -36,7 +36,7 @@ module TextHelper
     # translate anchor tags into a markdown-style name/link combo
     doc.css('a').each { |node| next if node.text.strip == node['href']; node.replace("[#{node.text}](#{node['href']})") }
     # translate img tags into just a url to the image
-    doc.css('img').each { |node| node.replace(node['src']) }
+    doc.css('img').each { |node| node.replace(node['src'] || '') }
     # append a line break to br and p tags, so they retain a line break after stripping tags
     doc.css('br, p').each { |node| node.after("\n\n") }
     doc.text.strip

@@ -327,4 +327,15 @@ describe AssignmentsApiController, :type => :integration do
             :format => 'json', :course_id => @course.id.to_s, :id => @a.to_param })
     @a.reload.should be_deleted
   end
+
+  it "should api translate assignment descriptions" do
+    course_with_teacher(:active_all => true)
+    should_translate_user_content(@course) do |content|
+      assignment = @course.assignments.create!(:description => content)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                      :controller => 'assignments_api', :action => 'show', :format => 'json',
+                      :course_id => @course.id.to_s, :id => assignment.id.to_s)
+      json['description']
+    end
+  end
 end
