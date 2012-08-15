@@ -148,8 +148,10 @@ class NotificationPolicy < ActiveRecord::Base
     full_category_list.each {|c| categories[c.category] = c.default_frequency}
     default_channel_id = user.communication_channel.try(:id)
     # Load unique list of categories that the user currently has settings for.
-    user_categories = NotificationPolicy.for(user).scoped(:joins => :notification,
-                                                          :select => 'DISTINCT notifications.category').all.map{|c| c.category}
+    user_categories = NotificationPolicy.for(user).scoped({
+      :include => :notification,
+      :conditions => "notification_id IS NOT NULL"
+    }).all.map{|np| np.notification.category }.uniq
     missing_categories = (categories.keys - user_categories)
     missing_categories.each do |need_category|
       # Create the settings for a completely unrepresented category. Use default communication_channel (primary email)
