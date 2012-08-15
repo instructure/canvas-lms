@@ -38,7 +38,7 @@ class UserProfile < ActiveRecord::Base
       if user && user.registered?
         @tabs.insert 1, { :id => TAB_COMMUNICATION_PREFERENCES, :label => I18n.t('#user_profile.tabs.notifications', "Notifications"), :css_class => 'notifications', :href => :communication_profile_path, :no_args => true }
       end
-      if user && user.instance_variable_get(:@show_profile_tab)
+      if user && opts[:root_account] && opts[:root_account].enable_profiles?
         @tabs.insert 1, {:id => TAB_PROFILE, :label => I18n.t('#user_profile.tabs.profile', "Profile"), :css_class => 'profile', :href => :user_profile_path, :args => [user.id]}
       end
 
