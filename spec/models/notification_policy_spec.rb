@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe NotificationPolicy do
   it "should create a new instance given valid attributes" do
@@ -265,6 +266,21 @@ describe NotificationPolicy do
       # Primary should have 1 created and secondary should be left alone.
       primary_channel.notification_policies.count.should == 1
       secondary_channel.notification_policies.count.should == 0
+    end
+
+    context "across shards" do
+      it_should_behave_like "sharding"
+
+      it "should find user categories accross shards" do
+        @shard1.activate {
+          @shard_user = user_model
+          @channel = communication_channel_model(:user_id => @shard_user.id)
+          NotificationPolicy.delete_all
+          @policy = @channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
+          NotificationPolicy.setup_with_default_policies(@shard_user, [@announcement])
+          @policy.reload.frequency.should == Notification::FREQ_NEVER
+        }
+      end
     end
   end
 end
