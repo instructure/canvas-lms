@@ -233,6 +233,7 @@ describe NotificationPolicy do
       communication_channel_model(:user_id => @user.id)
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
     end
+
     it "should create default NotificationPolicy entries if missing" do
       # Ensure no existing policies
       NotificationPolicy.delete_all
@@ -241,6 +242,7 @@ describe NotificationPolicy do
       policies.length.should == 1
       policies.first.frequency.should == @announcement.default_frequency
     end
+
     it "should not overwrite an existing setting with a default" do
       # Create an existing policy entry
       NotificationPolicy.delete_all
@@ -253,6 +255,7 @@ describe NotificationPolicy do
       policies.length.should == 1
       policies.first.frequency.should == Notification::FREQ_NEVER
     end
+
     it "should not set defaults on secondary communication channel" do
       NotificationPolicy.delete_all
       # Setup the second channel (higher position)
@@ -266,6 +269,24 @@ describe NotificationPolicy do
       # Primary should have 1 created and secondary should be left alone.
       primary_channel.notification_policies.count.should == 1
       secondary_channel.notification_policies.count.should == 0
+    end
+
+    it "should not pull defaults from non-default channels" do
+      NotificationPolicy.delete_all
+      # Setup the second channel (higher position)
+      primary_channel   = @user.communication_channel
+      secondary_channel = communication_channel_model(:user_id => @user.id, :path => 'secondary@example.com')
+      secondary_channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
+      NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      # Primary should have 1 created and secondary should be left alone.
+      primary_channel.reload.notification_policies.count.should == 1
+      secondary_channel.reload.notification_policies.count.should == 1
+    end
+
+    it "should not error if no channel exists" do
+      NotificationPolicy.delete_all
+      CommunicationChannel.delete_all
+      lambda { NotificationPolicy.setup_with_default_policies(@user, [@announcement])}.should_not raise_error
     end
 
     context "across shards" do

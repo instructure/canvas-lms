@@ -41,9 +41,8 @@ class NotificationPolicy < ActiveRecord::Base
     end
   }
   
-  # TODO: the named_scope name should be self-explanatory... change
-  # this to by_frequency or something
-  # This is for choosing a policy by frequency
+  # TODO: the named_scope name should be self-explanatory... change this to
+  # by_frequency or something This is for choosing a policy by frequency
   named_scope :by, lambda { |freq| 
     case freq
     when Array
@@ -132,34 +131,42 @@ class NotificationPolicy < ActiveRecord::Base
     nil
   end
 
-  # Fetch the user's NotificationPolicies but whenever a category is not represented, create a NotificationPolicy on the primary
+  # Fetch the user's NotificationPolicies but whenever a category is not
+  # represented, create a NotificationPolicy on the primary
   # CommunicationChannel with a default frequency set.
   # Returns the full list of policies for the user
   #
   # ===== Arguments
   # * <tt>user</tt> - The User instance to load the values for.
-  # * <tt>full_category_list</tt> - An array of Notification models that represent the unique list of categories that should be displayed for the user.
+  # * <tt>full_category_list</tt> - An array of Notification models that
+  # represent the unique list of categories that should be displayed for the
+  # user.
   #
   # ===== Returns
-  # A list of NotificationPolicy entries for the user. May include newly created entries if defaults were needed.
+  # A list of NotificationPolicy entries for the user. May include newly
+  # created entries if defaults were needed.
   def self.setup_with_default_policies(user, full_category_list)
     categories = {}
-    # Get the list of notification categories and its default. Like this: {"Announcement" => 'immediately'}
+    # Get the list of notification categories and its default. Like this:
+    # {"Announcement" => 'immediately'}
     full_category_list.each {|c| categories[c.category] = c.default_frequency}
-    default_channel_id = user.communication_channel.try(:id)
-    # Load unique list of categories that the user currently has settings for.
-    user_categories = NotificationPolicy.for(user).scoped({
-      :include => :notification,
-      :conditions => "notification_id IS NOT NULL"
-    }).all.map{|np| np.notification.category }.uniq
-    missing_categories = (categories.keys - user_categories)
-    missing_categories.each do |need_category|
-      # Create the settings for a completely unrepresented category. Use default communication_channel (primary email)
-      self.setup_for(user, {:category => need_category,
-                            :channel_id => default_channel_id,
-                            :frequency => categories[need_category]})
+    if default_channel_id = user.communication_channel.try(:id)
+      # Load unique list of categories that the user currently has settings for.
+      user_categories = NotificationPolicy.for(user).scoped({
+        :include => :notification,
+        :conditions => ["notification_id IS NOT NULL AND communication_channel_id = ?", default_channel_id]
+      }).all.map{|np| np.notification.category }.uniq
+      missing_categories = (categories.keys - user_categories)
+      missing_categories.each do |need_category|
+        # Create the settings for a completely unrepresented category. Use
+        # default communication_channel (primary email)
+        self.setup_for(user, {:category => need_category,
+                              :channel_id => default_channel_id,
+                              :frequency => categories[need_category]})
+      end
     end
     # Load and return user's policies after defaults may or may not have been set.
+    # TODO: Don't load policies for retired channels
     NotificationPolicy.scoped(:include => :notification).for(user)
   end
 end
