@@ -248,6 +248,69 @@ describe Instructure::AdheresToPolicy::InstanceMethods do
     b.total.should == 2
   end
 
+  context "grants_right?" do
+    it "should check the policy" do
+      course(:active_all => true)
+      @course.grants_right?(@teacher, :read).should be_true
+      @course.grants_right?(@teacher, :asdf).should be_false
+    end
+  end
+
+  context "grants_rights?" do
+    it "should return all granted rights if no specific ones are sought" do
+      course(:active_all => true)
+      rights = @course.grants_rights?(@teacher)
+      rights.should_not be_empty
+    end
+
+    context "caching" do
+      it "should cache for courses" do
+        enable_cache do
+          Rails.cache.expects(:fetch).twice.with{ |p,| p =~ /course_permissions.*course/ }.returns([])
+          course().grants_rights?(user(:name => 'bob'))
+          # cache lookups for "nobody" as well
+          course().grants_rights?(nil)
+        end
+      end
+  
+      it "should not cache for courses if session[:session_affects_permissions]" do
+        enable_cache do
+          Rails.cache.expects(:fetch).never.with{ |p,| p =~ /course_permissions.*course/ }
+          Rails.cache.stubs(:fetch).with{ |p,| p !~ /course_permissions.*course/ }.returns([])
+          course().grants_rights?(user(:name => 'bob'), {:session_affects_permissions => true})
+        end
+      end
+  
+      it "should not cache for non-courses" do
+        enable_cache do
+          class B
+            extend Instructure::AdheresToPolicy::ClassMethods
+            set_policy {}
+          end
+          Rails.cache.expects(:fetch).never
+          B.new.grants_rights?(user(:name => 'bob'))
+        end
+      end
+
+      it "should not nil the session argument when not caching" do
+        enable_cache do
+          class B
+            attr_reader :session
+            extend Instructure::AdheresToPolicy::ClassMethods
+            set_policy {
+              given { |user, session| @session = session }
+              can :read
+            }
+          end
+          Rails.cache.expects(:fetch).never
+          b = B.new
+          b.grants_rights?(user(:name => 'bob'), {})
+          b.session.should_not be_nil
+        end
+      end
+    end
+  end
+
   after(:all) do
     Object.send(:remove_const, :A)
   end
