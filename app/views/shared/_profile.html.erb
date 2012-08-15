@@ -22,7 +22,7 @@
           <span class="hide-if-editing"><%= @user_data[:short_name] %></span>
         </h1>
         <% if @user_data[:can_edit] %>
-          <label class="show-if-editing"><%= t('name', 'Name') %>: <br><input type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>"></label>
+          <label class="show-if-editing"><%= t('name', 'Name') %>: <br><input type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required></label>
         <% end %>
         <p>
           <span class="hide-if-editing"><%= @user_data[:title] %></span>
