@@ -33,7 +33,7 @@ shared_examples_for 'Delayed::Batch' do
         "string".send_later(:size).should be_true
         "string".send_later(:gsub, /./, "!").should be_true
       }
-      Delayed::Job.count.should == 1
+      Delayed::Job.jobs_count(:current).should == 1
       job = Delayed::Job.find_available(1).first
       expect{ job.invoke_job }.to raise_error
     end
@@ -43,7 +43,7 @@ shared_examples_for 'Delayed::Batch' do
         "string".send_later(:size).should be_true
         "string".send_later(:gsub, /./, "!").should be_true
       }
-      Delayed::Job.count.should == 1
+      Delayed::Job.jobs_count(:current).should == 1
 
       batch_job = Delayed::Job.find_available(1).first
       batch_job.batch?.should == true
@@ -67,7 +67,7 @@ shared_examples_for 'Delayed::Batch' do
         "string".send_later_enqueue_args(:size, :priority => Delayed::LOW_PRIORITY).should be_true
         "string".send_later(:gsub, /./, "!").should be_true
       }
-      Delayed::Job.count.should == 2
+      Delayed::Job.jobs_count(:current).should == 2
     end
   end
 

@@ -20,6 +20,10 @@ module Delayed
         include Delayed::Backend::Base
         set_table_name :delayed_jobs
 
+        def self.reconnect!
+          connection.reconnect!
+        end
+
         # be aware that some strand functionality is controlled by triggers on
         # the database. see
         # db/migrate/20110831210257_add_delayed_jobs_next_in_strand.rb
