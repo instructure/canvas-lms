@@ -28,11 +28,10 @@ describe Turnitin::Client do
   end
 
   def turnitin_submission
-    @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
+    expects_job_with_tag('Submission#submit_to_turnitin') do
+      @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
+    end
     @submission.reload
-
-    job = Delayed::Job.last(:conditions => { :tag => 'Submission#submit_to_turnitin'})
-    job.should_not be_nil
   end
 
   describe "create assignment" do

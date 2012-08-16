@@ -36,19 +36,19 @@ describe DiscussionTopic::MaterializedView do
     it "should return nil and schedule a job if no view" do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       DiscussionTopic::MaterializedView.materialized_view_for(@topic).should == nil
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
     it "should return the view if it exists but is out of date" do
       @view.update_materialized_view_without_send_later
       DiscussionTopic::MaterializedView.materialized_view_for(@topic).should be_present
       reply = @topic.reply_from(:user => @user, :text => "new message!")
-      Delayed::Job.delete_all
+      Delayed::Job.find_available(100).each(&:destroy)
       json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       json.should be_present
       entries.should_not be_include(reply.id)
       # since the view was out of date, it's returned but a job is queued
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
       # after updating, the view should include the new entry
       @view.update_materialized_view_without_send_later
       json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)

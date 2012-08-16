@@ -1200,9 +1200,7 @@ describe DiscussionTopicsController, :type => :integration do
       @all_entries.each &:reload
 
       run_transaction_commit_callbacks
-      job = Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}")
-      job.should be_present
-      run_job(job)
+      run_jobs
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
                 { :controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -1303,9 +1301,7 @@ describe DiscussionTopicsController, :type => :integration do
       @root1 = @topic.reply_from(:user => @student, :html => "root1")
 
       run_transaction_commit_callbacks
-      job = Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}")
-      job.should be_present
-      run_job(job)
+      run_jobs
 
       # make everything slightly in the past to test updating
       DiscussionEntry.update_all(:updated_at => 5.minutes.ago)

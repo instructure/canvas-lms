@@ -903,15 +903,14 @@ describe ContentImportsController, :type => :integration do
     }
 
     status_url = data['status_url']
-    dj = Delayed::Job.last
 
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
     (JSON.parse(response.body)).tap do |res|
       res['workflow_state'].should == 'created'
       res['progress'].should be_nil
     end
-    
-    dj.invoke_job
+
+    run_jobs
     cm.reload
     cm.migration_settings[:warnings].should == nil
     cm.content_export.error_messages.should == []

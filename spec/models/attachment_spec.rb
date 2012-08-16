@@ -210,16 +210,18 @@ describe Attachment do
 
     describe "submit_to_scribd job" do
       it "should queue for scribdable types" do
-        scribdable_attachment_model
-        @attachment.after_attachment_saved
-        Delayed::Job.count(:conditions => { :tag => 'Attachment#submit_to_scribd!' }).should == 1
+        expects_job_with_tag('Attachment#submit_to_scribd!') do
+          scribdable_attachment_model
+          @attachment.after_attachment_saved
+        end
         @attachment.should be_pending_upload
       end
 
       it "should not queue for non-scribdable types" do
-        attachment_model
-        @attachment.after_attachment_saved
-        Delayed::Job.count(:conditions => { :tag => 'Attachment#submit_to_scribd!' }).should == 0
+        expects_job_with_tag('Attachment#submit_to_scribd!', 0) do
+          attachment_model
+          @attachment.after_attachment_saved
+        end
         @attachment.should be_processed
       end
     end
@@ -373,11 +375,14 @@ describe Attachment do
       now = Time.now
       Time.stubs(:now).returns(now)
       Setting.expects(:get).with('attachment_build_media_object_delay_seconds', '10').once.returns('25')
-      @attachment.save!
+      track_jobs do
+        @attachment.save!
+      end
 
       MediaObject.count.should == 0
-      Delayed::Job.count.should == 1
-      Delayed::Job.first.run_at.to_i.should == (now + 25.seconds).to_i
+      job = created_jobs.first
+      job.tag.should == 'MediaObject.add_media_files'
+      job.run_at.to_i.should == (now + 25.seconds).to_i
     end
 
     it "should not create a media object in a skip_media_object_creation block" do
@@ -747,14 +752,15 @@ describe Attachment do
     end
 
     it "should schedule encoding detection when appropriate" do
-      prior_count = Delayed::Job.count(:all, :conditions => {:tag => 'Attachment#infer_encoding'})
-      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'image/png'), :content_type => 'image/png')
-      Delayed::Job.count(:all, :conditions => {:tag => 'Attachment#infer_encoding'}).should == prior_count
-      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
-      Delayed::Job.count(:all, :conditions => {:tag => 'Attachment#infer_encoding'}).should == prior_count + 1
-      prior_count += 1
-      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html', :encoding => 'UTF-8')
-      Delayed::Job.count(:all, :conditions => {:tag => 'Attachment#infer_encoding'}).should == prior_count
+      expects_job_with_tag('Attachment#infer_encoding', 0) do
+        attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'image/png'), :content_type => 'image/png')
+      end
+      expects_job_with_tag('Attachment#infer_encoding', 1) do
+        attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+      end
+      expects_job_with_tag('Attachment#infer_encoding', 0) do
+        attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html', :encoding => 'UTF-8')
+      end
     end
 
     it "should properly infer encoding" do
