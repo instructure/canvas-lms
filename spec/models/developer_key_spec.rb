@@ -30,4 +30,23 @@ describe DeveloperKey do
       end
     end
   end
+
+  describe "#redirect_domain_matches?" do
+    it "should match domains exactly, and sub-domains" do
+      key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")
+      key.redirect_domain_matches?("http://example.com/a/b").should be_true
+      # other paths on the same domain are ok
+      key.redirect_domain_matches?("http://example.com/other").should be_true
+      # completely separate domain
+      key.redirect_domain_matches?("http://example2.com/a/b").should be_false
+      # not a sub-domain
+      key.redirect_domain_matches?("http://wwwexample.com/a/b").should be_false
+      key.redirect_domain_matches?("http://example.com.evil/a/b").should be_false
+      key.redirect_domain_matches?("http://www.example.com.evil/a/b").should be_false
+      # sub-domains are ok
+      key.redirect_domain_matches?("http://www.example.com/a/b").should be_true
+      key.redirect_domain_matches?("http://a.b.example.com/a/b").should be_true
+      key.redirect_domain_matches?("http://a.b.example.com/other").should be_true
+    end
+  end
 end
