@@ -133,6 +133,22 @@ describe "Folders API", :type => :integration do
       raw_api_call(:get, @folders_path + "/#{f1.id}", @folders_path_options.merge(:action => "show", :id => f1.id.to_param), {}, {}, :expected_status => 404)
     end
 
+    it "should return correct locked values" do
+      json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
+      json["locked_for_user"].should == false
+      json["locked"].should == false
+
+      locked = @root.sub_folders.create!(:name => "locked", :context => @course, :position => 4, :locked => true)
+      json = api_call(:get, @folders_path + "/#{locked.id}", @folders_path_options.merge(:action => "show", :id => locked.id.to_param), {})
+      json["locked"].should == true
+      json["locked_for_user"].should == false
+
+      student_in_course(:course => @course, :active_all => true)
+      json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
+      json[0]["locked"].should == true
+      json[0]["locked_for_user"].should == true
+    end
+
     describe "folder in context" do
       it "should get the root folder for a course" do
         json = api_call(:get,  "/api/v1/courses/#{@course.id}/folders/root", @folders_path_options.merge(:action => "show", :course_id => @course.id.to_param, :id => 'root'), {})
