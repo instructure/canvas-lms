@@ -251,7 +251,7 @@ module AuthenticationMethods
     reset_session_for_login
     config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
     cas_client ||= CASClient::Client.new(config)
-    delegated_auth_redirect(cas_client.add_service_to_login_url(login_url))
+    delegated_auth_redirect(cas_client.add_service_to_login_url(cas_login_url))
   end
 
   def initiate_saml_login(current_host=nil)
