@@ -264,28 +264,31 @@ describe Instructure::AdheresToPolicy::InstanceMethods do
     end
 
     context "caching" do
-      it "should cache for courses" do
+      it "should cache for contexts" do
+        course(:active_all => true)
         enable_cache do
-          Rails.cache.expects(:fetch).twice.with{ |p,| p =~ /course_permissions.*course/ }.returns([])
-          course().grants_rights?(user(:name => 'bob'))
+          Rails.cache.expects(:fetch).times(3).with{ |p,| p =~ /context_permissions/ }.returns([])
+          @course.grants_rights?(@teacher)
           # cache lookups for "nobody" as well
-          course().grants_rights?(nil)
+          @course.grants_rights?(nil)
+          Account.default.grants_rights?(@teacher)
         end
       end
   
-      it "should not cache for courses if session[:session_affects_permissions]" do
+      it "should not cache for contexts if session[:session_affects_permissions]" do
         enable_cache do
-          Rails.cache.expects(:fetch).never.with{ |p,| p =~ /course_permissions.*course/ }
-          Rails.cache.stubs(:fetch).with{ |p,| p !~ /course_permissions.*course/ }.returns([])
+          Rails.cache.expects(:fetch).never.with{ |p,| p =~ /context_permissions/ }
+          Rails.cache.stubs(:fetch).with{ |p,| p !~ /context_permissions/ }.returns([])
           course().grants_rights?(user(:name => 'bob'), {:session_affects_permissions => true})
         end
       end
   
-      it "should not cache for non-courses" do
+      it "should not cache for non-contexts" do
         enable_cache do
           class B
             extend Instructure::AdheresToPolicy::ClassMethods
             set_policy {}
+            def is_a_context?; false; end
           end
           Rails.cache.expects(:fetch).never
           B.new.grants_rights?(user(:name => 'bob'))
@@ -301,6 +304,7 @@ describe Instructure::AdheresToPolicy::InstanceMethods do
               given { |user, session| @session = session }
               can :read
             }
+            def is_a_context?; false; end
           end
           Rails.cache.expects(:fetch).never
           b = B.new

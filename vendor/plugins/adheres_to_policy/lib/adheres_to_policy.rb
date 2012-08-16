@@ -112,18 +112,19 @@ module Instructure #:nodoc:
         end
         sought_rights = (sought_rights || []).compact.uniq
 
-        cache_lookup = is_a?(Course)
+        cache_lookup = is_a_context? && !is_a?(User)
         # If you're going to add something to the user session that
         # affects permissions, you'd durn well better set :session_affects_permissions
         # to true as well
         cache_lookup = false if session && session[:session_affects_permissions]
 
-        # Cache the lookup, iff this is a course and the session doesn't affect
-        # the policies. Since course policy lookups are expensive, we grab all
-        # the permissions at once
+        # Cache the lookup, iff this is a non-user context and the session
+        # doesn't affect the policies. Since context policy lookups are
+        # expensive (especially for courses), we grab all the permissions at
+        # once
         granted_rights = if cache_lookup
           # Check and cache all the things!
-          Rails.cache.fetch(['course_permissions', self, user].cache_key, :expires_in => 1.day) do
+          Rails.cache.fetch(['context_permissions', self, user].cache_key, :expires_in => 1.day) do
             check_policy(user)
           end
         else
