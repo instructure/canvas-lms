@@ -473,7 +473,7 @@ define [
             id: id
             checked: @sectionToShow is id
 
-        $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections, scrolling: sections.length > 15))
+        $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections))
         (updateSectionBeingShownText = =>
           $('#section_being_shown').html(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
         )()
