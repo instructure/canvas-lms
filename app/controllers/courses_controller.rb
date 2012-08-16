@@ -808,11 +808,7 @@ class CoursesController < ApplicationController
     @context = Course.active.find(params[:id])
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
-        if is_authorized_action?(@context, @current_user, [:manage_students, :manage_admin_users])
-          render :json => @context.to_json(:include => {:current_enrollments => {:methods => :email}})
-        else
-          render :json => @context.to_json
-        end
+        render :json => @context.to_json
       end
       return
     end
