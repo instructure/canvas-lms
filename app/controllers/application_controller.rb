@@ -205,7 +205,7 @@ class ApplicationController < ActionController::Base
 
   def require_password_session
     if session[:used_remember_me_token]
-      flash[:notice] = t "#application.notices.please_log_in", "Please enter your password to continue"
+      flash[:warning] = t "#application.warnings.please_log_in", "For security purposes, please enter your password to continue"
       store_location
       redirect_to login_url
       return false
