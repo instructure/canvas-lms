@@ -36,7 +36,7 @@ describe "equation editor" do
       end
       equation_editor.find_element(:css, 'button').click
       question.find_element(:css, '.toggle_question_content_views_link').click
-      question.find_element(:css, 'textarea.question_content').attribute(:value).should include('<img class="equation_image" title="1+1" src="/equation_images/1%2B1" alt="1+1" />')
+      question.find_element(:css, 'textarea.question_content').attribute(:value).should include('<img class="equation_image" title="" src="/equation_images/" alt="" />')
       save_question_and_wait
 
       question.find_elements(:css, 'img.equation_image').size.should == 1
