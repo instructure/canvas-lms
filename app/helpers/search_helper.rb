@@ -24,8 +24,9 @@ module SearchHelper
   # Used for TokenInput.coffee instances
   #
   # If a course is provided, just return it (and its groups/sections)
-  def load_all_contexts(course = nil)
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user, course].cache_key, :expires_in => 10.minutes) do
+  def load_all_contexts(options = {})
+    context = options[:context]
+    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user, context].cache_key, :expires_in => 10.minutes) do
       contexts = {:courses => {}, :groups => {}, :sections => {}}
 
       term_for_course = lambda do |course|
@@ -42,7 +43,7 @@ module SearchHelper
             :term => term_for_course.call(course),
             :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
             :available => type == :current && course.available?,
-            :can_add_notes => can_add_notes_to?(course)
+            :permissions => course.grants_rights?(@current_user)
           }
         end
       end
@@ -57,6 +58,8 @@ module SearchHelper
             :state => contexts[:courses][section.course_id][:state],
             :parent => {:course => section.course_id},
             :context_name =>  contexts[:courses][section.course_id][:name]
+            # if we decide to return permissions here, we should ensure those
+            # are cached in adheres_to_policy
           }
         end
       end
@@ -70,15 +73,16 @@ module SearchHelper
             :state => group.active? ? :active : :inactive,
             :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
             :context_name => group.context.name,
-            :category => group.category
+            :category => group.category,
+            :permissions => group.grants_rights?(@current_user)
           }
         end
       end
 
-      if course
-        add_courses.call [course], :current
-        add_sections.call course.course_sections
-        add_groups.call course.groups
+      if context.is_a?(Course)
+        add_courses.call [context], :current
+        add_sections.call context.course_sections
+        add_groups.call context.groups
       else
         add_courses.call @current_user.concluded_courses, :concluded
         add_courses.call @current_user.courses, :current
@@ -88,6 +92,14 @@ module SearchHelper
       end
       contexts
     end
+    permissions = options[:permissions] || []
+    @contexts.each do |type, contexts|
+      contexts.each do |id, context|
+        context[:permissions] ||= {}
+        context[:permissions].slice!(*permissions) unless permissions == :all
+      end
+    end
+    @contexts
   end
 
   def jsonify_users(users, options = {})
@@ -107,10 +119,6 @@ module SearchHelper
       hash[:avatar_url] = avatar_url_for_user(user, blank_fallback) if options[:include_participant_avatars]
       hash
     }
-  end
-
-  def can_add_notes_to?(course)
-    course.enable_user_notes && course.grants_right?(@current_user, nil, :manage_user_notes)
   end
 
 end

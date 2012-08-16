@@ -900,8 +900,8 @@ class Course < ActiveRecord::Base
     given { |user| self.available? && self.is_public }
     can :read
 
-    RoleOverride.permissions.each_key do |permission|
-      given {|user, session| self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission) }
+    RoleOverride.permissions.each do |permission, details|
+      given {|user, session| (self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission)) && (!details[:if] || send(details[:if])) }
       can permission
     end
     

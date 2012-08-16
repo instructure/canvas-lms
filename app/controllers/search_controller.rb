@@ -81,7 +81,7 @@ class SearchController < ApplicationController
     # admins may not be able to see the course listed at the top level (since
     # they aren't enrolled in it), but if they search within it, we want
     # things to work, so we set everything up here
-    load_all_contexts get_admin_search_context(params[:context])
+    load_all_contexts :context => get_admin_search_context(params[:context])
 
     types = (params[:types] || [] + [params[:type]]).compact
     types |= [:course, :section, :group] if types.delete('context')

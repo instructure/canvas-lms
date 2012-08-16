@@ -357,6 +357,12 @@ describe Account do
 
 
   it "should set up access policy correctly" do
+    # stub out any "if" permission conditions
+    RoleOverride.permissions.each do |k, v|
+      next unless v[:if]
+      Account.any_instance.stubs(v[:if]).returns(true)
+    end
+
     # Set up a hierarchy of 4 accounts - a root account, a sub account,
     # a sub sub account, and SiteAdmin account.  Create a 'Restricted Admin'
     # role in each one, and create an admin user and a user in the restricted

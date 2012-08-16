@@ -131,9 +131,8 @@ define [
 
     canAddNotesFor: (user) ->
       return false unless @options.NOTES_ENABLED
-      return true if user.can_add_notes
       for id, roles of user.common_courses
-        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.can_add_notes)
+        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.permissions?.manage_user_notes)
       false
 
     loadConversation: (conversation, $node, cb) ->

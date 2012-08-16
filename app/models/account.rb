@@ -564,7 +564,7 @@ class Account < ActiveRecord::Base
   set_policy do
     enrollment_types = RoleOverride.enrollment_types.map { |role| role[:name] }
     RoleOverride.permissions.each do |permission, details|
-      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
+      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) && (!details[:if] || send(details[:if])) } }
       can permission
       can :create_courses if permission == :manage_courses
 
@@ -572,7 +572,8 @@ class Account < ActiveRecord::Base
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|
         given { |user| user && RoleOverride.permission_for(self, permission, role)[:enabled] &&
           self.course_account_associations.find(:first, :joins => 'INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id',
-            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) }
+            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) &&
+          (!details[:if] || send(details[:if])) }
         can permission
       end
     end

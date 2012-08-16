@@ -28,7 +28,6 @@ class ConversationsController < ApplicationController
   before_filter :require_user, :except => [:public_feed]
   before_filter :reject_student_view_student
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
-  before_filter :load_all_contexts, :except => [:public_feed]
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
@@ -124,6 +123,7 @@ class ConversationsController < ApplicationController
       render :json => @conversations_json
     else
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
+      load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
       can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
       js_env(:CONVERSATIONS => {

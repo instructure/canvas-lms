@@ -20,10 +20,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe SearchHelper do
   
-  #Delete this example and add some real ones or delete this file
-  it "should be included in the object returned by #helper" do
-    included_modules = (class << helper; self; end).send :included_modules
-    included_modules.should be_include(SearchHelper)
-  end
+  include SearchHelper
 
+  context "load_all_contexts" do
+    it "should return requested permissions" do
+      course(:active_all => true)
+      @current_user = @teacher
+      
+      load_all_contexts
+      @contexts[:courses][@course.id][:permissions].should be_empty
+
+      load_all_contexts(:permissions => [:manage_assignments])
+      @contexts[:courses][@course.id][:permissions].should eql({:manage_assignments => true})
+    end
+  end
 end

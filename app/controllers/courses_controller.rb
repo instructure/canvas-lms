@@ -470,7 +470,7 @@ class CoursesController < ApplicationController
   def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
-      load_all_contexts(@context)
+      load_all_contexts(:context => @context)
       users_scope = @context.users_visible_to(@current_user)
       enrollment_counts = users_scope.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id')
       @user_counts = {
