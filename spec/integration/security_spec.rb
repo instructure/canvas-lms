@@ -242,7 +242,7 @@ describe "security" do
       # accessing sensitive areas of canvas require a fresh login
       get "/profile/settings"
       response.should redirect_to login_url
-      flash[:notice].should_not be_empty
+      flash[:warning].should_not be_empty
 
       post "/login", :pseudonym_session => { :unique_id => @p.unique_id, :password => 'asdfasdf' }
       response.should redirect_to settings_profile_url
@@ -589,7 +589,7 @@ describe "security" do
 
       follow_redirect!
       response.should redirect_to login_url
-      flash[:notice].should_not be_empty
+      flash[:warning].should_not be_empty
 
       post "/login", :pseudonym_session => { :unique_id => @admin.pseudonyms.first.unique_id, :password => 'password' }
       response.should redirect_to user_masquerade_url(@student)
