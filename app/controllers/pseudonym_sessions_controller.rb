@@ -51,13 +51,13 @@ class PseudonymSessionsController < ApplicationController
       if params[:ticket]
         # handle the callback from CAS
         logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
-        st = CASClient::ServiceTicket.new(params[:ticket], login_url)
+        st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
         begin
           cas_client.validate_service_ticket(st)
         rescue => e
           logger.warn "Failed to validate CAS ticket: #{e.inspect}"
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
-          redirect_to login_url(:no_auto=>'true')
+          redirect_to cas_login_url(:no_auto=>'true')
           return
         end
         if st.is_valid?
@@ -75,13 +75,13 @@ class PseudonymSessionsController < ApplicationController
             logger.warn "Received CAS login for unknown user: #{st.response.user}"
             reset_session
             session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.response.user
-            redirect_to(cas_client.logout_url(login_url :no_auto => true))
+            redirect_to(cas_client.logout_url(cas_login_url :no_auto => true))
             return
           end
         else
           logger.warn "Failed CAS login attempt."
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
-          redirect_to login_url(:no_auto=>'true')
+          redirect_to cas_login_url(:no_auto=>'true')
           return
         end
       end
@@ -188,7 +188,7 @@ class PseudonymSessionsController < ApplicationController
     elsif @domain_root_account.cas_authentication? and session[:cas_login]
       reset_session
       session[:delegated_message] = message if message
-      redirect_to(cas_client.logout_url(login_url))
+      redirect_to(cas_client.logout_url(cas_login_url))
       return
     else
       reset_session
