@@ -7,14 +7,7 @@
 <% form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "bootstrap-form form-vertical" } do %>
   <div class="image-block">
     <div class="image-block-image profile-avatar-wrapper">
-      <%= avatar_image @user_data[:id], 128 %>
-      <div class="report_picture">
-        <% if can_do(@user, @current_user, :remove_avatar) %>
-          <a href="#" class="remove_avatar_picture_link"><%= t('#profile.links.remove_avatar', %{Remove avatar picture}) %></a>
-        <% else %>
-          <a href="#" class="report_avatar_picture_link"><%= t('#profile.links.report_avatar', %{Report picture}) %></a>
-        <% end %>
-      </div>
+      <%= avatar_image @user_data[:id], 50 %>
     </div>
     <div class="image-block-content row-fluid">
       <div class="span6">
