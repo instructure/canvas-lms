@@ -18,7 +18,7 @@
       <div class="btn-group-was event-option-buttons">
         {{#each allButtons}}
         <input type="radio" class="{{code}}-button frequency" id="{{id}}" name="{{coordinate}}" title="{{title}}" data-value='{{code}}' {{#if active}}checked='checked'{{/if}}>
-        <label for="{{id}}" class="{{code}}-label">{{title}}</label>
+        <label for="{{id}}" class="{{code}}-label" data-tooltip >{{title}}</label>
         {{/each}}
       </div>
     {{/if}}
