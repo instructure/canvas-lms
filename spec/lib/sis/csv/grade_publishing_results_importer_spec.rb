@@ -74,4 +74,15 @@ describe SIS::CSV::GradePublishingResultsImporter do
     @enrollment.grade_publishing_status.should == 'published'
   end
 
+  it 'should give a proper error if you try to reference an enrollment from another root account' do
+    account = Account.create!
+    course_with_student(:account => account)
+
+    importer = process_csv_data(
+      "enrollment_id,grade_publishing_status,message",
+      "#{@enrollment.id},published,message1")
+    importer.errors.should == []
+    warnings = importer.warnings.map { |r| r.last }
+    warnings.should == ["Enrollment #{@enrollment.id} doesn't exist"]
+  end
 end
