@@ -100,7 +100,7 @@
         <% if @user_data[:links].length > 0 %>
           <ul>
             <% @user_data[:links].each do |link| %>
-              <li><a href="<%= link[:url] %>"><%= link[:title] %></a></li>
+              <li><a href="<%= add_uri_scheme_name(link[:url]) %>"><%= link[:title] %></a></li>
             <% end %>
           </ul>
         <% else %>

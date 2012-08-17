@@ -743,4 +743,10 @@ module ApplicationHelper
     keys = collection.map { |element| element.cache_key }
     Digest::MD5.hexdigest(keys.join('/'))
   end
+
+  def add_uri_scheme_name(uri)
+    noSchemeName = !uri.match(/^(.+):\/\/(.+)/)
+    uri = 'http://' + uri if noSchemeName
+    uri
+  end
 end
