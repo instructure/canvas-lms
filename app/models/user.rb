@@ -1189,7 +1189,7 @@ class User < ActiveRecord::Base
   #
   # val - A hash of options used to configure the avatar.
   #       :type - The type of avatar. Should be 'facebook,' 'gravatar,'
-  #         'twitter,' 'linked_in,' 'external,' or 'attachment.'
+  #         'external,' or 'attachment.'
   #       :url - The URL of the gravatar. Used for types 'external' and
   #         'attachment.'
   #
@@ -1214,28 +1214,6 @@ class User < ActiveRecord::Base
       self.avatar_image_source = 'gravatar'
       self.avatar_image_url = nil
       self.avatar_state = 'submitted'
-    elsif val['type'] == 'twitter'
-      twitter = self.user_services.for_service('twitter').first rescue nil
-      if twitter
-        url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
-        data = JSON.parse(Net::HTTP.get(url)) rescue nil
-        if data
-          self.avatar_image_source = 'twitter'
-          self.avatar_image_url = data['profile_image_url_https'] || self.avatar_image_url
-          self.avatar_state = 'submitted'
-        end
-      end
-    elsif val['type'] == 'linked_in'
-      @linked_in_service = self.user_services.for_service('linked_in').first rescue nil
-      if @linked_in_service
-        self.extend LinkedIn
-        profile = linked_in_profile
-        if profile
-          self.avatar_image_source = 'linked_in'
-          self.avatar_image_url = profile['picture_url']
-          self.avatar_state = 'submitted'
-        end
-      end
     elsif val['type'] == 'external'
       self.avatar_image_source = 'external'
       self.avatar_image_url = val['url']

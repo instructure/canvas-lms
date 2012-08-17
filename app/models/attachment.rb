@@ -672,7 +672,7 @@ class Attachment < ActiveRecord::Base
   if local_storage?
     has_attachment(
         :path_prefix => file_store_config['path_prefix'],
-        :thumbnails => { :thumb => '200x50' },
+        :thumbnails => { :thumb => '128x128' },
         :thumbnail_class => 'Thumbnail'
     )
     def authenticated_s3_url(*args)
@@ -696,7 +696,7 @@ class Attachment < ActiveRecord::Base
     has_attachment(
         :storage => :s3,
         :s3_access => :private,
-        :thumbnails => { :thumb => '200x50' },
+        :thumbnails => { :thumb => '128x128' },
         :thumbnail_class => 'Thumbnail'
     )
     def bucket_name
