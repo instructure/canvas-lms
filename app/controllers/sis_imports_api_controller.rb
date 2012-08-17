@@ -80,7 +80,7 @@ class SisImportsApiController < ApplicationController
   #   inferred from the Content-Type, falling back to zip-file format if all
   #   else fails.
   #
-  # @argument batch_mode ["1"] If set, this SIS import will be run in batch mode, deleting any data previously imported via SIS that is not present in this latest import.  See the PDF document for details.
+  # @argument batch_mode ["1"] If set, this SIS import will be run in batch mode, deleting any data previously imported via SIS that is not present in this latest import.  See the SIS CSV Format page for details.
   #
   # @argument batch_mode_term_id Limit deletions to only this term, if batch
   #   mode is enabled.
