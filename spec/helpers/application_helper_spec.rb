@@ -107,7 +107,7 @@ describe ApplicationHelper do
 
     context "with no custom css" do
       it "should be empty" do
-        include_account_css.should be_empty
+        include_account_css.should be_nil
       end
     end
 
@@ -293,21 +293,7 @@ describe ApplicationHelper do
         output.should match %r{/path/to/js}
       end
 
-      it "should include both site admin and account javascript" do
-        @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
-        @domain_root_account.settings = @domain_root_account.settings.merge({ :global_javascript => '/path/to/js' })
-        @domain_root_account.save!
-
-        @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
-        @site_admin.settings = @site_admin.settings.merge({ :global_javascript => '/path/to/js' })
-        @site_admin.save!
-
-        output = include_account_js
-        output.should have_tag 'script'
-        output.scan(%r{/path/to/js}).length.should eql 2
-      end
-
-      it "should include site admin javascript first" do
+      it "should include both site admin and root account javascript, site admin first" do
         @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
         @domain_root_account.settings = @domain_root_account.settings.merge({ :global_javascript => '/path/to/root/js' })
         @domain_root_account.save!
@@ -317,6 +303,7 @@ describe ApplicationHelper do
         @site_admin.save!
 
         output = include_account_js
+        output.should have_tag 'script'
         output.scan(%r{/path/to/(admin/|root/)?js}).should eql [['admin/'], ['root/']]
       end
     end
