@@ -309,6 +309,22 @@ describe ApplicationHelper do
     end
   end
 
+  context "global_includes" do
+    it "should only compute includes once, with includes" do
+      @site_admin = Account.site_admin
+      @site_admin.expects(:global_includes_hash).once.returns({:css => "/path/to/css", :js => "/path/to/js"})
+      include_account_css.should match %r{/path/to/css}
+      include_account_js.should match %r{/path/to/js}
+    end
+
+    it "should only compute includes once, with includes" do
+      @site_admin = Account.site_admin
+      @site_admin.expects(:global_includes_hash).once.returns(nil)
+      include_account_css.should be_nil
+      include_account_js.should be_nil
+    end
+  end
+
   describe "hidden dialogs" do
     before do
       hidden_dialogs.should be_empty
