@@ -672,20 +672,20 @@ module ApplicationHelper
   end
 
   def get_global_includes
-    return @global_includes if @global_includes.present?
+    return @global_includes if defined?(@global_includes)
     @global_includes = [Account.site_admin.global_includes_hash]
     @global_includes << @domain_root_account.global_includes_hash if @domain_root_account.present?
     if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding
       if acct = account_context(@context)
         key = [acct.id, 'account_context_global_includes'].cache_key
-        includes = Rails.cache.fetch(key) do
+        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
           acct.account_chain.reverse.map(&:global_includes_hash)
         end
         @global_includes.concat(includes)
       elsif @current_user.present?
         key = [@domain_root_account.id, 'common_account_global_includes', @current_user.id].cache_key
-        includes = Rails.cache.fetch(key) do
+        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
           @current_user.common_account_chain(@domain_root_account).map(&:global_includes_hash)
         end
         @global_includes.concat(includes)
