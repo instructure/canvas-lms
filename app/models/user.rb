@@ -1654,7 +1654,7 @@ class User < ActiveRecord::Base
   def common_account_chain(in_root_account)
     rid = in_root_account.id
     accts = self.associated_accounts.scoped(:conditions => ["accounts.id = ? OR accounts.root_account_id = ?", rid, rid])
-    return nil if accts.blank?
+    return [] if accts.blank?
     children = accts.inject({}) do |hash,acct| 
       pid = acct.parent_account_id
       if pid.present?
