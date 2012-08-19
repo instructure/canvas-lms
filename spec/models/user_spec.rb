@@ -1764,7 +1764,7 @@ describe User do
 
       @user.user_account_associations.create!(:account_id => root_acct2.id)
       @user.reload
-      @user.common_account_chain(root_acct1).should be_nil
+      @user.common_account_chain(root_acct1).should == []
       @user.common_account_chain(root_acct2).should eql [root_acct2]
     end
 
