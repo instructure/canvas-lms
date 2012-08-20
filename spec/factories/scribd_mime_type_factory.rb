@@ -23,6 +23,6 @@ end
 def valid_scribd_mime_type_attributes
   {
     :extension => "pdf",
-    :name => "pdf"
+    :name => "application/pdf"
   }
 end

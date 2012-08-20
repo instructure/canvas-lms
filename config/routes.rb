@@ -321,6 +321,10 @@ ActionController::Routing::Routes.draw do |map|
     course.test_student 'test_student', :controller => 'courses', :action => 'reset_test_student', :conditions => {:method => :delete}
   end
 
+  map.resources :crocodoc_sessions,
+    :path_prefix => '/submissions/:submission_id/attachments/:attachment_id',
+    :only => %w(create)
+
   map.resources :page_views, :only => [:update,:index]
   map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'

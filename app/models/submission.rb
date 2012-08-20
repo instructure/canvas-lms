@@ -102,6 +102,7 @@ class Submission < ActiveRecord::Base
   after_save :touch_user
   after_save :update_assignment
   after_save :update_attachment_associations
+  after_save :submit_attachments_to_crocodoc
   after_save :queue_websnap
   after_save :update_final_score
   after_save :submit_to_turnitin_later
@@ -417,6 +418,15 @@ class Submission < ActiveRecord::Base
           (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?))
         aa = self.attachment_associations.find_by_attachment_id(a.id)
         aa ||= self.attachment_associations.create(:attachment => a)
+      end
+    end
+  end
+
+  def submit_attachments_to_crocodoc
+    if attachment_ids_changed?
+      attachments = attachment_associations.map(&:attachment)
+      attachments.each do |a|
+        a.send_later_enqueue_args :submit_to_crocodoc
       end
     end
   end

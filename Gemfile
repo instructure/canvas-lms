@@ -62,6 +62,7 @@ gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 # this is only needed by jammit, but we're pinning at 0.9.4 because 0.9.5 breaks
 gem 'yui-compressor', '0.9.4'
 gem 'foreigner',      '0.9.2'
+gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
 
 group :assets do
   gem 'compass-rails', '1.0.2'

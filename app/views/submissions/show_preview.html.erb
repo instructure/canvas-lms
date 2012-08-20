@@ -100,8 +100,9 @@
                 </div>
                 <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
                   <%= attachment.display_name %>
-                  <% if attachment.scribdable? %>
-                    <span style="padding: 0 3px;" title="<%= t('preview_document', 'Preview the document') %>" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-scribd_doc_id="<%= attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= attachment.scribd_doc.try(:access_key) %>" ><%= image_tag('preview.png') %></span>
+                  <% preview_document = t('preview_document', 'Preview the document') %>
+                  <% if attachment.crocodoc_available? || attachment.scribdable? %>
+                    <span style="padding: 0 3px;" title="<%= preview_document %>" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" <%= doc_preview_attributes(attachment) %>><%= image_tag('preview.png') %></span>
                   <% end %>
                 </a>
               </li>
@@ -131,8 +132,8 @@
             $('<div style="padding:0; overflow:hidden;">') //overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
               .dialog({
                 title: "Preview of " + $(this).closest('a').text(),
-                width: document.width * .95,
-                height: document.height * .95
+                width: $(document).width() * .95,
+                height: $(document).height() * .75
               })
               .loadDocPreview($.extend({
                 height: '100%'

@@ -2557,6 +2557,24 @@ class User < ActiveRecord::Base
     key
   end
 
+  def crocodoc_id!
+    cid = read_attribute(:crocodoc_id)
+    return cid if cid
+
+    Setting.transaction do
+      s = Setting.find_by_name('crocodoc_counter', :lock => true)
+      cid = s.value = s.value.to_i + 1
+      s.save!
+    end
+
+    update_attribute(:crocodoc_id, cid)
+    cid
+  end
+
+  def crocodoc_user
+    "#{crocodoc_id!},#{short_name}"
+  end
+
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
   # a login for
   def mfa_settings

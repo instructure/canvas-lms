@@ -1,4 +1,6 @@
-<% content_for :page_title do %><%= join_title @attachment.display_name, @context.name %><% end %>
+<% content_for :page_title do %>
+  <%= join_title @attachment.display_name, @context.name %>
+<% end %>
 <% add_crumb @attachment.display_name, context_url(@context, :context_file_url, @attachment) %>
 <% download_url = context_url(@context, :context_file_download_url, @attachment.id) %>
 <% if !can_do(@context, @current_user, :manage_files) && (locked = @attachment.locked_for?(@current_user)) %>
@@ -34,33 +36,13 @@
     <h2><%= @attachment.display_name %></h2>
     <%= link_to(image_tag(download_url, :alt => @attachment.display_name), download_url) %>
   <% else %>
+    <% js_bundle :file_show %>
     <h2><%= @attachment.display_name %></h2>
     <span style="font-size: 1.2em;">
       <%= link_to "Download #{@attachment.display_name}", download_url %>
     </span> (<%= @attachment.readable_size %>)
-    <% if @attachment.scribdable? %>
-      <div id="doc_preview" data-attachment_view_inline_ping_url="<%= context_url(@context, :context_file_inline_view_url, @attachment.id) %>" data-scribd_doc_id="<%= @attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= @attachment.scribd_doc.try(:access_key) %>" data-public_url="<%= @attachment.authenticated_s3_url %>"></div>
-      <% js_block do %>
-        <script>
-        require([
-          'jquery' /* $ */,
-          'jquery.doc_previews' /* loadDocPreview */,
-          'jquery.instructure_misc_plugins' /* fillWindowWithMe */,
-          'vendor/scribd.view' /* scribd */
-        ], function($) {
-
-          $(function() {
-            $('#doc_preview').fillWindowWithMe().loadDocPreview({
-              height: '100%',
-              scribdParams: {
-                auto_size: true
-              }
-            });
-          });
-
-        });
-        </script>
-      <% end %>
+    <% if @attachment.crocodoc_available? || @attachment.scribdable? %>
+      <div id="doc_preview" <%= doc_preview_attributes(@attachment, :attachment_view_inline_ping_url => context_url(@context, :context_file_inline_view_url, @attachment.id)) %>></div>
     <% end %>
   <% end %>
 <% end %>
