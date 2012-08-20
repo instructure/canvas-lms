@@ -340,7 +340,7 @@ class SubmissionList
         h[:student_name] = self.student_map[h[:user_id]].name
         h[:course_id] = self.course.id
         h[:submission_id] = h[:id]
-        h[:graded_on] = Date.parse(h[:graded_at].to_s) if h[:graded_at]
+        h[:graded_on] = h[:graded_at].in_time_zone.to_date if h[:graded_at]
 
         h
       end
