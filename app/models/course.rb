@@ -2560,98 +2560,100 @@ class Course < ActiveRecord::Base
   end
 
   def tabs_available(user=nil, opts={})
-    # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
-    tabs = self.tab_configuration.compact
-    default_tabs = Course.default_tabs
-    settings_tab = default_tabs[-1]
-    external_tabs = external_tool_tabs(opts)
-    tabs = tabs.map do |tab|
-      default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
-      if default_tab
-        tab[:label] = default_tab[:label]
-        tab[:href] = default_tab[:href]
-        tab[:css_class] = default_tab[:css_class]
-        tab[:args] = default_tab[:args]
-        tab[:visibility] = default_tab[:visibility]
-        tab[:external] = default_tab[:external]
-        default_tabs.delete_if {|t| t[:id] == tab[:id] }
-        external_tabs.delete_if {|t| t[:id] == tab[:id] }
-        tab
-      else
-        # Remove any tabs we don't know about in default_tabs (in case we removed them or something, like Groups)
-        nil
-      end
-    end
-    tabs.compact!
-    tabs += default_tabs
-    tabs += external_tabs
-    # Ensure that Settings is always at the bottom
-    tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
-    tabs << settings_tab
-
-    tabs.each do |tab|
-      tab[:hidden_unused] = true if tab[:id] == TAB_MODULES && !active_record_types[:modules]
-      tab[:hidden_unused] = true if tab[:id] == TAB_FILES && !active_record_types[:files]
-      tab[:hidden_unused] = true if tab[:id] == TAB_QUIZZES && !active_record_types[:quizzes]
-      tab[:hidden_unused] = true if tab[:id] == TAB_ASSIGNMENTS && !active_record_types[:assignments]
-      tab[:hidden_unused] = true if tab[:id] == TAB_PAGES && !active_record_types[:pages] && !allow_student_wiki_edits
-      tab[:hidden_unused] = true if tab[:id] == TAB_CONFERENCES && !active_record_types[:conferences] && !self.grants_right?(user, nil, :create_conferences)
-      tab[:hidden_unused] = true if tab[:id] == TAB_ANNOUNCEMENTS && !active_record_types[:announcements]
-      tab[:hidden_unused] = true if tab[:id] == TAB_OUTCOMES && !active_record_types[:outcomes]
-    end
-
-    # remove tabs that the user doesn't have access to
-    unless opts[:for_reordering]
-      unless self.grants_rights?(user, opts[:session], :read, :manage_content).values.any?
-        tabs.delete_if { |t| t[:id] == TAB_HOME }
-        tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
-        tabs.delete_if { |t| t[:id] == TAB_PAGES }
-        tabs.delete_if { |t| t[:id] == TAB_OUTCOMES }
-        tabs.delete_if { |t| t[:id] == TAB_CONFERENCES }
-        tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
-        tabs.delete_if { |t| t[:id] == TAB_MODULES }
-      end
-      unless self.grants_rights?(user, opts[:session], :participate_as_student, :manage_content).values.any?
-        tabs.delete_if{ |t| t[:visibility] == 'members' }
-      end
-      unless self.grants_rights?(user, opts[:session], :read, :manage_content, :manage_assignments).values.any?
-        tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
-        tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
-        tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
-      end
-      tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :manage_content)
-      if self.grants_rights?(user, opts[:session], :manage_content, :manage_assignments).values.any?
-        tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
-        tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
-        tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
-      end
-      tabs.delete_if { |t| t[:hidden] && t[:external] }
-      tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
-      tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
-      tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_rights?(user, opts[:session], :manage_students, :manage_admin_users).values.any?
-      tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
-      tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :managed_files)
-      tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read_forum, :moderate_forum, :post_to_forum).values.any?
-      tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
-      tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
-
-      if !user || !self.grants_right?(user, nil, :manage_content)
-        # remove some tabs for logged-out users or non-students
-        if self.grants_right?(user, nil, :read_as_admin)
-          tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) }
-        elsif !self.grants_right?(user, nil, :participate_as_student)
-          tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) }
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
+      tabs = self.tab_configuration.compact
+      default_tabs = Course.default_tabs
+      settings_tab = default_tabs[-1]
+      external_tabs = external_tool_tabs(opts)
+      tabs = tabs.map do |tab|
+        default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
+        if default_tab
+          tab[:label] = default_tab[:label]
+          tab[:href] = default_tab[:href]
+          tab[:css_class] = default_tab[:css_class]
+          tab[:args] = default_tab[:args]
+          tab[:visibility] = default_tab[:visibility]
+          tab[:external] = default_tab[:external]
+          default_tabs.delete_if {|t| t[:id] == tab[:id] }
+          external_tabs.delete_if {|t| t[:id] == tab[:id] }
+          tab
+        else
+          # Remove any tabs we don't know about in default_tabs (in case we removed them or something, like Groups)
+          nil
         end
-
-        # remove hidden tabs from students
-        tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
       end
+      tabs.compact!
+      tabs += default_tabs
+      tabs += external_tabs
+      # Ensure that Settings is always at the bottom
+      tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
+      tabs << settings_tab
+
+      tabs.each do |tab|
+        tab[:hidden_unused] = true if tab[:id] == TAB_MODULES && !active_record_types[:modules]
+        tab[:hidden_unused] = true if tab[:id] == TAB_FILES && !active_record_types[:files]
+        tab[:hidden_unused] = true if tab[:id] == TAB_QUIZZES && !active_record_types[:quizzes]
+        tab[:hidden_unused] = true if tab[:id] == TAB_ASSIGNMENTS && !active_record_types[:assignments]
+        tab[:hidden_unused] = true if tab[:id] == TAB_PAGES && !active_record_types[:pages] && !allow_student_wiki_edits
+        tab[:hidden_unused] = true if tab[:id] == TAB_CONFERENCES && !active_record_types[:conferences] && !self.grants_right?(user, nil, :create_conferences)
+        tab[:hidden_unused] = true if tab[:id] == TAB_ANNOUNCEMENTS && !active_record_types[:announcements]
+        tab[:hidden_unused] = true if tab[:id] == TAB_OUTCOMES && !active_record_types[:outcomes]
+      end
+
+      # remove tabs that the user doesn't have access to
+      unless opts[:for_reordering]
+        unless self.grants_rights?(user, opts[:session], :read, :manage_content).values.any?
+          tabs.delete_if { |t| t[:id] == TAB_HOME }
+          tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
+          tabs.delete_if { |t| t[:id] == TAB_PAGES }
+          tabs.delete_if { |t| t[:id] == TAB_OUTCOMES }
+          tabs.delete_if { |t| t[:id] == TAB_CONFERENCES }
+          tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
+          tabs.delete_if { |t| t[:id] == TAB_MODULES }
+        end
+        unless self.grants_rights?(user, opts[:session], :participate_as_student, :manage_content).values.any?
+          tabs.delete_if{ |t| t[:visibility] == 'members' }
+        end
+        unless self.grants_rights?(user, opts[:session], :read, :manage_content, :manage_assignments).values.any?
+          tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
+          tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
+          tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
+        end
+        tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :manage_content)
+        if self.grants_rights?(user, opts[:session], :manage_content, :manage_assignments).values.any?
+          tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
+          tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
+          tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
+        end
+        tabs.delete_if { |t| t[:hidden] && t[:external] }
+        tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
+        tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
+        tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
+        tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_rights?(user, opts[:session], :manage_students, :manage_admin_users).values.any?
+        tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
+        tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :managed_files)
+        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read_forum, :moderate_forum, :post_to_forum).values.any?
+        tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
+        tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
+
+        if !user || !self.grants_right?(user, nil, :manage_content)
+          # remove some tabs for logged-out users or non-students
+          if self.grants_right?(user, nil, :read_as_admin)
+            tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) }
+          elsif !self.grants_right?(user, nil, :participate_as_student)
+            tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) }
+          end
+
+          # remove hidden tabs from students
+          tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
+        end
+      end
+      # Uncommenting these lines will always put hidden links after visible links
+      # tabs.each_with_index{|t, i| t[:sort_index] = i }
+      # tabs = tabs.sort_by{|t| [t[:hidden_unused] || t[:hidden] ? 1 : 0, t[:sort_index]] } if !self.tab_configuration || self.tab_configuration.empty?
+      tabs
     end
-    # Uncommenting these lines will always put hidden links after visible links
-    # tabs.each_with_index{|t, i| t[:sort_index] = i }
-    # tabs = tabs.sort_by{|t| [t[:hidden_unused] || t[:hidden] ? 1 : 0, t[:sort_index]] } if !self.tab_configuration || self.tab_configuration.empty?
-    tabs
   end
   memoize :tabs_available
 
