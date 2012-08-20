@@ -457,13 +457,11 @@ class Attachment < ActiveRecord::Base
     self.content_type = details['content-type']
     self.size = details['content-length']
 
-    if md5.present? && ns = infer_namespace
-      if existing_attachment = Attachment.find_all_by_md5_and_namespace(md5, ns).detect{|a| a.id != id && !a.root_attachment_id && a.content_type == content_type }
-        AWS::S3::S3Object.delete(full_filename, bucket_name) rescue nil
-        self.root_attachment = existing_attachment
-        write_attribute(:filename, nil)
-        clear_cached_urls
-      end
+    if existing_attachment = find_existing_attachment_for_md5
+      AWS::S3::S3Object.delete(full_filename, bucket_name) rescue nil
+      self.root_attachment = existing_attachment
+      write_attribute(:filename, nil)
+      clear_cached_urls
     end
 
     save!
