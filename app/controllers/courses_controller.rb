@@ -263,23 +263,13 @@ class CoursesController < ApplicationController
   #
   # Returns the list of students enrolled in this course.
   #
-  # @response_field id The unique identifier for the student.
-  # @response_field name The full student name.
-  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
+  # DEPRECATED: Please use the {api:CoursesController#users course users} endpoint
+  # and pass "student" as the enrollment_type.
   #
-  # @example_response
-  #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null, 'sis_login_id': null },
-  #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis' } ]
+  # @returns [User]
   def students
-    # DEPRECATED. #users should replace this in a new version of the API.
-    get_context
-    if authorized_action(@context, @current_user, :read_roster)
-      proxy = @context.students.order_by_sortable_name
-      if user_json_is_admin?
-        proxy = proxy.scoped(:include => :pseudonyms)
-      end
-      render :json => proxy.map { |u| user_json(u, @current_user, session) }
-    end
+    params[:enrollment_type] = "student"
+    self.users
   end
 
   # @API List users
@@ -294,32 +284,7 @@ class CoursesController < ApplicationController
   # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
   # @argument include[] ["avatar_url"] Optionally include avatar_url.
   #
-  # @response_field id The unique identifier for the user.
-  # @response_field name The full user name.
-  # @response_field sortable_name The sortable user name.
-  # @response_field short_name The short user name.
-  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
-  #
-  # @response_field enrollments The user's enrollments in this course.
-  #   See the API documentation for enrollment data returned; however, the user data is not included.
-  #
-  # @example_response
-  #   [
-  #     {
-  #       'id': 1,
-  #       'name': 'first user',
-  #       'sis_user_id': null,
-  #       'sis_login_id': null,
-  #       'enrollments': [ ... ],
-  #     },
-  #     {
-  #       'id': 2,
-  #       'name': 'second user',
-  #       'sis_user_id': 'from-sis',
-  #       'sis_login_id': 'login-from-sis',
-  #       'enrollments': [ ... ],
-  #     }
-  #   ]
+  # @returns [User]
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
@@ -327,13 +292,13 @@ class CoursesController < ApplicationController
       users = @context.users_visible_to(@current_user)
       users = users.scoped(:order => "users.sortable_name")
       users = users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) if enrollment_type
-      if user_json_is_admin?
-        users = users.scoped(:include => {:pseudonym => :communication_channel})
-      end
       users = Api.paginate(users, self, api_v1_course_users_path)
       includes = Array(params[:include])
+      user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
-        User.send(:preload_associations, users, :not_ended_enrollments,
+        # not_ended_enrollments for enrollment_json
+        # enrollments course for has_grade_permissions?
+        User.send(:preload_associations, users, { :not_ended_enrollments => :course },
                   :conditions => ['enrollments.course_id = ?', @context.id])
       end
       render :json => users.map { |u|
@@ -345,34 +310,23 @@ class CoursesController < ApplicationController
 
   # @API List recently logged in students
   #
-  # Returns the list of users in this course, including a 'last_login' field
-  # which contains a timestamp of the last time that user logged into canvas.
-  # The querying user must have the 'View usage reports' permission.
+  # Returns the list of users in this course, ordered by how recently they have
+  # logged in. The records include the 'last_login' field which contains
+  # a timestamp of the last time that user logged into canvas.  The querying
+  # user must have the 'View usage reports' permission.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          https://<canvas>/api/v1/courses/<course_id>/recent_users
   #
-  # @example_response
-  #   [
-  #     {
-  #       'id': 1,
-  #       'name': 'first user',
-  #       'sis_user_id': null,
-  #       'sis_login_id': null,
-  #       'last_login': <timestamp>,
-  #     },
-  #     ...
-  #   ]
+  # @returns [User]
   def recent_students
     get_context
     if authorized_action(@context, @current_user, :read_reports)
       scope = User.for_course_with_last_login(@context, @context.root_account_id, 'StudentEnrollment')
       scope = scope.scoped(:order => 'login_info_exists, last_login DESC')
       users = Api.paginate(scope, self, api_v1_course_recent_students_url)
-      if user_json_is_admin?
-        User.send(:preload_associations, users, :pseudonyms)
-      end
+      user_json_preloads(users)
       render :json => users.map { |u| user_json(u, @current_user, session, ['last_login']) }
     end
   end
@@ -382,17 +336,19 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the :users: action, and returns a
   # single user with the same fields as that action.
+  #
+  # @returns User
   def user
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       users = @context.users_visible_to(@current_user)
       users = users.scoped(:conditions => ['users.id = ?', params[:id]])
-      if user_json_is_admin?
-        users = users.scoped(:include => {:pseudonym => :communication_channel})
-      end
       includes = Array(params[:include])
+      user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
-        User.send(:preload_associations, users, :not_ended_enrollments,
+        # not_ended_enrollments for enrollment_json
+        # enrollments course for has_grade_permissions?
+        User.send(:preload_associations, users, { :not_ended_enrollments => :course },
                   :conditions => ['enrollments.course_id = ?', @context.id])
       end
       user = users.first or raise ActiveRecord::RecordNotFound
@@ -508,7 +464,7 @@ class CoursesController < ApplicationController
         :ta       => enrollment_counts['TaEnrollment'] || 0,
         :observer => enrollment_counts['ObserverEnrollment'] || 0,
         :designer => enrollment_counts['DesignerEnrollment'] || 0,
-        :invited  => users_scope.count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited'"])
+        :invited  => users_scope.count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'"])
       }
       js_env(:COURSE_ID => @context.id,
              :USER_COUNTS => @user_counts,

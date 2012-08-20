@@ -23,6 +23,60 @@
 # a shortcut for the id of the user accessing the API. For instance,
 # `users/:user_id/page_views` can be accessed as `users/self/page_views` to
 # access the current user's page views.
+#
+# @object User
+#     {
+#       // The ID of the user.
+#       "id": 1,
+#
+#       // The name of the user.
+#       "name": "Sheldon Cooper",
+#
+#       // The name of the user that is should be used for sorting groups of users,
+#       // such as in the gradebook.
+#       "sortable_name": "Cooper, Sheldon",
+#
+#       // A short name the user has selected, for use in conversations or other less
+#       // formal places through the site.
+#       "short_name": "Shelly",
+#
+#       // The SIS ID associated with the user.  This field is only included if the
+#       // user came from a SIS import
+#       "sis_user_id": "",
+#
+#       // DEPRECATED: The SIS login ID associated with the user. Please use the
+#       // sis_user_id or login_id. This field will be removed in a future version of
+#       // the API.
+#       "sis_login_id": "",
+#
+#       // The unique login id for the user.  This is what the user uses to log in to
+#       // canvas.
+#       "login_id": "sheldon@caltech.example.com",
+#
+#       // If avatars are enabled, this field will be included and contain a url to
+#       // retrieve the user's avatar.
+#       "avatar_url": "",
+#
+#       // Optional: This field can be requested with certain API calls, and will
+#       // return a list of the users active enrollments. See the List enrollments
+#       // API for more details about the format of these records.
+#       "enrollments": [
+#         // ...
+#       ],
+#
+#       // Optional: This field can be requested with certain API calls, and will
+#       // return the users primary email address.
+#       "email": "sheldon@caltech.example.com",
+#
+#       // Optional: This field can be requested with certain API calls, and will
+#       // return the users locale.
+#       "locale": "tlh",
+#
+#       // Optional: This field is only returned in certain API calls, and will
+#       // return a timestamp representing the last time the user logged in to
+#       // canvas.
+#       "last_login": "2012-05-30T17:45:25Z",
+#     }
 class UsersController < ApplicationController
 
 
@@ -160,11 +214,7 @@ class UsersController < ApplicationController
   # @API List users
   # Retrieve the list of users associated with this account.
   #
-  # @example_response
-  #   [
-  #     { "id": 1, "name": "Dwight Schrute", "sortable_name": "Schrute, Dwight", "short_name": "Dwight", "login_id": "dwight@example.com", "sis_user_id": "12345", "sis_login_id": null },
-  #     { "id": 2, "name": "Gob Bluth", "sortable_name": "Bluth, Gob", "short_name": "Gob Bluth", "login_id": "gob@example.com", "sis_user_id": "67890", "sis_login_id": null }
-  #   ]
+  # @returns [User]
   def index
     get_context
     if authorized_action(@context, @current_user, :read_roster)
@@ -180,13 +230,18 @@ class UsersController < ApplicationController
             :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]],
             :group => @context.connection.group_by('users.id', 'users.name', 'users.sortable_name')
           })
-        else
+        elsif !api_request?
           @users = @context.fast_all_users
         end
 
-        @users = api_request? ?
-          Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name) :
-          @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
+        if api_request?
+          @users = User.of_account(@context).active.order_by_sortable_name
+          @users = Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name)
+          user_json_preloads(@users)
+        else
+          @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
+        end
+
         respond_to do |format|
           if @users.length == 1 && params[:term]
             format.html {
@@ -199,7 +254,7 @@ class UsersController < ApplicationController
             end
             format.html
           end
-          format.json  {
+          format.json {
             cancel_cache_buster
             expires_in 30.minutes
             api_request? ?
@@ -210,6 +265,7 @@ class UsersController < ApplicationController
       end
     end
   end
+
 
   before_filter :require_password_session, :only => [:masquerade]
   def masquerade
@@ -619,6 +675,8 @@ class UsersController < ApplicationController
   # @argument pseudonym[password] [Optional] User's password.
   # @argument pseudonym[sis_user_id] [Optional] [Integer] SIS ID for the user's account. To set this parameter, the caller must be able to manage SIS permissions.
   # @argument pseudonym[send_confirmation] [Optional, 0|1] [Integer] Send user notification of account creation if set to 1.
+  #
+  # @returns User
   def create
     # Look for an incomplete registration with this pseudonym
     @pseudonym = @context.pseudonyms.active.custom_find_by_unique_id(params[:pseudonym][:unique_id])
@@ -772,16 +830,7 @@ class UsersController < ApplicationController
   #        -F 'user[avatar][token]=<opaque_token>' \ 
   #        -H "Authorization: Bearer <token>"
   #
-  # @example_response
-  #
-  #   {
-  #     "id":133,
-  #     "login_id":"sheldor@example.com",
-  #     "name":"Sheldon Cooper",
-  #     "short_name":"Shelly",
-  #     "sortable_name":"Cooper, Sheldon",
-  #     "avatar_url":"http://<canvas>/images/users/133-..."
-  #   }
+  # @returns User
   def update
     params[:user] ||= {}
     @user = api_request? ?
@@ -1029,14 +1078,7 @@ class UsersController < ApplicationController
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
   #       -X DELETE
   #
-  # @example_response
-  #   {
-  #     "id":133,
-  #     "login_id":"bieber@example.com",
-  #     "name":"Justin Bieber",
-  #     "short_name":"The Biebs",
-  #     "sortable_name":"Bieber, Justin"
-  #   }
+  # @returns User
   def destroy
     @user = api_request? ? api_find(User, params[:id]) : User.find(params[:id])
     if authorized_action(@user, @current_user, [:manage, :manage_logins])
@@ -1301,6 +1343,4 @@ class UsersController < ApplicationController
 
     data.values.sort_by { |e| e[:enrollment].user.sortable_name.downcase }
   end
-  
-
 end

@@ -632,9 +632,16 @@ class User < ActiveRecord::Base
   end
 
   def email
-    Rails.cache.fetch(['user_email', self].cache_key) do
-      email_channel.path if email_channel
+    # if you change this cache_key, change it in email_cached? as well
+    value = Rails.cache.fetch(['user_email', self].cache_key) do
+      email_channel.try(:path) || :none
     end
+    # this sillyness is because rails equates falsey as not in the cache
+    value == :none ? nil : value
+  end
+
+  def email_cached?
+    Rails.cache.exist?(['user_email', self].cache_key)
   end
 
   def self.cached_name(id)
