@@ -6,11 +6,11 @@
       </td>
     </tr>
     <tr>
-      <td><%= t :api_key, "Embedly API Key" %></td>
+      <td><%= f.blabel :api_key, :en => "Embedly API Key" %></td>
       <td><%= f.text_field :api_key %></td>
     </tr>
     <tr>
-      <td><%= t :plan_type, "Embedly plan type" %></td>
+      <td><%= f.blabel :plan_type, :en => "Embedly plan type" %></td>
       <td><%= f.select :plan_type, [["Free Plan", "free"], ["Paid Plan", "paid"]] %></td>
     </tr>
   </table>

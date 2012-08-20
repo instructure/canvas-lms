@@ -1106,6 +1106,8 @@ class ApplicationController < ActionController::Base
         !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
+      elsif feature == :crocodoc
+        !!Canvas::Crocodoc.config
       elsif feature == :lockdown_browser
         Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
       else

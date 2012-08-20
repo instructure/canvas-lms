@@ -1873,4 +1873,24 @@ describe User do
       user.mfa_settings.should == :optional
     end
   end
+
+  context "crocodoc attributes" do
+    before do
+      Setting.set 'crocodoc_counter', 998
+      @user = User.create! :short_name => "Bob"
+    end
+
+    it "should generate a unique crocodoc_id" do
+      @user.crocodoc_id.should be_nil
+      @user.crocodoc_id!.should eql 999
+      @user.crocodoc_user.should eql '999,Bob'
+    end
+
+    it "should not change a user's crocodoc_id" do
+      @user.update_attribute :crocodoc_id, 2
+      @user.crocodoc_id!.should eql 2
+      Setting.get('crocodoc_counter', 0).to_i.should eql 998
+    end
+  end
+
 end

@@ -90,7 +90,7 @@ class UnzipAttachment
   def process
     cnt = 0
     Attachment.skip_touch_context(true)
-    Attachment.skip_scribd_submits(true)
+    Attachment.skip_3rd_party_submits(true)
     FileInContext.queue_files_to_delete(true)
     paths = []
     Zip::ZipFile.open(self.filename).each do |entry|
@@ -152,7 +152,7 @@ class UnzipAttachment
     end
     Attachment.connection.execute("UPDATE attachments SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{id_positions.keys.join(",")})") unless updates.empty?
     Attachment.skip_touch_context(false)
-    Attachment.skip_scribd_submits(false)
+    Attachment.skip_3rd_party_submits(false)
     FileInContext.queue_files_to_delete(false)
     FileInContext.destroy_queued_files
     scribdable_attachments = @attachments.select {|a| a.scribdable? }
