@@ -190,11 +190,13 @@ class CalendarsController < ApplicationController
     get_all_pertinent_contexts
 
     @events = []
-    @contexts.each do |context|
-      @assignments = context.assignments.active.find(:all) if context.respond_to?("assignments")
-      @events.concat context.calendar_events.active.find(:all)
-      @events.concat @assignments || []
-      @events = @events.sort_by{ |e| [(e.start_at || Time.now), e.title] }
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      @contexts.each do |context|
+        @assignments = context.assignments.active.find(:all) if context.respond_to?("assignments")
+        @events.concat context.calendar_events.active.find(:all)
+        @events.concat @assignments || []
+        @events = @events.sort_by{ |e| [(e.start_at || Time.now), e.title] }
+      end
     end
     @contexts.each do |context|
       log_asset_access("calendar_feed:#{context.asset_string}", "calendar", 'other')

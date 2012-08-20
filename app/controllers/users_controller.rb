@@ -171,40 +171,42 @@ class UsersController < ApplicationController
       @root_account = @context.root_account
       @users = []
       @query = (params[:user] && params[:user][:name]) || params[:term]
-      if @context && @context.is_a?(Account) && @query
-        @users = @context.users_name_like(@query)
-      elsif params[:enrollment_term_id].present? && @root_account == @context
-        @users = @context.fast_all_users.scoped({
-          :joins => :courses,
-          :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]],
-          :group => @context.connection.group_by('users.id', 'users.name', 'users.sortable_name')
-        })
-      else
-        @users = @context.fast_all_users
-      end
-
-      @users = api_request? ?
-        Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name) :
-        @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
-      respond_to do |format|
-        if @users.length == 1 && params[:term]
-          format.html {
-            redirect_to(named_context_url(@context, :context_user_url, @users.first))
-          }
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+        if @context && @context.is_a?(Account) && @query
+          @users = @context.users_name_like(@query)
+        elsif params[:enrollment_term_id].present? && @root_account == @context
+          @users = @context.fast_all_users.scoped({
+            :joins => :courses,
+            :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]],
+            :group => @context.connection.group_by('users.id', 'users.name', 'users.sortable_name')
+          })
         else
-          @enrollment_terms = []
-          if @root_account == @context
-            @enrollment_terms = @context.enrollment_terms.active
-          end
-          format.html
+          @users = @context.fast_all_users
         end
-        format.json  {
-          cancel_cache_buster
-          expires_in 30.minutes
-          api_request? ?
-            render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
-            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
-        }
+
+        @users = api_request? ?
+          Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name) :
+          @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
+        respond_to do |format|
+          if @users.length == 1 && params[:term]
+            format.html {
+              redirect_to(named_context_url(@context, :context_user_url, @users.first))
+            }
+          else
+            @enrollment_terms = []
+            if @root_account == @context
+              @enrollment_terms = @context.enrollment_terms.active
+            end
+            format.html
+          end
+          format.json  {
+            cancel_cache_buster
+            expires_in 30.minutes
+            api_request? ?
+              render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
+              render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
+          }
+        end
       end
     end
   end

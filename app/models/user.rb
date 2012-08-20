@@ -1832,7 +1832,9 @@ class User < ActiveRecord::Base
   end
 
   def recent_stream_items(opts={})
-    visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item).compact
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item).compact
+    end
   end
   memoize :recent_stream_items
 
