@@ -42,6 +42,8 @@ $cell_height: 33px
     img
       max-width: 30px
       height: 30px
+  .student-placeholder
+    display: none
   .student-section
     font-size: 10px
     color: #aaa
@@ -50,6 +52,15 @@ $cell_height: 33px
     font-size: 10px
     text-align: center
     line-height: 35px
+
+  // show and hide student names using a parent css class.
+  .hide-students
+    .student-name, .avatar
+      display: none
+    .student-placeholder
+      display: block
+    .secondary_identifier_cell
+      text-indent: -9999em
 
 // override the default jquery ui top border
 .slick-header.ui-state-default
@@ -205,6 +216,25 @@ $cell_height: 33px
   &.resubmitted
     background-image: url("/images/gradebook-resubmitted-indicator.png")
 
+.gradebook-cell-turnitin
+  position: absolute
+  top: 2px
+  right: 2px
+  z-index: 1
+  width: 20px
+  height: 16px
+  &.no-score
+    background-image: url(/images/turnitin_no_score.png)
+  &.none-score
+    background-image: url(/images/turnitin_none_score.png)
+  &.acceptable-score
+    background-image: url(/images/turnitin_acceptable_score.png)
+  &.warning-score
+    background-image: url(/images/turnitin_warning_score.png)
+  &.problem-score
+    background-image: url(/images/turnitin_problem_score.png)
+  &.failure-score
+    background-image: url(/images/turnitin_failure_score.png)
 
 .gradebook-cell-comment
   position: absolute
@@ -214,7 +244,7 @@ $cell_height: 33px
   height: 12px
   width: 12px
   visibility: hidden
-  z-index: 1 //needs to be above "normal but below tooltips"
+  z-index: 2 //needs to be above "normal but below tooltips"
   overflow: hidden
 
   &:hover,
@@ -255,6 +285,7 @@ $cell_height: 33px
     padding: 0
     margin: 0
     background: none
+    box-shadow: none !important
   .grade::-webkit-outer-spin-button
     display: none
 .gradebook-cell-out-of-formatter
@@ -350,7 +381,7 @@ $gradebook_checkbox_width: 16px
     background-image: url('/images/file.png')
   .pending_review &
     background-image: url('/images/pending_review.png')
-  .media_comment &
+  .media_comment &, .media_recording &
     background-image: url('/images/media_comment.gif')
   .quiz &
     background-image: url('/images/quiz.png')

@@ -42,6 +42,7 @@ module Api::V1::Group
       # TODO: this should be switched to user_display_json
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }
     end
+    hash['html_url'] = group_url(group) if include.include? 'html_url'
     hash
   end
 

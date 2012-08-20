@@ -21,6 +21,8 @@ define([
   'i18n!files',
   'jquery' /* jQuery, $ */,
   'str/htmlEscape',
+  'compiled/tinymce',
+  'tinymce.editor_box',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.doc_previews' /* loadDocPreview */,
@@ -1806,11 +1808,30 @@ define([
         $dialog.find(".display_name").text(display_name);
         $dialog.find(".loading_message").text("Loading File Contents...").show().end()
           .find(".content").hide();
-        $dialog.dialog('close').dialog({
-          autoOpen: false,
+        $dialog.dialog({
           width: 600,
-          height: 410
-        }).dialog('open');
+          height: 410,
+          buttons: [
+            {
+              text: I18n.t('cancel', 'Cancel'),
+              click: function() {
+                $("#edit_content_dialog").dialog('close');
+              }
+            },
+            {
+              text: I18n.t('update_file', 'Update File'),
+              click: submitFile,
+              'class': 'btn-primary'
+            }
+          ],
+          close: function() {
+            var $textarea = $(this).find('textarea');
+            if ($textarea.data('tinyIsVisible')) {
+              $textarea.editorBox('toggle');
+              $textarea.data('tinyIsVisible', false);
+            }
+          }
+        });
         $.ajax({
           dataType: 'json',
           error: function() {
@@ -1818,22 +1839,46 @@ define([
           },
           success: function(data) {
             var body = data.body;
-            $dialog.find("textarea").val(body);
-            $dialog.find(".loading_message").hide().end()
-              .find(".content").show();
+            var $textarea = $dialog.find("textarea").val(body);
+            var inittedTiny = $textarea.data('rich_text');
+            var tinyIsVisible = $textarea.data('tinyIsVisible');
+            $textarea.css('width', '100%');
+            $dialog.find(".loading_message").hide().end().find(".content").show();
+            if ($item.hasClass('html')) {
+              $dialog.css('height', '380px');
+              $dialog.find('.switch_views').show().unbind('click').bind('click', function(event) {
+                event.preventDefault();
+                if (inittedTiny) {
+                  $textarea.editorBox('toggle');
+                  $textarea.data('tinyIsVisible', !tinyIsVisible);
+                } else {
+                  inittedTiny = true;
+                  setTimeout(function(){
+                    $dialog.find('.html_edit_warning').fadeIn();
+                  }, 250);
+                  $textarea.editorBox({
+                    tinyOptions: {
+                      valid_elements: '*[*]',
+                      extended_valid_elements: '*[*]',
+                      plugins: "autolink,instructure_external_tools,instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_equella,media,paste,table,inlinepopups"
+                    }
+                  });
+                  $textarea.data('tinyIsVisible', !tinyIsVisible);
+                }
+              });
+            }
             $dialog.find(".textarea").focus();
           },
           url: url.replace(/\/download/, "/contents")
         });
       });
-      $("#edit_content_dialog .cancel_button").click(function() {
-        $("#edit_content_dialog").dialog('close');
-      });
-      $("#edit_content_dialog .save_button").click(function() {
+      function submitFile() {
         var $dialog = $("#edit_content_dialog");
         $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.update_file', "Update File"));
         $dialog.find("button").attr('disabled', true).filter(".save_button").text(I18n.t('messages.updating_file', "Updating File..."));
         var context_string = files.currentItemData().context_string;
+        var $textarea = $dialog.find('textarea');
+        var content = $textarea.data('tinyIsVisible') ? $textarea.editorBox('get_code') : $textarea.val()
         $.ajaxFileUpload({
           url: $dialog.data('update_url'),
           method: 'PUT',
@@ -1843,7 +1888,7 @@ define([
               fake_file: true,
               name: $dialog.data('filename'),
               content_type: $dialog.data('content_type'),
-              content: $dialog.find("textarea").val()
+              content: content
             }
           },
           success: function(data) {
@@ -1855,7 +1900,7 @@ define([
             $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('errors.update_file_failed', "Updating File Failed, please try again"));
           }
         });
-      });
+      }
       $(".folder_item .preview_item_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();

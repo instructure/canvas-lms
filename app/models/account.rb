@@ -184,6 +184,16 @@ class Account < ActiveRecord::Base
     self.global_includes? || self.parent_account.try(:sub_account_includes?)
   end
 
+  def global_includes_hash
+    includes = {}
+    if allow_global_includes?
+      includes = {}
+      includes[:js] = settings[:global_javascript] if settings[:global_javascript].present?
+      includes[:css] = settings[:global_stylesheet] if settings[:global_stylesheet].present?
+    end
+    includes.present? ? includes : nil
+  end
+
   def ip_filters=(params)
     filters = {}
     require 'ipaddr'

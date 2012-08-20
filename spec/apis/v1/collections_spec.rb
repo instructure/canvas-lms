@@ -52,7 +52,7 @@ describe "Collections API", :type => :integration do
       @c1.reload.name.should == "test1 edited"
     end
 
-    it "should allow changing private to public but not the reverse" do
+    it "should allow changing private to public and vice versa" do
       json = api_call(:put, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "update", :format => "json" }, {
         :name => "test1 edited",
         :visibility => "public",
@@ -63,10 +63,10 @@ describe "Collections API", :type => :integration do
 
       json = api_call(:put, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "update", :format => "json" }, {
         :visibility => "private",
-      }, {}, :expected_status => 400)
+      })
       @c1.reload
       @c1.name.should == "test1 edited"
-      @c1.visibility.should == "public"
+      @c1.visibility.should == "private"
     end
 
     it "should allow deleting a collection" do

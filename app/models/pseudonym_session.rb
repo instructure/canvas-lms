@@ -69,6 +69,7 @@ class PseudonymSession < Authlogic::Session::Base
       if is_valid
         # this token has been used -- destroy it, and generate a new one
         # remember_me is implicitly true when they login via the remember_me token
+        controller.session[:used_remember_me_token] = true
         self.remember_me = true
         self.save!
       end

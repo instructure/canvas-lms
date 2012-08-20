@@ -54,9 +54,10 @@ class ContentTag < ActiveRecord::Base
   named_scope :active, lambda{
     {:conditions => ['content_tags.workflow_state != ?', 'deleted'] }
   }
-  
+
+  attr_accessor :skip_touch
   def touch_context_module
-    ContentTag.touch_context_modules([self.context_module_id])
+    ContentTag.touch_context_modules([self.context_module_id]) unless skip_touch.present?
   end
   
   def self.touch_context_modules(ids=[])
@@ -65,7 +66,9 @@ class ContentTag < ActiveRecord::Base
   end
   
   def touch_context_if_learning_outcome
-    self.context_type.constantize.update_all({:updated_at => Time.now.utc}, {:id => self.context_id}) if self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome'
+    if (self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome') && skip_touch.blank?
+      self.context_type.constantize.update_all({:updated_at => Time.now.utc}, {:id => self.context_id}) 
+    end
   end
   
   def default_values
@@ -88,13 +91,21 @@ class ContentTag < ActiveRecord::Base
   end
 
   def update_could_be_locked
-    if self.content_id && self.content_type
-      klass = self.content_type.constantize
+    ContentTag.update_could_be_locked([self]) unless skip_touch.present?
+    true
+  end
+
+  def self.update_could_be_locked(tags=[])
+    content_ids = {}
+    tags.each do |t| 
+      (content_ids[t.content_type] ||= []) << t.content_id if t.content_type && t.content_id
+    end
+    content_ids.each do |type, ids|
+      klass = type.constantize
       if klass.new.respond_to?(:could_be_locked=)
-        klass.update_all({:could_be_locked => true}, {:id => self.content_id})
+        klass.update_all({ :could_be_locked => true }, { :id => ids })
       end
     end
-    true
   end
 
   def confirm_valid_module_requirements
@@ -145,7 +156,6 @@ class ContentTag < ActiveRecord::Base
   def update_asset_name!
     return if !self.sync_title_to_asset_title?
     correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
-    correct_context ||= self.context && self.content.is_a?(WikiPage) && self.content.wiki && self.content.wiki.wiki_namespaces.length == 1 && self.content.wiki.wiki_namespaces.map(&:context_code).include?(self.context_code)
     if correct_context
       if self.content.respond_to?("name=") && self.content.respond_to?("name") && self.content.name != self.title
         self.content.update_attribute(:name, self.title)

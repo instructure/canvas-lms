@@ -283,8 +283,7 @@ class CoursesController < ApplicationController
   end
 
   # @API List users
-  # Returns the list of users in this course. And optionally the user's enrollments
-  # in the course.
+  # Returns the list of users in this course. And optionally the user's enrollments in the course.
   #
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
@@ -305,10 +304,22 @@ class CoursesController < ApplicationController
   #   See the API documentation for enrollment data returned; however, the user data is not included.
   #
   # @example_response
-  #   [ { 'id': 1, 'name': 'first user', 'sis_user_id': null, 'sis_login_id': null,
-  #       'enrollments': [ ... ] },
-  #     { 'id': 2, 'name': 'second user', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis',
-  #       'enrollments': [ ... ] }]
+  #   [
+  #     {
+  #       'id': 1,
+  #       'name': 'first user',
+  #       'sis_user_id': null,
+  #       'sis_login_id': null,
+  #       'enrollments': [ ... ],
+  #     },
+  #     {
+  #       'id': 2,
+  #       'name': 'second user',
+  #       'sis_user_id': 'from-sis',
+  #       'sis_login_id': 'login-from-sis',
+  #       'enrollments': [ ... ],
+  #     }
+  #   ]
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
@@ -329,6 +340,40 @@ class CoursesController < ApplicationController
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
+    end
+  end
+
+  # @API List recently logged in students
+  #
+  # Returns the list of users in this course, including a 'last_login' field
+  # which contains a timestamp of the last time that user logged into canvas.
+  # The querying user must have the 'View usage reports' permission.
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \ 
+  #          https://<canvas>/api/v1/courses/<course_id>/recent_users
+  #
+  # @example_response
+  #   [
+  #     {
+  #       'id': 1,
+  #       'name': 'first user',
+  #       'sis_user_id': null,
+  #       'sis_login_id': null,
+  #       'last_login': <timestamp>,
+  #     },
+  #     ...
+  #   ]
+  def recent_students
+    get_context
+    if authorized_action(@context, @current_user, :read_reports)
+      scope = User.for_course_with_last_login(@context, @context.root_account_id, 'StudentEnrollment')
+      scope = scope.scoped(:order => 'login_info_exists, last_login DESC')
+      users = Api.paginate(scope, self, api_v1_course_recent_students_url)
+      if user_json_is_admin?
+        User.send(:preload_associations, users, :pseudonyms)
+      end
+      render :json => users.map { |u| user_json(u, @current_user, session, ['last_login']) }
     end
   end
 
@@ -418,14 +463,14 @@ class CoursesController < ApplicationController
       @student_ids = @context.students.map &:id
       @range_start = Date.parse("Jan 1 2000")
       @range_end = Date.tomorrow
-      
+
       query = "SELECT COUNT(id), SUM(size) FROM attachments WHERE context_id=%s AND context_type='Course' AND root_attachment_id IS NULL AND file_state != 'deleted'"
       row = Attachment.connection.select_rows(query % [@context.id]).first
       @file_count, @files_size = [row[0].to_i, row[1].to_i]
       query = "SELECT COUNT(id), SUM(max_size) FROM media_objects WHERE context_id=%s AND context_type='Course' AND attachment_id IS NULL AND workflow_state != 'deleted'"
       row = MediaObject.connection.select_rows(query % [@context.id]).first
       @media_file_count, @media_files_size = [row[0].to_i, row[1].to_i]
-      
+
       if params[:range] && params[:date]
         date = Date.parse(params[:date]) rescue nil
         date ||= Time.zone.today
@@ -442,10 +487,11 @@ class CoursesController < ApplicationController
         end
       end
       
-      @recently_logged_students = @context.students.recently_logged_in
       respond_to do |format|
-        format.html
-        format.json{ render :json => @categories.to_json }
+        format.html do
+          js_env(:RECENT_STUDENTS_URL => api_v1_course_recent_students_url(@context))
+        end
+        format.json { render :json => @categories.to_json }
       end
     end
   end
@@ -750,7 +796,7 @@ class CoursesController < ApplicationController
   # @returns Course
   def show
     if api_request?
-      @context = api_find(Course, params[:id])
+      @context = api_find(Course.active, params[:id])
       if authorized_action(@context, @current_user, :read)
         enrollments = @context.current_enrollments.all(:conditions => { :user_id => @current_user.id })
         includes = Set.new(Array(params[:include]))
@@ -759,7 +805,7 @@ class CoursesController < ApplicationController
       return
     end
 
-    @context = Course.find(params[:id])
+    @context = Course.active.find(params[:id])
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
         if is_authorized_action?(@context, @current_user, [:manage_students, :manage_admin_users])
@@ -1042,8 +1088,28 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Update a course
+  # Update an existing course.
+  #
+  # For possible arguments, see the Courses#create documentation (note: the enroll_me param is not allowed in the update action).
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id> \ 
+  #     -X PUT \ 
+  #     -H 'Authorization: Bearer <token>' \ 
+  #     -d 'course[name]=New course name' \ 
+  #     -d 'course[start_at]=2012-05-05T00:00:00Z'
+  #
+  # @example_response
+  #   {
+  #     "name": "New course name",
+  #     "course_code": "COURSE-001",
+  #     "start_at": "2012-05-05T00:00:00Z",
+  #     "end_at": "2012-08-05T23:59:59Z",
+  #     "sis_course_id": "12345"
+  #   }
   def update
-    @course = Course.find(params[:id])
+    @course = api_find(Course, params[:id])
     if authorized_action(@course, @current_user, :update)
       root_account_id = params[:course].delete :root_account_id
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
@@ -1074,6 +1140,7 @@ class CoursesController < ApplicationController
           params[:course].delete :course_code
         end
       end
+      params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
       if sis_id = params[:course].delete(:sis_source_id)
         if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
           if sis_id == ''
@@ -1083,7 +1150,9 @@ class CoursesController < ApplicationController
           end
         end
       end
+      params[:course][:event] = :offer if params[:offer].present?
       @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+      params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
         if @course.update_attributes(params[:course])
@@ -1093,7 +1162,13 @@ class CoursesController < ApplicationController
           end
           flash[:notice] = t('notices.updated', 'Course was successfully updated.')
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
-          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok }
+          format.json do
+            if api_request?
+              render :json => course_json(@course, @current_user, session, [], nil)
+            else
+             render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok 
+            end
+          end
         else
           format.html { render :action => "edit" }
           format.json { render :json => @course.errors.to_json, :status => :bad_request }
@@ -1114,7 +1189,7 @@ class CoursesController < ApplicationController
     @entries.concat @context.assignments.active
     @entries.concat @context.calendar_events.active
     @entries.concat @context.discussion_topics.active.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
-    @entries.concat WikiNamespace.default_for_context(@context).wiki.wiki_pages.select{|p| !p.new_record?}
+    @entries.concat @context.wiki.wiki_pages
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)

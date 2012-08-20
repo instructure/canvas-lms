@@ -22,57 +22,41 @@ class ProfileController < ApplicationController
   before_filter :require_user, :only => :settings
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
+  before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
 
-  include Api::V1::User
   include Api::V1::Avatar
   include Api::V1::Notification
   include Api::V1::NotificationPolicy
   include Api::V1::CommunicationChannel
+  include Api::V1::UserProfile
 
   include TextHelper
 
   def show
-    if @current_user && @domain_root_account.enable_profiles?
-      # this is ghetto and we should get rid of this as soon as possible
-      @current_user.instance_variable_set(:@show_profile_tab, true)
-    else
+    unless @current_user && @domain_root_account.enable_profiles?
+      return unless require_password_session
       settings
       return
     end
 
-    @user ||= @current_user
-
+    @user = User.find(params[:id])
     @active_tab = "profile"
     @context = @user.profile if @user == @current_user
 
-    js_env :USER_ID => @user.id
+    @user_data = profile_data(
+      @user.profile,
+      @current_user,
+      session,
+      ['links', 'user_services']
+    )
 
-    @items_count = @user.collection_items.scoped(:conditions => {'collections.visibility' => 'public'}).count
-    @followers_count = @user.following_user_follow_ids.count
-
-    @following_user = @current_user &&
-      UserFollow.followed_by_user([@user], @current_user).present?
-
-    @can_follow = !@following_user &&
-      @current_user &&
-      @user.grants_right?(@current_user, :follow)
-
-    @services = @user.user_services.where(
-      :service => %w(facebook twitter linked_in delicious diigo skype)
-    ).sort_by { |s| UserService.sort_position(s.service) }
-
-    if @user.private? && @user != @current_user
-      if @user.grants_right?(@current_user, :view_statistics)
-        return render :action => :show
-      elsif @current_user.messageable_users(:ids => [@user.id]) == [@user]
-        return render :action => :show_limited
-      # TODO: also show full profile if user is following other user?
-      else
-        return render :action => :unauthorized
-      end
+    known_user = @user_data[:common_contexts].present?
+    if @user_data[:known_user] # if you can message them, you can see the profile
+      add_crumb(t('crumbs.profile_frd', "%{user}'s profile", :user => @user.short_name), user_profile_path(@user))
+      return render :action => :show
+    else
+      return render :action => :unauthorized
     end
-
-    render :action => :show
   end
 
   # @API Get user profile
@@ -86,8 +70,9 @@ class ProfileController < ApplicationController
   #   {
   #     'id': 1234,
   #     'name': 'Sample User',
+  #     'short_name': 'Sample User'
   #     'sortable_name': 'user, sample',
-  #     'email': 'sample_user@example.com',
+  #     'primary_email': 'sample_user@example.com',
   #     'login_id': 'sample_user@example.com',
   #     'sis_user_id': 'sis1',
   #     'sis_login_id': 'sis1-login',
@@ -95,10 +80,6 @@ class ProfileController < ApplicationController
   #     'calendar': { 'ics' => '..url..' }
   #   }
   def settings
-    if @current_user && @domain_root_account.enable_profiles?
-      @current_user.instance_variable_set(:@show_profile_tab, true)
-    end
-
     if api_request?
       # allow querying this basic profile data for the current user, or any
       # user the current user has view_statistics access to
@@ -123,13 +104,7 @@ class ProfileController < ApplicationController
         render :action => "profile"
       end
       format.json do
-        hash = user_json(@user, @current_user, session, 'avatar_url')
-        hash[:primary_email] = @default_email_channel.try(:path)
-        hash[:login_id] ||= @default_pseudonym.try(:unique_id)
-        if @user == @current_user
-          hash[:calendar] = { :ics => "#{feeds_calendar_url(@user.feed_code)}.ics" }
-        end
-        render :json => hash
+        render :json => user_profile_json(@user.profile, @current_user, session, params[:include])
       end
     end
   end
@@ -251,6 +226,52 @@ class ProfileController < ApplicationController
       else
         format.html
         format.json { render :json => @user.errors.to_json }
+      end
+    end
+  end
+
+  # TODO: the current update method needs to get moved to the UsersController
+  # (since it is not concerned with profiles), then this should get renamed
+  #
+  # not doing API docs until we can move this to PUT /profile
+  def update_profile
+    @user = @current_user
+    @profile = @user.profile
+    @context = @profile
+
+    short_name = params[:user] && params[:user][:short_name]
+    @user.short_name = short_name if short_name
+    @profile.attributes = params[:user_profile]
+
+    if params[:link_urls] && params[:link_titles]
+      links = params[:link_urls].zip(params[:link_titles]).
+        reject { |url, title| url.blank? && title.blank? }.
+        map { |url, title|
+          UserProfileLink.new :url => url, :title => title
+        }
+      @profile.links = links
+    end
+
+    if @user.valid? && @profile.valid?
+      @user.save!
+      @profile.save!
+
+      if params[:user_services]
+        visible, invisible = params[:user_services].partition { |service,bool|
+          value_to_boolean(bool)
+        }
+        @user.user_services.update_all("visible = TRUE", :service => visible.map(&:first))
+        @user.user_services.update_all("visible = FALSE", :service => invisible.map(&:first))
+      end
+
+      respond_to do |format|
+        format.html { redirect_to user_profile_path(@user) }
+        format.json { render :json => user_profile_json(@user.profile, @current_user, session, params[:includes]) }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to user_profile_path(@user) } # FIXME: need to go to edit path
+        format.json { render :json => 'TODO' }
       end
     end
   end

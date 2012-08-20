@@ -65,9 +65,9 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_rights?(user, session, :read)[:read] } #self.context.students.include? user }
+    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades).any?(&:last) }
     can :read
-    
+
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :update and can :delete and can :create and can :read
 

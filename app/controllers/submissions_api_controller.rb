@@ -90,7 +90,7 @@ class SubmissionsApiController < ApplicationController
   #       }
   #     ]
   def for_students
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, :view_all_grades)
       raise ActiveRecord::RecordNotFound if params[:student_ids].blank?
       student_ids = map_user_ids(params[:student_ids]).map(&:to_i) & visible_user_ids
       return render(:json => []) if student_ids.blank?
@@ -264,9 +264,11 @@ class SubmissionsApiController < ApplicationController
         submission[:grade] = params[:submission].delete(:posted_grade)
       end
       if submission[:grade]
-        @submission = @assignment.grade_student(@user, submission).first
+        @submissions = @assignment.grade_student(@user, submission)
+        @submission = @submissions.first
       else
         @submission ||= @assignment.find_or_create_submission(@user)
+        @submissions ||= [@submission]
       end
 
       assessment = params[:rubric_assessment]
@@ -294,7 +296,9 @@ class SubmissionsApiController < ApplicationController
       # fix this at some point.
       @submission.reload
 
-      render :json => submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments)).to_json
+      json = submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments))
+      json[:all_submissions] = @submissions.map { |submission| submission_json(submission, @assignment, @current_user, session, @context) }
+      render :json => json.to_json
     end
   end
 

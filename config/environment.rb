@@ -73,6 +73,7 @@ Rails::Initializer.run do |config|
   config.autoload_paths += %W( #{RAILS_ROOT}/app/middleware #{RAILS_ROOT}/app/observers )
 
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
+  config.middleware.insert_before('ActionController::ParamsParser', 'StatsTiming')
   config.middleware.insert_before('ActionController::ParamsParser', 'PreventNonMultipartParse')
   config.middleware.insert_before('ActionController::ParamsParser', "RequestContextGenerator")
   config.to_prepare do

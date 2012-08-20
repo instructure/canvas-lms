@@ -92,20 +92,29 @@ describe "gradebook2" do
     it "should allow showing only a certain section" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
+      # grade the first assignment
+      edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
+      edit_grade(f('#gradebook_grid [row="1"] .l0'), 1)
+
       button = f('#section_to_show')
       button.should include_text "All Sections"
       switch_to_section(@other_section)
       button.should include_text @other_section.name
+      validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # verify that it remembers the section to show across page loads
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       button = f('#section_to_show')
       button.should include_text @other_section.name
+      validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # now verify that you can set it back
       switch_to_section()
       button.should include_text "All Sections"
+      # validate all grades (i.e. submissions) were loaded
+      validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '0')
+      validate_cell_text(f('#gradebook_grid [row="1"] .l0'), '1')
     end
 
 
@@ -220,6 +229,18 @@ describe "gradebook2" do
       end
     end
 
+    it "should give a quiz submission 30 extra seconds before making it late" do
+      submission = Submission.last
+      assignment = submission.assignment
+      assignment.update_attribute(:due_at, Time.now)
+      submission.update_attribute(:submitted_at, assignment.due_at + 30.seconds)
+      submission.update_attribute(:submission_type, 'online_quiz')
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      ff('.late').count.should == 0
+    end
+
     describe "message students who" do
       it "should send messages" do
         message_text = "This is a message"
@@ -275,6 +296,20 @@ describe "gradebook2" do
       meta_cells[0].should include_text STUDENT_NAME_1
     end
 
+    it "should display for users with only :view_all_grades permissions" do
+      user_logged_in
+      RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+                           :permission => 'view_all_grades',
+                           :context => Account.default,
+                           :enabled => true)
+      AccountUser.create!(:user => @user,
+                          :account => Account.default,
+                          :membership_type => 'CustomAdmin')
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      ff('.ui-state-error').count.should == 0
+    end
 
     it "should include student view student for grading" do
       @fake_student = @course.student_view_student
@@ -284,6 +319,84 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       ff('.student-name').map(&:text).join(" ").should match @fake_student.name
+    end
+
+    it "should not include non-graded group assignment in group total" do
+      graded_assignment = assignment_model({
+                                             :course => @course,
+                                             :name => 'group assignment 1',
+                                             :due_at => (Time.now + 1.week),
+                                             :points_possible => 10,
+                                             :submission_types => 'online_text_entry',
+                                             :assignment_group => @group,
+                                             :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                             :grade_group_students_individually => true
+                                           })
+      group_assignment = assignment_model({
+                                            :course => @course,
+                                            :name => 'group assignment 2',
+                                            :due_at => (Time.now + 1.week),
+                                            :points_possible => 0,
+                                            :submission_types => 'not_graded',
+                                            :assignment_group => @group,
+                                            :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                            :grade_group_students_individually => true
+                                          })
+      project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      project_group.users << @student_1
+      #project_group.users << @student_2
+      graded_assignment.submissions.create(:user => @student)
+      graded_assignment.grade_student @student_1, :grade => 10   # 10 points possible
+      group_assignment.submissions.create(:user => @student)
+      group_assignment.grade_student @student_1, :grade => 2     # 0 points possible
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      f('#gradebook_grid [row="0"] .assignment-group-cell .percentage').should include_text('100%')  # otherwise 108%
+      f('#gradebook_grid [row="0"] .total-cell .percentage').should include_text('100%')             # otherwise 108%
+    end
+
+    it "should hide and show student names" do
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      menu   = f('#gradebook_settings')
+      toggle = f('.student_names_toggle')
+
+      menu.click
+      toggle.click
+      find_with_jquery('.student-name:visible').should be_nil
+      find_all_with_jquery('.student-placeholder:visible').length.should be > 0
+
+      menu.click
+      toggle.click
+      find_all_with_jquery('.student-name:visible').length.should be > 0
+      find_with_jquery('.student-placeholder:visible').should be_nil
+    end
+
+    context "turnitin" do
+      it "should show turnitin data" do
+        s1 = @first_assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'asdf')
+        s1.update_attribute :turnitin_data, {"submission_#{s1.id}" => {:similarity_score => 0.0, :web_overlap => 0.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'none'}}
+        a = attachment_model(:context => @student_2, :content_type => 'text/plain')
+        s2 = @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
+        s2.update_attribute :turnitin_data, {"attachment_#{a.id}" => {:similarity_score => 1.0, :web_overlap => 5.0, :publication_overlap => 0.0, :student_overlap => 0.0, :state => 'acceptable'}}
+    
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        icons = ffj('.gradebook-cell-turnitin')
+        icons.size.should eql 2
+
+        # make sure it appears in each submission dialog
+        icons.each do |icon|
+          cell = icon.find_element(:xpath, '..')
+          driver.action.move_to(cell).perform
+          cell.find_element(:css, "a").click
+          wait_for_ajaximations
+          fj('.turnitin_similarity_score:visible').should be_present
+          fj('.ui-icon-closethick:visible').click
+        end
+      end
     end
   end
 end

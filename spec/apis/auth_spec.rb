@@ -238,7 +238,7 @@ describe "API Authentication", :type => :integration do
           CASClient::Client.stubs(:new).returns(cas)
 
           get response['Location']
-          response.should redirect_to(@controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(login_url)))
+          response.should redirect_to(@controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(cas_login_url)))
 
           get '/login', :ticket => 'ST-abcd'
           response.should be_redirect
@@ -487,6 +487,17 @@ describe "API Authentication", :type => :integration do
       json['message'].should == "Invalid access token."
     end
 
+    it "should be able to log out" do
+      get "/api/v1/courses?access_token=#{@token.token}"
+      response.should be_success
+
+      delete "/login/oauth2/token?access_token=#{@token.token}"
+      response.should be_success
+
+      get "/api/v1/courses?access_token=#{@token.token}"
+      response.status.to_i.should == 401
+    end
+
     context "sharding" do
       it_should_behave_like "sharding"
 
@@ -535,6 +546,8 @@ describe "API Authentication", :type => :integration do
         'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'title' => nil,
+        'bio' => nil,
       }
 
       # as_user_id is ignored if it's not allowed
@@ -552,6 +565,8 @@ describe "API Authentication", :type => :integration do
         'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'bio' => nil,
+        'title' => nil,
       }
 
       # as_user_id is ignored if it's blank
@@ -567,6 +582,8 @@ describe "API Authentication", :type => :integration do
         'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'title' => nil,
+        'bio' => nil,
       }
     end
 
@@ -589,6 +606,8 @@ describe "API Authentication", :type => :integration do
         'sis_login_id' => 'blah@example.com',
         'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
+        'bio' => nil,
+        'title' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end

@@ -23,7 +23,7 @@ describe "/wiki_page_revisions/index" do
   it "should show user editing link and content import name" do
     course_with_student
     view_context
-    assigns[:wiki] = WikiNamespace.default_for_context(@course).wiki
+    assigns[:wiki] = @course.wiki
     assigns[:page] = assigns[:wiki].wiki_page
     assigns[:page].save!
     assigns[:page].update_attributes(:body => "oi", :user_id => @user.id)

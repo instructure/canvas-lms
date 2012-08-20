@@ -379,6 +379,18 @@ class ContextController < ApplicationController
       @enrollments = @context.enrollments.for_user(@user) rescue []
       @messages = @entries
       @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }.sort_by{|e| e.created_at }.reverse
+
+      if @domain_root_account.enable_profiles?
+        @user_data = profile_data(
+          @user.profile,
+          @current_user,
+          session,
+          ['links', 'user_services']
+        )
+        render :action => :new_roster_user
+        return false
+      end
+      true
     end
   end
     

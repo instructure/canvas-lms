@@ -68,7 +68,7 @@ define [
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
         opacity: 0.5
-        top: '50%'
+        top: '55px'
         left: '50%'
       ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
 
@@ -210,14 +210,15 @@ define [
       @multiGrid.invalidate()
 
     getSubmissionsChunks: =>
+      allStudents = (s for k, s of @students)
       loop
-        students = @rows[@chunk_start...(@chunk_start+@options.chunk_size)]
+        students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
         unless students.length
           @allSubmissionsLoaded = true
           break
         params =
           student_ids: (student.id for student in students)
-          response_fields: ['user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission']
+          response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments']
         $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
         @chunk_start += @options.chunk_size
 
@@ -240,13 +241,27 @@ define [
     # It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
     # where each student has an array of submissions.  This one just expects an array of submissions,
     # they are not grouped by student.
-    updateSubmissionsFromExternal: (submissions) =>
+    updateSubmissionsFromExternal: (submissions, submissionCell) =>
+      activeCell = @gradeGrid.getActiveCell()
+      editing = $(@gradeGrid.getActiveCellNode()).hasClass('editable')
+      columns = @gradeGrid.getColumns()
       for submission in submissions
         student = @students[submission.user_id]
+        idToMatch = "assignment_#{submission.assignment_id}"
+        cell = index for column, index in columns when column.id is idToMatch
+        thisCellIsActive = activeCell? and
+          editing and
+          activeCell.row is student.row and
+          activeCell.cell is cell
         @updateSubmission(submission)
-        @multiGrid.invalidateRow(student.row)
         @calculateStudentGrade(student)
-      @multiGrid.render()
+        @gradeGrid.updateCell student.row, cell unless thisCellIsActive
+        @updateRowTotals student.row
+
+    updateRowTotals: (rowIndex) ->
+      columns = @gradeGrid.getColumns()
+      for column, columnIndex in columns
+        @gradeGrid.updateCell rowIndex, columnIndex if column.type isnt 'assignment'
 
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
@@ -406,8 +421,14 @@ define [
     fixMaxHeaderWidth: ->
       @$grid.find('.slick-header-columns').width(1000000)
 
+    # SlickGrid doesn't have a blur event for the grid, so this mimics it in
+    # conjunction with a click listener on <body />. When we 'blur' the grid
+    # by clicking outside of it, save the current field.
+    onGridBlur: (e) =>
+      return if e.target.className.match(/cell|slick/) or !@gradeGrid.getActiveCell?
+      @gradeGrid.getEditorLock().commitCurrentEdit()
+
     onGridInit: () ->
-      @fixColumnReordering()
       tooltipTexts = {}
       $(@spinner.el).remove()
       $('#gradebook_wrapper').show()
@@ -509,6 +530,16 @@ define [
               $('#gradebook-upload-help').show()
         $upload_modal.dialog('open')
 
+      $settingsMenu.find('.student_names_toggle').click (e) ->
+        $wrapper = $('.grid-canvas')
+        $wrapper.toggleClass('hide-students')
+
+        if $wrapper.hasClass('hide-students')
+          $(this).text I18n.t('show_student_names', 'Show Student Names')
+        else
+          $(this).text I18n.t('hide_student_names', 'Hide Student Names')
+
+
     getVisibleGradeGridColumns: ->
       res = []
       for column in @allAssignmentColumns
@@ -586,7 +617,7 @@ define [
       @aggregateColumns = for id, group of @assignmentGroups
         html = "#{group.name}"
         if group.group_weight?
-          percentage =  I18n.toPercentage(group.group_weight, precision: 0)
+          percentage =  I18n.toPercentage(group.group_weight, precision: 2)
           html += """
             <div class='assignment-points-possible'>
               #{I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}
@@ -650,6 +681,8 @@ define [
       @gradeGrid.onCellChange.subscribe (event, data) =>
         @calculateStudentGrade(data.item)
         @gradeGrid.invalidate()
+      # this is a faux blur event for SlickGrid.
+      $('body').on('click', @onGridBlur)
       sortRowsBy = (sortFn) =>
         @rows.sort(sortFn)
         student.row = i for student, i in @rows

@@ -961,13 +961,12 @@ namespace :db do
     }
 
     create_notification 'WikiPage', 'Course Content', 15*60,
-    '<%ns=asset.find_namespace_for_user(user)%>http://<%= HostUrl.context_host(ns.context) %>/<%= ns.context.class.to_s.downcase.pluralize %>/<%= ns.context_id %>/wiki/<%= ns.namespace + ":" if !ns.default? %><%= asset.url %>', %{
+    'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/wiki/<%= asset.url %>', %{
       Updated Wiki Page
       
-      Updated Wiki Page: <%= asset.title.titleize %>, <%= asset.find_namespace_for_user(user).context.name rescue "" %>
+      Updated Wiki Page: <%= asset.title.titleize %>, <%= asset.context.name rescue "" %>
       
-      <% namespace = asset.find_namespace_for_user(user) %>
-      A page has been updated on the wiki for <%= namespace.context.name %> that may make your life easier.  
+      A page has been updated on the wiki for <%= asset.context.name %> that may make your life easier.
       
       <%= asset.title.titleize %> 
       
@@ -977,7 +976,7 @@ namespace :db do
       You can review it here: 
       <%= main_link %>
     }, %{
-      <%= asset.title %>, <%= asset.find_namespace_for_user(user).context.name rescue "" %> just updated:
+      <%= asset.title %>, <%= asset.context.name %> just updated:
 
       <%= strip_and_truncate(asset.body, :max_length => 200) %>
     }

@@ -40,7 +40,7 @@ describe "links" do
 
     it "should navigate user to gradebook page after grades link is clicked" do
       link = find_link('.grades')
-      validate_link(link, 'Grades')
+      validate_link(link, 'Gradebook')
     end
 
     it "should navigate user to users page after people link is clicked" do
@@ -102,8 +102,8 @@ describe "links" do
         validate_link(link, 'Conversations')
       end
 
-      it "should navigate user to user profile page after profile link is clicked" do
-        link = find_dashboard_link('#identity', 'Profile')
+      it "should navigate user to user settings page after settings link is clicked" do
+        link = find_dashboard_link('#identity', 'Settings')
         expect_new_page_load { link.click }
       end
     end
@@ -121,7 +121,7 @@ describe "links" do
       end
 
       it "should navigate user to gradebook page after grades link is clicked" do
-        validate_link(driver.find_element(:css, '#grades_menu_item a'), 'Grades')
+        validate_link(driver.find_element(:css, '#grades_menu_item a'), 'Gradebook')
       end
 
       it "should navigate user to the calendar page after calender link is clicked" do

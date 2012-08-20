@@ -1,5 +1,13 @@
 <div id="external_tools">
-  <p><%= t :external_tools_note, "External tools are tools outside of Canvas that support Basic LTI integrations.  You will need to check with the author of the tool for the correct configuration parameters to add. Tools are configured at the account level, and can then be added as content in course modules for courses in the account." %>
+  <p><%= mt :external_tools_note, <<-HEREDOC, :lti_index_url => "https://lti-examples.heroku.com/index.html", :lti_examples_url => "http://help.instructure.com/entries/20878626-lti-tools-and-examples"
+  External (LTI) Tools are an easy way to add new features to Canvas.
+  They can be added to individual courses, or to all courses in an account.
+  Once configured, you can link to them through course modules and create assignments for
+  assessment tools.
+
+  Click [here](%{lti_index_url}) to see some LTI tools that work great with Canvas. You can also check out the Canvas Community topics about LTI tools [here](%{lti_examples_url}).
+  HEREDOC
+        %>
   </p>
   <% @context.context_external_tools.active.each do |tool| %>
     <%= render :partial => 'external_tools/external_tool', :object => tool %>

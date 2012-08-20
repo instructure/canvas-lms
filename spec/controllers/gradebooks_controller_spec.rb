@@ -35,7 +35,7 @@ describe GradebooksController do
       course_with_teacher_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id
       response.should be_redirect
-      response.should redirect_to(:action => 'show')
+      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
     end
 
     it "should render for current user" do
@@ -174,15 +174,15 @@ describe GradebooksController do
       get 'grade_summary', :course_id => @course.id
 
       response.should be_redirect
+      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+
+      # reset back to showing the old gradebook
+      get 'change_gradebook_version', :course_id => @course.id, :version => 1
       response.should redirect_to(:action => 'show')
 
       # tell it to use gradebook 2
-      get 'change_gradebook_version', :course_id => @course.id
-      response.should redirect_to(:action => 'show', :controller => :gradebook2)
-
-      # reset back to showing the old gradebook
-      get 'change_gradebook_version', :course_id => @course.id, :reset => true
-      response.should redirect_to(:action => 'show')
+      get 'change_gradebook_version', :course_id => @course.id, :version => 2
+      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
     end
 
   end

@@ -50,6 +50,8 @@ class ErrorReport < ActiveRecord::Base
       # sanitize invalid encodings
       @opts[:message] = Iconv.conv('UTF-8//IGNORE', 'UTF-8', @opts[:message]) if @opts[:message]
       @opts[:exception_message] = Iconv.conv('UTF-8//IGNORE', 'UTF-8', @opts[:exception_message]) if @opts[:exception_message]
+      Canvas::Statsd.increment("errors.all")
+      Canvas::Statsd.increment("errors.#{category}")
       run_callbacks :on_log_error
       create_error_report(opts)
     end
@@ -68,21 +70,17 @@ class ErrorReport < ActiveRecord::Base
       report.assign_data(opts)
       report.save
       report
-    # rescue
-      # we're really hosed here
     end
   end
 
   # returns the new error report
   def self.log_error(category, opts = {})
     Reporter.new.log_error(category, opts)
-  # rescue
   end
 
   # returns the new error report
   def self.log_exception(category, exception, opts = {})
     Reporter.new.log_exception(category, exception, opts)
-  # rescue
   end
 
   # assigns data attributes to the column if there's a column with that name,
@@ -113,6 +111,10 @@ class ErrorReport < ActiveRecord::Base
       write_attribute(:comments, val[0,self.class.maximum_text_length])
     end
   end
+
+  def url=(val)
+    write_attribute(:url, Canvas::LoggingFilter.filter_uri(val))
+  end
   
   def guess_email
     self.email = nil if self.email && self.email.empty?
@@ -131,12 +133,31 @@ class ErrorReport < ActiveRecord::Base
     self.delete_all(['created_at < ?', before_date])
   end
 
+  USEFUL_ENV = [
+    "HTTP_ACCEPT",
+    "HTTP_ACCEPT_ENCODING",
+    "HTTP_COOKIE",
+    "HTTP_HOST",
+    "HTTP_REFERER",
+    "HTTP_USER_AGENT",
+    "PATH_INFO",
+    "QUERY_STRING",
+    "REMOTE_HOST",
+    "REQUEST_METHOD",
+    "REQUEST_PATH",
+    "REQUEST_URI",
+    "SERVER_NAME",
+    "SERVER_PORT",
+    "SERVER_PROTOCOL",
+  ]
   def self.useful_http_env_stuff_from_request(request)
-    stuff = request.env.slice( *["HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING", "HTTP_COOKIE", "HTTP_HOST", "HTTP_REFERER",
-                         "HTTP_USER_AGENT", "PATH_INFO", "QUERY_STRING", "REMOTE_HOST",
-                         "REQUEST_METHOD", "REQUEST_PATH", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT",
-                         "SERVER_PROTOCOL", "action_controller.request.path_parameters"] )
+    stuff = request.env.slice(*USEFUL_ENV)
     stuff['REMOTE_ADDR'] = request.remote_ip # ActionController::Request#remote_ip has proxy smarts
+    stuff['QUERY_STRING'] = Canvas::LoggingFilter.filter_query_string("?" + stuff['QUERY_STRING'])
+    stuff['REQUEST_URI'] = Canvas::LoggingFilter.filter_uri(stuff['REQUEST_URI'])
+    stuff['path_parameters'] = Canvas::LoggingFilter.filter_params(request.path_parameters.dup).inspect # params rails picks up from the url
+    stuff['query_parameters'] = Canvas::LoggingFilter.filter_params(request.query_parameters.dup).inspect # params rails picks up from the query string
+    stuff['request_parameters'] = Canvas::LoggingFilter.filter_params(request.request_parameters.dup).inspect # params from forms
     stuff
   end
 

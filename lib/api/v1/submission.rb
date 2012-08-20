@@ -44,7 +44,7 @@ module Api::V1::Submission
           sc_hash['media_comment'] = media_comment_json(:media_id => sc.media_comment_id, :media_type => sc.media_comment_type)
         end
         sc_hash['attachments'] = sc.attachments.map do |a|
-          attachment_json(a)
+          attachment_json(a, user)
         end unless sc.attachments.blank?
         sc_hash
       end
@@ -75,7 +75,7 @@ module Api::V1::Submission
     hash
   end
 
-  SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission workflow_state).freeze
+  SUBMISSION_JSON_FIELDS = %w(id user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission workflow_state).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries)
 
   def submission_attempt_json(attempt, assignment, user, session, version_idx = nil, context = nil)
@@ -98,6 +98,9 @@ module Api::V1::Submission
     end
 
     hash = api_json(attempt, user, session, :only => json_fields)
+    if hash['body'].present?
+      hash['body'] = api_user_content(hash['body'], context, user)
+    end
 
     hash['preview_url'] = course_assignment_submission_url(
       context, assignment, attempt[:user_id], 'preview' => '1',
@@ -117,7 +120,7 @@ module Api::V1::Submission
       attachments = attempt.versioned_attachments.dup
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
       hash['attachments'] = attachments.map do |attachment|
-        attachment_json(attachment)
+        attachment_json(attachment, user)
       end.compact unless attachments.blank?
     end
 

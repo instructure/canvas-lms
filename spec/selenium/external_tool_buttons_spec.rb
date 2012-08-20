@@ -18,20 +18,19 @@ describe "external tool buttons" do
     get "/courses/#{@course.id}/discussion_topics"
 
     f(".add_topic_link").click
-    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_#{tool.id}:visible").should be_displayed }
-    f( "#topic_content_topic_new_instructure_external_button_#{tool.id}").click
+    f("#topic_content_topic_new_instructure_external_button_#{tool.id}").should be_displayed
+    f("#topic_content_topic_new_instructure_external_button_#{tool.id}").click
+    wait_for_ajax_requests
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should == ""
 
-    keep_trying_until { fj("#external_tool_button_dialog iframe:visible").should be_displayed }
+    fj("#external_tool_button_dialog").should be_displayed
 
     in_frame('external_tool_button_frame') do
-      keep_trying_until { fj(".link:visible").should be_displayed }
       f(element).click
       wait_for_ajax_requests
     end
-    wait_for_ajax_requests
-      f("#external_tool_button_dialog").should_not be_displayed
+    keep_trying_until { !f("#external_tool_button_dialog").displayed? }
   end
 
   it "should allow inserting oembed content from external tool buttons" do
@@ -42,7 +41,6 @@ describe "external tool buttons" do
   end
 
   it "should allow inserting basic lti links from external tool buttons" do
-    skip_if_ie("IE hangs")
     load_selection_test_tool("#basic_lti_link")
     html = driver.execute_script("return $('#topic_content_topic_new').editorBox('get_code')")
     html.should match(/example/)
@@ -83,7 +81,7 @@ describe "external tool buttons" do
 
     get "/courses/#{@course.id}/discussion_topics"
     f(".add_topic_link").click
-    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_#{tools[0].id}:visible").should be_displayed}
+    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_#{tools[0].id}:visible").should be_displayed }
     f("#topic_content_topic_new_instructure_external_button_#{tools[1].id}").should be_displayed
     ff("#topic_content_topic_new_instructure_external_button_#{tools[2].id}").length.should == 0
     ff("#topic_content_topic_new_instructure_external_button_#{tools[3].id}").length.should == 0
@@ -109,7 +107,7 @@ describe "external tool buttons" do
 
     get "/courses/#{@course.id}/discussion_topics"
     f(".add_topic_link").click
-    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_clump:visible").should be_displayed}
+    keep_trying_until { fj("#topic_content_topic_new_instructure_external_button_clump:visible").should be_displayed }
     f("#topic_content_topic_new_instructure_external_button_clump").click
 
     f("#instructure_dropdown_list").should be_displayed
@@ -119,7 +117,7 @@ describe "external tool buttons" do
     keep_trying_until { fj("#external_tool_button_dialog iframe:visible").should be_displayed }
 
     in_frame('external_tool_button_frame') do
-      keep_trying_until { fj(".link:visible").should be_displayed}
+      keep_trying_until { fj(".link:visible").should be_displayed }
       f("#oembed_link").click
       wait_for_ajax_requests
     end

@@ -66,7 +66,7 @@ module Api::V1::Avatar
 
   def avatar_json(user, attachment_or_url, options = {})
     json = if options[:type] == 'attachment'
-      attachment_json(attachment_or_url, {}, { :thumbnail_url => true })
+      attachment_json(attachment_or_url, user, {}, { :thumbnail_url => true })
     else
       { 'url' => attachment_or_url }
     end

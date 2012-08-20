@@ -442,7 +442,16 @@ describe ConversationsController, :type => :integration do
                 "id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "attachments" => [],
                 "forwarded_messages" => [
                   {
-                    "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [{'filename' => 'test my file? hai!&.png', 'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png', 'id' => attachment.id, 'size' => attachment.size}]
+                          "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [],
+                          "attachments" => [{'filename' => 'test my file? hai!&.png', 'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}", 'content-type' => 'image/png', 'display_name' => 'test my file? hai!&.png', 'id' => attachment.id, 'size' => attachment.size,
+                                             'unlock_at' => nil,
+                                             'locked' => false,
+                                             'hidden' => false,
+                                             'lock_at' => nil,
+                                             'locked_for_user' => false,
+                                             'hidden_for_user' => false,
+                                             'created_at' => attachment.created_at.as_json,
+                                             'updated_at' => attachment.updated_at.as_json, }]
                   }
                 ]
               }
@@ -519,6 +528,14 @@ describe ConversationsController, :type => :integration do
                 "display_name" => "test.txt",
                 "id" => attachment.id,
                 "size" => attachment.size,
+                'unlock_at' => nil,
+                'locked' => false,
+                'hidden' => false,
+                'lock_at' => nil,
+                'locked_for_user' => false,
+                'hidden_for_user' => false,
+                'created_at' => attachment.created_at.as_json,
+                'updated_at' => attachment.updated_at.as_json,
               }
             ]
           },
@@ -850,6 +867,29 @@ describe ConversationsController, :type => :integration do
           {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ]
       })
+    end
+  end
+
+  context "recipients" do
+    before do
+      @group = @course.groups.create(:name => "the group")
+      @group.users = [@me, @bob, @joe]
+    end
+
+    it "should support the deprecated route" do
+      json = api_call(:get, "/api/v1/conversations/find_recipients.json?search=o",
+              { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'o' })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6},
+        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course"},
+        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course"},
+        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course"},
+        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+      ]
     end
   end
 end

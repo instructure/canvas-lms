@@ -84,6 +84,7 @@ class AssignmentGroupsController < ApplicationController
             end
             hash
           end
+          hashes.each { |group| group['group_weight'] = nil } unless @context.apply_group_weights?
           render :json => hashes.to_json
         }
       end

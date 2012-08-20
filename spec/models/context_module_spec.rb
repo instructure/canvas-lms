@@ -105,21 +105,7 @@ describe ContextModule do
       @tag.content.should eql(@page)
       @module.content_tags.should be_include(@tag)
     end
-    
-    it "should add pages from secondary wikis" do
-      course_module
-      @course.wiki
-      @wiki = Wiki.create!(:title => "new wiki")
-      @namespace = @course.wiki_namespaces.build
-      @namespace.wiki = @wiki
-      @namespace.save!
-      @page = @wiki.wiki_pages.create!(:title => "new page")
-      @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'})
-      @tag.should_not be_nil
-      @tag.content.should eql(@page)
-      @module.content_tags.should be_include(@tag)
-    end
-    
+
     it "should not add invalid wiki pages" do
       course_module
       @course.wiki

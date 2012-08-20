@@ -23,7 +23,6 @@
 #     {
 #       "context_type":"Course",
 #       "context_id":1401,
-#       "locked":null,
 #       "files_count":0,
 #       "position":3,
 #       "updated_at":"2012-07-06T14:58:50Z",
@@ -37,6 +36,10 @@
 #       "parent_folder_id":2934,
 #       "created_at":"2012-07-06T14:58:50Z",
 #       "unlock_at":null
+#       "hidden":null
+#       "hidden_for_user":false,
+#       "locked":true,
+#       "locked_for_user":false
 #     }
 class FoldersController < ApplicationController
   include Api::V1::Folders
@@ -55,16 +58,9 @@ class FoldersController < ApplicationController
   # @subtopic Folders
   # Returns the paginated list of folders in the folder.
   #
-  # @argument sort_by Either 'alphabetical' (default) or 'position'
-  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \ 
-  #        -H 'Authorization: Bearer <token>'
-  #
-  # @example_request
-  #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders?sort_by=position' \ 
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns [Folder]
@@ -81,7 +77,8 @@ class FoldersController < ApplicationController
         scope = scope.by_name
       end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(@context))
-      render :json => folders_json(@folders, @current_user, session)
+      can_manage_files = folder.context.grants_right?(@current_user, session, :manage_files)
+      render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
   

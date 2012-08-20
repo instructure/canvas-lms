@@ -21,7 +21,7 @@ class PseudonymSessionsController < ApplicationController
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
 
   def new
-    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id]
+    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
       redirect_to dashboard_url
       return
     end
@@ -35,6 +35,11 @@ class PseudonymSessionsController < ApplicationController
     session[:confirm] = params[:confirm] if params[:confirm]
     session[:enrollment] = params[:enrollment] if params[:enrollment]
 
+    if @current_pseudonym
+      params[:pseudonym_session] ||= {}
+      params[:pseudonym_session][:unique_id] ||= @current_pseudonym.unique_id
+    end
+
     @pseudonym_session = PseudonymSession.new
     @headers = false
     @is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
@@ -44,13 +49,13 @@ class PseudonymSessionsController < ApplicationController
       if params[:ticket]
         # handle the callback from CAS
         logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
-        st = CASClient::ServiceTicket.new(params[:ticket], login_url)
+        st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
         begin
           cas_client.validate_service_ticket(st)
         rescue => e
           logger.warn "Failed to validate CAS ticket: #{e.inspect}"
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
-          redirect_to login_url(:no_auto=>'true')
+          redirect_to cas_login_url(:no_auto=>'true')
           return
         end
         if st.is_valid?
@@ -68,13 +73,13 @@ class PseudonymSessionsController < ApplicationController
             logger.warn "Received CAS login for unknown user: #{st.response.user}"
             reset_session
             session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.response.user
-            redirect_to(cas_client.logout_url(login_url :no_auto => true))
+            redirect_to(cas_client.logout_url(cas_login_url :no_auto => true))
             return
           end
         else
           logger.warn "Failed CAS login attempt."
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
-          redirect_to login_url(:no_auto=>'true')
+          redirect_to cas_login_url(:no_auto=>'true')
           return
         end
       end
@@ -181,7 +186,7 @@ class PseudonymSessionsController < ApplicationController
     elsif @domain_root_account.cas_authentication? and session[:cas_login]
       reset_session
       session[:delegated_message] = message if message
-      redirect_to(cas_client.logout_url(login_url))
+      redirect_to(cas_client.logout_url(cas_login_url))
       return
     else
       reset_session
@@ -455,6 +460,12 @@ class PseudonymSessionsController < ApplicationController
       'access_token' => token.token,
       'user' => user.as_json(:only => [:id, :name], :include_root => false),
     }
+  end
+
+  def oauth2_logout
+    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
+    @access_token.destroy
+    render :json => {}
   end
 
   def final_oauth2_redirect(redirect_uri, opts = {})

@@ -47,7 +47,7 @@ define [
           helper: 'clone'
           start: ->
             $(this).hide()
-          stop: ->
+          stop: (e, ui) ->
             # Only show the element after the drag stops if it doesn't have a start date now
             # (meaning it wasn't dropped on the calendar)
             $(this).show() unless $(this).data('calendarEvent').start

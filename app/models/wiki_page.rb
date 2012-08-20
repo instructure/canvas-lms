@@ -27,7 +27,6 @@ class WikiPage < ActiveRecord::Base
   include ContextModuleItem
   
   belongs_to :wiki, :touch => true
-  belongs_to :wiki_with_participants, :class_name => 'Wiki', :foreign_key => 'wiki_id', :include => {:wiki_namespaces => :context }
   belongs_to :cloned_item
   belongs_to :user
   has_many :wiki_page_comments, :order => "created_at DESC"
@@ -103,7 +102,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
-  copy_authorized_links(:body) { [self.current_namespace(self.user).context, self.user] }
+  copy_authorized_links(:body) { [self.context, self.user] }
   
   validates_each :title do |record, attr, value|
     if value.blank?
@@ -172,31 +171,10 @@ class WikiPage < ActiveRecord::Base
     !deleted?
   end
 
-  attr_writer :current_namespace
-  
-  def current_namespace(user=nil)
-    @current_namespace ||= self.default_namespace_for(user) || self.wiki.wiki_namespaces.first
-  end
-  
-  def default_namespace_for(user)
-    return nil unless user
-    namespaces = self.wiki.wiki_namespaces.to_a
-    res = namespaces.find do |n|
-      n.context.teachers.include?(user) rescue false
-    end
-    res ||= namespaces.find do |n|
-      n.context.students.include?(user) rescue false
-    end
-    res ||= namespaces.find do |n|
-      n.context.users.include?(user) rescue false
-    end
-    res
-  end
-  
   def locked_for?(context, user, opts={})
     return false unless self.could_be_locked
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
-      m = context_module_tag_for(context, user).context_module rescue nil
+      m = context_module_tag_for(context).context_module rescue nil
       locked = false
       if (m && !m.available_for?(user))
         locked = {:asset_string => self.asset_string, :context_module => m.attributes}
@@ -205,15 +183,8 @@ class WikiPage < ActiveRecord::Base
     end
   end
   
-  def context_module_tag_for(context, user)
-    @tags ||= {}
-    user_id = user ? user.id : 0
-    # for wiki_pages, context_module_association_id should be the wiki_namespace_id to use
-    if context
-      @tags[user_id] ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s) #module_association_id(current_namespace(user).id)
-    elsif user
-      @tags[user_id] ||= self.context_module_tags.find_by_context_module_association_id(current_namespace(user).id)
-    end
+  def context_module_tag_for(context)
+    @tag ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
   end
   
   def context_module_action(user, context, action)
@@ -222,32 +193,28 @@ class WikiPage < ActiveRecord::Base
   end
   
   set_policy do
-    given {|user, session| self.current_namespace(user).grants_right?(user, session, :read) && can_read_page?(user) }
+    given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user) }
     can :read
     
-    given {|user, session| self.current_namespace(user).grants_right?(user, session, :contribute) && can_read_page?(user) }
+    given {|user, session| self.wiki.grants_right?(user, session, :contribute) && can_read_page?(user) }
     can :read
 
     given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
     can :read and can :update_content and can :create
     
-    given {|user, session| self.current_namespace(user).grants_right?(user, session, :manage) }
+    given {|user, session| self.wiki.grants_right?(user, session, :manage) }
     can :create and can :read and can :update and can :delete and can :update_content
     
-    given {|user, session| self.current_namespace(user).grants_right?(user, session, :manage_content) }
+    given {|user, session| self.wiki.grants_right?(user, session, :manage_content) }
     can :create and can :read and can :update and can :delete and can :update_content
     
   end
   
   def can_read_page?(user)
-    namespace = self.current_namespace(user)
-    context = namespace.context
     !hide_from_students || (context.respond_to?(:admins) && context.admins.include?(user))
   end
   
   def editing_role?(user)
-    namespace = self.current_namespace(user)
-    context = namespace.context
     context_roles = context.default_wiki_editing_roles rescue nil
     roles = (self.editing_roles || context_roles || default_roles).split(",")
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
@@ -258,20 +225,13 @@ class WikiPage < ActiveRecord::Base
   end
   
   def default_roles
-    namespace = self.current_namespace
-    if namespace.context.is_a?(Group)
+    if context.is_a?(Group)
       'members'
-    elsif namespace.context.is_a?(Course)
+    elsif context.is_a?(Course)
       'teachers'
     else
       'members'
     end
-  end
-  
-  def roles_for_namespace(user)
-    namespace = self.current_namespace(user)
-    context_roles = namespace.context.default_wiki_editing_roles rescue nil
-    (self.editing_roles || context_roles || default_roles).split(",")
   end
 
   set_broadcast_policy do |p|
@@ -289,32 +249,16 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context(user=nil)
-    (@context_for_user ||= {})[user] ||= (find_namespace_for_user(user).context rescue nil)
+    @context ||= Course.find_by_wiki_id(self.wiki_id) || Group.find_by_wiki_id(self.wiki_id)
   end
-  
-  def find_namespace_for_user(user=nil)
-    @@namespaces_for_users ||= {}
-    return @@namespaces_for_users[user.id] if user && @@namespaces_for_users[user.id]
-    return self.wiki.wiki_namespaces.first if self.wiki.wiki_namespaces.count == 1
-    res = nil
-    self.wiki_with_participants.wiki_namespaces.sort {|a, b| a.id <=> b.id }.each do |n|
-      if n.context && !res
-        res = n if user && n.context.participants.include?(user)
-        @@namespaces_for_users[user.id] = res if res
-      end
-    end
-    res
-  end
-  
+
   def participants
     res = []
-    self.wiki_with_participants.wiki_namespaces.each do |n|
-      if n.context && n.context.available?
-        if self.hide_from_students
-          res += n.context.participating_admins
-        else
-          res += n.context.participants
-        end
+    if context && context.available?
+      if self.hide_from_students
+        res += context.participating_admins
+      else
+        res += context.participants
       end
     end
     res.flatten.uniq
@@ -322,16 +266,14 @@ class WikiPage < ActiveRecord::Base
     
   def to_atom(opts={})
     context = opts[:context]
-    namespace = self.wiki.wiki_namespaces.find_by_context_id(context && context.id) || self.wiki.wiki_namespaces.find(:first)
-    prefix = namespace.context_prefix || ""
     Atom::Entry.new do |entry|
-      entry.title     = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", :course_or_group_name => namespace.context.name, :page_title => self.title)
+      entry.title     = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", :course_or_group_name => context.name, :page_title => self.title)
       entry.authors  << Atom::Person.new(:name => t(:atom_author, "Wiki Page"))
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
       entry.links    << Atom::Link.new(:rel => 'alternate', 
-                                    :href => "http://#{HostUrl.context_host(namespace.context)}/#{prefix}/wiki/#{self.url}")
+                                    :href => "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/wiki/#{self.url}")
       entry.content   = Atom::Content::Html.new(self.body || t('defaults.no_content', "no content"))
     end
   end
@@ -538,5 +480,4 @@ class WikiPage < ActiveRecord::Base
   def self.search(query)
     find(:all, :conditions => wildcard('title', 'body', query))
   end
-  
 end

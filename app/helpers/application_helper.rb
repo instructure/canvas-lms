@@ -149,11 +149,11 @@ module ApplicationHelper
     end
   end
 
-  def avatar_image(user_id, height=50)
+  def avatar_image(user_id, width=50)
     if session["reported_#{user_id}"]
       image_tag "messages/avatar-50.png"
     else
-      image_tag(avatar_image_url(User.avatar_key(user_id || 0), :bust => Time.now.to_i), :style => "height: #{height}px; max-width: #{height}px;", :alt => '')
+      image_tag(avatar_image_url(User.avatar_key(user_id || 0), :bust => Time.now.to_i), :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px", :alt => '')
     end
   end
 
@@ -356,7 +356,7 @@ module ApplicationHelper
     @section_tabs ||= begin
       if @context
         html = []
-        tabs = Rails.cache.fetch([@context, @current_user, "section_tabs_hash", I18n.locale].cache_key) do
+        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, "section_tabs_hash", I18n.locale].cache_key) do
           if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
             tabs.select do |tab|
               if (tab[:id] == @context.class::TAB_CHAT rescue false)
@@ -658,25 +658,34 @@ module ApplicationHelper
     end
   end
 
-  def get_include_accounts
-    return @include_accounts if @include_accounts.present?
-    @include_accounts = [Account.site_admin, @domain_root_account]
+  def get_global_includes
+    return @global_includes if defined?(@global_includes)
+    @global_includes = [Account.site_admin.global_includes_hash]
+    @global_includes << @domain_root_account.global_includes_hash if @domain_root_account.present?
     if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding
-      common_chain = account_context(@context).try(:account_chain).try(:reverse)
-      common_chain ||= @current_user.common_account_chain(@domain_root_account) if @current_user.present?
-      @include_accounts.concat(common_chain) if common_chain.present?
+      if acct = account_context(@context)
+        key = [acct.id, 'account_context_global_includes'].cache_key
+        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
+          acct.account_chain.reverse.map(&:global_includes_hash)
+        end
+        @global_includes.concat(includes)
+      elsif @current_user.present?
+        key = [@domain_root_account.id, 'common_account_global_includes', @current_user.id].cache_key
+        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
+          @current_user.common_account_chain(@domain_root_account).map(&:global_includes_hash)
+        end
+        @global_includes.concat(includes)
+      end
     end
-    @include_accounts.uniq!
-    @include_accounts.compact!
-    @include_accounts
+    @global_includes.uniq!
+    @global_includes.compact!
+    @global_includes
   end
 
   def include_account_js
-    includes = get_include_accounts.inject([]) do |js_includes, account|
-      if account && account.allow_global_includes? && account.settings[:global_javascript].present?
-        js_includes << "'#{account.settings[:global_javascript]}'"
-      end
+    includes = get_global_includes.inject([]) do |js_includes, global_include|
+      js_includes << "'#{global_include[:js]}'" if global_include[:js].present?
       js_includes
     end
     if includes.length > 0
@@ -701,14 +710,14 @@ module ApplicationHelper
   end
 
   def include_account_css
-    includes = get_include_accounts.inject([]) do |css_includes, account|
-      if account && account.allow_global_includes? && account.settings[:global_stylesheet].present?
-        css_includes << account.settings[:global_stylesheet]
-      end
+    includes = get_global_includes.inject([]) do |css_includes, global_include|
+      css_includes << global_include[:css] if global_include[:css].present?
       css_includes
     end
-    includes << { :media => 'all' }
-    stylesheet_link_tag *includes
+    if includes.length > 0
+      includes << { :media => 'all' }
+      stylesheet_link_tag *includes
+    end
   end
 
   # this should be the same as friendlyDatetime in handlebars_helpers.coffee
@@ -729,5 +738,11 @@ module ApplicationHelper
   def collection_cache_key(collection)
     keys = collection.map { |element| element.cache_key }
     Digest::MD5.hexdigest(keys.join('/'))
+  end
+
+  def add_uri_scheme_name(uri)
+    noSchemeName = !uri.match(/^(.+):\/\/(.+)/)
+    uri = 'http://' + uri if noSchemeName
+    uri
   end
 end

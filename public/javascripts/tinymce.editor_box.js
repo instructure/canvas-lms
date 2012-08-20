@@ -35,7 +35,8 @@ define([
   'i18nObj',
   'jquery',
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
-                        // tiny can require it themselves
+                        // tiny can require it themselves or else we have
+                        // build problems
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
@@ -47,6 +48,7 @@ define([
   $(document).ready(function() {
     enableBookmarking = $("body").hasClass('ie');
   });
+
   function EditorBoxList() {
     this._textareas = {};
     this._editors = {};
@@ -141,7 +143,9 @@ define([
     }
     var editor_css = "/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css,/stylesheets/compiled/tiny_like_ck_with_external_tools.css";
 
-    tinyMCE.init({
+
+
+    var tinyOptions = $.extend({
       mode : "exact",
       elements: id,
       theme : "advanced",
@@ -280,8 +284,9 @@ define([
           }
         });
       }
-    });
+    }, options.tinyOptions || {});
 
+    tinyMCE.init(tinyOptions);
 
     this._textarea =  $textarea;
     this._editor = null;

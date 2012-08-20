@@ -200,7 +200,6 @@ class User < ActiveRecord::Base
   }
   named_scope :recently_logged_in, lambda{
     {
-      :joins => :pseudonym,
       :include => :pseudonyms,
       :conditions => ['pseudonyms.current_login_at > ?', 1.month.ago],
       :order => 'pseudonyms.current_login_at DESC',
@@ -236,6 +235,24 @@ class User < ActiveRecord::Base
     {
       :joins => :enrollments,
       :conditions => ["enrollments.course_id in (#{ids_string}) AND enrollments.created_at > ? AND enrollments.created_at < ?", start_at, end_at]
+    }
+  }
+
+  named_scope :for_course_with_last_login, lambda {|course, root_account_id, enrollment_type|
+    course_id = course.is_a?(Course) ? course.id : course
+    enrollment_conditions = sanitize_sql(['enrollments.course_id = ? AND enrollments.workflow_state != ?', course_id, 'deleted'])
+    enrollment_conditions += sanitize_sql(['AND enrollments.type = ?', enrollment_type]) if enrollment_type
+    {
+      # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
+      :select => 'users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists',
+      # left outer join ensures we get the user even if they don't have a pseudonym
+      :joins => sanitize_sql([<<-SQL, root_account_id]),
+        LEFT OUTER JOIN "pseudonyms" ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
+        INNER JOIN "enrollments" ON enrollments.user_id = users.id
+      SQL
+      :conditions => enrollment_conditions,
+      # the trick to get unique users
+      :group => 'users.id'
     }
   }
 
@@ -1631,32 +1648,26 @@ class User < ActiveRecord::Base
   # accounts in the chain.  In other words, if the users associated accounts
   # made a tree, it would be the chain between the root and the first branching
   # point.
-  #
-  # NOTE: this is currently used for computing sub-account branding, and as
-  # such we can afford rudimentary caching. More precise caching may be
-  # necessary for future uses.
   def common_account_chain(in_root_account)
-    Rails.cache.fetch([self.id, 'common_account_chain', in_root_account.id].cache_key, :expires_in => 15.minutes) do
-      rid = in_root_account.id
-      accts = self.associated_accounts.scoped(:conditions => ["accounts.id = ? OR accounts.root_account_id = ?", rid, rid])
-      return nil if accts.blank?
-      children = accts.inject({}) do |hash,acct| 
-        pid = acct.parent_account_id
-        if pid.present?
-          hash[pid] ||= []
-          hash[pid] << acct
-        end
-        hash
+    rid = in_root_account.id
+    accts = self.associated_accounts.scoped(:conditions => ["accounts.id = ? OR accounts.root_account_id = ?", rid, rid])
+    return [] if accts.blank?
+    children = accts.inject({}) do |hash,acct| 
+      pid = acct.parent_account_id
+      if pid.present?
+        hash[pid] ||= []
+        hash[pid] << acct
       end
-
-      longest_chain = [in_root_account]
-      while true
-        next_children = children[longest_chain.last.id]
-        break unless next_children.present? && next_children.count == 1
-        longest_chain << next_children.first
-      end
-      longest_chain
+      hash
     end
+
+    longest_chain = [in_root_account]
+    while true
+      next_children = children[longest_chain.last.id]
+      break unless next_children.present? && next_children.count == 1
+      longest_chain << next_children.first
+    end
+    longest_chain
   end
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
@@ -1818,7 +1829,9 @@ class User < ActiveRecord::Base
   end
 
   def recent_stream_items(opts={})
-    visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item).compact
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item).compact
+    end
   end
   memoize :recent_stream_items
 
@@ -2284,6 +2297,12 @@ class User < ActiveRecord::Base
         AND user_account_associations.user_id = users.id
         #{user_condition_sql}
     SQL
+    user_sql << <<-SQL unless options[:context]
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
+      FROM users
+      WHERE id = #{self.id}
+        #{user_condition_sql}
+    SQL
 
     if options[:ids]
       # provides a way for this user to start a conversation with someone
@@ -2310,7 +2329,6 @@ class User < ActiveRecord::Base
     return [] if user_sql.empty?
 
     concat_sql = connection.adapter_name =~ /postgres/i ? :"course_id::text || ':' || roles::text" : :"course_id || ':' || roles"
-
     users = User.find_by_sql(<<-SQL)
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL},
         #{connection.func(:group_concat, concat_sql)} AS common_courses,

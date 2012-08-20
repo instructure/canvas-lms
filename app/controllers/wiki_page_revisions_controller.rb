@@ -28,7 +28,7 @@ class WikiPageRevisionsController < ApplicationController
         format.html {
           add_crumb(@page.title, named_context_url(@context, :context_wiki_page_url, @page))
           add_crumb(t("#crumbs.revisions", "Revisions"))
-          log_asset_access(@page, "wiki", @namespace)
+          log_asset_access(@page, "wiki", @wiki)
         }
         format.json { render :json => @page.version_history.to_json(:methods => :version_number) }
       end
@@ -63,7 +63,7 @@ class WikiPageRevisionsController < ApplicationController
       respond_to do |format|
         format.html {
           add_crumb(@page.title, named_context_url(@context, :context_wiki_page_url, @page))
-          log_asset_access(@page, "wiki", @namespace)
+          log_asset_access(@page, "wiki", @wiki)
         }
         @model = @revision.model rescue nil
         format.json { render :json => @model.to_json(:methods => :version_number) }
@@ -74,9 +74,10 @@ class WikiPageRevisionsController < ApplicationController
   def update
     if authorized_action(@page, @current_user, :update)
       @revision = @page.versions.find(params[:id])
-      @page.revert_to_version @revision
+      except_fields = [:id] + WikiPage.new.attributes.keys - WikiPage.accessible_attributes.to_a
+      @page.revert_to_version @revision, :except => except_fields
       flash[:notice] = t('notices.page_rolled_back', 'Page was successfully rolled-back to previous version.')
-      redirect_to course_wiki_page_url( @context.id, @page)
+      redirect_to polymorphic_url([@context, @page])
     end
   end
 end

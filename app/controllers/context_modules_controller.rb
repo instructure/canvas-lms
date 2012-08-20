@@ -244,14 +244,19 @@ class ContextModulesController < ApplicationController
       order = params[:order].split(",")
       tags = @context.context_module_tags.active.find_all_by_id(order).compact
       affected_module_ids = tags.map(&:context_module_id).uniq.compact
+      affected_items = []
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
-      items.each_index do |idx|
-        item = items[idx]
+      items.each_with_index do |item, idx|
         item.position = idx
         item.context_module_id = @module.id
-        item.save
+        if item.changed?
+          item.skip_touch = true
+          item.save
+          affected_items << item
+        end
       end
-      ContextModule.update_all({:updated_at => Time.now.utc}, {:id => affected_module_ids})
+      ContentTag.touch_context_modules(affected_module_ids)
+      ContentTag.update_could_be_locked(affected_items)
       @context.touch
       @module.reload
       respond_to do |format|

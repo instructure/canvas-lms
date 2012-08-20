@@ -62,16 +62,18 @@ class AccountReportsController < ApplicationController
 # @example_response
 #
 #  [
-#    {"id":"student_assignment_outcome_map_csv",
-#    "title":"Student Competency",
-#    "parameters":null
+#    {
+#      "report":"student_assignment_outcome_map_csv",
+#      "title":"Student Competency",
+#      "parameters":null
 #    },
-#    {"report":"grade_export_csv",
-#    "title":"Grade Export",
-#    "parameters":{
-#      "term":{
-#        "description":"The canvas id of the term to get grades from",
-#        "required":true
+#    {
+#      "report":"grade_export_csv",
+#      "title":"Grade Export",
+#      "parameters":{
+#        "term":{
+#          "description":"The canvas id of the term to get grades from",
+#          "required":true
 #        }
 #      }
 #    }

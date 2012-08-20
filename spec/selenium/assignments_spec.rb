@@ -4,6 +4,14 @@ describe "assignments" do
   it_should_behave_like "in-process server selenium tests"
 
   context "as a teacher" do
+
+    def manually_create_assignment(assignment_title = 'new assignment')
+      get "/courses/#{@course.id}/assignments"
+      f('.add_assignment_link').click
+      replace_content(f('#assignment_title'), assignment_title)
+      expect_new_page_load { f('.more_options_link').click }
+    end
+
     before (:each) do
       course_with_teacher_logged_in
     end
@@ -61,6 +69,50 @@ describe "assignments" do
       #click on assignment link
       f("#assignment_#{Assignment.last.id} .title").click
       f('h2.title').should include_text(assignment_name)
+    end
+
+    %w(points percent pass_fail letter_grade).each do |grading_option|
+      it "should create assignment with #{grading_option} grading option" do
+        assignment_title = 'grading options assignment'
+        manually_create_assignment(assignment_title)
+        click_option('#assignment_grading_type', grading_option, :value)
+        expect_new_page_load { submit_form('#edit_assignment_form') }
+        f('.assignment_list').should include_text(assignment_title)
+        Assignment.find_by_title(assignment_title).grading_type.should == grading_option
+      end
+    end
+
+    %w(discussion_topic quiz external_tool not_graded).each do |assignment_type|
+      it "should create an assignment with the type of #{assignment_type}" do
+        assignment_title = 'assignment type assignment'
+        lti_url = 'http://www.example.com/ims/lti'
+        manually_create_assignment(assignment_title)
+        click_option('.assignment_type', assignment_type, :value)
+        if assignment_type != 'external_tool'
+          expect_new_page_load { submit_form('#edit_assignment_form') }
+        else
+          f('#external_tool_create_url').send_keys(lti_url)
+          submit_dialog('#select_context_content_dialog', '.add_item_button')
+          expect_new_page_load { submit_form('#edit_assignment_form') }
+        end
+        f('.assignment_list').should include_text(assignment_title)
+        assignment = Assignment.find_by_title(assignment_title)
+        assignment_type == 'quiz' ? assignment.submission_types.should == 'online_quiz' : assignment.submission_types.should == assignment_type
+      end
+    end
+
+    it "should validate lock submits after functionality" do
+      middle_number = '15'
+      expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
+      manually_create_assignment
+      f('.submission_content .ui-datepicker-trigger').click
+      f('.ui-datepicker-prev').click
+      fj("#ui-datepicker-div a:contains(#{middle_number})").click
+      expect_new_page_load { submit_form('#edit_assignment_form') }
+      assignment = Assignment.find_by_title('new assignment')
+      expect_new_page_load { f("#assignment_#{assignment.id} .title").click }
+      f('.lock_date').should include_text(expected_date)
+      assignment.lock_at.strftime('%b %d').should == expected_date
     end
 
     it "should create an assignment with more options" do

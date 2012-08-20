@@ -22,7 +22,7 @@ module Api::V1::User
   include AvatarHelper
 
   API_USER_JSON_OPTS = {
-    :only => %w(id name email),
+    :only => %w(id name),
     :methods => %w(sortable_name short_name)
   }
 
@@ -38,7 +38,7 @@ module Api::V1::User
                       # TODO: don't send sis_login_id; it's garbage data
                       :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_rights?(current_user, :read_sis, :manage_sis).values.any?
         end
-        if pseudonym = sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account)
+        if pseudonym = (sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account))
           json[:login_id] = pseudonym.unique_id
         end
       end
@@ -50,6 +50,14 @@ module Api::V1::User
       end
       json[:email] = user.email if includes.include?('email')
       json[:locale] = user.locale if includes.include?('locale')
+
+      if includes.include?('last_login')
+        last_login = user.read_attribute(:last_login)
+        if last_login.is_a?(String)
+          Time.use_zone('utc') { last_login = Time.zone.parse(last_login) }
+        end
+        json[:last_login] = last_login.try(:iso8601)
+      end
     end
   end
 

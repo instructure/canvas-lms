@@ -36,7 +36,8 @@ module Api::V1::CalendarEvent
     include = options[:include] || ['child_events']
     participant = nil
 
-    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title description location_address location_name workflow_state))
+    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state))
+    hash['description'] = api_user_content(event.description, event.context)
 
     appointment_group_id = (options[:appointment_group_id] || event.appointment_group.try(:id))
 
@@ -100,7 +101,8 @@ module Api::V1::CalendarEvent
   end
 
   def assignment_event_json(assignment, user, session)
-    hash = api_json(assignment, user, session, :only => %w(created_at updated_at title description all_day all_day_date workflow_state))
+    hash = api_json(assignment, user, session, :only => %w(created_at updated_at title all_day all_day_date workflow_state))
+    hash['description'] = api_user_content(assignment.description, assignment.context)
     hash['id'] = "assignment_#{assignment.id}"
     hash['assignment'] = assignment_json(assignment, user, session)
     hash['context_code'] = assignment.context_code

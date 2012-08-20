@@ -85,6 +85,18 @@ describe 'Collections' do
       @del1.collection_items.destroy_all
       @del1.reload.items_count.should == 0
     end
+
+    it "should lose all followers when being set to private" do
+      @pub1 = @context.collections.create!(:visibility => "public")
+      UserFollow.create_follow(@user, @pub1)
+      run_jobs
+      @pub1.reload.followers.should == [@user]
+
+      @pub1.visibility = "private"
+      @pub1.save!
+      run_jobs
+      @pub1.reload.followers.should == []
+    end
   end
 
   describe "user collections" do

@@ -488,6 +488,9 @@ ActionController::Routing::Routes.draw do |map|
   map.login "login", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.connect "login", :controller => "pseudonym_sessions", :action=> "create", :conditions => {:method => :post}
   map.logout "logout", :controller => "pseudonym_sessions", :action => "destroy"
+  map.cas_login "login/cas", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
+  map.otp_login "login/otp", :controller => "pseudonym_sessions", :action => "otp_login", :conditions => { :method => [:get, :post] }
+  map.disable_mfa "users/:user_id/mfa", :controller => "pseudonym_sessions", :action => "disable_otp_login", :conditions => { :method => :delete }
   map.clear_file_session "file_session/clear", :controller => "pseudonym_sessions", :action => "clear_file_session"
   map.register "register", :controller => "users", :action => "new"
   map.register_from_website "register_from_website", :controller => "users", :action => "new"
@@ -529,7 +532,7 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.resource :profile, :only => %w(show update),
                :controller => "profile",
-               :member => { :communication => :get, :communication_update => :put, :settings => :get } do |profile|
+               :member => { :update_profile => :put, :communication => :get, :communication_update => :put, :settings => :get } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
     profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'
@@ -657,8 +660,10 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :courses) do |courses|
       courses.get 'courses', :action => :index
       courses.post 'accounts/:account_id/courses', :action => :create
+      courses.put 'courses/:id', :action => :update
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/students', :action => :students
+      courses.get 'courses/:course_id/recent_students', :action => :recent_students, :path_name => 'course_recent_students'
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
       courses.get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
@@ -823,6 +828,10 @@ ActionController::Routing::Routes.draw do |map|
     api.get 'users/:user_id/profile', :controller => :profile, :action => :settings
     api.get 'users/:user_id/avatars', :controller => :profile, :action => :profile_pics
 
+    # deprecated routes, second one is solely for YARD. preferred API is api/v1/search/recipients
+    api.get 'conversations/find_recipients', :controller => :search, :action => :recipients
+    api.get 'conversations/find_recipients', :controller => :conversations, :action => :find_recipients
+
     api.with_options(:controller => :conversations) do |conversations|
       conversations.get 'conversations', :action => :index
       conversations.post 'conversations', :action => :create
@@ -953,6 +962,7 @@ ActionController::Routing::Routes.draw do |map|
   map.oauth2_auth_confirm 'login/oauth2/confirm', :controller => 'pseudonym_sessions', :action => 'oauth2_confirm', :conditions => { :method => :get }
   map.oauth2_auth_accept 'login/oauth2/accept', :controller => 'pseudonym_sessions', :action => 'oauth2_accept', :conditions => { :method => :post }
   map.oauth2_auth_deny 'login/oauth2/deny', :controller => 'pseudonym_sessions', :action => 'oauth2_deny', :conditions => { :method => :get }
+  map.oauth2_logout 'login/oauth2/token', :controller => 'pseudonym_sessions', :action => 'oauth2_logout', :conditions => { :method => :delete }
 
   ApiRouteSet.route(map, "/api/lti/v1") do |lti|
     lti.post "tools/:tool_id/grade_passback", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"

@@ -23,7 +23,7 @@ describe "/wiki_pages/show" do
   it "should render" do
     course_with_student
     view_context
-    assigns[:wiki] = WikiNamespace.default_for_context(@course).wiki
+    assigns[:wiki] = @course.wiki
     assigns[:page] = assigns[:wiki].wiki_page
     assigns[:page].save!
     assigns[:context] = @course

@@ -202,6 +202,110 @@ describe CoursesController, :type => :integration do
     end
   end
 
+  describe "course update" do
+    before do
+      Course.any_instance.unstub(:start_at, :end_at)
+      account_admin_user
+      @path   = "/api/v1/courses/#{@course.id}"
+      @params = { :controller => 'courses', :action => 'update', :format => 'json', :id => @course.to_param }
+      @new_values = { 'course' => {
+        'name' => 'New Name',
+        'course_code' => 'NEW-001',
+        'sis_course_id' => 'NEW12345',
+        'start_at' => '2012-03-01T00:00:00Z',
+        'end_at' => '2012-03-30T23:59:59Z',
+        'license' => 'public_domain',
+        'is_public' => true,
+        'public_description' => 'new description',
+        'allow_student_assignment_edits' => true,
+        'allow_wiki_comments' => true,
+        'allow_student_forum_attachments' => true,
+        'open_enrollment' => true,
+        'self_enrollment' => true,
+        'restrict_enrollments_to_course_dates' => true
+      }, 'offer' => true }
+    end
+
+    context "an account admin" do
+      it "should be able to update a course" do
+        json = api_call(:put, @path, @params, @new_values)
+        @course.reload
+
+        json['name'].should eql @new_values['course']['name']
+        json['course_code'].should eql @new_values['course']['course_code']
+        json['start_at'].should eql @new_values['course']['start_at']
+        json['end_at'].should eql @new_values['course']['end_at']
+        json['sis_course_id'].should eql @new_values['course']['sis_course_id']
+
+        @course.name.should eql @new_values['course']['name']
+        @course.course_code.should eql @new_values['course']['course_code']
+        @course.start_at.strftime('%Y-%m-%dT%H:%M:%SZ').should eql @new_values['course']['start_at']
+        @course.end_at.strftime('%Y-%m-%dT%H:%M:%SZ').should eql @new_values['course']['end_at']
+        @course.sis_course_id.should eql @new_values['course']['sis_course_id']
+        @course.license.should == 'public_domain'
+        @course.is_public.should be_true
+        @course.public_description.should == 'new description'
+        @course.allow_student_assignment_edits.should be_true
+        @course.allow_wiki_comments.should be_true
+        @course.allow_student_forum_attachments.should be_true
+        @course.open_enrollment.should be_true
+        @course.self_enrollment.should be_true
+        @course.restrict_enrollments_to_course_dates.should be_true
+        @course.workflow_state.should == 'available'
+      end
+
+      it "should not change dates that aren't given" do
+        @course.update_attribute(:conclude_at, '2012-01-01T23:59:59Z')
+        @new_values['course'].delete('end_at')
+        api_call(:put, @path, @params, @new_values)
+        @course.reload
+        @course.end_at.strftime('%Y-%m-%dT%T%z').should == '2012-01-01T23:59:59+0000'
+      end
+
+      it "should allow a date to be deleted" do
+        @course.update_attribute(:conclude_at, Time.now)
+        @new_values['course']['end_at'] = nil
+        api_call(:put, @path, @params, @new_values)
+        @course.reload
+        @course.end_at.should be_nil
+      end
+    end
+
+    context "a teacher" do
+      before do
+        user
+        enrollment = @course.enroll_teacher(@user)
+        enrollment.accept!
+        @new_values['course'].delete('sis_course_id')
+      end
+
+      it "should be able to update a course" do
+        json = api_call(:put, @path, @params, @new_values)
+
+        json['name'].should eql @new_values['course']['name']
+        json['course_code'].should eql @new_values['course']['course_code']
+        json['start_at'].should eql @new_values['course']['start_at']
+        json['end_at'].should eql @new_values['course']['end_at']
+      end
+
+      it "should not be able to update the sis id" do
+        original_sis = @course.sis_source_id
+        raw_api_call(:put, @path, @params, @new_values.merge(:sis_course_id => 'NEW123'))
+        @course.reload
+        @course.sis_source_id.should eql original_sis
+      end
+    end
+
+    context "an unauthorized user" do
+      before { user }
+
+      it "should return 401 unauthorized" do
+         raw_api_call(:put, @path, @params, @new_values)
+         response.code.should eql '401'
+      end
+    end
+  end
+
   describe "course deletion" do
     before do
       account_admin_user
@@ -443,10 +547,11 @@ describe CoursesController, :type => :integration do
       section1 = @course1.default_section
       section2 = @course1.course_sections.create!(:name => 'Section B')
       @ta = user(:name => 'TA')
-      @student1 = user(:name => 'S1')
-      @student2 = user(:name => 'S2')
       @ta_enroll1 = @course1.enroll_user(@ta, 'TaEnrollment', :section => section1)
       @ta_enroll2 = @course1.enroll_user(@ta, 'TaEnrollment', :section => section2, :allow_multiple_enrollments => true)
+
+      @student1 = user(:name => 'S1')
+      @student2 = user(:name => 'S2')
       @student1_enroll = @course1.enroll_user(@student1, 'StudentEnrollment', :section => section1)
       @student2_enroll = @course1.enroll_user(@student2, 'StudentEnrollment', :section => section2)
     end
@@ -511,16 +616,15 @@ describe CoursesController, :type => :integration do
                                                               :only => USER_API_FIELDS).map {|x| x["id"]}.sort
     end
 
-    it "should not include user sis id or login id for non-admins" do
-      first_user = @user
-      new_user = User.create!(:name => 'Zombo')
-      @course2.enroll_student(new_user).accept!
+    it "should not include sis user id or login id for non-admins" do
       RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+      student_in_course(:course => @course2, :active_all => true, :name => 'Zombo')
 
-      @user = @me
+      @user = @me # @me is a student in course 2
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
                       { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
                       :enrollment_type => 'student')
+      json.length.should == 2
       %w{sis_user_id sis_login_id unique_id}.each do |attribute|
         json.map { |u| u[attribute] }.should == [nil, nil]
       end
@@ -596,6 +700,26 @@ describe CoursesController, :type => :integration do
                       :enrollment_type => 'student')
       json['id'].should == @course2.id
       json['sis_course_id'].should == 'TEST-SIS-ONE.2011'
+    end
+
+    it "should paginate unique users correctly" do
+      students = [@student1, @student2]
+      section2 = @course1.course_sections.create!(:name => 'Section B')
+      8.times do |i|
+        s = student_in_course(:course => @course1, :active_all => true).user
+        @course1.enroll_student(s, :section => section2, :allow_multiple_enrollments => true).accept!
+      end
+
+      @user = @me
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, 
+                      { :enrollment_type => 'student', :page => 1, :per_page => 5 })
+      json.map{|x| x['id']}.uniq.length.should == 5
+
+      link_header = response.headers['Link'].split(',')
+      link_header[0].should match /page=2&per_page=5/ # next page
+      link_header[1].should match /page=1&per_page=5/ # first page
+      link_header[2].should match /page=2&per_page=5/ # last page
     end
   end
 
@@ -702,6 +826,32 @@ describe CoursesController, :type => :integration do
         { :name => 'failboat.txt' }, {}, :expected_status => 401)
     end
   end
+
+  describe "/recent_students" do
+    before do
+      course_with_teacher_logged_in(:active_all => true)
+      @student1 = student_in_course(:active_all => true, :name => "Sheldon Cooper").user
+      @student2 = student_in_course(:active_all => true, :name => "Leonard Hofstadter").user
+      @student3 = student_in_course(:active_all => true, :name => "Howard Wolowitz").user
+      pseudonym(@student1) # no login info
+      pseudonym(@student2).tap{|p| p.current_login_at = 1.days.ago; p.save!}
+      pseudonym(@student3).tap{|p| p.current_login_at = 2.days.ago; p.save!}
+    end
+
+    it "should include the last_login information" do
+      @user = @teacher
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/recent_students",
+                      { :controller => 'courses', :action => 'recent_students', :course_id => @course.to_param, :format => 'json' })
+      json.map{ |el| el['last_login'] }.compact.should_not be_empty
+    end
+
+    it "should sort by last_login" do
+      @user = @teacher
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/recent_students",
+                      { :controller => 'courses', :action => 'recent_students', :course_id => @course.to_param, :format => 'json' })
+      json.map{ |el| el['id'] }.should == [@student2.id, @student3.id, @student1.id]
+    end
+  end
 end
 
 def each_copy_option
@@ -728,12 +878,12 @@ describe ContentImportsController, :type => :integration do
     @copy_from.context_modules.create!(:name => "a module")
     @copy_from.quizzes.create!(:title => 'quiz')
     LearningOutcomeGroup.default_for(@copy_from).add_item(@copy_from.learning_outcomes.create!(:short_description => 'oi', :context => @copy_from))
-    @copy_from.save
+    @copy_from.save!
     
     course_with_teacher(:active_all => true, :name => 'whatever', :user => @user)
     @copy_to = @course
     @copy_to.sis_source_id = 'to_course'
-    @copy_to.save
+    @copy_to.save!
   end
   
   def run_copy(to_id=nil, from_id=nil, options={})

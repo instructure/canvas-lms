@@ -52,7 +52,7 @@ describe "assignment column headers" do
     expected_text = "-"
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    open_gradebook_settings(f('#ui-menu-0-4'))
+    open_gradebook_settings(f('#ui-menu-0-5'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
     validate_cell_text(first_row_cells[0], expected_text)
   end
@@ -60,8 +60,8 @@ describe "assignment column headers" do
   it "should validate arrange columns by assignment group option" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    open_gradebook_settings(f('#ui-menu-0-4'))
     open_gradebook_settings(f('#ui-menu-0-5'))
+    open_gradebook_settings(f('#ui-menu-0-6'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
     validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
   end
@@ -69,10 +69,10 @@ describe "assignment column headers" do
   it "should validate show attendance columns option" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    open_gradebook_settings(f('#ui-menu-0-6'))
+    open_gradebook_settings(f('#ui-menu-0-7'))
     headers = ff('.slick-header')
     headers[1].should include_text(@attendance_assignment.title)
-    open_gradebook_settings(f('#ui-menu-0-6'))
+    open_gradebook_settings(f('#ui-menu-0-7'))
   end
 
   it "show letter grade in total column" do

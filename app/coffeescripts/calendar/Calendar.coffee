@@ -267,8 +267,12 @@ define [
       @updateFragment view_start: $.dateToISO8601UTC(view.start)
 
     drop: (date, allDay, jsEvent, ui) =>
-      el = $(jsEvent.target)
-      event = el.data('calendarEvent')
+      eventId = $(ui.helper).data('event-id')
+      event   = $("[data-event-id=#{eventId}]").data('calendarEvent')
+
+      date.setHours(23)
+      date.setMinutes(59)
+
       if event
         event.start = date
         event.addClass 'event_pending'

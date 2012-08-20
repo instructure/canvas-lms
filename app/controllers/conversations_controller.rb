@@ -525,6 +525,11 @@ class ConversationsController < ApplicationController
     end
   end
 
+  # @API Find recipients
+  #
+  # Deprecated, see the Find recipients endpoint in the Search API
+  def find_recipients; end
+
   def public_feed
     return unless get_feed_context(:only => [:user])
     @current_user = @context
@@ -718,7 +723,7 @@ class ConversationsController < ApplicationController
     messages.map{ |message|
       result = message.as_json
       result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
-      result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment) }
+      result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment, @current_user) }
       result['forwarded_messages'] = jsonify_messages(result['forwarded_messages'])
       result['submission'] = submission_json(message.submission, message.submission.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) if message.submission
       result

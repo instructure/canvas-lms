@@ -23,6 +23,15 @@ describe Course do
   before(:each) do
     @course = Course.new
   end
+
+  it "should propery determine if group weights are active" do
+    @course.update_attribute(:group_weighting_scheme, nil)
+    @course.apply_group_weights?.should == false
+    @course.update_attribute(:group_weighting_scheme, 'equal')
+    @course.apply_group_weights?.should == false
+    @course.update_attribute(:group_weighting_scheme, 'percent')
+    @course.apply_group_weights?.should == true
+  end
   
   context "validation" do
     it "should create a new instance given valid attributes" do
@@ -2786,6 +2795,12 @@ describe Course, "student_view_student" do
 
     @fake_student1.id.should_not eql @fake_student2.id
     @fake_student1.pseudonym.id.should_not eql @fake_student2.pseudonym.id
+  end
+
+  it "should give fake student active student permissions even if enrollment wouldn't otherwise be active" do
+    @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
+    @fake_student = @course.student_view_student
+    @course.grants_right?(@fake_student, nil, :read_forum).should be_true
   end
 end
 

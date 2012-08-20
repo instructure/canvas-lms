@@ -1,46 +1,20 @@
-<%
-  jammit_css :profile_show
-  js_bundle :profile_show
-  @body_classes << 'no-page-block'
-  content_for :page_title, @user.short_name
-%>
-<div class="image-block">
-  <div class="image-block-image profile-avatar-wrapper">
-    <%= avatar_image @user.id, 100 %>
-  </div>
-  <div class="image-block-content">
-    <h1><%= @user.short_name %></h1>
-    <p><%= format_message(@user.bio || "").first.html_safe %></p>
-    <% if @can_follow %>
-      <p><button id="follow_user" class="button">Follow</button></p>
-    <% end %>
-  </div>
-</div>
+<% content_for :page_title, @user_data[:short_name] %>
+
+<%= render 'shared/profile' %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <table class="stats">
-      <tr class="stats-header">
-        <th colspan="2">Stats</th>
-      </tr>
-      <tr>
-        <th>Followers</th>
-        <td><%= @followers_count %></td>
-      </tr><tr>
-        <th>Collections</th>
-        <td><%= @user.collections.public.count %></td>
-      </tr><tr>
-        <th>Items</th>
-        <td><%= @items_count %></td>
-    </table>
-
-    <% if @user.show_user_services? && @services.present? %>
-      <div class="social-header border border-b">Find Me On</div>
-      <ul class="social-links">
-        <% @services.each do |s| %>
-          <li><a href="<%= s.service_user_link %>" class="social <%= s.service %>"><%= s.service_name %></a></li>
-          <% end %>
-      </ul>
+    <% if @user_data[:can_edit] %>
+      <button data-event="editProfile" class="hide-if-editing button button-sidebar-wide"><i class="icon-edit"></i> <%= t('edit_profile', 'Edit Profile') %></button>
+      <button data-event="cancelEditProfile" class="show-if-editing button button-sidebar-wide"><i class="icon-edit"></i> <%= t('cancel_editing', 'Cancel Editing') %></button>
+    <% end %>
+    <% if can_do(@domain_root_account, @current_user, :manage) %>
+      <h2><%= t :administration, 'Administration' %></h2>
+      <div><a href="<%= user_path(@user.id) %>"><%= t('links.user_account_details', %{Account Details}) %></a></div>
+      <% if @user != @current_user %>
+        <div><a href="<%= context_url(@user.profile, :context_url, :become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a></div>
+      <% end %>
     <% end %>
   </div>
 <% end %>
+

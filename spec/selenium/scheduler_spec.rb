@@ -208,9 +208,9 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
       create_appointment_group_manual :checkable_options => {
-        :per_slot_option => true,
-        :participant_visibility => true,
-        :max_appointments_per_participant_option => true
+          :per_slot_option => true,
+          :participant_visibility => true,
+          :max_appointments_per_participant_option => true
       }
       # assert options are checked
       open_edit_dialog
@@ -269,18 +269,20 @@ describe "scheduler" do
         driver.execute_script("$('.appointment-group-item:index(#{i}').addClass('ui-state-hover')")
         %w(all registered unregistered).each do |registration_status|
           click_al_option('.message_link', i)
-          form = keep_trying_until { fj('.ui-dialog:visible') }
+          form = f('#message_participants_form')
+          form.should be_displayed
           wait_for_ajaximations
 
-          set_value form.find_element(:css, 'select'), registration_status
+          set_value(form.find_element(:css, '.message_groups'), registration_status)
           wait_for_ajaximations
 
-          form.find_elements(:css, 'li input').should_not be_empty
-          set_value form.find_element(:css, 'textarea'), 'hello'
-          submit_dialog(form, '.ui-button')
+          form.find_elements(:css, '.participant_list li').should_not be_empty
+          set_value(form.find_element(:css, '#body'), 'hello')
+          submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
+          wait_for_ajaximations
 
           assert_flash_notice_message /Messages Sent/
-          keep_trying_until { fj('.ui-dialog:visible').should be_nil }
+          fj('#message_participants_form').should be_nil # using fj to avoid selenium caching
         end
       end
 

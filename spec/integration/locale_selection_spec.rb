@@ -31,6 +31,7 @@ describe "locale_selection" do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     user_session(@user, @pseudonym)
     @user.update_attribute :locale, 'es'
+    @pseudonym.reload
     get dashboard_url
     response.should be_success
     I18n.locale.should eql(:es)

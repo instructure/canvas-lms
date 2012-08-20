@@ -1,0 +1,4 @@
+development:
+  #host: my.statsd.host
+  #port: 1234
+  #namespace: canvas

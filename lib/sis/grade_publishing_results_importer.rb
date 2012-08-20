@@ -45,18 +45,12 @@ module SIS
         raise ImportError, "No grade_publishing_status given for enrollment #{enrollment_id}" if grade_publishing_status.blank?
         raise ImportError, "Improper grade_publishing_status \"#{grade_publishing_status}\" for enrollment #{enrollment_id}" unless %w{ published error }.include?(grade_publishing_status.downcase)
 
-        enrollment = Enrollment.find_by_id(enrollment_id)
-        if enrollment
-          found_root_account = enrollment.root_account_id == @root_account.id
-          found_root_account ||= enrollment.course && enrollment.course.root_account_id == @root_account.id
-          found_root_account ||= enrollment.course_section && enrollment.course_section.root_account_id == @root_account.id
-          enrollment = nil unless found_root_account
+        if (Enrollment.update_all({:grade_publishing_status => grade_publishing_status.downcase,
+                               :grade_publishing_message => message.to_s,
+                               :updated_at => Time.now.utc},
+                              {:id => enrollment_id, :root_account_id => @root_account.id}) != 1)
+          raise ImportError, "Enrollment #{enrollment_id} doesn't exist"
         end
-        raise ImportError, "Enrollment #{enrollment_id} doesn't exist" unless enrollment
-
-        enrollment.grade_publishing_status = grade_publishing_status.downcase
-        enrollment.grade_publishing_message = message.to_s
-        enrollment.save!
 
         @success_count += 1
       end

@@ -53,7 +53,6 @@ class Group < ActiveRecord::Base
   belongs_to :wiki
   has_many :default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages
   has_many :active_default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages, :conditions => ['wiki_pages.workflow_state = ?', 'active']
-  has_many :wiki_namespaces, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
@@ -80,15 +79,10 @@ class Group < ActiveRecord::Base
       participating_users_association
   end
 
-  def wiki
-    res = self.wiki_id && Wiki.find_by_id(self.wiki_id)
-    unless res
-      res = WikiNamespace.default_for_context(self).wiki
-      self.wiki_id = res.id if res
-      self.save
-    end
-    res
+  def wiki_with_create
+    Wiki.wiki_for_context(self)
   end
+  alias_method_chain :wiki, :create
 
   def auto_accept?(user)
     self.group_category && 
@@ -345,6 +339,7 @@ class Group < ActiveRecord::Base
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
     can :create and
+    can :create_collaborations and
     can :create_conferences and
     can :delete and
     can :manage and
@@ -398,7 +393,7 @@ class Group < ActiveRecord::Base
   end
 
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_CHAT, TAB_FILES,
-    TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS = *1..20
+    TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
   def tabs_available(user=nil, opts={})
     available_tabs = [
       { :id => TAB_HOME,          :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
@@ -414,6 +409,7 @@ class Group < ActiveRecord::Base
       available_tabs << {:id => TAB_PROFILE, :label => t('#tabs.profile', 'Profile'), :css_class => 'profile', :href => :group_profile_path}
     end
     available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :read)
+    available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path } if user && self.grants_right?(user, nil, :read)
     if root_account.canvas_network_enabled? && user && grants_right?(user, nil, :manage)
       available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path } 
     end

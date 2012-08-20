@@ -249,6 +249,7 @@ module Api
       media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1', :host => host, :protocol => protocol)
       node['controls'] = 'controls'
       node['src'] = media_redirect
+      node.inner_html = anchor.inner_html
       anchor.replace(node)
     end
 

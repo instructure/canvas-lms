@@ -67,6 +67,7 @@ define([
       $resize_overlay = $("#resize_overlay"),
       $right_side = $("#right_side"),
       $width_resizer = $("#width_resizer"),
+      $fixed_bottom = $("#fixed_bottom"),
       $gradebook_header = $("#gradebook_header"),
       assignmentUrl = $("#assignment_url").attr('href'),
       $full_height = $(".full_height"),
@@ -634,7 +635,8 @@ define([
         delta,
         deltaRemaining,
         headerOffset = $right_side.offset().top,
-        fullHeight = Math.max(minimumWindowHeight, windowHeight) - headerOffset,
+        fixedBottomHeight = $fixed_bottom.height(),
+        fullHeight = Math.max(minimumWindowHeight, windowHeight) - headerOffset - fixedBottomHeight,
         resizableElements = [
           { element: $submission_files_list,    data: { newHeight: 0 } },
           { element: $rubric_summary_container, data: { newHeight: 0 } },

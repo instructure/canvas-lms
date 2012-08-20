@@ -29,7 +29,6 @@ class ApplicationController < ActionController::Base
   around_filter :set_locale
 
   helper :all
-  filter_parameter_logging :password
 
   include AuthenticationMethods
   protect_from_forgery
@@ -195,8 +194,18 @@ class ApplicationController < ActionController::Base
     end
     true
   end
-  
-  # checks the authorization policy for the given object using 
+
+  def require_password_session
+    if session[:used_remember_me_token]
+      flash[:warning] = t "#application.warnings.please_log_in", "For security purposes, please enter your password to continue"
+      store_location
+      redirect_to login_url
+      return false
+    end
+    true
+  end
+
+  # checks the authorization policy for the given object using
   # the vendor/plugins/adheres_to_policy plugin.  If authorized,
   # returns true, otherwise renders unauthorized messages and returns
   # false.  To be used as follows:
@@ -305,7 +314,7 @@ class ApplicationController < ActionController::Base
     unless @context
       if params[:course_id]
         @context = api_request? ?
-          api_find(Course, params[:course_id]) : Course.find(params[:course_id])
+          api_find(Course.active, params[:course_id]) : Course.active.find(params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && session[:enrollment_uuid_course_id] == @context.id
@@ -890,9 +899,7 @@ class ApplicationController < ActionController::Base
   end
   
   # Retrieving wiki pages needs to search either using the id or 
-  # the page title.  We've also got it in here to have more than one
-  # wiki per context, although we've never actually used that yet.
-  # And maybe we won't.  See models/wiki_namespace.rb for more though.
+  # the page title.
   def get_wiki_page
     page_name = (params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title]) || "front-page")
     if(params[:format] && !['json', 'html'].include?(params[:format]))
@@ -900,8 +907,7 @@ class ApplicationController < ActionController::Base
       params[:format] = 'html'
     end
     return @page if @page 
-    @namespace = WikiNamespace.default_for_context(@context)
-    @wiki = @namespace.wiki
+    @wiki = @context.wiki
     if params[:action] != 'create'
       @page = @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s) ||
               @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
@@ -911,7 +917,6 @@ class ApplicationController < ActionController::Base
       :title => page_name.titleize,
       :url => page_name.to_url
     )
-    @page.current_namespace = @namespace
     if page_name == "front-page" && @page.new_record?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
@@ -920,8 +925,6 @@ class ApplicationController < ActionController::Base
   
   def context_wiki_page_url
     page_name = @page.url
-    namespace = WikiNamespace.find_by_wiki_id_and_context_id_and_context_type(@page.wiki_id, @context.id, @context.class.to_s)
-    page_name = namespace.namespace + page_name if namespace && !namespace.default?
     named_context_url(@context, :context_wiki_page_url, page_name)
   end
 
@@ -1311,4 +1314,47 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :flash_notices
+
+  def profile_data(profile, viewer, session, includes)
+    extend Api::V1::UserProfile
+    extend Api::V1::Course
+    extend Api::V1::Group
+    includes ||= []
+    data = user_profile_json(profile, viewer, session, includes, profile)
+    data[:can_edit] = viewer == profile.user
+    known_user = viewer.messageable_users(:ids => [profile.user.id]).first
+    common_courses = []
+    common_groups = []
+    if viewer != profile.user
+      if known_user
+        common_courses = known_user.common_courses.map do |course_id, roles|
+          next if course_id.zero?
+          c = course_json(Course.find(course_id), @current_user, session, ['html_url'], false)
+          c[:roles] = roles.map { |role| Enrollment.readable_type(role) }
+          c
+        end.compact
+        common_groups = known_user.common_groups.map do |group_id, roles|
+          next if group_id.zero?
+          g = group_json(Group.find(group_id), @current_user, session, :include => ['html_url'])
+          # in the future groups will have more roles and we'll need soemthing similar to
+          # the roles.map above in courses
+          g[:roles] = [t('#group.memeber', "Member")]
+          g
+        end.compact
+      end
+    end
+    data[:common_contexts] = [] + common_courses + common_groups
+    data[:known_user] = known_user
+    data
+  end
+
+  filter_parameter_logging *Canvas::LoggingFilter.filtered_parameters
+
+  # filter out sensitive parameters in the query string as well when logging
+  # the rails "Completed in XXms" line.
+  # this is fixed in Rails 3.x
+  def complete_request_uri
+    uri = Canvas::LoggingFilter.filter_uri(request.request_uri)
+    "#{request.protocol}#{request.host}#{uri}"
+  end
 end

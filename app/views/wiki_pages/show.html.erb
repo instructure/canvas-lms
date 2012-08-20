@@ -12,4 +12,4 @@
   <%= render :partial => "wiki_pages/content" %>
 <% end %>
 
-<%= render :partial => "shared/sequence_footer", :locals => {:asset => @page} if @page.context_module_tag_for(@context, @current_user) %>
+<%= render :partial => "shared/sequence_footer", :locals => {:asset => @page} if @page.context_module_tag_for(@context) %>

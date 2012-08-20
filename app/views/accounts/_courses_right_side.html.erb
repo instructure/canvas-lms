@@ -28,7 +28,12 @@
       <div class="rs-margin-lr rs-margin-bottom">
         <% form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :method => :get} do |f| -%>
           <fieldset class="textfield-inline-with-button">
-            <input id="course_name" name="course[name]" value="<%= @query %>" />
+            <input id="course_name"
+                   name="course[name]"
+                   value="<%= @query %>"
+                   data-behaviors="autocomplete"
+                   data-autocomplete-options="<%= { :minLength => 4, :delay => 150, :source => account_courses_path(@account, :format => :json) }.to_json  %>"
+                   />
             <button class='button small-button'><%= t(:go_button, "Go") %></button>
           </fieldset>
         <%- end -%>

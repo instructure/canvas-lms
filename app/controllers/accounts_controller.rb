@@ -229,7 +229,7 @@ class AccountsController < ApplicationController
         end
       end
       if @account.grants_right?(@current_user, nil, :read_roster)
-        @recently_logged_users = @account.all_users.recently_logged_in[0,25]
+        @recently_logged_users = @account.all_users.recently_logged_in
       end
       @counts_report = @account.report_snapshots.detailed.last.try(:data)
     end

@@ -58,10 +58,10 @@ shared_examples_for "discussions selenium tests" do
 
     submit_form('.discussion-reply-form')
     wait_for_ajax_requests
-    keep_trying_until {
+    keep_trying_until do
       id = DiscussionEntry.last.id
       @last_entry = fj ".entry[data-id=#{id}]"
-    }
+    end
   end
 
   def get_all_replies

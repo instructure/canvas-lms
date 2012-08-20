@@ -48,7 +48,7 @@ gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.15'
+gem 'ruby-saml-mod',  '0.1.17'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '2.0.3'
@@ -119,6 +119,10 @@ end
 
 group :embedly do
   gem 'embedly', '1.5.5'
+end
+
+group :statsd do
+  gem 'statsd-ruby', '1.0.0', :require => 'statsd'
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from

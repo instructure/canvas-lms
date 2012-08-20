@@ -129,7 +129,9 @@ describe "user selenium tests" do
       form = fj('.ui-dialog:visible form')
       f('#student_join_code').send_keys(@course.self_enrollment_code)
       f('#student_name').send_keys('student!')
-      f('#student_birthdate').send_keys('1/1/1980')
+      form.find_element(:css, "select[name='user[birthdate(1)]'] option[value='#{Time.now.year - 20}']").click
+      form.find_element(:css, "select[name='user[birthdate(2)]'] option[value='1']").click
+      form.find_element(:css, "select[name='user[birthdate(3)]'] option[value='1']").click
       f('#student_username').send_keys('student')
       f('#student_password').send_keys('asdfasdf')
       f('#student_password_confirmation').send_keys('asdfasdf')
@@ -149,7 +151,9 @@ describe "user selenium tests" do
       form = fj('.ui-dialog:visible form')
       f('#student_higher_ed_name').send_keys('student!')
       f('#student_higher_ed_email').send_keys('student@example.com')
-      f('#student_higher_ed_birthdate').send_keys('1/1/1980')
+      form.find_element(:css, "select[name='user[birthdate(1)]'] option[value='#{Time.now.year - 20}']").click
+      form.find_element(:css, "select[name='user[birthdate(2)]'] option[value='1']").click
+      form.find_element(:css, "select[name='user[birthdate(3)]'] option[value='1']").click
       form.find_element(:css, 'input[name="user[terms_of_use]"]').click
 
       expect_new_page_load { form.submit }
@@ -187,6 +191,22 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
+    end
+  end
+
+  context "masquerading" do
+    it "should masquerade as a user" do
+      site_admin_logged_in(:name => "The Admin")
+      user_with_pseudonym(:active_user => true, :name => "The Student")
+      get "/users/#{@user.id}/masquerade"
+      f('.masquerade_button').click
+      wait_for_dom_ready
+      f("#identity .user_name").should include_text "The Student"
+      bar = f("#masquerade_bar")
+      bar.should include_text "You are currently masquerading"
+      bar.find_element(:css, ".stop_masquerading").click
+      wait_for_dom_ready
+      f("#identity .user_name").should include_text "The Admin"
     end
   end
 end
