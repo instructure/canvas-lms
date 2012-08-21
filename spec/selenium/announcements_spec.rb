@@ -104,7 +104,7 @@ describe "announcements" do
     end
 
     describe "shared bulk topics specs" do
-      let(:url) { "/courses/#{@course.id}/announcements" }
+      let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
       it_should_behave_like "discussion and announcement main page tests"
     end

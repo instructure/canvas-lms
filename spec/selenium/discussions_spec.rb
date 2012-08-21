@@ -10,7 +10,7 @@ describe "discussions" do
     end
 
     describe "shared bulk topics specs" do
-      let(:url) { "/courses/#{@course.id}/discussion_topics" }
+      let(:url) { "/courses/#{@course.id}/discussion_topics/" }
       let(:what_to_create) { DiscussionTopic }
       it_should_behave_like "discussion and announcement main page tests"
     end
