@@ -76,6 +76,7 @@ class ProfileController < ApplicationController
   #     'login_id': 'sample_user@example.com',
   #     'sis_user_id': 'sis1',
   #     'sis_login_id': 'sis1-login',
+  #     // The avatar_url can change over time, so we recommend not caching it for more than a few hours
   #     'avatar_url': '..url..',
   #     'calendar': { 'ics' => '..url..' }
   #   }

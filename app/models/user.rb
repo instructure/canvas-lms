@@ -1333,6 +1333,7 @@ class User < ActiveRecord::Base
 
   AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
   def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil)
+    return fallback if avatar_setting == 'disabled'
     size ||= 50
     avatar_setting ||= 'enabled'
     fallback = self.class.avatar_fallback_url(fallback, request)

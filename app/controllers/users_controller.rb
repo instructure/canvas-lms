@@ -1170,7 +1170,6 @@ class UsersController < ApplicationController
 
   def avatar_image
     cancel_cache_buster
-    return redirect_to(params[:fallback] || '/images/no_pic.gif') unless service_enabled?(:avatars)
     # TODO: remove support for specifying user ids by id, require using
     # the encrypted version. We can't do it right away because there are
     # a bunch of places that will have cached fragments using the old
@@ -1183,10 +1182,10 @@ class UsersController < ApplicationController
     account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
     url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
       user = User.find_by_id(user_id) if user_id.present?
-      if user && account_avatar_setting != 'disabled'
+      if user
         user.avatar_url(nil, account_avatar_setting, "%{fallback}")
       else
-        ''
+        '%{fallback}'
       end
     end
     fallback = User.avatar_fallback_url(params[:fallback], request)
