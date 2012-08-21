@@ -1,14 +1,5 @@
 module AvatarHelper
 
-  def set_avatar_size
-    @avatar_size = params[:avatar_size].to_i
-    @avatar_size = 50 unless [32, 50].include?(@avatar_size)
-  end
-
-  def avatar_size
-    @avatar_size || set_avatar_size
-  end
-
   def avatar_url_for(conversation, participants = conversation.participants)
     if participants.size == 1
       avatar_url_for_user(participants.first)
@@ -22,14 +13,14 @@ module AvatarHelper
   def avatar_url_for_group(blank_fallback=false)
     "#{request.protocol}#{request.host_with_port}" + (blank_fallback ?
       "/images/blank.png" :
-      "/images/messages/avatar-group-#{avatar_size}.png"
+      "/images/messages/avatar-group-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
     )
   end
 
   def avatar_url_for_user(user, blank_fallback=false)
     default_avatar = "#{request.protocol}#{request.host_with_port}" + (blank_fallback ?
       "/images/blank.png" :
-      "/images/messages/avatar-#{avatar_size}.png"
+      "/images/messages/avatar-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
     )
     if service_enabled?(:avatars)
       user.avatar_url(nil, (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'), default_avatar)

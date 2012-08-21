@@ -30,7 +30,7 @@
           <div class="post_date time_ago_date"><%= datetime_string(comment.created_at) %></div>
           <div class="clear"></div>
           <% if service_enabled?(:avatars) %>
-            <div style="float: left; margin: 0 5px 0 0;"><%= link_to(avatar_image(comment.author.id, 30), user_path(comment.author.id), :style => 'z-index: 2; position: relative;') %></div>
+            <div style="float: left; margin: 0 5px 0 0;"><%= link_to(avatar_image(comment.author, 30), user_path(comment.author.id), :style => 'z-index: 2; position: relative;') %></div>
           <% end %>
           <div class="user_content"><%= user_content(comment.formatted_body) %></div>
           <div class="clear"></div>

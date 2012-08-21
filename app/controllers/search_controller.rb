@@ -22,7 +22,6 @@ class SearchController < ApplicationController
   include SearchHelper
 
   before_filter :get_context
-  before_filter :set_avatar_size
 
   def rubrics
     contexts = @current_user.management_contexts rescue []
