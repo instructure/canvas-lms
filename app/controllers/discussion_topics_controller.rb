@@ -101,9 +101,6 @@
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
 
-  add_crumb(proc { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
-  before_filter { |c| c.active_tab = "discussions" }
-
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
 
@@ -120,6 +117,8 @@ class DiscussionTopicsController < ApplicationController
       log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
       respond_to do |format|
         format.html do
+          active_tab = "discussions"
+          add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
           js_env :permissions => {
             :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
             :moderate => @context.grants_right?(@current_user, session, :moderate_forum)
@@ -140,6 +139,7 @@ class DiscussionTopicsController < ApplicationController
 
   def new
     @topic = @context.send(params[:is_announcement] ? :announcements : :discussion_topics).new
+    add_discussion_or_announcement_crumb
     add_crumb t :create_new_crumb, "Create new"
     edit
   end
@@ -153,6 +153,7 @@ class DiscussionTopicsController < ApplicationController
       }
 
       unless @topic.new_record?
+        add_discussion_or_announcement_crumb
         add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
         add_crumb t :edit_crumb, "Edit"
         hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session)
@@ -167,6 +168,7 @@ class DiscussionTopicsController < ApplicationController
     parent_id = params[:parent_id]
     @topic = @context.all_discussion_topics.find(params[:id])
     @context.assert_assignment_group rescue nil
+    add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
     if @topic.deleted?
       flash[:notice] = t :deleted_topic_notice, "That topic has been deleted"
@@ -326,6 +328,16 @@ class DiscussionTopicsController < ApplicationController
   end
 
   protected
+
+  def add_discussion_or_announcement_crumb
+    if  @topic.is_a? Announcement
+      @active_tab = "announcements"
+      add_crumb t('#crumbs.announcements', "Announcements"), named_context_url(@context, :context_announcements_url)
+    else
+      @active_tab = "discussions"
+      add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
+    end
+  end
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at podcast_enabled
                                 podcast_has_student_posts require_initial_post is_announcement)
