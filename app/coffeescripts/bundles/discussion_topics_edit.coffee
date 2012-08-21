@@ -14,7 +14,7 @@ require [
   view = new EditView(model: model)
 
   [contextType, contextId] = splitAssetString ENV.context_asset_string
-  if contextType is 'courses' && !is_announcement
+  if contextType is 'courses' && !is_announcement && ENV.DISCUSSION_TOPIC.CAN_CREATE_ASSIGNMENT
     (view.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
 
   $ -> view.render().$el.appendTo('#content')
