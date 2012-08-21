@@ -26,7 +26,9 @@ class SummaryMessageConsolidator
   end
   
   def process
-    cc_ids = CommunicationChannel.ids_with_pending_delayed_messages
+    cc_ids = ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      CommunicationChannel.ids_with_pending_delayed_messages
+    end
     cc_ids.each do |cc_id|
       dm_ids = DelayedMessage.ids_for_messages_with_communication_channel_id(cc_id)
       DelayedMessage.update_all({ :batched_at => Time.now.utc, :workflow_state => 'sent', :updated_at => Time.now.utc },
