@@ -269,6 +269,14 @@ describe CoursesController, :type => :integration do
         @course.reload
         @course.end_at.should be_nil
       end
+
+      it "should allow updating only the offer parameter" do
+        @course.workflow_state = "claimed"
+        @course.save!
+        api_call(:put, @path, @params, {:offer => 1})
+        @course.reload
+        @course.workflow_state.should == "available"
+      end
     end
 
     context "a teacher" do

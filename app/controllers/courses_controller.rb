@@ -1107,6 +1107,7 @@ class CoursesController < ApplicationController
   def update
     @course = api_find(Course, params[:id])
     if authorized_action(@course, @current_user, :update)
+      params[:course] ||= {}
       root_account_id = params[:course].delete :root_account_id
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)
