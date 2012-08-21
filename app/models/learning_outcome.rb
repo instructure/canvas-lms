@@ -230,15 +230,32 @@ class LearningOutcome < ActiveRecord::Base
       end
       
       if !outcome
-        migration.add_warning(t('no_context_found', %{The external Learning Outcome couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
+        migration.add_warning(t(:no_context_found, %{The external Learning Outcome couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
       end
     end
     
     if !outcome
-      item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-      item ||= context.created_learning_outcomes.new
-      item.context = context
+      if hash[:is_global_standard]
+        if Account.site_admin.grants_right?(migration.user, :manage_global_outcomes)
+          # import from vendor with global outcomes
+          context = nil
+          hash[:learning_outcome_group] ||= LearningOutcomeGroup.global_root_outcome_group
+          item ||= LearningOutcome.global.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+          item ||= LearningOutcome.global.find_by_vendor_guid(hash[:vendor_guid]) if hash[:vendor_guid]
+          item ||= LearningOutcome.new
+        else
+          migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
+          return
+        end
+      else
+        item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+        item ||= context.created_learning_outcomes.new
+        item.context = context
+      end
       item.migration_id = hash[:migration_id]
+      item.vendor_guid = hash[:vendor_guid]
+      item.low_grade = hash[:low_grade]
+      item.high_grade = hash[:high_grade]
       item.workflow_state = 'active' if item.deleted?
       item.short_description = hash[:title]
       item.description = hash[:description]
@@ -252,7 +269,7 @@ class LearningOutcome < ActiveRecord::Base
       end
       
       item.save!
-      context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+      context.imported_migration_items << item if context && context.imported_migration_items && item.new_record?
     else
       item = outcome
     end

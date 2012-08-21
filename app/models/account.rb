@@ -1124,4 +1124,13 @@ class Account < ActiveRecord::Base
   def canvas_network_enabled?
     false
   end
+
+  def import_from_migration(data, params, migration)
+
+    LearningOutcome.process_migration(data, migration)
+
+    migration.progress=100
+    migration.workflow_state = :imported
+    migration.save
+  end
 end
