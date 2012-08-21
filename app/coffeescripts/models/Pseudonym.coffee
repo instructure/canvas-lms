@@ -10,6 +10,7 @@ define [
         too_short:    I18n.t("errors.required", "Required")
         too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 100})
         invalid:      I18n.t("errors.invalid", "May only contain letters, numbers, or the following: %{characters}", {characters: ". + - _ @ ="})
+        taken:        I18n.t("errors.taken", "Email already in use")
         bad_credentials: I18n.t("errors.bad_credentials", "Invalid username or password")
       password:
         too_short:    I18n.t("errors.too_short", "Must be at least %{min} characters", {min: 6})
