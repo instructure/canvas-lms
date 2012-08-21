@@ -309,6 +309,19 @@ define [
             submissionData.submission.drop = submissionData.drop
         student["total_grade"] = result[finalOrCurrent]
 
+        @addDroppedClass(student)
+
+    addDroppedClass: (student) ->
+      droppedAssignments = (name for name, assignment of student when name.match(/assignment_\d+/) and assignment.drop?)
+      drops = {}
+      drops[student.row] = {}
+      for a in droppedAssignments
+        drops[student.row][a] = 'dropped'
+
+      styleKey = "dropsForRow#{student.row}"
+      @gradeGrid.removeCellCssStyles(styleKey)
+      @gradeGrid.addCellCssStyles(styleKey, drops)
+
     highlightColumn: (columnIndexOrEvent) =>
       if isNaN(columnIndexOrEvent)
         # then assume that columnIndexOrEvent is an event, so figure out which column
@@ -686,7 +699,9 @@ define [
       $('body').on('click', @onGridBlur)
       sortRowsBy = (sortFn) =>
         @rows.sort(sortFn)
-        student.row = i for student, i in @rows
+        for student, i in @rows
+          student.row = i
+          @addDroppedClass(student)
         @multiGrid.invalidate()
       @gradeGrid.onSort.subscribe (event, data) =>
         sortRowsBy (a, b) ->
