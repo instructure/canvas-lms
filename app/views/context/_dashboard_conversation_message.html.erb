@@ -12,7 +12,7 @@
   </div>
   <div class="content">
     <% if service_enabled?(:avatars) %>
-      <div style="float: left; margin: 0 5px 0 -10px;"><%= link_to(avatar_image(author.id, 30), user_path(author.id), :style => 'z-index: 2; position: relative;') %></div>
+      <div style="float: left; margin: 0 5px 0 -10px;"><%= link_to(avatar_image(author, 30), user_path(author.id), :style => 'z-index: 2; position: relative;') %></div>
     <% end %>
     <div class="message user_content" style="<%= hidden unless message %>"><%= message ? user_content(message.formatted_body) : nbsp %></div>
     <% if !message %>

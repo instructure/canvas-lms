@@ -58,7 +58,7 @@
   <article id="discussion_topic" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
     <div class="entry_content">
       <header class="discussion-section clearfix">
-        <%= avatar((@topic.user_id), @context.asset_string) %>
+        <%= avatar((@topic.user), @context.asset_string) %>
         <div class="discussion-header-content right-of-avatar">
           <% if can_do(@topic, @current_user, :update) || can_do(@topic, @current_user, :delete) %>
             <div class="admin-links">

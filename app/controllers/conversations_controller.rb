@@ -27,7 +27,6 @@ class ConversationsController < ApplicationController
 
   before_filter :require_user, :except => [:public_feed]
   before_filter :reject_student_view_student
-  before_filter :set_avatar_size
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :except => [:public_feed]
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
