@@ -266,7 +266,7 @@ define([
         }
         var value = predefinedVariables && predefinedVariables[tree.value];
         value = value || (variables && variables[tree.value]);
-        if(!value) {
+        if (value == undefined) {
           throw("undefined variable " + tree.value);
         }
         return value;
