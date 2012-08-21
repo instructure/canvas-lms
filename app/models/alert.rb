@@ -92,7 +92,7 @@ class Alert < ActiveRecord::Base
   end
 
   def self.process
-    Account.root_accounts.find_each do |account|
+    Account.root_accounts.active.find_each do |account|
       Account.with_exclusive_scope do
         self.send_later_if_production_enqueue_args(:evaluate_for_root_account, { :priority => Delayed::LOW_PRIORITY }, account)
       end if account.settings[:enable_alerts]

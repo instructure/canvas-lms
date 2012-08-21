@@ -44,7 +44,7 @@ class CountsReport
 
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       Shard.with_each_shard do
-        Account.root_accounts.each do |account|
+        Account.root_accounts.active.each do |account|
           next if account.external_status == 'test'
           activity = CountsReport.last_activity(account.id)
           next unless activity
