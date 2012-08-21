@@ -2545,10 +2545,12 @@ class Course < ActiveRecord::Base
   end
 
   def tabs_available(user=nil, opts={})
+    # make sure t() is called before we switch to the slave, in case we update the user's selected locale in the process
+    default_tabs = Course.default_tabs
+
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
       tabs = self.tab_configuration.compact
-      default_tabs = Course.default_tabs
       settings_tab = default_tabs[-1]
       external_tabs = external_tool_tabs(opts)
       tabs = tabs.map do |tab|
