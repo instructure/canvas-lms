@@ -74,7 +74,7 @@ module Api::V1::User
   def user_display_json(user, parent_context = nil)
     return {} unless user
     participant_url = parent_context ? polymorphic_url([parent_context, user]) : user_url(user)
-    { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(user.id)), :html_url => participant_url }
+    { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_url_for_user(user, blank_fallback), :html_url => participant_url }
   end
 
   # optimization hint, currently user only needs to pull pseudonyms from the db

@@ -169,7 +169,7 @@ describe "Collections API", :type => :integration do
       'user' => {
         'id' => item.user.id,
         'display_name' => item.user.short_name,
-        'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(item.user.id)}",
+        'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png",
         'html_url' => (item.user == @user) ? "http://www.example.com/about/#{item.user.id}" : "http://www.example.com/users/#{item.user.id}",
       },
       'item_type' => item.collection_item_data.item_type,

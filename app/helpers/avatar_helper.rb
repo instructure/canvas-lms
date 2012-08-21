@@ -32,7 +32,7 @@ module AvatarHelper
       "/images/messages/avatar-#{avatar_size}.png"
     )
     if service_enabled?(:avatars)
-      avatar_image_url(User.avatar_key(user.id), :fallback => default_avatar)
+      user.avatar_url(nil, (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'), default_avatar)
     else
       default_avatar
     end

@@ -63,6 +63,14 @@ describe DiscussionTopicsController, :type => :integration do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
+  # needed for user_display_json
+  def avatar_url_for_user(user, *a)
+    "http://www.example.com/images/messages/avatar-50.png"
+  end
+  def blank_fallback
+    nil
+  end
+
   context "create topic" do
     it "should check permissions" do
       @user = user(:active_all => true)
@@ -1209,8 +1217,8 @@ describe DiscussionTopicsController, :type => :integration do
       json['unread_entries'].sort.should == (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
       json['participants'].sort_by { |h| h['id'] }.should == [
-        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
-        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@teacher.id)}", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
+        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
+        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
       ].sort_by { |h| h['id'] }
 
       reply_reply1_attachment_json = {
