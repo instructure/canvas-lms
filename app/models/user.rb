@@ -2571,7 +2571,7 @@ class User < ActiveRecord::Base
   end
 
   def crocodoc_user
-    "#{crocodoc_id!},#{short_name}"
+    "#{crocodoc_id!},#{short_name.gsub(",","")}"
   end
 
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
