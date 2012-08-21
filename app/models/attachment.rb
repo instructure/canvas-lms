@@ -572,9 +572,11 @@ class Attachment < ActiveRecord::Base
     quota = 0
     quota_used = 0
     if context
-      quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
-      quota = context.quota if (context.respond_to?("quota") && context.quota)
-      quota_used = context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+        quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
+        quota = context.quota if (context.respond_to?("quota") && context.quota)
+        quota_used = context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
+      end
     end
     {:quota => quota, :quota_used => quota_used}
   end
