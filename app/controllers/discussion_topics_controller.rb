@@ -218,7 +218,7 @@ class DiscussionTopicsController < ApplicationController
               :DELETE_URL => named_context_url(@context, :api_v1_context_discussion_delete_reply_url, @topic, ':id'),
               :UPDATE_URL => named_context_url(@context, :api_v1_context_discussion_update_reply_url, @topic, ':id'),
               :MARK_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, @topic, ':id'),
-              :CURRENT_USER => { :id => @current_user.id, :display_name => @current_user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(@current_user.id)) },
+              :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
             }
