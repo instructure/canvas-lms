@@ -173,4 +173,17 @@ module QuizzesHelper
       match.sub(%r{(<option.*?value=['"]#{ERB::Util.h(a)}['"])}, '\\1 selected')
     end
   end
+
+  def duration_in_minutes(duration_seconds)
+    if duration_seconds < 60
+      duration_minutes = 0
+    else
+      duration_minutes = (duration_seconds / 60).round
+    end
+    t("#quizzes.helpers.duration_in_minutes",
+      { :zero => "less than 1 minute",
+        :one => "1 minute",
+        :other => "%{count} minutes" },
+      :count => duration_minutes)
+  end
 end

@@ -93,7 +93,7 @@
 </div>
 <% end %>
 <div class="quiz_duration" style="<%= hidden if @quiz.ungraded? %>">
-  <%= t(:attempt_duration, "This attempt took %{duration}.", :duration => time_ago_in_words(Time.now + @submission.duration)) %>
+  <%= t(:attempt_duration, "This attempt took %{duration}.", :duration => duration_in_minutes(@submission.duration)) %>
 </div>
 <% if @quiz.require_lockdown_browser && @quiz.require_lockdown_browser_for_results && !@lockdown_browser_authorized_to_view && !can_do(@quiz, @current_user, :grade) %>
 <p>
