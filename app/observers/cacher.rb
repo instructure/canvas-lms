@@ -5,6 +5,10 @@ class Cacher < ActiveRecord::Observer
     ['avatar_img', user_id, account_avatar_setting].cache_key
   end
 
+  def self.inline_avatar_cache_key(user_id, account_avatar_setting)
+    ['inline_avatar_img', user_id, account_avatar_setting].cache_key
+  end
+
   def after_update(obj)
     case obj
     when User
@@ -13,6 +17,7 @@ class Cacher < ActiveRecord::Observer
          obj.avatar_state_changed?
         User::AVATAR_SETTINGS.each do |avatar_setting|
           Rails.cache.delete(Cacher.avatar_cache_key(obj.id, avatar_setting))
+          Rails.cache.delete(Cacher.inline_avatar_cache_key(obj.id, avatar_setting))
         end
       end
     end

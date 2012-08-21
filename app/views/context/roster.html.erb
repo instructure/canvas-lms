@@ -54,7 +54,7 @@
           <tr class="user" id="user_<%= student.id %>">
             <td style="vertical-align: top;">
               <% if service_enabled?(:avatars) %>
-                <div class="avatar"><%= avatar(student.id, @context.asset_string, 30) %></div>
+                <div class="avatar"><%= avatar(student, @context.asset_string, 30) %></div>
               <% end %>
             </td>
             <td>
@@ -86,7 +86,7 @@
           <tr class="user" id="user_<%= teacher.id %>">
             <td style="vertical-align: top;">
               <% if service_enabled?(:avatars) %>
-                <div class="avatar"><%= avatar(teacher.id, @context.asset_string, 30) %></div>
+                <div class="avatar"><%= avatar(teacher, @context.asset_string, 30) %></div>
               <% end %>
             </td>
             <td>

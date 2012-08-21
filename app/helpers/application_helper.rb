@@ -149,17 +149,33 @@ module ApplicationHelper
     end
   end
 
-  def avatar_image(user_id, width=50)
+  def avatar_image(user_or_id, width=50)
+    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
+    user = user_or_id.is_a?(User) && user_or_id
     if session["reported_#{user_id}"]
       image_tag "messages/avatar-50.png"
     else
-      image_tag(avatar_image_url(User.avatar_key(user_id || 0), :bust => Time.now.to_i), :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px", :alt => '')
+      avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'
+      image_url, alt_tag = Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
+        if !user && user_id.to_i > 0
+          user = User.find(user_id)
+        end
+        if user
+          url = avatar_url_for_user(user)
+        else
+          url = "messages/avatar-50.png"
+        end
+        alt = user ? user.short_name : ''
+        [url, alt]
+      end
+      image_tag(image_url, :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px", :alt => alt_tag)
     end
   end
 
-  def avatar(user_id, context_code, height=50)
+  def avatar(user_or_id, context_code, width=50)
+    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     if service_enabled?(:avatars)
-      link_to(avatar_image(user_id, height), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
+      link_to(avatar_image(user_or_id, width), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
     end
   end
 
