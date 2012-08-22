@@ -29,10 +29,10 @@ describe "assignment rubrics" do
 
       f('.add_rubric_link').click
       set_value(f('.rubric_title input[name="title"]'), rubric_name)
-      criterion_points = find_with_jquery('.criterion_points:visible')
+      criterion_points = fj('.criterion_points:visible')
       set_value(criterion_points, initial_points)
       criterion_points.send_keys(:return)
-      driver.find_element(:id, 'grading_rubric').click
+      f('#grading_rubric').click
       wait_for_ajax_requests
       submit_form('#edit_rubric_form')
       wait_for_ajaximations
@@ -64,12 +64,12 @@ describe "assignment rubrics" do
       wait_for_ajax_requests
       full_rubric_button =
           keep_trying_until do
-            full_rubric_button = find_with_jquery('.toggle_full_rubric')
+            full_rubric_button = fj('.toggle_full_rubric')
             full_rubric_button.should be_displayed
             full_rubric_button
           end
       full_rubric_button.click
-      find_with_jquery('#rubric_holder .criterion:visible .rating').click
+      fj('#rubric_holder .criterion:visible .rating').click
       f('#rubric_holder .save_rubric_button').click
       wait_for_ajaximations
 
@@ -101,9 +101,9 @@ describe "assignment rubrics" do
       f("#full_assignment .points_possible").text.should == '2'
 
       f('.add_rubric_link').click
-      driver.find_element(:id, 'grading_rubric').click
+      f('#grading_rubric').click
       submit_form('#edit_rubric_form')
-      find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
+      fj('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
       wait_for_ajaximations
       f('#rubrics span .rubric_total').text.should == '5'
       f("#full_assignment .points_possible").text.should == '2'
@@ -116,9 +116,9 @@ describe "assignment rubrics" do
       f("#full_assignment .points_possible").text.should == '2'
 
       f('.add_rubric_link').click
-      driver.find_element(:id, 'grading_rubric').click
+      f('#grading_rubric').click
       submit_form('#edit_rubric_form')
-      find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Change")').click
+      fj('.ui-dialog-buttonset .ui-button:contains("Change")').click
       wait_for_ajaximations
 
       f('#rubrics span .rubric_total').text.should == '5'
@@ -162,7 +162,7 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
+      f("#rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
       f("#rubric_long_description_dialog div.displaying .long_description").
           text.should == "<b>This text should not be bold</b>"
       close_visible_dialog
@@ -172,7 +172,7 @@ describe "assignment rubrics" do
       f(".toggle_full_rubric").click
       wait_for_animations
       f('#criterion_1 .long_description_link').click
-      keep_trying_until { driver.find_element(:id, 'rubric_long_description_dialog').should be_displayed }
+      keep_trying_until { f('#rubric_long_description_dialog').should be_displayed }
       f("#rubric_long_description_dialog div.displaying .long_description").
           text.should == "<b>This text should not be bold</b>"
     end
@@ -203,8 +203,8 @@ describe "assignment rubrics" do
     def mark_rubric_for_grading(rubric, expect_confirmation)
       f("#rubric_#{rubric.id} .edit_rubric_link").click
       driver.switch_to.alert.accept if expect_confirmation
-      find_with_jquery(".grading_rubric_checkbox:visible").click
-      find_with_jquery(".save_button:visible").click
+      fj(".grading_rubric_checkbox:visible").click
+      fj(".save_button:visible").click
       wait_for_ajaximations
     end
 
