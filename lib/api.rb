@@ -280,7 +280,7 @@ module Api
                 element[att] = val
               end
             end
-          rescue URI::InvalidURIError => e
+          rescue URI::Error => e
             # leave it as is
           end
         end
