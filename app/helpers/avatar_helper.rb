@@ -22,11 +22,20 @@ module AvatarHelper
       "/images/blank.png" :
       "/images/messages/avatar-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
     )
-    if service_enabled?(:avatars)
+
+    url = if service_enabled?(:avatars)
       user.avatar_url(nil, (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'), default_avatar)
     else
       default_avatar
     end
+
+
+    if !url.match(%r{\Ahttps?://})
+      # make sure that the url is not just a path
+      url = "#{request.protocol}#{request.host_with_port}#{url}"
+    end
+
+    url
   end
 
   def blank_fallback
