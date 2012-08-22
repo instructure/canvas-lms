@@ -25,6 +25,15 @@ describe ContextController do
       get 'roster', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "should work when the context is a group in a course" do
+      course_with_student_logged_in(:active_all => true)
+      @group = @course.groups.create!
+      @group.add_user(@student, 'accepted')
+      get 'roster', :group_id => @group.id
+      assigns[:primary_users].each_value.first.collect(&:id).should == [@student.id]
+      assigns[:secondary_users].each_value.first.collect(&:id).should == [@teacher.id]
+    end
   end
 
   describe "GET 'roster_user'" do
