@@ -25,7 +25,7 @@
   <% end %>
   <% if show_user_create_course_button(@current_user) %>
   <div class="rs-margin-lr">
-    <a href="<%= getting_started_path(:fresh => 1) %>" class="button button-sidebar-wide"><%= t('start_new_course', 'Start a New Course') %></a>
+    <a href="<%= getting_started_path(:fresh => 1) %>" id="start_new_course" class="button button-sidebar-wide"><%= t('start_new_course', 'Start a New Course') %></a>
   </div>
   <% end %>
 <% end %>
