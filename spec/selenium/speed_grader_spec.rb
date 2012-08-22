@@ -72,6 +72,41 @@ describe "speed grader" do
     keep_trying_until { f('#grade_container input').attribute('value').should == expected_points }
   end
 
+  it "should properly display student quiz results when the teacher also has a student enrollment" do
+    student = student_in_course(:active_user => true).user
+    @course.enroll_student(@teacher).accept!
+
+    @assignment.points_possible = 10
+    @assignment.submission_types = 'online_quiz'
+    @assignment.title = 'Anonymous Graded Quiz'
+    @assignment.save!
+
+    q = Quiz.find_by_assignment_id(@assignment.id)
+    q.quiz_questions.create!(:quiz => q, :question_data => {
+      :position => 1,
+      :question_type => "true_false_question",
+      :points_possible => 3,
+      :question_name => "true false question" })
+    q.generate_quiz_data
+    q.workflow_state = 'available'
+    q.save!
+
+    [student, @teacher].each do |user|
+      q.generate_submission(student).tap do |qs|
+        qs.submission_data = { 'foo' => 'bar1' }
+        qs.grade_submission
+      end
+    end
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{student.id}%7D"
+    wait_for_ajaximations
+
+    in_frame('speedgrader_iframe') do
+      f('#content').text.should match(/User/)
+      f('#content').text.should_not match(/nobody@example.com/)
+    end
+  end
+
   it "should display discussion entries for only one student" do
     #make assignment a discussion assignment
     @assignment.points_possible = 5
