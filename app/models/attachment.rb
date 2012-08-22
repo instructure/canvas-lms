@@ -457,13 +457,11 @@ class Attachment < ActiveRecord::Base
     self.content_type = details['content-type']
     self.size = details['content-length']
 
-    if md5.present? && ns = infer_namespace
-      if existing_attachment = Attachment.find_all_by_md5_and_namespace(md5, ns).detect{|a| a.id != id && !a.root_attachment_id && a.content_type == content_type }
-        AWS::S3::S3Object.delete(full_filename, bucket_name) rescue nil
-        self.root_attachment = existing_attachment
-        write_attribute(:filename, nil)
-        clear_cached_urls
-      end
+    if existing_attachment = find_existing_attachment_for_md5
+      AWS::S3::S3Object.delete(full_filename, bucket_name) rescue nil
+      self.root_attachment = existing_attachment
+      write_attribute(:filename, nil)
+      clear_cached_urls
     end
 
     save!
@@ -572,9 +570,11 @@ class Attachment < ActiveRecord::Base
     quota = 0
     quota_used = 0
     if context
-      quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
-      quota = context.quota if (context.respond_to?("quota") && context.quota)
-      quota_used = context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+        quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
+        quota = context.quota if (context.respond_to?("quota") && context.quota)
+        quota_used = context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
+      end
     end
     {:quota => quota, :quota_used => quota_used}
   end

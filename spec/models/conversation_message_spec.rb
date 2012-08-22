@@ -262,4 +262,25 @@ describe ConversationMessage do
       m2.conversation.conversation_participants.all?(&:has_media_objects?).should be_true
     end
   end
+
+  describe "reply_from" do
+    it "should ignore replies on deleted accounts" do
+      course_with_teacher
+      student_in_course
+      conversation = @teacher.initiate_conversation([@user.id])
+      cm = conversation.add_message("initial message", :root_account_id => Account.default.id)
+
+      Account.default.destroy
+      cm.reload
+
+      cm2 = cm.reply_from({
+        :purpose => 'general',
+        :user => @teacher,
+        :subject => "an email reply",
+        :html => "body",
+        :text => "body"
+      })
+      cm2.should be_nil
+    end
+  end
 end

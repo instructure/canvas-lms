@@ -378,4 +378,15 @@ describe DiscussionEntry do
       read.should == [@root2, @reply1, @reply2, @reply_reply1, @reply3].map(&:id)
     end
   end
+
+  describe "reply_from" do
+    it "should ignore replies in deleted accounts" do
+      course_with_teacher
+      discussion_topic_model
+      root = @topic.reply_from(:user => @teacher, :text => "root entry")
+      Account.default.destroy
+      root.reload
+      root.reply_from(:user => @teacher, :text => "sub entry").should be_nil
+    end
+  end
 end

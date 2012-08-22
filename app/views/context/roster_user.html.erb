@@ -151,7 +151,7 @@
 <div style="margin-bottom: 10px;">&nbsp;</div>
 <% elsif service_enabled?(:avatars) %>
   <div style="margin-bottom: 20px;">
-    <span class="avatar_image"><img src="<%= @user.avatar_url(50, @domain_root_account && @domain_root_account.settings[:avatars], "http://#{request.host_with_port}/images/dotted_pic.png") %>"/></span>
+    <span class="avatar_image"><%= avatar_image(@user) %></span>
     <% if can_do(@user, @current_user, :remove_avatar) %>
       <a href="#" class="remove_avatar_picture_link"><%= t('links.remove_avatar', %{Remove avatar picture}) %></a>
     <% else %>

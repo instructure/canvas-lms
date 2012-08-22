@@ -2476,21 +2476,6 @@ class Course < ActiveRecord::Base
     self.respond_to?(:wiki_is_public) && self.wiki_is_public && !self.is_public
   end
 
-  def reply_from(opts)
-    user = opts[:user]
-    message = opts[:text].strip
-    user = nil unless user && self.context.users.include?(user)
-    if !user
-      raise "Only comment participants may reply to messages"
-    elsif !message || message.empty?
-      raise "Message body cannot be blank"
-    else
-      recipients = self.teachers.map(&:id) - [user.id]
-      conversation = user.initiate_conversation(recipients)
-      conversation.add_message(message, :root_account_id => root_account_id)
-    end
-  end
-
   def tab_configuration
     super.map {|h| h.with_indifferent_access } rescue []
   end
@@ -2553,10 +2538,12 @@ class Course < ActiveRecord::Base
   end
 
   def tabs_available(user=nil, opts={})
+    # make sure t() is called before we switch to the slave, in case we update the user's selected locale in the process
+    default_tabs = Course.default_tabs
+
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
       tabs = self.tab_configuration.compact
-      default_tabs = Course.default_tabs
       settings_tab = default_tabs[-1]
       external_tabs = external_tool_tabs(opts)
       tabs = tabs.map do |tab|
