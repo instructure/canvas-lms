@@ -400,6 +400,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def reply_from(opts)
+    return if self.context.root_account.deleted?
     user = opts[:user]
     if opts[:text]
       message = opts[:text].strip

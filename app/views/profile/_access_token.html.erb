@@ -16,6 +16,8 @@
     <a href="#" rel="<%= profile_token_url(access_token.try(:id) || "{{ id }}") %>" class="show_token_link"><%= t('links.token_details', "details") %></a>
   </td>
   <td class="links">
-    <a href="#" class="delete_key_link" rel="<%= profile_token_url(access_token.try(:id) || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><%= image_tag "delete.png" %></a>
+    <% unless @real_current_user %>
+      <a href="#" class="delete_key_link" rel="<%= profile_token_url(access_token.try(:id) || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><%= image_tag "delete.png" %></a>
+    <% end %>
   </td>
 </tr>

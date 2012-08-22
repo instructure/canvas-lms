@@ -2,8 +2,9 @@ define [
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
   'underscore'
+  'compiled/gradebook2/Turnitin'
   'jquery.ajaxJSON'
-], (GRADEBOOK_TRANSLATIONS, $, _) ->
+], (GRADEBOOK_TRANSLATIONS, $, _, {extractData}) ->
 
   class SubmissionCell
 
@@ -54,17 +55,21 @@ define [
 
     cellWrapper: (innerContents, options = {}) ->
       opts = $.extend({}, {
-        innerContents: '',
         classes: '',
         editable: true
       }, options)
       opts.submission ||= @opts.item[@opts.column.field]
       opts.assignment ||= @opts.column.object
       specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment)
-      tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
 
       opts.classes += ' no_grade_yet ' unless opts.submission.grade
       innerContents ?= if opts.submission?.submission_type then '<span class="submission_type_icon" />' else '-'
+
+      if turnitin = extractData(opts.submission)
+        specialClasses.push('turnitin')
+        innerContents += "<span class='gradebook-cell-turnitin #{turnitin.state}-score' />"
+
+      tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
 
       """
       #{ if tooltipText then '<div class="gradebook-tooltip">'+ tooltipText + '</div>' else ''}
@@ -79,7 +84,7 @@ define [
       classes.push('resubmitted') if submission.grade_matches_current_submission == false
       if assignment.due_at && submission.submitted_at
         classes.push('late') if submission.submission_type isnt 'online_quiz' && (submission.submitted_at.timestamp > assignment.due_at.timestamp)
-        classes.push('late') if submission.submission_type is 'online_quiz' && ((submission.submitted_at.timestamp - assignment.due_at.timestamp) > 30)
+        classes.push('late') if submission.submission_type is 'online_quiz' && ((submission.submitted_at.timestamp - assignment.due_at.timestamp) > 60)
       classes.push('dropped') if submission.drop
       classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
       classes.push('muted') if assignment.muted

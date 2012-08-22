@@ -217,7 +217,7 @@ Spec::Runner.configure do |config|
   def user(opts={})
     @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
-    @user.workflow_state = opts[:user_state] if opts[:user_state]
+    @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @user
   end
 
@@ -249,6 +249,7 @@ Spec::Runner.configure do |config|
   def pseudonym(user, opts={})
     @spec_pseudonym_count ||= 0
     username = opts[:username] || (@spec_pseudonym_count > 0 ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
+    opts[:username] ||= username
     @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
@@ -393,15 +394,16 @@ Spec::Runner.configure do |config|
   end
 
   def user_session(user, pseudonym=nil)
-    pseudonym ||= mock()
-    pseudonym.stubs(:record).returns(user)
-    pseudonym.stubs(:user_id).returns(user.id)
-    pseudonym.stubs(:user).returns(user)
-    pseudonym.stubs(:login_count).returns(1)
-    session = mock()
-    session.stubs(:record).returns(pseudonym)
-    session.stubs(:session_credentials).returns(nil)
-    session.stubs(:used_basic_auth?).returns(false)
+    unless pseudonym
+      pseudonym = stub(:record => user, :user_id => user.id, :user => user, :login_count => 1)
+      # at least one thing cares about the id of the pseudonym... using the
+      # object_id should make it unique (but obviously things will fail if
+      # it tries to load it from the db.)
+      pseudonym.stubs(:id).returns(pseudonym.object_id)
+    end
+
+    session = stub(:record => pseudonym, :session_credentials => nil, :used_basic_auth? => false)
+
     PseudonymSession.stubs(:find).returns(session)
   end
 
@@ -607,7 +609,7 @@ Spec::Runner.configure do |config|
 
   def assert_require_login
     response.should be_redirect
-    flash[:notice].should eql("You must be logged in to access this page")
+    flash[:warning].should eql("You must be logged in to access this page")
   end
 
   def default_uploaded_data
@@ -822,6 +824,30 @@ Spec::Runner.configure do |config|
     # now check payload
     post_lines[post_lines.index(""),-1].should ==
       expected_post_lines[expected_post_lines.index(""),-1]
+  end
+
+  class FakeHttpResponse
+    def initialize(code, body = nil, headers={})
+      @code = code
+      @body = body
+      @headers = headers
+    end
+
+    def read_body(io)
+      io << @body
+    end
+
+    def code
+      @code.to_s
+    end
+
+    def [](arg)
+      @headers[arg]
+    end
+
+    def content_type
+      self['content-type']
+    end
   end
 end
 

@@ -377,7 +377,7 @@ class Notification < ActiveRecord::Base
     case self.category
       when 'Submission Comment'
         setting = {:name => :no_submission_comments_inbox, :value => user.preferences[:no_submission_comments_inbox],
-                   :label => t(:submission_new_as_unread, 'Mark new submission comments as unread.')}
+                   :label => t(:submission_new_as_read, 'Mark new submission comments as read.')}
       when 'Grading'
         setting = {:name => :send_scores_in_emails, :value => user.preferences[:send_scores_in_emails],
                    :label => t(:grading_notify_include_grade, 'Include scores when alerting about grade changes.')}
@@ -612,7 +612,7 @@ class Notification < ActiveRecord::Base
     when 'Announcement'
       t(:announcement_description, "For new announcements")
     when 'Course Content'
-      t(:course_content_description, "For changes to course pages")
+      t(:course_content_description, "For changes to course pages and assignments")
     when 'Files'
       t(:files_description, "For new files")
     when 'Discussion'

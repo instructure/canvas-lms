@@ -19,6 +19,24 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ProfileController do
+  describe "show" do
+    it "should chain to settings when it's the same user" do
+      user
+      user_session(@user)
+
+      get 'show', :user_id => @user.id
+      response.should render_template('profile')
+    end
+
+    it "should require a password session when chaining to settings" do
+      user
+      user_session(@user)
+      session[:used_remember_me_token] = true
+
+      get 'show', :user_id => @user.id
+      response.should redirect_to(login_url)
+    end
+  end
 
   describe "update" do
     it "should allow changing the default e-mail address and nothing else" do
@@ -79,7 +97,8 @@ describe ProfileController do
     before do
       user_with_pseudonym
       @user.register
-      user_session(@user, @pseudonym)
+      # reload to catch the user change
+      user_session(@user, @pseudonym.reload)
     end
 
     it "should let you change your short_name and profile information" do
@@ -114,8 +133,8 @@ describe ProfileController do
     it "should let you set your profile links" do
       put 'update_profile',
         :user_profile => {:bio => '...'},
-        :link_urls => %w(example.com foo.com),
-        :link_titles => %w(Example.com Foo),
+        :link_urls => ['example.com', 'foo.com', ''],
+        :link_titles => ['Example.com', 'Foo', ''],
         :format => 'json'
       response.should be_success
 

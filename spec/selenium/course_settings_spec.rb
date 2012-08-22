@@ -7,6 +7,11 @@ describe "course settings" do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
   end
 
+  it "should show unused tabs to teachers" do
+    get "/courses/#{@course.id}/settings"
+    ff("#section-tabs .section.hidden").count.should > 0
+  end
+
   describe "course details" do
     def test_select_standard_for(context)
       grading_standard_for context
@@ -277,6 +282,49 @@ describe "course settings" do
       # expect
       obs.reload.not_ended_enrollments.count.should == 2
       obs.reload.not_ended_enrollments.map {|e| e.associated_user_id}.sort.should include(students[2].id)
+    end
+
+    it "should handle deleted observees" do
+      students = []
+      obs = user_model(:name => "The Observer")
+      student_in_course(:name => "Student 1", :active_all => true)
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      student_in_course(:name => "Student 2", :active_all => true)
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :allow_multiple_enrollments => true)
+
+      # bye bye Student 2
+      @enrollment.destroy
+
+      go_to_users_tab
+
+      observeds = ff("#user_#{obs.id} .enrollment_type")
+      observeds.length.should == 1
+      observeds.first.text.should include "Student 1"
+      observeds.first.text.should_not include "Student 2"
+
+      # dialog loads too
+      use_link_dialog(obs) do
+        input = fj("#link_students")
+        input.text.should include "Student 1"
+        input.text.should_not include "Student 2"
+      end
+    end
+
+    %w[ta designer].each do |et|
+      it "should not let #{et}s remove admins from the course" do
+        send "course_with_#{et}", :course => @course, :active_all => true
+        user_session @user
+        student_in_course :course => @course
+
+        go_to_users_tab
+
+        # should NOT see remove link for teacher
+        cog = open_kyle_menu @teacher
+        f('a[data-event="removeFromCourse"]', cog).should be_nil
+        # should see remove link for student
+        cog = open_kyle_menu @student
+        f('a[data-event="removeFromCourse"]', cog).should_not be_nil
+      end
     end
 
     it "should not show the student view student" do

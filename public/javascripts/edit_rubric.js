@@ -406,23 +406,21 @@ define([
         .fillFormData(data)
         .find(".editing").showIf(editing && !$criterion.hasClass('learning_outcome_criterion')).end()
         .find(".displaying").showIf(!editing || $criterion.hasClass('learning_outcome_criterion')).end()
-        .dialog('close').dialog({
-          autoOpen: false,
+        .dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
           width: 400
-        }).dialog('open')
+        })
         .find("textarea:visible:first").focus().select();
 
     })
     .delegate(".find_rubric_link", 'click', function(event) {
       event.preventDefault();
-      $rubric_dialog.dialog('close').dialog({
-        autoOpen: true,
+      $rubric_dialog.dialog({
         width: 800,
         height: 380,
         resizable: true,
         title: I18n.t('titles.find_existing_rubric', 'Find Existing Rubric')
-      }).dialog('open');
+      });
       if(!$rubric_dialog.hasClass('loaded')) {
         $rubric_dialog.find(".loading_message").text(I18n.t('messages.loading_rubric_groups', "Loading rubric groups..."));
         var url = $rubric_dialog.find(".grading_rubrics_url").attr('href');

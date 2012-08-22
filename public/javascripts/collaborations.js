@@ -88,11 +88,10 @@ define([
       var $collaboration = $(this).parents(".collaboration");
       if($(this).parents(".collaboration").hasClass('google_docs')) {
         $("#delete_collaboration_dialog").data('collaboration', $collaboration);
-        $("#delete_collaboration_dialog").dialog('close').dialog({
-          autoOpen: false,
+        $("#delete_collaboration_dialog").dialog({
           title: "Delete Collaboration?",
           width: 350
-        }).dialog('open');
+        });
       } else {
         $collaboration.confirmDelete({
           message: "Are you sure you want to delete this collaboration?",

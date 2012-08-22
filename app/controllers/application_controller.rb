@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include AuthenticationMethods
   protect_from_forgery
   before_filter :load_account, :load_user
+  before_filter :check_pending_otp
   before_filter :set_user_id_header
   before_filter :set_time_zone
   before_filter :clear_cached_contexts
@@ -153,6 +154,13 @@ class ApplicationController < ActionController::Base
     @domain_root_account
   end
 
+  def check_pending_otp
+    if session[:pending_otp] && !(params[:action] == 'otp_login' && request.method == :post)
+      reset_session
+      redirect_to login_url
+    end
+  end
+
   # used to generate context-specific urls without having to
   # check which type of context it is everywhere
   def named_context_url(context, name, *opts)
@@ -194,8 +202,18 @@ class ApplicationController < ActionController::Base
     end
     true
   end
-  
-  # checks the authorization policy for the given object using 
+
+  def require_password_session
+    if session[:used_remember_me_token]
+      flash[:warning] = t "#application.warnings.please_log_in", "For security purposes, please enter your password to continue"
+      store_location
+      redirect_to login_url
+      return false
+    end
+    true
+  end
+
+  # checks the authorization policy for the given object using
   # the vendor/plugins/adheres_to_policy plugin.  If authorized,
   # returns true, otherwise renders unauthorized messages and returns
   # false.  To be used as follows:
@@ -304,7 +322,7 @@ class ApplicationController < ActionController::Base
     unless @context
       if params[:course_id]
         @context = api_request? ?
-          api_find(Course, params[:course_id]) : Course.find(params[:course_id])
+          api_find(Course.active, params[:course_id]) : Course.active.find(params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && session[:enrollment_uuid_course_id] == @context.id
@@ -1291,79 +1309,14 @@ class ApplicationController < ActionController::Base
     add_crumb t('#crumbs.site_admin', "Site Admin"), url_for(Account.site_admin)
   end
 
-  def can_add_notes_to?(course)
-    course.enable_user_notes && course.grants_right?(@current_user, nil, :manage_user_notes)
-  end
-
-  ##
-  # Loads all the contexts the user belongs to into instance variable @contexts
-  # Used for TokenInput.coffee instances
-  def load_all_contexts
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user].cache_key, :expires_in => 10.minutes) do
-      contexts = {:courses => {}, :groups => {}, :sections => {}}
-
-      term_for_course = lambda do |course|
-        course.enrollment_term.default_term? ? nil : course.enrollment_term.name
-      end
-
-      @current_user.concluded_courses.each do |course|
-        contexts[:courses][course.id] = {
-          :id => course.id,
-          :url => course_url(course),
-          :name => course.name,
-          :type => :course,
-          :term => term_for_course.call(course),
-          :state => course.recently_ended? ? :recently_active : :inactive,
-          :can_add_notes => can_add_notes_to?(course)
-        }
-      end
-
-      @current_user.courses.each do |course|
-        contexts[:courses][course.id] = {
-          :id => course.id,
-          :url => course_url(course),
-          :name => course.name,
-          :type => :course,
-          :term => term_for_course.call(course),
-          :state => :active,
-          :can_add_notes => can_add_notes_to?(course)
-        }
-      end
-
-      section_ids = @current_user.enrollment_visibility[:section_user_counts].keys
-      CourseSection.find(:all, :conditions => {:id => section_ids}).each do |section|
-        contexts[:sections][section.id] = {
-          :id => section.id,
-          :name => section.name,
-          :type => :section,
-          :term => contexts[:courses][section.course_id][:term],
-          :state => contexts[:courses][section.course_id][:state],
-          :parent => {:course => section.course_id},
-          :context_name =>  contexts[:courses][section.course_id][:name]
-        }
-      end if section_ids.present?
-
-      @current_user.messageable_groups.each do |group|
-        contexts[:groups][group.id] = {
-          :id => group.id,
-          :name => group.name,
-          :type => :group,
-          :state => group.active? ? :active : :inactive,
-          :parent => group.context_type == 'Course' ? {:course => group.context.id} : nil,
-          :context_name => group.context.name,
-          :category => group.category
-        }
-      end
-
-      contexts
-    end
-  end
-
   def flash_notices
     @notices ||= begin
       notices = []
       if error = flash.delete(:error)
         notices << {:type => 'error', :content => error}
+      end
+      if warning = flash.delete(:warning)
+        notices << {:type => 'warning', :content => warning}
       end
       if notice = (flash[:html_notice] ? flash.delete(:html_notice).html_safe : flash.delete(:notice))
         notices << {:type => 'success', :content => notice}
@@ -1406,15 +1359,13 @@ class ApplicationController < ActionController::Base
     data
   end
 
-  FILTERED_PARAMETERS = [:password, :access_token, :api_key, :client_secret]
-  filter_parameter_logging *FILTERED_PARAMETERS
+  filter_parameter_logging *Canvas::LoggingFilter.filtered_parameters
 
   # filter out sensitive parameters in the query string as well when logging
   # the rails "Completed in XXms" line.
   # this is fixed in Rails 3.x
   def complete_request_uri
-    @@filtered_parameters_regex ||= %r{([?&](?:#{FILTERED_PARAMETERS.join('|')}))=[^&]+}
-    uri = request.request_uri.gsub(@@filtered_parameters_regex, '\1=[FILTERED]')
+    uri = Canvas::LoggingFilter.filter_uri(request.request_uri)
     "#{request.protocol}#{request.host}#{uri}"
   end
 end

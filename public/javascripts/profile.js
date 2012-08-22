@@ -27,7 +27,8 @@ define([
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData */,
-  'jqueryui/sortable' /* /\.sortable/ */
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'compiled/jquery.rails_flash_notifications'
 ], function(INST, I18n, $, BackoffPoller) {
 
   var $profile_table = $(".profile_table"),
@@ -97,12 +98,27 @@ define([
   $update_profile_form
     .attr('method', 'PUT')
     .formSubmit({
-      required: $update_profile_form.find('#user_name').length ? ['name'] : [],
+      required: ($update_profile_form.find('#user_name').length ? ['name'] : []),
       object_name: 'user',
       property_validations: {
         '=default_email_id': function(val, data) {
           if($("#default_email_id").length && (!val || val == "new")) {
             return I18n.t('please_select_an_option', "Please select an option");
+          }
+        },
+        'birthdate(1i)': function(val, data) {
+          if (!val && (data['birthdate(2i)'] || data['birthdate(3i)'])) {
+            return I18n.t('please_select_a_year', "Please select a year");
+          }
+        },
+        'birthdate(2i)': function(val, data) {
+          if (!val && (data['birthdate(1i)'] || data['birthdate(3i)'])) {
+            return I18n.t('please_select_a_month', "Please select a month");
+          }
+        },
+        'birthdate(3i)': function(val, data) {
+          if (!val && (data['birthdate(1i)'] || data['birthdate(2i)'])) {
+            return I18n.t('please_select_a_day', "Please select a day");
           }
         }
       },
@@ -153,10 +169,9 @@ define([
   
   $("#unregistered_services li.service").click(function(event) {
     event.preventDefault();
-    $("#" + $(this).attr('id') + "_dialog").dialog('close').dialog({
-      width: 350,
-      autoOpen: false
-    }).dialog('open');
+    $("#" + $(this).attr('id') + "_dialog").dialog({
+      width: 350
+    });
   });
   $(".create_user_service_form").formSubmit({
     object_name: 'user_service',
@@ -276,10 +291,9 @@ define([
     event.preventDefault();
     var $dialog = $("#token_details_dialog");
     var url = $(this).attr('rel');
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
+    $dialog.dialog({
       width: 600
-    }).dialog('open');
+    });
     var $token = $(this).parents(".access_token");
     $dialog.data('token', $token);
     $dialog.find(".loading_message").show().end()
@@ -483,12 +497,11 @@ define([
         $dialog.find(".profile_pic_list h3").text(I18n.t('errors.loading_images_failed', "Loading Images Failed, please try again"));
       });
     }
-    $("#profile_pic_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#profile_pic_dialog").dialog({
       title: I18n.t('titles.select_profile_pic', "Select Profile Pic"),
       width: 500,
       height: 300
-    }).dialog('open');
+    });
   });
   var checkImage = function() {
     var img = $(".profile_pic_link img")[0];
@@ -503,4 +516,13 @@ define([
     }
   };
   setTimeout(checkImage, 500);
+
+  $("#disable_mfa_link").click(function(event) {
+    var $disable_mfa_link = $(this);
+    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', null, function() {
+      $.flashMessage(I18n.t('notices.mfa_disabled', "Multi-factor authentication disabled"));
+      $disable_mfa_link.remove();
+    });
+    event.preventDefault();
+  });
 });

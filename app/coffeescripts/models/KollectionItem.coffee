@@ -2,8 +2,8 @@ define [
   'Backbone'
   'underscore'
   'vendor/jquery.ba-tinypubsub'
-  'compiled/models/Topic'
-], (Backbone, _, {subscribe}, Topic) ->
+  'compiled/models/DiscussionTopic'
+], (Backbone, _, {subscribe}, DiscussionTopic) ->
 
   class KollectionItem  extends Backbone.Model
 
@@ -23,7 +23,7 @@ define [
         "/api/v1/collections/items/#{encodeURIComponent(@id)}"
 
     initialize: ->
-      @commentTopic = new Topic
+      @commentTopic = new DiscussionTopic
       @commentTopic.url = => "/api/v1/collection_items/#{@id}/discussion_topics/self"
       _.each ['upvote', 'deupvote'], (action) =>
         subscribe "#{action}Item", (itemId) =>

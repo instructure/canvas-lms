@@ -21,6 +21,8 @@ define([
   'i18n!files',
   'jquery' /* jQuery, $ */,
   'str/htmlEscape',
+  'compiled/tinymce',
+  'tinymce.editor_box',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.doc_previews' /* loadDocPreview */,
@@ -153,8 +155,7 @@ define([
                 var $progress = $dialog.find(".progress");
                 $progress.css('margin', '10px');
                 $progress.progressbar();
-                $dialog.dialog('close').dialog({
-                  autoOpen: false,
+                $dialog.dialog({
                   title: I18n.t('titles.extracting', "Extracting Files into Folder"),
                   close: function() {
                     $dialog.data('closed', true);
@@ -162,7 +163,7 @@ define([
                       $dialog.detach();
                     }, 500);
                   }
-                }).dialog('open');
+                });
                 
                 var importFailed = function(errors) {
                   $dialog.text(I18n.t('errors.extracting', "There were errors extracting the zip file.  Please try again."));
@@ -267,11 +268,10 @@ define([
               duplicatesHtml += "<span class='duplicate_filename'>" + htmlEscape(data.duplicates[idx]) + "</span>";
             }
             $dialog.find(".duplicate_filenames").html(duplicatesHtml);
-            $dialog.dialog('close').dialog({
-              autoOpen: false,
+            $dialog.dialog({
               title: '',
               width: 500
-            }).dialog('open');
+            });
             $dialog.find("button").unbind('click');
             $dialog.find(".cancel_button").click(function() {
               on_cancel();
@@ -1327,10 +1327,9 @@ define([
       });
       $("#file_uploads_dialog_link").click(function(event) {
         event.preventDefault();
-        $("#file_uploads").dialog('close').dialog({
-          autoOpen: false,
+        $("#file_uploads").dialog({
           title: I18n.t('titles.file_uplaods_queue', "File Uploads Queue")
-        }).dialog('open');
+        });
       });
       setTimeout(function() {
         $files_structure.find(".folder > .text").droppable(files.droppable_options);
@@ -1723,11 +1722,10 @@ define([
         });
 
         $("#edit_collaboration_dialog .collaborator_list").empty().append($users);
-        $("#edit_collaboration_dialog").dialog('close').dialog({
-          autoOpen: false,
+        $("#edit_collaboration_dialog").dialog({
           title: I18n.t('titles.edit_collaboration', 'Edit Collaboration'),
           width: 500
-        }).dialog('open');
+        });
       });
       $("#collaborations_panel .add_collaboration_link").click(function(event) {
         event.preventDefault();
@@ -1749,11 +1747,10 @@ define([
           $(this).attr('id', $(this).attr('class'));
         });
         $("#edit_collaboration_dialog .collaborator_list").empty().append($users);
-        $("#edit_collaboration_dialog").dialog('close').dialog({
-          autoOpen: false,
+        $("#edit_collaboration_dialog").dialog({
           title: I18n.t('titles.add_collaboration', 'Add New Collaboration'),
           width: 500
-        }).dialog('open');
+        });
       });
       $("#folder_panel .download_zip").click(function(event) {
         event.preventDefault();
@@ -1806,11 +1803,30 @@ define([
         $dialog.find(".display_name").text(display_name);
         $dialog.find(".loading_message").text("Loading File Contents...").show().end()
           .find(".content").hide();
-        $dialog.dialog('close').dialog({
-          autoOpen: false,
+        $dialog.dialog({
           width: 600,
-          height: 410
-        }).dialog('open');
+          height: 410,
+          buttons: [
+            {
+              text: I18n.t('cancel', 'Cancel'),
+              click: function() {
+                $("#edit_content_dialog").dialog('close');
+              }
+            },
+            {
+              text: I18n.t('update_file', 'Update File'),
+              click: submitFile,
+              'class': 'btn-primary'
+            }
+          ],
+          close: function() {
+            var $textarea = $(this).find('textarea');
+            if ($textarea.data('tinyIsVisible')) {
+              $textarea.editorBox('toggle');
+              $textarea.data('tinyIsVisible', false);
+            }
+          }
+        });
         $.ajax({
           dataType: 'json',
           error: function() {
@@ -1818,22 +1834,46 @@ define([
           },
           success: function(data) {
             var body = data.body;
-            $dialog.find("textarea").val(body);
-            $dialog.find(".loading_message").hide().end()
-              .find(".content").show();
+            var $textarea = $dialog.find("textarea").val(body);
+            var inittedTiny = $textarea.data('rich_text');
+            var tinyIsVisible = $textarea.data('tinyIsVisible');
+            $textarea.css('width', '100%');
+            $dialog.find(".loading_message").hide().end().find(".content").show();
+            if ($item.hasClass('html')) {
+              $dialog.css('height', '380px');
+              $dialog.find('.switch_views').show().unbind('click').bind('click', function(event) {
+                event.preventDefault();
+                if (inittedTiny) {
+                  $textarea.editorBox('toggle');
+                  $textarea.data('tinyIsVisible', !tinyIsVisible);
+                } else {
+                  inittedTiny = true;
+                  setTimeout(function(){
+                    $dialog.find('.html_edit_warning').fadeIn();
+                  }, 250);
+                  $textarea.editorBox({
+                    tinyOptions: {
+                      valid_elements: '*[*]',
+                      extended_valid_elements: '*[*]',
+                      plugins: "autolink,instructure_external_tools,instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_equella,media,paste,table,inlinepopups"
+                    }
+                  });
+                  $textarea.data('tinyIsVisible', !tinyIsVisible);
+                }
+              });
+            }
             $dialog.find(".textarea").focus();
           },
           url: url.replace(/\/download/, "/contents")
         });
       });
-      $("#edit_content_dialog .cancel_button").click(function() {
-        $("#edit_content_dialog").dialog('close');
-      });
-      $("#edit_content_dialog .save_button").click(function() {
+      function submitFile() {
         var $dialog = $("#edit_content_dialog");
         $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.update_file', "Update File"));
         $dialog.find("button").attr('disabled', true).filter(".save_button").text(I18n.t('messages.updating_file', "Updating File..."));
         var context_string = files.currentItemData().context_string;
+        var $textarea = $dialog.find('textarea');
+        var content = $textarea.data('tinyIsVisible') ? $textarea.editorBox('get_code') : $textarea.val()
         $.ajaxFileUpload({
           url: $dialog.data('update_url'),
           method: 'PUT',
@@ -1843,7 +1883,7 @@ define([
               fake_file: true,
               name: $dialog.data('filename'),
               content_type: $dialog.data('content_type'),
-              content: $dialog.find("textarea").val()
+              content: content
             }
           },
           success: function(data) {
@@ -1855,7 +1895,7 @@ define([
             $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('errors.update_file_failed', "Updating File Failed, please try again"));
           }
         });
-      });
+      }
       $(".folder_item .preview_item_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2076,12 +2116,11 @@ define([
         });
         $form.find("#folder_just_hide,#attachment_just_hide").attr('checked', false).change();
         $form.find(".item_type").text(item_type);
-        $("#lock_item_dialog").dialog('close').dialog({
-          autoOpen: true,
+        $("#lock_item_dialog").dialog({
           modal: true,
           width: 350,
           title: item_type == 'folder' ? I18n.t('titles.lock_folder', "Lock Folder") : I18n.t('titles.lock_file', 'Lock File')
-        }).dialog('open');
+        });
       });
       $("#folder_just_hide,#attachment_just_hide").change(function() {
         $(this).parents("form").find(".full_lock").showIf(!$(this).attr('checked'));
@@ -2165,19 +2204,14 @@ define([
       setTimeout(function() {
         $(window).triggerHandler('resize');
         $("#file_swf").uploadify({
-          fileDataName: 'file',
-          uploader: '/flash/uploadify/uploadify.swf',
-          buttonText: 'testing',
-          folder: 'no_idea',
-          script: 's3_url',
-          scriptAccess: 'always',
+          fileObjName: 'file',
+          swf: '/flash/uploadify/uploadify.swf',
+          uploader: 's3_url',
           multi: true,
           auto: false,
-          sizeLimit: 10737418240,
-          simUploadLimit: 1,
+          fileSizeLimit: 10737418240,
           buttonText: "",
           hideButton: true,
-          wmode: 'transparent',
           width: 60,
           height: 22,
           cancelImg: '/images/blank.png',
@@ -2185,14 +2219,11 @@ define([
             $add_file_link.text(I18n.t('links.add_files', "Add Files")).triggerHandler('show');
           },
           onSelect: fileUpload.swfFileQueue,
-          onSelectOnce: fileUpload.swfFileQueueOnce,
           onCancel: fileUpload.swfCancel,
-          onClearQueue: fileUpload.swfQueueClear,
-          onError: fileUpload.swfFileError,
-          onOpen: fileUpload.swfFileOpen,
-          onProgress: fileUpload.swfFileProgress,
-          onComplete: fileUpload.swfFileComplete,
-          onAllComplete: fileUpload.swfQueueComplete
+          onUploadError: fileUpload.swfFileError,
+          onUploadStart: fileUpload.swfFileOpen,
+          onUploadProgress: fileUpload.swfFileProgress,
+          onUploadSuccess: fileUpload.swfFileSuccess
         });
       }, 1000);
     });
@@ -2297,7 +2328,7 @@ define([
     updateUploadCount: function() {
       fileUpload.ajaxUploadCount = fileUpload.queuedAjaxUploads.length;
       if(fileUpload.currentlyUploading) { fileUpload.ajaxUploadCount++; }
-      var count = (fileUpload.swfFiles.length + fileUpload.ajaxUploadCount);
+      var count = (fileUpload.swfPreQueued.length + fileUpload.swfFiles.length + fileUpload.ajaxUploadCount);
       var errorCount = $("#file_uploads .file_upload.errored:visible").length;
       if(count === 0 && errorCount == 0) {
         fileUpload.hideStatus();
@@ -2335,24 +2366,11 @@ define([
         this.debug(ex);
       }
     },
-    fileQueued: function(file) {
-      var $file = fileUpload.initFile(file);
-      $file.data('folder', files.currentItemData());
-      $file.find(".status").text(I18n.t('messages.queue', "Queued"));
-      fileUpload.updateSwfUploadCount(this.getStats().files_queued);
-    },
-    fileQueueError: function(file, error, message) {
-      var $file = fileUpload.initFile(file);
-      $file.find(".status").text(I18n.t('errors.failed', "Failed")).end()
-        .find(".cancel_upload_link").hide();
-      $file.append(message);
-    },
     swfPreQueued: [],
     swfQueuedAndPendingFiles: [],
     swfFiles: [],
     swfFileQueueOnce: function(event, data) {
       var queue = fileUpload.swfPreQueued;
-      fileUpload.swfPreQueued = [];
       var folder = files.currentItemData();
       var filenames = [];
       for (idx in queue) {
@@ -2364,25 +2382,28 @@ define([
             queue[idx].duplicate_handling = method;
           }
         },
+        fileUpload.swfFileQueueNext,
         function() {
           for (idx in queue) {
-            var file = queue[idx];
-            fileUpload.swfFileQueueReal(event, file.id, file);
-          }
-        },
-        function() {
-          for (idx in queue) {
-            $("#file_swf").uploadifyCancel(queue[idx].id);
+            $("#file_swf").uploadify('cancel', queue[idx].id);
           }
         }
       );
     },
-    swfFileQueue: function(event, id, file) {
-      file.id = id;
+    swfFileQueue: function(file) {
       fileUpload.swfPreQueued.push(file);
+      clearTimeout(fileUpload.swfFileQueueOnceTimeout);
+      fileUpload.swfFileQueueOnceTimeout = setTimeout(fileUpload.swfFileQueueOnce, 500);
     },
-    swfFileQueueReal: function(event, id, file) { //onSelect
-      file.id = id;
+    swfFileQueueNext: function() {
+      var file = fileUpload.swfPreQueued.shift();
+      if (file) {
+        fileUpload.swfFileQueueReal(file);
+      } else {
+        fileUpload.swfQueueComplete();
+      }
+    },
+    swfFileQueueReal: function(file) { //onSelect
       var $file = fileUpload.initFile(file);
       $file.data('folder', files.currentItemData());
       $file.find(".status").text(I18n.t('messages.queued', "Queued"));
@@ -2395,14 +2416,9 @@ define([
         'no_redirect': true,
         'attachment[duplicate_handling]': file.duplicate_handling
       };
-      $("#file_swf").uploadifySettings('folder', '' + folder.id);
       fileUpload.updateUploadCount();
       $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {
         file.upload_url = data.proxied_upload_url || data.upload_url;
-        // It seems that the swf uploader is unencoding some of these params, so we need
-        // to encode them now.
-        data.upload_params.key = encodeURIComponent(data.upload_params.key);
-        data.upload_params.Signature = encodeURIComponent(data.upload_params.Signature);
         file.upload_params = data.upload_params;
         $file.data('success_url', data.success_url);
         if(!$file.hasClass('done')) {
@@ -2416,7 +2432,7 @@ define([
           data.base :
           I18n.t('upload_error', 'There was an error uploading your file')
         );
-        $("#file_swf").uploadifyCancel(id);
+        $("#file_swf").uploadify('cancel', file.id);
         $file.find(".cancel_upload_link").hide().end()
           .find(".status").text("Upload Failed");
       }, {skipDefaultError: true});
@@ -2425,15 +2441,14 @@ define([
       if(fileUpload.swfQueuedAndPendingFiles.length > 0) {
         file = fileUpload.swfQueuedAndPendingFiles.shift();
         if(file) {
-          $("#file_swf").uploadifySettings('script', file.upload_url);
-          $("#file_swf").uploadifySettings('scriptData', file.upload_params);
-          $("#file_swf").uploadifyUpload(file.id);
+          $("#file_swf").uploadify('settings', 'uploader', file.upload_url);
+          $("#file_swf").uploadify('settings', 'formData', file.upload_params);
+          $("#file_swf").uploadify('upload', file.id);
         }
       }
       fileUpload.updateUploadCount();
     },
-    swfCancel: function(event, id, file, data) { // onCancel
-      file.id = id;
+    swfCancel: function(file) { // onCancel
       var $file = fileUpload.initFile(file);
       $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
       $file.addClass('done');
@@ -2442,56 +2457,54 @@ define([
           .find(".status").text("Canceled");
         fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
       }
-      fileUpload.swfUploadNext();
-      return false;
+      //fileUpload.swfUploadNext();
+      //return false;
     },
-    swfQueueClear: function(event, data) { // onClearQueue
-    },
-    swfFileError: function(event, id, file, error, cancelable) { // onError
+    swfFileError: function(file, errorCode, errorMsg, errorString, cancelable) { // onUploadError
       cancelable = typeof(cancelable) != 'undefined' ? cancelable : true;
-      file.id = id;
+      if (errorCode == SWFUpload.UPLOAD_ERROR.HTTP_ERROR && errorMsg == "201") {
+        // As of Chrome 21 on Windows, uploadify seems to be calling the error callback when
+        // the upload succeeds. Luckily we can see the success in the error code here and
+        // intercept it.
+        fileUpload.s3Success(file);
+        return;
+      }
       var $file = fileUpload.initFile(file);
       setTimeout(function() {
         $file.addClass('error_cancelled');
-        if(cancelable) $("#file_swf").uploadifyCancel(id);
+        //if(cancelable) $("#file_swf").uploadify('cancel', file.id, true); //TODO: always suppress?
       }, 50);
       fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
       $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
       fileUpload.showStatus();
       $file.find(".cancel_upload_link").hide().end()
-        .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info}", {error_info: error.info}));
+        .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info}", {error_info: errorString}));
       $file.addClass('done').addClass('errored');
-      fileUpload.swfUploadNext();
-      return false;
+      fileUpload.swfFileQueueNext();
     },
-    swfFileOpen: function(event, id, file) { // onOpen
-      file.id = id;
+    swfFileOpen: function(file) { // onUploadStart
       var $file = fileUpload.initFile(file);
-      if(file.upload_url) $("#file_swf").uploadifySettings('script', file.upload_url);
-      if(file.upload_params) $("#file_swf").uploadifySettings('scriptData', file.upload_params);
+      if(file.upload_url) $("#file_swf").uploadify('settings', 'uploader', file.upload_url);
+      if(file.upload_params) $("#file_swf").uploadify('settings', 'formData', file.upload_params);
       fileUpload.swfQueuedAndPendingFiles = $.grep(fileUpload.swfQueuedAndPendingFiles, function(f) { return f.id != file.id; });
       $file.find(".progress_bar").progressbar('value', 1);
       $file.find(".status").text(I18n.t('messages.uploading', "Uploading"));
     },
-    swfFileProgress: function(event, id, file, data) { // onProgress
-      file.id = id;
+    swfFileProgress: function(file, bytesUploaded, bytesTotal, totalBytesUploaded, totalBytesTotal) { // onUploadProgress
       var $file = fileUpload.initFile(file);
-      $file.find(".status").text(I18n.t('messages.uploading_with_speed', "Uploading (%{speed}KB/s)", {speed: parseInt(data.speed, 10)}));
-      $file.find(".cancel_upload_link").showIf(data.percentage < 100);
-      $file.find(".progress_bar").progressbar('value', data.percentage);
+      $file.find(".status").text(I18n.t('messages.uploading', "Uploading"));
+      $file.find(".cancel_upload_link").showIf(totalBytesUploaded < totalBytesTotal);
+      $file.find(".progress_bar").progressbar('value', 100 * totalBytesUploaded / totalBytesTotal);
     },
-    swfFileComplete: function(event, id, file, response, data) { // onComplete
-      file.id = id;
+    s3Success: function(file) {
       var $file = fileUpload.initFile(file);
-      if(response.indexOf("<PostResponse>") >= 0) {
-        // we just got back XML stuff from S3. do the s3 success url
         $file.find(".status").text(I18n.t('messages.finalizing', "Finalizing"));
         var errored = function() {
-          fileUpload.swfFileError({}, file.id, file, {type: "server", info: I18n.t('errors.unexpected_response', "didn't get back expected response")});
+          fileUpload.swfFileError(file, '', '', I18n.t('errors.unexpected_response', "didn't get back expected response"));
         };
         $.ajaxJSON($file.data('success_url'), 'GET', {}, function(data) {
           if(data && data.attachment) {
-            fileUpload.swfFileComplete({}, file.id, file, JSON.stringify(data), {});
+            fileUpload.swfFileSuccess(file, JSON.stringify(data), true);
             if (data.deleted_attachment_ids) {
               files.deleteAttachmentIds(data.deleted_attachment_ids);
             }
@@ -2499,8 +2512,14 @@ define([
             errored();
           }
         }, errored);
+    },
+    swfFileSuccess: function(file, data, response) { // onUploadSuccess
+      if(data.indexOf("<PostResponse>") >= 0) {
+        // we just got back XML stuff from S3. that means success (?)
+        fileUpload.s3Success(file);
         return;
       }
+      var $file = fileUpload.initFile(file);
       fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
       $file.find(".status").text(I18n.t('messages.upload_complete', "Done uploading"));
       $file.find(".cancel_upload_link").remove();
@@ -2512,11 +2531,12 @@ define([
           $file.remove();
         });
       }, 5000);
-      if(response) {
+      if(data) {
         try {
-          var data = $.parseJSON(response);
+          data = $.parseJSON(data);
           if("errors" in data && !jQuery.isEmptyObject(data["errors"])) {
-            fileUpload.swfFileError(event, id, file, {type: "server", info: JSON.stringify(data["errors"])}, false);
+            fileUpload.swfFileError(file, '', '', JSON.stringify(data["errors"]), false);
+            return;
           } else {
             data.swf = true;
             setTimeout(function() {
@@ -2527,14 +2547,15 @@ define([
             }, 500);
           }
         } catch(e) {
-          fileUpload.swfFileError(event, id, file, {type: "JS", info: e.toString()}, false);
+          fileUpload.swfFileError(file, '', '', e.toString(), false);
+          return;
         }
       } else {
         $file.find(".status").text(I18n.t('warnings.file_uploaded_without_response', "File may have uploaded, but the server failed to respond.  Reload the page to confirm."));
       }
-      fileUpload.swfUploadNext();
+      fileUpload.swfFileQueueNext();
     },
-    swfQueueComplete: function(event, data) { // onAllComplete
+    swfQueueComplete: function() {
       fileUpload.updateUploadCount();
     },
     initFile: function(file) {
@@ -2558,7 +2579,7 @@ define([
         $file.find(".cancel_upload_link").click(function(event) {
           event.preventDefault();
           var id = ($(this).parents(".file_upload").attr('id') || "").substring(12);
-          $("#file_swf").uploadifyCancel(file.id);
+          $("#file_swf").uploadify('cancel', file.id);
         });
       }
       $file.find(".file_name").text(file.name);

@@ -107,7 +107,7 @@ describe ApplicationHelper do
 
     context "with no custom css" do
       it "should be empty" do
-        include_account_css.should be_empty
+        include_account_css.should be_nil
       end
     end
 
@@ -170,6 +170,7 @@ describe ApplicationHelper do
 
         @sub_account1 = account_model(:root_account => @domain_root_account)
         @sub_account1.settings = @sub_account1.settings.merge({ :global_stylesheet => '/path/to/sub1/css' })
+        @sub_account1.settings = @sub_account1.settings.merge({ :sub_account_includes => true })
         @sub_account1.save!
 
         @sub_account2 = account_model(:root_account => @domain_root_account)
@@ -230,6 +231,32 @@ describe ApplicationHelper do
         output.should have_tag 'link'
         output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/']]
       end
+
+      it "should include multiple levesl of sub-account css in the right order for course page" do
+        @sub_sub_account1 = account_model(:parent_account => @sub_account1, :root_account => @domain_root_account)
+        @sub_sub_account1.settings = @sub_sub_account1.settings.merge({ :global_stylesheet => '/path/to/subsub1/css' })
+        @sub_sub_account1.save!
+
+        @context = @sub_sub_account1.courses.create!
+        output = include_account_css
+        output.should have_tag 'link'
+        output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
+      end
+
+      it "should include multiple levesl of sub-account css in the right order" do
+        @sub_sub_account1 = account_model(:parent_account => @sub_account1, :root_account => @domain_root_account)
+        @sub_sub_account1.settings = @sub_sub_account1.settings.merge({ :global_stylesheet => '/path/to/subsub1/css' })
+        @sub_sub_account1.save!
+
+        @course = @sub_sub_account1.courses.create!
+        @course.offer!
+        student_in_course(:active_all => true)
+        @context = @user
+        @current_user = @user
+        output = include_account_css
+        output.should have_tag 'link'
+        output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
+      end
     end
   end
 
@@ -266,21 +293,7 @@ describe ApplicationHelper do
         output.should match %r{/path/to/js}
       end
 
-      it "should include both site admin and account javascript" do
-        @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
-        @domain_root_account.settings = @domain_root_account.settings.merge({ :global_javascript => '/path/to/js' })
-        @domain_root_account.save!
-
-        @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
-        @site_admin.settings = @site_admin.settings.merge({ :global_javascript => '/path/to/js' })
-        @site_admin.save!
-
-        output = include_account_js
-        output.should have_tag 'script'
-        output.scan(%r{/path/to/js}).length.should eql 2
-      end
-
-      it "should include site admin javascript first" do
+      it "should include both site admin and root account javascript, site admin first" do
         @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
         @domain_root_account.settings = @domain_root_account.settings.merge({ :global_javascript => '/path/to/root/js' })
         @domain_root_account.save!
@@ -290,8 +303,25 @@ describe ApplicationHelper do
         @site_admin.save!
 
         output = include_account_js
+        output.should have_tag 'script'
         output.scan(%r{/path/to/(admin/|root/)?js}).should eql [['admin/'], ['root/']]
       end
+    end
+  end
+
+  context "global_includes" do
+    it "should only compute includes once, with includes" do
+      @site_admin = Account.site_admin
+      @site_admin.expects(:global_includes_hash).once.returns({:css => "/path/to/css", :js => "/path/to/js"})
+      include_account_css.should match %r{/path/to/css}
+      include_account_js.should match %r{/path/to/js}
+    end
+
+    it "should only compute includes once, with includes" do
+      @site_admin = Account.site_admin
+      @site_admin.expects(:global_includes_hash).once.returns(nil)
+      include_account_css.should be_nil
+      include_account_js.should be_nil
     end
   end
 
@@ -344,6 +374,34 @@ describe ApplicationHelper do
       collection[1].reload
       key3 = collection_cache_key(collection)
       key1.should_not == key3
+    end
+  end
+
+  describe "avatar_image" do
+    before do
+      user_model(:short_name => 'test guy')
+    end
+
+    it "should accept a user id" do
+      self.expects(:avatar_url_for_user).with(@user).returns("http://www.example.com/test/url")
+      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(@user)).children.first
+      img['alt'].should == 'test guy'
+      img['src'].should == "http://www.example.com/test/url"
+      img['style'].should match %r"width: 50px"
+    end
+
+    it "should short-circuit user id 0" do
+      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(0)).children.first
+      img['alt'].should == ''
+      img['src'].should match %r"/images/messages/avatar-50.png"
+    end
+
+    it "should accept a user" do
+      self.expects(:avatar_url_for_user).with(@user).returns("http://www.example.com/test/url")
+      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(@user, 30)).children.first
+      img['alt'].should == 'test guy'
+      img['src'].should == "http://www.example.com/test/url"
+      img['style'].should match %r"width: 30px"
     end
   end
 end

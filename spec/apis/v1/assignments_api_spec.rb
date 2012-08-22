@@ -254,7 +254,9 @@ describe AssignmentsApiController, :type => :integration do
           { :controller => 'assignments_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
             :id => @assignment.id.to_s, })
+
     json['discussion_topic'].should == {
+      'author' => {},
       'id' => @topic.id,
       'title' => 'assignment1',
       'message' => nil,
@@ -266,14 +268,16 @@ describe AssignmentsApiController, :type => :integration do
       'delayed_post_at' => nil,
       'user_name' => @topic.user_name,
       'topic_children' => [],
+      'locked' => false,
       'root_topic_id' => @topic.root_topic_id,
       'podcast_url' => nil,
+      'podcast_has_student_posts' => nil,
       'read_state' => 'unread',
       'unread_count' => 0,
       'url' => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
       'html_url' => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
       'attachments' => [],
-      'permissions' => { 'attach' => true },
+      'permissions' => {'delete' => true, 'attach' => true, 'update' => true},
       'discussion_type' => 'side_comment',
     }
   end
@@ -322,5 +326,16 @@ describe AssignmentsApiController, :type => :integration do
           { :controller => 'assignments', :action => 'destroy',
             :format => 'json', :course_id => @course.id.to_s, :id => @a.to_param })
     @a.reload.should be_deleted
+  end
+
+  it "should api translate assignment descriptions" do
+    course_with_teacher(:active_all => true)
+    should_translate_user_content(@course) do |content|
+      assignment = @course.assignments.create!(:description => content)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                      :controller => 'assignments_api', :action => 'show', :format => 'json',
+                      :course_id => @course.id.to_s, :id => assignment.id.to_s)
+      json['description']
+    end
   end
 end

@@ -2,6 +2,7 @@ define [
   'i18n!submission_details_dialog'
   'jquery'
   'jst/SubmissionDetailsDialog'
+  'compiled/gradebook2/Turnitin'
   'jst/_submission_detail' # a partial needed by the SubmissionDetailsDialog template
   'jst/_turnitinScore' # a partial needed by the submission_detail partial
   'jquery.ajaxJSON'
@@ -10,7 +11,7 @@ define [
   'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
-], (I18n, $, submissionDetailsDialog) ->
+], (I18n, $, submissionDetailsDialog, {extractDataFor}) ->
 
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
@@ -52,20 +53,14 @@ define [
       @submission.moreThanOneSubmission = @submission.submission_history.length > 1
       @submission.loading = false
       for submission in @submission.submission_history
-        submission["submission_type_is#{submission.submission_type}"] = true
         submission.submissionWasLate = @assignment.due_at && new Date(@assignment.due_at) > new Date(submission.submitted_at)
         for comment in submission.submission_comments || []
           comment.url = "#{@options.context_url}/users/#{comment.author_id}"
           urlPrefix = "#{location.protocol}//#{location.host}"
           comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}?fallback=#{encodeURIComponent(urlPrefix+'/images/messages/avatar-50.png')}"
+        submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
-          if turnitinDataForThisAttachment = submission.turnitin_data?["attachment_#{attachment.id}"]
-            if turnitinDataForThisAttachment["similarity_score"]
-              attachment.turnitin_data = turnitinDataForThisAttachment
-              attachment.turnitin_data.state = "#{turnitinDataForThisAttachment.state || 'no'}_score"
-              attachment.turnitin_data.score = "#{turnitinDataForThisAttachment.similarity_score}%"
-              attachment.turnitin_data.reportUrl = "#{@options.context_url}/assignments/#{@assignment.id}/submissions/#{@student.id}/turnitin/attachment_#{attachment.id}"
-              attachment.turnitin_data.tooltip = I18n.t('turnitin.tooltip.score', 'Turnitin Similarity Score - See detailed report')
+          attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()

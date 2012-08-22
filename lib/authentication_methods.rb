@@ -53,7 +53,7 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_access_token
-    return unless api_request?
+    return unless api_request? || params[:action] == 'oauth2_logout'
 
     auth_header = ActionController::HttpAuthentication::Basic.authorization(request)
     token_string = if auth_header.present? && (header_parts = auth_header.split(' ', 2)) && header_parts[0] == 'Bearer'
@@ -209,7 +209,7 @@ module AuthenticationMethods
       else
         format.html {
           store_location
-          flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
+          flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
           opts = {}
           opts[:canvas_login] = 1 if params[:canvas_login]
           redirect_to login_url(opts) # should this have :no_auto => 'true' ?
@@ -230,7 +230,7 @@ module AuthenticationMethods
   end
 
   def reset_session_for_login
-    reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user_id)
+    reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user_id, :masquerade_return_to)
   end
 
   def initiate_delegated_login(current_host=nil)
@@ -251,7 +251,7 @@ module AuthenticationMethods
     reset_session_for_login
     config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
     cas_client ||= CASClient::Client.new(config)
-    delegated_auth_redirect(cas_client.add_service_to_login_url(login_url))
+    delegated_auth_redirect(cas_client.add_service_to_login_url(cas_login_url))
   end
 
   def initiate_saml_login(current_host=nil)

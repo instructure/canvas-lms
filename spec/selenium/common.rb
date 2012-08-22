@@ -599,7 +599,7 @@ shared_examples_for "all selenium tests" do
   end
 
   def hover_and_click(element_jquery_finder)
-    find_with_jquery(element_jquery_finder.to_s).should be_present
+    fj(element_jquery_finder.to_s).should be_present
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
   end
 
@@ -629,19 +629,19 @@ shared_examples_for "all selenium tests" do
   end
 
   def click_option(select_css, option_text, select_by = :text)
-    element = find_with_jquery(select_css)
+    element = fj(select_css)
     select = Selenium::WebDriver::Support::Select.new(element)
     select.select_by(select_by, option_text)
   end
 
   def close_visible_dialog
-    visible_dialog_element = find_with_jquery('.ui-dialog:visible')
+    visible_dialog_element = fj('.ui-dialog:visible')
     visible_dialog_element.find_element(:css, '.ui-dialog-titlebar-close').click
     visible_dialog_element.should_not be_displayed
   end
 
   def element_exists(css_selector)
-    !find_all_with_jquery(css_selector).empty?
+    !ffj(css_selector).empty?
   end
 
   def first_selected_option(select_element)
@@ -651,22 +651,21 @@ shared_examples_for "all selenium tests" do
   end
 
   def datepicker_prev(day_text = '15')
-    datepicker = driver.find_element(:css, '#ui-datepicker-div')
+    datepicker = f('#ui-datepicker-div')
     datepicker.find_element(:css, '.ui-datepicker-prev').click
-    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
+    fj("#ui-datepicker-div a:contains(#{day_text})").click
     datepicker
   end
 
   def datepicker_next(day_text = '15')
-    datepicker = driver.find_element(:css, '#ui-datepicker-div')
+    datepicker = f('#ui-datepicker-div')
     datepicker.find_element(:css, '.ui-datepicker-next').click
-    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
+    fj("#ui-datepicker-div a:contains(#{day_text})").click
     datepicker
   end
 
   def datepicker_current(day_text = '15')
-    datepicker = driver.find_element(:css, '#ui-datepicker-div')
-    find_with_jquery("#ui-datepicker-div a:contains(#{day_text})").click
+    fj("#ui-datepicker-div a:contains(#{day_text})").click
   end
 
   def stub_kaltura
@@ -762,6 +761,14 @@ shared_examples_for "all selenium tests" do
   def assert_flash_notice_message(okay_message_regex)
     keep_trying_until do
       text = f("#flash_message_holder .ui-state-success").text rescue ''
+      raise "server error" if text =~ /The last request didn't work out/
+      text =~ okay_message_regex
+    end
+  end
+
+  def assert_flash_warning_message(okay_message_regex)
+    keep_trying_until do
+      text = f("#flash_message_holder .ui-state-warning").text rescue ''
       raise "server error" if text =~ /The last request didn't work out/
       text =~ okay_message_regex
     end
@@ -914,7 +921,7 @@ end
   def validate_link(link_element, breadcrumb_text)
     expect_new_page_load { link_element.click }
     if breadcrumb_text != nil
-      breadcrumb = driver.find_element(:id, 'breadcrumbs')
+      breadcrumb = f('#breadcrumbs')
       breadcrumb.should include_text(breadcrumb_text)
     end
     driver.execute_script("return INST.errorCount;").should == 0

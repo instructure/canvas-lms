@@ -147,5 +147,101 @@ describe UserContent, :type => :integration do
       "invalid%20url",
     ]
   end
-end
 
+  context "data api endpoints" do
+    context "course context" do
+      it "should process links to each type of object" do
+        course_with_teacher(:active_all => true)
+        @wiki_page = @course.wiki.wiki_page
+        @wiki_page.body = <<-HTML
+        <p>
+          <a href='/courses/#{@course.id}/assignments'>assignments index</a>
+          <a href='/courses/#{@course.id}/assignments/9~123'>assignment</a>
+          <a href='/courses/#{@course.id}/wiki'>wiki index</a>
+          <a href='/courses/#{@course.id}/wiki/test-wiki-page'>wiki page</a>
+          <a href='/courses/#{@course.id}/discussion_topics'>discussion index</a>
+          <a href='/courses/#{@course.id}/discussion_topics/456'>discussion topic</a>
+          <a href='/courses/#{@course.id}/files'>files index</a>
+          <a href='/courses/#{@course.id}/files/789/download?verifier=lolcats'>files index</a>
+          <a href='/files/789/download?verifier=lolcats'>file</a>
+        </p>
+        HTML
+        @wiki_page.workflow_state = 'active'
+        @wiki_page.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
+                        { :controller => 'wiki_pages', :action => 'api_show',
+                          :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
+        doc = Nokogiri::HTML::DocumentFragment.parse(json['body'])
+        doc.css('a').collect { |att| att['data-api-endpoint'] }.should == [
+          "http://www.example.com/api/v1/courses/#{@course.id}/assignments",
+          "http://www.example.com/api/v1/courses/#{@course.id}/assignments/9~123",
+          "http://www.example.com/api/v1/courses/#{@course.id}/pages",
+          "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page",
+          "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics",
+          "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/456",
+          "http://www.example.com/api/v1/courses/#{@course.id}/folders/root",
+          "http://www.example.com/api/v1/files/789",
+          "http://www.example.com/api/v1/files/789"
+        ]
+        doc.css('a').collect { |att| att['data-api-returntype'] }.should ==
+            %w([Assignment] Assignment [Page] Page [Discussion] Discussion Folder File File)
+      end
+    end
+
+    context "group context" do
+      it "should process links to each type of object" do
+        group_with_user(:active_all => true)
+        @wiki_page = @group.wiki.wiki_page
+        @wiki_page.body = <<-HTML
+        <p>
+          <a href='/groups/#{@group.id}/wiki'>wiki index</a>
+          <a href='/groups/#{@group.id}/wiki/some-page'>wiki page</a>
+          <a href='/groups/#{@group.id}/discussion_topics'>discussion index</a>
+          <a href='/groups/#{@group.id}/discussion_topics/1~123'>discussion topic</a>
+          <a href='/groups/#{@group.id}/files'>files index</a>
+          <a href='/groups/#{@group.id}/files/789/preview'>file</a>
+        </p>
+        HTML
+        @wiki_page.workflow_state = 'active'
+        @wiki_page.save!
+
+        json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@wiki_page.url}",
+                        { :controller => 'wiki_pages', :action => 'api_show',
+                          :format => 'json', :group_id => @group.id.to_s, :url => @wiki_page.url })
+        doc = Nokogiri::HTML::DocumentFragment.parse(json['body'])
+        doc.css('a').collect { |att| att['data-api-endpoint'] }.should == [
+            "http://www.example.com/api/v1/groups/#{@group.id}/pages",
+            "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
+            "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics",
+            "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics/1~123",
+            "http://www.example.com/api/v1/groups/#{@group.id}/folders/root",
+            "http://www.example.com/api/v1/files/789"
+        ]
+        doc.css('a').collect{ |att| att['data-api-returntype'] }.should ==
+            %w([Page] Page [Discussion] Discussion Folder File)
+      end
+    end
+
+    context "user context" do
+      it "should process links to each type of object" do
+        course_with_teacher(:active_all => true)
+        @topic = @course.discussion_topics.create!(:message => <<-HTML)
+            <a href='/users/#{@teacher.id}/files'>file index</a>
+            <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
+        HTML
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
+                        :course_id => @course.id.to_s, :topic_id => @topic.id.to_s)
+        doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
+        doc.css('a').collect { |att| att['data-api-endpoint'] }.should == [
+          "http://www.example.com/api/v1/users/#{@teacher.id}/folders/root",
+          "http://www.example.com/api/v1/files/789"
+        ]
+        doc.css('a').collect { |att| att['data-api-returntype'] }.should ==
+            %w(Folder File)
+      end
+    end
+  end
+end

@@ -26,11 +26,19 @@
 #       "content-type":"text/plain",
 #       "url":"http://www.example.com/files/569/download?download_frd=1\u0026verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
 #       "id":569,
-#       "display_name":"file.txt"
+#       "display_name":"file.txt",
+#       "created_at':"2012-07-06T14:58:50Z",
+#       "updated_at':"2012-07-06T14:58:50Z",
+#       "unlock_at':null,
+#       "locked':false,
+#       "hidden':false,
+#       "lock_at':null,
+#       "locked_for_user":false,
+#       "hidden_for_user":false
 #     }
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update]
+  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
   skip_before_filter :verify_authenticity_token, :only => :api_create
@@ -101,16 +109,9 @@ class FilesController < ApplicationController
   # @API List files
   # Returns the paginated list of files for the folder.
   #
-  # @argument sort_by Either 'alphabetical' (default) or 'position'
-  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files' \ 
-  #         -H 'Authorization: Bearer <token>'
-  #
-  # @example_request
-  #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files?sort_by=position' \ 
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns [File]
@@ -129,7 +130,8 @@ class FilesController < ApplicationController
         scope = scope.by_display_name
       end
       @files = Api.paginate(scope, self, api_v1_list_files_url(@folder))
-      render :json => attachments_json(@files)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+      render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files)
     end
   end
 
@@ -221,7 +223,7 @@ class FilesController < ApplicationController
     @attachment = Attachment.find(params[:id])
     raise ActiveRecord::RecordNotFound if @attachment.deleted?
     if authorized_action(@attachment,@current_user,:read)
-      render :json => attachment_json(@attachment)
+      render :json => attachment_json(@attachment, @current_user)
     end
   end
   
@@ -306,8 +308,6 @@ class FilesController < ApplicationController
           )
           options[:methods] = :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
           log_asset_access(@attachment, "files", "files")
-        else
-          @attachment.scribd_doc = nil
         end
       end
       format.json { render :json => @attachment.to_json(options) }
@@ -561,7 +561,18 @@ class FilesController < ApplicationController
       @attachment.save!
     end
     @attachment.handle_duplicates(duplicate_handling)
-    render :json => attachment_json(@attachment)
+    render :json => attachment_json(@attachment, @current_user)
+  end
+
+  def api_file_status
+    @attachment = Attachment.find_by_id_and_uuid!(params[:id], params[:uuid])
+    if @attachment.file_state == 'available'
+      render :json => { :upload_status => 'ready', :attachment => attachment_json(@attachment, @current_user) }
+    elsif @attachment.file_state == 'deleted'
+      render :json => { :upload_status => 'pending' }
+    else
+      render :json => { :upload_status => 'errored', :message => @attachment.upload_error_message }
+    end
   end
   
   def create
@@ -723,7 +734,7 @@ class FilesController < ApplicationController
 
       @attachment.attributes = process_attachment_params(params)
       if @attachment.save
-        render :json => attachment_json(@attachment)
+        render :json => attachment_json(@attachment, @current_user)
       else
         render :json => @attachment.errors.to_json, :status => :bad_request
       end
@@ -757,7 +768,7 @@ class FilesController < ApplicationController
           redirect_to named_context_url(@context, :context_files_url)
         }
         if api_request?
-          format.json { render :json => attachment_json(@attachment) }
+          format.json { render :json => attachment_json(@attachment, @current_user) }
         else
           format.json { render :json => @attachment.to_json }
         end

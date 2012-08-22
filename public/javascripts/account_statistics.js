@@ -40,11 +40,11 @@ define([
       });
     });
     function populateDialog(data_points, axis) {
-      $("#over_time_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#over_time_dialog").dialog({
         width: 630,
-        height: 330
-      }).dialog('open').dialog('option', 'title', I18n.t('title_data_point_over_time', "%{data_point} Over Time", {data_point: axis}));
+        height: 330,
+        title: I18n.t('title_data_point_over_time', "%{data_point} Over Time", {data_point: axis})
+      });
 
       // google dependencies declared in views/acccounts/statistics since google.load uses document.write :(
       var data = new google.visualization.DataTable();

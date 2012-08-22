@@ -237,6 +237,19 @@ describe "security" do
       get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"
       response.should be_success
       cookies['_normandy_session'].should be_present
+      session[:used_remember_me_token].should be_true
+
+      # accessing sensitive areas of canvas require a fresh login
+      get "/profile/settings"
+      response.should redirect_to login_url
+      flash[:warning].should_not be_empty
+
+      post "/login", :pseudonym_session => { :unique_id => @p.unique_id, :password => 'asdfasdf' }
+      response.should redirect_to settings_profile_url
+      session[:used_remember_me_token].should_not be_true
+
+      follow_redirect!
+      response.should be_success
     end
 
     it "should not allow login via the same valid token twice" do
@@ -561,6 +574,33 @@ describe "security" do
       assigns['real_current_user'].id.should == @admin.id
       PageView.last.user_id.should == @student.id
       PageView.last.real_user_id.should == @admin.id
+    end
+
+    it "should remember the destination with an intervening auth" do
+      token = SessionPersistenceToken.generate(@admin.pseudonyms.first)
+      get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"
+      response.should be_success
+      cookies['_normandy_session'].should be_present
+      session[:used_remember_me_token].should be_true
+
+      # accessing sensitive areas of canvas require a fresh login
+      get "/conversations?become_user_id=#{@student.id}"
+      response.should redirect_to user_masquerade_url(@student)
+
+      follow_redirect!
+      response.should redirect_to login_url
+      flash[:warning].should_not be_empty
+
+      post "/login", :pseudonym_session => { :unique_id => @admin.pseudonyms.first.unique_id, :password => 'password' }
+      response.should redirect_to user_masquerade_url(@student)
+      session[:used_remember_me_token].should_not be_true
+
+      post "/users/#{@student.id}/masquerade"
+      response.should redirect_to conversations_url
+
+      follow_redirect!
+      response.should be_success
+      session[:become_user_id].should == @student.id.to_s
     end
   end
 

@@ -1,11 +1,11 @@
 define [
   'jquery'
-  'formToJSON'
-], ($, formToJSON) ->
+  'jquery.toJSON'
+], ($) ->
 
   # TODO: share code with 'unflatten' module
 
-  module 'formToJSON'
+  module 'jquery.toJSON'
 
   test 'turns a form into an JSON object', ->
 

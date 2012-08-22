@@ -105,10 +105,23 @@ describe "profile" do
       f('.email_channels').should include_text(test_email)
     end
 
+    it "should change default email address" do
+      channel = @user.communication_channels.create!(:path_type => 'email',
+        :path => 'walter_white@example.com')
+      channel.confirm!
+
+      get '/profile/settings'
+      row  = f("#channel_#{channel.id}")
+      link = f("#channel_#{channel.id} td:first-child a")
+      link.click
+      wait_for_ajaximations
+      row.attribute(:class).should match(/default/)
+    end
+
     it "should display file uploader link on files page" do
       get "/profile/settings"
       expect_new_page_load { driver.find_element(:css, '#left-side .files').click }
-      driver.find_element(:id, 'file_swfUploader').should be_displayed
+      driver.find_element(:id, 'file_swf-button').should be_displayed
     end
 
     it "should edit full name" do
@@ -227,6 +240,55 @@ describe "profile" do
       driver.switch_to.alert.accept
       wait_for_ajaximations
       driver.find_element(:id, 'access_tokens').should_not be_displayed
+    end
+
+    it "should set the birthdate" do
+      get "/profile/settings"
+      edit_form = click_edit
+      click_option('#user_birthdate_1i', '1980')
+      click_option('#user_birthdate_2i', 'January')
+      click_option('#user_birthdate_3i', '31')
+      submit_form(edit_form)
+      wait_for_ajaximations
+      @user.reload
+      @user.birthdate.should eql(Time.utc(1980, 1, 31))
+    end
+
+    it "should not accept a partial birthdate" do
+      get "/profile/settings"
+      edit_form = click_edit
+      click_option('#user_birthdate_1i', '')
+      click_option('#user_birthdate_2i', 'February')
+      click_option('#user_birthdate_3i', '2')
+      submit_form(edit_form)
+      wait_for_ajaximations
+      edit_form.should be_displayed    # not dismissed
+      @user.reload
+      @user.birthdate.should be_nil    # no default year assumed
+    end
+
+    it "should not allow the birthdate to be un-set" do
+      @user.birthdate = Time.utc(1980, 1, 1)
+      @user.save!
+      get "/profile/settings"
+      edit_form = click_edit
+      lambda { click_option('#user_birthdate_1i', '') }.should raise_error(Selenium::WebDriver::Error::NoSuchElementError)
+    end
+  end
+
+  context "services test" do
+    before (:each) do
+      course_with_teacher_logged_in
+    end
+
+    it "should link back to profile/settings in oauth callbacks" do
+      get "/profile/settings"
+      links = ffj('#unregistered_services .service .content a')
+      links.each do |l|
+        url = l.attribute('href')
+        query = URI.parse(url).query
+        CGI.unescape(query).should match /profile\/settings/
+      end
     end
   end
 end

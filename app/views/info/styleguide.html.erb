@@ -207,7 +207,7 @@
   <h2>Admin Links</h2>
   <div class="admin-link-hover-area">
     <div class="admin-links">
-      <button class="al-trigger"><span class="al-trigger-inner">Manage (will be accessibly hidden)</span></button>
+      <button class="al-trigger ui-button"><span class="al-trigger-inner">Manage (will be accessibly hidden)</span></button>
       <ul class="al-options">
         <li><a href="#"><span class="ui-icon ui-icon-pencil"></span>Edit</a></li>
         <li><a href="#"><span class="ui-icon ui-icon-trash"></span>Delete (from database)</a></li>
@@ -220,7 +220,7 @@
       <pre class="prettyprint linenums">
       &lt;div class=&quot;admin-link-hover-area&quot;&gt;
         &lt;div class=&quot;admin-links&quot;&gt;
-          &lt;button class=&quot;al-trigger&quot;&gt;&lt;span class=&quot;al-trigger-inner&quot;&gt;Manage (will be accessibly hidden)&lt;/span&gt;&lt;/button&gt;
+          &lt;button class=&quot;al-trigger ui-button&quot;&gt;&lt;span class=&quot;al-trigger-inner&quot;&gt;Manage (will be accessibly hidden)&lt;/span&gt;&lt;/button&gt;
           &lt;ul class=&quot;al-options&quot;&gt;
             &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&lt;span class=&quot;ui-icon ui-icon-pencil&quot;&gt;&lt;/span&gt;Edit&lt;/a&gt;&lt;/li&gt;
             &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&lt;span class=&quot;ui-icon ui-icon-trash&quot;&gt;&lt;/span&gt;Delete (from database)&lt;/a&gt;&lt;/li&gt;
@@ -232,7 +232,7 @@
       &lt;/div&gt;
       </pre>
   </div>
-  
+
 
   <h2 class="v-gutter">Icons</h2>
   <span class="demo-icons"><i class="icon-stats"></i> icon-stats</span>
@@ -1357,15 +1357,23 @@
       <input type="button" value="Button" /> <br />
     </p>
 
-
   </section><!-- end jqueryUI -->
 
+  <section>
+    <h2>Tooltips</h2>
+    these links have tooltips:
+    <a data-tooltip title="this is a really long tooltip, it was not passed any options, it just had the [data-tooltip] attribute, which means it should appear on the top center of the trigger element.  and it should wrap since the text is so long">default</a>
+    <a data-tooltip="top" title="same as default">top</a>
+    <a data-tooltip="right" title="should be right center">right</a>
+    <a data-tooltip="bottom" title="should be bottom center">bottom</a>
+    <a data-tooltip="left" title="should be left center">left</a>
+    <a data-tooltip='{"track":true}' title="this toolstip will stay connected to mouse as it moves around">
+      tooltip that tracks mouse
+    </a>
+    <button data-tooltip title="any type of element can have a tooltip" class="btn">
+      button with tooltip
+    </button>
+  </section>
 
 
 </div>
-
-<% js_block do %>
-  <script>
-
-  </script>
-<% end %>

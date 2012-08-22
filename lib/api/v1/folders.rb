@@ -19,20 +19,25 @@
 module Api::V1::Folders
   include Api::V1::Json
 
-  def folders_json(folders, user, session)
+  def folders_json(folders, user, session, opts={})
     folders.map do |f|
-      folder_json(f, user, session)
+      folder_json(f, user, session, opts)
     end
   end
 
-  def folder_json(folder, user, session)
+  def folder_json(folder, user, session, opts={})
+    can_manage_files = opts.has_key?(:can_manage_files) ? opts[:can_manage_files] : folder.grants_right?(user, nil, :update)
     json = api_json(folder, user, session,
-            :only => %w(id name full_name position parent_folder_id context_type context_id unlock_at locked lock_at created_at updated_at))
+            :only => %w(id name full_name position parent_folder_id context_type context_id unlock_at lock_at created_at updated_at))
     if folder
+      json['locked'] = !!folder.locked
       json['folders_url'] = api_v1_list_folders_url(folder)
       json['files_url'] = api_v1_list_files_url(folder)
       json['files_count'] = folder.attachments.active.count
       json['folders_count'] = folder.sub_folders.active.count
+      json['hidden'] = folder.hidden?
+      json['locked_for_user'] = can_manage_files ? false : !!folder.currently_locked
+      json['hidden_for_user'] = can_manage_files ? false : !!folder.hidden?
     end
     json
   end

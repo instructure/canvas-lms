@@ -46,14 +46,13 @@ $(document).ready(function() {
   }).change();
   $("#uploading_progressbar").progressbar();
   $("#zip_file_import_form").submit(function(){
-    $("#uploading_please_wait_dialog").dialog('close').dialog({
+    $("#uploading_please_wait_dialog").dialog({
       bgiframe: true,
       width: 400,
       modal: true,
-      autoOpen: false,
       closeOnEscape: false,
       dialogClass: "ui-dialog-no-close-button"
-    }).dialog('open');
+    });
     return true;
   });
   var $frame = $("<iframe id='import_frame' name='import_frame'/>")

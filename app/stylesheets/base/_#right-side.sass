@@ -21,8 +21,8 @@
     font-size: 14px
     color: $gray
     font-weight: bold
-    border-bottom: solid 1px $grayLight
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85)
+    border-bottom: solid 1px #bbb
+    box-shadow: 0 1px 0 white
     margin: $right_side_margin 0 0
 
 .rs-match-list-indent
@@ -43,9 +43,10 @@
   li
     a
       font-size: 12px
-      padding: 0 4px 0 24px
+      padding-top: 4px
+      padding-bottom: 4px
       display: block
-      border-bottom: 1px solid #ddd
+      border-bottom: 1px solid #d6d6d6
       box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85)
 
       &:hover, &:focus
@@ -73,7 +74,7 @@
       line-height: 13px
     em
       color: #bcbcbc
-      padding-bottom: 5px
+      padding-bottom: 2px
     .more_link
       padding-top: 6px
   .tooltip 
@@ -101,6 +102,7 @@
     li 
       position: relative
       a.item
+        padding-left: 24px
         b
           padding-right: 20px
       a.disable_item_link

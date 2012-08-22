@@ -137,24 +137,87 @@ describe "files local tests" do
       make_folder_actions_visible
     end
 
-    it "should allow you to edit html files" do
-      link = keep_trying_until { f("li.editable_folder_item div.header a.download_url") }
-      link.should be_displayed
-      link.text.should == "html-editing-test.html"
-      current_content = File.read(fixture_file_path("files/html-editing-test.html"))
-      4.times do
-        get "/courses/#{@course.id}/files"
-        new_content = "<html>#{ActiveSupport::SecureRandom.hex(10)}</html>"
+    context 'tinyMCE html editing' do
+
+      def click_edit_link(page_refresh = true)
+        get "/courses/#{@course.id}/files" if page_refresh
         link = keep_trying_until { f("li.editable_folder_item div.header a.edit_item_content_link") }
         link.should be_displayed
         link.text.should == "edit content"
         link.click
         keep_trying_until { fj("#edit_content_dialog").should be_displayed }
-        keep_trying_until(120) { driver.execute_script("return $('#edit_content_textarea')[0].value;") == current_content }
-        driver.execute_script("$('#edit_content_textarea')[0].value = '#{new_content}';")
-        current_content = new_content
-        f("#edit_content_dialog button.save_button").click
-        keep_trying_until { !f("#edit_content_dialog").displayed? }
+      end
+
+      def switch_html_edit_views
+        f('.switch_views').click
+      end
+
+      def save_html_content
+        f(".ui-dialog .btn-primary").click
+      end
+
+      before (:each) do
+        link = keep_trying_until { f("li.editable_folder_item div.header a.download_url") }
+        link.should be_displayed
+        link.text.should == "html-editing-test.html"
+      end
+
+      it "should allow you to edit html files" do
+        current_content = File.read(fixture_file_path("files/html-editing-test.html"))
+        4.times do
+          new_content = "<html>#{ActiveSupport::SecureRandom.hex(10)}</html>"
+          click_edit_link
+          keep_trying_until(120) { driver.execute_script("return $('#edit_content_textarea')[0].value;") == current_content }
+          driver.execute_script("$('#edit_content_textarea')[0].value = '#{new_content}';")
+          current_content = new_content
+          f(".ui-dialog .btn-primary").click
+          f("#edit_content_dialog").should_not be_displayed
+        end
+      end
+
+      it "should validate adding a bold line changes the html" do
+        click_edit_link
+        f('.switch_views').click
+        f('.mce_bold').click
+        type_in_tiny('#edit_content_textarea', 'this is bold')
+        f('.switch_views').click
+        driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<strong>this is bold<\/strong>/
+        driver.execute_script("return $('#edit_content_textarea')[0].value = '<fake>lol</fake>';")
+        f('.switch_views').click
+        f('.switch_views').click
+        driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<fake>lol<\/fake>/
+      end
+
+      it "should save changes from HTML view" do
+        click_edit_link
+        switch_html_edit_views
+        type_in_tiny('#edit_content_textarea', 'I am typing')
+        save_html_content
+        wait_for_ajax_requests
+        click_edit_link
+        keep_trying_until { f('#edit_content_textarea')[:value].should =~ /I am typing/ }
+      end
+
+      it "should save changes from code view" do
+        pending("intermittently fails")
+        click_edit_link
+        driver.execute_script("$('#edit_content_textarea')[0].value = 'I am typing';")
+        save_html_content
+        wait_for_ajax_requests
+        click_edit_link
+        keep_trying_until { f('#edit_content_textarea')[:value].should =~ /I am typing/ }
+      end
+
+      it "should allow you to open and close the dialog and switch views" do
+        click_edit_link
+        keep_trying_until { driver.execute_script("return $('#edit_content_textarea').is(':visible');").should == true }
+        switch_html_edit_views
+        driver.execute_script("return $('#edit_content_textarea').is(':hidden');").should == true
+        close_visible_dialog
+        click_edit_link(false)
+        keep_trying_until { driver.execute_script("return $('#edit_content_textarea').is(':visible');").should == true }
+        switch_html_edit_views
+        driver.execute_script("return $('#edit_content_textarea').is(':hidden');").should == true
       end
     end
 
@@ -191,12 +254,8 @@ describe "files local tests" do
 
   describe "files S3 tests" do
     it_should_behave_like "files selenium tests"
-    prepend_before(:each) {
-      Setting.set("file_storage_test_override", "s3")
-    }
-    prepend_before(:all) {
-      Setting.set("file_storage_test_override", "s3")
-    }
+    prepend_before(:each) { Setting.set("file_storage_test_override", "s3") }
+    prepend_before(:all) { Setting.set("file_storage_test_override", "s3") }
   end
 
   describe "collaborations folder in files menu" do
@@ -359,3 +418,4 @@ describe "zip file uploads" do
     end
   end
 end
+

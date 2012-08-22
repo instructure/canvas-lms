@@ -77,4 +77,33 @@ describe "accounts/settings.html.erb" do
       response.should have_tag("div#open_registration_delegated_warning_dialog")
     end
   end
+
+  describe "managed by site admins" do
+    before do
+      @account = Account.default
+      assigns[:account] = @account
+      assigns[:account_users] = []
+      assigns[:root_account] = @account
+      assigns[:associated_courses_count] = 0
+      assigns[:announcements] = []
+    end
+
+    it "should show settings that can only be managed by site admins" do
+      admin = site_admin_user
+      view_context(@account, admin)
+      render
+      response.should have_tag("input#account_settings_global_includes")
+      response.should have_tag("input#account_settings_enable_scheduler")
+      response.should have_tag("input#account_settings_enable_profiles")
+    end
+
+    it "it should not show settings to regular admin user" do
+      admin = account_admin_user
+      view_context(@account, admin)
+      render
+      response.should_not have_tag("input#account_settings_global_includes")
+      response.should_not have_tag("input#account_settings_enable_scheduler")
+      response.should_not have_tag("input#account_settings_enable_profiles")
+    end
+  end
 end

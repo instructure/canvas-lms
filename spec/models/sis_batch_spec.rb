@@ -96,21 +96,29 @@ describe SisBatch do
   end
 
   it "should schedule in the future if configured" do
-    create_csv_data(['abc']) do |batch|
-      batch.process
-      Delayed::Job.find_by_tag('SisBatch.process_all_for_account').run_at.to_i.should <= Time.now.to_i
+    track_jobs do
+      create_csv_data(['abc']) do |batch|
+        batch.process
+      end
     end
 
-    Delayed::Job.delete_all
+    job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
+    job.should be_present
+    job.run_at.to_i.should <= Time.now.to_i
+
+    job.destroy
 
     Setting.set('sis_batch_process_start_delay', '120')
-    create_csv_data(['abc']) do |batch|
-      start_time = Time.now.to_i
-      batch.process
-      job = Delayed::Job.find_by_tag('SisBatch.process_all_for_account')
-      job.run_at.to_i.should >= 100.seconds.from_now.to_i
-      job.run_at.to_i.should <= 150.minutes.from_now.to_i
+    track_jobs do
+      create_csv_data(['abc']) do |batch|
+        batch.process
+      end
     end
+
+    job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
+    job.should be_present
+    job.run_at.to_i.should >= 100.seconds.from_now.to_i
+    job.run_at.to_i.should <= 150.minutes.from_now.to_i
   end
 
   describe "batch mode" do

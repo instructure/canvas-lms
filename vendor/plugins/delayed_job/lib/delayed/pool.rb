@@ -91,7 +91,7 @@ class Pool
   end
 
   def say(msg, level = :debug)
-    if defined?(Rails)
+    if defined?(Rails.logger) && Rails.logger
       Rails.logger.send(level, "[#{Process.pid}]P #{msg}")
     else
       puts(msg)

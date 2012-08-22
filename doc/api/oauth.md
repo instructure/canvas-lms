@@ -22,6 +22,29 @@ OAuth2 Token sent in query string:
 
     curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
 
+Storing Tokens
+--------------
+
+When appropriate, applications should store the token locally, rather
+the requesting a new token for the same user each time the user uses the
+application. If the token is deleted or expires, the application will
+get a 401 Unauthorized error from the API, in which case the application should
+perform the OAuth flow again to receive a new token.
+
+Storing a token is in many ways equivalent to storing the user's
+password, so tokens should be stored and used in a secure manner,
+including but not limited to:
+
+  * Don't embed tokens in web pages.
+  * Don't pass tokens or session IDs around in URLs.
+  * Properly secure the database or other data store containing the
+    tokens.
+  * For web applications, practice proper techniques to avoid session
+    attacks such as cross-site scripting, request forgery, replay
+    attacks, etc.
+  * For native applications, take advantage of user keychain stores and
+    other operating system functionality for securely storing passwords.
+
 Manual Token Generation
 -----------------------
 
@@ -36,6 +59,20 @@ simplest option is to generate an access token on the user's profile page.
      have to generate a new token if you forget it. Remember that access
      tokens are password equivalent, so keep it secret.
 
+Logging Out
+-----------
+
+<div class="method_details">
+
+If your application supports logout functionality, you can revoke your own
+access token. This is useful for security reasons, as well as removing your
+application from the list of tokens on the user's profile page. Simply make
+an authenticated request to the following endpoint:
+
+<h3 class="endpoint">DELETE /login/oauth2/token</h3>
+
+</div>
+
 OAuth2 Token Request Flow
 -------------------------
 
@@ -48,8 +85,8 @@ ID and client secret. To obtain these application credentials, you will
 need to register your application.  The client secret should never be shared.
 
 For open source Canvas users, you will need to generate a client\_id and
-client\_secret for your application. There isn't yet any UI for
-generating these keys, so you will need to generate an API key from the Rails console:
+client\_secret for your application. You can either do it from the Developer
+Keys section of Site admin, or from the Rails console:
 
     $ script/console
     > key = DeveloperKey.create! { |k|
@@ -68,7 +105,7 @@ This is the OAuth flow for third-party web applications.
 
 <div class="method_details">
 
-<h3>GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
+<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
 
 <h4>Parameters</h4>
 
@@ -91,8 +128,8 @@ currently supported value is <code>code</code>.
     <div class="inline">
       required. The URL where the user will be redirected after
 authorization. The domain of this URL must match the domain of the
-redirect_uri stored on the developer key, though the rest of the path
-may differ.
+redirect_uri stored on the developer key, or it must be a subdomain of
+that domain.
     </div>
   </li>
 </ul>
@@ -126,7 +163,7 @@ parameter, rather than a `code` parameter, in the query string.
 
 <div class="method_details">
 
-<h3>POST /login/oauth2/token</h3>
+<h3 class="endpoint">POST /login/oauth2/token</h3>
 
 <h4>Parameters</h4>
 
@@ -191,7 +228,7 @@ read the out-of-band code response.
 
 <div class="method_details">
 
-<h3>GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
+<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
 
 <h4>Parameters</h4>
 
@@ -251,7 +288,7 @@ parameter, rather than a `code` parameter, to the query string.
 
 <div class="method_details">
 
-<h3>POST /login/oauth2/token</h3>
+<h3 class="endpoint">POST /login/oauth2/token</h3>
 
 <h4>Parameters</h4>
 

@@ -632,7 +632,8 @@ define([
     })
   }
   function showEvent($event, $day) {
-    var $box = $("#event_details");
+    var $box = $("#event_details"),
+        $editEvent = $('#edit_event');
     var data = $.extend({}, $event.getTemplateData({
       textValues: ['id', 'start_time_string', 'end_time_string', 'start_date_string', 'title', 'event_type', 'can_edit', 'can_delete', 'context_id', 'context_type', 'all_day'],
       htmlValues: ['description']
@@ -695,11 +696,10 @@ define([
     if (data.lock_info) {
       $box.find(".lock_explanation").html(INST.lockExplanation(data.lock_info, 'assignment'));
     }
-    $("#edit_event").dialog('close');
-    $("#event_details").dialog('close');
-    $("#event_details").find(".description").css("max-height", Math.max($(window).height() - 200, 150));
+    if ($editEvent.data('dialog')) $editEvent.dialog('close');
+    $box.find(".description").css("max-height", Math.max($(window).height() - 200, 150));
     var title = type_name == "Event" ? I18n.t('event_details', "Event Details") : I18n.t('assignment_details', "Assignment Details");
-    $("#event_details").show().dialog({
+    $box.dialog({
       title: title,
       width: (data.description.length > 2000 ? Math.max($(window).width() - 300, 450) : 450),
       resizable: true,
@@ -710,9 +710,8 @@ define([
       },
       open: function() {
         $(document).triggerHandler('event_dialog', $(this));
-      },
-      autoOpen: false
-    }).dialog('open').dialog('option', 'title', title);
+      }
+    });
     $event.addClass('selected');
     selectDateForEvent($day.parents(".calendar_day_holder"));
   }
@@ -762,8 +761,8 @@ define([
     }
   }
   function editEvent($event, $day) {
-    var $box = $("#edit_event");
-    $("#edit_event_tabs").show();
+    var $box = $("#edit_event"),
+        $eventDetails = $('#event_details');
     var data = $.extend({}, $event.data('event_data'), $event.getTemplateData({ textValues: [ 'title' ] }));
     data.description = $event.data('description');
     data.context_type = data.context_type || "";
@@ -803,11 +802,11 @@ define([
       data.event_type == "calendar_event";
     }
     var selectedTabIndex = 0;
-    var $assignmentForm = $box.find("#edit_assignment_form").show();
+    var $assignmentForm = $box.find("#edit_assignment_form");
     $assignmentForm.find("select.context_id").val(context);
     setFormURLs($assignmentForm, context, data.id);
     
-    var $eventForm = $box.find("#edit_calendar_event_form").show();
+    var $eventForm = $box.find("#edit_calendar_event_form");
     $eventForm.find("select.context_id").val(context);
     setFormURLs($eventForm, context, data.id);
 
@@ -824,8 +823,7 @@ define([
     $("#edit_calendar_event_form").data('current_event', $event);
     $("#edit_assignment_form").fillFormData(data, {object_name: 'assignment'});
     $("#edit_calendar_event_form").fillFormData(data, {object_name: 'calendar_event'});
-    $("#event_details").dialog('close');
-    $("#edit_event").dialog('close');
+    if ($eventDetails.data('dialog')) $eventDetails.dialog('close');
     selectDateForEvent($day.parents(".calendar_day_holder"));
     var title;
     if (isNew) {
@@ -833,7 +831,7 @@ define([
     } else {
       title = type_name == "Event" ? I18n.t('titles.edit_event', "Edit Event") : I18n.t('titles.edit_assignment', "Edit Assignment");
     }
-    $("#edit_event").show().dialog({
+    $box.dialog({
       title: title,
       width: 400,
       open: function() {
@@ -930,10 +928,9 @@ define([
         }
         $form.find("input[name='date']").datepicker('hide');
       },
-      autoOpen: false,
       resizable: false,
       modal: true
-    }).dialog('open').dialog('option', 'title', title);
+    });
     
     // if we know the context that the event is being edited for, color the box that contex's color
     if (data.context_id && data.context_type) {
@@ -1100,11 +1097,10 @@ define([
       event.preventDefault();
       $("#calendar_feed_box").find(".calendar_feed_url").val($(this).attr('href')).end()
         .find(".show_calendar_feed_link").attr('href', $(this).attr('href'));
-      $("#calendar_feed_box").dialog('close').dialog({
+      $("#calendar_feed_box").dialog({
         title: I18n.t('feed_dialog_title', "Calendar Feed"),
-        width: 375,
-        autoOpen: false
-      }).dialog('open');
+        width: 375
+      });
     });
     $("#calendar_feed_box .calendar_feed_url").focus(function() {
       $(this).select();

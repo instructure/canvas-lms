@@ -30,6 +30,7 @@ class UsersController < ApplicationController
   include Twitter
   include LinkedIn
   include DeliciousDiigo
+  include SearchHelper
   before_filter :require_user, :only => [:grades, :confirm_merge, :merge, :kaltura_session, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
   before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
   before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :user_dashboard, :masquerade]
@@ -170,40 +171,47 @@ class UsersController < ApplicationController
       @root_account = @context.root_account
       @users = []
       @query = (params[:user] && params[:user][:name]) || params[:term]
-      if @context && @context.is_a?(Account) && @query
-        @users = @context.users_name_like(@query)
-      elsif params[:enrollment_term_id].present? && @root_account == @context
-        @users = @context.fast_all_users.scoped(:joins => :courses, :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]], :group => @context.connection.group_by('users.id', 'users.name', 'users.sortable_name'))
-      else
-        @users = @context.fast_all_users
-      end
-
-      @users = api_request? ?
-        Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name) :
-        @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
-      respond_to do |format|
-        if @users.length == 1 && params[:term]
-          format.html {
-            redirect_to(named_context_url(@context, :context_user_url, @users.first))
-          }
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+        if @context && @context.is_a?(Account) && @query
+          @users = @context.users_name_like(@query)
+        elsif params[:enrollment_term_id].present? && @root_account == @context
+          @users = @context.fast_all_users.scoped({
+            :joins => :courses,
+            :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]],
+            :group => @context.connection.group_by('users.id', 'users.name', 'users.sortable_name')
+          })
         else
-          @enrollment_terms = []
-          if @root_account == @context
-            @enrollment_terms = @context.enrollment_terms.active
-          end
-          format.html
+          @users = @context.fast_all_users
         end
-        format.json  {
-          cancel_cache_buster
-          expires_in 30.minutes
-          api_request? ?
-            render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
-            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
-        }
+
+        @users = api_request? ?
+          Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name) :
+          @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
+        respond_to do |format|
+          if @users.length == 1 && params[:term]
+            format.html {
+              redirect_to(named_context_url(@context, :context_user_url, @users.first))
+            }
+          else
+            @enrollment_terms = []
+            if @root_account == @context
+              @enrollment_terms = @context.enrollment_terms.active
+            end
+            format.html
+          end
+          format.json  {
+            cancel_cache_buster
+            expires_in 30.minutes
+            api_request? ?
+              render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
+              render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
+          }
+        end
       end
     end
   end
 
+  before_filter :require_password_session, :only => [:masquerade]
   def masquerade
     @user = User.find(:first, :conditions => {:id => params[:user_id]})
     return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
@@ -652,11 +660,11 @@ class UsersController < ApplicationController
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
       # min age may also be enforced, depending on require_self_enrollment_code
-      @user.require_birthdate = (params[:enrollment_type] == 'student')
+      @user.require_birthdate = (@user.initial_enrollment_type == 'student')
     end
     
     @observee = nil
-    if params[:enrollment_type] == 'observer'
+    if @user.initial_enrollment_type == 'observer'
       # TODO: SAML/CAS support
       if observee = Pseudonym.authenticate(params[:observee] || {},
           [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
@@ -752,7 +760,7 @@ class UsersController < ApplicationController
   # @argument user[time_zone] [Optional] The time zone for the user. Allowed time zones are listed in {http://rubydoc.info/docs/rails/2.3.8/ActiveSupport/TimeZone The Ruby on Rails documentation}.
   # @argument user[locale] [Optional] The user's preferred language as a two-letter ISO 639-1 code. Current supported languages are English ("en") and Spanish ("es").
   # @argument user[avatar][token] [Optional] A unique representation of the avatar record to assign as the user's current avatar. This token can be obtained from the user avatars endpoint. This supersedes the user[avatar][url] argument, and if both are included the url will be ignored. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.
-  # @argument user[avatar][url] [Optional] To set the user's avatar to point to an external url, do not include a token and instead pass the url here. Warning: For maximum compatibility, please use 50 px square images.
+  # @argument user[avatar][url] [Optional] To set the user's avatar to point to an external url, do not include a token and instead pass the url here. Warning: For maximum compatibility, please use 128 px square images.
   #
   # @example_request
   #
@@ -775,6 +783,7 @@ class UsersController < ApplicationController
   #     "avatar_url":"http://<canvas>/images/users/133-..."
   #   }
   def update
+    params[:user] ||= {}
     @user = api_request? ?
       api_find(User, params[:id]) :
       params[:id] ? User.find(params[:id]) : @current_user
@@ -912,11 +921,10 @@ class UsersController < ApplicationController
   def admin_merge
     @user = User.find(params[:user_id])
     pending_user_id = params[:pending_user_id] || session[:pending_user_id]
-    @pending_other_user = User.find_by_id(pending_user_id) if pending_user_id.present?
-    @pending_other_user = nil if @pending_other_user == @user
-    @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
+    pending_other_error = get_pending_user_and_error(pending_user_id, params[:pending_user_id])
     @other_user = User.find_by_id(params[:new_user_id]) if params[:new_user_id].present?
     if authorized_action(@user, @current_user, :manage_logins)
+      flash[:error] = pending_other_error if pending_other_error.present?
       if @user && (params[:clear] || !@pending_other_user)
         session[:pending_user_id] = @user.id
         @pending_other_user = nil
@@ -930,6 +938,23 @@ class UsersController < ApplicationController
       end
       render :action => 'admin_merge'
     end
+  end
+
+  def get_pending_user_and_error(pending_user_id, entered_user_id)
+    pending_other_error = nil
+    if entered_user_id.to_s != entered_user_id.to_i.to_s && entered_user_id.present?
+      pending_user_id = nil
+      pending_other_error = t('invalid_input', "Invalid input. Please enter a valid ID.")
+    end
+    @pending_other_user = User.find_by_id(pending_user_id) if pending_user_id.present?
+    @pending_other_user = nil if @pending_other_user == @user
+    @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
+    if entered_user_id == @user.id.to_s
+      pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
+    elsif @pending_other_user.blank? && entered_user_id.present? && pending_other_error.blank?
+      pending_other_error = t('user_not_found', "No active user with that ID was found.")
+    end
+    return pending_other_error
   end
 
   def confirm_merge
@@ -1145,7 +1170,6 @@ class UsersController < ApplicationController
 
   def avatar_image
     cancel_cache_buster
-    return redirect_to(params[:fallback] || '/images/no_pic.gif') unless service_enabled?(:avatars)
     # TODO: remove support for specifying user ids by id, require using
     # the encrypted version. We can't do it right away because there are
     # a bunch of places that will have cached fragments using the old
@@ -1158,10 +1182,10 @@ class UsersController < ApplicationController
     account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
     url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
       user = User.find_by_id(user_id) if user_id.present?
-      if user && account_avatar_setting != 'disabled'
+      if user
         user.avatar_url(nil, account_avatar_setting, "%{fallback}")
       else
-        ''
+        '%{fallback}'
       end
     end
     fallback = User.avatar_fallback_url(params[:fallback], request)

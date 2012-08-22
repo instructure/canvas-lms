@@ -8,6 +8,7 @@ gem 'authlogic',      '2.1.3'
 # use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
 # is merged into mainline. gem built from https://github.com/lukfugl/aws-s3
 gem "aws-s3-instructure", "~> 0.6.2.1319643167",  :require => 'aws/s3'
+gem 'barby',          '0.5.0'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
 gem 'daemons',        '1.1.0'
@@ -46,9 +47,11 @@ end
 gem 'rdiscount',      '1.6.8'
 gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
+gem 'rotp',           '1.4.1'
+gem 'rqrcode',        '0.4.2'
 gem 'rscribd',        '1.2.0'
-gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.15'
+gem 'net-ldap',       '0.3.1',  :require => 'net/ldap'
+gem 'ruby-saml-mod',  '0.1.17'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '2.0.3'
@@ -110,7 +113,6 @@ group :i18n_tools do
   gem 'ruby_parser', '2.0.6'
   gem 'sexp_processor', '3.0.5'
   gem 'ya2yaml', '0.30'
-  gem 'uglifier'
 end
 
 group :redis do
@@ -120,6 +122,10 @@ end
 
 group :embedly do
   gem 'embedly', '1.5.5'
+end
+
+group :statsd do
+  gem 'statsd-ruby', '1.0.0', :require => 'statsd'
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from

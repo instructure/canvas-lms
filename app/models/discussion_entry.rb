@@ -119,6 +119,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def reply_from(opts)
+    return if self.context.root_account.deleted?
     user = opts[:user]
     message = opts[:html].strip
     user = nil unless user && self.context.users.include?(user)

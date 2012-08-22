@@ -43,7 +43,7 @@ define [
       containerScrollHeight - $container.scrollTop() - $container.height()
 
     startPaginationListener: ->
-      $(@paginationScrollContainer).on "scroll.pagination#{@cid} resize.pagination#{@cid}", $.proxy @fetchNextPageIfNeeded, this
+      $(@paginationScrollContainer).on "scroll.pagination#{@cid}, resize.pagination#{@cid}", $.proxy @fetchNextPageIfNeeded, this
       @fetchNextPageIfNeeded()
 
     stopPaginationListener: ->
@@ -54,5 +54,5 @@ define [
       unless @collection.nextPageUrl
         @stopPaginationListener() if @collection.length
         return
-      if @distanceToBottom() < @distanceTillFetchNextPage
+      if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
         @collection.fetchNextPage @fetchOptions

@@ -35,6 +35,7 @@ class CommunicationChannel < ActiveRecord::Base
   before_save :consider_building_pseudonym
   validates_presence_of :path
   validate :uniqueness_of_path
+  validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? }
 
   acts_as_list :scope => :user_id
   
@@ -49,6 +50,21 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_CHAT     = 'chat'
   TYPE_TWITTER  = 'twitter'
   TYPE_FACEBOOK = 'facebook'
+
+  def self.sms_carriers
+    @sms_carriers ||= (Setting.from_config('sms', false) ||
+        { 'AT&T' => 'txt.att.net',
+          'Alltel' => 'message.alltel.com',
+          'Boost' => 'myboostmobile.com',
+          'Cingular' => 'cingularme.com',
+          'CellularOne' => 'mobile.celloneusa.com',
+          'Cricket' => 'sms.mycricket.com',
+          'Nextel' => 'messaging.nextel.com',
+          'Sprint PCS' => 'messaging.sprintpcs.com',
+          'T-Mobile' => 'tmomail.net',
+          'Verizon' => 'vtext.com',
+          'Virgin Mobile' => 'vmobl.com' }).map.sort
+  end
 
   def pseudonym
     self.user.pseudonyms.find_by_unique_id(self.path)
@@ -116,6 +132,10 @@ class CommunicationChannel < ActiveRecord::Base
     end
   end
 
+  def not_otp_communication_channel
+    self.errors.add(:workflow_state, "Can't remove a user's SMS that is used for one time passwords") if self.id == self.user.otp_communication_channel_id
+  end
+
   # Return the 'path' for simple communication channel types like email and sms. For
   # Facebook and Twitter, return the user's configured user_name for the service.
   def path_description
@@ -152,7 +172,14 @@ class CommunicationChannel < ActiveRecord::Base
     self.save!
     @send_merge_notification = false
   end
-  
+
+  def send_otp!(code)
+    m = self.messages.new
+    m.to = self.path
+    m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
+    Mailer.deliver_message(m) rescue nil # omg! just ignore delivery failures
+  end
+
   # If you are creating a new communication_channel, do nothing, this just
   # works.  If you are resetting the confirmation_code, call @cc.
   # set_confirmation_code(true), or just save the record to leave the old
@@ -186,6 +213,8 @@ class CommunicationChannel < ActiveRecord::Base
   }
 
   named_scope :email, :conditions => { :path_type => TYPE_EMAIL }
+  named_scope :sms, :conditions => { :path_type => TYPE_SMS }
+
   named_scope :active, :conditions => { :workflow_state => 'active' }
   named_scope :unretired, :conditions => ['communication_channels.workflow_state<>?', 'retired']
 

@@ -18,6 +18,7 @@
 define([
   'i18n!course_settings',
   'jquery' /* $ */,
+  'underscore',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
@@ -34,7 +35,7 @@ define([
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $) {
+], function(I18n, $, _) {
 
   var GradePublishing = {
     status: null,
@@ -116,9 +117,13 @@ define([
         $course_form = $("#course_form"),
         $hashtag_form = $(".hashtag_form"),
         $course_hashtag = $("#course_hashtag"),
-        $enrollment_dialog = $("#enrollment_dialog");
+        $enrollment_dialog = $("#enrollment_dialog"),
+        $tabBar = $("#course_details_tabs"),
+        // as of jqueryui 1.9, the cookie trumps the fragment :(. so we hack
+        // around that here
+        initialTab = _.indexOf(_.pluck($tabBar.find('> ul a'), 'hash'), location.hash);
 
-    $("#course_details_tabs").tabs({cookie: {}}).show();
+    $tabBar.tabs({cookie: {}, active: initialTab >= 0 ? initialTab : null}).show();
 
     $add_section_form.formSubmit({
       required: ['course_section[name]'],
@@ -235,11 +240,11 @@ define([
 
     $(".edit_nav_link").click(function(event) {
       event.preventDefault();
-      $("#nav_form").dialog('close').dialog({
+      $("#nav_form").dialog({
         modal: true,
         resizable: false,
         width: 400
-      }).dialog('open');
+      });
     });
 
     $("#nav_enabled_list, #nav_disabled_list").sortable({
@@ -251,11 +256,10 @@ define([
 
     $(".hashtag_dialog_link").click(function(event) {
       event.preventDefault();
-      $("#hashtag_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#hashtag_dialog").dialog({
         title: I18n.t('titles.hashtag_help', "What's a Hashtag?"),
         width: 500
-      }).dialog('open');
+      });
     });
     $(".close_dialog_button").click(function() {
       $("#hashtag_dialog").dialog('close');
@@ -294,11 +298,10 @@ define([
     });
     $(".move_course_link").click(function(event) {
       event.preventDefault();
-      $("#move_course_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#move_course_dialog").dialog({
         title: I18n.t('titles.move_course', "Move Course"),
         width: 500
-      }).dialog('open');
+      });
     });
     $("#move_course_dialog").delegate('.cancel_button', 'click', function() {
       $("#move_course_dialog").dialog('close');
@@ -461,11 +464,10 @@ define([
 
     $(".reset_course_content_button").click(function(event) {
       event.preventDefault();
-      $("#reset_course_content_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#reset_course_content_dialog").dialog({
         title: I18n.t('titles.reset_course_content_dialog_help', "Reset Course Content"),
         width: 500
-      }).dialog('open');
+      });
     });
     $("#reset_course_content_dialog .cancel_button").click(function() {
       $("#reset_course_content_dialog").dialog('close');

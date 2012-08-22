@@ -374,7 +374,9 @@ describe 'Submissions API', :type => :integration do
                       :assignment_id => a1.id.to_s, :id => student1.id.to_s },
                     { :include => %w(submission_comments) })
 
-    json.should == {"grade"=>"A-",
+    json.should == {
+        "id"=>sub1.id,
+        "grade"=>"A-",
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -409,6 +411,21 @@ describe 'Submissions API', :type => :integration do
                     { :include => %w(submission_comments) })
     response.status.should =~ /401/
     JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
+  end
+
+  it "should api translate online_text_entry submissions" do
+    student1 = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student1).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    should_translate_user_content(@course) do |content|
+      sub1 = submit_homework(a1, student1, :body => content)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
+                    { :controller => "submissions_api", :action => "show",
+                      :format => "json", :course_id => @course.id.to_s,
+                      :assignment_id => a1.id.to_s, :id => student1.id.to_s })
+      json["body"]
+    end
   end
 
   it "should allow retrieving attachments without a session" do
@@ -490,9 +507,13 @@ describe 'Submissions API', :type => :integration do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => a1.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
-
+    
+    sub1.reload
+    sub2.reload
+    
     res =
-      [{"grade"=>"A-",
+      [{"id"=>sub1.id,
+        "grade"=>"A-",
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -505,10 +526,19 @@ describe 'Submissions API', :type => :integration do
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser",
              "id" => sub1.attachments.first.id,
-             "size" => sub1.attachments.first.size },
+             "size" => sub1.attachments.first.size,
+             'unlock_at' => nil,
+             'locked' => false,
+             'hidden' => false,
+             'lock_at' => nil,
+             'locked_for_user' => false,
+             'hidden_for_user' => false,
+             'created_at' => sub1.attachments.first.created_at.as_json,
+             'updated_at' => sub1.attachments.first.updated_at.as_json, },
          ],
         "submission_history"=>
-         [{"grade"=>nil,
+         [{"id"=>sub1.id,
+           "grade"=>nil,
            "body"=>"test!",
            "assignment_id" => a1.id,
            "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -520,8 +550,9 @@ describe 'Submissions API', :type => :integration do
            "grade_matches_current_submission"=>nil,
            "score"=>nil,
            "workflow_state" => "submitted"},
-          {"grade"=>nil,
-            "assignment_id" => a1.id,
+          {"id"=>sub1.id,
+           "grade"=>nil,
+           "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
               "media_id"=>"54321",
@@ -538,8 +569,9 @@ describe 'Submissions API', :type => :integration do
            "grade_matches_current_submission"=>nil,
            "score"=>nil,
            "workflow_state" => "submitted"},
-          {"grade"=>"A-",
-            "assignment_id" => a1.id,
+          {"id"=>sub1.id,
+           "grade"=>"A-",
+           "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
               "media_id"=>"54321","content-type" => "video/mp4",
@@ -552,7 +584,15 @@ describe 'Submissions API', :type => :integration do
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser",
                 "id" => sub1.attachments.first.id,
-                "size" => sub1.attachments.first.size },
+                "size" => sub1.attachments.first.size,
+                'unlock_at' => nil,
+                'locked' => false,
+                'hidden' => false,
+                'lock_at' => nil,
+                'locked_for_user' => false,
+                'hidden_for_user' => false,
+                'created_at' => sub1.attachments.first.created_at.as_json,
+                'updated_at' => sub1.attachments.first.updated_at.as_json, },
             ],
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -588,14 +628,16 @@ describe 'Submissions API', :type => :integration do
            "display_name" => nil },
         "score"=>13.5,
         "workflow_state"=>"graded"},
-       {"grade"=>"F",
+       {"id"=>sub2.id,
+        "grade"=>"F",
         "assignment_id" => a1.id,
         "body"=>nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1",
         "grade_matches_current_submission"=>true,
         "submitted_at"=>"1970-01-01T04:00:00Z",
         "submission_history"=>
-         [{"grade"=>"F",
+         [{"id"=>sub2.id,
+           "grade"=>"F",
            "assignment_id" => a1.id,
            "body"=>nil,
            "submitted_at"=>"1970-01-01T04:00:00Z",
@@ -613,6 +655,14 @@ describe 'Submissions API', :type => :integration do
               "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",
               "id" => sub2.attachments.first.id,
               "size" => sub2.attachments.first.size,
+              'unlock_at' => nil,
+              'locked' => false,
+              'hidden' => false,
+              'lock_at' => nil,
+              'locked_for_user' => false,
+              'hidden_for_user' => false,
+              'created_at' => sub2.attachments.first.created_at.as_json,
+              'updated_at' => sub2.attachments.first.updated_at.as_json,
             },
              {"content-type" => "image/png",
               "display_name" => "snapshot.png",
@@ -620,6 +670,14 @@ describe 'Submissions API', :type => :integration do
               "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?download_frd=1&verifier=#{sub2.attachment.uuid}",
               "id" => sub2.attachment.id,
               "size" => sub2.attachment.size,
+              'unlock_at' => nil,
+              'locked' => false,
+              'hidden' => false,
+              'lock_at' => nil,
+              'locked_for_user' => false,
+              'hidden_for_user' => false,
+              'created_at' => sub2.attachments.first.created_at.as_json,
+              'updated_at' => sub2.attachments.first.updated_at.as_json,
               },
             ],
            "score"=>9,
@@ -636,6 +694,14 @@ describe 'Submissions API', :type => :integration do
            "url" => "http://www.example.com/files/#{sub2.attachments.first.id}/download?download_frd=1&verifier=#{sub2.attachments.first.uuid}",
               "id" => sub2.attachments.first.id,
               "size" => sub2.attachments.first.size,
+             'unlock_at' => nil,
+             'locked' => false,
+             'hidden' => false,
+             'lock_at' => nil,
+             'locked_for_user' => false,
+             'hidden_for_user' => false,
+             'created_at' => sub2.attachments.first.created_at.as_json,
+             'updated_at' => sub2.attachments.first.updated_at.as_json,
          },
           {"content-type" => "image/png",
            "display_name" => "snapshot.png",
@@ -643,6 +709,14 @@ describe 'Submissions API', :type => :integration do
            "url" => "http://www.example.com/files/#{sub2.attachment.id}/download?download_frd=1&verifier=#{sub2.attachment.uuid}",
            "id" => sub2.attachment.id,
            "size" => sub2.attachment.size,
+           'unlock_at' => nil,
+           'locked' => false,
+           'hidden' => false,
+           'lock_at' => nil,
+           'locked_for_user' => false,
+           'hidden_for_user' => false,
+           'created_at' => sub2.attachments.first.created_at.as_json,
+           'updated_at' => sub2.attachments.first.updated_at.as_json,
            },
          ],
         "submission_comments"=>[],

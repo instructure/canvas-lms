@@ -193,4 +193,25 @@ describe ContentTag do
     quiz = course.quizzes.create!
     test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
   end
+
+  it "should allow skipping touches on save" do
+    course
+    @assignment = @course.assignments.create!(:title => "some assignment")
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({
+      :type => 'assignment',
+      :title => 'some assignment (renamed)',
+      :id => @assignment.id
+    })
+    @tag.update_asset_name!
+    @tag.reload
+
+    yesterday = 1.day.ago
+    ContextModule.update_all({:updated_at => yesterday}, {:id => @module.id})
+
+    @tag.skip_touch = true
+    @tag.save
+
+    @module.reload.updated_at.to_i.should == yesterday.to_i
+  end
 end

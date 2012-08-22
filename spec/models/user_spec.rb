@@ -791,6 +791,10 @@ describe User do
       @deleted_user.destroy
     end
 
+    it "should include yourself even when not enrolled in courses" do
+      @student.messageable_users(:ids => [@student.id]).should eql [@student]
+    end
+
     it "should only return users from the specified context and type" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
@@ -1057,6 +1061,43 @@ describe User do
         @student.group_membership_visibility[:user_counts][@group.id].should eql 1
       end
     end
+
+    context "admin_context" do
+      before do
+        set_up_course_with_users
+        account_admin_user
+      end
+
+      it "should find users in the course" do
+        @admin.messageable_users(:context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
+          [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
+      end
+
+      it "should find users in the section" do
+        @admin.messageable_users(:context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort.should ==
+          [@this_section_teacher.id, @this_section_user.id]
+      end
+
+      it "should find users in the group" do
+        @admin.messageable_users(:context => @group.asset_string, :admin_context => @group).map(&:id).sort.should ==
+          [@this_section_user.id]
+      end
+    end
+
+    context "skip_visibility_checks" do
+      it "should optionally show invited enrollments" do
+        course(:active_all => true)
+        student_in_course(:user_state => 'creation_pending')
+        @teacher.messageable_users(:skip_visibility_checks => true).map(&:id).should include @student.id
+      end
+
+      it "should optionally show pending enrollments in unpublished courses" do
+        course()
+        teacher_in_course(:active_user => true)
+        student_in_course()
+        @teacher.messageable_users(:skip_visibility_checks => true, :admin_context => @course).map(&:id).should include @student.id
+      end
+    end
   end
   
   context "lti_role_types" do
@@ -1164,13 +1205,13 @@ describe User do
         "https://somedomain/path"
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
-      User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :scheme => "http")).should ==
+      User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://")).should ==
         "http://foo/images/messages/avatar-50.png"
-      User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+      User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
         "https://bar/somepath"
-      User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+      User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
         "https://somedomain/path"
-      User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :scheme => "https")).should ==
+      User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
         "http://somedomain/path"
       User.avatar_fallback_url('%{fallback}').should ==
         '%{fallback}'
@@ -1723,7 +1764,7 @@ describe User do
 
       @user.user_account_associations.create!(:account_id => root_acct2.id)
       @user.reload
-      @user.common_account_chain(root_acct1).should be_nil
+      @user.common_account_chain(root_acct1).should == []
       @user.common_account_chain(root_acct2).should eql [root_acct2]
     end
 
@@ -1763,6 +1804,73 @@ describe User do
 
       @user.user_account_associations.create!(:account_id => sub_acct2.id)
       @user.reload.common_account_chain(root_acct).should eql [root_acct]
+    end
+  end
+
+  describe "mfa_settings" do
+    it "should be :disabled for unassociated users" do
+      user = User.new
+      user.mfa_settings.should == :disabled
+    end
+
+    it "should inherit from the account" do
+      user = User.create!
+      user.pseudonyms.create!(:account => Account.default, :unique_id => 'user')
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+
+      user.mfa_settings.should == :required
+
+      Account.default.settings[:mfa_settings] = :optional
+      Account.default.save!
+      user.reload
+      user.mfa_settings.should == :optional
+    end
+
+    it "should be the most-restrictive if associated with multiple accounts" do
+      user = User.create!
+      disabled_account = Account.create!(:settings => { :mfa_settings => :disabled })
+      optional_account = Account.create!(:settings => { :mfa_settings => :optional })
+      required_account = Account.create!(:settings => { :mfa_settings => :required })
+
+      p1 = user.pseudonyms.create!(:account => disabled_account, :unique_id => 'user')
+      user.mfa_settings.should == :disabled
+
+      p2 = user.pseudonyms.create!(:account => optional_account, :unique_id => 'user')
+      user.mfa_settings.should == :optional
+
+      p3 = user.pseudonyms.create!(:account => required_account, :unique_id => 'user')
+      user.mfa_settings.should == :required
+
+      p1.destroy
+      user.reload
+      user.mfa_settings.should == :required
+
+      p2.destroy
+      user.reload
+      user.mfa_settings.should == :required
+    end
+
+    it "should be required if admin and required_for_admins" do
+      user = User.create!
+      account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
+      user.pseudonyms.create!(:account => account, :unique_id => 'user')
+
+      user.mfa_settings.should == :optional
+      account.add_user(user)
+      user.reload
+      user.mfa_settings.should == :required
+    end
+
+    it "required_for_admins shouldn't get confused by admins in other accounts" do
+      user = User.create!
+      account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
+      user.pseudonyms.create!(:account => account, :unique_id => 'user')
+      user.pseudonyms.create!(:account => Account.default, :unique_id => 'user')
+
+      Account.default.add_user(user)
+
+      user.mfa_settings.should == :optional
     end
   end
 end

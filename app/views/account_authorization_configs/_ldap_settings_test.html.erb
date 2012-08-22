@@ -106,16 +106,16 @@ require([
 
   function testLDAP() {
     clearTestLDAP();
-    $("#test_ldap_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#test_ldap_dialog").dialog({
       title: <%= jt('#accounts.test_ldap_dialog_title', "Test LDAP Settings") %>,
       width: 500
-    }).dialog('open');
+    });
     <%= ldap_tests.first.js_function %>();
   }
   function clearTestLDAP() {
     <% ldap_tests.each do |test| %>
       $("#ldap_<%= test.test_type %>_result").html("");
+      $("#ldap_<%= test.test_type %>_help .server_error").remove();
       $("#ldap_<%= test.test_type %>_help").hide();
     <% end %>
     $("#ldap_login_result").html("");
@@ -125,13 +125,17 @@ require([
     function <%= test.js_function %>() {
       $("#ldap_<%= test.test_type %>_result").html("<img src='/images/ajax-loader.gif'/>");
       $.getJSON('<%= context_url(@account, test.url_context) %>', function(data) {
-        status = true;
+        var success = true;
+        var server_error = "";
         $.each(data, function(i, config) {
           if (!config['ldap_<%= test.test_type %>_test']) {
-            status = false;
+            success = false;
+            if(config['errors'][0] && config['errors'][0]['ldap_<%= test.test_type %>_test']) {
+              server_error = config['errors'][0]['ldap_<%= test.test_type %>_test'];
+            }
           }
         });
-        if (status == "true") {
+        if (success) {
           $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:green'>" + <%= jt('#accounts.test_ldap_result_ok', 'OK') %> + "</h4>");
           <% if next_test = ldap_tests[i+1] %>
             // proceed to the next test
@@ -143,6 +147,9 @@ require([
         } else {
           $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_failed', 'Failed') %> + "</h4>");
           $("#ldap_<%= test.test_type %>_help").show();
+          $server_error = $('<p></p>').addClass("server_error").css("color", "red").html(server_error);
+          $("#ldap_<%= test.test_type %>_help").append($server_error);
+
           <% ldap_tests[i+1..-1].each do |next_test| %>
             $("#ldap_<%= next_test.test_type %>_result").html("<h4 style='color:red'>" + <%= jt('#accounts.test_ldap_result_canceled', 'Canceled') %> + "</h4>");
           <% end %>
@@ -154,15 +161,15 @@ require([
   function testLDAPLogin() {
     $("#ldap_test_login").attr('disabled', 'true').attr('value', 'Testing...');
     $("#ldap_login_result").html("<img src='/images/ajax-loader.gif'/>");
-    username = $("#ldap_test_login_user").val();
-    password = $("#ldap_test_login_pass").val();
-    url = '<%= context_url(@account, :context_test_ldap_logins_url) %>';
+    var username = $("#ldap_test_login_user").val();
+    var password = $("#ldap_test_login_pass").val();
+    var url = '<%= context_url(@account, :context_test_ldap_logins_url) %>';
     $.post(url, {'username': username, 'password': password, authenticity_token: '<%= form_authenticity_token %>'}, function(data) {
-      status = true;
-      message = "";
+      var success = true;
+      var message = "";
       $.each(data, function(i, config) {
         if (!config['ldap_login_test']) {
-          status = false;
+          success = false;
         }
         if (config['errors']) {
           $.each(config['errors'], function(i, m) {
@@ -172,7 +179,7 @@ require([
           });
         }
       });
-      if (status == "true") {
+      if (success) {
         $("#ldap_login_help_error").hide();
         $("#ldap_login_result").html("<h4 style='color:green'>" + <%= jt('#accounts.test_ldap_result_ok', 'OK') %> + "</h4>");
         $("#ldap_test_login").attr('disabled', '').attr('value', 'Test Login');

@@ -49,9 +49,9 @@ describe Api::V1::User do
       @test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).has_key?("avatar_url").should be_false
       @test_api.services_enabled = [:avatars]
       @test_api.user_json(@student, @admin, {}, [], @course).has_key?("avatar_url").should be_false
-      @test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).should encompass({
-        "avatar_url" => "avatar_image_url(#{User.avatar_key(@student.id)})"
-      })
+      @test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)["avatar_url"].should match(
+        %r{^https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(@student.email)}.*#{CGI.escape("/images/messages/avatar-50.png")}}
+      )
     end
 
     it 'should use the correct SIS pseudonym' do
@@ -408,6 +408,11 @@ describe "Users API", :type => :integration do
           'locale' => 'en'
         }
         user.time_zone.should eql 'Tijuana'
+      end
+
+      it "should allow updating without any params" do
+        json = api_call(:put, @path, @path_options, {})
+        json.should_not be_nil
       end
 
       it "should update the user's avatar with a token" do

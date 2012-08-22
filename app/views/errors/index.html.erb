@@ -33,15 +33,21 @@
 
     <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
       <%= before_label :category, "category" %> <%= report.category || t(:default_category, 'default') %><br/>
-      <%= report.created_at %><br />
-      <%= report.url %><br/>
+      <%= before_label :created_at, "created at" %> <%= report.created_at %><br />
       <% if report.user_id %>
-        <%= link_to report.user.try(:name), user_url(report.user_id) %>
+        <%= before_label :user, "user" %> <%= link_to report.user.try(:name), user_url(report.user_id) %><br />
       <% end %>
-      <% (report.data || {}).each do |k,v| %>
+      <%= before_label :url, "url" %> <%= report.url %><br/>
+      <% if report.request_context_id %>
+        <%= before_label :request_context_id, "request context id" %> <%= report.request_context_id %>
+      <% end %>
+      <% (report.data || {}).to_a.sort.each do |k,v| %>
+        <% next if k.to_s == "exception_message" %>
         <br><%= before_label k.to_s %> <%= v %>
       <% end %>
+      <br />
       <pre style="font-size: 0.8em; margin-left: 20px; <%= "max-height: 150px;" if @reports.length > 1 %> overflow: auto;">
+        <%= report.data.try(:[], "exception_message") %><br />
         <%= report.backtrace %>
       </pre>
     </div>

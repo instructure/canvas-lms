@@ -50,8 +50,8 @@ module Canvas
         @paths ||= {
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
-          :uploadify => '../flash/uploadify/jquery.uploadify.v2.1.4',
           :use => 'vendor/use',
+          :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min'
         }.update(plugin_paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
   
@@ -95,6 +95,11 @@ module Canvas
             'vendor/slickgrid/plugins/slick.rowselectionmodel': {
               deps: ['use!vendor/slickgrid/slick.core'],
               attach: 'Slick'
+            },
+
+            'uploadify' : {
+              deps: ['jquery'],
+              attach: '$'
             }
           }
         JS

@@ -1,0 +1,5 @@
+{{#if this}}
+  {{#if avatar_image_url}}
+    <a {{#if html_url}} href="{{html_url}}" {{/if}} class="avatar" {{#if display_name}} title="{{display_name}}" {{/if}} data-user-id="{{id}}"><img src="{{avatar_image_url}}" alt="{{display_name}}"></a>
+  {{/if}}
+{{/if}}

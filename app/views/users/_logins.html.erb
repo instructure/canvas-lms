@@ -3,9 +3,9 @@
   <fieldset id="login_information">
     <legend><%= t('titles.logins', 'Login Information') %></legend>
     <table>
-      <% pseudonyms = @user.pseudonyms.active.scoped(:include => :account) + [nil] %>
+      <% pseudonyms = @user.pseudonyms.active.scoped(:include => { :account => :account_authorization_configs }) + [nil] %>
       <% pseudonyms.each do |pseudonym| %>
-        <% can_change_pseudonym_password = (pseudonym && pseudonym.account && pseudonym.account.settings && pseudonym.account.settings[:admins_can_change_passwords]) %>
+        <% can_change_pseudonym_password = (pseudonym && pseudonym.account && pseudonym.account.settings && pseudonym.account.settings[:admins_can_change_passwords]) && pseudonym.account.canvas_authentication? %>
         <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
           <th scope='row'>
             <b class='unique_id'><%= pseudonym && pseudonym.unique_id %></b>
@@ -60,6 +60,11 @@
         <tr class="add_holder">
           <td colspan="4" style="font-size: 0.8em;">
             <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" class="add_pseudonym_link"><%= t('add_login', 'Add Login') %></a>
+            <% if @user.otp_secret_key && (@user.mfa_settings != :required || @user != @current_user) %>
+              <span>|
+                <a href="<%= disable_mfa_path(@user) %>" class="reset_mfa_link"><%=  t('reset_mfa', "Reset Multi-Factor Authentication") %></a>
+              </span>
+            <% end %>
           </td>
         </tr>
       <% end %>

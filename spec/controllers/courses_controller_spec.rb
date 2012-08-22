@@ -172,7 +172,13 @@ describe CoursesController do
       get 'show', :id => @course.id
       assert_unauthorized
     end
-    
+
+    it "should not find deleted courses" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.destroy
+      lambda { get 'show', :id => @course.id }.should raise_exception(ActiveRecord::RecordNotFound)
+    end
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       get 'show', :id => @course.id

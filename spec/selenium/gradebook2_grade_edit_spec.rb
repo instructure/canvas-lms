@@ -113,20 +113,18 @@ describe "edititing grades" do
   end
 
   it "should edit a grade, move to the next cell and validate focus is not lost" do
-    pending('bug 7375 - server response causes active cell in same row to loose focus') do
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
 
-      first_cell = f('#gradebook_grid [row="0"] .l0')
-      grade_input = keep_trying_until do
-        first_cell.click
-        first_cell.find_element(:css, '.grade')
-      end
-      set_value(grade_input, 3)
-      first_cell.send_keys(:tab)
-      wait_for_ajax_requests
-      f('#gradebook_grid [row="0"] .l1').should have_class('editable')
+    first_cell = f('#gradebook_grid [row="0"] .l0')
+    grade_input = keep_trying_until do
+      first_cell.click
+      first_cell.find_element(:css, '.grade')
     end
+    set_value(grade_input, 3)
+    first_cell.send_keys(:tab)
+    wait_for_ajax_requests
+    f('#gradebook_grid [row="0"] .l1').should have_class('editable')
   end
 
   it "should update a grade when clicking outside of slickgrid" do
@@ -151,10 +149,10 @@ describe "edititing grades" do
     wait_for_ajaximations
 
     open_assignment_options(0)
-    f('#ui-menu-1-4').click
+    f('[data-action="curveGrades"]').click
     curve_form = f('#curve_grade_dialog')
     set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
-    find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
+    fj('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.dismiss
@@ -172,10 +170,10 @@ describe "edititing grades" do
     edit_grade(f('#gradebook_grid [row="1"] .l0'), '')
 
     open_assignment_options(0)
-    f('#ui-menu-1-4').click
+    f('[data-action="curveGrades"]').click
 
-    find_with_jquery('#assign_blanks').click
-    find_with_jquery('.ui-dialog-buttonpane button:visible').click
+    fj('#assign_blanks').click
+    fj('.ui-dialog-buttonpane button:visible').click
 
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
@@ -209,17 +207,15 @@ describe "edititing grades" do
   end
 
   it "should not factor non graded assignments into group total" do
-    pending("bug 7558 - Non-Graded Assignments are being factored in the Assignment Group's total") do
-      expected_totals = [STUDENT_1_TOTAL_IGNORING_UNGRADED, STUDENT_2_TOTAL_IGNORING_UNGRADED]
-      ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
-      @ungraded_assignment.grade_student(@student_1, :grade => 20)
-      ungraded_submission.save!
-      get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      assignment_group_cells = ff('.assignment-group-cell')
-      assignment_group_cells.each_with_index do |agc, i|
-        validate_cell_text(agc, expected_totals[i])
-      end
+    expected_totals = [STUDENT_1_TOTAL_IGNORING_UNGRADED, STUDENT_2_TOTAL_IGNORING_UNGRADED]
+    ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
+    @ungraded_assignment.grade_student(@student_1, :grade => 20)
+    ungraded_submission.save!
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    assignment_group_cells = ff('.assignment-group-cell')
+    assignment_group_cells.each_with_index do |agc, i|
+      validate_cell_text(agc, expected_totals[i])
     end
   end
 

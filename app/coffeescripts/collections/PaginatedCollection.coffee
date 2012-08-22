@@ -7,9 +7,7 @@ define [
 
     fetchNextPage: (options={}) ->
       throw new Error "can't fetch next page when @nextPageUrl is undefined" unless @nextPageUrl?
-      options = _.extend {}, options,
-        add: true
-        url: @nextPageUrl
+      options = _.extend({}, {add: true, url: @nextPageUrl}, options)
 
       @fetchingNextPage = true
       @trigger 'beforeFetchNextPage'
@@ -47,7 +45,6 @@ define [
 
       # useful for dispaying 'nothingToShow' messages
       @atLeastOnePageFetched = true
-
 
     parse: (response, xhr) ->
       @_parsePageLinks(xhr)

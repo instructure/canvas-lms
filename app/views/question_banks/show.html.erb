@@ -327,10 +327,10 @@ $(document).ready(function() {
         this.elements.$dialog.find('li message').hide();
       }
 
-      this.elements.$dialog.dialog('close').dialog({
+      this.elements.$dialog.dialog({
         title: this.messages.move_copy_questions,
         width: 600
-      }).dialog('open');
+      });
     },
     loadData: function(){
       this.elements.$questions.append(this.elements.$loadMessage);
@@ -368,10 +368,10 @@ $(document).ready(function() {
       data: template
     });
     $dialog.data('question', $(this).parents(".question_holder"));
-    $dialog.dialog('close').dialog({
+    $dialog.dialog({
       width: 600,
       title: <%= jt('title.move_copy_questions', "Move/Copy Questions") %>
-    }).dialog('open');
+    });
   });
   $("#move_question_dialog .submit_button").click(function() {
     var $dialog = $("#move_question_dialog");

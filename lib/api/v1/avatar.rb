@@ -25,26 +25,6 @@ module Api::V1::Avatar
     if feature_enabled?(:facebook) && facebook = user.facebook
       # TODO: add facebook picture if enabled
     end
-    if feature_enabled?(:twitter) && twitter = user.user_services.for_service('twitter').first
-      url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
-      data = JSON.parse(Net::HTTP.get(url)) rescue nil
-      if data
-        avatars << avatar_json(user, data['profile_image_url_https'], {
-          :type => 'twitter',
-          :alt => 'twitter pic'
-        })
-      end
-    end
-    if feature_enabled?(:linked_in) && linked_in = user.user_services.for_service('linked_in').first
-      self.extend LinkedIn
-      profile = linked_in_profile
-      if profile && profile['picture_url']
-        avatars << avatar_json(user, profile['picture_url'], {
-          :type => 'linked_in',
-          :alt => 'linked_in pic'
-        })
-      end
-    end
     avatars << avatar_json(user, user.gravatar_url(50, "/images/dotted_pic.png", request), {
       :type => 'gravatar',
       :alt => 'gravatar pic'
@@ -66,7 +46,7 @@ module Api::V1::Avatar
 
   def avatar_json(user, attachment_or_url, options = {})
     json = if options[:type] == 'attachment'
-      attachment_json(attachment_or_url, {}, { :thumbnail_url => true })
+      attachment_json(attachment_or_url, user, {}, { :thumbnail_url => true })
     else
       { 'url' => attachment_or_url }
     end

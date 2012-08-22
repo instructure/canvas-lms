@@ -97,15 +97,14 @@ define([
         });
 
         $box.data('editor', $editor);
-        $box.dialog('close').dialog({
-          autoOpen: false,
+        $box.dialog({
           width: 690,
           minWidth: 690,
           minHeight: 300,
           resizable: true,
           height: "auto",
           title: "Embed Math Equation"
-        }).dialog('open');
+        });
 
         // needs to be visible for some computed styles to work when we write
         // the equation

@@ -62,7 +62,6 @@ class Pseudonym < ActiveRecord::Base
     # blank.
     password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
-  attr_accessor :require_email_unique_id
 
   acts_as_list :scope => :user_id
   
@@ -189,7 +188,7 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def validate_unique_id
-    if (!self.account || self.account.email_pseudonyms || self.require_email_unique_id) && !self.deleted?
+    if (!self.account || self.account.email_pseudonyms) && !self.deleted?
       unless self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
         self.errors.add(:unique_id, t('errors.invalid_email_address', "\"%{email}\" is not a valid email address", :email => self.unique_id))
         return false
@@ -289,9 +288,12 @@ class Pseudonym < ActiveRecord::Base
     account = self.account || Account.default
     res = false
     res ||= valid_ldap_credentials?(plaintext_password) if account && account.ldap_authentication?
-    # Only check SIS if they haven't changed their password
-    res ||= valid_ssha?(plaintext_password) if password_auto_generated?
-    res ||= valid_password?(plaintext_password)
+    if account.canvas_authentication?
+      # Only check SIS if they haven't changed their password
+      res ||= valid_ssha?(plaintext_password) if password_auto_generated?
+      res ||= valid_password?(plaintext_password)
+    end
+    res
   end
   
   def generate_temporary_password
@@ -416,5 +418,14 @@ class Pseudonym < ActiveRecord::Base
       Canvas::Security.failed_login!(self, remote_ip)
     end
     nil
+  end
+
+  def mfa_settings
+    case self.account.mfa_settings
+    when :required_for_admins
+      self.account.all_account_users_for(self.user).empty? ? :optional : :required
+    else
+      self.account.mfa_settings
+    end
   end
 end

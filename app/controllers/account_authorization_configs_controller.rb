@@ -24,6 +24,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     @account_configs = @account.account_authorization_configs.to_a
     while @account_configs.length < 2
       @account_configs << @account.account_authorization_configs.new
+      @account_configs.last.auth_over_tls = :start_tls
     end
     @saml_identifiers = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
     @saml_login_attributes = AccountAuthorizationConfig.saml_login_attributes
@@ -102,10 +103,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The LDAP server's TCP port. (default: 389)
   #
-  # - auth_over_tls [Optional, Boolean]
+  # - auth_over_tls [Optional]
   #
-  #   Whether to use simple TLS encryption. Only simple TLS encryption is
-  #   supported at this time. (default: false)
+  #   Whether to use TLS. Can be '', 'simple_tls', or 'start_tls'. For backwards
+  #   compatibility, booleans are also accepted, with true meaning simple_tls.
+  #   If not provided, it will default to start_tls.
   #
   # - auth_base [Optional]
   #
@@ -116,6 +118,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   LDAP search filter. Use !{{login}} as a placeholder for the username
   #   supplied by the user. For example: "(sAMAccountName=!{{login}})".
+  #
+  # - identifier_format [Optional]
+  #
+  #   The LDAP attribute to use to look up the Canvas login. Omit to use
+  #   the username supplied by the user.
   #
   # - auth_username
   #
@@ -312,7 +319,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     when 'ldap'
       [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
         :auth_filter, :auth_username, :auth_password, :change_password_url,
-        :login_handle_name ]
+        :identifier_format, :login_handle_name ]
     when 'saml'
       [ :auth_type, :log_in_url, :log_out_url, :change_password_url, :requested_authn_context,
         :certificate_fingerprint, :identifier_format, :login_handle_name, :login_attribute ]
@@ -322,6 +329,12 @@ class AccountAuthorizationConfigsController < ApplicationController
   end
 
   def filter_data(data)
-    data ? data.slice(*recognized_params(data[:auth_type])) : {}
+    data ||= {}
+    data = data.slice(*recognized_params(data[:auth_type]))
+    if data[:auth_type] == 'ldap'
+      data[:auth_over_tls] = 'start_tls' unless data.has_key?(:auth_over_tls)
+      data[:auth_over_tls] = AccountAuthorizationConfig.auth_over_tls_setting(data[:auth_over_tls])
+    end
+    data
   end
 end

@@ -149,17 +149,33 @@ module ApplicationHelper
     end
   end
 
-  def avatar_image(user_id, width=50)
+  def avatar_image(user_or_id, width=50)
+    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
+    user = user_or_id.is_a?(User) && user_or_id
     if session["reported_#{user_id}"]
       image_tag "messages/avatar-50.png"
     else
-      image_tag(avatar_image_url(User.avatar_key(user_id || 0), :bust => Time.now.to_i), :style => "width: #{width}px;", :alt => '')
+      avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'
+      image_url, alt_tag = Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
+        if !user && user_id.to_i > 0
+          user = User.find(user_id)
+        end
+        if user
+          url = avatar_url_for_user(user)
+        else
+          url = "messages/avatar-50.png"
+        end
+        alt = user ? user.short_name : ''
+        [url, alt]
+      end
+      image_tag(image_url, :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px", :alt => alt_tag)
     end
   end
 
-  def avatar(user_id, context_code, height=50)
+  def avatar(user_or_id, context_code, width=50)
+    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     if service_enabled?(:avatars)
-      link_to(avatar_image(user_id, height), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
+      link_to(avatar_image(user_or_id, width), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
     end
   end
 
@@ -356,7 +372,7 @@ module ApplicationHelper
     @section_tabs ||= begin
       if @context
         html = []
-        tabs = Rails.cache.fetch([@context, @current_user, "section_tabs_hash", I18n.locale].cache_key) do
+        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, "section_tabs_hash", I18n.locale].cache_key) do
           if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
             tabs.select do |tab|
               if (tab[:id] == @context.class::TAB_CHAT rescue false)
@@ -424,6 +440,19 @@ module ApplicationHelper
 
   def show_user_create_course_button(user)
     @domain_root_account.manually_created_courses_account.grants_rights?(user, session, :create_courses, :manage_courses).values.any?
+  end
+
+  # Public: Create HTML for a sidebar button w/ icon.
+  #
+  # url - The url the button should link to.
+  # img - The path to an image (e.g. 'icon.png')
+  # label - The text to display on the button (should already be internationalized).
+  #
+  # Returns an HTML string.
+  def sidebar_button(url, label, img = nil)
+    link_to(url, :class => 'button button-sidebar-wide') do
+      img ? image_tag(img) + label : label
+    end
   end
 
   def hash_get(hash, key, default=nil)
@@ -658,25 +687,34 @@ module ApplicationHelper
     end
   end
 
-  def get_include_accounts
-    return @include_accounts if @include_accounts.present?
-    @include_accounts = [Account.site_admin, @domain_root_account]
+  def get_global_includes
+    return @global_includes if defined?(@global_includes)
+    @global_includes = [Account.site_admin.global_includes_hash]
+    @global_includes << @domain_root_account.global_includes_hash if @domain_root_account.present?
     if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding
-      common_chain = account_context(@context).try(:account_chain)
-      common_chain ||= @current_user.common_account_chain(@domain_root_account) if @current_user.present?
-      @include_accounts.concat(common_chain) if common_chain.present?
+      if acct = account_context(@context)
+        key = [acct.id, 'account_context_global_includes'].cache_key
+        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
+          acct.account_chain.reverse.map(&:global_includes_hash)
+        end
+        @global_includes.concat(includes)
+      elsif @current_user.present?
+        key = [@domain_root_account.id, 'common_account_global_includes', @current_user.id].cache_key
+        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
+          @current_user.common_account_chain(@domain_root_account).map(&:global_includes_hash)
+        end
+        @global_includes.concat(includes)
+      end
     end
-    @include_accounts.uniq!
-    @include_accounts.compact!
-    @include_accounts
+    @global_includes.uniq!
+    @global_includes.compact!
+    @global_includes
   end
 
   def include_account_js
-    includes = get_include_accounts.inject([]) do |js_includes, account|
-      if account && account.allow_global_includes? && account.settings[:global_javascript].present?
-        js_includes << "'#{account.settings[:global_javascript]}'"
-      end
+    includes = get_global_includes.inject([]) do |js_includes, global_include|
+      js_includes << "'#{global_include[:js]}'" if global_include[:js].present?
       js_includes
     end
     if includes.length > 0
@@ -701,14 +739,14 @@ module ApplicationHelper
   end
 
   def include_account_css
-    includes = get_include_accounts.inject([]) do |css_includes, account|
-      if account && account.allow_global_includes? && account.settings[:global_stylesheet].present?
-        css_includes << account.settings[:global_stylesheet]
-      end
+    includes = get_global_includes.inject([]) do |css_includes, global_include|
+      css_includes << global_include[:css] if global_include[:css].present?
       css_includes
     end
-    includes << { :media => 'all' }
-    stylesheet_link_tag *includes
+    if includes.length > 0
+      includes << { :media => 'all' }
+      stylesheet_link_tag *includes
+    end
   end
 
   # this should be the same as friendlyDatetime in handlebars_helpers.coffee
@@ -729,5 +767,11 @@ module ApplicationHelper
   def collection_cache_key(collection)
     keys = collection.map { |element| element.cache_key }
     Digest::MD5.hexdigest(keys.join('/'))
+  end
+
+  def add_uri_scheme_name(uri)
+    noSchemeName = !uri.match(/^(.+):\/\/(.+)/)
+    uri = 'http://' + uri if noSchemeName
+    uri
   end
 end

@@ -157,7 +157,7 @@ describe AccountsController do
       config = { :cas_base_url => account.account_authorization_config.auth_base }
       cas_client = CASClient::Client.new(config)
       get 'show', :id => account.id
-      response.should redirect_to(@controller.delegated_auth_redirect_uri(cas_client.add_service_to_login_url(login_url)))
+      response.should redirect_to(@controller.delegated_auth_redirect_uri(cas_client.add_service_to_login_url(cas_login_url)))
     end
   end
 
@@ -239,11 +239,14 @@ describe AccountsController do
       @account.sis_source_id.should be_nil
     end
 
-    it "should not allow non-site-admins to update global_includes" do
+    it "should not allow non-site-admins to update certain settings" do
       account_with_admin_logged_in
-      post 'update', :id => @account.id, :account => { :settings => { :global_includes => true } }
+      post 'update', :id => @account.id, :account => { :settings => { 
+        :global_includes => true, :enable_scheduler => true, :enable_profiles => true } }
       @account.reload
       @account.global_includes?.should be_false
+      @account.enable_scheduler?.should be_false
+      @account.enable_profiles?.should be_false
     end
 
     it "should allow site_admin to update global_includes" do
@@ -251,9 +254,12 @@ describe AccountsController do
       user_session(@user)
       @account = Account.create!
       Account.site_admin.add_user(@user)
-      post 'update', :id => @account.id, :account => { :settings => { :global_includes => true } }
+      post 'update', :id => @account.id, :account => { :settings => { 
+        :global_includes => true, :enable_scheduler => true, :enable_profiles => true } }
       @account.reload
       @account.global_includes?.should be_true
+      @account.enable_scheduler?.should be_true
+      @account.enable_profiles?.should be_true
     end
   end
 end

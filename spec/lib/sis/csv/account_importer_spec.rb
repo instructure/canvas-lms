@@ -154,4 +154,20 @@ describe SIS::CSV::AccountImporter do
     a1.root_account_id.should == @account.id
     a1.name.should == 'Humanities'
   end
+
+  it 'should not allow the creation of loops in account chains' do
+    process_csv_data_cleanly(
+      "Account_ID,Parent_Account_ID,Name,Status",
+      "A001,,Humanities,active",
+      "A002,A001,Humanities,active"
+    )
+    importer = process_csv_data(
+      "Account_ID,Parent_Account_ID,Name,Status",
+      "A001,A002,Humanities,active"
+    )
+    errors = importer.errors.map { |r| r.last }
+    warnings = importer.warnings.map { |r| r.last }
+    errors.should == []
+    warnings.should == ["Setting account A001's parent to A002 would create a loop"]
+  end
 end

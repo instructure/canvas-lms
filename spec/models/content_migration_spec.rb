@@ -270,6 +270,21 @@ describe ContentMigration do
       new_topic.message.should match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
     end
 
+    it "should keep date-locked files locked" do
+      student = user
+      @copy_from.enroll_student(student)
+      att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from, :lock_at => 1.month.ago, :unlock_at => 1.month.from_now)
+      att.grants_right?(student, :download).should be_false
+
+      run_course_copy
+
+      @copy_to.enroll_student(student)
+      new_att = @copy_to.attachments.find_by_migration_id(CC::CCHelper.create_key(att))
+      new_att.should be_present
+
+      new_att.grants_right?(student, :download).should be_false
+    end
+
     it "should tranlsate links to module items in html content" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
@@ -728,7 +743,23 @@ describe ContentMigration do
       g.assessment_question_bank_id.should == bank2.id
       g = q.quiz_groups[2]
       g.assessment_question_bank_id.should == nil
+    end
 
+    it "should omit deleted questions in banks" do
+      pending unless Qti.qti_enabled?
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      q1 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      q2 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
+      q3 = bank1.assessment_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}]})
+      q2.destroy
+
+      run_course_copy
+
+      bank2 = @copy_to.assessment_question_banks.first
+      bank2.should be_present
+      # we don't copy over deleted questions at all, not even marked as deleted
+      bank2.assessment_questions.active.size.should == 2
+      bank2.assessment_questions.size.should == 2
     end
 
     it "should copy a discussion topic when assignment is selected" do

@@ -32,13 +32,31 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   validates_presence_of :account_id
   validates_presence_of :entity_id, :if => Proc.new{|aac| aac.saml_authentication?}
   after_create :disable_open_registration_if_delegated
+  after_destroy :enable_canvas_authentication
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
+
+  def self.auth_over_tls_setting(value)
+    case value
+      when nil, '', false, 'false', 'f', 0, '0'
+        nil
+      when true, 'true', 't', 1, '1', 'simple_tls', :simple_tls
+        'simple_tls'
+      when 'start_tls', :start_tls
+        'start_tls'
+      else
+        raise ArgumentError("invalid auth_over_tls setting: #{value}")
+    end
+  end
+
+  def auth_over_tls
+    self.class.auth_over_tls_setting(read_attribute(:auth_over_tls))
+  end
 
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
     require 'net/ldap'
-    ldap = Net::LDAP.new(:encryption => (self.auth_over_tls ? :simple_tls : nil))
+    ldap = Net::LDAP.new(:encryption => self.auth_over_tls.try(:to_sym))
     ldap.host = self.auth_host
     ldap.port = self.auth_port
     ldap.base = self.auth_base
@@ -144,7 +162,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     end
     
     encryption = app_config[:encryption]
-    if encryption.is_a?(Hash) && File.exists?(encryption[:xmlsec_binary])
+    if encryption.is_a?(Hash)
       resolve_path = lambda { |path|
         if path.nil?
           nil
@@ -158,11 +176,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       private_key_path = resolve_path.call(encryption[:private_key])
       certificate_path = resolve_path.call(encryption[:certificate])
 
-      if File.exists?(private_key_path) && File.exists?(certificate_path)
-        settings.xmlsec1_path = encryption[:xmlsec_binary]
-        settings.xmlsec_certificate = certificate_path
-        settings.xmlsec_privatekey = private_key_path
-      end
+      settings.xmlsec_certificate = certificate_path if certificate_path.present? && File.exists?(certificate_path)
+      settings.xmlsec_privatekey = private_key_path if private_key_path.present? && File.exists?(private_key_path)
     end
     
     settings
@@ -212,36 +227,38 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         TCPSocket.open(self.auth_host, self.auth_port)
       end
       return true
+    rescue SocketError
+      self.errors.add(:ldap_connection_test, t(:test_host_unknown, "Unknown host: %{host}", :host => self.auth_host))
     rescue Timeout::Error
-      self.errors.add(
-        :ldap_connection_test,
-        t(:test_connection_timeout, "Timeout when connecting")
-      )
-    rescue
-      self.errors.add(
-        :ldap_connection_test,
-        t(:test_connection_failed, "Failed to connect to host/port")
-        )
+      self.errors.add(:ldap_connection_test, t(:test_connection_timeout, "Timeout when connecting"))
+    rescue => e
+      self.errors.add(:ldap_connection_test, e.message)
     end
     false
   end
 
   def test_ldap_bind
     begin
-      return self.ldap_connection.bind
-    rescue
-      self.errors.add(
-        :ldap_bind_test,
-        t(:test_bind_failed, "Failed to bind")
-      )
+      conn = self.ldap_connection
+      unless res = conn.bind
+        error = conn.get_operation_result
+        self.errors.add(:ldap_bind_test, "Error #{error.code}: #{error.message}")
+      end
+      return res
+    rescue => e
+      self.errors.add(:ldap_bind_test, t(:test_bind_failed, "Failed to bind with the following error: %{error}", :error => e.message))
       return false
     end
   end
 
   def test_ldap_search
     begin
-      res = self.ldap_connection.search {|s| break s}
-      return true if res
+      conn = self.ldap_connection
+      unless res = conn.search {|s| break s}
+        error = conn.get_operation_result
+        self.errors.add(:ldap_search_test, "Error #{error.code}: #{error.message}")
+      end
+      return res.present?
     rescue
       self.errors.add(
         :ldap_search_test,
@@ -276,7 +293,14 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       @account.save!
     end
   end
-  
+
+  def enable_canvas_authentication
+    if self.account.settings[:canvas_authentication] == false
+      self.account.settings[:canvas_authentication] = true
+      self.account.save!
+    end
+  end
+
   def debugging?
     !!Rails.cache.fetch(debug_key(:debugging))
   end

@@ -1,8 +1,10 @@
 define [
   'i18n!discussions'
+  'jquery'
   'Backbone'
   'underscore'
   'compiled/discussions/Topic'
+  'compiled/models/DiscussionTopic'
   'compiled/discussions/EntriesView'
   'compiled/discussions/EntryView'
   'jst/discussions/_reply_form'
@@ -11,7 +13,7 @@ define [
   'compiled/util/wikiSidebarWithMultipleEditors'
   'jquery.instructure_misc_helpers' #scrollSidebar
 
-], (I18n, Backbone, _, Topic, EntriesView, EntryView, replyTemplate, Reply, assignmentRubricDialog) ->
+], (I18n, $, Backbone, _, Topic, DiscussionTopic, EntriesView, EntryView, replyTemplate, Reply, assignmentRubricDialog) ->
 
   ##
   # View that considers the enter ERB template, not just the JS
@@ -47,6 +49,14 @@ define [
       $.scrollSidebar() if $(document.body).is('.with-right-side')
       assignmentRubricDialog.initTriggers()
       @disableNextUnread()
+
+      # this is weird but Topic.coffee was not set up to talk to the API for CRUD
+      $('.discussion_locked_toggler').click ->
+        locked = $(this).data('mark-locked')
+        topic = new DiscussionTopic(id: ENV.DISCUSSION.TOPIC.ID)
+        # get rid of the /view on /api/vl/courses/x/discusison_topics/x/view
+        topic.url = ENV.DISCUSSION.ROOT_URL.replace /\/view/m, ''
+        topic.save({locked: locked}).done -> window.location.reload()
 
       @$el.toggleClass 'side_comment_discussion', !ENV.DISCUSSION.THREADED
 

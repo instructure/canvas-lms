@@ -50,7 +50,7 @@ class SisImportsApiController < ApplicationController
   #
   #   Examples:
   #     curl -F attachment=@<filename> -H "Authorization: Bearer <token>" \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
   #
   #   If you decide to do a raw post, you can skip the 'attachment' argument,
   #   but you will then be required to provide a suitable Content-Type header.
@@ -59,19 +59,19 @@ class SisImportsApiController < ApplicationController
   #   Examples:
   #     curl -H 'Content-Type: application/octet-stream' --data-binary @<filename>.zip \ 
   #         -H "Authorization: Bearer <token>" \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&extension=zip'
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&extension=zip'
   #
   #     curl -H 'Content-Type: application/zip' --data-binary @<filename>.zip \ 
   #         -H "Authorization: Bearer <token>" \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
   #
   #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \ 
   #         -H "Authorization: Bearer <token>" \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
   #
   #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \ 
   #         -H "Authorization: Bearer <token>" \ 
-  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
   #
   # @argument extension Recommended for raw post request style imports. This
   #   field will be used to distinguish between zip, xml, csv, and other file
@@ -80,7 +80,7 @@ class SisImportsApiController < ApplicationController
   #   inferred from the Content-Type, falling back to zip-file format if all
   #   else fails.
   #
-  # @argument batch_mode ["1"] If set, this SIS import will be run in batch mode, deleting any data previously imported via SIS that is not present in this latest import.  See the PDF document for details.
+  # @argument batch_mode ["1"] If set, this SIS import will be run in batch mode, deleting any data previously imported via SIS that is not present in this latest import.  See the SIS CSV Format page for details.
   #
   # @argument batch_mode_term_id Limit deletions to only this term, if batch
   #   mode is enabled.

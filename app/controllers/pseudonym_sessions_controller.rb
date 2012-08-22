@@ -19,9 +19,11 @@
 class PseudonymSessionsController < ApplicationController
   protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
+  before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
+  before_filter :require_user, :only => [ :otp_login ]
 
   def new
-    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id]
+    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
       redirect_to dashboard_url
       return
     end
@@ -35,6 +37,11 @@ class PseudonymSessionsController < ApplicationController
     session[:confirm] = params[:confirm] if params[:confirm]
     session[:enrollment] = params[:enrollment] if params[:enrollment]
 
+    if @current_pseudonym
+      params[:pseudonym_session] ||= {}
+      params[:pseudonym_session][:unique_id] ||= @current_pseudonym.unique_id
+    end
+
     @pseudonym_session = PseudonymSession.new
     @headers = false
     @is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
@@ -44,13 +51,13 @@ class PseudonymSessionsController < ApplicationController
       if params[:ticket]
         # handle the callback from CAS
         logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
-        st = CASClient::ServiceTicket.new(params[:ticket], login_url)
+        st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
         begin
           cas_client.validate_service_ticket(st)
         rescue => e
           logger.warn "Failed to validate CAS ticket: #{e.inspect}"
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
-          redirect_to login_url(:no_auto=>'true')
+          redirect_to cas_login_url(:no_auto=>'true')
           return
         end
         if st.is_valid?
@@ -68,13 +75,13 @@ class PseudonymSessionsController < ApplicationController
             logger.warn "Received CAS login for unknown user: #{st.response.user}"
             reset_session
             session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.response.user
-            redirect_to(cas_client.logout_url(login_url :no_auto => true))
+            redirect_to(cas_client.logout_url(cas_login_url :no_auto => true))
             return
           end
         else
           logger.warn "Failed CAS login attempt."
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
-          redirect_to login_url(:no_auto=>'true')
+          redirect_to cas_login_url(:no_auto=>'true')
           return
         end
       end
@@ -112,6 +119,22 @@ class PseudonymSessionsController < ApplicationController
     @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session])
     @pseudonym_session.remote_ip = request.remote_ip
     found = @pseudonym_session.save
+
+    # look for LDAP pseudonyms where we get the unique_id back from LDAP
+    if !found && !@pseudonym_session.attempted_record
+      @domain_root_account.account_authorization_configs.each do |aac|
+        next unless aac.ldap_authentication?
+        next unless aac.identifier_format.present?
+        res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
+        unique_id = res.first[aac.identifier_format].first if res
+        if unique_id && pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
+          pseudonym.instance_variable_set(:@ldap_result, res)
+          @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
+          found = @pseudonym_session.save
+          break
+        end
+      end
+    end
 
     if !found && params[:pseudonym_session]
       pseudonym = Pseudonym.authenticate(params[:pseudonym_session], @domain_root_account.trusted_account_ids, request.remote_ip)
@@ -181,7 +204,7 @@ class PseudonymSessionsController < ApplicationController
     elsif @domain_root_account.cas_authentication? and session[:cas_login]
       reset_session
       session[:delegated_message] = message if message
-      redirect_to(cas_client.logout_url(login_url))
+      redirect_to(cas_client.logout_url(cas_login_url))
       return
     else
       reset_session
@@ -360,9 +383,105 @@ class PseudonymSessionsController < ApplicationController
     true
   end
 
-  def successful_login(user, pseudonym)
+  def otp_remember_me_cookie_domain
+    ActionController::Base.session_options[:domain]
+  end
+
+  def otp_login(send_otp = false)
+    if !@current_user.otp_secret_key || request.method == :get
+      session[:pending_otp_secret_key] ||= ROTP::Base32.random_base32
+    end
+    if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :otp_communication_channel_id)
+      @cc = @current_user.communication_channels.sms.unretired.find(params[:otp_login][:otp_communication_channel_id])
+      session[:pending_otp_communication_channel_id] = @cc.id
+      send_otp = true
+    end
+    if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :phone_number)
+      path = "#{params[:otp_login][:phone_number].gsub(/[^\d]/, '')}@#{params[:otp_login][:carrier]}"
+      @cc = @current_user.communication_channels.sms.by_path(path).first
+      @cc ||= @current_user.communication_channels.sms.create!(:path => path)
+      if @cc.retired?
+        @cc.workflow_state = 'unconfirmed'
+        @cc.save!
+      end
+      session[:pending_otp_communication_channel_id] = @cc.id
+      send_otp = true
+    end
+    secret_key = session[:pending_otp_secret_key] || @current_user.otp_secret_key
+    if send_otp
+      @cc ||= @current_user.otp_communication_channel
+      @cc.try(:send_later_if_production_enqueue_args, :send_otp!, { :priority => Delayed::HIGH_PRIORITY, :max_attempts => 1 }, ROTP::TOTP.new(secret_key).now)
+    end
+
+    return render :action => 'otp_login' unless params[:otp_login].try(:[], :verification_code)
+
+    drift = 30
+    # give them 5 minutes to enter an OTP sent via SMS
+    drift = 300 if session[:pending_otp_communication_channel_id] ||
+        (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
+
+    if ROTP::TOTP.new(secret_key).verify_with_drift(params[:otp_login][:verification_code], drift)
+      if session[:pending_otp_secret_key]
+        @current_user.otp_secret_key = session.delete(:pending_otp_secret_key)
+        @current_user.otp_communication_channel_id = session.delete(:pending_otp_communication_channel_id)
+        @current_user.otp_communication_channel.try(:confirm)
+        @current_user.save!
+      end
+
+      if params[:otp_login][:remember_me] == '1'
+        now = Time.now.utc
+        self.cookies['canvas_otp_remember_me'] = {
+              :value => @current_user.otp_secret_key_remember_me_cookie(now),
+              :expires => now + 30.days,
+              :domain => otp_remember_me_cookie_domain,
+              :httponly => true,
+              :secure => ActionController::Base.session_options[:secure],
+              :path => '/login'
+            }
+      end
+      if session.delete(:pending_otp)
+        successful_login(@current_user, @current_pseudonym, true)
+      else
+        flash[:notice] = t 'notices.mfa_complete', "Multi-factor authentication configured"
+        redirect_to settings_profile_url
+      end
+    else
+      @cc ||= @current_user.otp_communication_channel if !session[:pending_otp_secret_key]
+      flash.now[:error] = t 'errors.invalid_otp', "Invalid verification code, please try again"
+    end
+  end
+
+  def disable_otp_login
+    if params[:user_id] == 'self'
+      @user = @current_user
+    else
+      @user = User.find(params[:user_id])
+      return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
+    end
+    return render_unauthorized_action if @user == @current_user && @user.mfa_settings == :required
+
+    @user.otp_secret_key = nil
+    @user.otp_communication_channel = nil
+    @user.save!
+
+    render :json => {}
+  end
+
+  def successful_login(user, pseudonym, otp_passed = false)
     @current_user = user
     @current_pseudonym = pseudonym
+
+    otp_passed ||= cookies['canvas_otp_remember_me'] &&
+        @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'])
+    if !otp_passed
+      mfa_settings = @current_pseudonym.mfa_settings
+      if (@current_user.otp_secret_key && mfa_settings == :optional) ||
+          mfa_settings == :required
+        session[:pending_otp] = true
+        return otp_login(true)
+      end
+    end
+
     respond_to do |format|
       if session[:oauth2]
         return redirect_to(oauth2_auth_confirm_url)
@@ -455,6 +574,12 @@ class PseudonymSessionsController < ApplicationController
       'access_token' => token.token,
       'user' => user.as_json(:only => [:id, :name], :include_root => false),
     }
+  end
+
+  def oauth2_logout
+    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
+    @access_token.destroy
+    render :json => {}
   end
 
   def final_oauth2_redirect(redirect_uri, opts = {})

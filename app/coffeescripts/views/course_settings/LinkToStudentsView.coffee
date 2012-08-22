@@ -4,6 +4,7 @@ define [
   'underscore'
   'compiled/views/DialogBaseView'
   'jst/courses/settings/LinkToStudentsView'
+  'compiled/jquery.whenAll'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, DialogBaseView, linkToStudentsViewTemplate) ->
 
@@ -31,8 +32,9 @@ define [
         selector:
           baseData:
             type: 'user'
-            context: "course_#{ENV.COURSE_ID}"
+            context: "course_#{ENV.COURSE_ID}_students"
             exclude: [@model.get('id')]
+            skip_visibility_checks: true
           preparer: (postData, data, parent) ->
             row.noExpand = true for row in data
           browser:
@@ -49,7 +51,9 @@ define [
             text: user.name
             data: user
 
-      $.when(dfds...).done -> dfd.resolve()
+      # if a dfd fails (e.g. observee was removed from course), we still want
+      # the observer dialog to render (possibly with other observees)
+      $.whenAll(dfds...).always -> dfd.resolve(data)
       this
 
     getUserData: (id) ->

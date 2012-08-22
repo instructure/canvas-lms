@@ -97,7 +97,16 @@ describe "group weights" do
   it "should display group weights correctly when set on assignment groups" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    check_group_points('50%')
+    check_group_points('50.00%')
+  end
+
+  it "should display group weights with fractional value" do
+    @group1.group_weight = 70.5; @group1.save!
+    @group2.group_weight = 29.5; @group2.save!
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    validate_group_weight_text([@group1, @group2], ['70.50', '29.50'])
   end
 
   it "should display group weights correctly when unsetting group weights through assignments page" do

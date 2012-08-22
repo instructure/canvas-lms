@@ -319,13 +319,6 @@ class GroupsController < ApplicationController
     end
   end
 
-  def edit
-    @group = (@context ? @context.groups : Group).find(params[:id])
-    @context = @group
-    if authorized_action(@group, @current_user, :update)
-    end
-  end
-
   # @API Edit a group
   #
   # Modifies an existing group.  Note that to set an avatar image for the
@@ -564,7 +557,9 @@ class GroupsController < ApplicationController
   end
 
   def edit
-    @use_new_styles = true
+    account = @context.root_account
+    raise ActiveRecord::RecordNotFound unless account.canvas_network_enabled?
+
     @group = (@context ? @context.groups : Group).find(params[:id])
     @context = @group
 

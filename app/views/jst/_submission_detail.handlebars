@@ -8,8 +8,8 @@
       <div>
         {{#each attachments}}
           <div class="submisison-attachment">
-            {{#if turnitin_data.reportUrl}}
-              {{#with turnitin_data}}
+            {{#if turnitin.reportUrl}}
+              {{#with turnitin}}
                 <span class="turnitin_score_container">{{> turnitinScore}}</span>
               {{/with}}
             {{/if}}
@@ -18,9 +18,14 @@
         {{/each}}
       </div>
     {{/if}}
-    {{#if submission_type_is_online_text_entry}}
+    {{#ifEqual submission_type "online_text_entry"}}
+      {{#if turnitin.reportUrl}}
+        {{#with turnitin}}
+          <span class="turnitin_score_container">{{> turnitinScore}}</span>
+        {{/with}}
+      {{/if}}
       {{#t "online_text_entry_see_details_in_the_speedgrader."}}Online Text Entry, <a href="%{speedGraderUrl}">see details in the SpeedGrader</a>.{{/t}}
-    {{/if}}
+    {{/ifEqual}}
   {{else}}
     {{#t "no_submission"}}No submission{{/t}}
   {{/if}}

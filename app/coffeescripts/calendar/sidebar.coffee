@@ -67,7 +67,15 @@ define [
 
     visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
-    $holder.find('.settings').kyleMenu(buttonOpts: {icons: { primary:'ui-icon-cog-with-droparrow', secondary: null}})
+    $holder.find('.settings').kyleMenu
+      buttonOpts:
+        icons:
+          primary:'ui-icon-cog-with-droparrow'
+          secondary: null
+      popupOpts:
+        position:
+          offset: '-25px 10px'
+          within: '#right-side'
 
     $holder.delegate '.context_list_context', 'click', (event) ->
       # dont toggle if thy were clicking the .settings button

@@ -502,6 +502,29 @@ describe CalendarEventsApiController, :type => :integration do
       event.reload.should be_deleted
     end
 
+    it 'should api translate event descriptions' do
+      should_translate_user_content(@course) do |content|
+        event = @course.calendar_events.create!(:title => 'event', :start_at => '2012-01-08 12:00:00', :description => content)
+        json = api_call(:get, "/api/v1/calendar_events/#{event.id}",
+                        :controller => 'calendar_events_api', :action => 'show', :format => 'json',
+                        :id => event.id.to_s)
+        json['description']
+      end
+    end
+
+    it 'should api translate event descriptions in ics' do
+      HostUrl.stubs(:default_host).returns('www.example.com')
+      should_translate_user_content(@course) do |content|
+        @course.calendar_events.create!(:description => content, :start_at => Time.now + 1.hours, :end_at => Time.now + 2.hours)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}",
+                        :controller => 'courses', :action => 'show', :format => 'json', :id => @course.id.to_s)
+        get json['calendar']['ics']
+        response.should be_success
+        cal = Icalendar.parse(response.body)[0]
+        cal.events[0].x_alt_desc
+      end
+    end
+
     context "child_events" do
       it "should create an event with child events" do
         json = api_call(:post, "/api/v1/calendar_events",

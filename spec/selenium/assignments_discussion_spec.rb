@@ -22,7 +22,7 @@ describe "discussion assignments" do
     build_assignment_with_type("Discussion")
 
     expect_new_page_load { driver.find_element(:css, "#left-side .discussions").click }
-    driver.find_elements(:css, "#topic_list .discussion_topic").should_not be_empty
+    driver.find_elements(:css, ".discussionTopicIndexList .discussion-topic").should_not be_empty
   end
 
   it "should redirect to the discussion topic" do

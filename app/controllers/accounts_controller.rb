@@ -100,7 +100,6 @@ class AccountsController < ApplicationController
 
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
-        global_includes = !!params[:account][:settings].try(:delete, :global_includes)
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin? 
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
@@ -111,10 +110,21 @@ class AccountsController < ApplicationController
         if Account.site_admin.grants_right?(@current_user, :manage_site_settings)
           @account.enable_user_notes = enable_user_notes if enable_user_notes
           @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
-          if params[:account][:settings]
-            @account.settings[:admins_can_change_passwords] = !!params[:account][:settings][:admins_can_change_passwords]
-            @account.settings[:global_includes] = global_includes
-            @account.settings[:enable_eportfolios] = !!params[:account][:settings][:enable_eportfolios] unless @account.site_admin?
+          if @account.site_admin? && params[:account][:settings]
+            # these shouldn't get set for the site admin account
+            params[:account][:settings].delete(:enable_alerts)
+            params[:account][:settings].delete(:enable_eportfolios)
+          end
+        else
+          # must have :manage_site_settings to update these
+          [ :admins_can_change_passwords,
+            :enable_alerts,
+            :enable_eportfolios,
+            :enable_profiles,
+            :enable_scheduler,
+            :global_includes,
+          ].each do |key|
+            params[:account][:settings].try(:delete, key)
           end
         end
         if sis_id = params[:account].delete(:sis_source_id)
@@ -229,7 +239,7 @@ class AccountsController < ApplicationController
         end
       end
       if @account.grants_right?(@current_user, nil, :read_roster)
-        @recently_logged_users = @account.all_users.recently_logged_in[0,25]
+        @recently_logged_users = @account.all_users.recently_logged_in
       end
       @counts_report = @account.report_snapshots.detailed.last.try(:data)
     end

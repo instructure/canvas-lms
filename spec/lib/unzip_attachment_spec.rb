@@ -126,7 +126,7 @@ describe UnzipAttachment do
       @filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures attachments-none-scribdable.zip)))
       @ua = UnzipAttachment.new(:course => @course, :filename => @filename)
       @ua.process
-      Delayed::Job.count(:conditions => { :strand => 'scribd' }).should == 0
+      Delayed::Job.strand_size('scribd').should == 0
     end
 
     it "should queue a scribd job if there is a scribdable attachment" do
@@ -134,7 +134,7 @@ describe UnzipAttachment do
       @ua = UnzipAttachment.new(:course => @course, :filename => @filename)
       @ua = UnzipAttachment.new(:course => @course, :filename => @filename)
       @ua.process
-      Delayed::Job.count(:conditions => { :strand => 'scribd' }).should == 1
+      Delayed::Job.strand_size('scribd').should == 1
     end
   end
 end

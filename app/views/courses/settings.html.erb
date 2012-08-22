@@ -11,80 +11,9 @@
 
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 %>
+
 <% content_for :right_side do %>
-
-  <div class="rs-margin-lr rs-margin-top">
-    <% if can_do(@context, @current_user, :use_student_view) %>
-      <%= link_to image_tag("student_view_icon.png") + " " + t('links.student_view', %{Student View}), course_student_view_path(@context), { :method => :post, :class => 'button button-sidebar-wide student_view_button' }%>
-    <% end %>
-    <% if can_do(@context, @current_user, :read_reports) %>
-      <a href="<%= context_url(@context, :context_statistics_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> <%= t('links.stats', %{Course Statistics}) %></a>
-    <% end %>
-    <% if can_do(@context, @current_user, :read) %>
-      <a href="<%= calendar_url_for(@context) %>" class="button button-sidebar-wide" id="course_calendar_link"><%= image_tag "calendar_icon.png" %> <%= t('links.calendar', %{Course Calendar}) %></a>
-    <% end %>
-
-    <% if can_do(@context, @current_user, :change_course_state) %>
-      <% if @context.completed? %>
-        <% form_tag context_url(@context, :context_unconclude_url) do %>
-          <button class="button button-sidebar-wide" type="submit"><%= image_tag "add.png" %><%= t('buttons.unconclude', %{Un-Conclude Course}) %></button>
-        <% end %>
-      <% else %>
-        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.conclude', %{End this Course}) %></a>
-      <% end %>
-    <% end %>
-    <% if can_do(@context, @current_user, :delete) && !@context.deleted? %>
-      <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'delete') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.delete', %{Permanently Delete this Course}) %></a>
-    <% end %>
-    <% if show_user_create_course_button(@current_user) && can_do(@context, @current_user, :read) %>
-      <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.copy', %{Copy this Course}) %></a>
-    <% end %>
-    <% if can_do(@context, @current_user, :manage_content, :manage_files, :manage_quizzes) %>
-      <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide import_content"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
-    <% end %>
-    <% if can_do(@context, @current_user, :read) %>
-      <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export_content', %{Export Course Content}) %></a>
-    <% end %>
-    <% if can_do(@context, @current_user, :reset_content) %>
-      <a href="<%= context_url(@context, :course_reset_url) %>" class="button button-sidebar-wide reset_course_content_button"><%= image_tag "delete.png" %><%= t('links.reset', %{Reset Course Content}) %></a>
-      <div id="reset_course_content_dialog" style="display: none;">
-          <%= mt 'help.reset_course_content', %{Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content.  This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?} %>
-          <% form_for @context, :url => context_url(@context, :course_reset_url), :html => {:method => 'post'} do %>
-            <div class="button-container">
-              <button type="submit" class="submit_button button"><%= t('buttons.reset', %{Reset Course Content}) %></button>
-              <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
-            </div>
-          <% end %>
-        </div>
-    <% end %>
-    <table class="summary" style="margin-top: 20px;">
-      <thead>
-      <tr>
-        <th colspan="2"><%= t('headings.current_users', %{Current Users}) %></th>
-      </tr>
-      </thead>
-      <tr>
-        <td><%= before_label('students', %{Students}) %></td>
-        <td class="student_count"><%= @user_counts[:student] == 0 ? t('none', "None") : @user_counts[:student] %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('teachers', %{Teachers}) %></td>
-        <td class="teacher_count"><%= @user_counts[:teacher] ? t('none', "None") : @user_counts[:teacher] %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('tas', %{TAs}) %></td>
-        <td class="ta_count"><%= @user_counts[:ta] ? t('none', "None") : @user_counts[:ta] %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('observers', %{Observers}) %></td>
-        <td class="observer_count"><%= @user_counts[:observer] ? t('none', "None") : @user_counts[:observer] %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('designers', %{Designers}) %></td>
-        <td class="designer_count"><%= @user_counts[:designer] ? t('none', "None") : @user_counts[:designer] %></td>
-      </tr>
-    </table>
-  </div>
+  <%= render :partial => 'settings_sidebar' %>
 <% end %>
 
 <div id="course_details_tabs" style="display:none;">
@@ -112,8 +41,8 @@
     <% form_for @context, :html => {:id => "course_form"} do |f| %>
     <table class="formtable">
       <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.blabel :name, :course_name, :en => "Name" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
+        <td><%= f.blabel :name, :course_name, :en => "Name" %></td>
+        <td class="nobr">
           <% if can_rename_course %>
             <%= f.text_field :name, :class => "course_form", :style => "width: 150px;" %>
           <% else %>
@@ -134,7 +63,7 @@
         <% end %>
       </tr>
       <tr>
-        <td style="width: 10%; white-space: nowrap;"><%= f.blabel :course_code, :en => "Course Code" %></td>
+        <td class="nobr"><%= f.blabel :course_code, :en => "Course Code" %></td>
         <td class="nobr">
           <% if can_rename_course %>
             <span class="course_form"><%= f.text_field :course_code, :style => "width: 100px;" %></span>
@@ -288,7 +217,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         </td>
       <% if @context.turnitin_enabled? %>
       </tr><tr>
-        <td style="width: 10%;"><%= f.blabel :turnitin_comments, :en => "Turnitin Submission Comments" %></td>
+        <td style="width: 10%;"><%= f.blabel :turnitin_comments, :en => "Turnitin Comments" %></td>
         <td class="nobr">
           <span class="course_form"><span style="font-size: 0.8em;"><%= t('turnitin', %{these comments will be shown to students when submitting a Turnitin-enabled assignment}) %></span><br/><%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %></span>
           <span class="course_info turnitin_comments"><%= @context.turnitin_comments %></span>
@@ -637,7 +566,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
   </div>
 <% end %>
 <script>
-  var sisPublishEnabled = "<%= publishing_enabled %>";
+  var sisPublishEnabled = <%= publishing_enabled %>;
 </script>
 <div id="edit_letter_grades_form" style="display: none;" data-context_code="<%= @context.asset_string %>">
   <%= render :partial => "shared/grading_standard", :object => @context.grading_standard %>

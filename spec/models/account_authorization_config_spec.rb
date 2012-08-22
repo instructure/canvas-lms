@@ -46,7 +46,6 @@ describe AccountAuthorizationConfig do
         :tech_contact_name => 'Admin Dude',
         :tech_contact_email => 'admindude@example.com',
         :encryption => {
-          :xmlsec_binary => file_that_exists,
           :private_key => file_that_exists,
           :certificate => file_that_exists
         }
@@ -88,5 +87,26 @@ describe AccountAuthorizationConfig do
       c.auth_password = "2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3"
       c.auth_decrypted_password.should eql("2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3")
     end
+  end
+
+  it "should enable canvas auth when destroyed" do
+    Account.default.settings[:canvas_authentication] = false
+    Account.default.save!
+    Account.default.canvas_authentication?.should be_true
+    aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
+    Account.default.canvas_authentication?.should be_false
+    aac.destroy
+    Account.default.reload.canvas_authentication?.should be_true
+    Account.default.settings[:canvas_authentication].should_not be_false
+    Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
+    # still true
+    Account.default.reload.canvas_authentication?.should be_true
+  end
+
+  it "should disable open registration when created" do
+    Account.default.settings[:open_registration] = true
+    Account.default.save!
+    Account.default.account_authorization_configs.create!(:auth_type => 'cas')
+    Account.default.reload.open_registration?.should be_false
   end
 end

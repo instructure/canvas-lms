@@ -17,6 +17,7 @@
 #
 
 module CustomValidations
+  class RelativeUriError < ArgumentError; end
 
   # returns [normalized_url_string, URI] if valid, raises otherwise
   def self.validate_url(value)
@@ -27,7 +28,8 @@ module CustomValidations
       value = "http://#{value}"
       uri = URI.parse(value)
     end
-    raise ArgumentError unless uri.host && %w(http https).include?(uri.scheme.downcase)
+    raise(RelativeUriError) if uri.host.blank?
+    raise ArgumentError unless %w(http https).include?(uri.scheme.downcase)
     return value, uri
   end
 

@@ -238,7 +238,7 @@ describe "API Authentication", :type => :integration do
           CASClient::Client.stubs(:new).returns(cas)
 
           get response['Location']
-          response.should redirect_to(@controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(login_url)))
+          response.should redirect_to(@controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(cas_login_url)))
 
           get '/login', :ticket => 'ST-abcd'
           response.should be_redirect
@@ -485,6 +485,17 @@ describe "API Authentication", :type => :integration do
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = JSON.parse(response.body)
       json['message'].should == "Invalid access token."
+    end
+
+    it "should be able to log out" do
+      get "/api/v1/courses?access_token=#{@token.token}"
+      response.should be_success
+
+      delete "/login/oauth2/token?access_token=#{@token.token}"
+      response.should be_success
+
+      get "/api/v1/courses?access_token=#{@token.token}"
+      response.status.to_i.should == 401
     end
 
     context "sharding" do

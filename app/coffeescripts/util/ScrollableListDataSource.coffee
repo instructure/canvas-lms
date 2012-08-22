@@ -71,7 +71,7 @@ define [
         item.list = @list
         item
 
-      if data.length
+      if data.length?
         (modelize(item) for item in data)
       else
         modelize(data)

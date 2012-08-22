@@ -41,22 +41,22 @@ describe AssignmentGroupsController, :type => :integration do
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
-        'group_weight' => 0
+        'group_weight' => nil
       },
       {
         'id' => group1.id,
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'group_weight' => 0
+        'group_weight' => nil
       },
       {
         'id' => group3.id,
         'name' => 'group3',
         'position' => 12,
         'rules' => {},
-        'group_weight' => 0
-      },
+        'group_weight' => nil
+      }
     ]
   end
 
@@ -78,6 +78,8 @@ describe AssignmentGroupsController, :type => :integration do
                                      :data => larger_rubric_data)
 
     a3.create_rubric_association(:rubric => @rubric, :purpose => 'grading', :use_for_grading => true)
+
+    @course.update_attribute(:group_weighting_scheme, 'percent')
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
@@ -220,5 +222,34 @@ describe AssignmentGroupsController, :type => :integration do
     group.should be_present
     group['assignments'].size.should == 1
     group['assignments'].first['name'].should == 'test1'
+  end
+
+  it "should not return weights that aren't being applied" do
+    course_with_teacher(:active_all => true)
+    @course.update_attribute(:group_weighting_scheme, 'equal')
+
+    group1 = @course.assignment_groups.create!(:name => 'group1', :group_weight => 50)
+    group2 = @course.assignment_groups.create!(:name => 'group2', :group_weight => 50)
+
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups",
+                    { :controller => 'assignment_groups', :action => 'index',
+                      :format => 'json', :course_id => @course.to_param })
+
+    json.each { |group| group['group_weight'].should be_nil }
+  end
+
+  it "should not explode on assignments with <objects> with percentile widths" do
+    course_with_teacher(:active_all => true)
+    group = @course.assignment_groups.create!(:name => 'group')
+    assignment = @course.assignments.create!(:title => "test", :assignment_group => group, :points_possible => 10)
+    assignment.description = '<object width="100%" />'
+    assignment.save!
+
+    api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
+             :controller => 'assignment_groups',
+             :action => 'index',
+             :format => 'json',
+             :course_id => @course.id.to_s,
+             :include => ['assignments'])
   end
 end

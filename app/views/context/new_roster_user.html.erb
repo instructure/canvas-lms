@@ -1,0 +1,191 @@
+<%
+  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
+  add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
+  @active_tab="people"
+%>
+<% content_for :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
+
+<% content_for :right_side do %>
+  <div class="rs-margin-rl" id="right_nav">
+    <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
+      <a class="button button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><%= image_tag "grading_icon.png" %> <%= t 'links.user_grades', "Grades for %{user}", :user => context_user_name(@context, @user) %></a>
+    <% end %>
+    <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
+      <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide"> <%= t 'links.faculty_journal', "Faculty Journal for %{user}", :user => context_user_name(@context, @user) %></a>
+    <% end %>
+    <% if @context.is_a?(Course)%>
+      <% if @context.user_is_teacher?(@user) && can_do(@user, @current_user, :view_statistics) %>
+        <%= link_to(t('links.teacher_activity', 'Student Interactions Report for %{user}', :user => context_user_name(@context, @user)), user_course_teacher_activity_url(@user, @context), :class => 'button button-sidebar-wide') %>
+      <% elsif @context.user_has_been_student?(@user) && @context.user_is_teacher?(@current_user) && can_do(@context, @current_user, :read_reports) %>
+        <%= link_to(t('links.student_teacher_activity', 'Your Interactions Report with %{user}', :user => context_user_name(@context, @user)), user_student_teacher_activity_url(@current_user, @user), :class => 'button button-sidebar-wide') %>
+      <% end %>
+    <% end %>
+    <% if can_do(@context, @current_user, :read_reports) %>
+      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>" class="button button-sidebar-wide"><%= image_tag "link.png" %> <%= t 'links.access_report', "Access Report for %{user}", :user => context_user_name(@context, @user) %></a>
+    <% end %>
+    <% if @context.is_a?(Course) && @context.has_outcomes? && can_do(@context, @current_user, :manage) %>
+      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>" class="button button-sidebar-wide"><%= image_tag "learning_outcome.png" %> <%= t 'links.user_outcomes', "Outcomes for %{user}", :user => @user.short_name %></a>
+    <% end %>
+    <% if can_do(@domain_root_account, @current_user, :manage) %>
+      <a href="<%= user_path(@user.id) %>" class="button button-sidebar-wide"><%= image_tag "information.png" %> <%= t('links.user_account_details', %{User Account Details}) %></a>
+    <% end %>
+  </div>
+  <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
+<% end %>
+
+<% js_bundle :user_name %>
+<% jammit_css :roster_user %>
+
+<%= render :partial => 'shared/profile' %>
+
+<% if can_do(@context, @current_user, :manage_students) && !@context.is_a?(Group)%>
+<div class="more_user_information">
+  <% if @context.is_a?(Course) %>
+    <fieldset>
+      <legend><%= t('legends.memberships', %{Membership(s)}) %></legend>
+      <table>
+        <% @enrollments.sort_by(&:id).each do |enrollment| %>
+          <tr class="enrollment">
+            <td style="vertical-align: top; padding: 5px 50px 5px 5px;">
+              <b><a href="<%= context_url(@context, :context_section_url, enrollment.course_section_id) rescue "#" %>"><%= enrollment.try_rescue(:course_section).try_rescue(:display_name) || enrollment.short_name %></a></b>
+              <div style="font-size: 0.8em; padding-left: 20px;"><%= t 'enrolled_as', "Enrolled as a %{enrollment_type}", :enrollment_type => enrollment.readable_type %></div>
+              <div style="font-size: 0.8em; padding-left: 20px;">created <%= datetime_string(enrollment.created_at) %></div>
+              <% if enrollment.is_a?(ObserverEnrollment) %>
+                <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.associated_user %>" class="associated_user" >
+                  <%= t 'enrollment_linked_to', "linked to *%{linked_user}*",
+                      :linked_user => context_user_name(@context, enrollment.associated_user),
+                      :wrapper => '<span class="associated_user_name">\1</span>' %>
+                </div>
+              <% end %>
+              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? %>" class="completed_at_holder"><%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %></div>
+            </td>
+            <% if !enrollment.admin? || (can_do(@context, @current_user, :manage_admin_users) && enrollment.user_id != @current_user.id) %>
+              <td style="vertical-align: top; padding: 5px; font-size: 0.8em;">
+                <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
+                  <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
+                </div>
+                <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.explicitly_completed? %>">
+                  <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
+                </div>
+                <% if can_do(@context, @current_user, :manage_admin_users) && enrollment.is_a?(ObserverEnrollment) %>
+                  <div class="link_enrollment_link_holder" style="margin-bottom: 5px;">
+                    <a class="link_enrollment_link" href="#" data-id="<%= enrollment.id %>" data-associated-id="<%= enrollment.associated_user_id %>"><%= t('links.link_enrollment', %{Link this Enrollment}) %></a>
+                  </div>
+                <% end %>
+                <div><% if enrollment.defined_by_sis? %>
+                  <a href="#" title="<%= t('links.title.enrollment_sis_defined', %{This enrollment was defined by the university, and can't be deleted}) %>"><%= t('links.cant_delete', %{Can't Delete}) %></a>
+                <% else %>
+                  <a class="delete_enrollment_link" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>"><%= t('links.delete_enrollment', %{Delete this Enrollment}) %></a>
+                <% end %>
+                </div>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+        <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+          <tr>
+            <td style="border-top: 1px solid #eee; padding-top: 5px; vertical-align: top; font-weight: bold;"><%= before_label('user_privileges', %{Privileges}) %></td>
+            <td style="border-top: 1px solid #eee; padding-top: 5px;">
+              <div class="elevate_enrollment_link_holder" style="<%= hidden if @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
+                <%= t('user_only_view_section', %{this user can only view students in their assigned course section(s)}) %>
+                <div style="margin-left: 10px; font-size: 0.8em;">
+                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="elevate_enrollment_link"><%= t('links.user_view_all_sections', %{let this user see all course users}) %></a>
+                </div>
+              </div>
+              <div class="restrict_enrollment_link_holder" style="<%= hidden unless @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
+                <%= t('user_view_all_sections', %{this user can view students in any course section}) %>
+                <div style="margin-left: 10px; font-size: 0.8em;">
+                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="restrict_enrollment_link"><%= t('links.user_only_view_section', %{limit this user to only see fellow section users}) %></a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </fieldset>
+    <%= render :partial => 'courses/link_enrollment' %>
+  <% end %>
+  <%= render :partial => 'users/logins' %>
+</div>
+<% end %>
+
+<% js_block do %>
+<script>
+require([
+  'jquery' /* $ */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_misc_plugins' /* .dim, undim, confirmDelete */,
+  'jquery.loadingImg' /* loadingImage */,
+  'compiled/jquery.rails_flash_notifications',
+  'link_enrollment' /* link_enrollment */
+], function($) {
+
+$(document).ready(function() {
+  $(".show_user_services_checkbox").change(function() {
+    $.ajaxJSON($(".profile_url").attr('href'), 'PUT', {'user[show_user_services]': $(this).prop('checked')}, function(data) {
+    }, function(data) {
+    });
+  });
+  $(".link_enrollment_link").click(function(event) {
+    event.preventDefault();
+    var $link = $(this);
+    var name = $("#name_and_email .name").text();
+    var id = $link.attr('data-id');
+    var associated_id = $link.attr('data-associated-id');
+    link_enrollment.choose(name, id, associated_id, function(enrollment) {
+      $link.attr('data-id', enrollment.id);
+      $link.attr('data-associated-id', enrollment.associated_user_id);
+      $link.parents('.enrollment').find('.associated_user_name').text(enrollment.associated_user_name);
+      $link.parents('.enrollment').find('.associated_user').showIf(enrollment.associated_user_id);
+    });
+  });
+  $(".unconclude_enrollment_link").click(function(event) {
+    event.preventDefault();
+    var $enrollment = $(this).parents(".enrollment");
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
+      $enrollment.find(".conclude_enrollment_link_holder").slideDown();
+      $enrollment.find(".unconclude_enrollment_link_holder").slideUp();
+      $enrollment.find(".completed_at_holder").slideUp();
+    });
+  });
+  $(".conclude_enrollment_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".enrollment").confirmDelete({
+      message: <%= raw t('confirm.conclude_student', "Are you sure you want to conclude this student's enrollment?").to_json %>,
+      url: $(this).attr('href'),
+      success: function(data) {
+        $(this).undim();
+        $(this).find(".conclude_enrollment_link_holder").slideUp();
+        $(this).find(".unconclude_enrollment_link_holder").slideDown();
+        // $(this).find(".completed_at").text("just now");
+        // $(this).find(".completed_at_holder").slideDown();
+      }
+    });
+  });
+  $(".elevate_enrollment_link,.restrict_enrollment_link").click(function(event) {
+    var limit = $(this).hasClass('restrict_enrollment_link') ? "1" : "0";
+    var $user = $(this).parents(".tr");
+    $user.loadingImage();
+    $.ajaxJSON($(this).attr('href'), 'POST', {limit: limit}, function(data) {
+      $user.loadingImage('remove');
+      $(".elevate_enrollment_link_holder,.restrict_enrollment_link_holder").slideToggle();
+    }, function(data) {
+      $.flashError(<%= raw t('enrollment_change_failed', "Enrollment privilege change failed, please try again").to_json %>);
+      $user.loadingImage('remove');
+    });
+    event.preventDefault();
+  });
+  $(".delete_enrollment_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".enrollment").confirmDelete({
+      message: <%= raw t('confirm.delete_enrollment', "Are you sure you want to delete this student's enrollment?").to_json %>,
+      url: $(this).attr('href'),
+      success: function(data) {
+        $(this).closest('.enrollment').hide();
+      }
+    });
+  });
+});
+});
+</script>
+<% end %>

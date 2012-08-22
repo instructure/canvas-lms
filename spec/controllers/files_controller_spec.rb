@@ -161,7 +161,7 @@ describe FilesController do
     end
     
     it "should work for a group context, too" do
-      group_with_user_logged_in
+      group_with_user_logged_in(:group_context => Account.default)
       get 'index', :group_id => @group.id
       response.should be_success
     end
@@ -294,6 +294,39 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => old_file.id
       response.should be_success
       assigns(:attachment).should == new_file
+    end
+
+    describe "scribd_doc" do
+      before do
+        course_with_student_logged_in(:active_all => true)
+        @file = attachment_model(:scribd_doc => Scribd::Document.new, :uploaded_data => stub_png_data)
+      end
+
+      it "should be included if :download is allowed" do
+        get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
+        json_parse['attachment']['scribd_doc'].should be_present
+      end
+
+      it "should not be included if locked" do
+        @file.lock_at = 1.month.ago
+        @file.save!
+        get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
+        json_parse['attachment']['scribd_doc'].should be_blank
+      end
+
+      it "should not be included for locked attachments with a root_attachment" do
+        @file.lock_at = 1.month.ago
+        @file.save!
+        course2 = course(:active_all => true)
+        course2.enroll_student(@student).accept!
+        file2 = @file.clone_for(course2)
+        file2.save!
+        file2.scribd_doc.should be_present
+        file2.locked_for?(@student).should be_true
+
+        get 'show', :course_id => course2.id, :id => file2.id, :format => 'json'
+        json_parse['attachment']['scribd_doc'].should be_blank
+      end
     end
 
   end

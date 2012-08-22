@@ -286,36 +286,27 @@ class ContextController < ApplicationController
       format.json { render :json => {:marked_as_read => true}.to_json }
     end
   end
-  
+
   def roster
-    if authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
-      log_asset_access("roster:#{@context.asset_string}", "roster", "other")
-      if @context.is_a?(Course)
-        @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
-        @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
-        @students = @context.
-          students_visible_to(@current_user).
-          scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").
-          order_by_sortable_name.uniq
-        @teachers = @context.instructors.order_by_sortable_name.uniq
-        user_ids = @students.map(&:id) + @teachers.map(&:id)
-        if @context.visibility_limited_to_course_sections?(@current_user)
-          user_ids = @students.map(&:id) + [@current_user.id]
-        end
-        @primary_users = {t('roster.students', 'Students') => @students}
-        @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @teachers}
-      elsif @context.is_a?(Group)
-        @users = @context.participating_users.order_by_sortable_name.uniq
-        @primary_users = {t('roster.group_members', 'Group Members') => @users}
-        if @context.context && @context.context.is_a?(Course)
-          @secondary_users = {t('roster.teachers', 'Teachers & TAs') => @context.context.instructors.order_by_sortable_name.uniq}
-        end
+    return unless authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
+    log_asset_access("roster:#{@context.asset_string}", 'roster', 'other')
+
+    if @context.is_a?(Course)
+      sections = @context.course_sections(:select => 'id, name')
+      js_env :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } }
+    elsif @context.is_a?(Group)
+      @users         = @context.participating_users.order_by_sortable_name.uniq
+      @primary_users = { t('roster.group_members', 'Group Members') => @users }
+
+      if course = @context.context.try(:is_a?, Course)
+        @secondary_users = { t('roster.teachers', 'Teachers & TAs') => course.instructors.order_by_sortable_name.uniq }
       end
-      @secondary_users ||= {}
-      @groups = @context.groups.active rescue []
     end
+
+    @secondary_users ||= {}
+    @groups = @context.groups.active rescue []
   end
-  
+
   def prior_users
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
       @prior_memberships = @context.enrollments.not_fake.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name.downcase] }
@@ -380,12 +371,17 @@ class ContextController < ApplicationController
       @messages = @entries
       @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }.sort_by{|e| e.created_at }.reverse
 
-      @user_data = profile_data(
-        @user.profile,
-        @current_user,
-        session,
-        ['links', 'user_services']
-      )
+      if @domain_root_account.enable_profiles?
+        @user_data = profile_data(
+          @user.profile,
+          @current_user,
+          session,
+          ['links', 'user_services']
+        )
+        render :action => :new_roster_user
+        return false
+      end
+      true
     end
   end
     

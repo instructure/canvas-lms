@@ -83,6 +83,34 @@ describe UsersController, :type => :integration do
     }]
   end
 
+  it "should format DiscussionTopic for a CollectionItem" do
+    @item = collection_item_model
+    @item.discussion_topic.save!
+    @item.discussion_topic.discussion_subentries.create!(:message => "test", :user => @user, :discussion_topic => @item.discussion_topic)
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { :controller => "users", :action => "activity_stream", :format => 'json' })
+    json.should == [{
+      'id' => StreamItem.last.id,
+      'title' => "No Title",
+      'message' => nil,
+      'type' => 'DiscussionTopic',
+      'context_type' => "CollectionItem",
+      'created_at' => StreamItem.last.created_at.as_json,
+      'updated_at' => StreamItem.last.updated_at.as_json,
+      'require_initial_post' => nil,
+      'user_has_posted' => nil,
+
+      'total_root_discussion_entries' => 1,
+      'root_discussion_entries' => [
+        {
+          'user' => { 'user_id' => @user.id, 'user_name' => 'User' },
+          'message' => 'test',
+        },
+      ],
+      'collection_item_id' => @item.id,
+    }]
+  end
+
   it "should not return discussion entries if user has not posted" do
     @context = @course
     course_with_teacher(:course => @context, :active_all => true)
@@ -451,7 +479,7 @@ describe UsersController, :type => :integration do
         'user' => {
           'id' => @item.user.id,
           'display_name' => @item.user.short_name,
-          'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(@item.user.id)}",
+          'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png",
           'html_url' => (@item.user == @user) ? "http://www.example.com/profile" : "http://www.example.com/users/#{@item.user.id}",
         },
         'item_type' => @item.collection_item_data.item_type,

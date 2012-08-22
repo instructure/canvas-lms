@@ -62,7 +62,7 @@ describe "User Profile API", :type => :integration do
       'primary_email' => nil,
       'title' => nil,
       'bio' => nil,
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(new_user.id)}?fallback=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
+      'avatar_url' => "https://secure.gravatar.com/avatar/000?s=50&d=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
     }
 
     get("/courses/#{@course.id}/students")
@@ -78,7 +78,7 @@ describe "User Profile API", :type => :integration do
       'short_name' => 'User',
       'primary_email' => 'nobody@example.com',
       'login_id' => 'nobody@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@admin.id)}?fallback=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
+      'avatar_url' => "https://secure.gravatar.com/avatar/8c5548eb0b2b80924f237953392df5e7?s=50&d=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
       'title' => nil,
       'bio' => nil,
@@ -96,7 +96,7 @@ describe "User Profile API", :type => :integration do
       'short_name' => 'Student',
       'primary_email' => 'pvuser@example.com',
       'login_id' => 'pvuser@example.com',
-      'avatar_url' => "http://www.example.com/images/users/#{User.avatar_key(@student.id)}?fallback=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
+      'avatar_url' => "https://secure.gravatar.com/avatar/7f2ba69d483b221f7bea6145425a19c1?s=50&d=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png",
       'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       'title' => nil,
       'bio' => nil,

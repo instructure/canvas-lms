@@ -54,8 +54,12 @@ class ActiveRecord::Base
   end
 
   def self.parse_asset_string(str)
-    code = str.split(/_(\d+)\z/)
+    code = asset_string_components(str)
     [code.first.classify, code.last.to_i]
+  end
+
+  def self.asset_string_components(str)
+    str.split(/_(\d+)\z/)
   end
 
   def self.initialize_by_asset_string(string, asset_types)

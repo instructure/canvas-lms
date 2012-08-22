@@ -169,7 +169,7 @@ describe "Collections API", :type => :integration do
       'user' => {
         'id' => item.user.id,
         'display_name' => item.user.short_name,
-        'avatar_image_url' => "http://www.example.com/images/users/#{User.avatar_key(item.user.id)}",
+        'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png",
         'html_url' => (item.user == @user) ? "http://www.example.com/about/#{item.user.id}" : "http://www.example.com/users/#{item.user.id}",
       },
       'item_type' => item.collection_item_data.item_type,
@@ -290,8 +290,8 @@ describe "Collections API", :type => :integration do
             json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :image_url => "http://www.example.com/my/image.png", :user_comment => 'new item' })
             @item = CollectionItem.find(json['id'])
             @item.data.image_pending.should == true
-            http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
-            Canvas::HTTP.expects(:get).with("http://www.example.com/my/image.png").returns(http_res)
+            http_res = FakeHttpResponse.new('200', File.read(Rails.root+"public/images/cancel.png"), 'content-type' => 'image/png')
+            Canvas::HTTP.expects(:get).with("http://www.example.com/my/image.png").yields(http_res)
             run_jobs()
 
             @item.reload.data.image_pending.should == false
@@ -309,8 +309,8 @@ describe "Collections API", :type => :integration do
             @item = CollectionItem.find(json['id'])
             @item.data.image_pending.should == true
             Canvas::Embedly.any_instance.expects(:get_embedly_data).with("http://www.example.com/a/b/c").returns(stub_everything('embedly api', :type => 'test', :images => [{'url' => 'http://www.example.com/image1'}], :html => "<iframe>test</iframe>"))
-            http_res = mock('Net::HTTPOK', :body => File.read(Rails.root+"public/images/cancel.png"), :code => 200)
-            Canvas::HTTP.expects(:get).with("http://www.example.com/image1").returns(http_res)
+            http_res = FakeHttpResponse.new('200', File.read(Rails.root+"public/images/cancel.png"), 'content-type' => 'image/png')
+            Canvas::HTTP.expects(:get).with("http://www.example.com/image1").yields(http_res)
             run_jobs()
 
             @item.reload.data.image_pending.should == false

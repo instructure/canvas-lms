@@ -5,13 +5,6 @@ test:
   host: localhost
   username: canvas
   timeout: 5000
-  queue:
-    adapter: postgresql
-    encoding: utf8
-    database: canvas_queue_test
-    host: localhost
-    username: canvas
-    timeout: 5000
 
 test-in-memory:
   adapter: sqlite3

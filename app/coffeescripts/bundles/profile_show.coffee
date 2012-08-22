@@ -3,6 +3,7 @@ require [
   'jquery'
   'str/htmlEscape'
   'compiled/tinymce'
+  'compiled/jquery/validate'
   'tinymce.editor_box'
 ], ({View}, $, htmlEscape) ->
 
@@ -12,6 +13,7 @@ require [
 
     events:
       'click [data-event]': 'handleDeclarativeClick'
+      'submit #edit_profile_form': 'validateForm'
 
     handleDeclarativeClick: (event) ->
       event.preventDefault()
@@ -66,9 +68,11 @@ require [
         $row.find('input:first').focus()
 
     removeLinkRow: (event, $el) ->
-      console.log('hi')
       $el.parents('tr').remove()
 
+    validateForm: (event) ->
+      unless $('#edit_profile_form').validate()
+        event.preventDefault()
 
   new ProfileShow ENV.PROFILE
 

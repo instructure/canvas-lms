@@ -283,12 +283,11 @@ $(document).ready(function() {
         answer_text: answer_text,
         question_name: question_name
       }});
-      $dialog.dialog('close').dialog({
-        autoOpen: false,
+      $dialog.dialog({
         title: <%= jt('titles.submitted_users_for_quesiton', "Submitted Users for %{user}", '{\'user\': question_name}') %>,
         width: 500,
         height: 300
-      }).dialog('open');
+      });
     }
   });
 });

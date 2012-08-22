@@ -97,8 +97,18 @@
                   <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
                 </td>
               </tr>
-              <% unless @account.site_admin? %>
-                <% f.fields_for :settings do |settings| %>
+              <% f.fields_for :settings do |settings| %>
+                <% if Account.site_admin.grants_right?(@current_user, :manage_site_settings) %>
+                  <tr>
+                    <td><%= settings.blabel :mfa_settings, :en => "Multi-Factor Authentication" %></td>
+                    <td><%= settings.select :mfa_settings, [[t('select.mfa.disabled', "Disabled"), :disabled],
+                                                            [t('select.mfa.optional', "Optional"), :optional],
+                                                            [t('select.mfa.required_for_admins', "Required for Admins"), :required_for_admins],
+                                                            [t('select.mfa.required', "Required"), :required]], :selected => @account.mfa_settings %>
+                    </td>
+                  </tr>
+                <% end %>
+                <% unless @account.site_admin? %>
                   <tr>
                     <td><%= settings.blabel :self_enrollment, :en => "Allow Self-Enrollment" %></td>
                     <td>
@@ -191,20 +201,36 @@
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
                   <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
                 </div>
-              <% end %>
-              <div>
-                <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
-                <%= settings.label :open_registration, :en => "Open Registration" %>
-                <% if @account.delegated_authentication? %>
-                  <%= link_to(image_tag('warning.png'), '#', :class => 'open_registration_delegated_warning_link no-hover', :title => t(:open_registration_delegated_warning_tooltip, "An External Identity Provider is Enabled")) %></legend>
-
-                  <div id="open_registration_delegated_warning_dialog" style="display: none;">
-                      <%= t(:open_registration_delegated_warning_message,
-                      "An external identity provider is enabled, and users created via open registration may not be able to log in unless
-                      the external identity provider's login form has a link back to %{url}.", :url => login_url(:canvas_login => 1)) %>
+                <div>
+                  <%= settings.check_box :enable_scheduler, :checked => @account.settings[:enable_scheduler] %>
+                  <%= settings.label :enable_scheduler, :en => "Enable Calendar 2" %>
+                </div>
+                <div>
+                  <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
+                  <%= settings.label :enable_profiles, :en => "Enable Profiles" %>
+                </div>
+                <% if @account.account_authorization_config %>
+                  <div>
+                    <%= settings.check_box :canvas_authentication, :checked => @account.canvas_authentication? %>
+                    <%= settings.label :canvas_authentication, :en => "Canvas Authentication" %>
                   </div>
                 <% end %>
-              </div>
+              <% end %>
+              <% if @account.canvas_authentication? %>
+                <div>
+                  <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
+                  <%= settings.label :open_registration, :en => "Open Registration" %>
+                  <% if @account.delegated_authentication? %>
+                    <%= link_to(image_tag('warning.png'), '#', :class => 'open_registration_delegated_warning_link no-hover', :title => t(:open_registration_delegated_warning_tooltip, "An External Identity Provider is Enabled")) %></legend>
+
+                    <div id="open_registration_delegated_warning_dialog" style="display: none;">
+                        <%= t(:open_registration_delegated_warning_message,
+                        "An external identity provider is enabled, and users created via open registration may not be able to log in unless
+                        the external identity provider's login form has a link back to %{url}.", :url => login_url(:canvas_login => 1)) %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
               <div>
                 <%= settings.check_box :users_can_edit_name, :checked => @account.settings[:users_can_edit_name] != false %>
                 <%= settings.label :users_can_edit_name, :en => "Users can edit display name" %>

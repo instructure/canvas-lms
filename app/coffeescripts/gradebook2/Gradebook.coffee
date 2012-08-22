@@ -68,7 +68,7 @@ define [
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
         opacity: 0.5
-        top: '50%'
+        top: '55px'
         left: '50%'
       ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
 
@@ -210,14 +210,15 @@ define [
       @multiGrid.invalidate()
 
     getSubmissionsChunks: =>
+      allStudents = (s for k, s of @students)
       loop
-        students = @rows[@chunk_start...(@chunk_start+@options.chunk_size)]
+        students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
         unless students.length
           @allSubmissionsLoaded = true
           break
         params =
           student_ids: (student.id for student in students)
-          response_fields: ['user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission']
+          response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments']
         $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
         @chunk_start += @options.chunk_size
 
@@ -240,13 +241,27 @@ define [
     # It is different from gotSubmissionsChunk in that gotSubmissionsChunk expects an array of students
     # where each student has an array of submissions.  This one just expects an array of submissions,
     # they are not grouped by student.
-    updateSubmissionsFromExternal: (submissions) =>
+    updateSubmissionsFromExternal: (submissions, submissionCell) =>
+      activeCell = @gradeGrid.getActiveCell()
+      editing = $(@gradeGrid.getActiveCellNode()).hasClass('editable')
+      columns = @gradeGrid.getColumns()
       for submission in submissions
         student = @students[submission.user_id]
+        idToMatch = "assignment_#{submission.assignment_id}"
+        cell = index for column, index in columns when column.id is idToMatch
+        thisCellIsActive = activeCell? and
+          editing and
+          activeCell.row is student.row and
+          activeCell.cell is cell
         @updateSubmission(submission)
-        @multiGrid.invalidateRow(student.row)
         @calculateStudentGrade(student)
-      @multiGrid.render()
+        @gradeGrid.updateCell student.row, cell unless thisCellIsActive
+        @updateRowTotals student.row
+
+    updateRowTotals: (rowIndex) ->
+      columns = @gradeGrid.getColumns()
+      for column, columnIndex in columns
+        @gradeGrid.updateCell rowIndex, columnIndex if column.type isnt 'assignment'
 
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
@@ -287,11 +302,12 @@ define [
       if student.loaded
         finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
         submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
-        result = INST.GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
+        result = GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
         for group in result.group_sums
           student["assignment_group_#{group.group.id}"] = group[finalOrCurrent]
+          for submissionData in group[finalOrCurrent].submissions
+            submissionData.submission.drop = submissionData.drop
         student["total_grade"] = result[finalOrCurrent]
-
 
     highlightColumn: (columnIndexOrEvent) =>
       if isNaN(columnIndexOrEvent)
@@ -414,7 +430,6 @@ define [
       @gradeGrid.getEditorLock().commitCurrentEdit()
 
     onGridInit: () ->
-      @fixColumnReordering()
       tooltipTexts = {}
       $(@spinner.el).remove()
       $('#gradebook_wrapper').show()
@@ -459,7 +474,7 @@ define [
             id: id
             checked: @sectionToShow is id
 
-        $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections, scrolling: sections.length > 15))
+        $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections))
         (updateSectionBeingShownText = =>
           $('#section_being_shown').html(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
         )()
@@ -480,8 +495,8 @@ define [
           @buildRows()
 
       # don't show the "show attendance" link in the dropdown if there's no attendance assignments
-      unless (_.detect @gradeGrid.getColumns(), (col) -> col.object?.submission_types == "attendance")
-        $settingsMenu.find('#show_attendance').hide()
+      unless (_.detect @assignments, (a) -> (''+a.submission_types) == "attendance")
+        $settingsMenu.find('#show_attendance').closest('li').hide()
 
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
         event.preventDefault()
@@ -603,7 +618,7 @@ define [
       @aggregateColumns = for id, group of @assignmentGroups
         html = "#{group.name}"
         if group.group_weight?
-          percentage =  I18n.toPercentage(group.group_weight, precision: 0)
+          percentage =  I18n.toPercentage(group.group_weight, precision: 2)
           html += """
             <div class='assignment-points-possible'>
               #{I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}

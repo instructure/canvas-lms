@@ -26,7 +26,7 @@ class ErrorsController < ApplicationController
 
   def index
     params[:page] = params[:page].to_i > 0 ? params[:page].to_i : 1
-    @reports = ErrorReport
+    @reports = ErrorReport.scoped(:include => :user)
 
     @message = params[:message]
     if @message.present?

@@ -70,6 +70,31 @@ describe PseudonymSessionsController do
     assigns[:pseudonym_session].should_not be_nil
   end
 
+  context "ldap" do
+    it "should log in a user with a identifier_format" do
+      user_with_pseudonym(:username => '12345', :active_all => 1)
+      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns([{ 'uid' => ['12345'] }])
+      aac2 = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac.any_instantiation.expects(:ldap_bind_result).never
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      response.should be_redirect
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      assigns[:user].should == @user
+      assigns[:pseudonym].should == @pseudonym
+      assigns[:pseudonym_session].should_not be_nil
+    end
+
+    it "should only query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
+      user_with_pseudonym(:username => 'username', :active_all => 1)
+      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      response.status.should == '400 Bad Request'
+      response.should render_template('new')
+    end
+  end
+
   context "trusted logins" do
     it "should login for a pseudonym from a different account" do
       account = Account.create!
@@ -277,6 +302,128 @@ describe PseudonymSessionsController do
       response.should redirect_to(courses_url)
       session[:saml_unique_id].should == unique_id
     end
+
+    it "should decode an actual saml response" do
+      Setting.set_config("saml", {})
+      unique_id = 'student@example.edu'
+
+      account_with_saml
+
+      @aac = @account.account_authorization_config
+      @aac.login_attribute = 'eduPersonPrincipalName'
+      @aac.certificate_fingerprint = 'AF:E7:1C:28:EF:74:0B:C8:74:25:BE:13:A2:26:3D:37:97:1D:A1:F9'
+      @aac.save
+
+      user = user_with_pseudonym(:active_all => true, :username => unique_id)
+      @pseudonym.account = @account
+      @pseudonym.save!
+
+      controller.request.env['canvas.domain_root_account'] = @account
+      get 'saml_consume', :SAMLResponse => <<-SAML
+        PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJv
+        dG9jb2wiIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphc3NlcnRpb24iIElE
+        PSJfMzJmMTBlOGU0NjVmY2VmNzIzNjhlMjIwZmFlYjgxZGI0YzcyZjBjNjg3IiBWZXJzaW9uPSIyLjAi
+        IElzc3VlSW5zdGFudD0iMjAxMi0wOC0wM1QyMDowNzoxNVoiIERlc3RpbmF0aW9uPSJodHRwOi8vc2hh
+        cmQxLmxvY2FsZG9tYWluOjMwMDAvc2FtbF9jb25zdW1lIiBJblJlc3BvbnNlVG89ImQwMDE2ZWM4NThk
+        OTIzNjBjNTk3YTAxZDE1NTk0NGY4ZGY4ZmRiMTE2ZCI+PHNhbWw6SXNzdWVyPmh0dHA6Ly9waHBzaXRl
+        L3NpbXBsZXNhbWwvc2FtbDIvaWRwL21ldGFkYXRhLnBocDwvc2FtbDpJc3N1ZXI+PGRzOlNpZ25hdHVy
+        ZSB4bWxuczpkcz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyI+CiAgPGRzOlNpZ25l
+        ZEluZm8+PGRzOkNhbm9uaWNhbGl6YXRpb25NZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9y
+        Zy8yMDAxLzEwL3htbC1leGMtYzE0biMiLz4KICAgIDxkczpTaWduYXR1cmVNZXRob2QgQWxnb3JpdGht
+        PSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjcnNhLXNoYTEiLz4KICA8ZHM6UmVmZXJl
+        bmNlIFVSST0iI18zMmYxMGU4ZTQ2NWZjZWY3MjM2OGUyMjBmYWViODFkYjRjNzJmMGM2ODciPjxkczpU
+        cmFuc2Zvcm1zPjxkczpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5
+        L3htbGRzaWcjZW52ZWxvcGVkLXNpZ25hdHVyZSIvPjxkczpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRw
+        Oi8vd3d3LnczLm9yZy8yMDAxLzEwL3htbC1leGMtYzE0biMiLz48L2RzOlRyYW5zZm9ybXM+PGRzOkRp
+        Z2VzdE1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNzaGEx
+        Ii8+PGRzOkRpZ2VzdFZhbHVlPlM2TmUxMW5CN2cxT3lRQUdZckZFT251NVFBUT08L2RzOkRpZ2VzdFZh
+        bHVlPjwvZHM6UmVmZXJlbmNlPjwvZHM6U2lnbmVkSW5mbz48ZHM6U2lnbmF0dXJlVmFsdWU+bWdxWlVp
+        QTNtYXRyajZaeTREbCsxZ2hzZ29PbDh3UEgybXJGTTlQQXFyWUIwc2t1SlVaaFlVa0NlZ0ViRVg5V1JP
+        RWhvWjJiZ3dKUXFlVVB5WDdsZU1QZTdTU2RVRE5LZjlraXV2cGNDWVpzMWxGU0VkNTFFYzhmK0h2ZWpt
+        SFVKQVUrSklSV3BwMVZrWVVaQVRpaHdqR0xvazNOR2kveWdvYWpOaDQydlo0PTwvZHM6U2lnbmF0dXJl
+        VmFsdWU+CjxkczpLZXlJbmZvPjxkczpYNTA5RGF0YT48ZHM6WDUwOUNlcnRpZmljYXRlPk1JSUNnVEND
+        QWVvQ0NRQ2JPbHJXRGRYN0ZUQU5CZ2txaGtpRzl3MEJBUVVGQURDQmhERUxNQWtHQTFVRUJoTUNUazh4
+        R0RBV0JnTlZCQWdURDBGdVpISmxZWE1nVTI5c1ltVnlaekVNTUFvR0ExVUVCeE1EUm05dk1SQXdEZ1lE
+        VlFRS0V3ZFZUa2xPUlZSVU1SZ3dGZ1lEVlFRREV3OW1aV2xrWlM1bGNteGhibWN1Ym04eElUQWZCZ2tx
+        aGtpRzl3MEJDUUVXRW1GdVpISmxZWE5BZFc1cGJtVjBkQzV1YnpBZUZ3MHdOekEyTVRVeE1qQXhNelZh
+        Rncwd056QTRNVFF4TWpBeE16VmFNSUdFTVFzd0NRWURWUVFHRXdKT1R6RVlNQllHQTFVRUNCTVBRVzVr
+        Y21WaGN5QlRiMnhpWlhKbk1Rd3dDZ1lEVlFRSEV3TkdiMjh4RURBT0JnTlZCQW9UQjFWT1NVNUZWRlF4
+        R0RBV0JnTlZCQU1URDJabGFXUmxMbVZ5YkdGdVp5NXViekVoTUI4R0NTcUdTSWIzRFFFSkFSWVNZVzVr
+        Y21WaGMwQjFibWx1WlhSMExtNXZNSUdmTUEwR0NTcUdTSWIzRFFFQkFRVUFBNEdOQURDQmlRS0JnUURp
+        dmJoUjdQNTE2eC9TM0JxS3h1cFFlMExPTm9saXVwaUJPZXNDTzNTSGJEcmwzK3E5SWJmbmZtRTA0ck51
+        TWNQc0l4QjE2MVRkRHBJZXNMQ243YzhhUEhJU0tPdFBsQWVUWlNuYjhRQXU3YVJqWnEzK1BiclA1dVcz
+        VGNmQ0dQdEtUeXRIT2dlL09sSmJvMDc4ZFZoWFExNGQxRUR3WEpXMXJSWHVVdDRDOFFJREFRQUJNQTBH
+        Q1NxR1NJYjNEUUVCQlFVQUE0R0JBQ0RWZnA4NkhPYnFZK2U4QlVvV1E5K1ZNUXgxQVNEb2hCandPc2cy
+        V3lrVXFSWEYrZExmY1VIOWRXUjYzQ3RaSUtGRGJTdE5vbVBuUXo3bmJLK29ueWd3QnNwVkVibkh1VWlo
+        WnEzWlVkbXVtUXFDdzRVdnMvMVV2cTNvck9vL1dKVmhUeXZMZ0ZWSzJRYXJRNC82N09aZkhkN1IrUE9C
+        WGhvcGhTTXYxWk9vPC9kczpYNTA5Q2VydGlmaWNhdGU+PC9kczpYNTA5RGF0YT48L2RzOktleUluZm8+
+        PC9kczpTaWduYXR1cmU+PHNhbWxwOlN0YXR1cz48c2FtbHA6U3RhdHVzQ29kZSBWYWx1ZT0idXJuOm9h
+        c2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnN0YXR1czpTdWNjZXNzIi8+PC9zYW1scDpTdGF0dXM+PHNhbWw6
+        QXNzZXJ0aW9uIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFu
+        Y2UiIHhtbG5zOnhzPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSIgSUQ9Il82MjEyYjdl
+        OGMwNjlkMGY5NDhjODY0ODk5MWQzNTdhZGRjNDA5NWE4MmYiIFZlcnNpb249IjIuMCIgSXNzdWVJbnN0
+        YW50PSIyMDEyLTA4LTAzVDIwOjA3OjE1WiI+PHNhbWw6SXNzdWVyPmh0dHA6Ly9waHBzaXRlL3NpbXBs
+        ZXNhbWwvc2FtbDIvaWRwL21ldGFkYXRhLnBocDwvc2FtbDpJc3N1ZXI+PGRzOlNpZ25hdHVyZSB4bWxu
+        czpkcz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyI+CiAgPGRzOlNpZ25lZEluZm8+
+        PGRzOkNhbm9uaWNhbGl6YXRpb25NZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAx
+        LzEwL3htbC1leGMtYzE0biMiLz4KICAgIDxkczpTaWduYXR1cmVNZXRob2QgQWxnb3JpdGhtPSJodHRw
+        Oi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjcnNhLXNoYTEiLz4KICA8ZHM6UmVmZXJlbmNlIFVS
+        ST0iI182MjEyYjdlOGMwNjlkMGY5NDhjODY0ODk5MWQzNTdhZGRjNDA5NWE4MmYiPjxkczpUcmFuc2Zv
+        cm1zPjxkczpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRz
+        aWcjZW52ZWxvcGVkLXNpZ25hdHVyZSIvPjxkczpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3
+        LnczLm9yZy8yMDAxLzEwL3htbC1leGMtYzE0biMiLz48L2RzOlRyYW5zZm9ybXM+PGRzOkRpZ2VzdE1l
+        dGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNzaGExIi8+PGRz
+        OkRpZ2VzdFZhbHVlPmthWk4xK21vUzMyOHByMnpuOFNLVU1MMUVsST08L2RzOkRpZ2VzdFZhbHVlPjwv
+        ZHM6UmVmZXJlbmNlPjwvZHM6U2lnbmVkSW5mbz48ZHM6U2lnbmF0dXJlVmFsdWU+MWtVRWtHMzNaR1FN
+        Zi8xSDFnenFCT2hUNU4ySTM1dk0wNEpwNjd4VmpuWlhGNTRBcVBxMVphTStXamd4KytBakViTDdrc2FZ
+        dU0zSlN5SzdHbFo3N1ZtenBMc01xbjRlTTAwSzdZK0NlWnk1TEIyNHZjbmdYUHhCazZCZFVZa1ZrMHZP
+        c1VmQUFaK21SWC96ekJXN1o0QzdxYmpOR2hBQUpnaTEzSm9CV3BVPTwvZHM6U2lnbmF0dXJlVmFsdWU+
+        CjxkczpLZXlJbmZvPjxkczpYNTA5RGF0YT48ZHM6WDUwOUNlcnRpZmljYXRlPk1JSUNnVENDQWVvQ0NR
+        Q2JPbHJXRGRYN0ZUQU5CZ2txaGtpRzl3MEJBUVVGQURDQmhERUxNQWtHQTFVRUJoTUNUazh4R0RBV0Jn
+        TlZCQWdURDBGdVpISmxZWE1nVTI5c1ltVnlaekVNTUFvR0ExVUVCeE1EUm05dk1SQXdEZ1lEVlFRS0V3
+        ZFZUa2xPUlZSVU1SZ3dGZ1lEVlFRREV3OW1aV2xrWlM1bGNteGhibWN1Ym04eElUQWZCZ2txaGtpRzl3
+        MEJDUUVXRW1GdVpISmxZWE5BZFc1cGJtVjBkQzV1YnpBZUZ3MHdOekEyTVRVeE1qQXhNelZhRncwd056
+        QTRNVFF4TWpBeE16VmFNSUdFTVFzd0NRWURWUVFHRXdKT1R6RVlNQllHQTFVRUNCTVBRVzVrY21WaGN5
+        QlRiMnhpWlhKbk1Rd3dDZ1lEVlFRSEV3TkdiMjh4RURBT0JnTlZCQW9UQjFWT1NVNUZWRlF4R0RBV0Jn
+        TlZCQU1URDJabGFXUmxMbVZ5YkdGdVp5NXViekVoTUI4R0NTcUdTSWIzRFFFSkFSWVNZVzVrY21WaGMw
+        QjFibWx1WlhSMExtNXZNSUdmTUEwR0NTcUdTSWIzRFFFQkFRVUFBNEdOQURDQmlRS0JnUURpdmJoUjdQ
+        NTE2eC9TM0JxS3h1cFFlMExPTm9saXVwaUJPZXNDTzNTSGJEcmwzK3E5SWJmbmZtRTA0ck51TWNQc0l4
+        QjE2MVRkRHBJZXNMQ243YzhhUEhJU0tPdFBsQWVUWlNuYjhRQXU3YVJqWnEzK1BiclA1dVczVGNmQ0dQ
+        dEtUeXRIT2dlL09sSmJvMDc4ZFZoWFExNGQxRUR3WEpXMXJSWHVVdDRDOFFJREFRQUJNQTBHQ1NxR1NJ
+        YjNEUUVCQlFVQUE0R0JBQ0RWZnA4NkhPYnFZK2U4QlVvV1E5K1ZNUXgxQVNEb2hCandPc2cyV3lrVXFS
+        WEYrZExmY1VIOWRXUjYzQ3RaSUtGRGJTdE5vbVBuUXo3bmJLK29ueWd3QnNwVkVibkh1VWloWnEzWlVk
+        bXVtUXFDdzRVdnMvMVV2cTNvck9vL1dKVmhUeXZMZ0ZWSzJRYXJRNC82N09aZkhkN1IrUE9CWGhvcGhT
+        TXYxWk9vPC9kczpYNTA5Q2VydGlmaWNhdGU+PC9kczpYNTA5RGF0YT48L2RzOktleUluZm8+PC9kczpT
+        aWduYXR1cmU+PHNhbWw6U3ViamVjdD48c2FtbDpOYW1lSUQgU1BOYW1lUXVhbGlmaWVyPSJodHRwOi8v
+        c2hhcmQxLmxvY2FsZG9tYWluL3NhbWwyIiBGb3JtYXQ9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIu
+        MDpuYW1laWQtZm9ybWF0OnRyYW5zaWVudCI+XzNiM2U3NzE0YjcyZTI5ZGM0MjkwMzIxYTA3NWZhMGI3
+        MzMzM2E0ZjI1Zjwvc2FtbDpOYW1lSUQ+PHNhbWw6U3ViamVjdENvbmZpcm1hdGlvbiBNZXRob2Q9InVy
+        bjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpjbTpiZWFyZXIiPjxzYW1sOlN1YmplY3RDb25maXJtYXRp
+        b25EYXRhIE5vdE9uT3JBZnRlcj0iMjAxMi0wOC0wM1QyMDoxMjoxNVoiIFJlY2lwaWVudD0iaHR0cDov
+        L3NoYXJkMS5sb2NhbGRvbWFpbjozMDAwL3NhbWxfY29uc3VtZSIgSW5SZXNwb25zZVRvPSJkMDAxNmVj
+        ODU4ZDkyMzYwYzU5N2EwMWQxNTU5NDRmOGRmOGZkYjExNmQiLz48L3NhbWw6U3ViamVjdENvbmZpcm1h
+        dGlvbj48L3NhbWw6U3ViamVjdD48c2FtbDpDb25kaXRpb25zIE5vdEJlZm9yZT0iMjAxMi0wOC0wM1Qy
+        MDowNjo0NVoiIE5vdE9uT3JBZnRlcj0iMjAxMi0wOC0wM1QyMDoxMjoxNVoiPjxzYW1sOkF1ZGllbmNl
+        UmVzdHJpY3Rpb24+PHNhbWw6QXVkaWVuY2U+aHR0cDovL3NoYXJkMS5sb2NhbGRvbWFpbi9zYW1sMjwv
+        c2FtbDpBdWRpZW5jZT48L3NhbWw6QXVkaWVuY2VSZXN0cmljdGlvbj48L3NhbWw6Q29uZGl0aW9ucz48
+        c2FtbDpBdXRoblN0YXRlbWVudCBBdXRobkluc3RhbnQ9IjIwMTItMDgtMDNUMjA6MDc6MTVaIiBTZXNz
+        aW9uTm90T25PckFmdGVyPSIyMDEyLTA4LTA0VDA0OjA3OjE1WiIgU2Vzc2lvbkluZGV4PSJfMDJmMjZh
+        ZjMwYTM3YWZiOTIwODFmM2E3MzcyODgxMDE5M2VmZDdmYTZlIj48c2FtbDpBdXRobkNvbnRleHQ+PHNh
+        bWw6QXV0aG5Db250ZXh0Q2xhc3NSZWY+dXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFjOmNsYXNz
+        ZXM6UGFzc3dvcmQ8L3NhbWw6QXV0aG5Db250ZXh0Q2xhc3NSZWY+PC9zYW1sOkF1dGhuQ29udGV4dD48
+        L3NhbWw6QXV0aG5TdGF0ZW1lbnQ+PHNhbWw6QXR0cmlidXRlU3RhdGVtZW50PjxzYW1sOkF0dHJpYnV0
+        ZSBOYW1lPSJ1cm46b2lkOjEuMy42LjEuNC4xLjU5MjMuMS4xLjEuMSIgTmFtZUZvcm1hdD0idXJuOm9h
+        c2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmF0dHJuYW1lLWZvcm1hdDp1cmkiPjxzYW1sOkF0dHJpYnV0ZVZh
+        bHVlIHhzaTp0eXBlPSJ4czpzdHJpbmciPm1lbWJlcjwvc2FtbDpBdHRyaWJ1dGVWYWx1ZT48L3NhbWw6
+        QXR0cmlidXRlPjxzYW1sOkF0dHJpYnV0ZSBOYW1lPSJ1cm46b2lkOjEuMy42LjEuNC4xLjU5MjMuMS4x
+        LjEuNiIgTmFtZUZvcm1hdD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmF0dHJuYW1lLWZvcm1h
+        dDp1cmkiPjxzYW1sOkF0dHJpYnV0ZVZhbHVlIHhzaTp0eXBlPSJ4czpzdHJpbmciPnN0dWRlbnRAZXhh
+        bXBsZS5lZHU8L3NhbWw6QXR0cmlidXRlVmFsdWU+PC9zYW1sOkF0dHJpYnV0ZT48L3NhbWw6QXR0cmli
+        dXRlU3RhdGVtZW50Pjwvc2FtbDpBc3NlcnRpb24+PC9zYW1scDpSZXNwb25zZT4=
+      SAML
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      session[:saml_unique_id].should == unique_id
+    end
   end
 
   context "cas" do
@@ -320,6 +467,338 @@ describe PseudonymSessionsController do
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_login].should == true
       Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
+    end
+  end
+
+  context "otp login cookie" do
+    before do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+
+      user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.save!
+    end
+
+    it "should skip otp verification for a valid cookie" do
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc)
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should redirect_to dashboard_url(:login_success => 1)
+    end
+
+    it "should ignore a bogus cookie" do
+      cookies['canvas_otp_remember_me'] = 'bogus'
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should render_template('otp_login')
+    end
+
+    it "should ignore an expired cookie" do
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago)
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should render_template('otp_login')
+    end
+
+    it "should ignore a cookie from an old secret_key" do
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago)
+
+      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.save!
+
+      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      response.should render_template('otp_login')
+    end
+  end
+
+  describe 'create' do
+    context 'otp' do
+      it "should show enrollment for unenrolled, required user" do
+        Account.default.settings[:mfa_settings] = :required
+        Account.default.save!
+
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+        response.should render_template('otp_login')
+        session[:pending_otp_secret_key].should_not be_nil
+      end
+
+      it "should ask for verification of enrolled, optional user" do
+        Account.default.settings[:mfa_settings] = :optional
+        Account.default.save!
+
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        @user.otp_secret_key = ROTP::Base32.random_base32
+        @user.save!
+
+        post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+        response.should render_template('otp_login')
+        session[:pending_otp_secret_key].should be_nil
+      end
+
+      it "should not ask for verification of unenrolled, optional user" do
+        Account.default.settings[:mfa_settings] = :optional
+        Account.default.save!
+
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+
+        post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+        response.should redirect_to dashboard_url(:login_success => 1)
+      end
+
+      it "should send otp to sms channel" do
+        CommunicationChannel.any_instance.expects(:send_otp!).once
+
+        Account.default.settings[:mfa_settings] = :required
+        Account.default.save!
+
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        @user.otp_secret_key = ROTP::Base32.random_base32
+        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
+        @user.save!
+
+        post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+        response.should render_template('otp_login')
+        session[:pending_otp_secret_key].should be_nil
+        assigns[:cc].should == cc
+      end
+    end
+  end
+
+  describe 'otp_login' do
+    before do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+
+      user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+    end
+
+    context "verification" do
+      before do
+        CommunicationChannel.any_instance.expects(:send_otp!).never
+
+        @user.otp_secret_key = ROTP::Base32.random_base32
+        @user.save!
+        user_session(@user)
+        session[:pending_otp] = true
+      end
+
+      it "should verify a code" do
+        post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now }
+        response.should redirect_to dashboard_url(:login_success => 1)
+        cookies['canvas_otp_remember_me'].should be_nil
+      end
+
+      it "should set a cookie" do
+        post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@user.otp_secret_key).now, :remember_me => '1' }
+        response.should redirect_to dashboard_url(:login_success => 1)
+        cookies['canvas_otp_remember_me'].should_not be_nil
+      end
+
+      it "should fail for an incorrect token" do
+        post 'otp_login', :otp_login => { :verification_code => '123456' }
+        response.should render_template('otp_login')
+      end
+
+      it "should allow 30 seconds of drift by default" do
+        ROTP::TOTP.any_instance.expects(:verify_with_drift).with('123456', 30).once.returns(false)
+        post 'otp_login', :otp_login => { :verification_code => '123456' }
+        response.should render_template('otp_login')
+        assigns[:cc].should be_nil
+      end
+
+      it "should allow 5 minutes of drift for SMS" do
+        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
+        @user.save!
+
+        ROTP::TOTP.any_instance.expects(:verify_with_drift).with('123456', 300).once.returns(false)
+        post 'otp_login', :otp_login => { :verification_code => '123456' }
+        response.should render_template('otp_login')
+        assigns[:cc].should == cc
+      end
+    end
+
+    context "enrollment" do
+      before do
+        user_session(@user)
+      end
+
+      it "should generate a secret key" do
+        get 'otp_login'
+        session[:pending_otp_secret_key].should_not be_nil
+        @user.reload.otp_secret_key.should be_nil
+      end
+
+      it "should generate a new secret key for re-enrollment" do
+        @user.otp_secret_key = ROTP::Base32.random_base32
+        @user.save!
+
+        get 'otp_login'
+        session[:pending_otp_secret_key].should_not be_nil
+        session[:pending_otp_secret_key].should_not == @user.reload.otp_secret_key
+      end
+
+      context "selecting sms" do
+        it "should send a message to an existing channel" do
+          @cc = @user.communication_channels.sms.create!(:path => 'bob')
+          @cc.any_instantiation.expects(:send_otp!).once
+          post 'otp_login', :otp_login => { :otp_communication_channel_id => @cc.id }
+          response.should render_template('otp_login')
+          session[:pending_otp_communication_channel_id].should == @cc.id
+          assigns[:cc].should == @cc
+        end
+
+        it "should create a new channel" do
+          CommunicationChannel.any_instance.expects(:send_otp!).once
+          post 'otp_login', :otp_login => { :phone_number => '(800) 555-5555', :carrier => 'instructure.com' }
+          response.should render_template('otp_login')
+          @cc = @user.communication_channels.sms.first
+          @cc.should be_unconfirmed
+          @cc.path.should == '8005555555@instructure.com'
+          session[:pending_otp_communication_channel_id].should == @cc.id
+          assigns[:cc].should == @cc
+        end
+
+        it "should re-use an existing channel" do
+          @cc = @user.communication_channels.sms.create!(:path => '8005555555@instructure.com')
+          @cc.any_instantiation.expects(:send_otp!).once
+          post 'otp_login', :otp_login => { :phone_number => '(800) 555-5555', :carrier => 'instructure.com' }
+          response.should render_template('otp_login')
+          session[:pending_otp_communication_channel_id].should == @cc.id
+          assigns[:cc].should == @cc
+        end
+
+        it "should re-use an existing retired channel" do
+          @cc = @user.communication_channels.sms.create!(:path => '8005555555@instructure.com')
+          @cc.retire!
+          @cc.any_instantiation.expects(:send_otp!).once
+          post 'otp_login', :otp_login => { :phone_number => '(800) 555-5555', :carrier => 'instructure.com' }
+          response.should render_template('otp_login')
+          @cc.should be_unconfirmed
+          session[:pending_otp_communication_channel_id].should == @cc.id
+          assigns[:cc].should == @cc
+        end
+      end
+
+      context "verification" do
+        before do
+          @secret_key = session[:pending_otp_secret_key] = ROTP::Base32.random_base32
+        end
+
+        it "should save the pending key" do
+          @user.otp_communication_channel_id = @user.communication_channels.sms.create!(:path => 'bob')
+
+          post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@secret_key).now }
+          response.should redirect_to settings_profile_url
+          @user.reload.otp_secret_key.should == @secret_key
+          @user.otp_communication_channel.should be_nil
+
+          session[:pending_otp_secret_key].should be_nil
+        end
+
+        it "should continue to the dashboard if part of the login flow" do
+          session[:pending_otp] = true
+          post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@secret_key).now }
+          response.should redirect_to dashboard_url(:login_success => 1)
+          session[:pending_otp].should be_nil
+        end
+
+        it "should save a pending sms" do
+          @cc = @user.communication_channels.sms.create!(:path => 'bob')
+          session[:pending_otp_communication_channel_id] = @cc.id
+          code = ROTP::TOTP.new(@secret_key).now
+          # make sure we get 5 minutes of drift
+          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code, 300).once.returns(true)
+          post 'otp_login', :otp_login => { :verification_code => code }
+          response.should redirect_to settings_profile_url
+          @user.reload.otp_secret_key.should == @secret_key
+          @user.otp_communication_channel.should == @cc
+          @cc.reload.should be_active
+          session[:pending_otp_secret_key].should be_nil
+          session[:pending_otp_communication_channel_id].should be_nil
+        end
+
+        it "shouldn't fail if the sms is already active" do
+          @cc = @user.communication_channels.sms.create!(:path => 'bob')
+          @cc.confirm!
+          session[:pending_otp_communication_channel_id] = @cc.id
+          post 'otp_login', :otp_login => { :verification_code => ROTP::TOTP.new(@secret_key).now }
+          response.should redirect_to settings_profile_url
+          @user.reload.otp_secret_key.should == @secret_key
+          @user.otp_communication_channel.should == @cc
+          @cc.reload.should be_active
+          session[:pending_otp_secret_key].should be_nil
+          session[:pending_otp_communication_channel_id].should be_nil
+        end
+      end
+    end
+  end
+
+  describe 'disable_otp_login' do
+    before do
+      Account.default.settings[:mfa_settings] = :optional
+      Account.default.save!
+
+      user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
+      @user.save!
+      user_session(@user)
+    end
+
+    it "should delete self" do
+      post 'disable_otp_login', :user_id => 'self'
+      response.should be_success
+      @user.reload.otp_secret_key.should be_nil
+      @user.otp_communication_channel.should be_nil
+    end
+
+    it "should delete self as id" do
+      post 'disable_otp_login', :user_id => @user.id
+      response.should be_success
+      @user.reload.otp_secret_key.should be_nil
+      @user.otp_communication_channel.should be_nil
+    end
+
+    it "should not be able to delete self if required" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      post 'disable_otp_login', :user_id => 'self'
+      response.should_not be_success
+      @user.reload.otp_secret_key.should_not be_nil
+      @user.otp_communication_channel.should_not be_nil
+    end
+
+    it "should not be able to delete self as id if required" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      post 'disable_otp_login', :user_id => @user.id
+      response.should_not be_success
+      @user.reload.otp_secret_key.should_not be_nil
+      @user.otp_communication_channel.should_not be_nil
+    end
+
+    it "should not be able to delete another user" do
+      @other_user = @user
+      @admin = user_with_pseudonym(:active_all => 1, :unique_id => 'user2')
+      user_session(@admin)
+      post 'disable_otp_login', :user_id => @other_user.id
+      response.should_not be_success
+      @other_user.reload.otp_secret_key.should_not be_nil
+      @other_user.otp_communication_channel.should_not be_nil
+    end
+
+    it "should be able to delete another user as admin" do
+      # even if required
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+
+      @other_user = @user
+      @admin = user_with_pseudonym(:active_all => 1, :unique_id => 'user2')
+      Account.default.add_user(@admin)
+      user_session(@admin)
+      post 'disable_otp_login', :user_id => @other_user.id
+      response.should be_success
+      @other_user.reload.otp_secret_key.should be_nil
+      @other_user.otp_communication_channel.should be_nil
     end
   end
 end

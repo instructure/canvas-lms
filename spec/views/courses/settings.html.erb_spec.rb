@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-12 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,16 +20,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "courses/settings.html.erb" do
-  describe "sis_source_id edit box" do
-    before do
-      course_with_teacher(:active_all => true)
-      @course.sis_source_id = "so_special_sis_id"
-      @course.workflow_state = 'claimed'
-      @course.save
-      assigns[:context] = @course
-      assigns[:user_counts] = {}
-    end
+  before do
+    course_with_teacher(:active_all => true)
+    @course.sis_source_id = "so_special_sis_id"
+    @course.workflow_state = 'claimed'
+    @course.save!
+    assigns[:context] = @course
+    assigns[:user_counts] = {}
+  end
 
+  describe "sis_source_id edit box" do
     it "should not show to teacher" do
       view_context(@course, @user)
       assigns[:current_user] = @user
@@ -73,6 +73,5 @@ describe "courses/settings.html.erb" do
       response.body.should_not =~ /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
       response.body.should_not =~ /<div id="tab-grade-publishing">/
     end
-
   end
 end

@@ -27,7 +27,6 @@ class ConversationsController < ApplicationController
 
   before_filter :require_user, :except => [:public_feed]
   before_filter :reject_student_view_student
-  before_filter :set_avatar_size
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :except => [:public_feed]
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
@@ -525,6 +524,11 @@ class ConversationsController < ApplicationController
     end
   end
 
+  # @API Find recipients
+  #
+  # Deprecated, see the Find recipients endpoint in the Search API
+  def find_recipients; end
+
   def public_feed
     return unless get_feed_context(:only => [:user])
     @current_user = @context
@@ -718,7 +722,7 @@ class ConversationsController < ApplicationController
     messages.map{ |message|
       result = message.as_json
       result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
-      result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment) }
+      result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment, @current_user) }
       result['forwarded_messages'] = jsonify_messages(result['forwarded_messages'])
       result['submission'] = submission_json(message.submission, message.submission.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) if message.submission
       result

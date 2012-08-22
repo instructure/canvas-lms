@@ -10,7 +10,9 @@ define [
   'jst/courses/settings/UserView'
   'compiled/str/underscore'
   'str/htmlEscape'
+  'compiled/jquery.whenAll'
   'compiled/jquery.kylemenu'
+  'compiled/jquery.rails_flash_notifications'
 ], (I18n, $, _, Backbone, EditSectionsView, InvitationsView, LinkToStudentsView, User, userViewTemplate, toUnderscore, h) ->
 
   editSectionsDialog = null
@@ -45,10 +47,16 @@ define [
       dfds = []
       data = $.extend @model.toJSON(),
         url: "#{ENV.COURSE_ROOT_URL}/users/#{@model.get('id')}"
-        permissions: ENV.PERMISSIONS
         isObserver: @model.hasEnrollmentType('ObserverEnrollment')
+        isDesigner: @model.hasEnrollmentType('DesignerEnrollment')
         isPending: @model.pending()
-      for en in data.enrollments
+      data.canRemove =
+        if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType et)
+          ENV.PERMISSIONS.manage_admin_users
+        else
+          ENV.PERMISSIONS.manage_students
+
+      for en in data.enrollments when ! data.isDesigner
         en.pending = @model.pending()
         en.typeClass = toUnderscore en.type
         section = ENV.CONTEXTS['sections'][en.course_section_id]
@@ -66,7 +74,10 @@ define [
               section = ENV.CONTEXTS['sections'][en.course_section_id]
               ob.sectionTitle += h(I18n.t('#support.array.words_connector') + section.name) if section
             data.enrollments.push ob
-      $.when(dfds...).done -> dfd.resolve data
+      # if a dfd fails (e.g. observee was removed from course), we still want
+      # the observer to render (possibly with other observees)
+      $.whenAll(dfds...).then ->
+        dfd.resolve(data)
       dfd.promise()
 
     reload: =>
@@ -94,14 +105,16 @@ define [
       linkToStudentsDialog.render().show()
 
     removeFromCourse: (e) ->
-      return unless confirm I18n.t('links.unenroll_user_course', 'Remove User from Course')
+      return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this user?')
       @$el.hide()
       success = =>
         for e in @model.get('enrollments')
           e_type = e.typeClass.split('_')[0]
           c.innerText = parseInt(c.innerText) - 1 for c in $(".#{e_type}_count")
+        $.flashMessage I18n.t('flash.removed', 'User successfully removed.')
       failure = =>
         @$el.show()
+        $.flashError I18n.t('flash.removeError', 'Unable to remove the user. Please try again later.')
       deferreds = _.map @model.get('enrollments'), (e) ->
         $.ajaxJSON "#{ENV.COURSE_ROOT_URL}/unenroll/#{e.id}", 'DELETE'
       $.when(deferreds...).then success, failure

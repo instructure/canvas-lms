@@ -1,256 +1,154 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/discussion_announcement_specs')
 
 describe "discussions" do
   it_should_behave_like "discussions selenium tests"
-
-  context "main page" do
+  context "as a teacher" do
     DISCUSSION_NAME = 'new discussion'
 
     before (:each) do
       course_with_teacher_logged_in
     end
 
-    it "should start a new discussion topic" do
-      get "/courses/#{@course.id}/discussion_topics"
-
-      f('.add_topic_link').click
-      edit_discussion(DISCUSSION_NAME, 'new topic')
+    describe "shared bulk topics specs" do
+      let(:url) { "/courses/#{@course.id}/discussion_topics" }
+      let(:what_to_create) { DiscussionTopic }
+      it_should_behave_like "discussion and announcement main page tests"
     end
 
-    it "should edit a discussion" do
-      edit_name = 'edited discussion name'
-      create_discussion(DISCUSSION_NAME, 'side_comment')
-      get "/courses/#{@course.id}/discussion_topics"
-      driver.action.move_to(f('.discussion_topic')).perform
-      f('.edit_topic_link').click
-      edit_discussion(edit_name, 'edit message')
-    end
-
-    it "should delete a discussion" do
-      create_discussion(DISCUSSION_NAME, 'side_comment')
-      get "/courses/#{@course.id}/discussion_topics"
-
-      topic = DiscussionTopic.last
-      driver.execute_script("$('#topic_#{topic.id}').addClass('communication_message_hover')")
-      f("#topic_#{topic.id} .delete_topic_link").click
-      driver.switch_to.alert.should_not be_nil
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
-      DiscussionTopic.last.workflow_state.should == 'deleted'
-      f('#topic_list').should_not include_text(DISCUSSION_NAME)
-      f('#no_topics_message').should be_displayed
-    end
-
-    it "should reorder topics" do
-      pending("dragging and dropping does not work well with selenium")
-      2.times { |i| create_discussion("new discussion #{i}", "side_comment") }
-      get "/courses/#{@course.id}/discussion_topics"
-      f('.reorder_topics_link').click
-      f('#topics_reorder_list').should be_displayed
-      topics = ff('#reorder_topics_form .topic')
-      driver.action.drag_and_drop(topics[1], topics[0]).perform
-      f('.reorder_topics_button').click
-      wait_for_ajaximations
-      main_topics = ff('#topic_list .discussion_topic')
-      main_topics[0].should include_text('new discussion 0')
-      main_topics[1].should include_text('new discussion 1')
-    end
-
-    it "should validate view topics and announcements and topics only button" do
-      announcement_name = 'new announcement'
-      create_discussion(DISCUSSION_NAME, 'side_comment')
-      @context = @course
-      @announcement = announcement_model(:title => announcement_name, :message => 'some announcement message')
-      get "/courses/#{@course.id}/discussion_topics"
-      f('#topic_list').should_not include_text(announcement_name)
-      right_side_buttons = ff('#sidebar_content .button-sidebar-wide')
-      expect_new_page_load { right_side_buttons[3].click }
-      f('#topic_list').should include_text(announcement_name)
-    end
-  end
-
-  context "as a teacher" do
-    before (:each) do
-      course_with_teacher_logged_in
-    end
-
-    it "should load both topics and images via pageless without conflict" do
-      # create some topics. 11 is enough to trigger pageless with default value
-      # of 10 per page
-      11.times { |i| @course.discussion_topics.create!(:title => "Topic #{i}") }
-
-      # create some images
-      2.times do |i|
-        @attachment = @course.attachments.build
-        @attachment.filename = "image#{i}.png"
-        @attachment.file_state = 'available'
-        @attachment.content_type = 'image/png'
-        @attachment.save!
-      end
-      get "/courses/#{@course.id}/discussion_topics"
-
-      # go to Images tab to trigger pageless for .image_list
-      keep_trying_until {
-        f('.add_topic_link').click
-        ff('#editor_tabs .ui-tabs-nav li a').last.should be_displayed
-      }
-      ff('#editor_tabs .ui-tabs-nav li a').last.click
-
-      # scroll window to trigger pageless for #topic_list
-      driver.execute_script('window.scrollTo(0, 100000)')
-
-      # wait till done
-      wait_for_ajaximations
-
-      # check all topics were loaded (11 we created, plus the blank template)
-      ff("#topic_list .topic").length.should == 12
-
-      # check images were loaded
-      ff(".image_list .img_holder").length.should == 2
-    end
-
-    it "should work with graded assignments and pageless" do
-      get "/courses/#{@course.id}/discussion_topics"
-
-      # create some topics. 11 is enough to trigger pageless with default value
-      # of 10 per page
-      f('.add_topic_link').click
-      type_in_tiny('#topic_content_topic_new', 'asdf')
-      f('.more_options_link').click
-      f('#discussion_topic_assignment_set_assignment').click
-      submit_form('#add_topic_form_topic_new')
-      wait_for_ajax_requests
-
-      10.times do |i|
-        @course.discussion_topics.create!(:title => "Topic #{i}")
+    context "individual topic" do
+      it "should display the current username when adding a reply" do
+        create_and_go_to_topic
+        get_all_replies.count.should == 0
+        add_reply
+        get_all_replies.count.should == 1
+        @last_entry.find_element(:css, '.author').text.should == @user.name
       end
 
-      get "/courses/#{@course.id}/discussion_topics"
-
-      # scroll window to trigger pageless for #topic_list
-      driver.execute_script('window.scrollTo(0, 100000)')
-      wait_for_ajaximations
-      driver.execute_script "$('.discussion_topic:visible:last').mouseover()"
-      find_with_jquery('.edit_topic_link:visible:last').click
-      f('.more_options_link').click
-      is_checked('#discussion_topic_assignment_set_assignment').should_not be_nil
-    end
-
-    it "should create a podcast enabled topic" do
-      get "/courses/#{@course.id}/discussion_topics"
-
-      form = keep_trying_until do
-        f(".add_topic_link").click
-        f('#add_topic_form_topic_new')
+      it "should allow student view student to read/post" do
+        enter_student_view
+        create_and_go_to_topic
+        get_all_replies.count.should == 0
+        add_reply
+        get_all_replies.count.should == 1
       end
 
-      form.find_element(:id, "discussion_topic_title").send_keys("This is my test title")
-      type_in_tiny '#add_topic_form_topic_new .topic_content', 'This is the discussion description.'
+      # note: this isn't desirable, but it's the way it is for this release
+      it "should show student view posts to teacher and other students" do
+        @fake_student = @course.student_view_student
+        @topic = @course.discussion_topics.create!
+        @entry = @topic.reply_from(:user => @fake_student, :text => 'i am a figment of your imagination')
+        @topic.create_materialized_view
 
-      form.find_element(:css, '.more_options_link').click
-      form.find_element(:id, 'discussion_topic_podcast_enabled').click
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        wait_for_ajax_requests
+        get_all_replies.first.should include_text @fake_student.name
+      end
 
-      submit_form(form)
-      wait_for_ajaximations
+      it "should validate closing the discussion for comments" do
+        create_and_go_to_topic
+        expect_new_page_load { f('.discussion_locked_toggler').click }
+        f('.discussion-fyi').text.should == 'This topic is closed for comments'
+        ff('.discussion-reply-label').should be_empty
+        DiscussionTopic.last.workflow_state.should == 'locked'
+      end
 
-      f('.discussion_topic .podcast img').click
-      wait_for_animations
-      f('.feed').should be_displayed
+      it "should validate reopening the discussion for comments" do
+        create_and_go_to_topic('closed discussion', 'side_comment', true)
+        expect_new_page_load { f('.discussion_locked_toggler').click }
+        ff('.discussion-reply-label').should_not be_empty
+        DiscussionTopic.last.workflow_state.should == 'active'
+      end
+
+      it "should escape correctly when posting an attachment" do
+        create_and_go_to_topic
+        message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
+        add_reply(message, 'graded.png')
+        @last_entry.find_element(:css, '.message').text.should == message
+      end
     end
 
-    it "should display the current username when adding a reply" do
-      create_and_go_to_topic
-      get_all_replies.count.should == 0
-      add_reply
-      get_all_replies.count.should == 1
-      @last_entry.find_element(:css, '.author').text.should == @user.name
-    end
+    context "main page" do
+      describe "shared main page topics specs" do
+        let(:url) { "/courses/#{@course.id}/discussion_topics/" }
+        let(:what_to_create) { DiscussionTopic }
+        it_should_behave_like "discussion and announcement individual tests"
+      end
 
-    it "should allow student view student to read/post" do
-      enter_student_view
-      create_and_go_to_topic
-      get_all_replies.count.should == 0
-      add_reply
-      get_all_replies.count.should == 1
-    end
+      it "should filter by assignments" do
+        assignment_name = 'topic assignment'
+        title = 'assignment topic title'
+        @course.discussion_topics.create!(:title => title, :user => @user, :assignment => @course.assignments.create!(:name => assignment_name))
+        get "/courses/#{@course.id}/discussion_topics"
+        f('#onlyGraded').click
+        ff('.discussionTopicIndexList .discussion-topic').count.should == 1
+        f('.discussionTopicIndexList .discussion-topic').should include_text(title)
+      end
 
-    it "should validate editing a discussion" do
-      edit_text = 'title edited'
-      create_and_go_to_topic
-      expect_new_page_load { click_topic_option('#discussion_topic', '#ui-menu-0-0') }
-      replace_content(f('#discussion_topic_title'), edit_text)
-      type_in_tiny(".topic_content", ' new message')
-      submit_form('.add_topic_form_new')
-      wait_for_ajaximations
-      f('.discussion_topic').should include_text(edit_text)
-    end
+      it "should filter by unread and assignments" do
+        assignment_name = 'topic assignment'
+        title = 'assignment topic title'
+        expected_topic = @course.discussion_topics.create!(:title => title, :user => @user, :assignment => @course.assignments.create!(:name => assignment_name))
+        @course.discussion_topics.create!(:title => title, :user => @user)
+        expected_topic.change_read_state('unread', @user)
+        get "/courses/#{@course.id}/discussion_topics"
+        f('#onlyGraded').click
+        f('#onlyUnread').click
+        ff('.discussionTopicIndexList .discussion-topic').count.should == 1
+        f('.discussionTopicIndexList .discussion-topic').should include_text(title)
+      end
 
-    # note: this isn't desirable, but it's the way it is for this release
-    it "should show student view posts to teacher and other students" do
-      @fake_student = @course.student_view_student
-      @topic = @course.discussion_topics.create!
-      @entry = @topic.reply_from(:user => @fake_student, :text => 'i am a figment of your imagination')
-      @topic.create_materialized_view
+      it "should validate the discussion reply counter" do
+        @topic = create_discussion('new topic', 'side_comment')
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        add_reply('new reply')
 
-      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_ajax_requests
-      get_all_replies.first.should include_text @fake_student.name
-    end
+        get "/courses/#{@course.id}/discussion_topics"
+        f('.total-items').text.should == '1'
+      end
 
-    it "should validate editing a discussion" do
-      edit_text = 'title edited'
-      create_and_go_to_topic
-      expect_new_page_load { click_topic_option('#discussion_topic', '#ui-menu-0-0') }
-      wait_for_ajaximations
-      d_title= keep_trying_until {f("#discussion_topic_title")}
-      replace_content(d_title, edit_text)
-      type_in_tiny("textarea", 'other message')
-      submit_form(".add_topic_form_new")
-      wait_for_ajaximations
-      f(".discussion_topic").should include_text(edit_text)
-    end
+      it "should create a podcast enabled topic" do
+        get "/courses/#{@course.id}/discussion_topics"
+        wait_for_ajaximations
 
-    it "should validate the deletion of a discussion" do
-      create_and_go_to_topic
-      click_topic_option('#discussion_topic', %([data-method="delete"]))
-      driver.switch_to.alert.should_not be_nil
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
-      f('#no_topics_message').should be_displayed
-      DiscussionTopic.last.workflow_state.should == 'deleted'
-    end
+        expect_new_page_load { f('.btn-primary').click }
+        replace_content(f('input[name=title]'), "This is my test title")
+        type_in_tiny('textarea[name=message]', 'This is the discussion description.')
 
-    it "should validate closing the discussion for comments" do
-      create_and_go_to_topic
-      expect_new_page_load { submit_form('.edit_discussion_topic') }
-      f('.discussion-fyi').text.should == 'This topic is closed for comments'
-      ff('.discussion-reply-label').should be_empty
-      DiscussionTopic.last.workflow_state.should == 'locked'
-    end
-
-    it "should validate reopening the discussion for comments" do
-      create_and_go_to_topic('closed discussion', 'side_comment', true)
-      expect_new_page_load { submit_form('.edit_discussion_topic') }
-      ff('.discussion-reply-label').should_not be_empty
-      DiscussionTopic.last.workflow_state.should == 'active'
-    end
-
-    it "should escape correctly when posting an attachment" do
-      create_and_go_to_topic
-      message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
-      add_reply(message, 'graded.png')
-      @last_entry.find_element(:css, '.message').text.should == message
+        f('input[name=podcast_enabled]').click
+        expect_new_page_load { submit_form('.form-actions') }
+        get "/courses/#{@course.id}/discussion_topics"
+        f('.discussion-topic .icon-rss').should be_displayed
+        DiscussionTopic.last.podcast_enabled.should be_true
+      end
     end
   end
 
   context "as a student" do
     before (:each) do
       course_with_teacher(:name => 'teacher@example.com')
+      @course.offer!
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @course.enroll_student(@student).accept
       @topic = @course.discussion_topics.create!(:user => @teacher, :message => 'new topic from teacher', :discussion_type => 'side_comment')
       @entry = @topic.discussion_entries.create!(:user => @teacher, :message => 'new entry from teacher')
       user_session(@student)
+    end
+
+    it "should validate a group assignment discussion" do
+      group_assignment = assignment_model({
+                                              :course => @course,
+                                              :name => 'group assignment',
+                                              :due_at => (Time.now + 1.week),
+                                              :points_possible => 5,
+                                              :submission_types => 'online_text_entry',
+                                              :assignment_group => @course.assignment_groups.create!(:name => 'new assignment groups'),
+                                              :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+                                              :grade_group_students_individually => true
+                                          })
+      topic = @course.discussion_topics.build(:assignment => group_assignment, :title => "some topic", :message => "a little bit of content")
+      topic.save!
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+      f('.entry_content').should include_text('Since this is a group assignment')
     end
 
     it "should create a discussion and validate that a student can see it and reply to it" do
@@ -392,20 +290,20 @@ describe "discussions" do
       # make sure everything looks unread
       get("/courses/#{@course.id}/discussion_topics/#{@topic.id}", false)
       ff('.can_be_marked_as_read.unread').length.should eql(reply_count + 1)
-      f('.topic_unread_entries_count').text.should eql(reply_count.to_s)
+      f('.new-and-total-badge .new-items').text.should eql(reply_count.to_s)
 
       #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
       sleep 2
       ff('.can_be_marked_as_read.unread').should be_empty
       ff('.can_be_marked_as_read.just_read').length.should eql(reply_count + 1)
-      f('.topic_unread_entries_count').text.should eql('')
+      f('.new-and-total-badge .new-items').text.should eql('')
 
       # refresh page and make sure nothing is unread/just_read and everthing is .read
       get("/courses/#{@course.id}/discussion_topics/#{@topic.id}", false)
       ['unread', 'just_read'].each do |state|
         ff(".can_be_marked_as_read.#{state}").should be_empty
       end
-      f('.topic_unread_entries_count').text.should eql('')
+      f('.new-and-total-badge .new-items').text.should eql('')
     end
   end
 end

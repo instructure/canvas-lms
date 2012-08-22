@@ -17,6 +17,8 @@
 #
 
 class DeveloperKey < ActiveRecord::Base
+  include CustomValidations
+
   belongs_to :user
   belongs_to :account
   has_many :page_views
@@ -24,10 +26,12 @@ class DeveloperKey < ActiveRecord::Base
   has_many :context_external_tools, :primary_key => 'tool_id', :foreign_key => 'tool_id'
 
   attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :tool_id, :email
-  
+
   before_create :generate_api_key
   before_save :nullify_empty_tool_id
-  
+
+  validates_as_url :redirect_uri
+
   def nullify_empty_tool_id
     self.tool_id = nil if tool_id.blank?
     self.icon_url = nil if icon_url.blank?
@@ -74,7 +78,7 @@ class DeveloperKey < ActiveRecord::Base
   def redirect_domain_matches?(redirect_uri)
     self_domain = URI.parse(self.redirect_uri).host
     other_domain = URI.parse(redirect_uri).host
-    return self_domain.present? && self_domain == other_domain
+    return self_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
   rescue URI::InvalidURIError
     return false
   end

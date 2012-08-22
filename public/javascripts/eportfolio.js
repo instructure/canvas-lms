@@ -75,11 +75,10 @@ define([
   $(document).ready(function() {
     $(".portfolio_settings_link").click(function(event) {
       event.preventDefault();
-      $("#edit_eportfolio_form").dialog('close').dialog({
-        autoOpen: false,
+      $("#edit_eportfolio_form").dialog({
         width: "auto",
         title: I18n.t('eportfolio_settings', "ePortfolio Settings")
-      }).dialog('open');
+      });
     });
     $("#edit_eportfolio_form .cancel_button").click(function(event) {
       $("#edit_eportfolio_form").dialog('close');
@@ -394,15 +393,14 @@ define([
         $("#add_submission_form .submission_description").val(
           I18n.t('default_description', "This is my %{assignment} submission for %{course}.",
             { 'assignment': assignment, 'course': context }));
-        $("#add_submission_form").dialog('close').dialog({
-          autoOpen: false,
+        $("#add_submission_form").dialog({
           title: I18n.t('titles.add_submission', 'Add Page for Submission'),
           width: 400,
           open: function() {
             $(this).find(":text:visible:first").val(assignment).focus().select();
             $(document).triggerHandler('submission_dialog_opened');
           }
-        }).dialog('open');
+        });
       }
     });
     $("#add_submission_form .cancel_button").click(function() {
@@ -869,10 +867,9 @@ define([
       check(true);
     });
     $(".download_eportfolio_link").click(function(event) {
-      $("#downloading_eportfolio_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#downloading_eportfolio_dialog").dialog({
         title: I18n.t('titles.download_eportfolio', "Download ePortfolio")
-      }).dialog('open');
+      });
     });
   });
 });

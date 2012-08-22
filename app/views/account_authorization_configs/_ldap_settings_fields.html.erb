@@ -18,8 +18,22 @@
 <tr>
   <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_over_tls, :en => "Over TLS?" %></td>
   <td style="vertical-align: top;" class="nobr">
-    <%= f.check_box :auth_over_tls, :class => "auth_form" %>
-    <span class="auth_info auth_over_tls"><%= account_config.auth_over_tls %></span>
+    <%= f.radio_button :auth_over_tls, 'start_tls', :class => "auth_form" %>
+    <%= f.label :auth_over_tls_start_tls, :auth_over_tls_start_tls, :en => "StartTLS", :class => "auth_form" %>
+    <%= f.radio_button :auth_over_tls, 'simple_tls', :class => "auth_form" %>
+    <%= f.label :auth_over_tls_simple_tls, :auth_over_tls_simple_tls, :en => "Simple TLS", :class => "auth_form" %>
+    <%= f.radio_button :auth_over_tls, 'false', :class => "auth_form", :checked => !account_config.auth_over_tls %>
+    <%= f.label :auth_over_tls_false, :auth_over_tls_false, :en => "No TLS", :class => "auth_form" %>
+    <span class="auth_info auth_over_tls">
+    <%= case account_config.auth_over_tls
+        when 'start_tls'
+          t 'labels.start_tls', "StartTLS"
+        when 'simple_tls'
+          t 'labels.simple_tls', "Simple TLS"
+        else
+          t 'labels.no_tls', "No TLS"
+        end
+     %></span>
   </td>
 </tr>
 <tr>
@@ -38,6 +52,18 @@
       <br>
       <%= t(:auth_filter_description,
              "Use *%{placeholder}* as a placeholder for the username supplied by the user. For example: *(sAMAccountName=%{placeholder})*", :placeholder => '{{login}}', :wrapper => '<code>\1</code>') %>
+    </span>
+  </td>
+</tr>
+<tr>
+  <td style="vertical-align: top; width: 200px;"><%= f.blabel :identifier_format, :en => "Login ID Attribute" %></td>
+  <td style="vertical-align: top;" class="nobr">
+    <%= f.text_field :identifier_format, :class => "auth_form", :style => "width: 300px;" %>
+    <span class="auth_info identifier_format"><%= account_config.identifier_format %></span>
+    <span class="auth_form" style="font-size: smaller;">
+      <br>
+      <%= t(:identifer_format_description,
+             "The LDAP attribute to use to look up the Canvas login. Leave blank to use the username supplied by the user.") %>
     </span>
   </td>
 </tr>

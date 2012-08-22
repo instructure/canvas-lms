@@ -19,19 +19,21 @@
 module Api::V1::Attachment
   include Api::V1::Json
 
-  def attachments_json(files)
+  def attachments_json(files, user, url_options = {}, options = {})
     files.map do |f|
-      attachment_json(f)
+      attachment_json(f, user, url_options, options)
     end
   end
 
-  def attachment_json(attachment, url_options = {}, options = {})
+  def attachment_json(attachment, user, url_options = {}, options = {})
+    can_manage_files = options.has_key?(:can_manage_files) ? options[:can_manage_files] : attachment.grants_right?(user, nil, :update)
     url = if options[:thumbnail_url]
       # this thumbnail url is a route that redirects to local/s3 appropriately
       thumbnail_image_url(attachment.id, attachment.uuid)
     else
       file_download_url(attachment, { :verifier => attachment.uuid, :download => '1', :download_frd => '1' }.merge(url_options))
     end
+    
     {
       'id' => attachment.id,
       'content-type' => attachment.content_type,
@@ -39,6 +41,14 @@ module Api::V1::Attachment
       'filename' => attachment.filename,
       'url' => url,
       'size' => attachment.size,
+      'created_at' => attachment.created_at,
+      'updated_at' => attachment.updated_at,
+      'unlock_at' => attachment.unlock_at,
+      'locked' => !!attachment.locked,
+      'hidden' => !!attachment.hidden?,
+      'lock_at' => attachment.lock_at,
+      'locked_for_user' => can_manage_files ? false : !!attachment.currently_locked,
+      'hidden_for_user' => can_manage_files ? false : !!attachment.hidden?
     }
   end
 
@@ -75,23 +85,27 @@ module Api::V1::Attachment
         return
       end
     end
-    duplicate_handling = nil if duplicate_handling == 'overwrite'
-    quota_exemption = opts[:check_quota] ? nil : @attachment.quota_exemption_key
     @attachment.save!
-    render :json => @attachment.ajax_upload_params(@current_pseudonym,
-      api_v1_files_create_url(:on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
-      api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
-      :ssl => request.ssl?).slice(:upload_url, :upload_params)
+    if request.params[:url]
+      @attachment.send_later_enqueue_args(:clone_url, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :n_strand => 'file_download' }, request.params[:url], duplicate_handling, opts[:check_quota])
+      render :json => { :id => @attachment.id, :upload_status => 'pending', :status_url => api_v1_file_status_url(@attachment, @attachment.uuid) }
+    else
+      duplicate_handling = nil if duplicate_handling == 'overwrite'
+      quota_exemption = opts[:check_quota] ? nil : @attachment.quota_exemption_key
+      render :json => @attachment.ajax_upload_params(@current_pseudonym,
+                                                     api_v1_files_create_url(:on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
+                                                     api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
+                                                     :ssl => request.ssl?).slice(:upload_url, :upload_params)
+    end
   end
   
   def check_quota_after_attachment(request)
-    quota = Attachment.get_quota(@attachment.context)
     exempt = request.params[:quota_exemption] == @attachment.quota_exemption_key
-    if !exempt && quota[:quota] < quota[:quota_used] + (@attachment.size || 0)
+    if !exempt && Attachment.over_quota?(@attachment.context, @attachment.size)
       render(:json => {:message => 'file size exceeds quota limits'}, :status => :bad_request)
-      return nil
+      return false
     end
-    quota[:quota]
+    return true
   end
 
   def check_duplicate_handling_option(request)
@@ -112,5 +126,4 @@ module Api::V1::Attachment
     new_atts[:hidden] = value_to_boolean(params[:hidden]) if params.has_key?(:hidden)
     new_atts
   end
-
 end

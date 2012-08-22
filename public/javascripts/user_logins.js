@@ -97,15 +97,14 @@ $(document).ready(function() {
     $form.toggleClass('passwordable', passwordable);
     $form.find("tr.password").showIf(passwordable);
     $form.find(".account_id").hide();
-    $form.dialog('close').dialog({
-      autoOpen: false,
+    $form.dialog({
       width: 'auto',
       close: function() {
         if($form.data('unique_id_text') && $form.data('unique_id_text').parents(".login").hasClass('blank')) {
           $form.data('unique_id_text').parents(".login").remove();
         }
       }
-    }).dialog('open');
+    });
     $form.dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
       .find(".submit_button").text(I18n.t('buttons.update_login', "Update Login"));
     var $unique_id = $(this).parents(".login").find(".unique_id");
@@ -142,6 +141,15 @@ $(document).ready(function() {
     $form.find(".account_id").show();
     $form.find(".account_id_select").change();
     $form.data('unique_id_text', null);
+  });
+
+  $(".reset_mfa_link").click(function(event) {
+    var $disable_mfa_link = $(this);
+    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', null, function() {
+      $.flashMessage(I18n.t('notices.mfa_reset', "Multi-factor authentication reset"));
+      $disable_mfa_link.parent().remove();
+    });
+    event.preventDefault();
   });
 });
 });

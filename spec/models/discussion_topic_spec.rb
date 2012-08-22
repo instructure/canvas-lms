@@ -682,37 +682,37 @@ describe DiscussionTopic do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       @topic.materialized_view.should be_nil
       @topic.materialized_view.should be_nil
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
     it "should return the materialized view if it's up to date" do
-      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
+      run_jobs
       view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
       @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, "[]"]
     end
 
     it "should update the materialized view on new entry" do
-      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      run_jobs
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 0
       @topic.reply_from(:user => @user, :text => "ohai")
       run_transaction_commit_callbacks
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
     it "should update the materialized view on edited entry" do
       reply = @topic.reply_from(:user => @user, :text => "ohai")
-      run_job(Delayed::Job.find_by_strand("materialized_discussion:#{@topic.id}"))
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 0
+      run_jobs
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 0
       reply.update_attributes(:message => "i got that wrong before")
       run_transaction_commit_callbacks
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{@topic.id}").size.should == 1
+      Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
     it "should return empty data for a materialized view on a new (unsaved) topic" do
       new_topic = DiscussionTopic.new(:context => @topic.context, :discussion_type => DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
       new_topic.should be_new_record
       new_topic.materialized_view.should == [ "[]", [], [], "[]" ]
-      Delayed::Job.find_all_by_strand("materialized_discussion:#{new_topic.id}").size.should == 0
+      Delayed::Job.strand_size("materialized_discussion:#{new_topic.id}").should == 0
     end
   end
 
@@ -731,6 +731,17 @@ describe DiscussionTopic do
       @assignment.reload.should be_deleted
       @topic.touch
       @assignment.reload.should be_deleted
+    end
+  end
+
+  describe "reply_from" do
+    it "should ignore responses in deleted account" do
+      account = Account.create!
+      @teacher = course_with_teacher(:active_all => true, :account => account).user
+      @context = @course
+      discussion_topic_model(:user => @teacher)
+      account.destroy
+      @topic.reply_from(:user => @teacher, :text => "entry").should be_nil
     end
   end
 end

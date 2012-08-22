@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe NotificationPolicy do
   it "should create a new instance given valid attributes" do
@@ -202,6 +203,105 @@ describe NotificationPolicy do
       params[:root_account] = Account.default
       params[:root_account].settings[:allow_sending_scores_in_emails] = false
       NotificationPolicy.setup_for(user, params)
+    end
+
+    it "should set all notification entries within the same category" do
+      user_model
+      communication_channel_model(:user_id => @user.id)
+      notify1 = notification_model(:name => 'Setting 1', :category => 'MultiCategory')
+      notify2 = notification_model(:name => 'Setting 2', :category => 'MultiCategory')
+
+      NotificationPolicy.delete_all
+
+      trifecta_opts = {
+        :communication_channel => @communication_channel,
+        :frequency => Notification::FREQ_NEVER
+      }
+      n1 = notification_policy_model(trifecta_opts.merge(:notification => notify1) )
+      n2 = notification_policy_model(trifecta_opts.merge(:notification => notify2) )
+      params = {:category => 'MultiCategory', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY}
+      NotificationPolicy.setup_for(@user, params)
+      n1.reload; n2.reload
+      n1.frequency.should == Notification::FREQ_IMMEDIATELY
+      n2.frequency.should == Notification::FREQ_IMMEDIATELY
+    end
+  end
+
+  describe "setup_with_default_policies" do
+    before :each do
+      user_model
+      communication_channel_model(:user_id => @user.id)
+      @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
+    end
+
+    it "should create default NotificationPolicy entries if missing" do
+      # Ensure no existing policies
+      NotificationPolicy.delete_all
+
+      policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      policies.length.should == 1
+      policies.first.frequency.should == @announcement.default_frequency
+    end
+
+    it "should not overwrite an existing setting with a default" do
+      # Create an existing policy entry
+      NotificationPolicy.delete_all
+      n1 = notification_policy_model({:communication_channel => @communication_channel,
+                                      :notification => @announcement,
+                                      :frequency => Notification::FREQ_NEVER})
+
+      @announcement.default_frequency.should_not == Notification::FREQ_NEVER # verify that it differs from the default
+      policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      policies.length.should == 1
+      policies.first.frequency.should == Notification::FREQ_NEVER
+    end
+
+    it "should not set defaults on secondary communication channel" do
+      NotificationPolicy.delete_all
+      # Setup the second channel (higher position)
+      primary_channel   = @user.communication_channel
+      secondary_channel = communication_channel_model(:user_id => @user.id, :path => 'secondary@example.com')
+      # start out with 0 on primary and secondary
+      primary_channel.notification_policies.count.should == 0
+      secondary_channel.notification_policies.count.should == 0
+      # Load data
+      NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      # Primary should have 1 created and secondary should be left alone.
+      primary_channel.notification_policies.count.should == 1
+      secondary_channel.notification_policies.count.should == 0
+    end
+
+    it "should not pull defaults from non-default channels" do
+      NotificationPolicy.delete_all
+      # Setup the second channel (higher position)
+      primary_channel   = @user.communication_channel
+      secondary_channel = communication_channel_model(:user_id => @user.id, :path => 'secondary@example.com')
+      secondary_channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
+      NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      # Primary should have 1 created and secondary should be left alone.
+      primary_channel.reload.notification_policies.count.should == 1
+      secondary_channel.reload.notification_policies.count.should == 1
+    end
+
+    it "should not error if no channel exists" do
+      NotificationPolicy.delete_all
+      CommunicationChannel.delete_all
+      lambda { NotificationPolicy.setup_with_default_policies(@user, [@announcement])}.should_not raise_error
+    end
+
+    context "across shards" do
+      it_should_behave_like "sharding"
+
+      it "should find user categories accross shards" do
+        @shard1.activate {
+          @shard_user = user_model
+          @channel = communication_channel_model(:user_id => @shard_user.id)
+          NotificationPolicy.delete_all
+          @policy = @channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
+          NotificationPolicy.setup_with_default_policies(@shard_user, [@announcement])
+          @policy.reload.frequency.should == Notification::FREQ_NEVER
+        }
+      end
     end
   end
 end

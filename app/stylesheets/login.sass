@@ -47,7 +47,7 @@ body.modal
     border-top-color: #ccc
     width: $modal_box_width - (2 * $modal_box_padding)
     padding: 2 * $modal_box_padding
-    @include vertical-gradient(#f4f4f4, #e2e2e2)
+    @include vertical-gradient-no-ie(#f4f4f4, #e2e2e2)
     .bootstrap-form
       p.instructions
         font-weight: bold
@@ -70,7 +70,7 @@ body.modal
         border-bottom: 1px solid #fff
         height: 0
     &.login-box
-      @include vertical-gradient(#59656e, #3e464c)
+      background-color: #4B555D
       @include background(image-url("/images/Money_Noise_tm.png"), radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(top, #59656e, #3e464c))
       height: 331px
       width: $modal_box_width
