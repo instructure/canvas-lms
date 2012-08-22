@@ -24,7 +24,7 @@ describe "people" do
   end
 
   def create_student_group(group_text = "new student group")
-    expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+    expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
     open_student_group_dialog
     inputs = find_all_with_jquery('input:visible')
     inputs[0].clear
@@ -117,7 +117,7 @@ describe "people" do
     end
 
     it "should test self sign up help functionality" do
-      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
       open_student_group_dialog
       find_with_jquery('a.self_signup_help_link:visible').click
       help_dialog = driver.find_element(:css, '#self_signup_help_dialog')
@@ -125,7 +125,7 @@ describe "people" do
     end
 
     it "should test self sign up functionality" do
-      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
       dialog.find_element(:css, '#category_split_group_count').should_not be_displayed
@@ -134,7 +134,7 @@ describe "people" do
 
     it "should test self sign up / group structure functionality" do
       group_count = "4"
-      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
@@ -147,7 +147,7 @@ describe "people" do
       enroll_more_students
 
       group_count = 4
-      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_groups').click
       dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
@@ -186,7 +186,7 @@ describe "people" do
       enroll_more_students
 
       group_count = 4
-      expect_new_page_load { driver.find_element(:link, 'View Student Groups').click }
+      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
       submit_form('#add_category_form')
