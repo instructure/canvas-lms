@@ -42,7 +42,10 @@ define [
       unless wikiSidebar.inited
         wikiSidebar.init()
         $.scrollSidebar()
-      wikiSidebar.attachToEditor @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message')).editorBox()
+      $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
+      _.defer -> $textarea.editorBox()
+      wikiSidebar.attachToEditor $textarea
+
       wikiSidebar.show()
 
       if @assignmentGroupCollection
