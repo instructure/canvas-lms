@@ -96,4 +96,14 @@ describe "course rubrics" do
     refresh_page
     fj('.rubric_total').should include_text "10" #avoid selenium caching
   end
+
+  it "should not display the edit form more than once" do
+    course_with_teacher_logged_in
+    rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+
+    get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+
+    2.times { |n| f('.edit_rubric_link').click }
+    ff('.rubric .button-container').length.should == 1
+  end
 end
