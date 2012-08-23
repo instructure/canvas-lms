@@ -5,12 +5,13 @@ define [
   'jst/DiscussionTopics/EditView'
   'wikiSidebar'
   'str/htmlEscape'
+  'compiled/models/Announcement'
   'jquery'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
-], (I18n, ValidatedFormView, _, template, wikiSidebar, htmlEscape, $) ->
+], (I18n, ValidatedFormView, _, template, wikiSidebar, htmlEscape, Announcement, $) ->
 
   class EditView extends ValidatedFormView
 
@@ -33,6 +34,7 @@ define [
     toJSON: ->
       _.extend super, @options,
         showAssignment: !!@assignmentGroupCollection
+        isAnnouncement: @model.constructor is Announcement
 
     render: =>
       super
