@@ -107,10 +107,8 @@ class PageView < ActiveRecord::Base
       self.save
     end
 
-    if result
-      self.created_at ||= Time.zone.now
-      self.store_page_view_to_user_counts
-    end
+    self.created_at ||= Time.zone.now
+    self.store_page_view_to_user_counts
 
     result
   end
