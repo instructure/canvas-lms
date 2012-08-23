@@ -117,7 +117,7 @@ class DiscussionTopicsController < ApplicationController
       log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
       respond_to do |format|
         format.html do
-          active_tab = "discussions"
+          @active_tab = "discussions"
           add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
           js_env :permissions => {
             :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
