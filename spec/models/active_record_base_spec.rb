@@ -371,4 +371,51 @@ describe ActiveRecord::Base do
       User.find(:first, :conditions => { 'users.id' => @user.id }).should_not be_nil
     end
   end
+
+  context "uber_scope" do
+    before do
+      course(:active_all => true)
+      @students = []
+      @enrollments = []
+      ['asdf', 'qwerty', 'lolwut'].each do |name|
+        student_in_course(:user_name => name)
+        @students << @student
+        @enrollments << @enrollment
+      end
+    end
+
+    it "should override the default select" do
+      # has_many :through scopes normally don't let you override the select, but
+      # uber_scope is strong. so strong
+      @course.students.uber_scope(:select => "users.id").each do |u|
+        u.attributes.keys.should eql ["id"]
+      end
+      @course.students.uber_scope(:select => "users.id").paginate(:page => nil).each do |u|
+        u.attributes.keys.should eql ["id"]
+      end
+    end
+
+    it "should override an intermediate select" do
+      StudentEnrollment.scoped(:select => "user_id").uber_scope(:select => "id").each do |e|
+        e.attributes.keys.should eql ["id"]
+      end
+      StudentEnrollment.scoped(:select => "user_id").uber_scope(:select => "id").paginate(:page => nil).each do |e|
+        e.attributes.keys.should eql ["id"]
+      end
+    end
+
+    it "should override the default order" do
+      @course.students.uber_scope(:order => "id desc").map(&:id).
+        should eql @students.map(&:id).reverse
+      @course.students.uber_scope(:order => "id desc").paginate(:page => nil).map(&:id).
+        should eql @students.map(&:id).reverse
+    end
+
+    it "should override an intermediate order" do
+      StudentEnrollment.uber_scope(:order => "id desc").map(&:id).
+        should eql @enrollments.map(&:id).reverse
+      StudentEnrollment.uber_scope(:order => "id desc").paginate(:page => nil).map(&:id).
+        should eql @enrollments.map(&:id).reverse
+    end
+  end
 end

@@ -23,23 +23,6 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  module SortableNameExtension
-    # only works with scopes i.e. named_scopes and scoped()
-    def find(*args)
-      options = args.last.is_a?(::Hash) ? args.last : {}
-      scope = scope(:find)
-      select = if options[:select]
-                 options[:select]
-               elsif scope[:select]
-                 scope[:select]
-               else
-                 "#{proxy_scope.quoted_table_name}.*"
-               end
-      options[:select] = select + ', ' + User.sortable_name_order_by_clause
-      super args.first, options
-    end
-  end
-
   include Context
   include UserFollow::FollowedItem
 
@@ -228,8 +211,19 @@ class User < ActiveRecord::Base
 
   named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
 
-  def self.order_by_sortable_name
-    scoped(:order => sortable_name_order_by_clause, :extend => SortableNameExtension)
+  # NOTE: if :order is passed in, sortable name will be tacked onto the end
+  # rather than prepending or replacing it
+  def self.order_by_sortable_name(options = {})
+    add_sort_key!(options, sortable_name_order_by_clause)
+    uber_scope(options)
+  end
+
+  def self.by_top_enrollment(options = {})
+    options[:select] ||= "users.*"
+    options[:select] << ", MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank"
+    options[:group] = User.connection.group_by(User)
+    options[:order] = "enrollment_rank"
+    order_by_sortable_name(options)
   end
 
   named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at|
