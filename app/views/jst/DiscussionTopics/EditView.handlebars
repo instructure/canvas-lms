@@ -37,12 +37,14 @@
   <div class="control-group">
     <label class="control-label">Options</label>
     <div class="controls">
-      <label class="checkbox">
-        <input type="checkbox"
-               {{#ifEqual discussion_type "threaded"}}checked{{/ifEqual}}
-               name="threaded">
-        {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
-      </label>
+      {{#unless isAnnouncement}}
+        <label class="checkbox">
+          <input type="checkbox"
+                 {{#ifEqual discussion_type "threaded"}}checked{{/ifEqual}}
+                 name="threaded">
+          {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
+        </label>
+      {{/unless}}
       <label class="checkbox">
         <input type="checkbox"
                {{#if delayed_post_at}}checked{{/if}}
