@@ -1507,7 +1507,7 @@ class User < ActiveRecord::Base
     read_attribute(:uuid)
   end
 
-  def self.serialization_excludes; [:uuid,:phone,:features_used]; end
+  def self.serialization_excludes; [:uuid,:phone,:features_used,:otp_communication_channel_id,:otp_secret_key_enc,:otp_secret_key_salt]; end
 
   def migrate_content_links(html, from_course)
     Course.migrate_content_links(html, from_course, self)
