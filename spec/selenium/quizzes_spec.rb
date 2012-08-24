@@ -367,13 +367,11 @@ describe "quizzes" do
         # marked as answer
         ff('#question_list .answered').size.should eql 2
 
-        # after reload, answers should be remembered
-        expect_new_page_load {
-          driver.find_element(:link, 'Quizzes').click
-          confirm_dialog = driver.switch_to.alert
-          confirm_dialog.accept
-          get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
-        }
+        driver.find_element(:link, 'Quizzes').click
+        driver.switch_to.alert.accept
+
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        driver.find_element(:link, "Resume Quiz").click
         # there's some initial setTimeout stuff that happens, so things won't
         # be ready right when the page loads
         keep_trying_until {
