@@ -178,7 +178,10 @@ class DiscussionTopicsController < ApplicationController
     if authorized_action(@topic, @current_user, :read)
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-      @topic.context_module_action(@current_user, :read) if !@locked
+      unless @locked
+        @topic.context_module_action(@current_user, :read)
+        @topic.change_read_state('read', @current_user)
+      end
       if @topic.for_group_assignment?
         @groups = @topic.assignment.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
         topics = @topic.child_topics.to_a
