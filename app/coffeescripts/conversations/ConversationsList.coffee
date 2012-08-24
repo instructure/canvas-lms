@@ -147,6 +147,7 @@ define [
       if data.audience
         data.audienceHtml = @app.htmlAudience(data, highlightFilters: true)
         @app.resetMessageForm(false) if @isActive(data.id)
+
       data.lastMessage = data[@lastMessageKey()]
       data.lastMessageAt = $.friendlyDatetime($.parseFromISO(data[@lastMessageKey() + "_at"]).datetime)
       data.hideCount = data.message_count is 1
@@ -158,4 +159,5 @@ define [
       classes.push 'unsubscribed' unless data.subscribed
       classes.push 'selected' if $.inArray(data.id, @selected) >= 0
       data.classes = classes.join(' ')
+
       conversationItemTemplate(data)
