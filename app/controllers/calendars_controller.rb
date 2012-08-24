@@ -30,7 +30,12 @@ class CalendarsController < ApplicationController
       return redirect_to(calendar_url_for([@context]))
     end
     get_all_pertinent_contexts(true) # passing true has it return groups too.
-    build_calendar_dates
+    if params[:event_id]
+      event = CalendarEvent.find_by_id(params[:event_id])
+      event = nil if event && event.start_at.nil?
+      @active_event_id = event.id if event
+    end
+    build_calendar_dates(event)
 
     respond_to do |format|
       format.html do
@@ -149,7 +154,7 @@ class CalendarsController < ApplicationController
   end
   protected :calendar_events_for_request_format
 
-  def build_calendar_dates
+  def build_calendar_dates(event_to_focus)
     @today = Time.zone.today
 
     if params[:start_day] && params[:end_day]
@@ -165,10 +170,16 @@ class CalendarsController < ApplicationController
       end
       @current = Date.new(y = @year, m = @month, d = 1)
     else
-      @month = params[:month].to_i
-      @month = !@month || @month == 0 ? @today.month : @month
-      @year = params[:year].to_i
-      @year = !@year || @year == 0 ? @today.year : @year
+      if event_to_focus
+        use_start = event_to_focus.start_at.in_time_zone
+        @month = use_start.month
+        @year = use_start.year
+      else
+        @month = params[:month].to_i
+        @month = !@month || @month == 0 ? @today.month : @month
+        @year = params[:year].to_i
+        @year = !@year || @year == 0 ? @today.year : @year
+      end
 
       @first_day = Date.parse(params[:start_day]) if params[:start_day]
       @last_day = Date.parse(params[:end_day]) if params[:end_day]

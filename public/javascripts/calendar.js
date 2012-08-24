@@ -18,6 +18,7 @@
 
 define([
   'INST' /* INST */,
+  'ENV',
   'i18n!calendars',
   'jquery' /* $ */,
   'compiled/userSettings',
@@ -38,9 +39,10 @@ define([
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(INST, I18n, $, userSettings, calendarMonths) {
+], function(INST, ENV, I18n, $, userSettings, calendarMonths) {
 
   window.calendar = {
+    activateEventId: ENV.CALENDAR.ACTIVE_EVENT,
     viewItem: function(context_string, item_id, item_type) {
     },
     showingUndatedEvents: false,
@@ -624,6 +626,15 @@ define([
     if($("#" + groupId).length > 0) {
       $event.showIf($("#" + groupId).attr('checked'));
     }
+
+    // After loading the data, if have an event to activate and the event was just updated, show it.
+    if (event.id == calendar.activateEventId && calendar.activateEventId) {
+      $day = $event.parents(".calendar_day");
+      // Remove the ID from being automatically activated on the next data refresh
+      calendar.activateEventId = null;
+      showEvent($event, $day);
+    }
+
     return id;
   }
   function refreshCalendarData(cache) {
