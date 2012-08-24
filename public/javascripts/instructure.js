@@ -49,8 +49,9 @@ define([
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
+  'compiled/behaviors/trackEvent',
   'vendor/scribd.view' /* scribd */,
-  'compiled/behaviors/trackEvent'
+  'vendor/jquery.placeholder'
 ], function(ENV, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
@@ -1048,4 +1049,6 @@ define([
     }, 2000);
 
   });
+
+  $('input[placeholder], textarea[placeholder]').placeholder();
 });

@@ -14,6 +14,25 @@ describe "gradebook2" do
     f('.slick-header-columns').should_not include_text(@ungraded_assignment.title)
   end
 
+  def filter_student(text)
+    f('.gradebook_filter input').send_keys text
+  end
+
+  def get_visible_students
+    ff('.student-name')
+  end
+
+  it 'should filter students' do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    get_visible_students.length.should == 2
+    filter_student 'student 1'
+    sleep 1 # InputFilter has a delay
+    visible_students = get_visible_students
+    visible_students.length.should == 1
+    visible_students[0].text.should == 'student 1'
+  end
+
   it "should link to a student's grades page" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
@@ -404,4 +423,5 @@ describe "gradebook2" do
       end
     end
   end
+
 end

@@ -1,5 +1,6 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
+  'compiled/views/InputFilterView'
   'i18n!gradebook2'
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
@@ -30,7 +31,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
+], (InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, MultiGrid, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
     columnWidths =
@@ -54,6 +55,7 @@ define [
       @sectionToShow = userSettings.contextGet 'grading_show_only_section'
       @show_attendance = userSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = userSettings.contextGet 'include_ungraded_assignments'
+      @userFilterRemovedRows = []
       $.subscribe 'assignment_group_weights_changed', @buildRows
       $.subscribe 'assignment_muting_toggled', @handleAssignmentMutingChange
       $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
@@ -553,6 +555,42 @@ define [
         else
           $(this).text I18n.t('hide_student_names', 'Hide Student Names')
 
+      @userFilter = new InputFilterView el: '.gradebook_filter input'
+      @userFilter.on 'input', @onUserFilterInput
+
+    onUserFilterInput: (term) =>
+      # put rows back on the students for dropped assignments
+      _.each @multiGrid.data, (student) ->
+        if student.beforeFilteredRow?
+          student.row = student.beforeFilteredRow
+          delete student.beforeFilteredRow
+
+      # put the removed items back in their proper order
+      _.each @userFilterRemovedRows.reverse(), (removedStudentItem) =>
+        @multiGrid.data.splice removedStudentItem.index, 0, removedStudentItem.data
+      @userFilterRemovedRows = []
+
+      if term != ''
+        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
+        index = @multiGrid.data.length
+        while index--
+          student = @multiGrid.data[index]
+          matched = _.any propertiesToMatch, (prop) =>
+            student[prop]?.match new RegExp term, 'i'
+          if not matched
+            # remove the student, save the item and its index so we can put it
+            # back in order
+            item =
+              index: index
+              data: @multiGrid.data.splice(index, 1)[0]
+            @userFilterRemovedRows.push item
+
+      for student, index in @multiGrid.data
+        student.beforeFilteredRow = student.row
+        student.row = index
+        @addDroppedClass student
+
+      @multiGrid.invalidate()
 
     getVisibleGradeGridColumns: ->
       res = []

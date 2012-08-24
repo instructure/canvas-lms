@@ -66,7 +66,8 @@ $cell_height: 33px
 .slick-header.ui-state-default
   border-top: 0
 .slick-header-column
-  +vertical-gradient(#f3f4f8, #dbdcde)
+  background-color: #f3f4f8
+  background-image: none
   padding: 10px
   font-size: 12px
   text-align: center
@@ -362,9 +363,19 @@ $gradebook_checkbox_width: 16px
 
 // STUFF FOR HEADER
 #gradebook-toolbar
-  background: url('/images/black-header-bg.png') repeat-x
   height: 28px
-  padding: 8px 20px
+  padding: 6px 10px
+  position: relative
+  border-left: none
+  border-right: none
+
+.gradebook_filter
+  position: absolute
+  right: 10px
+  top: 6px
+
+.gradebook_filter input
+  width: 300px
 
 #section-to-show-menu
   width: 200px

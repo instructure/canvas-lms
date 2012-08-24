@@ -21,6 +21,14 @@ define [
       # example: new ExampleView
 
     ##
+    # Define default options, options passed in to the view will overwrite these
+    defaults: {}
+
+    initialize: (options) ->
+      @options = _.extend {}, @defaults, @options, options
+      super
+
+    ##
     # Extends render to add support for chid views and element filtering
     render: (opts = {}) =>
       @$el.html @template(@toJSON()) if @template
