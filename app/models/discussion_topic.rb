@@ -329,6 +329,8 @@ class DiscussionTopic < ActiveRecord::Base
     {:conditions => ['discussion_topics.created_at < ?', date]}
   }
 
+  named_scope :by_position, :order => "discussion_topics.position DESC, discussion_topics.created_at DESC"
+
   def try_posting_delayed
     if self.post_delayed? && Time.now >= self.delayed_post_at
       self.delayed_post
