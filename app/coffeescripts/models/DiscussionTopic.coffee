@@ -11,11 +11,9 @@ define [
 
     defaults:
       discussion_type: 'side_comment'
-      delayed_post_at: null
       podcast_enabled: false
       podcast_has_student_posts: false
       require_initial_post: false
-      assignment: null
       is_announcement: false
 
     dateAttributes: [
