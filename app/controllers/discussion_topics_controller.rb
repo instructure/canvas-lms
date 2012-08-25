@@ -367,9 +367,11 @@ class DiscussionTopicsController < ApplicationController
       @topic.content_being_saved_by(@current_user)
 
       # handle delayed posting
-      @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at]
-      @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at && @topic.delayed_post_at > Time.now
-      @topic.delayed_post_at = "" unless @topic.post_delayed?
+      if discussion_topic_hash.has_key? :delayed_post_at
+        @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at]
+        @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at && @topic.delayed_post_at > Time.now
+        @topic.delayed_post_at = "" unless @topic.post_delayed?
+      end
 
       #handle locking/unlocking
       if params.has_key? :locked
