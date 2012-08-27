@@ -23,23 +23,47 @@
 #
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.
+#
+# @object Communication Channel
+#     {
+#       // The ID of the communication channel.
+#       "id": 16,
+#
+#       // The address, or path, of the communication channel.
+#       "address": "sheldon@caltech.example.com",
+#
+#       // The type of communcation channel being described. Possible values
+#       // are: "email", "sms", "chat", "facebook" or "twitter". This field
+#       // determines the type of value seen in "address".
+#       "type": "email",
+#
+#       // The position of this communication channel relative to the user's
+#       // other channels when they are ordered.
+#       "position": 1,
+#
+#       // The ID of the user that owns this communication channel.
+#       "user_id": 1,
+#
+#       // The current state of the communication channel. Possible values are:
+#       // "unconfirmed" or "active".
+#       "workflow_state": "active"
+#     }
 class CommunicationChannelsController < ApplicationController
   before_filter :require_user, :only => [:create, :destroy]
   before_filter :reject_student_view_student
 
   include Api::V1::CommunicationChannel
 
-  # @API
-  # List the communication channels for a user.
+  # @API List user communication channels
+  #
+  # Returns a list of communication channels for the specified user, sorted by
+  # position.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/users/12345/communication_channels -H 'Authorization: Bearer <ACCESS_TOKEN>'
+  #     curl https://<canvas>/api/v1/users/12345/communication_channels \ 
+  #          -H 'Authorization: Bearer <token>'
   #
-  # @example_response
-  #   [
-  #     { "id": 1, "address": "bieberfever@example.com", "type": "email", "position": 1, "user_id": 12345 },
-  #     { "id": 2, "address": "8018675309", "type": "sms", "position": 2, "user_id": 12345 }
-  #   ]
+  # @returns [Communication Channel]
   def index
     @user = api_find(User, params[:user_id])
     return unless authorized_action(@user, @current_user, :read)
@@ -52,31 +76,21 @@ class CommunicationChannelsController < ApplicationController
     render :json => channels
   end
 
-  # @API Create a new communication channel.
+  # @API Create a communication channel
+  #
+  # Creates a new communication channel for the specified user.
   #
   # @argument communication_channel[address] An email address or SMS number.
   # @argument communication_channel[type] [email|sms] The type of communication channel.
-  # @argument skip_confirmation [Optional] Only valid for site admins making requests; If '1', the
-  # channel is automatically validated and no confirmation email or SMS is sent. Otherwise, the user must
-  # respond to a confirmation message to confirm the channel.
+  # @argument skip_confirmation [Optional] Only valid for site admins making requests; If '1', the channel is automatically validated and no confirmation email or SMS is sent. Otherwise, the user must respond to a confirmation message to confirm the channel.
   #
   # @example_request
+  #     curl https://<canvas>/api/v1/users/1/communication_channels \ 
+  #          -H 'Authorization: Bearer <token>' \ 
+  #          -d 'communication_channel[address]=new@example.com' \ 
+  #          -d 'communication_channel[type]=email' \ 
   #
-  #   curl https://<canvas>/api/v1/users/1/communication_channels \ 
-  #     -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
-  #     -d 'communication_channel[address]=new@example.com' \ 
-  #     -d 'communication_channel[type]=email' \ 
-  #
-  # @example_response
-  #
-  #   {
-  #     "id": 2,
-  #     "address": "new@example.com",
-  #     "type": "email",
-  #     "workflow_state": "unconfirmed",
-  #     "user_id": 1,
-  #     "position": 2
-  #   }
+  # @returns Communication Channel
   def create
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
 
@@ -310,23 +324,16 @@ class CommunicationChannelsController < ApplicationController
     render :json => {:re_sent => true}
   end
 
-  # @API Delete a communication channel.
+  # @API Delete a communication channel
+  #
   # Delete an existing communication channel.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/users/5/communication_channels/3
-  #     -H 'Authorization: Bearer <ACCESS_TOKEN>
-  #     -X DELETE
+  #     curl https://<canvas>/api/v1/users/5/communication_channels/3
+  #          -H 'Authorization: Bearer <token>
+  #          -X DELETE
   #
-  # @example_response
-  #   {
-  #     "id": 3,
-  #     "address": "new@example.com",
-  #     "type": "email",
-  #     "workflow_state": "deleted",
-  #     "user_id": 5,
-  #     "position": 2
-  #   }
+  # @returns Communication Channel
   def destroy
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
     @cc   = @user.communication_channels.find(params[:id]) if params[:id]
