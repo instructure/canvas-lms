@@ -304,6 +304,20 @@ describe DiscussionTopic do
     end
   end
 
+  context "#discussion_subentry_count" do
+    it "returns the count of all active discussion_entries" do
+      @student = student_in_course(:active_all => true).user
+      @topic = @course.discussion_topics.create(:title => "topic")
+      @topic.reply_from(:user => @teacher, :text => "entry 1").destroy  # no count
+      @topic.reply_from(:user => @teacher, :text => "entry 1")          # 1
+      @entry = @topic.reply_from(:user => @teacher, :text => "entry 2") # 2
+      @entry.reply_from(:user => @student, :html => "reply 1")          # 3
+      @entry.reply_from(:user => @student, :html => "reply 2")          # 4
+      # expect
+      @topic.discussion_subentry_count.should == 4
+    end
+  end
+
   context "for_assignment?/for_group_assignment?" do
     it "should not be for_assignment?/for_group_assignment? unless it has an assignment" do
       course_with_student(:active_all => true)
