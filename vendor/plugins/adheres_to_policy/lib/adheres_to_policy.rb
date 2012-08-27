@@ -138,7 +138,7 @@ module Instructure #:nodoc:
         # will not cache the value at all
         granted_rights = []
         if cache_lookup && RAILS_ENV != "test"
-          granted_rights = Rails.cache.fetch(cache_lookup) do
+          granted_rights = Rails.cache.fetch(cache_lookup, :expires_in => 1.hour) do
             check_policy(user, session, *check_rights)
           end
         else
