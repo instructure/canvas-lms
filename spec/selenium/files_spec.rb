@@ -1,6 +1,20 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
+def add_folders(name = 'new folder', number_to_add = 1)
+  1..number_to_add.times do |number|
+    keep_trying_until do
+      f(".add_folder_link").click
+      wait_for_animations
+      f("#files_content .add_folder_form #folder_name").should be_displayed
+    end
+    new_folder = f("#files_content .add_folder_form #folder_name")
+    new_folder.send_keys(name)
+    new_folder.send_keys(:return)
+    wait_for_ajax_requests
+  end
+end
+
 def make_folder_actions_visible
   driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
 end
@@ -35,6 +49,7 @@ shared_examples_for "files selenium tests" do
       wait_for_animations
       f("#files_content .add_folder_form #folder_name").should be_displayed
     end
+
     f("#files_content .add_folder_form #folder_name").send_keys("my folder\n")
     wait_for_ajax_requests
     f(".node.folder span").should have_class('ui-droppable')
@@ -44,30 +59,16 @@ shared_examples_for "files selenium tests" do
   end
 end
 
+
 describe "files without s3 and forked tests" do
   it_should_behave_like "in-process server selenium tests"
-
-  def add_folders(name = 'new folder', number_to_add = 1)
-    1..number_to_add.times do |number|
-      keep_trying_until do
-        f(".add_folder_link").click
-        wait_for_animations
-        f("#files_content .add_folder_form #folder_name").should be_displayed
-      end
-      new_folder = f("#files_content .add_folder_form #folder_name")
-      new_folder.send_keys(name + "#{number}")
-      new_folder.send_keys(:return)
-      wait_for_ajax_requests
-    end
-  end
-
   before (:each) do
     @folder_name = "my folder"
     course_with_teacher_logged_in
     get "/dashboard/files"
     wait_for_ajaximations
     add_folders(@folder_name)
-    Folder.last.name.should == @folder_name + '0'
+    Folder.last.name.should == @folder_name
     @folder_css = ".folder_#{Folder.last.id}"
     make_folder_actions_visible
   end
@@ -94,17 +95,6 @@ describe "files without s3 and forked tests" do
     f('#files_content').should_not include_text(@folder_name)
   end
 
-  it "should allow dragging folders to re-arrange them" do
-    pending('drag and drop not working')
-    expected_folder_text = 'my folder'
-    add_folders('new folder', 2)
-    fj('.folder_item:visible:first').text.should == expected_folder_text
-    make_folder_actions_visible
-    driver.action.drag_and_drop(move_icons[0], move_icons[1]).perform
-    wait_for_ajaximations
-    fj('.folder_item:visible:last').text.should == expected_folder_text
-  end
-
   it "should allow locking a folder" do
     f(@folder_css + ' .lock_item_link').click
     lock_form = f('#lock_folder_form')
@@ -114,6 +104,7 @@ describe "files without s3 and forked tests" do
     f(@folder_css + ' .header img').should have_attribute('alt', 'Locked Folder')
     Folder.last.locked.should be_true
   end
+
 end
 
 describe "files local tests" do
@@ -122,6 +113,7 @@ describe "files local tests" do
   prepend_before(:each) do
     Setting.set("file_storage_test_override", "local")
   end
+
 
   context "as a teacher" do
 
@@ -250,7 +242,9 @@ describe "files local tests" do
       fj('.file .item_icon:visible').should have_attribute('alt', 'Locked File')
       Folder.last.attachments.last.locked.should be_true
     end
+
   end
+
 
   describe "files S3 tests" do
     it_should_behave_like "files selenium tests"
@@ -419,3 +413,81 @@ describe "zip file uploads" do
   end
 end
 
+describe "common file behaviors" do
+  it_should_behave_like "forked server selenium tests"
+
+  before(:each) do
+    course_with_teacher_logged_in
+    get "/dashboard/files"
+  end
+
+  context "when creating new folders" do
+    let(:folder_a_name) { "a_folder" }
+    let(:folder_b_name) { "b_folder" }
+    let(:folder_c_name) { "c_folder" }
+
+    before(:each) do
+      add_folders(folder_b_name)
+      add_folders(folder_a_name)
+      add_folders(folder_c_name)
+    end
+
+    it "orders file structure folders alphabetically" do
+      folder_elements = ff('#files_structure_list > .context > ul > .node.folder > .name')
+
+      folder_elements[0].text.should == folder_a_name
+      folder_elements[1].text.should == folder_b_name
+      folder_elements[2].text.should == folder_c_name
+    end
+
+    it "orders file content folders alphabetically" do
+      folder_elements = ff('#files_content > .folder_item.folder > .header > .name')
+
+      folder_elements[0].text.should == folder_a_name
+      folder_elements[1].text.should == folder_b_name
+      folder_elements[2].text.should == folder_c_name
+    end
+  end
+
+  context "when creating new files" do
+
+    def add_file(file_fullpath)
+      attachment_field = keep_trying_until do
+        fj('#add_file_link').click # fj to avoid selenium caching
+        attachment_field = f('#attachment_uploaded_data')
+        attachment_field.should be_displayed
+        attachment_field
+      end
+      attachment_field.send_keys(file_fullpath)
+      f('.add_file_form').submit
+      wait_for_ajaximations
+      wait_for_js
+    end
+
+    before(:each) do
+      @a_filename, a_fullpath, a_data = get_file("a_file.txt")
+      @b_filename, b_fullpath, b_data = get_file("b_file.txt")
+      @c_filename, c_fullpath, c_data = get_file("c_file.txt")
+
+      add_file(c_fullpath)
+      add_file(a_fullpath)
+      add_file(b_fullpath)
+    end
+
+    it "orders file structure files alphabetically" do
+      file_elements = ff('#files_structure_list > .context > ul > .file > .name')
+
+      file_elements[0].text.should == @a_filename
+      file_elements[1].text.should == @b_filename
+      file_elements[2].text.should == @c_filename
+    end
+
+    it "orders file content files alphabetically" do
+      file_elements = ff('#files_content > .folder_item.file > .header > .name')
+
+      file_elements[0].text.should == @a_filename
+      file_elements[1].text.should == @b_filename
+      file_elements[2].text.should == @c_filename
+    end
+  end
+end

@@ -10,7 +10,6 @@
   </div>
   <div class="links">
     <a href='#' class="preview_item_link no-hover" style="<%= hidden unless content_file && !content_file.errored? && content_file.scribd_doc && can_do(content_file, @current_user, :update) rescue false %>" title="<%= t 'links.preview_file', "Preview this file" %>"><%= image_tag "preview.png" %></a>
-    <a href='#' class="reorder_item_link move no-hover" style="<%= hidden unless can_do(content_file, @current_user, :update) rescue false %>" title="<%= t 'links.drag_to_reorder', "Drag to reorder files in this folder" %>"><%= image_tag "move-ns.png" %></a>
     <a href="#" class="edit_item_link no-hover" style="<%= "display: none;" unless (can_do(content_file, @current_user, :update) rescue false) %>" title="<%= t 'links.rename', "Rename this file" %>"><%= image_tag "edit.png" %></a>
     <a href="#" class="delete_item_link no-hover" style="<%= "display: none;" unless (can_do(content_file, @current_user, :delete) rescue false) %>" title="<%= t 'links.delete', "Delete this file" %>"><%= image_tag "delete.png" %></a>
   </div>

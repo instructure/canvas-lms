@@ -1535,23 +1535,26 @@ class User < ActiveRecord::Base
   end
 
   def self.file_structure_for(context, user)
-    res = {
+    results = {
       :contexts => [context],
       :collaborations => [],
       :folders => [],
       :folders_with_subcontent => [],
       :files => []
     }
-    context_codes = res[:contexts].map{|c| c.asset_string }
+    context_codes = results[:contexts].map{|c| c.asset_string }
+
     if !context.is_a?(User) && user
-      res[:collaborations] = user.collaborations.active.find(:all, :include => [:user, :users]).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
-      res[:collaborations] = res[:collaborations].sort_by{|c| c.created_at}.reverse
+      results[:collaborations] = user.collaborations.active.find(:all, :include => [:user, :users]).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
+      results[:collaborations] = results[:collaborations].sort_by{|c| c.created_at}.reverse
     end
-    res[:contexts].each do |context|
-      res[:folders] += context.active_folders_with_sub_folders
+
+    results[:contexts].each do |context|
+      results[:folders] += context.active_folders_with_sub_folders
     end
-    res[:folders] = res[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
-    res
+
+    results[:folders] = results[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
+    results
   end
 
   def generate_reminders_if_changed
