@@ -311,4 +311,13 @@ Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint
       end
     end
   end
+
+  it "should strip out invalid utf-8" do
+    TextHelper.strip_invalid_utf8("hai\xfb").should == "hai"
+    TextHelper.strip_invalid_utf8("hai\xfb there").should == "hai there"
+    TextHelper.strip_invalid_utf8("hai\xfba").should == "haia"
+    TextHelper.strip_invalid_utf8("hai\xfbab").should == "haiab"
+    TextHelper.strip_invalid_utf8("hai\xfbabc").should == "haiabc"
+    TextHelper.strip_invalid_utf8("hai\xfbabcd").should == "haiabcd"
+  end
 end

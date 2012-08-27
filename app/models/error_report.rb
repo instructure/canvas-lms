@@ -48,8 +48,8 @@ class ErrorReport < ActiveRecord::Base
       opts[:category] = category.to_s
       @opts = opts
       # sanitize invalid encodings
-      @opts[:message] = Iconv.conv('UTF-8//IGNORE', 'UTF-8', @opts[:message]) if @opts[:message]
-      @opts[:exception_message] = Iconv.conv('UTF-8//IGNORE', 'UTF-8', @opts[:exception_message]) if @opts[:exception_message]
+      @opts[:message] = TextHelper.strip_invalid_utf8(@opts[:message]) if @opts[:message]
+      @opts[:exception_message] = TextHelper.strip_invalid_utf8(@opts[:exception_message]) if @opts[:exception_message]
       Canvas::Statsd.increment("errors.all")
       Canvas::Statsd.increment("errors.#{category}")
       run_callbacks :on_log_error
