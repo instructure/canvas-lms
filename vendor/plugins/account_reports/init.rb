@@ -39,6 +39,7 @@ Rails.configuration.to_prepare do
     'sis_export_csv'=> {
       :title => 'SIS Export',
       :parameters_partial => true,
+      :description_partial => true,
       :parameters => {
         :users => {
           :description => 'Get the SIS file for users'
@@ -66,6 +67,40 @@ Rails.configuration.to_prepare do
         },
         :xlist => {
           :description => 'Get the SIS file for cross listed courses'
+        },
+      }
+    },
+    'provisioning_csv'=> {
+      :title => 'Provisioning',
+      :parameters_partial => 'sis_export_csv_parameters',
+      :description_partial => true,
+      :parameters => {
+        :users => {
+          :description => 'Get the Provisioning file for users'
+        },
+        :accounts => {
+          :description => 'Get the Provisioning file for accounts'
+        },
+        :terms => {
+          :description => 'Get the Provisioning file for terms'
+        },
+        :courses => {
+          :description => 'Get the Provisioning file for courses'
+        },
+        :sections => {
+          :description => 'Get the Provisioning file for sections'
+        },
+        :enrollments => {
+          :description => 'Get the Provisioning file for enrollments'
+        },
+        :groups => {
+          :description => 'Get the Provisioning file for groups'
+        },
+        :group_membership => {
+          :description => 'Get the Provisioning file for group_membership'
+        },
+        :xlist => {
+          :description => 'Get the Provisioning file for cross listed courses'
         },
       }
     }
