@@ -181,12 +181,14 @@ class DiscussionTopic < ActiveRecord::Base
     !self.root_topic_id && self.assignment_id && self.assignment.has_group_category?
   end
 
+  # only the root level entries
   def discussion_subentries
     self.root_discussion_entries
   end
 
+  # count of all active discussion_entries
   def discussion_subentry_count
-    discussion_subentries.count
+    discussion_entries.active.count
   end
 
   def for_assignment?
