@@ -252,14 +252,14 @@
         text-decoration: none;
         color: $blue;
         i {
-          background-image: url(../../../images/blue/canvas-icons-16x16-blue.png);
+          background-image: url(/images/blue/canvas-icons-16x16-blue.png);
         }
       }
 
       &:active {
         color: $grayLight;
         i {
-          background-image: url(../../../images/blue/canvas-icons-16x16-ltgrey.png);
+          background-image: url(/images/blue/canvas-icons-16x16-ltgrey.png);
         }
       }
     }
