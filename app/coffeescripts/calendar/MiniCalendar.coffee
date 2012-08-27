@@ -1,17 +1,15 @@
 define [
   'jquery'
   'i18n!calendar'
+  'underscore'
+  'compiled/calendar/CalendarDefaults'
   'vendor/jquery.ba-tinypubsub'
-], ($, I18n) ->
+], ($, I18n, _, calendarDefaults) ->
   class MiniCalendar
     constructor: (selector, @mainCalendar) ->
       @calendar = $(selector)
-      @calendar.fullCalendar
+      @calendar.fullCalendar(_.defaults(
         height: 240
-        weekMode: "variable"
-        allDayDefault: false
-        lazyFetching: false
-        ignoreTimezone: true
         header:
           left: "prev"
           center: "title"
@@ -19,10 +17,12 @@ define [
         dayClick: @dayClick
         events: @getEvents
         eventRender: @eventRender
-
-        $.subscribe 
+        , calendarDefaults)
+      ,
+        $.subscribe
           "Calendar/visibleContextListChanged" : @visibleContextListChanged
           "Calendar/refetchEvents" : @refetchEvents
+      )
 
     getEvents: (start, end, cb) =>
       # Since we have caching (lazyFetching) turned off, we can rely on this
