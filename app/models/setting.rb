@@ -22,9 +22,7 @@ class Setting < ActiveRecord::Base
   @@cache = {}
 
   def self.get(name, default)
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      Setting.find_or_initialize_by_name(name, :value => default).value
-    end
+    Setting.find_or_initialize_by_name(name, :value => default).value
   end
   
   def self.set(name, value)
