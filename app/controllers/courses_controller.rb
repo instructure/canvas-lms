@@ -285,14 +285,28 @@ class CoursesController < ApplicationController
   # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
   # @argument include[] ["avatar_url"] Optionally include avatar_url.
   #
+  # @argument user_id [optional] If included, the user will be queried and if
+  #   the user is part of the users set, the page parameter will be modified so
+  #   that the page containing user_id will be returned.
+  #
   # @returns [User]
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       enrollment_type = "#{params[:enrollment_type].capitalize}Enrollment" if params[:enrollment_type]
       users = @context.users_visible_to(@current_user)
+      # TODO: convert this to the good user sorting stuff
       users = users.scoped(:order => "users.sortable_name")
       users = users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) if enrollment_type
+
+      # If a user_id is passed in, modify the page parameter so that the page
+      # that contains that user is returned.
+      if params[:user_id] && user = users.scoped(:conditions => ["users.id = ?", params[:user_id]]).first
+        position = users.scoped(:conditions => ["sortable_name <= ?", user.sortable_name]).count
+        per_page = Api.per_page_for(self)
+        params[:page] = (position.to_f / per_page.to_f).ceil
+      end
+
       users = Api.paginate(users, self, api_v1_course_users_path)
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))

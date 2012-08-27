@@ -729,6 +729,20 @@ describe CoursesController, :type => :integration do
       link_header[1].should match /page=1&per_page=5/ # first page
       link_header[2].should match /page=2&per_page=5/ # last page
     end
+
+    it "should allow jumping to a user's page based on id" do
+      students = []
+      5.times do |i|
+        students << student_in_course(:course => @course1, :name => "User #{i+1}", :active_all => true).user
+      end
+      @target = students[2]
+      @user = @me
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, 
+                      { :enrollment_type => 'student', :user_id => @target.id, :page => 1, :per_page => 1 })
+      json.map{|x| x['id']}.length.should == 1
+      json.map{|x| x['id']}.should == [@target.id]
+    end
   end
 
   it "should allow sis id in hex packed format" do
