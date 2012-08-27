@@ -1107,6 +1107,29 @@ describe Enrollment do
         Enrollment.ended.should == [@enrollment]
       end
     end
+
+    describe "future" do
+      it "should include future enrollments" do
+        user
+        future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
+                                        :restrict_enrollments_to_course_dates => true)
+        current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
+
+        future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
+        future_unrestricted_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
+
+        current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
+        future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
+        future_unpublished_enrollment = StudentEnrollment.create!(:course => future_unpublished_course, :user => @user)
+        future_unrestricted_enrollment = StudentEnrollment.create!(:course => future_unrestricted_course, :user => @user)
+
+        [future_course, current_course, future_unrestricted_course].each { |course| course.offer }
+        [current_enrollment, future_enrollment, future_unpublished_enrollment, future_unrestricted_enrollment].each { |e| e.accept }
+
+        @user.enrollments.future.length.should == 1
+        @user.enrollments.future.should include(future_enrollment)
+      end
+    end
   end
 
   describe "destroy" do
