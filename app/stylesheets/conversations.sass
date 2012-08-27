@@ -223,6 +223,16 @@ ul.messages, ul.conversations, div.conversations > ul
           color: #000 !important
           a
             color: #000 !important
+  > li
+    overflow: hidden
+    > .audience
+      min-width: 340px
+      overflow: hidden
+      display: block
+      white-space: nowrap
+    p
+      overflow: hidden
+      max-height: 40px
   > li.selected, > li.submission.selected ul > li, > li.submission.selected ul > li.header
     background-color: #e5f3ff
   .audience
@@ -585,7 +595,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
         display: block
     > li.attachments .attachments, > li.media_objects .media_objects
       display: inline
-
+    
 #message_blank
   display: none
 
@@ -934,3 +944,5 @@ form
   left: 50%
   top: 50%
   z-index: 3
+
+ 
