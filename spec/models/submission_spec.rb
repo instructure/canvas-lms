@@ -196,6 +196,33 @@ describe Submission do
         @assignment.mute!
         @user.stream_item_instances.last.should be_hidden
       end
+
+      it "should not create a message for admins and teachers with quiz submissions" do
+        Notification.create!(:name => 'Submission Graded')
+
+        course_with_teacher(:active_all => true)
+        assignment = @course.assignments.create!(
+          :title => 'assignment',
+          :points_possible => 10)
+        quiz       = @course.quizzes.build(
+          :assignment_id   => assignment.id,
+          :title           => 'test quiz',
+          :points_possible => 10)
+        quiz.workflow_state = 'available'
+        quiz.save!
+
+        user       = account_admin_user
+        channel    = user.communication_channels.create!(:path => 'admin@example.com')
+        submission = quiz.generate_submission(user, false)
+        submission.grade_submission
+
+        channel2   = @teacher.communication_channels.create!(:path => 'chang@example.com')
+        submission2 = quiz.generate_submission(@teacher, false)
+        submission2.grade_submission
+
+        submission.submission.messages_sent.should_not be_include('Submission Graded')
+        submission2.submission.messages_sent.should_not be_include('Submission Graded')
+      end
     end
 
     it "should create a stream_item_instance when graded and published" do
