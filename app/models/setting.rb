@@ -64,8 +64,8 @@ class Setting < ActiveRecord::Base
     s.destroy if s
   end
   
-  def self.config_key(config_name, with_current_rails_env=true)
-    "yaml_config_#{config_name}_#{Rails.env}_#{with_current_rails_env}"
+  def self.config_key(config_name, with_rails_env=:current)
+    "yaml_config_#{config_name}_#{with_rails_env == :current ? Rails.env : with_rails_env}"
   end
 
   def self.set_config(config_name, value)
@@ -73,8 +73,8 @@ class Setting < ActiveRecord::Base
     @@cache[config_key(config_name)] = value
   end
 
-  def self.from_config(config_name, with_current_rails_env=true)
-    key = config_key(config_name, with_current_rails_env)
+  def self.from_config(config_name, with_rails_env=:current)
+    key = config_key(config_name, with_rails_env)
     
     return @@cache[key] if @@cache[key] # if the config wasn't found it'll try again
     
@@ -82,7 +82,7 @@ class Setting < ActiveRecord::Base
     path = File.join(Rails.root, 'config', "#{config_name}.yml")
     if File.exists?(path)
       config = YAML.load_file(path).with_indifferent_access
-      config = config[Rails.env] if with_current_rails_env
+      config = config[with_rails_env == :current ? Rails.env : with_rails_env] if with_rails_env
     end
     @@cache[key] = config
   end

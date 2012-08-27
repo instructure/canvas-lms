@@ -60,15 +60,15 @@ module Canvas
     end
   end
 
-  def self.cache_store_config
+  def self.cache_store_config(rails_env = :current, nil_is_nil = false)
     cache_store_config = {
       'cache_store' => 'mem_cache_store',
-    }.merge(Setting.from_config('cache_store') || {})
+    }.merge(Setting.from_config('cache_store', rails_env) || {})
     config = nil
     case cache_store_config.delete('cache_store')
     when 'mem_cache_store'
       cache_store_config['namespace'] ||= cache_store_config['key']
-      servers = cache_store_config['servers'] || (Setting.from_config('memcache'))
+      servers = cache_store_config['servers'] || (Setting.from_config('memcache', rails_env))
       if servers
         config = :mem_cache_store, servers, cache_store_config
       end
@@ -79,12 +79,16 @@ module Canvas
       #
       # the only options currently supported in redis-cache are the list of
       # servers, not key prefix or database names.
-      cache_store_config = (Setting.from_config('redis') || {}).merge(cache_store_config)
+      cache_store_config = (Setting.from_config('redis', rails_env) || {}).merge(cache_store_config)
       cache_store_config['key_prefix'] ||= cache_store_config['key']
       servers = cache_store_config['servers']
       config = :redis_store, servers
+    when 'memory_store'
+      config = :memory_store
+    when 'nil_store'
+      config = :nil_store
     end
-    unless config
+    if !config && !nil_is_nil
       config = :nil_store
     end
     config
