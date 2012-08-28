@@ -19,7 +19,11 @@
                                              :student_only => true)
   %>
 <li style="<%= hidden if is_hidden %>" class="event">
-  <a class="<%= icon_class %> tooltip" href="<%= url %>">
+  <a
+    data-track-category="dashboard"
+    data-track-label="recent feedback"
+    class="<%= icon_class %> tooltip" href="<%= url %>"
+  >
     <span class="tooltip_wrap">
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
