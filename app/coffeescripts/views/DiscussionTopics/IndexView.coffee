@@ -43,6 +43,7 @@ define [
           containment: $list
           cursor: 'ns-resize'
           handle: '.discussion-drag-handle'
+          tolerance: 'pointer'
 
       else if $list.is(':ui-sortable')
         $list.sortable('destroy')
