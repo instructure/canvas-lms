@@ -1,9 +1,9 @@
 <% key ||= nil %>
 <li>
   <% if key == :needing_grading %>
-    <a href="<%= speed_grader_course_gradebook_path( menu_assignment.context_id, :assignment_id => menu_assignment.id) %>">
+    <a href="<%= speed_grader_course_gradebook_path( menu_assignment.context_id, :assignment_id => menu_assignment.id) %>" data-track-category="assignment dropdown" data-track-label="needs grading">
   <% else %>
-      <a href="<%= course_assignment_path( menu_assignment.context_id, menu_assignment.id ) %>">
+      <a href="<%= course_assignment_path( menu_assignment.context_id, menu_assignment.id ) %>" data-track-category="assignment dropdown" data-track-label="needs submitting">
   <% end %>
     <span class="name-right-wrapper">
       <span class="secondary-right">
