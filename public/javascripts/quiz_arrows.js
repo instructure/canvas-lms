@@ -19,12 +19,16 @@
 define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
   // Create and append right/wrong arrows to all appropriate
   // answers on a quiz results page.
-  return function() {
-    var rightAnswers   = $('.selected_answer.correct_answer'),
-        wrongAnswers   = $('.selected_answer.wrong_answer'),
-        correctAnswers = $('.question:not(.short_answer_question, .numerical_question) .correct_answer:not(.selected_answer)'),
-        shortAnswers   = $('.short_answer_question .answers_wrapper, .numerical_question .answers_wrapper'),
-        unansweredQ    = $('.question.unanswered .header .question_name'),
+  return function(scopeSelector) {
+    // Setup the selector. Default to use the full page. Otherwise within the given scope.
+    if (scopeSelector == undefined || scopeSelector == null)
+      scopeSelector = $('body');
+
+    var rightAnswers   = scopeSelector.find('.selected_answer.correct_answer'),
+        wrongAnswers   = scopeSelector.find('.selected_answer.wrong_answer'),
+        correctAnswers = scopeSelector.find('.question:not(.short_answer_question, .numerical_question) .correct_answer:not(.selected_answer)'),
+        shortAnswers   = scopeSelector.find('.short_answer_question .answers_wrapper, .numerical_question .answers_wrapper, .equation_combinations_holder_holder.calculated_question_answers'),
+        unansweredQ    = scopeSelector.find('.question.unanswered .header .question_name'),
         rightTpl       = $('<span />', { 'class': 'answer_arrow correct' }),
         wrongTpl       = $('<span />', { 'class': 'answer_arrow incorrect' }),
         correctTpl     = $('<span />', { 'class': 'answer_arrow info' }),
@@ -48,7 +52,7 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
     shortAnswers.append(shortTpl);
     unansweredQ.append(unansweredTpl);
 
-    // adjust these downw a little so they align better w/ answers.
-    $('.short_answer_question .answer_arrow').css('top', 5);
+    // adjust these down a little so they align better w/ answers.
+    scopeSelector.find('.short_answer_question .answer_arrow').css('top', 5);
   };
 });
