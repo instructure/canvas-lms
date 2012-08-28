@@ -224,6 +224,27 @@ describe Attachment do
         end
         @attachment.should be_processed
       end
+
+      describe "scribd submit filtering" do
+        it "should still submit if the attachment is tagged" do
+          Attachment.stubs(:filtering_scribd_submits?).returns(true)
+          expects_job_with_tag('Attachment#submit_to_scribd!') do
+            scribd_mime_type_model(:extension => 'pdf')
+            attachment_model(:content_type => 'pdf', :do_submit_to_scribd => true)
+            @attachment.after_attachment_saved
+          end
+          @attachment.should be_pending_upload
+        end
+
+        it "should skip submit if the attachment isn't tagged" do
+          Attachment.stubs(:filtering_scribd_submits?).returns(true)
+          expects_job_with_tag('Attachment#submit_to_scribd!', 0) do
+            scribdable_attachment_model
+            @attachment.after_attachment_saved
+          end
+          @attachment.should be_processed
+        end
+      end
     end
 
     it "should upload scribdable attachments" do
@@ -374,6 +395,7 @@ describe Attachment do
     it "should delay the creation of the media object by attachment_build_media_object_delay_seconds" do
       now = Time.now
       Time.stubs(:now).returns(now)
+      Setting.stubs(:get).returns(nil)
       Setting.expects(:get).with('attachment_build_media_object_delay_seconds', '10').once.returns('25')
       track_jobs do
         @attachment.save!
