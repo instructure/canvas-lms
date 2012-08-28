@@ -24,7 +24,7 @@
               :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
     <% if (@current_submission || @submission).try(:pending_review?) %>
       *
-      <div>
+      <div class='question-not-graded-text'>
         <% if can_do(@quiz, @current_user, :grade) %>
           <%= link_to t(:questions_not_graded, 'Some questions not yet graded'), context_url(@context, :context_quiz_history_url, @quiz, :version => @submission.version_number, :user_id => @submission.user_id) %>
         <% else %>
@@ -78,7 +78,7 @@
   <%= '*' if @submission.pending_review? %>
     </div>
 <% if @submission.pending_review? %>
-  <div>
+  <div class='question-not-graded-text'>
     *
     <% if can_do(@quiz, @current_user, :grade) %>
       <%= link_to t(:questions_not_graded, 'Some questions not yet graded'), context_url(@context, :context_quiz_history_url, @quiz, :version => @submission.version_number, :user_id => @submission.user_id) %>
@@ -154,7 +154,7 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %>">
+<div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (@quiz.try_rescue(:show_correct_answers) ? 'show_correct_answers' : 'suppress_correct_answers') %>">
   <%= render :partial => "quizzes/display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
 </div>
 <div style="margin: 10px 0;">
@@ -230,8 +230,7 @@ $(document).ready(function() {
         :score => raw("<span class=\"score_value\">#{@submission.score}</span>"),
         :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
   <% if @submission.pending_review? %>
-    *
-    <div>
+    <div class='question-not-graded-text'>
       *
       <% if can_do(@quiz, @current_user, :grade) %>
         <%= link_to t(:questions_not_graded, 'Some questions not yet graded'), context_url(@context, :context_quiz_history_url, @quiz, :version => @submission.version_number, :user_id => @submission.user_id) %>

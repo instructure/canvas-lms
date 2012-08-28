@@ -365,9 +365,11 @@ describe "quizzes" do
 
         # marked as answer
         ff('#question_list .answered').size.should eql 2
+        wait_for_ajaximations
 
         driver.find_element(:link, 'Quizzes').click
         driver.switch_to.alert.accept
+        wait_for_ajaximations
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         driver.find_element(:link, "Resume Quiz").click

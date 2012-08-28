@@ -14,6 +14,7 @@
   incorrect = user_answer && hash_get(user_answer, :correct) == false
   unanswered = (%w{multiple_choice_question true_false_question}.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||
     (hash_get(question, 'question_type') == 'multiple_answers_question' && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '0' }.length == 0) || false
+  partial_credit = user_answer && hash_get(user_answer, :correct) == 'partial'
   asset_string ||= (question_bank_id ? 'assessment_question' : 'quiz_question') + "_#{hash_get(question, :id)}"
   if question_type.display_answers == "multiple" && hash_get(question, :question_type) != "missing_word_question"
     right_answers = hash_get(question, :answers, {})
@@ -23,7 +24,7 @@
 <div class="question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>">
   <div style="display: block; height: 1px; overflow: hidden;">&nbsp;</div>
   <a name="question_<%= hash_get(question, :id, "blank") %>"></a>
-  <div class="display_question question <%= question_type.question_type %> <%= "marked" if assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"] %> <%= "correct" if correct %> <%= "incorrect" if !correct %> <%= "unanswered" if unanswered %>" id="question_<%= hash_get(question, :id, "new") %>">
+  <div class="display_question question <%= question_type.question_type %> <%= "marked" if assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"] %> <%= "correct" if correct %> <%= "incorrect" if incorrect %> <%= "unanswered" if unanswered %> <%= "partial_credit" if partial_credit %>" id="question_<%= hash_get(question, :id, "new") %>">
     <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
     <% if assessing %>
       <div class="flag_question"></div>
@@ -91,7 +92,7 @@
                variables.each {|var| answer_list << hash_get(user_answer, "answer_for_#{var}") }
              end
           %>
-          <%= fill_in_multiple_blanks_question :question => question, :answers => @stored_params, :answer_list => answer_list %>
+          <%= fill_in_multiple_blanks_question :question => question, :answers => @stored_params, :answer_list => answer_list, :editable => assessing %>
         <% elsif question && hash_get(question, :question_type) == "multiple_dropdowns_question" %>
           <% answer_list = []
              if assessment_results
@@ -197,7 +198,7 @@
                   {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
             <% elsif question_type.display_answers == "single" %>
               <%= render :partial => "quizzes/single_answer", :locals =>
-                    {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
+                    {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer, :editable => assessing} %>
             <% end %>
           <% end %>
         <% else %>

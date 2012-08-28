@@ -20,6 +20,9 @@ div#content
   background: $backgroundColor
   border: 1px solid #fff
   padding: 16px
+.quiz-submission
+  .question-not-graded-text
+    display: none
 
 .question_editing.brief
   min-height: 80px
@@ -61,7 +64,7 @@ div#content
           +opacity(1)
         &.selected_answer
           +opacity(1)
-        &.wrong_answer,
+        &.wrong_answer
           +border-radius(6px)
           border: 2px solid red
           padding-bottom: 8px
@@ -91,6 +94,18 @@ div#content
       :border-color inherit
     &.incorrect
       :border-color inherit
+  &.suppress_correct_answers, &.survey_results
+    .question .answers .answer.wrong_answer
+      border: none
+      border-top: 1px solid #DDD
+      +border-radius(0)
+      padding-bottom: 0
+      +opacity(1)
+      .ui-selectmenu-status
+        color: inherit
+  &.survey_results
+    .question_points_holder
+      display: none
 
 #questions.assessing,#questions.assessment_results
   .question_holder
