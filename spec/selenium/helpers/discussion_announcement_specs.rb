@@ -153,15 +153,17 @@ shared_examples_for "discussion and announcement individual tests" do
   end
 
   it "should reorder topics" do
-    pending('intermittently fails')
-    2.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @user) : announcement_model(:title => "new topic #{i}", :user => @user) }
+    3.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @user) : announcement_model(:title => "new topic #{i}", :user => @user) }
     get url
+    wait_for_ajax_requests
 
     topics = ff('.discussion-topic')
     driver.action.move_to(topics[0]).perform
-    driver.action.drag_and_drop(fj('.discussion-drag-handle:visible'), topics[1]).perform
+    # drag first topic to second place
+    # (using topics[2] as target to get the dragging to work)
+    driver.action.drag_and_drop(fj('.discussion-drag-handle:visible', topics[0]), topics[2]).perform
     wait_for_ajax_requests
     new_topics = ffj('.discussion-topic') # using ffj to avoid selenium caching
-    new_topics[0].should include_text('new topic 1')
+    new_topics[0].should_not include_text('new topic 0')
   end
 end
