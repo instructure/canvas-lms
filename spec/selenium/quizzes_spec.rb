@@ -366,6 +366,7 @@ describe "quizzes" do
 
         # marked as answer
         ff('#question_list .answered').size.should eql 2
+        wait_for_ajaximations
 
         # after reload, answers should be remembered
         expect_new_page_load {

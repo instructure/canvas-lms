@@ -9,15 +9,12 @@ require [
     if $(this).is(':checked')
       CreateQuizArrows()
     else
-      # Delete any quiz arrows
+      # Delete all quiz arrows
       $('.answer_arrow').remove()
 
-  $('.edit_question_link').on 'click', (e)->
-    $(this).find('.answer_arrow').remove()
-  $('.cancel_link').on 'click', (e)->
-    if $('#show_question_details').is(':checked')
-      CreateQuizArrows($(this).closest('.question'))
   # Subscribe to custom event that is triggered as an 'aftersave' on a question form
   $('body').on 'saved', '.question', ->
+    # Remove all arrows and recreate all if option is checked
+    $('.answer_arrow').remove()
     if $('#show_question_details').is(':checked')
-      CreateQuizArrows($(this).closest('.question_holder'))
+        CreateQuizArrows()
