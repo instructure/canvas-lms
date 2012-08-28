@@ -118,7 +118,7 @@ describe "quizzes question creation" do
     driver.find_element(:id, 'show_question_details').click
     finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
-    finished_question.find_elements(:css, '.correct_answer').length.should == 2
+    finished_question.find_elements(:css, '.answer.correct_answer').length.should == 2
   end
 
   it "should create a quiz question with a multiple dropdown question" do

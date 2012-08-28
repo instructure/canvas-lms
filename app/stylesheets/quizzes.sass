@@ -21,9 +21,6 @@ div#content
   border: 1px solid #fff
   padding: 16px
 
-.question_editing .question_holder
-  overflow: hidden
-
 .question_editing.brief
   min-height: 80px
 
@@ -304,6 +301,7 @@ div#content
         border-top: 1px solid #ccc
         text-align: left
     .equation_combinations_holder
+      position: relative
       max-height: 100px
       overflow: auto
     .equation_combinations
@@ -1092,6 +1090,17 @@ ul#quiz_versions
       .answer
         margin: 0 !important
         padding-top: 0
-#questions.question_editing .question
-  .answers_wrapper
-    border-top: none
+  &.question_editing
+    .question
+      .answers_wrapper
+        border-top: none
+        .answer
+          position: relative
+      .answers
+        .answer
+          position: relative
+      .calculated_question_answers
+        position: relative
+      /* Display persistent correct answer arrow when editing only. */
+      &.selectable .form_answers .answer.correct_answer .answer_select .answer_box
+        background: url(/images/correct_answer.png) no-repeat 3px 5px
