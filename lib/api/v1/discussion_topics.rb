@@ -105,11 +105,11 @@ module Api::V1::DiscussionTopics
     end
   end
 
-  def topic_pagination_path
+  def topic_pagination_path(options = {})
     if @context.is_a? Course
-      api_v1_course_discussion_topics_path(@context)
+      api_v1_course_discussion_topics_path(@context, options)
     else
-      api_v1_group_discussion_topics_path(@context)
+      api_v1_group_discussion_topics_path(@context, options)
     end
   end
 

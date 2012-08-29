@@ -126,7 +126,11 @@ class DiscussionTopicsController < ApplicationController
         end
         format.json do
           # you can pass ?only_announcements=true to get announcements instead of discussions TODO: document
-          @topics = Api.paginate(@context.send( params[:only_announcements] ? :active_announcements : :active_discussion_topics).by_position, self, topic_pagination_path)
+          scope = (params[:only_announcements] ?
+                   @context.active_announcements :
+                   @context.active_discussion_topics.only_discussion_topics)
+          scope = scope.by_position
+          @topics = Api.paginate(scope, self, topic_pagination_path(:only_announcements => params[:only_announcements]))
           @topics.reject! { |a| a.locked_for?(@current_user, :check_policies => true) }
           @topics.each { |t| t.current_user = @current_user }
           if api_request?
