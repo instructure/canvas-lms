@@ -16,7 +16,7 @@
   correct_answer = (hash_get(user_answer, "answer_#{answer[:id]}").to_i == hash_get(answer, :match_id).to_i) if user_answer && answer && question_type && question_type.answer_type == "matching_answer"
   correct_answer = false if !user_answer && question && hash_get(question, :question_type) == "matching_question"
   correct_answer = false unless show_correct_answers || selected_answer
-  correct_answer_class = !['multiple_answers_question'].include?(question_type.question_type) || show_correct_answers ? (correct_answer ? "correct_answer" : "") : "unspecified_answer"
+  correct_answer_class = show_correct_answers ? (correct_answer ? "correct_answer" : "") : "unspecified_answer"
   wrong_answer = selected_answer && !correct_answer
   no_answer = wrong_answer && (hash_get(user_answer, "answer_#{answer[:id]}")  == '')
   hide_right_arrow = false
@@ -32,7 +32,7 @@
   <% if false %>
     <!-- Display skipped -->
   <% else %>
-    <div class="answer answer_for_<%= hash_get(answer, :blank_id) %> <%= "hide_right_arrow" if hide_right_arrow %> <%= 'skipped' if should_skip %> <%= 'wrong_answer' if wrong_answer %> <%= 'no_answer' if no_answer %> <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>" id="answer_<%= hash_get(answer, :id, "template") %>" style="<%= hidden unless answer %>" title="<%= t(:selected_answer, "You selected this answer.") if selected_answer %> <%= t(:correct_answer, "This was the correct answer.") if correct_answer && show_correct_answers %>">
+    <div class="answer answer_for_<%= hash_get(answer, :blank_id) %> <%= "hide_right_arrow" if hide_right_arrow %> <%= 'skipped' if should_skip %> <%= 'wrong_answer' if wrong_answer && show_correct_answers %> <%= 'no_answer' if no_answer %> <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>" id="answer_<%= hash_get(answer, :id, "template") %>" style="<%= hidden unless answer %>" title="<%= t(:selected_answer, "You selected this answer.") if selected_answer %> <%= t(:correct_answer, "This was the correct answer.") if correct_answer && show_correct_answers %>">
     <% if !user_answer || question_type.display_answers != "xsingle" %>
     <div class="select_answer answer_type" <%= hidden(true) unless answer_type == "select_answer" %>>
       <% if %w{radio checkbox}.include?(question_type.entry_type) %>
@@ -109,7 +109,9 @@
         <span class="answer_tolerance"><%= hash_get(question, :answer_tolerance) %></span>
       </span>
     </div>
-    <span class="answer_weight" style="display: none;"><%= hash_get(answer, :weight, 0) %></span>
+    <% if show_correct_answers %>
+      <span class="answer_weight" style="display: none;"><%= hash_get(answer, :weight, 0) %></span>
+    <% end %>
     <% if show_comment %>
       <div class="quiz_comment <%= "empty" unless has_answer_comment %>">
         <% if hash_get(answer, :comments_html).present? %>
