@@ -20,7 +20,7 @@ module Api::V1::ExternalFeeds
   include Api::V1::Json
 
   API_ALLOWED_EXTERNAL_FEED_PARAMS = %w{url header_match verbosity}
-  API_EXPOSED_EXTERNAL_FEED_PARAMS = %w(id title feed_type url header_match created_at updated_at verbosity)
+  API_EXPOSED_EXTERNAL_FEED_PARAMS = %w(id url header_match created_at verbosity)
 
   def external_feeds_api_json(external_feeds, context, user, session)
     external_feeds.map do |external_feed|
@@ -39,7 +39,7 @@ module Api::V1::ExternalFeeds
   end
 
   def create_api_external_feed(context, feed_params, user)
-    feed = context.external_feeds.build(feed_params.slice(API_ALLOWED_EXTERNAL_FEED_PARAMS))
+    feed = context.external_feeds.build(feed_params.slice(*API_ALLOWED_EXTERNAL_FEED_PARAMS))
     feed.feed_purpose = "announcements"
     feed.user = user
     feed.feed_type = "rss/atom"
