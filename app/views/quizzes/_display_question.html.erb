@@ -214,13 +214,15 @@
                 <b class="answer-group-heading"><%= before_label(:for_answer_number, "Answer %{answer_number}", :answer_number => idx + 1) %></b>
                 <% if question_type.entry_type == "text_box" %>
                   <% answer_classes = ['selected_answer']
-                     answer_classes << ((matched_answer && matched_answer[:weight] == 100) ? 'correct_answer' : 'wrong_answer')
+                     if @quiz.show_correct_answers
+                       answer_classes << ((matched_answer && matched_answer[:weight] == 100) ? 'correct_answer' : 'wrong_answer')
+                     end
                      answer_classes << 'no_answer' if hash_get(user_answer, :text).blank?
                   %>
                   <div class='answer <%= answer_classes.compact.join(' ') %>'>
                     <%= h(hash_get(user_answer, :text) || t(:you_left_this_blank, "(You left this blank)")) %>
                     <% if matched_answer && comment_get(matched_answer, :comments).present? %>
-                      <div class="hide_right_arrow correct_answer">
+                      <div class="hide_right_arrow <%= "correct_answer" if @quiz.show_correct_answers %>">
                         <div class="quiz_comment">
                           <%= comment_get(matched_answer, :comments) %>
                         </div>
@@ -256,7 +258,9 @@
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'range_answer' && val <= hash_get(a, :end) && val >= hash_get(a, :start)
                   end %>
                   <% answer_classes = ['selected_answer']
-                     answer_classes << ((hash_get(user_answer, :correct) == true) ? 'correct_answer' : 'wrong_answer')
+                     if @quiz.show_correct_answers
+                       answer_classes << ((hash_get(user_answer, :correct) == true) ? 'correct_answer' : 'wrong_answer')
+                     end
                      answer_classes << 'no_answer' if hash_get(user_answer, :text).blank?
                   %>
                   <div class='answer <%= answer_classes.compact.join(' ') %>'>
@@ -264,7 +268,7 @@
                       {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
                   </div>
                   <% if matched_answer && comment_get(matched_answer, :comments).present? %>
-                    <div class="hide_right_arrow correct_answer">
+                    <div class="hide_right_arrow <%= "correct_answer" if @quiz.show_correct_answers %>">
                       <div class="quiz_comment">
                         <%= comment_get(matched_answer, :comments) %>
                       </div>
