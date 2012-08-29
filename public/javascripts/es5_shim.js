@@ -1,7 +1,7 @@
 // this just grabs Function.prototype.bind and String.prototype.trim from
 // https://github.com/kriskowal/es5-shim
 
-define(function(){
+(function(){
 
   var slice = Array.prototype.slice;
 
@@ -153,4 +153,4 @@ define(function(){
           return String(this).replace(trimBeginRegexp, "").replace(trimEndRegexp, "");
       };
   }
-});
+})();
