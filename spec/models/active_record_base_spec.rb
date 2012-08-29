@@ -297,7 +297,7 @@ describe ActiveRecord::Base do
   describe "find_ids_in_ranges" do
     it "should return ids from the table in ranges" do
       ids = []
-      10.times { ids << User.create!().id }
+      10.times { ids << User.create!().id.to_s }
       batches = []
       User.find_ids_in_ranges(:batch_size => 4) do |*found_ids|
         batches << found_ids
@@ -305,6 +305,15 @@ describe ActiveRecord::Base do
       batches.should == [ [ids[0], ids[3]],
                           [ids[4], ids[7]],
                           [ids[8], ids[9]] ]
+    end
+
+    it "should work with scopes" do
+      user = User.create!
+      user2 = User.create!
+      user2.destroy
+      User.active.find_ids_in_ranges do |*found_ids|
+        found_ids.should == [user.id.to_s, user.id.to_s]
+      end
     end
   end
 

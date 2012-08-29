@@ -512,17 +512,14 @@ class ActiveRecord::Base
 
   # returns 2 ids at a time (the min and the max of a range), working through
   # the primary key from smallest to largest.
-  #
-  # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_ranges(options = {})
-    batch_size = options[:batch_size] || 1000
-    ids = connection.select_rows("select min(id), max(id) from (select #{primary_key} as id from #{table_name} order by #{primary_key} limit #{batch_size.to_i}) as subquery").first
-    ids = ids.map { |id| id.try(:to_i) }
+    batch_size = options[:batch_size].try(:to_i) || 1000
+
+    ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :order => primary_key, :limit => batch_size)}) as subquery").first
     while ids.first.present?
       yield *ids
       last_value = ids.last
-      ids = connection.select_rows(sanitize_sql_array(["select min(id), max(id) from (select #{primary_key} as id from #{table_name} where #{primary_key} > ? order by #{primary_key} limit #{batch_size.to_i}) as subquery", last_value])).first
-      ids = ids.map { |id| id.try(:to_i) }
+      ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :conditions => ["#{primary_key}>?", last_value], :order => primary_key, :limit => batch_size)}) as subquery").first
     end
   end
 end
