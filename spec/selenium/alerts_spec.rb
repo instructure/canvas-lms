@@ -52,7 +52,7 @@ describe "Alerts" do
     edit.click
     alert.find_element(:css, '.criteria .delete_item_link').click
     wait_for_animations
-    keep_trying_until { find_all_with_jquery('.alert .criteria li').length == 1 }
+    keep_trying_until { ffj('.alert .criteria li').length == 1 }
     submit.click
 
     keep_trying_until{
@@ -80,7 +80,7 @@ describe "Alerts" do
 
     f('#tab-alerts-link').click
     f("#edit_alert_#{alert.id} .delete_link").click
-    keep_trying_until { find_with_jquery("#edit_alert_#{alert.id}").blank? }
+    keep_trying_until { fj("#edit_alert_#{alert.id}").blank? }
 
     @alerts.reload
     @alerts.should be_empty
@@ -108,7 +108,7 @@ describe "Alerts" do
     wait_for_animations
     f('.alert.new .cancel_button').click
     wait_for_animations
-    keep_trying_until { find_all_with_jquery(".alert.new").should be_empty }
+    keep_trying_until { ffj(".alert.new").should be_empty }
     @alerts.should be_empty
   end
 
@@ -121,7 +121,7 @@ describe "Alerts" do
       alert = f('.alert.new')
       link = alert.find_element(:css, '.add_recipient_link')
 
-      keep_trying_until { find_all_with_jquery('.alert.new .add_recipients_line select option').length > 1 }
+      keep_trying_until { ffj('.alert.new .add_recipients_line select option').length > 1 }
       for i in 1..alert.find_elements(:css, '.add_recipients_line select option').length do
         link.click
         wait_for_animations
@@ -136,18 +136,18 @@ describe "Alerts" do
       f('#tab-alerts-link').click
       alertElement = f("#edit_alert_#{alert.id}")
       alertElement.find_element(:css, ".edit_link").click
-      find_with_jquery("#edit_alert_#{alert.id} .add_recipient_link:visible").should be_blank
+      fj("#edit_alert_#{alert.id} .add_recipient_link:visible").should be_blank
 
       # Deleting a recipient should add it to the dropdown (which is now visible)
       alertElement.find_element(:css, '.recipients .delete_item_link').click
       wait_for_animations
-      find_with_jquery("#edit_alert_#{alert.id} .add_recipient_link").should be_displayed
+      fj("#edit_alert_#{alert.id} .add_recipient_link").should be_displayed
       alertElement.find_elements(:css, '.add_recipients_line select option').length.should == 1
       keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 2 }
 
       # Do it again, with the same results
       alertElement.find_element(:css, '.recipients .delete_item_link').click
-      find_with_jquery("#edit_alert_#{alert.id} .add_recipient_link").should be_displayed
+      fj("#edit_alert_#{alert.id} .add_recipient_link").should be_displayed
       alertElement.find_elements(:css, '.add_recipients_line select option').length.should == 2
       keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 1 }
 
@@ -167,20 +167,20 @@ describe "Alerts" do
     keep_trying_until do
       submit_form('#new_alert')
       wait_for_animations
-      find_all_with_jquery('.error_box').length == 4
+      ffj('.error_box').length == 4
     end
 
     # clicking "do not repeat" should remove the number of days error
     alert.find_element(:css, 'input[name="repetition"][value="none"]').click
-    keep_trying_until { find_all_with_jquery('.error_box').length == 3 }
+    keep_trying_until { ffj('.error_box').length == 3 }
 
     # adding recipients and criterion make the errors go away
     alert.find_element(:css, '.add_recipient_link').click
     alert.find_element(:css, '.add_criterion_link').click
-    keep_trying_until { find_all_with_jquery('.error_box').length == 1 }
+    keep_trying_until { ffj('.error_box').length == 1 }
 
     alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
     submit_form('#new_alert')
-    keep_trying_until { find_all_with_jquery('.error_box').length == 2 }
+    keep_trying_until { ffj('.error_box').length == 2 }
   end
 end

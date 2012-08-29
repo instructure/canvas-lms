@@ -12,7 +12,7 @@ describe "jquery ui" do
     driver.execute_script(<<-JS).should == true
       return $('<div />').dialog().dialog('option', 'modal');
     JS
-    driver.find_element(:css, ".ui-widget-overlay").should be_displayed
+    f(".ui-widget-overlay").should be_displayed
     
     # make sure that hiding then showing the same dialog again, it still looks modal
     driver.execute_script(<<-JS).should == true
@@ -22,27 +22,27 @@ describe "jquery ui" do
         .dialog('open')
         .dialog('option', 'modal');
     JS
-    driver.find_element(:css, ".ui-widget-overlay").should be_displayed
+    f(".ui-widget-overlay").should be_displayed
   end
   
   context "calendar widget" do
     it "should let you replace content by selecting and typing instead of appending" do
       get "/courses/#{@course.id}/assignments"
       
-      driver.find_element(:css, "a.add_assignment_link").click
+      f(".add_assignment_link").click
       wait_for_animations
-      driver.find_element(:css, ".ui-datepicker-trigger").click
+      f(".ui-datepicker-trigger").click
       wait_for_animations
-      driver.find_element(:css, ".ui-datepicker-time-hour").send_keys("12")
-      driver.find_element(:css, ".ui-datepicker-time-minute").send_keys("00")
-      driver.find_element(:css, ".ui-datepicker-ok").click
+      f(".ui-datepicker-time-hour").send_keys("12")
+      f(".ui-datepicker-time-minute").send_keys("00")
+      f(".ui-datepicker-ok").click
       
-      driver.find_element(:css, ".ui-datepicker-trigger").click
+      f(".ui-datepicker-trigger").click
       wait_for_animations
       
       driver.execute_script("$('#ui-datepicker-time-hour').select();")
-      driver.find_element(:id, "ui-datepicker-time-hour").send_keys('5')
-      driver.find_element(:id, "ui-datepicker-time-hour").attribute('value').should == "5"
+      f("#ui-datepicker-time-hour").send_keys('5')
+      f("#ui-datepicker-time-hour").attribute('value').should == "5"
     end
   end
   

@@ -222,7 +222,7 @@ describe "scheduler" do
       f('[name="per_slot_option"]').click
       f('[name="participant_visibility"]').click
       f('[name="max_appointments_per_participant_option"]').click
-      driver.find_element(:css, '.ui-dialog-buttonset .ui-button').click
+      submit_dialog('.ui-dialog-buttonset', '.ui-button')
       wait_for_ajaximations
       # assert options are not checked
       open_edit_dialog

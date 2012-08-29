@@ -34,7 +34,7 @@ describe "course rubrics" do
       wait_for_ajax_requests
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      find_all_with_jquery(".custom_ratings:visible").size.should eql(1)
+      ffj(".custom_ratings:visible").size.should eql(1)
     end
   end
 

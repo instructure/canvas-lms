@@ -14,14 +14,14 @@ describe "user selenium tests" do
 
       get "/users/#{@user.id}"
       pseudonym_form = f('#edit_pseudonym_form')
-      driver.find_element(:css, ".add_pseudonym_link").click
+      f(".add_pseudonym_link").click
       pseudonym_form.find_element(:css, "#pseudonym_unique_id").send_keys('new_user')
       pseudonym_form.find_element(:css, "#pseudonym_password").send_keys('qwerty1')
       pseudonym_form.find_element(:css, "#pseudonym_password_confirmation").send_keys('qwerty1')
       submit_form(pseudonym_form)
       wait_for_ajaximations
 
-      new_login = driver.find_elements(:css, '.login').select { |e| e.attribute(:class) !~ /blank/ }.first
+      new_login = ff('.login').select { |e| e.attribute(:class) !~ /blank/ }.first
       new_login.should_not be_nil
       new_login.find_element(:css, '.account_name').text().should_not be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first

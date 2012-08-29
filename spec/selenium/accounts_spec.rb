@@ -101,7 +101,7 @@ describe "account" do
 
       Account.default.account_authorization_configs.create(:auth_type => 'cas')
       get "/accounts/#{Account.default.id}/users"
-      driver.find_element(:css, ".add_user_link").click
+      f(".add_user_link").click
       dialog = f("#add_user_dialog")
       dialog.find_element(:id, "pseudonym_path").should be_displayed
       dialog.find_element(:id, "pseudonym_unique_id").should be_displayed

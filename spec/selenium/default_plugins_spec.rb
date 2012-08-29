@@ -15,16 +15,17 @@ describe "default plugins" do
     Twitter.stubs(:config_check).returns("Bad check")
     get "/plugins/twitter"
 
-    driver.find_element(:css, "#plugin_setting_disabled").click
+    f("#plugin_setting_disabled").click
 
-    driver.find_element(:css, "#settings_api_key").send_keys("asdf")
-    driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
-    driver.find_element(:css, "button.save_button").click
+    f("#settings_api_key").send_keys("asdf")
+    f("#settings_secret_key").send_keys("asdf")
+    submit_form('#new_plugin_setting')
 
     assert_flash_error_message /There was an error/
 
     Twitter.stubs(:config_check).returns(nil)
-    driver.find_element(:css, "button.save_button").click
+
+    submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
     assert_flash_notice_message /successfully updated/
@@ -40,16 +41,17 @@ describe "default plugins" do
     settings.should be_nil
 
     get "/plugins/etherpad"
+    get "/plugins/etherpad"
 
-    driver.find_element(:css, "#plugin_setting_disabled").click
+    f("#plugin_setting_disabled").click
 
-    driver.find_element(:css, "#settings_domain").send_keys("asdf")
-    driver.find_element(:css, "button.save_button").click
+    f("#settings_domain").send_keys("asdf")
+    submit_form('#new_plugin_setting')
 
     assert_flash_error_message /There was an error/
 
-    driver.find_element(:css, "#settings_name").send_keys("asdf")
-    driver.find_element(:css, "button.save_button").click
+    f("#settings_name").send_keys("asdf")
+    submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
     assert_flash_notice_message /successfully updated/
@@ -67,16 +69,16 @@ describe "default plugins" do
     GoogleDocs.stubs(:config_check).returns("Bad check")
     get "/plugins/google_docs"
 
-    driver.find_element(:css, "#plugin_setting_disabled").click
+    f("#plugin_setting_disabled").click
 
-    driver.find_element(:css, "#settings_api_key").send_keys("asdf")
-    driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
-    driver.find_element(:css, "button.save_button").click
+    f("#settings_api_key").send_keys("asdf")
+    f("#settings_secret_key").send_keys("asdf")
+    submit_form('#new_plugin_setting')
 
     assert_flash_error_message /There was an error/
 
     GoogleDocs.stubs(:config_check).returns(nil)
-    driver.find_element(:css, "button.save_button").click
+    submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
     assert_flash_notice_message /successfully updated/
@@ -94,16 +96,16 @@ describe "default plugins" do
     LinkedIn.stubs(:config_check).returns("Bad check")
     get "/plugins/linked_in"
 
-    driver.find_element(:css, "#plugin_setting_disabled").click
+    f("#plugin_setting_disabled").click
 
-    driver.find_element(:css, "#settings_api_key").send_keys("asdf")
-    driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
-    driver.find_element(:css, "button.save_button").click
+    f("#settings_api_key").send_keys("asdf")
+    f("#settings_secret_key").send_keys("asdf")
+    submit_form('#new_plugin_setting')
 
     assert_flash_error_message /There was an error/
 
     LinkedIn.stubs(:config_check).returns(nil)
-    driver.find_element(:css, "button.save_button").click
+    submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
     assert_flash_notice_message /successfully updated/
@@ -121,18 +123,18 @@ describe "default plugins" do
     ScribdAPI.stubs(:config_check).returns("Bad check")
     get "/plugins/scribd"
 
-    driver.find_element(:css, "#plugin_setting_disabled").click
+    f("#plugin_setting_disabled").click
 
-    driver.find_element(:css, "#settings_api_key").send_keys("asdf")
-    driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
+    f("#settings_api_key").send_keys("asdf")
+    f("#settings_secret_key").send_keys("asdf")
     keep_trying_until {
-      driver.find_element(:css, "button.save_button").click
+      submit_form('#new_plugin_setting')
       wait_for_ajaximations
       assert_flash_error_message /There was an error/
     }
 
     ScribdAPI.stubs(:config_check).returns(nil)
-    driver.find_element(:css, "button.save_button").click
+    submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
     assert_flash_notice_message /successfully updated/
@@ -150,16 +152,16 @@ describe "default plugins" do
     Tinychat.stubs(:config_check).returns("Bad check")
     get "/plugins/tinychat"
 
-    driver.find_element(:css, "#plugin_setting_disabled").click
+    f("#plugin_setting_disabled").click
 
-    driver.find_element(:css, "#settings_api_key").send_keys("asdf")
-    driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
-    driver.find_element(:css, "button.save_button").click
+    f("#settings_api_key").send_keys("asdf")
+    f("#settings_secret_key").send_keys("asdf")
+    submit_form('#new_plugin_setting')
 
     assert_flash_error_message /There was an error/
 
     Tinychat.stubs(:config_check).returns(nil)
-    driver.find_element(:css, "button.save_button").click
+    submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 
     assert_flash_notice_message /successfully updated/

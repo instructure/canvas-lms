@@ -67,7 +67,7 @@ describe "eportfolios" do
       f("#section_list_manage .add_section_link").click
       f("#section_list input").send_keys("test section name", :return)
       wait_for_ajax_requests
-      find_with_jquery("#section_list li:last-child .name").text.should eql "test section name"
+      fj("#section_list li:last-child .name").text.should eql "test section name"
     end
 
     it "should edit ePortfolio settings" do

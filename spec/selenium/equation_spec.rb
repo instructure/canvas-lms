@@ -8,20 +8,20 @@ describe "equation editor" do
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes"
-    driver.find_element(:css, '.new-quiz-link').click
+    f('.new-quiz-link').click
 
     def save_question_and_wait
       submit_form('.question_form')
       wait_for_ajaximations
     end
 
-    wait_for_tiny(driver.find_element(:css, "#quiz_description"))
+    wait_for_tiny(f("#quiz_description"))
 
-    new_question_link = driver.find_element(:css, '.add_question_link')
+    new_question_link = f('.add_question_link')
     2.times do |time|
       new_question_link.click
 
-      questions = find_all_with_jquery(".question_holder:visible")
+      questions = ffj(".question_holder:visible")
       questions.length.should eql(time + 1)
       question = questions[time]
 
@@ -30,7 +30,7 @@ describe "equation editor" do
       equation_editor = keep_trying_until do
         question.find_element(:css, '.mce_instructure_equation').click
         sleep 1
-        equation_editor = find_with_jquery("#instructure_equation_prompt:visible")
+        equation_editor = fj("#instructure_equation_prompt:visible")
         equation_editor.should_not be_nil
         equation_editor
       end
@@ -40,7 +40,7 @@ describe "equation editor" do
       save_question_and_wait
 
       question.find_elements(:css, 'img.equation_image').size.should == 1
-      driver.find_element(:css, "#right-side .points_possible").text.should eql((time + 1).to_s)
+      f("#right-side .points_possible").text.should eql((time + 1).to_s)
     end
   end
 end

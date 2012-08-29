@@ -16,16 +16,16 @@ describe "dashboard" do
       items.first.hidden.should == false
 
       get url
-      find_all_with_jquery("div.communication_message.announcement").size.should == 1
+      ffj(".communication_message.announcement").size.should == 1
       # force the element to be visible so we can click it -- webdriver has a
       # hover() event but it only works on Windows so far
       driver.execute_script("$('div.communication_message.announcement .disable_item_link').css('visibility', 'visible')")
-      driver.find_element(:css, "div.communication_message.announcement .disable_item_link").click
-      keep_trying_until { find_all_with_jquery("div.communication_message.announcement").size.should == 0 }
+      f(".communication_message.announcement .disable_item_link").click
+      keep_trying_until { ffj(".communication_message.announcement").size.should == 0 }
 
       # should still be gone on reload
       get url
-      find_all_with_jquery("div.communication_message.announcement").size.should == 0
+      ffj(".communication_message.announcement").size.should == 0
 
       @user.recent_stream_items.size.should == 0
       items.first.reload.hidden.should == true
@@ -48,8 +48,8 @@ describe "dashboard" do
       items.size.should == 1
 
       get "/"
-      find_all_with_jquery("div.communication_message.conversation").size.should == 1
-      find_all_with_jquery("div.communication_message.conversation .communication_sub_message:visible").size.should == 3 # two messages, plus add message form
+      ffj(".communication_message.conversation").size.should == 1
+      ffj(".communication_message.conversation .communication_sub_message:visible").size.should == 3 # two messages, plus add message form
     end
 
     it "should allow replying to conversation stream items" do
@@ -57,11 +57,11 @@ describe "dashboard" do
       c.add_message('test')
 
       get "/"
-      driver.find_element(:css, ".reply_message .textarea").click
-      driver.find_element(:css, "textarea[name='body']").send_keys("hey there")
+      f(".reply_message .textarea").click
+      f("textarea[name='body']").send_keys("hey there")
       submit_form(".communication_sub_message")
       wait_for_ajax_requests
-      messages = find_all_with_jquery(".communication_message.conversation .communication_sub_message:visible")
+      messages = ffj(".communication_message.conversation .communication_sub_message:visible")
 
       # messages[-1] is the reply form
       messages[-2].text.should =~ /hey there/
@@ -84,18 +84,18 @@ describe "dashboard" do
       @appointment_group.update_attributes(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
 
       get "/"
-      ffj(".topic_message div.communication_message.dashboard_notification").size.should == 3
+      ffj(".topic_message .communication_message.dashboard_notification").size.should == 3
       # appointment group publish and update notifications
-      ffj("div.communication_message.message_appointment_group_#{@appointment_group.id}").size.should == 2
+      ffj(".communication_message.message_appointment_group_#{@appointment_group.id}").size.should == 2
       # signup notification
-      ffj("div.communication_message.message_group_#{@group.id}").size.should == 1
+      ffj(".communication_message.message_group_#{@group.id}").size.should == 1
     end
 
     it "should display assignment in to do list" do
       due_date = Time.now.utc + 2.days
       @assignment = assignment_model({:due_at => due_date, :course => @course})
       get "/"
-      driver.find_element(:css, '.events_list .event a').should include_text(@assignment.title)
+      f('.events_list .event a').should include_text(@assignment.title)
       # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
       driver.execute_script("return $('.event a .tooltip_text').text()").should match(@course.short_name)
     end
@@ -120,7 +120,7 @@ describe "dashboard" do
 
       # No "To Do" list shown
       f('.right-side-list.to-do-list').should be_nil
-      coming_up_list = driver.find_element(:css, '.right-side-list.events')
+      coming_up_list = f('.right-side-list.events')
 
       2.times { |i| check_list_text(coming_up_list, names[i]) }
     end
@@ -133,10 +133,10 @@ describe "dashboard" do
 
       get "/"
 
-      find_all_with_jquery(".to-do-list li:visible").size.should == 5 + 1 # +1 is the see more link
-      driver.find_element(:css, ".more_link").click
+      ffj(".to-do-list li:visible").size.should == 5 + 1 # +1 is the see more link
+      f(".more_link").click
       wait_for_animations
-      find_all_with_jquery(".to-do-list li:visible").size.should == 20
+      ffj(".to-do-list li:visible").size.should == 20
     end
 
     it "should display assignments to do in to do list and assignments menu for a student" do
@@ -150,12 +150,12 @@ describe "dashboard" do
       get "/"
 
       #verify assignment changed notice is in messages
-      driver.find_element(:css, '#topic_list .topic_message').should include_text('Assignment Due Date Changed')
+      f('#topic_list .topic_message').should include_text('Assignment Due Date Changed')
       #verify assignment is in to do list
-      driver.find_element(:css, '.to-do-list > li').should include_text(assignment.submission_action_string)
+      f('.to-do-list > li').should include_text(assignment.submission_action_string)
 
       #verify assignment is in drop down
-      assignment_menu = driver.find_element(:id, 'assignments_menu_item')
+      assignment_menu = f('#assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
       assignment_menu.should include_text("To Turn In")
       assignment_menu.should include_text(assignment.title)
@@ -167,7 +167,7 @@ describe "dashboard" do
 
       get "/"
 
-      course_menu = driver.find_element(:id, 'courses_menu_item')
+      course_menu = f('#courses_menu_item')
 
       driver.action.move_to(course_menu).perform
       course_menu.should include_text('My Courses')
@@ -183,7 +183,7 @@ describe "dashboard" do
 
       get "/"
 
-      course_menu = driver.find_element(:id, 'courses_menu_item')
+      course_menu = f('#courses_menu_item')
 
       driver.action.move_to(course_menu).perform
       course_menu.should include_text('Current Groups')
@@ -202,7 +202,7 @@ describe "dashboard" do
 
       get "/"
 
-      find_with_jquery('#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
+      fj('#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
     end
 
     it "should display calendar events in the coming up list" do
@@ -213,7 +213,7 @@ describe "dashboard" do
                                :end_at => 10.minutes.from_now
                            })
       get "/"
-      driver.find_element(:css, 'div.events_list .event a').should include_text(@event.title)
+      f('div.events_list .event a').should include_text(@event.title)
     end
 
     it "should display quiz submissions with essay questions as submitted in coming up list" do
@@ -241,12 +241,12 @@ describe "dashboard" do
       @context = @course
       announcement_model({:title => "hey all read this k", :message => "announcement"})
       get "/"
-      driver.find_element(:css, '.topic_message .add_entry_link').click
+      f('.topic_message .add_entry_link').click
       driver.find_element(:name, 'discussion_entry[plaintext_message]').send_keys('first comment')
       submit_form('.add_sub_message_form')
       wait_for_ajax_requests
       wait_for_animations
-      driver.find_element(:css, '.topic_message .subcontent').should include_text('first comment')
+      f('.topic_message .subcontent').should include_text('first comment')
     end
 
     it "should create an announcement for the first course that is not visible in the second course" do
@@ -268,11 +268,11 @@ describe "dashboard" do
 
       get "/"
 
-      driver.find_element(:id, 'no_topics_message').should_not include_text('No Recent Messages')
+      f('#no_topics_message').should_not include_text('No Recent Messages')
 
       get "/courses/#{@second_course.id}"
 
-      driver.find_element(:id, 'no_topics_message').should include_text('No Recent Messages')
+      f('#no_topics_message').should include_text('No Recent Messages')
     end
 
     it "should validate the functionality of soft concluded courses in dropdown" do
@@ -284,8 +284,8 @@ describe "dashboard" do
       c1.save!
       get "/"
 
-      driver.action.move_to(driver.find_element(:id, 'courses_menu_item')).perform
-      course_menu = driver.find_element(:id, 'menu_enrollments')
+      driver.action.move_to(f('#courses_menu_item')).perform
+      course_menu = f('#menu_enrollments')
       course_menu.should be_displayed
       course_menu.should_not include_text(c1.name)
     end
@@ -307,7 +307,7 @@ describe "dashboard" do
       c1.reload
 
       get "/courses"
-      driver.find_element(:css, '.past_enrollments').should include_text(c1.name)
+      f('.past_enrollments').should include_text(c1.name)
     end
 
     it "should display assignment to grade in to do list and assignments menu for a teacher" do
@@ -320,10 +320,10 @@ describe "dashboard" do
       get "/"
 
       #verify assignment is in to do list
-      driver.find_element(:css, '.to-do-list > li').should include_text('Grade ' + assignment.title)
+      f('.to-do-list > li').should include_text('Grade ' + assignment.title)
 
       #verify assignment is in drop down
-      assignment_menu = driver.find_element(:id, 'assignments_menu_item')
+      assignment_menu = f('#assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
       assignment_menu.should include_text("To Grade")
       assignment_menu.should include_text(assignment.title)
@@ -366,7 +366,7 @@ describe "dashboard" do
 
         get "/"
 
-        course_menu = driver.find_element(:id, 'courses_menu_item')
+        course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
@@ -378,7 +378,7 @@ describe "dashboard" do
 
         get "/"
 
-        course_menu = driver.find_element(:id, 'courses_menu_item')
+        course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
@@ -394,7 +394,7 @@ describe "dashboard" do
 
         get "/"
 
-        course_menu = driver.find_element(:id, 'courses_menu_item')
+        course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
@@ -410,7 +410,7 @@ describe "dashboard" do
         # be enough.
         UsersController.before_filter { sleep 1; true }
 
-        course_menu = driver.find_element(:id, 'courses_menu_item')
+        course_menu = f('#courses_menu_item')
         driver.execute_script(%{$("#menu li.menu-item:first").trigger('mouseenter')})
         sleep 0.4 # there's a fixed 300ms delay before the menu will display
 
