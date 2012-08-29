@@ -22,11 +22,22 @@ class ExternalFeed < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :external_feed_entries, :dependent => :destroy
   
-  before_save :infer_defaults
-  
+  before_validation :infer_defaults
+
+  include CustomValidations
+  validates_presence_of :url
+  validates_as_url :url
+
+  VERBOSITIES = %w(full link_only truncate)
+  validates_inclusion_of :verbosity, :in => VERBOSITIES, :allow_nil => true
+
   def infer_defaults
     self.consecutive_failures ||= 0
     self.refresh_at ||= Time.now.utc
+    unless VERBOSITIES.include?(self.verbosity)
+      self.verbosity = "full"
+    end
+    true
   end
   protected :infer_defaults
   
@@ -34,6 +45,10 @@ class ExternalFeed < ActiveRecord::Base
     short_url = (self.url || "").split("/")[0,3].join("/")
     res = self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url )
     
+  end
+
+  def header_match=(str)
+    write_attribute(:header_match, str.to_s.strip.presence)
   end
   
   named_scope :to_be_polled, lambda {
@@ -95,8 +110,7 @@ class ExternalFeed < ActiveRecord::Base
         return entry
       end
       date = (item.respond_to?(:date) && item.date) || Time.zone.today
-      return nil if self.header_match && !item.title.match(Regexp.new(self.header_match, true))
-      return nil if self.body_match && !item.description.match(Regexp.new(self.body_match, true))
+      return nil if self.header_match && !item.title.downcase.include?(self.header_match.downcase)
       return nil if (date && self.created_at > date rescue false)
       description = "<a href='#{item.link}'>#{t :original_article, "Original article"}</a><br/><br/>"
       description += format_description(item.description || item.title)
@@ -130,8 +144,7 @@ class ExternalFeed < ActiveRecord::Base
         )
         return entry
       end
-      return nil if self.header_match && !item.title.match(Regexp.new(self.header_match, true))
-      return nil if self.body_match && !item.content.match(Regexp.new(self.body_match, true))
+      return nil if self.header_match && !item.title.downcase.include?(self.header_match.downcase)
       return nil if (item.published && self.created_at > item.published rescue false)
       author = item.authors.first || OpenObject.new
       description = "<a href='#{item.links.alternate.to_s}'>#{t :original_article, "Original article"}</a><br/><br/>"
