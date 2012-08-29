@@ -31,6 +31,8 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function(INST, I18n, $, BackoffPoller) {
 
+  var $edit_settings_link = $(".edit_settings_link");
+
   var $profile_table = $(".profile_table"),
       $update_profile_form = $("#update_profile_form"),
       $default_email_id = $("#default_email_id"),
@@ -61,14 +63,16 @@ define([
     return 'continue';
   });
   
-  $(".edit_profile_link").click(function(event) {
+  $edit_settings_link.click(function(event) {
+    $(this).hide();
     $profile_table.addClass('editing')
       .find(".edit_data_row").show().end()
       .find(":text:first").focus().select();
-    return false;
+  return false;
   });
   
   $profile_table.find(".cancel_button").click(function(event) {
+    $edit_settings_link.show();
     $profile_table
       .removeClass('editing')
       .find(".change_password_row,.edit_data_row,.more_options_row").hide().end()
@@ -152,7 +156,7 @@ define([
       },
       error: function(data) {
         $update_profile_form.loadingImage('remove').formErrors(data.errors || data);
-        $(".edit_profile_link").click();
+        $edit_settings_link.click();
       }
     })
     .find(".more_options_link").click(function() {

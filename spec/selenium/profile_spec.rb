@@ -1,12 +1,10 @@
-# coding: utf-8
-
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
   it_should_behave_like "in-process server selenium tests"
 
   def click_edit
-    f('.edit_profile_link').click
+    f('.edit_settings_link').click
     edit_form = f('#update_profile_form')
     keep_trying_until { edit_form.should be_displayed }
     edit_form
@@ -16,7 +14,7 @@ describe "profile" do
     f('#unregistered_service_skype > a').click
     skype_dialog = f('#unregistered_service_skype_dialog')
     skype_dialog.find_element(:id, 'user_service_user_name').send_keys("jakesorce")
-    submit_dialog('#unregistered_service_skype_dialog', '.button')
+    submit_dialog(skype_dialog, '.button')
     wait_for_ajaximations
     f('#registered_services').should include_text("Skype")
   end
@@ -38,7 +36,6 @@ describe "profile" do
     user_with_pseudonym({:active_user => true})
     login_as
     get '/profile/settings'
-    old_password = 'oldpassword'
     wrong_old_password = 'wrongoldpassword'
     new_password = 'newpassword'
     edit_form = click_edit
