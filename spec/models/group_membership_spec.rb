@@ -104,6 +104,64 @@ describe GroupMembership do
     @group_membership.workflow_state.should == "requested"
   end
 
+  context 'permissions' do
+    it "should allow someone to join an open, non-community group" do
+      student_in_course(:active_all => true)
+      student_organized = GroupCategory.student_organized_for(@course)
+      student_group = student_organized.groups.create!(:context => @course, :join_level => "parent_context_auto_join")
+      GroupMembership.new(:user => @student, :group => student_group).grants_right?(@student, :create).should be_true
+
+      course_groups = @course.group_categories.create!
+      course_groups.configure_self_signup(true, false)
+      course_groups.save!
+      course_group = course_groups.groups.create!(:context => @course, :join_level => "invitation_only")
+      GroupMembership.new(:user => @student, :group => course_group).grants_right?(@student, :create).should be_true
+    end
+
+    it "should allow someone to be added to a non-community group" do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      course_groups = @course.group_categories.create!
+      course_group = course_groups.groups.create!(:context => @course, :join_level => "invitation_only")
+      GroupMembership.new(:user => @student, :group => course_group).grants_right?(@teacher, :create).should be_true
+
+      @account = @course.root_account
+      account_admin_user(:active_all => true, :account => @account)
+      account_groups = @account.group_categories.create!
+      account_group = account_groups.groups.create!(:context => @account)
+      GroupMembership.new(:user => @student, :group => account_group).grants_right?(@admin, :create).should be_true
+    end
+
+    it "should allow someone to join an open community group" do
+      course_with_teacher(:active_all => true)
+      @account = @course.root_account
+      community_groups = GroupCategory.communities_for(@account)
+      community_group = community_groups.groups.create!(:context => @account, :join_level => "parent_context_auto_join")
+      GroupMembership.new(:user => @teacher, :group => community_group).grants_right?(@teacher, :create).should be_true
+
+    end
+
+    it "should not allow someone to be added to a community group" do
+      course_with_teacher(:active_all => true)
+      @account = @course.root_account
+      account_admin_user(:active_all => true, :account => @account)
+      community_groups = GroupCategory.communities_for(@account)
+      community_group = community_groups.groups.create!(:context => @account, :join_level => "parent_context_auto_join")
+      GroupMembership.new(:user => @teacher, :group => community_group).grants_right?(@admin, :create).should be_false
+    end
+
+    it "should allow a moderator to kick someone from a community" do
+      course_with_teacher(:active_all => true)
+      @account = @course.root_account
+      account_admin_user(:active_all => true, :account => @account)
+      community_groups = GroupCategory.communities_for(@account)
+      community_group = community_groups.groups.create!(:context => @account, :join_level => "parent_context_auto_join")
+      community_group.add_user(@admin, 'accepted', true)
+      community_group.add_user(@teacher, 'accepted', false)
+      GroupMembership.where(:group_id => community_group.id, :user_id => @teacher.id).first.grants_right?(@admin, :delete).should be_true
+    end
+  end
+
   context 'following' do
     before do
       user_model

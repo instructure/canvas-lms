@@ -911,10 +911,6 @@ class Course < ActiveRecord::Base
     given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
     can :read
 
-    # may want to make this more restrictive, but this is what it was prior to creating student view
-    given { |user| user && self.enrollments.not_fake.map(&:user_id).include?(user.id) }
-    can :participate_in_groups
-
     # Active students
     given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
     can :read and can :participate_as_student and can :read_grades

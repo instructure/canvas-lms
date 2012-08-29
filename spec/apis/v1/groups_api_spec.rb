@@ -346,6 +346,46 @@ describe "Groups API", :type => :integration do
       api_call(:post, "#{@community_path}/invite", @community_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees, {}, :expected_status => 401)
       @memberships = @community.reload.group_memberships.scoped(:conditions => { :workflow_state => "invited" }, :order => :id).count.should == 0
     end
+
+    it "should find people when inviting to a group in a non-default account" do
+      @account = Account.create!
+      @category = @account.group_categories.create!
+      @group = group_model(:name => "Blah", :group_category => @category, :context => @account)
+
+      @moderator = user_model
+      @group.add_user(@moderator, 'accepted', true)
+
+      @member = user_with_pseudonym(:account => @account)
+
+      @user = @moderator
+      api_call(
+        :post,
+        "/api/v1/groups/#{@group.id}/invite",
+        { :controller => "groups", :format => "json", :group_id => @group.to_param, :action => "invite" },
+        { :invitees => [@member.pseudonym.unique_id]},
+        {},
+        { :domain_root_account => @account })
+
+      @member.group_memberships.count.should == 1
+    end
+
+    it "should allow being added to a non-community account group" do
+      @account = Account.default
+      @category = @account.group_categories.create!
+      @group = group_model(:group_category => @category, :context => @account)
+
+      @to_add = user_with_pseudonym(:account => @account, :active_all => true)
+      @user = account_admin_user(:account => @account, :active_all => true)
+      json = api_call(
+        :post,
+        "/api/v1/groups/#{@group.id}/memberships",
+        @memberships_path_options.merge(:group_id => @group.to_param, :action => "create"),
+        { :user_id => @to_add.id })
+
+      @membership = GroupMembership.scoped(:conditions => { :user_id => @to_add.id, :group_id => @group.id }).first
+      @membership.workflow_state.should == "accepted"
+      json.should == membership_json(@membership)
+    end
   end
 
   context "group files" do
