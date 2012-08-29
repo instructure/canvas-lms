@@ -642,7 +642,7 @@ describe CoursesController do
       user
       user_session(@user, @pseudonym)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code.dup
       response.should redirect_to(course_url(@course))
       flash[:notice].should_not be_empty
       @user.enrollments.length.should == 1

@@ -116,9 +116,9 @@ class AppointmentGroup < ActiveRecord::Base
         gc = GroupCategory.find_by_id($1)
         code = @new_sub_context_codes.first
         self.appointment_group_sub_contexts = [
-          AppointmentGroupSubContext.new :appointment_group => self,
+          AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => gc,
-                                         :sub_context_code => code
+                                         :sub_context_code => code)
         ]
       else
         # right now we don't support changing the sub contexts for a context
@@ -130,9 +130,9 @@ class AppointmentGroup < ActiveRecord::Base
         new_sub_contexts = @new_sub_context_codes.map { |code|
           next unless code =~ /\Acourse_section_(.*)/
           cs = CourseSection.find_by_id($1)
-          AppointmentGroupSubContext.new :appointment_group => self,
+          AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => cs,
-                                         :sub_context_code => code
+                                         :sub_context_code => code)
         }
         self.appointment_group_sub_contexts += new_sub_contexts.compact
       end

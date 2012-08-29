@@ -1043,7 +1043,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # killing stuff that is holding locks too long
   def add_foreign_key_if_not_exists(from_table, to_table, options = {})
     case self.adapter_name
-    when 'SQLite': return
+    when 'SQLite'; return
     when 'PostgreSQL'
       begin
         add_foreign_key(from_table, to_table, options)
