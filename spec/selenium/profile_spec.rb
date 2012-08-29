@@ -1,5 +1,3 @@
-# coding: utf-8
-
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
@@ -38,7 +36,6 @@ describe "profile" do
     user_with_pseudonym({:active_user => true})
     login_as
     get '/profile/settings'
-    old_password = 'oldpassword'
     wrong_old_password = 'wrongoldpassword'
     new_password = 'newpassword'
     edit_form = click_edit

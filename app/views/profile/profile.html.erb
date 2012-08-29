@@ -1,5 +1,5 @@
 <% content_for :page_title do %>
-  <%= join_title t(:page_title, "Profile Settings"), @user.name %>
+  <%= join_title t(:page_title, "User Settings"), @user.name %>
 <% end %>
 
 <% content_for :right_side do %>
@@ -7,7 +7,7 @@
   <%= render :partial => "ways_to_contact" %>
   <div class="rs-margin-lr">
     <hr />
-    <a href="#" class="edit_profile_link button button-sidebar-wide"><%= image_tag "edit.png" %> <%= t('links.edit_settings', "Edit Settings") %></a>
+    <a href="#" class="edit_settings_link button button-sidebar-wide"><%= image_tag "edit.png" %> <%= t('links.edit_settings', "Edit Settings") %></a>
     <% mfa_settings = @user.mfa_settings %>
     <% if mfa_settings != :disabled %>
       <a href="<%= otp_login_path %>" class="button button-sidebar-wide"><%= image_tag "lock.png" %> <%= @user.otp_secret_key ? t('links.reconfigure_mfa', "Reconfigure Multi-Factor Authentication") : t('links.configure_mfa', "Set Up Multi-Factor Authentication") %></a>
@@ -27,7 +27,7 @@
     <%= avatar_image(@user) %>
   </a>
 <% end %>
-<h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Profile", :user => @user.short_name) %></h2>
+<h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h2>
 <div class="clear"></div>
 <% form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;"} do |f| %>
 <table class="profile_table">
@@ -135,8 +135,8 @@
   </tr>
   <tr class="edit_data_row" style="display: none;">
     <td colspan="2">
-      <p><a style="font-size: 0.9em" href="<%= user_delete_url(@user.id) %>" class="admin"><%= t('links.delete_profile', "Delete My Profile") %> </a></p>
-      <button type="submit" class="button"><%= t('buttons.update_profile', "Update Profile") %></button>
+      <p><a style="font-size: 0.9em" href="<%= user_delete_url(@user.id) %>" class="admin"><%= t('links.delete_account', "Delete My Account") %> </a></p>
+      <button type="submit" class="button"><%= t('buttons.update_settings', "Update Settings") %></button>
       <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
     </td>
   </tr>
