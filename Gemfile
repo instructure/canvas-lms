@@ -29,7 +29,7 @@ gem 'json',           '1.5.2'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '2.3.2',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
-gem 'mailman',        '0.5.0'
+gem 'mailman',        '0.5.3'
 gem 'mime-types',     '1.16',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
