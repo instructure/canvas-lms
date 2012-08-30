@@ -20,10 +20,10 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
   // Create and append right/wrong arrows to all appropriate
   // answers on a quiz results page.
   return function() {
-    var rightAnswers     = $('#questions.show_correct_answers .selected_answer.correct_answer'),
-        wrongAnswers     = $('#questions.show_correct_answers .selected_answer.wrong_answer'),
-        correctAnswers   = $('#questions.show_correct_answers .question:not(.short_answer_question, #questions.show_correct_answers .numerical_question) .correct_answer:not(.selected_answer)'),
-        shortAnswers     = $('#questions.show_correct_answers .short_answer_question .answers_wrapper, #questions.show_correct_answers .numerical_question .answers_wrapper, #questions.show_correct_answers .equation_combinations_holder_holder.calculated_question_answers'),
+    var rightAnswers     = $('#questions.show_correct_answers:not(.survey_quiz) .selected_answer.correct_answer'),
+        wrongAnswers     = $('#questions.show_correct_answers:not(.survey_quiz) .selected_answer.wrong_answer'),
+        correctAnswers   = $('#questions.show_correct_answers:not(.survey_quiz) .question:not(.short_answer_question, #questions.show_correct_answers:not(.survey_quiz) .numerical_question) .correct_answer:not(.selected_answer)'),
+        shortAnswers     = $('#questions.show_correct_answers:not(.survey_quiz):not(.survey_results) .short_answer_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .numerical_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .equation_combinations_holder_holder.calculated_question_answers'),
         unansweredQ      = $('.question.unanswered .header .question_name'),
         creditPartial    = $('#questions.suppress_correct_answers:not(.survey_results) .question.partial_credit .header .question_name'),
         creditFull       = $('#questions.suppress_correct_answers:not(.survey_results) .question.correct .header .question_name'),
