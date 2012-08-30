@@ -268,6 +268,7 @@ describe "discussions" do
       end
 
       it "should edit a side comment" do
+        pending("intermittently fails")
         edit_text = 'this has been edited '
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
