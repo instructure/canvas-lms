@@ -268,13 +268,13 @@ describe "discussions" do
       end
 
       it "should edit a side comment" do
-        pending("intermittently fails")
         edit_text = 'this has been edited '
+        text = "new side comment from student"
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
         wait_for_js
-
+        validate_entry_text(entry, text)
         edit_entry(entry, edit_text)
       end
     end
