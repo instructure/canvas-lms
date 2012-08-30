@@ -10,6 +10,7 @@
   editing ||= false
   in_group ||= false
   question_bank_id ||= nil
+  display_correct_answers = @quiz.display_correct_answers?(@current_user, @submission)
   correct = user_answer && hash_get(user_answer, :correct) == true
   incorrect = user_answer && hash_get(user_answer, :correct) == false
   unanswered = (%w{multiple_choice_question true_false_question}.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||
@@ -215,7 +216,7 @@
                 <b class="answer-group-heading"><%= before_label(:for_answer_number, "Answer %{answer_number}", :answer_number => idx + 1) %></b>
                 <% if question_type.entry_type == "text_box" %>
                   <% answer_classes = ['selected_answer']
-                     if @quiz.show_correct_answers
+                     if display_correct_answers
                        answer_classes << ((matched_answer && matched_answer[:weight] == 100) ? 'correct_answer' : 'wrong_answer')
                      end
                      answer_classes << 'no_answer' if hash_get(user_answer, :text).blank?
@@ -223,7 +224,7 @@
                   <div class='answer <%= answer_classes.compact.join(' ') %>'>
                     <%= h(hash_get(user_answer, :text) || t(:you_left_this_blank, "(You left this blank)")) %>
                     <% if matched_answer && comment_get(matched_answer, :comments).present? %>
-                      <div class="hide_right_arrow <%= "correct_answer" if @quiz.show_correct_answers %>">
+                      <div class="hide_right_arrow <%= "correct_answer" if display_correct_answers %>">
                         <div class="quiz_comment">
                           <%= comment_get(matched_answer, :comments) %>
                         </div>
@@ -231,7 +232,7 @@
                       <div class="clear"></div>
                     <% end %>
                   </div>
-                  <% if editing || @quiz.try(:show_correct_answers) %>
+                  <% if editing || display_correct_answers %>
                     <%= render :partial => "quizzes/display_answer", :collection => answers, :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question, :skip_if_correct => true, :matched_answer => matched_answer} %>
                   <% end %>
                 <% else %>
@@ -259,7 +260,7 @@
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'range_answer' && val <= hash_get(a, :end) && val >= hash_get(a, :start)
                   end %>
                   <% answer_classes = ['selected_answer']
-                     if @quiz.show_correct_answers
+                     if display_correct_answers
                        answer_classes << ((hash_get(user_answer, :correct) == true) ? 'correct_answer' : 'wrong_answer')
                      end
                      answer_classes << 'no_answer' if hash_get(user_answer, :text).blank?
@@ -269,7 +270,7 @@
                       {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
                   </div>
                   <% if matched_answer && comment_get(matched_answer, :comments).present? %>
-                    <div class="hide_right_arrow <%= "correct_answer" if @quiz.show_correct_answers %>">
+                    <div class="hide_right_arrow <%= "correct_answer" if display_correct_answers %>">
                       <div class="quiz_comment">
                         <%= comment_get(matched_answer, :comments) %>
                       </div>
@@ -280,8 +281,8 @@
               </div>
             <% end %>
             <% question[:answers] = [] if editing && question && hash_get(question, :question_type) == 'calculated_question' %>
-            <% if question && (user_answer || assessment_results || !@quiz || @quiz.show_correct_answers || (!assessment_results && !user_answer)) %>
-              <% show_headers = @quiz && @quiz.show_correct_answers && user_answer && question_type.display_answers == "single" && hash_get(question, :question_type) != "essay_question" %>
+            <% if question && (user_answer || assessment_results || !@quiz || display_correct_answers || (!assessment_results && !user_answer)) %>
+              <% show_headers = @quiz && display_correct_answers && user_answer && question_type.display_answers == "single" && hash_get(question, :question_type) != "essay_question" %>
               <% if editing || show_headers || !question_type.entry_type.match(/text_box/) %>
                 <div class="answers_wrapper">
                   <%= render :partial => "quizzes/display_answer", :collection => hash_get(question, :answers), :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question} %>
@@ -292,7 +293,7 @@
         <% end %>
       </div>
       <div class="after_answers">
-        <% if question && hash_get(question, :question_type) == 'matching_question' && !assessing && ((@quiz && @quiz.show_correct_answers) || (!user_answer && !assessment_results)) && !@quiz.try(:survey?) %>
+        <% if question && hash_get(question, :question_type) == 'matching_question' && !assessing && ((@quiz && display_correct_answers) || (!user_answer && !assessment_results)) && !@quiz.try(:survey?) %>
           <% other_matches = (hash_get(question, :matches) || hash_get(question, :answers, [])).select{|a| !hash_get(question, :answers, []).map{|an| hash_get(an, :match_id) }.include?(hash_get(a, :match_id)) } %>
           <% if !other_matches.empty? %>
             Other Incorrect Match Options:

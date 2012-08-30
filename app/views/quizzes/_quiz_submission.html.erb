@@ -154,7 +154,7 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (@quiz.try_rescue(:show_correct_answers) ? 'show_correct_answers' : 'suppress_correct_answers') %>">
+<div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (@quiz.display_correct_answers?(@current_user, @submission) ? 'show_correct_answers' : 'suppress_correct_answers') %>">
   <%= render :partial => "quizzes/display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
 </div>
 <div style="margin: 10px 0;">

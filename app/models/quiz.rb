@@ -208,7 +208,15 @@ class Quiz < ActiveRecord::Base
   def ungraded?
     !self.graded?
   end
-  
+
+  # Determine if the quiz should display the correct answers.
+  # Takes into account the quiz settings, the user viewing and
+  # the submission to be viewed.
+  def display_correct_answers?(user, submission)
+    # NOTE: We don't have a submission user when the teacher is previewing the quiz and displaying the results'
+    self.show_correct_answers || (self.grants_right?(user, nil, :grade) && (submission && submission.user && submission.user != user))
+  end
+
   def update_existing_submissions
     # If the quiz suddenly changes from non-graded to graded,
     # then this will update the existing submissions to reflect quiz
