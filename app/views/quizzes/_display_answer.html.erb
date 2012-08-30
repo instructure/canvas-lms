@@ -6,7 +6,7 @@
   user_answer ||= nil
   matched_answer ||= nil
   show_correct_answers = @quiz.try_rescue(:show_correct_answers) || (!assessment_results && !user_answer)#rescue false
-  show_correct_answers = false if @quiz.try_rescue(:quiz_type) == 'survey' || @quiz.try_rescue(:quiz_type) == 'graded_survey'
+  show_correct_answers = false if @quiz.try(:survey?)
   selected_answer = user_answer && answer && hash_get(user_answer, :answer_id) == hash_get(answer, :id)
   selected_answer = true if user_answer && question_type.answer_type == "matching_answer"
   selected_answer = (hash_get(user_answer, "answer_#{answer[:id]}")  == "1") if user_answer && hash_get(question, :question_type) == "multiple_answers_question"
