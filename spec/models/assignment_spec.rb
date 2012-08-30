@@ -1403,6 +1403,12 @@ describe Assignment do
       res.length.should eql(2)
       res.find{|s| s.user == @u1}.submission_comments.should_not be_empty
       res.find{|s| s.user == @u2}.submission_comments.should_not be_empty
+      # all the comments should have the same group_comment_id, for deletion
+      comments = SubmissionComment.for_assignment_id(@a.id).all
+      comments.size.should == 2
+      group_comment_id = comments[0].group_comment_id
+      group_comment_id.should be_present
+      comments.all? { |c| c.group_comment_id == group_comment_id }.should be_true
     end
     it "return the single submission if the user is not in a group" do
       setup_assignment_with_group
@@ -1410,7 +1416,9 @@ describe Assignment do
       res.should_not be_nil
       res.should_not be_empty
       res.length.should eql(1)
-      res.find{|s| s.user == @u3}.submission_comments.should_not be_empty
+      comments = res.find{|s| s.user == @u3}.submission_comments
+      comments.size.should == 1
+      comments[0].group_comment_id.should be_nil
     end
   end
 
