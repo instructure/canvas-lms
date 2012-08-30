@@ -114,6 +114,10 @@ class Group < ActiveRecord::Base
     self.group_category.try(:allows_multiple_memberships?) || self.allow_self_signup?(user)
   end
 
+  def allow_student_forum_attachments
+    context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments
+  end
+
   def participants(include_observers=false)
     # argument needed because #participants is polymorphic for contexts
     participating_users.uniq
@@ -410,7 +414,7 @@ class Group < ActiveRecord::Base
     end
     available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :read)
     available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path } if user && self.grants_right?(user, nil, :read)
-    if root_account.canvas_network_enabled? && user && grants_right?(user, nil, :manage)
+    if root_account.try(:canvas_network_enabled?) && user && grants_right?(user, nil, :manage)
       available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path } 
     end
     available_tabs

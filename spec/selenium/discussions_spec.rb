@@ -163,8 +163,7 @@ describe "discussions" do
 
   context "as a student" do
     before (:each) do
-      course_with_teacher(:name => 'teacher@example.com')
-      @course.offer!
+      course_with_teacher(:name => 'teacher@example.com', :active_all => true)
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @course.enroll_student(@student).accept
       @topic = @course.discussion_topics.create!(:user => @teacher, :message => 'new topic from teacher', :discussion_type => 'side_comment')
@@ -197,6 +196,37 @@ describe "discussions" do
       f('#content').should_not include_text(new_student_entry_text)
       add_reply new_student_entry_text
       f('#content').should include_text(new_student_entry_text)
+    end
+
+    it "should not show file attachment if allow_student_forum_attachments is not true" do
+      # given
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#attachment_uploaded_data').should be_nil
+      # when
+      @course.allow_student_forum_attachments = true
+      @course.save!
+      # expect
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#attachment_uploaded_data').should_not be_nil
+    end
+
+    context "in a group" do
+      before(:each) do
+        group_with_user :user => @student, :context => @course
+      end
+
+      it "should not show file attachment if allow_student_forum_attachments is not true" do
+        # given
+        get "/groups/#{@group.id}/discussion_topics/new"
+        f('label[for=attachment_uploaded_data]').should be_nil
+        # when
+        @course.allow_student_forum_attachments = true
+        @course.save!
+        # expect
+        get "/groups/#{@group.id}/discussion_topics/new"
+        f('label[for=attachment_uploaded_data]').should be_displayed
+      end
+
     end
 
     it "should let students post to a post-first discussion" do

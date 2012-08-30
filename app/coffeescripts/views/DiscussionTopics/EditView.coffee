@@ -29,6 +29,7 @@ define [
     )
 
     initialize: ->
+      @permissions = @options.permissions
       @model.on 'sync', -> window.location = @get 'html_url'
       super
 
@@ -36,6 +37,7 @@ define [
       _.extend super, @options,
         showAssignment: !!@assignmentGroupCollection
         isAnnouncement: @model.constructor is Announcement
+        canAttach: @permissions.CAN_ATTACH
 
     render: =>
       super
