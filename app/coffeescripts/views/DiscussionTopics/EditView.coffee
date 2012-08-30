@@ -70,9 +70,10 @@ define [
     getFormData: ->
       data = super
       data.title ||= I18n.t 'default_discussion_title', 'No Title'
-      data.delay_posting_at = data.delay_posting && data.delay_posting_at
+      data.delayed_post_at = '' unless data.delay_posting
       data.discussion_type = if data.threaded then 'threaded' else 'side_comment'
-      delete data.assignment unless data.assignment?.set_assignment
+      delete data.assignment unless data.assignment?.set_assignment?
+      data.podcast_has_student_posts = false unless data.podcast_enabled
 
       # these options get passed to Backbone.sync in ValidatedFormView
       @saveOpts = multipart: !!data.attachment

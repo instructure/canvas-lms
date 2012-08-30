@@ -14,7 +14,7 @@ define [
     alien: false
 
   testCheckbox = (context, prop, hash={}) ->
-    $input = $(helpers.checkbox.call(context, prop, {hash: hash}).string)
+    $input = $("<span>#{helpers.checkbox.call(context, prop, {hash: hash}).string}</span>").find('input').eq(1)
 
     checks = _.defaults hash,
       value: 1

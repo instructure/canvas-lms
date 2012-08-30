@@ -117,7 +117,7 @@ describe "announcements" do
 
     it "should create a delayed announcement" do
       get course_announcements_path(@course)
-      create_announcement_manual('input[name=delay_posting]')
+      create_announcement_manual('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
       datepicker_next
       expect_new_page_load { submit_form('.form-actions') }
