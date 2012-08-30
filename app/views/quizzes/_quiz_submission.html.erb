@@ -22,7 +22,7 @@
     <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
               :score => raw("<span class=\"score_value\">#{@submission.score}</span>"),
               :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
-    <% if submission_score.pending_review? %>
+    <% if (@current_submission || @submission).try(:pending_review?) %>
       *
       <div>
         <% if can_do(@quiz, @current_user, :grade) %>
