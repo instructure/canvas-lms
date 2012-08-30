@@ -28,12 +28,13 @@ define(['jquery'], function($) {
           cover = inputCover.clone(true);
 
       cover.css({
-        height   : el.height() + 10,
-        width    : el.width() + 10,
+        height   : el.height() + 12,
+        width    : el.width() + 12,
         position : 'absolute',
-        left     : el.offset().left - 5,
-        top      : el.offset().top - 5,
-        zIndex   : 15
+        left     : el.offset().left - 6,
+        top      : el.offset().top - 6,
+        zIndex   : 15,
+        background: 'url(/images/blank.png) 0 0 repeat'
       });
 
       body.append(cover);
