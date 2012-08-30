@@ -114,11 +114,49 @@ describe "discussions" do
         replace_content(f('input[name=title]'), "This is my test title")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
 
-        f('input[name=podcast_enabled]').click
+        f('input[type=checkbox][name=podcast_enabled]').click
         expect_new_page_load { submit_form('.form-actions') }
         get "/courses/#{@course.id}/discussion_topics"
         f('.discussion-topic .icon-rss').should be_displayed
         DiscussionTopic.last.podcast_enabled.should be_true
+      end
+    end
+
+    context "editing" do
+      it "should save and display all changes" do
+        @topic = @course.discussion_topics.create!(:title => "topic", :user => @user)
+
+        def confirm(state)
+          checkbox_state = state == :on ? 'true' : nil
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+  
+          f('input[type=checkbox][name=threaded]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name=delay_posting]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name=require_initial_post]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name=podcast_enabled]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name=podcast_has_student_posts]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name="assignment[set_assignment]"]')[:checked].should == checkbox_state
+        end
+
+        def toggle(state)
+          f('input[type=checkbox][name=threaded]').click
+          f('input[type=checkbox][name=delay_posting]').click
+          set_value f('input[name=delayed_post_at]'), 2.weeks.from_now.strftime('%m/%d/%Y') if state == :on
+          f('input[type=checkbox][name=require_initial_post]').click
+          f('input[type=checkbox][name=podcast_enabled]').click
+          f('input[type=checkbox][name=podcast_has_student_posts]').click if state == :on
+          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+
+          f('.form-actions button[type=submit]').click
+          wait_for_ajaximations
+        end
+
+        confirm(:off)
+        toggle(:on)
+        confirm(:on)
+        toggle(:off)
+        confirm(:off)
       end
     end
   end

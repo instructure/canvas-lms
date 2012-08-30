@@ -197,7 +197,8 @@ define [
     # usage:
     #   if 'this' is {human: true}
     #   and you do: {{checkbox "human"}}
-    #   you'll get: <input type="checkbox"
+    #   you'll get: <input name="human" type="hidden" value="0" />
+    #               <input type="checkbox"
     #                      value="1"
     #                      id="human"
     #                      checked="true"
@@ -205,7 +206,8 @@ define [
     # you can pass custom attributes and use nested properties:
     #   if 'this' is {likes: {tacos: true}}
     #   and you do: {{checkbox "likes.tacos" class="foo bar"}}
-    #   you'll get: <input type="checkbox"
+    #   you'll get: <input name="likes[tacos]" type="hidden" value="0" />
+    #               <input type="checkbox"
     #                      value="1"
     #                      id="likes_tacos"
     #                      checked="true"
@@ -231,7 +233,10 @@ define [
         inputProps.checked = true if value
 
       attributes = _.map inputProps, (val, key) -> "#{htmlEscape key}=\"#{htmlEscape val}\""
-      new Handlebars.SafeString "<input #{attributes.join ' '}>"
+      new Handlebars.SafeString """
+        <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" />
+        <input #{attributes.join ' '} />
+      """
 
   }
   return Handlebars

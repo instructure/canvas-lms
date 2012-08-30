@@ -373,8 +373,9 @@ class DiscussionTopicsController < ApplicationController
       # handle delayed posting
       if discussion_topic_hash.has_key? :delayed_post_at
         @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at]
-        @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at && @topic.delayed_post_at > Time.now
-        @topic.delayed_post_at = "" unless @topic.post_delayed?
+        @topic.delayed_post_at = "" if @topic.delayed_post_at && @topic.delayed_post_at < Time.now
+        @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at
+        @topic.workflow_state = 'active' if @topic.post_delayed? && !@topic.delayed_post_at
       end
 
       #handle locking/unlocking
@@ -422,8 +423,8 @@ class DiscussionTopicsController < ApplicationController
 
           if params[:assignment].has_key?(:set_assignment) && !value_to_boolean(params[:assignment][:set_assignment])
             if @topic.assignment
-              @topic.assignment.destroy
               @topic.update_attribute(:assignment_id, nil)
+              @topic.assignment.destroy
             end
           else
             update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
