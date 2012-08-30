@@ -504,7 +504,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) and not self.is_announcement }
     can :create
 
-    given { |user, session| self.context.respond_to?(:allow_student_forum_attachments) && self.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) }
     can :attach
 
     given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.locked? }

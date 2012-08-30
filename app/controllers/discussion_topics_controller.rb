@@ -153,7 +153,10 @@ class DiscussionTopicsController < ApplicationController
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
       hash =  {
         :URL_ROOT => named_context_url(@context, :api_v1_context_discussion_topics_url),
-        :CAN_CREATE_ASSIGNMENT => @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create)
+        :PERMISSIONS => {
+          :CAN_CREATE_ASSIGNMENT => @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create),
+          :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach)
+        }
       }
 
       unless @topic.new_record?
