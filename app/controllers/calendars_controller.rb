@@ -195,52 +195,6 @@ class CalendarsController < ApplicationController
   end
   protected :build_calendar_dates
 
-
-  def public_feed
-    return unless get_feed_context
-    get_all_pertinent_contexts
-
-    @events = []
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      @contexts.each do |context|
-        @assignments = context.assignments.active.find(:all) if context.respond_to?("assignments")
-        @events.concat context.calendar_events.active.find(:all)
-        @events.concat @assignments || []
-        @events = @events.sort_by{ |e| [(e.start_at || Time.now), e.title] }
-      end
-    end
-    @contexts.each do |context|
-      log_asset_access("calendar_feed:#{context.asset_string}", "calendar", 'other')
-    end
-    respond_to do |format|
-      format.ics do
-        render :text => @events.to_ics(t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name),
-          case
-            when @context.is_a?(Course)
-              t('ics_description_course', "Calendar events for the course, %{course_name}", :course_name => @context.name)
-            when @context.is_a?(Group)
-              t('ics_description_group', "Calendar events for the group, %{group_name}", :group_name => @context.name)
-            when @context.is_a?(User)
-              t('ics_description_user', "Calendar events for the user, %{user_name}", :user_name => @context.name)
-            else
-              t('ics_description', "Calendar events for %{context_name}", :context_name => @context.name)
-          end)
-      end
-      format.atom do
-        feed = Atom::Feed.new do |f|
-          f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", :course_or_group_name => @context.name
-          f.links << Atom::Link.new(:href => calendar_url_for(@context), :rel => 'self')
-          f.updated = Time.now
-          f.id = calendar_url_for(@context)
-        end
-        @events.each do |e|
-          feed.entries << e.to_atom
-        end
-        render :text => feed.to_xml
-      end
-    end
-  end
-
   def switch_calendar
     if @domain_root_account.enable_scheduler?
       if params[:preferred_calendar] == '2' &&

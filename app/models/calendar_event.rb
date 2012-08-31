@@ -164,6 +164,8 @@ class CalendarEvent < ActiveRecord::Base
     end
   }
 
+  named_scope :events_without_child_events, :conditions => "NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state <> 'deleted')"
+
   def validate_context!
     @validate_context = true
     context.validation_event_override = self
