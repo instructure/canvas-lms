@@ -132,6 +132,15 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.assignment.submission_types.should == "discussion_topic"
       @topic.assignment.title.should == "test title"
     end
+
+    it "should not create an assignment on a discussion topic when set_assignment is false" do
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+               { :title => "test title", :message => "test <b>message</b>", :assignment => { :set_assignment => 'false' } })
+      @topic = @course.discussion_topics.last(:order => :id)
+      @topic.title.should == "test title"
+      @topic.assignment.should be_nil
+    end
   end
 
   context "With item" do
@@ -272,6 +281,24 @@ describe DiscussionTopicsController, :type => :integration do
         @topic.assignment.due_at.to_i.should == due_date.to_i
         @topic.assignment.submission_types.should == "discussion_topic"
         @topic.assignment.title.should == "Topic 1"
+      end
+
+      it "should allow removing assignment on update" do
+        @assignment = @topic.context.assignments.build
+        @topic.assignment = @assignment
+        @topic.save!
+        @topic.assignment.should be_present
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :assignment => { :set_assignment => false } })
+        @topic.reload
+        @assignment.reload
+
+        @topic.title.should == "Topic 1"
+        @topic.assignment.should be_nil
+        @topic.old_assignment_id.should == @assignment.id
+        @assignment.should be_deleted
       end
 
       it "should allow unlocking a locked topic" do

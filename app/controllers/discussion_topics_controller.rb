@@ -417,16 +417,17 @@ class DiscussionTopicsController < ApplicationController
         end
 
         # handle creating/deleting assignment
-        if params[:assignment] &&
-           (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
-           @assignment.grants_right?(@current_user, session, :update)
-
+        if params[:assignment]
           if params[:assignment].has_key?(:set_assignment) && !value_to_boolean(params[:assignment][:set_assignment])
-            if @topic.assignment
-              @topic.update_attribute(:assignment_id, nil)
-              @topic.assignment.destroy
+            if @topic.assignment && @topic.assignment.grants_right?(@current_user, session, :update)
+              assignment = @topic.assignment
+              @topic.assignment = nil
+              @topic.save!
+              assignment.destroy
             end
-          else
+          
+          elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
+                 @assignment.grants_right?(@current_user, session, :update)
             update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
             @assignment.submission_types = 'discussion_topic'
             @assignment.saved_by = :discussion_topic
