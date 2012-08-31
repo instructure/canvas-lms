@@ -155,7 +155,8 @@ class DiscussionTopicsController < ApplicationController
         :URL_ROOT => named_context_url(@context, :api_v1_context_discussion_topics_url),
         :PERMISSIONS => {
           :CAN_CREATE_ASSIGNMENT => @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create),
-          :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach)
+          :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
+          :CAN_MODERATE => @context.grants_right?(@current_user, session, :moderate_forum)
         }
       }
 

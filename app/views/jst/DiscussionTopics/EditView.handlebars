@@ -40,10 +40,11 @@
 {{/if}}
 <fieldset>
 
+  {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
   <div class="control-group">
-    <label class="control-label">Options</label>
+    <label class="control-label">{{#t "options"}}Options{{/t}}</label>
     <div class="controls">
-      {{#unless isAnnouncement}}
+      {{#if isTopic}}
         <label class="checkbox">
           <input name="threaded" type="hidden" value="0" />
           <input type="checkbox"
@@ -51,47 +52,50 @@
                  name="threaded">
           {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
         </label>
-      {{/unless}}
-      <label class="checkbox">
-        <input name="delay_posting" type="hidden" value="0" />
-        <input type="checkbox"
-               {{#if delayed_post_at}}checked{{/if}}
-               name="delay_posting"
-               class="element_toggler"
-               aria-controls="discussion_topic_delay_post_container">
-        {{#t "delay_posting"}}Delay posting{{/t}}
-      </label>
-      <label id="discussion_topic_delay_post_container"
-             {{#unless delayed_post_at}}style="display: none;"{{/unless}}
-             class="checkbox">
-        {{#t "post_at"}}Post At{{/t}}
-        <input type="text"
-               class="datetime_field input-medium"
-               name="delayed_post_at"
-               {{! TODO: what would be the best way to get this formatted right? }}
-               value="{{datetimeFormatted delayed_post_at}}">
-      </label>
-      <label class="checkbox">
-        {{checkbox "require_initial_post"}}
-        {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
-      </label>
-
-      <label class="checkbox">
-        <input name="podcast_enabled" type="hidden" value="0" />
-        <input type="checkbox"
-               {{#if podcast_url}}checked{{/if}}
-               name="podcast_enabled"
-               class="element_toggler"
-               aria-controls="podcast_has_student_posts_container">
-        {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
-      </label>
-
-      <label id="podcast_has_student_posts_container"
-             {{#unless podcast_url}}style="display: none"{{/unless}}
-             class="checkbox">
-        {{checkbox "podcast_has_student_posts"}}
-        {{#t "include_replies_in_podcast_feed"}}Include Replies in podcast feed{{/t}}
-      </label>
+      {{/if}}
+      {{#if contextIsCourse}}
+        <label class="checkbox">
+          <input name="delay_posting" type="hidden" value="0" />
+          <input type="checkbox"
+                 {{#if delayed_post_at}}checked{{/if}}
+                 name="delay_posting"
+                 class="element_toggler"
+                 aria-controls="discussion_topic_delay_post_container">
+          {{#t "delay_posting"}}Delay posting{{/t}}
+        </label>
+        <label id="discussion_topic_delay_post_container"
+               {{#unless delayed_post_at}}style="display: none;"{{/unless}}
+               class="checkbox">
+          {{#t "post_at"}}Post At{{/t}}
+          <input type="text"
+                 class="datetime_field input-medium"
+                 name="delayed_post_at"
+                 {{! TODO: what would be the best way to get this formatted right? }}
+                 value="{{datetimeFormatted delayed_post_at}}">
+        </label>
+        <label class="checkbox">
+          {{checkbox "require_initial_post"}}
+          {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
+        </label>
+      {{/if}}
+      {{#if canModerate}}
+        <label class="checkbox">
+          <input name="podcast_enabled" type="hidden" value="0" />
+          <input type="checkbox"
+                 {{#if podcast_url}}checked{{/if}}
+                 name="podcast_enabled"
+                 class="element_toggler"
+                 aria-controls="podcast_has_student_posts_container">
+          {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
+        </label>
+  
+        <label id="podcast_has_student_posts_container"
+               {{#unless podcast_url}}style="display: none"{{/unless}}
+               class="checkbox">
+          {{checkbox "podcast_has_student_posts"}}
+          {{#t "include_replies_in_podcast_feed"}}Include Replies in podcast feed{{/t}}
+        </label>
+      {{/if}}
       {{#if showAssignment}}
         <label class="checkbox">
           <input name="assignment[set_assignment]" type="hidden" value="0" />
@@ -107,6 +111,7 @@
       {{/if}}
     </div>
   </div>
+  {{/ifAny}}
 
 </fieldset>
 
