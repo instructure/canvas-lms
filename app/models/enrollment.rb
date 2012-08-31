@@ -171,7 +171,8 @@ class Enrollment < ActiveRecord::Base
     :joins => :course,
     :conditions => ["courses.start_at > ?
                     AND courses.workflow_state = 'available'
-                    AND courses.restrict_enrollments_to_course_dates = true", Time.now]
+                    AND courses.restrict_enrollments_to_course_dates = TRUE
+                    AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now]
   } }
 
   named_scope :not_fake, :conditions => "enrollments.type != 'StudentViewEnrollment'"
@@ -445,7 +446,6 @@ class Enrollment < ActiveRecord::Base
     Message.delete_all({:id => ids}) if ids && !ids.empty?
     update_attribute(:workflow_state, 'active')
     user.touch
-    true
   end
 
   workflow do
@@ -496,25 +496,26 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    if [:invited, :active].include?(state)
-      ranges = self.enrollment_dates
-      now = Time.now
-      ranges.each do |range|
-        start_at, end_at = range
-        # start_at <= now <= end_at, allowing for open ranges on either end
-        return state if (start_at || now) <= now && now <= (end_at || now)
-      end
-      # not strictly within any range
-      global_start_at = ranges.map(&:first).compact.min
-      return state unless global_start_at
-      if global_start_at < Time.now
-        :completed
-      # Allow student view students to use course before the term starts
-      elsif !self.fake_student?
-        :inactive
-      else
-        state
-      end
+    return state unless [:invited, :active].include?(state)
+
+    ranges = self.enrollment_dates
+    now    = Time.now
+    ranges.each do |range|
+      start_at, end_at = range
+      # start_at <= now <= end_at, allowing for open ranges on either end
+      return state if (start_at || now) <= now && now <= (end_at || now)
+      return state if state == :invited &&
+        course.restrict_enrollments_to_course_dates &&
+        now < start_at
+    end
+
+    # Not strictly within any range
+    return state unless global_start_at = ranges.map(&:first).compact.min
+    if global_start_at < now
+      :completed
+    # Allow student view students to use the course before the term starts
+    elsif !self.fake_student?
+      :inactive
     else
       state
     end

@@ -164,6 +164,20 @@ describe CoursesController do
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @e2.uuid
       response.should redirect_to(login_url(:re_login => 1))
     end
+
+    it "should accept an enrollment for a restricted by dates course" do
+      course_with_student_logged_in(:active_all => true)
+
+      @course.update_attributes(:restrict_enrollments_to_course_dates => true,
+                                :start_at => Time.now + 2.weeks)
+      @enrollment.update_attributes(:workflow_state => 'invited')
+
+      post 'enrollment_invitation', :course_id => @course.id, :accept => '1',
+        :invitation => @enrollment.uuid
+
+      response.should redirect_to(courses_url)
+      @enrollment.reload.workflow_state.should == 'active'
+    end
   end
   
   describe "GET 'show'" do
@@ -360,7 +374,6 @@ describe CoursesController do
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
         response.should be_success
         response.should render_template('show')
-        assigns[:pending_enrollment].should be_nil
         assigns[:context_enrollment].should == @enrollment
         @enrollment.reload
         @enrollment.should be_active
