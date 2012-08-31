@@ -403,21 +403,18 @@ div#content
     margin: 8px 8px 0 0
     visibility: hidden
   .flag_question
-    :background url(/images/answers_sprite.png) -42px top
+    :background url(/images/answers_sprite.png) -48px top
     :cursor pointer
     :position absolute
     :left -30px
     :margin-top 13px
     :height 16px
     :width 20px
-    +opacity(1)
     &:hover
-      :background-position -62px top
-      +opacity(0.65)
+      :background-position -69px -17px
   &.marked,&.marked:hover
     .flag_question
-      :background-position -62px -16px
-      +opacity(1)
+      :background-position -48px -17px
   .no-touch &.hover
     .move
       :background-color #fff
@@ -666,10 +663,9 @@ form.question_form
 
 ul#question_list
   li
-    &.answered
-      +opacity(0.5)
+    &.answered a
+      color: #a1bfe0
     &.marked
-      +opacity(1.0)
       :font-weight bold
       :list-style-image url(/images/flagged_question.png)
     &.correct
@@ -948,35 +944,35 @@ ul#quiz_versions
     width: 11px
 
   &.correct
-    background-position: left -32px
+    background-position: left -34px
     color: #fff
 
     &:before
       background-position: top left
 
     &:after
-      background-position: -9px top
+      background-position: -12px top
 
   &.incorrect
-    background-position: left -59px
+    background-position: left -62px
     color: #fff
 
     &:before
-      background-position: -3px top
+      background-position: -4px top
 
     &:after
-      background-position: -20px top
+      background-position: -24px top
 
   &.info
-    background-position: left -86px
+    background-position: left -90px
     color: #333
     text-shadow: 0 -1px 0 rgba(#fff, 0.5)
 
     &:before
-      background-position: -6px top
+      background-position: -8px top
 
     &:after
-      background-position: -31px top
+      background-position: -36px top
 
 // styles for teacher comments on quiz answers (comment bubbles).
 @mixin comment-arrow
