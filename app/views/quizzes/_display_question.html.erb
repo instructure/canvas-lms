@@ -10,7 +10,7 @@
   editing ||= false
   in_group ||= false
   question_bank_id ||= nil
-  display_correct_answers = @quiz.display_correct_answers?(@current_user, @submission)
+  display_correct_answers = @quiz && @quiz.display_correct_answers?(@current_user, @submission)
   correct = user_answer && hash_get(user_answer, :correct) == true
   incorrect = user_answer && hash_get(user_answer, :correct) == false
   unanswered = (%w{multiple_choice_question true_false_question}.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||

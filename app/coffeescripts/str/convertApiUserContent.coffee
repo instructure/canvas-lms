@@ -1,6 +1,7 @@
 define [
   'jquery'
-], ($) ->
+  'underscore'
+], ($, _) ->
 
   # use this method to process any user content fields returned in api responses
   # this is important to handle object/embed tags safely, and to properly display audio/video tags
