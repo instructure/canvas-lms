@@ -23,8 +23,9 @@ define [
       @model.on 'destroy', @remove, this
 
     toJSON: ->
-      _.extend super,
-        permissions: @options.permissions
+      json = super
+      _.extend json,
+        permissions: _.extend @options.permissions, json.permissions
         selected: @model.selected
         unread_count_tooltip: (I18n.t 'unread_count_tooltip', {
           zero: 'No unread replies'
