@@ -1,7 +1,8 @@
 define [
   'use!vendor/backbone'
   'underscore'
-], (Backbone, _) ->
+  'str/htmlEscape'
+], (Backbone, _, h) ->
 
   ##
   # Extends Backbone.View on top of itself with some added features
@@ -81,6 +82,9 @@ define [
     # Binds a `@model` data to the element's html. Whenever the data changes
     # the view is updated automatically.
     #
+    # The value will be html-escaped by default, but the view can define a
+    # format method to specify other formatting behavior
+    #
     # ex:
     #   <div data-bind="foo">{I will always mirror @model.get('foo') in here}</div>
     #
@@ -89,7 +93,7 @@ define [
       $el = $ el
       attribute = $el.data 'bind'
       @model.on "change:#{attribute}", (model, value) =>
-        $el.html value
+        $el.html @format?(attribute, value) ? h(value)
 
     #_createBehavior: (index, el) ->
       # not using this yet
