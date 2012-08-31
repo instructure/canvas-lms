@@ -339,8 +339,8 @@ ActionController::Routing::Routes.draw do |map|
   # find a feed_code method to generate the code, and in
   # application_controller there's a get_feed_context to get it back out.
   map.resource :feeds do |feed|
-    feed.calendar "calendars/:feed_code", :controller => "calendars", :action => "public_feed"
-    feed.calendar_format "calendars/:feed_code.:format", :controller => "calendars", :action => "public_feed"
+    feed.calendar "calendars/:feed_code", :controller => "calendar_events_api", :action => "public_feed"
+    feed.calendar_format "calendars/:feed_code.:format", :controller => "calendar_events_api", :action => "public_feed"
     feed.forum "forums/:feed_code", :controller => "discussion_topics", :action => "public_feed"
     feed.forum_format "forums/:feed_code.:format", :controller => "discussion_topics", :action => "public_feed"
     feed.topic "topics/:discussion_topic_id/:feed_code", :controller => "discussion_entries", :action => "public_feed"
