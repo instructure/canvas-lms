@@ -2,7 +2,9 @@ define [
   'i18n!editor'
   'jquery'
   'compiled/editor/EditorToggle'
-], (I18n, $, EditorToggle) ->
+  'compiled/str/convertApiUserContent'
+  'vendor/jquery.ba-tinypubsub'
+], (I18n, $, EditorToggle, convertApiUserContent, {publish}) ->
 
   ##
   # Makes an EntryView's model message editable with TinyMCE
@@ -18,7 +20,7 @@ define [
     ##
     # @param {EntryView} view
     constructor: (@view) ->
-      super @view.$('.message:first')
+      super @view.$('.message:first'), switchViews: true
       @cancelButton = @createCancelButton()
       @done.addClass 'small-button'
 
@@ -41,6 +43,7 @@ define [
     createCancelButton: ->
       $('<a/>')
         .html(I18n.t('cancel', 'Cancel'))
+        .css(marginLeft: '5px')
         .attr('href', 'javascript:')
         .addClass('cancel_button')
         .click => @display cancel: true
@@ -56,7 +59,7 @@ define [
     #
     # @api private
     getContent: ->
-      @view.model.get 'message'
+      convertApiUserContent @view.model.get('message'), forEditing: true
 
     ##
     # Called when the model is successfully saved, provides user feedback

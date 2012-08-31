@@ -7,11 +7,12 @@ define [
   'str/htmlEscape'
   'compiled/models/Announcement'
   'jquery'
+  'compiled/fn/preventDefault'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
-], (I18n, ValidatedFormView, _, template, wikiSidebar, htmlEscape, Announcement, $) ->
+], (I18n, ValidatedFormView, _, template, wikiSidebar, htmlEscape, Announcement, $, preventDefault) ->
 
   class EditView extends ValidatedFormView
 
@@ -43,7 +44,9 @@ define [
         wikiSidebar.init()
         $.scrollSidebar()
       $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
-      _.defer -> $textarea.editorBox()
+      _.defer ->
+        $textarea.editorBox()
+        $('.rte_switch_views_link').click preventDefault -> $textarea.editorBox('toggle')
       wikiSidebar.attachToEditor $textarea
 
       wikiSidebar.show()
