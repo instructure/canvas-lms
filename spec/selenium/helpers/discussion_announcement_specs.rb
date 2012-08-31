@@ -15,6 +15,22 @@ shared_examples_for "discussion and announcement main page tests" do
     @checkboxes = ff('.toggleSelected')
   end
 
+  it "shouldn't allow users without permission to delete/lock an announcement" do
+    pending('need to log in as otherUser')
+    @otherUser = User.create!(:name => 'karl')
+    @otherUser.register!
+    @otherUser.pseudonyms.create!(:unique_id => "nobody1@example.com", :password => 'foobarbaz1234', :password_confirmation => 'foobarbaz1234')
+    e = @course.enroll_student(@otherUser)
+    e.workflow_state = 'active'
+    e.save!
+    what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @otherUser) : announcement_model(:title => 'other users', :user => @otherUser)
+    get url
+    wait_for_ajaximations
+    checkboxes = ff('.toggleSelected')
+    checkboxes.length.should == 1
+    ff('.discussion-topic').length.should == 6
+  end
+
   def update_attributes_and_validate(attribute, update_value, search_term = update_value, expected_results = 1)
     what_to_create.last.update_attributes(attribute => update_value)
     refresh_page # in order to get the new topic information
