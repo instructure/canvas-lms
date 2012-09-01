@@ -275,6 +275,8 @@ describe ExternalToolsController, :type => :integration do
      "description"=>"For testing stuff",
      "user_navigation"=>
              {"text"=>"User nav", "url"=>"http://www.example.com/ims/lti/user"},
+     "course_navigation" =>
+             {"text"=>"Course nav", "url"=>"http://www.example.com/ims/lti/course", "visibility"=>"admins", "default"=> false},
      "account_navigation"=>
              {"text"=>"Account nav", "url"=>"http://www.example.com/ims/lti/account"}}
   end
