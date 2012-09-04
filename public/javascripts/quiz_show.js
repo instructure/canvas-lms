@@ -26,7 +26,7 @@ define([
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'message_students' /* messageStudents */
-], function(I18n, $, showAnswerArrows, disableInputs) {
+], function(I18n, $, showAnswerArrows, inputMethods) {
 
 $(document).ready(function () {
 
@@ -41,7 +41,8 @@ $(document).ready(function () {
   }
 
   showAnswerArrows();
-  disableInputs('[type=radio], [type=checkbox]');
+  inputMethods.disableInputs('[type=radio], [type=checkbox]');
+  inputMethods.setWidths();
   
   $(".delete_quiz_link").click(function(event) {
     event.preventDefault();
