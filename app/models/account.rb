@@ -700,32 +700,48 @@ class Account < ActiveRecord::Base
     @special_accounts = {}
   end
 
-  def self.get_special_account(special_account_type, default_account_name)
-    @special_account_ids ||= {}
-    @special_accounts ||= {}
+  # an opportunity for plugins to load some other stuff up before caching the account
+  def precache
+  end
 
-    account = @special_accounts[special_account_type]
-    unless account
-      special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
-      account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id) if special_account_id
+  def self.find_cached(id)
+    account = Rails.cache.fetch(account_lookup_cache_key(id), :expires => 1.hour) do
+      account = Account.find_by_id(id)
+      account.precache if account
+      account || :nil
     end
-    # another process (i.e. selenium spec) may have changed the setting
-    unless account
-      special_account_id = Setting.get("#{special_account_type}_account_id", nil)
-      if special_account_id && special_account_id != @special_account_ids[special_account_type]
-        @special_account_ids[special_account_type] = special_account_id
-        account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id)
-      end
-    end
-    unless account
-      # TODO i18n
-      t '#account.default_site_administrator_account_name', 'Site Admin'
-      t '#account.default_account_name', 'Default Account'
-      account = @special_accounts[special_account_type] = Account.create!(:name => default_account_name)
-      Setting.set("#{special_account_type}_account_id", account.id)
-      @special_account_ids[special_account_type] = account.id
-    end
+    account = nil if account == :nil
     account
+  end
+
+  def self.get_special_account(special_account_type, default_account_name)
+    Shard.default.activate do
+      @special_account_ids ||= {}
+      @special_accounts ||= {}
+
+      account = @special_accounts[special_account_type]
+      unless account
+        special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
+        account = @special_accounts[special_account_type] = Account.find_cached(special_account_id) if special_account_id
+      end
+      # another process (i.e. selenium spec) may have changed the setting
+      unless account
+        special_account_id = Setting.get("#{special_account_type}_account_id", nil)
+        if special_account_id && special_account_id != @special_account_ids[special_account_type]
+          @special_account_ids[special_account_type] = special_account_id
+          account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id)
+        end
+      end
+      unless account
+        # TODO i18n
+        t '#account.default_site_administrator_account_name', 'Site Admin'
+        t '#account.default_account_name', 'Default Account'
+        account = @special_accounts[special_account_type] = Account.create!(:name => default_account_name)
+        Setting.set("#{special_account_type}_account_id", account.id)
+        @special_account_ids[special_account_type] = account.id
+      end
+      account
+    end
   end
 
   def site_admin?
