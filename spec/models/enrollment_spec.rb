@@ -494,12 +494,12 @@ describe Enrollment do
     end
 
     context 'dates change' do
-      before(:all) do
+      before do
         @old_cache = RAILS_CACHE
         silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
       end
 
-      after(:all) do
+      after do
         silence_warnings { Object.const_set(:RAILS_CACHE, @old_cache) }
       end
 
