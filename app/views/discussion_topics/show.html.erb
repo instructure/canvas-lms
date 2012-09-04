@@ -62,7 +62,7 @@
         <div class="discussion-header-content right-of-avatar">
           <% if can_do(@topic, @current_user, :update) || can_do(@topic, @current_user, :delete) %>
             <div class="admin-links">
-              <button class="al-trigger ui-button" data-kyle-menu-options='{"appendMenuTo": "body"}'><span class="al-trigger-inner"><%= t :manage, 'Manage' %></span></button>
+              <button class="al-trigger ui-button" data-kyle-menu-options='{"appendMenuTo": "body"}'><span class="al-trigger-inner"><%= t :manage_discussion, 'Manage Discussion' %></span></button>
               <ul class="al-options">
                 <% if can_do(@topic, @current_user, :update) %>
                   <li><a href="<%= context_url(@topic.context, :edit_context_discussion_topic_url, @topic) %>"><span class="ui-icon ui-icon-pencil"></span><%= t :edit, 'Edit' %></a></li>
