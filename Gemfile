@@ -15,6 +15,7 @@ gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'encrypted_cookie_store-instructure', '1.0.1', :require => 'encrypted_cookie_store'
 gem 'erubis',         '2.7.0'
+gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.1.13'
 gem 'haml',           '3.1.6'
 if !ONE_NINE
