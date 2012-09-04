@@ -41,6 +41,7 @@ shared_examples_for "discussion and announcement main page tests" do
   def refresh_and_filter(filter_type, filter, expected_text, expected_results = 1)
     refresh_page # in order to get the new topic information
     wait_for_ajax_requests
+    keep_trying_until { ff('.toggleSelected').count.should == what_to_create.count }
     filter_type == :css ? f(filter).click : replace_content(f('#searchTerm'), filter)
     ff('.discussionTopicIndexList .discussion-topic').count.should == expected_results
     expected_results > 1 ? ff('.discussionTopicIndexList .discussion-topic').each { |topic| topic.should include_text(expected_text) } : (f('.discussionTopicIndexList .discussion-topic').should include_text(expected_text))
@@ -82,12 +83,11 @@ shared_examples_for "discussion and announcement main page tests" do
   end
 
   it "should return multiple items in the search" do
-    pending("intermittently fails")
-    new_title = 'updated'
-    what_to_create.first.update_attributes(:title => "#{new_title} first")
-    what_to_create.last.update_attributes(:title => "#{new_title} last")
-    refresh_and_filter(:string, new_title, new_title, 2)
-  end
+     new_title = 'updated'
+     what_to_create.first.update_attributes(:title => "#{new_title} first")
+     what_to_create.last.update_attributes(:title => "#{new_title} last")
+     refresh_and_filter(:string, new_title, new_title, 2)
+   end
 
   it "should filter by unread" do
     what_to_create.last.change_read_state('unread', @user)
