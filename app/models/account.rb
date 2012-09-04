@@ -1066,8 +1066,31 @@ class Account < ActiveRecord::Base
   end
 
   def manually_created_courses_account
-    self.root_account.sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
+    return self.root_account.manually_created_courses_account unless self.root_account?
+    display_name = t('#account.manually_created_courses', "Manually-Created Courses")
+    acct = manually_created_courses_account_from_settings
+    if acct.blank?
+      transaction do
+        lock!
+        acct = manually_created_courses_account_from_settings
+        acct ||= self.sub_accounts.find_by_name(display_name) # for backwards compatibility
+        acct ||= self.sub_accounts.create!(:name => display_name)
+        if acct.id != self.settings[:manually_created_courses_account_id]
+          self.settings[:manually_created_courses_account_id] = acct.id
+          self.save!
+        end
+      end
+    end
+    acct
   end
+
+  def manually_created_courses_account_from_settings
+    acct_id = self.settings[:manually_created_courses_account_id]
+    acct = self.sub_accounts.find_by_id(acct_id) if acct_id.present?
+    acct = nil if acct.present? && acct.root_account_id != self.id
+    acct
+  end
+  private :manually_created_courses_account_from_settings
 
   def trusted_account_ids
     return [] if !root_account? || self == Account.site_admin
