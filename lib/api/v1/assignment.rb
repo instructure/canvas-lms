@@ -21,7 +21,7 @@ module Api::V1::Assignment
   include Api::V1::DiscussionTopics
   include ApplicationHelper
 
-  def assignment_json(assignment, user, session)
+  def assignment_json(assignment, user, session, include_discussion_topic = true)
     hash = api_json(assignment, user, session, :only => %w(id grading_type points_possible position due_at description assignment_group_id group_category_id))
 
     hash['course_id'] = assignment.context_id
@@ -71,8 +71,8 @@ module Api::V1::Assignment
       }
     end
 
-    if assignment.discussion_topic
-      hash['discussion_topic'] = discussion_topic_api_json(assignment.discussion_topic, assignment.discussion_topic.context, user, session)
+    if include_discussion_topic && assignment.discussion_topic
+      hash['discussion_topic'] = discussion_topic_api_json(assignment.discussion_topic, assignment.discussion_topic.context, user, session, !:include_assignment)
     end
 
     hash

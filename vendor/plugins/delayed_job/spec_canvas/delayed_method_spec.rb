@@ -308,14 +308,14 @@ shared_examples_for 'random ruby objects' do
       set_queue("testqueue") do
         job = "string".send_later :reverse
         job.queue.should == "testqueue"
+
+        job2 = "string".send_later :reverse, :queue => nil
+        job2.queue.should == "testqueue"
       end
     end
 
-    it "should have nil queue if there is not a default" do
-      set_queue(nil) do
-        job = "string".send_later :reverse
-        job.queue.should == nil
-      end
+    it "should require a queue" do
+      expect { set_queue(nil) }.to raise_error(ArgumentError)
     end
   end
 
@@ -329,7 +329,7 @@ shared_examples_for 'random ruby objects' do
     it "should schedule the job in the future" do
       time = 1.hour.from_now
       job = "string".send_at(time, :length)
-      job.run_at.should == time
+      job.run_at.to_i.should == time.to_i
     end
     
     it "should store payload as PerformableMethod" do
@@ -346,13 +346,6 @@ shared_examples_for 'random ruby objects' do
         job.queue.should == "testqueue"
       end
     end
-    
-    it "should have nil queue if there is not a default" do
-      set_queue(nil) do
-        job = "string".send_at 1.hour.from_now, :reverse
-        job.queue.should == nil
-      end
-    end
   end
 
   context "send_at_with_queue" do
@@ -365,7 +358,7 @@ shared_examples_for 'random ruby objects' do
     it "should schedule the job in the future" do
       time = 1.hour.from_now
       job = "string".send_at_with_queue(time, :length, "testqueue")
-      job.run_at.should == time
+      job.run_at.to_i.should == time.to_i
     end
     
     it "should override the default queue" do

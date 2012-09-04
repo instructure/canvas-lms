@@ -43,7 +43,7 @@ class User < ActiveRecord::Base
   include Context
   include UserFollow::FollowedItem
 
-  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code
+  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
   attr_accessor :original_id, :menu_data
 
   before_save :infer_defaults
@@ -183,6 +183,8 @@ class User < ActiveRecord::Base
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
+
+  belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
@@ -603,6 +605,7 @@ class User < ActiveRecord::Base
     self.sortable_name = User.last_name_first(self.name, self.sortable_name_was) unless read_attribute(:sortable_name)
     self.reminder_time_for_due_dates ||= 48.hours.to_i
     self.reminder_time_for_grading ||= 0
+    self.initial_enrollment_type = nil unless ['student', 'teacher', 'ta', 'observer'].include?(initial_enrollment_type)
     User.invalidate_cache(self.id) if self.id
     @reminder_times_changed = self.reminder_time_for_due_dates_changed? || self.reminder_time_for_grading_changed?
     true
@@ -1353,7 +1356,7 @@ class User < ActiveRecord::Base
   def self.avatar_fallback_url(fallback=nil, request=nil)
     return fallback if fallback == '%{fallback}'
     if fallback and uri = URI.parse(fallback) rescue nil
-      uri.scheme ||= request ? request.scheme : "https"
+      uri.scheme ||= request ? request.protocol[0..-4] : "https" # -4 to chop off the ://
       if request && !uri.host
         uri.host = request.host
         uri.port = request.port if ![80, 443].include?(request.port)
@@ -2545,5 +2548,54 @@ class User < ActiveRecord::Base
 
   def profile(force_reload = false)
     orig_profile(force_reload) || build_profile
+  end
+
+  def otp_secret_key_remember_me_cookie(time)
+    "#{time.to_i}.#{Canvas::Security.hmac_sha1("#{time.to_i}.#{self.otp_secret_key}")}"
+  end
+
+  def validate_otp_secret_key_remember_me_cookie(value)
+    value =~ /^(\d+)\.[0-9a-f]+/ &&
+        $1.to_i >= (Time.now.utc - 30.days).to_i &&
+        value == otp_secret_key_remember_me_cookie($1)
+  end
+
+  def otp_secret_key
+    return nil unless otp_secret_key_enc
+    Canvas::Security::decrypt_password(otp_secret_key_enc, otp_secret_key_salt, 'otp_secret_key', self.shard.settings[:encryption_key]) if otp_secret_key_enc
+  end
+
+  def otp_secret_key=(key)
+    if key
+      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security::encrypt_password(key, 'otp_secret_key', self.shard.settings[:encryption_key])
+    else
+      self.otp_secret_key_enc = self.otp_secret_key_salt = nil
+    end
+    key
+  end
+
+  # mfa settings for a user are the most restrictive of any pseudonyms the user has
+  # a login for
+  def mfa_settings
+    result = self.pseudonyms(:include => :account).map(&:account).uniq.map do |account|
+      case account.mfa_settings
+        when :disabled
+          0
+        when :optional
+          1
+        when :required_for_admins
+          if account.all_account_users_for(self).empty?
+            1
+          else
+            # short circuit the entire method
+            return :required
+          end
+        when :required
+          # short circuit the entire method
+          return :required
+      end
+    end.max
+    return :disabled if result.nil?
+    [ :disabled, :optional ][result]
   end
 end

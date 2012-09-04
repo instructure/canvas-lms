@@ -833,7 +833,6 @@ class Assignment < ActiveRecord::Base
       :author => grader,
       :media_comment_id => (opts.delete :media_comment_id),
       :media_comment_type => (opts.delete :media_comment_type),
-      :unique_key => Time.now.to_s
     }
     submissions = []
     tags = self.learning_outcome_tags.select{|t| !t.rubric_association_id }
@@ -920,7 +919,6 @@ class Assignment < ActiveRecord::Base
     res = []
     raise "No submission found for that student" unless submission
     group, students = group_students(original_student)
-    opts[:unique_key] = Time.now.to_s
     opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by_id(opts[:user_id])
 
     if opts[:comment] && opts[:assessment_request]
@@ -992,7 +990,7 @@ class Assignment < ActiveRecord::Base
     primary_homework.broadcast_group_submission if group
     homeworks.each do |homework|
       context_module_action(homework.student, :submitted)
-      homework.add_comment({:comment => comment, :author => original_student, :unique_key => ts}) if comment && (group_comment || homework == primary_homework)
+      homework.add_comment({:comment => comment, :author => original_student}) if comment && (group_comment || homework == primary_homework)
     end
     touch_context
     return primary_homework

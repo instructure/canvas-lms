@@ -78,13 +78,6 @@ eolist
     end
   end
 
-  it "should support both email addresses and user names on the getting started page" do
-    skip_if_ie('Out of memory')
-    course_with_teacher_logged_in(:active_all => true)
-    get "/getting_started/students"
-    add_users_to_user_list(false)
-  end
-
   it "should support adding an enrollment to an enrollmentless course" do
     skip_if_ie('Out of memory')
     user_logged_in

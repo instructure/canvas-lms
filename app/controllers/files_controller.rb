@@ -38,7 +38,7 @@
 #     }
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update]
+  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
   skip_before_filter :verify_authenticity_token, :only => :api_create
@@ -562,6 +562,17 @@ class FilesController < ApplicationController
     end
     @attachment.handle_duplicates(duplicate_handling)
     render :json => attachment_json(@attachment, @current_user)
+  end
+
+  def api_file_status
+    @attachment = Attachment.find_by_id_and_uuid!(params[:id], params[:uuid])
+    if @attachment.file_state == 'available'
+      render :json => { :upload_status => 'ready', :attachment => attachment_json(@attachment, @current_user) }
+    elsif @attachment.file_state == 'deleted'
+      render :json => { :upload_status => 'pending' }
+    else
+      render :json => { :upload_status => 'errored', :message => @attachment.upload_error_message }
+    end
   end
   
   def create

@@ -204,15 +204,14 @@ define([
             $a.text(data[i].name);
             $box.append($a).append("<br>");
           }
-          $box.dialog('close').dialog({
-            autoOpen: false,
+          $box.dialog({
             width: 425,
             minWidth: 425,
             minHeight: 215,
             resizable: true,
             height: "auto",
             title: $self.text()
-          }).dialog('open');
+          });
         } else {
           window.open(data[0].url);
         }

@@ -24,7 +24,7 @@ define([
   'vendor/slickgrid-googlecode/slick.editors',
   'jquery.instructure_forms' /* errorBox */,
   'jquery.instructure_misc_helpers' /* /\.detect/ */,
-  'jquery.templateData' /* fillTemplateData */,
+  'jquery.templateData' /* fillTemplateData */
 ], function(I18n, $, _, htmlEscape, SlickGrid) {
 
   var GradebookUploader = {

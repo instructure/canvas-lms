@@ -43,9 +43,13 @@ class SubmissionComment < ActiveRecord::Base
 
   serialize :cached_attachments
 
+  named_scope :for_assignment_id, lambda { |assignment_id|
+    { :conditions => ['submissions.assignment_id = ?', assignment_id], :joins => :submission }
+  }
+
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
-    SubmissionComment.find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
+    SubmissionComment.for_assignment_id(submission.assignment_id).find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
       comment.skip_destroy_callbacks!
       comment.destroy
     end

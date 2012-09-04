@@ -19,7 +19,7 @@ describe "account" do
 
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_host').send_keys('primary.host.example.com')
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_port').send_keys('1')
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_over_tls').click
+      ldap_form.find_element(:id, 'account_authorization_config_0_auth_over_tls_simple_tls').click
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_base').send_keys('primary base')
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_filter').send_keys('primary filter')
       ldap_form.find_element(:id, 'account_authorization_config_0_auth_username').send_keys('primary username')
@@ -32,7 +32,7 @@ describe "account" do
       config = Account.default.account_authorization_configs.first
       config.auth_host.should == 'primary.host.example.com'
       config.auth_port.should == 1
-      config.auth_over_tls.should == true
+      config.auth_over_tls.should == 'simple_tls'
       config.auth_base.should == 'primary base'
       config.auth_filter.should == 'primary filter'
       config.auth_username.should == 'primary username'
@@ -51,16 +51,18 @@ describe "account" do
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_filter').send_keys('secondary filter')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_username').send_keys('secondary username')
       ldap_form.find_element(:id, 'account_authorization_config_1_auth_password').send_keys('secondary password')
+
       expect_new_page_load { submit_form(ldap_form) }
 
       Account.default.account_authorization_configs.length.should == 2
       config = Account.default.account_authorization_configs.first
       config.auth_host.should == 'primary.host.example.com'
+      config.auth_over_tls.should == 'simple_tls'
 
       config = Account.default.account_authorization_configs[1]
       config.auth_host.should == 'secondary.host.example.com'
       config.auth_port.should == 2
-      config.auth_over_tls.should == false
+      config.auth_over_tls.should == 'start_tls'
       config.auth_base.should == 'secondary base'
       config.auth_filter.should == 'secondary filter'
       config.auth_username.should == 'secondary username'

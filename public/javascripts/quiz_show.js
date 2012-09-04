@@ -19,29 +19,29 @@
 define([
   'i18n!quizzes.show',
   'jquery' /* $ */,
+  'quiz_arrows',
+  'quiz_inputs',
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'message_students' /* messageStudents */
-], function(I18n, $) {
+], function(I18n, $, showAnswerArrows, disableInputs) {
 
 $(document).ready(function () {
+
   function loadStudents() {
-    var students_hash = {};
-    $(".student_list .student").each(function(i) {
-      var student = {};
-      student.id = $(this).attr('data-id');
-      student.name = $.trim($(this).find(".name").text());
-      student.submitted = $(this).closest(".student_list").hasClass('submitted');
-      students_hash[student.id] = student;
+    return $('.student_list .student').not('.blank').map(function() {
+      return {
+        id       : $(this).attr('data-id'),
+        name     : $.trim($(this).find(".name").text()),
+        submitted: $(this).closest(".student_list").hasClass('submitted')
+      };
     });
-    var students = [];
-    for(var idx in students_hash) {
-      students.push(students_hash[idx]);
-    }
-    return students;
   }
+
+  showAnswerArrows();
+  disableInputs('[type=radio], [type=checkbox]');
   
   $(".delete_quiz_link").click(function(event) {
     event.preventDefault();

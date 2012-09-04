@@ -22,7 +22,7 @@ class IncomingMessageProcessor
     encoding ||= 'UTF-8'
     encoding = encoding.upcase
     # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
-    Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue Iconv.conv('UTF-8//IGNORE', 'UTF-8', string)
+    Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue TextHelper.strip_invalid_utf8(string)
   end
 
   def self.process_single(message, secure_id, message_id)

@@ -10,29 +10,46 @@
     </div>
     <div>
     <table class="summary" style="font-size: 1.1em;">
-      <tr>
-        <th><%= before_label(:time, "Time") %></th>
-        <td><%= time_ago_in_words(Time.now - ((@submission.finished_at || @submission.end_at || @submission.started_at) - @submission.started_at)) %></td>
-      </tr>
-      <% unless @quiz.assignment.present? && @quiz.assignment.muted? %>
-      <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
-        <th><%= before_label(:current_score, "Current Score") %></th>
-        <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-                  :score => render(:partial => "submission_score", :object => @submission),
-                  :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
-      </tr>
-      <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
-        <th><%= before_label(:kept_score, "Kept Score") %></th>
-        <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-                  :score => @submission.kept_score,
-                  :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
-      </tr>
-        <% if @submission.manually_scored %>
-          <tr>
-            <td colspan="2"><%= t('score_set_manually', 'This score was set by the teacher') %></td>
-          </tr>
-        <% end %>
+      <% if @submission.pending_review? %>
+      <tfoot>
+        <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+          <td colspan="2" class="footnote">
+            *
+            <% if can_do(@quiz, @current_user, :grade) %>
+              <%= link_to t(:questions_not_graded, 'Some questions not yet graded'), context_url(@context, :context_quiz_history_url, @quiz, :version => @submission.version_number, :user_id => @submission.user_id) %>
+            <% else %>
+              <%= t(:questions_not_graded, 'Some questions not yet graded') %>
+            <% end %>
+          </td>
+        </tr>
+      </tfoot>
       <% end %>
+      <tbody>
+        <tr>
+          <th><%= before_label(:time, "Time") %></th>
+          <td><%= time_ago_in_words(Time.now - ((@submission.finished_at || @submission.end_at || @submission.started_at) - @submission.started_at)) %></td>
+        </tr>
+        <% unless @quiz.assignment.present? && @quiz.assignment.muted? %>
+        <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+          <th><%= before_label(:current_score, "Current Score") %></th>
+          <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+                    :score => @submission.score,
+                    :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
+                  <%= '*' if @submission.pending_review? %></td>
+        </tr>
+        <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+          <th><%= before_label(:kept_score, "Kept Score") %></th>
+          <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+                    :score => @submission.kept_score,
+                    :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
+        </tr>
+          <% if @submission.manually_scored %>
+            <tr>
+              <td colspan="2"><%= t('score_set_manually', 'This score was set by the teacher') %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
     </table>
     </div>
   </div>

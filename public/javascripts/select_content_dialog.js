@@ -74,11 +74,10 @@ $(document).ready(function() {
     $("#select_context_content_dialog #context_module_sub_headers_select :text").val("");
     $('#add_module_item_select').change();
     $("#select_context_content_dialog .module_item_select").change();
-    $("#select_context_content_dialog").dialog('close').dialog({
-      autoOpen: true,
+    $("#select_context_content_dialog").dialog({
       title: dialog_title,
       width: 400
-    }).dialog('open');
+    });
     $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
   }
   $("#select_context_content_dialog .cancel_button").click(function() {
@@ -138,8 +137,16 @@ $(document).ready(function() {
           var url = $("#select_context_content_dialog .module_item_option:visible:first .new .add_item_url").attr('href');
           var data = $("#select_context_content_dialog .module_item_option:visible:first").getFormData();
           var callback = function(data) {
+            var obj;
+
+            // discussion_topics will come from real api v1 and so wont be nested behind a `discussion_topic` root object
+            if (item_data['item[type]'] === 'discussion_topic') {
+              obj = data;
+            } else {
+              obj = data[item_data['item[type]']]; // e.g. data['wiki_page'] for wiki pages
+            }
+
             $("#select_context_content_dialog").loadingImage('remove');
-            var obj = data[item_data['item[type]']] // e.g. data['wiki_page'] for wiki pages
             item_data['item[id]'] = obj.id;
             item_data['item[title]'] = $("#select_context_content_dialog .module_item_option:visible:first .item_title").val();
             item_data['item[title]'] = item_data['item[title]'] || obj.display_name

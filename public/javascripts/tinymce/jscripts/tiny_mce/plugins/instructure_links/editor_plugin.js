@@ -242,15 +242,14 @@ define([
             $box.find(".auto_show_inline_content").attr('checked', $a.hasClass('auto_open')).triggerHandler('change');
             $box.find(".insert_button").text("Update Link");
           }
-          $box.dialog('close').dialog({
-            autoOpen: false,
+          $box.dialog({
             width: 425,
             height: "auto",
             title: "Link to Website URL",
             open: function() {
               $(this).find(".prompt").focus().select();
             }
-          }).dialog('open');
+          });
         });
         ed.addButton('instructure_links', {
           title: 'Link to URL',

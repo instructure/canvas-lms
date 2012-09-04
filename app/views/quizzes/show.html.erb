@@ -110,22 +110,24 @@
     <% end %>
   <% end %>
 <% end %>
+
 <% js_bundle :quiz_show %>
 <% jammit_css :quizzes %>
-<a id="context_quzzes_url" style="display:none;" href="<%= context_url(@context, :context_quizzes_url) %>">&nbsp;<!-- needed by quiz_show.js --></a>
+
+<a id="context_quzzes_url" style="display:none;" href="<%= context_url(@context, :context_quizzes_url) %>">&nbsp;<!-- This is needed by quiz_show.js --></a>
+
+<header class="quiz-header">
 <h2 id="quiz_title"><%= @quiz.quiz_title || @quiz.readable_type %></h2>
 <% if @submission && params[:preview] %>
   <h3>
     <%= image_tag "warning.png" %> <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
   </h3>
 <% end %>
-<% if !@quiz.available? %><p>
+<% if !@quiz.available? %>
+  <p>
   <%= @quiz.survey? ? t(:survey_not_published, "This survey hasn't been published yet.  Students can't take the survey until it's published.") : t(:quiz_not_published, "This quiz hasn't been published yet.  Students can't take the quiz until it's published.") %>
   <% if can_do(@quiz, @current_user, :update) %>
     <%= @quiz.survey? ? t(:publish_survey_instructions, 'To publish the survey, click "Edit This Survey" to the right and then click the "Publish" button.') : t(:publish_quiz_instructions, 'To publish the quiz, click "Edit This Quiz" to the right and then click the "Publish" button.') %>
-    <% if @submission && @submission.completed? %>
-      <%= render :partial => "quizzes/quiz_submission" %>
-    <% end %>
   <% end %>
   </p>
   <% if !@locked || @locked_reason[:lock_at] %>
@@ -142,6 +144,10 @@
       <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="edit"><%= @quiz.survey? ? t('links.edit_this_survey', "Edit This Survey") : t('links.edit_this_quiz', "Edit This Quiz") %></a>
       <a style="padding-left: 40px;" href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link delete"><%= @quiz.survey? ? t('links.delete_this_survey', "Delete This Survey") : t('links.delete_this_quiz', "Delete This Quiz") %></a>
     </div>
+  <% end %>
+ </header>
+  <% if @submission && @submission.completed? %>
+    <%= render :partial => "quizzes/quiz_submission" %>
   <% end %>
 <% else %>
   <% if can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
@@ -213,6 +219,7 @@
       </div>
     <% end %>
   <% end %>
+</header>
   <% if @submission && @submission.completed? %>
     <%= @quiz.assignment && @quiz.assignment.muted? ? render(:partial => "quizzes/muted") : render(:partial => "quizzes/quiz_submission") %>
   <% end %>

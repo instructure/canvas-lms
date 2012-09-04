@@ -39,9 +39,9 @@ en:
     default_delegated_login_handle_name: Login
     default_login_handle_name: Email
     saml_eppn_domain_stripped: "%{eppn} (domain stripped)"
-    test_bind_failed: "Failed to bind"
-    test_connection_failed: "Failed to connect to host/port"
+    test_bind_failed: "Failed to bind with the following error: %{error}"
     test_connection_timeout: "Timeout when connecting"
+    test_host_unknown: "Unknown host: %{host}"
     test_login_auth_exception: "Exception on login: %{error}"
     test_login_auth_failed: "Authentication failed"
     test_search_failed: "Search failed with the following error: %{error}"
@@ -58,8 +58,8 @@ en:
       add_auth_desc: "Add an identity provider to this account:"
       canvas_login_tip: |-
           If you configure settings that cause you to not be able to log in you can add
-            *%{url1}* to the end of your login url. This will let you login
-            using the normal Canvas login procedure. For this account the url would be %{url2}
+          *%{url1}* to the end of your login url. This will let you login
+          using the normal Canvas login procedure. For this account the url would be %{url2}
       choose_auth_type_option: "Choose an authentication service"
       current_settings_title: "Current Integration"
       delete_auth_confirmation: "Are you sure? Users may not be able to log in if this is removed."
@@ -89,14 +89,22 @@ en:
     ldap_settings_fields: 
       auth_filter_description: "Use *%{placeholder}* as a placeholder for the username supplied by the user. For example: *(sAMAccountName=%{placeholder})*"
       auth_password_description: "Leave blank to continue using the current password."
+      identifer_format_description: "The LDAP attribute to use to look up the Canvas login. Leave blank to use the username supplied by the user."
       labels: 
         auth_base: Base
         auth_filter: Filter
         auth_host: Host
         auth_over_tls: "Over TLS?"
+        auth_over_tls_false: "No TLS"
+        auth_over_tls_simple_tls: "Simple TLS"
+        auth_over_tls_start_tls: StartTLS
         auth_password: Password
         auth_port: Port
         auth_username: Username
+        identifier_format: "Login ID Attribute"
+        no_tls: "No TLS"
+        simple_tls: "Simple TLS"
+        start_tls: StartTLS
     ldap_settings_test: 
       labels: 
         pass: Password
@@ -356,6 +364,7 @@ en:
         admins_can_change_passwords: "Password setting by admins"
         allow_sending_scores_in_emails: "Students can opt-in to receiving scores in email notifications"
         allow_sis_import: "SIS imports"
+        canvas_authentication: "Canvas Authentication"
         default_course_storage_quota: "Default Course File Quota"
         default_language: "Default Language"
         default_time_zone: "Default Time Zone"
@@ -376,6 +385,7 @@ en:
         help_link_url: URL
         membership_type: "Add More"
         message: Message
+        mfa_settings: "Multi-Factor Authentication"
         name: "Account Name"
         no_enrollments_can_create_courses: "Users with no enrollments"
         open_registration: "Open Registration"
@@ -413,6 +423,12 @@ en:
       quiz_ip_filters_title: "Quiz IP Address Filters"
       report_last_run_never: Never
       report_running: "The report is running.*You'll receive an email when it is done.*"
+      select: 
+        mfa: 
+          disabled: Disabled
+          optional: Optional
+          required: Required
+          required_for_admins: "Required for Admins"
       self_enroll_for_any_courses_option: "For Any Courses"
       self_enroll_for_manually_created_courses_option: "For Manually-Created Courses"
       settings_crumb: Settings
@@ -624,36 +640,10 @@ en:
           other: "%{count} Posts Added"
     feed_name: "%{course} Announcements Feed"
     index: 
-      buttons: 
-        add_feed: "Add Feed"
-      descriptions: 
-        add_new_feed_for_course: "You can automatically add posts from an RSS or Atom feed as announcements for this course. Just paste the feed URL below and any new entries will be added."
-        add_new_feed_for_group: "You can automatically add posts from an RSS or Atom feed as announcements for this group. Just paste the feed URL below and any new entries will be added."
       feed_title_course: "Course Announcements Atom Feed"
       feed_title_group: "Group Announcements Atom Feed"
-      labels: 
-        external_feed_verbosity: "Content to post"
-        match_phrase_checkbox: "Only add posts with a specific phrase in the title"
-        phrase_to_look_for: "Phrase to look for"
-        url: URL
-      links: 
-        add_external_feed: "Add External Feed"
-        create_announcement: "Create Announcement"
-        feed: "Announcements Feed"
-      options: 
-        full_article: "Full article"
-        link_only: "Link only"
-        truncated: Truncated
-      page_title: Announcements
       podcast_title_course: "Course Announcements Podcast Feed"
       podcast_title_group: "Group Announcements Podcast Feed"
-      titles: 
-        add_new_feed: "Add a New Feed"
-        announcements: Announcements
-        external_feeds: "External Feeds"
-    messages: 
-      confirm_delete_feed: "Stop adding posts from this feed?"
-      loading_more_results: "Loading more results"
     podcast_feed_description_course: "Any media files linked from or embedded within announcements in the course \"%{course}\" will appear in this feed."
     podcast_feed_description_group: "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed."
     podcast_feed_name: "%{course} Announcements Podcast Feed"
@@ -1154,6 +1144,13 @@ en:
     feed_title_with_context: "File, %{course_or_group}: %{title}"
     title: 
       migration_list: "Associated Files"
+    upload_error_invalid_response_code: "Invalid response code, expected 200 got %{code}"
+    upload_error_invalid_url: "Could not parse the URL: %{url}"
+    upload_error_over_quota: "file size exceeds quota limits: %{bytes} bytes"
+    upload_error_relative_uri: "No host provided for the URL: %{url}"
+    upload_error_timeout: "The request timed out: %{url}"
+    upload_error_too_many_redirects: "Too many redirects"
+    upload_error_unexpected: "An unknown error occured downloading from %{url}"
   attendance: 
     default_attendance_title: "Attendance %{date}"
     errors: 
@@ -1199,7 +1196,6 @@ en:
     post_message: "Post Message"
     previous: Previous
     refresh: refresh
-    reorder_topics: "Reorder Topics"
     save: Save
     save_course: "Save Course"
     save_tool_settings: "Save Tool Settings"
@@ -1748,6 +1744,7 @@ en:
     event: 
       event: Event
   communication_channel: 
+    body: "Your Canvas verification code is %{verification_code}"
     default_facebook_account: "Facebook Account"
     default_twitter_handle: "Twitter Handle"
   communication_channels: 
@@ -2437,17 +2434,20 @@ en:
         prior_users: "Prior Users"
     roster: 
       group_members: "Group Members"
+      roster: 
+        students: Students
+        teachers: "Teachers & TAs"
+      teachers: "Teachers & TAs"
+      titles: 
+        course_roster: "Course Roster"
+        group_roster: "Group Roster"
+    roster_right_side: 
       links: 
         manage_users: "Manage Users"
         view_faculty_journals: "View Faculty Journals"
         view_prior_enrollments: "View Prior Enrollments"
         view_services: "View Registered Services"
         view_student_groups: "View Student Groups"
-      students: Students
-      teachers: "Teachers & TAs"
-      titles: 
-        course_roster: "Course Roster"
-        group_roster: "Group Roster"
     roster_user: 
       completed_enrollment: "completed *%{completed_at}*"
       confirm: 
@@ -3019,6 +3019,7 @@ en:
       re_publish_grades: "Are you sure you want to republish these grades to the student information system?"
     course_dates_enforced: "Users can only participate in the course between these dates"
     course_dates_unenforced: "These dates will not affect course availability"
+    delete_confirm: "Are you sure you want to remove this user?"
     edit_sections_placeholder: "Enter a section name"
     errors: 
       invalid_sis_status: "Invalid SIS publish status"
@@ -3029,6 +3030,8 @@ en:
     flash: 
       linkError: "Something went wrong updating the user's student links. Please try again later."
       links: "Student links successfully updated"
+      removeError: "Unable to remove the user. Please try again later."
+      removed: "User successfully removed."
       sectionError: "Something went wrong updating the user's sections. Please try again later."
       sections: "Section enrollments successfully updated"
     grading_standard_set: "Currently Set"
@@ -3043,7 +3046,6 @@ en:
       re_send_all: "Re-Send All Unaccepted Invitations"
       re_sending_invitation: "Re-Sending Invitation..."
       republish: "Republish grades to SIS"
-      unenroll_user_course: "Remove User from Course"
     observing_user: "*Observing*: %{user_name}"
     pending: "pending acceptance"
     private_course: Private
@@ -3353,7 +3355,7 @@ en:
           description: "too general"
         too_long_twitter_hashtag: 
           description: "too long"
-        turnitin_comments: "Turnitin Submission Comments"
+        turnitin_comments: "Turnitin Comments"
       language_overrides_preferences: "This will override any user/system language preferences. This is only recommended for foreign language courses"
       link_to_students_view: 
         link_student_action: "To link the course observer *%{name}* to a student, select the student's name from the list below."
@@ -3769,8 +3771,35 @@ en:
     default_title: "No Title"
     empty_message: "No message"
   discussion_topics: 
+    confirm_delete_announcement: 
+      one: "Are you sure you wan to delete this announcement?"
+      other: "Are you sure you want to delete these %{count} announcements?"
+    confirm_delete_discussion_topic: 
+      one: "Are you sure you wan to delete this discussion topic?"
+      other: "Are you sure you want to delete these %{count} discussion topics?"
+    create_new_crumb: "Create new"
+    default_discussion_title: "No Title"
     deleted_topic_notice: "That topic has been deleted"
     discussion_feed_title: "%{title} Discussion Feed"
+    edit: 
+      edit_topic: "Edit Discussion Topic"
+    edit_crumb: Edit
+    edit_view: 
+      allow_threaded_replies: "Allow threaded replies"
+      assignment_group: "Assignment Group"
+      attachment: Attachment
+      delay_posting: "Delay posting"
+      due: Due
+      enable_podcast_feed: "Enable podcast feed"
+      include_replies_in_podcast_feed: "Include Replies in podcast feed"
+      loading: Loading...
+      points_possible: "Points possible"
+      post_at: "Post At"
+      save: Save
+      saving: Saving...
+      topic_title: "Topic Title"
+      use_for_grading: "Use for grading"
+      users_must_post_before_seeing_replies: "Users must post before seeing replies"
     entry: 
       authors_name: "Author's name"
       delete_message: "Delete this Message"
@@ -3790,25 +3819,40 @@ en:
       separated_conversation_notice: "The conversation for this topic has been separated into separate groups. Below are all the group topics you have access to."
     index: 
       course_discussions_atom_feed_title: "Course Discussions Atom Feed"
-      drag_and_drop_notice: "You can manually define the order in which discussions will appear. Click and drag any topic to change where it will appear in the list."
-      locked_message: "This topic is currently locked. Visit the topic details page for more information."
-      locked_title: locked
-      manage_announcements: "Manage Announcements"
-      reorder_topics: "Reorder Topics"
-      start_new_topic: "Start a New Topic"
-      view_only_topics: "View Only Topics"
-      view_topics_and_announcements: "View Topics and Announcements"
-    loading_results: "Loading more results"
+    index_view: 
+      assignments: Assignments
+      delete: Delete
+      loading: Loading...
+      lock_for_comments: "Lock for comments"
+      make_an_announcement: "Make an announcement"
+      make_an_announcement_caps: "Make an Announcement"
+      make_sure_all_search_terms_are_spelled_correctly: "Make sure all search terms are spelled correctly."
+      new_discussion: "Start a discussion"
+      rss_feed: "RSS feed"
+      search_title_body_or_author: "Search title, body, or author"
+      start_one_now: "Start One Now"
+      suggestions: "Suggestions:"
+      there_are_no_announcements_show: "There are no announcements to show"
+      there_are_no_discussion_topics_to_show: "There are no discussion topics to show"
+      try_different_more_general_or_fewer_keywords: "Try different, more general, or fewer keywords."
+      try_disabling_the_unread_filters: "Try disabling the \"Unread\" filter."
+      try_disabling_the_unread_or_assignments_filters: "Try disabling the \"Unread\" or \"Assignments\" filters."
+      unread: Unread
+      your_search_did_not_match_any_announcements: "Your search did not match any announcements."
+      your_search_did_not_match_any_discussion_topics: "Your search did not match any discussion topics."
     new_and_total_badge: 
       reply_count_tooltip: 
         one: "1 reply"
         other: "%{count} replies"
         zero: "No replies"
       unread_count_tooltip: 
-        one: "*1* unread reply"
+        one: "1 unread reply"
         other: "%{count} unread replies"
         zero: "No unread replies"
-    reordered_topics_notice: "Topics successfully reordered"
+    reply_count_tooltip: 
+      one: "1 reply"
+      other: "%{count} replies"
+      zero: "No replies"
     show: 
       add_rubric: "Add Rubric"
       assignment_settings: "Assignment Details"
@@ -3855,9 +3899,17 @@ en:
     sub_entry: 
       authors_name: "Author's name"
       post_message: "Post Message"
-    topic_created_notice: "Topic was successfully created."
+    summary_view: 
+      attached_file_name: "Attached: %{display_name}"
+      drag_up_or_down_to_reorder: "Drag up or down to reorder"
+      locked: "This topic is closed for comments"
+      this_topic_is_used_for_grading: "This topic is used for grading"
+      topic_podcast_feed: "Topic Podcast Feed"
     topic_deleted_notice: "%{topic_title} deleted successfully"
-    topic_updated_notice: "Topic was successfully updated."
+    unread_count_tooltip: 
+      one: "1 unread reply"
+      other: "%{count} unread replies"
+      zero: "No unread replies"
   discussions: 
     deleted_entry: 
       deleted: "This entry has been deleted"
@@ -3890,6 +3942,7 @@ en:
       post_response: "Post Response"
       write_a_reply: "Write a reply..."
     uknown_author: "Unknown Author"
+    unknown_author: "Unknown Author"
     unread_count_tooltip: 
       one: "1 unread reply"
       other: "%{count} unread replies"
@@ -4229,6 +4282,23 @@ en:
   external_feed: 
     original_article: "Original article"
     short_feed_title: "%{short_url} feed"
+  external_feeds: 
+    index_view: 
+      add_a_new_feed: "Add a New Feed"
+      descriptions: 
+        add_new_feed: "You can automatically add posts from an RSS or Atom feed as announcements for this course. Just paste the feed URL below and any new entries will be added."
+      keyword: "Keyword:"
+      labels: 
+        match_phrase_checkbox: "Only add posts with a specific phrase in the title"
+      links: 
+        add_external_feed: "Add External Feed"
+      options: 
+        content_to_post: "--Content to post--"
+        full_article: "Full article"
+        link_only: "Link only"
+        truncated: Truncated
+      phrase_to_look_for: "Phrase to look for"
+      posts_added: "Posts Added"
   external_tools: 
     buttons: 
       save_tool_settings: "Save Tool Settings"
@@ -4372,7 +4442,6 @@ en:
     errors: 
       empty_file: "That file is empty.  Please upload a different file."
       extracting: "There were errors extracting the zip file.  Please try again."
-      failed: Failed
       failed_uploading: "Failed uploading: %{error_info}"
       loading_file: "Error Loading File Contents.  Please try again."
       missing_field: "Upload failed, expected form field missing"
@@ -4494,7 +4563,6 @@ en:
       loading_files: "Loading Files..."
       no_collaborations: "There are no collaborations to show"
       no_files_selected: "No valid files were selected"
-      queue: Queued
       queued: Queued
       updating_file: "Updating File..."
       upload_complete: "Done uploading"
@@ -4502,7 +4570,6 @@ en:
       uploading_files: 
         one: "Uploading 1 File..."
         other: "Uploading %{count} Files..."
-      uploading_with_speed: "Uploading (%{speed}KB/s)"
       zip_finished: "Finished!  Redirecting to File..."
     new: 
       buttons: 
@@ -5594,11 +5661,16 @@ en:
         current: Current
         failed: Failed
         future: Future
+        id: ID
+        strand: Strand
+        tag: Tag
       labels: 
         failed_at: "Failed At"
         handler: Handler
         id: id
         last_error: "Last Error"
+        locked_at: "Locked At"
+        locked_by: "Locked By"
         max_attempts: "Max Attempts"
         num_attempts: Attempts
         priority: Priority
@@ -7806,6 +7878,7 @@ en:
       select_image: "Select Image"
       selecting_image: "Selecting Image..."
     communication: 
+      confirm_email_instructions: "Before you can receive any notifications, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box."
       crumb_notification_preferences: "Notification Preferences"
       headers: 
         notification_preferences: "Notification Preferences"
@@ -7854,6 +7927,7 @@ en:
       resent_confirmation: "Done! Message may take a few minutes."
     notices: 
       contact_confirmed: "Contact successfully confirmed!"
+      mfa_disabled: "Multi-factor authentication disabled"
       updated_profile: "Profile successfully updated"
     please_select_a_day: "Please select a day"
     please_select_a_month: "Please select a month"
@@ -7875,7 +7949,7 @@ en:
         save_skype_name: "Save Skype Name"
         select_image: "Select Image"
         update_profile: "Update Profile"
-      confirm_email_instructions: "Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *re-send the email*, and make sure to check your spam box."
+      confirm_email_instructions: "Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box."
       delicious_description: "Delicious is a tool that lets you store and share your bookmarks with others. Canvas's rich content editor will let you search your Delicious tags to easily link from within Canvas to other resources you find useful."
       diigo_description: "Diigo is a social bookmarking tool tailored specifically to research and education. Canvas's rich content editor will let you search your Diigo tags to easily link from within Canvas to other resources you find useful."
       error_loading_token_details: "Error Loading Token Details"
@@ -7948,14 +8022,17 @@ en:
       linkedin_description: "LinkedIn is a great resources for business networking, and can be helpful long after you've finished your education. If you have a LinkedIn account, you can register it here. Then if you allow fellow course/group members to see your registered services, they can easily invite you to link with them without having to search LinkedIn for your profile."
       links: 
         add_account: "Add Account"
+        configure_mfa: "Set Up Multi-Factor Authentication"
         delete_profile: "Delete My Profile"
         delicious: Delicious
         diigo: Diigo
+        disable_mfa: "Disable Multi-Factor Authentication"
         edit_settings: "Edit Settings"
         facebook: Facebook
         google_docs: "Google Docs"
         linkedin: LinkedIn
         more_options: "more options"
+        reconfigure_mfa: "Reconfigure Multi-Factor Authentication"
         skype: Skype
         twitter: Twitter
         upload_new_image: "Upload a new Image"
@@ -8026,18 +8103,7 @@ en:
         register_email: "Register Email"
         register_sms: "Register SMS"
       carriers: 
-        a_t_and_t: AT&T
-        alltel: Alltel
-        boost: Boost
-        cellular_one: CellularOne
-        cingular: Cingular
-        cricket: Cricket
-        nextel: Nextel
         other: "Other Carrier"
-        sprint_psc: "Sprint PCS"
-        t_mobile: T-Mobile
-        verizon: Verizon
-        virgin_mobile: "Virgin Mobile"
       confirming_contact: Confirming...
       contact_types: 
         sms: sms
@@ -8094,6 +8160,7 @@ en:
     default_app_name: "Third-Party Application"
     errors: 
       invalid_credentials: "Incorrect username and/or password"
+      invalid_otp: "Invalid verification code, please try again"
       login_error: "There was a problem logging in at %{institution}"
       max_attempts: "Too many failed login attempts. Please try again later or contact your system administrator."
       no_matching_user: "Canvas doesn't have an account for user: %{user}"
@@ -8119,6 +8186,8 @@ en:
       page_title: "Log In to Canvas"
       titles: 
         registration_complete: "Registration Incomplete"
+    notices: 
+      mfa_complete: "Multi-factor authentication configured"
     oauth2_auth: 
       oauth2_complete: "The application has finished the login workflow, and should reactivate shortly."
     oauth2_confirm: 
@@ -8129,6 +8198,33 @@ en:
         login_name: "You are logging into this app as %{user_name}."
       log_in: "Log in"
       page_title: "App Login"
+    otp_login: 
+      buttons: 
+        send: Send
+        verify: Verify
+      details: 
+        mfa_enrollment: |-
+            Multi-factor authentication increases security by requiring that you have something in your physical possession,
+            in addition to knowing your password, in order to log in to Canvas. This can be a device that can generate
+            verification codes, or a phone that can receive text messages. The Google Authenticator app for [iPhone](%{iphone_url}) or
+            [Android](%{android_url}) can be configured by scanning the QR Code below. Other tokens can be configured by entering the
+            secret key **%{secret_key}**.
+        mfa_required: "You are required to set up multi-factor authentication."
+        otp_on_device: "Please enter the verification code shown by your token."
+        otp_sent_to_phone: "A verification code has been sent to your phone. Please enter it here."
+        send_to_sms: "Send text messages to %{phone_number}"
+      labels: 
+        carrier: Carrier
+        phone_number: "Phone Number"
+        remember_me: "Remember this computer"
+        verification_code: "Verification Code"
+      links: 
+        choose_number: "Choose an existing phone"
+      page_title: "Multi-factor Authentication"
+      select: 
+        new_number: "a new phone"
+      titles: 
+        mfa: "Multi-factor Authentication"
     password_confirmation_error: "Error sending request."
     password_confirmation_sent: "Password confirmation sent. Make sure you check your spam box."
   pseudonyms: 
@@ -10065,68 +10161,6 @@ en:
       assignment: Assignment
       grading_alt: grading
       submission_comment: "Submission Comment"
-    topic: 
-      assignment_points: 
-        one: "1 pt"
-        other: "%{count} pts"
-      assignment_topic: "This topic is an assignment *(%{points})*."
-      attached_file: "Attached File"
-      date_created: "Date Created"
-      edited_by: "This topic was edited by %{user}"
-      for_grading: "Grading will be based on posts submitted to this topic."
-      images: 
-        alt: 
-          announcement: announcement
-          delete: Delete
-          edit: Edit
-          podcast: "Has a podcast"
-          topic: topic
-        title: 
-          announcement: Announcement
-          delete: "Delete %{topic}"
-          edit: "Edit %{topic}"
-          podcast: "This topic has a podcast feed."
-          topic: Discussion
-      last_post: "Last Post"
-      links: 
-        reply: "Add New Entry"
-      locked: "This topic is closed for comments"
-      no_title: "No Title"
-      reply_count_tooltip: 
-        one: "1 reply"
-        other: "%{count} replies"
-        zero: "No replies"
-      retrieved_from_feed: "Retrieved from %{feed}"
-      topic_locked: "This topic will not be visible to users until *%{date}*"
-      unread_count_tooltip: 
-        one: "1 unread entry"
-        other: "%{count} unread entries"
-        zero: "No unread entries"
-    topics: 
-      delay_until: until
-      labels: 
-        assignment_group: Group
-        delay_posting: "Delay posting this message"
-        due_at: Due
-        file_attach: File
-        files_attached: "File Attached"
-        is_announcement: "Make this post an announcement"
-        podcast_enabled: "Enable Podcast Feed for this Topic"
-        podcast_has_student_post: "Include Student Comments in the Feed"
-        points_possible: Points
-        require_initial_post: "Replies are not visible until after users post"
-        set_assignment: "Use for grading"
-        threaded: "This is a threaded discussion"
-        title: Title
-      links: 
-        attach_file: "Attach File"
-        replace_file: "Replace File"
-      new_announcement: "Make a New Announcement"
-      new_topic: "Make a New Discussion"
-      no_announcements: "There are no announcements, sad to say."
-      no_announcements_admin: "There are no announcements, sad to say. Would you like to create one?"
-      no_discussions: "There are no discussions, sad to say."
-      no_discussions_admin: "There are no discussions, sad to say. Would you like to start one?"
     turnitin_settings: 
       buttons: 
         update_settings: "Update Settings"
@@ -10587,6 +10621,7 @@ en:
     add_students: "Add Students"
     aligned_items: "Aligned Items"
     announcement: Announcement
+    announcements: Announcements
     discussion: Discussion
     discussions: Discussions
     error_reports: "Error Reports"
@@ -10605,39 +10640,6 @@ en:
   todo_view_item: 
     grade: Grade
     needs_grading: "needs grading"
-  topics: 
-    add_new_announcement: "Add New Announcement"
-    add_new_entry: "Add New Entry"
-    add_new_topic: "Add New Topic"
-    adding: Adding...
-    assignment_is_locked: "Some properties for this assignment are locked, go to the assignment page to edit."
-    confirms: 
-      delete_announcement: "Are you sure you want to delete this announcement?"
-      delete_entry: "Are you sure you want to delete this entry?"
-      delete_topic: "Are you sure you want to delete this topic?"
-    default_topic_title: "Topic Title"
-    default_user_name: "User Name"
-    errors: 
-      enter_a_message: "Please enter a message"
-      invalid_date_time: "Please select a valid date time"
-    expand: Expand
-    loading: Loading...
-    no_replies: "No Replies"
-    no_title: "No Title"
-    number_of_replies: 
-      one: "1 Reply"
-      other: "%{count} Replies"
-      zero: "No Replies"
-    reordering: Reordering...
-    titles: 
-      assignment_rubric_details: "Assignment Rubric Details"
-      lock_this_topic: "Lock this Topic"
-      reorder_discussions: "Reorder Discussions"
-      unlock_this_topic: "Unlock this Topic"
-    update_announcment: "Update Announcement"
-    update_entry: "Update Entry"
-    update_topic: "Update Topic"
-    updating: Updating...
   turnitin: 
     error_1007: "The uploaded file is too big."
     error_1009: "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)"
@@ -10714,6 +10716,7 @@ en:
       saving: Saving...
     notices: 
       cant_delete_last_login: "You can't delete the last login for a user"
+      mfa_reset: "Multi-factor authentication reset"
     save_succeeded: "Save successful"
     titles: 
       add_login: "Add Login"
@@ -10815,6 +10818,7 @@ en:
         find_user: "Find a User"
         merge_users: "Merge User Accounts"
         really_merge: "Really Merge User Accounts?"
+    cant_self_merge: "You can't merge an account with itself."
     cc_prefs: 
       buttons: 
         configure: "Configure Communication Preferences"
@@ -10921,6 +10925,7 @@ en:
         all_users: "All Users"
         choose_term: "Choose Term"
         search_results: "Search results for \"%{search_term}\""
+    invalid_input: "Invalid input. Please enter a valid ID."
     linkedin_added: "LinkedIn account successfully added!"
     linkedin_fail: "LinkedIn authorization failed. Please try again"
     logins: 
@@ -10941,6 +10946,7 @@ en:
       more: more...
       never: never
       none: none
+      reset_mfa: "Reset Multi-Factor Authentication"
       titles: 
         logins: "Login Information"
     masquerade: 
@@ -11091,6 +11097,7 @@ en:
     user_is_deleted: "%{user_name} has been deleted"
     user_merge_fail: "User merge failed. Please make sure you have proper permission and try again."
     user_merge_success: "User merge succeeded! %{first_user} and %{second_user} are now one and the same."
+    user_not_found: "No active user with that ID was found."
     user_updated: "User was successfully updated."
   validate: 
     is_required: "This field is required"

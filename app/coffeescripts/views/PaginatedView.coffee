@@ -43,7 +43,7 @@ define [
       containerScrollHeight - $container.scrollTop() - $container.height()
 
     startPaginationListener: ->
-      $(@paginationScrollContainer).on "scroll.pagination#{@cid} resize.pagination#{@cid}", $.proxy @fetchNextPageIfNeeded, this
+      $(@paginationScrollContainer).on "scroll.pagination#{@cid}, resize.pagination#{@cid}", $.proxy @fetchNextPageIfNeeded, this
       @fetchNextPageIfNeeded()
 
     stopPaginationListener: ->

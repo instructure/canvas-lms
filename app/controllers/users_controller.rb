@@ -660,11 +660,11 @@ class UsersController < ApplicationController
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
       # min age may also be enforced, depending on require_self_enrollment_code
-      @user.require_birthdate = (params[:enrollment_type] == 'student')
+      @user.require_birthdate = (@user.initial_enrollment_type == 'student')
     end
     
     @observee = nil
-    if params[:enrollment_type] == 'observer'
+    if @user.initial_enrollment_type == 'observer'
       # TODO: SAML/CAS support
       if observee = Pseudonym.authenticate(params[:observee] || {},
           [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
@@ -921,11 +921,10 @@ class UsersController < ApplicationController
   def admin_merge
     @user = User.find(params[:user_id])
     pending_user_id = params[:pending_user_id] || session[:pending_user_id]
-    @pending_other_user = User.find_by_id(pending_user_id) if pending_user_id.present?
-    @pending_other_user = nil if @pending_other_user == @user
-    @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
+    pending_other_error = get_pending_user_and_error(pending_user_id, params[:pending_user_id])
     @other_user = User.find_by_id(params[:new_user_id]) if params[:new_user_id].present?
     if authorized_action(@user, @current_user, :manage_logins)
+      flash[:error] = pending_other_error if pending_other_error.present?
       if @user && (params[:clear] || !@pending_other_user)
         session[:pending_user_id] = @user.id
         @pending_other_user = nil
@@ -939,6 +938,23 @@ class UsersController < ApplicationController
       end
       render :action => 'admin_merge'
     end
+  end
+
+  def get_pending_user_and_error(pending_user_id, entered_user_id)
+    pending_other_error = nil
+    if entered_user_id.to_s != entered_user_id.to_i.to_s && entered_user_id.present?
+      pending_user_id = nil
+      pending_other_error = t('invalid_input', "Invalid input. Please enter a valid ID.")
+    end
+    @pending_other_user = User.find_by_id(pending_user_id) if pending_user_id.present?
+    @pending_other_user = nil if @pending_other_user == @user
+    @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
+    if entered_user_id == @user.id.to_s
+      pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
+    elsif @pending_other_user.blank? && entered_user_id.present? && pending_other_error.blank?
+      pending_other_error = t('user_not_found', "No active user with that ID was found.")
+    end
+    return pending_other_error
   end
 
   def confirm_merge

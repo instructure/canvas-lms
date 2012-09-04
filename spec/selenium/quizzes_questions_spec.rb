@@ -70,9 +70,9 @@ describe "quizzes questions" do
 
     load_simulate_js
 
-    # drag the first question down 100px (next slot)
+    # drag the second question up 100px (next slot)
     driver.execute_script <<-JS
-      $('.move_icon:eq(0)').show().simulate('drag', {dx: 0, dy: 100});
+      $('.move_icon:eq(1)').show().simulate('drag', {dx: 0, dy: -100});
     JS
 
     # verify they were swapped

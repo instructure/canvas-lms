@@ -217,15 +217,14 @@ define([
     });
   });
   $("#submit_google_doc_form").submit(function() {
-    $("#uploading_google_doc_message").dialog('close').dialog({
-      autoOpen: false,
+    $("#uploading_google_doc_message").dialog({
       title: I18n.t('titles.uploading', "Uploading Submission"),
       modal: true,
       overlay: {
         backgroundColor: "#000",
         opacity: 0.7
       }
-    }).dialog('open');
+    });
   });
 
   $(document).ready(function() {

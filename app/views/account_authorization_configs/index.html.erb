@@ -44,12 +44,14 @@
 </p>
 <% end %>
 
-<p>
-  <%= mt(:canvas_login_tip, "If you configure settings that cause you to not be able to log in you can add
-  *%{url1}* to the end of your login url. This will let you login
-  using the normal Canvas login procedure. For this account the url would be %{url2}",
-  :url1 => "?canvas_login=1", :url2 => "http://#{@account.domain}/login?canvas_login=1") %>
-</p>
+<% if @account.canvas_authentication? && !@account.ldap_authentication? %>
+  <p>
+    <%= mt(:canvas_login_tip, "If you configure settings that cause you to not be able to log in you can add
+*%{url1}* to the end of your login url. This will let you login
+using the normal Canvas login procedure. For this account the url would be %{url2}",
+    :url1 => "?canvas_login=1", :url2 => "http://#{@account.domain}/login?canvas_login=1") %>
+  </p>
+<% end %>
 
 <h3><%= t(:current_settings_title, "Current Integration") %></h3>
 

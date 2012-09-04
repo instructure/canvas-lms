@@ -32,6 +32,26 @@ describe Course do
     @course.update_attribute(:group_weighting_scheme, 'percent')
     @course.apply_group_weights?.should == true
   end
+
+  it "should know if it has been soft-concluded" do
+    @course.enrollment_term = EnrollmentTerm.create!
+
+    # Both course and term end_at dates are nil
+    @course.should_not be_soft_concluded
+
+    # Course end_at is in the past
+    @course.update_attribute(:conclude_at, Time.now - 1.week)
+    @course.should be_soft_concluded
+
+    # Course end_at in the future, term end_at in the past
+    @course.update_attribute(:conclude_at, Time.now + 1.week)
+    @course.enrollment_term.update_attribute(:end_at, Time.now - 1.week)
+    @course.should be_soft_concluded
+
+    # Both course and term end_at dates are in the future
+    @course.enrollment_term.update_attribute(:end_at, Time.now + 1.week)
+    @course.should_not be_soft_concluded
+  end
   
   context "validation" do
     it "should create a new instance given valid attributes" do

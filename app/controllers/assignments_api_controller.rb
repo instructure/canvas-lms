@@ -19,6 +19,122 @@
 # @API Assignments
 #
 # API for accessing assignment information.
+#
+# @object Assignment
+#     {
+#       // the ID of the assignment
+#       id: 4,
+#
+#       // the name of the assignment
+#       name: "some assignment",
+#
+#       // the assignment description, in an HTML fragment
+#       description: '<p>Do the following:</p>...',
+#
+#       // the due date
+#       due_at: '2012-07-01T23:59:00-06:00',
+#
+#       // the ID of the course the assignment belongs to
+#       course_id: 123,
+#
+#       // the URL to the assignment's web page
+#       html_url: 'http://canvas.example.com/courses/123/assignments/4'
+#
+#       // the ID of the assignment's group
+#       assignment_group_id: 2,
+#
+#       // the ID of the assignment’s group set (if this is a group assignment)
+#       group_category_id: 1
+#
+#       // if the requesting user has grading rights, the number of submissions that need grading.
+#       needs_grading_count: 17,
+#
+#       // the sorting order of the assignment in the group
+#       position: 1,
+#
+#       // the URL to the Canvas web UI page for the assignment
+#       html_url: "https://...",
+#
+#       // whether the assignment is muted
+#       muted: false,
+#
+#       // (Optional) explanation of lock status
+#       lock_explanation: "This assignment is locked until September 1 at 12:00am",
+#
+#       // (Optional) whether anonymous submissions are accepted (applies only to quiz assignments)
+#       anonymous_submissions: false,
+#
+#       // (Optional) list of file extensions allowed for submissions
+#       allowed_extensions: ["doc","xls"],
+#
+#       // (Optional) the DiscussionTopic associated with the assignment, if applicable
+#       discussion_topic: { ... },
+#
+#       // the maximum points possible for the assignment
+#       points_possible: 12,
+#
+#       // the types of submissions allowed for this assignment
+#       // list containing one or more of the following:
+#       // "online_text_entry", "online_url", "online_upload", "media_recording"
+#       submission_types: ["online_text_entry"]
+#
+#       // (Optional) the type of grading the assignment receives;
+#       // one of 'pass_fail', 'percent', 'letter_grade', 'points'
+#       grading_type: "points",
+#
+#       // if true, the rubric is directly tied to grading the assignment.
+#       // Otherwise, it is only advisory.
+#       use_rubric_for_grading: true,
+#
+#       // an object describing the basic attributes of the rubric, including the point total
+#       rubric_settings: {
+#         points_possible: 12
+#       },
+#
+#       // a list of scoring criteria and ratings for each 
+#       rubric: [
+#         {
+#           "points": 10,
+#           "id": "crit1",
+#           "description": "Criterion 1",
+#           "ratings": [
+#             {
+#               "points": 10,
+#               "id": "rat1",
+#               "description": "Full marks"
+#             },
+#             {
+#               "points": 7,
+#               "id": "rat2",
+#               "description": "Partial answer"
+#             },
+#             {
+#               "points": 0,
+#               "id": "rat3",
+#               "description": "No marks"
+#             }
+#           ]
+#         },
+#         {
+#           "points": 2,
+#           "id": "crit2",
+#           "description": "Criterion 2",
+#           "ratings": [
+#             {
+#               "points": 2,
+#               "id": "rat1",
+#               "description": "Pass"
+#             },
+#             {
+#               "points": 0,
+#               "id": "rat2",
+#               "description": "Fail"
+#             }
+#           ]
+#         }
+#       ]
+#     }
+#
 class AssignmentsApiController < ApplicationController
   before_filter :require_context
 
@@ -26,91 +142,7 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the list of assignments for the current context.
-  #
-  # @response_field id The unique identifier for the assignment.
-  # @response_field assignment_group_id The unique identifier of the assignment's group.
-  # @response_field name The name of the assignment.
-  # @response_field needs_grading_count [Integer] If the requesting user has grading rights, the number of submissions that need grading.
-  # @response_field position [Integer] The sorting order of this assignment in
-  #   the group.
-  # @response_field points_possible The maximum possible points for the
-  #   assignment.
-  # @response_field grading_type [Optional, "pass_fail"|"percent"|"letter_grade"|"points"]
-  #   The type of grade the assignment receives.
-  # @response_field use_rubric_for_grading [Boolean] If true, the rubric is
-  #   directly tied to grading the assignment. Otherwise, it is only advisory.
-  # @response_field rubric [Rubric]
-  #   A list of rows and ratings for each row. TODO: need more discussion of the
-  #   rubric data format and usage for grading.
-  # @response_field rubric_settings
-  #   An object describing the basic attributes of the rubric, including the point total.
-  # @response_field group_category_id [Integer] The unique identifier of the assignment's group set (if this is a group assignment)
-  # @response_field html_url The URL to the Canvas web UI page for the assignment.
-  #
-  # @example_response
-  #   [
-  #     {
-  #       "id": 4,
-  #       "assignment_group_id": 2,
-  #       "name": "some assignment",
-  #       "points_possible": 12,
-  #       "grading_type": "points",
-  #       "due_at": "2011-05-26T23:59:00-06:00",
-  #       "submission_types" : [
-  #         "online_upload",
-  #         "online_text_entry",
-  #         "online_url",
-  #         "media_recording"
-  #        ],
-  #       "use_rubric_for_grading": true,
-  #       "html_url": "https://...",
-  #       "rubric_settings": {
-  #         "points_possible": 12
-  #       }
-  #       "rubric": [
-  #         {
-  #           "ratings": [
-  #             {
-  #               "points": 10,
-  #               "id": "rat1",
-  #               "description": "A"
-  #             },
-  #             {
-  #               "points": 7,
-  #               "id": "rat2",
-  #               "description": "B"
-  #             },
-  #             {
-  #               "points": 0,
-  #               "id": "rat3",
-  #               "description": "F"
-  #             }
-  #           ],
-  #           "points": 10,
-  #           "id": "crit1",
-  #           "description": "Crit1"
-  #         },
-  #         {
-  #           "ratings": [
-  #             {
-  #               "points": 2,
-  #               "id": "rat1",
-  #               "description": "Pass"
-  #             },
-  #             {
-  #               "points": 0,
-  #               "id": "rat2",
-  #               "description": "Fail"
-  #             }
-  #           ],
-  #           "points": 2,
-  #           "id": "crit2",
-  #           "description": "Crit2"
-  #         }
-  #       ],
-  #       "group_category_id: 1
-  #     }
-  #   ]
+  # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
       @assignments = @context.active_assignments.find(:all,
@@ -124,6 +156,9 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
+  # @API Get a single assignment 
+  # Returns the assignment with the given id.
+  # @returns Assignment
   def show
     if authorized_action(@context, @current_user, :read)
       @assignment = @context.active_assignments.find(params[:id],
@@ -146,6 +181,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[due_at] [Timestamp] The day/time the assignment is due. Accepts
   #   times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   # @argument assignment[description] [String] The assignment's description, supports HTML.
+  # @returns Assignment
   def create
     @assignment = create_api_assignment(@context, params[:assignment])
 
@@ -163,6 +199,7 @@ class AssignmentsApiController < ApplicationController
   # @API Edit an assignment
   # Modify an existing assignment. See the documentation for assignment
   # creation.
+  # @returns Assignment
   def update
     @assignment = @context.assignments.find(params[:id])
 

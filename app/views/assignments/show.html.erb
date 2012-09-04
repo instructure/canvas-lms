@@ -60,9 +60,6 @@ $(document).ready(function() {
 }
 </style>
 <% end %>
-<% if @context.claimed? && params[:getting_started] %>
-  <a href="<%= getting_started_assignments_url %>" class="back" style="font-size: 1.2em;"><%= t 'links.back_to_getting_started', "Back to Getting Started Wizard"%></a>
-<% end %>
 <% unless @assignment.new_record? %>
   <% if can_do(@assignment, @current_user, :update) %>
     <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>

@@ -74,7 +74,8 @@ describe ContextModule do
     it "should not allow adding invalid prerequisites" do
       course_module
       @module2 = @course.context_modules.create!(:name => "next module")
-      @module2.prerequisites = "module_#{@module.id},module_99"
+      invalid = course().context_modules.create!(:name => "nope")
+      @module2.prerequisites = "module_#{@module.id},module_#{invalid.id}"
       @module2.save!
       @module2.prerequisites.should be_is_a(Array)
       @module2.prerequisites.should_not be_empty

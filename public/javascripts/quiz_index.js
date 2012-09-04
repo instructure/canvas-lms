@@ -51,10 +51,9 @@ $(document).ready(function() {
       $list.append($quiz_item.show());
     });
     $dialog.find("button").attr('disabled', false);
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
+    $dialog.dialog({
       width: 400
-    }).dialog('open');
+    });
   });
   $("#publish_quizzes_form").submit(function() {
     $(this).find("button").attr('disabled', true).filter('.submit_button').text(I18n.t('buttons.publishing_quizzes', 'Publishing Quizzes...'));

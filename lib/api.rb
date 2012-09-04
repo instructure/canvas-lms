@@ -219,7 +219,7 @@ module Api
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
-      obj = match.obj_class.find_by_id(match.obj_id)
+      obj = match.obj_id && match.obj_class.find_by_id(match.obj_id)
       next unless obj && rewriter.user_can_view_content?(obj)
       file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
     end
@@ -276,6 +276,9 @@ module Api
             # made absolute with the canvas hostname prepended
             if !url.host && url_str[0] == '/'[0]
               element[attribute] = "#{protocol}://#{host}#{url_str}"
+              api_endpoint_info(protocol, host, url_str).each do |att, val|
+                element[att] = val
+              end
             end
           rescue URI::InvalidURIError => e
             # leave it as is
@@ -290,4 +293,59 @@ module Api
   def value_to_boolean(value)
     Canvas::Plugin.value_to_boolean(value)
   end
+
+  # regex for shard-aware ID
+  ID = '(?:\d+~)?\d+'
+
+  # maps canvas URLs to API URL helpers
+  # target array is return type, helper, name of each capture, and optionally a Hash of extra arguments
+  API_ROUTE_MAP = {
+      # list discussion topics
+      %r{^/courses/(#{ID})/discussion_topics$} => ['[Discussion]', :api_v1_course_discussion_topics_url, :course_id],
+      %r{^/groups/(#{ID})/discussion_topics$} => ['[Discussion]', :api_v1_group_discussion_topics_url, :group_id],
+
+      # get a single topic
+      %r{^/courses/(#{ID})/discussion_topics/(#{ID})$} => ['Discussion', :api_v1_course_discussion_topic_url, :course_id, :topic_id],
+      %r{^/groups/(#{ID})/discussion_topics/(#{ID})$} => ['Discussion', :api_v1_group_discussion_topic_url, :group_id, :topic_id],
+
+      # List pages
+      %r{^/courses/(#{ID})/wiki$} => ['[Page]', :api_v1_course_pages_url, :course_id],
+      %r{^/groups/(#{ID})/wiki$} => ['[Page]', :api_v1_group_pages_url, :group_id],
+
+      # Show page
+      %r{^/courses/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_course_page_url, :course_id, :url],
+      %r{^/groups/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_group_page_url, :group_id, :url],
+
+      # List assignments
+      %r{^/courses/(#{ID})/assignments$} => ['[Assignment]', :api_v1_course_assignments_url, :course_id],
+
+      # Get assignment
+      %r{^/courses/(#{ID})/assignments/(#{ID})$} => ['Assignment', :api_v1_course_assignment_url, :course_id, :id],
+
+      # List files
+      %r{^/courses/(#{ID})/files$} => ['Folder', :api_v1_course_folder_url, :course_id, {:id => 'root'}],
+      %r{^/groups/(#{ID})/files$} => ['Folder', :api_v1_group_folder_url, :group_id, {:id => 'root'}],
+      %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, {:id => 'root'}],
+
+      # Get file
+      %r{^/courses/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
+      %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
+      %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
+      %r{^/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
+  }
+
+  def api_endpoint_info(protocol, host, url)
+    API_ROUTE_MAP.each_pair do |re, api_route|
+      match = re.match(url)
+      next unless match
+      return_type = api_route[0]
+      helper = api_route[1]
+      args = { :protocol => protocol, :host => host }
+      args.merge! Hash[api_route.slice(2, match.captures.size).zip match.captures]
+      api_route.slice(match.captures.size + 2, 1).each { |opts| args.merge!(opts) }
+      return { 'data-api-endpoint' => self.send(helper, args), 'data-api-returntype' => return_type }
+    end
+    {}
+  end
+
 end

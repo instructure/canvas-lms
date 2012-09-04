@@ -46,7 +46,6 @@ define [
       # useful for dispaying 'nothingToShow' messages
       @atLeastOnePageFetched = true
 
-
     parse: (response, xhr) ->
       @_parsePageLinks(xhr)
       super

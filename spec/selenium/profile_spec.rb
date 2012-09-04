@@ -1,5 +1,3 @@
-# coding: utf-8
-
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
@@ -38,7 +36,6 @@ describe "profile" do
     user_with_pseudonym({:active_user => true})
     login_as
     get '/profile/settings'
-    old_password = 'oldpassword'
     wrong_old_password = 'wrongoldpassword'
     new_password = 'newpassword'
     edit_form = click_edit
@@ -105,10 +102,23 @@ describe "profile" do
       f('.email_channels').should include_text(test_email)
     end
 
+    it "should change default email address" do
+      channel = @user.communication_channels.create!(:path_type => 'email',
+        :path => 'walter_white@example.com')
+      channel.confirm!
+
+      get '/profile/settings'
+      row  = f("#channel_#{channel.id}")
+      link = f("#channel_#{channel.id} td:first-child a")
+      link.click
+      wait_for_ajaximations
+      row.attribute(:class).should match(/default/)
+    end
+
     it "should display file uploader link on files page" do
       get "/profile/settings"
       expect_new_page_load { driver.find_element(:css, '#left-side .files').click }
-      driver.find_element(:id, 'file_swfUploader').should be_displayed
+      driver.find_element(:id, 'file_swf-button').should be_displayed
     end
 
     it "should edit full name" do

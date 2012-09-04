@@ -128,8 +128,8 @@ currently supported value is <code>code</code>.
     <div class="inline">
       required. The URL where the user will be redirected after
 authorization. The domain of this URL must match the domain of the
-redirect_uri stored on the developer key, though the rest of the path
-may differ.
+redirect_uri stored on the developer key, or it must be a subdomain of
+that domain.
     </div>
   </li>
 </ul>

@@ -200,12 +200,11 @@ define([
 
 
     $(document).keycodes("shift+/", function(event) {
-      $("#keyboard_navigation").dialog('close').dialog({
+      $("#keyboard_navigation").dialog({
         title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
         width: 400,
-        height: "auto",
-        autoOpen: false
-      }).dialog('open');
+        height: "auto"
+      });
     });
 
     $("#switched_role_type").ifExists(function(){
@@ -253,12 +252,11 @@ define([
     $(".custom_search_results_link").click(function(event) {
       event.preventDefault();
       var $dialog = $("#custom_search_results_dialog");
-      $dialog.dialog('close').dialog({
-        autoOpen: false,
+      $dialog.dialog({
         title: I18n.t('titles.search_for_open_resources', "Search for Open Resources"),
         width: 600,
         height: 400
-      }).dialog('open');
+      });
       var control = $dialog.data('searchControl');
       if(control) {
         control.execute($("title").text());
@@ -571,12 +569,11 @@ define([
 
     $(".cant_record_link").click(function(event) {
       event.preventDefault();
-      $("#cant_record_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#cant_record_dialog").dialog({
         modal: true,
         title: I18n.t('titles.cant_create_recordings', "Can't Create Recordings?"),
         width: 400
-      }).dialog('open');
+      });
     });
 
     $(".communication_message .content .links .show_users_link,.communication_message .header .show_users_link").click(function(event) {

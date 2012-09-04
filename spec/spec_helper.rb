@@ -378,7 +378,7 @@ Spec::Runner.configure do |config|
 
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
   def group(opts={})
-    @group = (opts[:group_context].try(:groups) || Group).create! opts.slice(VALID_GROUP_ATTRIBUTES)
+    @group = (opts[:group_context].try(:groups) || Group).create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
 
   def group_with_user(opts={})
@@ -609,7 +609,7 @@ Spec::Runner.configure do |config|
 
   def assert_require_login
     response.should be_redirect
-    flash[:notice].should eql("You must be logged in to access this page")
+    flash[:warning].should eql("You must be logged in to access this page")
   end
 
   def default_uploaded_data
@@ -766,11 +766,7 @@ Spec::Runner.configure do |config|
     Attachment.local_storage?.should eql(true)
   end
 
-  def run_job(job = Delayed::Job.last(:order => :id))
-    case job
-    when Hash
-      job = Delayed::Job.first(:conditions => job, :order => :id)
-    end
+  def run_job(job)
     Delayed::Worker.new.perform(job)
   end
 
@@ -782,6 +778,21 @@ Spec::Runner.configure do |config|
       Delayed::MAX_PRIORITY)
       run_job(job)
     end
+  end
+
+  def track_jobs
+    @jobs_tracking = Delayed::JobTracking.track { yield }
+  end
+
+  def created_jobs
+    @jobs_tracking.created
+  end
+
+  def expects_job_with_tag(tag, count = 1)
+    track_jobs do
+      yield
+    end
+    created_jobs.count { |j| j.tag == tag }.should == count
   end
 
   # send a multipart post request in an integration spec post_params is
@@ -813,6 +824,30 @@ Spec::Runner.configure do |config|
     # now check payload
     post_lines[post_lines.index(""),-1].should ==
       expected_post_lines[expected_post_lines.index(""),-1]
+  end
+
+  class FakeHttpResponse
+    def initialize(code, body = nil, headers={})
+      @code = code
+      @body = body
+      @headers = headers
+    end
+
+    def read_body(io)
+      io << @body
+    end
+
+    def code
+      @code.to_s
+    end
+
+    def [](arg)
+      @headers[arg]
+    end
+
+    def content_type
+      self['content-type']
+    end
   end
 end
 

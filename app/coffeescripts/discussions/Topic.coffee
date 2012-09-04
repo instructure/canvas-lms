@@ -1,3 +1,8 @@
+#################
+# DONT USE THIS, USE DiscussionTopic.coffee, the only place that should use this is
+# the discusison show page. (it was made before we tried standardizing and re-using models)
+#######################
+
 define [
   'Backbone'
   'compiled/util/BackoffPoller'

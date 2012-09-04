@@ -57,7 +57,7 @@ describe "login logout" do
   it "should test logging out with the correct page and navigating to a page after being logged out" do
     expected_url = verify_logout
     get "/grades"
-    assert_flash_notice_message /You must be logged in to access this page/
+    assert_flash_warning_message /You must be logged in to access this page/
     driver.current_url.should == expected_url
   end
 

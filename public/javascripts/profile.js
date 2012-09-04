@@ -27,8 +27,11 @@ define([
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData */,
-  'jqueryui/sortable' /* /\.sortable/ */
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'compiled/jquery.rails_flash_notifications'
 ], function(INST, I18n, $, BackoffPoller) {
+
+  var $edit_settings_link = $(".edit_settings_link");
 
   var $profile_table = $(".profile_table"),
       $update_profile_form = $("#update_profile_form"),
@@ -60,14 +63,16 @@ define([
     return 'continue';
   });
   
-  $(".edit_profile_link").click(function(event) {
+  $edit_settings_link.click(function(event) {
+    $(this).hide();
     $profile_table.addClass('editing')
       .find(".edit_data_row").show().end()
       .find(":text:first").focus().select();
-    return false;
+  return false;
   });
   
   $profile_table.find(".cancel_button").click(function(event) {
+    $edit_settings_link.show();
     $profile_table
       .removeClass('editing')
       .find(".change_password_row,.edit_data_row,.more_options_row").hide().end()
@@ -151,7 +156,7 @@ define([
       },
       error: function(data) {
         $update_profile_form.loadingImage('remove').formErrors(data.errors || data);
-        $(".edit_profile_link").click();
+        $edit_settings_link.click();
       }
     })
     .find(".more_options_link").click(function() {
@@ -168,10 +173,9 @@ define([
   
   $("#unregistered_services li.service").click(function(event) {
     event.preventDefault();
-    $("#" + $(this).attr('id') + "_dialog").dialog('close').dialog({
-      width: 350,
-      autoOpen: false
-    }).dialog('open');
+    $("#" + $(this).attr('id') + "_dialog").dialog({
+      width: 350
+    });
   });
   $(".create_user_service_form").formSubmit({
     object_name: 'user_service',
@@ -291,10 +295,9 @@ define([
     event.preventDefault();
     var $dialog = $("#token_details_dialog");
     var url = $(this).attr('rel');
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
+    $dialog.dialog({
       width: 600
-    }).dialog('open');
+    });
     var $token = $(this).parents(".access_token");
     $dialog.data('token', $token);
     $dialog.find(".loading_message").show().end()
@@ -498,12 +501,11 @@ define([
         $dialog.find(".profile_pic_list h3").text(I18n.t('errors.loading_images_failed', "Loading Images Failed, please try again"));
       });
     }
-    $("#profile_pic_dialog").dialog('close').dialog({
-      autoOpen: false,
+    $("#profile_pic_dialog").dialog({
       title: I18n.t('titles.select_profile_pic', "Select Profile Pic"),
       width: 500,
       height: 300
-    }).dialog('open');
+    });
   });
   var checkImage = function() {
     var img = $(".profile_pic_link img")[0];
@@ -518,4 +520,13 @@ define([
     }
   };
   setTimeout(checkImage, 500);
+
+  $("#disable_mfa_link").click(function(event) {
+    var $disable_mfa_link = $(this);
+    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', null, function() {
+      $.flashMessage(I18n.t('notices.mfa_disabled', "Multi-factor authentication disabled"));
+      $disable_mfa_link.remove();
+    });
+    event.preventDefault();
+  });
 });

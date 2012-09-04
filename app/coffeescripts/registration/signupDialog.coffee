@@ -29,13 +29,17 @@ define [
       signupDialog($(this).data('template'), $(this).prop('title'))
 
     $form = $node.find('form')
+    promise = null
     $form.formSubmit
-      disableWhileLoading: true
+      beforeSubmit: ->
+        promise = $.Deferred()
+        $form.disableWhileLoading(promise)
       success: (data) =>
         # they should now be authenticated (either registered or pre_registered)
         window.location = "/?login_success=1&registration_success=1"
       formErrors: false
       error: (errors) ->
+        promise.reject()
         if _.any(errors.user.birthdate ? [], (e) -> e.type is 'too_young')
           $node.find('.registration-dialog').html I18n.t('too_young_error', 'You must be at least %{min_years} years of age to use Canvas without a course join code.', min_years: ENV.USER.MIN_AGE)
           $node.dialog buttons: [

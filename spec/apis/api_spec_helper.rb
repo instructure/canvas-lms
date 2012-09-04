@@ -106,6 +106,7 @@ def should_translate_user_content(course)
       Hello, students.<br>
       This will explain everything: <img src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
+      And refer to this <a href="/courses/#{course.id}/wiki/awesome-page">awesome wiki page</a>.
     </p>
   }
   html = yield content
@@ -117,5 +118,7 @@ def should_translate_user_content(course)
   video.should be_present
   video['poster'].should match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
   video['src'].should match(%r{http://www.example.com/courses/#{course.id}/media_download})
-    video['src'].should match(%r{entryId=qwerty})
+  video['src'].should match(%r{entryId=qwerty})
+  doc.css('a').last['data-api-endpoint'].should match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
+  doc.css('a').last['data-api-returntype'].should == 'Page'
 end

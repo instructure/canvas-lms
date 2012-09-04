@@ -1,0 +1,6 @@
+<%
+  content_for :page_title, t(:edit_topic, "Edit Discussion Topic")
+  content_for :right_side, render(:partial => "shared/wiki_sidebar")
+  js_bundle :discussion_topics_edit
+  jammit_css :tinymce
+%>

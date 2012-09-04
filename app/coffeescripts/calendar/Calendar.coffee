@@ -122,7 +122,6 @@ define [
       @colorizeContexts()
 
       @scheduler = new Scheduler(".scheduler-wrapper", this)
-      $('html').addClass('calendar-loaded')
 
       # Pre-load the appointment group list, for the badge
       @dataSource.getAppointmentGroups false, (data) =>

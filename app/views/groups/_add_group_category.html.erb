@@ -6,8 +6,7 @@ require([
   'jqueryui/dialog'
 ], function(I18n, $) {
   window.addGroupCategory = function(callback) {
-    $("#add_category_form").dialog('close').dialog({
-      autoOpen: false,
+    $("#add_category_form").dialog({
       width: "auto",
       title: <%= jt('#groups.titles.add_group_category', 'Add Set of Groups') %>,
       modal: true,
@@ -15,7 +14,7 @@ require([
         backgroundColor: "#000",
         opacity: 0.7
       }
-    }).dialog('open');
+    });
     var callbacks = $("#add_category_form").data('callbacks') || [];
     callbacks.push(callback);
     $("#add_category_form").data('callbacks', callbacks);

@@ -288,9 +288,12 @@ class Pseudonym < ActiveRecord::Base
     account = self.account || Account.default
     res = false
     res ||= valid_ldap_credentials?(plaintext_password) if account && account.ldap_authentication?
-    # Only check SIS if they haven't changed their password
-    res ||= valid_ssha?(plaintext_password) if password_auto_generated?
-    res ||= valid_password?(plaintext_password)
+    if account.canvas_authentication?
+      # Only check SIS if they haven't changed their password
+      res ||= valid_ssha?(plaintext_password) if password_auto_generated?
+      res ||= valid_password?(plaintext_password)
+    end
+    res
   end
   
   def generate_temporary_password
@@ -415,5 +418,14 @@ class Pseudonym < ActiveRecord::Base
       Canvas::Security.failed_login!(self, remote_ip)
     end
     nil
+  end
+
+  def mfa_settings
+    case self.account.mfa_settings
+    when :required_for_admins
+      self.account.all_account_users_for(self.user).empty? ? :optional : :required
+    else
+      self.account.mfa_settings
+    end
   end
 end

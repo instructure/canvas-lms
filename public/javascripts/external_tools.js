@@ -23,12 +23,11 @@ $(document).ready(function() {
       consumer_key: "",
       shared_secret: ""
     }
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
+    $dialog.dialog({
       title: I18n.t('titles.edit_external_tool', "Edit External Tool"),
       width: 600,
       height: 420
-    }).dialog('open');
+    });
     $dialog.find(".shared_secret_note").hide();
     $dialog.find("form")
       .attr('method', 'POST')
@@ -85,12 +84,11 @@ $(document).ready(function() {
       .attr('method', 'PUT')
       .attr('action', $tool.find(".update_tool_url").attr('rel'));
     $dialog.fillFormData(data, {object_name: 'external_tool'});
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
+    $dialog.dialog({
       title: I18n.t('titles.edit_external_tool', "Edit External Tool"),
       width: 600,
       height: 420
-    }).dialog('open');
+    });
     $dialog.find(".config_type_option").hide();
     $("#external_tool_config_type").val('manual').change();
   }).delegate('.delete_tool_link', 'click', function(event) {

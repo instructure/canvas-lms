@@ -149,7 +149,7 @@ describe "edititing grades" do
     wait_for_ajaximations
 
     open_assignment_options(0)
-    f('#ui-menu-1-4').click
+    f('[data-action="curveGrades"]').click
     curve_form = f('#curve_grade_dialog')
     set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
     fj('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
@@ -170,7 +170,7 @@ describe "edititing grades" do
     edit_grade(f('#gradebook_grid [row="1"] .l0'), '')
 
     open_assignment_options(0)
-    f('#ui-menu-1-4').click
+    f('[data-action="curveGrades"]').click
 
     fj('#assign_blanks').click
     fj('.ui-dialog-buttonpane button:visible').click

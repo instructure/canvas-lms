@@ -1,9 +1,9 @@
 define [
   'jquery'
   'jquery.ui.menu.inputmenu'
-  'vendor/jquery.ui.popup-1.9'
-  'vendor/jquery.ui.button-1.9'
-], ($, _inputmenu, _popup, _button) ->
+  'jqueryui/button'
+  'jqueryui/popup'
+], ($) ->
 
   class KyleMenu
     constructor: (trigger, options) ->

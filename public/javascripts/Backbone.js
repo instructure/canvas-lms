@@ -10,7 +10,8 @@ define([
   // Apply all of our patches
   'compiled/backbone-ext/Backbone.syncWithMultipart',
   'compiled/backbone-ext/Model',
-  'compiled/backbone-ext/View'
+  'compiled/backbone-ext/View',
+  'compiled/backbone-ext/Collection/defaultUrl'
 
 ], function (Backbone) {
 

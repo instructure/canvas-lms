@@ -346,11 +346,10 @@ define([
         $dialog.fillTemplateData({data: data, htmlValues: ( is_learning_outcome ? ['long_description'] : [] )});
         $dialog.find(".editing").hide();
         $dialog.find(".displaying").show();
-        $dialog.dialog('close').dialog({
-          autoOpen: false,
+        $dialog.dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
           width: 400
-        }).dialog('open');
+        });
       }
     });
     $("#edit_external_tool_url, #assignment_external_tool_tag_attributes_url").click(function(event) {

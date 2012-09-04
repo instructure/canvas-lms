@@ -2,8 +2,7 @@ require File.expand_path("../../../../../spec/sharding_spec_helper", __FILE__)
 
 shared_examples_for 'Delayed::Batch' do
   before :each do
-    Delayed::Worker.queue = nil
-    Delayed::Job.delete_all
+    Delayed::Worker.queue = "Delayed::Batch test"
   end
 
   context "batching" do
@@ -14,12 +13,13 @@ shared_examples_for 'Delayed::Batch' do
         "string".send_at(later, :reverse).should be_true # won't be batched, it'll get its own job
         "string".send_later(:gsub, /./, "!").should be_true
       }
-      jobs = Delayed::Job.all
-      jobs.size.should == 2
-      batch_jobs, regular_jobs = jobs.partition(&:batch?)
+      batch_jobs = Delayed::Job.find_available(5)
+      regular_jobs = Delayed::Job.list_jobs(:future, 5)
       regular_jobs.size.should == 1
+      regular_jobs.first.batch?.should == false
       batch_jobs.size.should == 1
-      batch_job = batch_jobs.first 
+      batch_job = batch_jobs.first
+      batch_job.batch?.should == true
       batch_job.payload_object.mode.should  == :serial
       batch_job.payload_object.jobs.map { |j| [j.payload_object.object, j.payload_object.method, j.payload_object.args] }.should  == [
         ["string", :size, []],
@@ -34,7 +34,7 @@ shared_examples_for 'Delayed::Batch' do
         "string".send_later(:gsub, /./, "!").should be_true
       }
       Delayed::Job.count.should == 1
-      job = Delayed::Job.first
+      job = Delayed::Job.find_available(1).first
       expect{ job.invoke_job }.to raise_error
     end
 
@@ -45,7 +45,8 @@ shared_examples_for 'Delayed::Batch' do
       }
       Delayed::Job.count.should == 1
 
-      batch_job = Delayed::Job.first
+      batch_job = Delayed::Job.find_available(1).first
+      batch_job.batch?.should == true
       jobs = batch_job.payload_object.jobs
       jobs.size.should == 2
       jobs[0].should be_new_record
@@ -79,7 +80,7 @@ shared_examples_for 'Delayed::Batch' do
           "string".send_later(:gsub, /./, "!").should be_true
         }
       end
-      job = Delayed::Job.last
+      job = Delayed::Job.find_available(1).first
       job.current_shard.should == shard
       job.payload_object.jobs.first.current_shard.should == shard
     end

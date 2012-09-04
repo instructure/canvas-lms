@@ -524,13 +524,12 @@ window.contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_u
 INST.downloadFolderFiles = function(url) {
   var cancelled = false;
   $("#download_folder_files_dialog .status_box .status").text(<%= jt('#files.messages.gathering_data', "Gathering data...") %>);
-  $("#download_folder_files_dialog").dialog('close').dialog({
-    autoOpen: false,
+  $("#download_folder_files_dialog").dialog({
     title: <%= jt('#files.titles.download_folder_contents', "Download Folder Contents") %>,
     close: function() {
       cancelled = true;
     }
-  }).dialog('open');
+  });
   $("#download_folder_files_dialog .progress").progressbar({value: 0});
   var checkForChange = function() {
     if(cancelled || $("#download_folder_files_dialog:visible").length == 0) { return; }

@@ -67,6 +67,12 @@ describe "Converting Blackboard Vista qti" do
     hash.should == VistaExpected::MULTIPLE_CHOICE
   end
 
+  it "should not fail with missing response identifier" do
+    lambda {
+      hash = get_question_hash(vista_question_dir, 'no_response_id', delete_answer_ids=true, opts={})
+    }.should_not raise_error
+  end
+
   it "should convert images correctly" do
     manifest_node=get_manifest_node('true_false', :interaction_type => 'choiceInteraction')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>vista_question_dir)

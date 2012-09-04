@@ -241,7 +241,7 @@ define([
         });
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
-        $form.dialog('close').dialog({
+        $form.dialog({
           autoOpen: false,
           modal: true,
           width: 600,
@@ -637,7 +637,7 @@ define([
         $item.loadingImage('remove');
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         modules.addItemToModule($module, data.content_tag);
-        $module.find(".context_module_items").sortable('refresh');
+        $module.find(".context_module_items.ui-sortable").sortable('refresh');
         modules.updateAssignmentData();
       }, function(data) {
       });
@@ -651,10 +651,9 @@ define([
       $("#edit_item_form").find(".external_tool").showIf($item.hasClass('context_external_tool'));
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
-      $("#edit_item_form").dialog('close').dialog({
-        autoOpen: false,
+      $("#edit_item_form").dialog({
         title: I18n.t('titles.edit_item', "Edit Item Details")
-      }).dialog('open');
+      });
     });
     $("#edit_item_form .cancel_button").click(function(event) {
       $("#edit_item_form").dialog('close');
@@ -667,7 +666,7 @@ define([
         $(this).loadingImage('remove');
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         var $item = modules.addItemToModule($module, data.content_tag);
-        $module.find(".context_module_items").sortable('refresh');
+        $module.find(".context_module_items.ui-sortable").sortable('refresh');
         if (data.content_tag.content_id != 0) {
           modules.updateAllItemInstances(data.content_tag);
         }
@@ -701,8 +700,8 @@ define([
       var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
       $("#context_modules").append($module);
         $module.find(".context_module_items").sortable(modules.sortable_module_options);
-        $("#context_modules").sortable('refresh');
-        $("#context_modules .context_module .context_module_items").each(function() {
+        $("#context_modules.ui-sortable").sortable('refresh');
+        $("#context_modules .context_module .context_module_items.ui-sortable").each(function() {
           $(this).sortable('refresh');
           $(this).sortable('option', 'connectWith', '.context_module_items');
         });
@@ -726,7 +725,7 @@ define([
         options.submit = function(item_data) {
           var $module = $("#context_module_" + module.id);
           var $item = modules.addItemToModule($module, item_data);
-          $module.find(".context_module_items").sortable('refresh');
+          $module.find(".context_module_items.ui-sortable").sortable('refresh');
           var url = $module.find(".add_module_item_link").attr('rel');
           $item.loadingImage({image_size: 'small'});
           $.ajaxJSON(url, 'POST', item_data, function(data) {
@@ -734,7 +733,7 @@ define([
             $item.remove();
             data.content_tag.type = item_data['item[type]'];
             modules.addItemToModule($module, data.content_tag);
-            $module.find(".context_module_items").sortable('refresh');
+            $module.find(".context_module_items.ui-sortable").sortable('refresh');
             modules.updateAssignmentData();
           });
         };
@@ -802,11 +801,10 @@ define([
         $select.find(".context_module_" + afters[idx]).attr('disabled', true);
       }
       $("#add_module_prerequisite_dialog").find(".prerequisite_module_select").empty().append($select.show());
-      $("#add_module_prerequisite_dialog").dialog('close').dialog({
-        autoOpen: true,
+      $("#add_module_prerequisite_dialog").dialog({
         title: I18n.t('titles.add_prerequisite', 'Add Prerequisite to %{module}', {'module': module.name}),
         width: 400
-      }).dialog('open');
+      });
     });
     $("#add_context_module_form .cancel_button").click(function(event) {
       modules.hideEditModule(true);
@@ -992,7 +990,7 @@ define([
               modules.addItemToModule($module, item.content_tag);
               next();
             } else {
-              $module.find(".context_module_items").sortable('refresh');
+              $module.find(".context_module_items.ui-sortable").sortable('refresh');
               toggle(true);
               modules.updateProgressionState($module);
               $("#context_modules").triggerHandler('slow_load');
@@ -1005,7 +1003,7 @@ define([
             for(var idx in data) {
               modules.addItemToModule($module, data[idx].content_tag);
             }
-            $module.find(".context_module_items").sortable('refresh');
+            $module.find(".context_module_items.ui-sortable").sortable('refresh');
             toggle();
             modules.updateProgressionState($module);
           }
@@ -1129,13 +1127,12 @@ define([
         $dialog.find(".side_tabs_content tbody").append($template.show());
       });
   
-      $("#student_progression_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#student_progression_dialog").dialog({
         width: 800,
         open: function() {
           $(this).find(".student:not(.blank):first .name").click();
         }
-      }).dialog('open');
+      });
     });
     $(".context_module .progression_details_link").click(function(event) {
       event.preventDefault();
@@ -1153,11 +1150,10 @@ define([
         $dialog.find("." + progressionData.workflow_state + "_list").show()
           .find("ul").show().append($("<li />").text(progressionData.name));
       });
-      $("#module_progression_dialog").dialog('close').dialog({
-        autoOpen: false,
+      $("#module_progression_dialog").dialog({
         title: I18n.t('titles.student_progress', "Student Progress for Module"),
         width: 500
-      }).dialog('open');
+      });
     });
     $(document).fragmentChange(function(event, hash) {
       var module = $(hash.replace(/module/, "context_module"));

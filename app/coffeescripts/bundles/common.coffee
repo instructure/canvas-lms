@@ -13,7 +13,6 @@ require [
   'reminders'
   'jquery.instructure_forms'
   'instructure'
-  'fixed_warning'
   'ajax_errors'
   'page_views'
   'compiled/license_help'
@@ -23,11 +22,11 @@ require [
   'compiled/behaviors/upvote-item'
   'compiled/behaviors/repin-item'
   'compiled/behaviors/follow'
+  'compiled/behaviors/tooltip'
 
   # other stuff several bundles use
   'media_comments'
   'order'
-  'jqueryui/effects/core'
   'jqueryui/effects/drop'
   'jqueryui/progressbar'
   'jqueryui/tabs'

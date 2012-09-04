@@ -192,11 +192,10 @@ define([
       $("#moderate_student_form").data('ids', student_ids);
       $("#moderate_student_dialog h2").text(I18n.t('extensions_for_students', {'one': "Extensions for 1 Student", 'other': "Extensions for %{count} Students"}, {'count': student_ids.length}));
       $("#moderate_student_form").fillFormData(data);
-      $("#moderate_student_dialog").dialog('close').dialog({
-        auotOpen: false,
+      $("#moderate_student_dialog").dialog({
         title: I18n.t('titles.student_extensions', "Student Extensions"),
         width: 400
-      }).dialog('open');
+      });
     });
 
     $(".moderate_student_link").live('click', function(event) {
@@ -212,11 +211,10 @@ define([
       $("#moderate_student_form").data('ids', [$student.attr('data-user-id')]);
       $("#moderate_student_form").find("button").attr('disabled', false);
       $("#moderate_student_dialog h2").text(I18n.t('extensions_for_student', "Extensions for %{student}", {'student': name}));
-      $("#moderate_student_dialog").dialog('close').dialog({
-        auotOpen: false,
+      $("#moderate_student_dialog").dialog({
         title: I18n.t('titles.student_extensions', "Student Extensions"),
         width: 400
-      }).dialog('open');
+      });
     });
     $(".reload_link").click(function(event) {
       event.preventDefault();
@@ -276,11 +274,10 @@ define([
         }
       });
       $dialog.find("button").attr('disabled', false);
-      $dialog.dialog('close').dialog({
-        auto_open: false,
+      $dialog.dialog({
         title: I18n.t('titles.extend_quiz_time', "Extend Quiz Time"),
         width: 400
-      }).dialog('open');
+      });
     });
     $("#extend_time_dialog").find(".cancel_button").click(function() {
       $("#extend_time_dialog").dialog('close');

@@ -50,34 +50,31 @@ describe "assignment column headers" do
 
   it "should validate arrange columns by due date option" do
     expected_text = "-"
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    open_gradebook_settings(f('#ui-menu-0-5'))
+    arrange_settings = ff('input[name="arrange-columns-by"]')
+    open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
     validate_cell_text(first_row_cells[0], expected_text)
+    open_gradebook_settings(arrange_settings.last.find_element(:xpath, '..'))
   end
 
   it "should validate arrange columns by assignment group option" do
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    open_gradebook_settings(f('#ui-menu-0-5'))
-    open_gradebook_settings(f('#ui-menu-0-6'))
+    # due date, then assignment group
+    arrange_settings = ff('input[name="arrange-columns-by"]')
+    open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
+    open_gradebook_settings(arrange_settings.last.find_element(:xpath, '..'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
     validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
   end
 
   it "should validate show attendance columns option" do
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    open_gradebook_settings(f('#ui-menu-0-7'))
+    attendance_setting = f('#show_attendance').find_element(:xpath, '..')
+    open_gradebook_settings(attendance_setting)
     headers = ff('.slick-header')
     headers[1].should include_text(@attendance_assignment.title)
-    open_gradebook_settings(f('#ui-menu-0-7'))
+    open_gradebook_settings(attendance_setting)
   end
 
   it "show letter grade in total column" do
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
     f('#gradebook_grid [row="0"] .total-cell .letter-grade-points').should include_text("A")
     edit_grade(f('#gradebook_grid [row="1"] .l2'), '50')
     wait_for_ajax_requests

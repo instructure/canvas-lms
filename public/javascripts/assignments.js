@@ -116,7 +116,7 @@ define([
         .attr('method', 'PUT');
     }
     if(data.due_time && data.due_date) {
-      
+
     }
     $form.fillFormData(data, { object_name: "assignment" });
     $form.find(":text:first").focus().select();
@@ -256,8 +256,8 @@ define([
     if($assignment.attr('id') == 'assignment_creating') {
       isNew = true;
     }
-    $assignment.fillTemplateData({ 
-      id: "assignment_" + assignment.id, 
+    $assignment.fillTemplateData({
+      id: "assignment_" + assignment.id,
       data: assignment,
       hrefValues: ['id']
     });
@@ -404,9 +404,6 @@ define([
       if (data.points_possible) { params['points_possible'] = data.points_possible; }
       if(data.assignment_group_id) { params['assignment_group_id'] = data.assignment_group_id; }
       if(data.submission_types) { params['submission_types'] = data.submission_types; }
-      if(INST && INST.gettingStartedPage) {
-        params['getting_started'] = '1';
-      }
       params['return_to'] = location.href;
       pieces[0] += "?" + $.param(params);
       location.href = pieces.join("#");
@@ -507,9 +504,9 @@ define([
       }
     });
     $("#class_weighting_policy").change(function(event, justInit) {
-      if(justInit) { 
+      if(justInit) {
         $(this).triggerHandler('checked');
-        return; 
+        return;
       }
       var data = {};
       var doWeighting = $(this).attr('checked');
@@ -583,7 +580,7 @@ define([
       }
       $(".group_assignment.assignment-hover").removeClass('assignment-hover');
       $(this).addClass('assignment-hover');
-      if($("#groups .assignment_group").length > 0 && $(this).find(".edit_assignment_link").css('display') != 'none') {      
+      if($("#groups .assignment_group").length > 0 && $(this).find(".edit_assignment_link").css('display') != 'none') {
         $(this).find(".submitted_icon").hide();
         $(this).find(".move_icon").show();
       } else {
@@ -604,7 +601,7 @@ define([
       $group.find(".padding").show();
       var doWeighting = $("#class_weighting_policy").attr('checked');
       $group.find(".assignment_list").sortable(assignment_sortable_options);
-      $(".assignment_group .assignment_list").sortable('option', 'connectWith', '.assignment_group .assignment_list');
+      $("#groups.groups_editable .assignment_group .assignment_list").sortable('option', 'connectWith', '.assignment_group .assignment_list');
       editGroup($group);
     });
     $(".edit_group_link").click(function(event) {
@@ -665,10 +662,9 @@ define([
         });
         $dialog.find(".group_select")[0].selectedIndex = 0;
         $dialog.find("#assignment_group_delete").attr('checked', true);
-        $dialog.dialog('close').dialog({
-          autoOpen: false,
+        $dialog.dialog({
           width: 500
-        }).dialog('open').data('group_id', data.assignment_group_id);
+        }).data('group_id', data.assignment_group_id);
         return;
       }
       $group.confirmDelete({
@@ -725,7 +721,7 @@ define([
         data.rules = ruleList;
         data['assignment_group[rules]'] = data.rules;
         return data;
-      }, 
+      },
       beforeSubmit: function(data) {
         var $group = $(this).parents(".assignment_group");
         var $group_header = $group.find(".header");
@@ -736,7 +732,7 @@ define([
         }
         hideGroupForm();
         return $group;
-      }, 
+      },
       success: function(data, $group) {
         var $group_header = $group.find(".header");
         $group_header.loadingImage('remove');
@@ -811,7 +807,7 @@ define([
       },
       beforeSubmit: function(data) {
         var $assignment = $(this).parents(".group_assignment");
-        $assignment.fillTemplateData({ data: data });	
+        $assignment.fillTemplateData({ data: data });
         var date = null;
         if(data['assignment[due_at]']) {
           date = Date.parse(data['assignment[due_at]']);
@@ -834,7 +830,7 @@ define([
           $assignment.find(".date_text").hide();
         }
         $assignment.fillTemplateData({data: {
-          timestamp: updatedTimestamp, 
+          timestamp: updatedTimestamp,
           title: data.title
         } });
         $assignment.find(".points_text").showIf(data.points_possible);
@@ -842,7 +838,7 @@ define([
         $assignment.find(".links").hide();
         $assignment.loadingImage({image_size: 'small', paddingTop: 5});
         //$("html,body").scrollToVisible($assignment);
-        
+
         var isNew = false;
         if($assignment.attr('id') == "assignment_new") {
           isNew = true;
@@ -911,7 +907,7 @@ define([
     });
     $("#edit_assignment_form").bind('assignment_updated', function(event, data) {
       var $assignment = $("#assignment_" + data.assignment.id); //$("#edit_assignment_form").data('current_assignment');
-      updateAssignment($assignment, data);    
+      updateAssignment($assignment, data);
     });
     $(".preview_assignment_link").click(function(event) {
       event.preventDefault();
@@ -931,9 +927,8 @@ define([
         object_name: "assignment"
       }).attr('action', $assignment.find(".assignment_url").attr('href'));
       var height = Math.max(Math.round($(window).height() * 0.8), 400);
-      $("#full_assignment_holder").dialog('close').dialog({
+      $("#full_assignment_holder").dialog({
         title: I18n.t('titles.assignment_details', "Assignment Details"),
-        autoOpen: false,
         width: 630,
         height: height,
         modal: true,
@@ -944,12 +939,12 @@ define([
           backgroundColor: "#000",
           opacity: 0.7
         }
-      }).dialog('open');
+      });
       $("#full_assignment").show();
     });
     $(document).keycodes('j k', function(event) {
       event.preventDefault();
-      if(event.keyString == 'j') { 
+      if(event.keyString == 'j') {
         moveSelection('down');
       } else if(event.keyString == 'k') {
         moveSelection('up');

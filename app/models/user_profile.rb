@@ -32,12 +32,10 @@ class UserProfile < ActiveRecord::Base
     unless @tabs
       @tabs = [
         { :id => TAB_HOME, :label => I18n.t('#tabs.home', "Home"), :css_class => 'home', :href => :dashboard_path, :no_args => true },
+        { :id => TAB_COMMUNICATION_PREFERENCES, :label => I18n.t('#user_profile.tabs.notifications', "Notifications"), :css_class => 'notifications', :href => :communication_profile_path, :no_args => true },
         { :id => TAB_FILES, :label => I18n.t('#tabs.files', "Files"), :css_class => 'files', :href => :dashboard_files_path, :no_args => true },
         { :id => TAB_PROFILE_SETTINGS, :label => I18n.t('#user_profile.tabs.settings', 'Settings'), :css_class => 'profile_settings', :href => :settings_profile_path, :no_args => true },
       ]
-      if user && user.registered?
-        @tabs.insert 1, { :id => TAB_COMMUNICATION_PREFERENCES, :label => I18n.t('#user_profile.tabs.notifications', "Notifications"), :css_class => 'notifications', :href => :communication_profile_path, :no_args => true }
-      end
       if user && opts[:root_account] && opts[:root_account].enable_profiles?
         @tabs.insert 1, {:id => TAB_PROFILE, :label => I18n.t('#user_profile.tabs.profile', "Profile"), :css_class => 'profile', :href => :user_profile_path, :args => [user.id]}
       end

@@ -249,7 +249,7 @@ describe "quizzes" do
       }
 
       #flag first question
-      hover_and_click("#question_#{@quest1.id} .flag_icon")
+      hover_and_click("#question_#{@quest1.id} .flag_question")
 
       #click second answer
       driver.find_element(:css, "#question_#{@quest2.id} .answers .answer:first-child input").click
@@ -366,6 +366,7 @@ describe "quizzes" do
 
         # marked as answer
         ff('#question_list .answered').size.should eql 2
+        wait_for_ajaximations
 
         # after reload, answers should be remembered
         expect_new_page_load {

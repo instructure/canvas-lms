@@ -129,8 +129,8 @@ describe "calendar2" do
           wait_for_ajaximations
 
           driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          fj('ul#context-list li:nth-child(2) button').click
-          f("#ui-menu-1-0").click
+          fj('ul#context-list > li:nth-child(2) button').click
+          fj(".ui-kyle-menu:visible a").click
           edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
           create_calendar_event(event_title, true)
@@ -142,8 +142,8 @@ describe "calendar2" do
           wait_for_ajaximations
 
           driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          fj('ul#context-list li:nth-child(2) button').click
-          f("#ui-menu-1-1").click
+          fj('ul#context-list > li:nth-child(2) button').click
+          fj(".ui-kyle-menu:visible li:last-child a").click
           edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
           create_assignment_event(assignment_title, true)
@@ -402,16 +402,9 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajaximations
 
-        keep_trying_until do
-          driver.execute_script(%{$(".context_list_context:nth-child(1)").addClass('hovering')})
-          fj('ul#context-list li:nth-child(1) button').click
-          f("#ui-menu-0-0").click
-          edit_event_dialog = f('#edit_event_tabs')
-          edit_event_dialog.should be_displayed
-        end
-        tabs = ffj('.tab_list > li')
-        tabs.count.should == 1
-        tabs[0].should include_text('Event')
+        # first context is the user's calendar
+        driver.execute_script(%{$(".context_list_context:nth-child(2)").addClass('hovering')})
+        fj('ul#context-list > li:nth-child(2) button').should be_nil # no button, can't add events
       end
     end
 
