@@ -1812,6 +1812,8 @@ class User < ActiveRecord::Base
   end
 
   def recent_stream_items(opts={})
+    # cross-shard stream items need a *lot* of work; just disable them for now
+    return [] if self.shard != Shard.current
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item).compact
     end
