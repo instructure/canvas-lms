@@ -15,22 +15,6 @@ shared_examples_for "discussion and announcement main page tests" do
     @checkboxes = ff('.toggleSelected')
   end
 
-  it "shouldn't allow users without permission to delete/lock an announcement" do
-    pending('need to log in as otherUser')
-    @otherUser = User.create!(:name => 'karl')
-    @otherUser.register!
-    @otherUser.pseudonyms.create!(:unique_id => "nobody1@example.com", :password => 'foobarbaz1234', :password_confirmation => 'foobarbaz1234')
-    e = @course.enroll_student(@otherUser)
-    e.workflow_state = 'active'
-    e.save!
-    what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @otherUser) : announcement_model(:title => 'other users', :user => @otherUser)
-    get url
-    wait_for_ajaximations
-    checkboxes = ff('.toggleSelected')
-    checkboxes.length.should == 1
-    ff('.discussion-topic').length.should == 6
-  end
-
   def update_attributes_and_validate(attribute, update_value, search_term = update_value, expected_results = 1)
     what_to_create.last.update_attributes(attribute => update_value)
     refresh_page # in order to get the new topic information
@@ -83,11 +67,11 @@ shared_examples_for "discussion and announcement main page tests" do
   end
 
   it "should return multiple items in the search" do
-     new_title = 'updated'
-     what_to_create.first.update_attributes(:title => "#{new_title} first")
-     what_to_create.last.update_attributes(:title => "#{new_title} last")
-     refresh_and_filter(:string, new_title, new_title, 2)
-   end
+    new_title = 'updated'
+    what_to_create.first.update_attributes(:title => "#{new_title} first")
+    what_to_create.last.update_attributes(:title => "#{new_title} last")
+    refresh_and_filter(:string, new_title, new_title, 2)
+  end
 
   it "should filter by unread" do
     what_to_create.last.change_read_state('unread', @user)
@@ -141,9 +125,9 @@ shared_examples_for "discussion and announcement individual tests" do
     what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'graded attachment topic', :user => @user) : announcement_model(:title => 'graded attachment topic', :user => @user)
     what_to_create.last.update_attributes(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
     get url
-    expect_new_page_load{ f('.discussion-title').click }
+    expect_new_page_load { f('.discussion-title').click }
     f("#discussion_topic .al-trigger-inner").click
-    expect_new_page_load{ f("#ui-id-2").click }
+    expect_new_page_load { f("#ui-id-2").click }
 
     add_attachment_and_validate
   end
@@ -153,7 +137,7 @@ shared_examples_for "discussion and announcement individual tests" do
     topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => TOPIC_TITLE, :user => @user) : announcement_model(:title => TOPIC_TITLE, :user => @user)
     get url + "#{topic.id}"
     f("#discussion_topic .al-trigger-inner").click
-    expect_new_page_load{ f("#ui-id-2").click }
+    expect_new_page_load { f("#ui-id-2").click }
 
     edit(edit_name, 'edit message')
   end
@@ -183,5 +167,45 @@ shared_examples_for "discussion and announcement individual tests" do
     wait_for_ajax_requests
     new_topics = ffj('.discussion-topic') # using ffj to avoid selenium caching
     new_topics[0].should_not include_text('new topic 0')
+  end
+end
+
+shared_examples_for "discussion and announcement permissions tests" do
+  it_should_behave_like "in-process server selenium tests"
+
+  def check_permissions(number_of_checkboxes = 1)
+    get url
+    wait_for_ajaximations
+    checkboxes = ff('.toggleSelected')
+    checkboxes.length.should == number_of_checkboxes
+    ff('.discussion-topic').length.should == what_to_create.count
+  end
+
+  before (:each) do
+    course
+    @course.offer!
+    @teacher = user_with_pseudonym({:unique_id => 'firststudent@example.com', :password => 'asdfasdf'})
+    @course.enroll_user(@teacher, 'TeacherEnrollment').accept!
+    @other_user = user_with_pseudonym({:unique_id => 'otheruser@example.com', :password => 'asdfasdf'})
+    @course.enroll_user(@other_user, 'StudentEnrollment').accept!
+    3.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @teacher) : announcement_model(:title => "new topic #{i}", :user => @teacher) }
+  end
+
+  it "should allow the student user who created the topic to delete/lock a topic" do
+    what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @other_user) : announcement_model(:title => 'other users', :user => @other_user)
+    login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
+    check_permissions
+  end
+
+  it "should not allow a student to delete/edit topics if they didn't create any" do
+    login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
+    check_permissions(0)
+  end
+
+  it "should give the teacher delete/lock permissions on all topics" do
+    what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @other_user) : announcement_model(:title => 'other users', :user => @other_user)
+    login_as(@teacher.primary_pseudonym.unique_id, 'asdfasdf')
+    get url
+    check_permissions(what_to_create.count)
   end
 end

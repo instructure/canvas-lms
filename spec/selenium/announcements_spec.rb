@@ -2,7 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussion_announcement_specs')
 
 describe "announcements" do
-
   it_should_behave_like "in-process server selenium tests"
 
   def create_announcement(message = 'announcement message')
