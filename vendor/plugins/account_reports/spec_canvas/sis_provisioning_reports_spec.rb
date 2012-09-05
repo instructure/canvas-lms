@@ -74,7 +74,7 @@ describe "Default Account Reports" do
       parsed[0].should == ["user_sis_id_01", "john@stclair.com", nil, "John St.", "Clair", "john@stclair.com", "active"]
       parsed[1].should == ["user_sis_id_02", "micheal@michaelbolton.com", nil, "Michael", "Bolton", "micheal@michaelbolton.com", "active"]
 
-      parsed = run_report("provisioning_csv", parameters)
+      parsed = run_report("provisioning_csv", parameters,2)
       parsed.length.should == 3
 
       parsed[0].should == [user1.id.to_s, "user_sis_id_01", "john@stclair.com", nil, "John St.", "Clair", "john@stclair.com", "active"]
@@ -228,7 +228,7 @@ describe "Default Account Reports" do
       parsed[1].should == ["SIS_COURSE_ID_2", "MAT101", "Math 101", nil, nil, "active", nil, end_at.iso8601]
       parsed[2].should == ["SIS_COURSE_ID_3", "SCI101", "Science 101", nil, nil, "active", nil, nil]
 
-      parsed = run_report("provisioning_csv", parameters)
+      parsed = run_report("provisioning_csv", parameters,3)
       parsed.length.should == 4
       parsed[0].should == [course1.id.to_s, course1.sis_source_id, course1.course_code, course1.name, sub_account.sis_source_id, term1.sis_source_id, "active", start_at.iso8601, end_at.iso8601]
       parsed[1].should == [course2.id.to_s, "SIS_COURSE_ID_2", "MAT101", "Math 101", nil, nil, "active", nil, end_at.iso8601]
@@ -312,7 +312,7 @@ describe "Default Account Reports" do
       parsed[1].should == [section2.sis_source_id, course1.sis_source_id, section2.name, "active", nil, end_at.iso8601, nil]
       parsed[2].should == ["english_section_3", "SIS_COURSE_ID_2", "Math_01", "active", nil, end_at.iso8601, nil]
 
-      parsed = run_report("provisioning_csv", parameters)
+      parsed = run_report("provisioning_csv", parameters,5)
       parsed.length.should == 4
       parsed[0].should ==[section1.id.to_s, section1.sis_source_id, course1.id.to_s, course1.sis_source_id, section1.name, "active", start_at.iso8601, end_at.iso8601, sub_account.id.to_s, sub_account.sis_source_id]
       parsed[1].should == [section2.id.to_s, section2.sis_source_id, course1.id.to_s, course1.sis_source_id, section2.name, "active", nil, end_at.iso8601, nil, nil]
@@ -516,6 +516,7 @@ describe "Default Account Reports" do
       group2.sis_source_id = 'group2sis'
       group2.save!
       group3 = sub_account.groups.create(:name => 'group3name')
+      group3.sis_source_id = 'group3sis'
       group3.save!
       gm1 = GroupMembership.create(:group => group1, :user => user1, :workflow_state => "accepted")
       gm1.sis_batch_id = 1
@@ -541,7 +542,7 @@ describe "Default Account Reports" do
       parsed[0].should == [group1.sis_source_id, "user_sis_id_01", "accepted"]
       parsed[1].should == [group2.sis_source_id, "user_sis_id_02", "accepted"]
 
-      parsed = run_report("provisioning_csv", parameters)
+      parsed = run_report("provisioning_csv", parameters, 1)
       parsed.length.should == 3
       parsed[0].should == [group1.id.to_s, group1.sis_source_id, user1.id.to_s, "user_sis_id_01", "accepted"]
       parsed[1].should == [group2.id.to_s, group2.sis_source_id, user2.id.to_s, "user_sis_id_02", "accepted"]
@@ -573,8 +574,12 @@ describe "Default Account Reports" do
       course4.save
       course4.sis_source_id = "SIS_COURSE_ID_4"
       course4.save!
-      course5 = Course.new(:name => 'Spanish 1011', :course_code => 'SPA1011', :account => @account)
+      course5 = Course.new(:name => 'Spanish 203', :course_code => 'SPA203', :account => @account)
       course5.save
+      course6 = Course.new(:name => 'Science 304', :course_code => 'SCI304', :account => @account)
+      course6.save
+      course6.sis_source_id = "SIS_COURSE_ID_6"
+      course6.save!
       section1 = CourseSection.new(:name => 'English_01', :course => course1)
       section1.sis_source_id = 'english_section_1'
       section1.root_account_id = @account.id
@@ -597,7 +602,7 @@ describe "Default Account Reports" do
 
       section1.crosslist_to_course(course2)
       section3.crosslist_to_course(course4)
-      section5.crosslist_to_course(course2)
+      section5.crosslist_to_course(course6)
 
       parameters = {}
       parameters["enrollment_term"] = @account.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME).id
@@ -613,11 +618,11 @@ describe "Default Account Reports" do
       parsed[0].should == ["SIS_COURSE_ID_2", "english_section_1", "active"]
       parsed[1].should == ["SIS_COURSE_ID_4", "english_section_3", "active"]
 
-      parsed = run_report("provisioning_csv", parameters)
+      parsed = run_report("provisioning_csv", parameters,1)
       parsed.length.should == 3
       parsed[0].should == [course2.id.to_s, "SIS_COURSE_ID_2", section1.id.to_s, "english_section_1", "active"]
-      parsed[1].should == [course2.id.to_s, "SIS_COURSE_ID_2", section5.id.to_s, nil, "active"]
-      parsed[2].should == [course4.id.to_s, "SIS_COURSE_ID_4", section3.id.to_s, "english_section_3", "active"]
+      parsed[1].should == [course4.id.to_s, "SIS_COURSE_ID_4", section3.id.to_s, "english_section_3", "active"]
+      parsed[2].should == [course6.id.to_s, "SIS_COURSE_ID_6", section5.id.to_s, nil, "active"]
     end
 
     it "should run the SIS Export" do
