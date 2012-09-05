@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -89,6 +89,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -100,6 +101,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -133,6 +135,7 @@ describe CoursesController, :type => :integration do
             'open_enrollment'                      => true,
             'self_enrollment'                      => true,
             'restrict_enrollments_to_course_dates' => true,
+            'hide_final_grades'                     => true,
             'license'                              => 'Creative Commons',
             'sis_course_id'                        => '12345',
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.'
@@ -222,6 +225,7 @@ describe CoursesController, :type => :integration do
         'allow_student_forum_attachments' => true,
         'open_enrollment' => true,
         'self_enrollment' => true,
+        'hide_final_grades' => false,
         'restrict_enrollments_to_course_dates' => true
       }, 'offer' => true }
     end
@@ -383,6 +387,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -397,6 +402,7 @@ describe CoursesController, :type => :integration do
                            'computed_final_grade' => expected_final_grade}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -421,6 +427,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -432,6 +439,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+        'hide_final_grades' => true,
         'start_at' => nil,
         'end_at' => nil
       }
@@ -450,6 +458,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       }
@@ -809,6 +818,7 @@ describe CoursesController, :type => :integration do
         'needs_grading_count' => 1,
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -830,6 +840,7 @@ describe CoursesController, :type => :integration do
         'syllabus_body' => @course1.syllabus_body,
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },

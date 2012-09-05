@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -291,6 +291,7 @@ describe UsersController, :type => :integration do
         'id' => @course.id,
         'course_code' => @course.course_code,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
+        'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
       },
 
@@ -376,6 +377,7 @@ describe UsersController, :type => :integration do
         'id' => @course.id,
         'course_code' => @course.course_code,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
+        'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
       },
 

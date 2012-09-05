@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -57,6 +57,7 @@ class Course < ActiveRecord::Base
                   :grading_standard,
                   :grading_standard_enabled,
                   :locale,
+                  :hide_final_grades,
                   :settings
 
   serialize :tab_configuration
@@ -2697,6 +2698,19 @@ class Course < ActiveRecord::Base
   # these settings either are or could be easily added to
   # the course settings page
   add_setting :hide_final_grade, :boolean => true
+
+  def hide_final_grades
+    self.settings[:hide_final_grade]
+  end
+
+  def hide_final_grades=(hide_final_grade)
+    self.settings[:hide_final_grade] = hide_final_grade
+  end
+
+  def filter_attributes_for_user(hash, user, session)
+    hash.delete(:hide_final_grade) unless grants_right? user, :update
+    hash
+  end
 
   def settings=(hash)
 
