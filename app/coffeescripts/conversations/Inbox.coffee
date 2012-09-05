@@ -84,7 +84,8 @@ define [
 
       @resetMessageForm()
       @$form.find('#user_note_info').hide().find('input').attr('checked', false)
-      @$form.show().find(':input:visible:first').focus()
+      @$form.show()
+      @$form.find(':input:visible:first').focus() if window.location.hash isnt ''
 
     resetMessageForm: (resetFields = true) ->
       @$form.find('.audience').html(if c = @conversations.active()

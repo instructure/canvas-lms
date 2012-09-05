@@ -1029,8 +1029,8 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
 
   def conversations_path(params={})
-    hash = params.to_json.unpack('H*').first
-    "/conversations##{hash}"
+    hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
+    "/conversations#{hash}"
   end
   helper_method :conversations_path
   
