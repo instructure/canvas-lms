@@ -358,6 +358,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
 
   desc "Validates and imports new translations"
   task :import => :environment do
+    require 'ya2yaml'
     Hash.send :include, HashExtensions
 
     def placeholders(str)
