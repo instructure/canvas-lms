@@ -91,8 +91,8 @@ describe "people" do
 
     it "should validate the main page" do
       users = ff('.user_name')
-      users[0].text.should == @teacher.name
-      users[1].text.should == @student_1.name
+      users[0].text.should match @teacher.name
+      users[1].text.should match @student_1.name
     end
 
     it "should navigate to registered services on profile page" do
