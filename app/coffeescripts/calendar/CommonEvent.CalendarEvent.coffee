@@ -15,8 +15,6 @@ define [
       @deleteConfirmation = deleteConfirmation
       @deleteURL = contextInfo.calendar_event_url
 
-      @copyDataFromObject(data)
-
     copyDataFromObject: (data) =>
       data = data.calendar_event if data.calendar_event
       @object = @calendarEvent = data
@@ -27,6 +25,7 @@ define [
       @allDay = data.all_day
       @editable = true
       @lockedTitle = @object.parent_event_id?
+      @description = data.description
       @addClass "group_#{@contextCode()}"
       if @isAppointmentGroupEvent()
         @addClass "scheduler-event"
@@ -38,7 +37,7 @@ define [
           @addClass "scheduler-available"
         @editable = false
 
-      @description = data.description
+      super
 
     startDate: () ->
       if @calendarEvent.start_at then $.parseFromISO(@calendarEvent.start_at).time else null

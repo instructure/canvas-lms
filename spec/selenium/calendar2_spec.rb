@@ -383,8 +383,8 @@ describe "calendar2" do
         f('label[for=week]').click
         wait_for_ajaximations
 
-        events = ff('.fc-event').select{ |e| e.text == "super important" }
-        # shows on monday night and tuesday morning, and doesn't have the time
+        events = ff('.fc-event').select{ |e| e.text =~ /11:59.*super important/ }
+        # shows on monday night and tuesday morning
         events.size.should eql 2
       end
     end

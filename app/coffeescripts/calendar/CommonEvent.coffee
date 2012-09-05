@@ -13,6 +13,8 @@ define [
       @className = []
       @object = {}
 
+      @copyDataFromObject(data)
+
     isNewEvent: () =>
       @eventType == 'generic' || !@object?.id
 
@@ -68,3 +70,11 @@ define [
 
       $.publish "CommonEvent/eventSaving", this
       $.ajaxJSON url, method, params, onSuccess, onError
+
+    isDueAtMidnight: () ->
+      @midnightFudged || @start && @start.getHours() == 23 && @start.getMinutes() == 59
+
+    copyDataFromObject: (data) ->
+      if @isDueAtMidnight()
+        @midnightFudged = true
+        @start.setMinutes(30)

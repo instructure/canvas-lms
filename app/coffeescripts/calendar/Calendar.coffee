@@ -219,8 +219,9 @@ define [
       true
 
     eventAfterRender: (event, element, view) =>
-      if event.eventType == 'assignment' && event.isDueAtMidnight()
-        element.find('.fc-event-time').remove()
+      if event.isDueAtMidnight()
+        # show the actual time instead of the midnight fudged time
+        element.find('.fc-event-time').html @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t')
       if event.eventType == 'assignment' && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
