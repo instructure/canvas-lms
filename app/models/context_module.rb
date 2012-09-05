@@ -56,8 +56,6 @@ class ContextModule < ActiveRecord::Base
       end
     end
     self.prerequisites = prereqs
-    @re_evaluate_students = self.changed? || self.prerequisites_changed? || self.completion_requirements_changed?
-    @update_downstrea_modules = self.prerequisites_changed? || self.completion_requirements_changed?
     self.position
   end
   
@@ -98,15 +96,14 @@ class ContextModule < ActiveRecord::Base
   
   def check_students
     return if @dont_check_students || self.deleted?
-    # modules are ordered by position, so running through them in order will automatically
-    # issues with dependencies loading in the correct order
-    if @re_evaluate_students || true
-      send_later_if_production :update_student_progressions
-    end
+    send_later_if_production :update_student_progressions
     true
   end
   
   def update_student_progressions(user=nil)
+    # modules are ordered by position, so running through them in order will
+    # automatically handle issues with dependencies loading in the correct
+    # order
     modules = ContextModule.find(:all, :conditions => {:context_type => self.context_type, :context_id => self.context_id}, :order => :position)
     students = user ? [user] : self.context.students
     modules.each do |mod|
@@ -130,7 +127,7 @@ class ContextModule < ActiveRecord::Base
   end
   
   def available_for?(user, tag=nil, deep_check=false)
-    return true if !self.to_be_unlocked && (!self.prerequisites || self.prerequisites.empty?) && !self.require_sequential_progress
+    return true if !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
     return true if self.grants_right?(user, nil, :update)
     progression = self.evaluate_for(user)
     # if the progression is locked, then position in the progression doesn't
@@ -483,16 +480,13 @@ class ContextModule < ActiveRecord::Base
     end
     @cached_tags ||= self.content_tags.active
     tags = @cached_tags
-    if !recursive_check && !progression.new_record? && progression.updated_at > self.updated_at + 1 && ENV['RAILS_ENV'] != 'test' && !User.module_progression_jobs_queued?(user.id)
-    else
-      if (self.completion_requirements || []).empty? && (self.prerequisites || []).empty?
+    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || ENV['RAILS_ENV'] == 'test' || User.module_progression_jobs_queued?(user.id)
+      if self.completion_requirements.blank? && self.prerequisites.blank?
         progression.workflow_state = 'completed'
         progression.save
       end
       progression.workflow_state = 'locked'
-      if self.to_be_unlocked
-        progression.workflow_state = 'locked'
-      else
+      if !self.to_be_unlocked
         progression.requirements_met ||= []
         if progression.locked?
           progression.workflow_state = 'unlocked' if self.prerequisites_satisfied?(user, recursive_check)
@@ -567,16 +561,8 @@ class ContextModule < ActiveRecord::Base
     progression
   end
 
-  def self.visible_module_item_count
-    75
-  end
-  
   def to_be_unlocked
     self.unlock_at && self.unlock_at > Time.now
-  end
-  
-  def has_prerequisites?
-    self.prerequisites && !self.prerequisites.empty?
   end
   
   attr_accessor :clone_updated
