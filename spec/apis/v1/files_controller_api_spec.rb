@@ -307,10 +307,12 @@ describe "Files API", :type => :integration do
     end
 
     it "should update" do
-      api_call(:put, @file_path, @file_path_options, {:name => "newname.txt", :locked => 'true'}, {}, :expected_status => 200)
+      new_params = {:name => "newname.txt", :locked => 'true', :hidden => true}
+      api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 200)
       @att.reload
       @att.display_name.should == "newname.txt"
-      @att.locked.should == true
+      @att.locked.should be_true
+      @att.hidden.should be_true
     end
 
     it "should move to another folder" do

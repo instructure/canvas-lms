@@ -673,7 +673,7 @@ class FilesController < ApplicationController
       respond_to do |format|
         just_hide = params[:attachment][:just_hide]
         hidden = params[:attachment][:hidden]
-        params[:attachment].delete_if{|k, v| ![:display_name, :locked, :lock_at, :unlock_at, :uploaded_data].include?(k.to_sym) }
+        params[:attachment].delete_if{|k, v| ![:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden].include?(k.to_sym) }
         # Need to be careful on this one... we can't let students turn in a
         # file and then edit it after the fact...
         params[:attachment].delete(:uploaded_data) if @context.is_a?(User)
