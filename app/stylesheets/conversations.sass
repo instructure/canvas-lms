@@ -294,7 +294,8 @@ div.conversations > ul
       min-height: 0
       margin: 0
     img.avatar, span.date, .audience, input, .actions
-      display: none
+      left: -10000px
+      position: absolute
 
 ul.messages
   position: relative
@@ -387,10 +388,16 @@ ul.messages
     .message_attachments
       border-top-color: #b7c2cc
 
+ul.messages li.other .actions:focus
+  margin-left: 1em
+  display: inline
+  position: static
+
 ul.messages li.other:hover
   .actions
     margin-left: 1em
     display: inline
+    position: static
     .send_private_message
       height: 18px
       display: inline-block

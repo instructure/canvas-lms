@@ -10,6 +10,18 @@
   <span class="audience">{{{audienceHtml}}}</span>
   <span class="count"{{#if hideCount}} style="display:none"{{/if}}>{{message_count}}</span>
   <p>{{lastMessage}}</p>
-  <span class="actions"><a href="#" title="{{#t "inbox_actions_description"}}Actions{{/t}}">{{#t "inbox_actions_description"}}Actions{{/t}}</a></span>
+  <span class="actions"
+        role="menu"
+        aria-owns="action_mark_as_unread
+                   action_mark_as_read
+                   action_unstar
+                   action_star
+                   action_unsubscribe
+                   action_subscribe
+                   action_archive
+                   action_unarchive
+                   action_delete_all">
+    <a href="#" title="{{#t "inbox_actions_description"}}Actions{{/t}}">{{#t "inbox_actions_description"}}Actions{{/t}}</a>
+  </span>
   <a href="/conversations/{{id}}" class="details_link">{{#t "read_more"}}more...{{/t}}</a>
 </li>
