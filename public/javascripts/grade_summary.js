@@ -239,7 +239,10 @@ define([
     });
     $(".toggle_comments_link").click(function(event) {
       event.preventDefault();
-      $(this).parents("tr.student_assignment").next("tr.comments").toggle();
+      var $row = $( '#' + $(this).attr('aria-controls') );
+
+      $row.toggle();
+      $row.attr('aria-expanded', $row.is(':visible'));
     });
     $(".toggle_rubric_assessments_link").click(function(event) {
       event.preventDefault();
