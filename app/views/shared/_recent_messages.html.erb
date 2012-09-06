@@ -1,7 +1,7 @@
 <% show_limit ||= 15; conferences ||= []; show_context ||= false; recent_messages ||= [] %>
 <h2><%= t 'headings.recent_activity', 'Recent Activity' %></h2>
 <div class="clear"></div>
-<div id="topic_list" class="recent_messages_list <%= 'recent_messages_show_context' if show_context %>">
+<div id="topic_list" aria-live="polite" class="recent_messages_list <%= 'recent_messages_show_context' if show_context %>">
   <%= render :partial => 'users/ie7_upgrade' %>
   <%= render :partial => 'users/account_notification', :collection => @announcements %>
   <%= render :partial => 'users/cc_prefs', :locals => {:message_count => recent_messages.length} %>
