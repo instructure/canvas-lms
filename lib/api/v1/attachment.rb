@@ -121,7 +121,7 @@ module Api::V1::Attachment
     new_atts = {}
     new_atts[:display_name] = params[:name] if params.has_key?(:name)
     new_atts[:lock_at] = params[:lock_at] if params.has_key?(:lock_at)
-    new_atts[:un_lock_at] = params[:un_lock_at] if params.has_key?(:unlock_lock_at)
+    new_atts[:unlock_at] = params[:unlock_at] if params.has_key?(:unlock_at)
     new_atts[:locked] = value_to_boolean(params[:locked]) if params.has_key?(:locked)
     new_atts[:hidden] = value_to_boolean(params[:hidden]) if params.has_key?(:hidden)
     new_atts
