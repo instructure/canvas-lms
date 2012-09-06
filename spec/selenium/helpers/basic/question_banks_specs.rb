@@ -6,8 +6,8 @@ shared_examples_for "question bank basic tests" do
   end
 
   def add_question_bank(title = 'bank 1')
-    f(".add_bank_link").click
     question_bank_title = keep_trying_until do
+      f(".add_bank_link").click
       question_bank_title = f("#assessment_question_bank_title")
       question_bank_title.should be_displayed
       question_bank_title

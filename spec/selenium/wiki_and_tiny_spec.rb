@@ -238,7 +238,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         end
         [:width, :color].each do |part|
           [:top, :right, :bottom, :left].each do |side|
-            expected_value = attributes[{:width => :border, :color => :bordercolor}[part]] || {:width => 1, :color => 'rgba(136,136,136,1)'}[part]
+            expected_value = attributes[{:width => :border, :color => :bordercolor}[part]] || {:width => 1, :color => 'rgba(136, 136, 136, 1)'}[part]
             if expected_value.is_a?(Numeric)
               expected_value = 1 if expected_value == 0
               expected_value = "#{expected_value}px"
@@ -260,7 +260,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         :cellpadding => 5,
         :cellspacing => 6,
         :border => 7,
-        :bordercolor => 'rgba(255,0,0,1)'
+        :bordercolor => 'rgba(255, 0, 0, 1)'
     )
     check_table(
         :align => 'center',
