@@ -77,9 +77,9 @@ describe "Default Account Reports" do
       parsed = run_report("provisioning_csv", parameters,2)
       parsed.length.should == 3
 
-      parsed[0].should == [user1.id.to_s, "user_sis_id_01", "john@stclair.com", nil, "John St.", "Clair", "john@stclair.com", "active"]
-      parsed[1].should == [user2.id.to_s, "user_sis_id_02", "micheal@michaelbolton.com", nil, "Michael", "Bolton", "micheal@michaelbolton.com", "active"]
-      parsed[2].should == [user3.id.to_s, nil, "nobody@example.com", nil, "Rick", "Astley", "nobody@example.com", "active"]
+      parsed[0].should == [user1.id.to_s, "user_sis_id_01", "john@stclair.com", "John St.", "Clair", "john@stclair.com", "active"]
+      parsed[1].should == [user2.id.to_s, "user_sis_id_02", "micheal@michaelbolton.com", "Michael", "Bolton", "micheal@michaelbolton.com", "active"]
+      parsed[2].should == [user3.id.to_s, nil, "nobody@example.com", "Rick", "Astley", "nobody@example.com", "active"]
     end
 
     it "should run the SIS and Provisioning Accounts reports" do

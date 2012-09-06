@@ -49,7 +49,9 @@ module Canvas::AccountReports
     def users
       list_csv = FasterCSV.generate do |csv|
         headers = ['user_id','login_id', 'password','first_name','last_name','email', 'status']
-        headers.unshift 'canvas_user_id' unless @sis_format
+        unless @sis_format
+          headers = ['canvas_user_id','user_id','login_id','first_name','last_name','email', 'status']
+        end
         csv << headers
         users = @account.pseudonyms.active.scoped(:include => :user)
         users = users.scoped(:conditions => 'sis_user_id IS NOT NULL') if @sis_format
@@ -58,7 +60,7 @@ module Canvas::AccountReports
           row << i.user_id unless @sis_format
           row << i.sis_user_id
           row << i.login
-          row << nil
+          row << nil if @sis_format
           row << i.user.first_name
           row << i.user.last_name
           row << i.user.email
