@@ -13,7 +13,6 @@ describe "quizzes" do
     end
 
     it "should allow a teacher to create a quiz from the quizzes tab directly" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
       submit_form("#quiz_options_form")
@@ -22,7 +21,6 @@ describe "quizzes" do
     end
 
     it "should create and preview a new quiz" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load {
         f('.new-quiz-link').click
@@ -57,8 +55,6 @@ describe "quizzes" do
     end
 
     it "should correctly hide form when cancelling quiz edit" do
-      skip_if_ie('Out of memory')
-
       get "/courses/#{@course.id}/quizzes/new"
 
       wait_for_tiny f('#quiz_description')
@@ -77,7 +73,6 @@ describe "quizzes" do
     end
 
     it "should edit a quiz" do
-      skip_if_ie('Out of memory')
       @context = @course
       q = quiz_model
       q.generate_quiz_data
@@ -149,8 +144,6 @@ describe "quizzes" do
     end
 
     it "should create a new question group" do
-      skip_if_ie('Out of memory')
-
       get "/courses/#{@course.id}/quizzes/new"
 
       f('.add_question_group_link').click
@@ -163,8 +156,6 @@ describe "quizzes" do
     end
 
     it "should update a question group" do
-      skip_if_ie('Out of memory')
-
       get "/courses/#{@course.id}/quizzes/new"
 
       f('.add_question_group_link').click
@@ -185,8 +176,6 @@ describe "quizzes" do
     end
 
     it "should not let you exceed the question limit" do
-      skip_if_ie('Out of memory')
-
       get "/courses/#{@course.id}/quizzes/new"
 
       f('.add_question_group_link').click
@@ -236,17 +225,12 @@ describe "quizzes" do
     end
 
     it "should flag a quiz question while taking a quiz as a teacher" do
-      skip_if_ie('Out of memory')
       quiz_with_new_questions
 
-      expect_new_page_load {
-        f('.publish_quiz_button').click
-      }
+      expect_new_page_load { f('.publish_quiz_button').click }
       wait_for_ajax_requests
 
-      expect_new_page_load {
-        driver.find_element(:link, 'Take the Quiz').click
-      }
+      expect_new_page_load { driver.find_element(:link, 'Take the Quiz').click }
 
       #flag first question
       hover_and_click("#question_#{@quest1.id} .flag_question")
@@ -266,7 +250,6 @@ describe "quizzes" do
     end
 
     it "should indicate when it was last saved" do
-      skip_if_ie('Out of memory')
       take_quiz do
         indicator = f('#last_saved_indicator')
         indicator.text.should == 'Not saved'
@@ -281,7 +264,6 @@ describe "quizzes" do
     end
 
     it "should validate numerical input data" do
-      skip_if_ie('Out of memory')
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = AssessmentQuestion.create!
         bank.assessment_questions << aq
@@ -307,7 +289,6 @@ describe "quizzes" do
     end
 
     it "should mark questions as answered when the window loses focus" do
-      skip_if_ie('Out of memory')
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq1 = AssessmentQuestion.create!
         aq2 = AssessmentQuestion.create!
@@ -331,7 +312,6 @@ describe "quizzes" do
     end
 
     it "should mark dropdown questions as answered" do
-      skip_if_ie('Out of memory')
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq1 = AssessmentQuestion.create!
         aq2 = AssessmentQuestion.create!
@@ -386,8 +366,6 @@ describe "quizzes" do
     end
 
     it "should give a student extra time if the time limit is extended" do
-      skip_if_ie('Out of memory')
-
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -433,8 +411,6 @@ describe "quizzes" do
     end
 
     it "should notify a student of extra time given by a moderator" do
-      skip_if_ie('Out of memory')
-
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -485,7 +461,6 @@ describe "quizzes" do
 
 
     it "should display quiz statistics" do
-      skip_if_ie('Out of memory')
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 

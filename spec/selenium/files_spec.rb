@@ -17,7 +17,7 @@ shared_examples_for "files selenium tests" do
     get "/courses/#{@course.id}/files"
 
     link = keep_trying_until do
-      link = f("div.links a.download_zip_link")
+      link = f(".links a.download_zip_link")
       wait_for_ajaximations
       link.should be_displayed
       link

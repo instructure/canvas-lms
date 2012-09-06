@@ -18,7 +18,6 @@ describe "manage groups students" do
   end
 
   it "should move students from a deleted group back to unassigned" do
-    skip_if_ie("Switch to alert and accept hangs in IE")
     student = groups_student_enrollment(1).last
     group_category = @course.group_categories.create(:name => "Some Category")
     group = add_groups_in_category(group_category, 1).last
@@ -280,7 +279,6 @@ describe "manage groups students" do
     end
 
     it "should be visible iff category is not restricted self signup" do
-      skip_if_ie("Element must not be hidden, disabled or read-only line 378")
       new_category = add_category(@course, "Unrestricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => false)
       fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
 

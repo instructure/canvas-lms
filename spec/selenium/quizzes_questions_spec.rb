@@ -8,7 +8,6 @@ describe "quizzes questions" do
   end
 
   it "should edit a quiz question" do
-    skip_if_ie('Out of memory')
     @context = @course
     q = quiz_model
     quest1 = q.quiz_questions.create!(:question_data => {:name => "first question"})
@@ -47,8 +46,6 @@ describe "quizzes questions" do
   end
 
   it "should not show 'Missing Word' option in question types dropdown" do
-    skip_if_ie('Out of memory')
-
     get "/courses/#{@course.id}/quizzes/new"
 
     ff("#question_form_template option.missing_word").length.should == 1
@@ -82,7 +79,6 @@ describe "quizzes questions" do
   end
 
   it "should not show the display details for text questions" do
-    skip_if_ie('Out of memory')
     quiz = start_quiz_question
 
     question = fj(".question_form:visible")
@@ -97,7 +93,6 @@ describe "quizzes questions" do
   end
 
   it "should not show the display details for essay questions" do
-    skip_if_ie('Out of memory')
     quiz = start_quiz_question
 
     question = fj(".question_form:visible")
@@ -112,7 +107,6 @@ describe "quizzes questions" do
   end
 
   it "should show the display details when questions other than text or essay questions exist" do
-    skip_if_ie('Out of memory')
     quiz = start_quiz_question
     show_el = f('#show_question_details')
     question = fj(".question_form:visible")
@@ -128,7 +122,6 @@ describe "quizzes questions" do
   end
 
   it "should calculate correct quiz question points total" do
-    skip_if_ie('Out of memory')
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load { f('.new-quiz-link').click }
     @question_count = 0
@@ -163,7 +156,6 @@ describe "quizzes questions" do
   end
 
   it "should round numeric questions the same when created and taking a quiz" do
-    skip_if_ie('Out of memory')
     start_quiz_question
     question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Numerical Answer')
@@ -268,7 +260,7 @@ describe "quizzes questions" do
 
     it "should selectmenu-ify select elements" do
       select = f('.question select')
-      keep_trying_until { !select.displayed? }
+      keep_trying_until { fj('.question_select:visible').should be_nil }
       
       f('.ui-selectmenu').click
       ff('.ui-selectmenu-open li')[1].click

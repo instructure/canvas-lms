@@ -4,7 +4,6 @@ describe "equation editor" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should support multiple equation editors on the same page" do
-    skip_if_ie("Stack overflow ")
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes"

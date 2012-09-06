@@ -9,7 +9,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz with a multiple choice question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
     create_multiple_choice_question
     quiz.reload
@@ -34,7 +33,6 @@ describe "quizzes question creation" do
 
 
   it "should create a quiz question with a true false question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
     create_true_false_question
     quiz.reload
@@ -42,7 +40,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz question with a fill in the blank question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
     create_fill_in_the_blank_question
     quiz.reload
@@ -50,7 +47,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz question with a fill in multiple blanks question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
 
     question = fj(".question_form:visible")
@@ -98,7 +94,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz question with a multiple answers question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
 
     question = fj(".question_form:visible")
@@ -122,7 +117,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz question with a multiple dropdown question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
 
     question = fj(".question_form:visible")
@@ -168,7 +162,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz question with a matching question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
 
     question = fj(".question_form:visible")
@@ -198,7 +191,6 @@ describe "quizzes question creation" do
 
   #### Numerical Answer
   it "should create a quiz question with a numerical question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
 
     click_option('.question_form:visible .question_type', 'Numerical Answer')
@@ -222,7 +214,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz question with a formula question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
 
     question = fj(".question_form:visible")
@@ -253,7 +244,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz question with an essay question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
 
     question = fj(".question_form:visible")
@@ -270,7 +260,6 @@ describe "quizzes question creation" do
   end
 
   it "should create a quiz question with a text question" do
-    skip_if_ie('Out of memory')
     quiz = @last_quiz
 
     question = fj(".question_form:visible")
@@ -375,7 +364,6 @@ describe "quizzes question creation" do
     end
 
     it "should allow HTML answers for multiple choice" do
-      skip_if_ie 'Out of memory'
       quiz_with_new_questions
       edit_first_html_answer
       type_in_tiny '.answer:eq(3) textarea', 'HTML'

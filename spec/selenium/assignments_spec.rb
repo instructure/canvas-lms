@@ -182,7 +182,6 @@ describe "assignments" do
     end
 
     it "should allow creating a quiz assignment from 'more options'" do
-      skip_if_ie("Out of memory")
       get "/courses/#{@course.id}/assignments"
 
       f(".assignment_group .add_assignment_link").click
@@ -199,7 +198,6 @@ describe "assignments" do
     end
 
     it "should edit an assignment" do
-      skip_if_ie('Out of memory')
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
       group = @course.assignment_groups.create!(:name => "default")
@@ -291,8 +289,6 @@ describe "assignments" do
       end
 
       it "should respect frozen attributes for teacher" do
-        skip_if_ie('Out of memory')
-
         run_assignment_edit do
           f('#assignment_assignment_group_id').should be_nil
           f('#edit_assignment_form #assignment_peer_reviews').should be_nil
@@ -301,7 +297,6 @@ describe "assignments" do
       end
 
       it "should not be locked for admin" do
-        skip_if_ie('Out of memory')
         course_with_admin_logged_in(:course => @course, :name => "admin user")
 
         run_assignment_edit do

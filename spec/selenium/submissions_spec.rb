@@ -121,10 +121,10 @@ describe "submissions" do
       f('.submission_attachment input').send_keys(fullpath)
       expect_new_page_load { f('#submit_file_button').click }
 
-      keep_trying_until {
+      keep_trying_until do
         f('.details .header').should include_text "Turned In!"
         f('.details .file-big').should include_text "testfile1"
-      }
+      end
     end
   end
 
@@ -175,10 +175,10 @@ describe "submissions" do
       f('#submission_comment').send_keys("hello comment")
       expect_new_page_load { f('#submit_file_button').click }
 
-      keep_trying_until {
+      keep_trying_until do
         f('#sidebar_content .header').should include_text "Turned In!"
         f('.details .file-big').should include_text "testfile1"
-      }
+      end
       @submission = @assignment.reload.submissions.find_by_user_id(@student.id)
       @submission.submission_type.should == 'online_upload'
       @submission.attachments.length.should == 1

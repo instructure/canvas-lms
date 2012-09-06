@@ -22,7 +22,7 @@ describe "conversations submissions" do
     end
     elements.first.click
     wait_for_ajaximations
-    subs = ff("div#messages .submission")
+    subs = ff("#messages .submission")
     subs.size.should == 2
     subs[0].find_element(:css, '.score').text.should == '0.9 / 1.5'
     subs[1].find_element(:css, '.score').text.should == 'no score'

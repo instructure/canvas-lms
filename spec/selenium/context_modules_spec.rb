@@ -148,8 +148,6 @@ describe "context_modules" do
     end
 
     it "should rearrange child objects in same module" do
-      skip_if_ie("Drag and Drop not working in IE, line 65")
-
       modules = create_modules(1)
 
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
@@ -173,8 +171,6 @@ describe "context_modules" do
     end
 
     it "should rearrange child object to new module" do
-      skip_if_ie("Drag and Drop not working in IE, line 65")
-
       modules = create_modules(2)
 
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
@@ -515,7 +511,6 @@ describe "context_modules" do
     end
 
     it "should rearrange modules" do
-      skip_if_ie("Drag and Drop not working in IE, line 65")
       m1 = @course.context_modules.create!(:name => 'module 1')
       m2 = @course.context_modules.create!(:name => 'module 2')
 

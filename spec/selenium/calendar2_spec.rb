@@ -142,7 +142,7 @@ describe "calendar2" do
           wait_for_ajaximations
 
           driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          fj('ul#context-list > li:nth-child(2) button').click
+          fj('#context-list > li:nth-child(2) button').click
           fj(".ui-kyle-menu:visible li:last-child a").click
           edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
@@ -291,7 +291,7 @@ describe "calendar2" do
         f('.popover-links-holder .edit_event_link').click
         select = f('#edit_assignment_form .assignment_group')
         first_selected_option(select).attribute(:value).to_i.should == group2.id
-        replace_content(  f('div.ui-dialog #assignment_title'), "Assignment 2!")
+        replace_content(  f('.ui-dialog #assignment_title'), "Assignment 2!")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
         assignment2.reload.title.should == "Assignment 2!"

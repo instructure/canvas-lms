@@ -4,7 +4,7 @@ shared_examples_for "quizzes selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   def create_multiple_choice_question
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Choice')
 
     type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
@@ -27,7 +27,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def create_true_false_question
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'True/False')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
@@ -45,7 +45,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def create_fill_in_the_blank_question
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Fill In the Blank')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
@@ -63,14 +63,14 @@ shared_examples_for "quizzes selenium tests" do
   def add_quiz_question(points)
     @points_total += points.to_i
     @question_count += 1
-    driver.find_element(:css, '.add_question_link').click
-    question = find_with_jquery('.question_form:visible')
+    f('.add_question_link').click
+    question = fj('.question_form:visible')
     replace_content(question.find_element(:css, "input[name='question_points']"), points)
     submit_form(question)
     wait_for_ajax_requests
-    questions = find_all_with_jquery(".question_holder:visible")
+    questions = ffj(".question_holder:visible")
     questions.length.should eql(@question_count)
-    driver.find_element(:css, "#right-side .points_possible").text.should eql(@points_total.to_s)
+    f("#right-side .points_possible").text.should eql(@points_total.to_s)
   end
 
   def quiz_with_new_questions
@@ -95,10 +95,10 @@ shared_examples_for "quizzes selenium tests" do
   def start_quiz_question
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
-      driver.find_element(:css, '.new-quiz-link').click
+      f('.new-quiz-link').click
     }
 
-    driver.find_element(:css, '.add_question_link').click
+    f('.add_question_link').click
     wait_for_animations
     Quiz.last
   end

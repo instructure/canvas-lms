@@ -45,7 +45,7 @@ describe "external migrations" do
     click_option('#choose_migration_system', 'Common Cartridge 1.0/1.1/1.2 Package')
     f('#config_options').find_element(:name, 'export_file').send_keys(fullpath)
     submit_form('#config_options')
-    keep_trying_until { f('#file_uploaded').displayed? }
+    keep_trying_until { f('#file_uploaded').should be_displayed }
 
     ContentMigration.for_context(@course).count.should == 1
     @migration = ContentMigration.for_context(@course).first

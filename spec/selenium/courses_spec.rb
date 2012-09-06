@@ -23,13 +23,13 @@ describe "courses" do
 
       create_new_course
 
-      wizard_box = driver.find_element(:id, "wizard_box")
+      wizard_box = f("#wizard_box")
       keep_trying_until { wizard_box.displayed? }
       wizard_box.find_element(:css, ".close_wizard_link").click
 
       refresh_page
       wait_for_animations # we need to give the wizard a chance to pop up
-      wizard_box = driver.find_element(:id, "wizard_box")
+      wizard_box = f("#wizard_box")
       wizard_box.displayed?.should be_false
 
       # un-remember the setting
@@ -39,7 +39,7 @@ describe "courses" do
     it "should open and close wizard after initial close" do
       def find_wizard_box
         wizard_box = keep_trying_until do
-          wizard_box = driver.find_element(:id, "wizard_box")
+          wizard_box = f("#wizard_box")
           wizard_box.should be_displayed
           wizard_box
         end
@@ -54,7 +54,7 @@ describe "courses" do
       wizard_box.find_element(:css, ".close_wizard_link").click
       wait_for_animations
       wizard_box.should_not be_displayed
-      checklist_button = driver.find_element(:css, '.wizard_popup_link')
+      checklist_button = f('.wizard_popup_link')
       checklist_button.should be_displayed
       checklist_button.click
       wait_for_animations
@@ -72,28 +72,28 @@ describe "courses" do
       # first try setting the quota explicitly
       get "/courses/#{@course.id}/details"
       driver.find_element(:link, 'Course Details').click
-      form = driver.find_element(:css, "#course_form")
-      driver.find_element(:css, "#course_form .edit_course_link").should be_displayed
+      form = f("#course_form")
+      f("#course_form .edit_course_link").should be_displayed
       form.find_element(:css, ".edit_course_link").click
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
       quota_input.clear
       quota_input.send_keys("10")
       submit_form(form)
-      keep_trying_until { driver.find_element(:css, ".loading_image_holder").nil? rescue true }
+      keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
 
       # then try just saving it (without resetting it)
       get "/courses/#{@course.id}/details"
-      form = driver.find_element(:css, "#course_form")
+      form = f("#course_form")
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
       form.find_element(:css, ".edit_course_link").click
       submit_form(form)
-      keep_trying_until { driver.find_element(:css, ".loading_image_holder").nil? rescue true }
+      keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
 
       # then make sure it's right after a reload
       get "/courses/#{@course.id}/details"
-      form = driver.find_element(:css, "#course_form")
+      form = f("#course_form")
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
       @course.reload
       @course.storage_quota.should == 10.megabytes
@@ -110,7 +110,7 @@ describe "courses" do
 
       get "/courses/#{course1.id}/grades/#{student.id}"
 
-      select = driver.find_element(:id, 'course_url')
+      select = f('#course_url')
       options = select.find_elements(:css, 'option')
       options.length.should == 2
       select.click
@@ -130,7 +130,7 @@ describe "courses" do
       # Test that the page loads properly the first time.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      ff('.ui-state-error').length.should    == 0
+      ff('.ui-state-error').length.should == 0
       ff('.student_roster .user').length.should == 50
       ff('.teacher_roster .user').length.should == 1
 
@@ -206,7 +206,7 @@ describe "courses" do
 
       login_as(@student.name)
       get "/courses/#{@course.id}"
-      driver.find_element(:css, ".reminder .button[name='accept'] ").click
+      f(".reminder .button[name='accept'] ").click
       assert_flash_notice_message /Invitation accepted!/
     end
 
@@ -215,14 +215,14 @@ describe "courses" do
 
       login_as(@student.name)
       get "/courses/#{@course.id}"
-      driver.find_element(:css, ".reminder .reject_button").click
+      f(".reminder .reject_button").click
       driver.switch_to.alert.accept
       assert_flash_notice_message /Invitation canceled./
     end
 
     it "should validate that a user cannot see a course they are not enrolled in" do
       login_as(@student.name)
-      driver.find_element(:css, '#menu').should_not include_text('Courses')
+      f('#menu').should_not include_text('Courses')
     end
   end
 end

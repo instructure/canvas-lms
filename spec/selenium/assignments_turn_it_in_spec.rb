@@ -52,7 +52,6 @@ describe "assignments turn it in" do
   end
 
   it "should create turnitin settings" do
-    skip_if_ie('Out of memory')
     expect {
       get "/courses/#{@course.id}/assignments/new"
 
@@ -69,7 +68,6 @@ describe "assignments turn it in" do
   end
 
   it "should edit turnitin settings" do
-    skip_if_ie('Out of memory')
     assignment = @course.assignments.create!(
         :name => 'test assignment',
         :due_at => (Time.now.utc + 2.days),

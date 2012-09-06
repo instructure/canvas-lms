@@ -16,7 +16,7 @@ describe "content exports" do
       Delayed::Job.last(:conditions => {:tag => 'ContentExport#export_course_without_send_later'})
       @export = keep_trying_until { ContentExport.last }
       @export.export_course_without_send_later
-      new_download_link = keep_trying_until { f("div#export_files a") }
+      new_download_link = keep_trying_until { f("#export_files a") }
       url = new_download_link.attribute 'href'
       url.should match(%r{/files/\d+/download\?verifier=})
     end
