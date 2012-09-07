@@ -22,6 +22,7 @@ define [
   'str/htmlEscape'
   'compiled/conversations/introSlideshow'
   'compiled/conversations/ConversationsPane'
+  'compiled/conversations/MessageFormPane'
   'compiled/conversations/audienceList'
   'compiled/conversations/contextList'
   'compiled/widget/TokenInput'
@@ -37,7 +38,7 @@ define [
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'
   'jqueryui/position'
-], (I18n, _, h, introSlideshow, ConversationsPane, audienceList, contextList, TokenInput, TextHelper) ->
+], (I18n, _, h, introSlideshow, ConversationsPane, MessageFormPane, audienceList, contextList, TokenInput, TextHelper) ->
 
   class
     constructor: (@options) ->
@@ -57,53 +58,22 @@ define [
       @initializeForms()
       @initializeMenus()
       @initializeMessageActions()
-      @initializeConversationActions()
-      @initializeTemplates()
       @initializeTokenInputs()
       @initializeConversationsPane()
+      @initializeMessageFormPane()
       @initializeAutoResize()
       @initializeHashChange()
       if @options.SHOW_INTRO
         introSlideshow()
 
-    showMessageForm: ->
-      conversation = @conversations.active()
-      newMessage = !conversation?
-      @$form.find('#recipient_info').showIf newMessage
-      @$form.find('#group_conversation_info').hide()
-      $('#action_compose_message').toggleClass 'active', newMessage
-
-      if newMessage
-        @$form.addClass('new')
-        @$form.find('#action_add_recipients').hide()
-        @$form.attr action: '/conversations?' + $.param(@conversations?.baseData() ? {})
-      else
-        @$form.removeClass('new')
-        @$form.find('#action_add_recipients').showIf(!conversation.get('private'))
-        @$form.attr action: conversation.url('add_message')
-
-      @resetMessageForm()
-      @$form.find('#user_note_info').hide().find('input').attr('checked', false)
-      @$form.show()
-      @$form.find(':input:visible:first').focus() if window.location.hash isnt ''
-
-    resetMessageForm: (resetFields = true) ->
-      @$form.find('.audience').html(if c = @conversations.active()
-          @htmlAudience(c.attributes, linkToContexts: true, highlightFilters: true)
-        else
-          h(I18n.t('headings.new_message', 'New Message'))
-      )
-      if resetFields
-        @$form.find('input[name!=authenticity_token], textarea').not(":checkbox").val('').change()
-        @$form.find(".attachment:visible").remove()
-        @$form.find(".media_comment").hide()
-        @$form.find("#action_media_comment").show()
-      @resize()
-
     filters: ->
       @conversations.baseData().filter ? []
 
     htmlAudience: (conversation, options = {}) ->
+      conversation ?= @conversations.active()?.attributes
+      unless conversation?
+        return h(I18n.t('headings.new_message', 'New Message'))
+
       filters = options.filters = if options.highlightFilters then @filters() else []
       audience = for id in conversation.audience
         {
@@ -130,25 +100,22 @@ define [
     htmlNameForUser: (user, contexts = {courses: user.common_courses, groups: user.common_groups}) ->
       h(user.name) + if contexts.courses?.length or contexts.groups?.length then " <em>" + @htmlContextList(contexts) + "</em>" else ''
 
-    canAddNotesFor: (user) ->
+    canAddNotesFor: (userOrId) =>
       return false unless @options.NOTES_ENABLED
+      user = if typeof userOrId is 'object' then userOrId else @userCache[userOrId]
+      return false unless user?
       for id, roles of user.common_courses
         return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.permissions?.manage_user_notes)
       false
 
     loadConversation: (conversation, $node, cb) ->
-      @toggleMessageActions(off)
       @$messageList.removeClass('private').hide().html ''
       @$messageList.addClass('private') if $conversation?.hasClass('private')
-      @showMessageForm()
 
-      params = @currentHashData()
-      @$form.find('#body').val(params.message) if params.message
-      unless conversation?
-        if params.user_id
-          $('#from_conversation_id').val(params.from_conversation_id)
-          $('#recipients').data('token_input').selector.addByUserId(params.user_id, params.from_conversation_id)
-        return cb()
+      @resetMessageForm(conversation)
+      @toggleMessageActions(off)
+
+      return cb() unless conversation?
 
       url = conversation.url()
       @$messageList.show().disableWhileLoading $.ajaxJSON url, 'GET', {}, (data) =>
@@ -157,13 +124,37 @@ define [
         for user in data.participants when !@userCache[user.id]?.avatar_url
           @userCache[user.id] = user
           user.htmlName = @htmlNameForUser(user)
-        if data['private'] and user = (user for user in data.participants when user.id isnt @currentUser.id)[0] and @canAddNotesFor(user)
-          @$form.find('#user_note_info').show()
+        if data['private'] and user = (user for user in data.participants when user.id isnt @currentUser.id)[0]
+          @formPane.resetForParticipant(user)
         @resize()
         @$messages.show()
         @$messageList.append @buildMessage(message) for message in data.messages
         @$messageList.show()
         cb()
+
+    resetMessageForm: (conversation) ->
+      $('#action_compose_message').toggleClass 'active', !conversation?
+      baseData = @conversations.baseData()
+      @formPane.reset(_.extend({}, @currentHashData(),
+                       conversation: conversation
+                       audience: @htmlAudience(null, linkToContexts: true, highlightFilters: true)
+                       addRecipientsEnabled: conversation? and !conversation.get('private')
+                       mediaCommentsEnabled: @options.MEDIA_COMMENTS_ENABLED
+                       filter: baseData.filter
+                       scope: baseData.scope
+                    ))
+
+    updatedConversation: (data) ->
+      @formPane.refresh @htmlAudience(null, linkToContexts: true, highlightFilters: true)
+      return unless data.length
+
+      @conversations.updateItems data
+      if data.length is 1
+        conversation = data[0]
+        if @conversations.isActive(conversation.id)
+          @buildMessage(conversation.messages[0]).prependTo(@$messageList).slideDown 'fast'
+        if conversation.visible
+          @updateHashData id: conversation.id
 
     deselectMessages: ->
       @$messageList.find('li.selected').removeClass 'selected'
@@ -334,7 +325,7 @@ define [
         availableHeight = @minHeight if availableHeight < @minHeight
         $(document.body).toggleClass('too_small', availableHeight <= @minHeight)
         @$inbox.height(availableHeight)
-        @$messageList.height(availableHeight - @$form.outerHeight(true))
+        @$messageList.height(availableHeight - @formPane.height())
         @conversations.resize(availableHeight)
       , delay
 
@@ -346,7 +337,7 @@ define [
         state = !!@$messageList.find('li.selected').length
       $('#action_forward').parent().showIf(state and @$messageList.find('li.selected.forwardable').length)
       if state then $("#message_actions").slideDown(100) else $("#message_actions").slideUp(100)
-      @$form[if state then 'addClass' else 'removeClass']('disabled')
+      @formPane.toggle(state)
 
     updateHashData: (changes) ->
       data = $.extend(@currentHashData(), changes)
@@ -360,64 +351,17 @@ define [
         e.preventDefault()
         introSlideshow()
 
-    initializeForms: ->
-      $('#create_message_form, #forward_message_form').find('textarea').elastic().keypress (e) =>
+    prepareTextareas: ($nodes) ->
+      $nodes.elastic()
+      $nodes.keypress (e) =>
         if e.which is 13 and e.shiftKey
-          e.preventDefault()
           $(e.target).closest('form').submit()
           false
 
-      @$form = $('#create_message_form')
+    initializeForms: ->
       @$addForm = $('#add_recipients_form')
       @$forwardForm = $('#forward_message_form')
-
-      @$form.submit (e) =>
-        valid = !!(@$form.find('#body').val() and (@$form.find('#recipient_info').filter(':visible').length is 0 or @$form.find('.token_input li').length > 0))
-        e.stopImmediatePropagation() unless valid
-        valid
-      @$form.formSubmit
-        fileUpload: =>
-          return @$form.find(".file_input:visible").length > 0
-        preparedFileUpload: true
-        context_code: "user_" + $("#identity .user_id").text()
-        folder_id: @options.FOLDER_ID
-        intent: 'message'
-        formDataTarget: 'url'
-        handle_files: (attachments, data) ->
-          data.attachment_ids = (a.attachment.id for a in attachments)
-          data
-        disableWhileLoading: true
-        success: (data) =>
-          data = [data] unless data.length?
-          @conversations.updateItems data
-          if data.length == 1
-            conversation = data[0]
-            if @conversations.isActive(conversation.id)
-              @buildMessage(conversation.messages[0]).prependTo(@$messageList).slideDown 'fast'
-            if conversation.visible
-              @updateHashData id: conversation.id
-            $.flashMessage I18n.t('message_sent', 'Message Sent')
-          else
-            $.flashMessage I18n.t('messages_sent', 'Messages Sent')
-          @resetMessageForm()
-        error: (data) =>
-          return if data.isRejected?() # e.g. refreshed the page, thus aborting the request
-          error = data[0]
-          if error?.attribute is 'body'
-            @$form.find('#body').errorBox I18n.t('message_blank_error', 'No message was specified')
-          else
-            errorText = (if error?.attribute is 'recipients'
-              if error.message is 'blank'
-                I18n.t('recipient_blank_error', 'No recipients were specified')
-              else
-                I18n.t('recipient_error', 'The course or group you have selected has no valid recipients')
-            else
-              I18n.t('unspecified_error', 'An unexpected error occurred, please try again')
-            )
-            @$form.find('.token_input').errorBox(errorText)
-          $('.error_box').filter(':visible').css('z-index', 10) # TODO: figure out why this is necessary
-      @$form.click =>
-        @toggleMessageActions off
+      @prepareTextareas(@$forwardForm.find('textarea'))
 
       @$addForm.submit (e) =>
         valid = !!(@$addForm.find('.token_input li').length)
@@ -426,9 +370,7 @@ define [
       @$addForm.formSubmit
         disableWhileLoading: true,
         success: (data) =>
-          @buildMessage(data.messages[0]).prependTo(@$messageList).slideDown 'fast'
-          @conversations.updateItems [data]
-          @resetMessageForm()
+          @updatedConversation(data)
           @$addForm.dialog('close')
         error: (data) =>
           @$addForm.dialog('close')
@@ -440,10 +382,7 @@ define [
       @$forwardForm.formSubmit
         disableWhileLoading: true,
         success: (data) =>
-          conversation = data[0]
-          @conversations.updateItems [conversation]
-          @updateHashData id: conversation.id
-          @resetMessageForm()
+          @updatedConversation(data)
           @$forwardForm.dialog('close')
         error: (data) =>
           @$forwardForm.dialog('close')
@@ -554,71 +493,33 @@ define [
           close: =>
             $('#forward_recipients').data('token_input').$input.blur()
 
-
-    initializeConversationActions: ->
       $('#action_compose_message').click (e) =>
         e.preventDefault()
         @updateHashData id: null
 
-      $('#action_add_recipients').click (e) =>
-        e.preventDefault()
-        return unless @conversations.active()?
-        @$addForm
-          .attr('action', @conversations.actionUrlFor($(e.currentTarget)))
-          .dialog
-            width: 420
-            title: I18n.t('title.add_recipients', 'Add Recipients')
-            buttons: [
-              {
-                text: I18n.t('buttons.add_people', 'Add People')
-                click: => @$addForm.submit()
-              }
-              {
-                text: I18n.t('#buttons.cancel', 'Cancel')
-                click: => @$addForm.dialog('close')
-              }
-            ]
-            open: =>
-              tokenInput = $('#add_recipients').data('token_input')
-              tokenInput.baseExclude = @conversations.active().get('audience')
-              @$addForm.find("input[name!=authenticity_token]").val('').change()
-            close: =>
-              $('#add_recipients').data('token_input').$input.blur()
-
-    initializeTemplates: ->
-      nextAttachmentIndex = 0
-      $('#action_add_attachment').click (e) =>
-        e.preventDefault()
-        $attachment = $("#attachment_blank").clone(true)
-        $attachment.attr('id', null)
-        $attachment.find("input[type='file']").attr('name', 'attachments[' + (nextAttachmentIndex++) + ']')
-        $('#attachment_list').append($attachment)
-        $attachment.slideDown "fast", =>
-          @resize()
-        return false
-
-      $("#attachment_blank a.remove_link").click (e) =>
-        e.preventDefault()
-        $attachment = $(e.currentTarget).closest(".attachment")
-        $attachment.slideUp "fast", =>
-          @resize()
-          $attachment.remove()
-        return false
-
-      $('#action_media_comment').click (e) =>
-        e.preventDefault()
-        $("#create_message_form .media_comment").mediaComment 'create', 'any', (id, type) =>
-          $("#media_comment_id").val(id)
-          $("#media_comment_type").val(type)
-          $("#create_message_form .media_comment").show()
-          $("#action_media_comment").hide()
-
-      $('#create_message_form .media_comment a.remove_link').click (e) =>
-        e.preventDefault()
-        $("#media_comment_id").val('')
-        $("#media_comment_type").val('')
-        $("#create_message_form .media_comment").hide()
-        $("#action_media_comment").show()
+    addRecipients: ($node) ->
+      return unless @conversations.active()?
+      @$addForm
+        .attr('action', $node.prop('href'))
+        .dialog
+          width: 420
+          title: I18n.t('title.add_recipients', 'Add Recipients')
+          buttons: [
+            {
+              text: I18n.t('buttons.add_people', 'Add People')
+              click: => @$addForm.submit()
+            }
+            {
+              text: I18n.t('#buttons.cancel', 'Cancel')
+              click: => @$addForm.dialog('close')
+            }
+          ]
+          open: =>
+            tokenInput = $('#add_recipients').data('token_input')
+            tokenInput.baseExclude = @conversations.active().get('audience')
+            @$addForm.find("input[name!=authenticity_token]").val('').change()
+          close: =>
+            $('#add_recipients').data('token_input').$input.blur()
 
     buildContextInfo: (data) ->
       match = data.id.match(/^(course|section)_(\d+)$/)
@@ -636,7 +537,8 @@ define [
         $('<span />', class: 'context_info').text("(#{contextInfo})")
       else
         ''
-    initializeTokenInputs: ->
+
+    initializeTokenInputs: ($scope) ->
       buildPopulator = (pOptions={}) =>
         (selector, $node, data, options={}) =>
           data.id = "#{data.id}"
@@ -686,7 +588,7 @@ define [
       everyoneText  = I18n.t('enrollments_everyone', "Everyone")
       selectAllText = I18n.t('select_all', "Select All")
 
-      $('.recipients').tokenInput
+      ($scope ? $(document)).find('.recipients').tokenInput
         placeholder: placeholderText
         added: (data, $token, newToken) =>
           data.id = "#{data.id}"
@@ -699,6 +601,7 @@ define [
               $details = $('<span />')
               $details.text(I18n.t('people_count', 'person', {count: data.user_count}))
               $token.append($details)
+              $token.data('user_count', data.user_count)
           unless data.id.match(/^(course|group)_/)
             data = $.extend({}, data)
             delete data.avatar_url # since it's the wrong size and possibly a blank image
@@ -739,19 +642,7 @@ define [
               per_page: -1
               type: 'context'
 
-      tokenInput = $('#recipients').data('token_input')
-      # since it doesn't infer percentage widths, just whatever the current pixels are
-      tokenInput.$fakeInput.css('width', '100%')
-      tokenInput.change = (tokens) =>
-        if tokens.length > 1 or tokens[0]?.match(/^(course|group)_/)
-          @$form.find('#group_conversation').attr('checked', false) if !@$form.find('#group_conversation_info').is(':visible')
-          @$form.find('#group_conversation_info').show()
-          @$form.find('#user_note_info').hide()
-        else
-          @$form.find('#group_conversation').attr('checked', false)
-          @$form.find('#group_conversation_info').hide()
-          @$form.find('#user_note_info').showIf((user = @userCache[tokens[0]]) and @canAddNotesFor(user))
-        @resize()
+      return if $scope
 
       @filterNameMap = {}
       $('#context_tags').tokenInput
@@ -802,6 +693,13 @@ define [
     initializeConversationsPane: () ->
       @conversations = new ConversationsPane this, @$conversations
 
+    initializeMessageFormPane: () ->
+      @formPane = new MessageFormPane(this, folderId: @options.FOLDER_ID)
+
+    addedMessageForm: ($form) ->
+      @prepareTextareas($form.find('textarea'))
+      @initializeTokenInputs($form)
+
     initializeAutoResize: ->
       $(window).resize => @resize(50)
       @resize()
@@ -813,13 +711,15 @@ define [
         data = {}
       data
 
+    updateView: (force = false) =>
+      hash = location.hash
+      data = @currentHashData()
+      data.force = force
+      if data.filter
+        data.filter = (id for id in data.filter when @filterNameMap[id])
+        return @updateHashData(filter: null) if not data.filter.length
+      @setScope(data.scope)
+      @conversations.updateView(data)
+
     initializeHashChange: ->
-      $(window).bind 'hashchange', =>
-        hash = location.hash
-        data = @currentHashData()
-        if data.filter
-          data.filter = (id for id in data.filter when @filterNameMap[id])
-          return @updateHashData(filter: null) if not data.filter.length
-        @setScope(data.scope)
-        @conversations.updateView(data)
-      .triggerHandler('hashchange')
+      $(window).bind('hashchange', => @updateView()).triggerHandler('hashchange')

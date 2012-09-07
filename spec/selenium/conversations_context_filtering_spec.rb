@@ -49,7 +49,7 @@ describe "conversations context filtering" do
     @course2.complete!
     new_conversation
     @input = fj("#context_tags_filter input:visible")
-    search("th", "context_tags") do
+    search("th", "#context_tags") do
       menu.should eql ["the course", "the group", "that course"]
     end
   end
@@ -96,7 +96,7 @@ describe "conversations context filtering" do
     get_conversations.size.should eql 2
 
     @input = fj("#context_tags_filter input:visible")
-    search("the course", "context_tags") { browse("the course") { click("the course") } }
+    search("the course", "#context_tags") { browse("the course") { click("the course") } }
 
     keep_trying_until do
       conversations = get_conversations
@@ -127,7 +127,7 @@ describe "conversations context filtering" do
     get "/conversations/sent"
 
     @input = fj("#context_tags_filter input:visible")
-    search("the course", "context_tags") { browse("the course") { click("the course") } }
+    search("the course", "#context_tags") { browse("the course") { click("the course") } }
 
     keep_trying_until do
       conversations = get_conversations
@@ -148,7 +148,7 @@ describe "conversations context filtering" do
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
     @input = fj("#context_tags_filter input:visible")
-    search("student2", "context_tags") { click("student2") }
+    search("student2", "#context_tags") { click("student2") }
 
     keep_trying_until do
       conversations = get_conversations
@@ -172,7 +172,7 @@ describe "conversations context filtering" do
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
     @input = fj("#context_tags_filter input:visible")
-    search("the group", "context_tags") {
+    search("the group", "#context_tags") {
       menu.should eql ["the group"]
       elements.first.first.text.should include "the course" # make sure the group context is shown
       browse("the group") { click("the group") }
@@ -193,7 +193,7 @@ describe "conversations context filtering" do
     submit_message_form(:add_recipient => false)
 
     @input = fj("#context_tags_filter input:visible")
-    search("the course", "context_tags") do
+    search("the course", "#context_tags") do
       term_info = f('.autocomplete_menu .name .context_info')
       term_info.text.should == "(#{@course1.enrollment_term.name})"
     end
@@ -207,7 +207,7 @@ describe "conversations context filtering" do
     submit_message_form(:add_recipient => false)
 
     @input = fj("#context_tags_filter input:visible")
-    search("that course", "context_tags") do
+    search("that course", "#context_tags") do
       term_info = f('.autocomplete_menu .name')
       term_info.text.should == "that course"
     end

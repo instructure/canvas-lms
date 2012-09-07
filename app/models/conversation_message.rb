@@ -32,6 +32,8 @@ class ConversationMessage < ActiveRecord::Base
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
 
+  after_create :generate_user_note!
+
   named_scope :human, :conditions => "NOT generated"
   named_scope :with_attachments, :conditions => "attachment_ids <> '' OR has_attachments" # TODO: simplify post-migration
   named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL OR has_media_objects" # TODO: simplify post-migration
@@ -154,10 +156,12 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def recipients
+    return [] unless conversation
     self.subscribed_participants.reject{ |u| u.id == self.author_id }
   end
 
   def new_recipients
+    return [] unless conversation
     return [] unless generated? and event_data[:event_type] == :users_added
     recipients.select{ |u| event_data[:user_ids].include?(u.id) }
   end
@@ -190,7 +194,9 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 
-  def generate_user_note
+  attr_accessor :generate_user_note
+  def generate_user_note!
+    return unless @generate_user_note
     return unless recipients.size == 1
     recipient = recipients.first
     return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }

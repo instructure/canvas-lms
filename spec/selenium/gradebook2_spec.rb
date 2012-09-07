@@ -273,7 +273,7 @@ describe "gradebook2" do
         message_form.find_element(:css, '#body').send_keys(message_text)
         submit_form(message_form)
         wait_for_ajax_requests
-      }.to change(ConversationMessage, :count).by(2)
+      }.to change(ConversationMessage, :count).by_at_least(2)
     end
 
     it "should have a 'Haven't been graded' option" do

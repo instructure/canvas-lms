@@ -156,7 +156,7 @@ define [
     load: (options={}) ->
       sortKeyChanged = options.sortKey and options.sortKey isnt @ds.sortKey
       paramsChanged = options.params and JSON.stringify(options.params) isnt JSON.stringify(@ds.params)
-      if sortKeyChanged or paramsChanged or not @ds.initialized
+      if sortKeyChanged or paramsChanged or not @ds.initialized or options.force
         @fetchThrough = 0
         @$list.empty()
         @$list.css('min-height', '0px')

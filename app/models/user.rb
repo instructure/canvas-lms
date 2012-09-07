@@ -153,6 +153,7 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation
+  has_many :conversation_batches, :include => :root_conversation_message
   has_many :favorites
   has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
   has_many :zip_file_imports, :as => :context

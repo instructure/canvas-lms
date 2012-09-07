@@ -47,6 +47,7 @@ define [
       super
         sortKey: "#{@lastMessageKey()}_at"
         params: @baseData()
+        force: params.force
         loadId: params.id # if set, make sure it's loaded, and scroll into view
         cb: =>
           @emptyCheck()
@@ -146,7 +147,7 @@ define [
 
       if data.audience
         data.audienceHtml = @app.htmlAudience(data, highlightFilters: true)
-        @app.resetMessageForm(false) if @isActive(data.id)
+        @app.formPane.refresh() if @isActive(data.id)
 
       data.lastMessage = data[@lastMessageKey()]
       data.lastMessageAt = $.friendlyDatetime($.parseFromISO(data[@lastMessageKey() + "_at"]).datetime)
