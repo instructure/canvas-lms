@@ -510,6 +510,12 @@ div#content
     &.negative_answer .answer_select .answer_box
       :background-image url(/images/negative_answer.png)
 
+// Don't display the "select answer" answer_box for "fill-in-the-blank" questions where
+// it doesn't make sense to have incorrect answers so selecting a correct one doesn't apply.
+.question.fill_in_multiple_blanks_question
+  .answer .answer_select .answer_box
+    :display none
+
 .skipped
   display: none
 

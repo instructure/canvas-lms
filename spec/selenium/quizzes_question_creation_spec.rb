@@ -65,7 +65,6 @@ describe "quizzes question creation" do
 
     #input answers for both blank input
     answers = question.find_elements(:css, ".form_answers > .answer")
-    answers[0].find_element(:css, ".select_answer_link").click
 
     replace_content(answers[0].find_element(:css, '.short_answer input'), 'red')
     replace_content(answers[1].find_element(:css, '.short_answer input'), 'green')
@@ -73,7 +72,6 @@ describe "quizzes question creation" do
     wait_for_animations
     answers = question.find_elements(:css, ".form_answers > .answer")
 
-    answers[2].find_element(:css, ".select_answer_link").click
     replace_content(answers[2].find_element(:css, '.short_answer input'), 'blue')
     replace_content(answers[3].find_element(:css, '.short_answer input'), 'purple')
 
