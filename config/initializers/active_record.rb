@@ -519,7 +519,7 @@ class ActiveRecord::Base
     while ids.first.present?
       yield *ids
       last_value = ids.last
-      ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :conditions => ["#{primary_key}>?", last_value], :order => primary_key, :limit => batch_size)}) as subquery").first
+      ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :conditions => ["#{quoted_table_name}.#{primary_key}>?", last_value], :order => primary_key, :limit => batch_size)}) as subquery").first
     end
   end
 end
