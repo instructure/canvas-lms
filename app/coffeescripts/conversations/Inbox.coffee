@@ -773,9 +773,9 @@ define [
                   type: 'context'
                   avatar_url: parent.data('user_data').avatar_url
               filterText = if context.match(/^course/)
-                I18n.t('filter_by_course', 'Fiter by this course')
+                I18n.t('filter_by_course', 'Filter by this course')
               else
-                I18n.t('filter_by_group', 'Fiter by this group')
+                I18n.t('filter_by_group', 'Filter by this group')
               data.unshift
                 id: context
                 name: parent.data('text')
