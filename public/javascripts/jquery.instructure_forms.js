@@ -20,6 +20,7 @@ define([
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
   'underscore',
+  'compiled/xhr/FakeXHR',
   'jquery.ajaxJSON' /* ajaxJSONPreparedFiles, ajaxJSON */,
   'jquery.disableWhileLoading' /* disableWhileLoading */,
   'jquery.google-analytics' /* trackEvent */,
@@ -29,7 +30,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(INST, I18n, $, _) {
+], function(INST, I18n, $, _, FakeXHR) {
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -134,11 +135,29 @@ define([
       }
       event.preventDefault();
       event.stopPropagation();
-      if(options.noSubmit) {
-        if($.isFunction(options.success)) {
-          if (loadingPromise) loadingPromise.resolve();
-          options.success.call($form, formData, submitParam);
+
+      var xhrSuccess = function(data, request) {
+        if ($.isFunction(options.success)) {
+          options.success.call($form, data, submitParam, request);
         }
+      }
+      var xhrError = function(data, request) {
+        var $formObj = $form,
+            needValidForm = true;
+        if ($.isFunction(options.error)) {
+          var $obj = options.error.call($form, (data.errors || data), submitParam, request); // data is null?
+          if ($obj) $formObj = $obj;
+          needValidForm = false;
+        }
+        if ($formObj.parents("html").get(0) == $("html").get(0) && options.formErrors !== false) {
+          $formObj.formErrors(data, options);
+        } else if (needValidForm) {
+          $.ajaxJSON.unhandledXHRs.push(request);
+        }
+      }
+
+      if(options.noSubmit) {
+        xhrSuccess.call(this, formData, {});
       } else if(doUploadFile && options.preparedFileUpload && options.context_code) {
         $.ajaxJSONPreparedFiles.call(this, {
           handle_files: (options.upload_only ? options.success : options.handle_files),
@@ -153,8 +172,8 @@ define([
           uploadDataUrl: options.uploadDataUrl,
           formData: formData,
           formDataTarget: options.formDataTarget,
-          success: options.success,
-          error: options.error
+          success: xhrSuccess,
+          error: xhrError
         });
       } else if(doUploadFile && $.handlesHTML5Files && $form.hasClass('handlingHTML5Files')) {
         var args = $.extend({}, formData);
@@ -172,106 +191,43 @@ define([
             content_type: params.content_type,
             form_data: params.form_data,
             method: method,
-            success: function(data) {
-              if(options.success && $.isFunction(options.success)) {
-                options.success.call($form, data, submitParam);
-              }
-            },
-            error: function(data, request) {
-              // error function
-              var $formObj = $form,
-                  needValidForm = true;
-
-              if(options.error && $.isFunction(options.error)) {
-                data = data || {};
-                var $obj = options.error.call($form, data.errors || data, submitParam);
-                if($obj) {
-                  $formObj = $obj;
-                }
-                needValidForm = false;
-              } else {
-                needValidForm = true;
-              }
-              if($formObj.parents("html").get(0) == $("html").get(0) && options.formErrors !== false) {
-                $formObj.formErrors(data, options);
-              } else if(needValidForm) {
-                $.ajaxJSON.unhandledXHRs.push(request);
-              }
-            }
+            success: xhrSuccess,
+            error: xhrError
           });
         });
       } else if(doUploadFile) {
         var id            = _.uniqueId(formId + "_"),
-            $frame        = $("<div style='display: none;' id='box_" + id + "'><form id='form_" + id + "'></form><iframe id='frame_" + id + "' name='frame_" + id + "' src='about:blank' onload='$(\"#frame_" + id + "\").triggerHandler(\"form_response_loaded\");'></iframe>")
+            $frame        = $("<div style='display: none;' id='box_" + id + "'><iframe id='frame_" + id + "' name='frame_" + id + "' src='about:blank' onload='$(\"#frame_" + id + "\").triggerHandler(\"form_response_loaded\");'></iframe>")
                                 .appendTo("body").find("#frame_" + id),
-            $frameForm    = $(this),
             formMethod    = method,
-            priorTarget   = $frameForm.attr('target'),
-            priorEnctype  = $frameForm.attr('ENCTYPE'),
-            request       = new $.fakeXHR(0, ""),
-            $originalForm = $form;
+            priorTarget   = $form.attr('target'),
+            priorEnctype  = $form.attr('ENCTYPE'),
+            request       = new FakeXHR();
 
-        $frameForm.attr({
+        $form.attr({
           'method' : method,
           'action' : action,
           'ENCTYPE' : 'multipart/form-data',
           'encoding' : 'multipart/form-data',
-          'target' :"frame_" + id
+          'target' : "frame_" + id
         });
-        if(options.onlyGivenParameters) {
-          $frameForm.find("input[name='_method']").remove();
-          $frameForm.find("input[name='authenticity_token']").remove();
+        if (options.onlyGivenParameters) {
+          $form.find("input[name='_method']").remove();
+          $form.find("input[name='authenticity_token']").remove();
         }
 
         $.ajaxJSON.storeRequest(request, action, method, formData);
 
         $frame.bind('form_response_loaded', function() {
-          var $form = $originalForm,
-              i = $frame[0],
-              doc,
-              exception;
-          if (i.contentDocument) {
-            doc = i.contentDocument;
-          } else if (i.contentWindow) {
-            doc = i.contentWindow.document;
-          } else {
-            doc = window.frames[id].document;
-          }
-          var text = "";
-          var href = null;
-          var exception = null;
-          try {
-            if(doc.location.href == "about:blank") {
-              return;
-            }
-            text = $(doc).text();
-            var data = $.parseJSON(text);
-            if(options.success && $.isFunction(options.success) && data && !data.errors) {
-              options.success.call($form, data, submitParam);
-            }
-          } catch(e) {
-            data = {};
-            exception = e;
-          }
-          if(exception || data.errors) {
-            var $formObj = $form,
-                needValidForm = true;
+          var i = $frame[0],
+              doc = i.contentDocument || i.contentWindow.document;
+          if (doc.location.href == "about:blank") return;
 
-            request.responseText = text;
-            if(options.error && $.isFunction(options.error)) {
-              var $obj = options.error.call($form, (data.errors || text), submitParam);
-              if($obj) {
-                $formObj = $obj;
-              }
-              needValidForm = false;
-            } else if($.fn.formSubmit.defaultAjaxErrorObject && $.isFunction($.fn.formSubmit.defaultAjaxErrorFunction)) {
-              needValidForm = true;
-            }
-            if($formObj.parents("html").get(0) == $("html").get(0) && options.formErrors !== false) {
-              $formObj.formErrors(data.errrors || data, options);
-            } else if(needValidForm) {
-              $.ajaxJSON.unhandledXHRs.push(request);
-            }
+          request.setResponse($(doc).text());
+          if ($.httpSuccess(request)) {
+            xhrSuccess.call(this, request.response, request);
+          } else {
+            xhrError.call(this, request.response, request);
             $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, null, request, "0", exception);
           }
           setTimeout(function() {
@@ -283,33 +239,9 @@ define([
             $("#box_" + id).remove();
           }, 5000);
         });
-        $frameForm.data('submitting', true).submit().data('submitting', false);
+        $form.data('submitting', true).submit().data('submitting', false);
       } else {
-        $.ajaxJSON(action, method, formData, function(data) {
-          // success function
-          if($.isFunction(options.success)) {
-            options.success.call($form, data, submitParam);
-          }
-        }, function(data, request, status, error) {
-          // error function
-          data = data || {};
-          var $formObj = $form,
-              needValidForm = true;
-          if($.isFunction(options.error)) {
-            var $obj = options.error.call($form, data.errors || data, submitParam);
-            if($obj) {
-              $formObj = $obj;
-            }
-            needValidForm = false;
-          } else {
-            needValidForm = true;
-          }
-          if($formObj.parents("html").get(0) == $("html").get(0) && options.formErrors !== false) {
-            $formObj.formErrors(data, options);
-          } else if(needValidForm) {
-            $.ajaxJSON.unhandledXHRs.push(request);
-          }
-        });
+        $.ajaxJSON(action, method, formData, xhrSuccess, xhrError);
       }
     });
     return this;
@@ -560,13 +492,6 @@ define([
       }
     };
     nextParam();
-  };
-
-  // Used to make a fake XHR request, useful if there's errors on an
-  // asynchronous request generated using the iframe trick.
-  $.fakeXHR = function(status_code, text) {
-    this.status = status_code;
-    this.responseText = text;
   };
 
   // Defines a default error for all ajax requests.  Will always be called

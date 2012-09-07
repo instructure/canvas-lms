@@ -128,9 +128,7 @@ define([
       onlyGivenParameters: options ? options.onlyGivenParameters : false,
       error: error
     });
-    (function() {
-      $newForm.submit();
-    }).call($newForm);
+    $newForm.submit();
   };
   // Wrapper for default $.ajax behavior.  On error will call
   // the default error method if no error method is provided.
