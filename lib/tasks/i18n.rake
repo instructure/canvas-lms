@@ -246,10 +246,10 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
     # in addition to getting the non-en stuff into each scope_file, we need to get the core
     # formats and stuff for all languages (en included) into the common scope_file
     core_translations = I18n.available_locales.inject({}) { |h1, locale|
-      h1[locale] = all_translations[locale].slice(:date, :time, :number, :datetime, :support)
+      h1[locale.to_s] = all_translations[locale].slice(:date, :time, :number, :datetime, :support)
       h1
     }
-    dump_translations.call('_core_en', {:en => core_translations.delete(:en)})
+    dump_translations.call('_core_en', {'en' => core_translations.delete('en')})
     dump_translations.call('_core', core_translations)
   end
 
