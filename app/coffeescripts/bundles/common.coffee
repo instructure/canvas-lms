@@ -43,6 +43,7 @@ require [
 ], (courseList, helpDialog) ->
   courseList.init()
   helpDialog.initTriggers()
-  $('#skip_navigation_link').on('click', (e) -> $($(this).attr('href')).focus())
+  $('#skip_navigation_link').on 'click', ->
+    $($(this).attr('href')).attr('tabindex', -1).focus()
 
 
