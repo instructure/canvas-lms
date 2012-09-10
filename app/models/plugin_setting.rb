@@ -97,7 +97,7 @@ class PluginSetting < ActiveRecord::Base
   end
   
   def self.settings_for_plugin(name, plugin=nil)
-    Rails.cache.fetch(settings_cache_key(name), :expires_in => 5.minutes) do
+    res = Rails.cache.fetch(settings_cache_key(name), :expires_in => 5.minutes) do
       if (plugin_setting = PluginSetting.find_by_name(name.to_s)) && plugin_setting.valid_settings? && plugin_setting.enabled?
         plugin_setting.plugin = plugin
         settings = plugin_setting.settings
@@ -107,8 +107,10 @@ class PluginSetting < ActiveRecord::Base
         settings = plugin.default_settings
       end
 
-      settings
+      settings || :nil
     end
+    res = nil if res == :nil
+    res
   end
 
   def self.settings_cache_key(name)
