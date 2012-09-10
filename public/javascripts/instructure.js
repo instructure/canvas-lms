@@ -1023,17 +1023,6 @@ define([
         remove(url + "?permanent=1");
       }
     });
-    // if there is not a h1 or h2 on the page, then stick one in there for accessibility.
-    if (!$('h1').length) {
-      $('<h1 class="ui-helper-hidden-accessible" />').text(document.title).prependTo('#content');
-    }
-    if(!$('h2').length && $('#breadcrumbs li:last').text().length ) {
-      var $h2 = $('<h2 class="ui-helper-hidden-accessible" />').text($('#breadcrumbs li:last').text()),
-          $h1 = $('#content h1');
-      $h1.length ?
-        $h1.after($h2) :
-        $h2.prependTo('#content');
-    }
 
     // in 2 seconds (to give time for everything else to load), find all the external links and add give them
     // the external link look and behavior (force them to open in a new tab)
