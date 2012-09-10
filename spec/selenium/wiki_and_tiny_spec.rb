@@ -3,316 +3,282 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 describe "Wiki pages and Tiny WYSIWYG editor" do
   it_should_behave_like "wiki and tiny selenium tests"
 
-  before (:each) do
-    course_with_teacher_logged_in
-  end
+  context "as a teacher" do
 
-  it "should resize the WYSIWYG editor height gracefully" do
-    skip_if_ie('Out of memory')
-    wiki_page_tools_file_tree_setup
-    load_simulate_js
-    wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-    make_full_screen
-    # TODO: there's an issue where we can drag the box smaller than it's supposed to be on the first resize.
-    # Until we can track that down, first we do a fake drag to make sure the rest of the resizing machinery
-    # works.
-    drag_with_js('.editor_box_resizer', 0, -1)
-    resizer_to = 1 - f('.editor_box_resizer').location.y
-    # drag the resizer way up to the top of the screen (to make the wysiwyg the shortest it will go)
-    keep_trying_until do
-      drag_with_js('.editor_box_resizer', 0, resizer_to)
-      sleep 3
-      driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200)
-    end
-    f('.editor_box_resizer').attribute('style').should be_blank
-
-    # now move it down 30px from 200px high
-    keep_trying_until do
-      drag_with_js('.editor_box_resizer', 0, 30)
-      true
-    end
-    driver.execute_script("return $('#wiki_page_body_ifr').height()").should be_close(230, 5)
-    f('.editor_box_resizer').attribute('style').should be_blank
-    resize_screen_to_default
-  end
-
-  it "should add bold and italic text to the rce" do
-    skip_if_ie('Out of memory')
-    get "/courses/#{@course.id}/wiki"
-
-    wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-    f('.mceIcon.mce_bold').click
-    f('.mceIcon.mce_italic').click
-    first_text = 'This is my text.'
-
-    type_in_tiny('#wiki_page_body', first_text)
-    in_frame "wiki_page_body_ifr" do
-      f('#tinymce').should include_text(first_text)
-    end
-    #make sure each view uses the proper format
-    f('.wiki_switch_views_link').click
-    driver.execute_script("return $('#wiki_page_body').val()").should include '<em><strong>'
-    f('.wiki_switch_views_link').click
-    in_frame "wiki_page_body_ifr" do
-      f('#tinymce').should_not include_text('<p>')
+    before (:each) do
+      course_with_teacher_logged_in
     end
 
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-    wait_for_ajax_requests
+    it "should add a quiz to the rce" do
+      #create test quiz
+      @context = @course
+      quiz = quiz_model
+      quiz.generate_quiz_data
+      quiz.save!
 
-    driver.page_source.should match(/<em><strong>This is my text\./)
-  end
-
-  it "should add a quiz to the rce" do
-    #create test quiz
-    @context = @course
-    quiz = quiz_model
-    quiz.generate_quiz_data
-    quiz.save!
-
-    get "/courses/#{@course.id}/wiki"
-    # add quiz to rce
-    accordion = f('#pages_accordion')
-    accordion.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
-    keep_trying_until { accordion.find_element(:link, quiz.title).should be_displayed }
-    accordion.find_element(:link, quiz.title).click
-    in_frame "wiki_page_body_ifr" do
-      f('#tinymce').should include_text(quiz.title)
-    end
-
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-    wait_for_ajax_requests
-
-    f('#wiki_body').find_element(:link, quiz.title).should be_displayed
-  end
-
-  it "should add an assignment to the rce" do
-    assignment_name = 'first assignment'
-    @assignment = @course.assignments.create(:name => assignment_name)
-    get "/courses/#{@course.id}/wiki"
-
-    f('.wiki_switch_views_link').click
-    clear_wiki_rce
-    f('.wiki_switch_views_link').click
-    #check assigment accordion
-    accordion = f('#pages_accordion')
-    accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click
-    keep_trying_until { accordion.find_element(:link, assignment_name).should be_displayed }
-    accordion.find_element(:link, assignment_name).click
-    in_frame "wiki_page_body_ifr" do
-      f('#tinymce').should include_text(assignment_name)
-    end
-
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-    wait_for_ajax_requests
-    f('#wiki_body').find_element(:css, "a[title='#{assignment_name}']").should be_displayed
-  end
-
-  it "should add an equation to the rce by using equation buttons" do
-    skip_if_ie('Out of memory')
-    get "/courses/#{@course.id}/wiki"
-
-    f('#wiki_page_body_instructure_equation').click
-    wait_for_animations
-    f('#instructure_equation_prompt').should be_displayed
-    misc_tab = f('.mathquill-tab-bar > li:last-child a')
-    driver.action.move_to(misc_tab).perform
-    f('#Misc_tab li:nth-child(35) a').click
-    basic_tab = f('.mathquill-tab-bar > li:first-child a')
-    driver.action.move_to(basic_tab).perform
-    f('#Basic_tab li:nth-child(27) a').click
-    submit_form('#instructure_equation_prompt_form')
-    in_frame "wiki_page_body_ifr" do
-      f('#tinymce img').should be_displayed
-    end
-
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-    wait_for_ajax_requests
-
-    check_image(f('#wiki_body img'))
-  end
-
-  it "should add an equation to the rce by using the equation editor" do
-    equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
-
-    get "/courses/#{@course.id}/wiki"
-
-    f('#wiki_page_body_instructure_equation').click
-    wait_for_animations
-    f('#instructure_equation_prompt').should be_displayed
-    textarea = f('.mathquill-editor .textarea textarea')
-    3.times do
-      textarea.send_keys(:backspace)
-    end
-
-    # "paste" some latex
-    driver.execute_script "$('.mathquill-editor .textarea textarea').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
-    # make sure it renders correctly (inclding the medium space)
-    f('.mathquill-editor').text.should include "yay math stuff: \nd\n\dx\n"
-
-    # type and click a bit
-    textarea.send_keys "d/dx"
-    textarea.send_keys :arrow_right
-    textarea.send_keys "x^1/2"
-    textarea.send_keys :arrow_right
-    textarea.send_keys :arrow_right
-    f('.mathquill-editor .mathquill-toolbar a[title="="]').click
-    textarea.send_keys "1/2"
-    textarea.send_keys :arrow_right
-    textarea.send_keys "x^-1/2"
-    textarea.send_keys :arrow_right
-    textarea.send_keys :arrow_right
-    textarea.send_keys "=1/2"
-    f('.mathquill-editor .mathquill-toolbar a[title="\\\\sqrt"]').click
-    textarea.send_keys "x"
-    textarea.send_keys :arrow_right
-    textarea.send_keys :arrow_right
-    textarea.send_keys "\\text that. is. so. cool."
-    submit_form('#instructure_equation_prompt_form')
-    wait_for_ajax_requests
-    in_frame "wiki_page_body_ifr" do
-      keep_trying_until { f('.equation_image').attribute('title').should == equation_text }
-
-      # currently there's an issue where the equation is double-escaped in the
-      # src, though it's correct after the redirect to codecogs. here we just
-      # want to confirm we redirect correctly. so when that bug is fixed, this
-      # spec should still pass.
-      src = f('.equation_image').attribute('src')
-      response = Net::HTTP.get_response(URI.parse(src))
-      response.code.should eql "302"
-      response.header['location'].should include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-    end
-  end
-
-  it "should display record video dialog" do
-    skip_if_ie('Out of memory')
-    stub_kaltura
-    get "/courses/#{@course.id}/wiki"
-
-    f('.mce_instructure_record').click
-    keep_trying_until { f('#record_media_tab').should be_displayed }
-    f('#media_comment_dialog a[href="#upload_media_tab"]').click
-    f('#media_comment_dialog #audio_upload').should be_displayed
-    close_visible_dialog
-    f('#media_comment_dialog').should_not be_displayed
-  end
-
-  it "should handle table borders correctly" do
-    skip_if_ie('Out of memory')
-    get "/courses/#{@course.id}/wiki"
-
-    def check_table(attributes = {})
-      # clear out whatever is in the editor
-      driver.execute_script("$('#wiki_page_body_ifr')[0].contentDocument.body.innerHTML =''")
-
-      # this is the only way I know to actually trigger the insert table dialog to open
-      # listening to the click events on the button in the menu did not work
-      driver.execute_script("$('#wiki_page_body').editorBox('execute', 'mceInsertTable')")
-
-      # the iframe will be created with an id of mce_<some number>_ifr
-      table_iframe_id = keep_trying_until { ff('iframe').map { |f| f['id'] }.detect { |w| w =~ /mce_\d+_ifr/ } }
-      table_iframe_id.should_not be_nil
-      in_frame(table_iframe_id) do
-        attributes.each do |attribute, value|
-          tab_to_show = attribute == :bordercolor ? 'advanced' : 'general'
-          keep_trying_until do
-            driver.execute_script "mcTabs.displayTab('#{tab_to_show}_tab', '#{tab_to_show}_panel')"
-            set_value(f("##{attribute}"), value)
-            true
-          end
-        end
-        f('#insert').click
-      end
+      get "/courses/#{@course.id}/wiki"
+      # add quiz to rce
+      accordion = f('#pages_accordion')
+      accordion.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
+      keep_trying_until { accordion.find_element(:link, quiz.title).should be_displayed }
+      accordion.find_element(:link, quiz.title).click
       in_frame "wiki_page_body_ifr" do
-        table = f('#tinymce table')
-        attributes.each do |attribute, value|
-          (table[attribute].should == value.to_s) if (value && (attribute != :bordercolor))
-        end
-        [:width, :color].each do |part|
-          [:top, :right, :bottom, :left].each do |side|
-            expected_value = attributes[{:width => :border, :color => :bordercolor}[part]] || {:width => 1, :color => 'rgba(136, 136, 136, 1)'}[part]
-            if expected_value.is_a?(Numeric)
-              expected_value = 1 if expected_value == 0
-              expected_value = "#{expected_value}px"
-            end
-            table.style("border-#{side}-#{part}").should == expected_value
-          end
-        end
+        f('#tinymce').should include_text(quiz.title)
       end
-      # TODO: test how it looks after page is saved.
-      #submit_form('#new_wiki_page')
 
-    end
-
-    # check with default settings
-    check_table()
-
-    check_table(
-        :align => 'center',
-        :cellpadding => 5,
-        :cellspacing => 6,
-        :border => 7,
-        :bordercolor => 'rgba(255, 0, 0, 1)'
-    )
-    check_table(
-        :align => 'center',
-        :cellpadding => 0,
-        :cellspacing => 0,
-        :border => 0
-    )
-  end
-
-  context "auto link plugin" do
-
-    web_address = "www.google.com"
-
-    def add_text_to_tiny(text)
-      f('.wiki_switch_views_link').click
-      clear_wiki_rce
-      f('.wiki_switch_views_link').click
-      type_in_tiny('#wiki_page_body', text)
-      in_frame "wiki_page_body_ifr" do
-        f('#tinymce').send_keys(:return)
-        f('#tinymce').should include_text(text)
-      end
-    end
-
-    def save_wiki
       submit_form('#new_wiki_page')
       wait_for_ajax_requests
       get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
       wait_for_ajax_requests
+
+      f('#wiki_body').find_element(:link, quiz.title).should be_displayed
     end
 
-    def validate_link
+    it "should add an assignment to the rce" do
+      assignment_name = 'first assignment'
+      @assignment = @course.assignments.create(:name => assignment_name)
+      get "/courses/#{@course.id}/wiki"
+
+      f('.wiki_switch_views_link').click
+      clear_wiki_rce
+      f('.wiki_switch_views_link').click
+      #check assignment accordion
+      accordion = f('#pages_accordion')
+      accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click
+      keep_trying_until { accordion.find_element(:link, assignment_name).should be_displayed }
+      accordion.find_element(:link, assignment_name).click
       in_frame "wiki_page_body_ifr" do
-        link = f('#tinymce a')
-        link.attribute('href').should == 'http://www.google.com/'
+        f('#tinymce').should include_text(assignment_name)
+      end
+
+      submit_form('#new_wiki_page')
+      wait_for_ajax_requests
+      get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
+      wait_for_ajax_requests
+      f('#wiki_body').find_element(:css, "a[title='#{assignment_name}']").should be_displayed
+    end
+
+    ['Only Teachers', 'Teacher and Students', 'Anyone'].each_with_index do |permission, i|
+      it "should validate correct permissions for #{permission}" do
+        title = "test_page"
+        title2 = "test_page2"
+        hfs = false
+        edit_roles = "public"
+        validations = ["teachers", "teachers,students", "teachers,students,public"]
+
+        p = create_wiki_page(title, hfs, edit_roles)
+        get "/courses/#{@course.id}/wiki/#{p.title}"
+
+        keep_trying_until { f("#wiki_page_new").should be_displayed }
+
+        f('#wiki_page_new .new').click
+        f('#wiki_page_title').send_keys(title2)
+        submit_form("#add_wiki_page_form")
+
+        keep_trying_until { f("#wiki_page_editing_roles").should be_displayed }
+
+        click_option("#wiki_page_editing_roles", permission)
+        #form id is set like this because the id iterator is in the form but im not sure how to grab it directly before committed to the DB with the save
+        submit_form("#edit_wiki_page_#{p.id + 1}")
+
+        @course.wiki.wiki_pages.last.editing_roles.should == validations[i]
       end
     end
 
+    it "should take user to page history" do
+      title = "test_page"
+      hfs = false
+      edit_roles = "public"
+
+      p = create_wiki_page(title, hfs, edit_roles)
+      #sets body
+      p.update_attributes(:body => "test")
+
+      get "/courses/#{@course.id}/wiki/#{p.title}"
+
+      keep_trying_until { f("#page_history").should be_displayed }
+      f('#page_history').click
+
+      ff('a[title]').length.should == 3
+    end
+
+
+    it "should load the previous version of the page and roll-back page" do
+      title = "test_page"
+      hfs = false
+      edit_roles = "public"
+      body = "test"
+
+      p = create_wiki_page(title, hfs, edit_roles)
+      #sets body and then resets it for history verification
+      p.update_attributes(:body => body)
+      p.update_attributes(:body => "sample")
+
+      get "/courses/#{@course.id}/wiki/#{p.title}"
+      keep_trying_until { f("#page_history").should be_displayed }
+
+      f('#page_history').click
+      ff('a[title]')[1].click
+
+      f('#wiki_body').text.should == body
+
+      submit_form(".edit_version")
+      wait_for_ajax_requests
+
+      assert_flash_notice_message /successfully rolled-back/
+      f('#wiki_body').text.should == body
+    end
+
+    it "should restore the latest version of the page" do
+      title = "test_page"
+      hfs = false
+      edit_roles = "public"
+
+      p = create_wiki_page(title, hfs, edit_roles)
+      #sets body and then resets it for history verification
+      p.update_attributes(:body => "test")
+      p.update_attributes(:body => "sample")
+
+      old_version = p.versions[2].id
+
+      get "/courses/#{@course.id}/wiki/#{p.title}/revisions/#{old_version}"
+      keep_trying_until { f('.forward').should be_displayed }
+
+      #button to restore to most recent version
+      f('.forward').click
+      wait_for_ajax_requests
+
+      f('#wiki_body').text.should == "sample"
+    end
+
+    it "should take user back to revision history" do
+      title = "test_page"
+      hfs = false
+      edit_roles = "public"
+
+      p = create_wiki_page(title, hfs, edit_roles)
+      #sets body and then resets it for history verification
+      p.update_attributes(:body => "test")
+      version = p.versions[1].id
+
+      get "/courses/#{@course.id}/wiki/#{p.title}/revisions/#{version}"
+      keep_trying_until { f('.history').should be_displayed }
+
+      f('.history').click
+      wait_for_ajax_requests
+
+      ff('a[title]').length.should == 3
+    end
+  end
+
+  context "as a student" do
+
     before(:each) do
-      get "/courses/#{@course.id}/wiki"
-      wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
+      course_with_student_logged_in
     end
 
-    it "should type a web address and validate auto link plugin is working correctly" do
-      add_text_to_tiny(web_address)
-      validate_link
+    def set_notification_policy
+      n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
     end
 
-    it "should type a web address link, save it, and validate auto link plugin worked correctly" do
-      add_text_to_tiny(web_address)
-      save_wiki
-      validate_link
+    def update_wiki_attr(days_old, notify, body, p)
+      p.created_at = days_old.days.ago
+      p.notify_of_update = notify
+      p.save!
+      p.update_attributes(:body => body)
+    end
+
+    it "should not allow access to page when marked as hide from student" do
+      expected_error = "Unauthorized"
+      title = "test_page"
+      hfs = true
+      edit_roles = "members"
+
+      create_wiki_page(title, hfs, edit_roles)
+      get "/courses/#{@course.id}/wiki/#{title}"
+      wait_for_ajax_requests
+
+      f('.ui-state-error').should include_text(expected_error)
+    end
+
+    it "should not allow students to edit if marked for only teachers can edit" do
+      #vars for the create_wiki_page method which seeds the used page
+      title = "test_page"
+      hfs = false
+      edit_roles = "teachers"
+
+      create_wiki_page(title, hfs, edit_roles)
+      get "/courses/#{@course.id}/wiki/#{title}"
+      wait_for_ajax_requests
+
+      f('.edit_link').should be_nil
+    end
+
+    it "should allow students to edit wiki if any option but teachers is selected" do
+      title = "test_page"
+      hfs = false
+      edit_roles = "public"
+
+      create_wiki_page(title, hfs, edit_roles)
+
+      get "/courses/#{@course.id}/wiki/#{title}"
+      wait_for_ajax_requests
+
+      f('.edit_link').should be_displayed
+
+      #vars for 2nd wiki page with different permissions
+      title2 = "test_page2"
+      edit_roles2 = "members"
+
+      create_wiki_page(title2, hfs, edit_roles2)
+
+      get "/courses/#{@course.id}/wiki/#{title2}"
+      wait_for_ajax_requests
+
+      f('.edit_link').should be_displayed
+    end
+
+    it "should notify users when wiki page gets changed" do
+      set_notification_policy
+
+      #vars for the create_wiki_page method which seeds the used page
+      title = "test_page"
+      hfs = false
+      edit_roles = "members"
+      #vars for update_wiki_attrib method
+      days_old = 1
+      notify = true
+      body = "test"
+
+      p = create_wiki_page(title, hfs, edit_roles)
+      update_wiki_attr(days_old, notify, body, p)
+
+      #validation that the update to the body triggered a notification to the @user as expected
+      p.messages_sent.should_not be_nil
+      p.messages_sent.should_not be_empty
+      p.messages_sent["Updated Wiki Page"].should_not be_nil
+      p.messages_sent["Updated Wiki Page"].should_not be_empty
+      p.messages_sent["Updated Wiki Page"].map(&:user).should be_include(@user)
+    end
+
+    it "should not notify users when wiki page gets changed" do
+      set_notification_policy
+
+      #vars for the create_wiki_page method which seeds the used page
+      title = "test_page"
+      hfs = false
+      edit_roles = "members"
+      #vars for update_wiki_attrib method
+      days_old = 1
+      notify = false
+      body = "test"
+
+      p = create_wiki_page(title, hfs, edit_roles)
+      update_wiki_attr(days_old, notify, body, p)
+
+      #validation that the update to the body did not trigger a notification to the @user as expected
+      p.messages_sent.should be_empty
     end
   end
 end
