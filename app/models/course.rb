@@ -163,6 +163,7 @@ class Course < ActiveRecord::Base
   has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
+  has_many :asset_user_accesses, :as => :context
   has_many :role_overrides, :as => :context
   has_many :content_migrations, :foreign_key => :context_id
   has_many :content_exports
