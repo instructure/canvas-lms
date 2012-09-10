@@ -56,6 +56,15 @@ describe "Canvas::Redis" do
       Canvas::Redis.reset_redis_failure
     end
 
+    it "should fail if not ignore_redis_failures" do
+      Setting.set('ignore_redis_failures', 'false')
+      expect {
+        enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) {
+          Rails.cache.read('blah').should == nil
+        }
+      }.to raise_error(Redis::TimeoutError)
+    end
+
     it "should not fail cache.read" do
       enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
         Rails.cache.read('blah').should == nil
