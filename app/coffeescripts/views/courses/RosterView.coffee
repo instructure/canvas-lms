@@ -23,90 +23,68 @@ define [
   'jst/courses/RosterUser'
 ], ($, _, PaginatedView, rosterUser) ->
 
-  # This view displays a paginated collection of users inside of a course.
+  # RosterView: Display a paginated collection of users inside of a course.
   #
-  # @examples
+  # Examples
   #
-  #   view = RosterView.new
-  #     el: $('...')
-  #     collection: EnrollmentCollection.new(...')
-  #
-  #   view.collection.on('reset', view.render)
+  #   view = new RosterView el: $('..'), collection: new UserCollection(...)
+  #   view.collection.on('reset', view.render, view)
+  #   view.collection.fetch(...)
   class RosterView extends PaginatedView
-    # Default options to be passed to the server on each request for new
-    # collection records.
-    fetchOptions:
-      include: ['avatar_url']
-      per_page: 50
-
-    # Create and configure a new RosterView.
+    # Public: Create a new instance.
     #
-    # @param el {jQuery} - The parent element (should have overflow: hidden and
-    #   a height for infinite scroll).
-    # @param collection {EnrollmentCollection} - The collection to retrieve
-    #   results from.
-    # @param options {Object} - Configuration options.
-    #   - requestOptions: options to be passed w/ every server call.
-    #
-    # @examples
-    #
-    #   view = new RosterView
-    #     el: $(...)
-    #     collection: new EnrollmentCollection
-    #       url: ...
-    #       sections: ENV.SECTIONS
-    #     requestOptions:
-    #       type: ['StudentEnrollment']
-    #       include: ['avatar_url']
-    #       per_page: 25
-    #
-    # @api public
-    # @return a RosterView.
-    initialize: (options) ->
-      @fetchOptions =
-        data: _.extend({}, @fetchOptions, options.requestOptions)
-        add: false
-      @collection.on('reset', @render, this)
+    # fetchOptions - Options to be passed to @collection.fetch(). Needs to be
+    #   passed for subsequent page gets (see PaginatedView).
+    initialize: ({fetchOptions}) ->
       @paginationScrollContainer = @$el
-      @$el.disableWhileLoading(@collection.fetch(@fetchOptions))
-      super(fetchOptions: @fetchOptions)
+      super(fetchOptions: fetchOptions)
 
-    # Append newly fetched records to the roster list.
+    # Public: Append new records to the roster list.
     #
-    # @api private
-    # @return nothing.
+    # Returns nothing.
     render: ->
-      users       = @combinedSectionEnrollments(@collection)
-      enrollments = _.map(users, @renderUser)
-      @$el.append(enrollments.join(''))
+      @combineSectionNames(@collection)
+      @appendCourseId(@collection)
+      html = _.map(@collection.models, @renderUser)
+      @$el.append(html.join(''))
       super
 
-    # Create the HTML for a given user record.
+    # Public: Return HTML for a given record.
     #
-    # @param enrollment - An enrollment model.
+    # user - The user object to render as HTML.
     #
-    # @api private
-    # @return nothing.
-    renderUser: (enrollment) ->
-      rosterUser(enrollment.toJSON())
+    # Returns an HTML string.
+    renderUser: (user) ->
+      rosterUser(user.toJSON())
 
-    # Take users in multiple sections and combine their section names
-    # into an array to be displayed in a list.
+    # Internal: Mutate a user collection, adding a sectionNames property to
+    #   each child model.
     #
-    # @param collection {EnrollmentCollection} - Enrollments to format.
+    # collection - The collection to alter.
     #
-    # @api private
-    # @return an array of user models.
-    combinedSectionEnrollments: (collection) ->
-      users       = collection.groupBy (enrollment) -> enrollment.get('user_id')
-      enrollments = _.reduce users, (list, enrollments, key) ->
-        enrollment = enrollments[0]
-        names      = _.map(enrollments, (e) -> e.get('course_section_name'))
-        # do it this way instead of calling .set(...) so that we don't fire an
-        # extra page load from PaginatedView.
-        enrollment.attributes.course_section_name = _.uniq(names)
-        list.push(enrollment)
-        list
-      , []
-      enrollments
+    # Returns nothing.
+    combineSectionNames: (collection) ->
+      collection.each (user) =>
+        user.set('sectionNames', @getSections(user), silent: true)
+
+    # Internal: Mutate a user collection, adding a course_id attribute to
+    #   each child model.
+    #
+    # collection - The collection to alter.
+    #
+    # Returns nothing
+    appendCourseId: (collection) ->
+      collection.each (user) ->
+        user.set('course_id', user.get('enrollments')[0].course_id, silent: true)
+
+    # Internal: Get the names of a user's sections.
+    #
+    # user - The user to return section names for.
+    #
+    # Return an array of section names.
+    getSections: (user) ->
+      sections = user.get('enrollments').map (enrollment) =>
+        @collection.sections.find (section) -> enrollment.course_section_id == section.id
+
+      _.uniq(_.map(sections, (section) -> section.get('name')))
 

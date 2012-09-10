@@ -298,11 +298,11 @@ class CoursesController < ApplicationController
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      enrollment_type = "#{params[:enrollment_type].capitalize}Enrollment" if params[:enrollment_type]
+      enrollment_type = Array(params[:enrollment_type]).map { |e| "#{e.capitalize}Enrollment" } if params[:enrollment_type]
       users = @context.users_visible_to(@current_user)
       # TODO: convert this to the good user sorting stuff
       users = users.scoped(:order => "users.sortable_name")
-      users = users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) if enrollment_type
+      users = users.scoped(:conditions => ["enrollments.type IN (?) ", enrollment_type]) if enrollment_type
 
       # If a user_id is passed in, modify the page parameter so that the page
       # that contains that user is returned.

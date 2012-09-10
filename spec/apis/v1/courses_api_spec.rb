@@ -637,6 +637,14 @@ describe CoursesController, :type => :integration do
                                                               :only => USER_API_FIELDS).map {|x| x["id"]}.sort
     end
 
+    it "should accept an array of enrollment_types" do
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users",
+                      {:controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
+                      :enrollment_type => ['student', 'teacher'], :include => ['enrollments'])
+
+      json.map { |u| u['enrollments'].map { |e| e['type'] } }.flatten.uniq.sort.should == %w{StudentEnrollment TeacherEnrollment}
+    end
+
     it "should not include sis user id or login id for non-admins" do
       RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
       student_in_course(:course => @course2, :active_all => true, :name => 'Zombo')
