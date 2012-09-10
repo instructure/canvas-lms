@@ -218,7 +218,7 @@ describe "manage groups students" do
       simulate_group_drag(students[3].id, "blank", groups[0].id)
       wait_for_ajaximations
 
-      3.times{|i| groups[i].reload}
+      3.times { |i| groups[i].reload }
       groups[0].users.length.should == 2
       groups[1].users.length.should == 1
       groups[2].users.length.should == 1
@@ -226,14 +226,14 @@ describe "manage groups students" do
       simulate_group_drag(students[3].id, groups[0].id, groups[1].id)
       wait_for_ajaximations
 
-      3.times{|i| groups[i].reload}
+      3.times { |i| groups[i].reload }
       groups[0].users.length.should == 1
       groups[1].users.length.should == 2
       groups[2].users.length.should == 1
       simulate_group_drag(students[3].id, groups[1].id, groups[2].id)
       wait_for_ajaximations
 
-      3.times{|i| groups[i].reload}
+      3.times { |i| groups[i].reload }
       groups[0].users.length.should == 1
       groups[1].users.length.should == 2
       groups[2].users.length.should == 1
@@ -309,6 +309,17 @@ describe "manage groups students" do
       group_element.should include_text(expected_display_name)
     end
 
+    it "should give 'Nothing to do.' error flash if no unassigned students" do
+      assign_students(@category)
+      assign_students(@category)
+      assert_flash_error_message /Nothing to do/
+    end
+
+    it "should give 'Students assigned to groups.' success flash otherwise" do
+      assign_students(@category)
+      assert_flash_notice_message /Students assigned to groups/
+    end
+
     it "should give 'Assigning Students...' visual feedback" do
       assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
       assign_students.should_not be_nil
@@ -325,17 +336,6 @@ describe "manage groups students" do
       GroupsController.filter_chain.pop
       # make sure we wait before moving on
       wait_for_ajax_requests
-    end
-
-    it "should give 'Nothing to do.' error flash if no unassigned students" do
-      assign_students(@category)
-      assign_students(@category)
-      assert_flash_error_message /Nothing to do/
-    end
-
-    it "should give 'Students assigned to groups.' success flash otherwise" do
-      assign_students(@category)
-      assert_flash_notice_message /Students assigned to groups/
     end
   end
 
