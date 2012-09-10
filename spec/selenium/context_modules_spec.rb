@@ -37,23 +37,20 @@ describe "context_modules" do
     end
 
     it "should display all available modules in course through student progression" do
-      #enroll a student in the @course
       new_student = student_in_course.user
-
-      #create modules
       modules = create_modules(2)
-
 
       #attach 1 assignment to module 1 and 2 assignments to module 2
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-
       modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
       modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
 
       get "/courses/#{@course.id}/modules"
 
-      #opens the student progression link
-      f('.module_progressions_link').click
+      keep_trying_until do
+        f('.module_progressions_link').click
+        f(".student_list").should be_displayed
+      end
 
       #validates the modules are displayed, are in the expected state, and include the correct student including current in progress module
       f(".module_#{modules[0].id} .progress").should include_text("no information")
@@ -64,12 +61,7 @@ describe "context_modules" do
     end
 
     it "should refresh student progression page and display as expected" do
-
-      #enroll a student in the @course
       new_student = student_in_course.user
-
-      #create modules
-
       modules = create_modules(2)
 
       #attach 1 assignment to module 1 and 2 assignments to module 2
@@ -86,7 +78,11 @@ describe "context_modules" do
       get "/courses/#{@course.id}/modules"
 
       #opens the student progression link and validates all modules have no information"
-      f('.module_progressions_link').click
+      keep_trying_until do
+        f('.module_progressions_link').click
+        f(".student_list").should be_displayed
+      end
+
       student_list = f(".student_list")
       student_list.should include_text(new_student.name)
       student_list.should include_text("none in progress")
@@ -95,30 +91,23 @@ describe "context_modules" do
 
       #updates the state for @assignment in module_1 for new_student be completed
       modules[0].update_for(new_student, :read, @tag_1)
-      f('.refresh_progressions_link').click
-      # the refresh takes a little while to finish and during it creates a class called refreshing when done it removes it
-
-      wait_for_ajaximations
-
-      #validates the modules are displayed, are in the expected state, and include the correct student including current in progress module
 
       keep_trying_until do
-        f(".module_#{modules[0].id} .progress").should include_text("completed")
-        f(".module_#{modules[1].id} .progress").should include_text("in progress")
+        f('.refresh_progressions_link').click
+        f(".student_list").should be_displayed
       end
 
+      f(".module_#{modules[0].id} .progress").should include_text("completed")
+      f(".module_#{modules[1].id} .progress").should include_text("in progress")
       student_list.should include_text(new_student.name)
       #student_list.should include_text("module 2") ****Should update to module 2 but doesn't until renavigating to the page****
-
     end
 
     it "should allow selecting specific student progression and update module state on screen" do
-
       new_student = student_in_course.user
       new_student2 = student_in_course.user
 
       modules = create_modules(2)
-
 
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       @tag_1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -136,8 +125,10 @@ describe "context_modules" do
 
       get "/courses/#{@course.id}/modules"
 
-      #opens the student progression link
-      f('.module_progressions_link').click
+      keep_trying_until do
+        f('.module_progressions_link').click
+        f(".student_list").should be_displayed
+      end
 
       #selects the second student
       ff(".student_list .student")[2].click
