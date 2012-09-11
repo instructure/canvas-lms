@@ -94,7 +94,7 @@ class SearchController < ApplicationController
 
     @blank_fallback = !api_request?
 
-    max_results = [params[:per_page].try(:to_i) || 10, 50].min
+    max_results = Api.per_page_for(self)
     if max_results < 1
       if !types[:user] || params[:context]
         max_results = nil # i.e. all results
@@ -132,7 +132,7 @@ class SearchController < ApplicationController
             def total_pages; nil; end
             def per_page; #{max_results}; end
           CODE
-          recipients = Api.paginate(recipients, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
+          recipients = Api.paginate(recipients, self, api_v1_search_recipients_url)
         else
           if contexts.size <= max_results / 2
             recipients = contexts + participants

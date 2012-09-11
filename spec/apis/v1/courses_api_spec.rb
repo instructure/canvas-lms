@@ -654,6 +654,18 @@ describe CoursesController, :type => :integration do
       json.map { |u| u['enrollments'].map { |e| e['type'] } }.flatten.uniq.sort.should == %w{StudentEnrollment TeacherEnrollment}
     end
 
+    it "maintains query parameters in link headers" do
+      json = api_call(
+        :get,
+        "/api/v1/courses/#{@course1.id}/users.json",
+        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+        { :enrollment_type => 'student', :maintain_params => '1', :per_page => 1 })
+      links = response['Link'].split(",")
+      links.should_not be_empty
+      links.all?{ |l| l =~ /enrollment_type=student/ }.should be_true
+      links.first.scan(/per_page/).length.should == 1
+    end
+
     it "should not include sis user id or login id for non-admins" do
       RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
       student_in_course(:course => @course2, :active_all => true, :name => 'Zombo')

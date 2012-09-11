@@ -824,7 +824,7 @@ ActionController::Routing::Routes.draw do |map|
     api.get 'conversations/find_recipients', :controller => :conversations, :action => :find_recipients
 
     api.with_options(:controller => :conversations) do |conversations|
-      conversations.get 'conversations', :action => :index
+      conversations.get 'conversations', :action => :index, :path_name => 'conversations'
       conversations.post 'conversations', :action => :create
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/:id', :action => :show

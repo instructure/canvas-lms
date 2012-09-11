@@ -169,19 +169,19 @@ describe "Files API", :type => :integration do
       7.times {|i| Attachment.create!(:filename => "test#{i}.txt", :display_name => "test#{i}.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course) }
       json = api_call(:get, "/api/v1/folders/#{@root.id}/files?per_page=3", @files_path_options.merge(:id => @root.id.to_param, :per_page => '3'), {})
       json.length.should == 3
-      response.headers['Link'].should == [
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=2&per_page=3>; rel="next"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=1&per_page=3>; rel="first"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/folders\/#{@root.id}\/files/ }.should be_true
+      links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
 
       json = api_call(:get, "/api/v1/folders/#{@root.id}/files?per_page=3&page=3", @files_path_options.merge(:id => @root.id.to_param, :per_page => '3', :page => '3'), {})
       json.length.should == 1
-      response.headers['Link'].should == [
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=2&per_page=3>; rel="prev"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=1&per_page=3>; rel="first"},
-        %{<http://www.example.com/api/v1/folders/#{@root.id}/files?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/folders\/#{@root.id}\/files/ }.should be_true
+      links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
     end
   end
 

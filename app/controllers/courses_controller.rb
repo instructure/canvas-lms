@@ -307,14 +307,16 @@ class CoursesController < ApplicationController
 
       # If a user_id is passed in, modify the page parameter so that the page
       # that contains that user is returned.
-      if params[:user_id] && user = users.scoped(:conditions => ["users.id = ?", params[:user_id]]).first
+      # We delete it from params so that it is not maintained in pagination links.
+      user_id = params.delete(:user_id)
+      if user_id.present? && user = users.scoped(:conditions => ["users.id = ?", user_id]).first
         position_scope = users.scoped(:conditions => ["sortable_name <= ?", user.sortable_name])
         position = position_scope.count(:select => "users.*", :distinct => true)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
       end
 
-      users = Api.paginate(users, self, api_v1_course_users_path)
+      users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')

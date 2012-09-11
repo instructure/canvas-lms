@@ -155,23 +155,36 @@ module Api
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
     per_page = per_page_for(controller)
-    collection = collection.paginate({ :page => controller.params[:page], :per_page => per_page }.merge(pagination_args))
+    pagination_args.reverse_merge!({ :page => controller.params[:page], :per_page => per_page })
+    collection = collection.paginate(pagination_args)
     return unless collection.respond_to?(:next_page)
-    links = []
-    base_url += (base_url =~ /\?/ ? '&': '?')
-    template = "<%spage=%s&per_page=#{collection.per_page}>; rel=\"%s\""
-    if collection.next_page
-      links << template % [base_url, collection.next_page, "next"]
-    end
-    if collection.previous_page
-      links << template % [base_url, collection.previous_page, "prev"]
-    end
-    links << template % [base_url, 1, "first"]
-    if !pagination_args[:without_count] && collection.total_pages && collection.total_pages > 1
-      links << template % [base_url, collection.total_pages, "last"]
-    end
+    total_pages = (pagination_args[:without_count] ? nil : collection.total_pages)
+    total_pages = nil if total_pages.to_i <= 1
+    links = build_links(base_url, {
+      :query_parameters => controller.request.query_parameters,
+      :per_page => collection.per_page,
+      :next => collection.next_page,
+      :prev => collection.previous_page,
+      :first => 1,
+      :last => total_pages,
+    })
     controller.response.headers["Link"] = links.join(',') if links.length > 0
     collection
+  end
+
+  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
+  def self.build_links(base_url, opts={})
+    links = []
+    base_url += (base_url =~ /\?/ ? '&': '?')
+    qp = opts[:query_parameters] || {}
+    qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
+    base_url += "#{qp.to_query}&" if qp.present?
+    [:next, :prev, :first, :last].each do |k|
+      if opts[k].present?
+        links << "<#{base_url}page=#{opts[k]}&per_page=#{opts[:per_page]}>; rel=\"#{k}\""
+      end
+    end
+    links
   end
 
   def media_comment_json(media_object_or_hash)

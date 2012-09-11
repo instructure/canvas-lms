@@ -110,13 +110,23 @@ describe ConversationsController, :type => :integration do
                       {:controller => 'conversations', :action => 'index', :format => 'json', :scope => 'default', :per_page => '3'})
 
       json.size.should eql 3
-      response.headers['Link'].should eql(%{</api/v1/conversations.json?scope=default&page=2&per_page=3>; rel="next",</api/v1/conversations.json?scope=default&page=1&per_page=3>; rel="first",</api/v1/conversations.json?scope=default&page=3&per_page=3>; rel="last"})
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/conversations/ }.should be_true
+      links.all?{ |l| l.scan(/scope=default/).size == 1 }.should be_true
+      links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
 
       # get the last page
       json = api_call(:get, "/api/v1/conversations.json?scope=default&page=3&per_page=3",
                       {:controller => 'conversations', :action => 'index', :format => 'json', :scope => 'default', :page => '3', :per_page => '3'})
       json.size.should eql 1
-      response.headers['Link'].should eql(%{</api/v1/conversations.json?scope=default&page=2&per_page=3>; rel="prev",</api/v1/conversations.json?scope=default&page=1&per_page=3>; rel="first",</api/v1/conversations.json?scope=default&page=3&per_page=3>; rel="last"})
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/conversations/ }.should be_true
+      links.all?{ |l| l.scan(/scope=default/).size == 1 }.should be_true
+      links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2&per_page=3>/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
     end
 
     it "should filter conversations by scope" do

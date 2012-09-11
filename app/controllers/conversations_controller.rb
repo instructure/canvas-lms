@@ -111,7 +111,7 @@ class ConversationsController < ApplicationController
   #   ]
   def index
     if request.format == :json
-      conversations = Api.paginate(@conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
+      conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # optimize loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
       @conversations_json = conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => true) }
