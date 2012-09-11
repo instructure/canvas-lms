@@ -44,8 +44,11 @@
   <input type="hidden" name="enroll_me" value="true">
 
   <div class="button-container">
-    <button type="button" class="button dialog_closer"><%= t 'cancel', "Cancel" %></button>
-    <button class="button btn-primary" type="submit"><%= t 'create_course', 'Create course' %></button>
-
+    <button type="button"
+            data-text-while-loading="<%= t 'cancel', "Cancel" %>"
+            class="button dialog_closer"><%= t 'cancel', "Cancel" %></button>
+    <button class="button btn-primary"
+            data-text-while-loading="<%= t 'creating_course', 'Creating course...' %>"
+            type="submit"><%= t 'create_course', 'Create course' %></button>
   </div>
 <% end %>
