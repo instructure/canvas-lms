@@ -387,6 +387,23 @@ describe "calendar2" do
         # shows on monday night and tuesday morning
         events.size.should eql 2
       end
+
+      it "should change event duration by dragging" do
+        noon = Time.now.at_beginning_of_day + 12.hours
+        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 1.hour
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=week]').click
+        wait_for_ajaximations
+        resize_handle = fj('.fc-event:visible .ui-resizable-handle')
+        driver.action.drag_and_drop_by(resize_handle, 0, 50).perform
+        wait_for_ajaximations
+        # dragging it 50px will make it one hour longer, a 2 hour event is 80px tall
+        fj('.fc-event:visible').size.height.should == 80
+        event.reload
+        event.end_at.should == noon + 2.hours
+      end
+
     end
   end
 
