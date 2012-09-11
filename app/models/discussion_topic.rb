@@ -239,6 +239,7 @@ class DiscussionTopic < ActiveRecord::Base
     return nil unless current_user
 
     if new_state != self.read_state(current_user)
+      self.context_module_action(current_user, :read) if new_state == 'read'
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
     else
       true
@@ -250,6 +251,8 @@ class DiscussionTopic < ActiveRecord::Base
     return unless current_user
 
     transaction do
+      self.context_module_action(current_user, :read) if new_state == 'read'
+
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
 

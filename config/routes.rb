@@ -919,7 +919,8 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :files) do |files|
       files.post 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
       files.get 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
-      files.get 'files/:id', :action => :api_show, :path_name => 'file'
+      # 'attachment' (rather than 'file') is used below so modules API can use polymorphic_url to generate an item API link
+      files.get 'files/:id', :action => :api_show, :path_name => 'attachment'
       files.delete 'files/:id', :action => :destroy
       files.put 'files/:id', :action => :api_update
       files.get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
@@ -943,10 +944,18 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :wiki_pages) do |wiki_pages|
-      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_pages'
-      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_pages'
-      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_page'
-      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_page'
+      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_wiki_pages'
+      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_wiki_pages'
+      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_wiki_page'
+      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_wiki_page'
+    end
+
+    api.with_options(:controller => :context_modules_api) do |context_modules|
+      context_modules.get "courses/:course_id/modules", :action => :index, :path_name => 'course_context_modules'
+      context_modules.get "courses/:course_id/modules/:id", :action => :show, :path_name => 'course_context_module'
+      context_modules.get "courses/:course_id/modules/:module_id/items", :action => :list_module_items, :path_name => 'course_context_module_items'
+      context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
+      context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
     end
   end
 

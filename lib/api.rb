@@ -301,6 +301,16 @@ module Api
   # regex for shard-aware ID
   ID = '(?:\d+~)?\d+'
 
+  # maps a Canvas data type to an API-friendly type name
+  API_DATA_TYPE = { "Attachment" => "File",
+                    "WikiPage" => "Page",
+                    "DiscussionTopic" => "Discussion",
+                    "Assignment" => "Assignment",
+                    "Quiz" => "Quiz",
+                    "ContextModuleSubHeader" => "SubHeader",
+                    "ExternalUrl" => "ExternalUrl",
+                    "ContextExternalTool" => "ExternalTool" }.freeze
+
   # maps canvas URLs to API URL helpers
   # target array is return type, helper, name of each capture, and optionally a Hash of extra arguments
   API_ROUTE_MAP = {
@@ -313,12 +323,12 @@ module Api
       %r{^/groups/(#{ID})/discussion_topics/(#{ID})$} => ['Discussion', :api_v1_group_discussion_topic_url, :group_id, :topic_id],
 
       # List pages
-      %r{^/courses/(#{ID})/wiki$} => ['[Page]', :api_v1_course_pages_url, :course_id],
-      %r{^/groups/(#{ID})/wiki$} => ['[Page]', :api_v1_group_pages_url, :group_id],
+      %r{^/courses/(#{ID})/wiki$} => ['[Page]', :api_v1_course_wiki_pages_url, :course_id],
+      %r{^/groups/(#{ID})/wiki$} => ['[Page]', :api_v1_group_wiki_pages_url, :group_id],
 
       # Show page
-      %r{^/courses/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_course_page_url, :course_id, :url],
-      %r{^/groups/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_group_page_url, :group_id, :url],
+      %r{^/courses/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_course_wiki_page_url, :course_id, :url],
+      %r{^/groups/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_group_wiki_page_url, :group_id, :url],
 
       # List assignments
       %r{^/courses/(#{ID})/assignments$} => ['[Assignment]', :api_v1_course_assignments_url, :course_id],
@@ -332,11 +342,11 @@ module Api
       %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, {:id => 'root'}],
 
       # Get file
-      %r{^/courses/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
-      %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
-      %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
-      %r{^/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
-  }
+      %r{^/courses/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+  }.freeze
 
   def api_endpoint_info(protocol, host, url)
     API_ROUTE_MAP.each_pair do |re, api_route|

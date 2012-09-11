@@ -85,7 +85,7 @@ class WikiPagesController < ApplicationController
   # @returns [Page]
   def api_index
     if authorized_action(@context.wiki.wiki_pages.new, @current_user, :read)
-      pages_route = polymorphic_url([:api_v1, @context, :pages])
+      pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       scope = @context.wiki.wiki_pages.active.order_by_id
       view_hidden = is_authorized_action?(@context.wiki.wiki_pages.new(:hide_from_students => true), @current_user, :read)
       scope = scope.visible_to_students unless view_hidden

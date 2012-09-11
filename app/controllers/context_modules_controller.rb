@@ -19,8 +19,8 @@
 class ContextModulesController < ApplicationController
   before_filter :require_context  
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
-  before_filter { |c| c.active_tab = "modules" }  
-  
+  before_filter { |c| c.active_tab = "modules" }
+
   def index
     if authorized_action(@context, @current_user, :read)
       @modules = @context.context_modules.active
