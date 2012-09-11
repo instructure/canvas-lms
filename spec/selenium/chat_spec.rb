@@ -7,7 +7,7 @@ describe "chat" do
     course_with_teacher_logged_in
     PluginSetting.create!(:name => "tinychat", :settings => {})
     get "/courses/#{@course.id}/chat"
-    f(".tinychat_embed iframe").should be_displayed
+    keep_trying_until { f(".tinychat_embed iframe").should be_displayed }
   end
 end
 
