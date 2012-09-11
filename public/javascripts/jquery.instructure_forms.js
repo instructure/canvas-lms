@@ -61,6 +61,9 @@ define([
   //    fileUpload: Either a boolean or a function.  If it is true or
   //      returns true, then it's assumed this is a file upload request
   //      and we use the iframe trick to submit the form.
+  //    onSubmit: A callback which will receive 1. a deferred object
+  //      encompassing the request(s) triggered by the submit action and 2. the
+  //      formData being posted
   $.fn.formSubmit = function(options) {
     this.submit(function(event) {
       var $form = $(this); //this is to handle if bind to a template element, then it gets cloned the original this would not be the same as the this inside of here.
@@ -100,13 +103,21 @@ define([
       }
 
       if (options.disableWhileLoading) {
+        var oldOnSubmit = options.onSubmit || function(){};
+        options.onSubmit = function(loadingPromise) {
+          $form.disableWhileLoading(loadingPromise);
+          oldOnSubmit.apply(this, arguments);
+        }
+      }
+
+      if (options.onSubmit) {
         var loadingPromise = $.Deferred(),
             oldHandlers = {};
-        $form.disableWhileLoading(loadingPromise);
+        options.onSubmit(loadingPromise, formData);
         $.each(['success', 'error'], function(i, successOrError){
           oldHandlers[successOrError] = options[successOrError];
           options[successOrError] = function() {
-            loadingPromise[successOrError === 'success' ? 'resolve': 'reject']();
+            loadingPromise[successOrError === 'success' ? 'resolve': 'reject'].apply(loadingPromise, arguments);
             if ($.isFunction(oldHandlers[successOrError])) {
               return oldHandlers[successOrError].apply(this, arguments);
             }
