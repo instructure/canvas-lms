@@ -55,9 +55,11 @@ define [
       @save {}, options
 
     positionAfter: (otherId) ->
+      throw '`otherId` must be either the id of the model you want to position this after or the string "top"
+            (meaning you want to put this topic at the top of the list)' unless otherId > 0 || otherId is 'top'
       @updateOneAttribute 'position_after', otherId
       collection = @collection
-      otherIndex = collection.indexOf collection.get(otherId)
+      otherIndex = if otherId == 'top' then 0 else collection.indexOf(collection.get(otherId))
       collection.remove this, silent: true
-      collection.models.splice (otherIndex), 0, this
+      collection.models.splice otherIndex, 0, this
       collection.reset collection.models
