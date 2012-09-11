@@ -302,7 +302,8 @@ class CoursesController < ApplicationController
       # If a user_id is passed in, modify the page parameter so that the page
       # that contains that user is returned.
       if params[:user_id] && user = users.scoped(:conditions => ["users.id = ?", params[:user_id]]).first
-        position = users.scoped(:conditions => ["sortable_name <= ?", user.sortable_name]).count
+        position_scope = users.scoped(:conditions => ["sortable_name <= ?", user.sortable_name])
+        position = position_scope.count(:select => "users.*", :distinct => true)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
       end

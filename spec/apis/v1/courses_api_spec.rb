@@ -731,11 +731,14 @@ describe CoursesController, :type => :integration do
     end
 
     it "should allow jumping to a user's page based on id" do
+      @other_section = @course1.course_sections.create!
       students = []
       5.times do |i|
-        students << student_in_course(:course => @course1, :name => "User #{i+1}", :active_all => true).user
+        s = student_in_course(:course => @course1, :name => "User #{i+1}", :active_all => true).user
+        @course1.enroll_student(s, :section => @other_section, :allow_multiple_enrollments => true)
+        students << s
       end
-      @target = students[2]
+      @target = students[4]
       @user = @me
       json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                       { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, 
