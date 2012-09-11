@@ -31,9 +31,6 @@ define [
     equal collection2.options.foo, 'baz',
       'overrides default options with instance options'
 
-  ##
-  # need to make these pass!
-
   test 'sends @params in request', ->
     collection = new TestCollection()
     collection.fetch()

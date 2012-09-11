@@ -43,8 +43,6 @@ define [
       _.each @_directPropertyOptions, (prop) => @[prop] = @options[prop]
       super
 
-    ##
-    # Leave this alone unless you don't need @options.params
     fetch: (options = {}) ->
       options.data = @options.params if !options.data? and @options.params?
       super options
