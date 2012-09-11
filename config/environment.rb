@@ -40,26 +40,26 @@ Rails::Initializer.run do |config|
   end
 
   log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[RAILS_ENV]
-  if log_config
-    opts = {}
-    opts[:skip_thread_context] = true if log_config['log_context'] == false
-    case log_config["logger"]
-    when "syslog"
-      require 'syslog_wrapper'
-      log_config["app_ident"] ||= "canvas-lms"
-      log_config["daemon_ident"] ||= "canvas-lms-daemon"
-      facilities = 0
-      (log_config["facilities"] || []).each do |facility|
-        facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
-      end
-      ident = ENV['RUNNING_AS_DAEMON'] == 'true' ? log_config["daemon_ident"] : log_config["app_ident"]
-      opts[:include_pid] = true if log_config["include_pid"] == true
-      config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(ident, facilities, opts)
-    else
-      require 'canvas/logger'
-      log_level = ActiveSupport::BufferedLogger.const_get(config.log_level.to_s.upcase)
-      config.logger = RAILS_DEFAULT_LOGGER = CanvasLogger.new(config.log_path, log_level, opts)
+  log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
+  opts = {}
+  require 'canvas/logger'
+  log_level = ActiveSupport::BufferedLogger.const_get(log_config['log_level'].to_s.upcase)
+  opts[:skip_thread_context] = true if log_config['log_context'] == false
+  case log_config["logger"]
+  when "syslog"
+    require 'syslog_wrapper'
+    log_config["app_ident"] ||= "canvas-lms"
+    log_config["daemon_ident"] ||= "canvas-lms-daemon"
+    facilities = 0
+    (log_config["facilities"] || []).each do |facility|
+      facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
     end
+    ident = ENV['RUNNING_AS_DAEMON'] == 'true' ? log_config["daemon_ident"] : log_config["app_ident"]
+    opts[:include_pid] = true if log_config["include_pid"] == true
+    config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(ident, facilities, opts)
+    config.logger.level = log_level
+  else
+    config.logger = RAILS_DEFAULT_LOGGER = CanvasLogger.new(config.log_path, log_level, opts)
   end
 
   # Use SQL instead of Active Record's schema dumper when creating the test database.
