@@ -497,11 +497,9 @@ describe "calendar2" do
         pending('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         get "/calendar2"
         wait_for_ajaximations
-        # Get the spanish text for the current month
-        today_month = Date.today.month
-        I18n.locale = 'es'
-        expect_month = I18n.translate('date.month_names')[today_month]
-        fj('#minical h2').text.should == "#{expect_month} 2012"
+        # Get the spanish text for the current month/year
+        expect_month_year = I18n.l(Date.today, :format => '%B %Y', :locale => 'es')
+        fj('#minical h2').text.should == expect_month_year
         fj('#minical .fc-sun').text.should == 'Dom'
         fj('#minical .fc-mon').text.should == 'Lun'
         fj('#minical .fc-tue').text.should == 'Mar'
