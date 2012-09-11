@@ -83,17 +83,17 @@ describe "speed grader" do
 
     q = Quiz.find_by_assignment_id(@assignment.id)
     q.quiz_questions.create!(:quiz => q, :question_data => {
-      :position => 1,
-      :question_type => "true_false_question",
-      :points_possible => 3,
-      :question_name => "true false question" })
+        :position => 1,
+        :question_type => "true_false_question",
+        :points_possible => 3,
+        :question_name => "true false question"})
     q.generate_quiz_data
     q.workflow_state = 'available'
     q.save!
 
     [student, @teacher].each do |user|
       q.generate_submission(student).tap do |qs|
-        qs.submission_data = { 'foo' => 'bar1' }
+        qs.submission_data = {'foo' => 'bar1'}
         qs.grade_submission
       end
     end
@@ -237,12 +237,12 @@ describe "speed grader" do
     @account.service_enabled?(:avatars).should be_true
 
     student_submission
+
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_animations
-
     # make sure avatar shows up for current student
     ff("#avatar_image").length.should == 1
-    f("#avatar_image")['src'].should_not match(/blank.png/)
+    f("#avatar_image").should_not have_attribute('src', 'blank.png')
 
     #add comment
     f('#add_a_comment > textarea').send_keys('grader comment')
@@ -277,8 +277,7 @@ describe "speed grader" do
     sub.add_comment(:comment => "ohai teacher")
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
-    f("#avatar_image").should be_displayed
+    keep_trying_until { f("#avatar_image").should be_displayed }
 
     f("#settings_link").click
     f('#hide_student_names').click
@@ -431,5 +430,58 @@ describe "speed grader" do
     wait_for_ajaximations
 
     ff("#students_selectmenu option").length.should == 1
+  end
+
+  it "should mark the checkbox of students for graded assignments" do
+    student_submission
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    f("#students_selectmenu-button").should have_class("not_graded")
+
+    #if this block loses focuses of the window the checkbox won't get checked
+    keep_trying_until do
+      f('#grade_container input[type=text]').click
+      set_value(f('#grade_container input[type=text]'), 1)
+      f(".ui-selectmenu-icon").click
+      wait_for_ajaximations
+      f("#students_selectmenu-button").should have_class("graded")
+    end
+  end
+
+  context "grading display" do
+
+    it "should display the score on the sidebar" do
+      create_and_enroll_students(1)
+      submit_and_grade_homework(@students[0], 3)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      f('#grade_container input[type=text]').should have_attribute("value", "3")
+    end
+
+    it "should display total number of graded assignments to students" do
+      create_and_enroll_students(2)
+      submit_and_grade_homework(@students[0], 3)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      f("#x_of_x_graded").should include_text("1 / 2 Graded")
+    end
+
+    it "should display average submission grade for total assignment submissions" do
+      create_and_enroll_students(2)
+
+      submit_and_grade_homework(@students[0], 10)
+      submit_and_grade_homework(@students[1], 0)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      f("#average_score").should include_text("5 / 10 (50%)")
+    end
   end
 end

@@ -152,6 +152,90 @@ describe "speed grader submissions" do
     f('#this_student_does_not_have_a_submission').should be_displayed
   end
 
+  it "should leave the full rubric open when switching submissions" do
+    student_submission :username => "student1@example.com"
+    student_submission :username => "student2@example.com"
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    keep_trying_until { f('.toggle_full_rubric').should be_displayed }
+    f('.toggle_full_rubric').click
+    wait_for_animations
+    rubric = f('#rubric_full')
+    rubric.should be_displayed
+    first_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[0][:id]}")
+    first_criterion.find_element(:css, '.ratings .edge_rating').click
+    second_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[1][:id]}")
+    second_criterion.find_element(:css, '.ratings .edge_rating').click
+    rubric.find_element(:css, '.rubric_total').should include_text('8')
+    f('#rubric_full .save_rubric_button').click
+    wait_for_ajaximations
+    f('.toggle_full_rubric').click
+    wait_for_animations
+
+    f("#criterion_#{@rubric.criteria[0][:id]} input.criterion_points").should have_attribute("value", "3")
+    f("#criterion_#{@rubric.criteria[1][:id]} input.criterion_points").should have_attribute("value", "5")
+    f('#gradebook_header .next').click
+    wait_for_ajaximations
+
+    f('#rubric_full').should be_displayed
+    f("#criterion_#{@rubric.criteria[0][:id]} input.criterion_points").should have_attribute("value", "")
+    f("#criterion_#{@rubric.criteria[1][:id]} input.criterion_points").should have_attribute("value", "")
+
+    f('#gradebook_header .prev').click
+    wait_for_ajaximations
+
+    f('#rubric_full').should be_displayed
+    f("#criterion_#{@rubric.criteria[0][:id]} input.criterion_points").should have_attribute("value", "3")
+    f("#criterion_#{@rubric.criteria[1][:id]} input.criterion_points").should have_attribute("value", "5")
+  end
+
+  it "should highlight submitted assignments and not non-submitted assignments for students" do
+    student_submission
+    create_and_enroll_students(1)
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    keep_trying_until { f('#speedgrader_iframe').should be_displayed }
+
+    #check for assignment title
+    f('#assignment_url').should include_text(@assignment.title)
+    ff("#students_selectmenu-menu li")[0].should have_class("not_submitted")
+    ff("#students_selectmenu-menu li")[1].should have_class("not_graded")
+  end
+
+  it "should display image submission in browser" do
+    filename, fullpath, data = get_file("graded.png")
+    create_and_enroll_students(1)
+    @assignment.submission_types ='online_upload'
+    @assignment.save!
+
+    add_attachment_student_assignment(filename, @students[0], fullpath)
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    keep_trying_until { f('#speedgrader_iframe').should be_displayed }
+
+    in_frame("speedgrader_iframe") do
+      #validates the image\attachment is inside the iframe as expected
+      f(".decoded").attribute("src").should include_text("download")
+    end
+  end
+
+  it "should successfully download attachments" do
+    filename, fullpath, data = get_file("testfile1.txt")
+    create_and_enroll_students(1)
+    @assignment.submission_types ='online_upload'
+    @assignment.save!
+
+    add_attachment_student_assignment(filename, @students[0], fullpath)
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    keep_trying_until { f('#speedgrader_iframe').should be_displayed }
+    f(".submission-file-download").click
+
+    #this assertion verifies the attachment was opened since its a .txt it just renders in the browser
+    keep_trying_until { f("body pre").should include_text("63f46f1c") }
+  end
+
   context "turnitin" do
     before(:each) do
       @assignment.turnitin_enabled = true
@@ -219,7 +303,7 @@ describe "speed grader submissions" do
       f('#submission_files_list .submission_pending').should_not be_nil
     end
 
-    it "should sucessfully schedule resubmit when button is clicked" do
+    it "should successfully schedule resubmit when button is clicked" do
       student_submission
       set_turnitin_asset(@submission, {:status => 'error'})
 
@@ -228,50 +312,10 @@ describe "speed grader submissions" do
 
       f('#grade_container .submission_error').click
       wait_for_animations
-      f('#grade_container .turnitin_resubmit_button').click
-      wait_for_dom_ready
+      expect_new_page_load { f('#grade_container .turnitin_resubmit_button').click}
       wait_for_ajaximations
       Delayed::Job.find_by_tag('Submission#submit_to_turnitin').should_not be_nil
       f('#grade_container .submission_pending').should_not be_nil
     end
-  end
-
-  it "should leave the full rubric open when switching submissions" do
-    student_submission :username => "student1@example.com"
-    student_submission :username => "student2@example.com"
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
-
-    keep_trying_until { f('.toggle_full_rubric').should be_displayed }
-    f('.toggle_full_rubric').click
-    wait_for_animations
-    rubric = f('#rubric_full')
-    rubric.should be_displayed
-    first_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[0][:id]}")
-    first_criterion.find_element(:css, '.ratings .edge_rating').click
-    second_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[1][:id]}")
-    second_criterion.find_element(:css, '.ratings .edge_rating').click
-    rubric.find_element(:css, '.rubric_total').should include_text('8')
-    f('#rubric_full .save_rubric_button').click
-    wait_for_ajaximations
-    f('.toggle_full_rubric').click
-    wait_for_animations
-
-    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == "3"
-    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == "5"
-
-    f('#gradebook_header .next').click
-    wait_for_ajaximations
-
-    f('#rubric_full').should be_displayed
-    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == ""
-    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == ""
-
-    f('#gradebook_header .prev').click
-    wait_for_ajaximations
-
-    f('#rubric_full').should be_displayed
-    driver.execute_script("return $('#criterion_#{@rubric.criteria[0][:id]} input.criterion_points').val();").should == "3"
-    driver.execute_script("return $('#criterion_#{@rubric.criteria[1][:id]} input.criterion_points').val();").should == "5"
   end
 end
