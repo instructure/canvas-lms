@@ -20,7 +20,7 @@ describe "links" do
 
     it "should navigate user to home page after home link is clicked" do
       expect_new_page_load { driver.find_element(:link, 'Home').click }
-      f('#breadcrumbs').should include_text('Unnamed')
+      f("#course_home_content").should be_displayed
     end
 
     it "should navigate user to announcements page after announcements link is clicked" do
