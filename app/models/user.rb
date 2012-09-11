@@ -243,8 +243,8 @@ class User < ActiveRecord::Base
       :select => 'users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists',
       # left outer join ensures we get the user even if they don't have a pseudonym
       :joins => sanitize_sql([<<-SQL, root_account_id]),
-        LEFT OUTER JOIN "pseudonyms" ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
-        INNER JOIN "enrollments" ON enrollments.user_id = users.id
+        LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
+        INNER JOIN enrollments ON enrollments.user_id = users.id
       SQL
       :conditions => enrollment_conditions,
       # the trick to get unique users
