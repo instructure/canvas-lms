@@ -101,24 +101,4 @@ module SearchHelper
     end
     @contexts
   end
-
-  def jsonify_users(users, options = {})
-    options = {
-      :include_participant_avatars => true,
-      :include_participant_contexts => true
-    }.merge(options)
-    users.map { |user|
-      hash = {
-        :id => user.id,
-        :name => user.short_name
-      }
-      if options[:include_participant_contexts]
-        hash[:common_courses] = user.common_courses
-        hash[:common_groups] = user.common_groups
-      end
-      hash[:avatar_url] = avatar_url_for_user(user, blank_fallback) if options[:include_participant_avatars]
-      hash
-    }
-  end
-
 end

@@ -20,6 +20,7 @@
 
 class SearchController < ApplicationController
   include SearchHelper
+  include Api::V1::Conversation
 
   before_filter :get_context
 
@@ -152,7 +153,7 @@ class SearchController < ApplicationController
   private
 
   def matching_participants(options)
-    jsonify_users(@current_user.messageable_users(options.merge(:admin_context => @admin_context)), options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
+    conversation_users_json(@current_user.messageable_users(options.merge(:admin_context => @admin_context)), @current_user, session, options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
   end
 
   def matching_contexts(options)
