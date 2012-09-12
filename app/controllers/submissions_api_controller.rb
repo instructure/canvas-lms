@@ -259,7 +259,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     if authorized
-      submission = {}
+      submission = { :grader => @current_user }
       if params[:submission].is_a?(Hash)
         submission[:grade] = params[:submission].delete(:posted_grade)
       end
