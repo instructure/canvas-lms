@@ -13,7 +13,6 @@ $context_module_bg_color: #f2f3f4
   margin-bottom: 15px
   
   .links a, .reorder_module_link, .move_item_link
-    visibility: hidden
     +opacity(0.5)
     &:hover
       +opacity(1)
@@ -23,9 +22,6 @@ $context_module_bg_color: #f2f3f4
     padding-right: 10px
     text-align: right
     white-space: nowrap
-  &.context_module_hover,:hover
-    .reorder_module_link, .header .links a 
-      visibility: visible
   .header 
     background-color: darken($context_module_bg_color, 5%)
     border-bottom: 1px dotted #aaa
@@ -37,11 +33,8 @@ $context_module_bg_color: #f2f3f4
   .completion_status .complete_icon, 
   .locked_icon,
   .progression_details_link,
-  .reorder_module_link,
   .header .links,
   .add_module_item_link,
-  .edit_module_link,
-  .delete_module_link,
   .manage_module,
   .delete_prerequisite_link,
   .expand_module_link,

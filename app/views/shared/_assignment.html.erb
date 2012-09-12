@@ -12,7 +12,7 @@
   <div class="content">
     <div class="move data">
       <% if assignment.nil? || (assignment && !assignment.att_frozen?(:assignment_group_id, @current_user)) %>
-        <%= image_tag 'move.png', :alt => t('alts.move', "Move"), :class => "move_icon", :title => t('titles.sort_or_move', "Sort Assignments or Move to Another Group"), :style => "margin-top: 3px;" %>
+        <%= image_tag 'move.png', :alt => t('tiles.sort_or_move', 'Sort Assignments or Move to Another Group'), :class => "move_icon", :style => "margin-top: 3px;", :tabindex => '0' %>
       <% end %>
     </div>
     <div class="data assignment_title ellipsis">
