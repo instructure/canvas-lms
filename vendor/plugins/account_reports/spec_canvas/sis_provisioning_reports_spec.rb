@@ -219,6 +219,10 @@ describe "Default Account Reports" do
       course5.workflow_state = 'deleted'
       course5.save!
       #course5 should not show up since it is not active
+
+      course6 = Course.new(:name => 'talking 101', :course_code => 'Tal101')
+      course6.workflow_state = 'completed'
+      course6.save!
       parameters = {}
       parameters["courses"] = true
       parsed = run_report("sis_export_csv", parameters)
@@ -229,11 +233,12 @@ describe "Default Account Reports" do
       parsed[2].should == ["SIS_COURSE_ID_3", "SCI101", "Science 101", nil, nil, "active", nil, nil]
 
       parsed = run_report("provisioning_csv", parameters,3)
-      parsed.length.should == 4
+      parsed.length.should == 5
       parsed[0].should == [course1.id.to_s, course1.sis_source_id, course1.course_code, course1.name, sub_account.sis_source_id, term1.sis_source_id, "active", start_at.iso8601, end_at.iso8601]
       parsed[1].should == [course2.id.to_s, "SIS_COURSE_ID_2", "MAT101", "Math 101", nil, nil, "active", nil, end_at.iso8601]
       parsed[2].should == [course3.id.to_s, "SIS_COURSE_ID_3", "SCI101", "Science 101", nil, nil, "active", nil, nil]
       parsed[3].should == [course4.id.to_s, nil, "self", "self help", nil, nil, "unpublished", nil, nil]
+      parsed[4].should == [course6.id.to_s, nil, "Tal101", "talking 101", nil, nil, "concluded", nil, nil]
 
       parameters = {}
       parameters["enrollment_term"] = @account.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME).id

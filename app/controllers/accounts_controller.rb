@@ -390,7 +390,7 @@ class AccountsController < ApplicationController
       end
     end
   end
-  
+
   def run_report
     if authorized_action(@context, @current_user, :read_reports)
       student_report = AccountReport.new(:user=>@current_user, :account=>@account, :report_type=>params[:report_type], :parameters=>params[:parameters])

@@ -123,6 +123,7 @@ module Canvas::AccountReports
                                                      :select => "courses.*,
           CASE WHEN courses.workflow_state = 'claimed' THEN 'unpublished'
                WHEN courses.workflow_state = 'created' THEN 'unpublished'
+               WHEN courses.workflow_state = 'completed' THEN 'concluded'
                WHEN courses.workflow_state = 'available' THEN 'active' END as course_state")
         courses = courses.scoped(:conditions => ["enrollment_term_id=?", @term]) if @term
         courses = courses.scoped(:conditions => "sis_source_id IS NOT NULL") if @sis_format
