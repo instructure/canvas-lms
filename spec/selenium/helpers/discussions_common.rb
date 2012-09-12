@@ -68,8 +68,10 @@ shared_examples_for "discussions selenium tests" do
   end
 
   def validate_entry_text(discussion_entry, text)
-    li_selector = %([data-id$="#{discussion_entry.id}"])
-    keep_trying_until { fj(li_selector).should include_text(text) }
+    keep_trying_until do
+      li_selector = %([data-id$="#{discussion_entry.id}"])
+      fj(li_selector).should include_text(text)
+    end
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)

@@ -338,7 +338,6 @@ describe "discussions" do
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
-
         delete_entry(entry)
       end
 
@@ -347,7 +346,6 @@ describe "discussions" do
         text = "new side comment from student"
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_ajax_requests
         wait_for_js
         validate_entry_text(entry, text)
         edit_entry(entry, edit_text)
