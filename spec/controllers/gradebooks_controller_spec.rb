@@ -76,6 +76,37 @@ describe GradebooksController do
       assigns[:courses_with_grades].should be_nil
     end
 
+    it "should not allow access for a linked student" do
+      course_with_student(:active_all => true)
+      @student = @user
+      user(:active_all => true)
+      user_session(@user)
+      @se = @course.enroll_student(@user)
+      @se.accept
+      @se.update_attribute(:associated_user_id, @student.id)
+      @user.reload
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      assert_unauthorized
+    end
+
+    it "should not allow access for an observer linked in a different course" do
+      course_with_student(:active_all => true)
+      @course1 = @course
+      @student = @user
+      course(:active_all => true)
+      @course2 = @course
+
+      user(:active_all => true)
+      user_session(@user)
+      @oe = @course1.enroll_user(@user, 'ObserverEnrollment')
+      @oe.accept
+      @oe.update_attribute(:associated_user_id, @student.id)
+
+      @user.reload
+      get 'grade_summary', :course_id => @course2.id, :id => @student.id
+      assert_unauthorized
+    end
+
     it "should allow concluded teachers to see a student grades pages" do
       course_with_teacher_logged_in(:active_all => true)
       @enrollment.conclude
@@ -126,16 +157,23 @@ describe GradebooksController do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
       observer = user_with_pseudonym(:username => 'parent@example.com', :active_all => 1)
+
       course1 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
       student_in_course :user => student, :active_all => 1
       oe = course1.enroll_user(observer, 'ObserverEnrollment')
       oe.associated_user = student
       oe.save!
       oe.accept
+
+      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
+      student_in_course :user => student, :active_all => 1
+      oe = course2.enroll_user(observer, 'ObserverEnrollment')
+      oe.associated_user = student
+      oe.save!
+      oe.accept
+
       user_session(observer)
-      get 'grade_summary', :course_id => @course.id, :id => student.id
+      get 'grade_summary', :course_id => course1.id, :id => student.id
       response.should be_success
       assigns[:courses_with_grades].should be_nil
     end
