@@ -939,6 +939,9 @@ describe ContentMigration do
       @copy_from.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
                                            :delayed_post_at => old_start + 3.days)
+      @copy_from.calendar_events.create!(:title => "an event",
+                                         :start_at => old_start + 4.days,
+                                         :end_at => old_start + 4.days + 1.hour)
       cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => old_start + 1.days)
       cm.start_at = old_start + 2.day
       cm.end_at = old_start + 3.days
@@ -964,6 +967,10 @@ describe ContentMigration do
 
       new_disc = @copy_to.discussion_topics.first
       new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+
+      new_event = @copy_to.calendar_events.first
+      new_event.start_at.to_i.should == (new_start + 4.day).to_i
+      new_event.end_at.to_i.should == (new_start + 4.day + 1.hour).to_i
 
       new_mod = @copy_to.context_modules.first
       new_mod.unlock_at.to_i.should  == (new_start + 1.day).to_i
