@@ -830,7 +830,7 @@ class Attachment < ActiveRecord::Base
         file_state_changed? &&
         file_state == 'available' &&
         context && context.state == :available &&
-        folder.visible?
+        folder && folder.visible?
   end
 
   # generate notifications for recent file operations
