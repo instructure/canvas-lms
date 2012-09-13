@@ -180,6 +180,39 @@ describe "Standard Common Cartridge importing" do
       pending("Can't import assessment data with python QTI tool.")
     end
   end
+  
+  context "re-importing the cartridge" do
+    
+    append_before do
+      @migration2 = ContentMigration.create(:context => @course)
+      @migration2.migration_settings[:migration_ids_to_import] = {:copy=>{}}
+      @course.import_from_migration(@course_data, nil, @migration2)
+    end
+    
+    it "should import webcontent" do
+      @course.attachments.count.should == 20
+      @course.attachments.active.count.should == 10
+      mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
+      mig_ids.each do |mig_id|
+        atts = @course.attachments.find_all_by_migration_id(mig_id)
+        atts.length.should == 2
+        atts.any?{|a|a.file_state = 'deleted'}.should == true
+        atts.any?{|a|a.file_state = 'available'}.should == true
+      end
+    end
+    
+    it "should point to new attachment from module" do
+      @course.context_modules.count.should == 3
+      
+      mod1 = @course.context_modules.find_by_migration_id("I_00000")
+      mod1.content_tags.active.count.should == (Qti.qti_enabled? ? 5 : 4)
+      mod1.name.should == "Your Mom, Research, & You"
+      tag = mod1.content_tags.active[0]
+      tag.content_type.should == 'Attachment'
+      tag.content_id.should == @course.attachments.active.find_by_migration_id("I_00001_R").id
+      puts mod1.content_tags.active.count
+    end
+  end
 
 end
 

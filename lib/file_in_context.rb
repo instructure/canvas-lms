@@ -50,8 +50,8 @@ class FileInContext
         explicit_filename = Attachment.make_unique_filename(explicit_filename) { |fname| !atts.any? { |a| a.filename == fname } }
         display_name = Attachment.make_unique_filename(display_name) { |fname| !atts.any? { |a| a.display_name == fname } }
       elsif folder && explicit_filename
-        # This code will delete any file in the folder that had the same name...
-        context.attachments.active.find_all_by_folder_id(folder.id).select{|a| a.filename == explicit_filename }.each{|a| destroy_file(a) }
+        # Delete any file in the folder that had the same display name so that it is "replaced"
+        context.attachments.active.find_all_by_folder_id(folder.id).select{|a| a.display_name == explicit_filename }.each{|a| destroy_file(a) }
       end
 
       @attachment = context.attachments.build(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)

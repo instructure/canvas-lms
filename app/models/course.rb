@@ -1700,15 +1700,13 @@ class Course < ActiveRecord::Base
     params = migration.migration_settings[:migration_ids_to_import]
     valid_paths = []
     (data['file_map'] || {}).each do |id, file|
-      if !migration.context.attachments.detect { |f| f.migration_id == file['migration_id'] } || migration.migration_settings[:files_import_allow_rename]
-        path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
-        self.attachment_path_id_lookup[path] = file['migration_id']
-        self.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
-        if params[:copy][:files]
-          valid_paths << path if (bool_res(params[:copy][:files][file['migration_id'].to_sym]) rescue false)
-        else
-          valid_paths << path
-        end
+      path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
+      self.attachment_path_id_lookup[path] = file['migration_id']
+      self.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
+      if params[:copy][:files]
+        valid_paths << path if (bool_res(params[:copy][:files][file['migration_id'].to_sym]) rescue false)
+      else
+        valid_paths << path
       end
     end
     valid_paths = [0] if valid_paths.empty? && params[:copy] && params[:copy][:files]

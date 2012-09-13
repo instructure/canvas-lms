@@ -673,6 +673,8 @@ class ContextModule < ActiveRecord::Base
       item.prerequisites = preqs if preqs.length > 0
     end
     
+    # Clear the old tags to be replaced by new ones
+    item.content_tags.destroy_all
     item.save!
     
     item_map = {}
@@ -732,7 +734,7 @@ class ContextModule < ActiveRecord::Base
       end
     elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
       # this is a file of some kind
-      file = self.context.attachments.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
+      file = self.context.attachments.active.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
       if file
         title = hash[:title] || hash[:linked_resource_title]
         item = self.add_item({
