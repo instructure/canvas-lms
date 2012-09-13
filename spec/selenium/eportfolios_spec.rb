@@ -164,6 +164,7 @@ describe "eportfolios" do
           f(comment_public).click
           is_checked(comment_public).should be_true
           submit_form(".form_content")
+          wait_for_ajax_requests
           f(".section_content b").text.should eql "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
           refresh_page
