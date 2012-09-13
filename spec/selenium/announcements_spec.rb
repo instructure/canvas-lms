@@ -143,12 +143,12 @@ describe "announcements" do
       #add external feed to announcements
       feed_name = 'http://www.google.com'
       driver.execute_script("$('#add_external_feed_form').css('display', 'block')")
-      feed_form = f('#add_external_feed_form')
-      feed_form.find_element(:id, 'external_feed_url').send_keys(feed_name)
-      feed_form.find_element(:css, 'input[aria-controls=header_match_container]').click
-      feed_form.find_element(:css, 'input[name=header_match]').send_keys('blah')
+      fj('external_feed_url').send_keys(feed_name)
+      fj('input[aria-controls=header_match_container]').click
+      fj('input[name=header_match]').send_keys('blah')
+      #using fj to avoid selenium caching
       expect {
-        submit_form(feed_form)
+        submit_form(f('#add_external_feed_form'))
         wait_for_ajaximations
       }.to change(ExternalFeed, :count).by(1)
 
