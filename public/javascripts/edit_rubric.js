@@ -351,6 +351,7 @@ define([
       });
       $rubric.fillFormData(rubric);
       var url = $.replaceTags($rubric.find(".edit_rubric_url").attr('href'), 'rubric_id', rubric.id);
+      rubricEditing.isEditing = false;
       $rubric.find(".edit_rubric_link").attr('href', url);
       var url = $.replaceTags($rubric.find(".delete_rubric_url").attr('href'), 'association_id', rubric.rubric_association_id);
       $rubric.find(".delete_rubric_link").attr('href', url);
