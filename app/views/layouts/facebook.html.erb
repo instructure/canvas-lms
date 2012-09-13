@@ -15,7 +15,7 @@
   </div>
 
   <script>
-    window.JSON || document.write('<%= (include_javascripts :json2).gsub("</script>", "<\\/script>") %>');
+    window.JSON || document.write('<%= (javascript_include_tag "#{js_base_url}/vendor/json2.js").gsub("</script>", "<\\/script>") %>');
 
     INST = <%= raw(inst_env.to_json) %>;
     ENV = <%= raw js_env.to_json %>;
