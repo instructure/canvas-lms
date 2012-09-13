@@ -143,7 +143,7 @@ describe "announcements" do
       #add external feed to announcements
       feed_name = 'http://www.google.com'
       driver.execute_script("$('#add_external_feed_form').css('display', 'block')")
-      fj('external_feed_url').send_keys(feed_name)
+      fj('#external_feed_url').send_keys(feed_name)
       fj('input[aria-controls=header_match_container]').click
       fj('input[name=header_match]').send_keys('blah')
       #using fj to avoid selenium caching
