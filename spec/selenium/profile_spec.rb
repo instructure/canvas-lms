@@ -294,12 +294,11 @@ shared_examples_for "profile pictures selenium tests" do
   it_should_behave_like "forked server selenium tests"
 
   it "should successfully upload profile pictures" do
-    pending("intermittently fails")
     course_with_teacher_logged_in
     a = Account.default
     a.enable_service('avatars')
     a.save!
-    IMAGE_SRC = ''
+    image_src = ''
 
     get "/profile/settings"
     keep_trying_until { f(".profile_pic_link") }.click
@@ -324,15 +323,15 @@ shared_examples_for "profile pictures selenium tests" do
       spans.length.should == 3
       spans.last.attribute('class') =~ /selected/
       uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
-      IMAGE_SRC = uploaded_image.attribute('src')
-      IMAGE_SRC.should =~ %r{/images/thumbnails/}
+      image_src = uploaded_image.attribute('src')
+      image_src.should =~ %r{/images/thumbnails/}
       new_image.attribute('alt').should =~ /graded/
     end
     dialog.find_element(:css, '.select_button').click
     wait_for_ajaximations
     keep_trying_until do
       profile_pic = fj('.profile_pic_link img')
-      profile_pic.attribute('src').should == IMAGE_SRC
+      profile_pic.attribute('src').should == image_src
     end
     Attachment.last.folder.should == @user.profile_pics_folder
   end
@@ -343,4 +342,11 @@ describe "profile pictures local tests" do
   prepend_before(:each) do
     Setting.set("file_storage_test_override", "local")
   end
+end
+
+describe "profile pictures s3 tests" do
+  it_should_behave_like "profile pictures selenium tests"
+  prepend_before(:all) {
+    Setting.set("file_storage_test_override", "s3")
+  }
 end

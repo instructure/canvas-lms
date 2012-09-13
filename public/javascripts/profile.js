@@ -359,6 +359,14 @@ define([
   });
   $("#add_pic_form").formSubmit({
     fileUpload: true,
+    fileUploadOptions: {
+      preparedFileUpload: true,
+      upload_only: true,
+      singleFile: true,
+      context_code: ENV.context_asset_string,
+      folder_id: ENV.folder_id,
+      formDataTarget: 'uploadDataUrl'
+    },
 
     beforeSubmit: function() {
       $(this).find("button").attr('disabled', true).text(I18n.t('buttons.adding_file', "Adding File..."));
