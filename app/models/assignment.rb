@@ -1024,6 +1024,15 @@ class Assignment < ActiveRecord::Base
 
   def speed_grader_json(user, avatars=false)
     Attachment.skip_thumbnails = true
+    submission_fields = [ :user_id, :id, :submitted_at, :workflow_state,
+                          :grade, :grade_matches_current_submission,
+                          :graded_at, :turnitin_data, :submission_type, :score,
+                          :assignment_id, :submission_comments ]
+
+    comment_fields = [:comment, :id, :author_name, :posted_at, :author_id,
+                      :media_comment_type, :media_comment_id,
+                      :cached_attachments, :attachments]
+
     res = as_json(
       :include => {
         :context => { :only => :id },
@@ -1034,21 +1043,38 @@ class Assignment < ActiveRecord::Base
     avatar_methods = avatars ? [:avatar_path] : []
     visible_students = context.students_visible_to(user).order_by_sortable_name.uniq
     res[:context][:students] = visible_students.
-      map{|u| u.as_json(:include_root => false, :methods => avatar_methods)}
+      map{|u| u.as_json(:include_root => false, :methods => avatar_methods, :only => [:name, :id])}
     res[:context][:active_course_sections] = context.sections_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = context.enrollments_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
     res[:submissions] = submissions.scoped(:conditions => {:user_id => visible_students.map(&:id)}).map{|s|
-      s.as_json(:include_root => false,
+      json = s.as_json(:include_root => false,
         :include => {
-          :submission_comments => {:methods => avatar_methods},
-          :attachments => {:except => :thumbnail_url},
-          :rubric_assessment => {},
+          :submission_comments => {
+            :methods => avatar_methods,
+            :only => comment_fields
+          },
+          :attachments => {
+            :only => [:mime_class, :comment_id, :id, :submitter_id ]
+          },
         },
-        :methods => [:scribdable?, :scribd_doc, :submission_history]
+        :methods => [:scribdable?, :scribd_doc, :submission_history],
+        :only => submission_fields
       )
+      if json['submission_history']
+        json['submission_history'].map! do |s|
+          s.as_json(
+            :include => {
+              :submission_comments => { :only => comment_fields }
+            },
+            :only => submission_fields,
+            :methods => [:versioned_attachments]
+          )
+        end
+      end
+      json
     }
     res
   ensure
