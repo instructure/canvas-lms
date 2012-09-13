@@ -269,8 +269,13 @@ class CoursesController < ApplicationController
   #
   # @returns [User]
   def students
-    params[:enrollment_type] = "student"
-    self.users
+    # DEPRECATED. Needs to stay separate from #users though, because this is un-paginated
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      proxy = @context.students.order_by_sortable_name
+      user_json_preloads(proxy, false)
+      render :json => proxy.map { |u| user_json(u, @current_user, session) }
+    end
   end
 
   # @API List users
