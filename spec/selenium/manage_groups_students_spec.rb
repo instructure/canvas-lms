@@ -261,6 +261,49 @@ describe "manage groups students" do
     end
   end
 
+  context "single category" do
+    before (:each) do
+      @courses_group_category = @course.group_categories.create(:name => "Existing Category")
+      groups_student_enrollment 1
+    end
+    it "should add multiple groups and be sure they are all deleted" do
+      add_groups_in_category @courses_group_category
+      get "/courses/#{@course.id}/groups"
+      delete = f(".delete_category_link")
+      delete.click
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      wait_for_ajaximations
+      ff(".left_side .group").should be_empty
+      @course.group_categories.all.count.should eql 0
+    end
+
+    it "should edit an individual group" do
+      get "/courses/#{@course.id}/groups"
+      group = add_group_to_category @courses_group_category, "group 1"
+      f("#group_#{group.id}").click
+      f("#group_#{group.id} .edit_group_link").click
+      name = "new group 1"
+      f("#group_name").send_keys(name)
+      submit_form("#edit_group_form")
+      wait_for_ajaximations
+      new_group = @course.groups.find_by_name(name)
+      group.should_not be_nil
+    end
+
+    it "should delete an individual group" do
+      get "/courses/#{@course.id}/groups"
+      group = add_group_to_category @courses_group_category, "group 1"
+      f("#group_#{group.id}").click
+      f("#group_#{group.id} .delete_group_link").click
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      wait_for_ajaximations
+      ff(".left_side .group").should be_empty
+      @course.group_categories.last.groups.last.workflow_state =='deleted'
+    end
+  end
+
   context "assign_students_link" do
     def assign_students(category)
       assign_students = fj("#category_#{category.id} .assign_students_link:visible")
@@ -336,49 +379,6 @@ describe "manage groups students" do
       GroupsController.filter_chain.pop
       # make sure we wait before moving on
       wait_for_ajax_requests
-    end
-  end
-
-  context "single category" do
-    before (:each) do
-      @courses_group_category = @course.group_categories.create(:name => "Existing Category")
-      groups_student_enrollment 1
-    end
-    it "should add multiple groups and be sure they are all deleted" do
-      add_groups_in_category @courses_group_category
-      get "/courses/#{@course.id}/groups"
-      delete = f(".delete_category_link")
-      delete.click
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
-      wait_for_ajaximations
-      ff(".left_side .group").should be_empty
-      @course.group_categories.all.count.should eql 0
-    end
-
-    it "should edit an individual group" do
-      get "/courses/#{@course.id}/groups"
-      group = add_group_to_category @courses_group_category, "group 1"
-      f("#group_#{group.id}").click
-      f("#group_#{group.id} .edit_group_link").click
-      name = "new group 1"
-      f("#group_name").send_keys(name)
-      submit_form("#edit_group_form")
-      wait_for_ajaximations
-      new_group = @course.groups.find_by_name(name)
-      group.should_not be_nil
-    end
-
-    it "should delete an individual group" do
-      get "/courses/#{@course.id}/groups"
-      group = add_group_to_category @courses_group_category, "group 1"
-      f("#group_#{group.id}").click
-      f("#group_#{group.id} .delete_group_link").click
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
-      wait_for_ajaximations
-      ff(".left_side .group").should be_empty
-      @course.group_categories.last.groups.last.workflow_state =='deleted'
     end
   end
 end
