@@ -548,6 +548,19 @@ describe CoursesController, :type => :integration do
       json['id'].should == @course2.id
       json['sis_course_id'].should == 'TEST-SIS-ONE.2011'
     end
+
+    it "should not be paginated (for legacy reasons)" do
+      controller = mock()
+      controller.stubs(:params).returns({})
+      course_with_teacher(:active_all => true)
+      students = []
+      num = Api.per_page_for(controller) + 1 # get the default api per page value
+      num.times { students << student_in_course(:course => @course).user }
+      first_user = @user
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/students.json",
+                      { :controller => 'courses', :action => 'students', :course_id => @course.id.to_s, :format => 'json' })
+      json.count.should == num
+    end
   end
 
   describe "/users" do
