@@ -48,7 +48,7 @@
         <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link find" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
       </div>
       <div class="editing">
-        <%= before_label :title, "Title" %> <input type="text" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;"/>
+        <%= before_label :title, "Title" %> <input type="text" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255"/>
         <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;"><%= image_tag "find.png" %> <%= t 'links.find_rubric', "Find Rubric" %></a>
         <% if rubric_association && !rubric_association.rubric_assessments.empty? %>
           <div class="editing" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use',
