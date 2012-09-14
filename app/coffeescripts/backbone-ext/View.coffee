@@ -55,13 +55,17 @@ define [
       @[name] = @$(selector) for selector, name of @els if @els
 
     ##
-    # Filters elements to add behavior and bindings. Can be called automatically
-    # in `render`, so be careful not to call it twice
+    # Add behavior and bindings to elements. Can be called automatically in
+    # `render`, so be careful not to call it twice
     #
     # @api public
-    filter: ->
-      @$('[data-bind]').each => @createBinding.apply this, arguments
+    afterRender: ->
+      @$('[data-bind]').each @createBinding
       #@$('[data-behavior]').each => @_createBehavior.apply this, arguments
+
+    ##
+    # backwards compat for old afterRender name
+    filter: @::afterRender
 
     ##
     # in charge of getting variables ready to pass to handlebars during render
@@ -97,7 +101,7 @@ define [
     #   <div data-bind="foo">{I will always mirror @model.get('foo') in here}</div>
     #
     # @api public
-    createBinding: (index, el) ->
+    createBinding: (index, el) =>
       $el = $ el
       attribute = $el.data 'bind'
       @model.on "change:#{attribute}", (model, value) =>
