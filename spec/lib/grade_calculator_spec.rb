@@ -364,72 +364,7 @@ describe GradeCalculator do
       @user.enrollments.first.computed_current_score.should eql(52.5)
       @user.enrollments.first.computed_final_score.should eql(43.6)
     end
-  end
-
-  # We should keep this in sync with GradeCalculatorSpec.coffee
-  context "GradeCalculatorSpec.coffee examples" do
-    before do
-      course_with_student
-
-      @grades = [[100,100], [42,91], [14,55], [3,38], [nil,1000]]
-      @group = @course.assignment_groups.create! :name => 'group 1'
-      @assignments = @grades.map do |score,possible|
-        @course.assignments.create! :title => 'homework',
-                                    :points_possible => possible,
-                                    :assignment_group => @group
-      end
-    end
-
-    def set_default_grades
-      @assignments.each_with_index do |a,i|
-        score = @grades[i].first
-        next unless score # don't grade nil submissions
-        a.grade_student @student, :grade => score
-      end
-    end
-
-    def check_grades(current, final)
-      GradeCalculator.recompute_final_score(@student.id, @course.id)
-      @enrollment.reload
-      @enrollment.computed_current_score.should == current
-      @enrollment.computed_final_score.should == final
-    end
-
-    it "should work without assignments or submissions" do
-      @group.assignments.clear
-      check_grades(nil, nil)
-    end
-
-    it "should work without submissions" do
-      check_grades(nil, 0)
-    end
-
-    it "should work with no drop rules" do
-      set_default_grades
-      check_grades(56.0, 12.4)
-    end
-
-    it "should support drop_lowest" do
-      set_default_grades
-      @group.update_attribute(:rules, 'drop_lowest:1')
-      check_grades(63.4, 56.0)
-
-      @group.update_attribute(:rules, 'drop_lowest:2')
-      check_grades(74.6, 63.4)
-    end
-
-    it "should support drop_highest" do
-      set_default_grades
-      @group.update_attribute(:rules, 'drop_highest:1')
-      check_grades(32.1, 5.0)
-    end
-
-    it "should support never_drop" do
-      set_default_grades
-      rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 3/38
-      @group.update_attribute(:rules, rules)
-      check_grades(63.3, 56.0)
-    end
+    
   end
   
 end
