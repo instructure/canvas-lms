@@ -599,7 +599,7 @@ class Attachment < ActiveRecord::Base
     return quota[:quota] < quota[:quota_used] + (additional_quota || 0)
   end
 
-  def handle_duplicates(method)
+  def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
     method = method.to_sym
     deleted_attachments = []
@@ -611,8 +611,8 @@ class Attachment < ActiveRecord::Base
         # update content tags to refer to the new file
         ContentTag.update_all({:content_id => self.id}, {:content_id => a.id, :content_type => 'Attachment'})
 
-        # delete the overwritten file
-        a.destroy
+        # delete the overwritten file (unless the caller is queueing them up)
+        a.destroy unless opts[:caller_will_destroy]
         deleted_attachments << a
       end
     end
