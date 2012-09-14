@@ -18,8 +18,6 @@
 
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
-  include Api::V1::AssignmentGroup
-  include Api::V1::Submission
 
   before_filter :require_context, :except => :public_feed
 
@@ -64,10 +62,7 @@ class GradebooksController < ApplicationController
             groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.settings[:hide_final_grade])
           @no_calculations = groups_assignments.empty?
           @assignments.concat(groups_assignments)
-          @submissions = @context.submissions.all(
-            :conditions => {:user_id => @student.id},
-            :include => %w(submission_comments rubric_assessments assignment)
-          )
+          @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id], :include => [ :submission_comments, :rubric_assessments ])
           # pre-cache the assignment group for each assignment object
           @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
           # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
@@ -76,16 +71,6 @@ class GradebooksController < ApplicationController
           if @student == @current_user
             @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
           end
-
-          submissions_json = @submissions.map { |s|
-            submission_json(s, s.assignment, @current_user, session)
-          }
-          groups_json = @context.assignment_groups.active.map { |g|
-            assignment_group_json(g, @current_json, session, ['assignments'])
-          }
-          js_env :submissions => submissions_json,
-                 :assignment_groups => groups_json,
-                 :group_weighting_scheme => @context.group_weighting_scheme
           format.html { render :action => 'grade_summary' }
         else
           format.html { render :action => 'grade_summary_list' }

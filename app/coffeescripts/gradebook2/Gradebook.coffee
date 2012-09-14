@@ -304,25 +304,11 @@ define [
       if student.loaded
         finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
         submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
-        result = GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
+        result = INST.GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
         for group in result.group_sums
           student["assignment_group_#{group.group.id}"] = group[finalOrCurrent]
-          for submissionData in group[finalOrCurrent].submissions
-            submissionData.submission.drop = submissionData.drop
         student["total_grade"] = result[finalOrCurrent]
 
-        @addDroppedClass(student)
-
-    addDroppedClass: (student) ->
-      droppedAssignments = (name for name, assignment of student when name.match(/assignment_\d+/) and assignment.drop?)
-      drops = {}
-      drops[student.row] = {}
-      for a in droppedAssignments
-        drops[student.row][a] = 'dropped'
-
-      styleKey = "dropsForRow#{student.row}"
-      @gradeGrid.removeCellCssStyles(styleKey)
-      @gradeGrid.addCellCssStyles(styleKey, drops)
 
     highlightColumn: (columnIndexOrEvent) =>
       if isNaN(columnIndexOrEvent)
@@ -588,7 +574,6 @@ define [
       for student, index in @multiGrid.data
         student.beforeFilteredRow = student.row
         student.row = index
-        @addDroppedClass student
 
       @multiGrid.invalidate()
 
@@ -737,9 +722,7 @@ define [
       $('body').on('click', @onGridBlur)
       sortRowsBy = (sortFn) =>
         @rows.sort(sortFn)
-        for student, i in @rows
-          student.row = i
-          @addDroppedClass(student)
+        student.row = i for student, i in @rows
         @multiGrid.invalidate()
       @gradeGrid.onSort.subscribe (event, data) =>
         sortRowsBy (a, b) ->

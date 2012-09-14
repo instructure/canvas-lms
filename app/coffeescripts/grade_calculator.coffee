@@ -1,6 +1,7 @@
 define [
-  'underscore'
-], (_) ->
+  'INST'
+  'jquery'
+], (INST, $) ->
 
   class GradeCalculator
     # each submission needs fields: score, points_possible, assignment_id, assignment_group_id
@@ -13,7 +14,9 @@ define [
     # if weighting_scheme is "percent", group weights are used, otherwise no weighting is applied
     @calculate: (submissions, groups, weighting_scheme) ->
       result = {}
-      result.group_sums = _(groups).map (group) =>
+      # NOTE: purposely using $.map because it can handle array or object, old gradebook sends array
+      # new gradebook sends object, needs jquery >1.6's version of $.map, since it can handle both
+      result.group_sums = $.map groups, (group) =>
         group: group
         current: @create_group_sum(group, submissions, true)
         'final':   @create_group_sum(group, submissions, false)
@@ -21,133 +24,59 @@ define [
       result['final'] = @calculate_total(result.group_sums, false, weighting_scheme)
       result
 
-    @create_group_sum: (group, submissions, ignoreUngraded) ->
-      arrayToObj = (arr, property) ->
-        obj = {}
-        for e in arr
-          obj[e[property]] = e
-        obj
+    @create_group_sum: (group, submissions, ignore_ungraded) ->
+      sum = { submissions: [], score: 0, possible: 0, submission_count: 0 }
+      # Never include 'not_graded' assignments in the totals. The submission_types is an array (always?), adding a ''
+      # to it converts it to a string and will correctly evaluate if it is an array of multiple entries.
+      for assignment in group.assignments when (''+ assignment.submission_types != 'not_graded')
+        data = { score: 0, possible: 0, percent: 0, drop: false, submitted: false }
 
-      gradeableAssignments = _(group.assignments).filter (a) ->
-        not _.isEqual(a.submission_types, ['not_graded'])
-      assignments = arrayToObj gradeableAssignments, "id"
+        submission = null
+        for s in submissions when s.assignment_id == assignment.id
+          submission = s
+          break
 
-      # filter out submissions from other assignment groups
-      submissions = _(submissions).filter (s) -> assignments[s.assignment_id]?
+        submission ?= { score: null }
+        submission.assignment_group_id = group.id
+        submission.points_possible ?= assignment.points_possible
+        data.submission = submission
+        sum.submissions.push data
+        unless ignore_ungraded and (!submission.score? || submission.score == '')
+          data.score = @parse submission.score
+          data.possible = @parse assignment.points_possible
+          data.percent = @parse(data.score / data.possible)
+          data.submitted = (submission.score? and submission.score != '')
+          sum.submission_count += 1 if data.submitted
 
-      # fill in any missing submissions
-      unless ignoreUngraded
-        submissionAssignmentIds = _(submissions).map (s) ->
-          s.assignment_id.toString()
-        missingSubmissions = _.difference(_.keys(assignments),
-                                          submissionAssignmentIds)
-        dummySubmissions = _(missingSubmissions).map (assignmentId) ->
-          s = assignment_id: assignmentId, score: null
-        submissions.push dummySubmissions...
+      # sort the submissions by assigned score
+      sum.submissions.sort (a,b) -> a.percent - b.percent
+      rules = $.extend({ drop_lowest: 0, drop_highest: 0, never_drop: [] }, group.rules)
 
-      submissionsByAssignment = arrayToObj submissions, "assignment_id"
+      dropped = 0
 
-      submissionData = _(submissions).map (s) =>
-        sub =
-          total: @parse assignments[s.assignment_id].points_possible
-          score: @parse s.score
-          submitted: s.score? and s.score != ''
-          submission: s
-      relevantSubmissionData = if ignoreUngraded
-        _(submissionData).filter (s) -> s.submitted
-      else
-        submissionData
+      # drop the lowest and highest assignments
+      for lowOrHigh in ['low', 'high']
+        for data in sum.submissions
+          if !data.drop and rules["drop_#{lowOrHigh}est"] > 0 and $.inArray(data.assignment_id, rules.never_drop) == -1 and data.possible > 0 and data.submitted
+            data.drop = true
+            # TODO: do I want to do this, it actually modifies the passed in submission object but it
+            # it seems like the best way to tell it it should be dropped.
+            data.submission?.drop = true
+            rules["drop_#{lowOrHigh}est"] -= 1
+            dropped += 1
 
-      kept = @dropAssignments relevantSubmissionData, group.rules
+      # if everything was dropped, un-drop the highest single submission
+      if dropped > 0 and dropped == sum.submission_count
+        sum.submissions[sum.submissions.length - 1].drop = false
+        # see TODO above
+        sum.submissions[sum.submissions.length - 1].submission?.drop = false
+        dropped -= 1
 
-      [score, possible] = _.reduce kept
-      , ([scoreSum, totalSum], {score,total}) =>
-        [scoreSum + @parse(score), totalSum + total]
-      , [0, 0]
+      sum.submission_count -= dropped
 
-      ret =
-        possible: possible
-        score: score
-        # TODO: figure out what submission_count is actually counting
-        submission_count: (_(submissionData).filter (s) -> s.submitted).length
-        submissions: _(submissionData).map (s) =>
-          submissionRet =
-            drop: s.drop
-            percent: @parse(s.score / s.total)
-            possible: s.total
-            score: @parse(s.score)
-            submission: _.extend(s.submission, drop: s.drop)
-            submitted: s.submitted
-
-    # I'm not going to pretend that this code is understandable.
-    #
-    # The naive approach to dropping the lowest grades (calculate the
-    # grades for each combination of assignments and choose the set which
-    # results in the best overall score) is obviously too slow.
-    #
-    # This approach is based on the algorithm described in "Dropping Lowest
-    # Grades" by Daniel Kane and Jonathan Kane.  Please see that paper for
-    # a full explanation of the math.
-    # (http://web.mit.edu/dankane/www/droplowest.pdf)
-    @dropAssignments: (submissions, rules) ->
-      rules or= {}
-      dropLowest   = rules.drop_lowest  || 0
-      dropHighest  = rules.drop_highest || 0
-      neverDropIds = rules.never_drop || []
-      return submissions unless dropLowest or dropHighest
-
-      if neverDropIds.length > 0
-        cantDrop = _(submissions).filter (s) ->
-          _.indexOf(neverDropIds, parseInt s.submission.assignment_id) >= 0
-        submissions = _.difference submissions, cantDrop
-      else
-        cantDrop = []
-
-      return cantDrop if submissions.length == 0
-      dropLowest = submissions.length - 1 if dropLowest >= submissions.length
-      dropHighest = 0 if dropLowest + dropHighest >= submissions.length
-
-      totals = (s.total for s in submissions)
-      maxTotal = Math.max(totals...)
-
-      grades = (s.score / s.total for s in submissions).sort (a,b) -> a - b
-      qLow  = grades[0]
-      qHigh = grades[grades.length - 1]
-      qMid  = (qLow + qHigh) / 2
-
-      keepHighest = submissions.length - dropLowest
-      bigF = (q, submissions) ->
-        ratedScores  = _(submissions).map (s) ->
-          ratedScore = s.score - q * s.total
-          [ratedScore, s]
-        rankedScores = ratedScores.sort (a, b) -> b[0] - a[0]
-        keptScores = rankedScores[0...keepHighest]
-        qKept = _.reduce keptScores
-        , (sum, [ratedScore, s]) ->
-          sum + ratedScore
-        , 0
-        keptSubmissions = (s for [ratedScore, s] in keptScores)
-        [qKept, keptSubmissions]
-
-      [x, kept] = bigF(qMid, submissions)
-      threshold = 1 /(2 * keepHighest * Math.pow(maxTotal, 2))
-      until qHigh - qLow < threshold
-        if x < 0
-          qHigh = qMid
-        else
-          qLow = qMid
-        qMid = (qLow + qHigh) / 2
-        [x, kept] = bigF(qMid, submissions)
-
-      if dropHighest
-        kept.splice 0, dropHighest
-      kept.push cantDrop...
-
-      dropped = _.difference(submissions, kept)
-      # SIDE EFFECT: The gradebooks require this behavior
-      s.drop = true for s in dropped
-
-      kept
+      sum.score += s.score for s in sum.submissions when !s.drop
+      sum.possible += s.possible for s in sum.submissions when !s.drop
+      sum
 
     @calculate_total: (group_sums, ignore_ungraded, weighting_scheme) ->
       data_idx = if ignore_ungraded then 'current' else 'final'
@@ -186,7 +115,10 @@ define [
 
     @letter_grade: (grading_scheme, score) ->
       score = 0 if score < 0
-      letters = _(grading_scheme).filter (row, i) ->
+      letters = $.grep grading_scheme, (row, i) ->
         score >= row[1] * 100 || i == (grading_scheme.length - 1)
       letter = letters[0]
       letter[0]
+
+  window.INST.GradeCalculator = GradeCalculator
+
