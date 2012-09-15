@@ -375,22 +375,24 @@ class CalendarEventsApiController < ApplicationController
     get_feed_context
     @events = []
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      if @current_user
-        # if the feed url included the information on the requesting user,
-        # we can properly filter calendar events to the user's course sections
-        @type = :feed
-        @start_date = Setting.get('calendar_feed_previous_days', '30').to_i.days.ago
-        @end_date = Setting.get('calendar_feed_upcoming_days', '366').to_i.days.from_now
+    if @current_user
+      # if the feed url included the information on the requesting user,
+      # we can properly filter calendar events to the user's course sections
+      @type = :feed
+      @start_date = Setting.get('calendar_feed_previous_days', '30').to_i.days.ago
+      @end_date = Setting.get('calendar_feed_upcoming_days', '366').to_i.days.from_now
 
-        get_options(nil)
+      get_options(nil)
 
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
         @events.concat assignment_scope.all
         @events.concat calendar_event_scope.events_without_child_events.all
-      else
-        # if the feed url doesn't give us the requesting user,
-        # we have to just display the generic course feed
-        get_all_pertinent_contexts
+      end
+    else
+      # if the feed url doesn't give us the requesting user,
+      # we have to just display the generic course feed
+      get_all_pertinent_contexts
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
         @contexts.each do |context|
           @assignments = context.assignments.active.find(:all) if context.respond_to?("assignments")
           @events.concat context.calendar_events.active.find(:all)
@@ -398,6 +400,7 @@ class CalendarEventsApiController < ApplicationController
         end
       end
     end
+
     @events = @events.sort_by{ |e| [(e.start_at || Time.now), e.title] }
 
     @contexts.each do |context|
