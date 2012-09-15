@@ -73,6 +73,7 @@ describe PseudonymSessionsController do
   context "ldap" do
     it "should log in a user with a identifier_format" do
       user_with_pseudonym(:username => '12345', :active_all => 1)
+      @pseudonym.update_attribute(:sis_user_id, '12345')
       aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns([{ 'uid' => ['12345'] }])
       aac2 = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
