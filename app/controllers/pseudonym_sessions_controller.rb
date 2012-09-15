@@ -128,7 +128,7 @@ class PseudonymSessionsController < ApplicationController
         res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
         unique_id = res.first[aac.identifier_format].first if res
         if unique_id && pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
-          pseudonym.instance_variable_set(:@ldap_result, res)
+          pseudonym.instance_variable_set(:@ldap_result, res.first)
           @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
           found = @pseudonym_session.save
           break
