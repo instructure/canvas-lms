@@ -11,7 +11,7 @@ describe "quizzes question banks" do
     bank = AssessmentQuestionBank.create!(:context => @course)
     get "/courses/#{@course.id}/question_banks/#{bank.id}"
 
-    driver.find_element(:css, '.add_question_link').click
+    f('.add_question_link').click
     wait_for_animations
 
     expect { create_multiple_choice_question }.to change(AssessmentQuestion, :count).by(1)
@@ -25,17 +25,16 @@ describe "quizzes question banks" do
     harder.question_data[:points_possible] = 15
     harder.save!
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
-    find_questions_link = driver.find_element(:css, '.find_question_link')
+    find_questions_link = f('.find_question_link')
     keep_trying_until {
       find_questions_link.click
-      driver.find_element(:css, ".select_all_link")
+      f(".select_all_link")
     }.click
     submit_dialog("div#find_question_dialog")
-    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
+    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
 
   it "should allow you to use inherited question banks" do
-    skip_if_ie('Out of memory')
     @course.account = Account.default
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
@@ -45,27 +44,26 @@ describe "quizzes question banks" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
 
     keep_trying_until {
-      driver.find_element(:css, '.find_question_link').click
-      driver.find_element(:id, 'find_question_dialog').should be_displayed
+      f('.find_question_link').click
+      f('#find_question_dialog').should be_displayed
       wait_for_ajaximations
-      driver.find_element(:css, ".select_all_link").should be_displayed
+      f(".select_all_link").should be_displayed
     }
-    driver.find_element(:css, ".select_all_link").click
+    f(".select_all_link").click
     submit_dialog("div#find_question_dialog")
-    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
+    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
 
-    driver.find_element(:css, ".add_question_group_link").click
-    driver.find_element(:css, '.find_bank_link').click
+    f(".add_question_group_link").click
+    f('.find_bank_link').click
     keep_trying_until {
-      find_with_jquery("#find_bank_dialog .bank:visible")
+      fj("#find_bank_dialog .bank:visible")
     }.click
     submit_dialog("#find_bank_dialog")
     submit_form(".quiz_group_form")
-    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "2" }
+    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
 
   it "should allow you to use bookmarked question banks" do
-    skip_if_ie('Out of memory')
     @course.account = Account.default
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
@@ -76,27 +74,26 @@ describe "quizzes question banks" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
 
     keep_trying_until {
-      driver.find_element(:css, '.find_question_link').click
-      driver.find_element(:id, 'find_question_dialog').should be_displayed
+      f('.find_question_link').click
+      f('#find_question_dialog').should be_displayed
       wait_for_ajaximations
-      driver.find_element(:css, ".select_all_link").should be_displayed
+      f(".select_all_link").should be_displayed
     }
-    driver.find_element(:css, ".select_all_link").click
-    submit_dialog("div#find_question_dialog")
-    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
+    f(".select_all_link").click
+    submit_dialog("#find_question_dialog")
+    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
 
-    driver.find_element(:css, ".add_question_group_link").click
-    driver.find_element(:css, ".find_bank_link").click
+    f(".add_question_group_link").click
+    f(".find_bank_link").click
     keep_trying_until {
-      find_with_jquery("#find_bank_dialog .bank:visible")
+      fj("#find_bank_dialog .bank:visible")
     }.click
     submit_dialog("#find_bank_dialog")
     submit_form(".quiz_group_form")
-    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "2" }
+    keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
 
   it "should check permissions when retrieving question banks" do
-    skip_if_ie('Out of memory')
     @course.account = Account.default
     @course.account.role_overrides.create(:permission => 'read_question_banks', :enrollment_type => 'TeacherEnrollment', :enabled => false)
     @course.save
@@ -111,33 +108,31 @@ describe "quizzes question banks" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
 
     keep_trying_until {
-      driver.find_element(:css, '.find_question_link').click
-      driver.find_element(:id, 'find_question_dialog').should be_displayed
+      f('.find_question_link').click
+      f('#find_question_dialog').should be_displayed
       wait_for_ajaximations
-      driver.find_element(:css, ".select_all_link").should be_displayed
+      f(".select_all_link").should be_displayed
     }
-    find_all_with_jquery("#find_question_dialog .bank:visible").size.should eql 1
+    ffj("#find_question_dialog .bank:visible").size.should eql 1
 
     close_visible_dialog
     keep_trying_until {
-      driver.find_element(:css, '.add_question_group_link').click
-      driver.find_element(:css, '.find_bank_link').should be_displayed
+      f('.add_question_group_link').click
+      f('.find_bank_link').should be_displayed
     }
-    driver.find_element(:css, ".find_bank_link").click
+    f(".find_bank_link").click
     wait_for_ajaximations
-    find_all_with_jquery("#find_bank_dialog .bank:visible").size.should eql 1
+    ffj("#find_bank_dialog .bank:visible").size.should eql 1
   end
 
   it "should import questions from a question bank" do
-    skip_if_ie('Out of memory')
-
     get "/courses/#{@course.id}/quizzes/new"
 
-    driver.find_element(:css, '.add_question_group_link').click
-    group_form = driver.find_element(:css, '#group_top_new .quiz_group_form')
+    f('.add_question_group_link').click
+    group_form = f('#group_top_new .quiz_group_form')
     group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
     replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
     submit_form(group_form)
-    driver.find_element(:css, '#questions .group_top .group_display.name').should include_text('new group')
+    f('#questions .group_top .group_display.name').should include_text('new group')
   end
 end

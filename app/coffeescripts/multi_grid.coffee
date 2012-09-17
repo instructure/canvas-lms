@@ -7,7 +7,7 @@ define [
   'vendor/jquery.scrollTo'
 ], ($, Slick) ->
 
-  MultiGrid = class MultiGrid
+  class MultiGrid
     constructor: (data, default_options, grids, parent_grid) ->
       @data = data
       @parent_grid_idx = parent_grid

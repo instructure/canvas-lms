@@ -2094,6 +2094,9 @@ define([
         // quiz.
         questionData.assessment_question_id = questionData.assessment_question_id || question.assessment_question_id || question.id;
         quiz.updateDisplayQuestion($displayQuestion, questionData, true);
+        // Trigger a custom 'saved' event for catching and responding to change
+        // after save process completed. Used in quizzes_bundle.coffee
+        $displayQuestion.trigger('saved');
         $("#unpublished_changes_message").slideDown();
       }, function(data) {
         $displayQuestion.formErrors(data);

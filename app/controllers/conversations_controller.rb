@@ -22,13 +22,11 @@
 class ConversationsController < ApplicationController
   include ConversationsHelper
   include SearchHelper
-  include Api::V1::Submission
-  include Api::V1::Attachment
+  include Api::V1::Conversation
 
   before_filter :require_user, :except => [:public_feed]
   before_filter :reject_student_view_student
   before_filter :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
-  before_filter :load_all_contexts, :except => [:public_feed]
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
@@ -107,16 +105,16 @@ class ConversationsController < ApplicationController
   #       "audience": [2],
   #       "audience_contexts": {"courses": {"1": ["StudentEnrollment"]}, "groups": {}},
   #       "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
-  #       "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}]
+  #       "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}],
   #       "visible": true
   #     }
   #   ]
   def index
     if request.format == :json
-      conversations = Api.paginate(@conversations_scope, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
+      conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # optimize loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
-      @conversations_json = conversations.map{ |c| jsonify_conversation(c, :include_participant_avatars => false, :include_participant_contexts => false, :visible => true) }
+      @conversations_json = conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => true) }
   
       if params[:include_all_conversation_ids]
         @conversations_json = {:conversations => @conversations_json, :conversation_ids => @conversations_scope.conversation_ids}
@@ -124,10 +122,11 @@ class ConversationsController < ApplicationController
       render :json => @conversations_json
     else
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
+      load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
       can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
       js_env(:CONVERSATIONS => {
-        :USER => jsonify_users([@current_user], :include_participant_contexts => false).first,
+        :USER => conversation_users_json([@current_user], @current_user, session, :include_participant_contexts => false).first,
         :CONTEXTS => @contexts,
         :NOTES_ENABLED => notes_enabled,
         :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
@@ -189,11 +188,11 @@ class ConversationsController < ApplicationController
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
         visibility_map = infer_visibility(*conversations)
-        render :json => conversations.map{ |c| jsonify_conversation(c, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }
+        render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }
       else
         @conversation = @current_user.initiate_conversation(recipient_ids)
         message = create_message_on_conversation(@conversation)
-        render :json => [jsonify_conversation(@conversation.reload, :include_indirect_participants => true, :messages => [message])]
+        render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])]
       end
     end
   end
@@ -264,7 +263,7 @@ class ConversationsController < ApplicationController
   #     "messages":
   #       [
   #         {
-  #           "id": 3
+  #           "id": 3,
   #           "created_at": "2011-09-02T12:00:00Z",
   #           "body": "sure thing, here's the file",
   #           "author_id": 2,
@@ -274,7 +273,7 @@ class ConversationsController < ApplicationController
   #           "attachments": [{"id": 1, "display_name": "notes.doc", "uuid": "abcdefabcdefabcdefabcdefabcdef"}]
   #         },
   #         {
-  #           "id": 2
+  #           "id": 2,
   #           "created_at": "2011-09-02T11:00:00Z",
   #           "body": "hey, bob didn't get the notes. do you have a copy i can give him?",
   #           "author_id": 2,
@@ -283,7 +282,7 @@ class ConversationsController < ApplicationController
   #           "forwarded_messages":
   #             [
   #               {
-  #                 "id": 1
+  #                 "id": 1,
   #                 "created_at": "2011-09-02T10:00:00Z",
   #                 "body": "can i get a copy of the notes? i was out",
   #                 "author_id": 3,
@@ -320,10 +319,12 @@ class ConversationsController < ApplicationController
     else
       messages = messages.select{ |message| message.submission.nil? }
     end
-    render :json => jsonify_conversation(@conversation,
-                                         :include_indirect_participants => true,
-                                         :messages => messages,
-                                         :submissions => submissions)
+    render :json => conversation_json(@conversation,
+                                      @current_user,
+                                      session,
+                                      :include_indirect_participants => true,
+                                      :messages => messages,
+                                      :submissions => submissions)
   end
 
   # @API Edit a conversation
@@ -357,7 +358,7 @@ class ConversationsController < ApplicationController
   #   }
   def update
     if @conversation.update_attributes(params[:conversation])
-      render :json => jsonify_conversation(@conversation)
+      render :json => conversation_json(@conversation, @current_user, session)
     else
       render :json => @conversation.errors, :status => :bad_request
     end
@@ -390,7 +391,7 @@ class ConversationsController < ApplicationController
   #   }
   def destroy
     @conversation.remove_messages(:all)
-    render :json => jsonify_conversation(@conversation, :visible => false)
+    render :json => conversation_json(@conversation, @current_user, session, :visible => false)
   end
 
   # @API Add recipients
@@ -420,7 +421,7 @@ class ConversationsController < ApplicationController
   #     "messages":
   #       [
   #         {
-  #           "id": 4
+  #           "id": 4,
   #           "created_at": "2011-09-02T12:10:00Z",
   #           "body": "Jim was added to the conversation by Joe TA",
   #           "author_id": 1,
@@ -435,7 +436,7 @@ class ConversationsController < ApplicationController
   def add_recipients
     if @recipients.present?
       @conversation.add_participants(@recipients.keys, :tags => @tags, :root_account_id => @domain_root_account.id)
-      render :json => jsonify_conversation(@conversation.reload, :messages => [@conversation.messages.first])
+      render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [@conversation.messages.first])
     else
       render :json => {}, :status => :bad_request
     end
@@ -473,7 +474,7 @@ class ConversationsController < ApplicationController
   #     "messages":
   #       [
   #         {
-  #           "id": 3
+  #           "id": 3,
   #           "created_at": "2011-09-02T12:00:00Z",
   #           "body": "let's talk this over with jim",
   #           "author_id": 2,
@@ -489,7 +490,7 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
       message = create_message_on_conversation
-      render :json => jsonify_conversation(@conversation.reload, :messages => [message])
+      render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
       render :json => {}, :status => :bad_request
     end
@@ -520,7 +521,7 @@ class ConversationsController < ApplicationController
         to_delete << message if params[:remove].include?(message.id.to_s)
       end
       @conversation.remove_messages(*to_delete)
-      render :json => jsonify_conversation(@conversation)
+      render :json => conversation_json(@conversation, @current_user, session)
     end
   end
 
@@ -614,11 +615,10 @@ class ConversationsController < ApplicationController
     filters = Array(params[:filter]).compact
     @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
     @conversations_scope = @conversations_scope.tagged(*filters) if filters.present?
+    @set_visibility = true
   end
 
   def infer_visibility(*conversations)
-    infer_scope unless @conversations_scope
-
     result = Hash.new(false)
     visible_conversations = @conversations_scope.find(:all,
       :select => "conversation_id",
@@ -695,48 +695,13 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def jsonify_conversation(conversation, options = {})
-    options = {
-      :include_participant_contexts => true
-    }.merge(options)
-    result = conversation.as_json(options)
-    participants = conversation.participants(options.slice(:include_participant_contexts, :include_indirect_participants))
-    explicit_participants = conversation.participants({:include_participant_contexts => include_private_conversation_enrollments})
-    audience = conversation.other_participants(explicit_participants)
-    result[:messages] = jsonify_messages(options[:messages]) if options[:messages]
-    result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) } if options[:submissions]
-    unless interleave_submissions
-      result['message_count'] = result[:submissions] ?
-        result['message_count'] - result[:submissions].size :
-        conversation.messages.human.scoped(:conditions => "asset_id IS NULL").size
-    end
-    result[:audience] = audience.map(&:id)
-    result[:audience_contexts] = contexts_for(audience, conversation.context_tags)
-    result[:avatar_url] = avatar_url_for(conversation, explicit_participants)
-    result[:participants] = jsonify_users(participants, options)
-    result[:visible] = options.key?(:visible) ? options[:visible] : infer_visibility(conversation)
-    result
-  end
-
-  def jsonify_messages(messages)
-    messages.map{ |message|
-      result = message.as_json
-      result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
-      result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment, @current_user) }
-      result['forwarded_messages'] = jsonify_messages(result['forwarded_messages'])
-      result['submission'] = submission_json(message.submission, message.submission.assignment, @current_user, session, nil, ['assignment', 'submission_comments']) if message.submission
-      result
-    }
-  end
-
   # TODO API v2: default to true, like we do in the UI
   def interleave_submissions
-    params[:interleave_submissions] || !api_request?
+    value_to_boolean(params[:interleave_submissions]) || !api_request?
   end
 
   def include_private_conversation_enrollments
-    enabled = params[:include_private_conversation_enrollments] || api_request?
-    ["1", "true"].include?(enabled.to_s)
+    value_to_boolean(params[:include_private_conversation_enrollments]) || api_request?
   end
 
   # TODO API v2: default to false, like we do in the UI

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -102,6 +102,7 @@ describe "Accounts API", :type => :integration do
           'course_code' => 'c1',
           'sis_course_id' => nil,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c1.uuid}.ics" },
+          'hide_final_grades' => false,
           'start_at' => @c1.start_at.as_json,
           'end_at' => @c1.end_at.as_json
         },
@@ -112,6 +113,7 @@ describe "Accounts API", :type => :integration do
           'course_code' => 'c2',
           'sis_course_id' => 'sis2',
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
+          'hide_final_grades' => false,
           'start_at' => @c2.start_at.as_json,
           'end_at' => @c2.end_at.as_json
         }
@@ -128,6 +130,7 @@ describe "Accounts API", :type => :integration do
           'course_code' => 'c2',
           'sis_course_id' => 'sis2',
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
+          'hide_final_grades' => false,
           'start_at' => @c2.start_at.as_json,
           'end_at' => @c2.end_at.as_json
         }
@@ -144,6 +147,7 @@ describe "Accounts API", :type => :integration do
           'course_code' => 'c2',
           'sis_course_id' => 'sis2',
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
+          'hide_final_grades' => false,
           'start_at' => @c2.start_at.as_json,
           'end_at' => @c2.end_at.as_json
         }

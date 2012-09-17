@@ -298,7 +298,7 @@ class ContextController < ApplicationController
       @users         = @context.participating_users.order_by_sortable_name.uniq
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
 
-      if course = @context.context.try(:is_a?, Course)
+      if course = @context.context.try(:is_a?, Course) && @context.context
         @secondary_users = { t('roster.teachers', 'Teachers & TAs') => course.instructors.order_by_sortable_name.uniq }
       end
     end
@@ -309,7 +309,18 @@ class ContextController < ApplicationController
 
   def prior_users
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
-      @prior_memberships = @context.enrollments.not_fake.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name.downcase] }
+      @prior_users = @context.prior_users.
+        where(Enrollment.not_fake.proxy_options[:conditions]).
+        by_top_enrollment(:select => "users.*, NULL AS prior_enrollment").
+        paginate(:page => params[:page], :per_page => 20)
+
+      users = @prior_users.index_by(&:id)
+      if users.present?
+        # put the relevant prior enrollment on each user
+        @context.prior_enrollments.where({:user_id => users.keys}).
+          top_enrollment_by(:user_id, :student).
+          each { |e| users[e.user_id].write_attribute :prior_enrollment, e }
+      end
     end
   end
 

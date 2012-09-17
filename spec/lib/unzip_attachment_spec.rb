@@ -79,6 +79,23 @@ describe UnzipAttachment do
       @course.attachments.find_all_by_display_name('second_entry.txt').any?{|a| a.file_state == 'available' }.should eql(true)
     end
 
+    it "should update attachment items in modules when overwriting their files via zip upload" do
+      @ua.process
+      @module = @course.context_modules.create!(:name => "teh module")
+      @attachment = @course.attachments.find_by_display_name!('first_entry.txt')
+      @attachment_tag = @module.add_item(:id => @attachment.id, :type => 'attachment')
+
+      @ua.process
+      @attachment.reload
+      @attachment.file_state.should == 'deleted'
+      @new_attachment = @course.attachments.active.find_by_display_name!('first_entry.txt')
+      @new_attachment.id.should_not == @attachment.id
+
+      @attachment_tag.reload
+      @attachment_tag.should be_active
+      @attachment_tag.content_id.should == @new_attachment.id
+    end
+
     it "should update progress as it goes" do
       progress = nil
       @ua.progress_proc = Proc.new { |pct|

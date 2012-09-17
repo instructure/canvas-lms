@@ -222,7 +222,7 @@ describe "scheduler" do
       f('[name="per_slot_option"]').click
       f('[name="participant_visibility"]').click
       f('[name="max_appointments_per_participant_option"]').click
-      driver.find_element(:css, '.ui-dialog-buttonset .ui-button').click
+      submit_dialog('.ui-dialog-buttonset', '.ui-button')
       wait_for_ajaximations
       # assert options are not checked
       open_edit_dialog
@@ -281,11 +281,9 @@ describe "scheduler" do
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
           wait_for_ajaximations
 
-          assert_flash_notice_message /Messages Sent/
           fj('#message_participants_form').should be_nil # using fj to avoid selenium caching
         end
       end
-
       student1.conversations.first.messages.size.should eql 6 # registered/all * 3
       student2.conversations.first.messages.size.should eql 6 # unregistered/all * 2 + registered/all (ug1)
       student3.conversations.first.messages.size.should eql 6 # unregistered/all * 3

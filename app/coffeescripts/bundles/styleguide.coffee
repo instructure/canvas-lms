@@ -4,6 +4,7 @@ require [
   'jqueryui/accordion'
   'jqueryui/tabs'
   'jqueryui/button'
+  'jqueryui/tooltip'
 ], ($, preventDefault) ->
 
 
@@ -64,3 +65,14 @@ require [
   #Toolbar
   $("#play, #shuffle").button()
   $("#repeat").buttonset()
+
+  #Popover - Should be refactored to be more general purpose and reusable like tooltip.coffee. Do that when next needed.
+  $('.show-popover').tooltip(
+    position:
+      my: "left center"
+      at: "right+10 center"
+      collision: 'none none'
+    ,
+    tooltipClass: 'popover left middle horizontal'
+  )
+

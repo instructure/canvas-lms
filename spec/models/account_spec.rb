@@ -357,6 +357,12 @@ describe Account do
 
 
   it "should set up access policy correctly" do
+    # stub out any "if" permission conditions
+    RoleOverride.permissions.each do |k, v|
+      next unless v[:if]
+      Account.any_instance.stubs(v[:if]).returns(true)
+    end
+
     # Set up a hierarchy of 4 accounts - a root account, a sub account,
     # a sub sub account, and SiteAdmin account.  Create a 'Restricted Admin'
     # role in each one, and create an admin user and a user in the restricted
@@ -731,6 +737,41 @@ describe Account do
       Account.default.canvas_authentication?.should be_true
       Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
       Account.default.canvas_authentication?.should be_false
+    end
+  end
+
+  context "manually created courses account" do
+    it "should still work with existing manually created courses accounts" do
+      acct = Account.default
+      sub = acct.sub_accounts.create!(:name => "Manually-Created Courses")
+      manual_courses_account = acct.manually_created_courses_account
+      manual_courses_account.id.should == sub.id
+      acct.reload.settings[:manually_created_courses_account_id].should == sub.id
+    end
+
+    it "should not create a duplicate manual courses account when locale changes" do
+      acct = Account.default
+      sub1 = acct.manually_created_courses_account
+      I18n.locale = "es"
+      sub2 = acct.manually_created_courses_account
+      I18n.locale = "en"
+      sub1.id.should == sub2.id
+    end
+
+    it "should work if the saved account id doesn't exist" do
+      acct = Account.default
+      acct.settings[:manually_created_courses_account_id] = acct.id + 1000
+      acct.save!
+      acct.manually_created_courses_account.should be_present
+    end
+
+    it "should work if the saved account id is not a sub-account" do
+      acct = Account.default
+      bad_acct = Account.create!
+      acct.settings[:manually_created_courses_account_id] = bad_acct.id
+      acct.save!
+      manual_course_account = acct.manually_created_courses_account
+      manual_course_account.id.should_not == bad_acct.id
     end
   end
 end

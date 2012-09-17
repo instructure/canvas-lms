@@ -734,11 +734,11 @@ shared_examples_for "all selenium tests" do
   # can pass in either an element or a forms css
   def submit_form(form)
     submit_button_css = 'button[type="submit"]'
-    form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css).click : f(form + ' ' + submit_button_css).click
+    form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css).click : f("#{form} #{submit_button_css}").click
   end
 
   def submit_dialog(dialog, submit_button_css = '.submit_button')
-    dialog.is_a?(Selenium::WebDriver::Element) ? dialog.find_element(:css, submit_button_css).click : f(dialog + ' ' + submit_button_css).click
+    dialog.is_a?(Selenium::WebDriver::Element) ? dialog.find_element(:css, submit_button_css).click : f("#{dialog} #{submit_button_css}").click
   end
 
   def check_image(element)

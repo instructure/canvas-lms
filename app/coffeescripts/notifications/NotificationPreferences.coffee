@@ -10,6 +10,7 @@ define [
   'jquery.disableWhileLoading'
   'jquery.ajaxJSON'
   'compiled/jquery.rails_flash_notifications'
+  'jqueryui/tooltip'
 ], (I18n, $, _, userSettings, NotificationGroupMappings, notificationPreferencesTemplate, policyCellTemplate) ->
 
   class NotificationPreferences
@@ -151,7 +152,17 @@ define [
         channels: @channels,
         eventGroups: @communicationEventGroups()
         ))
+      # Display Bootstrap-like popover tooltip on category names. Allow entire cell to trigger popup.
+      $('#notification-preferences .category-name.show-popover').tooltip(
+          position:
+            my: "left center"
+            at: "right+20 center"
+            collision: 'none none'
+          ,
+          tooltipClass: 'popover left middle horizontal'
+      )
       @setupEventBindings()
+      null
 
     # Generate and return the HTML for an option cell with the with the sepecified value set/reflected.
     policyCellHtml: (category, channelId, selectedValue = 'never') =>
@@ -245,7 +256,7 @@ define [
             $.flashError(I18n.t('communication.errors.saving_preferences_failed', 'Oops! Something broke.  Please try again'))
           )
         ), @spinOpts
-        null
+      null
 
     # Options for the save spinner
     spinOpts: length: 4, radius: 5, width: 3

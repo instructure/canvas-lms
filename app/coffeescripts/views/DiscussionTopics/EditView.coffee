@@ -5,12 +5,14 @@ define [
   'jst/DiscussionTopics/EditView'
   'wikiSidebar'
   'str/htmlEscape'
+  'compiled/models/DiscussionTopic'
   'jquery'
+  'compiled/fn/preventDefault'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
-], (I18n, ValidatedFormView, _, template, wikiSidebar, htmlEscape, $) ->
+], (I18n, ValidatedFormView, _, template, wikiSidebar, htmlEscape, DiscussionTopic, $, preventDefault) ->
 
   class EditView extends ValidatedFormView
 
@@ -27,12 +29,17 @@ define [
     )
 
     initialize: ->
+      @permissions = @options.permissions
       @model.on 'sync', -> window.location = @get 'html_url'
       super
 
     toJSON: ->
       _.extend super, @options,
         showAssignment: !!@assignmentGroupCollection
+        isTopic: @model.constructor is DiscussionTopic
+        contextIsCourse: @options.contextType is 'courses'
+        canAttach: @permissions.CAN_ATTACH
+        canModerate: @permissions.CAN_MODERATE
 
     render: =>
       super
@@ -40,7 +47,12 @@ define [
       unless wikiSidebar.inited
         wikiSidebar.init()
         $.scrollSidebar()
-      wikiSidebar.attachToEditor @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message')).editorBox()
+      $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
+      _.defer ->
+        $textarea.editorBox()
+        $('.rte_switch_views_link').click preventDefault -> $textarea.editorBox('toggle')
+      wikiSidebar.attachToEditor $textarea
+
       wikiSidebar.show()
 
       if @assignmentGroupCollection
@@ -65,9 +77,10 @@ define [
     getFormData: ->
       data = super
       data.title ||= I18n.t 'default_discussion_title', 'No Title'
-      data.delay_posting_at = data.delay_posting && data.delay_posting_at
+      data.delayed_post_at = '' unless data.delay_posting
       data.discussion_type = if data.threaded then 'threaded' else 'side_comment'
-      delete data.assignment unless data.assignment?.set_assignment
+      delete data.assignment unless data.assignment?.set_assignment?
+      data.podcast_has_student_posts = false unless data.podcast_enabled
 
       # these options get passed to Backbone.sync in ValidatedFormView
       @saveOpts = multipart: !!data.attachment

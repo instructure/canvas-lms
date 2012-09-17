@@ -29,7 +29,7 @@ class ErrorsController < ApplicationController
     @reports = ErrorReport.scoped(:include => :user)
 
     @message = params[:message]
-    if @message.present?
+    if error_search_enabled? && @message.present?
       @reports = @reports.scoped(:conditions => ["message LIKE ?", '%' + @message + '%'])
     elsif params[:category].blank?
       @reports = @reports.scoped(:conditions => "category != '404'")
@@ -45,4 +45,9 @@ class ErrorsController < ApplicationController
     @reports = [ErrorReport.find(params[:id])]
     render :action => 'index'
   end
+
+  def error_search_enabled?
+    Setting.get_cached("error_search_enabled", "true") == "true"
+  end
+  helper_method :error_search_enabled?
 end

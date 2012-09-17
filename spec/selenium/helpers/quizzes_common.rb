@@ -4,7 +4,7 @@ shared_examples_for "quizzes selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   def create_multiple_choice_question
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Choice')
 
     type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
@@ -27,7 +27,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def create_true_false_question
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'True/False')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
@@ -45,7 +45,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def create_fill_in_the_blank_question
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Fill In the Blank')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
@@ -63,19 +63,19 @@ shared_examples_for "quizzes selenium tests" do
   def add_quiz_question(points)
     @points_total += points.to_i
     @question_count += 1
-    driver.find_element(:css, '.add_question_link').click
-    question = find_with_jquery('.question_form:visible')
+    f('.add_question_link').click
+    question = fj('.question_form:visible')
     replace_content(question.find_element(:css, "input[name='question_points']"), points)
     submit_form(question)
     wait_for_ajax_requests
-    questions = find_all_with_jquery(".question_holder:visible")
+    questions = ffj(".question_holder:visible")
     questions.length.should eql(@question_count)
-    driver.find_element(:css, "#right-side .points_possible").text.should eql(@points_total.to_s)
+    f("#right-side .points_possible").text.should eql(@points_total.to_s)
   end
 
   def quiz_with_new_questions
     @context = @course
-    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
     @q = quiz_model
     a = AssessmentQuestion.create!
     b = AssessmentQuestion.create!
@@ -95,10 +95,10 @@ shared_examples_for "quizzes selenium tests" do
   def start_quiz_question
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
-      driver.find_element(:css, '.new-quiz-link').click
+      f('.new-quiz-link').click
     }
 
-    driver.find_element(:css, '.add_question_link').click
+    f('.add_question_link').click
     wait_for_animations
     Quiz.last
   end
@@ -107,19 +107,16 @@ shared_examples_for "quizzes selenium tests" do
     @quiz ||= quiz_with_new_questions
 
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load {
-      driver.find_element(:link_text, 'Take the Quiz').click
-    }
+    expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
 
     # sleep because display is updated on timer, not ajax callback
     sleep 1
-    
+
     yield
   ensure
     #This step is to prevent selenium from freezing when the dialog appears when leaving the page
     driver.find_element(:link, 'Quizzes').click
-    confirm_dialog = driver.switch_to.alert
-    confirm_dialog.accept
+    driver.switch_to.alert.accept
   end
 
   def set_feedback_content(el, text)
@@ -201,9 +198,9 @@ shared_examples_for "quizzes selenium tests" do
       if el['class'].match(/question_holder/)
         id = el.find_element(:css, 'a')['name'].gsub(/question_/, '')
         question = {
-          :id => id.to_i,
-          :el => el,
-          :type => 'question'
+            :id => id.to_i,
+            :el => el,
+            :type => 'question'
         }
 
         if last_group_id
@@ -214,17 +211,17 @@ shared_examples_for "quizzes selenium tests" do
           data << question
         end
 
-      # its a group
+        # its a group
       elsif el['class'].match(/group_top/)
         last_group_id = el['id'].gsub(/group_top_/, '').to_i
         data << {
-          :id => last_group_id,
-          :questions => [],
-          :type => 'group',
-          :el => el
+            :id => last_group_id,
+            :questions => [],
+            :type => 'group',
+            :el => el
         }
 
-      # group ended
+        # group ended
       elsif el['class'].match(/group_bottom/)
         last_group_id = nil
       end

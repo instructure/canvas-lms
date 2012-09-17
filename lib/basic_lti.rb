@@ -69,6 +69,9 @@ module BasicLTI
       hash['lis_result_sourcedid'] = BasicLTI::BasicOutcomes.encode_source_id(tool, context, assignment, user)
       hash['lis_outcome_service_url'] = outcome_service_url
       hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
+      hash['ext_outcome_data_values_accepted'] = ['url', 'text'].join(',')
+      hash['custom_canvas_assignment_title'] = assignment.title
+      hash['custom_canvas_assignment_points_possible'] = assignment.points_possible
       if tool.public?
         hash['custom_canvas_assignment_id'] = assignment.id
       end

@@ -12,8 +12,9 @@ define [
   'compiled/widget/assignmentRubricDialog'
   'compiled/util/wikiSidebarWithMultipleEditors'
   'jquery.instructure_misc_helpers' #scrollSidebar
+  'str/htmlEscape'
 
-], (I18n, $, Backbone, _, Topic, DiscussionTopic, EntriesView, EntryView, replyTemplate, Reply, assignmentRubricDialog) ->
+], (I18n, $, Backbone, _, Topic, DiscussionTopic, EntriesView, EntryView, replyTemplate, Reply, assignmentRubricDialog, htmlEscape) ->
 
   ##
   # View that considers the enter ERB template, not just the JS
@@ -161,6 +162,12 @@ define [
         html = replyTemplate @model.toJSON()
         @$('.entry_content:first').append html
       super
+
+    format: (attr, value) ->
+      if attr is 'notification'
+        value
+      else
+        htmlEscape value
 
     initViewSwitcher: ->
       @$('.view_switcher').show().selectmenu

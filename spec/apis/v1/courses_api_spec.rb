@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -89,6 +89,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -100,6 +101,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -133,6 +135,7 @@ describe CoursesController, :type => :integration do
             'open_enrollment'                      => true,
             'self_enrollment'                      => true,
             'restrict_enrollments_to_course_dates' => true,
+            'hide_final_grades'                     => true,
             'license'                              => 'Creative Commons',
             'sis_course_id'                        => '12345',
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.'
@@ -222,6 +225,7 @@ describe CoursesController, :type => :integration do
         'allow_student_forum_attachments' => true,
         'open_enrollment' => true,
         'self_enrollment' => true,
+        'hide_final_grades' => false,
         'restrict_enrollments_to_course_dates' => true
       }, 'offer' => true }
     end
@@ -383,6 +387,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -397,6 +402,7 @@ describe CoursesController, :type => :integration do
                            'computed_final_grade' => expected_final_grade}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -421,6 +427,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -432,6 +439,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'student'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+        'hide_final_grades' => true,
         'start_at' => nil,
         'end_at' => nil
       }
@@ -450,6 +458,7 @@ describe CoursesController, :type => :integration do
         'enrollments' => [{'type' => 'teacher'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       }
@@ -548,6 +557,19 @@ describe CoursesController, :type => :integration do
       json['id'].should == @course2.id
       json['sis_course_id'].should == 'TEST-SIS-ONE.2011'
     end
+
+    it "should not be paginated (for legacy reasons)" do
+      controller = mock()
+      controller.stubs(:params).returns({})
+      course_with_teacher(:active_all => true)
+      students = []
+      num = Api.per_page_for(controller) + 1 # get the default api per page value
+      num.times { students << student_in_course(:course => @course).user }
+      first_user = @user
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/students.json",
+                      { :controller => 'courses', :action => 'students', :course_id => @course.id.to_s, :format => 'json' })
+      json.count.should == num
+    end
   end
 
   describe "/users" do
@@ -622,6 +644,26 @@ describe CoursesController, :type => :integration do
       # expect
       json.map {|x| x["id"]}.sort.should == api_json_response([@student1, @student2],
                                                               :only => USER_API_FIELDS).map {|x| x["id"]}.sort
+    end
+
+    it "should accept an array of enrollment_types" do
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users",
+                      {:controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
+                      :enrollment_type => ['student', 'teacher'], :include => ['enrollments'])
+
+      json.map { |u| u['enrollments'].map { |e| e['type'] } }.flatten.uniq.sort.should == %w{StudentEnrollment TeacherEnrollment}
+    end
+
+    it "maintains query parameters in link headers" do
+      json = api_call(
+        :get,
+        "/api/v1/courses/#{@course1.id}/users.json",
+        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+        { :enrollment_type => 'student', :maintain_params => '1', :per_page => 1 })
+      links = response['Link'].split(",")
+      links.should_not be_empty
+      links.all?{ |l| l =~ /enrollment_type=student/ }.should be_true
+      links.first.scan(/per_page/).length.should == 1
     end
 
     it "should not include sis user id or login id for non-admins" do
@@ -729,6 +771,23 @@ describe CoursesController, :type => :integration do
       link_header[1].should match /page=1&per_page=5/ # first page
       link_header[2].should match /page=2&per_page=5/ # last page
     end
+
+    it "should allow jumping to a user's page based on id" do
+      @other_section = @course1.course_sections.create!
+      students = []
+      5.times do |i|
+        s = student_in_course(:course => @course1, :name => "User #{i+1}", :active_all => true).user
+        @course1.enroll_student(s, :section => @other_section, :allow_multiple_enrollments => true)
+        students << s
+      end
+      @target = students[4]
+      @user = @me
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, 
+                      { :enrollment_type => 'student', :user_id => @target.id, :page => 1, :per_page => 1 })
+      json.map{|x| x['id']}.length.should == 1
+      json.map{|x| x['id']}.should == [@target.id]
+    end
   end
 
   it "should allow sis id in hex packed format" do
@@ -771,6 +830,7 @@ describe CoursesController, :type => :integration do
         'needs_grading_count' => 1,
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },
@@ -792,6 +852,7 @@ describe CoursesController, :type => :integration do
         'syllabus_body' => @course1.syllabus_body,
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+        'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil
       },

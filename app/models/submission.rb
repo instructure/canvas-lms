@@ -592,8 +592,9 @@ class Submission < ActiveRecord::Base
     p.whenever {|record|
       !record.suppress_broadcast and
       !record.assignment.muted? and
-      record.assignment.context.state == :available and 
-      record.assignment.state == :published and 
+      record.assignment.context.state == :available and
+      record.assignment.state == :published and
+      record.user.student_enrollments.map(&:course_id).include?(record.assignment.context_id) and
       (record.changed_state_to(:graded) || (record.changed_in_state(:graded, :fields => [:score, :grade]) && !@assignment_just_published && record.assignment_graded_in_the_last_hour?))
     }
     
@@ -801,7 +802,10 @@ class Submission < ActiveRecord::Base
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Time.zone.today.to_s) + (opts[:media_comment_id] || opts[:comment] || t('no_comment', "no comment")))
+    if self.group
+      # this is a bit icky, as it assumes the same opts hash will be passed in to each add_comment call for the group
+      opts[:group_comment_id] ||= AutoHandle.generate_securish_uuid
+    end
     self.save! if self.new_record?
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous, :hidden]
     comment = self.submission_comments.create(opts.slice(*valid_keys)) if !opts[:comment].empty?

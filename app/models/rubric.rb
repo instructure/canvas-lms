@@ -28,7 +28,8 @@ class Rubric < ActiveRecord::Base
   before_save :default_values
   after_save :update_alignments
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  
+  validates_length_of :title, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+
   serialize :data
   simply_versioned
   

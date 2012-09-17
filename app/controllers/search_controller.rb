@@ -20,6 +20,7 @@
 
 class SearchController < ApplicationController
   include SearchHelper
+  include Api::V1::Conversation
 
   before_filter :get_context
 
@@ -81,7 +82,7 @@ class SearchController < ApplicationController
     # admins may not be able to see the course listed at the top level (since
     # they aren't enrolled in it), but if they search within it, we want
     # things to work, so we set everything up here
-    load_all_contexts get_admin_search_context(params[:context])
+    load_all_contexts :context => get_admin_search_context(params[:context])
 
     types = (params[:types] || [] + [params[:type]]).compact
     types |= [:course, :section, :group] if types.delete('context')
@@ -93,7 +94,7 @@ class SearchController < ApplicationController
 
     @blank_fallback = !api_request?
 
-    max_results = [params[:per_page].try(:to_i) || 10, 50].min
+    max_results = Api.per_page_for(self)
     if max_results < 1
       if !types[:user] || params[:context]
         max_results = nil # i.e. all results
@@ -131,7 +132,7 @@ class SearchController < ApplicationController
             def total_pages; nil; end
             def per_page; #{max_results}; end
           CODE
-          recipients = Api.paginate(recipients, self, request.request_uri.gsub(/(per_)?page=[^&]*(&|\z)/, '').sub(/[&?]\z/, ''))
+          recipients = Api.paginate(recipients, self, api_v1_search_recipients_url)
         else
           if contexts.size <= max_results / 2
             recipients = contexts + participants
@@ -152,7 +153,7 @@ class SearchController < ApplicationController
   private
 
   def matching_participants(options)
-    jsonify_users(@current_user.messageable_users(options.merge(:admin_context => @admin_context)), options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
+    conversation_users_json(@current_user.messageable_users(options.merge(:admin_context => @admin_context)), @current_user, session, options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
   end
 
   def matching_contexts(options)

@@ -68,3 +68,7 @@
     top: 5px;
   }
 }
+
+.ie .ui-tooltip:before {
+  border: none;
+}

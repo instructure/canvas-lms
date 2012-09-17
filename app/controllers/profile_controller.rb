@@ -52,7 +52,7 @@ class ProfileController < ApplicationController
 
     known_user = @user_data[:common_contexts].present?
     if @user_data[:known_user] # if you can message them, you can see the profile
-      add_crumb(t('crumbs.profile_frd', "%{user}'s profile", :user => @user.short_name), user_profile_path(@user))
+      add_crumb(t('crumbs.settings_frd', "%{user}'s settings", :user => @user.short_name), user_profile_path(@user))
       return render :action => :show
     else
       return render :action => :unauthorized
@@ -101,7 +101,7 @@ class ProfileController < ApplicationController
     @active_tab = "profile_settings"
     respond_to do |format|
       format.html do
-        add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), settings_profile_path )
+        add_crumb(t(:crumb, "%{user}'s settings", :user => @user.short_name), settings_profile_path )
         render :action => "profile"
       end
       format.json do
@@ -129,7 +129,7 @@ class ProfileController < ApplicationController
 
   def communication_update
     params[:root_account] = @domain_root_account
-    @policies = NotificationPolicy.setup_for(@current_user, params)
+    NotificationPolicy.setup_for(@current_user, params)
     render :json => {}, :status => :ok
   end
 
@@ -220,7 +220,7 @@ class ProfileController < ApplicationController
           end
         end
         unless pseudonymed
-          flash[:notice] = t('notices.updated_profile', "Profile successfully updated")
+          flash[:notice] = t('notices.updated_profile', "Settings successfully updated")
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @user.to_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path]}, :pseudonym => {:only => [:id, :unique_id]} }) }
         end

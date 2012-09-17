@@ -13,19 +13,17 @@ describe "quizzes" do
     end
 
     it "should allow a teacher to create a quiz from the quizzes tab directly" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/quizzes"
-      expect_new_page_load { driver.find_element(:css, ".new-quiz-link").click }
-      driver.find_element(:css, ".save_quiz_button").click
+      expect_new_page_load { f(".new-quiz-link").click }
+      submit_form("#quiz_options_form")
       wait_for_ajax_requests
       assert_flash_notice_message /Quiz data saved/
     end
 
     it "should create and preview a new quiz" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load {
-        driver.find_element(:css, '.new-quiz-link').click
+        f('.new-quiz-link').click
       }
       #check url
       driver.current_url.should match %r{/courses/\d+/quizzes/(\d+)\/edit}
@@ -34,38 +32,36 @@ describe "quizzes" do
       quiz_id.should be > 0
 
       #input name and description then save quiz
-      replace_content(driver.find_element(:css, '#quiz_options_form input#quiz_title'), 'new quiz')
+      replace_content(ff('#quiz_title')[1], 'new quiz')
       test_text = "new description"
-      keep_trying_until { driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
+      keep_trying_until { f('#quiz_description_ifr').should be_displayed }
       type_in_tiny '#quiz_description', test_text
       in_frame "quiz_description_ifr" do
-        driver.find_element(:id, 'tinymce').should include_text(test_text)
+        f('#tinymce').should include_text(test_text)
       end
 
       #add a question
-      driver.find_element(:css, '.add_question_link').click
+      f('.add_question_link').click
       submit_form('.question_form')
       wait_for_ajax_requests
 
       #save the quiz
-      driver.find_element(:css, '.save_quiz_button').click
+      submit_form("#quiz_options_form")
       wait_for_ajax_requests
 
       #check quiz preview
       driver.find_element(:link, 'Preview the Quiz').click
-      driver.find_element(:id, 'questions').should be_present
+      f('#questions').should be_present
     end
 
     it "should correctly hide form when cancelling quiz edit" do
-      skip_if_ie('Out of memory')
-
       get "/courses/#{@course.id}/quizzes/new"
 
-      wait_for_tiny driver.find_element(:id, 'quiz_description')
-      driver.find_element(:css, ".add_question .add_question_link").click
-      driver.find_elements(:css, ".question_holder .question_form").length.should == 1
-      driver.find_element(:css, ".question_holder .question_form .cancel_link").click
-      driver.find_elements(:css, ".question_holder .question_form").length.should == 0
+      wait_for_tiny f('#quiz_description')
+      f(".add_question .add_question_link").click
+      ff(".question_holder .question_form").length.should == 1
+      f(".question_holder .question_form .cancel_link").click
+      ff(".question_holder .question_form").length.should == 0
     end
 
     it "should pop up calendar on top of #main" do
@@ -77,7 +73,6 @@ describe "quizzes" do
     end
 
     it "should edit a quiz" do
-      skip_if_ie('Out of memory')
       @context = @course
       q = quiz_model
       q.generate_quiz_data
@@ -87,17 +82,17 @@ describe "quizzes" do
       wait_for_ajax_requests
 
       test_text = "changed description"
-      keep_trying_until { driver.find_element(:id, 'quiz_description_ifr').should be_displayed }
+      keep_trying_until { f('#quiz_description_ifr').should be_displayed }
       type_in_tiny '#quiz_description', test_text
       in_frame "quiz_description_ifr" do
-        driver.find_element(:id, 'tinymce').text.include?(test_text).should be_true
+        f('#tinymce').text.include?(test_text).should be_true
       end
-      driver.find_element(:css, '.save_quiz_button').click
+      submit_form("#quiz_options_form")
       wait_for_ajax_requests
 
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
-      driver.find_element(:css, '#main .description').should include_text(test_text)
+      f('#main .description').should include_text(test_text)
     end
 
     it "message students who... should do something" do
@@ -112,17 +107,17 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
       driver.find_element(:partial_link_text, "Message Students Who...").click
-      dialog = find_all_with_jquery("#message_students_dialog:visible")
+      dialog = ffj("#message_students_dialog:visible")
       dialog.length.should eql(1)
       dialog = dialog.first
 
       click_option('.message_types', 'Have taken the quiz')
-      students = find_all_with_jquery(".student_list > .student:visible")
+      students = ffj(".student_list > .student:visible")
 
       students.length.should eql(0)
 
       click_option('.message_types', 'Have NOT taken the quiz')
-      students = find_all_with_jquery(".student_list > .student:visible")
+      students = ffj(".student_list > .student:visible")
       students.length.should eql(1)
 
       dialog.find_element(:css, 'textarea#body').send_keys('This is a test message.')
@@ -138,23 +133,21 @@ describe "quizzes" do
     it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do
       5.times { @course.quizzes.create!(:title => "My Quiz") }
       get "/courses/#{@course.id}/quizzes"
-      publish_multiple = driver.find_element(:css, '.publish_multiple_quizzes_link')
-      cancel = driver.find_element(:css, '#publish_multiple_quizzes_dialog .cancel_button')
+      publish_multiple = f('.publish_multiple_quizzes_link')
+      cancel = f('#publish_multiple_quizzes_dialog .cancel_button')
 
       5.times do
         publish_multiple.click
-        find_all_with_jquery('#publish_multiple_quizzes_dialog .quiz_item:not(.blank)').length.should == 5
+        ffj('#publish_multiple_quizzes_dialog .quiz_item:not(.blank)').length.should == 5
         cancel.click
       end
     end
 
     it "should create a new question group" do
-      skip_if_ie('Out of memory')
-
       get "/courses/#{@course.id}/quizzes/new"
 
-      driver.find_element(:css, '.add_question_group_link').click
-      group_form = driver.find_element(:css, '#questions .quiz_group_form')
+      f('.add_question_group_link').click
+      group_form = f('#questions .quiz_group_form')
       group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
       submit_form(group_form)
@@ -163,12 +156,10 @@ describe "quizzes" do
     end
 
     it "should update a question group" do
-      skip_if_ie('Out of memory')
-
       get "/courses/#{@course.id}/quizzes/new"
 
-      driver.find_element(:css, '.add_question_group_link').click
-      group_form = driver.find_element(:css, '#questions .quiz_group_form')
+      f('.add_question_group_link').click
+      group_form = f('#questions .quiz_group_form')
       group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
       submit_form(group_form)
@@ -185,8 +176,6 @@ describe "quizzes" do
     end
 
     it "should not let you exceed the question limit" do
-      skip_if_ie('Out of memory')
-
       get "/courses/#{@course.id}/quizzes/new"
 
       f('.add_question_group_link').click
@@ -227,51 +216,44 @@ describe "quizzes" do
 
       get "/courses/#{@course.id}/quizzes/#{q.id}/moderate"
 
-      driver.find_element(:css, '.moderate_student_link').click
-      driver.find_element(:id, 'extension_extra_attempts').send_keys('2')
+      f('.moderate_student_link').click
+      f('#extension_extra_attempts').send_keys('2')
       submit_form('#moderate_student_form')
       wait_for_ajax_requests
-      driver.find_element(:css, '.attempts_left').text.should == '3'
+      f('.attempts_left').text.should == '3'
 
     end
 
     it "should flag a quiz question while taking a quiz as a teacher" do
-      skip_if_ie('Out of memory')
       quiz_with_new_questions
 
-      expect_new_page_load {
-        driver.find_element(:css, '.publish_quiz_button').click
-      }
+      expect_new_page_load { f('.publish_quiz_button').click }
       wait_for_ajax_requests
 
-      expect_new_page_load {
-        driver.find_element(:link, 'Take the Quiz').click
-      }
+      expect_new_page_load { driver.find_element(:link, 'Take the Quiz').click }
 
       #flag first question
-      hover_and_click("#question_#{@quest1.id} .flag_icon")
+      hover_and_click("#question_#{@quest1.id} .flag_question")
 
       #click second answer
-      driver.find_element(:css, "#question_#{@quest2.id} .answers .answer:first-child input").click
+      f("#question_#{@quest2.id} .answers .answer:first-child input").click
       submit_form('#submit_quiz_form')
 
       #dismiss dialog and submit quiz
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.dismiss
-      driver.find_element(:css, "#question_#{@quest1.id} .answers .answer:last-child input").click
+      f("#question_#{@quest1.id} .answers .answer:last-child input").click
       expect_new_page_load {
         submit_form('#submit_quiz_form')
       }
-      driver.find_element(:id, 'quiz_title').text.should == @q.title
+      f('#quiz_title').text.should == @q.title
     end
 
     it "should indicate when it was last saved" do
-      skip_if_ie('Out of memory')
       take_quiz do
-        indicator = driver.find_element(:css, '#last_saved_indicator')
-
+        indicator = f('#last_saved_indicator')
         indicator.text.should == 'Not saved'
-        driver.find_element(:css, 'input[type=radio]').click
+        f('.answer .question_input').click
 
         # too fast, this always fails
         #indicator.text.should == 'Saving...'
@@ -282,7 +264,6 @@ describe "quizzes" do
     end
 
     it "should validate numerical input data" do
-      skip_if_ie('Out of memory')
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = AssessmentQuestion.create!
         bank.assessment_questions << aq
@@ -308,7 +289,6 @@ describe "quizzes" do
     end
 
     it "should mark questions as answered when the window loses focus" do
-      skip_if_ie('Out of memory')
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq1 = AssessmentQuestion.create!
         aq2 = AssessmentQuestion.create!
@@ -332,7 +312,6 @@ describe "quizzes" do
     end
 
     it "should mark dropdown questions as answered" do
-      skip_if_ie('Out of memory')
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq1 = AssessmentQuestion.create!
         aq2 = AssessmentQuestion.create!
@@ -366,14 +345,14 @@ describe "quizzes" do
 
         # marked as answer
         ff('#question_list .answered').size.should eql 2
+        wait_for_ajaximations
 
-        # after reload, answers should be remembered
-        expect_new_page_load {
-          driver.find_element(:link, 'Quizzes').click
-          confirm_dialog = driver.switch_to.alert
-          confirm_dialog.accept
-          get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
-        }
+        driver.find_element(:link, 'Quizzes').click
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        driver.find_element(:link, "Resume Quiz").click
         # there's some initial setTimeout stuff that happens, so things won't
         # be ready right when the page loads
         keep_trying_until {
@@ -387,10 +366,8 @@ describe "quizzes" do
     end
 
     it "should give a student extra time if the time limit is extended" do
-      skip_if_ie('Out of memory')
-
       @context = @course
-      bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+      bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
       a = AssessmentQuestion.create!
       b = AssessmentQuestion.create!
@@ -398,10 +375,10 @@ describe "quizzes" do
       bank.assessment_questions << b
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       question = q.quiz_questions.create!(:question_data => {
-        :name => "first question",
-        'question_type' => 'multiple_choice_question',
-        'answers' => answers,
-        :points_possible => 1
+          :name => "first question",
+          'question_type' => 'multiple_choice_question',
+          'answers' => answers,
+          :points_possible => 1
       }, :assessment_question => a)
 
       q.generate_quiz_data
@@ -411,8 +388,8 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
       driver.find_element(:link_text, 'Take the Quiz').click
 
-      answer_one = driver.find_element(:id, "question_#{question.id}_answer_1")
-      answer_two = driver.find_element(:id, "question_#{question.id}_answer_2")
+      answer_one = f("#question_#{question.id}_answer_1")
+      answer_two = f("#question_#{question.id}_answer_2")
 
       # force a save to create a submission
       answer_one.click
@@ -424,7 +401,7 @@ describe "quizzes" do
 
       keep_trying_until do
         assert_flash_notice_message /You have been given extra time on this attempt/
-        driver.find_element(:css, '.time_running').text.should match /^[19]{2}\sMinutes/
+        f('.time_running').text.should match /^[19]{2}\sMinutes/
       end
 
       #This step is to prevent selenium from freezing when the dialog appears when leaving the page
@@ -434,10 +411,8 @@ describe "quizzes" do
     end
 
     it "should notify a student of extra time given by a moderator" do
-      skip_if_ie('Out of memory')
-
       @context = @course
-      bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+      bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
       a = AssessmentQuestion.create!
       b = AssessmentQuestion.create!
@@ -445,10 +420,10 @@ describe "quizzes" do
       bank.assessment_questions << b
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       question = q.quiz_questions.create!(:question_data => {
-        :name => "first question",
-        'question_type' => 'multiple_choice_question',
-        'answers' => answers,
-        :points_possible => 1
+          :name => "first question",
+          'question_type' => 'multiple_choice_question',
+          'answers' => answers,
+          :points_possible => 1
       }, :assessment_question => a)
 
       q.generate_quiz_data
@@ -458,8 +433,8 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
       driver.find_element(:link_text, 'Take the Quiz').click
 
-      answer_one = driver.find_element(:id, "question_#{question.id}_answer_1")
-      answer_two = driver.find_element(:id, "question_#{question.id}_answer_2")
+      answer_one = f("#question_#{question.id}_answer_1")
+      answer_two = f("#question_#{question.id}_answer_2")
 
       # force a save to create a submission
       answer_one.click
@@ -474,7 +449,7 @@ describe "quizzes" do
 
       keep_trying_until do
         assert_flash_notice_message /You have been given extra time on this attempt/
-        driver.find_element(:css, '.time_running').text.should match /^[19]{2}\sMinutes/
+        f('.time_running').text.should match /^[19]{2}\sMinutes/
         true
       end
 
@@ -486,13 +461,12 @@ describe "quizzes" do
 
 
     it "should display quiz statistics" do
-      skip_if_ie('Out of memory')
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
       driver.find_element(:link, "Quiz Statistics").click
 
-      driver.find_element(:css, '#content .question_name').should include_text("Question 1")
+      f('#content .question_name').should include_text("Question 1")
     end
   end
 
@@ -547,6 +521,7 @@ describe "quizzes" do
 
       describe "on individual quiz page" do
         RESUME_TEXT = 'Resume Quiz'
+
         def validate_resume_button_text(text)
           f('#right-side .button').text.should == text
         end

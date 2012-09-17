@@ -37,7 +37,7 @@ describe "external tool buttons" do
       f(element).click
       wait_for_ajax_requests
     end
-    keep_trying_until { !f("#external_tool_button_dialog").displayed? }
+    keep_trying_until { !f("#external_tool_button_dialog").should_not be_displayed }
   end
 
   it "should allow inserting oembed content from external tool buttons" do

@@ -98,13 +98,17 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  def set_locale
+  def assign_localizer
     I18n.localizer = lambda {
       infer_locale :context => @context,
                    :user => @current_user,
                    :root_account => @domain_root_account,
                    :accept_language => request.headers['Accept-Language']
     }
+  end
+
+  def set_locale
+    assign_localizer
     yield if block_given?
   ensure
     I18n.localizer = nil
@@ -398,6 +402,7 @@ class ApplicationController < ActionController::Base
           end
         end
       end
+      assign_localizer if @context.present?
       add_crumb(@context.short_name, named_context_url(@context, :context_url), :id => "crumb_#{@context.asset_string}") if @context && @context.respond_to?(:short_name)
     end
   end
@@ -1029,8 +1034,8 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
 
   def conversations_path(params={})
-    hash = params.to_json.unpack('H*').first
-    "/conversations##{hash}"
+    hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
+    "/conversations#{hash}"
   end
   helper_method :conversations_path
   

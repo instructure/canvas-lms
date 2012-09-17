@@ -101,9 +101,6 @@
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
 
-  add_crumb(proc { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
-  before_filter { |c| c.active_tab = "discussions" }
-
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
 
@@ -120,6 +117,8 @@ class DiscussionTopicsController < ApplicationController
       log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
       respond_to do |format|
         format.html do
+          @active_tab = "discussions"
+          add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
           js_env :permissions => {
             :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
             :moderate => @context.grants_right?(@current_user, session, :moderate_forum)
@@ -127,7 +126,11 @@ class DiscussionTopicsController < ApplicationController
         end
         format.json do
           # you can pass ?only_announcements=true to get announcements instead of discussions TODO: document
-          @topics = Api.paginate(@context.send( params[:only_announcements] ? :announcements : :discussion_topics).active, self, topic_pagination_path)
+          scope = (params[:only_announcements] ?
+                   @context.active_announcements :
+                   @context.active_discussion_topics.only_discussion_topics)
+          scope = scope.by_position
+          @topics = Api.paginate(scope, self, topic_pagination_path(:only_announcements => params[:only_announcements]))
           @topics.reject! { |a| a.locked_for?(@current_user, :check_policies => true) }
           @topics.each { |t| t.current_user = @current_user }
           if api_request?
@@ -140,6 +143,7 @@ class DiscussionTopicsController < ApplicationController
 
   def new
     @topic = @context.send(params[:is_announcement] ? :announcements : :discussion_topics).new
+    add_discussion_or_announcement_crumb
     add_crumb t :create_new_crumb, "Create new"
     edit
   end
@@ -148,10 +152,16 @@ class DiscussionTopicsController < ApplicationController
     @topic ||= @context.all_discussion_topics.find(params[:id])
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
       hash =  {
-        :URL_ROOT => named_context_url(@context, :api_v1_context_discussion_topics_url)
+        :URL_ROOT => named_context_url(@context, :api_v1_context_discussion_topics_url),
+        :PERMISSIONS => {
+          :CAN_CREATE_ASSIGNMENT => @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create),
+          :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
+          :CAN_MODERATE => @context.grants_right?(@current_user, session, :moderate_forum)
+        }
       }
 
       unless @topic.new_record?
+        add_discussion_or_announcement_crumb
         add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
         add_crumb t :edit_crumb, "Edit"
         hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session)
@@ -166,6 +176,7 @@ class DiscussionTopicsController < ApplicationController
     parent_id = params[:parent_id]
     @topic = @context.all_discussion_topics.find(params[:id])
     @context.assert_assignment_group rescue nil
+    add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
     if @topic.deleted?
       flash[:notice] = t :deleted_topic_notice, "That topic has been deleted"
@@ -175,7 +186,9 @@ class DiscussionTopicsController < ApplicationController
     if authorized_action(@topic, @current_user, :read)
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-      @topic.context_module_action(@current_user, :read) if !@locked
+      unless @locked
+        @topic.change_read_state('read', @current_user)
+      end
       if @topic.for_group_assignment?
         @groups = @topic.assignment.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
         topics = @topic.child_topics.to_a
@@ -215,7 +228,7 @@ class DiscussionTopicsController < ApplicationController
               :DELETE_URL => named_context_url(@context, :api_v1_context_discussion_delete_reply_url, @topic, ':id'),
               :UPDATE_URL => named_context_url(@context, :api_v1_context_discussion_update_reply_url, @topic, ':id'),
               :MARK_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, @topic, ':id'),
-              :CURRENT_USER => { :id => @current_user.id, :display_name => @current_user.short_name, :avatar_image_url => avatar_image_url(User.avatar_key(@current_user.id)) },
+              :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
             }
@@ -326,6 +339,16 @@ class DiscussionTopicsController < ApplicationController
 
   protected
 
+  def add_discussion_or_announcement_crumb
+    if  @topic.is_a? Announcement
+      @active_tab = "announcements"
+      add_crumb t('#crumbs.announcements', "Announcements"), named_context_url(@context, :context_announcements_url)
+    else
+      @active_tab = "discussions"
+      add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
+    end
+  end
+
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at podcast_enabled
                                 podcast_has_student_posts require_initial_post is_announcement)
   def process_discussion_topic(is_new = false)
@@ -351,9 +374,12 @@ class DiscussionTopicsController < ApplicationController
       @topic.content_being_saved_by(@current_user)
 
       # handle delayed posting
-      @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at]
-      @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at && @topic.delayed_post_at > Time.now
-      @topic.delayed_post_at = "" unless @topic.post_delayed?
+      if discussion_topic_hash.has_key? :delayed_post_at
+        @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at]
+        @topic.delayed_post_at = "" if @topic.delayed_post_at && @topic.delayed_post_at < Time.now
+        @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at
+        @topic.workflow_state = 'active' if @topic.post_delayed? && !@topic.delayed_post_at
+      end
 
       #handle locking/unlocking
       if params.has_key? :locked
@@ -394,16 +420,17 @@ class DiscussionTopicsController < ApplicationController
         end
 
         # handle creating/deleting assignment
-        if params[:assignment] &&
-           (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
-           @assignment.grants_right?(@current_user, session, :update)
-
+        if params[:assignment]
           if params[:assignment].has_key?(:set_assignment) && !value_to_boolean(params[:assignment][:set_assignment])
-            if @topic.assignment
-              @topic.assignment.destroy
-              @topic.update_attribute(:assignment_id, nil)
+            if @topic.assignment && @topic.assignment.grants_right?(@current_user, session, :update)
+              assignment = @topic.assignment
+              @topic.assignment = nil
+              @topic.save!
+              assignment.destroy
             end
-          else
+          
+          elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
+                 @assignment.grants_right?(@current_user, session, :update)
             update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
             @assignment.submission_types = 'discussion_topic'
             @assignment.saved_by = :discussion_topic

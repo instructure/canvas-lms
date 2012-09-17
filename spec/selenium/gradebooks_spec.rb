@@ -17,18 +17,18 @@ describe "gradebooks" do
     @student2 = @student
 
     @assignment = assignment_model(
-      {
-        :course => @course,
-        :name => 'first assignment',
-        :due_at => nil,
-        :points_possible => 10,
-        :submission_types => 'online_text_entry,online_upload'
-      }
+        {
+            :course => @course,
+            :name => 'first assignment',
+            :due_at => nil,
+            :points_possible => 10,
+            :submission_types => 'online_text_entry,online_upload'
+        }
     )
   end
 
   def switch_to_section(section_name="All")
-    driver.find_element(:id, "gradebook_options").click
+    f("#gradebook_options").click
 
     driver.execute_script("$('#instructure_dropdown_list .option:last').click()")
     click_option("#section-to-show", section_name)
@@ -41,12 +41,12 @@ describe "gradebooks" do
     wait_for_ajaximations
 
     switch_to_section(@section1.display_name)
-    student_cell = driver.find_element(:id, "student_#{@student1.id}")
+    student_cell = f("#student_#{@student1.id}")
     student_cell.should include_text @student1.sortable_name
     student_cell.should include_text @section1.display_name
 
     switch_to_section(@section2.display_name)
-    student_cell = driver.find_element(:id, "student_#{@student2.id}")
+    student_cell = f("#student_#{@student2.id}")
     student_cell.should include_text @student2.sortable_name
     student_cell.should include_text @section2.display_name
   end
@@ -57,19 +57,19 @@ describe "gradebooks" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
-    student_cell = driver.find_element(:id, "student_#{@student1.id}")
+    student_cell = f("#student_#{@student1.id}")
     student_cell.should include_text @student1.sortable_name
     student_cell.should include_text @section1.display_name
     student_cell.should include_text @section2.display_name
 
     switch_to_section(@section1.display_name)
-    student_cell = driver.find_element(:id, "student_#{@student1.id}")
+    student_cell = f("#student_#{@student1.id}")
     student_cell.should include_text @student1.sortable_name
     student_cell.should include_text @section1.display_name
     student_cell.should include_text @section2.display_name
 
     switch_to_section(@section2.display_name)
-    student_cell = driver.find_element(:id, "student_#{@student1.id}")
+    student_cell = f("#student_#{@student1.id}")
     student_cell.should include_text @student1.sortable_name
     student_cell.should include_text @section1.display_name
     student_cell.should include_text @section2.display_name
@@ -84,14 +84,14 @@ describe "gradebooks" do
 
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
-    ffj('img.turnitin:visible').size.should eql 2
+    ffj('.turnitin:visible').size.should eql 2
 
     # now create a ton of students so that the data loads via ajax
     100.times { |i| student_in_course(:active_all => true, :name => "other guy #{i}") }
 
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
-    ffj('img.turnitin:visible').size.should eql 2
+    ffj('.turnitin:visible').size.should eql 2
   end
 
   it "should include student view student for grading" do
@@ -113,7 +113,7 @@ describe "gradebooks" do
 
     keep_trying_until {
       fj('#datagrid_data .row:nth-child(3) .cell:first .grade').click
-      fj('#submission_information').displayed?
+      fj('#submission_information').should be_displayed
     }
     link_el = f('#submission_information .submission_details .view_submission_link')
     URI.decode(URI.parse(link_el.attribute(:href)).fragment).should == "{\"student_id\":#{@student2.id}}"

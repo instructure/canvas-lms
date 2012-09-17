@@ -199,18 +199,18 @@
     <% if !assignment.special_class %>
     <td style="padding-left: 10px; white-space: nowrap;">
       <% has_comments = submission && submission.visible_submission_comments && !submission.visible_submission_comments.empty? %>
-      <a href="#" class="toggle_comments_link tooltip" title="<%= t(:view_comments, "View comments and scoring details") %>" style="<%= 'visibility: hidden;' unless has_comments %>">
+      <a href="#" class="toggle_comments_link tooltip" aria-role="button" aria-controls="grade_info_<%= assignment.id %>" title="<%= t(:view_comments, "View comments and scoring details") %>" style="<%= 'visibility: hidden;' unless has_comments %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text"><%= t(:comment_count, "comment", :count => (submission.visible_submission_comments.size rescue 0)) %></span>
         </span>
         <%= image_tag "word_bubble.png" %>
       </a>
       <% has_scoring_details = submission && submission.score && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted? %>
-      <a href="#" class="toggle_comments_link tooltip" title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless has_scoring_details %>">
+      <a href="#" class="toggle_comments_link tooltip" aria-role="button" aria-controls="grade_info_<%= assignment.id %>" title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless has_scoring_details %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text"><%= t(:see_scoring_details, "See scoring details") %></span>
         </span>
-        <%= image_tag "grading_icon.png", :style => "opacity: 0.5;" %>
+        <%= image_tag "grading_icon.png", :style => "opacity: 0.5;", :alt => t('titles.view_scoring_details', 'View Scoring Details') %>
       </a>
       <a href="#" class="toggle_rubric_assessments_link tooltip" title="<%= t 'titles.view_rubric_evaluation', 'View Rubric Evaluation' %>" style="<%= 'visibility: hidden;' if visible_rubric_assessments.empty? %>">
         <span class="tooltip_wrap right">
@@ -247,7 +247,7 @@
     <% end %>
   </tr>
   <%# always add row (even if empty) so javascript references work %>
-  <tr class="comments <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %>" style="display: none;">
+  <tr id="grade_info_<%= assignment.id %>" aria-expanded="false" role="region" class="comments <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %>" style="display: none;">
     <% if !assignment.special_class && (has_comments || has_scoring_details) %>
       <td colspan="5" style="padding-bottom: 20px;">
         <% if assignment && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted? %>
@@ -257,7 +257,7 @@
         <% title += " " + before_label(:high_score, "High") + " " + high.to_s unless assignment && assignment.hide_max_scores_for_assignments %>
         <% title += " " + before_label(:low_score, "Low") + " " + low.to_s unless assignment && assignment.hide_min_scores_for_assignments %>
         <% if mean && high && low %>
-        <div class="tooltip" style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= title %>">
+        <div tabindex="0" class="tooltip" style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= title %>">
           <span class="tooltip_wrap right" style="z-index: 11; bottom: 35px;">
             <span class="tooltip_text">
               <table>

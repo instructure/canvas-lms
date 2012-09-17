@@ -22,9 +22,13 @@ class Attachment < ActiveRecord::Base
     col = table ? "#{table}.display_name" : 'display_name'
     best_unicode_collation_key(col)
   end
-  attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data
+  attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
   include HasContentTags
   include ContextModuleItem
+
+  MAX_SCRIBD_ATTEMPTS = 3
+  # This value is used as a flag for when we are skipping the submit to scribd for this attachment
+  SKIPPED_SCRIBD_ATTEMPTS = 25
 
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
@@ -51,7 +55,7 @@ class Attachment < ActiveRecord::Base
   after_save :touch_context_if_appropriate
   after_save :build_media_object
 
-  attr_accessor :podcast_associated_asset
+  attr_accessor :podcast_associated_asset, :do_submit_to_scribd
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment fond
@@ -397,6 +401,11 @@ class Attachment < ActiveRecord::Base
       end
     end
 
+    # if we're filtering scribd submits, update the scribd_attempts here to skip the submission process
+    if self.new_record? && Attachment.filtering_scribd_submits? && !self.do_submit_to_scribd
+      self.scribd_attempts = SKIPPED_SCRIBD_ATTEMPTS
+    end
+
     if self.respond_to?(:namespace=) && self.new_record?
       self.namespace = infer_namespace
     end
@@ -590,7 +599,7 @@ class Attachment < ActiveRecord::Base
     return quota[:quota] < quota[:quota_used] + (additional_quota || 0)
   end
 
-  def handle_duplicates(method)
+  def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
     method = method.to_sym
     deleted_attachments = []
@@ -602,8 +611,8 @@ class Attachment < ActiveRecord::Base
         # update content tags to refer to the new file
         ContentTag.update_all({:content_id => self.id}, {:content_id => a.id, :content_type => 'Attachment'})
 
-        # delete the overwritten file
-        a.destroy
+        # delete the overwritten file (unless the caller is queueing them up)
+        a.destroy unless opts[:caller_will_destroy]
         deleted_attachments << a
       end
     end
@@ -821,7 +830,7 @@ class Attachment < ActiveRecord::Base
         file_state_changed? &&
         file_state == 'available' &&
         context && context.state == :available &&
-        folder.visible?
+        folder && folder.visible?
   end
 
   # generate notifications for recent file operations
@@ -1132,6 +1141,10 @@ class Attachment < ActiveRecord::Base
     self.context_module_tags.each { |tag| tag.context_module_action(user, action) }
   end
 
+  def self.filtering_scribd_submits?
+    Setting.get_cached("filter_scribd_submits", "false") == "true"
+  end
+
   include Workflow
 
   # Right now, using the state machine to manage whether an attachment has
@@ -1204,7 +1217,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def scribdable?
-    ScribdAPI.enabled? && self.scribd_mime_type_id ? true : false
+    !!(ScribdAPI.enabled? && self.scribd_mime_type_id && self.scribd_attempts != SKIPPED_SCRIBD_ATTEMPTS)
   end
 
   def self.submit_to_scribd(ids)
@@ -1417,7 +1430,7 @@ class Attachment < ActiveRecord::Base
 
 
   named_scope :scribdable?, :conditions => ['scribd_mime_type_id is not null']
-  named_scope :recyclable, :conditions => ['attachments.scribd_attempts < ? AND attachments.workflow_state = ?', 3, 'errored']
+  named_scope :recyclable, :conditions => ['attachments.scribd_attempts < ? AND attachments.workflow_state = ?', MAX_SCRIBD_ATTEMPTS, 'errored']
   named_scope :needing_scribd_conversion_status, :conditions => ['attachments.workflow_state = ? AND attachments.updated_at < ?', 'processing', 30.minutes.ago], :limit => 50
   named_scope :uploadable, :conditions => ['workflow_state = ?', 'pending_upload']
   named_scope :active, :conditions => ['file_state = ?', 'available']

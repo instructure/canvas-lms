@@ -66,6 +66,20 @@ describe DiscussionTopicsController do
       assigns[:topic].should eql(@topic)
     end
 
+    it "should mark as read when viewed" do
+      course_with_student_logged_in(:active_all => true)
+
+      # this @_user wierdness is so that course_topic does not set @topic.user to @user
+      @_user = @user
+      @user = nil
+      course_topic
+      @user = @_user
+
+      @topic.read_state(@user).should == 'unread'
+      get 'show', :course_id => @course.id, :id => @topic.id
+      @topic.read_state(@user).should == 'read'
+    end
+
     it "should allow concluded teachers to see discussions" do
       course_with_teacher_logged_in(:active_all => true)
       course_topic

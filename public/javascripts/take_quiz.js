@@ -58,7 +58,7 @@ define([
       started_at: started_at,
       end_at: end_at,
       time_limit: parseInt($(".time_limit").text(), 10) || null,
-      updateSubmission: function(repeat) {
+      updateSubmission: function(repeat, beforeLeave) {
         if(quizSubmission.submitting && !repeat) { return; }
         var now = new Date();
         if((now - quizSubmission.lastSubmissionUpdate) < 1000) { return }
@@ -71,44 +71,63 @@ define([
         });
 
         $last_saved.text(I18n.t('saving', 'Saving...'));
-        $.ajaxJSON($(".backup_quiz_submission_url").attr('href'), 'PUT', data, function(data) {
-          $last_saved.text(I18n.t('saved_at', 'Saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
-          quizSubmission.currentlyBackingUp = false;
-          if(repeat) {
-            setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
-          }
-          if(data && data.end_at) {
-            var endAtFromServer     = Date.parse(data.end_at),
-                submissionEndAt     = Date.parse(quizSubmission.end_at.text()),
-                serverEndAtTime     = endAtFromServer.getTime(),
-                submissionEndAtTime = submissionEndAt.getTime();
+        var url = $(".backup_quiz_submission_url").attr('href');
+        // If called before leaving the page (ie. onbeforeunload), we can't use any async or FF will kill the PUT request.
+        if (beforeLeave){
+          $.flashMessage(I18n.t('saving', 'Saving...'));
+          $.ajax({
+            url: url,
+            data: data,
+            type: 'PUT',
+            dataType: 'json',
+            async: false        // NOTE: Not asynchronous. Otherwise Firefox will cancel the request as navigating away from the page.
+            // NOTE: No callbacks. Don't care about response. Just making effort to save the quiz
+          });
+        }
+        else {
+          $.ajaxJSON(url, 'PUT', data,
+            // Success callback
+            function(data) {
+              $last_saved.text(I18n.t('saved_at', 'Saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
+              quizSubmission.currentlyBackingUp = false;
+              if(repeat) {
+                setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
+              }
+              if(data && data.end_at) {
+                var endAtFromServer     = Date.parse(data.end_at),
+                    submissionEndAt     = Date.parse(quizSubmission.end_at.text()),
+                    serverEndAtTime     = endAtFromServer.getTime(),
+                    submissionEndAtTime = submissionEndAt.getTime();
 
-            quizSubmission.referenceDate = null;
+                quizSubmission.referenceDate = null;
 
-            // if the new end_at from the server is different than our current end_at, then notify
-            // the user that their time limit's changed and let updateTime do the rest.
-            if (serverEndAtTime !== submissionEndAtTime) {
-              serverEndAtTime > submissionEndAtTime ?
-                $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt')) :
-                $.flashMessage(I18n.t('notices.less_time', 'Your time for this quiz has been reduced.'));
+                // if the new end_at from the server is different than our current end_at, then notify
+                // the user that their time limit's changed and let updateTime do the rest.
+                if (serverEndAtTime !== submissionEndAtTime) {
+                  serverEndAtTime > submissionEndAtTime ?
+                    $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt')) :
+                    $.flashMessage(I18n.t('notices.less_time', 'Your time for this quiz has been reduced.'));
 
-              quizSubmission.end_at.text(data.end_at);
-              endAtText   = data.end_at;
-              endAtParsed = new Date(data.end_at);
+                  quizSubmission.end_at.text(data.end_at);
+                  endAtText   = data.end_at;
+                  endAtParsed = new Date(data.end_at);
+                }
+              }
+            },
+            // Error callback
+            function() {
+            var current_user_id = $("#identity .user_id").text() || "none";
+            quizSubmission.currentlyBackingUp = false;
+            $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
+            }, function() {
+              ajaxErrorFlash(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}), request);
+            }, {skipDefaultError: true});
+
+            if(repeat) {
+              setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
             }
-          }
-        }, function() {
-          var current_user_id = $("#identity .user_id").text() || "none";
-          quizSubmission.currentlyBackingUp = false;
-          $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
-          }, function() {
-            ajaxErrorFlash(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}), request);
-          }, {skipDefaultError: true});
-
-          if(repeat) {
-            setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
-          }
-        }, {timeout: 5000 });
+          }, {timeout: 5000 });
+        }
       },
 
       updateTime: function() {
@@ -209,7 +228,7 @@ define([
 
     if($("#preview_mode_link").length == 0) {
       window.onbeforeunload = function() {
-        quizSubmission.updateSubmission();
+        quizSubmission.updateSubmission(false, true);
         if(!quizSubmission.submitting && !quizSubmission.alreadyAcceptedNavigatingAway) {
           return I18n.t('confirms.unfinished_quiz', "You're about to leave the quiz unfinished.  Continue anyway?");
         }

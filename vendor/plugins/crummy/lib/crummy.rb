@@ -79,7 +79,7 @@ module Crummy
     # Render the list of crumbs 
     def render_crumbs(options = {})
       if crumbs.length > 1
-        content_tag(:nav, :id => "breadcrumbs", :role => "navigation") do
+        content_tag(:nav, :id => "breadcrumbs", :role => "navigation", 'aria-label' => 'breadcrumbs') do
           content_tag(:ul, nil, nil, false) do 
             crumbs.collect do |crumb|
               content_tag(:li, crumb_to_html(crumb), crumb[2])

@@ -215,7 +215,6 @@ describe "conversations recipient finder" do
   end
 
   it "should allow a user id in the url hash to add recipient" do
-    skip_if_ie("Java crashes")
     # check without any user_name
     get conversations_path(:user_id => @s1.id)
     wait_for_ajaximations
@@ -228,7 +227,6 @@ describe "conversations recipient finder" do
   end
 
   it "should reject a non-contactable user id in the url hash" do
-    skip_if_ie("Java crashes")
     other = User.create(:name => "other guy")
     get conversations_path(:user_id => other.id)
     wait_for_ajaximations
@@ -236,7 +234,6 @@ describe "conversations recipient finder" do
   end
 
   it "should allow a non-contactable user in the hash if a shared conversation exists" do
-    skip_if_ie("Java crashes")
     other = User.create(:name => "other guy")
     # if the users have a conversation in common already, then the recipient can be added
     c = Conversation.initiate([@user.id, other.id], true)

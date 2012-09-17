@@ -87,6 +87,11 @@ module Canvas::HTTP
   # there was an extension)
   def self.tempfile_for_uri(uri)
     basename = File.basename(uri.path)
-    Tempfile.new(basename.split(".", 2))
+    basename, ext = basename.split(".", 2)
+    if ext
+      Tempfile.new([basename, ext])
+    else
+      Tempfile.new(basename)
+    end
   end
 end

@@ -211,5 +211,18 @@ describe "calendar" do
       ff('.mini_calendar_day .day_number')[10].click
       keep_trying_until { f('.calendar_month .month_name').text.should == f('.mini-cal-month-and-year .month_name').text }
     end
+
+    it "should open an event dialog on calendar from URL" do
+      event_title = 'Test Event 123'
+      start_time = 3.months.ago
+      end_time = start_time + 1.hour
+      calendar_event_model(:title => event_title, :start_at => start_time, :end_at => end_time)
+
+      get "/calendar?event_id=#{@event.id}&include_contexts=course_#{@course.id}"
+      wait_for_ajax_requests
+
+      keep_trying_until { fj(".ui-dialog").should be_displayed } #using fj to bypass selenium cache
+      fj(".ui-dialog .title").text.should == event_title
+    end
   end
 end

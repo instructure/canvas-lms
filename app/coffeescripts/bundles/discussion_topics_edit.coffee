@@ -11,12 +11,14 @@ require [
   model = new (if is_announcement then Announcement else DiscussionTopic)(ENV.DISCUSSION_TOPIC.ATTRIBUTES)
   model.urlRoot = ENV.DISCUSSION_TOPIC.URL_ROOT
 
-  view = new EditView(model: model)
-
   [contextType, contextId] = splitAssetString ENV.context_asset_string
-  if contextType is 'courses' && !is_announcement
+  view = new EditView(model: model, permissions: ENV.DISCUSSION_TOPIC.PERMISSIONS, contextType: contextType)
+
+  if contextType is 'courses' && !is_announcement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
     (view.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
 
-  $ -> view.render().$el.appendTo('#content')
+  $ ->
+    view.render().$el.appendTo('#content')
+    $('#discussion-title').focus()
 
   view

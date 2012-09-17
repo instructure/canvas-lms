@@ -65,11 +65,46 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
     in_frame('speedgrader_iframe') do
-      question_inputs = ff('.question_input')
+      question_inputs = ff('.header .question_input')
       question_inputs.each { |qi| replace_content(qi, 3) }
       submit_form('#update_history_form')
     end
     keep_trying_until { f('#grade_container input').attribute('value').should == expected_points }
+  end
+
+  it "should properly display student quiz results when the teacher also has a student enrollment" do
+    student = student_in_course(:active_user => true).user
+    @course.enroll_student(@teacher).accept!
+
+    @assignment.points_possible = 10
+    @assignment.submission_types = 'online_quiz'
+    @assignment.title = 'Anonymous Graded Quiz'
+    @assignment.save!
+
+    q = Quiz.find_by_assignment_id(@assignment.id)
+    q.quiz_questions.create!(:quiz => q, :question_data => {
+      :position => 1,
+      :question_type => "true_false_question",
+      :points_possible => 3,
+      :question_name => "true false question" })
+    q.generate_quiz_data
+    q.workflow_state = 'available'
+    q.save!
+
+    [student, @teacher].each do |user|
+      q.generate_submission(student).tap do |qs|
+        qs.submission_data = { 'foo' => 'bar1' }
+        qs.grade_submission
+      end
+    end
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{student.id}%7D"
+    wait_for_ajaximations
+
+    in_frame('speedgrader_iframe') do
+      f('#content').text.should match(/User/)
+      f('#content').text.should_not match(/nobody@example.com/)
+    end
   end
 
   it "should display discussion entries for only one student" do
@@ -136,10 +171,10 @@ describe "speed grader" do
     wait_for_animations
 
     #test opening and closing rubric
-    keep_trying_until {
+    keep_trying_until do
       f('.toggle_full_rubric').click
       f('#rubric_full').should be_displayed
-    }
+    end
     f('#rubric_holder .hide_rubric_link').click
     wait_for_animations
     f('#rubric_full').should_not be_displayed
@@ -169,10 +204,10 @@ describe "speed grader" do
     wait_for_animations
 
     #check media comment
-    keep_trying_until {
+    keep_trying_until do
       driver.execute_script("$('#add_a_comment .media_comment_link').click();")
       f("#audio_record_option").should be_displayed
-    }
+    end
     f("#video_record_option").should be_displayed
     close_visible_dialog
     f("#audio_record_option").should_not be_displayed
@@ -247,9 +282,7 @@ describe "speed grader" do
 
     f("#settings_link").click
     f('#hide_student_names').click
-    expect_new_page_load {
-      fj('.ui-dialog-buttonset .ui-button:visible:last').click
-    }
+    expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     wait_for_animations
 
     f("#avatar_image").should_not be_displayed
@@ -320,25 +353,19 @@ describe "speed grader" do
     f("#settings_link").click
     f('select#eg_sort_by option[value="submitted_at"]').click
     f('#hide_student_names').click
-    expect_new_page_load {
-      fj('.ui-dialog-buttonset .ui-button:visible:last').click
-    }
+    expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
 
     # make sure it works a second time too
     f("#settings_link").click
     f('select#eg_sort_by option[value="alphabetically"]').click
-    expect_new_page_load {
-      fj('.ui-dialog-buttonset .ui-button:visible:last').click
-    }
+    expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
 
     # unselect the hide option
     f("#settings_link").click
     f('#hide_student_names').click
-    expect_new_page_load {
-      fj('.ui-dialog-buttonset .ui-button:visible:last').click
-    }
+    expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "student@example.com" }
   end
 

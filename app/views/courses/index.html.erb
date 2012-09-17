@@ -7,11 +7,15 @@
 <% end %>
 
 <% if show_user_create_course_button(@current_user) %>
-    <% content_for :right_side do %>
-        <div class="rs-margin-lr rs-margin-top">
-            <a href="<%= getting_started_path(:fresh => 1) %>" style="font-size: 1.3em;" class="button button-sidebar-wide"><%= t('links.start_course', %{Start a New Course}) %></a>
-        </div>
-    <% end %>
+  <% content_for :right_side do %>
+    <div class="rs-margin-lr">
+      <button type="button"
+              id="start_new_course"
+              class="element_toggler button button-sidebar-wide"
+              aria-controls="new_course_form"><%= t('start_new_course', 'Start a New Course') %></button>
+      <%= render :partial => 'shared/new_course_form' %>
+    </div>
+  <% end %>
 <% end %>
 
 <% jammit_css :context_list %>

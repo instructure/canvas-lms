@@ -84,7 +84,8 @@ define [
 
       @resetMessageForm()
       @$form.find('#user_note_info').hide().find('input').attr('checked', false)
-      @$form.show().find(':input:visible:first').focus()
+      @$form.show()
+      @$form.find(':input:visible:first').focus() if window.location.hash isnt ''
 
     resetMessageForm: (resetFields = true) ->
       @$form.find('.audience').html(if c = @conversations.active()
@@ -131,9 +132,8 @@ define [
 
     canAddNotesFor: (user) ->
       return false unless @options.NOTES_ENABLED
-      return true if user.can_add_notes
       for id, roles of user.common_courses
-        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.can_add_notes)
+        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.permissions?.manage_user_notes)
       false
 
     loadConversation: (conversation, $node, cb) ->
@@ -774,9 +774,9 @@ define [
                   type: 'context'
                   avatar_url: parent.data('user_data').avatar_url
               filterText = if context.match(/^course/)
-                I18n.t('filter_by_course', 'Fiter by this course')
+                I18n.t('filter_by_course', 'Filter by this course')
               else
-                I18n.t('filter_by_group', 'Fiter by this group')
+                I18n.t('filter_by_group', 'Filter by this group')
               data.unshift
                 id: context
                 name: parent.data('text')

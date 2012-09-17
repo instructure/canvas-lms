@@ -164,6 +164,8 @@ class CalendarEvent < ActiveRecord::Base
     end
   }
 
+  named_scope :events_without_child_events, :conditions => "NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state <> 'deleted')"
+
   def validate_context!
     @validate_context = true
     context.validation_event_override = self
@@ -508,7 +510,6 @@ class CalendarEvent < ActiveRecord::Base
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
     item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
     item ||= context.calendar_events.new
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     item.workflow_state = 'active' if item.deleted?
     item.title = hash[:title] || hash[:name]

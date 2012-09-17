@@ -15,8 +15,6 @@ define [
       @deleteURL = contextInfo.assignment_url
       @addClass 'assignment'
 
-      @copyDataFromObject(data)
-
     copyDataFromObject: (data) =>
       data = data.assignment if data.assignment
       @object = @assignment = data
@@ -24,13 +22,10 @@ define [
       @title = data.title || data.name  || "Untitled" # due to a discrepancy between the legacy ajax API and the v1 API
       @lock_explanation = @object.lock_explanation
       @addClass "group_#{@contextCode()}"
-
-      @start = if data.due_at then $.parseFromISO(data.due_at, "due_date").time else null
-      if @isDueAtMidnight()
-        @midnightFudged = true
-        @start.setMinutes(30)
-
       @description = data.description
+      @start = if data.due_at then $.parseFromISO(data.due_at, "due_date").time else null
+
+      super
 
     fullDetailsURL: () ->
       $.replaceTags(@contextInfo.assignment_url, 'id', @assignment.id)
@@ -58,6 +53,3 @@ define [
         method = 'PUT'
         url = $.replaceTags(@contextInfo.assignment_url, 'id', @assignment.id)
       [ method, url ]
-
-    isDueAtMidnight: () ->
-      @midnightFudged || @start && @start.getHours() == 23 && @start.getMinutes() == 59

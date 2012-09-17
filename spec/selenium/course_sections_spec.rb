@@ -9,7 +9,7 @@ describe "course sections" do
   end
 
   def table_rows
-    table_rows = driver.find_elements(:css, '#enrollment_table tr')
+    table_rows = ff('#enrollment_table tr')
     table_rows
   end
 
@@ -55,11 +55,11 @@ describe "course sections" do
     edit_name = 'edited section name'
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
-    driver.find_element(:css, '.edit_section_link').click
-    edit_form = driver.find_element(:id, 'edit_section_form')
+    f('.edit_section_link').click
+    edit_form = f('#edit_section_form')
     replace_content(edit_form.find_element(:id, 'course_section_name'), edit_name)
     submit_form(edit_form)
     wait_for_ajaximations
-    driver.find_element(:id, 'section_name').should include_text(edit_name)
+f('#section_name').should include_text(edit_name)
   end
 end

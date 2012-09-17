@@ -4,12 +4,12 @@
   </a>
 
   <div class="user-details">
-    <a class="user_name" href="/courses/{{course_id}}/users/{{user_id}}">{{name}}</a>
+    <a class="user_name" href="/courses/{{course_id}}/users/{{id}}">{{name}}</a>
     <div class="more_info">
       <div class="short_name">{{short_name}}</div>
-      <div class="email">{{login_id}}</div>
+      <div class="email">{{email}}</div>
       <ul class="sections">
-        {{#each course_section_name}}
+        {{#each sectionNames}}
           <li class="section">{{this}}</li>
         {{/each}}
       </ul>

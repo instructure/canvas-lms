@@ -269,6 +269,7 @@ $(document).ready(function() {
 </script>
 <% end %>
 
+<header class="quiz-header">
 <h2><%= @quiz && !@quiz.new_record? ? t('headers.edit_quiz', "Edit Quiz") : t('headers.create_new_quiz', "Create a New Quiz") %></h2>
 <div style="display: none;" id="quiz_urls">
   <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="update_quiz_url">&nbsp;</a>
@@ -307,7 +308,8 @@ $(document).ready(function() {
   </span>
   <% end %>
 </div>
-<div id="questions" class="question_editing brief">
+</header>
+<div id="questions" class="question_editing brief show_correct_answers">
   <% @quiz.root_entries.each do |question| %>
     <% if question[:entry_type] == "quiz_group" %>
       <%= render :partial => "quizzes/question_group", :object => question %>
@@ -323,7 +325,7 @@ $(document).ready(function() {
 <%= render :partial => "quizzes/form_question", :object => nil %>
 <%= render :partial => "quizzes/question_group", :object => nil %>
 <%= render :partial => "quizzes/find_question_from_bank" %>
-<div style="text-align: center;" class="add_question question_editing">
+<div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
   <a href="#" class="add_question_link add"><%= t('links.new_question', "New Question") %></a>
   <a href="#" class="add_question_group_link add" style="margin-left: 20px; margin-right: 20px;"><%= t('links.new_question_group', "New Question Group") %></a>
   <% if feature_enabled?(:question_banks) %>

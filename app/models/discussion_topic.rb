@@ -181,12 +181,14 @@ class DiscussionTopic < ActiveRecord::Base
     !self.root_topic_id && self.assignment_id && self.assignment.has_group_category?
   end
 
+  # only the root level entries
   def discussion_subentries
     self.root_discussion_entries
   end
 
+  # count of all active discussion_entries
   def discussion_subentry_count
-    discussion_subentries.count
+    discussion_entries.active.count
   end
 
   def for_assignment?
@@ -237,6 +239,7 @@ class DiscussionTopic < ActiveRecord::Base
     return nil unless current_user
 
     if new_state != self.read_state(current_user)
+      self.context_module_action(current_user, :read) if new_state == 'read'
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
     else
       true
@@ -248,6 +251,8 @@ class DiscussionTopic < ActiveRecord::Base
     return unless current_user
 
     transaction do
+      self.context_module_action(current_user, :read) if new_state == 'read'
+
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
 
@@ -328,6 +333,8 @@ class DiscussionTopic < ActiveRecord::Base
   named_scope :before, lambda {|date|
     {:conditions => ['discussion_topics.created_at < ?', date]}
   }
+
+  named_scope :by_position, :order => "discussion_topics.position DESC, discussion_topics.created_at DESC"
 
   def try_posting_delayed
     if self.post_delayed? && Time.now >= self.delayed_post_at
@@ -500,7 +507,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) and not self.is_announcement }
     can :create
 
-    given { |user, session| self.context.respond_to?(:allow_student_forum_attachments) && self.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) }
     can :attach
 
     given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.locked? }

@@ -396,12 +396,13 @@ module CC
         correct_points = "%.2f" % correct_points
         
         groups.each_pair do |id, answers|
-          answer = answers.find{|a| a['weight'] > 0}
-          node.respcondition do |r_node|
-            r_node.conditionvar do |c_node|
-              c_node.varequal(answer['id'], :respident=>"response_#{id}")
+          if answer = answers.find{|a| a['weight'] > 0}
+            node.respcondition do |r_node|
+              r_node.conditionvar do |c_node|
+                c_node.varequal(answer['id'], :respident=>"response_#{id}")
+              end
+              r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
             end
-            r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
         end
       end

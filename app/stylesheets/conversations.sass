@@ -223,6 +223,16 @@ ul.messages, ul.conversations, div.conversations > ul
           color: #000 !important
           a
             color: #000 !important
+  > li
+    overflow: hidden
+    > .audience
+      min-width: 340px
+      overflow: hidden
+      display: block
+      white-space: nowrap
+    p
+      overflow: hidden
+      max-height: 40px
   > li.selected, > li.submission.selected ul > li, > li.submission.selected ul > li.header
     background-color: #e5f3ff
   .audience
@@ -294,7 +304,8 @@ div.conversations > ul
       min-height: 0
       margin: 0
     img.avatar, span.date, .audience, input, .actions
-      display: none
+      left: -10000px
+      position: absolute
 
 ul.messages
   position: relative
@@ -387,10 +398,16 @@ ul.messages
     .message_attachments
       border-top-color: #b7c2cc
 
+ul.messages li.other .actions:focus
+  margin-left: 1em
+  display: inline
+  position: static
+
 ul.messages li.other:hover
   .actions
     margin-left: 1em
     display: inline
+    position: static
     .send_private_message
       height: 18px
       display: inline-block
@@ -578,7 +595,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
         display: block
     > li.attachments .attachments, > li.media_objects .media_objects
       display: inline
-
+    
 #message_blank
   display: none
 
@@ -927,3 +944,5 @@ form
   left: 50%
   top: 50%
   z-index: 3
+
+ 

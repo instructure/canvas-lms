@@ -1,4 +1,8 @@
-define ['jquery', 'jqueryui/dialog' ], ($) ->
+define [
+  'jquery'
+  'compiled/fn/preventDefault'
+  'jqueryui/dialog'
+], ($, preventDefault) ->
 
   $.fn.fixDialogButtons = ->
     this.each ->
@@ -12,7 +16,7 @@ define ['jquery', 'jqueryui/dialog' ], ($) ->
           # if you add the class 'dialog_closer' to any of the buttons,
           # clicking it will cause the dialog to close
           if $button.is('.dialog_closer')
-            $button.click -> $dialog.dialog('close')
+            $button.click preventDefault -> $dialog.dialog('close')
 
           return {
             text: $button.text()

@@ -146,28 +146,45 @@ module Api
     return find_params
   end
 
+  def self.per_page_for(controller)
+    [(controller.params[:per_page] || Setting.get_cached('api_per_page', '10')).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
+  end
+
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
-    per_page = [(controller.params[:per_page] || Setting.get_cached('api_per_page', '10')).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
-    collection = collection.paginate({ :page => controller.params[:page], :per_page => per_page }.merge(pagination_args))
+    per_page = per_page_for(controller)
+    pagination_args.reverse_merge!({ :page => controller.params[:page], :per_page => per_page })
+    collection = collection.paginate(pagination_args)
     return unless collection.respond_to?(:next_page)
-    links = []
-    base_url += (base_url =~ /\?/ ? '&': '?')
-    template = "<%spage=%s&per_page=#{collection.per_page}>; rel=\"%s\""
-    if collection.next_page
-      links << template % [base_url, collection.next_page, "next"]
-    end
-    if collection.previous_page
-      links << template % [base_url, collection.previous_page, "prev"]
-    end
-    links << template % [base_url, 1, "first"]
-    if !pagination_args[:without_count] && collection.total_pages && collection.total_pages > 1
-      links << template % [base_url, collection.total_pages, "last"]
-    end
+    total_pages = (pagination_args[:without_count] ? nil : collection.total_pages)
+    total_pages = nil if total_pages.to_i <= 1
+    links = build_links(base_url, {
+      :query_parameters => controller.request.query_parameters,
+      :per_page => collection.per_page,
+      :next => collection.next_page,
+      :prev => collection.previous_page,
+      :first => 1,
+      :last => total_pages,
+    })
     controller.response.headers["Link"] = links.join(',') if links.length > 0
     collection
+  end
+
+  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
+  def self.build_links(base_url, opts={})
+    links = []
+    base_url += (base_url =~ /\?/ ? '&': '?')
+    qp = opts[:query_parameters] || {}
+    qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
+    base_url += "#{qp.to_query}&" if qp.present?
+    [:next, :prev, :first, :last].each do |k|
+      if opts[k].present?
+        links << "<#{base_url}page=#{opts[k]}&per_page=#{opts[:per_page]}>; rel=\"#{k}\""
+      end
+    end
+    links
   end
 
   def media_comment_json(media_object_or_hash)
@@ -280,7 +297,7 @@ module Api
                 element[att] = val
               end
             end
-          rescue URI::InvalidURIError => e
+          rescue URI::Error => e
             # leave it as is
           end
         end
@@ -297,6 +314,16 @@ module Api
   # regex for shard-aware ID
   ID = '(?:\d+~)?\d+'
 
+  # maps a Canvas data type to an API-friendly type name
+  API_DATA_TYPE = { "Attachment" => "File",
+                    "WikiPage" => "Page",
+                    "DiscussionTopic" => "Discussion",
+                    "Assignment" => "Assignment",
+                    "Quiz" => "Quiz",
+                    "ContextModuleSubHeader" => "SubHeader",
+                    "ExternalUrl" => "ExternalUrl",
+                    "ContextExternalTool" => "ExternalTool" }.freeze
+
   # maps canvas URLs to API URL helpers
   # target array is return type, helper, name of each capture, and optionally a Hash of extra arguments
   API_ROUTE_MAP = {
@@ -309,12 +336,12 @@ module Api
       %r{^/groups/(#{ID})/discussion_topics/(#{ID})$} => ['Discussion', :api_v1_group_discussion_topic_url, :group_id, :topic_id],
 
       # List pages
-      %r{^/courses/(#{ID})/wiki$} => ['[Page]', :api_v1_course_pages_url, :course_id],
-      %r{^/groups/(#{ID})/wiki$} => ['[Page]', :api_v1_group_pages_url, :group_id],
+      %r{^/courses/(#{ID})/wiki$} => ['[Page]', :api_v1_course_wiki_pages_url, :course_id],
+      %r{^/groups/(#{ID})/wiki$} => ['[Page]', :api_v1_group_wiki_pages_url, :group_id],
 
       # Show page
-      %r{^/courses/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_course_page_url, :course_id, :url],
-      %r{^/groups/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_group_page_url, :group_id, :url],
+      %r{^/courses/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_course_wiki_page_url, :course_id, :url],
+      %r{^/groups/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_group_wiki_page_url, :group_id, :url],
 
       # List assignments
       %r{^/courses/(#{ID})/assignments$} => ['[Assignment]', :api_v1_course_assignments_url, :course_id],
@@ -328,11 +355,11 @@ module Api
       %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, {:id => 'root'}],
 
       # Get file
-      %r{^/courses/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
-      %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
-      %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
-      %r{^/files/(#{ID})/} => ['File', :api_v1_file_url, :id],
-  }
+      %r{^/courses/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+      %r{^/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+  }.freeze
 
   def api_endpoint_info(protocol, host, url)
     API_ROUTE_MAP.each_pair do |re, api_route|

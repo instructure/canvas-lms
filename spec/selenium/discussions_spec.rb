@@ -2,6 +2,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussion_announcem
 
 describe "discussions" do
   it_should_behave_like "discussions selenium tests"
+
+  describe "shared topics permissions specs" do
+    let(:url) { "/courses/#{@course.id}/discussion_topics/" }
+    let(:what_to_create) { DiscussionTopic }
+    it_should_behave_like "discussion and announcement permissions tests"
+  end
+
   context "as a teacher" do
     DISCUSSION_NAME = 'new discussion'
 
@@ -10,7 +17,7 @@ describe "discussions" do
     end
 
     describe "shared bulk topics specs" do
-      let(:url) { "/courses/#{@course.id}/discussion_topics" }
+      let(:url) { "/courses/#{@course.id}/discussion_topics/" }
       let(:what_to_create) { DiscussionTopic }
       it_should_behave_like "discussion and announcement main page tests"
     end
@@ -114,19 +121,56 @@ describe "discussions" do
         replace_content(f('input[name=title]'), "This is my test title")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
 
-        f('input[name=podcast_enabled]').click
+        f('input[type=checkbox][name=podcast_enabled]').click
         expect_new_page_load { submit_form('.form-actions') }
         get "/courses/#{@course.id}/discussion_topics"
         f('.discussion-topic .icon-rss').should be_displayed
         DiscussionTopic.last.podcast_enabled.should be_true
       end
     end
+
+    context "editing" do
+      it "should save and display all changes" do
+        @topic = @course.discussion_topics.create!(:title => "topic", :user => @user)
+
+        def confirm(state)
+          checkbox_state = state == :on ? 'true' : nil
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          f('input[type=checkbox][name=threaded]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name=delay_posting]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name=require_initial_post]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name=podcast_enabled]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name=podcast_has_student_posts]')[:checked].should == checkbox_state
+          f('input[type=checkbox][name="assignment[set_assignment]"]')[:checked].should == checkbox_state
+        end
+
+        def toggle(state)
+          f('input[type=checkbox][name=threaded]').click
+          f('input[type=checkbox][name=delay_posting]').click
+          set_value f('input[name=delayed_post_at]'), 2.weeks.from_now.strftime('%m/%d/%Y') if state == :on
+          f('input[type=checkbox][name=require_initial_post]').click
+          f('input[type=checkbox][name=podcast_enabled]').click
+          f('input[type=checkbox][name=podcast_has_student_posts]').click if state == :on
+          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+
+          f('.form-actions button[type=submit]').click
+          wait_for_ajaximations
+        end
+
+        confirm(:off)
+        toggle(:on)
+        confirm(:on)
+        toggle(:off)
+        confirm(:off)
+      end
+    end
   end
 
   context "as a student" do
     before (:each) do
-      course_with_teacher(:name => 'teacher@example.com')
-      @course.offer!
+      course_with_teacher(:name => 'teacher@example.com', :active_all => true)
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @course.enroll_student(@student).accept
       @topic = @course.discussion_topics.create!(:user => @teacher, :message => 'new topic from teacher', :discussion_type => 'side_comment')
@@ -159,6 +203,37 @@ describe "discussions" do
       f('#content').should_not include_text(new_student_entry_text)
       add_reply new_student_entry_text
       f('#content').should include_text(new_student_entry_text)
+    end
+
+    it "should not show file attachment if allow_student_forum_attachments is not true" do
+      # given
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#attachment_uploaded_data').should be_nil
+      # when
+      @course.allow_student_forum_attachments = true
+      @course.save!
+      # expect
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#attachment_uploaded_data').should_not be_nil
+    end
+
+    context "in a group" do
+      before(:each) do
+        group_with_user :user => @student, :context => @course
+      end
+
+      it "should not show file attachment if allow_student_forum_attachments is not true" do
+        # given
+        get "/groups/#{@group.id}/discussion_topics/new"
+        f('label[for=attachment_uploaded_data]').should be_nil
+        # when
+        @course.allow_student_forum_attachments = true
+        @course.save!
+        # expect
+        get "/groups/#{@group.id}/discussion_topics/new"
+        f('label[for=attachment_uploaded_data]').should be_displayed
+      end
+
     end
 
     it "should let students post to a post-first discussion" do
@@ -263,17 +338,16 @@ describe "discussions" do
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
-
         delete_entry(entry)
       end
 
       it "should edit a side comment" do
         edit_text = 'this has been edited '
+        text = "new side comment from student"
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_ajax_requests
         wait_for_js
-
+        validate_entry_text(entry, text)
         edit_entry(entry, edit_text)
       end
     end

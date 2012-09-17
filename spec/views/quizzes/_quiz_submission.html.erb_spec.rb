@@ -29,5 +29,19 @@ describe "/quizzes/_quiz_submission" do
     render :partial => "quizzes/quiz_submission"
     response.should_not be_nil
   end
+
+  it "should render when quiz results are not supposed to be shown to the student" do
+    course_with_student
+    view_context
+    quiz = @course.quizzes.create!
+    quiz.hide_results = 'always'
+    quiz.save!
+
+    assigns[:quiz] = quiz
+    assigns[:submission] = assigns[:quiz].generate_submission(@user)
+    assigns[:submission].grade_submission
+    render :partial => "quizzes/quiz_submission"
+    response.should_not be_nil
+  end
 end
 

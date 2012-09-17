@@ -13,11 +13,12 @@ define [
   'str/htmlEscape'
   'vendor/jquery.ba-tinypubsub'
   'compiled/jquery.kylemenu'
+  'compiled/str/convertApiUserContent'
 
   # entry_with_replies partials
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], (require, I18n, Backbone, _, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, Reply, EntryEditor, MarkAsReadWatcher, htmlEscape, {publish}, KyleMenu) ->
+], (require, I18n, Backbone, _, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, Reply, EntryEditor, MarkAsReadWatcher, htmlEscape, {publish}, KyleMenu, convertApiUserContent) ->
 
   ##
   # View for a single entry
@@ -132,6 +133,17 @@ define [
 
     goToReply: (event, $el) ->
       # set the model to focused true or something
+
+    format: (attr, value) ->
+      if attr is 'message'
+        value = convertApiUserContent(value)
+        @$el.find('.message').removeClass('enhanced')
+        publish('userContent/change')
+        value
+      else if attr is 'notification'
+        value
+      else
+        htmlEscape value
 
   # circular dep
   require ['compiled/discussions/EntryCollectionView'], (EntryCollectionView) ->

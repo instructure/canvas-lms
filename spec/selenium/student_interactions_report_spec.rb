@@ -19,7 +19,7 @@ describe "student interactions report" do
   end
 
   it "should have sortable columns, except the email header" do
-    ths = driver.find_elements(:css, ".report th")
+    ths = ff(".report th")
     ths[0].attribute('class').should match(/header/)
     ths[1].attribute('class').should match(/header/)
     ths[2].attribute('class').should match(/header/)
@@ -29,31 +29,31 @@ describe "student interactions report" do
   end
 
   it "should allow sorting by columns" do
-    ths = driver.find_elements(:css, ".report th")
-    trs = driver.find_elements(:css, ".report tbody tr")
+    ths = ff(".report th")
+    trs = ff(".report tbody tr")
     ths[0].click
     ths[0].attribute('class').should match(/headerSortDown/)
-    driver.find_elements(:css, ".report tbody tr").should == [trs[0], trs[1]]
+    ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[0].click
     ths[0].attribute('class').should match(/headerSortUp/)
-    driver.find_elements(:css, ".report tbody tr").should == [trs[1], trs[0]]
+    ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[2].click
     ths[2].attribute('class').should match(/headerSortDown/)
-    driver.find_elements(:css, ".report tbody tr").should == [trs[0], trs[1]]
+    ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[2].click
     ths[2].attribute('class').should match(/headerSortUp/)
-    driver.find_elements(:css, ".report tbody tr").should == [trs[1], trs[0]]
+    ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[3].click
     ths[3].attribute('class').should match(/headerSortDown/)
-    driver.find_elements(:css, ".report tbody tr").should == [trs[0], trs[1]]
+    ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[3].click
     ths[3].attribute('class').should match(/headerSortUp/)
-    driver.find_elements(:css, ".report tbody tr").should == [trs[1], trs[0]]
+    ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[5].click
     ths[5].attribute('class').should_not match(/header/)

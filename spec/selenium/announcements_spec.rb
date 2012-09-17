@@ -2,7 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussion_announcement_specs')
 
 describe "announcements" do
-
   it_should_behave_like "in-process server selenium tests"
 
   def create_announcement(message = 'announcement message')
@@ -104,7 +103,7 @@ describe "announcements" do
     end
 
     describe "shared bulk topics specs" do
-      let(:url) { "/courses/#{@course.id}/announcements" }
+      let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
       it_should_behave_like "discussion and announcement main page tests"
     end
@@ -117,7 +116,7 @@ describe "announcements" do
 
     it "should create a delayed announcement" do
       get course_announcements_path(@course)
-      create_announcement_manual('input[name=delay_posting]')
+      create_announcement_manual('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
       datepicker_next
       expect_new_page_load { submit_form('.form-actions') }
@@ -139,17 +138,17 @@ describe "announcements" do
     end
 
     it "should add and remove an external feed to announcements" do
-      get course_announcements_path(@course)
+      get "/courses/#{@course.id}/announcements"
 
       #add external feed to announcements
       feed_name = 'http://www.google.com'
-      f('a[aria-controls=add_external_feed_form]').click
-      feed_form = f('#add_external_feed_form')
-      feed_form.find_element(:id, 'external_feed_url').send_keys(feed_name)
-      feed_form.find_element(:css, 'input[aria-controls=header_match_container]').click
-      feed_form.find_element(:css, 'input[name=header_match]').send_keys('blah')
+      driver.execute_script("$('#add_external_feed_form').css('display', 'block')")
+      fj('#external_feed_url').send_keys(feed_name)
+      fj('input[aria-controls=header_match_container]').click
+      fj('input[name=header_match]').send_keys('blah')
+      #using fj to avoid selenium caching
       expect {
-        submit_form(feed_form)
+        submit_form(f('#add_external_feed_form'))
         wait_for_ajaximations
       }.to change(ExternalFeed, :count).by(1)
 

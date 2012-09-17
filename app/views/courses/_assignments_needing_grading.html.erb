@@ -21,7 +21,12 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
     <% needs_grading.each_with_index do |assignment, i| %>
 
       <li style="<%= hidden if i >= visible_limit %>">
-      <a class="item icon-grading-gray tooltip" href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>">
+      <a
+        class="item icon-grading-gray tooltip"
+        href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>"
+        data-track-category="dashboard"
+        data-track-label="todo needs grading"
+      >
           <% if assignment.due_at || assignment.points_possible || show_context %>
             <span class="tooltip_wrap">
               <span class='tooltip-carat'></span>
@@ -46,7 +51,12 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
     <% end %>
     <% needs_submitting.each_with_index do |assignment, i| %>
       <li style="<%= hidden if i >= visible_limit %>">
-        <a class="item icon-grading-gray tooltip" href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit">
+        <a
+          class="item icon-grading-gray tooltip"
+          href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit"
+          data-track-category="dashboard"
+          data-track-label="todo needs submitting"
+        >
           <% if show_context || assignment.points_possible %>
             <span class="tooltip_wrap">
               <span class='tooltip-carat'></span>

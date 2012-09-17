@@ -397,17 +397,18 @@ class Enrollment < ActiveRecord::Base
     @long_name
   end
 
-  TYPE_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','StudentViewEnrollment','ObserverEnrollment']
-  TYPE_RANK_HASH = rank_hash(TYPE_RANK)
-  def self.type_rank_sql
+  TYPE_RANKS = {
+    :default => ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','StudentViewEnrollment','ObserverEnrollment'],
+    :student => ['StudentEnrollment','TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment','ObserverEnrollment']
+  }
+  TYPE_RANK_HASHES = Hash[TYPE_RANKS.map{ |k, v| [k, rank_hash(v)] }]
+  def self.type_rank_sql(order = :default)
     # don't call rank_sql during class load
-    @type_rank_sql ||= rank_sql(TYPE_RANK, 'enrollments.type')
+    rank_sql(TYPE_RANKS[order], 'enrollments.type')
   end
 
-  def rank_sortable(student_first=false)
-    type = self.class.to_s
-    return 0 if type == 'StudentEnrollment' && student_first
-    TYPE_RANK_HASH[type]
+  def rank_sortable(order = :default)
+    TYPE_RANK_HASHES[order][self.class.to_s]
   end
 
   STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'rejected', 'deleted']
@@ -789,7 +790,7 @@ class Enrollment < ActiveRecord::Base
     given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
     can :read and can :read_grades
 
-    given { |user| !!Enrollment.active.find_by_user_id_and_associated_user_id(user.id, self.user_id) }
+    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
     can :read and can :read_grades and can :read_services
   end
 
@@ -825,6 +826,17 @@ class Enrollment < ActiveRecord::Base
     Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
       Enrollment.invited.for_email(email).to_a
     end
+  end
+
+  def self.order_by_sortable_name(options = {})
+    add_sort_key!(options, User.sortable_name_order_by_clause('users'))
+    uber_scope(options)
+  end
+
+  def self.top_enrollment_by(key, rank_order = :default)
+    raise "top_enrollment_by_user must be scoped" unless scoped?(:find, :conditions)
+    key = key.to_s
+    distinct_on(key, :order => "#{key}, #{type_rank_sql(rank_order)}")
   end
 
   def assign_uuid
@@ -895,8 +907,7 @@ class Enrollment < ActiveRecord::Base
 
   # similar to above, but used on a scope or association (e.g. User#enrollments)
   def self.remove_duplicates!
-    scope = current_scoped_methods && current_scoped_methods[:find]
-    raise "remove_duplicates! needs to be scoped" unless scope && scope[:conditions]
+    raise "remove_duplicates! needs to be scoped" unless scoped?(:find, :conditions)
 
     where(["workflow_state NOT IN (?)", ['deleted', 'inactive', 'rejected']]).
       group_by{ |e| [e.user_id, e.course_id, e.course_section_id, e.associated_user_id] }.

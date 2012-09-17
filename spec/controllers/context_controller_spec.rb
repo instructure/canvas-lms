@@ -25,6 +25,15 @@ describe ContextController do
       get 'roster', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "should work when the context is a group in a course" do
+      course_with_student_logged_in(:active_all => true)
+      @group = @course.groups.create!
+      @group.add_user(@student, 'accepted')
+      get 'roster', :group_id => @group.id
+      assigns[:primary_users].each_value.first.collect(&:id).should == [@student.id]
+      assigns[:secondary_users].each_value.first.collect(&:id).should == [@teacher.id]
+    end
   end
 
   describe "GET 'roster_user'" do
@@ -153,6 +162,20 @@ describe ContextController do
       @media_object.media_id.should == "new_object"
       @media_object.media_type.should == "audio"
       @media_object.title.should == "title"
+    end
+  end
+
+  describe "GET 'prior_users" do
+    before do
+      course_with_teacher_logged_in(:active_all => true)
+      100.times { student_in_course(:active_all => true).conclude }
+      @user = @teacher
+    end
+
+    it "should paginate" do
+      get :prior_users, :course_id => @course.id
+      response.should be_success
+      assigns[:prior_users].size.should eql 20
     end
   end
 end

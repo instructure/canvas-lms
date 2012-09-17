@@ -1,33 +1,31 @@
-# coding: utf-8
-
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
   it_should_behave_like "in-process server selenium tests"
 
   def click_edit
-    driver.find_element(:css, '.edit_profile_link').click
-    edit_form = driver.find_element(:id, 'update_profile_form')
+    f('.edit_settings_link').click
+    edit_form = f('#update_profile_form')
     keep_trying_until { edit_form.should be_displayed }
     edit_form
   end
 
   def add_skype_service
-    driver.find_element(:css, '#unregistered_service_skype > a').click
-    skype_dialog = driver.find_element(:id, 'unregistered_service_skype_dialog')
+    f('#unregistered_service_skype > a').click
+    skype_dialog = f('#unregistered_service_skype_dialog')
     skype_dialog.find_element(:id, 'user_service_user_name').send_keys("jakesorce")
-    driver.find_element(:css, '#unregistered_service_skype_dialog .button').click
+    submit_dialog(skype_dialog, '.button')
     wait_for_ajaximations
-    driver.find_element(:id, 'registered_services').should include_text("Skype")
+    f('#registered_services').should include_text("Skype")
   end
 
   def generate_access_token(purpose = 'testing', close_dialog = false)
-    driver.find_element(:css, '.add_access_token_link').click
-    access_token_form = driver.find_element(:id, 'access_token_form')
+    f('.add_access_token_link').click
+    access_token_form = f('#access_token_form')
     access_token_form.find_element(:id, 'access_token_purpose').send_keys(purpose)
     submit_form(access_token_form)
     wait_for_ajax_requests
-    details_dialog = driver.find_element(:id, 'token_details_dialog')
+    details_dialog = f('#token_details_dialog')
     details_dialog.should be_displayed
     if close_dialog
       close_visible_dialog
@@ -38,7 +36,6 @@ describe "profile" do
     user_with_pseudonym({:active_user => true})
     login_as
     get '/profile/settings'
-    old_password = 'oldpassword'
     wrong_old_password = 'wrongoldpassword'
     new_password = 'newpassword'
     edit_form = click_edit
@@ -51,7 +48,7 @@ describe "profile" do
     # check to see if error box popped up
     errorboxes = ff('.error_text')
     errorboxes.length.should > 1
-    errorboxes.any? {|errorbox| errorbox.text =~ /Invalid old password for the login/}.should be_true
+    errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }.should be_true
   end
 
   it "should change the password" do
@@ -107,11 +104,11 @@ describe "profile" do
 
     it "should change default email address" do
       channel = @user.communication_channels.create!(:path_type => 'email',
-        :path => 'walter_white@example.com')
+                                                     :path => 'walter_white@example.com')
       channel.confirm!
 
       get '/profile/settings'
-      row  = f("#channel_#{channel.id}")
+      row = f("#channel_#{channel.id}")
       link = f("#channel_#{channel.id} td:first-child a")
       link.click
       wait_for_ajaximations
@@ -120,8 +117,8 @@ describe "profile" do
 
     it "should display file uploader link on files page" do
       get "/profile/settings"
-      expect_new_page_load { driver.find_element(:css, '#left-side .files').click }
-      driver.find_element(:id, 'file_swf-button').should be_displayed
+      expect_new_page_load { f('#left-side .files').click }
+      f('#file_swf-button').should be_displayed
     end
 
     it "should edit full name" do
@@ -131,7 +128,7 @@ describe "profile" do
       edit_form.find_element(:id, 'user_name').send_keys(new_user_name)
       submit_form(edit_form)
       wait_for_ajaximations
-      keep_trying_until { driver.find_element(:css, '.full_name').text.should == new_user_name }
+      keep_trying_until { f('.full_name').text.should == new_user_name }
     end
 
     it "should edit display name and validate" do
@@ -142,7 +139,7 @@ describe "profile" do
       submit_form(edit_form)
       wait_for_ajaximations
       refresh_page
-      keep_trying_until { driver.find_element(:css, '#topbar li.user_name').text.should == new_display_name }
+      keep_trying_until { f('#topbar li.user_name').text.should == new_display_name }
     end
 
     it "should change the language" do
@@ -150,7 +147,7 @@ describe "profile" do
       edit_form = click_edit
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
-      driver.find_element(:css, '.profile_table').should include_text('Nombre')
+      f('.profile_table').should include_text('Nombre')
     end
 
     it "should change the language even if you can't update your name" do
@@ -163,20 +160,20 @@ describe "profile" do
       edit_form.find_elements(:id, 'user_short_name').first.should be_nil
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
-      driver.find_element(:css, '.profile_table').should include_text('Nombre')
+      f('.profile_table').should include_text('Nombre')
     end
 
     it "should add another contact method - sms" do
       test_cell_number = '8017121011'
       get "/profile/settings"
-      driver.find_element(:css, '.add_contact_link').click
-      register_form = driver.find_element(:id, 'register_sms_number')
+      f('.add_contact_link').click
+      register_form = f('#register_sms_number')
       register_form.find_element(:css, '.sms_number').send_keys(test_cell_number)
       click_option('select.user_selected.carrier', 'AT&T')
       submit_form(register_form)
       wait_for_ajaximations
       close_visible_dialog
-      keep_trying_until { driver.find_element(:css, '.other_channels .path').should include_text(test_cell_number) }
+      keep_trying_until { f('.other_channels .path').should include_text(test_cell_number) }
     end
 
     it "should register a service" do
@@ -189,11 +186,11 @@ describe "profile" do
       add_skype_service
       #had to use add class because tests were failing inconsistently in aws
       driver.execute_script("$('.service').addClass('service-hover')")
-      driver.find_element(:css, '.delete_service_link').click
+      f('.delete_service_link').click
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      driver.find_element(:id, 'unregistered_services').should include_text("Skype")
+      f('#unregistered_services').should include_text("Skype")
     end
 
     it "should toggle service visibility" do
@@ -201,11 +198,11 @@ describe "profile" do
       add_skype_service
       initial_state = @user.show_user_services
 
-      driver.find_element(:id, 'show_user_services').click
+      f('#show_user_services').click
       wait_for_ajaximations
       @user.reload.show_user_services.should_not eql initial_state
 
-      driver.find_element(:id, 'show_user_services').click
+      f('#show_user_services').click
       wait_for_ajaximations
       @user.reload.show_user_services.should eql initial_state
     end
@@ -217,8 +214,8 @@ describe "profile" do
 
     it "should test canceling creating a new access token" do
       get "/profile/settings"
-      driver.find_element(:css, '.add_access_token_link').click
-      access_token_form = driver.find_element(:id, 'access_token_form')
+      f('.add_access_token_link').click
+      access_token_form = f('#access_token_form')
       access_token_form.find_element(:css, '.cancel_button').click
       access_token_form.should_not be_displayed
     end
@@ -227,19 +224,19 @@ describe "profile" do
       get "/profile/settings"
       generate_access_token('testing', true)
       #had to use :visible because it was failing saying element wasn't visible
-      find_with_jquery('#access_tokens .show_token_link:visible').click
-      driver.find_element(:id, 'token_details_dialog').should be_displayed
+      fj('#access_tokens .show_token_link:visible').click
+      f('#token_details_dialog').should be_displayed
     end
 
     it "should delete an access token" do
       get "/profile/settings"
       generate_access_token('testing', true)
       #had to use :visible because it was failing saying element wasn't visible
-      find_with_jquery("#access_tokens .delete_key_link:visible").click
+      fj("#access_tokens .delete_key_link:visible").click
       driver.switch_to.alert.should_not be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      driver.find_element(:id, 'access_tokens').should_not be_displayed
+      f('#access_tokens').should_not be_displayed
     end
 
     it "should set the birthdate" do
@@ -262,9 +259,9 @@ describe "profile" do
       click_option('#user_birthdate_3i', '2')
       submit_form(edit_form)
       wait_for_ajaximations
-      edit_form.should be_displayed    # not dismissed
+      edit_form.should be_displayed # not dismissed
       @user.reload
-      @user.birthdate.should be_nil    # no default year assumed
+      @user.birthdate.should be_nil # no default year assumed
     end
 
     it "should not allow the birthdate to be un-set" do

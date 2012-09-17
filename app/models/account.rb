@@ -556,7 +556,7 @@ class Account < ActiveRecord::Base
   set_policy do
     enrollment_types = RoleOverride.enrollment_types.map { |role| role[:name] }
     RoleOverride.permissions.each do |permission, details|
-      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
+      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) && (!details[:if] || send(details[:if])) } }
       can permission
       can :create_courses if permission == :manage_courses
 
@@ -564,7 +564,8 @@ class Account < ActiveRecord::Base
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|
         given { |user| user && RoleOverride.permission_for(self, permission, role)[:enabled] &&
           self.course_account_associations.find(:first, :joins => 'INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id',
-            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) }
+            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) &&
+          (!details[:if] || send(details[:if])) }
         can permission
       end
     end
@@ -691,32 +692,48 @@ class Account < ActiveRecord::Base
     @special_accounts = {}
   end
 
-  def self.get_special_account(special_account_type, default_account_name)
-    @special_account_ids ||= {}
-    @special_accounts ||= {}
+  # an opportunity for plugins to load some other stuff up before caching the account
+  def precache
+  end
 
-    account = @special_accounts[special_account_type]
-    unless account
-      special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
-      account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id) if special_account_id
+  def self.find_cached(id)
+    account = Rails.cache.fetch(account_lookup_cache_key(id), :expires_in => 1.hour) do
+      account = Account.find_by_id(id)
+      account.precache if account
+      account || :nil
     end
-    # another process (i.e. selenium spec) may have changed the setting
-    unless account
-      special_account_id = Setting.get("#{special_account_type}_account_id", nil)
-      if special_account_id && special_account_id != @special_account_ids[special_account_type]
-        @special_account_ids[special_account_type] = special_account_id
-        account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id)
-      end
-    end
-    unless account
-      # TODO i18n
-      t '#account.default_site_administrator_account_name', 'Site Admin'
-      t '#account.default_account_name', 'Default Account'
-      account = @special_accounts[special_account_type] = Account.create!(:name => default_account_name)
-      Setting.set("#{special_account_type}_account_id", account.id)
-      @special_account_ids[special_account_type] = account.id
-    end
+    account = nil if account == :nil
     account
+  end
+
+  def self.get_special_account(special_account_type, default_account_name)
+    Shard.default.activate do
+      @special_account_ids ||= {}
+      @special_accounts ||= {}
+
+      account = @special_accounts[special_account_type]
+      unless account
+        special_account_id = @special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
+        account = @special_accounts[special_account_type] = Account.find_cached(special_account_id) if special_account_id
+      end
+      # another process (i.e. selenium spec) may have changed the setting
+      unless account
+        special_account_id = Setting.get("#{special_account_type}_account_id", nil)
+        if special_account_id && special_account_id != @special_account_ids[special_account_type]
+          @special_account_ids[special_account_type] = special_account_id
+          account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id)
+        end
+      end
+      unless account
+        # TODO i18n
+        t '#account.default_site_administrator_account_name', 'Site Admin'
+        t '#account.default_account_name', 'Default Account'
+        account = @special_accounts[special_account_type] = Account.create!(:name => default_account_name)
+        Setting.set("#{special_account_type}_account_id", account.id)
+        @special_account_ids[special_account_type] = account.id
+      end
+      account
+    end
   end
 
   def site_admin?
@@ -1057,8 +1074,31 @@ class Account < ActiveRecord::Base
   end
 
   def manually_created_courses_account
-    self.root_account.sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
+    return self.root_account.manually_created_courses_account unless self.root_account?
+    display_name = t('#account.manually_created_courses', "Manually-Created Courses")
+    acct = manually_created_courses_account_from_settings
+    if acct.blank?
+      transaction do
+        lock!
+        acct = manually_created_courses_account_from_settings
+        acct ||= self.sub_accounts.find_by_name(display_name) # for backwards compatibility
+        acct ||= self.sub_accounts.create!(:name => display_name)
+        if acct.id != self.settings[:manually_created_courses_account_id]
+          self.settings[:manually_created_courses_account_id] = acct.id
+          self.save!
+        end
+      end
+    end
+    acct
   end
+
+  def manually_created_courses_account_from_settings
+    acct_id = self.settings[:manually_created_courses_account_id]
+    acct = self.sub_accounts.find_by_id(acct_id) if acct_id.present?
+    acct = nil if acct.present? && acct.root_account_id != self.id
+    acct
+  end
+  private :manually_created_courses_account_from_settings
 
   def trusted_account_ids
     return [] if !root_account? || self == Account.site_admin

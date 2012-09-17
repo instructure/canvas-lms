@@ -47,7 +47,7 @@ define [
 
       submissionsByAssignment = arrayToObj submissions, "assignment_id"
 
-      submissionData = submissions.map (s) =>
+      submissionData = _(submissions).map (s) =>
         sub =
           total: @parse assignments[s.assignment_id].points_possible
           score: @parse s.score
@@ -76,7 +76,7 @@ define [
             percent: @parse(s.score / s.total)
             possible: s.total
             score: @parse(s.score)
-            submission: s.submission
+            submission: _.extend(s.submission, drop: s.drop)
             submitted: s.submitted
 
     # I'm not going to pretend that this code is understandable.

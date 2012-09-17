@@ -76,6 +76,8 @@ class AssessmentItemConverter
           @question[:question_text] += "\n<br/>\n" if i > 0
           @question[:question_text] += sanitize_html_string(text.text)
         end
+      elsif text = @doc.at_css('itemBody > div.text')
+        @question[:question_text] = sanitize_html!(text)
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
         @question[:question_text] = sanitize_html!(text)
       elsif @doc.at_css('itemBody')

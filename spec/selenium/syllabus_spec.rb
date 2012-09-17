@@ -29,20 +29,20 @@ describe "course syllabus" do
   end
 
   it "should confirm existing assignments and dates are correct" do
-    assignment_details = driver.find_elements(:css, 'td.name')
+    assignment_details = ff('td.name')
     assignment_details[0].text.should == @assignment_1.title
     assignment_details[1].text.should == @assignment_2.title
   end
 
   it "should edit the description" do
     new_description = "new syllabus description"
-    driver.find_element(:css, '.edit_syllabus_link').click
-    edit_form = driver.find_element(:id, 'edit_course_syllabus_form')
-    wait_for_tiny(keep_trying_until { driver.find_element(:id, 'edit_course_syllabus_form') })
+    f('.edit_syllabus_link').click
+    edit_form = f('#edit_course_syllabus_form')
+    wait_for_tiny(keep_trying_until { f('#edit_course_syllabus_form') })
     type_in_tiny('#course_syllabus_body', new_description)
     submit_form(edit_form)
     wait_for_ajaximations
-    driver.find_element(:id, 'course_syllabus').text.should == new_description
+    f('#course_syllabus').text.should == new_description
   end
 
   it "should validate Jump to Today works on the mini calendar" do

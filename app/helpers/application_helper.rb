@@ -390,7 +390,7 @@ module ApplicationHelper
           end
         end
         return '' if tabs.empty?
-        html << '<nav role="navigation"><ul id="section-tabs">'
+        html << '<nav role="navigation" aria-label="context"><ul id="section-tabs">'
         tabs.each do |tab|
           path = nil
           if tab[:args]

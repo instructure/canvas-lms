@@ -39,10 +39,6 @@ class ContextModuleProgression < ActiveRecord::Base
     (self.requirements_met || []).any?{|r| r[:id] == item.id}
   end
   
-  def collapsed?
-    !!self.collapsed
-  end
-  
   def uncollapse!
     return if self.collapsed == false
     progressions = self.context_module.context.context_modules.include_tags_and_progressions.map(&:context_module_progressions).flatten
@@ -55,7 +51,7 @@ class ContextModuleProgression < ActiveRecord::Base
   def deep_evaluate(mod)
     mod = nil if mod && mod.id != self.context_module_id
     mod ||= self.context_module
-    return if !mod.completion_requirements || mod.completion_requirements.empty?
+    return if mod.completion_requirements.blank?
     tags_hash = mod.content_tags_hash
     met = self.requirements_met || []
     orig_reqs = met.map{|r| "#{r[:id]}_#{r[:type]}"}.sort

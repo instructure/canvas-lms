@@ -457,6 +457,23 @@ This text has a http://www.google.com link in it...
         c1.destroy
         @teacher1.reload.conversations.size.should eql 0
       end
+
+      it "should delete other comments for the same assignment with the same group_comment_id" do
+        c1 = @submission1.add_comment(:comment => "hai")
+        c1.update_attribute(:group_comment_id, "testid1")
+        @submission2 = @assignment.submit_homework(@course.enroll_student(user).user, :body => 'sub2')
+        c2 = @submission2.add_comment(:comment => "hai2")
+        c2.update_attribute(:group_comment_id, "testid1")
+        @assignment2 = assignment_model(:course => @course)
+        @assignment2.update_attribute(:workflow_state, 'published')
+        @submission3 = @assignment2.submit_homework(@student1, :body => 'sub3')
+        c3 = @submission3.add_comment(:comment => "hai3")
+        c3.update_attribute(:group_comment_id, "testid1")
+        c1.destroy
+        SubmissionComment.find_by_id(c1.id).should be_nil
+        SubmissionComment.find_by_id(c2.id).should be_nil
+        SubmissionComment.find_by_id(c3.id).should == c3
+      end
     end
 
     context "migration" do

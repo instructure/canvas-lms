@@ -524,8 +524,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def score_to_grade_percent(score=0.0)
-    result = score.to_f / self.points_possible
-    result = (result * 1000.0).round / 10.0
+    if self.points_possible > 0
+      result = score.to_f / self.points_possible
+      result = (result * 1000.0).round / 10.0
+    else
+      # there's not really any reasonable value we can set here -- if the
+      # assignment is worth no points, any percentage is as valid as any other.
+      score.to_f
+    end
   end
 
   def score_to_grade(score=0.0, given_grade=nil)
@@ -840,7 +846,6 @@ class Assignment < ActiveRecord::Base
       :author => grader,
       :media_comment_id => (opts.delete :media_comment_id),
       :media_comment_type => (opts.delete :media_comment_type),
-      :unique_key => Time.now.to_s
     }
     submissions = []
 
@@ -929,7 +934,6 @@ class Assignment < ActiveRecord::Base
     res = []
     raise "No submission found for that student" unless submission
     group, students = group_students(original_student)
-    opts[:unique_key] = Time.now.to_s
     opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by_id(opts[:user_id])
 
     if opts[:comment] && opts[:assessment_request]
@@ -1001,7 +1005,7 @@ class Assignment < ActiveRecord::Base
     primary_homework.broadcast_group_submission if group
     homeworks.each do |homework|
       context_module_action(homework.student, :submitted)
-      homework.add_comment({:comment => comment, :author => original_student, :unique_key => ts}) if comment && (group_comment || homework == primary_homework)
+      homework.add_comment({:comment => comment, :author => original_student}) if comment && (group_comment || homework == primary_homework)
     end
     touch_context
     return primary_homework

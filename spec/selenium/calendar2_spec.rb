@@ -142,7 +142,7 @@ describe "calendar2" do
           wait_for_ajaximations
 
           driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          fj('ul#context-list > li:nth-child(2) button').click
+          fj('#context-list > li:nth-child(2) button').click
           fj(".ui-kyle-menu:visible li:last-child a").click
           edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
@@ -291,7 +291,7 @@ describe "calendar2" do
         f('.popover-links-holder .edit_event_link').click
         select = f('#edit_assignment_form .assignment_group')
         first_selected_option(select).attribute(:value).to_i.should == group2.id
-        replace_content(  f('div.ui-dialog #assignment_title'), "Assignment 2!")
+        replace_content(  f('.ui-dialog #assignment_title'), "Assignment 2!")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
         assignment2.reload.title.should == "Assignment 2!"
@@ -383,10 +383,27 @@ describe "calendar2" do
         f('label[for=week]').click
         wait_for_ajaximations
 
-        events = ff('.fc-event').select{ |e| e.text == "super important" }
-        # shows on monday night and tuesday morning, and doesn't have the time
+        events = ff('.fc-event').select{ |e| e.text =~ /11:59.*super important/ }
+        # shows on monday night and tuesday morning
         events.size.should eql 2
       end
+
+      it "should change event duration by dragging" do
+        noon = Time.now.at_beginning_of_day + 12.hours
+        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 1.hour
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=week]').click
+        wait_for_ajaximations
+        resize_handle = fj('.fc-event:visible .ui-resizable-handle')
+        driver.action.drag_and_drop_by(resize_handle, 0, 50).perform
+        wait_for_ajaximations
+        # dragging it 50px will make it one hour longer, a 2 hour event is 80px tall
+        fj('.fc-event:visible').size.height.should == 80
+        event.reload
+        event.end_at.should == noon + 2.hours
+      end
+
     end
   end
 
@@ -459,6 +476,54 @@ describe "calendar2" do
         popup_title = f('.details_title')
         popup_title.should be_displayed
         popup_title.text.should eql "future event"
+      end
+
+    end
+  end
+
+  context "as a spanish student" do
+    before (:each) do
+      # Setup with spanish locale
+      @student = course_with_student_logged_in(:active_all => true).user
+      @student.locale = 'es'
+      @student.save!
+    end
+
+    describe "main calendar" do
+      it "should display in Spanish" do
+        pending('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
+        date = Date.new(2012, 7, 12)
+        # Use event to  open to a specific and testable month
+        event = calendar_event_model(:title => 'Test Event', :start_at => date, :end_at => (date + 1.hour))
+
+        get "/courses/#{@course.id}/calendar_events/#{event.id}"
+        wait_for_ajaximations
+        fj('#calendar-app h2').text.should == 'Julio 2012'
+        fj('#calendar-app .fc-sun').text.should == 'Domingo'
+        fj('#calendar-app .fc-mon').text.should == 'Lunes'
+        fj('#calendar-app .fc-tue').text.should == 'Martes'
+        fj('#calendar-app .fc-wed').text.should == 'Miercoles'
+        fj('#calendar-app .fc-thu').text.should == 'Jueves'
+        fj('#calendar-app .fc-fri').text.should == 'Viernes'
+        fj('#calendar-app .fc-sat').text.should == 'Sabado'
+      end
+    end
+
+    describe "mini calendar" do
+      it "should display in Spanish" do
+        pending('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
+        get "/calendar2"
+        wait_for_ajaximations
+        # Get the spanish text for the current month/year
+        expect_month_year = I18n.l(Date.today, :format => '%B %Y', :locale => 'es')
+        fj('#minical h2').text.should == expect_month_year
+        fj('#minical .fc-sun').text.should == 'Dom'
+        fj('#minical .fc-mon').text.should == 'Lun'
+        fj('#minical .fc-tue').text.should == 'Mar'
+        fj('#minical .fc-wed').text.should == 'Mie'
+        fj('#minical .fc-thu').text.should == 'Jue'
+        fj('#minical .fc-fri').text.should == 'Vie'
+        fj('#minical .fc-sat').text.should == 'Sab'
       end
     end
   end

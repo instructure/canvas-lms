@@ -40,7 +40,7 @@ require([
           <%= link_to(image_tag('help.png'), '#', :class => 'self_signup_help_link no-hover',
                       :title => t(:self_signup_help_tooltip, "What Are Self Sign-Up Groups?")) %>
           <br/>
-          <input type="checkbox" name="category[restrict_self_signup]" id="category_restrict_self_signup" value="1" />
+          <input type="checkbox" name="category[restrict_self_signup]" id="category_restrict_self_signup" value="1" disabled />
           <label for="category_restrict_self_signup"><%= t :restricted_self_signup, "Require group members to be in the same section" %></label>
         </td>
       </tr>

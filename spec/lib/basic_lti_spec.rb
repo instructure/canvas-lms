@@ -253,12 +253,15 @@ describe BasicLTI do
     course_with_teacher(:active_all => true)
     @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
     launch = BasicLTI::ToolLaunch.new(:url => "http://www.yahoo.com", :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
-    assignment_model(:submission_types => "external_tool", :course => @course)
+    assignment_model(:submission_types => "external_tool", :course => @course, :points_possible => 5, :title => "an assignment")
     launch.for_assignment!(@assignment, "/my/test/url", "/my/other/test/url")
     hash = launch.generate
     hash['lis_result_sourcedid'].should == BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @user)
     hash['lis_outcome_service_url'].should == "/my/test/url"
     hash['ext_ims_lis_basic_outcome_url'].should == "/my/other/test/url"
+    hash['ext_outcome_data_values_accepted'].should == 'url,text'
+    hash['custom_canvas_assignment_title'].should == @assignment.title
+    hash['custom_canvas_assignment_points_possible'].should == @assignment.points_possible.to_s
   end
 
   context "sharding" do

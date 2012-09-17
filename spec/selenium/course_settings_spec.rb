@@ -69,34 +69,34 @@ describe "course settings" do
 
       get "/courses/#{@course.id}/settings"
 
-      driver.find_element(:css, '.edit_course_link').click
-      course_form = driver.find_element(:id, 'course_form')
+      f('.edit_course_link').click
+      course_form = f('#course_form')
       name_input = course_form.find_element(:id, 'course_name')
       replace_content(name_input, course_name)
       code_input = course_form.find_element(:id, 'course_course_code')
       replace_content(code_input, course_code)
       click_option('#course_locale', locale_text)
-      driver.find_element(:css, '.course_form_more_options_link').click
+      f('.course_form_more_options_link').click
       wait_for_animations
-      driver.find_element(:css, '.course_form_more_options').should be_displayed
+      f('.course_form_more_options').should be_displayed
       submit_form(course_form)
       wait_for_ajaximations
 
-      driver.find_element(:css, '.course_info').should include_text(course_name)
-      driver.find_element(:css, '.course_code').should include_text(course_code)
-      driver.find_element(:css, '.locale').should include_text(locale_text)
+      f('.course_info').should include_text(course_name)
+      f('.course_code').should include_text(course_code)
+      f('.locale').should include_text(locale_text)
     end
 
     it "should add a section" do
       section_name = 'new section'
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      section_input = driver.find_element(:id, 'course_section_name')
+      section_input = f('#course_section_name')
       keep_trying_until { section_input.should be_displayed }
       replace_content(section_input, section_name)
       submit_form('#add_section_form')
       wait_for_ajaximations
-      new_section = driver.find_elements(:css, 'ul#sections > .section')[1]
+      new_section = ff('#sections > .section')[1]
       new_section.should include_text(section_name)
     end
 
@@ -104,14 +104,14 @@ describe "course settings" do
       add_section('Delete Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      driver.find_element(:css, '.section_link.delete_section_link').click
+      f('.section_link.delete_section_link').click
       keep_trying_until do
         driver.switch_to.alert.should_not be_nil
         driver.switch_to.alert.accept
         true
       end
       wait_for_ajaximations
-      driver.find_elements(:css, 'ul#sections > .section').count.should == 1
+      ff('#sections > .section').count.should == 1
     end
 
     it "should edit a section" do
@@ -119,24 +119,24 @@ describe "course settings" do
       add_section('Edit Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      driver.find_element(:css, '.section_link.edit_section_link').click
-      section_input = driver.find_element(:id, 'course_section_name')
+      f('.section_link.edit_section_link').click
+      section_input = f('#course_section_name')
       keep_trying_until { section_input.should be_displayed }
       replace_content(section_input, edit_text)
       section_input.send_keys(:return)
       wait_for_ajaximations
-      driver.find_elements(:css, 'ul#sections > .section')[0].should include_text(edit_text)
+      ff('#sections > .section')[0].should include_text(edit_text)
     end
 
     it "should move a nav item to disabled" do
       get "/courses/#{@course.id}/settings#tab-navigation"
-      disabled_div = driver.find_element(:id, 'nav_disabled_list')
-      announcements_nav = driver.find_element(:id, 'nav_edit_tab_id_14')
+      disabled_div = f('#nav_disabled_list')
+      announcements_nav = f('#nav_edit_tab_id_14')
       driver.action.click_and_hold(announcements_nav).
           move_to(disabled_div).
           release(disabled_div).
           perform
-      driver.find_element(:id, 'nav_disabled_list').should include_text(announcements_nav.text)
+      f('#nav_disabled_list').should include_text(announcements_nav.text)
     end
   end
 
@@ -171,19 +171,20 @@ describe "course settings" do
       add_section(section_name)
 
       get "/courses/#{@course.id}/settings#tab-users"
-      add_button = driver.find_element(:css, '.add_users_link')
+      add_button = f('.add_users_link')
       keep_trying_until { add_button.should be_displayed }
       add_button.click
       click_option('#course_section_id_holder > #course_section_id', section_name)
-      driver.find_element(:css, 'textarea.user_list').send_keys(user.name)
-      driver.find_element(:css, '.verify_syntax_button').click
+      f('#user_list_boxes .user_list').send_keys(user.name)
+      f('.verify_syntax_button').click
       wait_for_ajax_requests
-      driver.find_element(:id, 'user_list_parsed').should include_text(user.name)
-      driver.find_element(:css, '.add_users_button').click
+      f('#user_list_parsed').should include_text(user.name)
+      f('.add_users_button').click
       wait_for_ajax_requests
       refresh_page #needed to update the student count on the next page
-      f("a[href='#tab-sections']").click
-      new_section = driver.find_elements(:css, 'ul#sections > .section')[1]
+
+      get "/courses/#{@course.id}/settings/#tab-sections"
+      new_section = ff('#sections > .section')[1]
       new_section.find_element(:css, '.users_count').should include_text("1")
     end
 
@@ -366,7 +367,7 @@ describe "course settings" do
     it "should not include student view student in the statistics count" do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
-      find_with_jquery('.summary tr:nth(1)').text.should match /Students:\s*None/
+      fj('.summary tr:nth(1)').text.should match /Students:\s*None/
     end
   end
 end

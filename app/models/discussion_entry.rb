@@ -241,7 +241,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }
     can :read
 
-    given { |user, session| self.discussion_topic.context.respond_to?(:allow_student_forum_attachments) && self.discussion_topic.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked?  }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) && !discussion_topic.locked? }
     can :attach
 
     given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }

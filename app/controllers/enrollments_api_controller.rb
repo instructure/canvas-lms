@@ -136,12 +136,11 @@ class EnrollmentsApiController < ApplicationController
     }
 
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
-    scope_arguments = { :conditions => @conditions,
+    scope_arguments = {
+      :conditions => @conditions,
       :order => 'enrollments.type ASC, users.sortable_name ASC',
-      :include => {:user => [], :course => [], :course_section => []} }
-    if user_json_is_admin?
-      scope_arguments[:include][:user] = :pseudonyms
-    end
+      :include => [:user, :course, :course_section]
+    }
 
     return unless enrollments = @context.is_a?(Course) ?
       course_index_enrollments(scope_arguments) :
@@ -152,6 +151,7 @@ class EnrollmentsApiController < ApplicationController
       self, send("api_v1_#{endpoint_scope}_enrollments_path"))
     includes = [:user] + Array(params[:include])
 
+    user_json_preloads(enrollments.map(&:user))
     render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, includes) }
   end
 

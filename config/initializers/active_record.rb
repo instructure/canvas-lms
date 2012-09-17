@@ -387,6 +387,53 @@ class ActiveRecord::Base
     {:conditions => conditions}
   }
 
+  # convenience method to add a (computed) field to :select/:order(/:group) all
+  # at once
+  def self.add_sort_key!(options, field)
+    options[:select] ||= "#{quoted_table_name}.*"
+    options[:select] << ", #{field}"
+    if options[:order]
+      options[:order] << ", #{field}, #{quoted_table_name}.id"
+    else
+      options[:order] = "#{field}, #{quoted_table_name}.id"
+    end
+    options[:group] << ", #{field}" if options[:group]
+    options
+  end
+
+  # provides a way to override :order and :select in an association, while
+  # still just getting a scope (rather than doing an immediate find). primarily
+  # useful if you intend to paginate or otherwise use the scope multiple times.
+  # note that uber_scope still needs to be the last one in the chain
+  module UberScope
+    def find(*args)
+      super args.first, add_uber_options!(args.last.is_a?(::Hash) ? args.last : {})
+    end
+
+    def paginate(*args)
+      add_uber_options!(args.last)
+      super
+    end
+
+    def add_uber_options!(options)
+      options[:select] ||= uber_option(options, :select) || "#{proxy_scope.quoted_table_name}.*"
+      options[:order] ||= uber_option(options, :order)
+      options
+    end
+
+    def uber_option(options, key)
+      if @proxy_options && @proxy_options[key]
+        @proxy_options[key]
+      elsif (scope = scope(:find)) && scope[key]
+        scope[key]
+      end
+    end
+  end
+
+  def self.uber_scope(options)
+    scoped options.merge(:extend => UberScope)
+  end
+
   # set up class-specific getters/setters for a polymorphic association, e.g.
   #   belongs_to :context, :polymorphic => true, :types => [:course, :account]
   def self.belongs_to(name, options={})
@@ -465,17 +512,14 @@ class ActiveRecord::Base
 
   # returns 2 ids at a time (the min and the max of a range), working through
   # the primary key from smallest to largest.
-  #
-  # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_ranges(options = {})
-    batch_size = options[:batch_size] || 1000
-    ids = connection.select_rows("select min(id), max(id) from (select #{primary_key} as id from #{table_name} order by #{primary_key} limit #{batch_size.to_i}) as subquery").first
-    ids = ids.map { |id| id.try(:to_i) }
+    batch_size = options[:batch_size].try(:to_i) || 1000
+
+    ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :order => primary_key, :limit => batch_size)}) as subquery").first
     while ids.first.present?
       yield *ids
       last_value = ids.last
-      ids = connection.select_rows(sanitize_sql_array(["select min(id), max(id) from (select #{primary_key} as id from #{table_name} where #{primary_key} > ? order by #{primary_key} limit #{batch_size.to_i}) as subquery", last_value])).first
-      ids = ids.map { |id| id.try(:to_i) }
+      ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :conditions => ["#{quoted_table_name}.#{primary_key}>?", last_value], :order => primary_key, :limit => batch_size)}) as subquery").first
     end
   end
 end
@@ -752,9 +796,21 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
 
   def group_by(*columns)
-    # the first item should be the primary key(s) that the other
-    # columns are functionally dependent on
-    Array(columns.first).join(", ")
+    # the first item should be the primary key(s) that the other columns are
+    # functionally dependent on. alternatively, it can be a class, and all
+    # columns will be inferred from it. this is useful for cases where you want
+    # to select all columns from one table, and an aggregate from another.
+    Array(infer_group_by_columns(columns).first).join(", ")
+  end
+
+  def infer_group_by_columns(columns)
+    columns.map { |col|
+      col.respond_to?(:columns) ?
+        col.columns.map { |c|
+          "#{col.quoted_table_name}.#{quote_column_name(c.name)}"
+        } :
+        col
+    }
   end
 
   def after_transaction_commit(&block)
@@ -830,7 +886,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       # dependent on the primary keys, that's only true if the FROM items are
       # all tables (i.e. not subselects). to keep things simple, we always
       # specify all columns for postgres
-      columns.flatten.join(', ')
+      infer_group_by_columns(columns).flatten.join(', ')
     end
 
     alias_method_chain :commit_db_transaction, :callbacks
@@ -984,7 +1040,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # killing stuff that is holding locks too long
   def add_foreign_key_if_not_exists(from_table, to_table, options = {})
     case self.adapter_name
-    when 'SQLite': return
+    when 'SQLite'; return
     when 'PostgreSQL'
       begin
         add_foreign_key(from_table, to_table, options)

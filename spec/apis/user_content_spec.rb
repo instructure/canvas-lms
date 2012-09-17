@@ -148,6 +148,17 @@ describe UserContent, :type => :integration do
     ]
   end
 
+  it "should not choke on funny email addresses" do
+    course_with_teacher(:active_all => true)
+    @wiki_page = @course.wiki.wiki_page
+    @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
+    @wiki_page.workflow_state = 'active'
+    @wiki_page.save!
+    api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
+               { :controller => 'wiki_pages', :action => 'api_show',
+                 :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
+  end
+
   context "data api endpoints" do
     context "course context" do
       it "should process links to each type of object" do

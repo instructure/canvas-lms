@@ -432,4 +432,18 @@ def self.date_component(start_date, style=:normal)
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.html_safe.strip
   end
+
+  # This doesn't make any attempt to convert other encodings to utf-8, it just
+  # removes invalid bytes from otherwise valid utf-8 strings.
+  # Basically, this is a last ditch effort, you probably don't want to use it
+  # as part of normal request processing.
+  # It's used for things like filtering out ErrorReport data so that we can
+  # make sure we won't get an invalid utf-8 error trying to save the error
+  # report to the db.
+  def self.strip_invalid_utf8(string)
+    return string unless string.present?
+    # add four spaces to the end of the string, because iconv with the //IGNORE
+    # option will still fail on incomplete byte sequences at the end of the input
+    Iconv.conv('UTF-8//IGNORE', 'UTF-8', string + '    ')[0...-4]
+  end
 end

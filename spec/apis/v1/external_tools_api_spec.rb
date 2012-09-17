@@ -199,21 +199,21 @@ describe ExternalToolsController, :type => :integration do
                     {:controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3'})
 
     json.length.should == 3
-    response.headers['Link'].should == [
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=2&per_page=3>; rel="next"},
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=1&per_page=3>; rel="first"},
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=3&per_page=3>; rel="last"}
-    ].join(',')
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }.should be_true
+    links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2/
+    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
 
     # get the last page
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?page=3&per_page=3",
                     {:controller => 'external_tools', :action => 'index', :format => 'json', :"#{type}_id" => context.id.to_s, :per_page => '3', :page => '3'})
     json.length.should == 1
-    response.headers['Link'].should == [
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=2&per_page=3>; rel="prev"},
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=1&per_page=3>; rel="first"},
-            %{</api/v1/#{type}s/#{context.id}/external_tools?page=3&per_page=3>; rel="last"}
-    ].join(',')
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }.should be_true
+    links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2/
+    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1/
+    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
   end
   
   def tool_with_everything(context, opts={})
@@ -275,6 +275,8 @@ describe ExternalToolsController, :type => :integration do
      "description"=>"For testing stuff",
      "user_navigation"=>
              {"text"=>"User nav", "url"=>"http://www.example.com/ims/lti/user"},
+     "course_navigation" =>
+             {"text"=>"Course nav", "url"=>"http://www.example.com/ims/lti/course", "visibility"=>"admins", "default"=> false},
      "account_navigation"=>
              {"text"=>"Account nav", "url"=>"http://www.example.com/ims/lti/account"}}
   end

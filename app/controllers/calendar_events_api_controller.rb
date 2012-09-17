@@ -182,9 +182,8 @@
 class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
 
-  before_filter :require_user
+  before_filter :require_user, :except => %w(public_feed)
   before_filter :get_calendar_context, :only => :create
-  before_filter :get_options, :only => :index
 
   # @API List calendar events
   #
@@ -202,14 +201,13 @@ class CalendarEventsApiController < ApplicationController
   #   to the current user (i.e personal calendar, no course/group events).
   #   Limited to 10 context codes, additional ones are ignored
   def index
+    codes = (params[:context_codes] || [])[0, 10]
+    get_options(codes)
+
     scope = if @type == :assignment
-      Assignment.active.
-        for_context_codes(@context_codes).
-        send(*date_scope_and_args(:due_between))
+      assignment_scope
     else
-      CalendarEvent.active.
-        for_user_and_context_codes(@current_user, @context_codes, @section_codes).
-        send(*date_scope_and_args)
+      calendar_event_scope
     end
 
     events = Api.paginate(scope.order('id'), self, api_v1_calendar_events_path(search_params))
@@ -373,6 +371,70 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
+  def public_feed
+    get_feed_context
+    @events = []
+
+    if @current_user
+      # if the feed url included the information on the requesting user,
+      # we can properly filter calendar events to the user's course sections
+      @type = :feed
+      @start_date = Setting.get('calendar_feed_previous_days', '30').to_i.days.ago
+      @end_date = Setting.get('calendar_feed_upcoming_days', '366').to_i.days.from_now
+
+      get_options(nil)
+
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+        @events.concat assignment_scope.all
+        @events.concat calendar_event_scope.events_without_child_events.all
+      end
+    else
+      # if the feed url doesn't give us the requesting user,
+      # we have to just display the generic course feed
+      get_all_pertinent_contexts
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+        @contexts.each do |context|
+          @assignments = context.assignments.active.find(:all) if context.respond_to?("assignments")
+          @events.concat context.calendar_events.active.find(:all)
+          @events.concat @assignments || []
+        end
+      end
+    end
+
+    @events = @events.sort_by{ |e| [(e.start_at || Time.now), e.title] }
+
+    @contexts.each do |context|
+      log_asset_access("calendar_feed:#{context.asset_string}", "calendar", 'other')
+    end
+    respond_to do |format|
+      format.ics do
+        render :text => @events.to_ics(t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name),
+          case
+            when @context.is_a?(Course)
+              t('ics_description_course', "Calendar events for the course, %{course_name}", :course_name => @context.name)
+            when @context.is_a?(Group)
+              t('ics_description_group', "Calendar events for the group, %{group_name}", :group_name => @context.name)
+            when @context.is_a?(User)
+              t('ics_description_user', "Calendar events for the user, %{user_name}", :user_name => @context.name)
+            else
+              t('ics_description', "Calendar events for %{context_name}", :context_name => @context.name)
+          end)
+      end
+      format.atom do
+        feed = Atom::Feed.new do |f|
+          f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", :course_or_group_name => @context.name
+          f.links << Atom::Link.new(:href => calendar_url_for(@context), :rel => 'self')
+          f.updated = Time.now
+          f.id = calendar_url_for(@context)
+        end
+        @events.each do |e|
+          feed.entries << e.to_atom
+        end
+        render :text => feed.to_xml
+      end
+    end
+  end
+
   protected
 
   def get_calendar_context
@@ -397,27 +459,30 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
-  def get_options
+  def get_options(codes)
     unless value_to_boolean(params[:undated])
       today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
-      @start_date = params[:start_date] && (Date.parse(params[:start_date]) rescue nil) || today.to_date
-      @end_date = params[:end_date] && (Date.parse(params[:end_date]) rescue nil) || today.to_date
+      @start_date ||= params[:start_date] && (Date.parse(params[:start_date]) rescue nil) || today.to_date
+      @end_date ||= params[:end_date] && (Date.parse(params[:end_date]) rescue nil) || today.to_date
       @end_date = @start_date if @end_date < @start_date
       @end_date += 1
     end
 
-    @type = params[:type] == 'assignment' ? :assignment : :event
+    @type ||= params[:type] == 'assignment' ? :assignment : :event
 
-    @context = @current_user
-    codes = (params[:context_codes] || [])[0, 10]
+    @context ||= @current_user
     # refactor opportunity: get_all_pertinent_contexts expects the list of
     # unenrolled contexts to be in the include_contexts parameter, rather than
     # a function parameter
-    params[:include_contexts] = codes.join(",")
+    params[:include_contexts] = codes.join(",") if codes
 
     get_all_pertinent_contexts(true)
 
-    selected_contexts = @contexts.select{ |c| codes.include?(c.asset_string) }
+    if codes
+      selected_contexts = @contexts.select{ |c| codes.include?(c.asset_string) }
+    else
+      selected_contexts = @contexts
+    end
     @context_codes = selected_contexts.map(&:asset_string)
     @section_codes = selected_contexts.inject([]){ |ary, context|
       next ary unless context.is_a?(Course)
@@ -441,6 +506,18 @@ class CalendarEventsApiController < ApplicationController
                           intersecting(@start_date, @end_date).
                           map(&:asset_string)
     end
+  end
+
+  def assignment_scope
+    Assignment.active.
+      for_context_codes(@context_codes).
+      send(*date_scope_and_args(:due_between))
+  end
+
+  def calendar_event_scope
+    CalendarEvent.active.
+      for_user_and_context_codes(@current_user, @context_codes, @section_codes).
+      send(*date_scope_and_args)
   end
 
   def search_params

@@ -296,13 +296,20 @@ define([
       return $rubric;
     },
     editRubric: function($original_rubric, url) {
-      var $rubric = $original_rubric.clone(true).addClass('editing');
+      var $rubric, data, $tr, $form;
+
+      rubricEditing.isEditing = true;
+
+      $rubric = $original_rubric.clone(true).addClass('editing');
       $rubric.find("#edit_rubric").remove();
-      var data = $rubric.getTemplateData({textValues: ['use_for_grading', 'free_form_criterion_comments', 'hide_score_total']});
+
+      data = $rubric.getTemplateData({textValues: ['use_for_grading', 'free_form_criterion_comments', 'hide_score_total']});
       $original_rubric.hide().after($rubric.show());
-      var $tr = $("#edit_rubric").clone(true).show().removeAttr('id').addClass('edit_rubric');
-      var $form = $tr.find("#edit_rubric_form");
+
+      $tr = $("#edit_rubric").clone(true).show().removeAttr('id').addClass('edit_rubric');
+      $form = $tr.find("#edit_rubric_form");
       $rubric.append($tr);
+
       $rubric.find(":text:first").focus().select();
       $form.find(".grading_rubric_checkbox").attr('checked', data.use_for_grading == "true").triggerHandler('change');
       $form.find(".rubric_custom_rating").attr('checked', data.free_form_criterion_comments == "true").triggerHandler('change');
@@ -310,9 +317,11 @@ define([
       $form.find(".save_button").text($rubric.attr('id') == 'rubric_new' ? "Create Rubric" : "Update Rubric");
       $form.attr('method', 'PUT').attr('action', url);
       rubricEditing.sizeRatings();
+
       return $rubric;
     },
     hideEditRubric: function($rubric, remove) {
+      rubricEditing.isEditing = false;
       $rubric = $rubric.filter(":first");
       if(!$rubric.hasClass('editing')) {
         $rubric = $rubric.next(".editing");
@@ -342,6 +351,7 @@ define([
       });
       $rubric.fillFormData(rubric);
       var url = $.replaceTags($rubric.find(".edit_rubric_url").attr('href'), 'rubric_id', rubric.id);
+      rubricEditing.isEditing = false;
       $rubric.find(".edit_rubric_link").attr('href', url);
       var url = $.replaceTags($rubric.find(".delete_rubric_url").attr('href'), 'association_id', rubric.rubric_association_id);
       $rubric.find(".delete_rubric_link").attr('href', url);
@@ -452,14 +462,20 @@ define([
       }
     })
     .delegate(".edit_rubric_link", 'click', function(event) {
-      var $this = $(this);
-      if (
-        !$this.hasClass('copy_edit')  ||
-        confirm(I18n.t('prompts.read_only_rubric', "You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric based on the old rubric.  Continue anyway?"))
-      ) {
-        rubricEditing.editRubric($this.parents(".rubric"), $this.attr('href')); //.hide().after($rubric.show());
+      event.preventDefault();
+
+      var $link   = $(this),
+          $rubric = $link.parents('.rubric'),
+          prompt  = I18n.t('prompts.read_only_rubric', "You can't edit this " +
+                           "rubric, either because you don't have permission " +
+                           "or it's being used in more than one place. Any " +
+                           "changes you make will result in a new rubric based " +
+                           "on the old rubric. Continue anyway?");
+
+      if (rubricEditing.isEditing) return false;
+      if (!$link.hasClass('copy_edit') || confirm(prompt)) {
+        rubricEditing.editRubric($rubric, $link.attr('href'));
       }
-      return false;
     });
 
     // cant use delegate because events bound to a .delegate wont get triggered when you do .triggerHandler('click') because it wont bubble up.

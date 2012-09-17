@@ -338,4 +338,49 @@ describe AssignmentsApiController, :type => :integration do
       json['description']
     end
   end
+
+  it "should fulfill module progression requirements" do
+    course_with_student(:active_all => true)
+    @assignment = @course.assignments.create! :title => "Test Assignment", :description => "public stuff"
+
+    mod = @course.context_modules.create!(:name => "some module")
+    tag = mod.add_item(:id => @assignment.id, :type => 'assignment')
+    mod.completion_requirements = { tag.id => {:type => 'must_view'} }
+    mod.save!
+
+    # index should not affect anything
+    api_call(:get,
+             "/api/v1/courses/#{@course.id}/assignments.json",
+             { :controller => 'assignments_api', :action => 'index',
+               :format => 'json', :course_id => @course.id.to_s })
+    mod.evaluate_for(@user).should be_unlocked
+
+    # show should count as a view
+    json = api_call(:get,
+             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+             { :controller => "assignments_api", :action => "show",
+               :format => "json", :course_id => @course.id.to_s,
+               :id => @assignment.id.to_s })
+    json['description'].should_not be_nil
+    mod.evaluate_for(@user).should be_completed
+  end
+
+  it "should not fulfill requirements when description isn't returned" do
+    course_with_student(:active_all => true)
+    @assignment = @course.assignments.create! :title => "Locked Assignment", :description => "locked!"
+    @assignment.any_instantiation.expects(:locked_for?).returns({:asset_string => '', :unlock_at => 1.hour.from_now}).at_least(1)
+
+    mod = @course.context_modules.create!(:name => "some module")
+    tag = mod.add_item(:id => @assignment.id, :type => 'assignment')
+    mod.completion_requirements = { tag.id => {:type => 'must_view'} }
+    mod.save!
+
+    json = api_call(:get,
+             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+             { :controller => "assignments_api", :action => "show",
+               :format => "json", :course_id => @course.id.to_s,
+               :id => @assignment.id.to_s })
+    json['description'].should be_nil
+    mod.evaluate_for(@user).should be_unlocked
+  end
 end

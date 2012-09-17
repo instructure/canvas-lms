@@ -7,7 +7,7 @@
   js_bundle :gradebook2
 %>
 <div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
-  <div id="gradebook-toolbar">
+  <div id="gradebook-toolbar" class="toolbar">
     <button style="display:none;" id="section_to_show">Showing: <span id="section_being_shown">All Sections</span></button>
     <button id="gradebook_settings">&nbsp;</button>
     <ul style="display: none;">
@@ -24,6 +24,10 @@
       <li><a href="#"><label><%= t('show_attendance_columns', 'Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
       <li><a href="#"><label><%= t('include_ungraded', "Treat Ungraded as 0's") %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
     </ul>
+    <div class="gradebook_filter">
+      <% placeholder = t('filter_by_student', 'Filter by student name or secondary ID') %>
+      <input type="text" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
+    </div>
   </div>
   <div id="gradebook-grid-wrapper">
     <div id="gradebook_students_grid"></div>

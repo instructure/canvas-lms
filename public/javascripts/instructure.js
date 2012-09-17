@@ -49,8 +49,12 @@ define([
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
-  'vendor/scribd.view' /* scribd */
+  'compiled/behaviors/trackEvent',
+  'vendor/scribd.view' /* scribd */,
+  'vendor/jquery.placeholder'
 ], function(ENV, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
+
+  $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
   // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
   var CSRFProtection =  function(xhr) {
@@ -623,7 +627,7 @@ define([
         // notify the user and any other watchers in the document
         $.flashMessage('Message Sent!');
         $(document).triggerHandler('user_content_change');
-        if(location.href.match(/dashboard/)) {
+        if(location.pathname === '/') {
           $.trackEvent('dashboard_comment', 'create');
         }
       },
@@ -1045,4 +1049,6 @@ define([
     }, 2000);
 
   });
+
+  $('input[placeholder], textarea[placeholder]').placeholder();
 });

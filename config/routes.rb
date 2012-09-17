@@ -337,8 +337,8 @@ ActionController::Routing::Routes.draw do |map|
   # find a feed_code method to generate the code, and in
   # application_controller there's a get_feed_context to get it back out.
   map.resource :feeds do |feed|
-    feed.calendar "calendars/:feed_code", :controller => "calendars", :action => "public_feed"
-    feed.calendar_format "calendars/:feed_code.:format", :controller => "calendars", :action => "public_feed"
+    feed.calendar "calendars/:feed_code", :controller => "calendar_events_api", :action => "public_feed"
+    feed.calendar_format "calendars/:feed_code.:format", :controller => "calendar_events_api", :action => "public_feed"
     feed.forum "forums/:feed_code", :controller => "discussion_topics", :action => "public_feed"
     feed.forum_format "forums/:feed_code.:format", :controller => "discussion_topics", :action => "public_feed"
     feed.topic "topics/:discussion_topic_id/:feed_code", :controller => "discussion_entries", :action => "public_feed"
@@ -562,23 +562,6 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :plugins, :only => [:index, :show, :update]
-
-  # The getting_started pages are a short wizard used to help
-  # a teacher start a new course from scratch.
-  map.getting_started_assignments 'getting_started/assignments',
-    :controller => 'getting_started', :action => 'assignments', :conditions => { :method => :get }
-  map.getting_started_teacherless 'getting_started/teacherless',
-    :controller => 'getting_started', :action => 'teacherless', :conditions => { :method => :get }
-  map.getting_started_students 'getting_started/students',
-    :controller => 'getting_started', :action => 'students', :conditions => { :method => :get }
-  map.getting_started_setup 'getting_started/setup',
-    :controller => 'getting_started', :action => 'setup', :conditions => { :method => :get }
-  map.getting_started 'getting_started',
-    :controller => 'getting_started', :action => 'name', :conditions => { :method => :get }
-  map.getting_started_name 'getting_started/name',
-    :controller => 'getting_started', :action => 'name', :conditions => { :method => :get }
-  map.getting_started_finalize 'getting_started/finalize',
-    :controller => 'getting_started', :action => 'finalize', :conditions => { :method => :post }
 
   map.calendar 'calendar', :controller => 'calendars', :action => 'show', :conditions => { :method => :get }
   map.calendar2 'calendar2', :controller => 'calendars', :action => 'show2', :conditions => { :method => :get }
@@ -839,7 +822,7 @@ ActionController::Routing::Routes.draw do |map|
     api.get 'conversations/find_recipients', :controller => :conversations, :action => :find_recipients
 
     api.with_options(:controller => :conversations) do |conversations|
-      conversations.get 'conversations', :action => :index
+      conversations.get 'conversations', :action => :index, :path_name => 'conversations'
       conversations.post 'conversations', :action => :create
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/:id', :action => :show
@@ -934,7 +917,8 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :files) do |files|
       files.post 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
       files.get 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
-      files.get 'files/:id', :action => :api_show, :path_name => 'file'
+      # 'attachment' (rather than 'file') is used below so modules API can use polymorphic_url to generate an item API link
+      files.get 'files/:id', :action => :api_show, :path_name => 'attachment'
       files.delete 'files/:id', :action => :destroy
       files.put 'files/:id', :action => :api_update
       files.get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
@@ -958,10 +942,18 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :wiki_pages) do |wiki_pages|
-      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_pages'
-      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_pages'
-      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_page'
-      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_page'
+      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_wiki_pages'
+      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_wiki_pages'
+      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_wiki_page'
+      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_wiki_page'
+    end
+
+    api.with_options(:controller => :context_modules_api) do |context_modules|
+      context_modules.get "courses/:course_id/modules", :action => :index, :path_name => 'course_context_modules'
+      context_modules.get "courses/:course_id/modules/:id", :action => :show, :path_name => 'course_context_module'
+      context_modules.get "courses/:course_id/modules/:module_id/items", :action => :list_module_items, :path_name => 'course_context_module_items'
+      context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
+      context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
     end
 
     api.with_options(:controller => :outcome_groups_api) do |outcome_groups|

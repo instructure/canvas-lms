@@ -84,34 +84,30 @@ class Group < ActiveRecord::Base
   end
   alias_method_chain :wiki, :create
 
-  def auto_accept?(user)
+  def auto_accept?
     self.group_category && 
-    self.group_category.available_for?(user) &&
     self.group_category.allows_multiple_memberships? &&
     self.join_level == 'parent_context_auto_join'
   end
 
-  def allow_join_request?(user)
+  def allow_join_request?
     self.group_category && 
-    self.group_category.available_for?(user) &&
     self.group_category.allows_multiple_memberships? &&
     ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
 
   def allow_self_signup?(user)
-    self.context && 
-    self.context.grants_right?(user, :participate_in_groups) &&
     self.group_category &&
     (self.group_category.unrestricted_self_signup? ||
       (self.group_category.restricted_self_signup? && self.has_common_section_with_user?(user)))
   end
 
-  def can_join?(user)
-    auto_accept?(user) || allow_join_request?(user) || allow_self_signup?(user)
+  def free_association?(user)
+    auto_accept? || allow_join_request? || allow_self_signup?(user)
   end
 
-  def can_leave?(user)
-    self.group_category.try(:allows_multiple_memberships?) || self.allow_self_signup?(user)
+  def allow_student_forum_attachments
+    context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments
   end
 
   def participants(include_observers=false)
@@ -357,12 +353,33 @@ class Group < ActiveRecord::Base
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster
 
-    given { |user| user && self.can_join?(user) }
-    can :read_roster
-
     given { |user| user && self.is_public? }
     can :follow
+
+    # Participate means the user is connected to the group somehow and can be  
+    given { |user| user && can_participate?(user) }
+    can :participate
+
+    # Join is participate + the group being in a state that allows joining directly (free_association)
+    given { |user| user && can_participate?(user) && free_association?(user)}
+    can :join and can :read_roster
+
+    given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
+    can :leave
   end
+
+  # Helper needed by several permissions, use grants_right?(user, :participate)
+  def can_participate?(user)
+    return false unless user.present? && self.context.present?
+    return true if self.group_category.try(:communities?)
+    if self.context.is_a?(Course)
+      return self.context.enrollments.not_fake.where(:user_id => user.id).first.present?
+    elsif self.context.is_a?(Account)
+      return self.context.user_account_associations.where(:user_id => user.id).first.present?
+    end
+    return false
+  end
+  private :can_participate?
 
   def file_structure_for(user)
     User.file_structure_for(self, user)
@@ -410,7 +427,7 @@ class Group < ActiveRecord::Base
     end
     available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :read)
     available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path } if user && self.grants_right?(user, nil, :read)
-    if root_account.canvas_network_enabled? && user && grants_right?(user, nil, :manage)
+    if root_account.try(:canvas_network_enabled?) && user && grants_right?(user, nil, :manage)
       available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path } 
     end
     available_tabs

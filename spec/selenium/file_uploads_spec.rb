@@ -26,7 +26,6 @@ shared_examples_for "file uploads selenium tests" do
   end
 
   it "should upload a file on the content import page" do
-    skip_if_ie("s3 test fails due to javascript error")
     login_as(@teacher.email, @password)
 
     get "/courses/#{@course.id}/imports/migrate"
@@ -35,10 +34,10 @@ shared_examples_for "file uploads selenium tests" do
 
     keep_trying_until { fj("#choose_migration_system").should be_displayed }
     click_option('#choose_migration_system', 'common_cartridge_importer', :value)
-    driver.find_element(:css, '#config_options').find_element(:name, 'export_file').send_keys(fullpath)
+    f('#config_options').find_element(:name, 'export_file').send_keys(fullpath)
     submit_form('#config_options')
     wait_for_ajax_requests
-    keep_trying_until { driver.find_element(:id, 'file_uploaded').should be_displayed }
+    keep_trying_until { f('#file_uploaded').should be_displayed }
 
     ContentMigration.for_context(@course).count.should == 1
     cm = ContentMigration.for_context(@course).first
@@ -68,13 +67,13 @@ shared_examples_for "file uploads selenium tests" do
       driver.find_element(:name, 'attachments[0][uploaded_data]').send_keys(fullpath)
       submit_form('#submit_online_upload_form')
       keep_trying_until { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
-      link = driver.find_element(:css, "div.details a.forward")
+      link = f(".details a.forward")
       link.text.should eql("Submission Details")
 
       expect_new_page_load { link.click }
       keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
       in_frame('preview_frame') do
-        driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click
+        f('.centered-block .ui-listview .comment_attachment_link').click
         wait_for_ajax_requests
         keep_trying_until { driver.page_source =~ /#{Regexp.quote(data)}/ }
       end
@@ -111,16 +110,16 @@ describe "file uploads local tests" do
       JS
       wait_for_ajax_requests
 
-      driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
-      driver.find_element(:css, '#tree1 .folder .sign').click
+      f('#tree1 .folder').text.should eql("course files")
+      f('#tree1 .folder .sign').click
       # work around bizarre bug where the click above doesn't register the first time
       # when testing firefox on windows xp WITHOUT firebug installed. (works with firebug enabled!)
-      sign = find_with_jquery("#tree1 .folder .sign.minus")
+      sign = fj("#tree1 .folder .sign.minus")
       sign.click if sign != nil
 
       wait_for_ajax_requests
 
-      files = driver.find_elements(:css, '#tree1 .folder .file')
+      files = ff('#tree1 .folder .file')
       if first_time
         files.should be_empty
       else
@@ -129,9 +128,10 @@ describe "file uploads local tests" do
       first_time = false
 
       # upload the file
-      driver.find_element(:css, '.upload_new_file_link').click
-      driver.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-      driver.find_element(:css, '#sidebar_upload_file_form button').click
+      f('.upload_new_file_link').click
+      f('#attachment_uploaded_data').send_keys(fullpath)
+      submit_form('#sidebar_upload_file_form')
+      "sidebar_upload_file_form"
       wait_for_ajax_requests
       keep_trying_until { driver.execute_script("return $('#tree1 .leaf:contains(#{filename})').length") > 0 }
 
