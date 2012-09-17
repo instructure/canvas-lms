@@ -197,7 +197,7 @@ class CalendarsController < ApplicationController
 
   def switch_calendar
     if @domain_root_account.enable_scheduler?
-      if params[:preferred_calendar] == '2' &&
+      if params[:preferred_calendar] == '2'
         @current_user.preferences.delete(:use_calendar1)
       else
         @current_user.preferences[:use_calendar1] = true
@@ -209,7 +209,11 @@ class CalendarsController < ApplicationController
 
   def check_preferred_calendar(always_redirect=false)
     preferred_calendar = 'show'
-    preferred_calendar = 'show2' if @domain_root_account.enable_scheduler? && !@current_user.preferences[:use_calendar1]
+    if (@domain_root_account.enable_scheduler? &&
+          !@current_user.preferences[:use_calendar1]) ||
+       @domain_root_account.calendar2_only?
+      preferred_calendar = 'show2'
+    end
     if always_redirect || params[:action] != preferred_calendar
       redirect_to({ :action => preferred_calendar, :anchor => ' ' }.merge(params.slice(:include_contexts, :event_id)))
       return false
