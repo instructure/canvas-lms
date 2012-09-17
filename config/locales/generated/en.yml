@@ -191,6 +191,14 @@ en:
     announcement_creation_failed_notice: "Announcement creation failed"
     announcement_deleted_notice: "Announcement successfully deleted"
     permission_denied_notice: "You cannot create announcements for that account"
+  account_reports: 
+    default: 
+      all_terms: "All Terms"
+      extra_text: "For Term: %{term_name}"
+      grade: 
+        message: "Grade export successfully generated for term %{term_name}"
+      outcome: 
+        message: "Student-assignment-outcome mapping report successfully generated for %{account_name}"
   account_settings: 
     confirms: 
       delete_announcement: "Are you sure you want to delete this announcement?"
@@ -303,6 +311,19 @@ en:
       go_button: Go
       hide_enrollmentless_courses: "Hide enrollmentless courses"
     crumb_statistics: Statistics
+    grade_export_csv_description: 
+      account_reports: 
+        default: 
+          description: 
+            header: Example
+            text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook."
+    grade_export_csv_parameters: 
+      account_reports: 
+        default: 
+          parameters: 
+            header: Term
+            note: "Courses with muted assignments may not accurately reflect scores in this report."
+      all_terms: "All Terms"
     index: 
       accounts_crumb: Accounts
       no_accounts_message: "No Accounts"
@@ -371,6 +392,8 @@ en:
         default_user_storage_quota: "Default User File Quota"
         enable_alerts: Alerts
         enable_eportfolios: ePortfolios
+        enable_profiles: "Enable Profiles"
+        enable_scheduler: "Enable Calendar 2"
         enable_user_notes: "Faculty Journal"
         end_at: Ends
         equella: Equella
@@ -463,6 +486,31 @@ en:
     sis_batch_messages: 
       sis_batch_errors_title: "Errors that prevent importing"
       sis_batch_warnings_title: Warnings
+    sis_export_csv_parameters: 
+      account_reports: 
+        default: 
+          accounts: 
+            check_box: "Accounts CSV"
+          courses: 
+            check_box: "Course CSV"
+          enrollments: 
+            check_box: "Enrollments CSV"
+          group_membership: 
+            login: 
+              check_box: "Group Membership CSV"
+          groups: 
+            check_box: "Groups CSV"
+          sections: 
+            check_box: "Sections CSV"
+          terms: 
+            check_box: "Terms CSV"
+          users: 
+            check_box: "Users CSV"
+          xlist: 
+            check_box: "X list CSV"
+        sis_default: 
+          parameters: 
+            note: "*Term settings only impact Courses, Sections, Enrollments, and X list CSV files."
     sis_import: 
       add_sis_stickiness_instructions: "With this option selected, changes made through this SIS import will be processed as if they are UI changes, preventing subsequent non-overriding SIS imports from changing the fields changed here."
       add_sis_stickiness_label: "Process as UI changes"
@@ -535,6 +583,12 @@ en:
         one: "%{file_size} *from one file*"
         other: "%{file_size} *from %{count} files*"
       uploaded_file_storage_header: "Uploaded File Storage"
+    terms_parameters: 
+      account_reports: 
+        default: 
+          parameters: 
+            header: Term
+      all_terms: "All Terms"
     test_ldap_dialog_title: "Test LDAP Settings"
     test_ldap_result_canceled: Canceled
     test_ldap_result_failed: Failed
@@ -996,7 +1050,6 @@ en:
         upload_as_zip: "Please upload files as a .zip"
       links: 
         assign_rubric: "Assign Rubric"
-        back_to_getting_started: "Back to Getting Started Wizard"
       new_assignment: "New Assignment"
     show_locked: 
       labels: 
@@ -1183,24 +1236,18 @@ en:
     authorize_google_docs: "Authorize Google Docs Access"
     back_to_outcomes: "Back to Outcomes"
     cancel: Cancel
-    continue: Continue
     delete: Delete
     done: Done
     filter: Filter
     find_learning_outcome: "Find Learning Outcome"
-    hide: Hide
     hide_all_artifacts: "Hide All Artifacts"
     manage_rubrics: "Manage Rubrics"
     ok: OK
-    okay: Okay
     post_message: "Post Message"
-    previous: Previous
     refresh: refresh
     save: Save
-    save_course: "Save Course"
     save_tool_settings: "Save Tool Settings"
     search: Search
-    show: Show
     show_all_artifacts: "Show All Artifacts"
     submit: Submit
     update: Update
@@ -1214,111 +1261,76 @@ en:
     command: 
       abs: 
         description: "Returns the absolute value of the given value"
-        name: abs
       acos: 
         description: "Returns the arccos of the given value"
-        name: acos
       asin: 
         description: "Returns the arcsin of the given value"
-        name: asin
       at: 
         description: "Returns the indexed value in the given list"
-        name: at
       atan: 
         description: "Returns the arctan of the given value"
-        name: atan
       ceil: 
         description: "Returns the ceiling for the given value"
-        name: ceil
       comb: 
         description: "Returns the combination result for the given values"
-        name: comb
       cos: 
         description: "Returns the cosine of the given value"
-        name: cos
       count: 
         description: "Returns the number of items in the list"
-        name: count
       default_description: "No description given"
       deg_to_rad: 
         description: "Returns the given value converted from degrees to radians"
-        name: deg_to_rad
       e: 
         description: "Returns the value for e"
-        name: e
       fact: 
         description: "Returns the factorial of the given number"
-        name: fact
       first: 
         description: "Returns the first value in the list"
-        name: first
       floor: 
         description: "Returns the floor for the given value"
-        name: floor
       if: 
         description: "Evaluates the first argument, returns the second argument if it evaluates to a non-zero value, otherwise returns the third value"
-        name: if
       last: 
         description: "Returns the last value in the list"
-        name: last
       length: 
         description: "Returns the number of arguments in the given list"
-        name: length
       ln: 
         description: "Returns the natural log of the given value"
-        name: ln
       log: 
         description: "Returns the log of the given value with an optional base"
-        name: log
       max: 
         description: "Returns the highest value in the list"
-        name: max
       mean: 
         description: "Returns the average mean of the values in the list"
-        name: mean
       median: 
         description: "Returns the median for the list of values"
-        name: median
       min: 
         description: "Returns the lowest value in the list"
-        name: min
       no_description: "No description found for the function, %{functionName}"
       perm: 
         description: "Returns the permutation result for the given values"
-        name: perm
       pi: 
         description: "Returns the computed value of pi"
-        name: pi
       rad_to_deg: 
         description: "Returns the given value converted from radians to degrees"
-        name: rad_to_deg
       rand: 
         description: "Returns a random number between zero and the range specified, or one if no number is given"
-        name: rand
       range: 
         description: "Returns the range for the list of values"
-        name: range
       reverse: 
         description: "Reverses the order of the list of values"
-        name: reverse
       round: 
         description: "Returns the given value rounded to the nearest whole number"
-        name: round
       sin: 
         description: "Returns the sine of the given value"
-        name: sin
       sort: 
         description: "Returns the list of values, sorted from lowest to highest"
-        name: sort
       sqrt: 
         description: "Returns the square root of the given value"
-        name: sqrt
       sum: 
         description: "Returns the sum of the list of values"
-        name: sum
       tan: 
         description: "Returns the tangent of the given value"
-        name: tan
       unrecognized: "%{functionName} is not a recognized function"
     drag_to_reorder: "Drag to reorder"
     headings: 
@@ -2447,7 +2459,7 @@ en:
         view_faculty_journals: "View Faculty Journals"
         view_prior_enrollments: "View Prior Enrollments"
         view_services: "View Registered Services"
-        view_student_groups: "View Student Groups"
+        view_user_groups: "View User Groups"
     roster_user: 
       completed_enrollment: "completed *%{completed_at}*"
       confirm: 
@@ -3189,8 +3201,7 @@ en:
       headings: 
         my_courses: "My Courses"
         past_enrollments: "Past Enrollments"
-      links: 
-        start_course: "Start a New Course"
+      start_new_course: "Start a New Course"
       titles: 
         courses: Courses
         rss: 
@@ -3477,7 +3488,6 @@ en:
         change_layout: "Change Home Page Layout"
         course_setup: "Course Setup Checklist"
         course_stream: "See Course Stream"
-        delete: "Delete This Course"
         drop_course: "Drop this Course"
         join_course: "Join this Course"
         new_announcement: "New Announcement"
@@ -3559,6 +3569,7 @@ en:
     discussion_replies: "Discussion Replies"
   crumbs: 
     access_report: "Access Report"
+    announcements: Announcements
     assignments: Assignments
     calendar_events: "Calendar Events"
     chat: Chat
@@ -3793,6 +3804,7 @@ en:
       enable_podcast_feed: "Enable podcast feed"
       include_replies_in_podcast_feed: "Include Replies in podcast feed"
       loading: Loading...
+      options: Options
       points_possible: "Points possible"
       post_at: "Post At"
       save: Save
@@ -3955,7 +3967,7 @@ en:
       loading_rubrics: "Loading rubrics..."
     prompts: 
       confirm_delete: "Are you sure you want to delete this rubric?"
-      read_only_rubric: "You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric based on the old rubric.  Continue anyway?"
+      read_only_rubric: "You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric based on the old rubric. Continue anyway?"
     titles: 
       criterion_long_description: "Criterion Long Description"
       find_existing_rubric: "Find Existing Rubric"
@@ -4644,96 +4656,6 @@ en:
       unlock_before_due: "The assignment should be unlocked before it's due"
     titles: 
       criterion_long_description: "Criterion Long Description"
-  getting_started: 
-    assignments: 
-      add_assignment_group_link: "Add Assignment Group"
-      add_assignment_link: "*Add Assignment* to %{group_name}"
-      confused_notice: "Confused? Click the \"How Do I...?\" link to the right for more help."
-      default_group_notice: "*Now we're getting somewhere!* Next you'll want to add your course assignments. Assignments are organized into groups (quizzes, papers, etc.), and each group can be weighted to count as a percentage of the final score. We've added a default group above to get you started. You can add assignments to it by clicking the plus icon, or use the links to the right to create your own groups."
-      grade_groups_notice: "Nicely done. Next you'll want to define the assignments for your course. Most classes base grades either on straight points, or points according to types (50% of your grade is from tests, 20% is from papers, etc.). In Canvas you add assignments, quizzes, or whatever into groups and optionally weight those groups. Build your Canvas course to match the grading scheme of your actual course, and we'll take care of computing your final grade for you."
-      grade_weight_label: "Weight the final grade based on assignment groups"
-      how_do_i: "How Do I...?"
-      page_title: "Try It: Assignments"
-      save_and_skip: "Save & Skip the Rest"
-      skip_assignments_notice: "Not ready to create your assignments? Feel free to skip this step, you can always come back to it later after your course is set up."
-      student_next_step_link: "Next Step: Students"
-    course_created_notice: "Course created! You'll need to log in or register to claim this course."
-    name: 
-      assignment_next_step_link: "Next Step: Assignments"
-      course_code_example: "(something like BIO 100, ENG 315, etc.)"
-      course_name_notice: "First thing's first, tell us the name of the course you'd like to track."
-      course_name_notice_longer: "Right, then. Let's get this course set up! It should only take a few minutes for the whole process. First off come up with a name for your course. Then you'll add your assignments and students. Shouldn't take too long at all."
-      labels: 
-        course_code: "And a shorter reference code"
-        indexed: "Include this course in Instructure's public course index"
-        is_public: "Make this course publicly visible"
-        license: "License for course content"
-        name: "Enter a name for your course"
-      page_title: "Try It: Choose Course Name"
-      save_and_skip: "Save & Skip the Rest"
-      student_data_privacy: "(student data will remain private)"
-      teacherless_grades_notice: "You can use Canvas to keep track of how you're doing in all your courses, whether they're using Canvas or not. Just tell us how your course's grading policy is set up and then enter your scores manually. You can also invite your classmates to use the course you set up so they can track their grades, too!"
-    setup: 
-      assignments: Assignments
-      labels: 
-        course_name: "Course Name"
-        students: Students
-      new_student: "New Student"
-      no_assignments: "No Assignments Created"
-      no_email: "no email"
-      no_students: "No Students Added"
-      page_title: "Try It: Save"
-      short_header: 
-        assignment: Assignment
-        due: Due
-        email: Email
-        points: Pts
-        student: Student
-        type: Type
-      summary_notice: "*That's it! You're done!* Here's the summary of everything you put in. Feel free to click any section to go back and edit the information there. When you're sure you've got everything right, click the save button to go to your course page."
-      total_assignment_count: 
-        one: "1 Assignment Total"
-        other: "%{count} Assignments Total"
-      total_students_count: 
-        one: "1 Student Total"
-        other: "%{count} Students Total"
-      unpublished_notice: "Don't worry, this course will stay visible to just you until you publish it. When you publish, your course will become active and students will be notified that it has been created and they are enrolled. You can publish at any time from the course's main page."
-    student: 
-      edit_name_title: "Click to Edit Name"
-      missing_email: "no email"
-      new_student_name: "New Student"
-      remove_student_title: "Remove this Student"
-      student_name_title: "Student Name"
-    students: 
-      go_back_and_edit: "Go back and edit the list of users"
-      looks_good: "OK Looks Good, Add These Users"
-      no_enrollments: "No Students Enrolled"
-      page_title: "Try It: Add Students"
-      save_and_skip: "Save & Skip the Rest"
-      save_next_step_link: "Next Step: Save"
-      teacher_add_student_notice_just_email: "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. Paste in just email addresses (bob@example.com) or names with addresses #(\"Jones, Bob M.\" <bob@example.com>)# separated by commas or on separate lines."
-      teacher_add_student_notice_with_login_handle: "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. You can paste in their %{login_handle_name}, just their email address (bob@example.com), or their name and address #(\"Jones, Bob M.\" <bob@example.com>)#. Multiple users should be separated by commas or be on separate lines."
-      teacher_add_student_skip: "If you're not sure who's going to be in your class, you can skip this step and add students (along with TAs and other teachers) anytime after you finish the wizard."
-      teacherless_add_student_notice_just_email: "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies all over again, and we'll also give you a place to share files and collaborate. Just paste in a list of email addresses below to invite others to join."
-      teacherless_add_student_notice_with_login_handle: "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies all over again, and we'll also give you a place to share files and collaborate. Just paste in a list of users below to invite others to join. You can use their email addresses or %{login_handle_name}."
-      teacherless_add_student_skip: "You can always skip this step and invite your classmates (or even your teacher) to share this course later on."
-    teacherless: 
-      get_started: "Click here to get started"
-      page_title: "Try It: New Course"
-      setup: "Set up a new Course in Canvas"
-      teacherless_explanation: "You can use Canvas to keep track of how you're doing in all your courses, whether they're using Canvas or not. Just tell us how your course's grading policy is set up and then enter your scores manually. You can also invite your classmates to use the course you set up so they can track their grades, too!"
-      use_canvas_for_grading: "Use Canvas for Grading"
-    wizard_secondary_nav: 
-      assignments: Assignments
-      course_name: "Course Name"
-      review_and_save: "Review and Save"
-      start_from_scratch: "Start From Scratch"
-      step1: "Step 1"
-      step2: "Step 2"
-      step3: "Step 3"
-      step4: "Step 4"
-      students: Students
-      visit_course_page: "Visit Course Page"
   gradebook: 
     alerts: 
       no_active_students: "Sorry, there are either no active students in the course or none are gradable by you."
@@ -5779,6 +5701,9 @@ en:
         not_authenticated: "You must be logged in to access this page"
         student_not_found: "No student found"
         teacher_not_found: "No teacher found"
+    basic_lti: 
+      bad_score: "Score is not between 0 and 1"
+      no_score: "No score given"
     cc: 
       standard: 
         failed_to_convert_qti: "Failed to import Assessment %{file_identifier}"
@@ -7889,9 +7814,9 @@ en:
       delete_login: "Are you sure you want to delete this login?"
       regenerate_token: "Are you sure you want to regenerate this token?  Anything using this token will have to be updated."
       unregister_service: "Are you sure you want to unregister this service?"
-    crumb: "%{user}'s profile"
+    crumb: "%{user}'s settings"
     crumbs: 
-      profile_frd: "%{user}'s profile"
+      settings_frd: "%{user}'s settings"
     done_resending: "Done! Message delivery may take a few minutes."
     email_select: 
       default_email_option: "[Select Email]"
@@ -7928,7 +7853,7 @@ en:
     notices: 
       contact_confirmed: "Contact successfully confirmed!"
       mfa_disabled: "Multi-factor authentication disabled"
-      updated_profile: "Profile successfully updated"
+      updated_profile: "Settings successfully updated"
     please_select_a_day: "Please select a day"
     please_select_a_month: "Please select a month"
     please_select_a_year: "Please select a year"
@@ -7948,7 +7873,7 @@ en:
         save_login: "Save Login"
         save_skype_name: "Save Skype Name"
         select_image: "Select Image"
-        update_profile: "Update Profile"
+        update_settings: "Update Settings"
       confirm_email_instructions: "Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box."
       delicious_description: "Delicious is a tool that lets you store and share your bookmarks with others. Canvas's rich content editor will let you search your Delicious tags to easily link from within Canvas to other resources you find useful."
       diigo_description: "Diigo is a social bookmarking tool tailored specifically to research and education. Canvas's rich content editor will let you search your Diigo tags to easily link from within Canvas to other resources you find useful."
@@ -7981,7 +7906,7 @@ en:
         registered_services: "Registered Services"
         share_skype_id: "Share your Skype ID"
         twitter_access: "Twitter Access"
-        users_profile: "%{user}'s Profile"
+        users_profile: "%{user}'s Settings"
         ways_to_log_in: "Ways to Log In"
         web_services: "Web Services"
       hints: 
@@ -8023,7 +7948,7 @@ en:
       links: 
         add_account: "Add Account"
         configure_mfa: "Set Up Multi-Factor Authentication"
-        delete_profile: "Delete My Profile"
+        delete_account: "Delete My Account"
         delicious: Delicious
         diigo: Diigo
         disable_mfa: "Disable Multi-Factor Authentication"
@@ -8043,7 +7968,7 @@ en:
       no_language_preference: "System Default (%{language})"
       no_registered_services: "No Registered Services"
       none: None
-      page_title: "Profile Settings"
+      page_title: "User Settings"
       profile_pictures: "Select the image you'd like to use as your profile pic, or upload a new image:"
       skype_description: "Skype offers free online voice and video calls. Lots of students use Skype as a free, easy way to communicate. If you register your Skype Name and enable visibility, then other students can easily find your contact and call or add you using Skype."
       titles: 
@@ -8147,6 +8072,7 @@ en:
       invalid_email_address: "\"%{email}\" is not a valid email address"
       mismatch: "Doesn't match"
       required: Required
+      taken: "Email already in use"
       too_long: "Can't exceed %{max} characters"
       too_short: "Must be at least %{min} characters"
   pseudonym_session: 
@@ -8445,11 +8371,10 @@ en:
       labels: 
         answer_with_margin: "with margin"
         your_answer: "Your Answer"
-      percent_of_points: "%{percent}% of points"
       plus_or_minus: +/-
       range_answer: "Between %{lower_bound} and %{upper_bound}"
       selected_answer: "You selected this answer."
-      you_left_this_blank: "You left this blank"
+      you_left_this_blank: "(You left this blank)"
     display_question: 
       default_question_answer: "[ Choose ]"
       headers: 
@@ -8463,26 +8388,21 @@ en:
         variables: Variables
       labels: 
         additional_comments: "Additional Comments"
-        correct_answers: 
-          one: "Correct Answer"
-          other: "Correct Answers"
-        correct_answers2: "Correct Answer(s)"
-        for_answer_number: "For answer %{answer_number}"
-        your_answer: "Your Answer"
+        for_answer_number: "Answer %{answer_number}"
       links: 
         delete_question: "Delete this Question"
         edit_question: "Edit this Question"
         move_copy_question: "move/copy question to another bank"
+      not_yet_graded: "Not yet graded"
       points_possible: "%{points_possible} pts"
       show_ansers_for_variable: "Show Answers for %{variable}"
       skip_question_text: "Skip to question text."
       titles: 
-        mark_to_revisit: "Mark this question to come back to later"
         question_correct_comment: "Students will see this comment if they get the question correct"
         question_incorrect_comment: "Students will see this comment if they get the question wrong"
         question_neutral_comment: "Students will see this comment once they've answered the question"
       unsupported_question_type: "This question was imported from an external source. It was a '%{question_type}' question, which is not supported in this quiz tool."
-      you_left_this_blank: "You left this blank"
+      you_left_this_blank: "(You left this blank)"
     enter_answer_variable_above: "[ Enter Answer Variables Above ]"
     equations_help: 
       equation_functions: "In addition to variables, there are also a collection of helper functions you can use to generate useful values. For example: %{example} To see an exaplanation of a given helper function, select it from the list below:"
@@ -8632,6 +8552,11 @@ en:
         click_to_enter_general_answer_comments: "Click to enter general comments"
         click_to_enter_wrong_answer_comments: "Click to enter comments for a wrong answer"
       wrong_answer_comments: "Wrong answer comments"
+    helpers: 
+      duration_in_minutes: 
+        one: "1 minute"
+        other: "%{count} minutes"
+        zero: "less than 1 minute"
     history: 
       anonymous_username: Student
       buttons: 
@@ -8936,6 +8861,7 @@ en:
         take_quiz_again: "Take the Quiz Again"
         take_survey_again: "Take the Survey Again"
       no_more_attempts: "No More Attempts available"
+      questions_not_graded: "Some questions not yet graded"
       score_out_of_points_possible: "%{score} out of %{points_possible}"
       score_set_manually: "This score was set by the teacher"
       unlimited_attempts: "Unlimited Attempts"
@@ -8958,6 +8884,7 @@ en:
         survey_score: "Survey Score"
       links: 
         click_to_view_results: "Click here to view the results."
+      questions_not_graded: "Some questions not yet graded"
       quiz_fudged_negative: "This quiz score has been manually adjusted by %{fudge} points."
       quiz_fudged_positive: "This quiz score has been manually adjusted by +%{fudge} points."
       quiz_not_yet_taken: "The quiz hasn't been taken yet."
@@ -9023,6 +8950,14 @@ en:
         details: "Assignment Rubric Details"
     show: 
       anonymous_student: "Student %{n}"
+      answers: 
+        correct: Correct!
+        correct_answers: "Correct Answers"
+        incorrect: Incorrect
+        partial: Partial
+        right: "Correct Answer"
+        unanswered: Unanswered
+        you_answered: "You Answered"
       buttons: 
         lock_quiz: "Lock this Quiz Now"
         lock_survey: "Lock this Survey Now"
@@ -9133,10 +9068,6 @@ en:
         other: "%{count} other submissions"
     statistics_crumb: Statistics
     statistics_filename: "%{title} %{type} Report"
-    submission_score: 
-      titles: 
-        score_needs_review: "This score needs review"
-        score_pending_review: "This score is pending review, and may change"
     take_quiz: 
       buttons: 
         out_of_time_submit: "Ok, fine"
@@ -9970,6 +9901,17 @@ en:
           
           Once you have muted this assignment, you can begin sending
           notifications again by clicking the "Unmute Assignment" link.
+    new_course_form: 
+      cancel: Cancel
+      course_cose_explanation: "This will be displayed in places with little space"
+      create_course: "Create course"
+      labels: 
+        course_code: "Short Name"
+        license: "Content License"
+        name: "Course Name"
+      new_course_name_placeholder: "Course Name"
+      sample_course_code: Course-101
+      start_a_new_course: "Start A New Course"
     pending_enrollment: 
       designer: "%{course} as a designer."
       designer_title: "Invited as a designer, click to see the Course"
@@ -10403,7 +10345,6 @@ en:
     atom_no_author: "No Author"
     attached_files_comment: "See attached files."
     media_comment: "This is a media comment."
-    no_comment: "no comment"
     state: 
       graded: graded
       submitted: submitted
@@ -10618,7 +10559,6 @@ en:
     with_ago: "%{time} ago"
   title_separator: ": "
   titles: 
-    add_students: "Add Students"
     aligned_items: "Aligned Items"
     announcement: Announcement
     announcements: Announcements
@@ -10628,8 +10568,6 @@ en:
     learning_outcomes: "Learning Outcomes"
     messages: Messages
     outcome_artifacts: "Outcome Artifacts"
-    review_and_save: "Review and Save"
-    students: Students
   todo_item_view: 
     grading: 
       grade: Grade
@@ -10914,7 +10852,7 @@ en:
       all_users: "All Users"
       buttons: 
         manage_profile_pictures: "Manage Profile Pictures"
-        student_groups: "View Student Groups"
+        user_groups: "View User Groups"
       crumbs: 
         users: Users
       labels: 

@@ -11,10 +11,10 @@ describe "manage groups students" do
   it "should click on  the self signup help link " do
     @student = @course.enroll_student(user_model(:name => "John Doe")).user
     get "/courses/#{@course.id}/groups"
-    driver.find_element(:css, ".add_category_link").click
-    form = driver.find_element(:css, "#add_category_form")
+    f(".add_category_link").click
+    form = f("#add_category_form")
     form.find_element(:css, ".self_signup_help_link").click
-    driver.find_element(:id, "self_signup_help_dialog").should be_displayed
+    f("#self_signup_help_dialog").should be_displayed
   end
 
   it "should move students from a deleted group back to unassigned" do
@@ -25,7 +25,7 @@ describe "manage groups students" do
     group.add_user student
 
     get "/courses/#{@course.id}/groups"
-    category = find_with_jquery(".group_category:visible")
+    category = fj(".group_category:visible")
     category.find_elements(:css, ".group_blank .user_id_#{student.id}").should be_empty
 
     driver.execute_script("$('#group_#{group.id} .delete_group_link').hover().click()") #move_to occasionally breaks in the hudson build
@@ -51,11 +51,11 @@ describe "manage groups students" do
     get "/courses/#{@course.id}/groups"
     wait_for_ajaximations
 
-    sections = driver.find_element(:css, ".user_id_#{@student.id} .section_code")
+    sections = f(".user_id_#{@student.id} .section_code")
     sections.should include_text(@course.default_section.name)
     sections.should include_text(@other_section.name)
 
-    driver.find_element(:css, "#category_#{gc1.id} .group_blank .user_count").should include_text("1")
+    f("#category_#{gc1.id} .group_blank .user_count").should include_text("1")
   end
 
   it "should not show sections for students when managing from an account" do
@@ -89,14 +89,14 @@ describe "manage groups students" do
     get "/courses/#{@course.id}/groups"
     wait_for_ajaximations
 
-    category = driver.find_element(:css, ".group_category")
+    category = f(".group_category")
     unassigned_div = category.find_element(:css, ".group_blank")
 
     unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
     unassigned_div.find_elements(:css, ".student").length.should == 15
     # 15 comes from window.contextGroups.autoLoadGroupThreshold
 
-    driver.find_element(:css, ".next_page").click
+    f(".next_page").click
     wait_for_ajaximations
 
     unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
@@ -110,7 +110,7 @@ describe "manage groups students" do
     get "/courses/#{@course.id}/groups"
     wait_for_ajaximations
 
-    find_all_with_jquery(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+    ffj(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
   end
 
   it "should not include student view student in the unassigned student list at the account level" do
@@ -122,7 +122,7 @@ describe "manage groups students" do
     get "/accounts/#{@account.id}/groups"
     wait_for_ajaximations
 
-    find_all_with_jquery(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+    ffj(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
   end
 
   context "dragging a user between groups" do
@@ -132,7 +132,7 @@ describe "manage groups students" do
       group_category = @course.group_categories.create(:name => "Other Groups")
       groups = add_groups_in_category group_category, 2
       get "/courses/#{@course.id}/groups"
-      category = driver.find_element(:css, ".group_category")
+      category = f(".group_category")
       unassigned_div = category.find_element(:css, ".group_blank")
       group1_div = category.find_element(:css, "#group_#{groups[0].id}")
       group2_div = category.find_element(:css, "#group_#{groups[1].id}")
@@ -165,7 +165,7 @@ describe "manage groups students" do
       groups = add_groups_in_category group_category, 2
       get "/courses/#{@course.id}/groups"
 
-      category = driver.find_element(:css, ".group_category")
+      category = f(".group_category")
       unassigned_div = category.find_element(:css, ".group_blank")
       group1_div = category.find_element(:css, "#group_#{groups[0].id}")
       group2_div = category.find_element(:css, "#group_#{groups[1].id}")
@@ -205,7 +205,7 @@ describe "manage groups students" do
       groups = add_groups_in_category group_category, 3
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
-      category_div = driver.find_element(:css, ".group_category")
+      category_div = f(".group_category")
       group1_div = category_div.find_element(:css, "#group_#{groups[0].id}")
       group2_div = category_div.find_element(:css, "#group_#{groups[1].id}")
       group3_div = category_div.find_element(:css, "#group_#{groups[2].id}")
@@ -255,22 +255,22 @@ describe "manage groups students" do
       simulate_group_drag(@students[0].id, "blank", group.id)
       wait_for_ajaximations
 
-      driver.find_element(:css, ".unassigned_members_pagination .next_page").click
+      f(".unassigned_members_pagination .next_page").click
       wait_for_ajaximations
 
-      driver.find_elements(:css, ".group_blank .student").length.should == 15
+      ff(".group_blank .student").length.should == 15
     end
   end
 
   context "assign_students_link" do
     def assign_students(category)
-      assign_students = find_with_jquery("#category_#{category.id} .assign_students_link:visible")
+      assign_students = fj("#category_#{category.id} .assign_students_link:visible")
       assign_students.should_not be_nil
       assign_students.click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajax_requests
-      keep_trying_until { driver.find_element(:css, '.right_side .group .user_count').text.should eql '0 students' }
+      keep_trying_until { f('.right_side .group .user_count').text.should eql '0 students' }
     end
 
     before (:each) do
@@ -282,21 +282,21 @@ describe "manage groups students" do
     it "should be visible iff category is not restricted self signup" do
       skip_if_ie("Element must not be hidden, disabled or read-only line 378")
       new_category = add_category(@course, "Unrestricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => false)
-      find_with_jquery("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
+      fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
 
       edit_category(:restrict_self_signup => true)
-      find_with_jquery("#category_#{new_category.id} .assign_students_link:visible").should be_nil
+      fj("#category_#{new_category.id} .assign_students_link:visible").should be_nil
 
       new_category = add_category(@course, "Restricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => true)
-      find_with_jquery("#category_#{new_category.id} .assign_students_link:visible").should be_nil
+      fj("#category_#{new_category.id} .assign_students_link:visible").should be_nil
 
       edit_category(:restrict_self_signup => false)
-      find_with_jquery("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
+      fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
     end
 
     it "should assign students in DB and in UI" do
       expected_display_name = 'Doe, John'
-      keep_trying_until { driver.find_element(:css, '.right_side .student_list .student .name').should include_text(expected_display_name) }
+      keep_trying_until { f('.right_side .student_list .student .name').should include_text(expected_display_name) }
       @student.groups.should be_empty
 
       assign_students(@category)
@@ -305,14 +305,14 @@ describe "manage groups students" do
       keep_trying_until { @student.groups.size.should == 1 }
       group = @student.groups.first
 
-      driver.find_element(:css, '.right_side .student_list').should_not include_text(expected_display_name)
-      group_element = find_with_jquery("#category_#{@category.id} #group_#{group.id} .user_id_#{@student.id}")
+      f('.right_side .student_list').should_not include_text(expected_display_name)
+      group_element = fj("#category_#{@category.id} #group_#{group.id} .user_id_#{@student.id}")
       group_element.should_not be_nil
       group_element.should include_text(expected_display_name)
     end
 
     it "should give 'Assigning Students...' visual feedback" do
-      assign_students = find_with_jquery("#category_#{@category.id} .assign_students_link:visible")
+      assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
       assign_students.should_not be_nil
       assign_students.click
       # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
@@ -321,7 +321,7 @@ describe "manage groups students" do
       GroupsController.before_filter { lock.lock; lock.unlock; true }
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
-      loading = find_with_jquery("#category_#{@category.id} .group_blank .loading_members:visible")
+      loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
       loading.text.should == 'Assigning Students...'
       lock.unlock
       GroupsController.filter_chain.pop
@@ -349,23 +349,23 @@ describe "manage groups students" do
     it "should add multiple groups and be sure they are all deleted" do
       add_groups_in_category @courses_group_category
       get "/courses/#{@course.id}/groups"
-      delete = driver.find_element(:css, ".delete_category_link")
+      delete = f(".delete_category_link")
       delete.click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajaximations
-      driver.find_elements(:css, ".left_side .group").should be_empty
+      ff(".left_side .group").should be_empty
       @course.group_categories.all.count.should eql 0
     end
 
     it "should edit an individual group" do
       get "/courses/#{@course.id}/groups"
       group = add_group_to_category @courses_group_category, "group 1"
-      driver.find_element(:css, "#group_#{group.id}").click
-      driver.find_element(:css, "#group_#{group.id} .edit_group_link").click
+      f("#group_#{group.id}").click
+      f("#group_#{group.id} .edit_group_link").click
       name = "new group 1"
-      driver.find_element(:css, "#group_name").send_keys(name)
-      driver.find_element(:css, "#group_#{group.id} .button").click
+      f("#group_name").send_keys(name)
+      submit_form("#edit_group_form")
       wait_for_ajaximations
       new_group = @course.groups.find_by_name(name)
       group.should_not be_nil
@@ -374,12 +374,12 @@ describe "manage groups students" do
     it "should delete an individual group" do
       get "/courses/#{@course.id}/groups"
       group = add_group_to_category @courses_group_category, "group 1"
-      driver.find_element(:css, "#group_#{group.id}").click
-      driver.find_element(:css, "#group_#{group.id} .delete_group_link").click
+      f("#group_#{group.id}").click
+      f("#group_#{group.id} .delete_group_link").click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajaximations
-      driver.find_elements(:css, ".left_side .group").should be_empty
+      ff(".left_side .group").should be_empty
       @course.group_categories.last.groups.last.workflow_state =='deleted'
     end
   end

@@ -61,7 +61,7 @@
         <%= before_label(:quiz_due, "Due") %> <%= datetime_string(q.due_at) %><br/>
       <% end %>
       <% if q.time_limit %>
-        <%= before_label(:quiz_time_limit, "Time Limit") %> <%= time_ago_in_words(Time.now - q.time_limit.minutes) %><br/>
+        <%= before_label(:quiz_time_limit, "Time Limit") %> <%= duration_in_minutes(q.time_limit.minutes) %><br/>
       <% end %>
       <% if q.allowed_attempts && q.allowed_attempts != 1 %>
         <% if q.allowed_attempts > 0 %>

@@ -136,6 +136,7 @@ describe 'Submissions API', :type => :integration do
 
       Submission.count.should == 2
       @submission = Submission.last(:order => :id)
+      @submission.grader.should == @teacher
 
       json['score'].should == 7.5
       json['grade'].should == '75%'
@@ -1665,6 +1666,7 @@ describe 'Submissions API', :type => :integration do
         @context = @course
         @student2 = @student
         @user = @student1
+        @always_scribd = true
       end
 
       it_should_behave_like "file uploads api"

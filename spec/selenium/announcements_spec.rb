@@ -104,7 +104,7 @@ describe "announcements" do
     end
 
     describe "shared bulk topics specs" do
-      let(:url) { "/courses/#{@course.id}/announcements" }
+      let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
       it_should_behave_like "discussion and announcement main page tests"
     end
@@ -139,11 +139,11 @@ describe "announcements" do
     end
 
     it "should add and remove an external feed to announcements" do
-      get course_announcements_path(@course)
+      get "/courses/#{@course.id}/announcements"
 
       #add external feed to announcements
       feed_name = 'http://www.google.com'
-      f('a[aria-controls=add_external_feed_form]').click
+      driver.execute_script("$('#add_external_feed_form').css('display', 'block')")
       feed_form = f('#add_external_feed_form')
       feed_form.find_element(:id, 'external_feed_url').send_keys(feed_name)
       feed_form.find_element(:css, 'input[aria-controls=header_match_container]').click

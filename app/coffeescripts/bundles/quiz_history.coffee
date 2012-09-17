@@ -3,7 +3,8 @@ require [
   'quiz_arrows'
   'quiz_inputs'
   'quiz_history'
-], ($, createQuizArrows, disableInputs) ->
+], ($, createQuizArrows, inputMethods) ->
   $ ->
     createQuizArrows()
-    disableInputs('[type=radio], [type=checkbox]')
+    inputMethods.disableInputs('[type=radio], [type=checkbox]')
+    inputMethods.setWidths()

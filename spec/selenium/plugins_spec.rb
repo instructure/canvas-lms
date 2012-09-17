@@ -8,7 +8,8 @@ describe "plugins ui" do
 
     get '/plugins/etherpad'
     is_checked('#plugin_setting_disabled').should be_true
-    expect_new_page_load { driver.find_element(:css, "button.save_button").click }
+
+    expect_new_page_load { submit_form("#new_plugin_setting") }
     PluginSetting.all.count.should == 1
     PluginSetting.first.tap do |ps|
       ps.name.should == "etherpad"
@@ -20,8 +21,8 @@ describe "plugins ui" do
     truncate_table PluginSetting
     get '/plugins/etherpad'
     is_checked('#plugin_setting_disabled').should be_true
-    driver.find_element(:css, '#plugin_setting_disabled').click
-    expect_new_page_load { driver.find_element(:css, "button.save_button").click }
+    f('#plugin_setting_disabled').click
+    expect_new_page_load { submit_form("#new_plugin_setting") }
     PluginSetting.all.count.should == 1
     PluginSetting.first.tap do |ps|
       ps.name.should == "etherpad"

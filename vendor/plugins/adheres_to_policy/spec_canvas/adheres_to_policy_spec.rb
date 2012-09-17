@@ -277,8 +277,8 @@ describe Instructure::AdheresToPolicy::InstanceMethods do
   
       it "should not cache for contexts if session[:session_affects_permissions]" do
         enable_cache do
-          Rails.cache.expects(:fetch).never.with{ |p,| p =~ /context_permissions/ }
-          Rails.cache.stubs(:fetch).with{ |p,| p !~ /context_permissions/ }.returns([])
+          Rails.cache.expects(:read).never.with{ |p,| p =~ /context_permissions/ }
+          Rails.cache.stubs(:read).with{ |p,| p !~ /context_permissions/ }.returns(nil)
           course().grants_rights?(user(:name => 'bob'), {:session_affects_permissions => true})
         end
       end

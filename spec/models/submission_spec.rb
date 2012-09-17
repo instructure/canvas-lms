@@ -196,6 +196,33 @@ describe Submission do
         @assignment.mute!
         @user.stream_item_instances.last.should be_hidden
       end
+
+      it "should not create a message for admins and teachers with quiz submissions" do
+        Notification.create!(:name => 'Submission Graded')
+
+        course_with_teacher(:active_all => true)
+        assignment = @course.assignments.create!(
+          :title => 'assignment',
+          :points_possible => 10)
+        quiz       = @course.quizzes.build(
+          :assignment_id   => assignment.id,
+          :title           => 'test quiz',
+          :points_possible => 10)
+        quiz.workflow_state = 'available'
+        quiz.save!
+
+        user       = account_admin_user
+        channel    = user.communication_channels.create!(:path => 'admin@example.com')
+        submission = quiz.generate_submission(user, false)
+        submission.grade_submission
+
+        channel2   = @teacher.communication_channels.create!(:path => 'chang@example.com')
+        submission2 = quiz.generate_submission(@teacher, false)
+        submission2.grade_submission
+
+        submission.submission.messages_sent.should_not be_include('Submission Graded')
+        submission2.submission.messages_sent.should_not be_include('Submission Graded')
+      end
     end
 
     it "should create a stream_item_instance when graded and published" do
@@ -296,7 +323,6 @@ describe Submission do
       end
 
       before(:each) do
-        Delayed::Job.destroy_all(:tag => 'Submission#submit_to_turnitin')
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
@@ -305,7 +331,7 @@ describe Submission do
       end
 
       it "should submit to turnitin after a delay" do
-        job = Delayed::Job.find_by_tag('Submission#submit_to_turnitin')
+        job = Delayed::Job.list_jobs(:future, 100).find { |j| j.tag == 'Submission#submit_to_turnitin' }
         job.should_not be_nil
         job.run_at.should > Time.now.utc
       end
@@ -324,7 +350,7 @@ describe Submission do
         @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
         @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(false)
         @submission.submit_to_turnitin
-        Delayed::Job.find_all_by_tag('Submission#submit_to_turnitin').count.should == 2
+        Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size.should == 2
       end
 
       it "should set status as failed if something fails after several attempts" do
@@ -372,9 +398,10 @@ describe Submission do
         @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
         @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({})
 
-        @submission.check_turnitin_status(Submission::TURNITIN_RETRY-1)
-        @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
-        Delayed::Job.find_by_tag('Submission#check_turnitin_status').should_not be_nil
+        expects_job_with_tag('Submission#check_turnitin_status') do
+          @submission.check_turnitin_status(Submission::TURNITIN_RETRY-1)
+          @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'pending'
+        end
 
         @submission.check_turnitin_status(Submission::TURNITIN_RETRY)
         @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'

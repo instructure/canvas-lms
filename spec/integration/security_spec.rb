@@ -843,7 +843,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         response.should be_success
-        response.body.should match /View Student Groups/
+        response.body.should match /View User Groups/
         response.body.should match /View Prior Enrollments/
         response.body.should_not match /Manage Users/
 
@@ -881,7 +881,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         response.should be_success
-        response.body.should_not match /View Student Groups/
+        response.body.should_not match /View User Groups/
         response.body.should match /View Prior Enrollments/
         response.body.should match /Manage Users/
 

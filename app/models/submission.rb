@@ -592,8 +592,9 @@ class Submission < ActiveRecord::Base
     p.whenever {|record|
       !record.suppress_broadcast and
       !record.assignment.muted? and
-      record.assignment.context.state == :available and 
-      record.assignment.state == :published and 
+      record.assignment.context.state == :available and
+      record.assignment.state == :published and
+      record.user.student_enrollments.map(&:course_id).include?(record.assignment.context_id) and
       (record.changed_state_to(:graded) || (record.changed_in_state(:graded, :fields => [:score, :grade]) && !@assignment_just_published && record.assignment_graded_in_the_last_hour?))
     }
     

@@ -68,25 +68,25 @@ describe "enhanceable_content" do
 
     get "/courses/#{@course.id}/wiki/#{page.url}"
 
-    dialog = driver.find_element(:css, ".enhanceable_content.dialog")
+    dialog = f(".enhanceable_content.dialog")
 
     # need to wait for the content to get enhanced (it happens in instructure.js in a setTimeout of 1000 ms)
     keep_trying_until {
-      driver.find_element(:css, "#link1").click
+      f("#link1").click
       dialog.should be_displayed
       dialog.should have_class('ui-dialog')
     }
-    driver.find_element(:css, ".ui-dialog .ui-dialog-titlebar-close").click
+    f(".ui-dialog .ui-dialog-titlebar-close").click
     dialog.should_not be_displayed
 
-    driver.find_element(:css, ".enhanceable_content.draggable").should have_class('ui-draggable')
-    driver.find_element(:css, ".enhanceable_content.resizable").should have_class('ui-resizable')
+    f(".enhanceable_content.draggable").should have_class('ui-draggable')
+    f(".enhanceable_content.resizable").should have_class('ui-resizable')
 
-    ul = driver.find_element(:css, ".enhanceable_content.sortable")
+    ul = f(".enhanceable_content.sortable")
     ul.should be_displayed
     ul.should have_class('ui-sortable')
 
-    accordion = driver.find_element(:css, ".enhanceable_content.accordion")
+    accordion = f(".enhanceable_content.accordion")
     accordion.should have_class('ui-accordion')
     headers = accordion.find_elements(:css, ".ui-accordion-header")
     headers.length.should eql(3)
@@ -103,7 +103,7 @@ describe "enhanceable_content" do
     divs[1].should be_displayed
 
 
-    tabs = driver.find_element(:css, ".enhanceable_content.tabs")
+    tabs = f(".enhanceable_content.tabs")
     tabs.should have_class('ui-tabs')
     headers = tabs.find_elements(:css, ".ui-tabs-nav li")
     headers.length.should eql(3)

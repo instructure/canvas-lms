@@ -307,8 +307,7 @@ describe Enrollment do
       course_with_student(:user => @user)
       @c2 = @course
       Enrollment.recompute_final_scores(@user.id)
-      jobs = Delayed::Job.all(:conditions => { :tag => 'Enrollment.recompute_final_score' })
-      jobs.size.should == 2
+      jobs = Delayed::Job.find_available(100).select { |j| j.tag == 'Enrollment.recompute_final_score' }
       # pull the course ids out of the job params
       jobs.map { |j| j.payload_object.args[1] }.sort.should == [@c1.id, @c2.id]
     end
@@ -495,12 +494,12 @@ describe Enrollment do
     end
 
     context 'dates change' do
-      before(:all) do
+      before do
         @old_cache = RAILS_CACHE
         silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
       end
 
-      after(:all) do
+      after do
         silence_warnings { Object.const_set(:RAILS_CACHE, @old_cache) }
       end
 

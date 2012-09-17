@@ -26,6 +26,16 @@ module Api::V1::User
     :methods => %w(sortable_name short_name)
   }
 
+  def user_json_preloads(users, preload_email=false)
+    # pseudonyms for User#sis_pseudoym_for and User#find_pseudonym_for_account
+    # pseudonyms account for Pseudonym#works_for_account?
+    User.send(:preload_associations, users, [{ :pseudonyms => :account }]) if user_json_is_admin?
+    if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
+      # communication_channesl for User#email if it is not cached
+      User.send(:preload_associations, no_email_users, :communication_channels)
+    end
+  end
+
   def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil)
     includes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
@@ -135,9 +145,8 @@ module Api::V1::User
   protected
   def has_grade_permissions?(user, enrollment)
     course = enrollment.course
-    enrollment_user = enrollment.user
 
-    (user == enrollment_user && !course.settings[:hide_final_grade]) ||
+    (user.id == enrollment.user_id && !course.settings[:hide_final_grade]) ||
      course.grants_rights?(user, :manage_grades, :view_all_grades).values.any?
   end
 end

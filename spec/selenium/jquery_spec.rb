@@ -10,7 +10,7 @@ describe "jquery" do
     get('/logout')
     driver.execute_script("$(document.body).append('<input type=\"checkbox\" checked=\"checked\" id=\"checkbox_test\">')")
 
-    checkbox = driver.find_element(:id, 'checkbox_test')
+    checkbox = f('#checkbox_test')
     driver.execute_script("return $('#checkbox_test').attr('checked');").should eql('checked')
 
     checkbox.click

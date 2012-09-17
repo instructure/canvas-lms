@@ -266,7 +266,7 @@ define([
         }
         var value = predefinedVariables && predefinedVariables[tree.value];
         value = value || (variables && variables[tree.value]);
-        if(!value) {
+        if (value == undefined) {
           throw("undefined variable " + tree.value);
         }
         return value;
@@ -315,9 +315,9 @@ define([
     var isFunction = function(arg) {
       return true;
     }
-    calcCmd.addFunction = function(methodName, friendlyName, method, description, examples) {
+    calcCmd.addFunction = function(methodName, method, description, examples) {
       if(typeof(methodName) == 'string' && isFunction(method)) {
-        method.friendlyName = friendlyName;
+        method.friendlyName = methodName;
         method.description = description;
         if(typeof(examples) == 'string') {
           examples = [examples];
@@ -368,24 +368,24 @@ define([
   })();
   (function() {
     var p = function(name, value, description) { calcCmd.addPredefinedVariable(name, value, description); }
-    var f = function(name, friendlyName, func, description, example) { calcCmd.addFunction(name, friendlyName, func, description, example); }
+    var f = function(name, func, description, example) { calcCmd.addFunction(name, func, description, example); }
     
     p('pi', Math.PI );
     p('e', Math.exp(1));
     
-    f('abs', I18n.t('abs.name', 'abs'), function(val) { return Math.abs(val) }, I18n.t('abs.description', "Returns the absolute value of the given value"), "abs(x)");
-    f('asin', I18n.t('asin.name', 'asin'), function(x) { return Math.asin(x); }, I18n.t('asin.description', "Returns the arcsin of the given value"), "asin(x)");
-    f('acos', I18n.t('acos.name', 'acos'), function(x) { return Math.acos(x); }, I18n.t('acos.description', "Returns the arccos of the given value"), "acos(x)");
-    f('atan', I18n.t('atan.name', 'atan'), function(x) { return Math.atan(x); }, I18n.t('atan.description', "Returns the arctan of the given value"), "atan(x)");
-    f('log', I18n.t('log.name', 'log'), function(x, base) { return (Math.log(x) / Math.log(base || 10)); }, I18n.t('log.description', "Returns the log of the given value with an optional base"), "log(x, [base])");
-    f('ln', I18n.t('ln.name', 'ln'), function(x) { return Math.log(x); }, I18n.t('ln.description', "Returns the natural log of the given value"), "ln(x)");
-    f('rad_to_deg', I18n.t('rad_to_deg.name', 'rad_to_deg'), function(x) { return x * 180 / Math.PI; }, I18n.t('rad_to_deg.description', "Returns the given value converted from radians to degrees"), "rad_to_deg(radians)");
-    f('deg_to_rad', I18n.t('deg_to_rad.name', 'deg_to_rad'), function(x) { return x * Math.PI / 180; }, I18n.t('deg_to_rad.description', "Returns the given value converted from degrees to radians"), "deg_to_rad(degrees)");
-    f('sin', I18n.t('sin.name', 'sin'), function(x) { return Math.sin(x); }, I18n.t('sin.description', "Returns the sine of the given value"), "sin(radians)");
-    f('cos', I18n.t('cos.name', 'cos'), function(x) { return Math.cos(x); }, I18n.t('cos.description', "Returns the cosine of the given value"), "cos(radians)" );
-    f('tan', I18n.t('tan.name', 'tan'), function(x) { return Math.tan(x); }, I18n.t('tan.description', "Returns the tangent of the given value"), "tan(radians)");
-    f('pi', I18n.t('pi.name', 'pi'), function(x) { return Math.PI; }, I18n.t('pi.description', "Returns the computed value of pi"), "pi()");
-    f('if', I18n.t('if.name', 'if'), function(bool, pass, fail) { return bool ? pass : fail; }, I18n.t('if.description', "Evaluates the first argument, returns the second argument if it evaluates to a non-zero value, otherwise returns the third value"), "if(bool,success,fail)");
+    f('abs', function(val) { return Math.abs(val) }, I18n.t('abs.description', "Returns the absolute value of the given value"), "abs(x)");
+    f('asin', function(x) { return Math.asin(x); }, I18n.t('asin.description', "Returns the arcsin of the given value"), "asin(x)");
+    f('acos', function(x) { return Math.acos(x); }, I18n.t('acos.description', "Returns the arccos of the given value"), "acos(x)");
+    f('atan', function(x) { return Math.atan(x); }, I18n.t('atan.description', "Returns the arctan of the given value"), "atan(x)");
+    f('log', function(x, base) { return (Math.log(x) / Math.log(base || 10)); }, I18n.t('log.description', "Returns the log of the given value with an optional base"), "log(x, [base])");
+    f('ln', function(x) { return Math.log(x); }, I18n.t('ln.description', "Returns the natural log of the given value"), "ln(x)");
+    f('rad_to_deg', function(x) { return x * 180 / Math.PI; }, I18n.t('rad_to_deg.description', "Returns the given value converted from radians to degrees"), "rad_to_deg(radians)");
+    f('deg_to_rad', function(x) { return x * Math.PI / 180; }, I18n.t('deg_to_rad.description', "Returns the given value converted from degrees to radians"), "deg_to_rad(degrees)");
+    f('sin', function(x) { return Math.sin(x); }, I18n.t('sin.description', "Returns the sine of the given value"), "sin(radians)");
+    f('cos', function(x) { return Math.cos(x); }, I18n.t('cos.description', "Returns the cosine of the given value"), "cos(radians)" );
+    f('tan', function(x) { return Math.tan(x); }, I18n.t('tan.description', "Returns the tangent of the given value"), "tan(radians)");
+    f('pi', function(x) { return Math.PI; }, I18n.t('pi.description', "Returns the computed value of pi"), "pi()");
+    f('if', function(bool, pass, fail) { return bool ? pass : fail; }, I18n.t('if.description', "Evaluates the first argument, returns the second argument if it evaluates to a non-zero value, otherwise returns the third value"), "if(bool,success,fail)");
     var make_list = function(args) {
       if(args.length == 1 && (args[0] instanceof Array)) {
         return args[0];
@@ -393,7 +393,7 @@ define([
         return args;
       }
     }
-    f('max', I18n.t('max.name', 'max'), function() { 
+    f('max', function() { 
       var args = make_list(arguments)
       var max = args[0];
       for(var idx = 0; idx < args.length; idx++) { //in arguments) {
@@ -401,7 +401,7 @@ define([
       }
       return max;
     }, I18n.t('max.description', "Returns the highest value in the list"), ["max(a,b,c...)", "max(list)"]);
-    f('min', I18n.t('min.name', 'min'), function() {
+    f('min', function() {
       var args = make_list(arguments);
       var min = args[0];
       for(var idx = 0; idx < args.length; idx++) { //in arguments) {
@@ -409,8 +409,8 @@ define([
       }
       return min;
     }, I18n.t('min.description', "Returns the lowest value in the list"), ["min(a,b,c...)", "min(list)"]);
-    f('sqrt', I18n.t('sqrt.name', 'sqrt'), function(x) { return Math.sqrt(x); }, I18n.t('sqrt.description', "Returns the square root of the given value"), "sqrt(x)");
-    f('sort', I18n.t('sort.name', 'sort'), function(x) { 
+    f('sqrt', function(x) { return Math.sqrt(x); }, I18n.t('sqrt.description', "Returns the square root of the given value"), "sqrt(x)");
+    f('sort', function(x) { 
       var args = make_list(arguments);
       var list = [];
       for(var idx = 0; idx < args.length; idx++) {
@@ -418,7 +418,7 @@ define([
       }
       return list.sort();
     }, I18n.t('sort.description', "Returns the list of values, sorted from lowest to highest"), ["sort(a,b,c...)", "sort(list)"]);
-    f('reverse', I18n.t('reverse.name', 'reverse'), function(x) { 
+    f('reverse', function(x) { 
       var args = make_list(arguments);
       var list = [];
       for(var idx = 0; idx < args.length; idx++) {
@@ -426,14 +426,14 @@ define([
       }
       return list;
     }, I18n.t('reverse.description', "Reverses the order of the list of values"), ["reverse(a,b,c...)", "reverse(list)"]);
-    f('first', I18n.t('first.name', 'first'), function() { return make_list(arguments)[0]; }, I18n.t('first.description', "Returns the first value in the list"), ["first(a,b,c...)", "first(list)"]);
-    f('last', I18n.t('last.name', 'last'), function() { 
+    f('first', function() { return make_list(arguments)[0]; }, I18n.t('first.description', "Returns the first value in the list"), ["first(a,b,c...)", "first(list)"]);
+    f('last', function() { 
       var args = make_list(arguments);
       return args[args.length - 1]; 
     }, I18n.t('last.description', "Returns the last value in the list"), ["last(a,b,c...)", "last(list)"]);
-    f('at', I18n.t('at.name', 'at'), function(list, x) { return list[x]; }, I18n.t('at.description', "Returns the indexed value in the given list"), "at(list,index)" );
-    f('rand', I18n.t('rand.name', 'rand'), function(x) { return (Math.random() * (x || 1)); }, I18n.t('rand.description', "Returns a random number between zero and the range specified, or one if no number is given"), "rand(x)");
-    f('length', I18n.t('length.name', 'length'), function() { return make_list(arguments).length; }, I18n.t('length.description', "Returns the number of arguments in the given list"), ["length(a,b,c...)", "length(list)"]);
+    f('at', function(list, x) { return list[x]; }, I18n.t('at.description', "Returns the indexed value in the given list"), "at(list,index)" );
+    f('rand', function(x) { return (Math.random() * (x || 1)); }, I18n.t('rand.description', "Returns a random number between zero and the range specified, or one if no number is given"), "rand(x)");
+    f('length', function() { return make_list(arguments).length; }, I18n.t('length.description', "Returns the number of arguments in the given list"), ["length(a,b,c...)", "length(list)"]);
     var sum = function(list) {
       var total = 0;
       for(var idx = 0; idx < list.length; idx++) { // in list) {
@@ -443,11 +443,11 @@ define([
       }
       return total;
     }
-    f('mean', I18n.t('mean.name', 'mean'), function() { 
+    f('mean', function() { 
       var args = make_list(arguments);
       return sum(args) / args.length;
     }, I18n.t('mean.description', "Returns the average mean of the values in the list"), ["mean(a,b,c...)", "mean(list)"]);
-    f('median', I18n.t('median.name', 'median'), function() {
+    f('median', function() {
       var args = make_list(arguments);
       var list = [];
       for(var idx = 0; idx < args.length; idx++) {
@@ -460,7 +460,7 @@ define([
         return ((list[Math.round(list.length / 2)] + list[Math.round(list.length / 2) - 1]) / 2);
       }
     }, I18n.t('median.description', "Returns the median for the list of values"), ["median(a,b,c...)", "median(list)"]);
-    f('range', I18n.t('range.name', 'range'), function() { 
+    f('range', function() { 
       var args = make_list(arguments);
       var list = [];
       for(var idx = 0; idx < args.length; idx++) {
@@ -469,8 +469,8 @@ define([
       var list = list.sort();
       return list[list.length - 1] - list[0];
     }, I18n.t('range.description', "Returns the range for the list of values"), ["range(a,b,c...)", "range(list)"]);
-    f('count', I18n.t('count.name', 'count'), function() { return make_list(arguments).length; }, I18n.t('count.description', "Returns the number of items in the list"), ["count(a,b,c...)", "count(list)"]);
-    f('sum', I18n.t('sum.name', 'sum'), function() { return sum(make_list(arguments)); }, I18n.t('sum.description', "Returns the sum of the list of values"), ["sum(a,b,c...)", "sum(list)"]);
+    f('count', function() { return make_list(arguments).length; }, I18n.t('count.description', "Returns the number of items in the list"), ["count(a,b,c...)", "count(list)"]);
+    f('sum', function() { return sum(make_list(arguments)); }, I18n.t('sum.description', "Returns the sum of the list of values"), ["sum(a,b,c...)", "sum(list)"]);
     var factorials = {};
     var fact = function(n) {
       n = Math.max(parseInt(n), 0);
@@ -484,13 +484,13 @@ define([
         return n * fact(n - 1);
       }
     };
-    f('fact', I18n.t('fact.name', 'fact'), function(n) { return fact(n); }, I18n.t('fact.description', "Returns the factorial of the given number"), "fact(n)");
-    f('perm', I18n.t('perm.name', 'perm'), function(n, k) { return fact(n) / fact(n - k); }, I18n.t('perm.description', "Returns the permutation result for the given values"), "perm(n, k)");
-    f('comb', I18n.t('comb.name', 'comb'), function(n, k) { return fact(n) / (fact(k) * fact(n - k)); }, I18n.t('comb.description', "Returns the combination result for the given values"), "comb(n, k)");
-    f('ceil', I18n.t('ceil.name', 'ceil'), function(x) { return Math.ceil(x); }, I18n.t('ceil.description', "Returns the ceiling for the given value"), "ceil(x)");
-    f('floor', I18n.t('floor.name', 'floor'), function(x) { return Math.floor(x); }, I18n.t('floor.description', "Returns the floor for the given value"), "floor(x)");
-    f('round', I18n.t('round.name', 'round'), function(x) { return Math.round(x); }, I18n.t('round.description', "Returns the given value rounded to the nearest whole number"), "round(x)");
-    f('e', I18n.t('e.name', 'e'), function(x) { return Math.exp(x || 1); }, I18n.t('e.description', "Returns the value for e"), "e()");
+    f('fact', function(n) { return fact(n); }, I18n.t('fact.description', "Returns the factorial of the given number"), "fact(n)");
+    f('perm', function(n, k) { return fact(n) / fact(n - k); }, I18n.t('perm.description', "Returns the permutation result for the given values"), "perm(n, k)");
+    f('comb', function(n, k) { return fact(n) / (fact(k) * fact(n - k)); }, I18n.t('comb.description', "Returns the combination result for the given values"), "comb(n, k)");
+    f('ceil', function(x) { return Math.ceil(x); }, I18n.t('ceil.description', "Returns the ceiling for the given value"), "ceil(x)");
+    f('floor', function(x) { return Math.floor(x); }, I18n.t('floor.description', "Returns the floor for the given value"), "floor(x)");
+    f('round', function(x) { return Math.round(x); }, I18n.t('round.description', "Returns the given value rounded to the nearest whole number"), "round(x)");
+    f('e', function(x) { return Math.exp(x || 1); }, I18n.t('e.description', "Returns the value for e"), "e()");
   })();
 
   return calcCmd;

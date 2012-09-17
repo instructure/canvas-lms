@@ -4,8 +4,10 @@
 %>
 
 <% form_for @current_user, :url => '/error_reports', :html => { :method => :get }  do |f| %>
-  <%= t :message_contains, "Message contains" %>
-  <input type="text" name="message" value="<%= @message %>" style="width: 250px;"/>
+  <% if error_search_enabled? %>
+    <%= t :message_contains, "Message contains" %>
+    <input type="text" name="message" value="<%= @message %>" style="width: 250px;"/>
+  <% end %>
   <select name="category">
     <%= options_for_select([[t(:all_categories, " - All Categories -"), nil]] + ErrorReport.categories, params[:category]) %>
   </select>

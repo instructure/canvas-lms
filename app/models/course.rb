@@ -74,6 +74,7 @@ class Course < ActiveRecord::Base
   has_many :current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", :include => :user
   has_many :typical_current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')", :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
+  has_many :prior_users, :through => :prior_enrollments, :source => :user
   has_many :students, :through => :student_enrollments, :source => :user
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') and enrollments.workflow_state = 'active'"
@@ -1192,7 +1193,7 @@ class Course < ActiveRecord::Base
     # 'publish_final_grades'
 
     self.recompute_student_scores_without_send_later
-    enrollments = self.student_enrollments.not_fake.scoped(:include => [:user, :course_section], :order => User.sortable_name_order_by_clause('users'), :extend => User::SortableNameExtension)
+    enrollments = self.student_enrollments.not_fake.order_by_sortable_name(:include => [:user, :course_section])
 
     errors = []
     posts_to_make = []
@@ -1278,7 +1279,7 @@ class Course < ActiveRecord::Base
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.scoped(:include => includes, :order => User.sortable_name_order_by_clause('users'), :extend => User::SortableNameExtension)
+    student_enrollments = scope.order_by_sortable_name(:include => includes)
     # remove duplicate enrollments for students enrolled in multiple sections
     seen_users = []
     student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }

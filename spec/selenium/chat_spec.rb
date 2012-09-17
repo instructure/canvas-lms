@@ -8,7 +8,7 @@ describe "chat" do
     course_with_teacher_logged_in
     PluginSetting.create!(:name => "tinychat", :settings => {})
     get "/courses/#{@course.id}/chat"
-    driver.find_element(:css, ".tinychat_embed iframe").should be_displayed
+    f(".tinychat_embed iframe").should be_displayed
   end
 end
 

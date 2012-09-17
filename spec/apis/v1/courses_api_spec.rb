@@ -269,6 +269,14 @@ describe CoursesController, :type => :integration do
         @course.reload
         @course.end_at.should be_nil
       end
+
+      it "should allow updating only the offer parameter" do
+        @course.workflow_state = "claimed"
+        @course.save!
+        api_call(:put, @path, @params, {:offer => 1})
+        @course.reload
+        @course.workflow_state.should == "available"
+      end
     end
 
     context "a teacher" do
@@ -539,6 +547,19 @@ describe CoursesController, :type => :integration do
                       { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
       json['id'].should == @course2.id
       json['sis_course_id'].should == 'TEST-SIS-ONE.2011'
+    end
+
+    it "should not be paginated (for legacy reasons)" do
+      controller = mock()
+      controller.stubs(:params).returns({})
+      course_with_teacher(:active_all => true)
+      students = []
+      num = Api.per_page_for(controller) + 1 # get the default api per page value
+      num.times { students << student_in_course(:course => @course).user }
+      first_user = @user
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/students.json",
+                      { :controller => 'courses', :action => 'students', :course_id => @course.id.to_s, :format => 'json' })
+      json.count.should == num
     end
   end
 
@@ -903,15 +924,14 @@ describe ContentImportsController, :type => :integration do
     }
 
     status_url = data['status_url']
-    dj = Delayed::Job.last
 
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
     (JSON.parse(response.body)).tap do |res|
       res['workflow_state'].should == 'created'
       res['progress'].should be_nil
     end
-    
-    dj.invoke_job
+
+    run_jobs
     cm.reload
     cm.migration_settings[:warnings].should == nil
     cm.content_export.error_messages.should == []

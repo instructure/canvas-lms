@@ -70,8 +70,11 @@ shared_examples_for "gradebook2 selenium tests" do
   end
 
   def open_gradebook_settings(element_to_click = nil)
-    f('#gradebook_settings').click
-    ff('#gradebook-toolbar ul.ui-kyle-menu').last.should be_displayed
+    keep_trying_until do
+      f('#gradebook_settings').click
+      ff('#gradebook-toolbar ul.ui-kyle-menu').last.should be_displayed
+      true
+    end
     element_to_click.click if element_to_click != nil
   end
 

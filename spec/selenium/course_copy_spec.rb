@@ -44,6 +44,12 @@ describe "course copy" do
     @course.reload
   end
 
+  def validate_course_main_page
+    header = f('#section-tabs-header')
+    header.should be_displayed
+    header.text.should == @course.course_code
+  end
+
   def upload_helper(import_quiz = false)
     if import_quiz
       expect_new_page_load { fj('.content-imports-instructions a:last').click }
@@ -57,13 +63,18 @@ describe "course copy" do
       f('#zip_file').send_keys(fullpath)
       submit_form('#zip_file_import_form')
       keep_trying_until { Delayed::Job.count > 0 }
-      Delayed::Job.last.invoke_job
-      back_button = keep_trying_until do
-        back_button = f('.back_to_course')
-        back_button.should_not be_nil
-        back_button
+      expect_new_page_load { Delayed::Job.last.invoke_job }
+      if defined?(QTI) != nil && QTI.qti_enabled?
+        back_button = keep_trying_until do
+          back_button = f('.back_to_course')
+          back_button.should_not be_nil
+          back_button
+          expect_new_page_load { back_button.click }
+        end
+        validate_course_main_page
+      else
+        validate_course_main_page
       end
-      expect_new_page_load { back_button.click }
       folder = Folder.root_folders(@course).first
       folder.attachments.active.map(&:display_name).should == ["first_entry.txt"]
       folder.sub_folders.active.count.should == 1
@@ -264,7 +275,7 @@ describe "course copy" do
 
   describe "course file imports" do
     before (:each) do
-      course_with_teacher_logged_in
+      course_with_teacher_logged_in(:course_code => 'first files course')
       @second_course = Course.create!(:name => 'second files course')
       @second_course.offer!
       @second_course.enroll_teacher(@user).accept!

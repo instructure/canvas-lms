@@ -177,7 +177,7 @@ class SubmissionsApiController < ApplicationController
     permission = :nothing if @user != @current_user
     # we don't check quota when uploading a file for assignment submission
     if authorized_action(@assignment, @current_user, permission)
-      api_attachment_preflight(@user, request, :check_quota => false)
+      api_attachment_preflight(@user, request, :check_quota => false, :do_submit_to_scribd => true)
     end
   end
 
@@ -259,7 +259,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     if authorized
-      submission = {}
+      submission = { :grader => @current_user }
       if params[:submission].is_a?(Hash)
         submission[:grade] = params[:submission].delete(:posted_grade)
       end

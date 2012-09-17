@@ -23,23 +23,6 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  module SortableNameExtension
-    # only works with scopes i.e. named_scopes and scoped()
-    def find(*args)
-      options = args.last.is_a?(::Hash) ? args.last : {}
-      scope = scope(:find)
-      select = if options[:select]
-                 options[:select]
-               elsif scope[:select]
-                 scope[:select]
-               else
-                 "#{proxy_scope.quoted_table_name}.*"
-               end
-      options[:select] = select + ', ' + User.sortable_name_order_by_clause
-      super args.first, options
-    end
-  end
-
   include Context
   include UserFollow::FollowedItem
 
@@ -228,8 +211,19 @@ class User < ActiveRecord::Base
 
   named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
 
-  def self.order_by_sortable_name
-    scoped(:order => sortable_name_order_by_clause, :extend => SortableNameExtension)
+  # NOTE: if :order is passed in, sortable name will be tacked onto the end
+  # rather than prepending or replacing it
+  def self.order_by_sortable_name(options = {})
+    add_sort_key!(options, sortable_name_order_by_clause)
+    uber_scope(options)
+  end
+
+  def self.by_top_enrollment(options = {})
+    options[:select] ||= "users.*"
+    options[:select] << ", MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank"
+    options[:group] = User.connection.group_by(User)
+    options[:order] = "enrollment_rank"
+    order_by_sortable_name(options)
   end
 
   named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at|
@@ -249,8 +243,8 @@ class User < ActiveRecord::Base
       :select => 'users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists',
       # left outer join ensures we get the user even if they don't have a pseudonym
       :joins => sanitize_sql([<<-SQL, root_account_id]),
-        LEFT OUTER JOIN "pseudonyms" ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
-        INNER JOIN "enrollments" ON enrollments.user_id = users.id
+        LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
+        INNER JOIN enrollments ON enrollments.user_id = users.id
       SQL
       :conditions => enrollment_conditions,
       # the trick to get unique users
@@ -632,9 +626,16 @@ class User < ActiveRecord::Base
   end
 
   def email
-    Rails.cache.fetch(['user_email', self].cache_key) do
-      email_channel.path if email_channel
+    # if you change this cache_key, change it in email_cached? as well
+    value = Rails.cache.fetch(['user_email', self].cache_key) do
+      email_channel.try(:path) || :none
     end
+    # this sillyness is because rails equates falsey as not in the cache
+    value == :none ? nil : value
+  end
+
+  def email_cached?
+    Rails.cache.exist?(['user_email', self].cache_key)
   end
 
   def self.cached_name(id)
@@ -1189,7 +1190,7 @@ class User < ActiveRecord::Base
   #
   # val - A hash of options used to configure the avatar.
   #       :type - The type of avatar. Should be 'facebook,' 'gravatar,'
-  #         'twitter,' 'linked_in,' 'external,' or 'attachment.'
+  #         'external,' or 'attachment.'
   #       :url - The URL of the gravatar. Used for types 'external' and
   #         'attachment.'
   #
@@ -1214,28 +1215,6 @@ class User < ActiveRecord::Base
       self.avatar_image_source = 'gravatar'
       self.avatar_image_url = nil
       self.avatar_state = 'submitted'
-    elsif val['type'] == 'twitter'
-      twitter = self.user_services.for_service('twitter').first rescue nil
-      if twitter
-        url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
-        data = JSON.parse(Net::HTTP.get(url)) rescue nil
-        if data
-          self.avatar_image_source = 'twitter'
-          self.avatar_image_url = data['profile_image_url_https'] || self.avatar_image_url
-          self.avatar_state = 'submitted'
-        end
-      end
-    elsif val['type'] == 'linked_in'
-      @linked_in_service = self.user_services.for_service('linked_in').first rescue nil
-      if @linked_in_service
-        self.extend LinkedIn
-        profile = linked_in_profile
-        if profile
-          self.avatar_image_source = 'linked_in'
-          self.avatar_image_url = profile['picture_url']
-          self.avatar_state = 'submitted'
-        end
-      end
     elsif val['type'] == 'external'
       self.avatar_image_source = 'external'
       self.avatar_image_url = val['url']
@@ -1522,7 +1501,7 @@ class User < ActiveRecord::Base
     read_attribute(:uuid)
   end
 
-  def self.serialization_excludes; [:uuid,:phone,:features_used]; end
+  def self.serialization_excludes; [:uuid,:phone,:features_used,:otp_communication_channel_id,:otp_secret_key_enc,:otp_secret_key_salt]; end
 
   def migrate_content_links(html, from_course)
     Course.migrate_content_links(html, from_course, self)

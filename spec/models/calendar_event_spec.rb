@@ -182,6 +182,9 @@ describe CalendarEvent do
 
       CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).sort_by(&:id).
         should eql [@e1, a1, a2, pe, se]
+
+      CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).events_without_child_events.sort_by(&:id).
+        should eql [@e1, a1, a2, se]
     end
   end
 

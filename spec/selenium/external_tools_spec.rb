@@ -31,11 +31,11 @@ describe "editing external tools" do
     tool_elem = f("#external_tool_#{tool.id}")
     tool_elem.find_element(:css, ".edit_tool_link").click
     f("#external_tools_dialog").should be_displayed
-    replace_content(f("#external_tool_name"),"new tool (updated)")
-    replace_content(f("#external_tool_consumer_key"),"key (updated)")
-    replace_content(f("#external_tool_shared_secret"),"secret (updated)")
+    replace_content(f("#external_tool_name"), "new tool (updated)")
+    replace_content(f("#external_tool_consumer_key"), "key (updated)")
+    replace_content(f("#external_tool_shared_secret"), "secret (updated)")
     replace_content(f("#external_tool_domain"), "example2.com")
-    replace_content(f("#external_tool_custom_fields_string"),"a=9\nb=8")
+    replace_content(f("#external_tool_custom_fields_string"), "a=9\nb=8")
     f("#external_tools_dialog .save_button").click
     wait_for_ajax_requests
     f("#external_tools_dialog").should_not be_displayed
@@ -74,7 +74,7 @@ describe "editing external tools" do
 
   it "should not list external tools that don't have a url, domain, or resource_selection configured" do
     @module = @course.context_modules.create!(:name => "module")
-    
+
     @tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
     @tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
     @tool2.settings[:editor_button] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
@@ -87,11 +87,11 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
-    driver.find_element(:css, "#context_module_#{@module.id} .add_module_item_link").click
-    driver.find_element(:css, "#add_module_item_select option[value='context_external_tool']").click
-    
-    keep_trying_until { driver.find_elements(:css, "#context_external_tools_select .tool .name").length > 0 }
-    names = driver.find_elements(:css, "#context_external_tools_select .tool .name").map(&:text)
+    f("#context_module_#{@module.id} .add_module_item_link").click
+    f("#add_module_item_select option[value='context_external_tool']").click
+
+    keep_trying_until { ff("#context_external_tools_select .tool .name").length > 0 }
+    names = ff("#context_external_tools_select .tool .name").map(&:text)
     names.should be_include(@tool1.name)
     names.should_not be_include(@tool2.name)
     names.should be_include(@tool3.name)
@@ -167,7 +167,7 @@ describe "editing external tools" do
     tools[1].find_element(:css, ".name").text.should match(/not bob/)
     tools[1].click
     f("#external_tool_create_url").should have_value "https://www.example.com"
-    f("#external_tool_create_title").should have_value"not bob"
+    f("#external_tool_create_title").should have_value "not bob"
 
     tools[0].click
     keep_trying_until { f("#resource_selection_dialog").should be_displayed }
@@ -213,7 +213,7 @@ describe "editing external tools" do
 
     tools[0].click
 
-    keep_trying_until {f("#resource_selection_dialog").should be_displayed }
+    keep_trying_until { f("#resource_selection_dialog").should be_displayed }
 
     expect_fired_alert do
       in_frame('resource_selection_iframe') do
@@ -229,7 +229,7 @@ describe "editing external tools" do
     f("#external_tool_create_title").should have_value ""
 
     tools[0].click
-    keep_trying_until {f("#resource_selection_dialog").should be_displayed }
+    keep_trying_until { f("#resource_selection_dialog").should be_displayed }
 
     expect_fired_alert do
       in_frame('resource_selection_iframe') do
@@ -272,7 +272,7 @@ describe "editing external tools" do
     f("#external_tool_create_title").should have_value "not bob"
 
     tools[0].click
-    keep_trying_until {f("#resource_selection_dialog").should be_displayed }
+    keep_trying_until { f("#resource_selection_dialog").should be_displayed }
     in_frame('resource_selection_iframe') do
       keep_trying_until { ff("#basic_lti_link").length > 0 }
       ff(".link").length.should eql 4

@@ -14,7 +14,7 @@ describe "quizzes question creation" do
     create_multiple_choice_question
     quiz.reload
     question_data = quiz.quiz_questions[0].question_data
-    driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
+    f("#question_#{quiz.quiz_questions[0].id}").should be_displayed
 
     question_data[:answers].length.should == 4
     question_data[:answers][0][:text].should == "Correct Answer"
@@ -38,7 +38,7 @@ describe "quizzes question creation" do
     quiz = @last_quiz
     create_true_false_question
     quiz.reload
-    driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
+    f("#question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
 
   it "should create a quiz question with a fill in the blank question" do
@@ -46,14 +46,14 @@ describe "quizzes question creation" do
     quiz = @last_quiz
     create_fill_in_the_blank_question
     quiz.reload
-    driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
+    f("#question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
 
   it "should create a quiz question with a fill in multiple blanks question" do
     skip_if_ie('Out of memory')
     quiz = @last_quiz
 
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Fill In Multiple Blanks')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
@@ -84,9 +84,9 @@ describe "quizzes question creation" do
     submit_form(question)
     wait_for_ajax_requests
 
-    driver.find_element(:id, 'show_question_details').click
+    f('#show_question_details').click
     quiz.reload
-    finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
 
     #check select box on finished question
@@ -101,7 +101,7 @@ describe "quizzes question creation" do
     skip_if_ie('Out of memory')
     quiz = @last_quiz
 
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Answers')
 
     type_in_tiny '.question:visible textarea.question_content', 'This is a multiple answer question.'
@@ -115,8 +115,8 @@ describe "quizzes question creation" do
     submit_form(question)
     wait_for_ajax_requests
 
-    driver.find_element(:id, 'show_question_details').click
-    finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
+    f('#show_question_details').click
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
     finished_question.find_elements(:css, '.answer.correct_answer').length.should == 2
   end
@@ -125,7 +125,7 @@ describe "quizzes question creation" do
     skip_if_ie('Out of memory')
     quiz = @last_quiz
 
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Dropdowns')
 
     type_in_tiny '.question:visible textarea.question_content', 'Roses are [color1], violets are [color2]'
@@ -154,9 +154,9 @@ describe "quizzes question creation" do
     submit_form(question)
     wait_for_ajax_requests
 
-    driver.find_element(:id, 'show_question_details').click
+    f('#show_question_details').click
     quiz.reload
-    finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
 
     #check select box on finished question
@@ -171,7 +171,7 @@ describe "quizzes question creation" do
     skip_if_ie('Out of memory')
     quiz = @last_quiz
 
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Matching')
 
     type_in_tiny '.question:visible textarea.question_content', 'This is a matching question.'
@@ -186,9 +186,9 @@ describe "quizzes question creation" do
     submit_form(question)
     wait_for_ajax_requests
 
-    driver.find_element(:id, 'show_question_details').click
+    f('#show_question_details').click
     quiz.reload
-    finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
 
     first_answer = finished_question.find_element(:css, '.answer_match')
@@ -204,7 +204,7 @@ describe "quizzes question creation" do
     click_option('.question_form:visible .question_type', 'Numerical Answer')
     type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
 
-    quiz_form = driver.find_element(:css, '.question_form')
+    quiz_form = f('.question_form')
     answers = quiz_form.find_elements(:css, ".form_answers > .answer")
     replace_content(answers[0].find_element(:name, 'answer_exact'), 5)
     replace_content(answers[0].find_element(:name, 'answer_error_margin'), 2)
@@ -214,9 +214,9 @@ describe "quizzes question creation" do
     submit_form(quiz_form)
     wait_for_ajaximations
 
-    driver.find_element(:id, 'show_question_details').click
+    f('#show_question_details').click
     quiz.reload
-    finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
 
   end
@@ -225,38 +225,38 @@ describe "quizzes question creation" do
     skip_if_ie('Out of memory')
     quiz = @last_quiz
 
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Formula Question')
 
     type_in_tiny '.question_form:visible textarea.question_content', 'If [x] + [y] is a whole number, then this is a formula question.'
 
-    find_with_jquery('button.recompute_variables').click
-    find_with_jquery('.supercalc:visible').send_keys('x + y')
-    find_with_jquery('button.save_formula_button').click
+    fj('button.recompute_variables').click
+    fj('.supercalc:visible').send_keys('x + y')
+    fj('button.save_formula_button').click
     # normally it's capped at 200 (to keep the yaml from getting crazy big)...
     # since selenium tests take forever, let's make the limit much lower
     driver.execute_script("window.maxCombinations = 10")
-    find_with_jquery('.combination_count:visible').send_keys('20') # over the limit
-    button = find_with_jquery('button.compute_combinations:visible')
+    fj('.combination_count:visible').send_keys('20') # over the limit
+    button = fj('button.compute_combinations:visible')
     button.click
-    find_with_jquery('.combination_count:visible').attribute(:value).should eql "10"
+    fj('.combination_count:visible').attribute(:value).should eql "10"
     keep_trying_until {
       button.text == 'Generate'
     }
-    find_all_with_jquery('table.combinations:visible tr').size.should eql 11 # plus header row
+    ffj('table.combinations:visible tr').size.should eql 11 # plus header row
 
     submit_form(question)
     wait_for_ajax_requests
 
     quiz.reload
-    driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}").should be_displayed
+    f("#question_#{quiz.quiz_questions[0].id}").should be_displayed
   end
 
   it "should create a quiz question with an essay question" do
     skip_if_ie('Out of memory')
     quiz = @last_quiz
 
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Essay Question')
 
     type_in_tiny '.question:visible textarea.question_content', 'This is an essay question.'
@@ -264,7 +264,7 @@ describe "quizzes question creation" do
     wait_for_ajax_requests
 
     quiz.reload
-    finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should_not be_nil
     finished_question.find_element(:css, '.text').should include_text('This is an essay question.')
   end
@@ -273,7 +273,7 @@ describe "quizzes question creation" do
     skip_if_ie('Out of memory')
     quiz = @last_quiz
 
-    question = find_with_jquery(".question_form:visible")
+    question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Text (no question)')
 
     type_in_tiny '.question_form:visible textarea.question_content', 'This is a text question.'
@@ -281,7 +281,7 @@ describe "quizzes question creation" do
     wait_for_ajax_requests
 
     quiz.reload
-    finished_question = driver.find_element(:id, "question_#{quiz.quiz_questions[0].id}")
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should_not be_nil
     finished_question.find_element(:css, '.text').should include_text('This is a text question.')
   end
@@ -290,17 +290,17 @@ describe "quizzes question creation" do
     quiz = @last_quiz
 
     create_multiple_choice_question
-    driver.find_element(:css, '.add_question_link').click
+    f('.add_question_link').click
     create_true_false_question
-    driver.find_element(:css, '.add_question_link').click
+    f('.add_question_link').click
     create_fill_in_the_blank_question
 
     quiz.reload
     refresh_page #making sure the quizzes load up from the database
     3.times do |i|
-      driver.find_element(:id, "question_#{quiz.quiz_questions[i].id}").should be_displayed
+      f("#question_#{quiz.quiz_questions[i].id}").should be_displayed
     end
-    questions = driver.find_elements(:css, '.display_question')
+    questions = ff('.display_question')
     questions[0].should have_class("multiple_choice_question")
     questions[1].should have_class("true_false_question")
     questions[2].should have_class("short_answer_question")
@@ -367,11 +367,11 @@ describe "quizzes question creation" do
       edit_first_question
       click_option('.question_form:visible .question_type', question_type) if question_type
       driver.execute_script "$('.answer').addClass('hover');"
-      find_with_jquery('.edit_html:visible').click
+      fj('.edit_html:visible').click
     end
 
     def close_first_html_answer
-      driver.find_element(:css, '.edit-html-done').click
+      f('.edit-html-done').click
     end
 
     it "should allow HTML answers for multiple choice" do
@@ -392,7 +392,7 @@ describe "quizzes question creation" do
     def check_for_no_edit_button(option)
       click_option('.question_form:visible .question_type', option)
       driver.execute_script "$('.answer').addClass('hover');"
-      find_with_jquery('.edit_html:visible').should be_nil
+      fj('.edit_html:visible').should be_nil
     end
 
     it "should not show the edit html button for question types besides multiple choice and multiple answers" do
@@ -424,7 +424,7 @@ describe "quizzes question creation" do
 
       # add text to regular input
       edit_first_question
-      input = find_with_jquery 'input[name=answer_text]:visible'
+      input = fj('input[name=answer_text]:visible')
       input.click
       input.send_keys 'ohai'
       submit_form('.question_form')

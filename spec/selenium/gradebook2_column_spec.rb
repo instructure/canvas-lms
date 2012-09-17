@@ -12,7 +12,7 @@ describe "assignment column headers" do
   end
 
   it "should minimize a column and remember it" do
-    pending("dragging and dropping these dont actually work in selenium")
+    pending("dragging and dropping these does not work well in selenium")
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     first_dragger, second_dragger = ff('#gradebook_grid .slick-resizable-handle')

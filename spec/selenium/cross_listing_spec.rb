@@ -17,14 +17,14 @@ describe "cross-listing" do
   end
 
   it "should allow cross-listing a section" do
-    driver.find_element(:css, '.crosslist_link').click
-    form = driver.find_element(:id, 'crosslist_course_form')
+    f('.crosslist_link').click
+    form = f('#crosslist_course_form')
     submit_btn = form.find_element(:css, '.submit_button')
     form.should_not be_nil
     form.find_element(:css, '.submit_button').attribute(:disabled).should eql 'true'
 
     course_id   = form.find_element(:id, 'course_id')
-    course_name = driver.find_element(:id, 'course_autocomplete_name')
+    course_name = f('#course_autocomplete_name')
 
     # crosslist a valid course
     course_id.click
@@ -40,23 +40,23 @@ describe "cross-listing" do
 
     # verify teacher doesn't have de-crosslist privileges
     get "/courses/#{@course2.id}/sections/#{@section.id}"
-    driver.find_elements(:css, '.uncrosslist_link').length.should eql 0
+    ff('.uncrosslist_link').length.should eql 0
 
     # enroll teacher and de-crosslist
     @course1.enroll_teacher(@user).accept
     get "/courses/#{@course2.id}/sections/#{@section.id}"
-    driver.find_element(:css, '.uncrosslist_link').click
-    driver.find_element(:id, 'uncrosslist_form').should be_displayed
+    f('.uncrosslist_link').click
+    f('#uncrosslist_form').should be_displayed
     submit_form('#uncrosslist_form')
     wait_for_ajaximations
     keep_trying_until { driver.current_url.should match /courses\/#{@course1.id}/ }
   end
 
   it "should not allow cross-listing an invalid section" do
-    driver.find_element(:css, '.crosslist_link').click
-    form = driver.find_element(:id, 'crosslist_course_form')
+    f('.crosslist_link').click
+    form = f('#crosslist_course_form')
     course_id   = form.find_element(:id, 'course_id')
-    course_name = driver.find_element(:id, 'course_autocomplete_name')
+    course_name = f('#course_autocomplete_name')
     course_id.click
     course_id.send_keys "-1\n"
     keep_trying_until { course_name.text != 'Confirming Course ID "-1"...' }
@@ -78,23 +78,23 @@ describe "cross-listing" do
     # we visit the first course's section. the teacher is enrolled in this
     # section. we're going to crosslist it.
     get "/courses/#{course.id}/sections/#{section.id}"
-    driver.find_element(:css, ".crosslist_link").click
-    form = driver.find_element(:css, "#crosslist_course_form")
+    f(".crosslist_link").click
+    form = f("#crosslist_course_form")
     form.find_element(:css, ".submit_button").attribute(:disabled).should eql("true")
     form.should_not be_nil
 
     # let's try and crosslist an invalid course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").send_keys("-1\n")
-    keep_trying_until { driver.find_element(:css, "#course_autocomplete_name").text != "Confirming Course ID \"-1\"..." }
-    driver.find_element(:css, "#course_autocomplete_name").text.should eql("Course ID \"-1\" not authorized for cross-listing")
+    keep_trying_until { f("#course_autocomplete_name").text != "Confirming Course ID \"-1\"..." }
+    f("#course_autocomplete_name").text.should eql("Course ID \"-1\" not authorized for cross-listing")
 
     # k, let's crosslist to the other course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").clear
     form.find_element(:css, "#course_id").send_keys([:control, 'a'], other_course.id.to_s, "\n")
-    keep_trying_until { driver.find_element(:css, "#course_autocomplete_name").text != "Confirming Course ID \"#{other_course.id}\"..." }
-    driver.find_element(:css, "#course_autocomplete_name").text.should eql(other_course.name)
+    keep_trying_until { f("#course_autocomplete_name").text != "Confirming Course ID \"#{other_course.id}\"..." }
+    f("#course_autocomplete_name").text.should eql(other_course.name)
     form.find_element(:css, "#course_autocomplete_id").attribute(:value).should eql(other_course.id.to_s)
     form.find_element(:css, ".submit_button").attribute(:disabled).should eql("false")
     submit_form(form)
@@ -104,13 +104,13 @@ describe "cross-listing" do
     # they were enrolled in got moved). they don't have the rights to
     # uncrosslist.
     get "/courses/#{other_course.id}/sections/#{section.id}"
-    driver.find_elements(:css, ".uncrosslist_link").length.should eql(0)
+    ff(".uncrosslist_link").length.should eql(0)
 
     # enroll, and make sure the teacher can uncrosslist.
     course.enroll_teacher(@user).accept
     get "/courses/#{other_course.id}/sections/#{section.id}"
-    driver.find_element(:css, ".uncrosslist_link").click
-    driver.find_element(:css, "#uncrosslist_form").displayed?.should eql(true)
+    f(".uncrosslist_link").click
+    f("#uncrosslist_form").should be_displayed
     submit_form("#uncrosslist_form")
     keep_trying_until { driver.current_url.match(/courses\/#{course.id}/) }
   end

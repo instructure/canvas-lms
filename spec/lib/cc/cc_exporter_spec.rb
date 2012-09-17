@@ -275,5 +275,35 @@ describe "Common Cartridge exporting" do
       @zip_file.find_entry(path).should_not be_nil
     end
 
+    it "should not fail when answers are missing for FIMB" do
+      @q1 = @course.quizzes.create(:title => 'quiz1')
+
+      qq = @q1.quiz_questions.create!
+      data = {"question_text" =>
+                      "<p><span>enter three things [d], [e], [f]</span></p>",
+              "neutral_comments" => "",
+              "incorrect_comments" => "",
+              "name" => "silly question with no answers",
+              "answers" =>
+                      [{"id" => 4505, "weight" => 0, "text" => "", "blank_id" => "d", "comments" => ""},
+                       {"id" => 7936, "weight" => 0, "text" => "", "blank_id" => "d", "comments" => ""}],
+              "correct_comments" => "",
+              "question_type" => "fill_in_multiple_blanks_question",
+              "assessment_question_id" => nil,
+              "question_name" => "personality",
+              "points_possible" => 1}.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+              :all_quizzes => "1",
+      }
+      @ce.save!
+
+      # this checks that there are no export errors, so the test is in there
+      run_export
+    end
+
   end
 end

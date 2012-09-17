@@ -2,7 +2,7 @@
   <% if @context.is_a?(Course) %>
     <% if can_do(@context, @current_user, :read_roster) %>
       <% sidebar_button context_url(@context, :context_groups_url),
-                        t('links.view_student_groups', 'View Student Groups'),
+                        t('links.view_user_groups', 'View User Groups'),
                         'group.png' %>
     <% end %>
 

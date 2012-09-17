@@ -1,0 +1,71 @@
+// Based on Twitter Bootstrap styles 2.1 but adapted to work on a jQueryUI tooltip
+//
+// POPOVERS
+// --------
+
+// Greater specificity on selection to help override default tooltip styles.
+.popover.ui-widget.ui-tooltip {
+  text-align: left;
+  z-index: $zindexPopover;
+  display: none;
+  padding: 1px;
+  background-color: $white;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  min-height: 90px;                 // keep arrow/carat from mixing with title
+  @include opacity(1);
+  min-width: 280px;
+  color: #333;
+  &.left   { margin-left: 10px; }
+
+  .arrow,
+  .arrow:after {
+    position: absolute;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+  }
+  .arrow:after {
+    z-index: -1;
+    content: "";
+  }
+  &.left .arrow {
+    top: 50%;
+    left: -10px;
+    margin-top: -10px;
+    border-right-color: $white;
+    border-width: 10px 10px 10px 0;
+  }
+
+  &.left .arrow:after {
+    bottom: -11px;
+    left: -1px;
+    border-right-color: rgba(0, 0, 0, 0.25);
+    border-width: 11px 11px 11px 0;
+  }
+
+  .popover-title {
+    font-size: 18px;
+    padding: 8px 14px;
+    line-height: 1;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #EBEBEB;
+    border-radius: 5px 5px 0 0;
+  }
+  .popover-content {
+    padding: 14px;
+    background-color: $white;
+    border-radius: 0 0 5px 5px;
+    @include background-clip(padding-box);
+    p, ul, ol {
+      margin-bottom: 0;
+    }
+  }
+}

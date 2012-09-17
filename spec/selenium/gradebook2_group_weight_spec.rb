@@ -31,15 +31,14 @@ describe "group weights" do
     end
     group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
     set_value(group_weight_input, weight_number)
-    save_button = find_with_jquery('.ui-dialog-buttonset .ui-button:contains("Save")')
-    save_button.click
+    fj('.ui-button:contains("Save")').click
     wait_for_ajaximations
     @course.reload.group_weighting_scheme.should == 'percent'
   end
 
   def validate_group_weight_text(assignment_groups, weight_numbers)
     assignment_groups.each_with_index do |ag, i|
-      heading = find_with_jquery(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
+      heading = fj(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
       heading.should include_text("#{weight_numbers[i]}% of grade")
     end
   end

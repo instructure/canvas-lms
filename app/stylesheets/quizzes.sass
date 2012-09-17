@@ -231,7 +231,9 @@ div#content
 
   &:last-child
     border-bottom: none
-
+  .move
+    display: none
+    // Don't display the "move"  icon since the the new order change isn't persisted for a bank. #10148
 
 .question_holder 
   :position relative
@@ -485,6 +487,9 @@ div#content
   .answer
     .answer_select .select_answer_link
       :display none
+  input[type=text]
+    max-width: 100%
+    min-width: 120px
 .question.selectable
   .answer
     .answer_select .select_answer
@@ -1069,6 +1074,7 @@ ul#quiz_versions
 
   .button-container
     padding: 16px
+    text-align: right
 
   #questions
     .user_points, .question_points_holder

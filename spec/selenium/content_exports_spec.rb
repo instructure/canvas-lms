@@ -16,7 +16,7 @@ describe "content exports" do
       Delayed::Job.last(:conditions => {:tag => 'ContentExport#export_course_without_send_later'})
       @export = keep_trying_until { ContentExport.last }
       @export.export_course_without_send_later
-      new_download_link = keep_trying_until { driver.find_element(:css, "div#export_files a") }
+      new_download_link = keep_trying_until { f("div#export_files a") }
       url = new_download_link.attribute 'href'
       url.should match(%r{/files/\d+/download\?verifier=})
     end
@@ -28,7 +28,7 @@ describe "content exports" do
 
     it "should allow qti export downloads" do
       run_export do
-        driver.find_element(:css, "input[value=qti]").click
+        f("input[value=qti]").click
       end
       @export.export_type.should == 'qti'
     end

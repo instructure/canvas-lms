@@ -61,9 +61,6 @@ define([
       ed.addCommand('instructureEquation', function() {
         var nodes = $('<span>' + ed.selection.getContent() + '</span>');
         var equation = getEquationText(nodes).replace(/^\s+|\s+$/g, '');
-        if (!equation) {
-          equation = "1 + 1";
-        }
 
         var $editor = $("#" + ed.id);
         var $box = $("#instructure_equation_prompt");

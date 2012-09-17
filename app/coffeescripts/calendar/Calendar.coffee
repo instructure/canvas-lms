@@ -7,6 +7,7 @@
 define [
   'i18n!calendar'
   'jquery'
+  'underscore'
   'compiled/util/hsvToRgb'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
@@ -14,13 +15,14 @@ define [
   'compiled/calendar/ShowEventDetailsDialog'
   'compiled/calendar/EditEventDetailsDialog'
   'compiled/calendar/Scheduler'
+  'compiled/calendar/CalendarDefaults'
   'vendor/fullcalendar'
 
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler) ->
+], (I18n, $, _, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, calendarDefaults) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -53,7 +55,7 @@ define [
         </span>'
       """
 
-      fullCalendarParams =
+      fullCalendarParams = _.defaults(
         header:
           left:   'prev,today,next,title'
           center: ''
@@ -62,22 +64,13 @@ define [
         columnFormat:
           month: 'dddd'
           week: weekColumnFormatter
-        allDayDefault: false
         buttonText:
           today: I18n.t 'today', 'Today'
         defaultEventMinutes: 60
-        weekMode: 'variable'
         slotMinutes: 30
         firstHour: 7
         droppable: true
         dropAccept: '.undated_event'
-        # In order to display times in the time zone configured in the user's profile,
-        # and NOT the system timezone, we tell fullcalendar to ignore timezones and
-        # give it Date objects that have had times shifted appropriately.
-        ignoreTimezone: true
-        # We do our own caching with our EventDataSource, so there's no need for
-        # fullcalendar to also cache.
-        lazyFetching: false
         events: @getEvents
         eventRender: @eventRender
         eventAfterRender: @eventAfterRender
@@ -89,6 +82,7 @@ define [
           week: "MMM d[ yyyy]{ '&ndash;'[ MMM] d, yyyy}"
         viewDisplay: @viewDisplay
         drop: @drop
+        , calendarDefaults)
 
       data = @dataFromDocumentHash()
       if not data.view_start and @options?.viewStart

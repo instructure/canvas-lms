@@ -10,7 +10,7 @@ describe "discussions" do
     end
 
     describe "shared bulk topics specs" do
-      let(:url) { "/courses/#{@course.id}/discussion_topics" }
+      let(:url) { "/courses/#{@course.id}/discussion_topics/" }
       let(:what_to_create) { DiscussionTopic }
       it_should_behave_like "discussion and announcement main page tests"
     end
@@ -337,11 +337,12 @@ describe "discussions" do
 
       it "should edit a side comment" do
         edit_text = 'this has been edited '
+        text = "new side comment from student"
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
         wait_for_js
-
+        validate_entry_text(entry, text)
         edit_entry(entry, edit_text)
       end
     end

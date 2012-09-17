@@ -35,9 +35,9 @@ describe "oauth2 flow" do
       it "should show the confirmation dialog after logging in" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
         driver.current_url.should match(%r{/login$})
-        user_element = driver.find_element(:css, '#pseudonym_session_unique_id')
+        user_element = f('#pseudonym_session_unique_id')
         user_element.send_keys("nobody@example.com")
-        password_element = driver.find_element(:css, '#pseudonym_session_password')
+        password_element = f('#pseudonym_session_password')
         password_element.send_keys("asdfasdf")
         password_element.submit
         f('#modal-box').text.should match(%r{Specs is requesting access to your account})
