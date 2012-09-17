@@ -673,7 +673,10 @@ module ApplicationHelper
     css_classes << "support_url" if url
     css_classes << "help_dialog_trigger" if show_feedback_link
     if url || show_feedback_link
-      link_to t('#links.help', "Help"), url || '#', :class => css_classes.join(" ")
+      link_to t('#links.help', "Help"), url || '#',
+        :class => css_classes.join(" "),
+        'data-track-category' => "help system",
+        'data-track-label' => 'help button'
     end
   end
 
