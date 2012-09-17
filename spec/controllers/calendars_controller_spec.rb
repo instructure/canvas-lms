@@ -24,6 +24,13 @@ describe CalendarsController do
     @event = @course.calendar_events.create(:title => "some assignment", :start_at => date, :end_at => date)
   end
 
+  def calendar2_only!
+    Account.default.update_attribute :settings, {
+      :enable_scheduler => true,
+      :calendar2_only => true
+    }
+  end
+
   describe "GET 'show'" do
     it "should redirect if no contexts are found" do
       course_with_student(:active_all => true)
@@ -77,6 +84,21 @@ describe CalendarsController do
       get 'show', :month => "02", :year => "2008"
       response.should be_success
     end
+
+    it "should redirect if the user should be on the new calendar" do
+      calendar2_only!
+      course_with_student_logged_in(:active_all => true)
+      Account.default.update_attribute :settings, {
+        :enable_scheduler => true,
+        :calendar2_only => true
+      }
+      @user.preferences[:use_calendar1] = true
+      @user.save!
+      get 'show'
+
+      response.should be_redirect
+      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
+    end
   end
 
   describe "GET 'show2'" do
@@ -109,6 +131,18 @@ describe CalendarsController do
       post 'switch_calendar', {:preferred_calendar => '1'}
       response.should be_redirect
       response.redirected_to.should == {:action => 'show', :anchor => ' '}
+      @user.reload.preferences[:use_calendar1].should be_true
+    end
+
+    it "should not switch to the old calendar if not allowed" do
+      calendar2_only!
+      course_with_student_logged_in(:active_all => true)
+      @user.preferences[:use_calendar1].should be_nil
+      post 'switch_calendar', {:preferred_calendar => '1'}
+      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
+
+      # not messing with their preference in case they prefer cal1 in a
+      # different account
       @user.reload.preferences[:use_calendar1].should be_true
     end
 

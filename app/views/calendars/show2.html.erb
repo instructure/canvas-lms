@@ -6,6 +6,7 @@
     :SELECTED_CONTEXTS => @selected_contexts,
     :ACTIVE_EVENT => @active_event_id,
     :VIEW_START => @view_start,
+    :CAL2_ONLY => @domain_root_account.calendar2_only?
   }
   js_bundle :calendar2
   jammit_css :calendar2

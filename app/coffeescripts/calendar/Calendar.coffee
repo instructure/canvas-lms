@@ -95,7 +95,7 @@ define [
           fullCalendarParams.month = date.getMonth()
           fullCalendarParams.date = date.getDate()
 
-      @el = $(selector).html calendarAppTemplate()
+      @el = $(selector).html calendarAppTemplate(calendar2Only: @options.calendar2Only)
 
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
         radioId = if data.view_name == 'agendaWeek' then 'week' else 'month'
