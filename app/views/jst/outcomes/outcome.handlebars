@@ -1,0 +1,32 @@
+<h3 class="title">
+  <i class="icon-note-light"></i>
+  {{title}}
+</h3>
+<div class="description">
+  {{{description}}}
+</div>
+<table class="criterion">
+  <tr>
+    {{#each ratings}}
+    <td class="rating">
+      <h5>{{description}}</h5>
+      {{#t "points.rating"}}{{points}} Points{{/t}}
+    </td>
+    {{/each}}
+    <td class="total">
+      <h5>{{#t "total_points"}}Total Points{{/t}}</h5>
+      {{#t "points.total"}}{{points_possible}} Points{{/t}}
+    </td>
+  </tr>
+</table>
+
+{{#unless readOnly}}
+<a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+  {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
+</a>
+<a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
+  {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
+</a>
+{{/unless}}
+
+<p>{{#t "point_mastery"}}Mastery at {{mastery_points}} points{{/t}}</p>

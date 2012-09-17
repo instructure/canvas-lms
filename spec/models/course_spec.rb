@@ -998,7 +998,7 @@ describe Course, "backup" do
   it "should not count learning outcome groups as having outcomes" do
     course = course_model
     default_group = course.root_outcome_group
-    other_group = course.learning_outcome_groups.create!
+    other_group = course.learning_outcome_groups.create!(:title => 'other group')
     default_group.adopt_outcome_group(other_group)
     
     course.should_not have_outcomes

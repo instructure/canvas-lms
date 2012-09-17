@@ -92,7 +92,7 @@ class OutcomeGroupsApiController < ApplicationController
 
       # get and paginate links from group
       link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title
-      url = polymorphic_url [:api_v1, @context, :outcome_group_outcomes], :id => @outcome_group.id
+      url = polymorphic_url [:api_v1, @context || :global, :outcome_group_outcomes], :id => @outcome_group.id
       @links = Api.paginate(link_scope, self, url)
 
       # pre-populate the links' groups and contexts to prevent
@@ -107,6 +107,30 @@ class OutcomeGroupsApiController < ApplicationController
 
       # render to json and serve
       render :json => @links.map{ |link| outcome_link_json(link, @current_user, session) }
+    end
+  end
+
+  def account_chain
+    if authorized_action(@context, @current_user, :manage_outcomes)
+      account_chain =
+        if @context.is_a?(Account)
+          @context.account_chain - [@context]
+        else
+          @context.account.account_chain
+        end
+      account_chain.map! {|a| {
+          :id => a.root_outcome_group.id,
+          :title => a.name,
+          :description => t('account_group_description', 'Account level outcomes group.'),
+          :dontImport => true,
+          :url => polymorphic_path([:api_v1, a, :outcome_group], :id => a.root_outcome_group.id),
+          :subgroups_url => polymorphic_path([:api_v1, a, :outcome_group_subgroups], :id => a.root_outcome_group.id),
+          :outcomes_url => polymorphic_path([:api_v1, a, :outcome_group_outcomes], :id => a.root_outcome_group.id)
+        } }
+      path = polymorphic_path [:api_v1, @context, :account_chain]
+      account_chain = Api.paginate(account_chain, self, path)
+
+      render :json => account_chain
     end
   end
 
@@ -154,7 +178,7 @@ class OutcomeGroupsApiController < ApplicationController
 
       # get and paginate subgroups from group
       subgroup_scope = @outcome_group.child_outcome_groups.active.order_by_title
-      url = polymorphic_url [:api_v1, @context, :outcome_group_subgroups], :id => @outcome_group.id
+      url = polymorphic_url [:api_v1, @context || :global, :outcome_group_subgroups], :id => @outcome_group.id
       @subgroups = Api.paginate(subgroup_scope, self, url)
 
       # pre-populate the subgroups' parent groups to prevent extraneous
@@ -215,7 +239,7 @@ class OutcomeGroupsApiController < ApplicationController
 
   def can_read_outcomes
     if @context
-      authorized_action(@context, @current_user, :manage_outcomes)
+      authorized_action(@context, @current_user, :read)
     else
       # anyone (that's logged in) can read global outcomes
       true

@@ -41,7 +41,7 @@ module LearningOutcomeContext
 
     def available_outcomes
       [self, *associated_accounts].uniq.map do |context|
-        [context.linked_learning_outcomes, context.created_learning_outcomes]
+        [context.linked_learning_outcomes, context.created_learning_outcomes.active]
       end.flatten.uniq
     end
 

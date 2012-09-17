@@ -3,229 +3,143 @@
 input.outcome_rating_description
   width: 200px
   
-.criterion_title
-  white-space: nowrap
-.outcome_result
-  margin: 10px 0
-  .title
-    font-weight: bold
-  .scoring
-    margin-left: 20px
-    font-size: 0.9em
-  .last_attempt
-    margin-left: 20px
-    font-size: 0.9em
-  .mastery
-    display: none
-  .results_link
-    font-size: 0.8em
-    margin-left: 20px
-  &.mastery_result
-    .mastery
-      display: inline
-.outcome_group
-  > .header
-    display: none
-  .outcome_group
-    border: 1px solid #ccc
-    +border-radius(5px)
-    background-color: #fff
-    margin: 5px 0 10px
-    > .header
-      position: relative
-      background-color: #eee
-      .reorder_link
-        position: absolute
-        top: 3px
-        left: 0
-        visibility: hidden
-
-      .title
-        margin: 0 44px 0 20px /*leave 44px for the delete and edit icons and 20px for the move icon */
-        font-size: 1.0em
-        font-weight: bold
-      .links
-        position: absolute
-        right: 0
-        top: 3px
-        a img
-          visibility: hidden
-        opacity: 0.5
-      .description
-        margin-left: 20px
-      display: block
-      border-bottom: 1px solid #ccc
-      padding: 5px 10px 2px
-    &:hover > .header
-      .links
-        float: right
-        opacity: 1.0
-        a img
-          visibility: visible
-      .reorder_link
-        visibility: visible
-    > .content
-      padding: 5px 10x
-      min-height: 40px
-      margin: 5px 0
-    .outcome_group
-      margin-left: 10px
-      margin-right: 10px
-  form.outcome_group
-    > .header
-      border-bottom-width: 0
-  > .header
-    .title
-      font-size: 1.2em
-      font-weight: bold
-
-.child_outcomes
-  min-height: 10px
-  padding-bottom: 10px
-
-.learning_outcome
-  margin-bottom: 10px
-  background-color: #fff
-  margin: 5px 11px 10px
-  display: block
-  .header
-    padding: 0 44px 0 20px /*leave 44px for the delete and edit icons and 20px for the move icon */
-    position: relative
-    .reorder_link
-      position: absolute
-      top: 3px
-      left: 0
-      visibility: hidden
-    .short_description
-      font-size: 1.2em
-      font-weight: bold
-    .links
-      position: absolute
-      right: 0
-      top: 3px
-      opacity: 0.5
-      a img
-        visibility: hidden
-    border-bottom: 1px solid #888
-  &:hover
-    .links
-      opacity: 1.0
-      a img
-        visibility: visible
-    .reorder_link
-      visibility: visible
-  .body
-    margin: 5px 25px
-    > .description
-      display: none
-    .hide_details_link
-      display: none
-    .aligned_artifacts
-      display: none
-    .rubric_criterion
-      display: none
-    .rubric_criterion
-      margin-top: 5px
-      border-top: 1px solid #ccc
-      width: 100%
-      td
-        vertical-align: top
-        padding-bottom: 3px
-        &.add_holder
-          padding-left: 10px
-        &.criterion_title
-          padding-right: 10px
-      .rating
-        font-size: 0.8em
-      .rating,.add_holder
-        td
-          padding-left: 20px
-    .aligned_artifacts
-      font-size: 0.8em
-  &.expanded
-    .body > .description
-      display: block
-    .rubric_criterion
-      display: inline-table
-    .aligned_artifacts
-      display: block
-    .show_details_link
-      display: none
-    .hide_details_link
-      display: inline
-#edit_outcome_form 
-  .header
-    padding-bottom: 5px
-  .rubric_criterion
-    margin-left: 0
-    border-collapse: collapse
-    td
-      padding: 5px 2px
-    .rating td,.add_holder td
-      padding: 5px 5px 5px 20px
-    
-
-#alignments
-  list-style-type: none
-  padding-left: 20px
-  li
-    margin-bottom: 10px
-    padding: 2px 5px
-    display: block
-    .move_alignment_link
-      display: none
-    .title
-      font-size: 1.2em
-      font-weight: bold
-    .header
-      float: left
-    .links
+.outcomes-browser
+  min-width: 840px
+  .toolbar
+    padding: 5px
+    height: 28px
+    .manage_rubrics
       float: right
-      opacity: 0.5
-    &.hover_alignment
-      background-color: #eee
-      +border-radius(5px)
-      .links
-        opacity: 1.0
-    .type_icon
-      background: url(/images/file.png) no-repeat left top
-    &.attachment 
-      .type_icon
-        background-image: url(/images/file_download.png)
-    &.discussion_topic
-      .type_icon
-        background-image: url(/images/word_bubble.png)
-    &.assignment 
-      .type_icon 
-        background-image: url(/images/assignment.png)
-    &.quiz 
-      .type_icon 
-        background-image: url(/images/quiz.png)
-    &.external_url
-      .type_icon
-        background-image: url(/images/link.png)
-  
-#alignments.orderable li .move_alignment_link
-  display: inline
-  
-#artifacts
-  list-style-type: none
-  padding-left: 20px
+    .search
+      float: right
+    .ui-button
+      i
+        margin-bottom: -3px
+  .outcomes-main
+    height: 500px
+    padding: 0
+    overflow: hidden
+    background-color: white
+    &::after
+      clear: both
+  .outcomes-sidebar
+    float: left
+    height: 500px
+    width: 201px
+    background-color: $lightBackground
+    overflow-x: scroll
+    overflow-y: hidden
+    .wrapper
+      width: 201px
+  .outcomes-content
+    height: 500px
+    border-left: 1px solid $borderColor
+    overflow: scroll
+    .wrapper
+      padding: 15px
+      width: 600px
+      min-height: 300px
+    table.criterion
+      padding: 0
+      min-width: 600px
+      margin: 2em 0
+      td
+        border: 1px solid $borderColor
+        padding: 5px
+        text-align: center
+        h5
+          margin-bottom: 10px
+          color: $link_color
+          font-weight: normal
+        &.total
+          background-color: $lightBackground
+          h5
+            font-weight: bold
+        .edit
+          display: none
+          height: 67px
+        .edit_rating
+          float: right
+        .rating-wrap
+          // for .insert positioning
+          position: relative
+        .insert
+          position: absolute
+          top: -34px
+          right: -21px
+          cursor: pointer
+          a
+            color: $grayLight
+            text-decoration: none
+          span
+            width: 0
+            height: 0
+            padding: 0
+            margin: 0 11px
+            border-right: 5px solid transparent
+            border-left:  5px solid transparent
+            border-top:   5px solid $grayLight
+            display: block
+          &:hover
+            a
+              color: $link-color
+            span
+              border-top-color: $link-color
+    label
+      display: block
+      padding: 5px 0 5px 0
+    .outcome_information_link i
+      margin-bottom: -3px
+    .delete_button
+      margin-right: 1em
+ul.outcome-level
+  padding: 0
+  margin: 0
+  border-right: 1px solid #ccc
+  float: left
+  padding-bottom: 50px
+  height: 450px
+  width: 200px
+  overflow-x: hidden
+  overflow-y: scroll
   li
-    margin-bottom: 10px
-    padding: 2px 5px
-    display: block
-    &.hover_artifact
-      background-color: #eee
-      +border-radius(5px)
-    .scoring
-      margin-bottom: 5px
-    .attempt
-    .title
-      font-weight: bold
+    padding: 0
+    margin: 0
+    background-color: $lightBackground
+    overflow: hidden
+    list-style: none
+    width: 200px
+    a
+      text-decoration: none
+      display: block
+      border-top: 1px solid white
+      border-bottom: 1px solid #e4e5e7
+      padding: 4px 12px
+      color: #555555
+      white-space: nowrap
+      &:hover
+        background: white
+    &.selected
+      a
+        background-color: $toolbarBackgroundLight
+        border-bottom-color: lighten($borderColor, 15%)
+        border-top-color: lighten($activeBG, 2%)
+        &:hover
+          background-color: $activeBG
+      &.droppable
+        a
+          background-color: $lightBackground
+          color: #bbb
+    &.droppable
+      a
+        background-color: $activeBG
+        border-bottom-color: lighten($borderColor, 15%)
+        border-top-color: lighten($activeBG, 2%)
+    a.loading-more
+      background-color: darken($lightBackground, 3%)
 
-.outcomes .uneditable
-  .outcome_group .header
-    .reorder_link
-      display: none
-      
+#import_dialog
+  padding: 0
+  margin: 0
+  .ui-dialog-buttonpane
+    margin-top: 0

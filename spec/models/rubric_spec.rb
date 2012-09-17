@@ -23,7 +23,7 @@ describe Rubric do
   context "outcomes" do
     it "should allow learning outcome rows in the rubric" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -56,7 +56,7 @@ describe Rubric do
     
     it "should delete learning outcome tags when they no longer exist" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -109,8 +109,8 @@ describe Rubric do
     end
     it "should create learning outcome associations for multiple outcome rows" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
-      @outcome2 = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      @outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -162,7 +162,7 @@ describe Rubric do
     end
     it "should create outcome results when outcome-aligned rubrics are assessed" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {

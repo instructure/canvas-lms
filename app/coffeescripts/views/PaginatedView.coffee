@@ -19,9 +19,7 @@ define [
       ret = super options
       @fetchOptions = options.fetchOptions
       @startPaginationListener()
-      @collection.on 'beforeFetch:next', @showPaginationLoader, this
-      @collection.on 'fetch:next', @hidePaginationLoader, this
-      @collection.on 'all', @fetchNextPageIfNeeded, this
+      @bindPaginationEvents()
       ret
 
     render: ->
@@ -57,3 +55,8 @@ define [
         return
       if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
         @collection.fetch _.extend({page: 'next'}, @fetchOptions)
+
+    bindPaginationEvents: ->
+      @collection.on 'beforeFetch:next', @showPaginationLoader, this
+      @collection.on 'fetch:next', @hidePaginationLoader, this
+      @collection.on 'all', @fetchNextPageIfNeeded, this

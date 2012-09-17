@@ -3,6 +3,7 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'jqueryui/dialog'
 ], (I18n, $, _, Backbone) ->
 
   ##
@@ -24,10 +25,10 @@ define [
       width: 420
       resizable: false
       buttons: [
-        text: I18n.t 'cancel', 'Cancel'
+        text: I18n.t '#buttons.cancel', 'Cancel'
         click: @cancel
       ,
-        text: I18n.t 'update', 'Update'
+        text: I18n.t '#buttons.update', 'Update'
         'class' : 'btn-primary'
         click: @update
       ]

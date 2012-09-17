@@ -38,14 +38,14 @@ describe "Outcomes API", :type => :integration do
   end
 
   describe "show" do
-    it "should require permission" do
+    it "should not require permission" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
                    :controller => 'outcomes_api',
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      response.status.to_i.should == 200
     end
 
     it "should 404 for deleted outcomes" do
@@ -125,7 +125,7 @@ describe "Outcomes API", :type => :integration do
 
     it "should require manage_global_outcomes permission for global outcomes" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
-      @outcome = LearningOutcome.global.create!
+      @outcome = LearningOutcome.global.create!(:title => 'global')
       revoke_permission(@account_user, :manage_global_outcomes)
       raw_api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                    :controller => 'outcomes_api',

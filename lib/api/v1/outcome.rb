@@ -42,20 +42,21 @@ module Api::V1::Outcome
   end
 
   # style can be :full or :abbrev; anything unrecognized defaults to :full.
-  # abbreviated includes only id, title, url, and can_edit. full expands on
-  # that by adding subgroups_url, outcomes_url, parent_outcome_group (if any),
+  # abbreviated includes only id, title, url, subgroups_url, outcomes_url, and can_edit. full expands on
+  # that by adding import_url, parent_outcome_group (if any),
   # context id and type, and description.
   def outcome_group_json(outcome_group, user, session, style=:full)
     path_context = outcome_group.context || :global
     api_json(outcome_group, user, session, :only => %w(id title)).tap do |hash|
       hash['url'] = polymorphic_path [:api_v1, path_context, :outcome_group], :id => outcome_group.id
+      hash['subgroups_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_subgroups], :id => outcome_group.id
+      hash['outcomes_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_outcomes], :id => outcome_group.id
       hash['can_edit'] = outcome_group.context_id ?
         outcome_group.context.grants_right?(user, session, :manage_outcomes) :
         Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
 
       unless style == :abbrev
-        hash['subgroups_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_subgroups], :id => outcome_group.id
-        hash['outcomes_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_outcomes], :id => outcome_group.id
+        hash['import_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_import], :id => outcome_group.id
         if outcome_group.learning_outcome_group_id
           hash['parent_outcome_group'] = outcome_group_json(outcome_group.parent_outcome_group, user, session, :abbrev)
         end

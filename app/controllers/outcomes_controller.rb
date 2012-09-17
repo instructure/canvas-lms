@@ -17,6 +17,7 @@
 #
 
 class OutcomesController < ApplicationController
+  include Api::V1::Outcome
   before_filter :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_filter { |c| c.active_tab = "outcomes" }
@@ -25,9 +26,24 @@ class OutcomesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_OUTCOMES)
       @root_outcome_group = @context.root_outcome_group
+      if common_core_group_id = Setting.get(:common_core_outcome_group_id, nil)
+        common_core_group_id = common_core_group_id.to_i
+        common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
+      end
+
+      js_env(:COURSE_ID => @context.id,
+             :ROOT_OUTCOME_GROUP => outcome_group_json(@root_outcome_group, @current_user, session),
+             :CONTEXT_URL_ROOT => polymorphic_path([@context]),
+             :ACCOUNT_CHAIN_URL => polymorphic_path([:api_v1, @context, :account_chain]),
+             :STATE_STANDARDS_URL => api_v1_global_redirect_path,
+             :COMMON_CORE_GROUP_ID => common_core_group_id,
+             :COMMON_CORE_GROUP_URL => common_core_group_url,
+             :PERMISSIONS => {
+               :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes)
+             })
     end
   end
-  
+
   def show
     @outcome = @context.linked_learning_outcomes.find(params[:id])
     if authorized_action(@context, @current_user, :manage_outcomes)

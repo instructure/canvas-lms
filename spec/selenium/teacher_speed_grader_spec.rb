@@ -397,7 +397,7 @@ describe "speed grader" do
     student_submission
     @association.use_for_grading = true
     @association.save!
-    @ignored = @course.created_learning_outcomes.create!(:description => 'just for reference')
+    @ignored = @course.created_learning_outcomes.create!(:title => 'outcome', :description => 'just for reference')
     @rubric.data = @rubric.data + [{
                                        :points => 3,
                                        :description => "just for reference",

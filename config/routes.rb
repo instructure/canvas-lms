@@ -977,10 +977,12 @@ ActionController::Routing::Routes.draw do |map|
       def og_routes(route_object, context)
         prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
         route_object.get "#{prefix}/root_outcome_group", :action => :redirect, :path_name => "#{context}_redirect"
+        route_object.get "#{prefix}/outcome_groups/account_chain", :action => :account_chain, :path_name => "#{context}_account_chain"
         route_object.get "#{prefix}/outcome_groups/:id", :action => :show, :path_name => "#{context}_outcome_group"
         route_object.put "#{prefix}/outcome_groups/:id", :action => :update
         route_object.delete "#{prefix}/outcome_groups/:id", :action => :destroy
         route_object.get "#{prefix}/outcome_groups/:id/outcomes", :action => :outcomes, :path_name => "#{context}_outcome_group_outcomes"
+        route_object.get "#{prefix}/outcome_groups/:id/available_outcomes", :action => :available_outcomes, :path_name => "#{context}_outcome_group_available_outcomes"
         route_object.post "#{prefix}/outcome_groups/:id/outcomes", :action => :link
         route_object.put "#{prefix}/outcome_groups/:id/outcomes/:outcome_id", :action => :link, :path_name => "#{context}_outcome_link"
         route_object.delete "#{prefix}/outcome_groups/:id/outcomes/:outcome_id", :action => :unlink

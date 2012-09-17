@@ -28,6 +28,13 @@ describe "Outcome Groups API", :type => :integration do
     RoleOverride.manage_role_override(account_user.account, account_user.membership_type, permission.to_s, :override => false)
   end
 
+  def create_outcome(opts={})
+    group = opts.delete(:group) || @group
+    account = opts.delete(:account) || @account
+    outcome = account.created_learning_outcomes.create!({:title => 'new outcome'}.merge(opts))
+    group.add_outcome(outcome)
+  end
+
   describe "redirect" do
     describe "global context" do
       before :each do
@@ -73,14 +80,14 @@ describe "Outcome Groups API", :type => :integration do
         @account_user = @user.account_users.create(:account => @account)
       end
 
-      it "should require permission" do
+      it "should NOT require permission to read" do
         revoke_permission(@account_user, :manage_outcomes)
         raw_api_call(:get, "/api/v1/accounts/#{@account.id}/root_outcome_group",
                      :controller => 'outcome_groups_api',
                      :action => 'redirect',
                      :account_id => @account.id.to_s,
                      :format => 'json')
-        response.status.to_i.should == 401
+        response.status.to_i.should == 302
       end
 
       it "should redirect to the root group" do
@@ -151,7 +158,7 @@ describe "Outcome Groups API", :type => :integration do
       end
 
       it "should 404 for deleted groups" do
-        group = LearningOutcomeGroup.global_root_outcome_group.child_outcome_groups.create!
+        group = LearningOutcomeGroup.global_root_outcome_group.child_outcome_groups.create!(:title => 'subgroup')
         group.destroy
         raw_api_call(:get, "/api/v1/global/outcome_groups/#{group.id}",
                      :controller => 'outcome_groups_api',
@@ -175,6 +182,7 @@ describe "Outcome Groups API", :type => :integration do
           "can_edit" => true,
           "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => group.id),
           "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => group.id),
+          "import_url" => polymorphic_path([:api_v1, :global, :outcome_group_import], :id => group.id),
           "context_id" => nil,
           "context_type" => nil,
           "description" => group.description
@@ -200,10 +208,13 @@ describe "Outcome Groups API", :type => :integration do
           "can_edit" => true,
           "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => group.id),
           "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => group.id),
+          "import_url" => polymorphic_path([:api_v1, :global, :outcome_group_import], :id => group.id),
           "parent_outcome_group" => {
             "id" => parent_group.id,
             "title" => parent_group.title,
             "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => parent_group.id),
+            "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => parent_group.id),
+            "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => parent_group.id),
             "can_edit" => true
           },
           "context_id" => nil,
@@ -245,6 +256,7 @@ describe "Outcome Groups API", :type => :integration do
           "can_edit" => true,
           "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => group.id),
           "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => group.id),
+          "import_url" => polymorphic_path([:api_v1, @account, :outcome_group_import], :id => group.id),
           "context_id" => @account.id,
           "context_type" => "Account",
           "description" => group.description
@@ -277,7 +289,7 @@ describe "Outcome Groups API", :type => :integration do
     it "should require manage_global_outcomes permission for global outcomes" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
       @root_group = LearningOutcomeGroup.global_root_outcome_group
-      @group = @root_group.child_outcome_groups.create!
+      @group = @root_group.child_outcome_groups.create!(:title => 'subgroup')
       revoke_permission(@account_user, :manage_global_outcomes)
       raw_api_call(:put, "/api/v1/global/outcome_groups/#{@group.id}",
                    :controller => 'outcome_groups_api',
@@ -328,9 +340,9 @@ describe "Outcome Groups API", :type => :integration do
     end
 
     it "should allow changing the group's parent" do
-      groupA = @root_group.child_outcome_groups.create!
-      groupB = @root_group.child_outcome_groups.create!
-      groupC = groupA.child_outcome_groups.create!
+      groupA = @root_group.child_outcome_groups.create!(:title => 'subgroup')
+      groupB = @root_group.child_outcome_groups.create!(:title => 'subgroup')
+      groupC = groupA.child_outcome_groups.create!(:title => 'subgroup')
 
       api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{groupC.id}",
                { :controller => 'outcome_groups_api',
@@ -347,7 +359,7 @@ describe "Outcome Groups API", :type => :integration do
     end
 
     it "should fail if changed parentage would create a cycle" do
-      child_group = @group.child_outcome_groups.create!
+      child_group = @group.child_outcome_groups.create!(:title => 'subgroup')
       raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    { :controller => 'outcome_groups_api',
                      :action => 'update',
@@ -388,10 +400,13 @@ describe "Outcome Groups API", :type => :integration do
         "can_edit" => true,
         "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
         "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
+        "import_url" => polymorphic_path([:api_v1, @account, :outcome_group_import], :id => @group.id),
         "parent_outcome_group" => {
           "id" => @root_group.id,
           "title" => @root_group.title,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @root_group.id),
+          "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @root_group.id),
+          "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @root_group.id),
           "can_edit" => true
         },
         "context_id" => @account.id,
@@ -406,7 +421,7 @@ describe "Outcome Groups API", :type => :integration do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @root_group = @account.root_outcome_group
-      @group = @root_group.child_outcome_groups.create!
+      @group = @root_group.child_outcome_groups.create!(:title => 'subgroup')
     end
 
     it "should require permission" do
@@ -423,7 +438,7 @@ describe "Outcome Groups API", :type => :integration do
     it "should require manage_global_outcomes permission for global outcomes" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
       @root_group = LearningOutcomeGroup.global_root_outcome_group
-      @group = @root_group.child_outcome_groups.create!
+      @group = @root_group.child_outcome_groups.create!(:title => 'subgroup')
       revoke_permission(@account_user, :manage_global_outcomes)
       raw_api_call(:delete, "/api/v1/global/outcome_groups/#{@group.id}",
                    :controller => 'outcome_groups_api',
@@ -466,15 +481,18 @@ describe "Outcome Groups API", :type => :integration do
 
       json.should == {
         "id" => @group.id,
-        "title" => nil,
+        "title" => 'subgroup',
         "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
         "can_edit" => true,
         "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
         "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
+        "import_url" => polymorphic_path([:api_v1, @account, :outcome_group_import], :id => @group.id),
         "parent_outcome_group" => {
           "id" => @root_group.id,
           "title" => @root_group.title,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @root_group.id),
+          "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @root_group.id),
+          "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @root_group.id),
           "can_edit" => true
         },
         "context_id" => @account.id,
@@ -491,7 +509,7 @@ describe "Outcome Groups API", :type => :integration do
       @group = @account.root_outcome_group
     end
 
-    it "should require permission" do
+    it "should NOT require permission to read" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                    :controller => 'outcome_groups_api',
@@ -499,14 +517,7 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
-    end
-
-    def create_outcome(opts={})
-      group = opts.delete(:group) || @group
-      account = opts.delete(:account) || @account
-      outcome = account.created_learning_outcomes.create!(opts)
-      group.add_outcome(outcome)
+      response.status.to_i.should == 200
     end
 
     it "should return the outcomes linked into the group" do
@@ -526,6 +537,8 @@ describe "Outcome Groups API", :type => :integration do
             "id" => @group.id,
             "title" => @group.title,
             "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
+            "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
+            "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
             "can_edit" => true
           },
           "outcome" => {
@@ -541,8 +554,8 @@ describe "Outcome Groups API", :type => :integration do
     end
 
     it "should not include deleted links" do
-      @outcome1 = @account.created_learning_outcomes.create!
-      @outcome2 = @account.created_learning_outcomes.create!
+      @outcome1 = @account.created_learning_outcomes.create!(:title => 'outcome')
+      @outcome2 = @account.created_learning_outcomes.create!(:title => 'outcome')
       @link1 = @group.add_outcome(@outcome1)
       @link2 = @group.add_outcome(@outcome2)
       @link2.destroy
@@ -601,7 +614,7 @@ describe "Outcome Groups API", :type => :integration do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
-      @outcome = LearningOutcome.global.create!
+      @outcome = LearningOutcome.global.create!(:title => 'subgroup')
     end
 
     it "should require permission" do
@@ -631,7 +644,7 @@ describe "Outcome Groups API", :type => :integration do
 
     it "should fail if the outcome isn't available to the context" do
       @subaccount = @account.sub_accounts.create!
-      @outcome = @subaccount.created_learning_outcomes.create!
+      @outcome = @subaccount.created_learning_outcomes.create!(:title => 'outcome')
       raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',
                    :action => 'link',
@@ -671,6 +684,8 @@ describe "Outcome Groups API", :type => :integration do
           "id" => @group.id,
           "title" => @group.title,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
+          "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
+          "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
           "can_edit" => true
         },
         "outcome" => {
@@ -766,7 +781,7 @@ describe "Outcome Groups API", :type => :integration do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
-      @outcome = LearningOutcome.global.create!
+      @outcome = LearningOutcome.global.create!(:title => 'outcome')
       @group.add_outcome(@outcome)
     end
 
@@ -797,7 +812,7 @@ describe "Outcome Groups API", :type => :integration do
     end
 
     it "should 404 if the outcome isn't linked in the group" do
-      @outcome = LearningOutcome.global.create!
+      @outcome = LearningOutcome.global.create!(:title => 'outcome')
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',
                    :action => 'unlink',
@@ -849,6 +864,8 @@ describe "Outcome Groups API", :type => :integration do
           "id" => @group.id,
           "title" => @group.title,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
+          "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
+          "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
           "can_edit" => true
         },
         "outcome" => {
@@ -870,7 +887,7 @@ describe "Outcome Groups API", :type => :integration do
       @group = @account.root_outcome_group
     end
 
-    it "should require permission" do
+    it "should NOT require permission to read" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                    :controller => 'outcome_groups_api',
@@ -878,12 +895,12 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      response.status.to_i.should == 200
     end
 
     def create_subgroup(opts={})
       group = opts.delete(:group) || @group
-      group.child_outcome_groups.create!(opts)
+      group.child_outcome_groups.create!({:title => 'subgroup'}.merge(opts))
     end
 
     it "should return the subgroups under the group" do
@@ -899,6 +916,8 @@ describe "Outcome Groups API", :type => :integration do
           "id" => subgroup.id,
           "title" => subgroup.title,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => subgroup.id),
+          "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => subgroup.id),
+          "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => subgroup.id),
           "can_edit" => true
         }
       end.sort_by{ |subgroup| subgroup['id'] }
@@ -1021,10 +1040,13 @@ describe "Outcome Groups API", :type => :integration do
         "can_edit" => true,
         "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @subgroup.id),
         "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @subgroup.id),
+        "import_url" => polymorphic_path([:api_v1, @account, :outcome_group_import], :id => @subgroup.id),
         "parent_outcome_group" => {
           "id" => @group.id,
           "title" => @group.title,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @group.id),
+          "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @group.id),
+          "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @group.id),
           "can_edit" => true
         },
         "context_id" => @account.id,
@@ -1084,7 +1106,7 @@ describe "Outcome Groups API", :type => :integration do
 
     it "should fail if the source group isn't available to the context" do
       @subaccount = @account.sub_accounts.create!
-      @source_group = @subaccount.root_outcome_group.child_outcome_groups.create!
+      @source_group = @subaccount.root_outcome_group.child_outcome_groups.create!(:title => 'subgroup')
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@target_group.id}/import",
                    { :controller => 'outcome_groups_api',
                      :action => 'import',
@@ -1126,10 +1148,13 @@ describe "Outcome Groups API", :type => :integration do
         "can_edit" => true,
         "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @subgroup.id),
         "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @subgroup.id),
+        "import_url" => polymorphic_path([:api_v1, @account, :outcome_group_import], :id => @subgroup.id),
         "parent_outcome_group" => {
           "id" => @target_group.id,
           "title" => @target_group.title,
           "url" => polymorphic_path([:api_v1, @account, :outcome_group], :id => @target_group.id),
+          "subgroups_url" => polymorphic_path([:api_v1, @account, :outcome_group_subgroups], :id => @target_group.id),
+          "outcomes_url" => polymorphic_path([:api_v1, @account, :outcome_group_outcomes], :id => @target_group.id),
           "can_edit" => true
         },
         "context_id" => @account.id,

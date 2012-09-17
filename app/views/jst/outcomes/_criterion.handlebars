@@ -1,0 +1,22 @@
+<td class="rating">
+  <div class="rating-wrap">
+    <div class="show">
+      <h5>{{description}}</h5>
+      {{#t "points"}}{{points}} Points{{/t}}
+      <a href="#" class="edit_rating active" title="{{#t "edit_criterion_rating"}}Edit criterion rating{{/t}}"><i class="icon-edit"></i></a>
+    </div>
+    <div class="edit">
+      <input type="text" name="ratings[{{_index}}][description]" class="outcome_rating_description" value="{{description}}">
+      <span>
+        <input type="text" name="ratings[{{_index}}][points]" style="width: 20px;" class="outcome_rating_points" value="{{points}}"> {{#t "pts"}}pts{{/t}}
+      </span>
+      <a href="#" class="delete_rating_link" title="{{#t "remove_criterion_rating"}}Remove criterion rating{{/t}}"><i class="icon-trash"></i></a>
+    </div>
+    <div class="insert">
+      <a href="#" class="insert_rating" title="{{#t "insert_criterion_rating"}}Insert criterion rating{{/t}}">
+        {{#t "insert_rating"}}Insert{{/t}}
+        <span></span>
+      </a>
+    </div>
+  </div>
+</td>

@@ -19,29 +19,47 @@
 def outcome_model(opts={})
   @context ||= course_model(:reusable => true)
   @outcome_group ||= @context.root_outcome_group
-  @outcome = @context.created_learning_outcomes.create!(valid_outcome_attributes.merge(opts))
-  @outcome_group.add_outcome(@outcome)
-  @outcome_group.save!
+  @outcome = @context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
   @outcome.rubric_criterion = valid_outcome_data
   @outcome.save!
+  @outcome_group.add_outcome(@outcome)
+  @outcome_group.save!
   @outcome
 end
 
 def valid_outcome_attributes
   {
-    :short_description => 'first new outcome',
+    :title => 'first new outcome',
     :description => '<p>new outcome</p>'
   } 
 end
 
 def valid_outcome_data
   {
-    :description => "Outcome row",
-    :points_possible => 3,
     :mastery_points => 3,
     :ratings => [
       { :points => 3, :description => "Rockin" },
       { :points => 0, :description => "Lame" }
     ]
+  }
+end
+
+def outcome_group_model(opts={})
+  context = opts[:context] || @context
+  @parent_outcome_group =
+    if opts[:outcome_group_id]
+      LearningOutcomeGroup.for_context(context).active.find(opts[:outcome_group_id])
+    else
+      context.root_outcome_group
+    end
+  @outcome_group = @parent_outcome_group.child_outcome_groups.build(valid_outcome_group_attributes.merge(opts))
+  @outcome_group.save!
+  @outcome_group
+end
+
+def valid_outcome_group_attributes
+  {
+    :title => 'new outcome group',
+    :description => '<p>outcome group description</p>'
   }
 end

@@ -22,7 +22,7 @@ describe LearningOutcome do
   context "outcomes" do
     it "should allow learning outcome rows in the rubric" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -56,7 +56,7 @@ describe LearningOutcome do
     
     it "should delete learning outcome alignments when they no longer exist" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -112,8 +112,8 @@ describe LearningOutcome do
     
     it "should create learning outcome associations for multiple outcome rows" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
-      @outcome2 = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      @outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -167,7 +167,7 @@ describe LearningOutcome do
     
     it "should create outcome results when outcome-aligned rubrics are assessed" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -249,7 +249,7 @@ describe LearningOutcome do
     
     it "should override non-rubric-based alignments with rubric-based alignments for the same assignment" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @alignment = @outcome.align(@assignment, @course, :mastery_type => "points")
       @alignment.should_not be_nil
       @alignment.content.should eql(@assignment)
@@ -323,7 +323,7 @@ describe LearningOutcome do
     end
     it "should not override rubric-based alignments with non-rubric-based alignments for the same assignment" do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -392,7 +392,7 @@ describe LearningOutcome do
       assignment_model
       @assignment.mastery_score = 2
       @assignment.save!
-      @outcome = @course.created_learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @alignment = @outcome.align(@assignment, @course, :mastery_type => "points")
       @alignment.should_not be_nil
       @alignment.content.should eql(@assignment)

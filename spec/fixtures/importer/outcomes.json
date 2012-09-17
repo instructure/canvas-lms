@@ -1,10 +1,12 @@
 [
   {
     "migration_id":"bdf6dc13-5d8f-43a8-b426-03380c9b6781",
+    "title":"Outcome 1",
     "description":"Outcome 1: Read stuff"
   },
   {
     "migration_id":"fa67b467-37c7-4fb9-aef4-21a33a06d0be",
+    "title":"Outcome 2",
     "description":"Outcome 2: follow directions"
   }
 ]

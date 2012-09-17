@@ -1,0 +1,41 @@
+<form action="{{url}}" class="learning_outcome" method="post">
+  <label for="title">{{#t "title"}}Name this outcome{{/t}}:</label>
+  <input class="outcome_title" name="title" size="50" type="text" value="{{title}}">
+  <label for="description">{{#t "description"}}Describe this outcome{{/t}}:</label>
+  <textarea cols="40" name="description" rows="20" style="width: 100%; height: 150px;">{{description}}</textarea>
+  <div id="outcome_criterion_dialog" style="display: none;">
+    {{#t "criterion_dialog"}}Learning outcomes can be included in assignment rubrics as an easy way
+    to assess mastery of outcomes aligned to specific assignments.  When you define
+    a learning outcome, you should also define a criterion that can be used
+    when building assignment rubrics.  Define as many rubric columns as you
+    need, and specify a point threshold that will be used to define mastery
+    of this outcome.{{/t}}
+  </div>
+  <label>
+    {{#t "criterion"}}Criterion ratings{{/t}}:
+    <a class="outcome_information_link" title="{{#t "criterion_info_link"}}Click to learn about criterion ratings{{/t}}"><i class="icon-question"></i></a>
+  </label>
+  <table class="criterion">
+    <tbody>
+      <tr>
+        {{#eachWithIndex ratings}}
+          {{> [outcomes/criterion]}}
+        {{/eachWithIndex}}
+       <td class="total">
+         <h5>{{#t "total_points"}}Total Points{{/t}}</h5>
+         <div class="points_possible">
+           {{#t "points"}}{{points_possible}} Points{{/t}}
+         </div>
+       </td>
+      </tr>
+    </tbody>
+  </table>
+  <div>
+    {{#t "mastery"}}Mastery at{{/t}}:
+    <input type="text" name="mastery_points" style="width: 20px;" class="mastery_points" value="{{mastery_points}}">
+  </div>
+  <div class="button-container-right-aligned">
+    <button type="button" class="button cancel_button">{{#t "#buttons.cancel"}}Cancel{{/t}}</button>
+    <button type="submit" class="button btn-primary submit_button">{{#t "#buttons.save"}}Save{{/t}}</button>
+  </div>
+</form>

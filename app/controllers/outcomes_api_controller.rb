@@ -64,9 +64,10 @@ class OutcomesApiController < ApplicationController
 
   def can_read_outcome
     if @outcome.context_id
-      authorized_action(@outcome.context, @current_user, :manage_outcomes)
+      authorized_action(@outcome.context, @current_user, :read)
     else
-      authorized_action(Account.site_admin, @current_user, [:read_global_outcomes, :manage_global_outcomes])
+      # anyone (that's logged in) can read global outcomes
+      true
     end
   end
 

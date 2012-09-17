@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe OutcomesController do
   def context_outcome(context)
     @outcome_group ||= context.root_outcome_group
-    @outcome = context.created_learning_outcomes.create
+    @outcome = context.created_learning_outcomes.create!(:title => 'outcome')
     @outcome_group.add_outcome(@outcome)
   end
   

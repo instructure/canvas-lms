@@ -26,6 +26,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_presence_of :title
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
 
   attr_accessor :building_default
@@ -139,7 +140,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # groups, but only once per group).
   def add_outcome(outcome)
     # no-op if the outcome is already linked under this group
-    outcome_link = child_outcome_links.find_by_content_id(outcome.id)
+    outcome_link = child_outcome_links.active.find_by_content_id(outcome.id)
     return outcome_link if outcome_link
 
     # create new link and in this group
@@ -164,12 +165,12 @@ class LearningOutcomeGroup < ActiveRecord::Base
     copy.save!
 
     # copy the group contents
-    original.child_outcome_groups.each_with_index do |group|
+    original.child_outcome_groups.each do |group|
       next if opts[:only] && opts[:only][group.asset_string] != "1"
       copy.add_outcome_group(group, opts)
     end
 
-    original.child_outcome_links.each_with_index do |link|
+    original.child_outcome_links.each do |link|
       next if opts[:only] && opts[:only][link.asset_string] != "1"
       copy.add_outcome(link.content)
     end
@@ -292,7 +293,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     transaction do
       group = scope.active.root.first
       if !group && force
-        group = scope.build
+        group = scope.build :title => 'ROOT'
         group.building_default = true
         group.save!
       end
