@@ -546,11 +546,22 @@ class Account < ActiveRecord::Base
   end
 
   def account_users_for(user)
-    @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
+    return [] unless user
     @account_users_cache ||= {}
-    @account_users_cache[user] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
-      AccountUser.find(:all, :conditions => { :account_id => account_chain_ids, :user_id => user.id })
-    end if user
+    if self == Account.site_admin
+      @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users', :expires_in => 30.minutes) do
+        self.account_users.all
+      end.select { |au| au.user == user }.each { |au| au.account = self }
+    else
+      @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
+      @account_users_cache[user] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
+        if account_chain_ids == [Account.site_admin.id]
+          Account.site_admin.account_users_for(user)
+        else
+          AccountUser.find(:all, :conditions => { :account_id => account_chain_ids, :user_id => user.id })
+        end
+      end
+    end
     @account_users_cache[user] ||= []
     @account_users_cache[user]
   end

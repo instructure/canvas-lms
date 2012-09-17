@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require 'socket'
 
 describe Course do
@@ -2954,6 +2954,40 @@ describe Course do
     it "should return a scope" do
       # can't use "should respond_to", because that delegates to the instantiated Array
       lambda{ @course.groups_visible_to(@user).scoped({}) }.should_not raise_exception
+    end
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should properly return site admin permissions from another shard" do
+      enable_cache do
+        @shard1.activate do
+          course_with_student(:active_all => 1)
+        end
+        @site_admin = user
+        site_admin = Account.site_admin
+        site_admin.add_user(@user)
+
+        @shard1.activate do
+          @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+          @course.grants_right?(@teacher, nil, :manage_content).should be_true
+          @course.grants_right?(@student, nil, :manage_content).should be_false
+        end
+
+        @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+      end
+
+      enable_cache do
+        # do it in a different order
+        @shard1.activate do
+          @course.grants_right?(@student, nil, :manage_content).should be_false
+          @course.grants_right?(@teacher, nil, :manage_content).should be_true
+          @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+        end
+
+        @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+      end
     end
   end
 end

@@ -710,14 +710,22 @@ describe Account do
     it_should_behave_like "sharding"
 
     it "should properly return site admin permissions regardless of active shard" do
-      user
-      site_admin = Account.site_admin
-      site_admin.add_user(@user)
+      enable_cache do
+        user
+        site_admin = Account.site_admin
+        site_admin.add_user(@user)
 
-      @shard1.activate do
+        @shard1.activate do
+          site_admin.grants_right?(@user, nil, :manage_site_settings).should be_true
+        end
         site_admin.grants_right?(@user, nil, :manage_site_settings).should be_true
+
+        user
+        @shard1.activate do
+          site_admin.grants_right?(@user, nil, :manage_site_settings).should be_false
+        end
+        site_admin.grants_right?(@user, nil, :manage_site_settings).should be_false
       end
-      site_admin.grants_right?(@user, nil, :manage_site_settings).should be_true
     end
   end
 
@@ -772,6 +780,27 @@ describe Account do
       acct.save!
       manual_course_account = acct.manually_created_courses_account
       manual_course_account.id.should_not == bad_acct.id
+    end
+  end
+
+  describe "account_users_for" do
+    it "should be cache coherent for site admin" do
+      enable_cache do
+        user
+        sa = Account.site_admin
+        sa.account_users_for(@user).should == []
+
+        au = sa.add_user(@user)
+        # out-of-proc cache should clear, but we have to manually clear
+        # the in-proc cache
+        sa = Account.find(sa)
+        sa.account_users_for(@user).should == [au]
+
+        au.destroy
+        #ditto
+        sa = Account.find(sa)
+        sa.account_users_for(@user).should == []
+      end
     end
   end
 end

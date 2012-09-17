@@ -1053,10 +1053,17 @@ class Course < ActiveRecord::Base
   memoize :institution_name
 
   def account_users_for(user)
+    return [] unless user
     @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id: nil }.compact
     @account_users ||= {}
-    @account_users[user] ||= AccountUser.find(:all, :conditions => { :account_id => @associated_account_ids, :user_id => user.id }) if user
-    @account_users[user] ||= nil
+    @account_users[user] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
+      if account_chain_ids == [Account.site_admin.id]
+        Account.site_admin.account_users_for(user)
+      else
+        AccountUser.find(:all, :conditions => { :account_id => account_chain_ids, :user_id => user.id })
+      end
+    end
+    @account_users[user] ||= []
     @account_users[user]
   end
 
