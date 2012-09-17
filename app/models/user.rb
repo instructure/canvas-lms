@@ -264,6 +264,8 @@ class User < ActiveRecord::Base
   end
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  validates_length_of :short_name, :maximum => maximum_string_length, :allow_nil => true
+  validates_length_of :sortable_name, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :name, :if => :require_presence_of_name
   validates_locale :locale, :browser_locale, :allow_nil => true
   validates_acceptance_of :terms_of_use, :if => :require_acceptance_of_terms, :allow_nil => false

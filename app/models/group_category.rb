@@ -21,6 +21,7 @@ class GroupCategory < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
 
   named_scope :active, lambda {
     { :conditions => ['group_categories.deleted_at is null'] }

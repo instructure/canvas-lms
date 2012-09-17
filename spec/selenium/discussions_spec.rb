@@ -179,8 +179,7 @@ describe "discussions" do
     end
 
     it "should validate a group assignment discussion" do
-      group_assignment = assignment_model({
-                                              :course => @course,
+      group_assignment = @course.assignments.create!({
                                               :name => 'group assignment',
                                               :due_at => (Time.now + 1.week),
                                               :points_possible => 5,

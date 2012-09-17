@@ -183,16 +183,15 @@ describe "gradebook2" do
   end
 
   it "should let you post a group comment to a group assignment" do
-    group_assignment = assignment_model({
-                                            :course => @course,
-                                            :name => 'group assignment',
-                                            :due_at => (Time.now + 1.week),
-                                            :points_possible => ASSIGNMENT_3_POINTS,
-                                            :submission_types => 'online_text_entry',
-                                            :assignment_group => @group,
-                                            :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-                                            :grade_group_students_individually => true
-                                        })
+    group_assignment = @course.assignments.create!({
+                                                       :title => 'group assignment',
+                                                       :due_at => (Time.now + 1.week),
+                                                       :points_possible => ASSIGNMENT_3_POINTS,
+                                                       :submission_types => 'online_text_entry',
+                                                       :assignment_group => @group,
+                                                       :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+                                                       :grade_group_students_individually => true
+                                                   })
     project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
     project_group.users << @student_1
     project_group.users << @student_2
@@ -341,26 +340,24 @@ describe "gradebook2" do
   end
 
   it "should not include non-graded group assignment in group total" do
-    graded_assignment = assignment_model({
-                                             :course => @course,
-                                             :name => 'group assignment 1',
-                                             :due_at => (Time.now + 1.week),
-                                             :points_possible => 10,
-                                             :submission_types => 'online_text_entry',
-                                             :assignment_group => @group,
-                                             :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
-                                             :grade_group_students_individually => true
-                                         })
-    group_assignment = assignment_model({
-                                            :course => @course,
-                                            :name => 'group assignment 2',
-                                            :due_at => (Time.now + 1.week),
-                                            :points_possible => 0,
-                                            :submission_types => 'not_graded',
-                                            :assignment_group => @group,
-                                            :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
-                                            :grade_group_students_individually => true
-                                        })
+    graded_assignment = @course.assignments.create!({
+                                                        :title => 'group assignment 1',
+                                                        :due_at => (Time.now + 1.week),
+                                                        :points_possible => 10,
+                                                        :submission_types => 'online_text_entry',
+                                                        :assignment_group => @group,
+                                                        :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                                        :grade_group_students_individually => true
+                                                    })
+    group_assignment = @course.assignments.create!({
+                                                       :title => 'group assignment 2',
+                                                       :due_at => (Time.now + 1.week),
+                                                       :points_possible => 0,
+                                                       :submission_types => 'not_graded',
+                                                       :assignment_group => @group,
+                                                       :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                                       :grade_group_students_individually => true
+                                                   })
     project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
     project_group.users << @student_1
     #project_group.users << @student_2
