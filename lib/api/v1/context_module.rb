@@ -45,7 +45,7 @@ module Api::V1::ContextModule
 
     # add canvas web url
     unless content_tag.content_type == 'ContextModuleSubHeader'
-      hash['url'] = case content_tag.content_type
+      hash['html_url'] = case content_tag.content_type
         when 'ExternalUrl'
           # API prefers to redirect to the external page, rather than host in an iframe
           api_v1_course_context_module_item_redirect_url(:id => content_tag.id)
@@ -65,7 +65,7 @@ module Api::V1::ContextModule
       when 'Attachment'
         api_url = polymorphic_url([:api_v1, content_tag.content])
     end
-    hash['data_api_endpoint'] = api_url if api_url
+    hash['url'] = api_url if api_url
 
     # add completion requirements
     if criterion = context_module.completion_requirements && context_module.completion_requirements.detect { |r| r[:id] == content_tag.id }

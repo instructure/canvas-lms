@@ -75,10 +75,10 @@
 #       type: "Assignment",
 #
 #       // link to the item in Canvas
-#       url: "https://canvas.example.edu/courses/222/modules/items/768",
+#       html_url: "https://canvas.example.edu/courses/222/modules/items/768",
 #
 #       // (Optional) link to the Canvas API object, if applicable
-#       data_api_endpoint: "https://canvas.example.edu/api/v1/courses/222/assignments/987",
+#       url: "https://canvas.example.edu/api/v1/courses/222/assignments/987",
 #
 #       // Completion requirement for this module item
 #       // (Optional; present only if the caller is a student)
