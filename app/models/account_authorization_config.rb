@@ -254,6 +254,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def test_ldap_search
     begin
       conn = self.ldap_connection
+      filter = self.ldap_filter("canvas_ldap_test_user")
+      Net::LDAP::Filter.construct(filter)
       unless res = conn.search {|s| break s}
         error = conn.get_operation_result
         self.errors.add(:ldap_search_test, "Error #{error.code}: #{error.message}")

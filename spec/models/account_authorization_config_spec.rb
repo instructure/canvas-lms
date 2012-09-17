@@ -20,11 +20,28 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AccountAuthorizationConfig do
 
-  it "should not escape auth_filter" do
-    @account = Account.new
-    @account_config = @account.account_authorization_configs.build(:ldap_filter => '(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))')
-    @account_config.save
-    @account_config.auth_filter.should eql("(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))")
+  context "LDAP settings" do
+    it "should not escape auth_filter" do
+      @account = Account.new
+      @account_config = @account.account_authorization_configs.build(:ldap_filter => '(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))')
+      @account_config.save
+      @account_config.auth_filter.should eql("(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))")
+    end
+
+    describe "test_ldap_search" do
+      it "should validate filter syntax" do
+        aac = AccountAuthorizationConfig.new
+        aac.auth_type = 'ldap'
+        aac.ldap_filter = 'bob'
+        aac.test_ldap_search.should be_false
+        aac.errors.first.last.should match /Invalid filter syntax/
+
+        aac.errors.clear
+        aac.ldap_filter = '(sAMAccountName={{login}})'
+        aac.test_ldap_search.should be_false
+        aac.errors.first.last.should_not match /Invalid filter syntax/
+      end
+    end
   end
   
   it "should replace empty string with nil" do
