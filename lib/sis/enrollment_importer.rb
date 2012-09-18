@@ -147,6 +147,7 @@ module SIS
             # commit pending incremental account associations
             incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
 
+            associated_enrollment = nil
             type = if role =~ /\Ateacher\z/i
                 'TeacherEnrollment'
               elsif role =~ /student/i
