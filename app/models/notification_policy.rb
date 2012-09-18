@@ -33,7 +33,8 @@ class NotificationPolicy < ActiveRecord::Base
   named_scope :for, lambda { |context| 
     case context
     when User
-      { :joins => :communication_channel, :conditions => { 'communication_channels.user_id' => context.id } }
+      { :joins => :communication_channel,
+        :conditions => ["communication_channels.user_id = ? AND communication_channels.workflow_state <> 'retired'", context.id] }
     when Notification
       { :conditions => ['notification_policies.notification_id = ?', context.id] }
     else
