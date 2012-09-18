@@ -210,7 +210,7 @@ en:
       turnitin: 
         checking_settings: "checking Turnitin settings..."
         invalid_settings: "invalid Turnitin settings, please check your account id and shared secret from Turnitin"
-deploy@184.73.8.101:         setings_confirmed: "Turnitin settings confirmed!"
+        setings_confirmed: "Turnitin settings confirmed!"
     titles: 
       configure_report: "Configure Report"
       open_registration_delegated_warning_dialog: "An External Identity Provider is Enabled"
@@ -536,7 +536,7 @@ deploy@184.73.8.101:         setings_confirmed: "Turnitin settings confirmed!"
       import_started_message: "The import process has started! This can take awhile if there is a lot to import. You can leave the page and come back."
       import_type_label: "Import type"
       imported_message: "All SIS data was successfully imported."
-deploy@184.73.8.101:       imported_with_messages_message: "The SIS data was imported but with these messages:"
+      imported_with_messages_message: "The SIS data was imported but with these messages:"
       last_batch_title: "Last Batch"
       override_sis_stickiness_instructions: |-
           By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.  
@@ -3552,7 +3552,7 @@ deploy@184.73.8.101:       imported_with_messages_message: "The SIS data was imp
         allotted_storage: "Allotted Storage"
         media_files: "Media Files"
         uploaded_files: "Uploaded Files"
-deploy@184.73.8.101:       new: New
+      new: New
       new_discussion_entries: "New Discussion Entries"
       new_discussions: "New Discussions"
       num_assignments: "# Assignments"
@@ -5054,7 +5054,7 @@ deploy@184.73.8.101:       new: New
         complete: Complete
         discussion: "Discussion Submission"
         fail: Fail
-deploy@184.73.8.101:         incomplete: Incomplete
+        incomplete: Incomplete
         media: "Media Comment Submission"
         new_message: "New message for this submission"
         pass: Pass
@@ -5320,7 +5320,7 @@ deploy@184.73.8.101:         incomplete: Incomplete
         load_more: "Load more"
       buttons: 
         add_group: "Add Another Group"
-deploy@184.73.8.101:         delete_category: "Remove This Set of Groups"
+        delete_category: "Remove This Set of Groups"
         edit_category: "Edit This Set of Groups"
       group_category_all: Everyone
       group_category_unassigned: Unassigned
@@ -5538,7 +5538,7 @@ deploy@184.73.8.101:         delete_category: "Remove This Set of Groups"
       minimize_file_preview: "Minimize File Preview"
       minimize_youtube_video: "Minimize Video"
       view_equella_content_in_new_window: "view the content in a new window"
-deploy@184.73.8.101:     loading: Loading...
+    loading: Loading...
     no_description: "No description"
     no_results_found: "No Results Found"
     status: 
@@ -6893,7 +6893,7 @@ deploy@184.73.8.101:     loading: Loading...
         no_time_set: "No Time Set"
         subject: "Canvas Alert - Event: %{event_title}, %{course_name}"
     new_student_organized_group: 
-deploy@184.73.8.101:       email: 
+      email: 
         body_account: "A new student organized group named \"%{group_name}\" was created for the account %{account}. The first member is %{user}."
         body_course: "A new student organized group named \"%{group_name}\" was created for the course %{course}. The first member is %{user}."
         details: "You can see details for this group by clicking the link below:"
@@ -7874,7 +7874,7 @@ deploy@184.73.8.101:       email:
     profile: 
       access_token_description: "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate access tokens and *use the Canvas Open API* to come up with your own integrations."
       approved_integrations: "These are the third-party applications you have authorized to access the Canvas site on your behalf:"
-deploy@184.73.8.101:       buttons: 
+      buttons: 
         add_picture_file: "Add File"
         authorize_google_docs: "Authorize Google Docs Access"
         authorize_twitter: "Authorize Twitter Access"
@@ -8096,7 +8096,7 @@ deploy@184.73.8.101:       buttons:
       logout_redirect: "LogoutRequest sent to IdP"
       logout_redirect_from_idp: "Received LogoutResponse from IdP"
       redirect_from_idp: "Recieved LoginResponse from IdP"
-deploy@184.73.8.101:     default_app_name: "Third-Party Application"
+    default_app_name: "Third-Party Application"
     errors: 
       invalid_credentials: "Incorrect username and/or password"
       invalid_otp: "Invalid verification code, please try again"
@@ -9490,7 +9490,7 @@ deploy@184.73.8.101:     default_app_name: "Third-Party Application"
         are_you_sure_decrosslist: "Are you sure you want to de-cross-list this section?"
       run_dates: "Runs from %{start_date} to %{end_date}"
       run_from: "Runs from %{start_date} with no end date"
-deploy@184.73.8.101:       runs_until: "Runs until %{end_date}"
+      runs_until: "Runs until %{end_date}"
       student_access_dates: "Students can only access the course between these dates"
       titles: 
         completed_enrollments: "Completed Enrollments"
@@ -9807,7 +9807,7 @@ deploy@184.73.8.101:       runs_until: "Runs until %{end_date}"
       titles: 
         score_range: "Lowest and highest possible scores for this assignment"
     global_dialogs: 
-deploy@184.73.8.101:       buttons: 
+      buttons: 
         install_video_plugin: "Install the Video Plugin"
       dont_have_a_webcam: "Don't have a webcam?"
       you_need_a_webcam: "In order to create video or audio recordings your computer needs to be webcam-enabled. If you don't have a webcam on your computer, you can still record audio-only messages by first installing the Google Video Chat plugin."
@@ -10066,7 +10066,7 @@ deploy@184.73.8.101:       buttons:
       discussion_item: Discussion
       domain_match_notice: "to use this tool the domain must match %{domain}"
       external_tool_item: "External Tool"
-deploy@184.73.8.101:       external_tool_link_alt: "External tool"
+      external_tool_link_alt: "External tool"
       external_tool_notice: "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*."
       external_url_item: "External URL"
       external_url_link_alt: "External URL"
@@ -10301,7 +10301,7 @@ deploy@184.73.8.101:       external_tool_link_alt: "External tool"
       import_complete_warnings: "The SIS data was imported but with these messages:"
     notices: 
       processing_takes_awhile: "this may take a bit..."
-deploy@184.73.8.101:     status: 
+    status: 
       processing: Processing
   sis_imports_api: 
     errors: 
