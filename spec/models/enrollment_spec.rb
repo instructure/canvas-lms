@@ -94,6 +94,20 @@ describe Enrollment do
     e.readable_type.should eql('Student')
   end
 
+  it "should not allow an associated_user_id on a non-observer enrollment" do
+    observed = User.create!
+
+    @enrollment.type = 'ObserverEnrollment'
+    @enrollment.associated_user_id = observed.id
+    @enrollment.should be_valid
+
+    @enrollment.type = 'StudentEnrollment'
+    @enrollment.should_not be_valid
+
+    @enrollment.associated_user_id = nil
+    @enrollment.should be_valid
+  end
+
   it "should not allow read permission on a course if date inactive" do
     course_with_student(:active_all => true)
     @enrollment.start_at = 2.days.from_now
@@ -1182,7 +1196,9 @@ describe Enrollment do
     end
 
     it "should group by associated_user_id" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :associated_user_id => user.id, :type => "StudentEnrollment")
+      @e1.type = "ObserverEnrollment"
+      @e1.save!
+      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :associated_user_id => user.id, :type => "ObserverEnrollment")
       expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
     end
 

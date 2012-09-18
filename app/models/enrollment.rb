@@ -31,6 +31,9 @@ class Enrollment < ActiveRecord::Base
 
   validates_presence_of :user_id, :course_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
+  validates_inclusion_of :associated_user_id, :in => [nil],
+                         :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
+                         :message => "only ObserverEnrollments may have an associated_user_id"
 
   before_save :assign_uuid
   before_save :assert_section
