@@ -329,6 +329,21 @@ describe "gradebook2" do
     ff('.ui-state-error').count.should == 0
   end
 
+  it "should display for users with only :manage_grades permissions" do
+    user_logged_in
+    RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+                         :permission => 'manage_grades',
+                         :context => Account.default,
+                         :enabled => true)
+    AccountUser.create!(:user => @user,
+                        :account => Account.default,
+                        :membership_type => 'CustomAdmin')
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    ff('.ui-state-error').count.should == 0
+  end
+
   it "should include student view student for grading" do
     @fake_student = @course.student_view_student
     @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')

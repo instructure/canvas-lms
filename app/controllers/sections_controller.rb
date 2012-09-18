@@ -50,7 +50,7 @@ class SectionsController < ApplicationController
   #
   # @returns [Section]
   def index
-    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades])
+    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       includes = Array(params[:include])
 
       result = @context.active_course_sections.map { |section| section_json(section, @current_user, session, includes) }

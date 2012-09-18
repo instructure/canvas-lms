@@ -4,7 +4,7 @@ class Gradebook2Controller < ApplicationController
   before_filter { |c| c.active_tab = "grades" }
 
   def show
-    if authorized_action(@context, @current_user, :view_all_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
         js_env  :GRADEBOOK_OPTIONS => {
           :chunk_size => Setting.get_cached('gradebook2.submissions_chunk_size', '35').to_i,
           :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments]),
