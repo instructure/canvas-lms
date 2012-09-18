@@ -1106,8 +1106,9 @@ define([
     }).triggerHandler('change');
 
     $("#never_hide_results").change(function() {
-      $(".show_quiz_results_options").showIf($(this).attr('checked'));
-      if (!$(this).attr('checked')) {
+      var $this = $(this);
+      $(".show_quiz_results_options").showIf($this.attr('checked'));
+      if (!$this.attr('checked')) {
         $("#hide_results_only_after_last").attr('checked', false);
         $("#quiz_show_correct_answers").attr('checked', false);
       }
