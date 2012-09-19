@@ -2,7 +2,9 @@ module DataFixup::RegenerateUserThumbnails
   def self.run
     profile_pic_ids = nil
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    env = :slave
+    env = :deploy if ActiveRecord::Base::ConnectionSpecification.environment == :deploy
+    ActiveRecord::Base::ConnectionSpecification.with_environment(env) do
       profile_pic_ids = Attachment.connection.select_all <<-SQL
         SELECT DISTINCT at.id FROM users AS u
         JOIN attachments AS at ON (at.context_type = 'User' and at.context_id = u.id)
