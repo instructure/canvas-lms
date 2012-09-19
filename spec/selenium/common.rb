@@ -931,6 +931,16 @@ end
     pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
   end
 
+  def alert_present?
+    is_present = true
+    begin
+      driver.switch_to.alert
+    rescue Selenium::WebDriver::Error::NoAlertPresentError
+      is_present = false
+    end
+    is_present
+  end
+
   # for when you have something like a textarea's value and you want to match it's contents
   # against a css selector.
   # usage:

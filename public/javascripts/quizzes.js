@@ -1114,11 +1114,19 @@ define([
       }
     }).triggerHandler('change');
 
-    $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").bind('change', function() {
-      var checked = $("#multiple_attempts_option").attr('checked') && $("#limit_attempts_option").attr('checked');
-      var cnt = parseInt($("#quiz_allowed_attempts").val(), 10);
-      if (checked && cnt && cnt > 0) {
-        $("#hide_results_only_after_last_holder").show();
+    $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").change(function() {
+      var checked = $("#multiple_attempts_option").prop('checked') && $("#limit_attempts_option").prop('checked');
+      if (checked) {
+          $("#hide_results_only_after_last_holder").show();
+          var $attempts = $('#quiz_allowed_attempts');
+          var $attemptsVal = $attempts.val();
+          if(isNaN($attemptsVal)) {
+              alert(I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers'));
+              $attempts.val("");
+          } else if($attemptsVal.length > 3) {
+              alert(I18n.t('quiz_attempts_length_error', 'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left'));
+              $attempts.val("");
+          }
       } else {
         $("#hide_results_only_after_last").attr('checked', false);
         $("#hide_results_only_after_last_holder").hide();
