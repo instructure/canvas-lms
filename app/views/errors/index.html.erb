@@ -46,6 +46,9 @@
       <% if report.request_context_id %>
         <%= before_label :request_context_id, "request context id" %> <%= report.request_context_id %>
       <% end %>
+      <% if report.comments %>
+        <%= before_label :comments, "comments" %> <%= report.comments %><br/>
+      <% end %>
       <% (report.data || {}).to_a.sort.each do |k,v| %>
         <% next if k.to_s == "exception_message" %>
         <br><%= before_label k.to_s %> <%= v %>
