@@ -13,7 +13,13 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
     if self.class.environment && @config.has_key?(self.class.environment)
       @current_config.merge!(@config[self.class.environment].symbolize_keys)
     end
+
+    @current_config.keys.each do |key|
+      next unless @current_config[key].is_a?(String)
+      @current_config[key] = I18n.interpolate_hash(@current_config[key], @current_config)
+    end
     @current_config[:username] = @current_config[:username].gsub('{schema}', @current_config[:schema_search_path]) if @current_config[:username] && @current_config[:schema_search_path]
+
     if self.class.explicit_user
       @current_config[:username] = self.class.explicit_user
       @current_config.delete(:password)

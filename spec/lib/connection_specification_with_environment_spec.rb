@@ -48,11 +48,11 @@ describe ActiveRecord::Base::ConnectionSpecification do
     spec.config[:database].should == 'master'
   end
 
-  it "should allow using {schema} as an insertion into the username" do
+  it "should allow using hash insertions" do
     conf = {
         :adapter => 'postgresql',
         :database => 'master',
-        :username => '{schema}',
+        :username => '%{schema_search_path}',
         :schema_search_path => 'canvas',
         :deploy => {
             :username => 'deploy'
@@ -70,7 +70,7 @@ describe ActiveRecord::Base::ConnectionSpecification do
     conf = {
         :adapter => 'postgresql',
         :database => 'master',
-        :username => '{schema}',
+        :username => '%{schema_search_path}',
         :schema_search_path => 'canvas',
         :deploy => {
             :username => 'deploy'
