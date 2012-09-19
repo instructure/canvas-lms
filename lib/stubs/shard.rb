@@ -49,7 +49,7 @@ class Shard
     {}
   end
 
-  def description
+  def id
     "default"
   end
 

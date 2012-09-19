@@ -74,7 +74,7 @@ if PageView.page_view_method == :cache
   Delayed::Periodic.cron 'PageView.process_cache_queue', '*/1 * * * *' do
     Shard.with_each_shard do
       unless Shard.current.settings[:process_page_view_queue] == false
-        PageView.send_later_enqueue_args(:process_cache_queue, :singleton => "PageView.process_cache_queue:#{Shard.current.description}")
+        PageView.send_later_enqueue_args(:process_cache_queue, :singleton => "PageView.process_cache_queue:#{Shard.current.id}")
       end
     end
   end
