@@ -318,9 +318,12 @@ describe "discussions" do
         type_in_tiny '.reply-textarea', side_comment_text
         submit_form('.add-side-comment-wrap')
         wait_for_ajax_requests
+
         last_entry = DiscussionEntry.last
-        validate_entry_text(last_entry, side_comment_text)
         last_entry.depth.should == 2
+        last_entry.message.should include_text(side_comment_text)
+
+        ff("#discussion_subentries .message")[1].should include_text(side_comment_text)
       end
 
       it "should create multiple side comments" do

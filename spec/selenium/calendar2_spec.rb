@@ -291,7 +291,7 @@ describe "calendar2" do
         f('.popover-links-holder .edit_event_link').click
         select = f('#edit_assignment_form .assignment_group')
         first_selected_option(select).attribute(:value).to_i.should == group2.id
-        replace_content(  f('.ui-dialog #assignment_title'), "Assignment 2!")
+        replace_content(f('.ui-dialog #assignment_title'), "Assignment 2!")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
         assignment2.reload.title.should == "Assignment 2!"
@@ -374,18 +374,22 @@ describe "calendar2" do
 
     context "week view" do
       it "should render assignments due just before midnight" do
-        assignment_model :course => @course,
+        assignment_model(:course => @course,
                          :title => "super important",
-                         :due_at => Time.zone.now.beginning_of_week + 1.day - 1.minute
+                         :due_at => Time.zone.now.beginning_of_week + 1.day - 1.minute)
+        calendar_events = @teacher.calendar_events_for_calendar.last
+
+        calendar_events.title.should eql "super important"
+        @assignment.due_date == Time.zone.now.beginning_of_week + 1.day - 1.minute
 
         get "/calendar2"
         wait_for_ajaximations
         f('label[for=week]').click
-        wait_for_ajaximations
-
-        events = ff('.fc-event').select{ |e| e.text =~ /11:59.*super important/ }
-        # shows on monday night and tuesday morning
-        events.size.should eql 2
+        keep_trying_until do
+          events = ff('.fc-event').select { |e| e.text =~ /11:59.*super important/ }
+          # shows on monday night and tuesday morning
+          events.size.should eql 2
+        end
       end
 
       it "should change event duration by dragging" do
@@ -403,7 +407,6 @@ describe "calendar2" do
         event.reload
         event.end_at.should == noon + 2.hours
       end
-
     end
   end
 

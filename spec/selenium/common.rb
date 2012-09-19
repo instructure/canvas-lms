@@ -587,7 +587,7 @@ shared_examples_for "all selenium tests" do
 
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
-    driver.switch_to.frame id
+    driver.switch_to.frame(id)
     yield
   ensure
     driver.switch_to.window saved_window_handle

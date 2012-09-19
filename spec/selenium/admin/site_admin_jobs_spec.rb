@@ -32,12 +32,12 @@ describe "site admin jobs ui" do
   end
 
   def first_jobs_cell_displayed?
-    ffj('#jobs-grid .slick-cell').count > 0
+    !ff('#jobs-grid .slick-cell').should_not be_empty
   end
 
   def load_jobs_page
     get "/jobs"
-    wait_for_ajax_requests
+    wait_for_ajaximations
     keep_trying_until do
       first_jobs_cell_displayed?
     end
