@@ -185,6 +185,8 @@ class Course < ActiveRecord::Base
   after_save :set_self_enrollment_code
   before_validation :verify_unique_sis_source_id
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :course_code, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_locale :allow_nil => true
 
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
