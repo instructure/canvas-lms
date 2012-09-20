@@ -5,6 +5,18 @@ describe "assignments" do
 
   context "as a student" do
     DUE_DATE = Time.now.utc + 2.days
+
+    def update_assignment_attributes(assignment, attribute, values, click_submit_link = true)
+      assignment.update_attributes(attribute => values)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      f('.submit_assignment_link').click if click_submit_link
+    end
+
+    def click_away_accept_alert
+      f('#section-tabs .home').click
+      driver.switch_to.alert.accept # doing this step and the step above to avoid the alert from failing other selenium specs
+    end
+
     before (:each) do
       course_with_student_logged_in
       @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => DUE_DATE)
@@ -156,6 +168,54 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
 
       f('.submit_assignment_link').should be_nil
+    end
+
+    it "should validate file upload restrictions" do
+      filename_txt, fullpath_txt, data_txt = get_file("testfile4.txt")
+      filename_zip, fullpath_zip, data_zip = get_file("testfile5.zip")
+      @fourth_assignment.update_attributes(:submission_types => 'online_upload', :allowed_extensions => '.txt')
+      get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
+      f('.submit_assignment_link').click
+      submission_input = f('.submission_attachment input')
+      submission_input.send_keys(fullpath_zip)
+      ext_error = f('.bad_ext_msg')
+      ext_error.should be_displayed
+      submit_file_button = f('#submit_file_button')
+      submit_file_button.should have_class('disabled')
+      submission_input.send_keys(fullpath_txt)
+      ext_error.should_not be_displayed
+      submit_file_button.should_not have_class('disabled')
+      click_away_accept_alert
+    end
+
+    it "should validate on paper submission assignment type" do
+      update_assignment_attributes(@fourth_assignment, :submission_types, 'on_paper', false)
+      f('.submit_assignment_link').should be_nil
+    end
+
+    it "should validate no submission assignment type" do
+      update_assignment_attributes(@fourth_assignment, :submission_types, nil, false)
+      f('.submit_assignment_link').should be_nil
+    end
+
+    it "should validate that website url submissions are allowed" do
+      update_assignment_attributes(@fourth_assignment, :submission_types, 'online_url')
+      f('#submission_url').should be_displayed
+      click_away_accept_alert
+    end
+
+    it "should validate that text entry submissions are allowed" do
+      update_assignment_attributes(@fourth_assignment, :submission_types, 'online_text_entry')
+      f('.submit_online_text_entry_option').should be_displayed
+      click_away_accept_alert
+    end
+
+    it "should allow an assignment with all 3 online submission types" do
+      update_assignment_attributes(@fourth_assignment, :submission_types, 'online_text_entry, online_url, online_upload')
+      f('.submit_online_text_entry_option').should be_displayed
+      f('.submit_online_url_option').should be_displayed
+      f('.submit_online_upload_option').should be_displayed
+      click_away_accept_alert
     end
   end
 end
