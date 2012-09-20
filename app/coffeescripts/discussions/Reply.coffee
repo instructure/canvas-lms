@@ -15,7 +15,7 @@ define [
     ##
     # Creates a new reply to an Entry
     #
-    # @param {Entry} entry
+    # @param {view} an EntryView instance
     constructor: (@view, @options={}) ->
       @el = @view.$ '.discussion-reply-label:first'
       @showWhileEditing = @el.next()
@@ -41,12 +41,9 @@ define [
     # @api public
     edit: ->
       @form.addClass 'replying'
-      @textarea.editorBox()
+      @textarea.editorBox tinyOptions: width: '100%'
       @el.hide()
-      # sometimes it doesn't focus, not sure why yet, but using a setTimeout
-      # makes it focus every time (chrome/safari anyway...)
-      setTimeout =>
-        @textarea.editorBox 'focus'
+      setTimeout (=> @textarea.editorBox 'focus'), 20 if @options.focus
       @editing = true
       @trigger 'edit', this
 
@@ -94,26 +91,21 @@ define [
       # work is required
       summary: $('<div/>').html(@content).text()
       message: @content
-      parent_cid: if @options.topLevel then null else @view.model.cid
       parent_id: if @options.topLevel then null else @view.model.get 'id'
       user_id: ENV.current_user_id
       created_at: now
       updated_at: now
-      collapsedView: false
       attachment: @form.find('input[type=file]')[0]
+      new: true
 
     ##
     # Callback when the model is succesfully saved
     #
     # @api private
     onPostReplySuccess: (entry) =>
-      @view.collection.add entry unless @options.added?()
-      if @view.model.get('allowsSideComments')
-        text = ''
-      else
-        text = "<div class='alert alert-success'><a class='close' data-dismiss='alert'>×</a>#{I18n.t 'reply_saved', "Reply saved, *go to your reply*", wrapper: "<a href='##{entry.cid}' data-event='goToReply'>$1</a>"}</div>"
-      @view.model.set 'notification', text
+      @view.model.set 'notification', ''
       @el.show()
+      @trigger 'save', entry
 
     ##
     # Callback when the model fails to save

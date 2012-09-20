@@ -1,13 +1,7 @@
-<form class="discussion-section hide-if-collapsed discussion-reply-form">
-  <span class="notification" data-bind="notification"></span>
+<div class="notification" data-bind="notification"></div>
+<form class="discussion-reply-form">
   <a class="discussion-reply-label hide-if-replying" data-event="addReply" href="#">
-    <label for="reply_message_for_{{id}}">
-      {{#if allowsSideComments}}
-        {{#t "add_side_comment"}}Add a side comment...{{/t}}
-      {{else}}
-        {{#t "write_a_reply"}}Write a reply...{{/t}}
-      {{/if}}
-    </label>
+    {{#t "write_a_reply"}}Reply{{/t}}
   </a>
   <div class="show-if-replying">
     <textarea class="reply-textarea" id="reply_message_for_{{id}}"></textarea>

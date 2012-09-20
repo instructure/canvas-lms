@@ -213,6 +213,7 @@ class DiscussionTopicsController < ApplicationController
             @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
             @sequence_asset = @context_module_tag.try(:content)
             env_hash = {
+              :APP_URL => named_context_url(@context, :context_discussion_topic_url, @topic),
               :TOPIC => {
                 :ID => @topic.id,
               },

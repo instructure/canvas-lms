@@ -1,143 +1,156 @@
 define [
   'underscore'
   'jquery'
+  'jst/DiscussionTopics/pageNav'
   'Backbone'
-  'compiled/collections/EntryCollection'
   'compiled/views/DiscussionTopic/EntryCollectionView'
-  'compiled/views/DiscussionTopic/EntryView'
-  'compiled/collections/ParticipantCollection'
-  'compiled/discussions/MarkAsReadWatcher'
-  'jst/discussions/_reply_form'
-  'vendor/ui.selectmenu'
-], (_, $, Backbone, EntryCollection, EntryCollectionView, EntryView, ParticipantCollection, MarkAsReadWatcher, template, replyForm) ->
+  'compiled/jquery/scrollIntoView'
+], (_, $, pageNavTemplate, Backbone, EntryCollectionView) ->
 
-  ##
-  # View for all of the entries in a topic. TODO: There is some overlap and
-  # role confusion between this and TopicView, potential refactor to make
-  # their roles clearer (for starters, the Topic model should probably be
-  # fetched by the TopicView).
-  #
-  # events: `onFetchSucess` - Called when the model is successfully fetched
-  #
   class EntriesView extends Backbone.View
 
-    events:
+    defaults:
+      initialPage: 0
+      descendants: 2
+      showMoreDescendants: 2
+      children: 3
 
-      ##
-      # Catch-all for delegating entry click events in this view instead
-      # of delegating events in every entry view. This way we have one
-      # event listener instead of several hundred.
-      #
-      # Instead of the usual backbone pattern of adding events to delegate
-      # in EntryView, add the `data-event` attribute to elements in the
-      # view and the method defined will be called on the appropriate
-      # EntryView instance.
-      #
-      # ex:
-      #
-      #    <div data-event="someMethod">
-      #      click to call someMethod on an EntryView instance
-      #   </div>
-      #
-      'click .entry': 'handleEntryEvent'
+    $body: $ 'body:first'
 
-    ##
-    # Initializes a new EntryView
+    $window: $ window
+
     initialize: ->
-      @$el = $ '#discussion_subentries'
+      @options.showMoreDescendants ?= @options.descendants
+      @collection.on 'add', @addEntry
+      @model.on 'change', @hideIfFiltering
 
-      @participants = new ParticipantCollection
-      @model.bind 'change:participants', @initParticipants
+    hideIfFiltering: =>
+      if @model.hasFilter()
+        @$el.addClass 'hidden'
+      else
+        @$el.removeClass 'hidden'
 
-      @collection = new EntryCollection
-      @model.bind 'change:view', @initEntries
+    addEntry: (entry) =>
+      @collectionView.collection.add entry
 
-      MarkAsReadWatcher.on 'markAsRead', @onMarkAsRead
-
-      @model.fetch success: @onFetchSuccess
-
-    ##
-    # Initializes all the entries
-    #
-    # @api private
-    initEntries: (thisView, entries) =>
-      @collectionView = new EntryCollectionView
-        $el: @$el
-        collection: @collection
-        showReplyButton: ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
-      @collection.reset entries
-      @updateFromNewEntries()
-      @setUnreadEntries()
-      MarkAsReadWatcher.init()
-
-    updateFromNewEntries: ->
-      newEntries = @model.get 'new_entries'
-      _.each newEntries, (entry) =>
-        view = EntryView.instances[entry.id]
-        if view
-          # update
-          view.model.set entry
+    goToEntry: (id) =>
+      # can take an id or an entry object so we don't have to get the entry
+      # data when we're trying again
+      if typeof id isnt 'object'
+        id = parseInt id, 10
+      else
+        entryData = id
+        id = entryData.entry.id
+      # dom is the fastest access to see if the entry is already rendered
+      $el = $ "#entry-#{id}"
+      if $el.length
+        return @scrollToEl $el
+      entryData ?= @collection.getEntryData id
+      if @collection.currentPage is entryData.page
+        if entryData.levels is 0
+          @expandToUnrenderedEntry entryData
         else
-          # create
-          view = EntryView.instances[entry.parent_id] or this
-          view.collection.add entry
+          @descendToUnrenderedEntry entryData
+      else
+        @renderAndGoToEntry entryData
+
+    expandToUnrenderedEntry: (entryData) ->
+      {entry} = entryData
+      $el = {}
+      until $el.length
+        entry = entry.parent
+        $el = $ "#entry-#{entry.id}"
+      view = $el.data 'view'
+      if view.treeView
+        view.treeView.loadNext()
+      else
+        view.renderTree()
+      # try again, will do this as many times as it takes
+      @goToEntry entryData
 
     ##
-    # We don't get the unread state with the initial models, but we do get
-    # a list of ids for the unread entries. This fills in the gap
-    #
-    # @api private
-    setUnreadEntries: ->
-      unread_entries = @model.get 'unread_entries'
-      _.each unread_entries, (id) ->
-        EntryView.instances[id].model.set 'read_state', 'unread'
+    # finds the last rendered parent, re-orders the parents to be the first
+    # child, renders the tree down to the entry
+    descendToUnrenderedEntry: (entryData) ->
+      {entry} = entryData
+      parent = entry
+      descendants = -1
+      $el = {}
+      # look for last rendered parent
+      until $el.length
+        child = parent
+        parent = child.parent
+        descendants++
+        # put the child on top so we can easily render it
+        replies = _.without parent.replies, child
+        replies.unshift child
+        parent.replies = replies
+        # see if its rendered
+        $el = $ "#entry-#{child.id}"
+      view = $el.data 'view'
+      view.renderTree descendants: descendants
+      # try again
+      @goToEntry entryData
+
+    renderAndGoToEntry: (entryData) ->
+      @render entryData.page + 1
+      # try again
+      @goToEntry entryData
+
+    scrollToEl: ($el) ->
+      @$body.scrollTo $el, 200,
+        offset: -100
+        onAfter: =>
+          # pretty blinking
+          setTimeout (-> $el.addClass 'highlight' ), 200
+          setTimeout (-> $el.removeClass 'highlight' ), 400
+          setTimeout (-> $el.addClass 'highlight' ), 600
+          once = =>
+            $el.removeClass 'highlight'
+            @$window.off 'scroll', once
+            @trigger 'scrollAwayFromEntry'
+          # behind setTimeout because onAfter doesn't seem to work properly,
+          # and triggers the scroll event we're adding here
+          setTimeout =>
+            @$window.on "scroll", once
+            setTimeout once, 5000
+          , 10
 
     ##
-    # Initializes the participants. This collection is used as a data lookup
-    # when since the user information is not stored on the Entry
-    #
-    # @api private
-    initParticipants: (thisView, participants) =>
-      @participants.reset participants
+    # Render a specific page with `page: n`
+    render: (page=1) =>
+      @teardown()
+      @collectionView = new EntryCollectionView
+        el: @$el[0]
+        collection: @collection.getPageAsCollection(page - 1, perPage: @options.children)
+        descendants: @options.descendants
+        showMoreDescendants: @options.descendants
+        displayShowMore: no
+        threaded: @options.threaded
+        root: true
+      @collectionView.render()
+      @renderPageNav()
+      this
 
-    ##
-    # Event listener for MarkAsReadWatcher. Whenever an entry is marked as read
-    # we remove the entry id from the unread_entries attribute of @model.
-    #
-    # @api private
-    onMarkAsRead: (entry) =>
-      unread = @model.get 'unread_entries'
-      id = entry.get 'id'
-      @model.set 'unread_entries', _.without(unread, id)
+    teardown: ->
+      @$el.empty()
 
-    ##
-    # Called when the Topic model is successfully returned from the server,
-    # triggers `fetchSuccess` so other objects can wait.
-    #
-    # @api private
-    onFetchSuccess: =>
-      @model.trigger 'fetchSuccess', @model
+    renderPageNav: ->
+      total = @collection.totalPages()
+      current = @collection.currentPage + 1
+      return if total < 2
+      pagesToShow = 3
+      locals = current: current
+      locals.showFirst = total > pagesToShow and current isnt 1
+      locals.lastPage = total if total > pagesToShow and current isnt total
+      locals.pages = if total < pagesToShow + 1
+        [1..total]
+      else if locals.showFirst and locals.lastPage
+        [current - 1, current, current + 1]
+      else if locals.showFirst and !locals.lastPage
+        [current - 2, current - 1, current]
+      else if !locals.showFirst and locals.lastPage
+        [current, current + 1, current + 2]
+      html = pageNavTemplate locals
+      @$el.prepend(html).append(html)
 
-    ##
-    # Routes events to the appropriate EntryView instance. See comments in
-    # `events` block of this file.
-    #
-    # @api private
-    handleEntryEvent: (event) ->
-      # get the element and the method to call
-      el = $(event.target).closest '[data-event]'
-      return unless el.length
-      method = el.data 'event'
-
-      # get the EntryView instance ID
-      modelEl = $(event.currentTarget)
-      id = modelEl.data 'id'
-
-      # call the method from the EntryView, sets the context to the view
-      # so you can access everything in the method like it was called
-      # from a normal backbone event
-      instance = EntryView.instances[id]
-      instance[method](event, el)
-
-      # we already handled it, dont let it bubble up to the entries I am nested in
-      false

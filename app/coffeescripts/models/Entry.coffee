@@ -1,11 +1,14 @@
+####
+# TODO: consolidate this into DiscussionEntry
+#
+
 define [
-  'compiled/discussions/app'
+  'i18n!discussions'
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/discussions/findParticipant'
   'jquery.ajaxJSON'
-], (app, $, _, Backbone, findParticipant) ->
+], (I18n, $, _, Backbone) ->
 
   ##
   # Model representing an entry in discussion topic
@@ -15,10 +18,9 @@ define [
 
       ##
       # Attributes persisted with the server
-
       id: null
       parent_id: null
-      message: null
+      message: I18n.t('no_content', 'No Content')
       user_id: null
       read_state: 'read'
       created_at: null
@@ -28,32 +30,23 @@ define [
 
       ##
       # Received from API, but not persisted
-
       replies: []
 
       ##
       # Client side attributes not persisted with the server
-
-      parent_cid: null
-
-      # Change this to toggle between collapsed and expanded views
-      # false because we expand everything on load
-      collapsedView: false
-
       canAttach: ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
 
-      # not used, but we'll eventually want to style differently when
-      # an entry is "focused"
-      focused: false
+      # so we can branch for new stuff
+      new: false
+
+      highlight: false
 
     computedAttributes: [
-      'author'
-      'editor'
       'canModerate'
-      'allowsSideComments'
-      'hideRepliesOnCollapse'
       'speedgraderUrl'
-      { name: 'canReply', deps: ['parent_id'] }
+      { name: 'allowsSideComments', deps: ['parent_id', 'deleted'] }
+      { name: 'allowsThreadedReplies', deps: ['deleted'] }
+      { name: 'collapsable', deps: ['replies', 'allowsSideComments', 'allowsThreadedReplies'] }
       { name: 'summary', deps: ['message'] }
     ]
 
@@ -64,6 +57,7 @@ define [
      "#{ENV.DISCUSSION.ENTRY_ROOT_URL}?ids[]=#{@get 'id'}"
 
     create: ->
+      @set 'author', ENV.DISCUSSION.CURRENT_USER
       parentId = @get 'parent_id'
       if parentId is null # i.e. top-level
         ENV.DISCUSSION.ROOT_REPLY_URL
@@ -88,12 +82,20 @@ define [
         # POST (create) requests just send the object
         data
 
-    ##
-    # Computed attribute to get the author into the model data
-    author: ->
-      return {} if @get('deleted')
-      findParticipant @get('user_id')
-    #
+    toJSON: ->
+      json = super
+      _.pick json,
+        'id'
+        'parent_id'
+        'message'
+        'user_id'
+        'read_state'
+        'created_at'
+        'updated_at'
+        'deleted'
+        'attachment'
+        'replies'
+
     ##
     # Computed attribute to determine if the entry can be moderated
     # by the current user
@@ -104,16 +106,23 @@ define [
     ##
     # Only threaded discussions get the ability to reply in an EntryView
     # Directed discussions have the reply form in the EntryCollectionView
-    canReply: ->
-      return false unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
-      return true if ENV.DISCUSSION.THREADED
-      false
+    allowsThreadedReplies: ->
+      return no if @get 'deleted'
+      return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
+      return no if not ENV.DISCUSSION.THREADED
+      yes
 
-    ##
-    # Computed attribute to determine if the entry has an editor
-    editor: ->
-      if id = @get 'editor_id'
-        findParticipant id
+    allowsSideComments: ->
+      return no if @get 'deleted'
+      return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
+      return no if ENV.DISCUSSION.THREADED
+      return no if @get 'parent_id'
+      yes
+
+    collapsable: ->
+      @hasChildren() or
+      @allowsSideComments() or
+      @allowsThreadedReplies()
 
     ##
     # Computed attribute
@@ -130,22 +139,6 @@ define [
       @escapeDiv.html(@get('message')).text()
 
     ##
-    # Shows the reply form at the bottom of all side comments
-    allowsSideComments: ->
-      deleted = @get 'deleted'
-      not ENV.DISCUSSION.THREADED and
-      ENV.DISCUSSION.PERMISSIONS.CAN_REPLY and
-      @get('parent_id') is null and # root entry
-      not deleted
-
-    ##
-    # Computed attribute. In side_comment discussions we hide the replies
-    # on collapse
-    hideRepliesOnCollapse: ->
-      not ENV.DISCUSSION.THREADED and
-        @get('parent_id') is null
-
-    ##
     # Not familiar enough with Backbone.sync to do this, using ajaxJSON
     # Also, we can't just @save() because the mark as read api is a different
     # resource altogether
@@ -153,4 +146,7 @@ define [
       @set 'read_state', 'read'
       url = ENV.DISCUSSION.MARK_READ_URL.replace /:id/, @get 'id'
       $.ajaxJSON url, 'PUT'
+
+    hasChildren: ->
+      @get('replies').length > 0
 

@@ -26,7 +26,8 @@ define [
 
     initialize: (options) ->
       @options = _.extend {}, @defaults, @options, options
-      super
+      @$el.data 'view', this
+      this
 
     ##
     # Extends render to add support for chid views and element filtering

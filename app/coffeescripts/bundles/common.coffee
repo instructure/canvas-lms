@@ -1,5 +1,6 @@
 require [
   # true modules that we manage in this file
+  'Backbone'
   'compiled/widget/courseList'
   'compiled/helpDialog'
 
@@ -25,7 +26,6 @@ require [
   # 'compiled/behaviors/follow'
   'compiled/behaviors/tooltip'
   'compiled/behaviors/instructure_inline_media_comment'
-
   # other stuff several bundles use
   'media_comments'
   'order'
@@ -42,10 +42,8 @@ require [
   'media_comments'
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
-
   'compiled/badge_counts'
-
-], (courseList, helpDialog) ->
+], (Backbone, courseList, helpDialog) ->
   courseList.init()
   helpDialog.initTriggers()
 
@@ -57,4 +55,10 @@ require [
   $logo = $('#header-logo')
   if $logo.length > 0 and $logo.css('background-image').match(/\/canvas\/header_canvas_logo\.png/)
     $logo.addClass('original')
+
+  ##
+  # Backbone routes
+  $('body').on 'click', '[data-pushstate]', (event) ->
+    event.preventDefault()
+    Backbone.history.navigate $(this).attr('href'), yes
 

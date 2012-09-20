@@ -97,12 +97,6 @@ ActionController::Routing::Routes.draw do |map|
     context.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
   end
 
-  def add_announcements(context)
-    context.resources :announcements
-    context.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
-    context.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
-  end
-
   def add_chat(context)
     context.resources :chats
     context.chat 'chat', :controller => 'context', :action => 'chat'
@@ -110,8 +104,15 @@ ActionController::Routing::Routes.draw do |map|
     context.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
   end
 
+  def add_announcements(context)
+    context.resources :announcements
+    context.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
+    context.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
+  end
+
   def add_discussions(context)
-    context.resources :discussion_topics, :only => [:index, :show, :new, :edit, :destroy]
+    context.resources :discussion_topics, :only => [:index, :new, :show, :edit, :destroy]
+    context.map 'discussion_topics/:id/:extras', :extras => /.+/, :controller => :discussion_topics, :action => :show
     context.resources :discussion_entries
   end
 
