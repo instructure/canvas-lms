@@ -152,15 +152,16 @@ describe "site admin jobs ui" do
         f("#jobs-grid .odd").should be_displayed
         f("#jobs-grid .even").should be_displayed
         f("#jobs-total").text.should == "3"
-        expect {
-          keep_trying_until do
+        num_of_jobs = Delayed::Job.all.count
+
+         keep_trying_until do
             f("#delete-jobs").click
             driver.switch_to.alert.should_not be_nil
             driver.switch_to.alert.accept
-            true
-          end
-          wait_for_ajax_requests
-        }.to change(Delayed::Job, :count).by(-3)
+            wait_for_ajax_requests
+           Delayed::Job.count.should eql num_of_jobs - 3
+         end
+
         fj("#jobs-grid .odd").should be_nil # using fj to bypass selenium cache
         fj("#jobs-grid .even").should be_nil #using fj to bypass selenium cache
       end
