@@ -93,7 +93,7 @@ define([
         $profile_table.find(".change_password_row").hide().find(":password").val("");
       } else {
         $(this).addClass('showing');
-        $profile_table.find(".change_password_row").show().find(":password:first").focus().select();
+        $profile_table.find(".change_password_row").show().find("#old_password").focus().select();
       }
     })
     .attr('checked', false)
