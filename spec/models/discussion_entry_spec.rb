@@ -133,7 +133,8 @@ describe DiscussionEntry do
     it "should send to inbox" do
       course
       @course.offer
-      topic = @course.discussion_topics.create!
+      topic = @course.discussion_topics.create!(:title => "abc " * 63 + "abc")
+      topic.title.length.should == 255
       @u = user_model
       entry = topic.discussion_entries.create!(:user => @u)
       @u2 = user_model
@@ -144,6 +145,9 @@ describe DiscussionEntry do
       sub_entry.inbox_item_recipient_ids.should_not be_nil
       sub_entry.inbox_item_recipient_ids.should_not be_empty
       sub_entry.inbox_item_recipient_ids.should be_include(entry.user_id)
+      item = InboxItem.last
+      item.subject.length.should <= 255
+      item.subject.should match /abc /
     end
   end
 
