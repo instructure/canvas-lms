@@ -158,9 +158,10 @@ describe "site admin jobs ui" do
             f("#delete-jobs").click
             driver.switch_to.alert.should_not be_nil
             driver.switch_to.alert.accept
-            wait_for_ajax_requests
-           Delayed::Job.count.should eql num_of_jobs - 3
+           true
          end
+        wait_for_ajaximations
+        Delayed::Job.count.should eql num_of_jobs - 3
 
         fj("#jobs-grid .odd").should be_nil # using fj to bypass selenium cache
         fj("#jobs-grid .even").should be_nil #using fj to bypass selenium cache
