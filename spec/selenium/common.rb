@@ -686,6 +686,34 @@ shared_examples_for "all selenium tests" do
     Kaltura::ClientV3.stubs(:new).returns(kal)
   end
 
+  def page_view(opts={})
+    course = opts[:course] || @course
+    user = opts[:user] || @student
+    controller = opts[:controller] || 'assignments'
+    summarized = opts[:summarized] || nil
+    url = opts[:url]
+    user_agent = opts[:user_agent] || 'firefox'
+
+    page_view = course.page_views.build(
+        :user => user,
+        :controller => controller,
+        :url => url,
+        :user_agent => user_agent)
+
+    page_view.summarized = summarized
+    page_view.request_id = ActiveSupport::SecureRandom.hex(10)
+    page_view.created_at = opts[:created_at] || Time.now
+
+    if opts[:participated]
+      page_view.participated = true
+      access = page_view.build_asset_user_access
+      access.display_name = 'Some Asset'
+    end
+
+    page_view.store
+    page_view
+  end
+
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
   def get(link, wait_for_dom = true)

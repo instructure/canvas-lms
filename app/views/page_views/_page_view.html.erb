@@ -1,7 +1,0 @@
-<tr class="<%= cycle("even", "odd") %>">
-  <td><%= link_to(h(truncate_text(page_view.url, { :max_length => 100 })), page_view.url, :title => page_view.url) %></td>
-  <td style="white-space: nowrap;"><%= datetime_string page_view.created_at %></td>
-  <td><%= image_tag("checked.png", :style => "width: 12px;") if page_view.participated? %></td>
-  <td><%= page_view.interaction_seconds_readable %></td>
-  <td class="user_agent"><%= page_view.user_agent %></td>
-</tr>

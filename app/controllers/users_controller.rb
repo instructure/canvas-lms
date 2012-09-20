@@ -623,7 +623,6 @@ class UsersController < ApplicationController
     @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
     if authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
-      @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC', :per_page => 50, :without_count => true
 
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include

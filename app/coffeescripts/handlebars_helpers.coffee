@@ -55,6 +55,10 @@ define [
     dateToString : (date = '', format) ->
       date.toString(format)
 
+    # convert a date to a string, using the given i18n format in the date.formats namespace
+    tDateToString : (date = '', i18n_format) ->
+      I18n.l("date.formats.#{i18n_format}", date)
+
     mimeClass: (contentType) -> $.mimeClass(contentType)
 
     # use this method to process any user content fields returned in api responses

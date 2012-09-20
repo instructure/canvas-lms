@@ -1,0 +1,11 @@
+#pageviews {
+  height: 400px;
+  width: 100%;
+  table {
+    width: 100%;
+    td {
+      white-space: nowrap;
+    }
+  }
+  overflow-y: scroll;
+}

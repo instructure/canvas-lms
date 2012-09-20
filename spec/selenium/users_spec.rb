@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "user selenium tests" do
+describe "users" do
   it_should_behave_like "in-process server selenium tests"
 
   context "logins" do
@@ -26,6 +26,55 @@ describe "user selenium tests" do
       new_login.find_element(:css, '.account_name').text().should_not be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first
       pseudonym.valid_password?('qwerty1').should be_true
+    end
+  end
+
+  context "page views" do
+
+    before (:each) do
+      @teacher = course_with_teacher_logged_in
+      @student = student_in_course.user
+      Setting.set('enable_page_views', 'db')
+    end
+
+    it "should validate a basic page view" do
+      page_view(:user => @student, :course => @course, :url => 'assignments')
+      get "/users/#{@student.id}"
+      rows = ff('#page_view_results tr')
+      rows.count.should == 1
+      page_view = rows.first
+      page_view.should include_text('Firefox')
+      page_view.should include_text('assignments')
+      f('#page_view_results tr img').should be_nil # should not have a participation
+    end
+
+    it "should validate page view with a participation" do
+      page_view(:user => @student, :course => @course, :participated => true)
+      get "/users/#{@student.id}"
+      f("#page_view_results img").should have_attribute(:src, '/images/checked.png')
+    end
+
+    it "should validate a page view url" do
+      second_student_name = 'test student for page views'
+      get "/users/#{@student.id}"
+      page_view(:user => @student, :course => @course, :participated => true, :url => student_in_course(:name => second_student_name).user.id.to_s)
+      refresh_page # in order to get the generated page view
+      page_view_url = f('#page_view_results a')
+      second_student = User.find_by_name(second_student_name)
+      page_view_url.text.should == second_student.id.to_s
+      expect_new_page_load { page_view_url.click }
+      f('.user_details .name').text.should == second_student.name
+      ff("#page_view_results tr").length.should == 0 # validate the second student has no page views
+    end
+
+    it "should validate all page views were loaded" do
+      page_views_count = 100
+      page_views_count.times { |i| page_view(:user => @student, :course => @course, :url => "#{"%03d" % i}") }
+      get "/users/#{@student.id}"
+      wait_for_ajaximations
+      driver.execute_script("$('#pageviews').scrollTop($('#pageviews')[0].scrollHeight);")
+      wait_for_ajaximations
+      ff("#page_view_results tr").length.should == page_views_count
     end
   end
 
@@ -126,7 +175,7 @@ describe "user selenium tests" do
       expect_new_page_load { f('button[type="submit"]').click }
       f('.static_message').text.should =~ /Invalid input. Please enter a valid ID./
     end
-    
+
     it "should show an error if the user id doesnt exist" do
       get "/users/#{@student_1.id}/admin_merge"
       f('.static_message').should be_false
@@ -139,10 +188,10 @@ describe "user selenium tests" do
   context "registration" do
     before :each do
       a = Account.default
-      a.settings = { :open_registration => true, :no_enrollments_can_create_courses => true }
+      a.settings = {:open_registration => true, :no_enrollments_can_create_courses => true}
       a.save!
     end
-  
+
     it "should register a student with a join code" do
       course(:active_all => true)
       @course.update_attribute :self_enrollment, true
@@ -164,7 +213,7 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should == 'student'
+      User.last.initial_enrollment_type.should eql 'student'
     end
 
     it "should register a student without a join code" do
@@ -184,7 +233,7 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should == 'student'
+      User.last.initial_enrollment_type.should eql 'student'
     end
 
     it "should register a teacher" do
@@ -199,7 +248,7 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should == 'teacher'
+      User.last.initial_enrollment_type.should eql 'teacher'
     end
 
     it "should register an observer" do
@@ -218,7 +267,7 @@ describe "user selenium tests" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should == 'observer'
+      User.last.initial_enrollment_type.should eql 'observer'
     end
   end
 

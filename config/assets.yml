@@ -223,6 +223,8 @@ stylesheets:
     - public/stylesheets/compiled/grade_summary.css
   context_list:
     - public/stylesheets/compiled/context_list.css
+  page_views:
+    - public/stylesheets/compiled/page_views.css
   prior_users:
     - public/stylesheets/compiled/prior_users.css
   popup:

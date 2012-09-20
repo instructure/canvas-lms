@@ -329,7 +329,7 @@ ActionController::Routing::Routes.draw do |map|
     :controller => :crocodoc_sessions, :action => :create,
     :conditions => {:method => :post}
 
-  map.resources :page_views, :only => [:update,:index]
+  map.resources :page_views, :only => [:update]
   map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
@@ -509,7 +509,7 @@ ActionController::Routing::Routes.draw do |map|
     user.delete 'delete', :controller => 'users', :action => 'delete'
     add_files(user, :images => true)
     add_zip_file_imports(user)
-    user.resources :page_views, :only => [:index]
+    user.resources :page_views, :only => 'index'
     user.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
