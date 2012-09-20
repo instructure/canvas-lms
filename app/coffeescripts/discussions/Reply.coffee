@@ -3,7 +3,7 @@ define [
   'underscore'
   'i18n!discussions.reply'
   'jquery'
-  'compiled/discussions/Entry'
+  'compiled/models/Entry'
   'str/htmlEscape'
   'jst/discussions/_reply_attachment'
   'compiled/fn/preventDefault'

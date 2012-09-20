@@ -3,7 +3,7 @@ define [
   'i18n!discussions.entry'
   'Backbone'
   'underscore'
-  'compiled/discussions/EntryCollection'
+  'compiled/collections/EntryCollection'
   'jst/discussions/_entry_content'
   'jst/discussions/_deleted_entry'
   'jst/discussions/entry_with_replies'
@@ -146,7 +146,7 @@ define [
         htmlEscape value
 
   # circular dep
-  require ['compiled/discussions/EntryCollectionView'], (EntryCollectionView) ->
+  require ['compiled/views/DiscussionTopic/EntryCollectionView'], (EntryCollectionView) ->
 
     EntryView::createReplies = ->
       el = @$el.find '.replies'

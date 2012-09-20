@@ -1,7 +1,7 @@
 require [
   'Backbone'
   'compiled/discussions/app'
-  'compiled/discussions/TopicView'
+  'compiled/views/DiscussionTopic/TopicView'
   'compiled/collections/ParticipantCollection'
 ], (Backbone, app, TopicView, ParticipantCollection) ->
 

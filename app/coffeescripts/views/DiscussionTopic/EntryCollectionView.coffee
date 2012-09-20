@@ -1,6 +1,6 @@
 define [
   'Backbone'
-  'compiled/discussions/EntryView'
+  'compiled/views/DiscussionTopic/EntryView'
   'jst/discussions/EntryCollectionView'
 ], (Backbone, EntryView, entryCollectionViewTemplate) ->
 

@@ -1,6 +1,6 @@
 define [
   'Backbone'
-  'compiled/discussions/Entry'
+  'compiled/models/Entry'
 ], (Backbone, Entry) ->
 
   ##
