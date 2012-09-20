@@ -54,8 +54,6 @@ class Group < ActiveRecord::Base
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
-  has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
-  has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :collections, :as => :context

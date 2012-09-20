@@ -51,7 +51,6 @@ module Context
     QuizSubmission = ::QuizSubmission
     Rubric = ::Rubric
     RubricAssociation = ::RubricAssociation
-    ShortMessage = ::ShortMessage
     Submission = ::Submission
     WebConference = ::WebConference
     Wiki = ::Wiki

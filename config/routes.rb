@@ -268,7 +268,6 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     course.resources :collaborations
-    course.resources :short_messages
 
     course.resources :gradebook_uploads
     course.resources :rubrics
@@ -411,7 +410,6 @@ ActionController::Routing::Routes.draw do |map|
     add_conferences(group)
     add_media(group)
     group.resources :collaborations
-    group.resources :short_messages
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
     group.profile 'profile', :controller => :groups, :action => 'profile', :conditions => {:method => :get}
   end

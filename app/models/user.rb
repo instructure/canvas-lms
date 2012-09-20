@@ -472,10 +472,6 @@ class User < ActiveRecord::Base
   end
   protected :assign_uuid
 
-  def hashtag
-    nil
-  end
-
   named_scope :with_service, lambda { |service|
     if service.is_a?(UserService)
       {:include => :user_services, :conditions => ['user_services.service = ?', service.service]}
@@ -919,7 +915,7 @@ class User < ActiveRecord::Base
       'calendar_events','collaborations',
       'context_module_progressions','discussion_entries','discussion_topics',
       'enrollments','group_memberships','page_comments',
-      'rubric_assessments','short_messages',
+      'rubric_assessments',
       'submission_comment_participants','user_services','web_conferences',
       'web_conference_participants','wiki_pages'].each do |key|
       updates[key] = "user_id"

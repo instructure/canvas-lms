@@ -50,17 +50,6 @@
           <% end %>
           <span class="course_info name"><%= @context.name %></span>
         </td>
-        <% if feature_and_service_enabled?(:twitter) %>
-          <td class="hashtag_form" style="<%= hidden unless @context.hashtag && @context.hashtag != "" %> vertical-align: top;"><%= f.blabel :hashtag, :en => "Hashtag" %></td>
-          <td class="hashtag_form" style="<%= hidden unless @context.hashtag && @context.hashtag != "" %> width: 60%;">
-            <%= f.text_field :hashtag, :class => "course_form" %>
-            <span class="course_info" id="course_hashtag"><%= @context.hashtag %></span>
-            <div style="font-size: 0.8em;" id="hashtag_options"><span class="course_form">
-              <%= f.check_box :show_public_context_messages %>
-              <%= f.label :show_public_context_messages, :en => "collect public messages for this hashtag" %>
-            </span></div>
-          </td>
-        <% end %>
       </tr>
       <tr>
         <td class="nobr"><%= f.blabel :course_code, :en => "Course Code" %></td>
@@ -72,33 +61,6 @@
           <% end %>
           <span class="course_info course_code"><%= @context.course_code %></span>
         </td>
-        <% if feature_and_service_enabled?(:twitter) %>
-          <td colspan="2" style=" display: none; padding-left: 10px;"><span class="course_form" style="font-size: 0.8em;">
-            <a href="#" class="hashtag_dialog_link help"> <%= t('links.hashtag_help', %{What's a hashtag?}) %></a>
-            <div id="hashtag_dialog" style="display: none; font-size: 0.8em;">
-              <%= image_tag "twitter.png", :style => "float: left; margin: 10px;" %>
-              <%= mt 'help.hashtags', %{Hashtags are special phrases that let people consistently mention the same idea (like a course) on web sites like Twitter.  For example, the message "I like #instructure" is using the hashtag "instructure".
-
-Hashtags should consist of letters, numbers, dashes and underscores (no spaces).  The hashtag should be unique, easily recognizable, and short.  Short hashtags are better since sites like Twitter limit the number of letters per message.}%>
-              <p><%= before_label('examples', %{Examples}) %><br/>
-              <table style="margin-left: 20px;"><tr>
-                <td><%= before_label('too_general_twitter_hashtag.description', %{too general}) %></td>
-                <td><b> <%= t('too_general_twitter_hashtag.example', %{#biology}) %></b></td>
-              </tr><tr>
-                <td><%= before_label('too_long_twitter_hashtag.description', %{too long}) %></td>
-                <td><b> <%= t('too_long_twitter_hashtag.example', %{#san-fransisco-university-biology-100}) %></b></td>
-              </tr><tr>
-                <td><%= before_label('good_twitter_hashtag.description', %{much better}) %></td>
-                <td><b> <%= t('good_twitter_hashtag.example', %{#sfu-bio100}) %></b></td>
-              </tr></table>
-              </p>
-              <div class="button-container">
-                <button type="button" class="close_dialog_button button"><%= t('buttons.kthxbai', %{Cool, Thanks}) %></button>
-              </div>
-            </div>
-          </span>
-          </td>
-        <% end %>
       <% if @context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
           <td><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>

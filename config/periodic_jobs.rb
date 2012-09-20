@@ -52,13 +52,6 @@ Delayed::Periodic.cron 'CrocodocDocument.update_process_states', '*/5 * * * *' d
   end
 end
 
-Delayed::Periodic.cron 'Twitter processing', '*/15 * * * *' do
-  Shard.with_each_shard do
-    TwitterSearcher.process
-    TwitterUserPoller.process
-  end
-end
-
 Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * *' do
   Reporting::CountsReport.process
 end

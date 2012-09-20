@@ -32,7 +32,6 @@ class Course < ActiveRecord::Base
                   :publish_grades_immediately,
                   :allow_student_wiki_edits,
                   :allow_student_assignment_edits,
-                  :hashtag,
                   :show_public_context_messages,
                   :syllabus_body,
                   :public_description,
@@ -155,8 +154,6 @@ class Course < ActiveRecord::Base
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
-  has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
-  has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :grading_standards, :as => :context
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
   has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
@@ -589,7 +586,6 @@ class Course < ActiveRecord::Base
   end
 
   def assert_defaults
-    Hashtag.find_or_create_by_hashtag(self.hashtag) if self.hashtag && self.hashtag != ""
     self.tab_configuration ||= [] unless self.tab_configuration == []
     self.name = nil if self.name && self.name.strip.empty?
     self.name ||= t('missing_name', "Unnamed Course")
@@ -771,10 +767,6 @@ class Course < ActiveRecord::Base
     self.enrollments.find_all_by_workflow_state("creation_pending").each do |e|
       e.invite!
     end
-  end
-
-  def hashtag_model
-    Hashtag.find_by_hashtag(self.hashtag) if self.hashtag
   end
 
   workflow do
@@ -2244,7 +2236,7 @@ class Course < ActiveRecord::Base
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public,
       :publish_grades_immediately, :allow_student_wiki_edits,
-      :allow_student_assignment_edits, :hashtag, :show_public_context_messages,
+      :allow_student_assignment_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
