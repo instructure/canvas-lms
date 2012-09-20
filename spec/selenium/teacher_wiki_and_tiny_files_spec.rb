@@ -27,6 +27,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     wait_for_ajax_requests
   end
 
+
   context "wiki and tiny files as a teacher" do
 
     before (:each) do
@@ -51,7 +52,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should lazy load files" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
 
@@ -80,7 +80,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should lazy load directory structure for upload form" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
 
@@ -93,7 +92,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should be able to upload a file when nothing has been loaded" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       keep_trying_until { f("#new_wiki_page").should be_displayed }
       f('.wiki_switch_views_link').click
@@ -124,7 +122,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should show uploaded files in file tree and add them to the rce" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
       f('.wiki_switch_views_link').click
@@ -155,7 +152,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should not show uploaded files in image list" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
@@ -177,7 +173,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should show files uploaded on the images tab in the file tree" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       root_folders = @tree1.find_elements(:css, 'li.folder')
@@ -198,26 +193,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       root_folders.first.find_elements(:css, '.file.text').length.should == 2
       @image_list.find_elements(:css, 'img.img').length.should == 2
       wiki_page_body[:value].should be_empty
-    end
-  end
-
-  context "wiki and tiny files as a student" do
-    before (:each) do
-      course(:active_all => true, :name => 'wiki course')
-      @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
-      @teacher = user_with_pseudonym(:active_user => true, :username => 'teacher@example.com', :name => 'teacher@example.com', :password => 'asdfasdf')
-      @course.enroll_student(@student).accept
-      @course.enroll_teacher(@teacher).accept
-    end
-
-    it "should add a file to the page and validate a student can see it" do
-      login_as(@teacher.name)
-
-      add_file_to_rce
-      login_as(@student.name)
-      get "/courses/#{@course.id}/wiki"
-      fj('a[title="text_file.txt"]').should be_displayed
-      #check_file would be good to do here but the src on the file in the wiki body is messed up
     end
   end
 end

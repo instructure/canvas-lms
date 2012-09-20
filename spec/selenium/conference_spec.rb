@@ -13,8 +13,7 @@ describe "web conference" do
   it "should create a web conference" do
     conference_title = 'new conference'
     f('.add_conference_link').click
-    f('#web_conference_title').clear
-    f('#web_conference_title').send_keys(conference_title)
+    replace_content(f('#web_conference_title'), conference_title)
     submit_form('#add_conference_form')
     wait_for_ajaximations
     driver.find_element(:link, conference_title).click
@@ -25,8 +24,7 @@ describe "web conference" do
   it "should cancel creating a web conference" do
     conference_title = 'new conference'
     f('.add_conference_link').click
-    f('#web_conference_title').clear
-    f('#web_conference_title').send_keys(conference_title)
+    replace_content(f('#web_conference_title'), conference_title)
     f('#add_conference_form button.cancel_button').click
     wait_for_animations
     f('#add_conference_form div.header').text.include?('Start').should be_false

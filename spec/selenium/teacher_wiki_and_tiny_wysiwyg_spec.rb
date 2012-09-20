@@ -3,12 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 describe "Wiki pages and Tiny WYSIWYG editor features" do
   it_should_behave_like "wiki and tiny selenium tests"
 
-  context "WYSIWYG generic" do
+  context "WYSIWYG generic as a teacher" do
 
     before (:each) do
       course_with_teacher_logged_in
     end
-
 
     def wysiwyg_state_setup(text = "<p>1</p><p>2</p><p>3</p>", val = false)
       get "/courses/#{@course.id}/wiki"
@@ -21,7 +20,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         add_text_to_tiny_no_val(text)
         select_all_wiki
       end
-
     end
 
     it "should type a web address link, save it, and validate auto link plugin worked correctly" do
@@ -205,7 +203,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should resize the WYSIWYG editor height gracefully" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       load_simulate_js
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })

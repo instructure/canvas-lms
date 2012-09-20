@@ -27,8 +27,7 @@ describe "people" do
     expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
     open_student_group_dialog
     inputs = ffj('input:visible')
-    inputs[0].clear
-    inputs[0].send_keys(group_text)
+    replace_content(inputs[0], group_text)
     submit_form('#add_category_form')
     wait_for_ajaximations
     f('#category_list').should include_text(group_text)

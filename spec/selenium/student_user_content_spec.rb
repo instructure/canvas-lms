@@ -3,6 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "user_content" do
   it_should_behave_like "in-process server selenium tests"
 
+  context "as a student" do
+
   def message_body
     <<-MESSAGE
 <p>flash:</p>
@@ -15,7 +17,7 @@ describe "user_content" do
     HostUrl.stubs(:is_file_host?).returns(true)
   end
 
-  context "iframes" do
+  describe "iframes" do
 
     it "should serve embed tags from a safefiles iframe" do
       factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => message_body)
@@ -50,4 +52,5 @@ describe "user_content" do
       end
     end
   end
+end
 end

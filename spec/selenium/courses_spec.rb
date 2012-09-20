@@ -76,8 +76,7 @@ describe "courses" do
       f("#course_form .edit_course_link").should be_displayed
       form.find_element(:css, ".edit_course_link").click
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
-      quota_input.clear
-      quota_input.send_keys("10")
+      replace_content(quota_input, "10")
       submit_form(form)
       keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"

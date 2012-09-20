@@ -19,8 +19,7 @@ describe "external tool assignments" do
     f('.ui-datepicker-trigger').click
     datepicker = datepicker_next
     datepicker.find_element(:css, '.ui-datepicker-ok').click
-    f('#assignment_points_possible').clear
-    f('#assignment_points_possible').send_keys('5')
+    replace_content(f('#assignment_points_possible'), '5')
     click_option('.assignment_submission_types', 'External Tool')
     expect_new_page_load { f('.more_options_link').click }
     keep_trying_until do
