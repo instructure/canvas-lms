@@ -17,7 +17,7 @@ gem 'encrypted_cookie_store-instructure', '1.0.1', :require => 'encrypted_cookie
 gem 'erubis',         '2.7.0'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.1.13'
-gem 'haml',           '3.1.6'
+gem 'sass',           '3.2.1'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
 end
