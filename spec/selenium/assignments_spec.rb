@@ -239,7 +239,7 @@ describe "assignments" do
       #save changes
       submit_form(form)
       wait_for_ajaximations
-      ff('.loading_image_holder').length.should eql 0
+      ff('.loading_image_holder').length.should == 0
       f('h2.title').should include_text(assignment_name + ' edit')
     end
 
@@ -284,7 +284,7 @@ describe "assignments" do
         #save changes
         submit_form('#edit_assignment_form')
         wait_for_ajaximations
-        ff('.loading_image_holder').length.should eql 0
+        ff('.loading_image_holder').length.should == 0
         f('h2.title').should include_text(orig_title + ' edit')
       end
 
@@ -331,16 +331,16 @@ describe "assignments" do
 
       wait_for_animations
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      errorBoxes.size.should eql 2
+      errorBoxes.size.should == 2
       errorBoxes.first.should_not be_displayed # .text just gives us an empty string since it's hidden
-      errorBoxes.last.text.should eql "There were errors on one or more advanced options"
+      errorBoxes.last.text.should == "There were errors on one or more advanced options"
       errorBoxes.last.should be_displayed
 
       f('a.more_options_link').click
       wait_for_animations
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      errorBoxes.size.should eql 1 # the more_options_link one has now been removed from the DOM
-      errorBoxes.first.text.should eql "The assignment shouldn't be locked again until after the due date"
+      errorBoxes.size.should == 1 # the more_options_link one has now been removed from the DOM
+      errorBoxes.first.text.should == "The assignment shouldn't be locked again until after the due date"
       errorBoxes.first.should be_displayed
     end
   end

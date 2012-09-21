@@ -1,136 +1,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
+
 
 describe "submissions" do
   it_should_behave_like "in-process server selenium tests"
-
-  def create_assignment(type = 'online_text_entry')
-    assignment = @course.assignments.build({
-                                               :name => 'media assignment',
-                                               :submission_types => type
-                                           })
-    assignment.workflow_state = 'published'
-    assignment.save!
-    assignment
-  end
-
-  def create_assignment_and_go_to_page(type = 'online_text_entry')
-    assignment = create_assignment type
-    get "/courses/#{@course.id}/assignments/#{assignment.id}"
-    assignment
-  end
-
-  def open_media_comment_dialog
-    f('.media_comment_link').click
-    # swf and stuff loads, give it a sec to do its thing
-    sleep 0.5
-  end
-
-  def submit_media_comment_1
-    open_media_comment_dialog
-    # pretend like we are flash sending data to the JS
-    driver.execute_script <<-JS
-      var entries1 = [{"duration":1.664,"thumbnailUrl":"http://www.instructuremedia.com/p/100/sp/10000/thumbnail/entry_id/0_jd6ger47/version/0","numComments":-1,"status":1,"rank":-1,"userScreenName":"_100_1_1","displayCredit":"_100_1_1","partnerLandingPage":null,"dataUrl":"http://www.instructuremedia.com/p/100/sp/10000/flvclipper/entry_id/0_jd6ger47/version/100000","sourceLink":"","subpId":10000,"puserId":"1_1","views":0,"height":0,"description":null,"hasThumbnail":false,"width":0,"kshowId":"0_pb7id2lf","kuserId":"","userLandingPage":"","mediaType":2,"plays":0,"partnerId":100,"adminTags":"","entryVersion":"","downloadUrl":"http://www.instructuremedia.com/p/100/sp/10000/raw/entry_id/0_jd6ger47/version/100000","createdAtDate":"1970-01-16T09:24:02.931Z","votes":-1,"uploaderName":null,"tags":"","entryName":"ryanf@instructure.com 2012-02-21T16:48:37.729Z","entryType":1,"entryId":"0_jd6ger47","createdAtAsInt":1329842931,"uid":"E78A81CC-D03D-CD10-B449-A0D0D172EF38"}]
-      addEntryComplete(entries1);
-    JS
-    wait_for_ajax_requests
-  end
-
-  def submit_media_comment_2
-    open_media_comment_dialog
-    driver.execute_script <<-JS
-      var entries2 = [{"duration":1.829,"thumbnailUrl":"http://www.instructuremedia.com/p/100/sp/10000/thumbnail/entry_id/0_5hcd9mro/version/0","numComments":-1,"status":1,"rank":-1,"userScreenName":"_100_1_1","displayCredit":"_100_1_1","partnerLandingPage":null,"dataUrl":"http://www.instructuremedia.com/p/100/sp/10000/flvclipper/entry_id/0_5hcd9mro/version/100000","sourceLink":"","subpId":10000,"puserId":"1_1","views":0,"height":0,"description":null,"hasThumbnail":false,"width":0,"kshowId":"0_pb7id2lf","kuserId":"","userLandingPage":"","mediaType":2,"plays":0,"partnerId":100,"adminTags":"","entryVersion":"","downloadUrl":"http://www.instructuremedia.com/p/100/sp/10000/raw/entry_id/0_5hcd9mro/version/100000","createdAtDate":"1970-01-16T09:24:03.563Z","votes":-1,"uploaderName":null,"tags":"","entryName":"ryanf@instructure.com 2012-02-21T16:59:11.249Z","entryType":1,"entryId":"0_5hcd9mro","createdAtAsInt":1329843563,"uid":"22A2C625-5FAB-AF3A-1A76-A0DA7572BFE4"}]
-      addEntryComplete(entries2);
-    JS
-    wait_for_ajax_requests
-  end
-
-  context 'as a teacher' do
-
-    before (:each) do
-      course_with_teacher_logged_in
-    end
-
-    it "should allow media comments" do
-      stub_kaltura
-      student_in_course
-      assignment = create_assignment
-      assignment.submissions.create(:user => @student)
-      get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
-
-      # make sure the JS didn't burn any bridges, and submit two
-      submit_media_comment_1
-      submit_media_comment_2
-
-      # check that the thumbnails show up on the right sidebar
-      number_of_comments = driver.execute_script "return $('.comment_list').children().length"
-      number_of_comments.should == 2
-    end
-
-    it "should display the grade in grade field" do
-      student_in_course
-      assignment = create_assignment
-      assignment.submissions.create(:user => @student)
-      assignment.grade_student @student, :grade => 2
-      get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
-      f('.grading_value')[:value].should == '2'
-    end
-  end
-
-  context "student view" do
-
-    before (:each) do
-      course_with_teacher_logged_in
-    end
-
-    it "should allow a student view student to view/submit assignments" do
-      @assignment = @course.assignments.create(
-          :title => 'Cool Assignment',
-          :points_possible => 10,
-          :submission_types => "online_text_entry",
-          :due_at => Time.now.utc + 2.days)
-
-      enter_student_view
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      f('.assignment .title').should include_text @assignment.title
-      f('.submit_assignment_link').click
-      assignment_form = f('#submit_online_text_entry_form')
-      wait_for_tiny(assignment_form)
-
-      type_in_tiny('#submission_body', 'my assigment submission')
-      expect_new_page_load { submit_form(assignment_form) }
-
-      @course.student_view_student.submissions.count.should == 1
-      f('#sidebar_content .details').should include_text "Turned In!"
-    end
-
-    it "should allow a student view student to submit file upload assignments" do
-      @assignment = @course.assignments.create(
-          :title => 'Cool Assignment',
-          :points_possible => 10,
-          :submission_types => "online_upload",
-          :due_at => Time.now.utc + 2.days)
-
-      enter_student_view
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      f('.submit_assignment_link').click
-
-      filename, fullpath, data = get_file("testfile1.txt")
-      f('.submission_attachment input').send_keys(fullpath)
-      expect_new_page_load { f('#submit_file_button').click }
-
-      keep_trying_until do
-        f('.details .header').should include_text "Turned In!"
-        f('.details .file-big').should include_text "testfile1"
-      end
-    end
-  end
+  it_should_behave_like "submissions selenium tests"
 
   context 'as a student' do
+
     DUE_DATE = Time.now.utc + 2.days
-    before (:each) do
+    before(:each) do
       course_with_student_logged_in
       @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => DUE_DATE)
       @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
@@ -140,7 +20,7 @@ describe "submissions" do
 
     it "should not break when you open and close the media comment dialog" do
       stub_kaltura
-      create_assignment_and_go_to_page 'media_recording'
+      create_assignment_and_go_to_page('media_recording')
 
       f(".submit_assignment_link").click
       open_button = f(".record_media_comment_link")
@@ -155,7 +35,7 @@ describe "submissions" do
       close_visible_dialog
 
       # fire the callback that the flash object fires
-      driver.execute_script "window.mediaCommentCallback([{entryId:1, entryType:1}]);"
+      driver.execute_script("window.mediaCommentCallback([{entryId:1, entryType:1}]);")
 
       # see if the confirmation element shows up
       f('#media_media_recording_ready').should be_displayed
@@ -326,40 +206,40 @@ describe "submissions" do
         tooltip_text_elements[1].text.should == 'submitted'
       end
     end
-  end
 
-  describe 'uploaded files for submission' do
-    it_should_behave_like "forked server selenium tests"
-    it_should_behave_like "files selenium shared"
+    describe 'uploaded files for submission' do
+      it_should_behave_like "forked server selenium tests"
+      it_should_behave_like "files selenium shared"
 
-    it "should allow uploaded files to be used for submission" do
+      it "should allow uploaded files to be used for submission" do
 
-      Setting.set("file_storage_test_override", "local")
-      user_with_pseudonym :username => "nobody2@example.com",
-                          :password => "asdfasdf2"
-      course_with_student_logged_in :user => @user
-      login "nobody2@example.com", "asdfasdf2"
-      add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
-               @user, "html-editing-test.html")
-      File.read(fixture_file_path("files/html-editing-test.html"))
-      assignment = @course.assignments.create!(:title => 'assignment 1',
-                                               :name => 'assignment 1',
-                                               :submission_types => "online_upload")
-      get "/courses/#{@course.id}/assignments/#{assignment.id}"
-      f('.submit_assignment_link').click
-      f('.toggle_uploaded_files_link').click
+        Setting.set("file_storage_test_override", "local")
+        user_with_pseudonym :username => "nobody2@example.com",
+                            :password => "asdfasdf2"
+        course_with_student_logged_in :user => @user
+        login "nobody2@example.com", "asdfasdf2"
+        add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
+                 @user, "html-editing-test.html")
+        File.read(fixture_file_path("files/html-editing-test.html"))
+        assignment = @course.assignments.create!(:title => 'assignment 1',
+                                                 :name => 'assignment 1',
+                                                 :submission_types => "online_upload")
+        get "/courses/#{@course.id}/assignments/#{assignment.id}"
+        f('.submit_assignment_link').click
+        f('.toggle_uploaded_files_link').click
 
-      # traverse the tree
-      f('#uploaded_files > ul > li.folder > .sign').click
-      wait_for_animations
-      f('#uploaded_files > ul > li.folder .file .name').click
-      wait_for_animations
+        # traverse the tree
+        f('#uploaded_files > ul > li.folder > .sign').click
+        wait_for_animations
+        f('#uploaded_files > ul > li.folder .file .name').click
+        wait_for_animations
 
-      expect_new_page_load { f('#submit_file_button').click }
+        expect_new_page_load { f('#submit_file_button').click }
 
-      keep_trying_until do
-        f('.details .header').should include_text "Turned In!"
-        f('.details .file-big').should include_text "html-editing-test.html"
+        keep_trying_until do
+          f('.details .header').should include_text "Turned In!"
+          f('.details .file-big').should include_text "html-editing-test.html"
+        end
       end
     end
   end

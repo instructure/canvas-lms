@@ -32,15 +32,15 @@ describe "conversations" do
       c = get_conversations.first
       c.click
       c.should have_class('unread') # not marked immediately
-      @me.conversations.unread.size.should eql 5
+      @me.conversations.unread.size.should == 5
       keep_trying_until do
         get_conversations.first.should_not have_class('unread')
         true
       end
-      @me.conversations.unread.size.should eql 4
+      @me.conversations.unread.size.should == 4
 
       get_conversations.last.click
-      get_conversations.size.should eql 4 # removed once deselected
+      get_conversations.size.should == 4 # removed once deselected
     end
 
     it "should star a conversation" do
@@ -158,7 +158,7 @@ describe "conversations" do
           true
         end
         get '/conversations'
-        f('.unread-messages-count').text.should eql '4'
+        f('.unread-messages-count').text.should == '4'
       end
     end
   end

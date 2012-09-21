@@ -59,7 +59,7 @@ describe "gradebook2" do
     submit_dialog(dialog, '.ui-button')
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
-      driver.switch_to.alert.text.should eql 'None to Update'
+      driver.switch_to.alert.text.should == 'None to Update'
       driver.switch_to.alert.dismiss
       true
     end
@@ -285,12 +285,12 @@ describe "gradebook2" do
 
       # expect dialog to show 1 fewer student with the "Haven't been graded" option
       f('[data-action="messageStudentsWho"]').click
-      ffj('.student_list li:visible').size.should eql 2
+      ffj('.student_list li:visible').size.should == 2
       # select option
       select = f('#message_assignment_recipients select.message_types')
       select.click
       select.all(:tag_name => 'option').find { |o| o.text == "Haven't been graded" }.click
-      ffj('.student_list li:visible').size.should eql 1
+      ffj('.student_list li:visible').size.should == 1
     end
   end
 
@@ -422,7 +422,7 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       icons = ffj('.gradebook-cell-turnitin')
-      icons.size.should eql 2
+      icons.size.should == 2
 
       # make sure it appears in each submission dialog
       icons.each do |icon|

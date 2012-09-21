@@ -78,8 +78,8 @@ describe "manage groups" do
     # submit new category form
     add_category(@course, 'New Category')
     ff("#category_list li").size.should == 2
-    ff("#category_list li a").first.text.should eql "New Category"
-    ff("#category_list li a").last.text.should eql group_category.name
+    ff("#category_list li a").first.text.should == "New Category"
+    ff("#category_list li a").last.text.should == group_category.name
   end
 
   it "should remove tab and sidebar entries for deleted category" do

@@ -10,7 +10,7 @@ describe "grading standards" do
     f(".add_standard_link").click
     standard = f("#grading_standard_new")
     standard.should_not be_nil
-    standard.attribute(:class).should match(/editing/)
+    standard.should have_class(/editing/)
     standard.find_elements(:css, ".delete_row_link").select(&:displayed?).each_with_index do |link, i|
       if i % 2 == 1
         link.click
@@ -21,8 +21,8 @@ describe "grading standards" do
     standard.find_element(:css, "input.scheme_name").send_keys("New Standard")
     standard.find_element(:css, ".save_button").click
     keep_trying_until { !standard.attribute(:class).match(/editing/) }
-    standard.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should eql(6)
-    standard.find_element(:css, ".standard_title .title").text.should eql("New Standard")
+    standard.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should == 6
+    standard.find_element(:css, ".standard_title .title").text.should == "New Standard"
 
     id = standard.attribute(:id)
     standard.find_element(:css, ".delete_grading_standard_link").click
@@ -46,8 +46,8 @@ describe "grading standards" do
     form.find_element(:css, ".edit_letter_grades_link").click
 
     dialog = f("#edit_letter_grades_form")
-    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should eql(12)
-    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map { |e| e.find_element(:css, ".name").text }.should eql(["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"])
+    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should == 12
+    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map { |e| e.find_element(:css, ".name").text }.should == ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
 
     dialog.find_element(:css, ".find_grading_standard_link").click
     keep_trying_until { f(".find_grading_standard").should have_class("loaded") }
@@ -58,14 +58,13 @@ describe "grading standards" do
     dialog.find_element(:css, ".display_grading_standard").should be_displayed
     dialog.find_element(:css, ".find_grading_standard_link").click
 
-    dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should eql(@standard.title)
+    dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should == @standard.title
     dialog.find_elements(:css, ".grading_standard_select")[-1].click
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").should be_displayed
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id} .select_grading_standard_link").click
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").should_not be_displayed
     dialog.find_element(:css, ".display_grading_standard").should be_displayed
-    dialog.find_element(:css, ".standard_title .title").text.should eql(@standard.title)
-    sleep 2
+    dialog.find_element(:css, ".standard_title .title").text.should == @standard.title
   end
 
   it "should allow setting a grading standard for a course" do
@@ -83,12 +82,12 @@ describe "grading standards" do
     form.find_element(:css, ".edit_letter_grades_link").click
 
     dialog = f("#edit_letter_grades_form")
-    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should eql(12)
-    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map { |e| e.find_element(:css, ".name").text }.should eql(["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"])
+    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should ==(12)
+    dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map { |e| e.find_element(:css, ".name").text }.should == ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
 
     dialog.find_element(:css, ".find_grading_standard_link").click
     keep_trying_until { f(".find_grading_standard").should have_class("loaded") }
-    dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should eql(@standard.title)
+    dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should == @standard.title
     dialog.find_elements(:css, ".grading_standard_select")[-1].click
     (standard_brief = dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}")).should be_displayed
     rows = standard_brief.find_elements(:css, '.details_row')
@@ -102,7 +101,7 @@ describe "grading standards" do
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id} .select_grading_standard_link").click
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").should_not be_displayed
     dialog.find_element(:css, ".display_grading_standard").should be_displayed
-    dialog.find_element(:css, ".standard_title .title").text.should eql(@standard.title)
+    dialog.find_element(:css, ".standard_title .title").text.should == @standard.title
 
     dialog.find_element(:css, ".remove_grading_standard_link").should be_displayed
     dialog.find_element(:css, ".remove_grading_standard_link").click

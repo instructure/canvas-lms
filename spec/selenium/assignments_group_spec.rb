@@ -75,7 +75,7 @@ describe "assignment groups" do
     4.times do |i|
       ags << @course.assignment_groups.create!(:name => "group_#{i}")
     end
-    ags.collect(&:position).should eql([1,2,3,4])
+    ags.collect(&:position).should == [1,2,3,4]
 
     get "/courses/#{@course.id}/assignments"
 
@@ -85,7 +85,7 @@ describe "assignment groups" do
     wait_for_ajaximations
 
     ags.each {|ag| ag.reload}
-    ags.collect(&:position).should eql([1,3,2,4])
+    ags.collect(&:position).should == [1,3,2,4]
   end
 
   it "should round assignment groups percentages to 2 decimal places" do

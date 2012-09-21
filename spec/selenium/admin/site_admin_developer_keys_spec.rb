@@ -10,7 +10,7 @@ describe "managing developer keys" do
 
   it "should allow creating, editing and deleting a developer key" do
     get '/developer_keys'
-    keep_trying_until { f("#loading").attribute('class') != 'loading' }
+    wait_for_ajaximations
     ff("#keys tbody tr").length.should == 0
 
     f(".add_key").click

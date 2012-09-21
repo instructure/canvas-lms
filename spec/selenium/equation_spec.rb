@@ -13,7 +13,6 @@ describe "equation editor" do
       submit_form('.question_form')
       wait_for_ajaximations
     end
-
     wait_for_tiny(f("#quiz_description"))
 
     new_question_link = f('.add_question_link')
@@ -21,7 +20,7 @@ describe "equation editor" do
       new_question_link.click
 
       questions = ffj(".question_holder:visible")
-      questions.length.should eql(time + 1)
+      questions.length.should == time + 1
       question = questions[time]
 
       wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
@@ -39,7 +38,7 @@ describe "equation editor" do
       save_question_and_wait
 
       question.find_elements(:css, 'img.equation_image').size.should == 1
-      f("#right-side .points_possible").text.should eql((time + 1).to_s)
+      f("#right-side .points_possible").text.should == (time + 1).to_s
     end
   end
 end

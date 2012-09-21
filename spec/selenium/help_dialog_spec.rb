@@ -99,7 +99,7 @@ describe "help dialog" do
       er.subject.should == 'test subject'
       er.comments.should == 'test comments'
       er.data['user_perceived_severity'].should == severity
-      er.guess_email.should eql @user.email
+      er.guess_email.should == @user.email
     end
   end
 

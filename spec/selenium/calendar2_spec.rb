@@ -257,12 +257,12 @@ describe "calendar2" do
         f('.fc-event').click
         f('.message_students').click
         wait_for_ajaximations
-        ff(".participant_list input").size.should eql 1
+        ff(".participant_list input").size.should == 1
         set_value f('textarea[name="body"]'), 'hello'
         fj('.ui-button:contains(Send)').click
         wait_for_ajaximations
 
-        student1.conversations.first.messages.size.should eql 1
+        student1.conversations.first.messages.size.should == 1
         student2.conversations.should be_empty
       end
 
@@ -341,7 +341,7 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajaximations
         events = ff('.fc-event')
-        events.size.should eql 2
+        events.size.should == 2
         events.first.click
 
         details = f('.event-details')
@@ -366,7 +366,7 @@ describe "calendar2" do
           fj('.ui-button:contains(Update)').click
           wait_for_ajaximations
 
-          ag.reload.appointments.first.description.should eql description
+          ag.reload.appointments.first.description.should == description
           lambda { f('.fc-event') }.should_not raise_error
         end
       end
@@ -379,7 +379,7 @@ describe "calendar2" do
                          :due_at => Time.zone.now.beginning_of_week + 1.day - 1.minute)
         calendar_events = @teacher.calendar_events_for_calendar.last
 
-        calendar_events.title.should eql "super important"
+        calendar_events.title.should == "super important"
         @assignment.due_date == Time.zone.now.beginning_of_week + 1.day - 1.minute
 
         get "/calendar2"
@@ -388,7 +388,7 @@ describe "calendar2" do
         keep_trying_until do
           events = ff('.fc-event').select { |e| e.text =~ /11:59.*super important/ }
           # shows on monday night and tuesday morning
-          events.size.should eql 2
+          events.size.should == 2
         end
       end
 
@@ -462,7 +462,7 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajaximations
         events = ff('.fc-event')
-        events.size.should eql 1
+        events.size.should == 1
         events.first.text.should include "1p"
         events.first.click
 
@@ -478,7 +478,7 @@ describe "calendar2" do
 
         popup_title = f('.details_title')
         popup_title.should be_displayed
-        popup_title.text.should eql "future event"
+        popup_title.text.should == "future event"
       end
 
     end

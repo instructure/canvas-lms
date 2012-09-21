@@ -69,7 +69,7 @@ describe "speed grader" do
       question_inputs.each { |qi| replace_content(qi, 3) }
       submit_form('#update_history_form')
     end
-    keep_trying_until { f('#grade_container input').attribute('value').should == expected_points }
+    keep_trying_until { f('#grade_container input').should have_attribute('value', expected_points) }
   end
 
   it "should properly display student quiz results when the teacher also has a student enrollment" do
@@ -285,7 +285,7 @@ describe "speed grader" do
     wait_for_animations
 
     f("#avatar_image").should_not be_displayed
-    f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should eql "Student 1"
+    f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
 
     f('#comments > .comment').should include_text('ohai')
     f("#comments > .comment .avatar").should_not be_displayed
@@ -297,7 +297,7 @@ describe "speed grader" do
     keep_trying_until { ff('#comments > .comment').size == 2 }
 
     # make sure name and avatar show up for teacher comment
-    ffj("#comments > .comment .avatar:visible").size.should eql 1
+    ffj("#comments > .comment .avatar:visible").size.should == 1
     ff('#comments > .comment .author_name')[1].should include_text('nobody@example.com')
   end
 
@@ -309,8 +309,8 @@ describe "speed grader" do
     wait_for_animations
 
     keep_trying_until { ffj('#students_selectmenu option').size > 0 }
-    ffj('#students_selectmenu option').size.should eql(1) # just the one student
-    ffj('#section-menu ul li').size.should eql(1) # "Show all sections"
+    ffj('#students_selectmenu option').size.should == 1 # just the one student
+    ffj('#section-menu ul li').size.should == 1 # "Show all sections"
     fj('#students_selectmenu #section-menu').should be_nil # doesn't get inserted into the menu
   end
 

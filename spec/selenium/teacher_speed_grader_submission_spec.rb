@@ -3,6 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/speed_grader_common'
 describe "speed grader submissions" do
   it_should_behave_like "speed grader tests"
 
+  context "as a teacher" do
+
   it "should display submission of first student and then second student" do
     student_submission
 
@@ -99,9 +101,9 @@ describe "speed grader submissions" do
   end
 
   it "should handle versions correctly" do
-    submission1 = student_submission :username => "student1@example.com", :body => 'first student, first version'
-    submission2 = student_submission :username => "student2@example.com", :body => 'second student'
-    submission3 = student_submission :username => "student3@example.com", :body => 'third student'
+    submission1 = student_submission(:username => "student1@example.com", :body => 'first student, first version')
+    submission2 = student_submission(:username => "student2@example.com", :body => 'second student')
+    submission3 = student_submission(:username => "student3@example.com", :body => 'third student')
 
     # This is "no submissions" guy
     submission3.delete
@@ -153,8 +155,8 @@ describe "speed grader submissions" do
   end
 
   it "should leave the full rubric open when switching submissions" do
-    student_submission :username => "student1@example.com"
-    student_submission :username => "student2@example.com"
+    student_submission(:username => "student1@example.com")
+    student_submission(:username => "student2@example.com")
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
@@ -318,4 +320,5 @@ describe "speed grader submissions" do
       f('#grade_container .submission_pending').should_not be_nil
     end
   end
+end
 end

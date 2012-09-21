@@ -84,14 +84,14 @@ describe "gradebooks" do
 
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
-    ffj('.turnitin:visible').size.should eql 2
+    ffj('.turnitin:visible').size.should == 2
 
     # now create a ton of students so that the data loads via ajax
     100.times { |i| student_in_course(:active_all => true, :name => "other guy #{i}") }
 
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
-    ffj('.turnitin:visible').size.should eql 2
+    ffj('.turnitin:visible').size.should == 2
   end
 
   it "should include student view student for grading" do

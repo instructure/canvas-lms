@@ -42,7 +42,7 @@ describe "jquery ui" do
       
       driver.execute_script("$('#ui-datepicker-time-hour').select();")
       f("#ui-datepicker-time-hour").send_keys('5')
-      f("#ui-datepicker-time-hour").attribute('value').should == "5"
+      f("#ui-datepicker-time-hour").should have_attribute('value', '5')
     end
   end
   

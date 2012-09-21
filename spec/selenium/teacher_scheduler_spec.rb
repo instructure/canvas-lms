@@ -1,106 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
-
-EDIT_NAME = 'edited appointment'
-EDIT_LOCATION = 'edited location'
+require File.expand_path(File.dirname(__FILE__) + '/helpers/scheduler_common')
 
 describe "scheduler" do
   it_should_behave_like "calendar2 selenium tests"
-
-  def fill_out_appointment_group_form(new_appointment_text, opts = {})
-    f('.create_link').click
-    edit_form = f('#edit_appointment_form')
-    keep_trying_until { edit_form.should be_displayed }
-    replace_content(fj('input[name="title"]'), new_appointment_text)
-    f('.ag_contexts_selector').click
-    f('.ag_sections_toggle').click
-    if opts[:section_codes]
-      opts[:section_codes].each { |code| f("[name='sections[]'][value='#{code}']").click }
-    else
-      f('[name="context_codes[]"]').click
-    end
-    f('.ag_contexts_done').click
-    if opts[:checkable_options]
-      if opts[:checkable_options].has_key?(:per_slot_option)
-        set_value f('[name="per_slot_option"]'), true
-      end
-      if opts[:checkable_options].has_key?(:participant_visibility)
-        set_value f('[name="participant_visibility"]'), true
-      end
-      if opts[:checkable_options].has_key?(:max_appointments_per_participant_option)
-        set_value f('[name="max_appointments_per_participant_option"]'), true
-      end
-    end
-    date_field = edit_form.find_element(:css, '.date_field')
-    date_field.click
-    wait_for_animations
-    fj('.ui-datepicker-trigger:visible').click
-    datepicker_next
-    replace_content(edit_form.find_element(:css, '.start_time'), '1')
-    replace_content(edit_form.find_element(:css, '.end_time'), '3')
-  end
-
-  def submit_appointment_group_form(publish = true)
-    save, save_and_publish = ff('.ui-dialog-buttonset .ui-button')
-    if publish
-      save_and_publish.click
-    else
-      save.click
-    end
-    wait_for_ajaximations
-  end
-
-  def create_appointment_group_manual(opts = {})
-    opts = {
-        :publish => true,
-        :new_appointment_text => 'new appointment group'
-    }.with_indifferent_access.merge(opts)
-
-    expect {
-      fill_out_appointment_group_form(opts[:new_appointment_text], opts)
-      submit_appointment_group_form(opts[:publish])
-      f('.view_calendar_link').text.should == opts[:new_appointment_text]
-    }.to change(AppointmentGroup, :count).by(1)
-  end
-
-  def click_scheduler_link
-    header_buttons = ff('.ui-buttonset > label')
-    header_buttons[2].click
-    wait_for_ajaximations
-  end
-
-  def click_appointment_link
-    f('.view_calendar_link').click
-    f('.scheduler-mode').should be_displayed
-  end
-
-  def click_al_option(option_selector, offset=0)
-    ffj('.al-trigger')[offset].click
-    options = ffj('.al-options')[offset]
-    options.should be_displayed
-    options.find_element(:css, option_selector).click
-  end
-
-  def delete_appointment_group
-    delete_button = fj('.ui-dialog-buttonset .ui-button:contains("Delete")')
-    delete_button.click
-    wait_for_ajaximations
-  end
-
-  def edit_appointment_group(appointment_name = EDIT_NAME, location_name = EDIT_LOCATION)
-    f('#edit_appointment_form').should be_displayed
-    replace_content(fj('input[name="title"]'), appointment_name)
-    replace_content(fj('input[name="location"]'), location_name)
-    f('.ui-dialog-buttonset .ui-button').click
-    wait_for_ajaximations
-    f('.view_calendar_link').text.should == appointment_name
-    f('.ag-location').should include_text(location_name)
-  end
-
-  def open_edit_dialog
-    driver.action.move_to(f('.appointment-group-item')).perform
-    click_al_option('.edit_link')
-  end
+  it_should_behave_like "scheduler selenium tests"
 
   context "as a teacher" do
 
@@ -111,7 +15,6 @@ describe "scheduler" do
     it "should create a new appointment group" do
       get "/calendar2"
       click_scheduler_link
-
       create_appointment_group_manual
     end
 
@@ -284,11 +187,11 @@ describe "scheduler" do
           fj('#message_participants_form').should be_nil # using fj to avoid selenium caching
         end
       end
-      student1.conversations.first.messages.size.should eql 6 # registered/all * 3
-      student2.conversations.first.messages.size.should eql 6 # unregistered/all * 2 + registered/all (ug1)
-      student3.conversations.first.messages.size.should eql 6 # unregistered/all * 3
-      student4.conversations.first.messages.size.should eql 4 # unregistered/all * 2 (not in any group)
-      student5.conversations.first.messages.size.should eql 2 # unregistered/all * 1 (doesn't meet any sub_context criteria)
+      student1.conversations.first.messages.size.should == 6 # registered/all * 3
+      student2.conversations.first.messages.size.should == 6 # unregistered/all * 2 + registered/all (ug1)
+      student3.conversations.first.messages.size.should == 6 # unregistered/all * 3
+      student4.conversations.first.messages.size.should == 4 # unregistered/all * 2 (not in any group)
+      student5.conversations.first.messages.size.should == 2 # unregistered/all * 1 (doesn't meet any sub_context criteria)
     end
 
     it "should validate the appointment group shows up on the calendar" do
@@ -355,19 +258,19 @@ describe "scheduler" do
         wait_for_ajax_requests
 
         fj('.fc-event:visible').click
-        ff('#attendees li').size.should eql 2
+        ff('#attendees li').size.should == 2
 
         # delete the first appointment
         fj('.cancel_appointment_link:visible').click
         fj('button:visible:contains(Delete)').click
         wait_for_ajax_requests
-        ff('#attendees li').size.should eql 1
+        ff('#attendees li').size.should == 1
 
         # make sure the appointment was really deleted
         f('#refresh_calendar_link').click
         wait_for_ajax_requests
         fj('.fc-event-time:visible').click
-        ff('#attendees li').size.should eql 1
+        ff('#attendees li').size.should == 1
 
         f('.single_item_done_button').click
       end
@@ -392,8 +295,8 @@ describe "scheduler" do
       wait_for_ajaximations
 
       ag = AppointmentGroup.first
-      ag.appointments.first.participants_per_appointment.should eql 5
-      ag.participants_per_appointment.should eql 2
+      ag.appointments.first.participants_per_appointment.should == 5
+      ag.participants_per_appointment.should == 2
 
       open_edit_event_dialog
       f('[name=max_participants_option]').click
@@ -432,102 +335,8 @@ describe "scheduler" do
       ag = AppointmentGroup.first
       ag.contexts.should include course1
       ag.contexts.should include @course
-      ag.sub_contexts.should eql []
+      ag.sub_contexts.should == []
     end
 
   end
-
-  context "as a student" do
-
-    before (:each) do
-      course_with_student_logged_in
-    end
-
-    def reserve_appointment_manual(n)
-      ff('.fc-event')[n].click
-      f('.event-details .reserve_event_link').click
-      wait_for_ajax_requests
-    end
-
-    it "should let me reserve appointment groups for contexts I am in" do
-      my_course = @course
-      course_with_student(:active_all => true)
-      other_course = @course
-
-      create_appointment_group(:contexts => [other_course, my_course])
-
-      get "/calendar2"
-      click_scheduler_link
-      wait_for_ajaximations
-      click_appointment_link
-
-      reserve_appointment_manual(0)
-      f('.fc-event').should include_text "Reserved"
-    end
-
-    it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do
-      tomorrow = (Date.today + 1).to_s
-      create_appointment_group(:max_appointments_per_participant => 1,
-                               :new_appointments => [
-                                   [tomorrow + ' 12:00:00', current_date = tomorrow + ' 13:00:00'],
-                                   [tomorrow + ' 14:00:00', current_date = tomorrow + ' 15:00:00'],
-                               ])
-      get "/calendar2"
-      wait_for_ajaximations
-      click_scheduler_link
-      click_appointment_link
-
-      reserve_appointment_manual(0)
-      f('.fc-event').should include_text "Reserved"
-
-      # try to reserve the second appointment
-      reserve_appointment_manual(1)
-      fj('.ui-button:contains(Reschedule)').click
-      wait_for_ajax_requests
-
-      event1, event2 = ff('.fc-event')
-      event1.should include_text "Available"
-      event2.should include_text "Reserved"
-    end
-
-    it "should not let me book too many appointments" do
-      tomorrow = (Date.today + 1).to_s
-      create_appointment_group(:max_appointments_per_participant => 2,
-                               :new_appointments => [
-                                   [tomorrow + ' 12:00:00', current_date = tomorrow + ' 13:00:00'],
-                                   [tomorrow + ' 14:00:00', current_date = tomorrow + ' 15:00:00'],
-                                   [tomorrow + ' 16:00:00', current_date = tomorrow + ' 17:00:00'],
-                               ])
-      get "/calendar2"
-      wait_for_ajaximations
-      click_scheduler_link
-      click_appointment_link
-
-      reserve_appointment_manual(0)
-      reserve_appointment_manual(1)
-      e1, e2, *rest = ff('.fc-event')
-      e1.should include_text "Reserved"
-      e2.should include_text "Reserved"
-
-      reserve_appointment_manual(2)
-      fj('.ui-button:contains("OK")').click # "can't reserve" dialog
-      f('.fc-event:nth-child(3)').should include_text "Available"
-    end
-
-    it "should not allow me to cancel reservations from the attendees list" do
-      create_appointment_group
-      ag = AppointmentGroup.first
-      ag.appointments.first.reserve_for(@user, @user)
-      get "/calendar2"
-      wait_for_ajaximations
-      click_scheduler_link
-      wait_for_ajaximations
-      click_appointment_link
-
-      fj('.fc-event:visible').click
-      ff('#reservations').size.should be_zero
-    end
-
-  end
-
 end

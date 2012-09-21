@@ -43,7 +43,7 @@ describe "conversations user notes" do
     checkbox.should be_displayed
     checkbox.click
     submit_message_form(:add_recipient => false)
-    @the_student.user_notes.size.should eql(1)
+    @the_student.user_notes.size.should == 1
   end
 
   it "should allow user notes on existing private conversations with students" do
@@ -55,6 +55,6 @@ describe "conversations user notes" do
     checkbox.should be_displayed
     checkbox.click
     submit_message_form
-    @the_student.user_notes.size.should eql(1)
+    @the_student.user_notes.size.should == 1
   end
 end

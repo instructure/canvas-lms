@@ -216,7 +216,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       keep_trying_until do
         drag_with_js('.editor_box_resizer', 0, resizer_to)
         sleep 3
-        driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200)
+        driver.execute_script("return $('#wiki_page_body_ifr').height()").should == 200
       end
       f('.editor_box_resizer').attribute('style').should be_blank
 
@@ -231,7 +231,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should add bold and italic text to the rce" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
@@ -260,7 +259,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should add an equation to the rce by using equation buttons" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
       f('#wiki_page_body_instructure_equation').click
@@ -332,13 +330,12 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         # spec should still pass.
         src = f('.equation_image').attribute('src')
         response = Net::HTTP.get_response(URI.parse(src))
-        response.code.should eql "302"
+        response.code.should == "302"
         response.header['location'].should include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
       end
     end
 
     it "should display record video dialog" do
-      skip_if_ie('Out of memory')
       stub_kaltura
       get "/courses/#{@course.id}/wiki"
 
@@ -351,7 +348,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should handle table borders correctly" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
       def check_table(attributes = {})

@@ -20,7 +20,7 @@ describe "assignment column headers" do
   end
 
   it "should have a tooltip with the assignment name" do
-    f(@header_selector)["title"].should eql @assignment.title
+    f(@header_selector)["title"].should == @assignment.title
   end
 
   it "should handle a ton of assignments without wrapping the slick-header" do
@@ -30,7 +30,7 @@ describe "assignment column headers" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     # being 38px high means it did not wrap
-    driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should eql 38
+    driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should == 38
   end
 
   it "should validate row sorting works when first column is clicked" do

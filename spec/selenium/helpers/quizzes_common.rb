@@ -10,7 +10,7 @@ shared_examples_for "quizzes selenium tests" do
     type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
-    answers.length.should eql(4)
+    answers.length.should == 4
     replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
     set_feedback_content(answers[0].find_element(:css, ".answer_comments"), "Good job!")
     replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
@@ -35,7 +35,7 @@ shared_examples_for "quizzes selenium tests" do
     type_in_tiny '.question:visible textarea.question_content', 'This is not a true/false question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
-    answers.length.should eql(2)
+    answers.length.should == 2
     answers[1].find_element(:css, ".select_answer_link").click # false - get it?
     answers[1].find_element(:css, ".comment_focus").click
     answers[1].find_element(:css, ".answer_comments textarea").send_keys("Good job!")
@@ -69,8 +69,8 @@ shared_examples_for "quizzes selenium tests" do
     submit_form(question)
     wait_for_ajax_requests
     questions = ffj(".question_holder:visible")
-    questions.length.should eql(@question_count)
-    f("#right-side .points_possible").text.should eql(@points_total.to_s)
+    questions.length.should == @question_count
+    f("#right-side .points_possible").text.should == @points_total.to_s
   end
 
   def quiz_with_new_questions

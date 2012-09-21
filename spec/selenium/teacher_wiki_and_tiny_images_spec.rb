@@ -38,7 +38,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
 
     it "should properly clone images, including thumbnails, and display" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       old_course = @course
       new_course = old_course.clone_for(old_course.account)
@@ -50,7 +49,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       keep_trying_until do
         images = ffj('#editor_tabs_4 .image_list .img')
         images.length.should == 2
-        images.each { |i| i.attribute('complete').should == 'true' } # - commented out because it is breaking with
+        images.each { |i| i.should have_attribute('complete', 'true') } # - commented out because it is breaking with
                                                                      #webdriver 2.22 and firefox 12
       end
     end

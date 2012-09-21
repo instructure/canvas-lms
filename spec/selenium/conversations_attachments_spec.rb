@@ -95,7 +95,7 @@ shared_examples_for "conversations attachments selenium tests" do
 
     wait_for_ajaximations
 
-    ff('img.attachments').size.should eql 2
+    ff('img.attachments').size.should == 2
     messages = get_messages(false) # new conversation auto-selected
     messages.size.should == 1
     messages.first.text.should include "ohai look an attachment"

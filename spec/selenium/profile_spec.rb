@@ -112,7 +112,7 @@ describe "profile" do
       link = f("#channel_#{channel.id} td:first-child a")
       link.click
       wait_for_ajaximations
-      row.attribute(:class).should match(/default/)
+      row.should have_class("default")
     end
 
     it "should display file uploader link on files page" do
@@ -200,11 +200,11 @@ describe "profile" do
 
       f('#show_user_services').click
       wait_for_ajaximations
-      @user.reload.show_user_services.should_not eql initial_state
+      @user.reload.show_user_services.should_not == initial_state
 
       f('#show_user_services').click
       wait_for_ajaximations
-      @user.reload.show_user_services.should eql initial_state
+      @user.reload.show_user_services.should == initial_state
     end
 
     it "should generate a new access token" do
@@ -248,7 +248,7 @@ describe "profile" do
       submit_form(edit_form)
       wait_for_ajaximations
       @user.reload
-      @user.birthdate.should eql(Time.utc(1980, 1, 31))
+      @user.birthdate.should == Time.utc(1980, 1, 31)
     end
 
     it "should not accept a partial birthdate" do
@@ -330,7 +330,7 @@ shared_examples_for "profile pictures selenium tests" do
     wait_for_ajaximations
     keep_trying_until do
       profile_pic = fj('.profile_pic_link img')
-      profile_pic.attribute('src').should == image_src
+      profile_pic.should have_attribue('src', image_src)
     end
     Attachment.last.folder.should == @user.profile_pics_folder
   end

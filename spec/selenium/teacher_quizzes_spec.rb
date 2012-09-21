@@ -102,32 +102,32 @@ describe "quizzes" do
       q.save!
       # add a student to the course
       student = student_in_course(:active_enrollment => true).user
-      student.conversations.size.should eql(0)
+      student.conversations.size.should == 0
 
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
       driver.find_element(:partial_link_text, "Message Students Who...").click
       dialog = ffj("#message_students_dialog:visible")
-      dialog.length.should eql(1)
+      dialog.length.should == 1
       dialog = dialog.first
 
       click_option('.message_types', 'Have taken the quiz')
       students = ffj(".student_list > .student:visible")
 
-      students.length.should eql(0)
+      students.length.should == 0
 
       click_option('.message_types', 'Have NOT taken the quiz')
       students = ffj(".student_list > .student:visible")
-      students.length.should eql(1)
+      students.length.should == 1
 
       dialog.find_element(:css, 'textarea#body').send_keys('This is a test message.')
 
       button = dialog.find_element(:css, "button.send_button")
       button.click
       keep_trying_until { button.text != "Sending Message..." }
-      button.text.should eql("Message Sent!")
+      button.text.should == "Message Sent!"
 
-      student.conversations.size.should eql(1)
+      student.conversations.size.should == 1
     end
 
     it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do
@@ -192,7 +192,7 @@ describe "quizzes" do
 
       pick_count.call('1001')
       dismiss_alert
-      pick_count_field[:value].should eql "1"
+      pick_count_field.should have_attribute(:value, "1")
 
       f('.add_question_link').click # 1 total, ok
       group_form.find_element(:css, '.edit_group_link').click
@@ -203,7 +203,7 @@ describe "quizzes" do
 
       pick_count.call('1000') # 1001 total, bad
       dismiss_alert
-      pick_count_field[:value].should eql "999"
+      pick_count_field.should have_attribute(:value, "999")
     end
 
     it "should moderate quiz" do
@@ -284,7 +284,7 @@ describe "quizzes" do
         input.send_keys('1')
         error_displayed?.should be_false
         input.send_keys(:tab)
-        input[:value].should eql "1.0000"
+        input.should have_attribute(:value, "1.0000")
       end
     end
 
@@ -306,8 +306,8 @@ describe "quizzes" do
           f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
         end
         wait_for_ajax_requests
-        ff('#question_list .answered').size.should eql 1
-        input[:value].should eql "1.0000"
+        ff('#question_list .answered').size.should == 1
+        input.should have_attribute(:value, "1.0000")
       end
     end
 
@@ -327,7 +327,7 @@ describe "quizzes" do
 
       take_quiz do
         dropdowns = ff('a.ui-selectmenu.question_input')
-        dropdowns.size.should eql 6
+        dropdowns.size.should == 6
 
         # partially answer each question
         [dropdowns.first, dropdowns.last].each do |d|
@@ -344,7 +344,7 @@ describe "quizzes" do
         end
 
         # marked as answer
-        ff('#question_list .answered').size.should eql 2
+        ff('#question_list .answered').size.should == 2
         wait_for_ajaximations
 
         driver.find_element(:link, 'Quizzes').click
@@ -357,11 +357,11 @@ describe "quizzes" do
         # be ready right when the page loads
         keep_trying_until {
           dropdowns = ff('a.ui-selectmenu.question_input')
-          dropdowns.size.should eql 6
+          dropdowns.size.should == 6
         }
 
-        dropdowns.map(&:text).should eql %w{orange green east east east east}
-        ff('#question_list .answered').size.should eql 2
+        dropdowns.map(&:text).should == %w{orange green east east east east}
+        ff('#question_list .answered').size.should == 2
       end
     end
 
@@ -467,84 +467,6 @@ describe "quizzes" do
       driver.find_element(:link, "Quiz Statistics").click
 
       f('#content .question_name').should include_text("Question 1")
-    end
-  end
-
-  context "as a student" do
-    before (:each) do
-      course_with_student_logged_in
-      @qsub = quiz_with_submission(false)
-    end
-
-    context "resume functionality" do
-      def update_quiz_lock(lock_at, unlock_at)
-        @quiz.update_attributes(:lock_at => lock_at, :unlock_at => unlock_at)
-        @quiz.reload
-        @quiz.save!
-      end
-
-      describe "on main page" do
-        def validate_description_text(does_contain_text, text)
-          description = f('.description')
-          if does_contain_text
-            description.should include_text(text)
-          else
-            description.should_not include_text(text)
-          end
-        end
-
-        it "should show the resume quiz link if quiz is unlocked" do
-          get "/courses/#{@course.id}/quizzes"
-          f('.description').should include_text('Resume Quiz')
-        end
-
-        it "should show the resume quiz link if quiz unlock_at date is < now" do
-          update_quiz_lock(Time.now - 1.day.ago, Time.now - 10.minutes.ago)
-          get "/courses/#{@course.id}/quizzes"
-          f('.description').should include_text('Resume Quiz')
-        end
-
-        it "should not show the resume link if the quiz is locked" do
-          update_quiz_lock(Time.now - 5.minutes, nil)
-          get "/courses/#{@course.id}/quizzes"
-          f('.description').should_not include_text('Resume Quiz')
-        end
-
-        it "should grade any submission that needs grading" do
-          @qsub.end_at = Time.now - 5.minutes
-          @qsub.save!
-          get "/courses/#{@course.id}/quizzes"
-          f('.description').should_not include_text('Resume Quiz')
-          f('.description').should include_text('0 out of')
-        end
-      end
-
-      describe "on individual quiz page" do
-        RESUME_TEXT = 'Resume Quiz'
-
-        def validate_resume_button_text(text)
-          f('#right-side .button').text.should == text
-        end
-
-        it "should show the resume quiz button if the quiz is unlocked" do
-          get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-          validate_resume_button_text(RESUME_TEXT)
-        end
-
-        it "should show the resume quiz button if the quiz unlock_at date is < now" do
-          update_quiz_lock(Time.now - 1.day.ago, Time.now - 10.minutes.ago)
-          get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-          validate_resume_button_text(RESUME_TEXT)
-        end
-
-        it "should not show the resume quiz button if quiz is locked" do
-          update_quiz_lock(Time.now - 5.minutes, nil)
-          get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-          right_side = f('#right-side')
-          right_side.should_not include_text("You're in the middle of taking this quiz.")
-          right_side.should_not include_text(RESUME_TEXT)
-        end
-      end
     end
   end
 end

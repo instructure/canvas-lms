@@ -23,8 +23,8 @@ def add_user (opts={})
   wait_for_ajax_requests
   user = User.first(:conditions => {:name => name})
   user.should be_present
-  user.sortable_name.should eql sortable_name
-  user.short_name.should eql short_name
-  user.email.should eql email
+  user.sortable_name.should == sortable_name
+  user.short_name.should == short_name
+  user.email.should == email
   user
 end

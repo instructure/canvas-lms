@@ -115,7 +115,7 @@ shared_examples_for "gradebook2 selenium tests" do
     keep_trying_until do
       students.each do |student_id, expected_score|
         row_total = f(".final_grade .student_#{student_id} .grade").text + '%'
-        row_total.should eql expected_score
+        row_total.should == expected_score
       end
     end
   end

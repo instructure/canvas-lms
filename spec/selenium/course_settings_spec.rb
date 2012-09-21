@@ -361,7 +361,7 @@ describe "course settings" do
       reset_link.click
       wait_for_dom_ready
       @fake_student_after = @course.student_view_student
-      @fake_student_before.id.should_not eql @fake_student_after.id
+      @fake_student_before.id.should_not == @fake_student_after.id
     end
 
     it "should not include student view student in the statistics count" do
