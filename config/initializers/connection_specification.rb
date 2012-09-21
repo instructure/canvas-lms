@@ -42,23 +42,56 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
   def self.with_environment(environment)
     return yield if environment == self.environment
     begin
+      self.save_handler
       old_environment = self.environment
       self.environment = environment
-      ActiveRecord::Base.connection_handler.clear_all_connections! unless Rails.env.test?
+      ActiveRecord::Base.connection_handler = self.ensure_handler unless Rails.env.test?
       yield
     ensure
       self.environment = old_environment
-      ActiveRecord::Base.connection_handler.clear_all_connections! unless Rails.env.test?
+      ActiveRecord::Base.connection_handler = @connection_handlers[old_environment] unless Rails.env.test?
     end
   end
 
-  # for use from script/console ONLY
+  def self.save_handler
+    @connection_handlers ||= {}
+    @connection_handlers[self.environment] ||= ActiveRecord::Base.connection_handler
+  end
+
+  def self.ensure_handler
+    new_handler = @connection_handlers[self.environment]
+    if !new_handler
+      new_handler = @connection_handlers[self.environment] = ActiveRecord::ConnectionAdapters::ConnectionHandler.new
+      ActiveRecord::Base.connection_handler.connection_pools.each do |model, pool|
+        new_handler.establish_connection(model, pool.spec)
+      end
+    end
+    new_handler
+  end
+
+  def self.reset_connection_handler_cache!
+    @connection_handlers = {}
+  end
+
+  # for use from script/console ONLY; these will still disconnect
   def self.switch_user!(user)
     self.explicit_user = user
     ActiveRecord::Base.connection_handler.clear_all_connections!
   end
+
   def self.switch_environment!(environment)
     self.environment = environment
     ActiveRecord::Base.connection_handler.clear_all_connections!
+  end
+end
+
+ActiveRecord::ConnectionAdapters::ConnectionHandler.class_eval do
+  # double-require prevention
+  unless self.instance_methods.include?('clear_all_connections_without_multiple_environments!')
+    def clear_all_connections_with_multiple_environments!
+      ActiveRecord::Base::ConnectionSpecification.reset_connection_handler_cache!
+      clear_all_connections_without_multiple_environments!
+    end
+    alias_method_chain :clear_all_connections!, :multiple_environments
   end
 end
