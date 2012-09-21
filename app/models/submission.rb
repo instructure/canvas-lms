@@ -426,7 +426,10 @@ class Submission < ActiveRecord::Base
     if attachment_ids_changed?
       attachments = attachment_associations.map(&:attachment)
       attachments.each do |a|
-        a.send_later_enqueue_args :submit_to_crocodoc
+        a.send_later_enqueue_args :submit_to_crocodoc,
+          :n_strand     => 'crocodoc',
+          :max_attempts => 5,
+          :priority => Delayed::LOW_PRIORITY
       end
     end
   end
