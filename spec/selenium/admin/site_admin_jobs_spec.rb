@@ -85,6 +85,27 @@ describe "site admin jobs ui" do
         load_jobs_page
       end
 
+      it "should confirm that clicking on delete button should delete all future jobs" do
+        2.times { "test".send_at 2.hours.from_now, :to_s }
+        filter_jobs(FlavorTags::FUTURE)
+        validate_all_jobs_selected
+        f("#jobs-grid .odd").should be_displayed
+        f("#jobs-grid .even").should be_displayed
+        f("#jobs-total").text.should == "3"
+        num_of_jobs = Delayed::Job.all.count
+
+        keep_trying_until do
+          fj("#delete-jobs").click
+          driver.switch_to.alert.should_not be_nil
+          driver.switch_to.alert.accept
+          wait_for_ajaximations
+          Delayed::Job.count.should eql num_of_jobs - 3
+        end
+
+        fj("#jobs-grid .odd").should be_nil # using fj to bypass selenium cache
+        fj("#jobs-grid .even").should be_nil #using fj to bypass selenium cache
+      end
+
       it "should check current popular tags" do
         filter_tags(FlavorTags::CURRENT)
         keep_trying_until do
@@ -143,28 +164,6 @@ describe "site admin jobs ui" do
         wait_for_ajax_requests
         ff("#jobs-grid .slick-row").count.should == 1
         f("#jobs-grid .r1").text.should include_text "String#downcase"
-      end
-
-      it "should confirm that clicking on delete button should delete all future jobs" do
-        2.times { "test".send_at 2.hours.from_now, :to_s }
-        filter_jobs(FlavorTags::FUTURE)
-        validate_all_jobs_selected
-        f("#jobs-grid .odd").should be_displayed
-        f("#jobs-grid .even").should be_displayed
-        f("#jobs-total").text.should == "3"
-        num_of_jobs = Delayed::Job.all.count
-
-         keep_trying_until do
-            f("#delete-jobs").click
-            driver.switch_to.alert.should_not be_nil
-            driver.switch_to.alert.accept
-           true
-         end
-        wait_for_ajaximations
-        Delayed::Job.count.should eql num_of_jobs - 3
-
-        fj("#jobs-grid .odd").should be_nil # using fj to bypass selenium cache
-        fj("#jobs-grid .even").should be_nil #using fj to bypass selenium cache
       end
     end
   end
