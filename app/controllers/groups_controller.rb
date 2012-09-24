@@ -686,6 +686,9 @@ class GroupsController < ApplicationController
     elsif @context.group_categories.other_than(@group_category).find_by_name(name)
       render :json => { 'category[name]' => t('errors.category_name_unavailable', "%{category_name} is already in use.", :category_name => name) }, :status => :bad_request
       return false
+    elsif name.length >= 250 && params[:category][:split_group_count].to_i > 0
+      render :json => { 'category[name]' => t('errors.category_name_too_long', "Enter a shorter category name to split students into groups") }, :status => :bad_request
+      return false
     end
 
     enable_self_signup = params[:category][:enable_self_signup] == "1"
