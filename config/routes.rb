@@ -106,6 +106,7 @@ ActionController::Routing::Routes.draw do |map|
   def add_chat(context)
     context.resources :chats
     context.chat 'chat', :controller => 'context', :action => 'chat'
+    context.tinychat 'tinychat.html', :controller => 'context', :action => 'chat_iframe'
     context.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
   end
 

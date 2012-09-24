@@ -221,10 +221,16 @@ class ContextController < ApplicationController
     end
     if authorized_action(@context, @current_user, :read_roster)
       return unless tab_enabled?(@context.class::TAB_CHAT)
-      
+
       add_crumb(t('#crumbs.chat', "Chat"), named_context_url(@context, :context_chat_url))
       self.active_tab="chat"
-      
+
+      js_env :tinychat => {
+               :room => "inst#{Digest::MD5.hexdigest(@context.asset_string)}",
+               :nick => (@current_user.short_name.gsub(/[^\w]+/, '_').sub(/_\z/, '') rescue 'user'),
+               :key  => Tinychat.config['api_key']
+             }
+
       res = nil
       begin
         session[:last_chat] ||= {}
@@ -258,6 +264,10 @@ class ContextController < ApplicationController
         format.json { render :json => @room_details.to_json }
       end
     end
+  end
+
+  def chat_iframe
+    render :layout => false
   end
   
   def inbox
