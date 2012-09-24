@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,8 +17,6 @@
 #
 
 class PageView < ActiveRecord::Base
-  include TextHelper
-
   set_primary_key 'request_id'
 
   belongs_to :developer_key
@@ -31,83 +29,88 @@ class PageView < ActiveRecord::Base
   before_save :cap_interaction_seconds
   belongs_to :context, :polymorphic => true
 
-  named_scope :of_account, lambda { |account|
-    {
-      :conditions => { :account_id => account.self_and_all_sub_accounts }
-    }
-  }
-  named_scope :by_created_at, :order => 'created_at DESC'
-
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
-  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user
+  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user, :context
 
   def ensure_account
     self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
     self.account_id ||= (self.context.is_a?(Account) ? self.context : self.context.account) if self.context
   end
 
-  def interaction_seconds_readable
-    seconds = (self.interaction_seconds || 0).to_i
-    if seconds <= 10
-      t(:insignificant_duration, "--")
-    else
-      readable_duration(seconds)
-    end
-  end
-
   def cap_interaction_seconds
     self.interaction_seconds = [self.interaction_seconds || 5, 10.minutes.to_i].min
   end
 
-  def user_name
-    self.user.name rescue t(:default_user_name, "Unknown User")
-  end
-
-  def context_name
-    self.context.name rescue ""
-  end
-
-  named_scope :after, lambda{ |date|
-    {:conditions => ['page_views.created_at > ?', date] }
-  }
-  named_scope :for_user, lambda {|user_ids|
-    {:conditions => {:user_id => user_ids} }
-  }
-  named_scope :limit, lambda {|limit|
-    {:limit => limit }
-  }
+  # the list of columns we display to users, export to csv, etc
+  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action contributed interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id)
 
   def self.page_views_enabled?
     !!page_view_method
   end
 
   def self.page_view_method
-    enable_page_views = Setting.get_cached('enable_page_views', 'false')
+    enable_page_views = Shard.current.settings[:page_view_method] || Setting.get_cached('enable_page_views', 'false')
     return false if enable_page_views == 'false'
     enable_page_views = 'db' if enable_page_views == 'true' # backwards compat
     enable_page_views.to_sym
   end
 
+  def self.redis_queue?
+    %w(cache cassandra).include?(page_view_method.to_s)
+  end
+
+  def self.cassandra?
+    %w(cassandra).include?(page_view_method.to_s)
+  end
+
+  def self.cassandra
+    @cassandra ||= Canvas::Cassandra::Database.from_config('page_views')
+  end
+  def cassandra
+    self.class.cassandra
+  end
+
+  def self.find_one(id, options)
+    return super unless cassandra?
+    find_some([id], options).first || raise(ActiveRecord::RecordNotFound, "Couldn't find PageView with ID=#{id}")
+  end
+
+  def self.find_some(ids, options)
+    return super unless cassandra?
+    raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
+    pvs = []
+    cassandra.execute("SELECT * FROM page_views WHERE request_id IN (?)", ids).fetch do |row|
+      pvs << from_cassandra(row)
+    end
+    pvs
+  end
+
+  def self.find_every(options)
+    return super unless cassandra?
+    raise(NotImplementedError, "find_every not implemented")
+  end
+
+  def self.from_cassandra(attrs)
+    @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
+    Shard.default.activate { instantiate(@blank_template.merge(attrs)) }
+  end
+
   def store
+    self.created_at ||= Time.zone.now
+
     result = case PageView.page_view_method
     when :log
       Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
-    when :cache
+    when :cache, :cassandra
       json = self.attributes.as_json
       json['is_update'] = true if self.is_update
-      if Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
-        true
-      else
-        # redis failed, push right to the db
-        self.save
-      end
+      Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
     when :db
       self.save
     end
 
-    self.created_at ||= Time.zone.now
     self.store_page_view_to_user_counts
 
     result
@@ -127,6 +130,94 @@ class PageView < ActiveRecord::Base
     self.updated_at = Time.now
     self.interaction_seconds = seconds
     self.is_update = true
+  end
+
+  def create_without_callbacks
+    return super unless self.class.cassandra?
+    self.created_at ||= Time.zone.now
+    self.shard = Shard.default
+    update
+    if user
+      cassandra.execute("INSERT INTO page_views_history_by_context (context_and_time_bucket, ordered_id, request_id) VALUES (?, ?, ?)", "#{user.global_asset_string}/#{PageView.timeline_bucket_for_time(created_at, "User")}", "#{created_at.to_i}/#{request_id[0,8]}", request_id)
+    end
+    @new_record = false
+    self.id
+  end
+
+  def update_without_callbacks
+    return super unless self.class.cassandra?
+    cassandra.update_record("page_views", { :request_id => request_id }, self.changes)
+    true
+  end
+
+  named_scope :for_context, proc { |ctx| { :conditions => { :context_type => ctx.class.name, :context_id => ctx.id } } }
+  named_scope :for_users, proc { |users| { :conditions => { :user_id => users.map(&:id) } } }
+
+  # returns a collection with very limited functionality
+  # basically, it responds to #paginate and returns a
+  # WillPaginate::Collection-like object
+  def self.for_user(user)
+    if cassandra?
+      PageView::CassandraAssociation.new('User', user.global_id)
+    else
+      self.scoped(:conditions => { :user_id => user.id }, :order => 'created_at desc')
+    end
+  end
+
+  class CassandraAssociation
+    def initialize(context_type, context_id)
+      @context_type = context_type
+      @context_id = context_id
+      @scrollback_limit = Setting.get('page_views_scrollback_limit:users', 52.weeks.to_s).to_i.ago
+    end
+
+    class Collection < Array
+      attr_accessor :per_page, :next_page
+      # the following are for will_paginate compatibility, and will always be nil
+      attr_accessor :previous_page, :first_page, :last_page, :total_pages
+    end
+
+    def paginate(options)
+      results = Collection.new
+      results.per_page = options[:per_page].to_i
+      raise(ArgumentError, "per_page required") unless results.per_page > 0
+
+      if options[:page].to_s =~ %r{^(\d+):(\d+/\w+)$}
+        row_ts = $1.to_i
+        start_column = $2
+      else
+        # page 1
+        row_ts = PageView.timeline_bucket_for_time(Time.now, @context_type)
+      end
+
+      until results.next_page || Time.at(row_ts) < @scrollback_limit
+        limit = results.per_page + 1 - results.size
+        args = []
+        args << "#{@context_type.underscore}_#{@context_id}/#{row_ts}"
+        if start_column
+          ordered_id = "AND ordered_id <= ?"
+          args << start_column
+        else
+          ordered_id = nil
+        end
+        qs = "SELECT ordered_id, request_id FROM page_views_history_by_context where context_and_time_bucket = ? #{ordered_id} ORDER BY ordered_id DESC LIMIT #{limit}"
+        PageView.cassandra.execute(qs, *args).fetch do |row|
+          if results.size == results.per_page
+            results.next_page = "#{row_ts}:#{row['ordered_id']}"
+          else
+            results << row['request_id']
+          end
+        end
+
+        start_column = nil
+        # possible optimization: query page_views_counters_by_context_and_day ,
+        # and use it as a secondary index to skip days where the user didn't
+        # have any page views
+        row_ts -= PageView.timeline_bucket_size(@context_type)
+      end
+
+      results.replace(PageView.find(results).sort_by { |pv| results.index(pv.request_id) })
+    end
   end
 
   def self.cache_queue_name
@@ -175,7 +266,7 @@ class PageView < ActiveRecord::Base
     return if attrs['is_update'] && Setting.get_cached('skip_pageview_updates', nil) == "true"
     self.transaction(:requires_new => true) do
       if attrs['is_update']
-        page_view = self.find_by_request_id(attrs['request_id'])
+        page_view = self.find_some([attrs['request_id']], {}).first
         return unless page_view
         page_view.do_update(attrs)
         page_view.save
@@ -185,6 +276,19 @@ class PageView < ActiveRecord::Base
       end
     end
   rescue ActiveRecord::StatementInvalid => e
+  end
+
+  def self.timeline_bucket_for_time(time, context_type)
+    time.to_i - (time.to_i % timeline_bucket_size(context_type))
+  end
+
+  def self.timeline_bucket_size(context_type)
+    case context_type
+    when "User"
+      1.week.to_i
+    else
+      raise "don't know bucket size for context type: #{context_type}"
+    end
   end
 
   def self.user_count_bucket_for_time(time)
@@ -201,5 +305,13 @@ class PageView < ActiveRecord::Base
     bucket = PageView.user_count_bucket_for_time(self.created_at)
     Canvas.redis.sadd(bucket, self.user.global_id)
     Canvas.redis.expire(bucket, exptime)
+  end
+
+  # to_csv uses these methods, see lib/ext/array.rb
+  def export_columns(format = nil)
+    PageView::EXPORTED_COLUMNS
+  end
+  def to_row(format = nil)
+    export_columns(format).map { |c| self.send(c) }
   end
 end

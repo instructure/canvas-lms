@@ -122,6 +122,10 @@ group :redis do
   gem 'redis', '3.0.1'
 end
 
+group :cassandra do
+  gem 'cassandra-cql', '1.1.1'
+end
+
 group :embedly do
   gem 'embedly', '1.5.5'
 end

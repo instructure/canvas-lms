@@ -2341,23 +2341,6 @@ class Course < ActiveRecord::Base
   def self.serialization_excludes; [:uuid]; end
 
 
-  def page_views_by_day(options={})
-    conditions = {
-      :context_id => self.id,
-      :context_type => self.class.to_s
-    }
-    if options[:dates]
-      conditions.merge!({
-        :created_at => (options[:dates].first)..(options[:dates].last)
-      })
-    end
-    PageView.count(
-      :group => "date(created_at)",
-      :conditions => conditions
-    )
-  end
-  memoize :page_views_by_day
-
   def section_visibilities_for(user)
     Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
       Enrollment.find(:all, :select => "course_section_id, limit_privileges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_privileges_to_course_section => e.limit_privileges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id, :admin => e.admin?} }
@@ -2470,19 +2453,6 @@ class Course < ActiveRecord::Base
       :full
     end
   end
-
-  def page_view_data(options={})
-    # if they dont supply a date range then use the first day returned by page_views_by_day (which should be the first day that there is pageview statistics gathered)
-    dates = options[:dates].nil? ? [page_views_by_day.sort.first.first.to_datetime, Time.now] : options[:dates]
-    days = []
-    dates.first.to_datetime.upto(dates.last) do |d|
-      # this * 1000 part is because the Highcharts expects something like what Date.UTC(2006, 2, 28) would give you,
-      # which is MILLISECONDS from the unix epoch, ruby's to_f gives you SECONDS since then.
-      days << [ (d.at_beginning_of_day.to_f * 1000).to_i , page_views_by_day[d.to_date.to_s].to_i ]
-    end
-    days
-  end
-  memoize :page_view_data
 
   def unpublished?
     self.created? || self.claimed?

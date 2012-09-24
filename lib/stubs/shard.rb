@@ -74,6 +74,11 @@ ActiveRecord::Base.class_eval do
     Shard.default
   end
 
+  def shard=(new_shard)
+    raise ReadOnlyRecord unless new_record?
+    new_shard
+  end
+
   def global_id
     id
   end

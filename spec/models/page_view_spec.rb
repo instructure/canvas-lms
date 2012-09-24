@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper.rb')
 
 describe PageView do
   before do
@@ -25,11 +26,59 @@ describe PageView do
     @page_view = PageView.new { |p| p.send(:attributes=, { :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, false) }
   end
 
+  describe "cassandra page views" do
+    it_should_behave_like "cassandra page views"
+    it "should store and load from cassandra" do
+      expect {
+        @page_view.save!
+      }.to change { PageView.cassandra.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
+      PageView.find(@page_view.id).should == @page_view
+      expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "should paginate with a willpaginate-like array" do
+      # some page views we shouldn't find
+      page_view_model(:user => user_model)
+      page_view_model(:user => user_model)
+
+      user_model
+      pvs = []
+      4.times { |i| pvs << page_view_model(:user => @user, :created_at => (5 - i).weeks.ago) }
+      pager = @user.page_views
+      pager.should be_a PageView::CassandraAssociation
+      expect { pager.paginate() }.to raise_exception(ArgumentError)
+      full = pager.paginate(:per_page => 4)
+      full.size.should == 4
+      full.next_page.should be_nil
+
+      half = pager.paginate(:per_page => 2)
+      half.should == full[0,2]
+      half.next_page.should be_present
+
+      second_half = pager.paginate(:per_page => 2, :page => half.next_page)
+      second_half.should == full[2,2]
+      second_half.next_page.should be_nil
+    end
+
+    it "should halt pagination after a set time period" do
+      p1 = page_view_model(:user => @user)
+      p2 = page_view_model(:user => @user, :created_at => 13.months.ago)
+      coll = @user.page_views.paginate(:per_page => 3)
+      coll.should == [p1]
+      coll.next_page.should be_blank
+    end
+
+    it "should ignore an invalid page" do
+      @page_view.save!
+      @user.page_views.paginate(:per_page => 2, :page => '3').should == [@page_view]
+    end
+  end
+
   it "should store directly to the db in db mode" do
     Setting.set('enable_page_views', 'db')
     @page_view.store.should be_true
     PageView.count.should == 1
-    PageView.first.should == @page_view
+    PageView.find(@page_view.id).should == @page_view
   end
 
   if Canvas.redis_enabled?
@@ -42,7 +91,7 @@ describe PageView do
       PageView.count.should == 0
       PageView.process_cache_queue
       PageView.count.should == 1
-      PageView.first.attributes.except('created_at', 'updated_at', 'summarized').should == @page_view.attributes.except('created_at', 'updated_at', 'summarized')
+      PageView.find(@page_view.id).attributes.except('created_at', 'updated_at', 'summarized').should == @page_view.attributes.except('created_at', 'updated_at', 'summarized')
     end
 
     it "should store into redis in transactional batches" do
@@ -54,15 +103,6 @@ describe PageView do
       PageView.expects(:transaction).at_least(5).yields # 5 times, because 2 outermost transactions, then rails starts a "transaction" for each save (which runs as a no-op, since we're already in a transaction)
       PageView.process_cache_queue
       PageView.count.should == 3
-    end
-
-    it "should store directly to the db if redis is down" do
-      Canvas::Redis.patch
-      Redis::Client.any_instance.expects(:ensure_connected).raises(Redis::TimeoutError)
-      @page_view.store.should be_true
-      PageView.count.should == 1
-      PageView.first.attributes.except('created_at', 'updated_at').should == @page_view.attributes.except('created_at', 'updated_at')
-      Canvas::Redis.reset_redis_failure
     end
 
     describe "batch transaction" do

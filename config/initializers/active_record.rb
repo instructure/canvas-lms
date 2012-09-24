@@ -71,7 +71,11 @@ class ActiveRecord::Base
   end
 
   def asset_string
-    @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
+    @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id}"
+  end
+
+  def global_asset_string
+    @global_asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{global_id}"
   end
 
   # little helper to keep checks concise and avoid a db lookup
@@ -900,6 +904,10 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 end
 
 class ActiveRecord::Migration
+  VALID_TAGS = [:predeploy, :postdeploy, :cassandra]
+  # at least one of these tags is required
+  DEPLOY_TAGS = [:predeploy, :postdeploy]
+
   class << self
     def transactional?
       @transactional != false
@@ -909,7 +917,7 @@ class ActiveRecord::Migration
     end
 
     def tag(*tags)
-      raise "invalid tags #{tags.inspect}" unless tags - [:predeploy, :postdeploy] == []
+      raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []
       (@tags ||= []).concat(tags).uniq!
     end
 
@@ -930,10 +938,14 @@ end
 class ActiveRecord::MigrationProxy
   delegate :connection, :transactional?, :tags, :to => :migration
 
+  def runnable?
+    !migration.respond_to?(:runnable?) || migration.runnable?
+  end
+
   def load_migration
     load(filename)
     @migration = name.constantize
-    raise "#{self.name} (#{self.version}) is not tagged as predeploy or postdeploy!" if @migration.tags.empty? && self.version > 20120217214153
+    raise "#{self.name} (#{self.version}) is not tagged as predeploy or postdeploy!" if (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).empty? && self.version > 20120217214153
     @migration
   end
 end
@@ -973,6 +985,11 @@ class ActiveRecord::Migrator
     end
   end
 
+  def pending_migrations_with_runnable
+    pending_migrations_without_runnable.reject { |m| !m.runnable? }
+  end
+  alias_method_chain :pending_migrations, :runnable
+
   def migrate(tag = nil)
     current = migrations.detect { |m| m.version == current_version }
     target = migrations.detect { |m| m.version == @target_version }
@@ -1001,6 +1018,7 @@ class ActiveRecord::Migrator
       end
 
       next if !tag.nil? && !migration.tags.include?(tag)
+      next if !migration.runnable?
 
       begin
         ddl_transaction(migration) do

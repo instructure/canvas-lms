@@ -147,7 +147,6 @@ class User < ActiveRecord::Base
   has_many :account_users
   has_many :media_objects, :as => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
-  has_many :page_views
   has_many :user_notes
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
@@ -175,6 +174,10 @@ class User < ActiveRecord::Base
   def conversations
     # i.e. exclude any where the user has deleted all the messages
     all_conversations.visible.scoped(:order => "last_message_at DESC, conversation_id DESC")
+  end
+
+  def page_views
+    PageView.for_user(self)
   end
 
   named_scope :of_account, lambda { |account|

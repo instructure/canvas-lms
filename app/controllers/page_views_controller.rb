@@ -20,6 +20,8 @@
 class PageViewsController < ApplicationController
   before_filter :require_user, :only => [:index]
 
+  include Api::V1::PageView
+
   def update
     render :json => {:ok => true}
     # page view update happens in log_page_view after_filter
@@ -41,30 +43,19 @@ class PageViewsController < ApplicationController
     if authorized_action(@user, @current_user, :view_statistics)
       @page_views = Api.paginate(@user.page_views, self, api_v1_user_page_views_url(:user_id => @user), :order => 'created_at DESC', :without_count => :true)
       respond_to do |format|
-        format.html do
-          if params[:html_xhr]
-            render :partial => @page_views
-          end
-        end
-        format.js { render :partial => @page_views }
         format.json do
-          if api_request?
-            stream_json_array(@page_views,
-                              :include_root => false,
-                              :only => (PageView.content_columns.map(&:name) + ['request_id']))
-          else
-            render :partial => @page_views
-          end
+          render :json => @page_views.map { |pv| page_view_json(pv, @current_user, session) }
         end
-        format.csv {
+        format.csv do
           cancel_cache_buster
+          data = @user.page_views.paginate(:page => 1, :per_page => Setting.get('page_views_csv_export_rows', '300').to_i)
           send_data(
-            @user.page_views.by_created_at.scoped(:limit=>params[:report_count] || 300).to_a.to_csv,
-            :type => "text/csv", 
-            :filename => t(:download_filename, "Pageviews For %{user}", :user => @user.name.to_s.gsub(/ /, "_")) + '.csv', 
+            data.to_a.to_csv,
+            :type => "text/csv",
+            :filename => t(:download_filename, "Pageviews For %{user}", :user => @user.name.to_s.gsub(/ /, "_")) + '.csv',
             :disposition => "attachment"
-          ) 
-        }
+          )
+        end
       end
     end
   end

@@ -210,20 +210,6 @@ module Api
     }
   end
 
-  # stream an array of objects as a json response, without building a string of
-  # the whole response in memory.
-  def stream_json_array(array, json_opts)
-    response.content_type ||= Mime::JSON
-    render :text => proc { |r, o|
-      o.write('[')
-      array.each_with_index { |v,i|
-        o.write(v.to_json(json_opts));
-        o.write(',') unless i == array.length - 1
-      }
-      o.write(']')
-    }
-  end
-
   # See User.submissions_for_given_assignments and SubmissionsApiController#for_students
   mattr_accessor :assignment_ids_for_students_api
 

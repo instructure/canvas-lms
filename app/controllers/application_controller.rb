@@ -780,7 +780,7 @@ class ApplicationController < ActionController::Base
         @access.summarized_at = nil
         @access.last_access = Time.now.utc
         @access.save
-        @page_view.asset_user_access_id = @access.id if @page_view
+        @page_view.asset_user_access = @access if @page_view
         @page_view_update = true
       end
       if @page_view && !request.xhr? && request.get? && (response.content_type || "").match(/html/)
@@ -797,7 +797,7 @@ class ApplicationController < ActionController::Base
     end
   rescue => e
     logger.error "Pageview error!"
-    raise e if Rails.env == 'development'
+    raise e if Rails.env.development?
     true
   end
 

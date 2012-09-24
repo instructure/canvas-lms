@@ -170,17 +170,21 @@ namespace :db do
   end
 
   namespace :test do
-    unless Rake::Task.task_defined?('db:test:reset')
-      task :reset => [:environment, :load_config] do
-        raise "Run with RAILS_ENV=test" unless Rails.env.test?
-        config = ActiveRecord::Base.configurations['test']
-        queue = config['queue']
-        drop_database(queue) if queue rescue nil
-        drop_database(config) rescue nil
-        create_database(queue) if queue
-        create_database(config)
-        Rake::Task['db:migrate'].invoke
+    task :reset => [:environment, :load_config] do
+      raise "Run with RAILS_ENV=test" unless Rails.env.test?
+      config = ActiveRecord::Base.configurations['test']
+      queue = config['queue']
+      drop_database(queue) if queue rescue nil
+      drop_database(config) rescue nil
+      Canvas::Cassandra::Database.config_names.each do |cass_config|
+        db = Canvas::Cassandra::Database.from_config(cass_config)
+        db.keyspace_information.tables.each do |table|
+          db.execute("DROP TABLE #{table}")
+        end
       end
+      create_database(queue) if queue
+      create_database(config)
+      Rake::Task['db:migrate'].invoke
     end
   end
 end
