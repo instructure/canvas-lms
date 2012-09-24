@@ -64,13 +64,19 @@ class GradebooksController < ApplicationController
           @no_calculations = groups_assignments.empty?
           @assignments.concat(groups_assignments)
           @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id], :include => [ :submission_comments, :rubric_assessments ])
-          # pre-cache the assignment group for each assignment object
+          # pre-cache the assignment group for each assignment object, and assignment for each submission object
           @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
+          @submissions.each { |s| assignment = @assignments.find { |a| a.id == s.assignment_id }; s.assignment = assignment if assignment.present? }
           # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
           # assignment in order to calculate grade distributions
           @all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
+          @unread_submission_ids = []
           if @student == @current_user
             @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
+            # remember unread submissions and then mark all as read
+            @unread_submissions = @submissions.select{ |s| s.unread?(@current_user) }
+            @unread_submissions.each{ |s| s.change_read_state("read", @current_user) }
+            @unread_submission_ids = @unread_submissions.map(&:id)
           end
           format.html { render :action => 'grade_summary' }
         else

@@ -461,7 +461,7 @@ class ApplicationController < ActionController::Base
 
   def badge_counts_for(context, user, enrollment=nil)
     badge_counts = {}
-    ['Announcement', 'DiscussionTopic'].each do |type|
+    ['Announcement', 'DiscussionTopic', 'Submission'].each do |type|
       participation_count = context.content_participation_counts.find(:first, {
         :conditions => { :user_id => user.id, :content_type => type },
       })

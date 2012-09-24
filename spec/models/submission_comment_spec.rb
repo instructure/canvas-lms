@@ -618,4 +618,17 @@ This text has a http://www.google.com link in it...
     end
   end
 
+  describe "read/unread state" do
+    it "should be unread after submission is commented on by teacher" do
+      expect {
+        @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @teacher}))
+      }.to change(ContentParticipation, :count).by(1)
+      @submission.unread?(@student).should be_true
+    end
+
+    it "should be unread after submission is commented on by self" do
+      @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @student}))
+      @submission.read?(@student).should be_true
+    end
+  end
 end

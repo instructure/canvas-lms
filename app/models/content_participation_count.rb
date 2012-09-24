@@ -57,7 +57,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
   def self.unread_count_for(type, context, user)
     return 0 unless user.present? && context.present?
-    return 0 unless %w(DiscussionTopic Announcement).include?(type)
+    return 0 unless %w(DiscussionTopic Announcement Submission).include?(type)
     send("unread_#{type.underscore}_count_for", context, user)
   end
 
@@ -81,23 +81,67 @@ class ContentParticipationCount < ActiveRecord::Base
     unread_count
   end
 
+  def self.unread_submission_count_for(context, user, enrollment = nil)
+    unread_count = 0
+    if context.is_a?(Course)
+      enrollment ||= context.enrollments.find(:first, {
+        :conditions => { :user_id => user.id },
+        :order => "#{Enrollment.state_rank_sql}, #{Enrollment.type_rank_sql}"
+      })
+      if enrollment.try(:student?)
+        submission_conditions = sanitize_sql_for_conditions([<<-SQL, user.id, context.class.to_s, context.id])
+          submissions.user_id = ? AND
+          assignments.context_type = ? AND
+          assignments.context_id = ? AND
+          assignments.workflow_state <> 'deleted' AND
+          (assignments.muted IS NULL OR NOT assignments.muted)
+        SQL
+        subs_with_grades = Submission.graded.scoped({
+          :select => "submissions.id",
+          :joins => :assignment,
+          :conditions => "submissions.score IS NOT NULL AND #{submission_conditions}",
+        }).map(&:id)
+        subs_with_comments = SubmissionComment.scoped({
+          :select => "submissions.id",
+          :joins => { :submission => :assignment },
+          :conditions => [<<-SQL, user.id],
+            (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
+            AND submission_comments.author_id <> ?
+            AND #{submission_conditions}
+            SQL
+        }).map(&:id)
+        potential_ids = (subs_with_grades + subs_with_comments).uniq
+        already_read_count = ContentParticipation.scoped(:conditions => {
+          :content_type => "Submission",
+          :content_id => potential_ids,
+          :user_id => user.id,
+          :workflow_state => "read",
+        }).count
+        unread_count = potential_ids.size - already_read_count
+      end
+    end
+    unread_count
+  end
+
   def unread_count(refresh = true)
-    refresh_count if refresh && !frozen? && self.updated_at.utc < Time.now.utc - stale_after
+    refresh_unread_count if refresh && !frozen? && ttl.present? && self.updated_at.utc < ttl.ago.utc
     read_attribute(:unread_count)
   end
 
-  def refresh_count
+  def refresh_unread_count
     transaction do
       self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
       self.save if self.changed?
     end
   end
 
-  # This is sadness, but because announcements can be post_delayed and
-  # discussion_topics can be locked (explicitly or as part of a module) we have
-  # to manually refresh our count every so often
-  def stale_after
-    10.minutes
+  # Things we know of that will only get updated by a refresh:
+  # - delayed_post announcements
+  # - unlocking discussions/announcements from a module
+  # - unmuting an assignment with submissions
+  # - deleting a discussion/announcement/assignment/submission
+  def ttl
+    Setting.get('content_participation_count_ttl', 30.minutes).to_i
   end
-  private :stale_after
+  private :ttl
 end

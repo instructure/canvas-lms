@@ -583,7 +583,39 @@ describe Submission do
     @submission.submission_comments.count.should eql 1
     @submission.visible_submission_comments.count.should eql 1
   end
-  
+
+  describe "read/unread state" do
+    it "should be read if a submission exists with no grade" do
+      @submission = @assignment.submit_homework(@user)
+      @submission.read?(@user).should be_true
+    end
+
+    it "should be unread after assignment is graded" do
+      @submission = @assignment.grade_student(@user, { :grade => 3 }).first
+      @submission.unread?(@user).should be_true
+    end
+
+    it "should be unread after submission is graded" do
+      @assignment.submit_homework(@user)
+      @submission = @assignment.grade_student(@user, { :grade => 3 }).first
+      @submission.unread?(@user).should be_true
+    end
+
+    it "should be unread after submission is commented on by teacher" do
+      @student = @user
+      course_with_teacher(:course => @context, :active_all => true)
+      @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
+      @submission.unread?(@user).should be_true
+    end
+
+    it "should be read if other submission fields change" do
+      @submission = @assignment.submit_homework(@user)
+      @submission.workflow_state = 'graded'
+      @submission.graded_at = Time.now
+      @submission.save!
+      @submission.read?(@user).should be_true
+    end
+  end
 end
 
 def submission_spec_model(opts={})

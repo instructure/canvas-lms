@@ -35,6 +35,7 @@ class SubmissionComment < ActiveRecord::Base
 
   before_save :infer_details
   after_save :update_submission
+  after_save :update_participation
   after_save :check_for_media_object
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
@@ -222,4 +223,18 @@ class SubmissionComment < ActiveRecord::Base
   named_scope :for_context, lambda{|context|
     {:conditions => ['submission_comments.context_id = ? AND submission_comments.context_type = ?', context.id, context.class.to_s] }
   }
+
+  def update_participation
+    # id_changed? because new_record? is false in after_save callbacks
+    if id_changed? || (hidden_changed? && !hidden?)
+      return if submission.user_id == author_id
+      return if submission.assignment.deleted? || submission.assignment.muted?
+
+      ContentParticipation.create_or_update({
+        :content => submission,
+        :user => self.author,
+        :workflow_state => "unread",
+      })
+    end
+  end
 end
