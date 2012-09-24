@@ -32,6 +32,7 @@ define([
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
@@ -78,7 +79,7 @@ define([
       $("#edit_eportfolio_form").dialog({
         width: "auto",
         title: I18n.t('eportfolio_settings', "ePortfolio Settings")
-      });
+      }).fixDialogButtons();
     });
     $("#edit_eportfolio_form .cancel_button").click(function(event) {
       $("#edit_eportfolio_form").dialog('close');
@@ -408,7 +409,7 @@ define([
             $(this).find(":text:visible:first").val(assignment).focus().select();
             $(document).triggerHandler('submission_dialog_opened');
           }
-        });
+        }).fixDialogButtons();
       }
     });
     $("#add_submission_form .cancel_button").click(function() {

@@ -22,6 +22,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.templateData' /* fillTemplateData */
 ], function(I18n, $) {
 $(document).ready(function() {
@@ -29,7 +30,7 @@ $(document).ready(function() {
     event.preventDefault();
     $("#edit_student_dialog").dialog({
       width: 450
-    });
+    }).fixDialogButtons();
     $("#edit_student_form :text:visible:first").focus().select();
   });
   $("#edit_student_form").formSubmit({

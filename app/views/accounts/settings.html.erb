@@ -560,11 +560,12 @@ TEXT
           </div>
           <%= render :partial => 'shared/user_lists' %>
         </div>
-        <div class="button-container">
-          <button type="button" class="button verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
-          <button type="submit" class="button add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
-          <button type="button" class="go_back_button button-secondary"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
+        <div class="form-actions">
+          <button type="button" class="btn go_back_button"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
+          <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+          <button type="button" class="btn btn-primary verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
+          <button type="submit" class="btn btn-primary add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
+          
         </div>
       <% end %>
     <% end %>
@@ -695,7 +696,7 @@ TEXT
                       </div>
                       <br />
                       <input type="hidden" name="report_type" value="<%= report %>" />
-                      <a href="#" id="run_<%= report %>" class="button run_report_link"><%= t 'links.run_report', 'Run Report' %></a><br/>
+                        <a href="#" id="run_<%= report %>" class="button btn-primary run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
                     </form>
                   </div>
                 </div>

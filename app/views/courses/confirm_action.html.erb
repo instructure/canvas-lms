@@ -12,9 +12,9 @@
 
     <% form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="delete"/>
-      <div class="button-container">
-        <button class="button big-button" type="submit"><%= t('buttons.delete_course', %{Delete Course}) %></button>
-        <a href="<%= context_url(@context, :context_url) %>" class="button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></a>
+      <div class="form-actions">
+        <a href="<%= context_url(@context, :context_url) %>" class="button"><%= t('#buttons.cancel', %{Cancel}) %></a>
+        <button class="button btn-danger" type="submit"><%= t('buttons.delete_course', %{Delete Course}) %></button>
       </div>
     <% end %>
   <% else %>
@@ -23,9 +23,9 @@
 
     <% form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="conclude"/>
-      <div class="button-container">
-        <button class="button big-button" type="submit"><%= t('buttons.conclude_course', %{Conclude Course}) %></button>
-        <a href="<%= context_url(@context, :context_url) %>" class="button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></a>
+      <div class="form-actions">
+        <a href="<%= context_url(@context, :context_url) %>" class="button"><%= t('#buttons.cancel', %{Cancel}) %></a>
+        <button class="button btn-primary" type="submit"><%= t('buttons.conclude_course', %{Conclude Course}) %></button>
       </div>
     <% end %>
   <% end %>

@@ -31,6 +31,7 @@ define([
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* replaceTags, /\$\.size/ */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,

@@ -25,9 +25,9 @@ DOC
   <%= f.blabel :syllabus_body, :en => "Syllabus Description" %>
   <div class="clear"></div>
   <%= f.text_area :syllabus_body, :style => "width: 100%; height: 300px;", :id => "course_syllabus_body" %>
-  <div class='button-container'>
-    <button type="submit" class='button'><%= t 'buttons.update_syllabus', "Update Syllabus" %></button>
-    <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+  <div class='form-actions'>
+    <button type="button" class="button cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+    <button type="submit" class='button btn-primary'><%= t 'buttons.update_syllabus', "Update Syllabus" %></button>
   </div>
 <% end %>
 <table id="syllabus">

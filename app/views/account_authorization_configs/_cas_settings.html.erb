@@ -36,10 +36,12 @@
       </tr>
       <tr>
         <td colspan="4">
-          <span class="auth_form">
-            <button type="submit" class="button"><%= t(:save_button, "Save Authentication Settings") %></button>
-            <button type="button" class="cancel_button button-secondary"><%= t("#buttons.cancel", "Cancel") %></button>
-          </span>
+          <div class="form-actions">
+            <span class="auth_form">
+              <button type="button" class="button cancel_button"><%= t("#buttons.cancel", "Cancel") %></button>
+              <button type="submit" class="button btn-primary"><%= t(:save_button, "Save Authentication Settings") %></button>
+            </span>
+          </div>
         </td>
       </tr>
     </table>

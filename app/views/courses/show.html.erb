@@ -99,6 +99,7 @@ require([
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function($) {
@@ -107,7 +108,7 @@ $(document).ready(function() {
   $(".self_unenrollment_link").click(function(event) {
     $("#self_unenrollment_dialog").dialog({
       title: <%= raw t('titles.drop_course', "Drop this Course").to_json %>
-    });
+    }).fixDialogButtons();
   });
   $("#self_unenrollment_dialog .action").click(function() {
     $("#self_unenrollment_dialog a.button").attr('disabled', true);

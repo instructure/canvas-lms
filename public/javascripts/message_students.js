@@ -21,6 +21,7 @@ define([
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_plugins' /* showIf */
 ], function(I18n, $) {
 
@@ -69,7 +70,7 @@ define([
     $message_students_dialog.dialog({
       width: 600,
       modal: true
-    }).dialog('open').dialog('option', 'title', I18n.t("message_student", "Message Students for %{course_name}", {course_name: title}));
+    }).fixDialogButtons().dialog('open').dialog('option', 'title', I18n.t("message_student", "Message Students for %{course_name}", {course_name: title}));
   };
   $(document).ready(function() {
     $message_students_dialog.find(".cutoff_score").bind('change blur keyup', function() {

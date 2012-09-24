@@ -24,6 +24,7 @@ define([
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jquery.instructure_forms' /* fillFormData, getFormData */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'compiled/jquery.rails_flash_notifications',
@@ -195,7 +196,7 @@ define([
       $("#moderate_student_dialog").dialog({
         title: I18n.t('titles.student_extensions', "Student Extensions"),
         width: 400
-      });
+      }).fixDialogButtons();
     });
 
     $(".moderate_student_link").live('click', function(event) {
@@ -214,7 +215,7 @@ define([
       $("#moderate_student_dialog").dialog({
         title: I18n.t('titles.student_extensions', "Student Extensions"),
         width: 400
-      });
+      }).fixDialogButtons();
     });
     $(".reload_link").click(function(event) {
       event.preventDefault();
@@ -277,7 +278,7 @@ define([
       $dialog.dialog({
         title: I18n.t('titles.extend_quiz_time', "Extend Quiz Time"),
         width: 400
-      });
+      }).fixDialogButtons();
     });
     $("#extend_time_dialog").find(".cancel_button").click(function() {
       $("#extend_time_dialog").dialog('close');

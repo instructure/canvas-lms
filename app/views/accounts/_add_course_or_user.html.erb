@@ -66,8 +66,8 @@
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button type="submit" class="button submit_button"><%= t(:add_user_button, "Add User") %></button>
-            <button type="button" class="button button-secondary cancel_button"><%= t("#buttons.cancel", "Cancel") %></button>
+            <button type="button" class="button cancel_button"><%= t("#buttons.cancel", "Cancel") %></button>
+            <button type="submit" class="button btn-primary submit_button"><%= t(:add_user_button, "Add User") %></button>
           </div>
         </td>
       </tr>
@@ -93,9 +93,9 @@
         <td><%= f.select :enrollment_term_id, @root_account.enrollment_terms.active.map{|t| [t.name, t.id] }, :selected => @term && @term.id %></td>
       </tr><tr>
         <td colspan="2">
-          <div class="button-container">
-            <button type="submit" class="button submit_button"><%= t(:add_course_button, "Add Course") %></button>
-            <button type="button" class="button button-secondary cancel_button"><%= t("#buttons.cancel", "Cancel") %></button>
+          <div class="button-container"> 
+            <button type="button" class="button dialog_closer"><%= t("#buttons.cancel", "Cancel") %></button>
+            <button type="submit" class="button btn-primary"><%= t(:add_course_button, "Add Course") %></button>
           </div>
         </td>
       </tr>
@@ -114,6 +114,7 @@ require([
   'str/htmlEscape' /* htmlEscape, /\$\.h/ */,
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData */
 ], function(I18n, $, htmlEscape) {
@@ -125,7 +126,7 @@ require([
       $("#add_user_dialog").dialog({
         title: <%= jt('#accounts.add_user_dialog_title', "Add a New User") %>,
         width: 500
-      });
+      }).fixDialogButtons();
       $("#add_user_form :text:visible:first").focus().select();
     });
     $("#add_user_form").formSubmit({
@@ -162,7 +163,7 @@ require([
       $("#add_course_dialog").dialog({
         title: <%= jt('#accounts.add_course_dialog_title', "Add a New Course") %>,
         width: 500
-      });
+      }).fixDialogButtons();
       $("#add_course_form :text:visible:first").focus().select();
     });
     $("#add_course_form").formSubmit({

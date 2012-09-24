@@ -265,9 +265,10 @@
     <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
     <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
   </p>
-  <p>
-    <button type="submit" class="button submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
-  </p>
+  <div class="button-container">
+    <button class="button dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="submit" class="button btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
+  </div>
 </form>
 <%= render :partial => "shared/mute_dialog" %>
 <ul id="section-menu" class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open" style="display:none;" role="listbox" aria-activedescendant="section-menu-link">

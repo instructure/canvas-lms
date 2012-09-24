@@ -68,8 +68,10 @@
     </tr>
     <tr>
       <td colspan="4">
-        <button type="submit" class="button submit_button"><%= calendar_event.new_record? ? t('buttons.create', "Create Event") : t('buttons.update', "Update Event") %></button>
-        <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+        <div class="form-actions">
+          <button type="button" class="button cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="button btn-primary submit_button"><%= calendar_event.new_record? ? t('buttons.create', "Create Event") : t('buttons.update', "Update Event") %></button>
+        </div>
       </td>
     </tr>
   </table>

@@ -143,8 +143,8 @@
       </tbody>
     </table>
     <div class="button-container">
-      <button type="submit" class="save_permissions_changes button"><%= t 'buttons.save', "Save Changes" %></button>
-      <a class="cancel_button button-secondary" href="<%= url_for(:back) %>"><%= t '#buttons.cancel', "Cancel" %></a>
+      <a class="button cancel_button" href="<%= url_for(:back) %>"><%= t '#buttons.cancel', "Cancel" %></a>
+      <button type="submit" class="button btn-primary save_permissions_changes"><%= t 'buttons.save', "Save Changes" %></button>
     </div>
   <% end -%>
 </div>

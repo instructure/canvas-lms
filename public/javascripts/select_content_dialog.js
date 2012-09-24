@@ -23,6 +23,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* replaceTags, getUserServices, findLinkForService */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.keycodes' /* keycodes */,

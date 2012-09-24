@@ -23,6 +23,7 @@ define([
   'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
@@ -280,7 +281,7 @@ define([
       $("#move_course_dialog").dialog({
         title: I18n.t('titles.move_course', "Move Course"),
         width: 500
-      });
+      }).fixDialogButtons();
     });
     $("#move_course_dialog").delegate('.cancel_button', 'click', function() {
       $("#move_course_dialog").dialog('close');
@@ -449,7 +450,7 @@ define([
       });
 
       $(".ui-dialog").focus();
-    });
+    }).fixDialogButtons();
     $("#reset_course_content_dialog .cancel_button").click(function() {
       $("#reset_course_content_dialog").dialog('close');
     });

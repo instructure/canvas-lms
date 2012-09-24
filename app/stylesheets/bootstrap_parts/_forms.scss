@@ -490,8 +490,17 @@ legend + .control-group {
     margin-top: $baseLineHeight / 2;
     margin-bottom: 0;
   }
-  // Move over buttons in .form-actions to align with .controls
-  .form-actions {
-    padding-left: 160px;
-  }
+
+}
+
+// moving .form-actions out of .form-horizontal scope, so the right-aligned buttons can be applied across the app
+.form-actions {
+  text-align: right;
+  padding: 10px 10px 11px;
+}
+
+// when .form-actions is in a modal box, make it look different per Kyle mockup
+.ui-dialog-content .form-actions {
+  margin-bottom: 0;
+  box-shadow: inset 0 1px 0 #fff;
 }

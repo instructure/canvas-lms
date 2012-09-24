@@ -122,10 +122,8 @@ describe "quizzes" do
 
       dialog.find_element(:css, 'textarea#body').send_keys('This is a test message.')
 
-      button = dialog.find_element(:css, "button.send_button")
-      button.click
-      keep_trying_until { button.text != "Sending Message..." }
-      button.text.should == "Message Sent!"
+      submit_dialog(dialog)
+      wait_for_ajax_requests
 
       student.conversations.size.should == 1
     end

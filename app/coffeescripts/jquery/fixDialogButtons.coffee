@@ -24,6 +24,7 @@ define [
           if $button.prop('type') is 'submit' && $button[0].form
             classes += ' button_type_submit'
             $dialog.keypress (e) ->
+              return unless $(e.target).filter('input:text').length
               $($button[0].form).submit() if e.keyCode is $.ui.keyCode.ENTER
 
           return {

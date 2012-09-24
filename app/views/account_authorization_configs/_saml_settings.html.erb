@@ -210,11 +210,15 @@
                 </div>
               </div>
             <% end %>
-            <button type="submit" class="button btn-primary">Submit</button>
-            <% unless config.new_record? %>
-              <button class="element_toggler button" aria-controls="<%= form_id %>">Cancel</button>
-            <% end %>
 
+            <div class="form-actions">
+              <span class="auth_form">
+                <% unless config.new_record? %>
+                  <button type="button" class="button cancel_button element_toggler" aria-controls="<%= form_id %>"><%= t("#buttons.cancel", "Cancel") %></button>
+                <% end %>
+                <button type="submit" class="button btn-primary"><%= t(:save_button, "Save Authentication Settings") %></button>
+              </span>
+            </div>
           <% end %>
         <% end %>
       </div>

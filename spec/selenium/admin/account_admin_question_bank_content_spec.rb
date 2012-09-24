@@ -120,7 +120,7 @@ describe "account admin question bank" do
     question_bank_2 = create_question_bank("bank 2")
     f(".move_question_link").click
     f("#move_question_dialog #question_bank_#{question_bank_2.id}").click
-    submit_dialog("#move_question_dialog")
+    submit_dialog("#move_question_dialog", '.submit_button')
     wait_for_ajaximations
     question_bank_2.assessment_questions.find_by_name(@question.name).should be_present
   end
@@ -183,7 +183,7 @@ describe "account admin question bank" do
       questions.count.should == 3
       f("#bank_new").click
       f("#new_question_bank_name").send_keys(new_bank)
-      submit_dialog("#move_question_dialog")
+      submit_dialog("#move_question_dialog", '.submit_button')
       wait_for_ajaximations
       AssessmentQuestionBank.count.should == 2
       move_questions_validation(new_bank, questions)
@@ -196,7 +196,7 @@ describe "account admin question bank" do
       questions.count.should == 2
       f(".bank .bank_name").should include_text bank_name
       f("#question_bank_#{question_bank_2.id}").click
-      submit_dialog("#move_question_dialog")
+      submit_dialog("#move_question_dialog", '.submit_button')
       wait_for_ajaximations
       move_questions_validation(bank_name, questions)
     end

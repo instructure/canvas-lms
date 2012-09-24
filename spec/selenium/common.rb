@@ -770,15 +770,21 @@ shared_examples_for "all selenium tests" do
     submit_button_css = 'button[type="submit"]'
     button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
     # the button may have been hidden via fixDialogButtons
-    if !button.displayed? && dialog = button.find_element(:xpath, "ancestor::div[contains(@class, 'ui-dialog')]")
-      submit_dialog(dialog, ".ui-dialog-buttonpane .button_type_submit")
+    if !button.displayed? && dialog = dialog_for(button)
+      submit_dialog(dialog)
     else
       button.click
     end
   end
 
-  def submit_dialog(dialog, submit_button_css = '.submit_button')
-    dialog.is_a?(Selenium::WebDriver::Element) ? dialog.find_element(:css, submit_button_css).click : f("#{dialog} #{submit_button_css}").click
+  def submit_dialog(dialog, submit_button_css = ".ui-dialog-buttonpane .button_type_submit")
+    dialog = f(dialog) unless dialog.is_a?(Selenium::WebDriver::Element)
+    dialog = dialog_for(dialog)
+    dialog.find_elements(:css, submit_button_css).last.click
+  end
+
+  def dialog_for(node)
+    node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]")
   end
 
   def check_image(element)

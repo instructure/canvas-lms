@@ -308,7 +308,7 @@ describe "context_modules" do
     edit_form = f('#add_context_module_form')
     f('.completion_entry .delete_criterion_link', edit_form).click
     wait_for_ajaximations
-    f('.cancel_button', edit_form).click
+    ff('.cancel_button', dialog_for(edit_form)).last.click
     wait_for_ajaximations
 
     # now delete the criterion frd

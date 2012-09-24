@@ -217,7 +217,7 @@ describe "profile" do
       get "/profile/settings"
       f('.add_access_token_link').click
       access_token_form = f('#access_token_form')
-      access_token_form.find_element(:css, '.cancel_button').click
+      access_token_form.find_element(:xpath, '../..').find_element(:css, '.ui-dialog-buttonpane .cancel_button').click
       access_token_form.should_not be_displayed
     end
 

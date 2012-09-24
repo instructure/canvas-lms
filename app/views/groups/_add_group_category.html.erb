@@ -3,7 +3,8 @@
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
-  'jqueryui/dialog'
+  'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
 ], function(I18n, $) {
   window.addGroupCategory = function(callback) {
     $("#add_category_form").dialog({
@@ -14,7 +15,7 @@ require([
         backgroundColor: "#000",
         opacity: 0.7
       }
-    });
+    }).fixDialogButtons();
     var callbacks = $("#add_category_form").data('callbacks') || [];
     callbacks.push(callback);
     $("#add_category_form").data('callbacks', callbacks);
@@ -79,7 +80,7 @@ TEXT
     <% end %>
     <tr>
       <td colspan="2" class="button-container-right-aligned" style="padding: 0.5em;">
-        <button type="submit" class="button submit_button"><%= t 'buttons.create_category', "Create Category" %></button>
+        <button type="submit" class="button btn-primary submit_button"><%= t 'buttons.create_category', "Create Category" %></button>
       </td>
     </tr>
   </table>

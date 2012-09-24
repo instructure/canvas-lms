@@ -187,8 +187,8 @@
       </tr>
     </table>
     <div class="button-container">
-      <button type="submit" class="button"><%= t('buttons.add_page', "Add Page") %></button>
-      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="button" class="button cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="submit" class="button btn-primary"><%= t('buttons.add_page', "Add Page") %></button>
     </div>
     <div style="display: none;">
       <a class="add_eportfolio_entry_url" href="<%= eportfolio_entries_path(@portfolio.id) %>">&nbsp;</a>
@@ -331,8 +331,9 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2" class="button-container-right-aligned">
-      <button type="submit" class="button"><%= t('buttons.update_eportfolio', "Update ePortfolio") %></button>
+    <td colspan="2" class="button-container">
+      <button class="button dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="submit" class="button btn-primary"><%= t('buttons.update_eportfolio', "Update ePortfolio") %></button>
     </td>
   <td>
 </table>

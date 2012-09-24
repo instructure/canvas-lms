@@ -49,7 +49,7 @@ describe "admin settings tabs" do
       new_description = "a different description"
       hover_and_click(".edit_tool_link:visible")
       replace_content(f("#external_tool_description"), new_description)
-      f(".save_button").click
+      fj(".save_button:visible").click
       wait_for_ajax_requests
       tool = ContextExternalTool.last
       tool.description.should == new_description

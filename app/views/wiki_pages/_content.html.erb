@@ -125,9 +125,9 @@ course will see this page first.  You can change that from [the course home page
         <%= f.check_box :notify_of_update %>
         <%= f.label :notify_of_update, :en => "Notify users that this content has changed" %>
       </div>
-      <div style="text-align: left; padding: 0.4em 0;">
-        <button type="submit" name="commit" id="wiki_page_submit" class="button"><%= t 'buttons.save_changes', 'Save Changes' %></button>
-        <button type="button" id="cancel_editing" class="cancel_button button-secondary"><%= t '#buttons.cancel', 'Cancel' %></button>
+      <div class="form-actions">
+        <button type="button" id="cancel_editing" class="btn cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
+        <button type="submit" name="commit" id="wiki_page_submit" class="btn btn-primary"><%= t 'buttons.save_changes', 'Save Changes' %></button>
       </div>
     </div>
   <% end -%>

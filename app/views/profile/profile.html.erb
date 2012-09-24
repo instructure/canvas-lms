@@ -137,8 +137,11 @@
   <tr class="edit_data_row" style="display: none;">
     <td colspan="2">
       <p><a style="font-size: 0.9em" href="<%= user_delete_url(@user.id) %>" class="admin"><%= t('links.delete_account', "Delete My Account") %> </a></p>
-      <button type="submit" class="button"><%= t('buttons.update_settings', "Update Settings") %></button>
-      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+      <div class="form-actions">
+        <button type="button" class="button cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+        <button type="submit" class="button btn-primary"><%= t('buttons.update_settings', "Update Settings") %></button>
+      </div>
+
     </td>
   </tr>
 </table>
@@ -269,7 +272,7 @@ TEXT
                 <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
               </tr><tr>
                 <td colspan="2">
-                  <button type="submit" class="button"><%= t('buttons.save_skype_name', "Save Skype Name") %></button>
+                  <button type="submit" class="button btn-primary"><%= t('buttons.save_skype_name', "Save Skype Name") %></button>
                 </td>
               </tr>
             </table>
@@ -292,7 +295,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <a class="button" href="<%= oauth_url(:service => "facebook", :return_to => settings_profile_url) %>"><%= t('buttons.register_facebook_account', "Register Your Facebook Account") %></a>
+            <a class="button btn-primary" href="<%= oauth_url(:service => "facebook", :return_to => settings_profile_url) %>"><%= t('buttons.register_facebook_account', "Register Your Facebook Account") %></a>
           </div>
         </div>
       </li>
@@ -314,7 +317,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <a class="button" href="<%= oauth_url(:service => "linked_in", :return_to => settings_profile_url) %>"><%= t('buttons.register_linkedin_account', "Register Your LinkedIn Account") %></a>
+            <a class="button btn-primary" href="<%= oauth_url(:service => "linked_in", :return_to => settings_profile_url) %>"><%= t('buttons.register_linkedin_account', "Register Your LinkedIn Account") %></a>
           </div>
         </div>
       </li>
@@ -338,7 +341,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; margin-top: 10px;">
-            <a class="button" href="<%= oauth_url(:service => "twitter", :return_to => settings_profile_url) %>"><%= t('buttons.authorize_twitter', "Authorize Twitter Access") %></a>
+            <a class="button btn-primary" href="<%= oauth_url(:service => "twitter", :return_to => settings_profile_url) %>"><%= t('buttons.authorize_twitter', "Authorize Twitter Access") %></a>
           </div>
         </div>
       </li>
@@ -368,7 +371,7 @@ TEXT
                 <td><%= f.password_field :password, :style => "width: 150px;" %></td>
               </tr><tr>
                 <td colspan="2">
-                  <button type="submit" class="button"><%= t('buttons.save_login', "Save Login") %></button>
+                  <button type="submit" class="button btn-primary"><%= t('buttons.save_login', "Save Login") %></button>
                 </td>
               </tr>
             </table>
@@ -403,7 +406,7 @@ TEXT
                 <td><%= f.password_field :password, :style => "width: 150px;" %></td>
               </tr><tr>
                 <td colspan="2">
-                  <button type="submit" class="button"><%= t('buttons.save_login', "Save Login") %></button>
+                  <button type="submit" class="button btn-primary"><%= t('buttons.save_login', "Save Login") %></button>
                 </td>
               </tr>
             </table>
@@ -528,8 +531,8 @@ TEXT
         </tr>
           <td colspan="2">
             <div class="button-container">
-              <button class="button submit_button" type="submit"><%= t('buttons.generate_token', "Generate Token") %></button>
-              <button class="button button-secondary cancel_button" type="button"><%= t('#buttons.cancel', "Cancel") %></button>
+              <button class="button cancel_button" type="button"><%= t('#buttons.cancel', "Cancel") %></button>
+              <button class="button btn-primary submit_button" type="submit"><%= t('buttons.generate_token', "Generate Token") %></button>
             </div>
           </td>
         </tr>
