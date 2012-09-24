@@ -710,10 +710,11 @@ shared_examples_for 'a backend' do
                                                       { :tag => "String#downcase", :count => 1 }]
       @cur[0,4].each { |j| j.destroy }
       @future[0].update_attribute(:run_at, 1.hour.ago)
+      @future[1].update_attribute(:run_at, 1.hour.ago)
 
       Delayed::Job.tag_counts(:current, 5).should == [{ :tag => "String#to_i", :count => 4 },
-                                                      { :tag => "String#upcase", :count => 2 },
-                                                      { :tag => "String#downcase", :count => 2 }]
+                                                      { :tag => "String#downcase", :count => 3 },
+                                                      { :tag => "String#upcase", :count => 2 },]
     end
 
     it "should return a sorted list of all popular tags" do
