@@ -300,6 +300,19 @@ describe ContentMigration do
       page_to.body.should == body % [@copy_to.id, tag_to.id]
     end
 
+    it "should find and fix wiki links by title or id" do
+      # simulating what happens when the user clicks "link to new page" and enters a title that isn't
+      # urlified the same way by the client vs. the server.  this doesn't break navigation because
+      # ApplicationController#get_wiki_page can match by urlified title, but it broke import (see #9945)
+      main_page = @copy_from.wiki.wiki_page
+      main_page.body = %{<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>}
+      main_page.save!
+      @copy_from.wiki.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
+      run_course_copy
+      @copy_to.wiki.wiki_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
+      @copy_to.wiki.wiki_pages.find_by_url!("online-unit-pages").body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
+    end
+
     it "should selectively copy items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       dt2 = @copy_from.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
