@@ -85,4 +85,15 @@ describe "i18n js" do
       JS
     end
   end
+
+  context "scoped" do
+    it "should use the scoped translations" do
+      pending('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
+      (I18n.available_locales - [:en]).each do |locale|
+        exec_cs("I18n.locale = '#{locale}'")
+        require_exec('i18n!conferences', "i18n.t('confirm.delete')").should ==
+          I18n.t('conferences.confirm.delete', :locale => locale)
+      end
+    end
+  end
 end
