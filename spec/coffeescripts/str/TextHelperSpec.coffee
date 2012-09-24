@@ -1,4 +1,4 @@
-define [ 'compiled/str/TextHelper' ], ({delimit}) ->
+define [ 'compiled/str/TextHelper' ], ({delimit, truncateText}) ->
   module 'TextHelper'
 
   test 'delimit: comma-delimits long numbers', ->
@@ -20,3 +20,17 @@ define [ 'compiled/str/TextHelper' ], ({delimit}) ->
     equal delimit(0/0), 'NaN'
     equal delimit(5/0), 'Infinity'
     equal delimit(-5/0), '-Infinity'
+
+  test 'truncateText: should truncate on word boundaries without exceeding max', ->
+    equal truncateText("zomg zomg zomg", max: 11), "zomg..."
+    equal truncateText("zomg zomg zomg", max: 12), "zomg zomg..."
+    equal truncateText("zomg zomg zomg", max: 13), "zomg zomg..."
+    equal truncateText("zomg      whitespace!   ", max: 15), "zomg..."
+
+  test 'truncateText: should not truncate if the string fits', ->
+    equal truncateText("zomg zomg zomg", max: 14), "zomg zomg zomg"
+    equal truncateText("zomg      whitespace!   ", max: 16), "zomg whitespace!"
+
+  test 'truncateText: should break up the first word if it exceeds max', ->
+    equal truncateText("zomgzomg", max: 6), "zom..."
+    equal truncateText("zomgzomg", max: 7), "zomg..."
