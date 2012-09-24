@@ -270,14 +270,13 @@ describe ConversationMessage do
       Account.default.destroy
       cm.reload
 
-      cm2 = cm.reply_from({
+      lambda { cm.reply_from({
         :purpose => 'general',
         :user => @teacher,
         :subject => "an email reply",
         :html => "body",
         :text => "body"
-      })
-      cm2.should be_nil
+      }) }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
     end
   end
 end

@@ -407,25 +407,33 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    return if self.context.root_account.deleted?
+    raise IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
     user = opts[:user]
-    if opts[:text]
+    if opts[:html]
+      message = opts[:html].strip
+    else
       message = opts[:text].strip
       message = format_message(message).first
-    else
-      message = opts[:html].strip
     end
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
     elsif !message || message.empty?
       raise "Message body cannot be blank"
+    elsif !self.grants_right?(user, :read)
+      nil
     else
-      DiscussionEntry.create!({
+      entry = DiscussionEntry.new({
         :message => message,
         :discussion_topic => self,
         :user => user,
       })
+      if !entry.grants_right?(user, :create)
+        raise IncomingMessageProcessor::ReplyToLockedTopicError
+      else
+        entry.save!
+        entry
+      end
     end
   end
 

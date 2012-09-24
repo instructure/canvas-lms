@@ -25,6 +25,19 @@ describe IncomingMessageProcessor do
       def reply_from(opts)
         @@incoming_replies ||= []
         @@incoming_replies << opts
+        if @@reply_from_result.kind_of?(Class) && @@reply_from_result.ancestors.include?(Exception)
+          raise @@reply_from_result
+        else
+          @@reply_from_result
+        end
+      end
+
+      def self.reply_from_result
+        @@reply_from_result
+      end
+
+      def self.reply_from_result=(value)
+        @@reply_from_result = value
       end
 
       def self.incoming_replies
@@ -39,9 +52,12 @@ describe IncomingMessageProcessor do
 
   before(:each) do
     DiscussionTopic.incoming_replies = []
+    DiscussionTopic.reply_from_result = DiscussionEntry.new
 
     discussion_topic_model
     @message = Message.create(:context => @topic, :user => @user)
+    @previous_message_count = Message.count
+    @previous_message_count.should == 1
   end
 
   after(:all) do
@@ -78,6 +94,61 @@ describe IncomingMessageProcessor do
     DiscussionTopic.incoming_replies.length.should == 1
     DiscussionTopic.incoming_replies[0][:text].should == 'This is plain text'
     DiscussionTopic.incoming_replies[0][:html].should == '<h1>This is HTML</h1>'
+  end
+
+  describe "when data is not found" do
+    it "should send a bounce reply when sent a bogus secure_id" do
+      IncomingMessageProcessor.process_single(Mail.new { body "body"; from "a@b.c" }, 
+        "deadbeef", @message.id)
+      Message.count.should == @previous_message_count + 1
+      # new_message = Message.find_by_id(@message.id + 1)
+      new_message = Message.find(:first, :order => 'created_at DESC')
+      new_message.subject.should match(/Reply Failed/)
+      new_message.body.should match(/unknown mailbox/)
+    end
+
+    it "should send a bounce reply when sent a bogus message id" do
+      IncomingMessageProcessor.process_single(Mail.new { body "body"; from "a@b.c" },
+        @message.reply_to_secure_id, -1)
+      Message.count.should == @previous_message_count + 1
+      # new_message = Message.find_by_id(@message.id + 1)
+      new_message = Message.find(:first, :order => 'created_at DESC')
+      new_message.subject.should match(/Reply Failed/)
+      new_message.body.should match(/unknown mailbox/)
+    end
+
+    it "should send a bounce reply when user is not found" do
+      @message.user = nil
+      @message.save!
+      IncomingMessageProcessor.process_single(Mail.new { body "body"; from "a@b.c" }, 
+        @message.reply_to_secure_id, @message.id)
+      Message.count.should == @previous_message_count + 1
+      # new_message = Message.find_by_id(@message.id + 1)
+      new_message = Message.find(:first, :order => 'created_at DESC')
+      new_message.subject.should match(/Reply Failed/)
+      new_message.body.should match(/unknown mailbox/)
+    end
+
+    it "should send a bounce reply when context is not found" do
+      @message.context = nil
+      @message.save!
+      IncomingMessageProcessor.process_single(Mail.new { body "body"; from "a@b.c" }, 
+        @message.reply_to_secure_id, @message.id)
+      Message.count.should == @previous_message_count + 1
+      # new_message = Message.find_by_id(@message.id + 1)
+      new_message = Message.find(:first, :order => 'created_at DESC')
+      new_message.subject.should match(/Reply Failed/)
+      new_message.body.should match(/unknown mailbox/)
+    end
+  end
+
+  it "should send a bounce reply when reply_from raises ReplyToLockedTopicError" do
+    DiscussionTopic.reply_from_result = IncomingMessageProcessor::ReplyToLockedTopicError
+    test_mail = Mail.new { body "reply body"; from "test@example.a" }
+    IncomingMessageProcessor.process_single(test_mail, @message.reply_to_secure_id, @message.id)
+    Message.count.should == @previous_message_count + 1
+    new_message = Message.find(:first, :order => 'created_at DESC')
+    new_message.body.should match(/topic is locked/)
   end
 
   it "should process emails from mailman" do

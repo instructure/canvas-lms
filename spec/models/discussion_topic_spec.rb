@@ -755,7 +755,23 @@ describe DiscussionTopic do
       @context = @course
       discussion_topic_model(:user => @teacher)
       account.destroy
-      @topic.reply_from(:user => @teacher, :text => "entry").should be_nil
+      lambda { @topic.reply_from(:user => @teacher, :text => "entry") }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
     end
+
+    it "should prefer html to text" do
+      course_with_teacher
+      discussion_topic_model
+      msg = @topic.reply_from(:user => @teacher, :text => "text body", :html => "<p>html body</p>")
+      msg.should_not be_nil
+      msg.message.should == "<p>html body</p>"
+    end
+
+    it "should not allow replies to locked topics" do
+      course_with_teacher
+      discussion_topic_model
+      @topic.lock!
+      lambda { @topic.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMessageProcessor::ReplyToLockedTopicError)
+    end
+
   end
 end

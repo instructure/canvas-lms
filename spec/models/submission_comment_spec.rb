@@ -606,4 +606,16 @@ This text has a http://www.google.com link in it...
     @reviewer_comment.grants_right?(@student1, :read).should be_true
     @my_comment.grants_right?(@student1, :read).should be_true
   end
+
+  describe "reply_from" do
+    it "should ignore replies on deleted accounts" do
+      comment = @submission.add_comment(:user => @teacher, :comment => "some comment")
+      Account.default.destroy
+      comment.reload
+      lambda { 
+        comment.reply_from(:user => @student, :text => "some reply") 
+      }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
+    end
+  end
+
 end
