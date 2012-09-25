@@ -19,9 +19,10 @@ require [
   'compiled/behaviors/ujsLinks'
   'compiled/behaviors/admin-links'
   'compiled/behaviors/elementToggler'
-  'compiled/behaviors/upvote-item'
-  'compiled/behaviors/repin-item'
-  'compiled/behaviors/follow'
+  # uncomment these to turn on collection pinning and voting
+  # 'compiled/behaviors/upvote-item'
+  # 'compiled/behaviors/repin-item'
+  # 'compiled/behaviors/follow'
   'compiled/behaviors/tooltip'
 
   # other stuff several bundles use
