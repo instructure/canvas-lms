@@ -69,6 +69,24 @@ shared_examples_for 'Delayed::Batch' do
       }
       Delayed::Job.jobs_count(:current).should == 2
     end
+
+    it "should use the given priority for all, if specified" do
+      Delayed::Batch.serial_batch(:priority => 11) {
+        "string".send_later_enqueue_args(:size, :priority => 20).should be_true
+        "string".send_later_enqueue_args(:gsub, { :priority => 15 }, /./, "!").should be_true
+      }
+      Delayed::Job.jobs_count(:current).should == 1
+      Delayed::Job.find_available(1).first.priority.should == 11
+    end
+
+    it "should just create the job, if there's only one in the batch" do
+      Delayed::Batch.serial_batch(:priority => 11) {
+        "string".send_later_enqueue_args(:size).should be_true
+      }
+      Delayed::Job.jobs_count(:current).should == 1
+      Delayed::Job.find_available(1).first.tag.should == "String#size"
+      Delayed::Job.find_available(1).first.priority.should == 11
+    end
   end
 
   shared_examples_for "delayed_jobs_shards" do

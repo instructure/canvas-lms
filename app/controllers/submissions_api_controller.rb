@@ -27,6 +27,7 @@
 # "sis_section_id:" as described in the API documentation on SIS IDs.
 class SubmissionsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
+  batch_jobs_in_actions :only => :update, :batch => { :priority => Delayed::LOW_PRIORITY }
 
   include Api::V1::Submission
 

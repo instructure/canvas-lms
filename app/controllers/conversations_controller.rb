@@ -30,6 +30,9 @@ class ConversationsController < ApplicationController
   before_filter :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
   before_filter :infer_tags, :only => [:create, :add_message, :add_recipients]
+  # whether it's a bulk private message, or a big group conversation,
+  # batch up all delayed jobs to make this more responsive to the user
+  batch_jobs_in_actions :only => :create
   add_crumb(proc { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
   # @API List conversations
@@ -177,29 +180,25 @@ class ConversationsController < ApplicationController
     batch_private_messages = !value_to_boolean(params[:group_conversation]) && @recipients.size > 1
     recipient_ids = @recipients.keys
 
-    # whether it's a bulk private message, or a big group conversation,
-    # batch up all delayed jobs to make this more responsive to the user
-    Delayed::Batch.serial_batch do
-      message = build_message
-      if batch_private_messages
-        mode = params[:mode] == 'async' ? :async : :sync
-        batch = ConversationBatch.generate(message, recipient_ids, mode, :user_map => @recipients, :tags => @tags)
-        if mode == :async
-          headers['X-Conversation-Batch-Id'] = batch.id.to_s
-          return render :json => [], :status => :accepted
-        end
-
-        # reload and preload stuff
-        conversations = ConversationParticipant.find(:all, :conditions => {:id => batch.conversations.map(&:id)}, :include => [:conversation], :order => "visible_last_authored_at DESC, last_message_at DESC, id DESC")
-        Conversation.preload_participants(conversations.map(&:conversation))
-        ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
-        visibility_map = infer_visibility(*conversations) 
-        render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
-      else
-        @conversation = @current_user.initiate_conversation(recipient_ids)
-        @conversation.add_message(message, :tags => @tags)
-        render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
+    message = build_message
+    if batch_private_messages
+      mode = params[:mode] == 'async' ? :async : :sync
+      batch = ConversationBatch.generate(message, recipient_ids, mode, :user_map => @recipients, :tags => @tags)
+      if mode == :async
+        headers['X-Conversation-Batch-Id'] = batch.id.to_s
+        return render :json => [], :status => :accepted
       end
+
+      # reload and preload stuff
+      conversations = ConversationParticipant.find(:all, :conditions => {:id => batch.conversations.map(&:id)}, :include => [:conversation], :order => "visible_last_authored_at DESC, last_message_at DESC, id DESC")
+      Conversation.preload_participants(conversations.map(&:conversation))
+      ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
+      visibility_map = infer_visibility(*conversations) 
+      render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
+    else
+      @conversation = @current_user.initiate_conversation(recipient_ids)
+      @conversation.add_message(message, :tags => @tags)
+      render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   end
 
