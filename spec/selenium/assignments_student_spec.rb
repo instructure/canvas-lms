@@ -191,16 +191,18 @@ describe "assignments" do
         @fourth_assignment.update_attributes(:submission_types => 'online_upload', :allowed_extensions => '.txt')
         get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
         f('.submit_assignment_link').click
-        submission_input = f('.submission_attachment input')
-        submission_input.send_keys(fullpath_zip)
-        ext_error = f('.bad_ext_msg')
-        ext_error.should be_displayed
+
         submit_file_button = f('#submit_file_button')
-        submit_file_button.should have_class('disabled')
+        submission_input = f('.submission_attachment input')
+        ext_error = f('.bad_ext_msg')
+
         keep_trying_until do
-          submission_input.send_keys(fullpath_txt)
-          ext_error.should_not be_displayed
-          !submit_file_button.should_not have_class('disabled')
+        submission_input.send_keys(fullpath_txt)
+        ext_error.should_not be_displayed
+        submit_file_button.should_not have_class('disabled')
+        submission_input.send_keys(fullpath_zip)
+        ext_error.should be_displayed
+        submit_file_button.should have_class('disabled')
         end
       end
 
