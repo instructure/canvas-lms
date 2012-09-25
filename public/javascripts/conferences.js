@@ -14,6 +14,10 @@ define([
 ], function(INST, I18n, $) {
 
   $(document).ready(function() {
+    $.screenReaderFlashMessage(
+      I18n.t('notifications.inaccessible',
+             'Warning: This page contains third-party content which is not accessible ' +
+             'to screen readers.'), 20000);
     $("#add_conference_form .cancel_button").click(function() {
       if($("#add_conference_form").prev(".conference").length > 0) {
         $("#add_conference_form").hide();
