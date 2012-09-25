@@ -197,6 +197,19 @@ describe Attachment do
       @attachment.crocodoc_available?.should be_true
       @attachment.crocodoc_document.uuid.should == '1234567890'
     end
+
+    it "should submit to scribd if crocodoc fails to convert" do
+      crocodocable_attachment_model
+      @attachment.submit_to_crocodoc
+
+      Crocodoc::API.any_instance.stubs(:status).returns [
+        {'uuid' => '1234567890', 'status' => 'ERROR'}
+      ]
+
+      expects_job_with_tag('Attachment.submit_to_scribd') {
+        CrocodocDocument.update_process_states
+      }
+    end
   end
 
   it "should set the uuid" do
