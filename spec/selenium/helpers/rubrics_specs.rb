@@ -35,6 +35,15 @@ shared_examples_for "rubric tests" do
     JS
   end
 
+  it "should delete a rubric" do
+    create_rubric_with_criterion_points "5"
+    f('.delete_rubric_link').click
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    Rubric.last.workflow_state.should == 'deleted'
+    ff('#rubrics .rubric').each { |rubric| rubric.should_not be_displayed }
+  end
+
   it "should edit a rubric" do
     edit_title = 'edited rubric'
     create_rubric_with_criterion_points "5"
@@ -46,15 +55,6 @@ shared_examples_for "rubric tests" do
     rubric.reload
     rubric.title.should == edit_title
     f('.rubric_title .title').text.should == edit_title
-  end
-
-  it "should delete a rubric" do
-    create_rubric_with_criterion_points "5"
-    f('.delete_rubric_link').click
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
-    Rubric.last.workflow_state.should == 'deleted'
-    ff('#rubrics .rubric').each { |rubric| rubric.should_not be_displayed }
   end
 
   it "should allow fractional points" do
