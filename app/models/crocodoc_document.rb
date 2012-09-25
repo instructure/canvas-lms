@@ -59,15 +59,46 @@ class CrocodocDocument < ActiveRecord::Base
     user = opts.delete(:user)
     if user
       opts[:user] = user.crocodoc_user
-    else
-      opts[:editable] = false
     end
+
+    opts.merge! permissions_for_user(user)
 
     Canvas.timeout_protection("crocodoc") do
       response = crocodoc_api.session(uuid, opts)
       session = response['session']
       crocodoc_api.view(session)
     end
+  end
+
+  def permissions_for_user(user)
+    opts = {
+      :filter => 'none',
+      :admin => false,
+    }
+
+    if user.blank?
+      opts[:editable] = false
+      return opts
+    else
+      opts[:filter] = user.crocodoc_id!
+    end
+
+    submissions = attachment.attachment_associations.
+      where(:context_type => 'Submission').
+      scoped(:include => :context).
+      map(&:context)
+
+    return opts unless submissions
+
+    if submissions.any? { |s| s.grants_right? user, :read_grade }
+      opts[:filter] = 'all'
+
+      if submissions.any? { |s| s.grants_right? user, :grade }
+        opts[:admin] = true
+      end
+    end
+
+    opts
   end
 
   def available?
