@@ -170,24 +170,6 @@ describe "assignments" do
       f('.submit_assignment_link').should be_nil
     end
 
-    it "should validate file upload restrictions" do
-      filename_txt, fullpath_txt, data_txt = get_file("testfile4.txt")
-      filename_zip, fullpath_zip, data_zip = get_file("testfile5.zip")
-      @fourth_assignment.update_attributes(:submission_types => 'online_upload', :allowed_extensions => '.txt')
-      get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
-      f('.submit_assignment_link').click
-      submission_input = f('.submission_attachment input')
-      submission_input.send_keys(fullpath_zip)
-      ext_error = f('.bad_ext_msg')
-      ext_error.should be_displayed
-      submit_file_button = f('#submit_file_button')
-      submit_file_button.should have_class('disabled')
-      submission_input.send_keys(fullpath_txt)
-      ext_error.should_not be_displayed
-      submit_file_button.should_not have_class('disabled')
-      click_away_accept_alert
-    end
-
     it "should validate on paper submission assignment type" do
       update_assignment_attributes(@fourth_assignment, :submission_types, 'on_paper', false)
       f('.submit_assignment_link').should be_nil
@@ -198,24 +180,46 @@ describe "assignments" do
       f('.submit_assignment_link').should be_nil
     end
 
-    it "should validate that website url submissions are allowed" do
-      update_assignment_attributes(@fourth_assignment, :submission_types, 'online_url')
-      f('#submission_url').should be_displayed
-      click_away_accept_alert
-    end
+    context "click_away_accept_alert" do #this context exits to handle the click_away_accept_alert method call after each spec that needs it even if it fails early to prevent other specs from failing
+      after(:each) do
+        click_away_accept_alert
+      end
 
-    it "should validate that text entry submissions are allowed" do
-      update_assignment_attributes(@fourth_assignment, :submission_types, 'online_text_entry')
-      f('.submit_online_text_entry_option').should be_displayed
-      click_away_accept_alert
-    end
+      it "should validate file upload restrictions" do
+        filename_txt, fullpath_txt, data_txt = get_file("testfile4.txt")
+        filename_zip, fullpath_zip, data_zip = get_file("testfile5.zip")
+        @fourth_assignment.update_attributes(:submission_types => 'online_upload', :allowed_extensions => '.txt')
+        get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
+        f('.submit_assignment_link').click
+        submission_input = f('.submission_attachment input')
+        submission_input.send_keys(fullpath_zip)
+        ext_error = f('.bad_ext_msg')
+        ext_error.should be_displayed
+        submit_file_button = f('#submit_file_button')
+        submit_file_button.should have_class('disabled')
+        keep_trying_until do
+          submission_input.send_keys(fullpath_txt)
+          ext_error.should_not be_displayed
+          !submit_file_button.should_not have_class('disabled')
+        end
+      end
 
-    it "should allow an assignment with all 3 online submission types" do
-      update_assignment_attributes(@fourth_assignment, :submission_types, 'online_text_entry, online_url, online_upload')
-      f('.submit_online_text_entry_option').should be_displayed
-      f('.submit_online_url_option').should be_displayed
-      f('.submit_online_upload_option').should be_displayed
-      click_away_accept_alert
+      it "should validate that website url submissions are allowed" do
+        update_assignment_attributes(@fourth_assignment, :submission_types, 'online_url')
+        f('#submission_url').should be_displayed
+      end
+
+      it "should validate that text entry submissions are allowed" do
+        update_assignment_attributes(@fourth_assignment, :submission_types, 'online_text_entry')
+        f('.submit_online_text_entry_option').should be_displayed
+      end
+
+      it "should allow an assignment with all 3 online submission types" do
+        update_assignment_attributes(@fourth_assignment, :submission_types, 'online_text_entry, online_url, online_upload')
+        f('.submit_online_text_entry_option').should be_displayed
+        f('.submit_online_url_option').should be_displayed
+        f('.submit_online_upload_option').should be_displayed
+      end
     end
   end
 end
