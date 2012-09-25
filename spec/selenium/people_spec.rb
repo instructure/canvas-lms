@@ -152,7 +152,7 @@ describe "people" do
       dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
       submit_form('#add_category_form')
       wait_for_ajaximations
-      ff('.left_side .group_name').count.should == group_count.to_i
+      ffj('.left_side .group_name:visible').count.should == group_count.to_i
     end
 
     it "should edit a student group" do
