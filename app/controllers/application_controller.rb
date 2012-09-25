@@ -956,7 +956,7 @@ class ApplicationController < ActionController::Base
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module
-      tag.context_module_action(@current_user, :read)
+      tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
       render :template => 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag

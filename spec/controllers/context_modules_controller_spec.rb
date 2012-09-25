@@ -180,6 +180,30 @@ describe ContextModulesController do
       response.should be_redirect
       response.should redirect_to course_quiz_url(@course, quiz, :module_item_id => tag.id)
     end
+
+    it "should mark an external url item read" do
+      course_with_student_logged_in(:active_all => true)
+      @module = @course.context_modules.create!
+      tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
+      @module.completion_requirements = { tag.id => { :type => 'must_view' }}
+      @module.save!
+      @module.evaluate_for(@user).should be_unlocked
+      get 'item_redirect', :course_id => @course.id, :id => tag.id
+      requirements_met = @module.evaluate_for(@user).requirements_met
+      requirements_met[0][:type].should == 'must_view'
+      requirements_met[0][:id].should == tag.id
+    end
+
+    it "should not mark a locked external url item read" do
+      course_with_student_logged_in(:active_all => true)
+      @module = @course.context_modules.create! :unlock_at => 1.week.from_now
+      tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
+      @module.completion_requirements = { tag.id => { :type => 'must_view' }}
+      @module.save!
+      @module.evaluate_for(@user).should be_locked
+      get 'item_redirect', :course_id => @course.id, :id => tag.id
+      @module.evaluate_for(@user).requirements_met.should be_blank
+    end
   end
   
   describe "POST 'reorder_items'" do
