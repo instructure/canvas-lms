@@ -684,6 +684,31 @@ describe DiscussionTopic do
       DiscussionTopic.expects(:unique_constraint_retry).once
       @topic.change_all_read_state("unread", @student)
     end
+
+    it "should update content participation count normally" do
+      cpc = ContentParticipationCount.create_or_update({
+        :user => @student,
+        :context => @course,
+        :content_type => "DiscussionTopic"
+      })
+      old_count = cpc.unread_count
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
+      cpc.reload.unread_count.should == old_count + 1
+    end
+
+    it "should not update content participation count if discussion belongs to locked assignment" do
+      cpc = ContentParticipationCount.create_or_update({
+        :user => @student,
+        :context => @course,
+        :content_type => "DiscussionTopic"
+      })
+      old_count = cpc.unread_count
+      assignment_model({
+        :submission_types => "discussion_topic",
+        :lock_at => 1.day.ago,
+      })
+      cpc.reload.unread_count.should == old_count
+    end
   end
 
   context "materialized view" do

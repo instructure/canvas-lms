@@ -60,6 +60,7 @@ class Group < ActiveRecord::Base
   belongs_to :avatar_attachment, :class_name => "Attachment"
   has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
   has_many :user_follows, :foreign_key => 'following_user_id'
+  has_many :content_participation_counts, :as => :context, :dependent => :destroy
 
   before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted

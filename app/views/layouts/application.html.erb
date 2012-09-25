@@ -16,7 +16,7 @@
       left_side_custom = yield :left_side_custom
       @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length))
     end
-     @body_classes << "with-left-side" if @show_left_side
+    @body_classes << "with-left-side" if @show_left_side
     #we dont want to render a right side unless there is actually content in it.
     @body_classes << "with-right-side" if right_side and not right_side.strip.empty?
     @body_classes << "padless-content" if @padless

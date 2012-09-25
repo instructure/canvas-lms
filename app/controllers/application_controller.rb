@@ -402,6 +402,7 @@ class ApplicationController < ActionController::Base
           end
         end
       end
+      set_badge_counts_for(@context, @current_user, @current_enrollment)
       assign_localizer if @context.present?
       add_crumb(@context.short_name, named_context_url(@context, :context_url), :id => "crumb_#{@context.asset_string}") if @context && @context.respond_to?(:short_name)
     end
@@ -449,6 +450,29 @@ class ApplicationController < ActionController::Base
     Course.require_assignment_groups(@contexts)
     @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)
     @context_membership = @context_enrollment
+  end
+
+  def set_badge_counts_for(context, user, enrollment=nil)
+    return if @js_env && @js_env[:badge_counts].present?
+    return unless context.present? && user.present?
+    return unless context.respond_to?(:content_participation_counts) # just Course and Group so far
+    js_env(:badge_counts => badge_counts_for(context, user, enrollment))
+  end
+
+  def badge_counts_for(context, user, enrollment=nil)
+    badge_counts = {}
+    ['Announcement', 'DiscussionTopic'].each do |type|
+      participation_count = context.content_participation_counts.find(:first, {
+        :conditions => { :user_id => user.id, :content_type => type },
+      })
+      participation_count ||= ContentParticipationCount.create_or_update({
+        :context => context,
+        :user => user,
+        :content_type => type,
+      })
+      badge_counts[type.underscore.pluralize] = participation_count.unread_count
+    end
+    badge_counts
   end
 
   # Retrieves all assignments for all contexts held in the @contexts variable.

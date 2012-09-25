@@ -281,7 +281,10 @@ class DiscussionTopicsController < ApplicationController
     process_discussion_topic(!!:is_new)
   end
 
-  # @API Update a topic, accepts the same parameters as create
+  # @API Update a topic
+  #
+  # Accepts the same parameters as create
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
   #         -F title='This will be positioned after Topic #1234' \ 

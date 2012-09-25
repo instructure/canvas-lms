@@ -68,4 +68,37 @@ describe Announcement do
       to_users.should include(@observer)
     end
   end
+
+  context "read/unread state" do
+    before(:each) do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+    end
+
+    it "should update content participation count normally" do
+      cpc = ContentParticipationCount.create_or_update({
+        :user => @student,
+        :context => @course,
+        :content_type => "Announcement"
+      })
+      old_count = cpc.unread_count
+      @topic = @course.announcements.create!(:title => "title", :message => "message", :user => @teacher)
+      cpc.reload.unread_count.should == old_count + 1
+    end
+
+    it "should not update content participation count if discussion belongs to locked assignment" do
+      cpc = ContentParticipationCount.create_or_update({
+        :user => @student,
+        :context => @course,
+        :content_type => "DiscussionTopic"
+      })
+      old_count = cpc.unread_count
+      @topic = @course.announcements.create!({
+        :title => "title",
+        :message => "message", :user => @teacher,
+        :delayed_post_at => Time.now + 3.days,
+      })
+      cpc.reload.unread_count.should == old_count
+    end
+  end
 end
