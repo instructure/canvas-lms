@@ -644,7 +644,7 @@ class ApplicationController < ActionController::Base
     # Annoying problem.  If I set the cache-control to anything other than "no-cache, no-store" 
     # then the local cache is used when the user clicks the 'back' button.  I don't know how
     # to tell the browser to ALWAYS check back other than to disable caching...
-    return true if @cancel_cache_buster
+    return true if @cancel_cache_buster || request.xhr? || api_request?
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
