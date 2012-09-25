@@ -139,13 +139,14 @@ describe "people" do
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
       submit_form('#add_category_form')
       wait_for_ajaximations
-      ff('.left_side .group_name').count.should == group_count.to_i
+      @course.groups.count.should == 4
+      f('.group_count').should include_text("#{group_count} Groups")
     end
 
     it "should test group structure functionality" do
       enroll_more_students
 
-      group_count = 4
+      group_count = "4"
       expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_groups').click
