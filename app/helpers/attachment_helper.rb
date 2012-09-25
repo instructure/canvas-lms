@@ -22,7 +22,7 @@ module AttachmentHelper
     if attachment.crocodoc_available?
       begin
         crocodoc = attachment.crocodoc_document
-        session_url = crocodoc.session_url(:current_user => @current_user)
+        session_url = crocodoc.session_url(:user => @current_user)
         attrs[:crocodoc_session_url] = session_url
       rescue => e
         ErrorReport.log_exception('crocodoc', e)
