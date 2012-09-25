@@ -23,6 +23,7 @@ module Delayed
 
       module ClassMethods
         attr_accessor :batches
+        attr_accessor :batch_enqueue_args
         attr_accessor :default_priority
 
         # Add a job to the queue
@@ -55,7 +56,7 @@ module Delayed
             options[:strand] = options.delete :singleton
             job = self.create_singleton(options)
           elsif batches && options.slice(:strand, :run_at).empty?
-            batch_enqueue_args = options.slice(:priority, :queue)
+            batch_enqueue_args = options.slice(*self.batch_enqueue_args)
             batches[batch_enqueue_args] << options
             return true
           else

@@ -1375,4 +1375,13 @@ class ApplicationController < ActionController::Base
     uri = Canvas::LoggingFilter.filter_uri(request.request_uri)
     "#{request.protocol}#{request.host}#{uri}"
   end
+
+  def self.batch_jobs_in_actions(opts = {})
+    batch_opts = opts.delete(:batch)
+    around_filter(opts) do |controller, action|
+      Delayed::Batch.serial_batch(batch_opts || {}) do
+        action.call
+      end
+    end
+  end
 end
