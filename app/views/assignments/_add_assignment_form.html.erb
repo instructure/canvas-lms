@@ -1,44 +1,64 @@
 <div id="add_assignment" style="display: none;">
-  <% form_for :assignment, :url => context_url(@context, :controller => :assignments, :action => :create), :html => { :style => "display: none; padding: 2px;", :id => "add_assignment_form" } do |form| %>
-    <%= form.hidden_field :assignment_group_id %>
-    <input type="hidden" name="assignment_group_id"/>
-    <div style="float: left;">
-      <div style="float: left;">
-        <%= form.text_field :title, :title => t(:assignment_name, "Assignment Name"), :style => 'width: 120px;', :maxlength => "255" %>
-        <div style="padding-left: 20px; font-size: 0.8em; margin-top: 1px;">
-          type: <select name="assignment[submission_types]" style="font-size: 0.8em;" class="assignment_submission_types">
-            <option value="" class="current_submission_types"><%= t 'options.assignment', "Assignment" %></option>
-            <option value="discussion_topic"><%= t 'options.discussion', "Discussion" %></option>
-            <option value="online_quiz"><%= t 'options.quiz', "Quiz" %></option>
-            <option value="external_tool"><%= t 'options.external_tool', "External Tool" %></option>
-            <% if feature_enabled?(:attendance) %>
-              <option value="attendance"><%= t 'options.attendance', "Attendance" %></option>
-            <% end %>
-            <option value="not_graded"><%= t 'options.not_graded', "Not Graded" %></option>
-          </select>
+  <% form_for :assignment,
+              :url => context_url(@context, :controller => :assignments, :action => :create),
+              :html => { :style => 'display: none;',
+                         :id    => 'add_assignment_form',
+                         :class => 'add_assignment_form' } do |f| %>
+
+    <%= f.hidden_field   :assignment_group_id %>
+    <%= hidden_field_tag :assignment_group_id %>
+
+    <div class="cell first">
+      <div class="row-fluid" style="min-width: 405px;">
+        <div class="span4">
+          <%= f.text_field :title,
+                           :style => 'max-width: 130px; width: 60%;',
+                           :maxlength => '255',
+                           'aria-label' => t(:assignment_name, 'Assignment Name') %>
+          <div>
+            <label for="assignment_submission_types"><%= t('labels.type', 'type') %>:</label>
+            <select name="assignment[submission_types]" class="assignment_submission_types" id="assignment_submission_types">
+              <option value="" class="current_submission_types"><%= t 'options.assignment', "Assignment" %></option>
+              <option value="discussion_topic"><%= t 'options.discussion', "Discussion" %></option>
+              <option value="online_quiz"><%= t 'options.quiz', "Quiz" %></option>
+              <option value="external_tool"><%= t 'options.external_tool', "External Tool" %></option>
+              <% if feature_enabled?(:attendance) %>
+                <option value="attendance"><%= t 'options.attendance', "Attendance" %></option>
+              <% end %>
+              <option value="not_graded"><%= t 'options.not_graded', "Not Graded" %></option>
+            </select>
+          </div>
         </div>
-      </div><div style="float: left;">      
-        <span style="font-size: 0.8em; padding-left: 10px;"><%= before_label :due, "due" %></span>
-        <%= form.text_field :due_at, :style => "width: 130px;", :class => "datetime_field" %>
-      </div><div style="float: left;">
-      <span class="points nobr">
-        <span style="font-size: 0.8em; padding-left: 10px;"><%= before_label :points, "points" %></span>
-        <%= form.text_field :points_possible, :size => '2', :title => 'pts' %>
-        <br/><a href="#" class="more_options_link" style="font-size: 0.8em; padding-left: 10px;"><%= t 'links.more_options', "more options" %></a>
-      </span>
-      <span class="no_points nobr" title="<%= t 'tooltips.assignment_is_quiz', "This assignment is a quiz, so points possible comes from the questions and can't be set manually." %>">
-        quiz pts
-      </span>
+
+        <div class="span4">
+          <%= f.label :due_at, t('labels.due', 'due') %>
+          <%= f.text_field :due_at, :style => 'max-width: 130px; width: 60%;', :class => 'datetime_field' %>
+        </div>
+
+        <div class="span4">
+          <span class="points nobr">
+            <%= f.label :points_possible, t('labels.points', 'points') %>
+            <%= f.text_field :points_possible, :size => 2 %>
+            <br/>
+
+            <a href="#" class="more_options_link" style="font-size: 0.8em; padding-left: 10px;"><%= t 'links.more_options', "more options" %></a>
+          </span>
+
+          <span class="no_points nobr" title="<%= t 'tooltips.assignment_is_quiz', "This assignment is a quiz, so points possible comes from the questions and can't be set manually." %>">
+            <%= t('labels.quiz_points', 'quiz pts.') %>
+          </span>
+        </div>
       </div>
-      <div class="clear"></div>
     </div>
-    <div class="button-container-right-aligned">
-      <button type="submit" class="button small-button"><%= t '#buttons.update', "Update" %></button>
-      <button type="button" class="button-secondary cancel_button" style="margin-right:0 !important;"><%= image_tag("cancel.png") %></button>
-      <br/>
+
+    <div class="button-container-right-aligned cell last">
+      <button type="button" class="btn btn-small cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
+      <button type="submit" class="btn btn-small btn-primary"><%= t('#buttons.update', 'Update') %></button>
+      <br />
+
       <a href="#" style="font-size: 0.8em; display: none;"><%= t 'links.full_edit', "Full Edit" %></a>
     </div>
-    <div class="clear"></div>
   <% end %>
+
   <a href="<%= context_url(@context, :controller => :assignments, :action => :create) %>" class="assignments_url">&nbsp;</a>
 </div>

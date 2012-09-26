@@ -1,7 +1,7 @@
 <%= render :partial => "assignments/add_assignment_form" %>
 <%= render :partial => "assignments/add_assignment_group_form" %>
 
-<div style="<%= "display: none;" unless can_do(@context, @current_user, :manage_grades) %>margin-bottom: 10px; displayx: none; padding-left: 20px;" id="class_weighting_box">
+<div style="<%= "display: none;" unless can_do(@context, @current_user, :manage_grades) %>margin-bottom: 16px; padding-left: 16px;" id="class_weighting_box">
   <input type="checkbox" id="class_weighting_policy" name="class_weighting_policy" <%= "checked" if (@context.group_weighting_scheme == 'percent') %>/>
   <label for="class_weighting_policy"><%= t 'labels.class_weighting_policy', "Weight the final grade based on assignment groups" %></label>
   <a href="<%= url_for (@context) %>" class="context_url" style="display: none;">&nbsp;</a>

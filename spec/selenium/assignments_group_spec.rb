@@ -30,6 +30,7 @@ describe "assignment groups" do
     get "/courses/#{@course.id}/assignments"
 
     #edit group grading rules
+    driver.execute_script %{$('.edit_group_link:first').addClass('focus');}
     f('.edit_group_link img').click
     #set number of lowest scores to drop
     f('.add_rule_link').click
@@ -79,6 +80,7 @@ describe "assignment groups" do
 
     get "/courses/#{@course.id}/assignments"
 
+    driver.execute_script %{$('.group_move_icon').addClass('focus');}
     second_group = fj("#group_#{ags[1].id} .group_move_icon")
     third_group = fj("#group_#{ags[2].id} .group_move_icon")
     driver.action.drag_and_drop(third_group, second_group).perform

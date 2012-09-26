@@ -184,6 +184,7 @@ describe "assignments" do
     it "should allow creating a quiz assignment from 'more options'" do
       get "/courses/#{@course.id}/assignments"
 
+      driver.execute_script %{$('.assignment_group .add_assignment_link:first').addClass('focus');}
       f(".assignment_group .add_assignment_link").click
       form = f("#add_assignment_form")
       form.find_element(:css, ".assignment_submission_types option[value='online_quiz']").click
