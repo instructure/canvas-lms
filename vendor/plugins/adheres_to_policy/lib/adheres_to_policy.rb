@@ -124,7 +124,7 @@ module Instructure #:nodoc:
         # once
         granted_rights = if cache_lookup
           # Check and cache all the things!
-          Rails.cache.fetch(['context_permissions', self, user].cache_key, :expires_in => 1.hour) do
+          Rails.cache.fetch(permission_cache_key_for(user), :expires_in => 1.hour) do
             check_policy(user)
           end
         else
@@ -147,6 +147,10 @@ module Instructure #:nodoc:
       # Used for a more-natural: user.has_rights?(@account, :destroy)
       def has_rights?(obj, *sought_rights)
         obj.grants_rights?(self, *sought_rights)
+      end
+
+      def permission_cache_key_for(user)
+        ['context_permissions', self, user].cache_key
       end
 
     end # InstanceMethods
