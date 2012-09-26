@@ -239,7 +239,8 @@ describe "speed grader" do
     student_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
+
     # make sure avatar shows up for current student
     ff("#avatar_image").length.should == 1
     f("#avatar_image").should_not have_attribute('src', 'blank.png')
@@ -251,8 +252,7 @@ describe "speed grader" do
     f('#comments > .comment').should include_text('grader comment')
 
     # make sure avatar shows up for user comment
-    f("#comments > .comment .avatar").should be_displayed
-
+    ff("#comments > .comment .avatar")[0].should have_attribute('style', "display: inline\;")
     # disable avatars
     @account = Account.default
     @account.disable_service(:avatars)
@@ -263,7 +263,7 @@ describe "speed grader" do
 
     ff("#avatar_image").length.should == 0
     ff("#comments > .comment .avatar").length.should == 1
-    ff("#comments > .comment .avatar")[0]['style'].should match(/display:\s*none/)
+    ff("#comments > .comment .avatar")[0].should have_attribute('style', "display: none\;")
   end
 
   it "should hide student names and avatar images if \"Hide student names\" is checked" do
