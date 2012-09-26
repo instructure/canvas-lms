@@ -4,7 +4,7 @@
     <input type="hidden" name="assignment_group_id"/>
     <div style="float: left;">
       <div style="float: left;">
-        <%= form.text_field :title, :title => t(:assignment_name, "Assignment Name"), :style => 'width: 120px;' %>
+        <%= form.text_field :title, :title => t(:assignment_name, "Assignment Name"), :style => 'width: 120px;', :maxlength => "255" %>
         <div style="padding-left: 20px; font-size: 0.8em; margin-top: 1px;">
           type: <select name="assignment[submission_types]" style="font-size: 0.8em;" class="assignment_submission_types">
             <option value="" class="current_submission_types"><%= t 'options.assignment', "Assignment" %></option>
