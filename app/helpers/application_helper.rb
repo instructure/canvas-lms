@@ -575,7 +575,7 @@ module ApplicationHelper
   end
 
   def jt(key, default, js_options='{}')
-    full_key = key =~ /\A#/ ? key : i18n_scope + '.' + key
+    full_key = key =~ /\A#/ ? key.sub(/\A#/, '') : i18n_scope + '.' + key
     translated_default = I18n.backend.send(:lookup, I18n.locale, full_key) || default # string or hash
     raw "I18n.scoped(#{i18n_scope.to_json}).t(#{key.to_json}, #{translated_default.to_json}, #{js_options})"
   end
