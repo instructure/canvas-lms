@@ -9,6 +9,7 @@ module ParallelExclude
       'vendor/plugins/respondus_soap_endpoint/spec_canvas/integration/respondus_endpoint_spec.rb',
       'vendor/plugins/multiple_root_accounts/spec_canvas/models/attachment_spec.rb',
       'vendor/plugins/webct_scraper/spec_canvas/lib/models/bulk_course_migration_spec.rb',
+      'vendor/plugins/instructure_misc_plugin/spec_canvas/student_access_spec.rb',
       'spec/apis/api_spec_helper.rb',
       'spec/apis/general_api_spec.rb',
       'spec/apis/user_content_spec.rb',
