@@ -460,6 +460,29 @@ class Attachment < ActiveRecord::Base
     ns
   end
 
+  def change_namespace(new_namespace)
+    if self.root_attachment
+      raise "change_namespace must be called on a root attachment"
+    end
+
+    old_namespace = self.namespace
+    return if new_namespace == old_namespace
+    old_full_filename = self.full_filename
+    write_attribute(:namespace, new_namespace)
+
+    if Attachment.s3_storage?
+      AWS::S3::S3Object.rename(old_full_filename,
+                               self.full_filename,
+                               bucket_name,
+                               :access => attachment_options[:s3_access])
+    else
+      FileUtils.mv old_full_filename, full_filename
+    end
+
+    self.save
+    Attachment.update_all({ :namespace => new_namespace }, { :root_attachment_id => self.id })
+  end
+
   def process_s3_details!(details)
     unless workflow_state == 'unattached_temporary'
       self.workflow_state = nil

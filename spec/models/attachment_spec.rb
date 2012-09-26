@@ -907,6 +907,31 @@ describe Attachment do
     end
   end
 
+  context "#change_namespace" do
+    before do
+      Setting.set("file_storage_test_override", "s3")
+      @old_account = account_model
+      Attachment.domain_namespace = @old_account.file_namespace
+      @root = attachment_model
+      @child = attachment_model(:root_attachment => @root)
+      @new_account = account_model
+    end
+
+    it "should fail for non-root attachments" do
+      AWS::S3::S3Object.expects(:rename).never
+      expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error
+      @root.reload.namespace.should == @old_account.file_namespace
+      @child.reload.namespace.should == @root.reload.namespace
+    end
+
+    it "should rename root attachments and update children" do
+      AWS::S3::S3Object.expects(:rename).with(@root.full_filename, @root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), @root.bucket_name, anything)
+      @root.change_namespace(@new_account.file_namespace)
+      @root.namespace.should == @new_account.file_namespace
+      @child.reload.namespace.should == @root.namespace
+    end
+  end
+
   context "dynamic thumbnails" do
     before do
       attachment_model(:uploaded_data => stub_png_data)
