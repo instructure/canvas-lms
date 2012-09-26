@@ -29,3 +29,11 @@
 
 <div id='notification-preferences'>
 </div>
+
+<span class='weekly_notification_range'>
+  <% weekly_notification_range = @current_user.weekly_notification_range %>
+  <%= t "weekly_notification_range", "Your weekly notifications will be sent %{weekday} between %{start_time} and %{end_time}.",
+    :weekday => I18n.l(weekly_notification_range.first.in_time_zone.to_date, :format => :weekday),
+    :start_time => time_string(weekly_notification_range.first),
+    :end_time => time_string(weekly_notification_range.last) %>
+</span>

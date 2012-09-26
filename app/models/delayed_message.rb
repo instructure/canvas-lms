@@ -131,33 +131,34 @@ class DelayedMessage < ActiveRecord::Base
     message.parse!
     message.save
   end
-  
-  protected
-    def set_send_at
-      # Find the user's timezone
-      if self.communication_channel and self.communication_channel.user
-        user = self.communication_channel.user
-        time_zone = ActiveSupport::TimeZone.us_zones.find {|zone| zone.name == user.time_zone}
-      else
-        time_zone = ActiveSupport::TimeZone.us_zones.find {|zone| zone.name == 'Mountain Time (US & Canada)'}
-      end
 
-      time_zone ||= ActiveSupport::TimeZone.us_zones.find {|zone| zone.name == 'Mountain Time (US & Canada)'}
-      time_zone ||= Time.zone
+  protected
+    MINUTES_PER_DAY = 60 * 24
+    WEEKLY_ACCOUNT_BUCKETS = 4
+    MINUTES_PER_WEEKLY_ACCOUNT_BUCKET = MINUTES_PER_DAY / WEEKLY_ACCOUNT_BUCKETS
+
+    def set_send_at
+      # no cc yet = wait
+      return unless self.communication_channel and self.communication_channel.user
+      return if self.send_at
 
       # I got tired of trying to figure out time zones in my head, and I realized
       # if we do it this way, Rails will take care of it all for us!
-      target = ActiveSupport::TimeWithZone.new(Time.now.utc, time_zone)
       if self.frequency == 'weekly'
-        target = target.next_week.advance(:day => -2).change(:hour => 20)
-      elsif target.hour >= 18
-        target = target.tomorrow.change(:hour => 18)
+        target = self.communication_channel.user.weekly_notification_time
       else
-        target = target.change(:hour => 18)
+        # Find the appropriate timezone. For weekly notifications, always use
+        # Eastern. For other notifications, try and user the user's time zone,
+        # defaulting to mountain. (Should be impossible to not find mountain, but
+        # default to system time if necessary.)
+        zone_name = self.communication_channel.user.time_zone || 'Mountain Time (US & Canada)'
+        time_zone = ActiveSupport::TimeZone.us_zones.find{ |zone| zone.name == zone_name } || Time.zone
+        target = time_zone.now.change(:hour => 18)
+        target += 1.day if target < time_zone.now
       end
 
       # Set the send_at value
-      self.send_at ||= target
+      self.send_at = target
     end
 
 end
