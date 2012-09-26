@@ -2600,4 +2600,51 @@ class User < ActiveRecord::Base
     return :disabled if result.nil?
     [ :disabled, :optional ][result]
   end
+
+  def weekly_notification_bucket
+    # place in the next 24 hours after saturday morning midnight is
+    # determined by account and user. messages for any user in the same
+    # account (on the same shard) map into the same 6-hour window, and then
+    # are spread within that window by user. this is specifically 24 real
+    # hours, not 1 day, because DST sucks. so it'll go to 1am sunday
+    # morning and 11pm saturday night on the DST transition days, but
+    # midnight sunday morning the rest of the time.
+    account_bucket = (shard.id.to_i + pseudonym.try(:account_id).to_i) % DelayedMessage::WEEKLY_ACCOUNT_BUCKETS
+    user_bucket = self.id % DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET
+    account_bucket * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET + user_bucket
+  end
+
+  def weekly_notification_time
+    # weekly notification scheduling happens in Eastern-time
+    time_zone = ActiveSupport::TimeZone.us_zones.find{ |zone| zone.name == 'Eastern Time (US & Canada)' }
+
+    # start at midnight saturday morning before next monday
+    target = time_zone.now.next_week - 2.days
+
+    minutes = weekly_notification_bucket.minutes
+
+    # if we're already past that (e.g. it's sunday or late saturday),
+    # advance by a week
+    target += 1.week if target + minutes < time_zone.now
+
+    # move into the 24 hours after midnight saturday morning and return
+    target + minutes
+  end
+
+  def weekly_notification_range
+    # weekly notification scheduling happens in Eastern-time
+    time_zone = ActiveSupport::TimeZone.us_zones.find{ |zone| zone.name == 'Eastern Time (US & Canada)' }
+
+    # start on January first instead of "today" to avoid DST, but still move to
+    # a saturday from there so we get the right day-of-week on start_hour
+    target = time_zone.now.change(:month => 1, :day => 1).next_week - 2.days + weekly_notification_bucket.minutes
+
+    # 2 hour on-the-hour span around the target such that distance from the
+    # start hour is at least 30 minutes.
+    start_hour = target - 30.minutes
+    start_hour = start_hour.change(:hour => start_hour.hour)
+    end_hour = start_hour + 2.hours
+
+    [start_hour, end_hour]
+  end
 end
