@@ -220,6 +220,8 @@ class Group < ActiveRecord::Base
     else
       member = self.group_memberships.create(attrs)
     end
+    # permissions for this user in the group are probably different now
+    Rails.cache.delete(permission_cache_key_for(user))
     return member
   end
 
