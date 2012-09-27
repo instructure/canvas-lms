@@ -14,7 +14,7 @@ shared_examples_for "context module tests" do
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', module_name)
     select_module_item(item_select_selector + ' .module_item_select', item_name)
-    f('.add_item_button').click
+    fj('.add_item_button:visible').click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
@@ -50,13 +50,13 @@ shared_examples_for "context module tests" do
     select_module_item('#add_module_item_select', module_name)
     select_module_item(item_select_selector + ' .module_item_select', new_item_text)
     item_title = keep_trying_until do
-      item_title = find_with_jquery('.item_title:visible')
+      item_title = fj('.item_title:visible')
       item_title.should be_displayed
       item_title
     end
     replace_content(item_title, item_title_text)
     yield if block_given?
-    f('.add_item_button').click
+    fj('.add_item_button:visible').click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
@@ -74,7 +74,7 @@ shared_examples_for "context module tests" do
 
     replace_content(title_input, page_name_text)
 
-    f('.add_item_button').click
+    fj('.add_item_button:visible').click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")

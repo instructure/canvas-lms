@@ -77,7 +77,7 @@ $(document).ready(function() {
     $("#select_context_content_dialog").dialog({
       title: dialog_title,
       width: 400
-    });
+    }).fixDialogButtons();
     $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
   }
   $("#select_context_content_dialog .cancel_button").click(function() {

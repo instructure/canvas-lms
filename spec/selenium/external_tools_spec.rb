@@ -60,7 +60,7 @@ describe "editing external tools" do
     f("#external_tool_create_url").send_keys("http://www.example.com")
     f("#external_tool_create_title").send_keys("Example")
     f("#external_tool_create_new_tab").click
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
     ff("#context_module_item_new").length.should == 0
@@ -115,7 +115,7 @@ describe "editing external tools" do
     ff("#context_external_tools_select .tools .tool")[0].click
     f("#external_tool_create_url").should have_value @tool1.url
     f("#external_tool_create_title").should have_value @tool1.name
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
     keep_trying_until { ff("#context_module_item_new").length.should == 0 }
@@ -131,7 +131,7 @@ describe "editing external tools" do
     ff("#context_external_tools_select .tools .tool")[1].click
     f("#external_tool_create_url").should have_value @tool2.url
     f("#external_tool_create_title").should have_value @tool2.name
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
     ff("#context_module_item_new").length.should == 0

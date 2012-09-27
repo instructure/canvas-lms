@@ -92,7 +92,7 @@ describe "assignments" do
           expect_new_page_load { submit_form('#edit_assignment_form') }
         else
           f('#external_tool_create_url').send_keys(lti_url)
-          submit_dialog('#select_context_content_dialog', '.add_item_button')
+          submit_dialog('.ui-dialog-buttonset', '.add_item_button')
           expect_new_page_load { submit_form('#edit_assignment_form') }
         end
         f('.assignment_list').should include_text(assignment_title)

@@ -31,7 +31,7 @@ describe "external tool assignments" do
       ff('#context_external_tools_select td.tools .tool')[1].click
       f('#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t2.url
     end
-    f('#select_context_content_dialog .add_item_button').click
+    fj('.add_item_button:visible').click
     f('#assignment_external_tool_tag_attributes_url').attribute('value').should == @t2.url
     submit_form('form.new_assignment')
 
@@ -55,7 +55,7 @@ describe "external tool assignments" do
     f('#assignment_external_tool_tag_attributes_url').click
     ff('#context_external_tools_select td.tools .tool')[0].click
     f('#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
-    f('#select_context_content_dialog .add_item_button').click
+    fj('.add_item_button:visible').click
     f('#assignment_external_tool_tag_attributes_url').attribute('value').should == @t1.url
     submit_form('form.edit_assignment')
 
