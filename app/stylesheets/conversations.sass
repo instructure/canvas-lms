@@ -201,29 +201,7 @@ ul.messages, ul.conversations, div.conversations > ul
       cursor: pointer
       color: #2571bd
       > span
-        display: block
-        cursor: auto
-        z-index: 4
-        background: #fff
-        border: 1px solid #ccc
-        padding: 0.5em
         display: none
-        position: absolute
-        +border-radius(10px)
-        box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2)
-      ul
-        padding: 0
-        margin: 0
-        max-height: 120px
-        overflow: auto
-        list-style: none
-        li
-          font-weight: normal
-          padding: 0 1em
-          border: none
-          color: #000 !important
-          a
-            color: #000 !important
   > li
     overflow: hidden
     > .conversation-summary
@@ -250,6 +228,30 @@ ul.messages, ul.conversations, div.conversations > ul
       padding: 0 2px
       background-color: #2571bd
       color: #fff
+#others_popup
+  z-index: 10
+  position: absolute
+  > span
+    display: block
+    cursor: auto
+    background: #fff
+    border: 1px solid #ccc
+    padding: 0.5em
+    +border-radius(10px)
+    box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2)
+  ul
+    padding: 0
+    margin: 0
+    max-height: 120px
+    overflow: auto
+    list-style: none
+    li
+      font-weight: normal
+      padding: 0 1em
+      border: none
+      color: #000 !important
+      a
+        color: #000 !important
 #inbox form ul.conversations .audience em a
   color: #777
 

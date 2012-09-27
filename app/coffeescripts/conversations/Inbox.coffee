@@ -34,6 +34,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.disableWhileLoading'
   'compiled/jquery.rails_flash_notifications'
+  'compiled/jquery/offsetFrom'
   'media_comments'
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'
@@ -54,6 +55,7 @@ define [
       @$conversations = $('#conversations')
       @$messages = $('#messages')
       @$messageList = @$messages.find('ul.messages')
+      @$others = $('<div class="others" id="others_popup" />')
       @initializeHelp()
       @initializeForms()
       @initializeMenus()
@@ -408,8 +410,8 @@ define [
         @openMenu $(e.currentTarget)
 
       $(document).bind 'mousedown', (e) =>
-        unless $(e.target).closest("span.others").find('> span').length
-          $('span.others > span').hide()
+        unless $(e.target).closest("#others_popup").length
+          @$others.hide()
         @closeMenus() unless $(e.target).closest(".menus > li, #conversation_actions, #conversations .actions").length
 
       @$menuViews = $('#menu_views')
@@ -420,14 +422,16 @@ define [
           e.preventDefault()
           @updateHashData scope: scope
 
-      $('#conversations ul, #create_message_form').delegate '.audience', 'click', (e) =>
-        if ($others = $(e.target).closest('span.others').find('> span')).length
-          if not $(e.target).closest('span.others > span').length
-            $('span.others > span').not($others).hide()
-            $others.toggle()
-            $others.css('left', $others.parent().position().left)
-            $others.css('top', $others.parent().height() + $others.parent().position().top)
-          return false
+      $('#conversations ul, #create_message_form').on 'click', '.others', (e) =>
+        $this = $(e.currentTarget)
+        $container = $this.closest('li').offsetParent()
+        offset = $this.offsetFrom($container)
+        @$others.empty().append($this.find('> span').clone()).css
+          left: offset.left
+          top: offset.top + $this.height() + $container.scrollTop()
+          fontSize: $this.css('fontSize')
+        $container.append(@$others.show())
+        return false # i.e. don't select conversation
 
     setScope: (scope) ->
       $items = @$menuViewsList.find('li')
