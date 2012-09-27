@@ -21,25 +21,38 @@ class CrocodocSessionsController < ApplicationController
 
   def create
     attachment = Attachment.find(params[:attachment_id])
-    submission = Submission.find(params[:submission_id])
-    if params[:version]
-      submission = submission.submission_history[params[:version].to_i]
-    end
+    submission = Submission.find(params[:submission_id]) if params[:submission_id]
 
-    # make sure the attachment is tied to this submission
-    attachment_ids = (submission.attachment_ids || "").split(',')
-    unless attachment_ids.include? attachment.id.to_s
-      raise ActiveRecord::RecordNotFound
-    end
+    if submission
+      if params[:version]
+        submission = submission.submission_history[params[:version].to_i]
+      end
 
-    unless submission.grants_right? @current_user, session, :read
-      render :text => 'unauthorized', :status => :unauthorized
-      return
+      # make sure the attachment is tied to this submission
+      attachment_ids = (submission.attachment_ids || "").split(',')
+      unless attachment_ids.include? attachment.id.to_s
+        raise ActiveRecord::RecordNotFound
+      end
+
+      unless submission.grants_right? @current_user, session, :read
+        render :text => 'unauthorized', :status => :unauthorized
+        return
+      end
+    else
+      unless attachment.grants_right? @current_user, session, :download
+        render :text => 'unauthorized', :status => :unauthorized
+        return
+      end
     end
 
     if attachment.crocodoc_available?
+      annotations = params[:annotations] ?
+        value_to_boolean(params[:annotations]) :
+        true
+
       crocodoc = attachment.crocodoc_document
-      session_url = crocodoc.session_url(:user => @current_user)
+      session_url = crocodoc.session_url :user => @current_user,
+                                         :annotations => annotations
       respond_to do |format|
         format.json { render :json => {:session_url => session_url} }
       end
