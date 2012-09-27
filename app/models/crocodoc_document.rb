@@ -109,7 +109,7 @@ class CrocodocDocument < ActiveRecord::Base
   end
 
   def available?
-    uuid && process_state != 'ERROR' && Canvas::Crocodoc.config
+    !!(uuid && process_state != 'ERROR' && Canvas::Crocodoc.config)
   end
 
   def crocodoc_api
