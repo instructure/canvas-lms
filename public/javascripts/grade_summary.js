@@ -86,6 +86,7 @@ define([
       setGroupData(groups, $(this));
     });
     $submissions.removeClass('dropped');
+    $submissions.find('.points_possible').attr('aria-label', '');
     $submissions.each(function() {
       var $submission = $(this),
           submission;
@@ -93,7 +94,9 @@ define([
       
       var data = $submission.getTemplateData({textValues: ['assignment_group_id', 'score', 'points_possible', 'assignment_id']});
       if((!data.score || isNaN(parseFloat(data.score))) && ignoreUngradedSubmissions) {
-        $(this).addClass('dropped');
+        $submission.addClass('dropped')
+                   .find('.points_possible')
+                   .attr('aria-label', I18n.t('titles.dropped_assignment_no_total', 'This assignment will not be considered in the total calculation'));
         return;
       }
       var groupData = groups[data.assignment_group_id];
