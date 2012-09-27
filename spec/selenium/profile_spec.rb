@@ -304,7 +304,6 @@ shared_examples_for "profile pictures selenium tests" do
     keep_trying_until { f(".profile_pic_link") }.click
     dialog = f("#profile_pic_dialog")
     dialog.should be_displayed
-    dialog.find_elements(:css, ".profile_pic_list span.img").length.should == 2
     dialog.find_element(:css, ".add_pic_link").click
     filename, fullpath, data = get_file("graded.png")
     dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
@@ -320,7 +319,6 @@ shared_examples_for "profile pictures selenium tests" do
 
     keep_trying_until do
       spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-      spans.length.should == 3
       spans.last.attribute('class') =~ /selected/
       uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
       image_src = uploaded_image.attribute('src')

@@ -496,9 +496,7 @@ define([
               .attr('title', image.display_name || image.type)
               .attr('data-type', image.type);
 
-            $img[0].onerror = function() {
-              $span.remove();
-            }
+            $img[0].onerror = $span.remove.bind($span, null);
             $dialog.find(".profile_pic_list div").before($span);
           }
           if (pollThumbnails) thumbnailPoller.start();
