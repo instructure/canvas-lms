@@ -49,6 +49,7 @@ class Folder < ActiveRecord::Base
   after_save :touch_context
   before_save :infer_hidden_state
   validates_presence_of :context_id, :context_type
+  validates_length_of :name, :maximum => maximum_string_length
   validate_on_update :reject_recursive_folder_structures
 
   def reject_recursive_folder_structures

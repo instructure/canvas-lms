@@ -292,7 +292,7 @@
       <%= f.hidden_field :parent_folder_id %>
       <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <span class="name" style="display: none;">&nbsp;</span>
-      <%= f.text_field :name, :title => "Folder Name" %>
+      <%= f.text_field :name, :maxlength => "255", :title => "Folder Name" %>
     <% end %>
     <div class="clear"></div>
   </li>
