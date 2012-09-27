@@ -9,8 +9,8 @@
 <form id="question_form_template" class="question_form" style="display: none;">
 <div class="question">
   <div class="header" style="background-color: transparent;">
-    <input type="text" style="width: 150px;" name="question_name"/>
-    <select class="question_type" name="question_type">
+    <input type="text" style="width: 150px;" name="question_name" aria-label="<%= t "label.question.name", "Question name" %>"/>
+    <select class="question_type" name="question_type" aria-label="<%= t "label.question.type", "Question type" %>">
       <option value="multiple_choice_question" style="padding: 2px;"><%= t('question_type.multiple_choice', "Multiple Choice") %></option>
       <option value="true_false_question" style="padding: 2px;"><%= t('question_type.true_false', "True/False") %></option>
       <option value="short_answer_question" style="padding: 2px;"><%= t('question_type.short_answer', "Fill In the Blank") %></option>
@@ -26,58 +26,58 @@
     </select>
     <span class="question_points_holder">
       <span style="padding-left: 20px;"><%= before_label :points, 'pts' %></span>
-      <input class="float_value" type="text" style="width: 25px;" name="question_points"/>
+      <input class="float_value" type="text" style="width: 25px;" name="question_points" aria-label="<%= t "label.question.points", "Question point value" %>"/>
     </span>
   </div>
   <div class="links">
   </div>
   <div class="clear"></div>
   <div class="text">
-    <div class="multiple_choice_question_explanation explanation subheader">
+    <div tabindex="0" class="multiple_choice_question_explanation explanation subheader">
       <%= t('explanations.multiple_choice', "Enter your question and multiple answers, then select the one correct answer.") %>
     </div>
-    <div class="true_false_question_explanation explanation subheader">
+    <div tabindex="0" class="true_false_question_explanation explanation subheader">
       <%= t('explanations.true_false', "Enter your question text, then select if True or False is the correct answer.") %>
     </div>
-    <div class="short_answer_question_explanation explanation subheader">
+    <div tabindex="0" class="short_answer_question_explanation explanation subheader">
       <%= mt('explanations.short_answer', "Enter your question text, then define all possible correct answers for the blank.  \nStudents will see the question followed by a small text box to type their answer.") %>
     </div>
-    <div class="fill_in_multiple_blanks_question_explanation explanation subheader">
+    <div tabindex="0" class="fill_in_multiple_blanks_question_explanation explanation subheader">
       <%= t('explanations.fill_in_multiple_blanks', "Enter your question, specifying where each blank should go.  Then define the possible correct answer for each blank.  Students must type correct answers into text boxes at each blank.") %>
     </div>
-    <div class="multiple_answers_question_explanation explanation subheader">
+    <div tabindex="0" class="multiple_answers_question_explanation explanation subheader">
       <%= t('explanations.multiple_answers', "This question will show a checkbox next to each answer, and the student must select ALL the answers you mark as correct.") %>
     </div>
-    <div class="multiple_dropdowns_question_explanation explanation subheader">
+    <div tabindex="0" class="multiple_dropdowns_question_explanation explanation subheader">
       <%= t('explanations.multiple_dropdowns', "Enter your question, specifying where each dropdown should go.  Then define possible answers for each dropdown, with one correct answer per dropdown.") %>
     </div>
-    <div class="matching_question_explanation explanation subheader">
+    <div tabindex="0" class="matching_question_explanation explanation subheader">
       <%= t('explanations.matching', "Build pairs of matching values.  Students will see values on the left and have to select the matching value on the right from a dropdown.  Multiple rows can have the same answer, and you can add additional distractors to the right side.") %>
     </div>
-    <div class="numerical_question_explanation explanation subheader">
+    <div tabindex="0" class="numerical_question_explanation explanation subheader">
       <%= t('explanations.numerical', "Define the correct answer as any number within a range, or a number plus or minus some error margin.  Student will be given an empty text box to type their numerical answer.") %>
     </div>
-    <div class="calculated_question_explanation explanation subheader">
+    <div tabindex="0" class="calculated_question_explanation explanation subheader">
       <%= t('explanations.calculated', "Enter your question, build a formula, and generate a set of possible answer combinations.  Students will see the question with a randomly selected set of variables filled in and have to type the correct numerical answer.") %>
     </div>
-    <div class="missing_word_question_explanation explanation subheader">
+    <div tabindex="0" class="missing_word_question_explanation explanation subheader">
       <%= t('explanations.missing_word', "Define text to go before and after the dropdown.  Build a set of possible answers and select one correct answer.") %>
     </div>
-    <div class="essay_question_explanation explanation subheader">
+    <div tabindex="0" class="essay_question_explanation explanation subheader">
       <%= t('explanations.essay', "Students will be given a text field to compose their answer.") %>
     </div>
-    <div class="text_only_question_explanation explanation subheader">
+    <div tabindex="0" class="text_only_question_explanation explanation subheader">
       <%= t('explanations.text_only', 'This "question" will not be scored, but can be useful for introducing a set of related questions.') %>
     </div>
     <b class="question_header"><%= before_label(:question, "Question") %></b>
-    <div class="equation_header">
+    <div tabindex="0" class="equation_header">
       <div class="equation_subheader">
         <%= t('explanations.equations', "You can define variables by typing variable names surrounded by brackets") %><br/>
         (<%= t(:equation_example, 'i.e. "What is 5 plus [x]?"') %>)
         <a href="#" class="help_with_equations_link"><%= t('links.need_help', "Need help?") %></a>
       </div>
     </div>
-    <div class="multi_answer_sets multi_answer_sets_subheader">
+    <div tabindex="0" class="multi_answer_sets multi_answer_sets_subheader">
       <%= t('explanations.multi_answer_sets', "In the box below, every place you want to show an answer box, type a reference word (no spaces) surrounded by brackets") %><br/>
       (<%= t(:multi_answer_sets_example, 'i.e. "Roses are [color1], violets are [color2]"') %>)
     </div>
@@ -88,7 +88,7 @@
     <div style="text-align: center;">
       <textarea style="width: 90%; height: 120px;" class="question_content" name="question_text"></textarea>
     </div>
-    <b class="answers_header"><%= before_label(:answers, "Answers") %></b>
+    <b tabindex="0" role="heading" class="answers_header"><%= before_label(:answers, "Answers") %></b>
     <div style="display: none;">
     <select class="answer_selection_type" name="answer_selection_type">
       <option value="single_answer"><%= t('options.only_one_correct', "Only One Correct Answer") %></option>
@@ -96,7 +96,7 @@
     </select>
     </div>
     <div class="multi_answer_sets">
-      <%= t(:show_possible_answers, "Show Possible Answers for %{question}", :question => raw('<select class="blank_id_select"></select>')) %>
+      <%= t(:show_possible_answers, "Show Possible Answers for %{question}", :question => raw("<select class='blank_id_select' aria-label='#{I18n.t('question_blank', 'Question blank')}'></select>")) %>
     </div>
     <div class="equation_answers">
       <div class="clear"></div>
@@ -160,10 +160,10 @@
       <a href="#" class="add_answer_link add"><%= t('links.add_another_answer', "Add Another Answer") %></a>
     </div>
     <div class="matching_answer_incorrect_matches_holder" style="margin-top: 15px;">
-      <b><%= before_label(:distractors, "Additional Match Possibilities (distractors)") %></b>
+      <b id="distractor_label"><%= before_label(:distractors, "Additional Match Possibilities (distractors)") %></b>
       <div style="font-size: 0.8em;"><%= t(:distractor_instructions, "type each distractor on its own line") %></div>
       <div style="text-align: center;">
-      <textarea style="width: 90%; height: 50px;" name="matching_answer_incorrect_matches"></textarea>
+      <textarea style="width: 90%; height: 50px;" aria-labelledby="distractor_label" name="matching_answer_incorrect_matches"></textarea>
       </div>
     </div>
     <div class="missing_word_after_answer" style="margin-top: 15px;">
@@ -178,22 +178,22 @@
     <div class="question_comment question_correct_comment">
       <div class="comment_top"></div>
       <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_correct_answer_comments', "Click to enter comments for a correct answer") %>">...</a>
-      <div class="details"><%= t(:correct_answer_comments, "Correct answer comments") %></div>
-      <textarea style="width: 90%; height: 75px;" class="comments" name="correct_comments"></textarea>
+      <div id="correct_label" class="details"><%= t(:correct_answer_comments, "Correct answer comments") %></div>
+      <textarea style="width: 90%; height: 75px;" class="comments" name="correct_comments" aria-labelledby="correct_label"></textarea>
       <span class="correct_comments_html" style="display:none;"></span>
     </div>
     <div class="question_comment question_incorrect_comment">
       <div class="comment_top"></div>
       <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_wrong_answer_comments', "Click to enter comments for a wrong answer") %>">...</a>
-      <div class="details"><%= t(:wrong_answer_comments, "Wrong answer comments") %></div>
-      <textarea style="width: 90%; height: 75px;" class="comments" name="incorrect_comments"></textarea>
+      <div id="wrong_label" class="details"><%= t(:wrong_answer_comments, "Wrong answer comments") %></div>
+      <textarea style="width: 90%; height: 75px;" class="comments" name="incorrect_comments" aria-labelledby="wrong_label"></textarea>
       <span class="incorrect_comments_html" style="display:none;"></span>
     </div>
     <div class="question_comment question_neutral_comment">
       <div class="comment_top"></div>
       <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_general_answer_comments', "Click to enter general comments") %>">...</a>
-      <div class="details"><%= t(:general_answer_comments, "General answer comments") %></div>
-      <textarea style="width: 90%; height: 75px;" class="comments" name="neutral_comments"></textarea>
+      <div id="general_label" class="details"><%= t(:general_answer_comments, "General answer comments") %></div>
+      <textarea style="width: 90%; height: 75px;" class="comments" name="neutral_comments" aria-labelledby="general_label"></textarea>
       <span class="neutral_comments_html" style="display:none;"></span>
     </div>
     <div class="clear"></div>

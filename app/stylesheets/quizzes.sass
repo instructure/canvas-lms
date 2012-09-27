@@ -404,7 +404,11 @@ div#content
   .links
     float: right
     margin: 8px 8px 0 0
-    visibility: hidden
+    a
+      position: relative
+      left: -100000px
+      &:focus
+        left: 0
   .flag_question
     :background url(/images/answers_sprite.png) -48px top
     :cursor pointer
@@ -423,8 +427,8 @@ div#content
       :background-color #fff
       .move_icon
         :display inline
-    .links
-      :visibility visible
+    .links a
+      left: 0
     .flag_question
       :background-color #fff
       .flag_icon
@@ -593,10 +597,11 @@ form.question_form
       :-moz-border-radius 5px
     .answer.hover
       :border 1px solid #ddd
-    .answer .question_actions
-      display: none
-    .answer.hover .question_actions
-      display: block
+    .answer .question_actions a
+      position: relative
+      left: -100000px
+    .answer.hover .question_actions a, .question_actions a:focus
+      left: 0
     .answer_comments
       :-moz-border-radius 5px
       :border 2px solid #faa

@@ -4,57 +4,64 @@
     <tr>
       <td class="answer_select" style="width: 30px;">
         <div style="width: 30px;" class="answer_box">
-          <a href="#" class="select_answer_link no-hover" title="<%= t('titles.click_to_set_as_correct', "Click to set this answer as correct") %>"><%= image_tag "blank_answer.png", :class => "answer_image" %></a><br/>
+          <% click_to_set_correct = t('titles.click_to_set_as_correct', "Click to set this answer as correct") %>
+          <a href="#" class="select_answer_link no-hover" role="button" title="<%= click_to_set_correct %>"><%= image_tag "blank_answer.png", :class => "answer_image", :alt => click_to_set_correct %></a><br/>
           <span class="answer_weight"><input class="float_value" type="text" style="width: 25px;" name="answer_weight"/>%</span>
         </div>
       </td><td>
         <div class="select_answer answer_type">
-          <b><%= before_label(:answer_text, "Answer text") %></b>
-          <input type="text" style="width: 200px;" name="answer_text" placeholder="<%= t('anser_text', 'Answer Text') %>" />
+          <label for="answer_text"><b><%= t 'answer_text', 'Answer Text' %></b></label>
+          <input type="text" style="width: 200px;" name="answer_text" placeholder="<%= t('answer_text', 'Answer Text') %>" />
           <input type="hidden" name="answer_html"/>
           <span class="answer_html" style="display:inline-block;"></span>
         </div>
         <div class="fixed_answer answer_type">
-          <b class="answer_text"></b>
+          <b class="answer_text" tabindex="0"></b>
         </div>
         <div class="short_answer answer_type">
-          <b class="short_answer_header"><%= before_label(:possible_answer, "Possible Answer") %></b>
+          <label class="short_answer_header" for="answer_text"><b><%= t 'possible_answer', 'Possible Answer' %></b></label>
           <input type="text" name="answer_text" placeholder="<%= t('answer_text', 'Answer Text') %>"/>
         </div>
         <div class="matching_answer answer_match answer_type">
           <div class="answer_match_left">
-            <input type="text" style="width: 95%;" name="answer_match_left" placeholder="<%= t('matching_left', 'Matching left side') %>"/>
+            <% matching_left_text = t('matching_left', 'Matching left side') %>
+            <input type="text" style="width: 95%;" name="answer_match_left" placeholder="<%= matching_left_text %>" aria-label="<%= matching_left_text %>"/>
           </div>
           <input type="hidden" name="answer_match_left_html"/>
           <div class="answer_match_left_html"></div>
           <div class="answer_match_middle">&nbsp;
           </div>
           <div class="answer_match_right">
-            <input type="text" style="width: 95%;" name="answer_match_right" placeholder="<%= t('matching_right', 'Matching right side') %>" />
+            <% matching_right_text = t('matching_right', 'Matching right side') %>
+            <input type="text" style="width: 95%;" name="answer_match_right" placeholder="<%= matching_right_text %>" aria-label="<%= matching_right_text %>"/>
           </div>
           <div class="clear"></div>
         </div>
         <div class="numerical_answer answer_type">
-          <select style="font-weight: bold;" class="numerical_answer_type" name="numerical_answer_type">
+          <select style="font-weight: bold;" class="numerical_answer_type" name="numerical_answer_type" aria-label="<%= t 'numerical_answer', 'Numerical Answer' %>">
             <option value="exact_answer"><%= before_label(:exact_answer, "Exact Answer") %></option>
             <option value="range_answer"><%= before_label(:answer_in_range, "Answer in the Range") %></option>
           </select>
           <span class="exact_answer numerical_answer_text">
-            <%= t(:exact_answer_with_error_margin, "%{exact_answer} with error margin %{error_margin}",
-                  :exact_answer => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_exact"/>'),
-                  :error_margin => raw('<input class="float_value long" type="text" style="width: 70px;" name="answer_error_margin"/>')) %>
+            <%= t(:exact_answer_with_error_margin, "%{exact_answer_start}exact answer%{exact_answer_end} with error margin %{error_margin_start}error margin%{error_margin_end}",
+                  :exact_answer_start => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_exact" aria-label="'),
+                  :exact_answer_end => raw('"/>'),
+                  :error_margin_start => raw('<input class="float_value long" type="text" style="width: 70px;" name="answer_error_margin" aria-label="'),
+                  :error_margin_end => raw('"/>')) %>
           </span>
           <span class="range_answer numerical_answer_text">
-            <%= t(:answer_in_range, "between %{lower_bound} and %{upper_bound}",
-                  :lower_bound => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_range_start"/>'),
-                  :upper_bound => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_range_end"/>')) %>
+            <%= t(:answer_in_range, "between %{lower_bound_start}range start%{lower_bound_end} and %{upper_bound_start}range end%{upper_bound_end}",
+                  :lower_bound_start => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_range_start" aria-label="'),
+                  :lower_bound_end => raw('"/>'),
+                  :upper_bound_start => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_range_end" aria-label="'),
+                  :upper_bound_end => raw('"/>')) %>
           </span>
         </div>
         <div class="answer_comments empty">
           <div class="comment_top"></div>
           <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_answer_comments', "Click to enter comments, if the student chooses this answer") %>">...</a>
-          <span class="comments_header"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
-          <textarea style="width: 95%;" name="answer_comment" class="comments answer_comment_box"></textarea>
+          <span id="comments_header" class="comments_header"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
+          <textarea style="width: 95%;" name="answer_comment" class="comments answer_comment_box" aria-labelledby="comments_header"></textarea>
           <span class="answer_comment_html" style="display:none"></span>
         </div>
         <div style="display: none;">
@@ -64,7 +71,8 @@
         </div>
       </td><td style="vertical-align: top; padding-top: 0.5em; text-align: right; width: 40px;">
         <div class="question_actions">
-          <a href="#" class="edit_html atr-edit" title="<%= t('titles.edit_as_html', "Edit HTML") %>"><%= t('titles.edit_as_html', "Edit HTML") %></a>
+          <% edit_html_text = t('titles.edit_as_html', "Toggle editing answer text as HTML") %>
+          <a href="#" class="edit_html atr-edit" title="<%= edit_html_text %>"><%= edit_html_text %></a>
           <a href="#" class="delete_answer_link atr-delete" title="<%= t('titles.delete_answer', "Delete this Answer") %>"><%= t('titles.delete_answer', "Delete this Answer") %></a>
         </div>
       </td>
