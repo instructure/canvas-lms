@@ -322,9 +322,12 @@ ActionController::Routing::Routes.draw do |map|
     course.test_student 'test_student', :controller => 'courses', :action => 'reset_test_student', :conditions => {:method => :delete}
   end
 
-  map.resources :crocodoc_sessions,
-    :path_prefix => '/submissions/:submission_id/attachments/:attachment_id',
-    :only => %w(create)
+  map.connect '/submissions/:submission_id/attachments/:attachment_id/crocodoc_sessions',
+    :controller => :crocodoc_sessions, :action => :create,
+    :conditions => {:method => :post}
+  map.connect '/attachments/:attachment_id/crocodoc_sessions',
+    :controller => :crocodoc_sessions, :action => :create,
+    :conditions => {:method => :post}
 
   map.resources :page_views, :only => [:update,:index]
   map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}

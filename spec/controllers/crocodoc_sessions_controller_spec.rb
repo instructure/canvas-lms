@@ -27,15 +27,17 @@ describe CrocodocSessionsController do
     Crocodoc::API.any_instance.stubs(:session).returns 'session' => 'SESSION'
   end
 
-  context "POST 'create'" do
-    before do
-      course_with_teacher_logged_in(:active_all => true)
+  before do
+    course_with_student(:active_all => true)
+    @student_pseudonym = @pseudonym
+    course_with_teacher_logged_in(:active_all => true)
 
-      attachment_model :content_type => 'application/pdf'
-      submission_model :course => @course
-      @submission.update_attribute :attachment_ids, @attachment.id
-    end
+    attachment_model :content_type => 'application/pdf', :context => @student
+    submission_model :course => @course, :user => @student
+    @submission.update_attribute :attachment_ids, @attachment.id
+  end
 
+  context "with submission" do
     it "should create a session" do
       @attachment.submit_to_crocodoc
       post :create,
@@ -53,13 +55,30 @@ describe CrocodocSessionsController do
              :attachment_id => @attachment.id
       }.should raise_error(ActiveRecord::RecordNotFound)
     end
+  end
 
-    it "should 404 if a crocodoc document is unavailable" do
-      lambda {
-        post :create,
-             :submission_id => @submission.id,
-             :attachment_id => @attachment.id
-      }.should raise_error(ActiveRecord::RecordNotFound)
+  context "without submission" do
+    before do
+      @attachment.submit_to_crocodoc
     end
+
+    it "should create a session for the owner of the attachment" do
+      user_session(@student)
+      post :create, :attachment_id => @attachment.id
+      response.body.should include 'https://crocodoc.com/view/SESSION'
+    end
+
+    it "should not create a session for others" do
+      post :create, :attachment_id => @attachment.id
+      response.status.should == '401 Unauthorized'
+    end
+  end
+
+  it "should 404 if a crocodoc document is unavailable" do
+    lambda {
+      post :create,
+           :submission_id => @submission.id,
+           :attachment_id => @attachment.id
+    }.should raise_error(ActiveRecord::RecordNotFound)
   end
 end

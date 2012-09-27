@@ -50,11 +50,13 @@ class CrocodocDocument < ActiveRecord::Base
 
   def session_url(opts = {})
     defaults = {
-      :editable => true,
+      :annotations => true,
       :downloadable => true,
     }.with_indifferent_access
 
     opts = defaults.merge(opts)
+
+    annotations_on = opts.delete(:annotations)
 
     user = opts.delete(:user)
     if user
@@ -62,6 +64,11 @@ class CrocodocDocument < ActiveRecord::Base
     end
 
     opts.merge! permissions_for_user(user)
+
+    unless annotations_on
+      opts[:filter] = 'none'
+      opts[:editable] = false
+    end
 
     Canvas.timeout_protection("crocodoc") do
       response = crocodoc_api.session(uuid, opts)
