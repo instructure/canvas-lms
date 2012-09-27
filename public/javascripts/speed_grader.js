@@ -115,6 +115,7 @@ define([
       $rubric_full = $("#rubric_full"),
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
       $mute_link = $('#mute_link'),
+      $no_annotation_warning = $('#no_annotation_warning'),
       $selectmenu = null,
       broswerableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
@@ -845,6 +846,11 @@ define([
       header.init();
       initKeyCodes();
 
+      $('#hide_no_annotation_warning').click(function(e){
+        e.preventDefault();
+        $no_annotation_warning.hide();
+      });
+
       $window.bind('hashchange', EG.handleFragmentChange);
       $('#eg_sort_by').val(userSettings.get('eg_sort_by'));
       $('#submit_same_score').click(function(e) {
@@ -1035,6 +1041,8 @@ define([
     },
 
     handleSubmissionSelectionChange: function(){
+      $no_annotation_warning.hide();
+
       try {
         var submissionToViewVal = $submission_to_view.filter(":visible").val(),
             currentSelectedIndex = Number(submissionToViewVal) ||
@@ -1261,6 +1269,8 @@ define([
           )
         }
         else if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) {
+          if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
+
           if (scribdDocAvailable) {
             previewOptions = $.extend(previewOptions, {
               scribd_doc_id: attachment.scribd_doc.attributes.doc_id, 
