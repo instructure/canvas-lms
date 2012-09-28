@@ -1077,7 +1077,8 @@ define([
         $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
           if (attachment['crocodoc_available?'] ||
-              (attachment.scribd_doc && attachment.scribd_doc.created)) {
+              (attachment.scribd_doc && attachment.scribd_doc.created) ||
+              $.isPreviewable(attachment.content_type, 'google')) {
             inlineableAttachments.push(attachment);
           }
           if (broswerableCssClasses.test(attachment.mime_class)) {
