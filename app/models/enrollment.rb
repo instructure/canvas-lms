@@ -57,33 +57,36 @@ class Enrollment < ActiveRecord::Base
 
   def self.needs_grading_trigger_sql
     no_other_enrollments_sql = "NOT " + active_student_subselect("user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id")
-
-    # IN (...) subselects perform poorly in mysql, plus we want to avoid
-    # locking rows in other tables
-    {:default => <<-SQL, :mysql => <<-MYSQL}
-      UPDATE assignments SET needs_grading_count = needs_grading_count + %s
+    default_sql = <<-SQL
+      UPDATE assignments SET needs_grading_count = needs_grading_count + %s, updated_at = {{now}}
       WHERE context_id = NEW.course_id
-        AND context_type = 'Course'
-        AND EXISTS (
-          SELECT 1
-          FROM submissions
-          WHERE user_id = NEW.user_id
-            AND assignment_id = assignments.id
-            AND (#{Submission.needs_grading_conditions})
-          LIMIT 1
-        )
-        AND #{no_other_enrollments_sql};
-    SQL
+      AND context_type = 'Course'
+      AND EXISTS (
+        SELECT 1
+        FROM submissions
+        WHERE user_id = NEW.user_id
+        AND assignment_id = assignments.id
+        AND (#{Submission.needs_grading_conditions})
+                LIMIT 1
+      )
+      AND #{no_other_enrollments_sql};
+      SQL
 
-      IF #{no_other_enrollments_sql} THEN
-        UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s
-        WHERE context_id = NEW.course_id
-          AND context_type = 'Course'
-          AND assignments.id = submissions.assignment_id
-          AND submissions.user_id = NEW.user_id
-          AND (#{Submission.needs_grading_conditions});
-      END IF;
-    MYSQL
+    # IN (...) subselects perform poorly in mysql, plus we want to avoid locking rows in other tables
+    # also, every database uses a different construct for a current UTC timestamp
+    { :default    => default_sql.gsub("{{now}}", "now()"),
+      :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
+      :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
+      :mysql => <<-MYSQL }
+        IF #{no_other_enrollments_sql} THEN
+          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, updated_at = utc_timestamp()
+          WHERE context_id = NEW.course_id
+            AND context_type = 'Course'
+            AND assignments.id = submissions.assignment_id
+            AND submissions.user_id = NEW.user_id
+            AND (#{Submission.needs_grading_conditions});
+        END IF;
+      MYSQL
   end
 
   trigger.after(:insert).where(active_student_conditions('NEW')) do

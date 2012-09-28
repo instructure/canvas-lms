@@ -1465,16 +1465,8 @@ class User < ActiveRecord::Base
   def assignments_needing_grading(opts={})
     course_codes = opts[:contexts] ? (Array(opts[:contexts]).map(&:asset_string) & current_admin_enrollment_course_codes) : current_admin_enrollment_course_codes
     ignored_ids = ignored_items(:grading).select{|key, val| key.match(/\Aassignment_/) }.map{|key, val| key.sub(/\Aassignment_/, "") }
-    Assignment.for_context_codes(course_codes).active.expecting_submission.need_grading_info(opts[:limit] || 15, ignored_ids)
+    Assignment.for_context_codes(course_codes).active.expecting_submission.need_grading_info(opts[:limit] || 15, ignored_ids).reject{|a| a.needs_grading_count_for_user(self) == 0}
   end
-  memoize :assignments_needing_grading
-
-  def assignments_needing_grading_total_count(opts={})
-    course_codes = opts[:contexts] ? (Array(opts[:contexts]).map(&:asset_string) & current_admin_enrollment_course_codes) : current_admin_enrollment_course_codes
-    ignored_ids = ignored_items(:grading).select{|key, val| key.match(/\Aassignment_/) }.map{|key, val| key.sub(/\Aassignment_/, "") }
-    Assignment.for_context_codes(course_codes).active.expecting_submission.need_grading_info(nil, ignored_ids).size
-  end
-  memoize :assignments_needing_grading_total_count
 
   def generate_access_verifier(ts)
     require 'openssl'

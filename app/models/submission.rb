@@ -111,24 +111,30 @@ class Submission < ActiveRecord::Base
   after_save :update_quiz_submission
 
   def self.needs_grading_trigger_sql
-    <<-SQL
+    # every database uses a different construct for a current UTC timestamp...
+    default_sql = <<-SQL
       UPDATE assignments
-      SET needs_grading_count = needs_grading_count + %s
+      SET needs_grading_count = needs_grading_count + %s, updated_at = {{now}}
       WHERE id = NEW.assignment_id
-        AND context_type = 'Course'
-        AND #{Enrollment.active_student_subselect("user_id = NEW.user_id AND course_id = assignments.context_id")};
-    SQL
+      AND context_type = 'Course'
+      AND #{Enrollment.active_student_subselect("user_id = NEW.user_id AND course_id = assignments.context_id")};
+      SQL
+
+    { :default    => default_sql.gsub("{{now}}", "now()"),
+      :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
+      :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
+      :mysql      => default_sql.gsub("{{now}}", "utc_timestamp()") }
   end
 
   trigger.after(:insert) do |t|
     t.where("#{needs_grading_conditions("NEW")}") do
-      needs_grading_trigger_sql % 1
+      Hash[needs_grading_trigger_sql.map{|key, value| [key, value % 1]}]
     end
   end
 
   trigger.after(:update) do |t|
     t.where("(#{needs_grading_conditions("NEW")}) <> (#{needs_grading_conditions("OLD")})") do
-      needs_grading_trigger_sql % "CASE WHEN (#{needs_grading_conditions('NEW')}) THEN 1 ELSE -1 END"
+      Hash[needs_grading_trigger_sql.map{|key, value| [key, value % "CASE WHEN (#{needs_grading_conditions('NEW')}) THEN 1 ELSE -1 END"]}]
     end
   end
   

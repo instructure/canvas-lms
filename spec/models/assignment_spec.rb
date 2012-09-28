@@ -167,6 +167,76 @@ describe Assignment do
       @assignment.needs_grading_count.should eql(0)
       @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(1)
     end
+
+    it "updated_at should be set when needs_grading_count changes due to a submission" do
+      setup_assignment_with_homework
+      @assignment.needs_grading_count.should eql(1)
+      old_timestamp = Time.now.utc - 1.minute
+      Assignment.update_all({:updated_at => old_timestamp}, {:id => @assignment.id})
+      @assignment.grade_student(@user, :grade => "0")
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+      @assignment.updated_at.should > old_timestamp
+    end
+
+    it "updated_at should be set when needs_grading_count changes due to an enrollment change" do
+      setup_assignment_with_homework
+      old_timestamp = Time.now.utc - 1.minute
+      @assignment.needs_grading_count.should eql(1)
+      Assignment.update_all({:updated_at => old_timestamp}, {:id => @assignment.id})
+      @course.offer!
+      @course.enrollments.find_by_user_id(@user.id).destroy
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+      @assignment.updated_at.should > old_timestamp
+    end
+  end
+
+  context "needs_grading_count_for_user" do
+    it "should only count submissions in the user's visible section(s)" do
+      course_with_teacher(:active_all => true)
+      @section = @course.course_sections.create!(:name => 'section 2')
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+      @section.enroll_user(@user2, 'StudentEnrollment', 'active')
+      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+      @course.enroll_student(@user1).update_attribute(:workflow_state, 'active')
+
+      # enroll a section-limited TA
+      @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
+      ta_enrollment = @course.enroll_ta(@ta)
+      ta_enrollment.limit_privileges_to_course_section = true
+      ta_enrollment.workflow_state = 'active'
+      ta_enrollment.save!
+
+      # make a submission in each section
+      @assignment = @course.assignments.create(:title => "some assignment", :submission_types => ['online_text_entry'])
+      @assignment.submit_homework @user1, :submission_type => "online_text_entry", :body => "o hai"
+      @assignment.submit_homework @user2, :submission_type => "online_text_entry", :body => "haldo"
+      @assignment.reload
+
+      # check the teacher sees both, the TA sees one
+      @assignment.needs_grading_count_for_user(@teacher).should eql(2)
+      @assignment.needs_grading_count_for_user(@ta).should eql(1)
+      @teacher.assignments_needing_grading.collect(&:id).should == [@assignment.id]
+      @ta.assignments_needing_grading.collect(&:id).should == [@assignment.id]
+
+      # grade an assignment
+      @assignment.grade_student(@user1, :grade => "1")
+      @assignment.reload
+
+      # check that the numbers changed
+      @assignment.needs_grading_count_for_user(@teacher).should eql(1)
+      @assignment.needs_grading_count_for_user(@ta).should eql(0)
+      @teacher.assignments_needing_grading.collect(&:id).should == [@assignment.id]
+      @ta.assignments_needing_grading.collect(&:id).should == []
+
+      # test limited enrollment in multiple sections
+      @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section,
+                          :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
+      @assignment.reload
+      @assignment.needs_grading_count_for_user(@ta).should eql(1)
+      @ta.assignments_needing_grading.collect(&:id).should == [@assignment.id]
+    end
   end
 
   it "should preserve pass/fail with zero points possible" do

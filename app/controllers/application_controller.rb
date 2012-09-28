@@ -526,7 +526,7 @@ class ApplicationController < ActionController::Base
     @ungraded_assignments = @assignments.select{|a| 
       a.grants_right?(@current_user, session, :grade) && 
       a.expects_submission? &&
-      a.needs_grading_count > 0
+      a.needs_grading_count_for_user(@current_user) > 0
     }
     @assignment_groups = @groups
     @past_assignments = @assignments.select{ |a| a.due_at && a.due_at < Time.now }

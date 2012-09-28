@@ -33,7 +33,7 @@ module Api::V1::Assignment
     end
 
     if assignment.grants_right?(user, :grade)
-      hash['needs_grading_count'] = assignment.needs_grading_count
+      hash['needs_grading_count'] = assignment.needs_grading_count_for_user(user)
     end
 
     hash['submission_types'] = assignment.submission_types.split(',')
