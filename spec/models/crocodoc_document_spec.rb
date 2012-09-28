@@ -41,6 +41,7 @@ describe 'CrocodocDocument' do
       @crocodoc.permissions_for_user(@teacher).should == {
         :filter => 'all',
         :admin => true,
+        :editable => true,
       }
     end
 
@@ -49,6 +50,7 @@ describe 'CrocodocDocument' do
         @crocodoc.permissions_for_user(@submitter).should == {
           :filter => 'all',
           :admin => false,
+          :editable => true,
         }
       end
 
@@ -57,6 +59,7 @@ describe 'CrocodocDocument' do
         @crocodoc.permissions_for_user(@submitter).should == {
           :filter => @submitter.crocodoc_id,
           :admin => false,
+          :editable => true,
         }
       end
     end
@@ -65,6 +68,7 @@ describe 'CrocodocDocument' do
       @crocodoc.permissions_for_user(@other_student).should == {
         :filter => @other_student.crocodoc_id!,
         :admin => false,
+        :editable => true,
       }
     end
 

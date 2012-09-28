@@ -81,12 +81,13 @@ class CrocodocDocument < ActiveRecord::Base
     opts = {
       :filter => 'none',
       :admin => false,
+      :editable => false,
     }
 
     if user.blank?
-      opts[:editable] = false
       return opts
     else
+      opts[:editable] = true
       opts[:filter] = user.crocodoc_id!
     end
 
