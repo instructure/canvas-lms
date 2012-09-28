@@ -58,7 +58,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :account_authorization_configs, :order => 'id'
+  has_many :account_authorization_configs, :order => "position"
   has_many :account_reports
   has_many :grading_standards, :as => :context
   has_many :assessment_questions, :through => :assessment_question_banks
@@ -671,6 +671,18 @@ class Account < ActiveRecord::Base
   
   def saml_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?)
+  end
+
+  def multi_auth?
+    self.account_authorization_configs.count > 1
+  end
+
+  def auth_discovery_url=(url)
+    self.settings[:auth_discovery_url] = url
+  end
+
+  def auth_discovery_url
+    self.settings[:auth_discovery_url]
   end
   
   # When a user is invited to a course, do we let them see a preview of the

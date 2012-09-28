@@ -1,23 +1,31 @@
-<% @account_config = @account_configs.first %>
+<%
+   @ldap_configs = @account_configs.clone
+   while @ldap_configs.length < 2
+    @ldap_configs << @account.account_authorization_configs.new
+    @ldap_configs.last.auth_over_tls = :start_tls
+  end
+   @account_config = @ldap_configs.first
+
+%>
 <% form_id = @account_config.ldap_authentication? ? 'auth_form' : 'ldap_form' %>
 <% active = @account_config.ldap_authentication? ? 'class="active"' : '' %>
 <div id="ldap_div" <%= raw active %>>
 <% form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class=>"auth_type ldap_form" ) do %>
   <table class="formtable" style="margin-left: 20px;">
-    <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => @account_configs[0] } %>
+    <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => @ldap_configs[0] } %>
     <tr>
       <th><%= before_label(t(:auth_type_label, "Type")) %></th>
       <th><%= t :setting_type_ldap, 'LDAP' %></th>
     </tr>
-    <% fields_for @account_configs[0], :index => 0 do |f| %>
+    <% fields_for @ldap_configs[0], :index => 0 do |f| %>
       <%= f.hidden_field :disabled, :value => '0' %>
-      <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @account_configs[0] } %>
+      <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @ldap_configs[0] } %>
 
       <tr>
         <td style="vertical-align: top; width: 200px;"><%= f.blabel :login_handle_name, :en => "Login Label" %></td>
         <td style="vertical-align: top;" class="nobr">
           <%= f.text_field :login_handle_name, :class => "auth_form", :style => "width: 300px;", :placeholder => AccountAuthorizationConfig.default_login_handle_name %>
-          <span class="auth_info auth_login_handle_name"><%= @account_configs[0].login_handle_name || AccountAuthorizationConfig.default_login_handle_name %></span>
+          <span class="auth_info auth_login_handle_name"><%= @ldap_configs[0].login_handle_name || AccountAuthorizationConfig.default_login_handle_name %></span>
           <span class="auth_form" style="font-size: smaller;">
             <br><%= t(:login_handle_name_description, "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc.") %>
           </span>
@@ -28,7 +36,7 @@
         <td style="vertical-align: top;" class="nobr">
           <%= f.text_field :change_password_url, :class => "auth_form", :style => "width: 300px;" %>
           <div style="font-size: 0.8em;"><span class="auth_form"><%= t(:change_password_url_help, "Leave blank for default Canvas behavior") %></span></div>
-          <span class="auth_info auth_forgot_password_url"><%= @account_configs[0].change_password_url || t(:change_password_url_not_specified, "None specified") %></span>
+          <span class="auth_info auth_forgot_password_url"><%= @ldap_configs[0].change_password_url || t(:change_password_url_not_specified, "None specified") %></span>
         </td>
       </tr>
     <% end %>
@@ -36,24 +44,29 @@
 
   <div>
     <div class="auth_form" style="margin: 15px;">
-      <a href="#" class="add_secondary_ldap_link" style="<%= "display: none;" if @account_configs[1].ldap_authentication? %>"><%= t(:add_secondary_ldap_server_link, "Add Secondary LDAP Server") %></a>
+      <a href="#" class="add_secondary_ldap_link" style="<%= "display: none;" if @ldap_configs[1].ldap_authentication? %>"><%= t(:add_secondary_ldap_server_link, "Add Secondary LDAP Server") %></a>
     </div>
   </div>
 
-  <table class="formtable ldap_secondary" style="margin-left: 20px; margin-top: 20px; <%= "display: none;" unless @account_configs[1].ldap_authentication? %>">
-    <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => @account_configs[1] } %>
+  <table class="formtable ldap_secondary" style="margin-left: 20px; margin-top: 20px; <%= "display: none;" unless @ldap_configs[1].ldap_authentication? %>">
+    <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => @ldap_configs[1] } %>
     <tr>
       <th><%= before_label(t(:auth_type_label, "Type")) %></th>
-      <th><%= t(:secondary_ldap_label, "Secondary LDAP") %><% unless @account_configs.length > 2 %> <a href="#" class="auth_form remove_secondary_ldap_link"><%= t(:remove_secondary_ldap_link, "(Remove)") %></a><% end %></th>
+      <th><%= t(:secondary_ldap_label, "Secondary LDAP") %>
+        <% unless @ldap_configs.length > 2 %>
+          <a href="#" class="auth_form remove_secondary_ldap_link">
+            <%= t(:remove_secondary_ldap_link, "(Remove)") %></a>
+        <% end %>
+      </th>
     </tr>
-    <% fields_for @account_configs[1], :index => 1 do |f| %>
-      <%= f.hidden_field :disabled, :value => @account_configs[1].ldap_authentication? ? '0' : '1', :id => 'secondary_ldap_config_disabled' %>
-      <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @account_configs[1] } %>
+    <% fields_for @ldap_configs[1], :index => 1 do |f| %>
+      <%= f.hidden_field :disabled, :value => @ldap_configs[1].ldap_authentication? ? '0' : '1', :id => 'secondary_ldap_config_disabled' %>
+      <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @ldap_configs[1] } %>
     <% end %>
   </table>
 
-  <% if @account_configs.length > 2 %>
-    <% @account_configs[2..-1].each_with_index do |aac, i| %>
+  <% if @ldap_configs.length > 2 %>
+    <% @ldap_configs[2..-1].each_with_index do |aac, i| %>
       <% next unless aac.ldap_authentication? %>
       <table class="formtable ldap_secondary" style="margin-left: 20px; margin-top: 20px;">
         <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => aac } %>
