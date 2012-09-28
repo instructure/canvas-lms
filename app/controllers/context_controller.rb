@@ -398,22 +398,22 @@ class ContextController < ApplicationController
     
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = {
-        :discussion_topics => ['workflow_state = ?', 'deleted'],
-        :assignments => ['workflow_state = ?', 'deleted'],
-        :assignment_groups => ['workflow_state = ?', 'deleted'],
-        :enrollments => ['workflow_state = ?', 'deleted'],
-        :default_wiki_wiki_pages => ['workflow_state = ?', 'deleted'],
-        :attachments => ['file_state = ?', 'deleted'],
-        :rubrics => ['workflow_state = ?', 'deleted'],
-        :collaborations => ['workflow_state = ?', 'deleted'],
-        :quizzes => ['workflow_state = ?', 'deleted'],
-        :context_modules => ['workflow_state = ?', 'deleted']
-      }
+      @item_types = [
+        @context.discussion_topics,
+        @context.assignments,
+        @context.assignment_groups,
+        @context.enrollments,
+        @context.wiki.wiki_pages,
+        @context.rubrics,
+        @context.collaborations,
+        @context.quizzes,
+        @context.context_modules
+      ]
       @deleted_items = []
-      @item_types.each do |type, conditions|
-        @deleted_items += @context.send(type).find(:all, :conditions => conditions, :limit => 25) rescue []
+      @item_types.each do |scope|
+        @deleted_items += scope.find(:all, :conditions => "workflow_state='deleted'", :limit => 25)
       end
+      @deleted_items += @context.attachments.find(:all, :conditions => "file_state='deleted'", :limit => 25)
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end
@@ -423,8 +423,9 @@ class ContextController < ApplicationController
       type = params[:asset_string].split("_")
       id = type.pop
       type = type.join("_")
-      type = 'default_wiki_wiki_pages' if type == 'wiki_pages'
-      @item = @context.send(type.pluralize).find(id)
+      scope = @context
+      scope = @context.wiki if type == 'wiki_pages'
+      @item = scope.send(type.pluralize).find(id)
       @item.restore
       render :json => @item
     end

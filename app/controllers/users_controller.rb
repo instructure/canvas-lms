@@ -1134,7 +1134,7 @@ class UsersController < ApplicationController
       @entries.concat context.assignments.active
       @entries.concat context.calendar_events.active
       @entries.concat context.discussion_topics.active
-      @entries.concat context.default_wiki_wiki_pages.select{|p| !p.deleted? }
+      @entries.concat context.wiki.wiki_pages.not_deleted
     end
     @entries = @entries.select{|e| e.updated_at > 1.weeks.ago }
     @entries.each do |entry|
