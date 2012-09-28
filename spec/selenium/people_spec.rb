@@ -151,8 +151,10 @@ describe "people" do
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_groups').click
       dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
+      @course.groups.count.should == 0
       submit_form('#add_category_form')
       wait_for_ajaximations
+      @course.groups.count.should == 4
       ffj('.left_side .group_name:visible').count.should == group_count.to_i
     end
 
