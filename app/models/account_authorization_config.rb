@@ -20,13 +20,14 @@ require 'onelogin/saml'
 
 class AccountAuthorizationConfig < ActiveRecord::Base
   belongs_to :account
+  acts_as_list :scope => :account
 
   attr_accessible :account, :auth_port, :auth_host, :auth_base, :auth_username,
                   :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
                   :log_in_url, :log_out_url, :identifier_format,
                   :certificate_fingerprint, :entity_id, :change_password_url,
                   :login_handle_name, :ldap_filter, :auth_filter, :requested_authn_context,
-                  :login_attribute
+                  :login_attribute, :idp_entity_id
 
   before_validation :set_saml_defaults, :if => Proc.new { |aac| aac.saml_authentication? }
   validates_presence_of :account_id
@@ -35,6 +36,23 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   after_destroy :enable_canvas_authentication
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
+
+  def self.recognized_params(auth_type)
+    case auth_type
+    when 'cas'
+      [ :auth_type, :auth_base, :log_in_url, :login_handle_name ]
+    when 'ldap'
+      [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
+        :auth_filter, :auth_username, :auth_password, :change_password_url,
+        :identifier_format, :login_handle_name, :position ]
+    when 'saml'
+      [ :auth_type, :log_in_url, :log_out_url, :change_password_url, :requested_authn_context,
+        :certificate_fingerprint, :identifier_format, :login_handle_name,
+        :login_attribute, :idp_entity_id, :position]
+    else
+      []
+    end
+  end
 
   def self.auth_over_tls_setting(value)
     case value

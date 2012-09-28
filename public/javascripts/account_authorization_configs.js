@@ -16,6 +16,7 @@ define([
       event.preventDefault();
       $("#auth_form").find(".cancel_button:first").click();
       new_type = $(this).find(":selected").val();
+      $(".active").each(function(i){$(this).removeClass('active');})
       if(new_type == "" || new_type == null){
           new_type = null;
       }

@@ -491,6 +491,7 @@ ActionController::Routing::Routes.draw do |map|
   map.grades "grades", :controller => "users", :action => "grades"
 
   map.login "login", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
+  map.aac_login "login/:account_authorization_config_id", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.connect "login", :controller => "pseudonym_sessions", :action=> "create", :conditions => {:method => :post}
   map.logout "logout", :controller => "pseudonym_sessions", :action => "destroy"
   map.cas_login "login/cas", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
@@ -819,7 +820,15 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
-      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => 'update_all'
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :show_discovery_url
+      authorization_configs.put 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :update_discovery_url
+      authorization_configs.delete 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :destroy_discovery_url
+
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs', :action => :index
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs/:id', :action => :show
+      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => :create, :path_name => 'account_create_aac'
+      authorization_configs.put 'accounts/:account_id/account_authorization_configs/:id', :action => :update, :path_name => 'account_update_aac'
+      authorization_configs.delete 'accounts/:account_id/account_authorization_configs/:id', :action => :destroy, :path_name => 'account_delete_aac'
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
