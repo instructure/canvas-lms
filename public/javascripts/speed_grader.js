@@ -1251,12 +1251,12 @@ define([
           };
         }
         if (crocodocAvailable) {
-          $.ajaxJSON(
+          $iframe_holder.show();
+          $iframe_holder.disableWhileLoading($.ajaxJSON(
             '/submissions/' + this.currentStudent.submission.id + '/attachments/' + attachment.id + '/crocodoc_sessions/',
             'POST',
             {version: this.currentStudent.submission.currentSelectedIndex},
             function(response) {
-              $iframe_holder.show();
               $iframe_holder.loadDocPreview($.extend(previewOptions, {
                 crocodoc_session_url: response.session_url
               }));
@@ -1266,7 +1266,7 @@ define([
               attachment['crocodoc_available?'] = false;
               EG.handleSubmissionSelectionChange();
             }
-          )
+          ));
         }
         else if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) {
           if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
