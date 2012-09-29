@@ -462,7 +462,7 @@ class FilesController < ApplicationController
       @group = @asset.group_category.group_for(@current_user) if @asset.has_group_category?
       @context = @group || @current_user
       @check_quota = false
-      @attachment.do_submit_to_scribd = true
+      @attachment.submission_attachment = true
     elsif @context && intent == 'attach_discussion_file'
       permission_object = @context.discussion_topics.new
       permission = :attach
