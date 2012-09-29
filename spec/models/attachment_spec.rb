@@ -175,9 +175,9 @@ describe Attachment do
       @attachment.should be_crocodocable
     end
 
-    it "should not submit to scribd if crocodocable" do
+    it "should not submit to auto-submit to scribd if a crocodoc is present" do
       expects_job_with_tag('Attachment#submit_to_scribd!', 0) do
-        scribdable_attachment_model  # <= pdf, which is also crocodocable
+        attachment_model(:content_type => 'application/pdf', :submission_attachment => true)
         @attachment.after_attachment_saved
       end
 
@@ -280,7 +280,7 @@ describe Attachment do
           Attachment.stubs(:filtering_scribd_submits?).returns(true)
           expects_job_with_tag('Attachment#submit_to_scribd!') do
             scribd_mime_type_model(:extension => 'pdf')
-            attachment_model(:content_type => 'application/pdf', :do_submit_to_scribd => true)
+            attachment_model(:content_type => 'application/pdf', :submission_attachment => true)
             @attachment.after_attachment_saved
           end
           @attachment.should be_pending_upload

@@ -56,7 +56,7 @@ class Attachment < ActiveRecord::Base
   after_save :touch_context_if_appropriate
   after_save :build_media_object
 
-  attr_accessor :podcast_associated_asset, :do_submit_to_scribd
+  attr_accessor :podcast_associated_asset, :submission_attachment
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment fond
@@ -113,7 +113,7 @@ class Attachment < ActiveRecord::Base
   # it to scribd from that point does not make the user wait since that
   # does happen asynchronously and the data goes directly from s3 to scribd.
   def after_attachment_saved
-    if scribdable? && !Attachment.skip_3rd_party_submits? && !crocodocable?
+    if scribdable? && !Attachment.skip_3rd_party_submits?
       send_later_enqueue_args(:submit_to_scribd!,
                               {:n_strand => 'scribd', :max_attempts => 1})
     else
@@ -401,7 +401,11 @@ class Attachment < ActiveRecord::Base
     end
 
     # if we're filtering scribd submits, update the scribd_attempts here to skip the submission process
-    if self.new_record? && Attachment.filtering_scribd_submits? && !self.do_submit_to_scribd
+    if self.new_record? && Attachment.filtering_scribd_submits? && !self.submission_attachment
+      self.scribd_attempts = SKIPPED_SCRIBD_ATTEMPTS
+    end
+    # i'm also hijacking SKIPPED_SCRIBD_ATTEMPTS to flag whether a document was probably sent to crocodoc
+    if new_record? && submission_attachment && crocodocable?
       self.scribd_attempts = SKIPPED_SCRIBD_ATTEMPTS
     end
 
