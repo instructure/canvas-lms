@@ -278,7 +278,7 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  TURNITIN_JOB_OPTS = { :n_strand => 'turnitin', :priority => Delayed::LOW_PRIORITY }
+  TURNITIN_JOB_OPTS = { :n_strand => 'turnitin', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
 
   def submit_to_turnitin_later
     if self.turnitinable? && @submit_to_turnitin
