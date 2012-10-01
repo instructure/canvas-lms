@@ -58,15 +58,17 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
     @connection_handlers[self.environment] ||= ActiveRecord::Base.connection_handler
   end
 
-  def self.ensure_handler
-    new_handler = @connection_handlers[self.environment]
-    if !new_handler
-      new_handler = @connection_handlers[self.environment] = ActiveRecord::ConnectionAdapters::ConnectionHandler.new
-      ActiveRecord::Base.connection_handler.connection_pools.each do |model, pool|
-        new_handler.establish_connection(model, pool.spec)
+  unless self.respond_to?(:ensure_handler)
+    def self.ensure_handler
+      new_handler = @connection_handlers[self.environment]
+      if !new_handler
+        new_handler = @connection_handlers[self.environment] = ActiveRecord::ConnectionAdapters::ConnectionHandler.new
+        ActiveRecord::Base.connection_handler.connection_pools.each do |model, pool|
+          new_handler.establish_connection(model, pool.spec)
+        end
       end
+      new_handler
     end
-    new_handler
   end
 
   def self.reset_connection_handler_cache!
