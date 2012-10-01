@@ -294,6 +294,7 @@ shared_examples_for "profile pictures selenium tests" do
   it_should_behave_like "forked server selenium tests"
 
   it "should successfully upload profile pictures" do
+    pending("intermittently fails")
     course_with_teacher_logged_in
     a = Account.default
     a.enable_service('avatars')

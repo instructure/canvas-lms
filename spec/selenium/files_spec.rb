@@ -454,7 +454,7 @@ describe "common file behaviors" do
     def add_file(file_fullpath)
       attachment_field = keep_trying_until do
         fj('#add_file_link').click # fj to avoid selenium caching
-        attachment_field = f('#attachment_uploaded_data')
+        attachment_field = fj('#attachment_uploaded_data')
         attachment_field.should be_displayed
         attachment_field
       end
@@ -462,6 +462,15 @@ describe "common file behaviors" do
       f('.add_file_form').submit
       wait_for_ajaximations
       wait_for_js
+    end
+
+    def get_file_elements
+      file_elements = keep_trying_until do
+        file_elements = ffj('#files_structure_list > .context > ul > .file > .name')
+        file_elements.count.should == 3
+        file_elements
+      end
+      file_elements
     end
 
     before(:each) do
@@ -475,7 +484,7 @@ describe "common file behaviors" do
     end
 
     it "orders file structure files alphabetically" do
-      file_elements = ff('#files_structure_list > .context > ul > .file > .name')
+      file_elements = get_file_elements
 
       file_elements[0].text.should == @a_filename
       file_elements[1].text.should == @b_filename
@@ -483,7 +492,7 @@ describe "common file behaviors" do
     end
 
     it "orders file content files alphabetically" do
-      file_elements = ff('#files_content > .folder_item.file > .header > .name')
+      file_elements = get_file_elements
 
       file_elements[0].text.should == @a_filename
       file_elements[1].text.should == @b_filename
