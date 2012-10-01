@@ -606,6 +606,11 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       if Hash === options # legacy support, since this param was a string
         index_type = options[:unique] ? "UNIQUE" : ""
         index_name = options[:name].to_s if options[:name]
+        concurrently = "CONCURRENTLY " if options[:concurrently]
+        conditions = options[:conditions]
+        if conditions
+          conditions = " WHERE #{ActiveRecord::Base.send(:sanitize_sql, conditions, table_name.to_s.dup)}"
+        end
       else
         index_type = options
       end
@@ -620,7 +625,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       end
       quoted_column_names = quoted_columns_for_index(column_names, options).join(", ")
 
-      execute "CREATE #{index_type} INDEX #{"CONCURRENTLY " if options[:concurrently]}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})"
+      execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
     end
   end
 end
