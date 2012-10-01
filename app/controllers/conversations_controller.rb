@@ -124,6 +124,10 @@ class ConversationsController < ApplicationController
       end
       render :json => @conversations_json
     else
+      if @current_user.shard != Shard.current
+        flash[:notice] = 'Conversations are not yet cross-shard enabled'
+        return redirect_to dashboard_url
+      end
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
       load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
