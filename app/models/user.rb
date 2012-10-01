@@ -145,7 +145,6 @@ class User < ActiveRecord::Base
   has_many :web_conference_participants
   has_many :web_conferences, :through => :web_conference_participants
   has_many :account_users
-  has_many :accounts, :through => :account_users
   has_many :media_objects, :as => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :page_views
@@ -2646,4 +2645,15 @@ class User < ActiveRecord::Base
 
     [start_hour, end_hour]
   end
+
+  def associated_shards
+    [Shard.default]
+  end
+
+  def accounts
+    Shard.with_each_shard(self.associated_shards) do
+      AccountUser.find(:all, :conditions => { :user_id => self.id }, :include => :account).map(&:account).uniq
+    end
+  end
+  memoize :accounts
 end

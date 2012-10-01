@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe User do
   
@@ -1893,4 +1893,18 @@ describe User do
     end
   end
 
+  describe "accounts" do
+    it_should_behave_like "sharding"
+
+    it "should include accounts from multiple shards" do
+      user
+      Account.site_admin.add_user(@user)
+      @shard1.activate do
+        @account2 = Account.create!
+        @account2.add_user(@user)
+      end
+
+      @user.accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+    end
+  end
 end

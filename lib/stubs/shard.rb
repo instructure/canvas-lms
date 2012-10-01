@@ -34,7 +34,7 @@ class Shard
     Array(yield array)
   end
 
-  def self.with_each_shard
+  def self.with_each_shard(shards = nil)
     Array(yield)
   end
 
