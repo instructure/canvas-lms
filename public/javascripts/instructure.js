@@ -923,6 +923,7 @@ define([
       userSettings.set('hide_wizard_' + pathname, true);
       $wizard_box.slideUp('fast', function() {
         $(".wizard_popup_link").slideDown('fast');
+        $('.wizard_popup_link').focus();
         setWizardSpacerBoxDispay('hide');
       });
     });
@@ -932,6 +933,7 @@ define([
       $(".wizard_popup_link").slideUp('fast');
       $wizard_box.slideDown('fast', function() {
         $wizard_box.triggerHandler('wizard_opened');
+        $wizard_box.focus();
         $([document, window]).triggerHandler('scroll');
       });
     });

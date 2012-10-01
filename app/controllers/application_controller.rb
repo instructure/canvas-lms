@@ -1034,8 +1034,8 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
 
   def conversations_path(params={})
-    hash = params.to_json.unpack('H*').first
-    "/conversations##{hash}"
+    hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
+    "/conversations#{hash}"
   end
   helper_method :conversations_path
   
@@ -1106,6 +1106,8 @@ class ApplicationController < ActionController::Base
         !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
+      elsif feature == :crocodoc
+        !!Canvas::Crocodoc.config
       elsif feature == :lockdown_browser
         Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
       else
@@ -1372,5 +1374,14 @@ class ApplicationController < ActionController::Base
   def complete_request_uri
     uri = Canvas::LoggingFilter.filter_uri(request.request_uri)
     "#{request.protocol}#{request.host}#{uri}"
+  end
+
+  def self.batch_jobs_in_actions(opts = {})
+    batch_opts = opts.delete(:batch)
+    around_filter(opts) do |controller, action|
+      Delayed::Batch.serial_batch(batch_opts || {}) do
+        action.call
+      end
+    end
   end
 end

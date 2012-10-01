@@ -557,7 +557,8 @@ class RoleOverride < ActiveRecord::Base
           'TaEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :if => :enable_user_notes
       },
       :read_course_content => {
         :label => lambda { t('permissions.read_course_content', "View course content") },

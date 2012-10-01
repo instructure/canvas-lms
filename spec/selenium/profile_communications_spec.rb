@@ -48,7 +48,7 @@ describe "profile communication settings" do
     # Page title should match expected
     f('title').text.should == 'Notification Preferences'
     # Expect breadcrumbs to correctly display page name
-    f('nav#breadcrumbs').should include_text('Notification Preferences')
+    f('#breadcrumbs').should include_text('Notification Preferences')
     # Expect h2 with
     f('#content > h2').text.should == 'Notification Preferences'
   end

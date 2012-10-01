@@ -10,7 +10,6 @@ describe "external tool assignments" do
   end
 
   it "should allow creating" do
-    skip_if_ie('Out of memory')
     get "/courses/#{@course.id}/assignments"
 
     #create assignment
@@ -47,7 +46,6 @@ describe "external tool assignments" do
   end
 
   it "should allow editing" do
-    skip_if_ie('Out of memory')
     a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
     a.create_external_tool_tag(:url => @t1.url)
     a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')

@@ -4,8 +4,8 @@ shared_examples_for "manage groups selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   def add_category(course, name, opts={})
-    driver.find_element(:css, ".add_category_link").click
-    form = driver.find_element(:css, "#add_category_form")
+    f(".add_category_link").click
+    form = f("#add_category_form")
     input = form.find_element(:css, "input[type=text]")
     replace_content input, name
     enable_self_signup = form.find_element(:css, "#category_enable_self_signup")
@@ -33,8 +33,8 @@ shared_examples_for "manage groups selenium tests" do
   end
 
   def edit_category(opts={})
-    find_with_jquery(".edit_category_link:visible").click
-    form = driver.find_element(:css, "#edit_category_form")
+    fj(".edit_category_link:visible").click
+    form = f("#edit_category_form")
     input_box = form.find_element(:css, "input[type=text]")
     if opts[:new_name]
       replace_content input_bopts[:new_name]
@@ -82,8 +82,8 @@ shared_examples_for "manage groups selenium tests" do
 
   def add_group_to_category(context, name)
 
-    find_with_jquery(".add_group_link:visible").click
-    driver.find_element(:css, "#group_name").send_keys(name)
+    fj(".add_group_link:visible").click
+    f("#group_name").send_keys(name)
     submit_form("#edit_group_form")
     wait_for_ajaximations
     group = context.groups.find_by_name(name)

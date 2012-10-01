@@ -43,12 +43,8 @@ module SendToStream
       block = self.class.send_to_stream_block rescue nil
       stream_recipients = Array(self.instance_eval(&block)) if block
       if stream_recipients && !stream_recipients.empty?
-        if ENV['RAILS_ENV'] == 'production'
-          send_later_enqueue_args(:create_stream_items,
-                                  :priority => Delayed::LOW_PRIORITY)
-        else
-          create_stream_items
-        end
+        send_later_if_production_enqueue_args(:create_stream_items,
+                                              :priority => Delayed::LOW_PRIORITY)
       end
       true
     end
@@ -79,19 +75,15 @@ module SendToStream
       block = self.class.send_to_stream_update_block
       stream_recipients = Array(self.instance_eval(&block)) if block
       if stream_recipients && !stream_recipients.empty?
-        if ENV['RAILS_ENV'] == 'production'
-          send_later_enqueue_args(:generate_stream_items,
-                                  { :priority => Delayed::LOW_PRIORITY },
-                                  stream_recipients)
-        else
-          generate_stream_items(stream_recipients)
-        end
+        send_later_if_production_enqueue_args(:generate_stream_items,
+                                              { :priority => Delayed::LOW_PRIORITY },
+                                              stream_recipients)
         true
       end
     rescue => e
       ErrorReport.log_exception(:default, e, {
         :message => "SendToStream failure",
-      }) if ENV['RAILS_ENV'] == 'production'
+      })
       true
     end
     

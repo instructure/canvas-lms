@@ -17,6 +17,7 @@ module ParallelExclude
       'spec/apis/v1/collections_spec.rb',
       'spec/apis/auth_spec.rb',
       'spec/integration/files_spec.rb',
+      'spec/integration/security_spec.rb',
       'spec/lib/acts_as_list.rb',
       'spec/lib/content_zipper_spec.rb',
       'spec/lib/turnitin_spec.rb',

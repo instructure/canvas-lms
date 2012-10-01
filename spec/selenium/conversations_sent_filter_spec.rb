@@ -35,10 +35,9 @@ describe "conversations sent filter" do
 
     submit_message_form(:message => first_message_text)
 
-    conversations = get_conversations
-    conversations.size.should eql 2
-    conversations.first.should include_text(first_message_text)
-    conversations.last.should include_text('yay i sent this')
+    ff(".last_author").length.should == 2
+    ff(".last_author")[0].should include_text(first_message_text)
+    ff(".last_author")[1].should include_text('yay i sent this')
   end
 
   it "should remove the conversation when the last message by the author is deleted" do

@@ -46,6 +46,12 @@ Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * *
   end
 end
 
+Delayed::Periodic.cron 'CrocodocDocument.update_process_states', '*/5 * * * *' do
+  Shard.with_each_shard do
+    CrocodocDocument.update_process_states
+  end
+end
+
 Delayed::Periodic.cron 'Twitter processing', '*/15 * * * *' do
   Shard.with_each_shard do
     TwitterSearcher.process

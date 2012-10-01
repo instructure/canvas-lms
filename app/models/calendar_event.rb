@@ -510,7 +510,6 @@ class CalendarEvent < ActiveRecord::Base
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
     item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
     item ||= context.calendar_events.new
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     item.workflow_state = 'active' if item.deleted?
     item.title = hash[:title] || hash[:name]

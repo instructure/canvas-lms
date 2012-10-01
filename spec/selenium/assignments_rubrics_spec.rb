@@ -126,8 +126,6 @@ describe "assignment rubrics" do
     end
 
     it "should not allow XSS attacks through rubric descriptions" do
-      skip_if_ie('Unexpected page behavior')
-
       student = user_with_pseudonym :active_user => true,
                                     :username => "student@example.com",
                                     :password => "password"
@@ -266,7 +264,7 @@ describe "assignment rubrics" do
                                       })
       # when
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
-      f('a.assess_submission_link').click
+      f('.assess_submission_link').click
       # expect
       ee = ff('.criterion_comments')
       ee.first.should be_displayed

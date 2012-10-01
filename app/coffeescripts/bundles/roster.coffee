@@ -19,54 +19,48 @@
 require [
   'jquery'
   'underscore'
-  'compiled/collections/EnrollmentCollection'
+  'compiled/collections/UserCollection'
   'compiled/collections/SectionCollection'
   'compiled/views/courses/RosterView'
-], ($, _, EnrollmentCollection, SectionCollection, RosterView) ->
+], ($, _, UserCollection, SectionCollection, RosterView) ->
 
-  rosterPage =
-    init: ->
-      @loadEnvironment()
-      @cacheElements()
-      @createCollections()
+  # Load environment
+  course       = ENV.context_asset_string.split('_')[1]
+  url          = "/api/v1/courses/#{course}/users"
+  fetchOptions =
+    include: ['avatar_url', 'enrollments', 'email']
+    per_page: 50
 
-    # Get the course ID and create the enrollments API url.
-    #
-    # @api public
-    # @return nothing
-    loadEnvironment: ->
-      @course = ENV.context_asset_string.split('_')[1]
-      @url    = "/api/v1/courses/#{@course}/enrollments"
+  # Cache elements
+  $studentList = $('.student_roster .user_list')
+  $teacherList = $('.teacher_roster .user_list')
 
-    # Store DOM elements used.
-    #
-    # @api public
-    # @return nothing
-    cacheElements: ->
-      @$studentList = $('.student_roster .user_list')
-      @$teacherList = $('.teacher_roster .user_list')
+  # Create views
+  sections = new SectionCollection(ENV.SECTIONS)
+  students = new UserCollection
+  teachers = new UserCollection
 
-    # Create the view and collection objects needed for the page.
-    #
-    # @api public
-    # @return nothing
-    createCollections: ->
-      @sections    = new SectionCollection(ENV.SECTIONS)
-      students     = new EnrollmentCollection
-      teachers     = new EnrollmentCollection
+  _.each [students, teachers], (c) ->
+    c.url      = url
+    c.sections = sections
 
-      _.each [students, teachers], (c) =>
-        c.url      = @url
-        c.sections = @sections
+  studentOptions = add: false, data: _.extend({}, fetchOptions, enrollment_type: 'student')
+  teacherOptions = add: false, data: _.extend({}, fetchOptions, enrollment_type: ['teacher', 'ta'])
 
-      @studentView = new RosterView
-        el: @$studentList
-        collection: students
-        requestOptions: type: ['StudentEnrollment']
-      @teacherView = new RosterView
-        el: @$teacherList
-        collection: teachers
-        requestOptions: type: ['TeacherEnrollment', 'TaEnrollment']
+  studentView = new RosterView
+    collection: students
+    el: $studentList
+    fetchOptions: studentOptions
+  teacherView = new RosterView
+    collection: teachers
+    el: $teacherList
+    fetchOptions: teacherOptions
 
-  # Start loading the page.
-  rosterPage.init()
+  # Add events
+  students.on('reset', studentView.render, studentView)
+  teachers.on('reset', teacherView.render, teacherView)
+
+  # Fetch roster
+  studentView.$el.disableWhileLoading(students.fetch(studentOptions))
+  teacherView.$el.disableWhileLoading(teachers.fetch(teacherOptions))
+

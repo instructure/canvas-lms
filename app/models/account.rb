@@ -150,6 +150,7 @@ class Account < ActiveRecord::Base
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
+  add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :mfa_settings, :root_only => true
   add_setting :canvas_authentication, :boolean => true, :root_only => true
@@ -564,7 +565,7 @@ class Account < ActiveRecord::Base
   set_policy do
     enrollment_types = RoleOverride.enrollment_types.map { |role| role[:name] }
     RoleOverride.permissions.each do |permission, details|
-      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
+      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) && (!details[:if] || send(details[:if])) } }
       can permission
       can :create_courses if permission == :manage_courses
 
@@ -572,7 +573,8 @@ class Account < ActiveRecord::Base
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|
         given { |user| user && RoleOverride.permission_for(self, permission, role)[:enabled] &&
           self.course_account_associations.find(:first, :joins => 'INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id',
-            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) }
+            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) &&
+          (!details[:if] || send(details[:if])) }
         can permission
       end
     end
@@ -704,7 +706,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.find_cached(id)
-    account = Rails.cache.fetch(account_lookup_cache_key(id), :expires => 1.hour) do
+    account = Rails.cache.fetch(account_lookup_cache_key(id), :expires_in => 1.hour) do
       account = Account.find_by_id(id)
       account.precache if account
       account || :nil

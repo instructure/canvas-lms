@@ -79,6 +79,8 @@ class InfoController < ApplicationController
   def health_check
     # This action should perform checks on various subsystems, and raise an exception on failure.
     Account.connection.select_value("SELECT 1")
+    Rails.cache.read 'heartbeat'
+    Canvas.redis.get('heartbeat') if Canvas.redis_enabled?
 
     respond_to do |format|
       format.html { render :text => 'canvas ok' }

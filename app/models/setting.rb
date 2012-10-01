@@ -81,8 +81,13 @@ class Setting < ActiveRecord::Base
     config = nil
     path = File.join(Rails.root, 'config', "#{config_name}.yml")
     if File.exists?(path)
-      config = YAML.load_file(path).with_indifferent_access
-      config = config[with_rails_env == :current ? Rails.env : with_rails_env] if with_rails_env
+      config = YAML.load_file(path)
+      if config.respond_to?(:with_indifferent_access)
+        config = config.with_indifferent_access
+        config = config[with_rails_env == :current ? Rails.env : with_rails_env] if with_rails_env
+      else
+        config = nil
+      end
     end
     @@cache[key] = config
   end

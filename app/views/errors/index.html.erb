@@ -34,6 +34,9 @@
     </h3>
 
     <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
+      <% if report.account_id %>
+        <%= before_label :account, "account" %> <%= link_to report.account.try(:name), account_url(report.account_id) %><br />
+      <% end %>
       <%= before_label :category, "category" %> <%= report.category || t(:default_category, 'default') %><br/>
       <%= before_label :created_at, "created at" %> <%= report.created_at %><br />
       <% if report.user_id %>

@@ -99,12 +99,6 @@ class GroupCategory < ActiveRecord::Base
     self.student_organized? || self.communities?
   end
 
-  # Communities can be joined by anyone,
-  # otherwise defer to the permission on the context
-  def available_for?(user)
-    self.communities? || (self.context && self.context.grants_right?(user, :participate_in_groups))
-  end
-
   # this is preferred over setting self_signup directly. know that if you set
   # self_signup directly to anything other than nil (or ''), 'restricted', or
   # 'enabled', it will behave as if you used 'enabled'.

@@ -35,7 +35,6 @@ describe "quizzes question banks" do
   end
 
   it "should allow you to use inherited question banks" do
-    skip_if_ie('Out of memory')
     @course.account = Account.default
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
@@ -65,7 +64,6 @@ describe "quizzes question banks" do
   end
 
   it "should allow you to use bookmarked question banks" do
-    skip_if_ie('Out of memory')
     @course.account = Account.default
     @course.save
     quiz = @course.quizzes.create!(:title => "My Quiz")
@@ -82,7 +80,7 @@ describe "quizzes question banks" do
       f(".select_all_link").should be_displayed
     }
     f(".select_all_link").click
-    submit_dialog("div#find_question_dialog")
+    submit_dialog("#find_question_dialog")
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
 
     f(".add_question_group_link").click
@@ -96,7 +94,6 @@ describe "quizzes question banks" do
   end
 
   it "should check permissions when retrieving question banks" do
-    skip_if_ie('Out of memory')
     @course.account = Account.default
     @course.account.role_overrides.create(:permission => 'read_question_banks', :enrollment_type => 'TeacherEnrollment', :enabled => false)
     @course.save
@@ -129,8 +126,6 @@ describe "quizzes question banks" do
   end
 
   it "should import questions from a question bank" do
-    skip_if_ie('Out of memory')
-
     get "/courses/#{@course.id}/quizzes/new"
 
     f('.add_question_group_link').click

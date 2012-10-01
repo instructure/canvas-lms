@@ -19,15 +19,13 @@ describe "user_content" do
     factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => message_body)
     get "/"
     name = ff(".user_content_iframe").first.attribute('name')
-    in_frame(name) {
-      keep_trying_until {
-        driver.current_url.should match("/object_snippet")
-      }
+    in_frame(name) do
+      keep_trying_until { driver.current_url.should match("/object_snippet")  }
       html = Nokogiri::HTML(driver.page_source)
       obj = html.at_css('object')
       obj.should_not be_nil
       obj['data'].should == '/javascripts/swfobject/test.swf'
-    }
+    end
   end
 
   it "should iframe calendar json requests" do
@@ -39,14 +37,12 @@ describe "user_content" do
     event_el.find_element(:tag_name, 'a').click
     wait_for_ajax_requests
     name = keep_trying_until { ff(".user_content_iframe").first.attribute('name') }
-    in_frame(name) {
-      keep_trying_until {
-        driver.current_url.should match("/object_snippet")
-      }
+    in_frame(name) do
+      keep_trying_until { driver.current_url.should match("/object_snippet") }
       html = Nokogiri::HTML(driver.page_source)
       obj = html.at_css('object')
       obj.should_not be_nil
       obj['data'].should == '/javascripts/swfobject/test.swf'
-    }
+    end
   end
 end

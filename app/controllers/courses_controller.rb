@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -152,6 +152,7 @@ class CoursesController < ApplicationController
   # @argument course[restrict_enrollments_to_course_dates] [Boolean] [optional] Set to true to restrict user enrollments to the start and end dates of the course.
   # @argument course[enroll_me] [Boolean] [optional] Set to true to enroll the current user as the teacher.
   # @argument course[sis_course_id] [String] [optional] The unique SIS identifier.
+  # @argument course[hide_final_grades] [Boolean] [optional] If this option is set to true, the totals in student grades summary will be hidden.
   # @argument offer [Boolean] [optional] If this option is set to true, the course will be available to students immediately.
   #
   # @returns Course
@@ -195,7 +196,7 @@ class CoursesController < ApplicationController
              :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
-             :restrict_enrollments_to_course_dates, :workflow_state], nil)
+             :restrict_enrollments_to_course_dates, :workflow_state, :hide_final_grades], nil)
           }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
@@ -290,15 +291,32 @@ class CoursesController < ApplicationController
   # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
   # @argument include[] ["avatar_url"] Optionally include avatar_url.
   #
+  # @argument user_id [optional] If included, the user will be queried and if
+  #   the user is part of the users set, the page parameter will be modified so
+  #   that the page containing user_id will be returned.
+  #
   # @returns [User]
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      enrollment_type = "#{params[:enrollment_type].capitalize}Enrollment" if params[:enrollment_type]
+      enrollment_type = Array(params[:enrollment_type]).map { |e| "#{e.capitalize}Enrollment" } if params[:enrollment_type]
       users = @context.users_visible_to(@current_user)
+      # TODO: convert this to the good user sorting stuff
       users = users.scoped(:order => "users.sortable_name")
-      users = users.scoped(:conditions => ["enrollments.type = ? ", enrollment_type]) if enrollment_type
-      users = Api.paginate(users, self, api_v1_course_users_path)
+      users = users.scoped(:conditions => ["enrollments.type IN (?) ", enrollment_type]) if enrollment_type
+
+      # If a user_id is passed in, modify the page parameter so that the page
+      # that contains that user is returned.
+      # We delete it from params so that it is not maintained in pagination links.
+      user_id = params.delete(:user_id)
+      if user_id.present? && user = users.scoped(:conditions => ["users.id = ?", user_id]).first
+        position_scope = users.scoped(:conditions => ["sortable_name <= ?", user.sortable_name])
+        position = position_scope.count(:select => "users.*", :distinct => true)
+        per_page = Api.per_page_for(self)
+        params[:page] = (position.to_f / per_page.to_f).ceil
+      end
+
+      users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
@@ -461,7 +479,7 @@ class CoursesController < ApplicationController
   def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
-      load_all_contexts(@context)
+      load_all_contexts(:context => @context)
       users_scope = @context.users_visible_to(@current_user)
       enrollment_counts = users_scope.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id')
       @user_counts = {
@@ -762,6 +780,7 @@ class CoursesController < ApplicationController
       if authorized_action(@context, @current_user, :read)
         enrollments = @context.current_enrollments.all(:conditions => { :user_id => @current_user.id })
         includes = Set.new(Array(params[:include]))
+        includes << :hide_final_grades
         render :json => course_json(@context, @current_user, session, includes, enrollments)
       end
       return
@@ -1109,6 +1128,9 @@ class CoursesController < ApplicationController
           end
         end
       end
+      unless (hide_final_grades = params[:course].delete(:hide_final_grades)).nil?
+        @course.hide_final_grades = value_to_boolean(hide_final_grades)
+      end
       params[:course][:event] = :offer if params[:offer].present?
       @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
@@ -1123,7 +1145,7 @@ class CoursesController < ApplicationController
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
           format.json do
             if api_request?
-              render :json => course_json(@course, @current_user, session, [], nil)
+              render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
             else
              render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
             end

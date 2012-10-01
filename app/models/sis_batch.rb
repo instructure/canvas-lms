@@ -54,13 +54,13 @@ class SisBatch < ActiveRecord::Base
     batch.data = {:import_type => import_type}
     batch.save
 
-    Attachment.skip_scribd_submits(true)
+    Attachment.skip_3rd_party_submits(true)
     att = Attachment.new
     att.context = batch
     att.uploaded_data = attachment
     att.display_name = t :upload_filename, "sis_upload_%{id}.zip", :id => batch.id
     att.save!
-    Attachment.skip_scribd_submits(false)
+    Attachment.skip_3rd_party_submits(false)
     batch.attachment = att
 
     yield batch if block_given?

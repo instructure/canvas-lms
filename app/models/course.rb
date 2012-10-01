@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -57,6 +57,7 @@ class Course < ActiveRecord::Base
                   :grading_standard,
                   :grading_standard_enabled,
                   :locale,
+                  :hide_final_grades,
                   :settings
 
   serialize :tab_configuration
@@ -163,6 +164,7 @@ class Course < ActiveRecord::Base
   has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
+  has_many :asset_user_accesses, :as => :context
   has_many :role_overrides, :as => :context
   has_many :content_migrations, :foreign_key => :context_id
   has_many :content_exports
@@ -900,8 +902,8 @@ class Course < ActiveRecord::Base
     given { |user| self.available? && self.is_public }
     can :read
 
-    RoleOverride.permissions.each_key do |permission|
-      given {|user, session| self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission) }
+    RoleOverride.permissions.each do |permission, details|
+      given {|user, session| (self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission)) && (!details[:if] || send(details[:if])) }
       can permission
     end
     
@@ -910,10 +912,6 @@ class Course < ActiveRecord::Base
 
     given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
     can :read
-
-    # may want to make this more restrictive, but this is what it was prior to creating student view
-    given { |user| user && self.enrollments.not_fake.map(&:user_id).include?(user.id) }
-    can :participate_in_groups
 
     # Active students
     given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
@@ -1703,15 +1701,13 @@ class Course < ActiveRecord::Base
     params = migration.migration_settings[:migration_ids_to_import]
     valid_paths = []
     (data['file_map'] || {}).each do |id, file|
-      if !migration.context.attachments.detect { |f| f.migration_id == file['migration_id'] } || migration.migration_settings[:files_import_allow_rename]
-        path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
-        self.attachment_path_id_lookup[path] = file['migration_id']
-        self.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
-        if params[:copy][:files]
-          valid_paths << path if (bool_res(params[:copy][:files][file['migration_id'].to_sym]) rescue false)
-        else
-          valid_paths << path
-        end
+      path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
+      self.attachment_path_id_lookup[path] = file['migration_id']
+      self.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
+      if params[:copy][:files]
+        valid_paths << path if (bool_res(params[:copy][:files][file['migration_id'].to_sym]) rescue false)
+      else
+        valid_paths << path
       end
     end
     valid_paths = [0] if valid_paths.empty? && params[:copy] && params[:copy][:files]
@@ -2702,6 +2698,19 @@ class Course < ActiveRecord::Base
   # these settings either are or could be easily added to
   # the course settings page
   add_setting :hide_final_grade, :boolean => true
+
+  def hide_final_grades
+    self.settings[:hide_final_grade]
+  end
+
+  def hide_final_grades=(hide_final_grade)
+    self.settings[:hide_final_grade] = hide_final_grade
+  end
+
+  def filter_attributes_for_user(hash, user, session)
+    hash.delete(:hide_final_grade) unless grants_right? user, :update
+    hash
+  end
 
   def settings=(hash)
 

@@ -321,6 +321,13 @@ ActionController::Routing::Routes.draw do |map|
     course.test_student 'test_student', :controller => 'courses', :action => 'reset_test_student', :conditions => {:method => :delete}
   end
 
+  map.connect '/submissions/:submission_id/attachments/:attachment_id/crocodoc_sessions',
+    :controller => :crocodoc_sessions, :action => :create,
+    :conditions => {:method => :post}
+  map.connect '/attachments/:attachment_id/crocodoc_sessions',
+    :controller => :crocodoc_sessions, :action => :create,
+    :conditions => {:method => :post}
+
   map.resources :page_views, :only => [:update,:index]
   map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
@@ -824,7 +831,7 @@ ActionController::Routing::Routes.draw do |map|
     api.get 'conversations/find_recipients', :controller => :conversations, :action => :find_recipients
 
     api.with_options(:controller => :conversations) do |conversations|
-      conversations.get 'conversations', :action => :index
+      conversations.get 'conversations', :action => :index, :path_name => 'conversations'
       conversations.post 'conversations', :action => :create
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
       conversations.get 'conversations/:id', :action => :show
@@ -919,7 +926,8 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :files) do |files|
       files.post 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
       files.get 'files/:id/create_success', :action => :api_create_success, :path_name => 'files_create_success'
-      files.get 'files/:id', :action => :api_show, :path_name => 'file'
+      # 'attachment' (rather than 'file') is used below so modules API can use polymorphic_url to generate an item API link
+      files.get 'files/:id', :action => :api_show, :path_name => 'attachment'
       files.delete 'files/:id', :action => :destroy
       files.put 'files/:id', :action => :api_update
       files.get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
@@ -943,10 +951,18 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :wiki_pages) do |wiki_pages|
-      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_pages'
-      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_pages'
-      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_page'
-      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_page'
+      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_wiki_pages'
+      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_wiki_pages'
+      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_wiki_page'
+      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_wiki_page'
+    end
+
+    api.with_options(:controller => :context_modules_api) do |context_modules|
+      context_modules.get "courses/:course_id/modules", :action => :index, :path_name => 'course_context_modules'
+      context_modules.get "courses/:course_id/modules/:id", :action => :show, :path_name => 'course_context_module'
+      context_modules.get "courses/:course_id/modules/:module_id/items", :action => :list_module_items, :path_name => 'course_context_module_items'
+      context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
+      context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
     end
   end
 

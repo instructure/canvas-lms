@@ -2,6 +2,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussion_announcem
 
 describe "discussions" do
   it_should_behave_like "discussions selenium tests"
+
+  describe "shared topics permissions specs" do
+    let(:url) { "/courses/#{@course.id}/discussion_topics/" }
+    let(:what_to_create) { DiscussionTopic }
+    it_should_behave_like "discussion and announcement permissions tests"
+  end
+
   context "as a teacher" do
     DISCUSSION_NAME = 'new discussion'
 
@@ -130,7 +137,7 @@ describe "discussions" do
           checkbox_state = state == :on ? 'true' : nil
           get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
           wait_for_ajaximations
-  
+
           f('input[type=checkbox][name=threaded]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=delay_posting]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=require_initial_post]')[:checked].should == checkbox_state
@@ -331,7 +338,6 @@ describe "discussions" do
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajax_requests
-
         delete_entry(entry)
       end
 
@@ -340,7 +346,6 @@ describe "discussions" do
         text = "new side comment from student"
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_ajax_requests
         wait_for_js
         validate_entry_text(entry, text)
         edit_entry(entry, edit_text)

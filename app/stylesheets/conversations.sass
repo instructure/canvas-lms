@@ -36,7 +36,7 @@ body
       background-position: 0 -27px
     a.active
       background-position: 0 -54px
-    
+
   .menus
     float: left
     font-size: 0.9em
@@ -200,29 +200,15 @@ ul.messages, ul.conversations, div.conversations > ul
       cursor: pointer
       color: #2571bd
       > span
-        display: block
-        cursor: auto
-        z-index: 4
-        background: #fff
-        border: 1px solid #ccc
-        padding: 0.5em
         display: none
-        position: absolute
-        +border-radius(10px)
-        box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2)
-      ul
-        padding: 0
-        margin: 0
-        max-height: 120px
-        overflow: auto
-        list-style: none
-        li
-          font-weight: normal
-          padding: 0 1em
-          border: none
-          color: #000 !important
-          a
-            color: #000 !important
+  > li
+    overflow: hidden
+    > .conversation-summary
+      min-width: 340px
+      overflow: hidden
+      white-space: nowrap
+    p
+      overflow: hidden
   > li.selected, > li.submission.selected ul > li, > li.submission.selected ul > li.header
     background-color: #e5f3ff
   .audience
@@ -240,6 +226,30 @@ ul.messages, ul.conversations, div.conversations > ul
       padding: 0 2px
       background-color: #2571bd
       color: #fff
+#others_popup
+  z-index: 10
+  position: absolute
+  > span
+    display: block
+    cursor: auto
+    background: #fff
+    border: 1px solid #ccc
+    padding: 0.5em
+    +border-radius(10px)
+    box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2)
+  ul
+    padding: 0
+    margin: 0
+    max-height: 120px
+    overflow: auto
+    list-style: none
+    li
+      font-weight: normal
+      padding: 0 1em
+      border: none
+      color: #000 !important
+      a
+        color: #000 !important
 #inbox form ul.conversations .audience em a
   color: #777
 
@@ -294,7 +304,8 @@ div.conversations > ul
       min-height: 0
       margin: 0
     img.avatar, span.date, .audience, input, .actions
-      display: none
+      left: -10000px
+      position: absolute
 
 ul.messages
   position: relative
@@ -387,10 +398,16 @@ ul.messages
     .message_attachments
       border-top-color: #b7c2cc
 
+ul.messages li.other .actions:focus
+  margin-left: 1em
+  display: inline
+  position: static
+
 ul.messages li.other:hover
   .actions
     margin-left: 1em
     display: inline
+    position: static
     .send_private_message
       height: 18px
       display: inline-block
@@ -422,7 +439,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     z-index: 3
     box-shadow: 0 0 6px 3px rgba(0,0,0,0.25)
     a
-      background-image: url(/images/messages/message-action-sprites.png) 
+      background-image: url(/images/messages/message-action-sprites.png)
       background-repeat: no-repeat
     a:hover
       background-color: #fff
@@ -702,7 +719,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       background: #f4fbff
       border-top-color: #fff
       border-bottom-color: #d4d5d7
-        
+
 
 .autocomplete_menu
   ul
@@ -866,7 +883,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       padding: 0 8px 2px 0
       color: #2571bd
 #create_message_form.disabled
-  opacity: 0.3  
+  opacity: 0.3
 form
   input[type=text]
     width: 100%

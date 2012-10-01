@@ -142,7 +142,7 @@
         <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless @submission.submission_comments.empty? %>">Comments <% unless @submission.submission_comments.empty? %>(<%= @submission.submission_comments.length %>)<% end %></a>
         <div class="comments" style="border-left: 2px solid #ccc; height: 300px; overflow: auto; background-color: #f0f0f0;">
           <button type="button" class="button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
-          <div class="comment_list" style="padding: 10px; clear:right;">
+          <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
             <% unless can_do(@submission, @current_user, :read_grade) %>
               <% if @assignment.muted? %>
                 <i><%= t('only_see_your_own_comments_muted', "You may not see all comments right now because the assignment is currently being graded") %></i>

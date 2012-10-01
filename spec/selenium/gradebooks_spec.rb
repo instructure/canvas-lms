@@ -113,7 +113,7 @@ describe "gradebooks" do
 
     keep_trying_until {
       fj('#datagrid_data .row:nth-child(3) .cell:first .grade').click
-      fj('#submission_information').displayed?
+      fj('#submission_information').should be_displayed
     }
     link_el = f('#submission_information .submission_details .view_submission_link')
     URI.decode(URI.parse(link_el.attribute(:href)).fragment).should == "{\"student_id\":#{@student2.id}}"

@@ -92,14 +92,17 @@ namespace :canvas do
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets do
+  task :compile_assets, :generate_documentation do |t, args|
+    args.with_defaults(:generate_documentation => 'true')
+    generate_docs = args[:generate_documentation]
+    generate_docs = 'true' if !['true', 'false'].include?(args[:generate_documentation])
+
     puts "--> Compiling static assets [css]"
     Rake::Task['css:generate'].invoke
 
     puts "--> Compiling static assets [jammit]"
     output = `bundle exec jammit 2>&1`
     raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
-
     puts "--> Compiled static assets [css/jammit]"
 
     puts "--> Compiling static assets [javascript]"
@@ -111,8 +114,10 @@ namespace :canvas do
     puts "--> Optimizing JavaScript [r.js]"
     Rake::Task['js:build'].invoke
 
-    puts "--> Generating documentation [yardoc]"
-    Rake::Task['doc:api'].invoke
+    if generate_docs == 'true'
+      puts "--> Generating documentation [yardoc]"
+      Rake::Task['doc:api'].invoke
+      end
   end
 
   desc "Check static assets and generate api documentation."

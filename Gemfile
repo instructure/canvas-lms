@@ -52,7 +52,7 @@ gem 'rotp',           '1.4.1'
 gem 'rqrcode',        '0.4.2'
 gem 'rscribd',        '1.2.0'
 gem 'net-ldap',       '0.3.1',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.17'
+gem 'ruby-saml-mod',  '0.1.18'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '2.0.3'
@@ -62,6 +62,7 @@ gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 # this is only needed by jammit, but we're pinning at 0.9.4 because 0.9.5 breaks
 gem 'yui-compressor', '0.9.4'
 gem 'foreigner',      '0.9.2'
+gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
 
 group :assets do
   gem 'compass-rails', '1.0.2'
@@ -86,11 +87,11 @@ group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
   gem 'parallelized_specs', '0.1.9'
-  gem 'mocha',        '0.10.0'
+  gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.24.0'
+  gem 'selenium-webdriver', '2.25.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
   if ONE_NINE

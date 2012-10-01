@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -27,8 +27,10 @@ module Api::V1::Course
     include_description = includes.include?('public_description')
 
     base_attributes = %w(id name course_code account_id start_at)
+    methods = ['end_at']
+    methods << 'hide_final_grades' if includes.include?(:hide_final_grades)
     allowed_attributes = includes.is_a?(Array) ? base_attributes + includes : base_attributes
-    hash = api_json(course, user, session, :only => allowed_attributes, :methods => 'end_at')
+    hash = api_json(course, user, session, :only => allowed_attributes, :methods => methods)
     hash['sis_course_id'] = course.sis_source_id if course.root_account.grants_rights?(user, :read_sis, :manage_sis).values.any?
     if enrollments
       hash['enrollments'] = enrollments.map do |e|
@@ -52,6 +54,7 @@ module Api::V1::Course
     if include_description
       hash['public_description'] = course.public_description
     end
+    hash['hide_final_grades'] = (course.hide_final_grades.to_s == 'true')
     request = self.respond_to?(:request) ? self.request : nil
     hash['html_url'] = course_url(course, :host => HostUrl.context_host(course, request.try(:host_with_port))) if include_url
     hash

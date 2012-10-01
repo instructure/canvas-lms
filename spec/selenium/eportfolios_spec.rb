@@ -48,7 +48,7 @@ describe "eportfolios" do
     it "Should start the download of ePortfolio contents" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".download_eportfolio_link").click
-      f("#export_progress").should be_displayed
+      keep_trying_until { f("#export_progress").should be_displayed }
     end
 
     it "should display and hide eportfolio wizard" do
@@ -82,7 +82,6 @@ describe "eportfolios" do
     end
 
     it "should have a working flickr search dialog" do
-      skip_if_ie("Out of memory / stack overflow")
       get "/eportfolios/#{@eportfolio.id}"
       edit_link = keep_trying_until do
         f("#page_list a.page_url").click
@@ -165,6 +164,7 @@ describe "eportfolios" do
           f(comment_public).click
           is_checked(comment_public).should be_true
           submit_form(".form_content")
+          wait_for_ajax_requests
           f(".section_content b").text.should eql "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
           refresh_page

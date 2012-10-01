@@ -60,7 +60,7 @@
 <table class="course_details teacher_grades">
 <% @teacher_enrollments.each do |enrollment| %>
   <tr>
-    <td class="course" style="vertical-align: middle;"><a href="<%= course_gradebook_path(enrollment.course_id) %>"><%= enrollment.course.name %></a></td>
+    <td class="course" style="vertical-align: middle;"><a href="<%= course_grades_path(enrollment.course_id) %>"><%= enrollment.course.name %></a></td>
     <td class="percent">
       <% if @course_grade_summaries[enrollment.course_id] && @course_grade_summaries[enrollment.course_id][:score] %>
         <%= number_to_percentage(@course_grade_summaries[enrollment.course_id][:score], :precision => 2) %>

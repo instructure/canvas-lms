@@ -372,8 +372,16 @@ describe Notification do
         DelayedMessage.all.size.should eql(i + 1)
       end
       
-      it "should do things" do
-        true
+      it "should not send a delayed message to a retired cc" do
+        notification_policy_model({:frequency => "weekly"}.merge(@trifecta_opts) )
+        @cc.retire!
+        communication_channel_model(:user_id => @user.id).confirm!
+        notification_policy_model({:frequency => "never",
+                                   :communication_channel => @communication_channel,
+                                   :notification => @notification})
+        @notification.record_delayed_messages(:user => @user,
+                                              :communication_channel => @communication_channel,
+                                              :asset => @assignment).should be_false
       end
         
     end # testing that the applicable daily or weekly policies exist

@@ -19,7 +19,8 @@
 class QuizSubmissionsController < ApplicationController
   protect_from_forgery :except => [:create, :backup]
   before_filter :require_context
-  
+  batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
+
   def index
     @quiz = @context.quizzes.find(params[:quiz_id])
     redirect_to named_context_url(@context, :context_quiz_url, @quiz.id)

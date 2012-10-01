@@ -3,6 +3,7 @@ define [
   'compiled/conversations/ConversationsList'
   'str/htmlEscape'
   'compiled/util/shortcut'
+  'compiled/jquery/offsetFrom'
 ], (I18n, ConversationsList, h, shortcut) ->
 
   class
@@ -138,10 +139,10 @@ define [
         elements.groups.first().addClass 'first'
         elements.groups.last().addClass 'last'
 
-      offset = elements.node.offset()
+      offset = elements.node.offsetFrom(elements.container.offsetParent())
       elements.container.css
-        left: (offset.left + (elements.node.width() / 2) - elements.container.offsetParent().offset().left - (elements.container.width() / 2)),
-        top : (offset.top + (elements.node.height() * 0.9) - elements.container.offsetParent().offset().top)
+        left: (offset.left + (elements.node.width() / 2) - (elements.container.width() / 2)),
+        top : (offset.top + (elements.node.height() * 0.9))
 
     resize: (newHeight) ->
       @list.$scroller.height(newHeight - $('#actions').outerHeight(true))

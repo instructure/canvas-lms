@@ -127,7 +127,11 @@
           :display block
           
           .move_icon
-            :visibility hidden
+            left: -10000px
+            position: absolute
+
+            &:focus
+              left: inherit
 
       &.assignment-hover, .ui-sortable-helper 
         :background-color #eee
@@ -136,7 +140,7 @@
           :display block
         
         div.data.move .move_icon
-          :visibility visible
+          left: inherit
         
       &.editing
         :background-color #ddd  

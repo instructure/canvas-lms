@@ -300,6 +300,19 @@ describe ContentMigration do
       page_to.body.should == body % [@copy_to.id, tag_to.id]
     end
 
+    it "should find and fix wiki links by title or id" do
+      # simulating what happens when the user clicks "link to new page" and enters a title that isn't
+      # urlified the same way by the client vs. the server.  this doesn't break navigation because
+      # ApplicationController#get_wiki_page can match by urlified title, but it broke import (see #9945)
+      main_page = @copy_from.wiki.wiki_page
+      main_page.body = %{<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>}
+      main_page.save!
+      @copy_from.wiki.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
+      run_course_copy
+      @copy_to.wiki.wiki_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
+      @copy_to.wiki.wiki_pages.find_by_url!("online-unit-pages").body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
+    end
+
     it "should selectively copy items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       dt2 = @copy_from.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
@@ -939,6 +952,9 @@ describe ContentMigration do
       @copy_from.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
                                            :delayed_post_at => old_start + 3.days)
+      @copy_from.calendar_events.create!(:title => "an event",
+                                         :start_at => old_start + 4.days,
+                                         :end_at => old_start + 4.days + 1.hour)
       cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => old_start + 1.days)
       cm.start_at = old_start + 2.day
       cm.end_at = old_start + 3.days
@@ -964,6 +980,10 @@ describe ContentMigration do
 
       new_disc = @copy_to.discussion_topics.first
       new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+
+      new_event = @copy_to.calendar_events.first
+      new_event.start_at.to_i.should == (new_start + 4.day).to_i
+      new_event.end_at.to_i.should == (new_start + 4.day + 1.hour).to_i
 
       new_mod = @copy_to.context_modules.first
       new_mod.unlock_at.to_i.should  == (new_start + 1.day).to_i

@@ -267,13 +267,23 @@ describe SearchController, :type => :integration do
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '3'})
         json.size.should eql 3
-        response.headers['Link'].should eql(%{</api/v1/search/recipients.json?search=cletus&type=user&page=2&per_page=3>; rel="next",</api/v1/search/recipients.json?search=cletus&type=user&page=1&per_page=3>; rel="first"})
+        links = response.headers['Link'].split(",")
+        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
+        links.all?{ |l| l.scan(/search=cletus/).size == 1 }.should be_true
+        links.all?{ |l| l.scan(/type=user/).size == 1 }.should be_true
+        links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
+        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
 
         # get the next page
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&page=2&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :page => '2', :per_page => '3'})
         json.size.should eql 1
-        response.headers['Link'].should eql(%{</api/v1/search/recipients.json?search=cletus&type=user&page=1&per_page=3>; rel="prev",</api/v1/search/recipients.json?search=cletus&type=user&page=1&per_page=3>; rel="first"})
+        links = response.headers['Link'].split(",")
+        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
+        links.all?{ |l| l.scan(/search=cletus/).size == 1 }.should be_true
+        links.all?{ |l| l.scan(/type=user/).size == 1 }.should be_true
+        links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=1&per_page=3>/
+        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
       end
 
       it "should allow fetching all users iff a context is specified" do
@@ -284,7 +294,12 @@ describe SearchController, :type => :integration do
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '-1'})
         json.size.should eql 10
-        response.headers['Link'].should eql(%{</api/v1/search/recipients.json?search=cletus&type=user&page=2&per_page=10>; rel="next",</api/v1/search/recipients.json?search=cletus&type=user&page=1&per_page=10>; rel="first"})
+        links = response.headers['Link'].split(",")
+        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
+        links.all?{ |l| l.scan(/search=cletus/).size == 1 }.should be_true
+        links.all?{ |l| l.scan(/type=user/).size == 1 }.should be_true
+        links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=10>/
+        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=10>/
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&context=course_#{@course.id}&per_page=-1",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :context => "course_#{@course.id}", :type => 'user', :per_page => '-1'})
@@ -301,13 +316,23 @@ describe SearchController, :type => :integration do
         json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'ofcourse', :type => 'context', :per_page => '3'})
         json.size.should eql 3
-        response.headers['Link'].should eql(%{</api/v1/search/recipients.json?search=ofcourse&type=context&page=2&per_page=3>; rel="next",</api/v1/search/recipients.json?search=ofcourse&type=context&page=1&per_page=3>; rel="first"})
+        links = response.headers['Link'].split(",")
+        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
+        links.all?{ |l| l.scan(/search=ofcourse/).size == 1 }.should be_true
+        links.all?{ |l| l.scan(/type=context/).size == 1 }.should be_true
+        links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
+        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
 
         # get the next page
         json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&page=2&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'ofcourse', :type => 'context', :page => '2', :per_page => '3'})
         json.size.should eql 1
-        response.headers['Link'].should eql(%{</api/v1/search/recipients.json?search=ofcourse&type=context&page=1&per_page=3>; rel="prev",</api/v1/search/recipients.json?search=ofcourse&type=context&page=1&per_page=3>; rel="first"})
+        links = response.headers['Link'].split(",")
+        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
+        links.all?{ |l| l.scan(/search=ofcourse/).size == 1 }.should be_true
+        links.all?{ |l| l.scan(/type=context/).size == 1 }.should be_true
+        links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=1&per_page=3>/
+        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
       end
 
       it "should allow fetching all contexts" do

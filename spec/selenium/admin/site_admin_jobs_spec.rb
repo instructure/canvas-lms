@@ -173,8 +173,10 @@ describe "site admin jobs ui" do
       j.lock_exclusively!('my test worker')
       load_jobs_page
       ffj('#running-grid .slick-row').size.should == 1
-      first_cell = f('#running-grid .slick-cell.l0.r0')
-      first_cell.text.should == 'my test worker'
+      keep_trying_until do
+        first_cell = fj('#running-grid .slick-cell.l0.r0')
+        first_cell.text.should == 'my test worker'
+      end
     end
   end
 end

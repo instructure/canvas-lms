@@ -112,12 +112,12 @@ shared_examples_for "gradebook2 selenium tests" do
   def check_gradebook_1_totals(students)
     get "/courses/#{@course.id}/gradebook"
     # this keep_trying_untill is there because gradebook1 loads it's cells in a bunch of setTimeouts
-    keep_trying_until {
+    keep_trying_until do
       students.each do |student_id, expected_score|
         row_total = f(".final_grade .student_#{student_id} .grade").text + '%'
         row_total.should eql expected_score
       end
-    }
+    end
   end
 
   def conclude_and_unconclude_course

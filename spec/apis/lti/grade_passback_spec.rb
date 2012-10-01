@@ -496,9 +496,6 @@ describe LtiApiController, :type => :integration do
       end
 
       it "should set the grader to nil" do
-        # don't call id on nil, because it'll return 4 instead of nil.
-        nil.expects(:id).never
-
         make_call('body' => update_result('1.0'))
 
         check_success

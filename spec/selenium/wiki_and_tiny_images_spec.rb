@@ -3,34 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
   it_should_behave_like "wiki and tiny selenium tests"
 
-  def add_flickr_image(el)
-    el.find_element(:css, '.mce_instructure_embed').click
-    f('.flickr_search_link').click
-    f('#image_search_form > input').send_keys('angel')
-    submit_form('#image_search_form')
-    wait_for_ajax_requests
-    keep_trying_until { f('.image_link').should be_displayed }
-    f('.image_link').click
-  end
-
-  def add_image_to_rce
-    wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-    f('.wiki_switch_views_link').click
-    clear_wiki_rce
-    f('.wiki_switch_views_link').click
-    f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
-    f('.upload_new_image_link').click
-    wiki_page_tools_upload_file('#sidebar_upload_image_form', :image)
-    in_frame "wiki_page_body_ifr" do
-      f('#tinymce img').should be_displayed
-    end
-
-    submit_form('#new_wiki_page')
-    wait_for_ajax_requests
-    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-    wait_for_ajax_requests
-  end
-
   context "wiki and tiny images as a teacher" do
 
     before (:each) do
@@ -55,7 +27,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should lazy load images" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       @image_list.should_not have_class('initialized')
       @image_list.find_elements(:css, '.img').length.should == 0
@@ -80,12 +51,11 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         images = ffj('#editor_tabs_4 .image_list .img')
         images.length.should == 2
         images.each { |i| i.attribute('complete').should == 'true' }# - commented out because it is breaking with
-        #webdriver 2.22 and firefox 12
+                                                                    #webdriver 2.22 and firefox 12
       end
     end
 
     it "should infini-scroll images" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       90.times do |i|
         image = @root_folder.attachments.build(:context => @course)
@@ -114,7 +84,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should show images uploaded on the files tab in the image list" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
@@ -139,7 +108,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should show uploaded images in image list and add the image to the rce" do
-      skip_if_ie('Out of memory')
       wiki_page_tools_file_tree_setup
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
       f('.wiki_switch_views_link').click
@@ -173,7 +141,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should add image from flickr" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/wiki"
 
       #add image from flickr to rce
@@ -195,7 +162,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
 
     it "should put flickr images into the right editor" do
-      skip_if_ie('Out of memory')
       get "/courses/#{@course.id}/quizzes"
       f(".new-quiz-link").click
       keep_trying_until { f(".mce_instructure_embed").should be_displayed }

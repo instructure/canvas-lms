@@ -18,7 +18,6 @@ describe "manage groups students" do
   end
 
   it "should move students from a deleted group back to unassigned" do
-    skip_if_ie("Switch to alert and accept hangs in IE")
     student = groups_student_enrollment(1).last
     group_category = @course.group_categories.create(:name => "Some Category")
     group = add_groups_in_category(group_category, 1).last
@@ -219,7 +218,7 @@ describe "manage groups students" do
       simulate_group_drag(students[3].id, "blank", groups[0].id)
       wait_for_ajaximations
 
-      3.times{|i| groups[i].reload}
+      3.times { |i| groups[i].reload }
       groups[0].users.length.should == 2
       groups[1].users.length.should == 1
       groups[2].users.length.should == 1
@@ -227,14 +226,14 @@ describe "manage groups students" do
       simulate_group_drag(students[3].id, groups[0].id, groups[1].id)
       wait_for_ajaximations
 
-      3.times{|i| groups[i].reload}
+      3.times { |i| groups[i].reload }
       groups[0].users.length.should == 1
       groups[1].users.length.should == 2
       groups[2].users.length.should == 1
       simulate_group_drag(students[3].id, groups[1].id, groups[2].id)
       wait_for_ajaximations
 
-      3.times{|i| groups[i].reload}
+      3.times { |i| groups[i].reload }
       groups[0].users.length.should == 1
       groups[1].users.length.should == 2
       groups[2].users.length.should == 1
@@ -259,85 +258,6 @@ describe "manage groups students" do
       wait_for_ajaximations
 
       ff(".group_blank .student").length.should == 15
-    end
-  end
-
-  context "assign_students_link" do
-    def assign_students(category)
-      assign_students = fj("#category_#{category.id} .assign_students_link:visible")
-      assign_students.should_not be_nil
-      assign_students.click
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
-      wait_for_ajax_requests
-      keep_trying_until { f('.right_side .group .user_count').text.should eql '0 students' }
-    end
-
-    before (:each) do
-      @student = @course.enroll_student(user_model(:name => "John Doe")).user
-      get "/courses/#{@course.id}/groups"
-      @category = add_category(@course, "New Category", :enable_self_signup => true, :group_count => '2')
-    end
-
-    it "should be visible iff category is not restricted self signup" do
-      skip_if_ie("Element must not be hidden, disabled or read-only line 378")
-      new_category = add_category(@course, "Unrestricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => false)
-      fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
-
-      edit_category(:restrict_self_signup => true)
-      fj("#category_#{new_category.id} .assign_students_link:visible").should be_nil
-
-      new_category = add_category(@course, "Restricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => true)
-      fj("#category_#{new_category.id} .assign_students_link:visible").should be_nil
-
-      edit_category(:restrict_self_signup => false)
-      fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
-    end
-
-    it "should assign students in DB and in UI" do
-      expected_display_name = 'Doe, John'
-      keep_trying_until { f('.right_side .student_list .student .name').should include_text(expected_display_name) }
-      @student.groups.should be_empty
-
-      assign_students(@category)
-
-      @student.reload
-      keep_trying_until { @student.groups.size.should == 1 }
-      group = @student.groups.first
-
-      f('.right_side .student_list').should_not include_text(expected_display_name)
-      group_element = fj("#category_#{@category.id} #group_#{group.id} .user_id_#{@student.id}")
-      group_element.should_not be_nil
-      group_element.should include_text(expected_display_name)
-    end
-
-    it "should give 'Assigning Students...' visual feedback" do
-      assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
-      assign_students.should_not be_nil
-      assign_students.click
-      # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
-      lock = Mutex.new
-      lock.lock
-      GroupsController.before_filter { lock.lock; lock.unlock; true }
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
-      loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
-      loading.text.should == 'Assigning Students...'
-      lock.unlock
-      GroupsController.filter_chain.pop
-      # make sure we wait before moving on
-      wait_for_ajax_requests
-    end
-
-    it "should give 'Nothing to do.' error flash if no unassigned students" do
-      assign_students(@category)
-      assign_students(@category)
-      assert_flash_error_message /Nothing to do/
-    end
-
-    it "should give 'Students assigned to groups.' success flash otherwise" do
-      assign_students(@category)
-      assert_flash_notice_message /Students assigned to groups/
     end
   end
 
@@ -381,6 +301,84 @@ describe "manage groups students" do
       wait_for_ajaximations
       ff(".left_side .group").should be_empty
       @course.group_categories.last.groups.last.workflow_state =='deleted'
+    end
+  end
+
+  context "assign_students_link" do
+    def assign_students(category)
+      assign_students = fj("#category_#{category.id} .assign_students_link:visible")
+      assign_students.should_not be_nil
+      assign_students.click
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      wait_for_ajax_requests
+      keep_trying_until { f('.right_side .group .user_count').text.should eql '0 students' }
+    end
+
+    before (:each) do
+      @student = @course.enroll_student(user_model(:name => "John Doe")).user
+      get "/courses/#{@course.id}/groups"
+      @category = add_category(@course, "New Category", :enable_self_signup => true, :group_count => '2')
+    end
+
+    it "should be visible iff category is not restricted self signup" do
+      new_category = add_category(@course, "Unrestricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => false)
+      fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
+
+      edit_category(:restrict_self_signup => true)
+      fj("#category_#{new_category.id} .assign_students_link:visible").should be_nil
+
+      new_category = add_category(@course, "Restricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => true)
+      fj("#category_#{new_category.id} .assign_students_link:visible").should be_nil
+
+      edit_category(:restrict_self_signup => false)
+      fj("#category_#{new_category.id} .assign_students_link:visible").should_not be_nil
+    end
+
+    it "should assign students in DB and in UI" do
+      expected_display_name = 'Doe, John'
+      keep_trying_until { f('.right_side .student_list .student .name').should include_text(expected_display_name) }
+      @student.groups.should be_empty
+
+      assign_students(@category)
+
+      @student.reload
+      keep_trying_until { @student.groups.size.should == 1 }
+      group = @student.groups.first
+
+      f('.right_side .student_list').should_not include_text(expected_display_name)
+      group_element = fj("#category_#{@category.id} #group_#{group.id} .user_id_#{@student.id}")
+      group_element.should_not be_nil
+      group_element.should include_text(expected_display_name)
+    end
+
+    it "should give 'Nothing to do.' error flash if no unassigned students" do
+      assign_students(@category)
+      assign_students(@category)
+      assert_flash_error_message /Nothing to do/
+    end
+
+    it "should give 'Students assigned to groups.' success flash otherwise" do
+      assign_students(@category)
+      assert_flash_notice_message /Students assigned to groups/
+    end
+
+    it "should give 'Assigning Students...' visual feedback" do
+      assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
+      assign_students.should_not be_nil
+      assign_students.click
+      # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
+      lock = Mutex.new
+      lock.lock
+      GroupsController.before_filter { lock.lock; lock.unlock; true }
+      confirm_dialog = driver.switch_to.alert
+      confirm_dialog.accept
+      loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
+      loading.text.should == 'Assigning Students...'
+      lock.unlock
+      GroupsController.filter_chain.pop
+      # make sure we wait before moving on
+      wait_for_ajax_requests
     end
   end
 end

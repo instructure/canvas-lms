@@ -119,7 +119,7 @@ describe 'Submissions API', :type => :integration do
 
     it "should post to submissions" do
       @a1 = @course.assignments.create!({:title => 'assignment1', :grading_type => 'percent', :points_possible => 10})
-      raw_api_call(:put,
+      json = raw_api_call(:put,
                       "/api/v1/sections/#{@default_section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
       { :controller => 'submissions_api', :action => 'update',
         :format => 'json', :section_id => @default_section.id.to_s,
@@ -127,12 +127,15 @@ describe 'Submissions API', :type => :integration do
         { :submission => { :posted_grade => '75%' } })
       response.status.should == "404 Not Found"
 
+      expect {
       json = api_call(:put,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
       { :controller => 'submissions_api', :action => 'update',
         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
         :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
         { :submission => { :posted_grade => '75%' } })
+        # never more than 1 job added, because it's in a Delayed::Batch
+      }.to change { Delayed::Job.jobs_count(:current) }.by(1)
 
       Submission.count.should == 2
       @submission = Submission.last(:order => :id)

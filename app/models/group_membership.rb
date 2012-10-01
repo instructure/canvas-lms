@@ -146,18 +146,20 @@ class GroupMembership < ActiveRecord::Base
   end
 
   set_policy do
-    # for non-communities, people can be put into groups
-    given { |user, session| user.present? && (user == self.user || self.group.grants_right?(user, session, :manage)) && self.group.can_join?(user) && !self.group.group_category.try(:communities?) }
+    # for non-communities, people can be put into groups by users who can manage groups at the context level,
+    # but not moderators (hence :manage_groups)
+    given { |user, session| user && self.user && self.group && !self.group.group_category.try(:communities?) && ((user == self.user && self.group.grants_right?(user, session, :join)) || (self.group.grants_right?(self.user, session, :participate) && self.group.context && self.group.context.grants_right?(user, session, :manage_groups))) }
     can :create
 
     # for communities, users must initiate in order to be added to a group
-    given { |user, session| user.present? && user == self.user && self.group.can_join?(user) && self.group.group_category.try(:communities?) }
+    given { |user, session| user && self.group && user == self.user && self.group.grants_right?(user, :join) && self.group.group_category.try(:communities?) }
     can :create
 
-    given { |user, session| user.present? && self.group.grants_right?(user, session, :manage) }
+    given { |user, session| user && self.group && self.group.grants_right?(user, session, :manage) }
     can :update
 
-    given { |user, session| user.present? && (user == self.user || self.group.grants_right?(user, session, :manage)) && self.group.can_leave?(user) }
+    # allow moderators to kick people out (hence :manage instead of :manage_groups on the context)
+    given { |user, session| user && self.user && self.group && ((user == self.user && self.group.grants_right?(self.user, session, :leave)) || self.group.grants_right?(user, session, :manage)) }
     can :delete
   end
 end

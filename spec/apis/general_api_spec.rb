@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -33,7 +33,7 @@ describe "API", :type => :integration do
   describe "as_json extensions" do
     it "should skip attribute filtering if obj doesn't respond" do
       course_with_teacher
-      @course.respond_to?(:filter_attributes_for_user).should be_false
+      @course.respond_to?(:filter_attributes_for_user).should be_true
       @course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w(name sis_source_id)).keys.sort.should == %w(name permissions sis_source_id)
     end
 

@@ -1615,18 +1615,41 @@ define([
                 }
                 $panel.data('node', node);
                 $panel.show();
-                if($preview) {
-                  $preview.addClass('file_preview');
-                  $files_content.append($preview);
-                  if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
+                if ($preview) {
+                  var showPreview = function() {
                     $('#doc_preview_holder').loadDocPreview({
                       mimeType: data.content_type,
                       attachment_id: data.id,
                       height: '100%',
+                      crocodoc_session_url: data.crocodocSession,
                       scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id,
                       scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key
                     });
                     files.viewFile(data.context_string, data.id);
+                  };
+                  if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
+                    $preview.addClass('file_preview');
+                    $files_content.append($preview);
+                    if (data['crocodoc_available?'] && !data.crocodocSession) {
+                      $preview.disableWhileLoading(
+                        $.ajaxJSON(
+                          '/attachments/' + data.id + '/crocodoc_sessions/',
+                          'POST',
+                          {annotations: false},
+                          function(response) {
+                            data.crocodocSession = response.session_url;
+                            showPreview();
+                          },
+                          function() {
+                            data['crocodoc_available?'] = false;
+                            showPreview();
+                          }
+                        )
+                      );
+                    }
+                    else {
+                      showPreview();
+                    }
                   }
                 }
                 $(window).triggerHandler('resize');

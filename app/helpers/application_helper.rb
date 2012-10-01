@@ -390,7 +390,7 @@ module ApplicationHelper
           end
         end
         return '' if tabs.empty?
-        html << '<nav role="navigation"><ul id="section-tabs">'
+        html << '<nav role="navigation" aria-label="context"><ul id="section-tabs">'
         tabs.each do |tab|
           path = nil
           if tab[:args]
@@ -488,6 +488,7 @@ module ApplicationHelper
       :error_id                 => @error && @error.id,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
       :disableScribdPreviews    => !feature_enabled?(:scribd),
+      :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,

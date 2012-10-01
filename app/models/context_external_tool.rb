@@ -169,8 +169,12 @@ class ContextExternalTool < ActiveRecord::Base
       if hash[:visibility] == 'members' || hash[:visibility] == 'admins'
         nav_settings[:visibility] = hash[:visibility]
       end
-      nav_settings[:default] = !!hash[:default]
+      nav_settings[:default] = Canvas::Plugin.value_to_boolean(hash[:default])
     }
+  end
+
+  def course_navigation
+    settings[:course_navigation]
   end
 
   def account_navigation=(hash)

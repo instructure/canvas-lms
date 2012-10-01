@@ -187,7 +187,6 @@ class DiscussionTopicsController < ApplicationController
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       unless @locked
-        @topic.context_module_action(@current_user, :read)
         @topic.change_read_state('read', @current_user)
       end
       if @topic.for_group_assignment?

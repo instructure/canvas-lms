@@ -17,7 +17,7 @@ define [
       super
       @collection.on 'remove', => @render() unless @collection.length
       @collection.on 'reset', @render
-      @collection.on 'add didFetchNextPage', @renderList
+      @collection.on 'add fetch:next', @renderList
       @collection.on 'change:selected', @toggleActionsForSelectedDiscussions
       @render()
 

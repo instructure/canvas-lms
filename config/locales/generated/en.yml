@@ -330,6 +330,11 @@ en:
       page_title: Accounts
       title: "Accounts I Manage"
     no_user_message: "No user found with that id"
+    provisioning_csv_description: 
+      account_reports: 
+        sis_export: 
+          description: 
+            text: "This report will export all the needed information that relates to provisioning Canvas in its respective categories."
     settings: 
       about_google_docs: |-
           In order to make it easier for users, rather than forcing them to download things like Word docs, PDFs, Excel spreadsheets, and open office documents (In addition to requiring that those programs be installed on their on their computer), in many areas throughout Canvas, it will allow you an inline preview of the document.
@@ -486,13 +491,18 @@ en:
     sis_batch_messages: 
       sis_batch_errors_title: "Errors that prevent importing"
       sis_batch_warnings_title: Warnings
+    sis_export_csv_description: 
+      account_reports: 
+        sis_export: 
+          description: 
+            text: "SIS Export report: This report will export all the needed files for Users, Accounts, Terms, Courses, Sections, Enrollments, Groups, Group Memberships, and Cross Listings for an SIS import in their respective categories."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
           accounts: 
             check_box: "Accounts CSV"
           courses: 
-            check_box: "Course CSV"
+            check_box: "Courses CSV"
           enrollments: 
             check_box: "Enrollments CSV"
           group_membership: 
@@ -1516,6 +1526,13 @@ en:
       created: "Event was successfully created."
       deleted: "This event has been deleted"
       updated: "Event was successfully updated."
+  calendar_events_api: 
+    feed_title: "%{course_or_group_name} Calendar Feed"
+    ics_description: "Calendar events for %{context_name}"
+    ics_description_course: "Calendar events for the course, %{course_name}"
+    ics_description_group: "Calendar events for the group, %{group_name}"
+    ics_description_user: "Calendar events for the user, %{user_name}"
+    ics_title: "%{course_or_group_name} Calendar (Canvas)"
   calendars: 
     assignment_details: "Assignment Details"
     calendar: 
@@ -1561,12 +1578,6 @@ en:
       event_title: "due: %{event_title}"
     event_details: "Event Details"
     feed_dialog_title: "Calendar Feed"
-    feed_title: "%{course_or_group_name} Calendar Feed"
-    ics_description: "Calendar events for %{context_name}"
-    ics_description_course: "Calendar events for the course, %{course_name}"
-    ics_description_group: "Calendar events for the group, %{group_name}"
-    ics_description_user: "Calendar events for the user, %{user_name}"
-    ics_title: "%{course_or_group_name} Calendar (Canvas)"
     keycodes: 
       delete: d
       edit: e
@@ -2798,8 +2809,8 @@ en:
     crumbs: 
       messages: Conversations
     enrollments_everyone: Everyone
-    filter_by_course: "Fiter by this course"
-    filter_by_group: "Fiter by this group"
+    filter_by_course: "Filter by this course"
+    filter_by_group: "Filter by this group"
     groups_count: 
       one: "1 group"
       other: "%{count} groups"
@@ -3890,7 +3901,7 @@ en:
       lock_topic: "Close for Comments"
       locked: "This topic is closed for comments"
       locked_topic: "This topic is currently locked."
-      manage: Manage
+      manage_discussion: "Manage Discussion"
       next_message: "Next Message"
       points_possible: 
         one: "1 point possible"
@@ -3935,7 +3946,7 @@ en:
       edit: Edit
       go_to_parent: "Go To Parent"
       just_read: "Just Read"
-      manage: Manage
+      manage_discussion_entry: "Manage Discussion Entry"
       open_in_speedgrader: "Open in SpeedGrader"
       unknown_author: "Unknown Author"
       unread: Unread
@@ -4272,6 +4283,7 @@ en:
       all_categories: "- All Categories -"
       default_category: default
       labels: 
+        account: account
         category: category
         created_at: "created at"
         request_context_id: "request context id"
@@ -4719,7 +4731,6 @@ en:
     new_assessment: "[New Assessment]"
     no_submission_time: "no submission time"
     nth_student: "Student %{n}"
-    percent: Percent
     publish_to_sis: "Publish grades to SIS"
     reupload_submission_files: "Re-Upload Submission Files"
     reupload_submissions: "Re-Upload Submissions"
@@ -4801,6 +4812,7 @@ en:
       arrange_columns_by_due_date: "Arrange columns by due date"
       arrange_columns_by_group: "Arrange columns by assignment group"
       download_scores: "Download Scores (.csv)"
+      filter_by_student: "Filter by student name or secondary ID"
       go_back_to_the_old_gradebook: "Go back to the old gradebook"
       hide_student_names: "Hide Student Names"
       include_ungraded: "Treat Ungraded as 0's"
@@ -5063,6 +5075,7 @@ en:
       incomplete: Incomplete
     grades_filename: Grades
     history: 
+      graded_on_submission: "Graded on submission"
       headers: 
         after: After
         before: Before
@@ -9566,8 +9579,6 @@ en:
         align_outcomes_for_assignment: "Align Outcomes for Assignment"
         outcomes_for_assignment: "Outcomes for this Assignment"
     assignment: 
-      alts: 
-        move: Move
       due_at: "%{date} at %{time}"
       graded_count: "%{graded_count} Graded"
       links: 
@@ -9580,7 +9591,7 @@ en:
       student_mute_notification: "Instructor is working on grades"
       submitted_and_graded_count: "%{submitted_count} Submitted, %{graded_count} Graded"
       submitted_count: "%{submitted_count} Submitted"
-      titles: 
+      tiles: 
         sort_or_move: "Sort Assignments or Move to Another Group"
     assignment_group: 
       alts: 

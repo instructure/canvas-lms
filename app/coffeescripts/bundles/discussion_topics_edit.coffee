@@ -17,6 +17,8 @@ require [
   if contextType is 'courses' && !is_announcement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
     (view.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
 
-  $ -> view.render().$el.appendTo('#content')
+  $ ->
+    view.render().$el.appendTo('#content')
+    $('#discussion-title').focus()
 
   view

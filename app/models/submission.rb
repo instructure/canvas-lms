@@ -102,6 +102,7 @@ class Submission < ActiveRecord::Base
   after_save :touch_user
   after_save :update_assignment
   after_save :update_attachment_associations
+  after_save :submit_attachments_to_crocodoc
   after_save :queue_websnap
   after_save :update_final_score
   after_save :submit_to_turnitin_later
@@ -276,14 +277,16 @@ class Submission < ActiveRecord::Base
       @submit_to_turnitin = true
     end
   end
-  
+
+  TURNITIN_JOB_OPTS = { :n_strand => 'turnitin', :priority => Delayed::LOW_PRIORITY }
+
   def submit_to_turnitin_later
     if self.turnitinable? && @submit_to_turnitin
       delay = Setting.get_cached('turnitin_submission_delay_seconds', 60.to_s).to_i
-      send_at(delay.seconds.from_now, :submit_to_turnitin)
+      send_later_enqueue_args(:submit_to_turnitin, { :run_at => delay.seconds.from_now }.merge(TURNITIN_JOB_OPTS))
     end
   end
-  
+
   TURNITIN_RETRY = 5
   def submit_to_turnitin(attempt=0)
     return unless self.context.turnitin_settings
@@ -295,7 +298,7 @@ class Submission < ActiveRecord::Base
     enroll_status = turnitin.enrollStudent(self.context, self.user)
     unless assign_status && enroll_status
       if attempt < TURNITIN_RETRY
-        send_at(5.minutes.from_now, :submit_to_turnitin, attempt + 1)
+        send_later_enqueue_args(:submit_to_turnitin, { :run_at => 5.minutes.from_now }.merge(TURNITIN_JOB_OPTS), attempt + 1)
       else
         assign_error = self.assignment.turnitin_settings[:error]
         turnitin_assets.each do |a| 
@@ -318,13 +321,13 @@ class Submission < ActiveRecord::Base
       end
     end
 
-    self.send_at(5.minutes.from_now, :check_turnitin_status)
+    send_later_enqueue_args(:check_turnitin_status, { :run_at => 5.minutes.from_now }.merge(TURNITIN_JOB_OPTS))
     self.save
 
     # Schedule retry if there were failures
     submit_status = submission_response.present? && submission_response.values.all?{ |v| v[:object_id] }
     unless submit_status
-      send_at(5.minutes.from_now, :submit_to_turnitin, attempt + 1) if attempt < TURNITIN_RETRY
+      send_later_enqueue_args(:submit_to_turnitin, { :run_at => 5.minutes.from_now }.merge(TURNITIN_JOB_OPTS), attempt + 1) if attempt < TURNITIN_RETRY
       return false
     end
 
@@ -415,6 +418,18 @@ class Submission < ActiveRecord::Base
           (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?))
         aa = self.attachment_associations.find_by_attachment_id(a.id)
         aa ||= self.attachment_associations.create(:attachment => a)
+      end
+    end
+  end
+
+  def submit_attachments_to_crocodoc
+    if attachment_ids_changed?
+      attachments = attachment_associations.map(&:attachment)
+      attachments.each do |a|
+        a.send_later_enqueue_args :submit_to_crocodoc,
+          :n_strand     => 'crocodoc',
+          :max_attempts => 5,
+          :priority => Delayed::LOW_PRIORITY
       end
     end
   end

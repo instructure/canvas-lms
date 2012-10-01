@@ -210,3 +210,13 @@ Canvas::Plugin.register('embedly', nil, {
   :settings_partial => 'plugins/embedly_settings',
   :settings => nil
 })
+Canvas::Plugin.register('crocodoc', :previews, {
+  :name => lambda { t :name, 'Crocodoc' },
+  :description => lambda { t :description, 'Enabled Crocodoc as a document preview option' },
+  :website => 'https://crocodoc.com/',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/crocodoc_settings',
+  :settings => nil
+})

@@ -363,9 +363,9 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         return res if res
       end
     rescue Net::LDAP::LdapError
-      ErrorReport.log_exception(:ldap, $!)
+      ErrorReport.log_exception(:ldap, $!, :account => self.account)
     rescue Timeout::Error
-      ErrorReport.log_exception(:ldap, $!)
+      ErrorReport.log_exception(:ldap, $!, :account => self.account)
       self.update_attribute(:last_timeout_failure, Time.now)
     end
 

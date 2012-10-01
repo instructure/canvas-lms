@@ -1,6 +1,6 @@
 <% @context ||= @current_user %>
 <% cache(['wiki_sidebar_render_', @context.cache_key, @current_user].cache_key.to_s) do %>
-<% collections = @current_user && @current_user.collections.all %>
+<% collections = [] #@current_user && @current_user.collections.all %>
 <% load_wiki_sidebar %>
 <div id="editor_tabs" style="display: none;">
 

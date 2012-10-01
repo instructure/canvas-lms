@@ -182,7 +182,6 @@ describe "assignments" do
     end
 
     it "should allow creating a quiz assignment from 'more options'" do
-      skip_if_ie("Out of memory")
       get "/courses/#{@course.id}/assignments"
 
       f(".assignment_group .add_assignment_link").click
@@ -199,7 +198,6 @@ describe "assignments" do
     end
 
     it "should edit an assignment" do
-      skip_if_ie('Out of memory')
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
       group = @course.assignment_groups.create!(:name => "default")
@@ -291,8 +289,6 @@ describe "assignments" do
       end
 
       it "should respect frozen attributes for teacher" do
-        skip_if_ie('Out of memory')
-
         run_assignment_edit do
           f('#assignment_assignment_group_id').should be_nil
           f('#edit_assignment_form #assignment_peer_reviews').should be_nil
@@ -301,7 +297,6 @@ describe "assignments" do
       end
 
       it "should not be locked for admin" do
-        skip_if_ie('Out of memory')
         course_with_admin_logged_in(:course => @course, :name => "admin user")
 
         run_assignment_edit do
@@ -347,121 +342,6 @@ describe "assignments" do
       errorBoxes.size.should eql 1 # the more_options_link one has now been removed from the DOM
       errorBoxes.first.text.should eql "The assignment shouldn't be locked again until after the due date"
       errorBoxes.first.should be_displayed
-    end
-  end
-
-  context "as a student" do
-    DUE_DATE = Time.now.utc + 2.days
-    before (:each) do
-      course_with_student_logged_in
-      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => DUE_DATE)
-      @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
-      @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
-      @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => DUE_DATE - 1.day)
-    end
-
-    it "should not sort undated assignments first and it should order them by title" do
-      get "/courses/#{@course.id}/assignments"
-      titles = ff('.title')
-      titles[2].text.should == @second_assignment.title
-      titles[3].text.should == @third_assignment.title
-    end
-
-    it "should order upcoming assignments starting with first due" do
-      get "/courses/#{@course.id}/assignments"
-      titles = ff('.title')
-      titles[0].text.should == @fourth_assignment.title
-      titles[1].text.should == @assignment.title
-    end
-
-    it "should expand the comments box on click" do
-      @assignment = @course.assignments.create!(
-          :name => 'test assignment',
-          :due_at => Time.now.utc + 2.days,
-          :submission_types => 'online_upload')
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      f('.submit_assignment_link').click
-      wait_for_ajaximations
-      driver.execute_script("return $('#submission_comment').height()").should eql 16
-      driver.execute_script("$('#submission_comment').focus()")
-      wait_for_ajaximations
-      driver.execute_script("return $('#submission_comment').height()").should eql 72
-
-      # navigate off the page and dismiss the alert box to avoid problems
-      # with other selenium tests
-      f('#section-tabs .home').click
-      driver.switch_to.alert.accept
-      driver.switch_to.default_content
-    end
-
-    it "should highlight mini-calendar dates where stuff is due" do
-      get "/courses/#{@course.id}/assignments/syllabus"
-
-      f(".mini_calendar_day.date_#{DUE_DATE.strftime("%m_%d_%Y")}").
-          attribute('class').should match /has_event/
-    end
-
-    it "should not show submission data when muted" do
-      @assignment.update_attributes(:submission_types => "online_url,online_upload")
-      @submission = @assignment.submit_homework(@student)
-      @submission.submission_type = "online_url"
-      @submission.save!
-
-      @submission.add_comment :author => @teacher, :comment => "comment before muting"
-      @assignment.mute!
-      @assignment.update_submission(@student, :hidden => true, :comment => "comment after muting")
-
-      outcome_with_rubric
-      @rubric.associate_with @assignment, @course, :purpose => "grading"
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      details = f(".details")
-      details.should include_text('comment before muting')
-      details.should_not include_text('comment after muting')
-    end
-
-    it "should have group comment checkboxes for group assignments" do
-      @u1 = @user
-      student_in_course(:course => @course)
-      @u2 = @user
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload,online_text_entry", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
-      @group = @assignment.group_category.groups.create!(:name => 'g1', :context => @course)
-      @group.users << @u1
-      @group.users << @user
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      ffj('table.formtable input[name="submission[group_comment]"]').size.should eql 3
-    end
-  end
-
-  context "as an admin" do
-    before do
-      @student = user_with_pseudonym(:active_user => true)
-      course_with_student(:active_all => true, :user => @student)
-      site_admin_logged_in
-    end
-
-    it "should not show google docs tab for masquerading admin" do
-      PluginSetting.create!(:name => 'google_docs', :settings => :tmp)
-      assignment_model(:course => @course, :submission_types => 'online_upload', :title => 'Assignment 1')
-      get "/users/#{@student.id}/masquerade"
-      f('.masquerade_button').click
-      wait_for_dom_ready
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      wait_for_ajaximations
-
-      f('#sidebar_content .submit_assignment_link').click
-      ff('#submit_google_doc_form').should be_empty
-
-      # navigate off the page and dismiss the alert box to avoid problems
-      # with other selenium tests
-      f('#section-tabs .home').click
-      driver.switch_to.alert.accept
-      driver.switch_to.default_content
     end
   end
 end

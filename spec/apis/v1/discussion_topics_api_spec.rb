@@ -387,21 +387,21 @@ describe DiscussionTopicsController, :type => :integration do
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :per_page => '3'})
 
     json.length.should == 3
-    response.headers['Link'].should == [
-      %{</api/v1/courses/#{@course.id}/discussion_topics?page=2&per_page=3>; rel="next"},
-      %{</api/v1/courses/#{@course.id}/discussion_topics?page=1&per_page=3>; rel="first"},
-      %{</api/v1/courses/#{@course.id}/discussion_topics?page=3&per_page=3>; rel="last"}
-    ].join(',')
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }.should be_true
+    links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
+    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
 
     # get the last page
     json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?page=3&per_page=3",
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :page => '3', :per_page => '3'})
     json.length.should == 1
-    response.headers['Link'].should == [
-      %{</api/v1/courses/#{@course.id}/discussion_topics?page=2&per_page=3>; rel="prev"},
-      %{</api/v1/courses/#{@course.id}/discussion_topics?page=1&per_page=3>; rel="first"},
-      %{</api/v1/courses/#{@course.id}/discussion_topics?page=3&per_page=3>; rel="last"}
-    ].join(',')
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }.should be_true
+    links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2&per_page=3>/
+    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
   end
 
   it "should work with groups" do
@@ -464,21 +464,51 @@ describe DiscussionTopicsController, :type => :integration do
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s, :per_page => '3'})
 
     json.length.should == 3
-    response.headers['Link'].should == [
-      %{</api/v1/groups/#{group.id}/discussion_topics?page=2&per_page=3>; rel="next"},
-      %{</api/v1/groups/#{group.id}/discussion_topics?page=1&per_page=3>; rel="first"},
-      %{</api/v1/groups/#{group.id}/discussion_topics?page=3&per_page=3>; rel="last"}
-    ].join(',')
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }.should be_true
+    links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
+    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
 
       # get the last page
     json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics.json?page=3&per_page=3",
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s, :page => '3', :per_page => '3'})
     json.length.should == 1
-    response.headers['Link'].should == [
-      %{</api/v1/groups/#{group.id}/discussion_topics?page=2&per_page=3>; rel="prev"},
-      %{</api/v1/groups/#{group.id}/discussion_topics?page=1&per_page=3>; rel="first"},
-      %{</api/v1/groups/#{group.id}/discussion_topics?page=3&per_page=3>; rel="last"}
-    ].join(',')
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }.should be_true
+    links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2&per_page=3>/
+    links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+    links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
+  end
+
+  it "should fulfill module viewed requirements when marking a topic read" do
+    @module = @course.context_modules.create!(:name => "some module")
+    @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
+    tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
+    @module.completion_requirements = { tag.id => {:type => 'must_view'} }
+    @module.save!
+    course_with_student(:course => @course)
+
+    @module.evaluate_for(@user).should be_unlocked
+    raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
+                 { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
+                   :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+    @module.evaluate_for(@user).should be_completed
+  end
+
+  it "should fulfill module viewed requirements when marking a topic and all its entries read" do
+    @module = @course.context_modules.create!(:name => "some module")
+    @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
+    tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
+    @module.completion_requirements = { tag.id => {:type => 'must_view'} }
+    @module.save!
+    course_with_student(:course => @course)
+
+    @module.evaluate_for(@user).should be_unlocked
+    raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all",
+                 { :controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
+                   :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+    @module.evaluate_for(@user).should be_completed
   end
 
   context "creating an entry under a topic" do
@@ -690,11 +720,11 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :per_page => '3' })
       json.length.should == 3
       json.map{ |e| e['id'] }.should == entries.last(3).reverse.map{ |e| e.id }
-      response.headers['Link'].should == [
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=2&per_page=3>; rel="next"},
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=1&per_page=3>; rel="first"},
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }.should be_true
+      links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
 
       # last page
       json = api_call(
@@ -703,11 +733,11 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :page => '3', :per_page => '3' })
       json.length.should == 2
       json.map{ |e| e['id'] }.should == [entries.first, @entry].map{ |e| e.id }
-      response.headers['Link'].should == [
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=2&per_page=3>; rel="prev"},
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=1&per_page=3>; rel="first"},
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }.should be_true
+      links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2&per_page=3>/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
     end
 
     it "should only include the first 10 replies for each top-level entry" do
@@ -780,11 +810,11 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :per_page => '3' })
       json.length.should == 3
       json.map{ |e| e['id'] }.should == replies.last(3).reverse.map{ |e| e.id }
-      response.headers['Link'].should == [
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=2&per_page=3>; rel="next"},
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=1&per_page=3>; rel="first"},
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }.should be_true
+      links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
 
       # last page
       json = api_call(
@@ -793,11 +823,11 @@ describe DiscussionTopicsController, :type => :integration do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :page => '3', :per_page => '3' })
       json.length.should == 2
       json.map{ |e| e['id'] }.should == [replies.first, @reply].map{ |e| e.id }
-      response.headers['Link'].should == [
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=2&per_page=3>; rel="prev"},
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=1&per_page=3>; rel="first"},
-        %{</api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies?page=3&per_page=3>; rel="last"}
-      ].join(',')
+      links = response.headers['Link'].split(",")
+      links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }.should be_true
+      links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=2&per_page=3>/
+      links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+      links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3&per_page=3>/
     end
   end
 

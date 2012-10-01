@@ -33,6 +33,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.disableWhileLoading'
   'compiled/jquery.rails_flash_notifications'
+  'compiled/jquery/offsetFrom'
   'media_comments'
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'
@@ -53,6 +54,7 @@ define [
       @$conversations = $('#conversations')
       @$messages = $('#messages')
       @$messageList = @$messages.find('ul.messages')
+      @$others = $('<div class="others" id="others_popup" />')
       @initializeHelp()
       @initializeForms()
       @initializeMenus()
@@ -84,7 +86,8 @@ define [
 
       @resetMessageForm()
       @$form.find('#user_note_info').hide().find('input').attr('checked', false)
-      @$form.show().find(':input:visible:first').focus()
+      @$form.show()
+      @$form.find(':input:visible:first').focus() if window.location.hash isnt ''
 
     resetMessageForm: (resetFields = true) ->
       @$form.find('.audience').html(if c = @conversations.active()
@@ -131,9 +134,8 @@ define [
 
     canAddNotesFor: (user) ->
       return false unless @options.NOTES_ENABLED
-      return true if user.can_add_notes
       for id, roles of user.common_courses
-        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.can_add_notes)
+        return true if 'StudentEnrollment' in roles and (@options.CAN_ADD_NOTES_FOR_ACCOUNT or @contexts.courses[id]?.permissions?.manage_user_notes)
       false
 
     loadConversation: (conversation, $node, cb) ->
@@ -469,8 +471,8 @@ define [
         @openMenu $(e.currentTarget)
 
       $(document).bind 'mousedown', (e) =>
-        unless $(e.target).closest("span.others").find('> span').length
-          $('span.others > span').hide()
+        unless $(e.target).closest("#others_popup").length
+          @$others.hide()
         @closeMenus() unless $(e.target).closest(".menus > li, #conversation_actions, #conversations .actions").length
 
       @$menuViews = $('#menu_views')
@@ -481,14 +483,16 @@ define [
           e.preventDefault()
           @updateHashData scope: scope
 
-      $('#conversations ul, #create_message_form').delegate '.audience', 'click', (e) =>
-        if ($others = $(e.target).closest('span.others').find('> span')).length
-          if not $(e.target).closest('span.others > span').length
-            $('span.others > span').not($others).hide()
-            $others.toggle()
-            $others.css('left', $others.parent().position().left)
-            $others.css('top', $others.parent().height() + $others.parent().position().top)
-          return false
+      $('#conversations ul, #create_message_form').on 'click', '.others', (e) =>
+        $this = $(e.currentTarget)
+        $container = $this.closest('li').offsetParent()
+        offset = $this.offsetFrom($container)
+        @$others.empty().append($this.find('> span').clone()).css
+          left: offset.left
+          top: offset.top + $this.height() + $container.scrollTop()
+          fontSize: $this.css('fontSize')
+        $container.append(@$others.show())
+        return false # i.e. don't select conversation
 
     setScope: (scope) ->
       $items = @$menuViewsList.find('li')
@@ -774,9 +778,9 @@ define [
                   type: 'context'
                   avatar_url: parent.data('user_data').avatar_url
               filterText = if context.match(/^course/)
-                I18n.t('filter_by_course', 'Fiter by this course')
+                I18n.t('filter_by_course', 'Filter by this course')
               else
-                I18n.t('filter_by_group', 'Fiter by this group')
+                I18n.t('filter_by_group', 'Filter by this group')
               data.unshift
                 id: context
                 name: parent.data('text')

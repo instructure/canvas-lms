@@ -57,10 +57,10 @@ describe "concluded/unconcluded" do
     entry = f("#submission_#{@student.id}_#{@assignment.id}")
 
     driver.execute_script("$('#submission_#{@student.id}_#{@assignment.id} .grade').mouseover();")
-    keep_trying_until {
+    keep_trying_until do
       entry.send_keys('i')
-      f("#submission_information").displayed?
-    }
+      f("#submission_information").should be_displayed
+    end
 
     f("#submission_information .add_comment").should be_displayed
     f("#submission_information .save_buttons").should be_displayed

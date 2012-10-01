@@ -4,7 +4,7 @@ shared_examples_for "conversations attachments selenium tests" do
   it_should_behave_like "forked server selenium tests"
   it_should_behave_like "conversations selenium tests"
 
-  it "should be able to add an attachment to the message form" do
+  it "should be able to add an attachment" do
     filename, fullpath, data = get_file("testfile1.txt")
     new_conversation
 
@@ -12,27 +12,6 @@ shared_examples_for "conversations attachments selenium tests" do
     submit_message_form(:attachments => [fullpath])
     @user.conversations.last.has_attachments.should be_true
     @user.conversation_attachments_folder.attachments.count.should == 1
-  end
-
-  it "should be able to add multiple attachments to the message form" do
-    filename1, fullpath1, data1 = get_file("testfile1.txt")
-    filename2, fullpath2, data2 = get_file("testfile2.txt")
-    filename3, fullpath3, data3 = get_file("testfile3.txt")
-    new_conversation
-
-    add_attachment_link = f("#action_add_attachment")
-    add_attachment_link.click
-    wait_for_animations
-    ffj("#create_message_form .file_input:visible")[0].send_keys(fullpath1)
-    add_attachment_link.click
-    wait_for_animations
-    ffj("#create_message_form .file_input:visible")[1].send_keys(fullpath2)
-    add_attachment_link.click
-    wait_for_animations
-    ffj("#create_message_form .file_input:visible")[2].send_keys(fullpath3)
-    ffj("#attachment_list > .attachment:visible").size.should == 3
-    submit_message_form
-    @user.conversation_attachments_folder.attachments.count.should == 3
   end
 
   it "should be able to remove attachments from the message form" do

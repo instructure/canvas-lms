@@ -129,11 +129,11 @@ describe "conversations context filtering" do
     @input = fj("#context_tags_filter input:visible")
     search("the course", "context_tags") { browse("the course") { click("the course") } }
 
-    keep_trying_until {
+    keep_trying_until do
       conversations = get_conversations
       conversations.size.should eql 1
       conversations.first.find_element(:css, 'p').text.should eql 'asdf'
-    }
+    end
   end
 
   it "should let you filter by a user" do

@@ -27,10 +27,11 @@ describe "Alerts" do
     wait_for_animations
     wait_for_ajax_requests
 
-    keep_trying_until{
+    keep_trying_until do
       @alerts.reload
       @alerts.length.should == 1
-    }
+    end
+
     @alerts.first.criteria.length.should == 1
 
     wait_for_animations
@@ -41,10 +42,11 @@ describe "Alerts" do
     wait_for_animations
     wait_for_ajax_requests
 
-    keep_trying_until{
+    keep_trying_until do
       @alerts.first.criteria.reload
       @alerts.first.criteria.length.should == 2
-    }
+    end
+
     @alerts.reload
     @alerts.length.should == 1
 
@@ -55,10 +57,11 @@ describe "Alerts" do
     keep_trying_until { ffj('.alert .criteria li').length == 1 }
     submit.click
 
-    keep_trying_until{
+    keep_trying_until do
       @alerts.first.criteria.reload
       @alerts.first.criteria.length.should == 1
-    }
+    end
+
     @alerts.reload
     @alerts.length.should == 1
 
@@ -68,10 +71,10 @@ describe "Alerts" do
     wait_for_ajaximations
     f('.alert').should_not be_displayed
 
-    keep_trying_until{
+    keep_trying_until do
       @alerts.reload
       @alerts.length.should == 0
-    }
+    end
   end
 
   it "should delete alerts" do
@@ -174,7 +177,7 @@ describe "Alerts" do
     alert.find_element(:css, 'input[name="repetition"][value="none"]').click
     keep_trying_until { ffj('.error_box').length == 3 }
 
-    # adding recipients and criterion make the errors go away
+    # adding recipient and criterion make the errors go away
     alert.find_element(:css, '.add_recipient_link').click
     alert.find_element(:css, '.add_criterion_link').click
     keep_trying_until { ffj('.error_box').length == 1 }

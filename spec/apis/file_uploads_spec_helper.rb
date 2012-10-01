@@ -124,28 +124,6 @@ shared_examples_for "file uploads api" do
     attachment
   end
 
-  it "should filter scribd submits" do
-    s3_storage!
-    Attachment.stubs(:filtering_scribd_submits?).returns(true)
-    scribd_mime_type_model(:extension => 'doc')
-    json = preflight({ :name => "test.doc" })
-    attachment = Attachment.last(:order => :id)
-    expects_job_with_tag('Attachment#submit_to_scribd!', (@always_scribd ? 1 : 0)) do
-      AWS::S3::S3Object.expects(:about).with(attachment.full_filename, attachment.bucket_name).returns({
-        'content-type' => 'application/msword',
-        'content-length' => 1234,
-      })
-      post json['upload_params']['success_action_redirect'], {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
-    end
-    attachment.reload
-    if @always_scribd
-      attachment.should be_pending_upload
-      attachment.should be_scribdable
-    else
-      attachment.should be_processed
-    end
-  end
-
   it "should allow uploading files from a url" do
     filename = "delete.png"
 
