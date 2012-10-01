@@ -1718,6 +1718,8 @@ define([
                 $panel.data('node', node);
                 $panel.show();
                 if ($preview) {
+                  $preview.addClass('file_preview');
+                  $files_content.append($preview);
                   var showPreview = function() {
                     $('#doc_preview_holder').loadDocPreview({
                       mimeType: data.content_type,
@@ -1730,8 +1732,6 @@ define([
                     files.viewFile(data.context_string, data.id);
                   };
                   if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
-                    $preview.addClass('file_preview');
-                    $files_content.append($preview);
                     if (data['crocodoc_available?'] && !data.crocodocSession) {
                       $preview.disableWhileLoading(
                         $.ajaxJSON(
