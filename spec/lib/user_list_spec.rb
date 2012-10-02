@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe UserList do
   
@@ -36,12 +36,12 @@ describe UserList do
     cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
     cc.confirm!
     ul = UserList.new '(801) 555-5555'
-    ul.addresses.should == [{:address => '(801) 555-5555', :type => :sms, :user_id => @user.id, :name => 'JT'}]
+    ul.addresses.should == [{:address => '(801) 555-5555', :type => :sms, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
     ul.errors.should == []
     ul.duplicate_addresses.should == []
 
     ul = UserList.new '8015555555'
-    ul.addresses.should == [{:address => '(801) 555-5555', :type => :sms, :user_id => @user.id, :name => 'JT'}]
+    ul.addresses.should == [{:address => '(801) 555-5555', :type => :sms, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
     ul.errors.should == []
     ul.duplicate_addresses.should == []
   end
@@ -179,7 +179,7 @@ describe UserList do
     @user2 = user_with_pseudonym(:name => 'Bob', :username => 'jt2@instructure.com', :active_all => 1)
     @user2.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
     ul = UserList.new 'jt@instructure.com'
-    ul.addresses.should == [{:type => :pseudonym, :address => 'jt@instructure.com', :user_id => @user1.id, :name => 'JT'}]
+    ul.addresses.should == [{:type => :pseudonym, :address => 'jt@instructure.com', :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
     ul.duplicate_addresses.should == []
   end
 
@@ -188,7 +188,7 @@ describe UserList do
     @user2 = user_with_pseudonym(:name => 'Bob', :username => 'jt2@instructure.com', :active_all => 1)
     @user2.communication_channels.create!(:path => '8015555555@tmomail.net', :path_type => 'sms') { |cc| cc.workflow_state = 'active' }
     ul = UserList.new '8015555555'
-    ul.addresses.should == [{:type => :pseudonym, :address => '8015555555', :user_id => @user1.id, :name => 'JT'}]
+    ul.addresses.should == [{:type => :pseudonym, :address => '8015555555', :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
     ul.duplicate_addresses.should == []
   end
 
@@ -217,7 +217,7 @@ describe UserList do
       user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => 1)
       @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
       ul = UserList.new 'jt@instructure.com'
-      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user1.id, :name => 'JT'}]
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
     end
@@ -238,7 +238,7 @@ describe UserList do
       @user.pseudonyms.create!(:unique_id => 'jt+2@instructure.com')
       @user.communication_channels.create!(:path => 'jt+3@instructure.com') { |cc| cc.workflow_state = 'active' }
       ul = UserList.new 'jt+3@instructure.com'
-      ul.addresses.should == [{:address => 'jt+3@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT'}]
+      ul.addresses.should == [{:address => 'jt+3@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
     end
@@ -248,9 +248,9 @@ describe UserList do
       cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
       cc.confirm
       ul = UserList.new 'jt@instructure.com, (801) 555-5555'
-      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT'}]
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
-      ul.duplicate_addresses.should == [{:address => '(801) 555-5555', :type => :sms, :user_id => @user.id, :name => 'JT'}]
+      ul.duplicate_addresses.should == [{:address => '(801) 555-5555', :type => :sms, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
     end
 
     it "should choose the active CC if there is 1 active and n unconfirmed" do
@@ -260,7 +260,7 @@ describe UserList do
       user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
       @user.communication_channels.create!(:path => 'jt+2@instructure.com')
       ul = UserList.new 'jt+2@instructure.com'
-      ul.addresses.should == [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user1.id, :name => 'JT' }]
+      ul.addresses.should == [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user1.id, :name => 'JT', :shard => Shard.default }]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
     end
@@ -273,13 +273,12 @@ describe UserList do
       user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
       @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
       ul = UserList.new 'jt+2@instructure.com'
-      ul.addresses.should == [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT 1' }]
+      ul.addresses.should == [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT 1', :shard => Shard.default }]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
     end
 
     it "should not find users from untrusted accounts" do
-      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({:conditions => {:account_id => Account.default.id}}))
       account = Account.create!
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
       ul = UserList.new 'jt@instructure.com'
@@ -288,39 +287,39 @@ describe UserList do
     end
 
     it "should find users from trusted accounts" do
-      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({}))
       account = Account.create!
+      Account.default.stubs(:trusted_account_ids).returns([account.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
       ul = UserList.new 'jt@instructure.com'
-      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT'}]
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
     end
 
     it "should prefer a user from the current account instead of a trusted account" do
-      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({}))
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       @user1 = @user
       account = Account.create!
+      Account.default.stubs(:trusted_account_ids).returns([account.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
       ul = UserList.new 'jt@instructure.com'
-      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user1.id, :name => 'JT'}]
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
     end
 
     it "should prefer a user from the current account instead of a trusted account (reverse order)" do
-      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({}))
       account = Account.create!
+      Account.default.stubs(:trusted_account_ids).returns([account.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       ul = UserList.new 'jt@instructure.com'
-      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT'}]
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
     end
 
     it "should not find a user if there is a conflict of unique_ids from not-this-account" do
-      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({}))
       account1 = Account.create!
       account2 = Account.create!
+      Account.default.stubs(:trusted_account_ids).returns([account1.id, account2.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account2)
       ul = UserList.new 'jt@instructure.com'
@@ -329,18 +328,17 @@ describe UserList do
     end
 
     it "should find a user with multiple not-this-account pseudonyms" do
-      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({}))
       account1 = Account.create!
       account2 = Account.create!
+      Account.default.stubs(:trusted_account_ids).returns([account1.id, account2.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
       @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :account => account2)
       ul = UserList.new 'jt@instructure.com'
-      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT'}]
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
     end
 
     it "should not find a user from a different account by SMS" do
-      Pseudonym.stubs(:trusted_by_including_self).with(Account.default).returns(Pseudonym.scoped({:conditions => {:account_id => Account.default.id}}))
       account = Account.create!
       user_with_pseudonym(:name => "JT", :active_all => 1, :account => account)
       cc = @user.communication_channels.create!(:path => '8015555555@txt.att.net', :path_type => 'sms')
@@ -357,7 +355,7 @@ describe UserList do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
       @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
       ul = UserList.new 'jt+2@instructure.com', nil, :preferred
-      ul.addresses.should == [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT'}]
+      ul.addresses.should == [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
       ul.users.should == [@user]
@@ -436,6 +434,22 @@ describe UserList do
       ul.addresses.length.should == 1
       ul.addresses.first[:user_id].should == @user.id
       ul.addresses.first[:type].should == :email
+      ul.users.should == [@user]
+    end
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should find a user from a trusted account in a different shard" do
+      @shard1.activate do
+        @account = Account.create!
+        user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account)
+      end
+      Account.default.stubs(:trusted_account_ids).returns([@account.id])
+      ul = UserList.new 'jt@instructure.com'
+      ul.addresses.should == [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.local_id, :name => 'JT', :shard => @shard1}]
+      ul.errors.should == []
       ul.users.should == [@user]
     end
   end
