@@ -9,7 +9,7 @@
 
   content_for :pre_html do
     @body_class_no_headers = @headers == false
-    @show_fixed_bottom = @fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user && (!@body_class_no_headers || @outer_frame))
+    @show_fixed_bottom = (@fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user)) && (!@body_class_no_headers || @outer_frame)
     @body_classes << "no-headers" if @body_class_no_headers
     unless (@body_classes.include? "no-headers") || (@show_left_side == false)
       left_side = yield :left_side
