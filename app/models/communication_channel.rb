@@ -136,6 +136,10 @@ class CommunicationChannel < ActiveRecord::Base
     self.errors.add(:workflow_state, "Can't remove a user's SMS that is used for one time passwords") if self.id == self.user.otp_communication_channel_id
   end
 
+  def context
+    pseudonym.try(:account)
+  end
+
   # Return the 'path' for simple communication channel types like email and sms. For
   # Facebook and Twitter, return the user's configured user_name for the service.
   def path_description

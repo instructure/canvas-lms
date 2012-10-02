@@ -28,4 +28,8 @@ class Collaborator < ActiveRecord::Base
     p.to { self.collaboration.collaboration_type == 'google_docs' ? self.user.gmail_channel : self.user }
     p.whenever {|record| record.just_created && record.collaboration && record.user != record.collaboration.user }
   end
+
+  def context
+    collaboration.try(:context)
+  end
 end

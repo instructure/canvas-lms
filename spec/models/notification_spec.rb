@@ -192,25 +192,49 @@ describe Notification do
       messages = @notification.create_message(@assignment, @user)
       messages.each {|m| m.subject.should eql("This is 5!")}
     end
-    
-    it "should localize the notification" do
-      notification_set
 
-      I18n.backend.store_translations :piglatin, {:messages => {:test_name => {:email => {:subject => "Isthay isay ivefay!"}}}}
-      @user.browser_locale = 'piglatin'
-      @user.save(false) # the validation was declared before :piglatin was added, so we skip it
-      messages = @notification.create_message(@assignment, @user)
-      messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
-      I18n.locale.should eql(:en)
+    context "localization" do
+      before { notification_set }
 
-      I18n.backend.store_translations :shouty, {:messages => {:test_name => {:email => {:subject => "THIS IS *5*!!!!?!11eleventy1"}}}}
-      @user.locale = 'shouty'
-      @user.save(false)
-      messages = @notification.create_message(@assignment, @user)
-      messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
-      I18n.locale.should eql(:en)
+      it "should respect browser locales" do
+        I18n.backend.store_translations :piglatin, {:messages => {:test_name => {:email => {:subject => "Isthay isay ivefay!"}}}}
+        @user.browser_locale = 'piglatin'
+        @user.save(false) # the validation was declared before :piglatin was added, so we skip it
+        messages = @notification.create_message(@assignment, @user)
+        messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
+        I18n.locale.should eql(:en)
+      end
+
+      it "should respect user locales" do
+        I18n.backend.store_translations :shouty, {:messages => {:test_name => {:email => {:subject => "THIS IS *5*!!!!?!11eleventy1"}}}}
+        @user.locale = 'shouty'
+        @user.save(false)
+        messages = @notification.create_message(@assignment, @user)
+        messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
+        I18n.locale.should eql(:en)
+      end
+
+      it "should respect course locales" do
+        course
+        I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
+        @course.enroll_teacher(@user).accept!
+        @course.update_attribute(:locale, 'es')
+        messages = @notification.create_message(@course, @user)
+        messages.each { |m| m.subject.should eql('El Tigre Chino') }
+        I18n.locale.should eql(:en)
+      end
+
+      it "should respect account locales" do
+        course
+        I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
+        @course.account.update_attribute(:default_locale, 'es')
+        @course.enroll_teacher(@user).accept!
+        messages = @notification.create_message(@course, @user)
+        messages.each { |m| m.subject.should eql('El Tigre Chino') }
+        I18n.locale.should eql(:en)
+      end
     end
-    
+
     it "should not get confused with nil values in the to list" do
       notification_set
       messages = @notification.create_message(@assignment, nil)

@@ -28,6 +28,8 @@ class AccountUser < ActiveRecord::Base
 
   validates_presence_of :account_id, :user_id
 
+  alias_method :context, :account
+
   def update_account_associations_if_changed
     if (self.account_id_changed? || self.user_id_changed?)
       if self.new_record?

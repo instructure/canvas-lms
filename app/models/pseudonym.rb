@@ -41,6 +41,8 @@ class Pseudonym < ActiveRecord::Base
   after_save :update_passwords_on_related_pseudonyms
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
+
+  alias_method :context, :account
   
   include StickySisFields
   are_sis_sticky :unique_id
