@@ -537,6 +537,11 @@ shared_examples_for "all selenium tests" do
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1])).toArray();", selector, scope)
   end
 
+  #pass full selector ex. "#blah td tr" the attibute ex. "style" type and the value ex. "Red"
+  def fba(selector, attrib, value)
+  f("#{selector} [#{attrib}='#{value}']").click
+  end
+
   # pass in an Element pointing to the textarea that is tinified.
   def wait_for_tiny(element)
     # TODO: Better to wait for an event from tiny?

@@ -3,11 +3,11 @@
 .defaultSkin table.mceLayout
   margin: 10px 0
   background-color: transparent
-  tr.mceLast
-    td.mceIframeContainer
-      border: 1px solid #ccc
-      padding: 0
-  tr.mceFirst 
+  border: 0
+  td.mceIframeContainer
+    border: 1px solid #ccc
+    padding: 0
+  tr.mceFirst
     td.mceToolbar
       border: 1px solid #ccc
       border-top-left-radius: 4px
@@ -37,28 +37,20 @@
             padding: 0
             a.mceAction,a.mceOpen
               border-color: #ccc
-//TODO
- check available width to tiny, give it a class to reflect that width and
- adjust margin/padding of buttons to have more space if space is available
 
-.editor_box_resizer
-  position: relative
-  height: 1px
-  width: 100%
-  border-bottom: 1px solid #ccc
-  cursor: s-resize !important
-  -moz-user-select: none
-  div.ui-icon
-    display: block
-    position: absolute
-    background-color: !important
-    height: 16px
-    width: 13px
-    right: 0
-    top: -13px
-    background-position: -64px -224px !important
-    background-image: url(/images/jqueryui/ui-icons_222222_256x240.png) !important
-    cursor: se-resize !important
+  //make the font-size and format dropdowns less wide than default.
+  .mceListBox .mceText
+    width: 52px
 
-
-
+  // tiny normally has a status bar on the bottom that on the left has "Path: h1 » img" and has
+  // a resizer on the right.  This collapses that so the only thing visible is the resizer.
+  .mceStatusbar
+    height: 0
+    border: 0 !important
+    position: relative
+    .mceResize
+      position: absolute
+      right: 0
+      bottom: 0
+    div
+      display: none
