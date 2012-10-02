@@ -35,7 +35,7 @@ class ActiveRecord::Base
     'notification_policies' => %w(user_id),
     'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id crypted_webdav_access_code),
     'role_overrides' => %w(context_code),
-    'users' => %w(type creation_unique_id creation_sis_batch_id creation_email sis_name),
+    'users' => %w(type creation_unique_id creation_sis_batch_id creation_email sis_name bio),
     'quizzes' => %w(root_quiz_id),
   }.freeze
 
