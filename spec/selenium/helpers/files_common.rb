@@ -57,5 +57,10 @@ shared_examples_for "files selenium shared" do
       resp.code.should == "200"
     end
   end
+
+  def make_folder_actions_visible
+    driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
+  end
+
 end
 
