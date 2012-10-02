@@ -66,7 +66,7 @@ class AccountsController < ApplicationController
   # Retrieve the list of courses in this account.
   #
   # @argument hide_enrollmentless_courses [optional] If set, only return courses that have at least one enrollment.
-  # @argument state[] [optional] If set, only return courses that are in the given state[s]. Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
+  # @argument state[] [optional] If set, only return courses that are in the given state(s). Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
   #
   # @example_response
   #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'sis_course_id': 'first-sis' },

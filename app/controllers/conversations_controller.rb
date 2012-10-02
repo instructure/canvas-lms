@@ -275,7 +275,7 @@ class ConversationsController < ApplicationController
   #   attachments:: Array of attachments for this message. Fields include: display_name, content-type, filename, url
   # @response_field submissions Array of assignment submissions having
   #   comments relevant to this conversation. These should be interleaved with
-  #   the messages when displaying to the user. See the {api:SubmissionsApiController Submissions API documentation}
+  #   the messages when displaying to the user. See the {api:SubmissionsApiController#index Submissions API documentation}
   #   for details on the fields included. This response includes
   #   the submission_comments and assignment associations.
   #
