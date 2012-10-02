@@ -469,7 +469,7 @@ class GroupsController < ApplicationController
     find_group
     if authorized_action(@group, @current_user, :manage)
       root_account = @group.context.try(:root_account) || @domain_root_account
-      ul = UserList.new(params[:invitees], root_account, :preferred)
+      ul = UserList.new(params[:invitees], :root_account => root_account, :search_method => :preferred)
       @memberships = []
       ul.users.each{ |u| @memberships << @group.invite_user(u) }
       render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }

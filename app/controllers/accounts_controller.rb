@@ -362,7 +362,9 @@ class AccountsController < ApplicationController
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      list = UserList.new(params[:user_list], @context.root_account, @context.user_list_search_mode_for(@current_user))
+      list = UserList.new(params[:user_list],
+                          :root_account => @context.root_account,
+                          :search_method => @context.user_list_search_mode_for(@current_user))
       users = list.users
       account_users = users.map do |user|
         admin = user.flag_as_admin(@context, params[:membership_type])

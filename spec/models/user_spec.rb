@@ -1893,6 +1893,24 @@ describe User do
     end
   end
 
+  describe ".initial_enrollment_type_from_type" do
+    it "should return supported initial_enrollment_type values" do
+      User.initial_enrollment_type_from_text('StudentEnrollment').should == 'student'
+      User.initial_enrollment_type_from_text('StudentViewEnrollment').should == 'student'
+      User.initial_enrollment_type_from_text('TeacherEnrollment').should == 'teacher'
+      User.initial_enrollment_type_from_text('TaEnrollment').should == 'ta'
+      User.initial_enrollment_type_from_text('ObserverEnrollment').should == 'observer'
+      User.initial_enrollment_type_from_text('DesignerEnrollment').should be_nil
+      User.initial_enrollment_type_from_text('UnknownThing').should be_nil
+      User.initial_enrollment_type_from_text(nil).should be_nil
+      # Non-enrollment type strings
+      User.initial_enrollment_type_from_text('student').should == 'student'
+      User.initial_enrollment_type_from_text('teacher').should == 'teacher'
+      User.initial_enrollment_type_from_text('ta').should == 'ta'
+      User.initial_enrollment_type_from_text('observer').should == 'observer'
+    end
+  end
+
   describe "accounts" do
     it_should_behave_like "sharding"
 

@@ -557,6 +557,15 @@ describe CoursesController do
       @course.students.map{|s| s.name}.should be_include("Fred")
     end
 
+    it "should record initial_enrollment_type on new users" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>", :enrollment_type => 'ObserverEnrollment'
+      response.should be_success
+      @course.reload
+      @course.observers.count.should == 1
+      @course.observers.first.initial_enrollment_type.should == 'observer'
+    end
+
     it "should allow TAs to enroll Observers (by default)" do
       course_with_teacher(:active_all => true)
       @user = user

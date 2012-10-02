@@ -2646,6 +2646,18 @@ class User < ActiveRecord::Base
     [start_hour, end_hour]
   end
 
+  # Given a text string, return a value suitable for the user's initial_enrollment_type.
+  # It supports strings formatted as enrollment types like "StudentEnrollment" and
+  # it also supports text like "student", "teacher", "observer" and "ta".
+  #
+  # Any unsupported types have +nil+ returned.
+  def self.initial_enrollment_type_from_text(type)
+    # Convert the string "StudentEnrollment" to "student".
+    # Return only valid matching types. Otherwise, nil.
+    type = type.to_s.downcase.sub(/(view)?enrollment/, '')
+    %w{student teacher ta observer}.include?(type) ? type : nil
+  end
+
   def associated_shards
     [Shard.default]
   end

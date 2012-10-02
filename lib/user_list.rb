@@ -18,20 +18,41 @@
 #
 
 class UserList
-  # list_in is either a comma/semi-colon/newline separated string or an array of paths
+  # Initialize a new UserList.
+  #
   # open_registration is true, false, or nil. if nil, it defaults to root_account.open_registration?
-  # search_method configures how e-mails are handled
-  #   :open e-mails that don't match a pseudonym always create temporary users
-  #   :closed e-mails must belong to a user
-  #   :preferred if the e-mail belongs to a single user, that user is used. otherwise a temporary user is created
-  #   :infer :open or :closed according to root_account.open_registration
-  def initialize(list_in, root_account = nil, search_method = :infer)
+  #
+  # ==== Arguments
+  # * <tt>list_in</tt> - either a comma/semi-colon/newline separated string or an array of paths
+  # * <tt>options</tt> - a hash of additional optional data.
+  #
+  # ==== Options
+  # * <tt>:search_method</tt> - configures how e-mails are handled. Defaults to :infer.
+  # * <tt>:root_account</tt> - the account to use as the root account. Defaults to Account.default
+  # * <tt>:initial_type</tt> - the initial enrollment type used for creating any new users.
+  #                            Value is used when setting a new user's 'initial_enrollment_type'.
+  #                            Defaults to +nil+.
+  #
+  # ==== Search Methods
+  # The supported list of search methods.
+  #
+  # * <tt>:open</tt> - e-mails that don't match a pseudonym always create temporary users
+  # * <tt>:closed</tt> - e-mails must belong to a user
+  # * <tt>:preferred</tt> - if the e-mail belongs to a single user, that user
+  #                         is used. otherwise a temporary user is created
+  # * <tt>:infer</tt> - uses :open or :closed according to root_account.open_registration
+  #
+  def initialize(list_in, options = {})
+    options.reverse_merge! :root_account => Account.default,
+                           :search_method => :infer,
+                           :initial_type => nil
+    @options = options
     @addresses = []
     @errors = []
     @duplicate_addresses = []
-    @root_account = root_account || Account.default
-    @search_method = search_method
-    @search_method = (@root_account.open_registration? ? :open : :closed) if search_method == :infer
+    @root_account = @options[:root_account]
+    @search_method = @options[:search_method]
+    @search_method = (@root_account.open_registration? ? :open : :closed) if @search_method == :infer
     parse_list(list_in)
     resolve
   end
@@ -57,6 +78,7 @@ class UserList
       user = User.new(:name => a[:name] || a[:address])
       user.communication_channels.build(:path => a[:address], :path_type => 'email')
       user.workflow_state = 'creation_pending'
+      user.initial_enrollment_type = User.initial_enrollment_type_from_text(@options[:initial_type])
       user.save!
       user
     end

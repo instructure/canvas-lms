@@ -88,7 +88,7 @@ describe UserList do
     user.pseudonyms.create!(:unique_id => "A123451", :account => @account)
     user = User.create!(:name => 'user 3')
     user.pseudonyms.create!(:unique_id => "user3", :account => @account)
-    ul = UserList.new regular + "," + without_brackets + ", A123451, user3, A123451, user3", @account
+    ul = UserList.new regular + "," + without_brackets + ", A123451, user3, A123451, user3", :root_account => @account
     ul.addresses.map{|x| [x[:name], x[:address], x[:type]]}.should eql([
         ["Shaw, Ryan", "ryankshaw@gmail.com", :email],
         ["Last, First", "lastfirst@gmail.com", :email],
@@ -101,7 +101,7 @@ describe UserList do
         ['A 123451', "A123451", :pseudonym],
         ['user 3', "user3", :pseudonym]])
 
-    ul = UserList.new regular + ",A123451 ,user3 ," + without_brackets + ", A123451, user3", @account
+    ul = UserList.new regular + ",A123451 ,user3 ," + without_brackets + ", A123451, user3", :root_account => @account
     ul.addresses.map{|x| [x[:name], x[:address], x[:type]]}.should eql([
         ["Shaw, Ryan", "ryankshaw@gmail.com", :email],
         ["Last, First", "lastfirst@gmail.com", :email],
@@ -125,7 +125,7 @@ describe UserList do
     user.pseudonyms.create!(:unique_id => "user4", :account => @account)
     user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
 
-    ul = UserList.new 'JT@INSTRUCTURE.COM, USER3', @account
+    ul = UserList.new 'JT@INSTRUCTURE.COM, USER3', :root_account => @account
     ul.addresses.map{|x| [x[:name], x[:address], x[:type]]}.should eql([
         ['user 4', 'jt@instructure.com', :email],
         ['user 3', 'user3', :pseudonym]])
@@ -143,7 +143,7 @@ describe UserList do
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
     user = User.create!(:name => 'user 1')
     user.pseudonyms.create!(:unique_id => "user1", :account => @account)
-    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>}, @account
+    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>}, :root_account => @account
     ul.addresses.map{|x| [x[:name], x[:address], x[:type]]}.should eql([
         ["Shaw, Ryan", "ryankshaw@gmail.com", :email],
         ["Last, First", "lastfirst@gmail.com", :email],
@@ -161,7 +161,7 @@ describe UserList do
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
     user = User.create!(:name => 'user 1')
     user.pseudonyms.create!(:unique_id => "user1", :account => @account)
-    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>,A4513454}, @account
+    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>,A4513454}, :root_account => @account
     ul.addresses.map{|x| [x[:name], x[:address], x[:type]]}.should eql([
         ["Shaw, Ryan", "ryankshaw@gmail.com", :email],
         ["Last, First", "lastfirst@gmail.com", :email],
@@ -193,7 +193,8 @@ describe UserList do
   end
 
   it "should work with a list of paths" do
-    ul = UserList.new(['leonard@example.com', 'sheldon@example.com'], @account, :preferred)
+    ul = UserList.new(['leonard@example.com', 'sheldon@example.com'],
+                      :root_account => @account, :search_method => :preferred)
     ul.addresses.count.should == 2
     expect { ul.users }.to change(User, :count).by(2)
   end
@@ -354,7 +355,7 @@ describe UserList do
     it "should find an existing user if there is only one" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
       @user.communication_channels.create!(:path => 'jt+2@instructure.com') { |cc| cc.workflow_state = 'active' }
-      ul = UserList.new 'jt+2@instructure.com', nil, :preferred
+      ul = UserList.new 'jt+2@instructure.com', :search_method => :preferred
       ul.addresses.should == [{:address => 'jt+2@instructure.com', :type => :email, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
@@ -362,7 +363,7 @@ describe UserList do
     end
 
     it "should create a new user if none exists" do
-      ul = UserList.new 'jt@instructure.com', nil, :preferred
+      ul = UserList.new 'jt@instructure.com', :search_method => :preferred
       ul.addresses.should == [{:address => 'jt@instructure.com', :type => :email, :name => nil}]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
@@ -373,7 +374,7 @@ describe UserList do
       @user2 = user_with_pseudonym(:name => 'JT', :username => 'jt+2@instructure.com')
       @user1.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
       @user2.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
-      ul = UserList.new 'jt@instructure.com', nil, :preferred
+      ul = UserList.new 'jt@instructure.com', :search_method => :preferred
       ul.addresses.should == [{:address => 'jt@instructure.com', :type => :email, :details => :non_unique}]
       ul.errors.should == []
       ul.duplicate_addresses.should == []
@@ -384,7 +385,7 @@ describe UserList do
     end
 
     it "should not create a new user for non-matching non-email" do
-      ul = UserList.new 'jt', nil, :preferred
+      ul = UserList.new 'jt', :search_method => :preferred
       ul.addresses.should == []
       ul.errors.should == [{:address => 'jt', :type => :pseudonym, :details => :not_found}]
       ul.duplicate_addresses.should == []
@@ -430,11 +431,45 @@ describe UserList do
     it "should not create new users for users found by email" do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
       @pseudonym.update_attribute(:unique_id, 'jt')
-      ul = UserList.new 'jt@instructure.com', Account.default, :closed
+      ul = UserList.new 'jt@instructure.com', :root_account => Account.default, :search_method => :closed
       ul.addresses.length.should == 1
       ul.addresses.first[:user_id].should == @user.id
       ul.addresses.first[:type].should == :email
       ul.users.should == [@user]
+    end
+
+    it "should default initial_enrollment_type for new users" do
+      ul = UserList.new 'student1@instructure.com', :initial_type => 'StudentEnrollment'
+      ul.users.first.initial_enrollment_type.should == 'student'
+      ul = UserList.new 'student1@instructure.com', :initial_type => 'student'
+      ul.users.first.initial_enrollment_type.should == 'student'
+      #
+      ul = UserList.new 'observer1@instructure.com', :initial_type => 'StudentViewEnrollment'
+      ul.users.first.initial_enrollment_type.should == 'student'
+      #
+      ul = UserList.new 'teacher1@instructure.com', :initial_type => 'TeacherEnrollment'
+      ul.users.first.initial_enrollment_type.should == 'teacher'
+      ul = UserList.new 'teacher1@instructure.com', :initial_type => 'teacher'
+      ul.users.first.initial_enrollment_type.should == 'teacher'
+      #
+      ul = UserList.new 'ta1@instructure.com', :initial_type => 'TaEnrollment'
+      ul.users.first.initial_enrollment_type.should == 'ta'
+      ul = UserList.new 'ta1@instructure.com', :initial_type => 'ta'
+      ul.users.first.initial_enrollment_type.should == 'ta'
+      #
+      ul = UserList.new 'observer1@instructure.com', :initial_type => 'ObserverEnrollment'
+      ul.users.first.initial_enrollment_type.should == 'observer'
+      ul = UserList.new 'observer1@instructure.com', :initial_type => 'observer'
+      ul.users.first.initial_enrollment_type.should == 'observer'
+      #
+      ul = UserList.new 'designer1@instructure.com', :initial_type => 'DesignerEnrollment'
+      ul.users.first.initial_enrollment_type.should be_nil
+      #
+      ul = UserList.new 'unknown1@instructure.com', :initial_type => 'UnknownThing'
+      ul.users.first.initial_enrollment_type.should be_nil
+      # Left blank/default
+      ul = UserList.new 'unknown1@instructure.com'
+      ul.users.first.initial_enrollment_type.should be_nil
     end
   end
 
