@@ -140,6 +140,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def overridden_for(user)
+    AssignmentOverrideApplicator.assignment_overridden_for(self, user)
+  end
+
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
     if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
       # handle if it has already come due, but has not yet been auto_peer_reviewed

@@ -575,6 +575,22 @@ describe Assignment do
     end
   end
 
+  it "should respond to #overridden_for(user)" do
+    student_in_course
+    @assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
+
+    @override = assignment_override_model(:assignment => @assignment)
+    @override.override_due_at(7.days.from_now)
+    @override.save!
+
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+
+    @overridden = @assignment.overridden_for(@student)
+    @overridden.due_at.should == @override.due_at
+  end
+
   context "concurrent inserts" do
     def concurrent_inserts
       assignment_model
