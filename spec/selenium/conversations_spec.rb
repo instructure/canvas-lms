@@ -272,4 +272,29 @@ describe "conversations" do
       get_conversations(false).should be_empty
     end
   end
+
+  context "bulk popovers" do
+    before (:each) do
+      @number_of_people = 10
+      @conversation_students = []
+      @number_of_people.times do |i|
+        u = User.create!(:name => "conversation student #{i}")
+        @course.enroll_user(u, "StudentEnrollment").accept!
+        @conversation_students << u
+      end
+    end
+
+    it "should validate the others popover" do
+      new_conversation
+      @conversation_students.each { |student| add_recipient(student.name) }
+      f("#create_message_form .conversation_body").send_keys "testing testing"
+      f('.group_conversation').click
+      submit_form('#create_message_form')
+      wait_for_ajaximations
+      run_jobs
+      f('.others').click
+      f('#others_popup').should be_displayed
+      ff('#others_popup li').count.should == (@conversation_students.count - 2) # - 2 because the first 2 show up in the conversation summary
+    end
+  end
 end
