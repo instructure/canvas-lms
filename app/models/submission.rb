@@ -437,7 +437,7 @@ class Submission < ActiveRecord::Base
       attachments.each do |a|
         a.send_later_enqueue_args :submit_to_crocodoc,
           :n_strand     => 'crocodoc',
-          :max_attempts => 5,
+          :max_attempts => 1,
           :priority => Delayed::LOW_PRIORITY
       end
     end
