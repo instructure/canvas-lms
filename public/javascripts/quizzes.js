@@ -418,7 +418,8 @@ define([
           }
           if (data.answer_weight > 0) { hadOne = true; }
           var $displayAnswer = makeDisplayAnswer(data, escaped);
-          $question.find(".answers").append($displayAnswer);
+          // must use > in selector
+          $question.find(".text > .answers").append($displayAnswer);
           var $option = $(document.createElement("option"));
           $option.val("option_" + i).text(data.answer_text);
           $select.append($option);
@@ -837,7 +838,8 @@ define([
         });
       }
       if (question.question_type != 'calculated_question') {
-        $question.find(".answer").each(function() {
+        // must use > in selector
+        $question.find(".text > .answers .answer").each(function() {
           var $answer = $(this);
           var answerData = $answer.getTemplateData({
             textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment'],
@@ -1384,7 +1386,8 @@ define([
         $form.triggerHandler('settings_change', false);
         $formQuestion.triggerHandler('recompute_variables', true);
       } else {
-        $question.find(".answers .answer").each(function() {
+        // must use > in selector
+        $question.find(".text > .answers .answer").each(function() {
           var answer = $(this).getTemplateData({
             textValues: data.textValues,
             htmlValues: data.htmlValues

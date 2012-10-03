@@ -47,6 +47,27 @@ describe "quizzes questions" do
       question.find_elements(:css, '.answers .answer').length.should == 3
     end
 
+    it "should ignore html added in the quiz description" do
+      bad_html = '<div id="question_16740547_question_text" class="question_text user_content enhanced">
+                    <p>For Mead, what is the "essence" of the self?</p>
+                  </div>
+                  <div class="answers">
+                    <div class="answers_wrapper">
+                      <div id="answer_6949" class="answer answer_for_      correct_answer hover">&nbsp;</div>
+                    </div>
+                  </div>'
+
+      quiz = start_quiz_question
+
+      question = fj(".question_form:visible")
+      click_option('.question_form:visible .question_type', 'True/False')
+      type_in_tiny '.question:visible textarea.question_content', bad_html
+      submit_form(question)
+
+      hover_and_click(".edit_question_link")
+      ffj(".question_form:visible .form_answers .answer").size.should == 2
+    end
+
     it "should not show 'Missing Word' option in question types dropdown" do
       get "/courses/#{@course.id}/quizzes/new"
 
