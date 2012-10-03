@@ -465,6 +465,9 @@ class Submission < ActiveRecord::Base
       self.attempt += 1 if self.submitted_at_changed?
       self.attempt = 1 if self.attempt < 1
     end
+    if self.submission_type == 'media_recording' && !self.media_comment_id
+      raise "Can't create media submission without media object"
+    end
     if self.submission_type == 'online_quiz'
       self.quiz_submission ||= QuizSubmission.find_by_submission_id(self.id) rescue nil
       self.quiz_submission ||= QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil

@@ -44,6 +44,16 @@ describe "submissions" do
       submit_form('#submit_media_recording_form')
     end
 
+    it "should not allow blank media submission" do
+      stub_kaltura
+      create_assignment_and_go_to_page 'media_recording'
+      f(".submit_assignment_link").click
+      f('#media_comment_submit_button').attribute('disabled').should == 'true'
+      # leave so the "are you sure?!" message doesn't freeze up selenium
+      f('#section-tabs .home').click
+      driver.switch_to.alert.accept
+    end
+
     it "should allow you to submit a file" do
       @assignment.submission_types = 'online_upload'
       @assignment.save!
