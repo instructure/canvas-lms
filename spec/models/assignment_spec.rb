@@ -417,18 +417,162 @@ describe Assignment do
     end
   end
 
-  it "should treat 11:59pm as an all_day" do
-    assignment_model(:due_at => "Sep 4 2008 11:59pm")
-    @assignment.all_day.should eql(true)
-    @assignment.due_at.strftime("%H:%M").should eql("23:59")
-    @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
+  describe "all_day and all_day_date from due_at" do
+    def fancy_midnight(opts={})
+      zone = opts[:zone] || Time.zone
+      Time.use_zone(zone) do
+        time = opts[:time] || Time.zone.now
+        time.in_time_zone.midnight + 1.day - 1.minute
+      end
+    end
+
+    before :each do
+      @assignment = assignment_model
+    end
+
+    it "should interpret 11:59pm as all day with no prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should interpret 11:59pm as all day with same-tz all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.day
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should interpret 11:59pm as all day with other-tz all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Baghdad')
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should interpret 11:59pm as all day with non-all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should not interpret non-11:59pm as all day no prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should not interpret non-11:59pm as all day with same-tz all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should not interpret non-11:59pm as all day with other-tz all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Baghdad')
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should not interpret non-11:59pm as all day with non-all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 2.hour
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should preserve all-day when only changing time zone" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should preserve non-all-day when only changing time zone" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should determine date from due_at's timezone" do
+      @assignment.due_at = Date.today.in_time_zone('Baghdad') + 1.hour # 01:00:00 AST +03:00 today
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.all_day_date.should == Date.today
+
+      @assignment.due_at = @assignment.due_at.in_time_zone('Alaska') - 2.hours # 12:00:00 AKDT -08:00 previous day
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day_date.should == Date.today - 1.day
+    end
+
+    it "should preserve all-day date when only changing time zone" do
+      @assignment.due_at = Date.today.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.due_at = @assignment.due_at.in_time_zone('Alaska') # 13:00:00 AKDT -08:00 previous day
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day_date.should == Date.today
+    end
+
+    it "should preserve non-all-day date when only changing time zone" do
+      @assignment.due_at = Date.today.in_time_zone('Alaska') - 11.hours # 13:00:00 AKDT -08:00 previous day
+      @assignment.save!
+      @assignment.due_at = @assignment.due_at.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.all_day_date.should == Date.today - 1.day
+    end
   end
 
-  it "should not be set to all_day if a time is specified" do
-    assignment_model(:due_at => "Sep 4 2008 11:58pm")
-    @assignment.all_day.should eql(false)
-    @assignment.due_at.strftime("%H:%M").should eql("23:58")
-    @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
+  it "should destroy group overrides when the group category changes" do
+    @assignment = assignment_model
+    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.save!
+
+    overrides = 5.times.map do
+      override = @assignment.assignment_overrides.build
+      override.set = @assignment.group_category.groups.create!
+      override.save!
+
+      override.workflow_state.should == 'active'
+      override
+    end
+
+    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.save!
+
+    overrides.each do |override|
+      override.reload
+
+      override.workflow_state.should == 'deleted'
+      override.versions.size.should == 2
+      override.assignment_version.should == @assignment.version_number
+    end
   end
 
   context "concurrent inserts" do

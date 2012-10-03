@@ -50,6 +50,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
   has_many :assignment_reminders, :dependent => :destroy
+  has_many :assignment_overrides, :dependent => :destroy
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
@@ -128,7 +129,16 @@ class Assignment < ActiveRecord::Base
                 :clear_unannounced_grading_changes_if_just_unpublished,
                 :schedule_do_auto_peer_review_job_if_automatic_peer_review,
                 :delete_empty_abandoned_children,
-                :remove_assignment_updated_flag
+                :remove_assignment_updated_flag,
+                :validate_assignment_overrides
+
+  def validate_assignment_overrides
+    if group_category_id_changed? 
+      # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
+      # 'deleted') so that the override gets versioned properly
+      assignment_overrides.active.scoped(:conditions => {:set_type => 'Group'}).each(&:destroy)
+    end
+  end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
     if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
@@ -213,26 +223,41 @@ class Assignment < ActiveRecord::Base
     write_attribute :turnitin_settings, settings
   end
 
+  def self.all_day_interpretation(opts={})
+    if opts[:due_at]
+      if opts[:due_at] == opts[:due_at_was]
+        # (comparison is modulo time zone) no real change, leave as was
+        return opts[:all_day_was], opts[:all_day_date_was]
+      else
+        # 'normal' case. compare due_at to fancy midnight and extract its
+        # date-part
+        return (opts[:due_at].strftime("%H:%M") == '23:59'), opts[:due_at].to_date
+      end
+    else
+      # no due at = all_day and all_day_date are irrelevant
+      return nil, nil
+    end
+  end
+
   def default_values
     raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= (self.assignment_group.default_assignment_name rescue nil) || "Assignment"
     self.grading_type = "pass_fail" if self.submission_types == "attendance"
-    zoned_due_at = self.due_at && ActiveSupport::TimeWithZone.new(self.due_at.utc, (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone)
-    if self.due_at_changed?
-      if zoned_due_at && zoned_due_at.strftime("%H:%M") == '23:59'
-        self.all_day = true
-      elsif self.due_at && self.due_at_was && self.all_day && self.due_at.strftime("%H:%M") == self.due_at_was.strftime("%H:%M")
-        self.all_day = true
-      else
-        self.all_day = false
-      end
-    end
+
+    # make the comparison to "fancy midnight" and the date-part extraction in
+    # the time zone that was active during editing
+    time_zone = (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone
+    self.all_day, self.all_day_date = Assignment.all_day_interpretation(
+      :due_at => self.due_at ? self.due_at.in_time_zone(time_zone) : nil,
+      :due_at_was => self.due_at_was,
+      :all_day_was => self.all_day_was,
+      :all_day_date_was => self.all_day_date_was)
+
     if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
       self.assignment_group = self.context.assignment_groups.active.first || self.context.assignment_groups.create!
     end
     self.mastery_score = [self.mastery_score, self.points_possible].min if self.mastery_score && self.points_possible
-    self.all_day_date = (zoned_due_at.to_date rescue nil) if !self.all_day_date || self.due_at_changed? || self.all_day_date_changed?
     self.submission_types ||= "none"
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
     @workflow_state_was = self.workflow_state_was
