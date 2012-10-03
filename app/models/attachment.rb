@@ -27,6 +27,7 @@ class Attachment < ActiveRecord::Base
   include ContextModuleItem
 
   MAX_SCRIBD_ATTEMPTS = 3
+  MAX_CROCODOC_ATTEMPTS = 2
   # This value is used as a flag for when we are skipping the submit to scribd for this attachment
   SKIPPED_SCRIBD_ATTEMPTS = 25
 
@@ -1313,7 +1314,7 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def submit_to_crocodoc
+  def submit_to_crocodoc(attempt = 1)
     if crocodocable? && !Attachment.skip_3rd_party_submits?
       crocodoc = crocodoc_document || create_crocodoc_document
       crocodoc.upload
@@ -1322,6 +1323,15 @@ class Attachment < ActiveRecord::Base
   rescue => e
     update_attribute(:workflow_state, 'errored')
     ErrorReport.log_exception(:crocodoc, e, :attachment_id => id)
+
+    if attempt < MAX_CROCODOC_ATTEMPTS
+      send_later_enqueue_args :submit_to_crocodoc, {
+        :n_strand => 'crocodoc_retries',
+        :run_at => 30.seconds.from_now,
+        :max_attempts => 1,
+        :priority => Delayed::LOW_PRIORITY,
+      }, attempt + 1
+    end
   end
 
   def resubmit_to_scribd!
