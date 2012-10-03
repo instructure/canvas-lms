@@ -49,7 +49,7 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
       yield
     ensure
       self.environment = old_environment
-      ActiveRecord::Base.connection_handler = @connection_handlers[old_environment] unless Rails.env.test?
+      ActiveRecord::Base.connection_handler = self.ensure_handler unless Rails.env.test?
     end
   end
 
