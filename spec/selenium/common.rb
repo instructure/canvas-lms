@@ -734,7 +734,13 @@ shared_examples_for "all selenium tests" do
   # can pass in either an element or a forms css
   def submit_form(form)
     submit_button_css = 'button[type="submit"]'
-    form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css).click : f("#{form} #{submit_button_css}").click
+    button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
+    # the button may have been hidden via fixDialogButtons
+    if !button.displayed? && dialog = button.find_element(:xpath, "ancestor::div[contains(@class, 'ui-dialog')]")
+      submit_dialog(dialog, ".ui-dialog-buttonpane .button_type_submit")
+    else
+      button.click
+    end
   end
 
   def submit_dialog(dialog, submit_button_css = '.submit_button')
