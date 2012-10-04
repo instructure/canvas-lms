@@ -42,7 +42,9 @@
       <% if report.user_id %>
         <%= before_label :user, "user" %> <%= link_to report.user.try(:name), user_url(report.user_id) %><br />
       <% end %>
-      <%= before_label :url, "url" %> <%= report.url %><br/>
+      <% if report.url.present? %>
+        <%= before_label :url, "url" %> <%= link_to report.url, report.url %><br/>
+      <% end %>
       <% if report.request_context_id %>
         <%= before_label :request_context_id, "request context id" %> <%= report.request_context_id %>
       <% end %>
