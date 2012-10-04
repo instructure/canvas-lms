@@ -74,6 +74,13 @@ describe Sanitize do
     res.should match(/width/)
   end
   
+  it "should allow negative values" do
+    str = "<div style='margin: -18px;height: 10px;'></div>"
+    res = Sanitize.clean(str, Instructure::SanitizeField::SANITIZE)
+    res.should match(/margin/)
+    res.should match(/height/)
+  end
+
   it "should remove non-whitelisted css attributes" do
     str = "<div style='bacon: 5px; border-left-color: #fff;'></div>"
     res = Sanitize.clean(str, Instructure::SanitizeField::SANITIZE)
