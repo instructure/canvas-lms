@@ -79,9 +79,9 @@ describe "admin settings tabs" do
 
     def add_announcement
       fj(".element_toggler:visible").click
-      subject = "This is a file"
+      subject = "This is a date change"
       f("#account_notification_subject").send_keys(subject)
-      f("#account_notification_icon .file").click
+      f("#account_notification_icon .calendar").click
       ff("#add_notification_form .ui-datepicker-trigger")[0].click
       today = date_chooser
       ff("#add_notification_form .ui-datepicker-trigger")[1].click

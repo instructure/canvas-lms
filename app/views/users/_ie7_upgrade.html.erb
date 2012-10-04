@@ -1,24 +1,26 @@
 <!--[if IE 7 ]>
-  <div class="communication_message dashboard_notification">
-    <div class="header">
-      <div class="header_title">
-        <%= image_tag "warning.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
-        <span class="title subject"><%= link_to(t('browser_upgrade', 'You should upgrade your browser'), 'http://www.beautyoftheweb.com/#/download', :class => 'not_external') %></span>
-        <div class="sub_title">
-          <span class="context_code"><%= t('information', 'Information') %></span>
-        </div>
-      </div>
-      <div style="clear: left;"></div>
+<div class="global-message image-block">
+  <div class="image-block-image">
+    <i class="warning-icon"></i>
+    <span class="hidden-inline-text">
+      <%= accessible_message_icon_text("warning") %>
+    </span>
+  </div>
+  <div class="image-block-content">
+    <div class="title">
+      <%= link_to(t('browser_upgrade', 'You should upgrade your browser'), 'http://www.beautyoftheweb.com/#/download', :class => 'not_external') %>
     </div>
-    <div class="content">
-      <div class="message user_content">
-        <%= t('ie7_really_is_old', "You are using Internet Explorer 7.  This browser
-        is not fully supported by Canvas (and many other web sites) and you should
-        %{link}.  Until you upgrade, some portions of Canvas will not be fully functional.", 
-        :link => link_to(t('consider_upgrading_browser', 'consider upgrading'), 'http://www.beautyoftheweb.com/#/download')) 
-        %>
-      </div>
-      <div class="clear"></div>
+    <div class="message">
+      <p><%= t 'upgrade_ie7', <<-BODY
+      You are using Internet Explorer 7.  This browser is not fully supported by
+      Canvas (and many other web sites) and you should consider upgrading.
+      Until you upgrade, some portions of Canvas will not be fully functional.
+      BODY
+      %></p>
+    </div>
+    <div class="buttons">
+      <%= link_to(t('buttons.upgrade', "Upgrade"), 'http://www.beautyoftheweb.com/#/download', :class => "btn btn-primary not_external", :role => "button") %>
     </div>
   </div>
+</div>
 <![endif]-->

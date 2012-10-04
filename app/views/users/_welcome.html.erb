@@ -1,0 +1,23 @@
+<% if show_welcome_message? %>
+<div class="global-message image-block">
+  <div class="image-block-image">
+    <i class="information-icon"></i>
+    <span class="hidden-inline-text">
+      <%= accessible_message_icon_text("information") %>
+    </span>
+  </div>
+  <div class="image-block-content">
+    <div class="title">
+      <%= t('welcome_to_happiness', 'Welcome to Canvas!') %>
+    </div>
+    <div class="message">
+      <p><%= t 'no_courses_message', <<-BODY
+      You don't have any courses, so this page won't be very exciting for now.
+      Once you've created or signed up for courses, you'll start to see
+      conversations from all of your classes.
+      BODY
+      %></p>
+    </div>
+  </div>
+</div>
+<% end %>

@@ -49,7 +49,10 @@ stylesheets:
     - public/stylesheets/compiled/views/KollectionItems/ShowView.css
     - public/stylesheets/compiled/views/CommentsView.css
   dashboard:
-    - public/stylesheets/compiled/dashboard.css
+    - public/stylesheets/compiled/dashboard_messages.css
+    - public/stylesheets/compiled/dashboard_activity.css
+  dashboard2:
+    - public/stylesheets/compiled/dashboard2.css
     - public/stylesheets/compiled/quick_start_bar.css
     - public/stylesheets/compiled/activity_feed.css
   registration:
@@ -58,10 +61,6 @@ stylesheets:
     - public/stylesheets/compiled/profile/show.css
   profile_edit:
     - public/stylesheets/compiled/profile/edit.css
-  group_dashboard:
-    - public/stylesheets/compiled/quick_start_bar.css
-    - public/stylesheets/compiled/activity_feed.css
-    - public/stylesheets/compiled/groups/dashboard.css
   group_settings:
     - public/stylesheets/compiled/groups/edit.css
   group_profile:

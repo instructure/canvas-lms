@@ -105,16 +105,7 @@ class StreamItem < ActiveRecord::Base
       object = ActiveRecord::Base.find_by_asset_string(object, valid_asset_types) rescue nil
       object ||= ActiveRecord::Base.initialize_by_asset_string(object, valid_asset_types) rescue nil
     end
-    case object
-    when DiscussionEntry
-      object.discussion_topic
-    when SubmissionComment
-      object.submission
-    when ConversationMessage
-      object.conversation
-    else
-      object
-    end
+    get_parent_for_stream(object)
   end
 
   def generate_data(object)
@@ -213,6 +204,7 @@ class StreamItem < ActiveRecord::Base
     # Make the StreamItem
     object = get_parent_for_stream(object)
     res = StreamItem.generate_or_update(object)
+    prepare_object_for_unread(object)
 
     # set the hidden flag if an assignment and muted
     hidden = object.is_a?(Submission) && object.assignment.muted? ? true : false
@@ -223,7 +215,8 @@ class StreamItem < ActiveRecord::Base
       StreamItemInstance.transaction do
         user_ids_subset.each do |user_id|
           i = StreamItemInstance.create(:user_id => user_id, :stream_item => res) do |sii|
-            sii.hidden = object.class == Submission && object.assignment.muted? ? true : false
+            sii.hidden = hidden
+            sii.workflow_state = object_unread_for_user(object, user_id)
           end
           instance_ids << i.id
         end
@@ -256,10 +249,39 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.get_parent_for_stream(object)
-    object = object.discussion_topic if object.is_a?(DiscussionEntry)
-    object = object.submission if object.is_a?(SubmissionComment)
-    object = object.conversation if object.is_a?(ConversationMessage)
-    object
+    case object
+    when DiscussionEntry
+      object.discussion_topic
+    when SubmissionComment
+      object.submission
+    when ConversationMessage
+      object.conversation
+    else
+      object
+    end
+  end
+
+  def self.prepare_object_for_unread(object)
+    case object
+    when DiscussionTopic
+      DiscussionTopic.send(:preload_associations, object, :discussion_topic_participants)
+    end
+  end
+
+  def self.object_unread_for_user(object, user_id)
+    case object
+    when DiscussionTopic
+      object.read_state(user_id)
+    else
+      nil
+    end
+  end
+
+  def self.update_read_state_for_asset(asset, new_state, user_id)
+    if item = StreamItem.find_by_item_asset_string(asset.asset_string)
+      StreamItemInstance.update_all({ :workflow_state => new_state },
+                                    { :stream_item_id => item.id, :user_id => user_id })
+    end
   end
 
   # call destroy_stream_items using a before_date based on the global setting
@@ -329,7 +351,6 @@ class StreamItem < ActiveRecord::Base
         end
       end
     end
-    
     res
   end
 end

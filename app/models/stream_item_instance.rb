@@ -17,6 +17,8 @@
 #
 
 class StreamItemInstance < ActiveRecord::Base
+  include Workflow
+
   belongs_to :user
   belongs_to :stream_item
 
@@ -25,5 +27,10 @@ class StreamItemInstance < ActiveRecord::Base
   before_save :set_context_code
   def set_context_code
     self.context_code = stream_item && stream_item.context_code
+  end
+
+  workflow do
+    state :read
+    state :unread
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,15 +16,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe "context/dashboard_topic" do
-  it "should not show the author for nil user_id" do
-    render :partial => "context/dashboard_topic", :locals =>
-        { :dashboard_topic => OpenObject.new({:root_discussion_entries => nil,
-                                              :created_at => Time.now.utc, :user_id => nil})}
-    response.should_not be_nil
-    response.body.should_not match /Author/
+describe DashboardHelper do
+  include DashboardHelper
+  
+  context "show_welcome_message?" do
+    it "should be true if the user has no current enrollments" do
+      user_model
+      @current_user = @user
+      show_welcome_message?().should be_true
+    end
+
+    it "should be false otherwise" do
+      course_with_student(:active_all => true)
+      @current_user = @student
+      show_welcome_message?().should be_false
+    end
   end
 end

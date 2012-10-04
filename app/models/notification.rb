@@ -20,35 +20,21 @@ class Notification < ActiveRecord::Base
   include LocaleSelection
 
   include Workflow
-  
-  TYPES_TO_SHOW_IN_FEED = ["Assignment Due Date Changed", 
+
+  TYPES_TO_SHOW_IN_FEED = [
+    # Assignment
     "Assignment Created",
-    "Grade Weight Changed", 
-    "Assignment Graded", 
-    "New Event Created", 
-    "Event Date Changed", 
-    "Collaboration Invitation", 
-    "Web Conference Invitation", 
-    "Enrollment Invitation", 
-    "Enrollment Registration", 
-    "Enrollment Notification", 
-    "Enrollment Accepted", 
-    "New Context Group Membership", 
-    "New Context Group Membership Invitation", 
-    "Group Membership Accepted", 
-    "Group Membership Rejected", 
-    "New Student Organized Group", 
-    "Rubric Assessment Submission Reminder", 
-    "Rubric Assessment Invitation", 
-    "Rubric Association Created", 
-    "Assignment Submitted Late", 
+    "Assignment Changed",
+    "Assignment Due Date Changed",
+
+    # Submissions / Grading
+    "Assignment Graded",
+    "Assignment Submitted Late",
+    "Grade Weight Changed",
     "Group Assignment Submitted Late",
+
+    # Testing
     "Show In Feed",
-    "Migration Import Finished",
-    "Migration Import Failed",
-    "Appointment Group Published",
-    "Appointment Group Updated",
-    "Appointment Reserved For User",
   ].freeze
 
   FREQ_IMMEDIATELY = 'immediately'
@@ -74,7 +60,7 @@ class Notification < ActiveRecord::Base
     end
 
   end
-  
+
   def self.summary_notification
     by_name('Summaries')
   end
@@ -153,7 +139,7 @@ class Notification < ActiveRecord::Base
       list << delayed_message
     end
   end
-  
+
   def create_message(asset, *tos)
     current_locale = I18n.locale
 
@@ -677,5 +663,4 @@ class Notification < ActiveRecord::Base
       true
     end
   end
-
 end

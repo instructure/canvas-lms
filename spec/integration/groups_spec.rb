@@ -28,7 +28,7 @@ describe GroupsController do
     response.should be_success
     
     html = Nokogiri::HTML(response.body)
-    html.css('.floating_links a.add').attribute("href").text.should == "/groups/#{@group.id}/announcements#new"
+    html.css('#right-side a.add').attribute("href").text.should == "/groups/#{@group.id}/announcements#new"
   end
 
   it "should not rendering 'pending' page when joining a self-signup group" do

@@ -83,6 +83,7 @@ describe GroupsController do
       response.should be_success
       assigns[:group].should eql(@group)
       assigns[:context].should eql(@group)
+      assigns[:stream_items].should eql([])
     end
 
     it "should allow user to join self-signup groups" do

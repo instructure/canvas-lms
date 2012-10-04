@@ -223,7 +223,10 @@ class DiscussionTopic < ActiveRecord::Base
     current_user ||= self.current_user
     return "read" unless current_user #default for logged out user
     uid = current_user.is_a?(User) ? current_user.id : current_user
-    discussion_topic_participants.find_by_user_id(uid).try(:workflow_state) || "unread"
+    dtp = discussion_topic_participants.loaded? ?
+      discussion_topic_participants.detect{ |dtp| dtp.user_id == uid } :
+      discussion_topic_participants.find_by_user_id(uid)
+    dtp.try(:workflow_state) || "unread"
   end
 
   def read?(current_user = nil)
@@ -240,6 +243,7 @@ class DiscussionTopic < ActiveRecord::Base
     return true if new_state == self.read_state(current_user)
 
     self.context_module_action(current_user, :read) if new_state == 'read'
+    StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
     self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
   end
 
@@ -249,6 +253,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     transaction do
       self.context_module_action(current_user, :read) if new_state == 'read'
+      StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
 
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
       self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)

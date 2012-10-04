@@ -85,7 +85,7 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
-  before_filter :require_user, :only => [:grades, :confirm_merge, :merge, :kaltura_session, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
+  before_filter :require_user, :only => [:grades, :confirm_merge, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
   before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
   before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :user_dashboard, :masquerade]
   before_filter :require_open_registration, :only => [:new, :create]
@@ -301,20 +301,13 @@ class UsersController < ApplicationController
     if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
+
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+    @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).select { |e| e.invited? }
+    @stream_items = @current_user.try(:recent_stream_items) || []
 
     incomplete_registration = @current_user && @current_user.pre_registered? && params[:registration_success]
-    base_env = {:INCOMPLETE_REGISTRATION => incomplete_registration, :USER_EMAIL => @current_user.email}
-
-    if show_new_dashboard?
-      @use_new_styles = true
-      load_all_contexts
-      js_env base_env.merge(:CONTEXTS => @contexts, :DASHBOARD_PATH => dashboard_path)
-      return render :action => :new_user_dashboard
-    else
-      js_env base_env
-    end
-
+    js_env({:INCOMPLETE_REGISTRATION => incomplete_registration, :USER_EMAIL => @current_user.email})
   end
 
   def toggle_dashboard

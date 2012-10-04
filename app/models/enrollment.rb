@@ -200,6 +200,19 @@ class Enrollment < ActiveRecord::Base
     READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
   end
 
+  TYPES_WITH_INDEFINITE_ARTICLE = {
+    'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
+    'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
+    'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
+    'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+    'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+    'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
+  }
+
+  def self.type_with_indefinite_article(type)
+    TYPES_WITH_INDEFINITE_ARTICLE[type] || TYPES_WITH_INDEFINITE_ARTICLE['StudentEnrollment']
+  end
+
   def should_update_user_account_association?
     self.new_record? || self.course_id_changed? || self.course_section_id_changed? || self.root_account_id_changed?
   end

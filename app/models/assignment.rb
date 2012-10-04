@@ -530,7 +530,7 @@ class Assignment < ActiveRecord::Base
     p.whenever { |record|
       !self.suppress_broadcast and
       !record.muted? and
-      record.created_at < Time.now - (30*60) and
+      record.created_at < Time.now - 30.minutes and
       record.context.state == :available and [:available, :published].include?(record.state) and
       record.prior_version and (record.points_possible != record.prior_version.points_possible || @assignment_changed)
     }

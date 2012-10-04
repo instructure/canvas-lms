@@ -16,16 +16,15 @@ describe "dashboard" do
       items.first.hidden.should == false
 
       get url
-      ffj(".communication_message.announcement").size.should == 1
-      # force the element to be visible so we can click it -- webdriver has a
-      # hover() event but it only works on Windows so far
-      driver.execute_script("$('div.communication_message.announcement .disable_item_link').css('visibility', 'visible')")
-      f(".communication_message.announcement .disable_item_link").click
-      keep_trying_until { ffj(".communication_message.announcement").size.should == 0 }
+      f('.stream-announcement .stream_header').click
+      item_selector = '#announcement-details tbody tr'
+      ff(item_selector).size.should == 1
+      f('#announcement-details .ignore-item').click
+      keep_trying_until { ff(item_selector).size.should == 0 }
 
       # should still be gone on reload
       get url
-      ffj(".communication_message.announcement").size.should == 0
+      ff(item_selector).size.should == 0
 
       @user.recent_stream_items.size.should == 0
       items.first.reload.hidden.should == true
@@ -48,26 +47,11 @@ describe "dashboard" do
       items.size.should == 1
 
       get "/"
-      ffj(".communication_message.conversation").size.should == 1
-      ffj(".communication_message.conversation .communication_sub_message:visible").size.should == 3 # two messages, plus add message form
-    end
-
-    it "should allow replying to conversation stream items" do
-      c = User.create.initiate_conversation([@user.id, User.create.id])
-      c.add_message('test')
-
-      get "/"
-      f(".reply_message .textarea").click
-      f("textarea[name='body']").send_keys("hey there")
-      submit_form(".communication_sub_message")
-      wait_for_ajax_requests
-      messages = ffj(".communication_message.conversation .communication_sub_message:visible")
-
-      # messages[-1] is the reply form
-      messages[-2].text.should =~ /hey there/
+      ff('#conversation-details tbody tr').size.should == 1
     end
 
     it "should show appointment stream items on the dashboard" do
+      pending "we need to add this stuff back in"
       Notification.create(:name => 'Appointment Group Published', :category => "Appointment Availability")
       Notification.create(:name => 'Appointment Group Updated', :category => "Appointment Availability")
       Notification.create(:name => 'Appointment Reserved For User', :category => "Appointment Signups")
@@ -150,7 +134,8 @@ describe "dashboard" do
       get "/"
 
       #verify assignment changed notice is in messages
-      f('#topic_list .topic_message').should include_text('Assignment Due Date Changed')
+      f('.stream-assignment .stream_header').click
+      f('#assignment-details').should include_text('Assignment Due Date Changed')
       #verify assignment is in to do list
       f('.to-do-list > li').should include_text(assignment.submission_action_string)
 
@@ -193,16 +178,18 @@ describe "dashboard" do
     it "should display scheduled web conference in stream" do
       PluginSetting.create!(:name => "dim_dim", :settings => {"domain" => "dimdim.instructure.com"})
 
+      # NOTE: recently changed the behavior here: conferences only display on
+      # the course page, and they only display when they are in progress
       @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "DimDim", :duration => 60})
       @conference.user = @user
       @conference.save!
+      @conference.restart
       @conference.add_initiator(@user)
       @conference.add_invitee(@user)
       @conference.save!
 
-      get "/"
-
-      fj('#topic_list .topic_message:last-child .header_title').should include_text(@conference.title)
+      get "/courses/#{@course.to_param}"
+      f('.conference .message').should include_text(@conference.title)
     end
 
     it "should display calendar events in the coming up list" do
@@ -237,18 +224,6 @@ describe "dashboard" do
       f('.events_list .event .tooltip_wrap').should include_text 'submitted'
     end
 
-    it "should add comment to announcement" do
-      @context = @course
-      announcement_model({:title => "hey all read this k", :message => "announcement"})
-      get "/"
-      f('.topic_message .add_entry_link').click
-      driver.find_element(:name, 'discussion_entry[plaintext_message]').send_keys('first comment')
-      submit_form('.add_sub_message_form')
-      wait_for_ajax_requests
-      wait_for_animations
-      f('.topic_message .subcontent').should include_text('first comment')
-    end
-
     it "should create an announcement for the first course that is not visible in the second course" do
       @context = @course
       announcement_model({:title => "hey all read this k", :message => "announcement"})
@@ -267,12 +242,10 @@ describe "dashboard" do
       Enrollment.update_all(["created_at = ?", 1.minute.ago]) # need to make created_at and updated_at different
 
       get "/"
-
-      f('#no_topics_message').should_not include_text('No Recent Messages')
+      f('.no-recent-messages').should be_nil
 
       get "/courses/#{@second_course.id}"
-
-      f('#no_topics_message').should include_text('No Recent Messages')
+      f('.no-recent-messages').should include_text('No Recent Messages')
     end
 
     it "should validate the functionality of soft concluded courses in dropdown" do

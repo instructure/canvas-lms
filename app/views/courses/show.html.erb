@@ -76,6 +76,7 @@
 <% end %>
 
 <%
+  jammit_css :dashboard
   case @course_home_view
   when 'wiki'
     jammit_css :tinymce
@@ -86,6 +87,8 @@
   when 'syllabus'
     js_bundle :syllabus
     jammit_css :tinymce
+  else
+    js_bundle :dashboard
   end
 %>
 
@@ -207,7 +210,7 @@ $(document).ready(function() {
   </div>
 <% end %>
 <% if @pending_enrollment %>
-  <%= render :partial => "courses/enrollment_reminders" %>
+  <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
 <div id="edit_course_home_content" style="display: none;">
   <% form_for :course, :url => context_url(@context, :context_url), :html => {:id => "edit_course_home_content_form", :method => :put} do |f| %>
@@ -216,7 +219,7 @@ $(document).ready(function() {
     <p>
       <label for="edit_course_home_content_select"><strong><%= t('labels.set_layout', %{When people visit the course page, show them}) %></strong></label>
       <select name="course[default_view]" id="edit_course_home_content_select">
-        <option value="feed" <%= 'selected' if @context.default_view == 'feed' %>><%= t('options.communication_stream', %{the Communication Stream}) %></option>
+        <option value="feed" <%= 'selected' if @context.default_view == 'feed' %>><%= t('options.recent_activity_dashboard', %{the Recent Activity Dashboard}) %></option>
         <option value="wiki" <%= 'selected' if @context.default_view == 'wiki' %>><%= t('options.custom_page', %{a Page I'll Design Myself}) %></option>
         <option value="modules" <%= 'selected' if @context.default_view == 'modules' %>><%= t('options.modules', %{the Course Modules/Sections}) %></option>
         <option value="assignments" <%= 'selected' if @context.default_view == 'assignments' %>><%= t('options.assignments', %{the Assignment List}) %></option>
@@ -225,7 +228,7 @@ $(document).ready(function() {
     </p>
     <div class="select_details ui-state-highlight ui-corner-all" style="display: none; padding: 1em; font-size: 12px;">
       <div class="feed_details options_details">
-        <%= mt 'details.communication_stream', "The **communication stream** lets participants see the most recent conversations, notifications, and interactions for this course.  It's very similar to the dashboard page users see when they first log in, but only shows content for this specific course." %>
+        <%= mt 'details.recent_activity_dashboard', "The **recent activity dashboard** lets participants see the most recent conversations, announcements, discussions, and interactions for this course.  It's very similar to the dashboard page users see when they first log in, but only shows content for this specific course." %>
       </div>
       <div class="wiki_details options_details">
         <%= mt 'details.custom_page', "You can **design your own course home page** and include whatever links, images or rich media you like." %>
@@ -275,9 +278,8 @@ This layout is probably best for courses that aren't based on a specific schedul
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
   <% else %>
-    <% cache(safe_cache_key([@current_user, @contexts, @current_conferences, 'recent_messages'])) do %>
-      <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.recent_stream_items(:contexts => @contexts)) || []), :locals => {:conferences => @current_conferences, :show_context => @contexts && @contexts.length > 1 } %>
-    <% end %>
+    <%= render :partial => 'shared/dashboard_messages' %>
+    <%= render :partial => 'shared/recent_activity' %>
   <% end %>
 </div>
 <% if @context.public_license? %>

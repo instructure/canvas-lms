@@ -1,4 +1,6 @@
 <% content_for :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
+<% jammit_css :dashboard %>
+<% js_bundle :dashboard %>
 <%  @active_tab = "home" %>
 <% content_for :auto_discovery do %>
   <% if @context_membership %>
@@ -9,6 +11,9 @@
 <% end %>
 
 <% content_for :right_side do %>
+  <% if can_do(@context.announcements.new, @current_user, :create) %>
+    <div><a href="<%= group_announcements_path(@context) %>#new" class='add'><%= t 'new_announcement', "New Announcement" %></a></div>
+  <% end %>
   <% locals = {:title => t('coming_up', "Coming Up"), :display_count => 3, :period => t('next_week', "the next week"), :contexts_to_link_to => @context, :upcoming => true} %>
   <% if @current_user %>
     <% cache([@current_user, @context, 'group_upcoming_events' ]) do %>
@@ -19,13 +24,7 @@
   <% end %>
 <% end %>
 
-<div style="float: right; text-align: left;" class="floating_links">
-  <% if can_do(@context.announcements.new, @current_user, :create) %>
-    <div><a href="<%= group_announcements_path(@context) %>#new" class='add'><%= t 'new_announcement', "New Announcement" %></a></div>
-  <% end %>
-</div>
 <div id="group_messages">
-  <% cache([@current_user, @context, @current_conferences, 'recent_messages']) do %>
-    <%= render :partial => 'shared/recent_messages', :object => ((@current_user && @current_user.recent_stream_items(:contexts => @context)) || []), :locals => {:conferences => @current_conferences } %>
-  <% end %>
+  <%= render :partial => 'shared/dashboard_messages' %>
+  <%= render :partial => 'shared/recent_activity' %>
 </div>

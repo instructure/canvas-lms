@@ -1,0 +1,64 @@
+<h2 class="recent-activity-header">
+  <% if @context.nil? || @context.is_a?(User) %>
+    <%= t :recent_activity, "Recent Activity" %>
+  <% else %>
+    <%= t :recent_activity_in_course, "Recent Activity in %{course_or_group}", :course_or_group => @context.short_name %>
+  <% end %>
+</h2>
+
+<ul class="recent_activity unstyled_list">
+<% categorized_items = categorize_stream_items(@stream_items) %>
+<% %w(Announcement Conversation Assignment DiscussionTopic).each do |category| %>
+  <% items = categorized_items[category] %> 
+  <% category_class = category.underscore %> 
+  <% if items.present? %>
+    <li class="stream-<%= category_class %>">
+      <div class="stream_header">
+        <div class="image-block">
+          <div class=image-block-image>
+            <i class="<%= category_class %>-icon"></i>
+          </div>
+          <div class=image-block-content>
+            <div class=title>
+              <%= activity_category_title(category, items) %>
+            </div>
+            <% unread_count = items.select { |i| i.unread }.size %>
+            <% if unread_count > 0 %>
+              <strong class="unread-count">
+                <%= t(:unread_count_badge, { :one => "1 *unread item*", :other => "%{count} *unread items*" },
+                      :count => unread_count,
+                      :wrapper => '<span class="accessibly-hidden">\1</span>') %>
+              </strong>
+            <% end %>
+            <div class="links">
+              <%= activity_category_links(category, items) %>
+            </div>
+          </div>
+        </div>
+        <div class=header-right-side>
+          <a href="#" class="toggle-details" aria-controls="<%= category_class %>_details" role="button"><%= t :show_more, 'Show More' %> ▼</a>
+        </div>
+      </div>
+
+      <div class=details_container aria-expanded=false>
+        <table id="<%= category_class %>-details" class="stream-details">
+          <caption class="accessibly-hidden"><%= category_details_label(category) %></caption>
+          <thead class="accessibly-hidden">
+            <tr>
+              <th scope="col"><%= t(:unread_column, "Unread") %></th>
+              <th scope="col"><%= t(:message_column, "Message") %></th>
+              <th scope="col"><%= t(:date_column, "Date") %></th>
+              <th></th>
+            </tr>
+          </thead>
+          <%= render :partial => 'shared/recent_activity_item', :collection => items %>
+        </table>
+      </div>
+    </li>
+  <% end %>
+<% end %>
+</ul>
+
+<% if categorized_items.values.map(&:count).sum == 0 %>
+  <%= render :partial => 'shared/no_recent_activity' %>
+<% end %>

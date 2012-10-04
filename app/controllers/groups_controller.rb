@@ -218,6 +218,7 @@ class GroupsController < ApplicationController
           return
         end
         @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
+        @stream_items = @current_user.try(:recent_stream_items, { :contexts => @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
           @group.request_user(@current_user)
           if !@group.grants_right?(@current_user, session, :read)
@@ -239,13 +240,8 @@ class GroupsController < ApplicationController
           end
         end
         if authorized_action(@group, @current_user, :read)
-          #if show_new_dashboard?
-          #  @use_new_styles = true
-          #  js_env :GROUP_ID => @group.id
-          #  return render :action => :dashboard
-          #else
+          set_badge_counts_for(@group, @current_user)
           @home_page = @group.wiki.wiki_page
-          #end
         end
       end
       format.json do

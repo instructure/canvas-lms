@@ -108,7 +108,7 @@ describe Notification do
     end
     
     it "should not dispatch non-immediate message based on default policies" do
-      notification_model(:category => 'TestDaily',:name => "Show In Feed")
+      notification_model(:category => 'TestDaily', :name => "Show In Feed")
       @notification.default_frequency.should eql("daily")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       
@@ -163,19 +163,6 @@ describe Notification do
       all_messages.select {|m| 
         m.to == m2.to and m.notification == m2.notification and m.communication_channel == m2.communication_channel
       }.length.should eql(2)
-    end
-    
-    it "should replace dashboard messages when a similar notification occurs" do
-      notification_set(:notification_opts => {:name => "Show In Feed"})
-      
-      messages = @notification.create_message(@assignment, @user)
-      messages.length.should eql(2)
-      messages.select{|m| m.to == "dashboard"}.length.should eql(1)
-      StreamItem.for_user(@user).count.should eql(1)
-      
-      messages = @notification.create_message(@assignment, @user)
-      messages.length.should eql(2)
-      StreamItem.for_user(@user).count.should eql(2)
     end
     
     it "should create stream items" do

@@ -659,12 +659,14 @@ describe DiscussionTopic do
 
     it "should allow being marked unread" do
       @topic.change_read_state("unread", @teacher)
+      @topic.reload
       @topic.read?(@teacher).should be_false
       @topic.unread_count(@teacher).should == 0
     end
 
     it "should allow being marked read" do
       @topic.change_read_state("read", @student)
+      @topic.reload
       @topic.read?(@student).should be_true
       @topic.unread_count(@student).should == 0
     end
@@ -672,6 +674,7 @@ describe DiscussionTopic do
     it "should allow mark all as unread" do
       @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
       @topic.change_all_read_state("unread", @teacher)
+      @topic.reload
 
       @topic.read?(@student).should be_false
       @entry.read?(@student).should be_false
@@ -681,6 +684,7 @@ describe DiscussionTopic do
     it "should allow mark all as read" do
       @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
       @topic.change_all_read_state("read", @student)
+      @topic.reload
 
       @topic.read?(@student).should be_true
       @entry.read?(@student).should be_true
@@ -695,6 +699,20 @@ describe DiscussionTopic do
     it "should use unique_constaint_retry when updating all read state" do
       DiscussionTopic.expects(:unique_constraint_retry).once
       @topic.change_all_read_state("unread", @student)
+    end
+
+    it "should sync unread state with the stream item" do
+      @stream_item = StreamItem.for_item_asset_string(@topic.asset_string).first
+      @stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}.should be_read
+      @stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}.should be_unread
+
+      @topic.change_all_read_state("unread", @teacher)
+      @topic.change_all_read_state("read", @student)
+      @topic.reload
+
+      @stream_item = StreamItem.for_item_asset_string(@topic.asset_string).first
+      @stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}.should be_unread
+      @stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}.should be_read
     end
   end
 

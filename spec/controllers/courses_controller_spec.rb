@@ -214,7 +214,7 @@ describe CoursesController do
       get 'show', :id => @course.id
       response.should be_success
       assigns[:context].should eql(@course)
-      # assigns[:message_types].should_not be_nil
+      assigns[:stream_items].should eql([])
     end
 
     it "should give a helpful error message for students that can't access yet" do

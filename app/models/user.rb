@@ -1824,7 +1824,10 @@ class User < ActiveRecord::Base
   memoize :recent_feedback
 
   def visible_stream_item_instances(opts={})
-    instances = stream_item_instances.scoped(:conditions => { 'stream_item_instances.hidden' => false }, :order => 'stream_item_instances.id desc', :include => :stream_item)
+    instances = stream_item_instances.scoped({
+      :conditions => { :hidden => false },
+      :order => 'stream_item_instances.id desc',
+    })
 
     # dont make the query do an stream_item_instances.context_code IN
     # ('course_20033','course_20237','course_20247' ...) if they dont pass any
@@ -1833,7 +1836,8 @@ class User < ActiveRecord::Base
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      instances = instances.scoped(:conditions => ['stream_item_instances.context_code in (?)', setup_context_lookups(opts[:contexts])])
+      context_codes = setup_context_lookups(opts[:contexts])
+      instances = instances.scoped(:conditions => { :context_code => context_codes }) if context_codes.present?
     end
 
     instances
@@ -1843,7 +1847,15 @@ class User < ActiveRecord::Base
     # cross-shard stream items need a *lot* of work; just disable them for now
     return [] if self.shard != Shard.current
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      visible_stream_item_instances(opts).scoped(:include => :stream_item, :limit => 21).map(&:stream_item).compact
+      visible_instances = visible_stream_item_instances(opts).scoped({
+        :include => :stream_item,
+        :limit => Setting.get('recent_stream_item_limit', 100),
+      })
+      visible_instances.map do |sii|
+        si = sii.stream_item
+        si.data.unread = sii.unread? if si.present?
+        si
+      end.compact
     end
   end
   memoize :recent_stream_items
