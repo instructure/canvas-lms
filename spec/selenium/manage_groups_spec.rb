@@ -195,4 +195,16 @@ describe "manage groups" do
       f('#category_split_group_count').should have_attribute(:value, '')
     end
   end
+
+  it "should not show the Make a New Set of Groups button if there are no students in the course" do
+    get "/courses/#{@course.id}/groups"
+    f('.add_category_link').should be_nil
+    f('#no_students_message').should be_displayed
+  end
+  it "should show the Make a New Set of Groups button if there are students in the course" do
+    student_in_course
+    get "/courses/#{@course.id}/groups"
+    f('.add_category_link').should be_displayed
+    f('#no_students_message').should be_nil
+  end
 end
