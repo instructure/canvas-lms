@@ -276,6 +276,23 @@ describe "gradebook2" do
       }.to change(ConversationMessage, :count).by_at_least(2)
     end
 
+    it "should send messages when 'Scored more than' X points" do
+      message_text = "This is a message"
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      open_assignment_options(1)
+      f('[data-action="messageStudentsWho"]').click
+      expect {
+        message_form = f('#message_assignment_recipients')
+        click_option('#message_assignment_recipients .message_types', 'Scored more than')
+        message_form.find_element(:css, '.cutoff_score').send_keys('3')  # both assignments have score of 5
+        message_form.find_element(:css, '#body').send_keys(message_text)
+        submit_form(message_form)
+        wait_for_ajax_requests
+      }.to change(ConversationMessage, :count).by_at_least(2)
+    end
+
     it "should have a 'Haven't been graded' option" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
