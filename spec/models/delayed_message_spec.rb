@@ -228,7 +228,7 @@ describe DelayedMessage do
       force_now @dm.send_at + 30.minutes
       @dm.send_at = nil
       @dm.send(:set_send_at)
-      @dm.send_at.in_time_zone(@eastern).midnight.should == @eastern.now.midnight + 1.week
+      @dm.send_at.in_time_zone(@eastern).midnight.should == saturday + 1.week
     end
 
     it "should use the same time of day across weeks for weekly messages for the same user" do
