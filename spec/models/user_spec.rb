@@ -674,6 +674,123 @@ describe User do
       @user1.move_to_user(@user2)
       @oe.reload.associated_user_id.should == @user2.id
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should merge a user across shards" do
+        @user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
+        @p1 = @pseudonym
+        @cc1 = @cc
+        @shard1.activate do
+          account = Account.create!
+          @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
+          @p2 = @pseudonym
+        end
+
+        @shard2.activate do
+          @user1.move_to_user(@user2)
+        end
+
+        @user1.should be_deleted
+        @p1.reload.user.should == @user2
+        @cc1.reload.should be_retired
+        @user2.communication_channels.all.map(&:path).sort.should == ['user1@example.com', 'user2@example.com']
+        @user2.all_pseudonyms.should == [@p2, @p1]
+        @user2.associated_shards.should == [@shard1, Shard.default]
+      end
+
+      it "should move ccs to the new user (but only if they don't already exist)" do
+        @user1 = user_model
+        @shard1.activate do
+          @user2 = user_model
+        end
+
+        # unconfirmed => active conflict
+        @user1.communication_channels.create!(:path => 'a@instructure.com')
+        @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'B@instructure.com')
+        # active => active conflict
+        @user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # unconfirmed => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'd@instructure.com')
+        @user2.communication_channels.create!(:path => 'D@instructure.com')
+        # retired => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'E@instructure.com')
+        # unconfirmed => retired conflict
+        @user1.communication_channels.create!(:path => 'f@instructure.com')
+        @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => active conflict
+        @user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => retired conflict
+        @user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => retired conflict
+        @user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # <nothing> => active
+        @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => <nothing>
+        @user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # <nothing> => unconfirmed
+        @user2.communication_channels.create!(:path => 'l@instructure.com')
+        # unconfirmed => <nothing>
+        @user1.communication_channels.create!(:path => 'm@instructure.com')
+        # <nothing> => retired
+        @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => <nothing>
+        @user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
+
+        @shard2.activate do
+          @user1.move_to_user(@user2)
+        end
+
+        @user1.reload
+        @user2.reload
+        @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+            ['A@instructure.com', 'active'],
+            ['B@instructure.com', 'retired'],
+            ['C@instructure.com', 'active'],
+            ['D@instructure.com', 'unconfirmed'],
+            ['E@instructure.com', 'unconfirmed'],
+            ['F@instructure.com', 'retired'],
+            ['G@instructure.com', 'active'],
+            ['H@instructure.com', 'retired'],
+            ['I@instructure.com', 'retired'],
+            ['b@instructure.com', 'active'],
+            ['f@instructure.com', 'unconfirmed'],
+            ['h@instructure.com', 'active'],
+            ['i@instructure.com', 'retired'],
+            ['j@instructure.com', 'active'],
+            ['k@instructure.com', 'active'],
+            ['l@instructure.com', 'unconfirmed'],
+            ['m@instructure.com', 'unconfirmed'],
+            ['n@instructure.com', 'retired'],
+            ['o@instructure.com', 'retired']
+        ]
+        # on cross shard merges, the deleted user retains all CCs (pertinent ones were
+        # duplicated over to the surviving shard)
+        @user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+            ['a@instructure.com', 'retired'],
+            ['b@instructure.com', 'retired'],
+            ['c@instructure.com', 'retired'],
+            ['d@instructure.com', 'retired'],
+            ['e@instructure.com', 'retired'],
+            ['f@instructure.com', 'retired'],
+            ['g@instructure.com', 'retired'],
+            ['h@instructure.com', 'retired'],
+            ['i@instructure.com', 'retired'],
+            ['k@instructure.com', 'retired'],
+            ['m@instructure.com', 'retired'],
+            ['o@instructure.com', 'retired']
+        ]
+      end
+    end
   end
 
   describe "can_masquerade?" do
