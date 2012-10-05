@@ -90,9 +90,9 @@ describe "eportfolios" do
       edit_link.click
       f('.add_content_link.add_rich_content_link').click
       wait_for_tiny(f('textarea.edit_section'))
-      f("img[alt='Embed Image']").click
-      f(".flickr_search_link").click
-      f("#instructure_image_search").should be_displayed
+      f('a.mce_instructure_image').click
+      f('a[href="#tabFlickr"]').click
+      f('form.FindFlickrImageView').should be_displayed
     end
 
 

@@ -1,0 +1,52 @@
+<div class="insertUpdateImage bootstrap-form form-horizontal" >
+  <fieldset style="max-width: 597px;">
+    <legend>{{#t "image_source"}}Image Source{{/t}}</legend>
+    <div class="ui-tabs-minimal imageSourceTabs">
+      <ul>
+        <li><a href="#tabUrl">{{#t "url"}}URL{{/t}}</a></li>
+        <li><a href="#tabUploaded">{{#t "canvas"}}Canvas{{/t}}</a></li>
+        <li><a href="#tabFlickr">{{#t "flickr"}}Flickr{{/t}}</a></li>
+      </ul>
+      <div id="tabUrl">
+        <input type="url"
+               name="image[src]"
+               class="input-xxlarge"
+               placeholder="http://example.com/image.png"
+               style="margin-bottom: 20px;">
+      </div>
+      <ul role="tree" class="folderTree insertUpdateImageTabpane" id="tabUploaded"></ul>
+      <div id="tabFlickr">
+
+      </div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>{{#t "attributes"}}Attributes{{/t}}</legend>
+    <div class="control-group">
+      <label class="control-label" for="image_alt">{{#t "alt_text"}}Alt text{{/t}}</label>
+      <div class="controls">
+        <input type="text"
+               class="input-xlarge"
+               name="image[alt]"
+               id="image_alt"
+               aria-describedby="alt_text_description">
+        <span><p class="help-block" id="alt_text_description">{{#t "alt_help_text"}}Describe the image to improve accessibility{{/t}}</p></span>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="dimensions_controls">{{#t "dimensions"}}Dimensions{{/t}}</label>
+      <div class="controls" id="dimensions_controls" aria-describedby="aspect_ratio_note">
+        <input class="span1"
+               name="image[width]"
+               type="text"
+               aria-label="{{#t "image_width"}}Image Width{{/t}}">
+        x
+        <input class="span1"
+               name="image[height]"
+               type="text"
+               aria-label="{{#t "image_height"}}Image Height{{/t}}">
+      <span><p class="help-block" id="aspect_ratio_note">{{#t "dimension_help_text"}}Aspect ratio will be preserved{{/t}}</p></span>
+      </div>
+    </div>
+  </fieldset>
+</div>

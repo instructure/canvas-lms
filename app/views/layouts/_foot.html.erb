@@ -9,7 +9,7 @@
   require = {
     translate: <%= include_js_translations? %>,
     baseUrl: '<%= js_base_url %>',
-    paths: <%= raw Canvas::RequireJs.paths %>,
+    paths: <%= raw Canvas::RequireJs.paths(true) %>,
     use: <%= raw Canvas::RequireJs.shims %>
   };
 </script>

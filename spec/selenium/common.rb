@@ -824,6 +824,17 @@ shared_examples_for "all selenium tests" do
     temp_file = open(element.attribute('src'))
     temp_file.size.should > 0
   end
+  
+  def check_element_attrs(element, attrs)
+    element.should be_displayed
+    attrs.each do |k, v|
+      if v.is_a? Regexp
+        element.attribute(k).should match v
+      else
+        element.attribute(k).should == v
+      end
+    end
+  end
 
   def check_file(element)
     require 'open-uri'

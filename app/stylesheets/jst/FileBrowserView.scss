@@ -1,0 +1,42 @@
+@import 'environment';
+
+$triangle-edge-size: 5px;
+
+.folderTree {
+  &, ul {
+    @include reset-list;
+  }
+  ul { margin-left: 8px; }
+  li a {
+    padding: 1px 7px 1px 35px;
+    display: block;
+    background: url(/images/inst_tree/file_types/page_white.png) no-repeat 13px 3px;
+    position: relative;
+    &.folderLabel {
+      background-image: url(/images/inst_tree/folder.png);
+      &:before{
+        position: absolute;
+        top: $triangle-edge-size;
+        left: 4px;
+        border: solid transparent;
+        border-width: $triangle-edge-size;
+        border-left-color: $button-text-color;
+        content: '';
+      }
+      &.expanded:before{
+        left: 0;
+        top: 7px;
+        border-left-color: transparent;
+        border-top-color: $button-text-color;
+      }
+    }
+
+    &.active { background-color: $activeBG; }
+  }
+  .preview-thumbnail {
+    margin-left: -23px;
+    max-width: 200px;
+    height: 30px;
+    vertical-align: middle;
+  }
+}

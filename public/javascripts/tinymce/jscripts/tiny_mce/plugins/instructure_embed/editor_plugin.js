@@ -149,12 +149,15 @@ define([
 
         if (search === 'flickr') $flickrLink.click();
       });
-
+        
+      /* replaced by instructure_image button
+         but this plugin is still used by the wiki sidebar (for now)
       editor.addButton('instructure_embed', {
         title: TRANSLATIONS.embed_image,
         cmd: 'instructureEmbed',
         image: url + '/img/button.gif'
       });
+      */
     },
 
     getInfo: function () {

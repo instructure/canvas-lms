@@ -9,6 +9,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
     before (:each) do
       course_with_teacher_logged_in
+      @blank_page = @course.wiki.wiki_pages.create! :title => 'blank'
     end
 
     after(:each) do
@@ -142,30 +143,59 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should add image from flickr" do
-      get "/courses/#{@course.id}/wiki"
-
-      #add image from flickr to rce
-      f('.wiki_switch_views_link').click
-      clear_wiki_rce
-      f('.wiki_switch_views_link').click
+      get "/courses/#{@course.id}/wiki/blank"
+      wait_for_ajaximations
+      f('.edit_link').click
       add_flickr_image(driver)
       in_frame "wiki_page_body_ifr" do
         f('#tinymce img').should be_displayed
       end
-
-      submit_form('#new_wiki_page')
-      wait_for_ajax_requests
-      get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
-      wait_for_ajax_requests
-
+      submit_form("#edit_wiki_page_#{@blank_page.id}")
+      keep_trying_until { f('#wiki_body').displayed? }
       check_image(f('#wiki_body img'))
     end
 
+    it "should add image via url" do
+      get "/courses/#{@course.id}/wiki/blank"
+      wait_for_ajaximations
+      f('.edit_link').click
+      add_url_image(driver, 'http://example.com/image.png', 'alt text')
+      submit_form("#edit_wiki_page_#{@blank_page.id}")
+      keep_trying_until { f('#wiki_body').displayed? }
+      check_element_attrs(f('#wiki_body img'), :src => 'http://example.com/image.png', :alt => 'alt text')
+    end
+    
+    describe "canvas images" do
+      before do
+        @course_root = Folder.root_folders(@course).first
+        @course_attachment = @course.attachments.create! :uploaded_data => jpeg_data_frd, :filename => 'course.jpg', :display_name => 'course.jpg', :folder => @course_root
+        @teacher_root = Folder.root_folders(@teacher).first
+        @teacher_attachment = @teacher.attachments.create! :uploaded_data => jpeg_data_frd, :filename => 'teacher.jpg', :display_name => 'teacher.jpg', :folder => @teacher_root
+        get "/courses/#{@course.id}/wiki/blank"
+        wait_for_ajaximations
+        f('.edit_link').click
+      end
+      
+      it "should add a course image" do
+        add_canvas_image(driver, 'Course files', 'course.jpg')
+        submit_form("#edit_wiki_page_#{@blank_page.id}")
+        keep_trying_until { f('#wiki_body').displayed? }
+        check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
+      end
+      
+      it "should add a user image" do
+        add_canvas_image(driver, 'My files', 'teacher.jpg')
+        submit_form("#edit_wiki_page_#{@blank_page.id}")
+        keep_trying_until { f('#wiki_body').displayed? }
+        check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@teacher_attachment.id}/, :alt => 'teacher.jpg')
+      end
+    end
 
     it "should put flickr images into the right editor" do
       get "/courses/#{@course.id}/quizzes"
+      wait_for_ajaximations
       f(".new-quiz-link").click
-      keep_trying_until { f(".mce_instructure_embed").should be_displayed }
+      keep_trying_until { f(".mce_instructure_image").displayed? }
       add_flickr_image(driver)
 
       click_questions_tab
@@ -181,4 +211,3 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
   end
 end
-

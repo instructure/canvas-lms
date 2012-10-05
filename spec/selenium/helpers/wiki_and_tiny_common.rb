@@ -91,15 +91,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_flickr_image(el)
     require 'open-uri'
-
-    el.find_element(:css, '.mce_instructure_embed').click
-    f('.flickr_search_link').click
-    f('#image_search_form > input').send_keys('angel')
-    submit_form('#image_search_form')
+  
+    el.find_element(:css, '.mce_instructure_image').click
+    dialog = ff('.ui-dialog').reverse.detect(&:displayed?)
+    f('a[href="#tabFlickr"]', dialog).click
+    f('.FindFlickrImageView .flickrSearchTerm', dialog).send_keys('angel')
+    submit_form(f('.FindFlickrImageView', dialog))
     wait_for_ajax_requests
-    keep_trying_until { f('.image_link').should be_displayed }
+    keep_trying_until { f('.flickrImageResult', dialog).should be_displayed }
     # sometimes flickr has broken images; choose the first one that works
-    image = ff('.image_link').detect do |image|
+    image = ff('.flickrImageResult img', dialog).detect do |image|
       begin
         temp_file = open(image.attribute('src'))
         temp_file.size > 0
@@ -109,6 +110,35 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     end
     raise "Couldn't find an image on flickr!" unless image
     image.click
+    f('.ui-dialog-buttonset .btn-primary', dialog).click
+    wait_for_ajaximations
+  end
+
+  def add_canvas_image(el, folder, filename)
+    el.find_element(:css, '.mce_instructure_image').click
+    dialog = ff('.ui-dialog').reverse.detect(&:displayed?)
+    f('a[href="#tabUploaded"]', dialog).click
+    keep_trying_until { f('.folderLabel', dialog).displayed? }
+    folder_el = ff('.folderLabel', dialog).detect { |el| el.text == folder }
+    folder_el.should_not be_nil
+    folder_el.click
+    keep_trying_until { f('.treeFile', dialog).displayed? }
+    file_el = f(".treeFile[title=\"#{filename}\"]", dialog)
+    file_el.should_not be_nil
+    file_el.click
+    wait_for_ajaximations
+    f('.ui-dialog-buttonset .btn-primary', dialog).click
+    wait_for_ajaximations
+  end
+
+  def add_url_image(el, url, alt_text)
+    el.find_element(:css, '.mce_instructure_image').click
+    dialog = ff('.ui-dialog').reverse.detect(&:displayed?)
+    f('a[href="#tabUrl"]', dialog).click
+    f('[name="image[src]"]', dialog).send_keys(url)
+    f('[name="image[alt]"]', dialog).send_keys(alt_text)
+    f('.ui-dialog-buttonset .btn-primary', dialog).click
+    wait_for_ajaximations
   end
 
   def add_image_to_rce

@@ -22,9 +22,9 @@ define([
   'jquery' /* $ */
 ], function(INST, $) {
 
-  $.originalGetJSON = $.getJSON;
+  var _getJSON = $.getJSON;
   $.getJSON = function(url, data, callback) {
-    var xhr = $.originalGetJSON(url, data, callback);
+    var xhr = _getJSON.apply($, arguments);
     $.ajaxJSON.storeRequest(xhr, url, 'GET', data);
     return xhr;
   };

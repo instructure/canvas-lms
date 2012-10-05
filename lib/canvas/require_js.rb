@@ -51,13 +51,13 @@ module Canvas
         bundle == '*' ? result : (result[bundle.to_s] || [])
       end
 
-      def paths
+      def paths(cache_busting = false)
         @paths ||= {
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
           :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min'
-        }.update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
+        }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
   
       def plugin_paths
@@ -70,6 +70,10 @@ module Canvas
         end
       end
 
+      def cache_busting_paths
+        { 'compiled/tinymce' => 'compiled/tinymce.js?v2' } # hack: increment to purge browser cached bundles after tiny change
+      end
+      
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {

@@ -53,3 +53,8 @@ end
 def stub_png_data(filename = 'test my file? hai!&.png', data = nil)
   stub_file_data(filename, data, 'image/png')
 end
+
+def jpeg_data_frd
+  fixture_path = File.expand_path(File.dirname(__FILE__) + '/../fixtures/test_image.jpg')
+  ActionController::TestUploadedFile.new(fixture_path, 'image/jpeg', true)
+end
