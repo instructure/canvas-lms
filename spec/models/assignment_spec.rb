@@ -1615,30 +1615,54 @@ describe Assignment do
   end
 
   context "generate comments from submissions" do
-    it "should infer_comment_context_from_filename" do
+    def create_and_submit
       setup_assignment_without_submission
 
-      attachment = @user.attachments.new :filename => "homework.doc"
-      attachment.content_type = "foo/bar"
-      attachment.size = 10
-      attachment.save!
+      @attachment = @user.attachments.new :filename => "homework.doc"
+      @attachment.content_type = "foo/bar"
+      @attachment.size = 10
+      @attachment.save!
 
-      submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [attachment]
+      @submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [@attachment]
+    end
 
+    it "should infer_comment_context_from_filename" do
+      create_and_submit
       ignore_file = "/tmp/._why_macos_why.txt"
       @assignment.instance_variable_set :@ignored_files, []
       @assignment.send(:infer_comment_context_from_filename, ignore_file).should be_nil
       @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
 
-      filename = [@user.last_name_first, @user.id, attachment.id, attachment.display_name].join("_")
+      filename = [@user.last_name_first, @user.id, @attachment.id, @attachment.display_name].join("_")
 
       @assignment.send(:infer_comment_context_from_filename, filename).should == ({
         :user => @user,
-        :submission => submission,
+        :submission => @submission,
         :filename => filename,
-        :display_name => attachment.display_name
+        :display_name => @attachment.display_name
       })
       @assignment.instance_variable_get(:@ignored_files).should == [ignore_file]
+    end
+
+    it "should mark comments as hidden for submission zip uploads" do
+      create_and_submit
+      @assignment.muted = true
+      @assignment.save!
+
+      temp = Tempfile.new('sub.txt')
+
+      group = {:user => @user, :submission => @submission, :display_name => 'sub.txt', :filename => temp.path}
+
+      fake = mock()
+      fake.stubs(:map).returns([])
+      fake.stubs(:unzip_files).returns(fake)
+      ZipExtractor.stubs(:new).returns(fake)
+      @assignment.stubs(:partition_for_user).returns([[group]])
+
+      @assignment.generate_comments_from_files(temp.path, @user)
+
+      @submission.reload
+      @submission.submission_comments.last.hidden.should == true
     end
   end
 
