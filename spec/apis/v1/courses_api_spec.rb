@@ -596,14 +596,13 @@ describe CoursesController, :type => :integration do
     end
 
     it "returns a list of users with emails" do
+      @user = @course1.teachers.first
       # when
       json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                       { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                       :include => ['email'])
       # expect
-      json.sort_by{|x| x["id"]}.should == api_json_response(@course1.users.uniq,
-                                                            :only => USER_API_FIELDS, :methods => ['email']
-                                                            ).sort_by{|x| x["id"]}
+      json.each { |u| u.keys.should include('email') }
     end
 
     it "returns a list of users and enrollments with enrollments option" do
@@ -728,6 +727,22 @@ describe CoursesController, :type => :integration do
       json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
       json.map { |u| u['sis_login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
       json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
+    end
+
+    it "should not return email addresses if the requestor is a student" do
+      user
+      @course1.enroll_student(user).accept!
+      json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
+                      { :controller => 'courses', :action => 'users',
+                      :course_id => @course1.to_param, :format => 'json' },
+                      { :include => %w{email} })
+      json.each do |u|
+        if u['id'] == @user.id
+          u['email'].should == @user.email
+        else
+          u.keys.should_not include(:email)
+        end
+      end
     end
 
     it "should allow specifying course sis id" do
