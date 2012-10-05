@@ -1105,7 +1105,7 @@ class Assignment < ActiveRecord::Base
       submission = group.first[:submission]
       user = group.first[:user]
       attachments = group.map { |g| FileInContext.attach(self, g[:filename], g[:display_name]) }
-      comments << submission.add_comment({:comment => comment, :author => commenter, :attachments => attachments})
+      comments << submission.add_comment({:comment => comment, :author => commenter, :attachments => attachments, :hidden => self.muted?})
     end
     [comments.compact, @ignored_files]
   end
