@@ -64,8 +64,6 @@ define [
         locals =
           showEmail: showEmail
           helpLinks: links
-          showBadBrowserMessage: INST.browser.ie
-          browserVersion: INST.browser.version
           url: window.location
 
         @$dialog.html(helpDialogTemplate locals)
