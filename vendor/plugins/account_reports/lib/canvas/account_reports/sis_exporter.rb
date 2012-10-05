@@ -18,12 +18,14 @@
 
 module Canvas::AccountReports
   class SisExporter
+    include Api
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections", "enrollments", "groups", "group_membership", "xlist"]
 
     def initialize(account_report, params = {})
       @account_report = account_report
-      @term = @account_report.parameters["enrollment_term"].presence
       @account = @account_report.account
+      @domain_root_account = @account.root_account
+      @term = api_find(@account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.parameters["enrollment_term"]
       @reports = SIS_CSV_REPORTS & @account_report.parameters.keys
       @sis_format = params[:sis_format]
     end
