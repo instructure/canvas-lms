@@ -474,6 +474,7 @@ describe "common file behaviors" do
     end
 
     before(:each) do
+      sleep 5 # page does a weird load twice which is causing selenium failures so we sleep and wait for the page
       @a_filename, a_fullpath, a_data = get_file("a_file.txt")
       @b_filename, b_fullpath, b_data = get_file("b_file.txt")
       @c_filename, c_fullpath, c_data = get_file("c_file.txt")
