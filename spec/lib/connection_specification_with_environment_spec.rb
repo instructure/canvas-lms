@@ -93,10 +93,9 @@ describe ActiveRecord::Base::ConnectionSpecification do
     before do
       #!!! trick it in to actually switching envs
       Rails.env.stubs(:test?).returns(false)
-    end
 
-    after do
-      Rails.env.unstub(:test?)
+      # be sure to test bugs where the current env isn't yet included in this hash
+      ActiveRecord::Base::ConnectionSpecification.connection_handlers.clear
     end
 
     it "should call ensure_handler when switching envs" do
@@ -110,6 +109,18 @@ describe ActiveRecord::Base::ConnectionSpecification do
       slave_conn = ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) { ActiveRecord::Base.connection }
       conn.should_not == slave_conn
       ActiveRecord::Base.connection.should == conn
+    end
+
+    context "non-transactional" do
+      self.use_transactional_fixtures = false
+
+      it "should really disconnect" do
+        ActiveRecord::Base.connection
+        ActiveRecord::Base.connection_pool.should be_connected
+
+        ActiveRecord::Base.clear_all_connections!
+        ActiveRecord::Base.connection_pool.should_not be_connected
+      end
     end
   end
 end

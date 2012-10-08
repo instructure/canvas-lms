@@ -71,9 +71,9 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
     end
   end
 
-  def self.reset_connection_handler_cache!
-    @connection_handlers ||= {}
-    @connection_handlers.values.each(&:clear_all_connections_without_multiple_environments!)
+  def self.connection_handlers
+    self.save_handler
+    @connection_handlers
   end
 
   # for use from script/console ONLY; these will still disconnect
@@ -89,11 +89,15 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
 end
 
 ActiveRecord::ConnectionAdapters::ConnectionHandler.class_eval do
-  # double-require prevention
-  unless self.instance_methods.include?('clear_all_connections_without_multiple_environments!')
-    def clear_all_connections_with_multiple_environments!
-      ActiveRecord::Base::ConnectionSpecification.reset_connection_handler_cache!
-    end
-    alias_method_chain :clear_all_connections!, :multiple_environments
+  %w{clear_active_connections clear_reloadable_connections
+     clear_all_connections verify_active_connections }.each do |method|
+    # double-require prevention
+    next self.instance_methods.include?("#{method}_without_multiple_environments!")
+    class_eval(<<EOS)
+      def #{method}_with_multiple_environments!
+        ActiveRecord::Base::ConnectionSpecification.connection_handlers.values.each(&:#{method}_without_multiple_environments!)
+      end
+EOS
+    alias_method_chain "#{method}!".to_sym, :multiple_environments
   end
 end
