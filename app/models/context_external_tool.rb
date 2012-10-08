@@ -165,11 +165,10 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def course_navigation=(hash)
-    tool_setting(:course_navigation, hash) { |nav_settings|
+    tool_setting(:course_navigation, hash, :default) { |nav_settings|
       if hash[:visibility] == 'members' || hash[:visibility] == 'admins'
         nav_settings[:visibility] = hash[:visibility]
       end
-      nav_settings[:default] = Canvas::Plugin.value_to_boolean(hash[:default])
     }
   end
 
@@ -500,8 +499,10 @@ class ContextExternalTool < ActiveRecord::Base
       settings.delete setting
       return
     else
-      settings[setting] = {}
+      settings[setting] = {}.with_indifferent_access
     end
+
+    hash = hash.with_indifferent_access
 
     settings[setting][:url] = hash[:url] if hash[:url]
     settings[setting][:text] = hash[:text] if hash[:text]
