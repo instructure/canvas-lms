@@ -143,6 +143,7 @@ module SeleniumTestsHelperMethods
   end
 
   def self.setup_host_and_port(tries = 60)
+    ENV['CANVAS_CDN_HOST'] = "canvas.instructure.com"
     if SELENIUM_CONFIG[:server_port]
       $server_port = SELENIUM_CONFIG[:server_port]
       $app_host_and_port = "#{SERVER_IP}:#{$server_port}"
