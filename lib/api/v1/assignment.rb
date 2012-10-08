@@ -18,7 +18,6 @@
 
 module Api::V1::Assignment
   include Api::V1::Json
-  include Api::V1::DiscussionTopics
   include ApplicationHelper
 
   def assignment_json(assignment, user, session, include_discussion_topic = true)
@@ -72,6 +71,7 @@ module Api::V1::Assignment
     end
 
     if include_discussion_topic && assignment.discussion_topic
+      extend Api::V1::DiscussionTopics
       hash['discussion_topic'] = discussion_topic_api_json(assignment.discussion_topic, assignment.discussion_topic.context, user, session, !:include_assignment)
     end
 
