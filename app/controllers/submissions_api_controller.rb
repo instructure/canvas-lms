@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -40,6 +40,7 @@ class SubmissionsApiController < ApplicationController
   # Fields include:
   # assignment_id:: The unique identifier for the assignment.
   # user_id:: The id of the user who submitted the assignment.
+  # grader_id:: The id of the user who graded the assignment.
   # submitted_at:: The timestamp when the assignment was submitted, if an actual submission has been made.
   # score:: The raw score for the assignment submission.
   # attempt:: If multiple submissions have been made, this is the attempt number.

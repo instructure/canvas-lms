@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -82,6 +82,9 @@
 #
 #       // The id of the user who created the submission
 #       user_id: 134
+#
+#       // The id of the user who graded the submission
+#       grader_id: 86
 #
 #       // The submissions user (see user API) (optional)
 #       user: User
