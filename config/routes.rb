@@ -692,6 +692,16 @@ ActionController::Routing::Routes.draw do |map|
       assignments.delete 'courses/:course_id/assignments/:id', :action => :destroy, :controller => :assignments
     end
 
+    api.with_options(:controller => :assignment_overrides) do |overrides|
+      overrides.get 'courses/:course_id/assignments/:assignment_id/overrides', :action => :index
+      overrides.post 'courses/:course_id/assignments/:assignment_id/overrides', :action => :create
+      overrides.get 'courses/:course_id/assignments/:assignment_id/overrides/:id', :action => :show, :path_name => 'assignment_override'
+      overrides.put 'courses/:course_id/assignments/:assignment_id/overrides/:id', :action => :update
+      overrides.delete 'courses/:course_id/assignments/:assignment_id/overrides/:id', :action => :destroy
+      overrides.get 'sections/:course_section_id/assignments/:assignment_id/override', :action => :section_alias
+      overrides.get 'groups/:group_id/assignments/:assignment_id/override', :action => :group_alias
+    end
+
     api.with_options(:controller => :submissions_api) do |submissions|
       def submissions_api(submissions, context)
         submissions.get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", :action => :index, :path_name => "#{context}_assignment_submissions"

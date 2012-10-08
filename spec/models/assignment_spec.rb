@@ -608,7 +608,7 @@ describe Assignment do
     it "should allow overriding the scope" do
       @override.destroy
       @assignment.overrides_visible_to(@teacher).should be_empty
-      @assignment.overrides_visible_to(@teacher, @assignment.assignment_overrides).should == [@override]
+      @assignment.overrides_visible_to(@teacher, @assignment.assignment_overrides(true)).should == [@override]
     end
 
     it "should skip the visible_to application if the scope is already empty" do

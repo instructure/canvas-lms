@@ -139,6 +139,7 @@ class AssignmentsApiController < ApplicationController
   before_filter :require_context
 
   include Api::V1::Assignment
+  include Api::V1::AssignmentOverride
 
   # @API List assignments
   # Returns the list of assignments for the current context.
@@ -183,12 +184,13 @@ class AssignmentsApiController < ApplicationController
   #   times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   # @argument assignment[description] [String] The assignment's description, supports HTML.
   # @argument assignment[assignment_group_id] [Integer] The assignment group id to put the assignment in. Defaults to the top assignment group in the course.
+  # @argument assignment[assignment_overrides] [Optional, [AssignmentOverride]]
+  #   List of overrides for the assignment.
   # @returns Assignment
   def create
-    @assignment = create_api_assignment(@context, params[:assignment])
-
+    @assignment = @context.assignments.build
     if authorized_action(@assignment, @current_user, :create)
-      if @assignment.save
+      if update_and_save_assignment(@assignment, params[:assignment])
         render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
       else
         # TODO: we don't really have a strategy in the API yet for returning
@@ -201,25 +203,51 @@ class AssignmentsApiController < ApplicationController
   # @API Edit an assignment
   # Modify an existing assignment. See the documentation for assignment
   # creation.
+  # 
+  # If the assignment[assignment_overrides] key is absent, any existing
+  # overrides are kept as is. If the assignment[assignment_overrides] key is
+  # present, existing overrides are updated or deleted (and new ones created,
+  # as necessary) to match the provided list.
+  #
   # @returns Assignment
   def update
     @assignment = @context.assignments.find(params[:id])
-
     if authorized_action(@assignment, @current_user, :update_content)
       if @assignment.frozen?
         render :json => {:message => t('errors.no_edit_frozen', "You cannot edit a frozen assignment.")}.to_json, :status => 400
+      elsif update_and_save_assignment(@assignment, params[:assignment])
+        render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
       else
-        update_api_assignment(@assignment, params[:assignment])
-
-        if @assignment.save
-          render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
-        else
-          # TODO: we don't really have a strategy in the API yet for returning
-          # errors.
-          render :json => 'error'.to_json, :status => 400
-        end
+        # TODO: we don't really have a strategy in the API yet for returning
+        # errors.
+        render :json => 'error'.to_json, :status => 400
       end
     end
   end
 
+  protected
+
+  def update_and_save_assignment(assignment, assignment_params)
+    # convert hashes like {0 => x, 1 => y} into arrays like [x, y]
+    overrides = assignment_params[:assignment_overrides]
+    if overrides.is_a?(Hash)
+      return unless overrides.keys.all?{ |k| k.to_i.to_s == k.to_s }
+      indices = overrides.keys.sort_by(&:to_i)
+      return unless indices.map(&:to_i) == (0...indices.size).to_a
+      overrides = indices.map{ |index| overrides[index] }
+    end
+
+    # require it to be formatted as an array if it's present
+    return if overrides && !overrides.is_a?(Array)
+
+    # do the updating
+    update_api_assignment(assignment, assignment_params)
+    assignment.transaction do
+      assignment.save!
+      batch_update_assignment_overrides(assignment, overrides) if overrides
+    end
+    return true
+  rescue ActiveRecord::RecordInvalid
+    return false
+  end
 end
