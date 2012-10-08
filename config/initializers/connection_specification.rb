@@ -72,7 +72,8 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
   end
 
   def self.reset_connection_handler_cache!
-    @connection_handlers = {}
+    @connection_handlers ||= {}
+    @connection_handlers.values.each(&:clear_all_connections_without_multiple_environments!)
   end
 
   # for use from script/console ONLY; these will still disconnect
@@ -92,7 +93,6 @@ ActiveRecord::ConnectionAdapters::ConnectionHandler.class_eval do
   unless self.instance_methods.include?('clear_all_connections_without_multiple_environments!')
     def clear_all_connections_with_multiple_environments!
       ActiveRecord::Base::ConnectionSpecification.reset_connection_handler_cache!
-      clear_all_connections_without_multiple_environments!
     end
     alias_method_chain :clear_all_connections!, :multiple_environments
   end
