@@ -83,8 +83,9 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
   end
 
   def self.switch_environment!(environment)
+    self.save_handler
     self.environment = environment
-    ActiveRecord::Base.connection_handler.clear_all_connections!
+    ActiveRecord::Base.connection_handler = self.ensure_handler
   end
 end
 
