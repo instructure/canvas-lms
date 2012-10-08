@@ -88,4 +88,28 @@ describe ActiveRecord::Base::ConnectionSpecification do
     spec.config = conf.dup
     spec.config[:username].should == 'canvas'
   end
+
+  describe "with_environment" do
+    before do
+      #!!! trick it in to actually switching envs
+      Rails.env.stubs(:test?).returns(false)
+    end
+
+    after do
+      Rails.env.unstub(:test?)
+    end
+
+    it "should call ensure_handler when switching envs" do
+      old_handler = ActiveRecord::Base.connection_handler
+      ActiveRecord::Base::ConnectionSpecification.expects(:ensure_handler).returns(old_handler).twice
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) {}
+    end
+
+    it "should not close connections when switching envs" do
+      conn = ActiveRecord::Base.connection
+      slave_conn = ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) { ActiveRecord::Base.connection }
+      conn.should_not == slave_conn
+      ActiveRecord::Base.connection.should == conn
+    end
+  end
 end
