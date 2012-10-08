@@ -2,7 +2,7 @@
   <h3><%= check_box :copy, :shift_dates, :class => "shift_dates_checkbox" %><%= label :copy, :shift_dates, :en => "Adjust events and due dates" %></h3>
   <div style="display: none; margin-left: 50px;" class="shift_dates_settings">
     <div>
-      <div style="margin-bottom: 5px;"><%= t 'labels.dates_range', "%{course} dates range", :course => %{<strong class="course_name">#{@source_course.name}</strong>}.html_safe %></div>
+      <div style="margin-bottom: 5px;"><%= t 'labels.dates_range', "*%{course}* dates range", :course => @source_course.name, :wrapper => '<strong class="course_name">\1</strong>' %></div>
       <% ot 'from_to', "*from* %{start_date} **to** %{end_date}",
             :start_date => capture { %>
         <div style="float: left;"><%= text_field :copy, :old_start_date, :value => date_string(@source_course.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
