@@ -3,7 +3,7 @@ class AddCrocodocIdToUsers < ActiveRecord::Migration
 
   def self.up
     add_column :users, :crocodoc_id, :int
-    Setting.set 'crocodoc_counter', 0
+    Setting.set('crocodoc_counter', 0) if Shard.current.default?
   end
 
   def self.down
