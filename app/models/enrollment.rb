@@ -178,6 +178,12 @@ class Enrollment < ActiveRecord::Base
                     AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now]
   } }
 
+  named_scope :past,
+              :joins => :course,
+              :conditions => "courses.workflow_state = 'completed' OR
+                              enrollments.workflow_state IN ('rejected', 'completed')
+                              AND enrollments.workflow_state NOT IN ('invited', 'deleted')"
+
   named_scope :not_fake, :conditions => "enrollments.type != 'StudentViewEnrollment'"
 
 
