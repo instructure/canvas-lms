@@ -42,7 +42,7 @@
             <%= t(:student_mute_notification, "Instructor is working on grades") %>
           <% else %>
             <% unless q.ungraded? %>
-              <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}", :score => submission.score, :points_possible => q.points_possible) %>
+              <%= score_out_of_points_possible(submission.score, q.points_possible) %>
             <% end %>
           <% end %>
         <% elsif submission %>

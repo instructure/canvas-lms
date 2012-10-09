@@ -36,5 +36,37 @@ describe QuizzesHelper do
       render_score('100').should == '100'
       render_score('1.43').should == '1.43'
     end
+
+    it 'should remove trailing zeros' do
+      render_score(1.20000000).should == '1.2'
+      render_score(0.10340000, 5).should == '0.1034'
+    end
+
+    it 'should remove trailing zeros and decimal point' do
+      render_score(0.00000000).should == '0'
+      render_score(1.00000000).should == '1'
+      render_score(100.0).should == '100'
+    end
+  end
+
+  context 'score_out_of_points_possible' do
+    it 'should show single digit scores' do
+      score_out_of_points_possible(1, 5).should == "1 out of 5"
+      score_out_of_points_possible(0, 9).should == "0 out of 9"
+    end
+
+    it 'should show 2-decimal precision if necessary' do
+      score_out_of_points_possible(0.66666666666, 1).should == "0.67 out of 1"
+      score_out_of_points_possible(5.23333333333, 10.0).should == "5.23 out of 10"
+    end
+
+    it 'should be wrapped by a span when a CSS class, id, or style is given' do
+      score_out_of_points_possible(1.5, 3, :class => "score_value").should == \
+        '<span class="score_value">1.5</span> out of 3'
+      score_out_of_points_possible(1.5, 3, :id => "score").should == \
+        '<span id="score">1.5</span> out of 3'
+      score_out_of_points_possible(1.5, 3, :style => "width:100%").should == \
+        '<span style="width:100%">1.5</span> out of 3'
+    end
   end
 end

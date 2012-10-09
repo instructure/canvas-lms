@@ -17,11 +17,11 @@
 #
 
 module QuizzesHelper
-  def render_score(score)
+  def render_score(score, precision=2)
     if score.nil?
       '_'
     else
-      score.to_f.round(2).to_s
+      score.to_f.round(precision).to_s
     end
   end
 
@@ -190,5 +190,20 @@ module QuizzesHelper
         :one => "1 minute",
         :other => "%{count} minutes" },
       :count => duration_minutes)
+  end
+
+  def score_out_of_points_possible(score, points_possible, options={})
+    options = {:precision => 2}.merge(options)
+    score_html = \
+      if options[:id] or options[:class] or options[:style] then
+        content_tag('span',
+          render_score(score, options[:precision]), 
+          options.slice(:class, :id, :style))
+      else
+        render_score(score, options[:precision])
+      end
+    I18n.t("quizzes.helpers.score_out_of_points_possible", "%{score} out of %{points_possible}",
+        :score => score_html,
+        :points_possible => render_score(points_possible, options[:precision]))
   end
 end

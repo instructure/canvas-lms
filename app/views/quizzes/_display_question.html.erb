@@ -41,7 +41,7 @@
             <% if hash_get(user_answer, :correct) == "undefined" %>
               <%= t(:not_yet_graded, 'Not yet graded') %>
             <% else %>
-              <%= hash_get(user_answer, :points) %>
+              <%= render_score(hash_get(user_answer, :points)) %>
             <% end %>
           <% end %>
           <% question[:points_possible] = 0 if question_type.answer_type == 'none' %>

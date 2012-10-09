@@ -16,9 +16,7 @@
   <% if @submission.finished_at %>
     <div class="quiz_score">
       <%= before_label(:score, "Score") %>
-      <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-            :score => raw("<span class=\"score_value\">#{@submission.score}</span>"),
-            :points_possible => @quiz.points_possible) %>
+      <%= score_out_of_points_possible(@submission.score, @quiz.points_possible, :class => 'score_value') %>
     </div>
   <% end %>
   <div>

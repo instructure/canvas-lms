@@ -8482,6 +8482,7 @@ ru:
     helpers: 
       duration_in_minutes: 
         other: "%{count} минут(ы)"
+      score_out_of_points_possible: "%{score} из %{points_possible}"
     history: 
       anonymous_username: Студент
       buttons: 
@@ -8780,7 +8781,6 @@ ru:
         take_quiz_again: "Снова принять контрольную работу"
         take_survey_again: "Снова принять опрос"
       no_more_attempts: "Нет доступных попыток"
-      score_out_of_points_possible: "%{score} из %{points_possible}"
       score_set_manually: "Этот результат был установлен учителем"
       unlimited_attempts: "Неограниченное число попыток"
       view_previous_attempts: "Просмотреть предыдущие попытки"
@@ -8809,7 +8809,6 @@ ru:
       quiz_results_protected_until_last_attempt: "Результаты контрольной работы защищены для этой контрольной работы и не отображаются студентам до отправки их последних попыток."
       quiz_submission_needs_review: "Тест был значительно изменен после того, как это задание было отправлено. Возможно, требуется пересмотреть оценку этого задания."
       requires_lockdown: "Для просмотра результатов контрольной работы требуется браузер Respondus LockDown."
-      score_out_of_points_possible: "%{score} из %{points_possible}"
       submitted_at: "Отправлено %{when}"
       survey_fudged_negative: "Результат этого опроса был изменен вручную на %{fudge} баллов."
       survey_fudged_positive: "Результат этого опроса был изменен вручную на +%{fudge} баллов."
@@ -8843,7 +8842,6 @@ ru:
       quiz_points_possible: 
         one: "1 балл"
         other: "%{count} балла(ов)"
-      score_out_of_points_possible: "%{score} из %{points_possible}"
       student_mute_notification: "Инструктор выполняет оценку"
       titles: 
         delete_quiz: "Удалить контрольную работу"
@@ -9032,7 +9030,6 @@ ru:
         twelve_hours_left: "Осталось двенадцать часов"
       saved_at: "Сохранено в %{t}"
       saving: Сохранение...
-      score_out_of_points_possible: "%{score} из %{points_possible}"
       seconds_count: 
         one: "1 секунда"
         other: "%{count} секунд(ы)"

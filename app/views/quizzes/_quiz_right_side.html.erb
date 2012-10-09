@@ -32,16 +32,12 @@
         <% unless @quiz.assignment.present? && @quiz.assignment.muted? %>
         <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
           <th><%= before_label(:current_score, "Current Score") %></th>
-          <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-                    :score => @submission.score,
-                    :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
+          <td><%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
                   <%= '*' if @submission.pending_review? %></td>
         </tr>
         <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
           <th><%= before_label(:kept_score, "Kept Score") %></th>
-          <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-                    :score => @submission.kept_score,
-                    :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
+          <td><%= score_out_of_points_possible(@submission.kept_score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
         </tr>
           <% if @submission.manually_scored %>
             <tr>
