@@ -44,13 +44,14 @@ class PseudonymsController < ApplicationController
   def index
     return unless get_user && authorized_action(@user, @current_user, :read)
 
-    scope = @user.pseudonyms.active
     if @context.is_a?(Account)
       return unless context_is_root_account?
+      scope = @context.pseudonyms.active.scoped(:conditions => { :user_id => @user.id })
       @pseudonyms = Api.paginate(
-        scope.scoped(:conditions => { :account_id => @context.id }),
+        scope,
         self, api_v1_account_pseudonyms_path)
     else
+      scope = @user.all_pseudonyms(:conditions => { :workflow_state => 'active' })
       @pseudonyms = Api.paginate(scope, self, api_v1_user_pseudonyms_path)
     end
 
@@ -144,7 +145,7 @@ class PseudonymsController < ApplicationController
   end
 
   def new
-    @pseudonym = @current_user.pseudonyms.build(:account_id => @domain_root_account.id)
+    @pseudonym = @domain_root_account.pseudonyms.build(:user => @current_user)
   end
 
   # @API Create a user login
@@ -160,16 +161,15 @@ class PseudonymsController < ApplicationController
 
     if api_request?
       return unless context_is_root_account?
-      params[:pseudonym] = params[:login].merge(
-        :password_confirmation => params[:login][:password],
-        :account => @context
-      )
+      @account = @context
+      params[:login][:password_confirmation] = params[:login][:password]
+      params[:pseudonym] = params[:login]
     else
       account_id = params[:pseudonym].delete(:account_id)
       if Account.site_admin.grants_right?(@current_user, :manage_user_logins)
-        params[:pseudonym][:account] = Account.root_accounts.find(account_id)
+        @account = Account.root_accounts.find(account_id)
       else
-        params[:pseudonym][:account] = @domain_root_account
+        @account = @domain_root_account
         unless @domain_root_account.settings[:admins_can_change_passwords]
           params[:pseudonym].delete :password
           params[:pseudonym].delete :password_confirmation
@@ -177,9 +177,10 @@ class PseudonymsController < ApplicationController
       end
     end
 
+    params[:pseudonym][:user] = @user
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
-    @pseudonym = @user.pseudonyms.build(params[:pseudonym])
-    @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
+    @pseudonym = @account.pseudonyms.build(params[:pseudonym])
+    @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @account.grants_right?(@current_user, session, :manage_sis)
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
     if @pseudonym.save
       respond_to do |format|
@@ -227,7 +228,8 @@ class PseudonymsController < ApplicationController
       params[:pseudonym]  = params[:login]
     else
       return unless get_user
-      @pseudonym = @user.pseudonyms.active.find(params[:id])
+      @pseudonym = Pseudonym.active.find(params[:id])
+      raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
     end
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     return render(:json => nil, :status => :bad_request) if params[:pseudonym].blank?
@@ -285,8 +287,9 @@ class PseudonymsController < ApplicationController
   def destroy
     return unless get_user
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
-    @pseudonym = @user.pseudonyms.active.find(params[:id])
-    if @user.pseudonyms.active.length < 2
+    @pseudonym = Pseudonym.active.find(params[:id])
+    raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
+    if @user.all_pseudonyms(:conditions => { :workflow_state => 'active' }).length < 2
       @pseudonym.errors.add_to_base(t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors.to_json, :status => :bad_request
     elsif @pseudonym.sis_user_id && !@pseudonym.account.grants_right?(@current_user, session, :manage_sis)

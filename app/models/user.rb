@@ -2667,4 +2667,11 @@ class User < ActiveRecord::Base
     end
   end
   memoize :accounts
+
+  def all_pseudonyms(options = {})
+    Shard.with_each_shard(self.associated_shards) do
+      Pseudonym.scoped(options).find(:all, :conditions => { :user_id => self.id })
+    end
+  end
+  memoize :all_pseudonyms
 end
