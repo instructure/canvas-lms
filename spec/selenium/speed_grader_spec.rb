@@ -229,6 +229,29 @@ describe "speed grader" do
     fj('body.grades').should be_displayed
   end
 
+  it "should show comment post time" do
+    @submission = student_submission
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_animations
+
+    #add comment
+    f('#add_a_comment > textarea').send_keys('grader comment')
+    submit_form('#add_a_comment')
+    keep_trying_until { f('#comments > .comment').should be_displayed }
+    @submission.reload
+    @comment = @submission.submission_comments.first
+
+    # immediately from javascript
+    extend TextHelper
+    expected_posted_at = datetime_string(@comment.created_at).gsub(/\s+/, ' ')
+    f('#comments > .comment .posted_at').should include_text(expected_posted_at)
+
+    # after refresh
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_animations
+    f('#comments > .comment .posted_at').should include_text(expected_posted_at)
+  end
+
   it "should properly show avatar images only if avatars are enabled on the account" do
     # enable avatars
     @account = Account.default
