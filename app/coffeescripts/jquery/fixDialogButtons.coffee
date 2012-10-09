@@ -1,8 +1,9 @@
 define [
   'jquery'
+  'underscore'
   'compiled/fn/preventDefault'
   'jqueryui/dialog'
-], ($, preventDefault) ->
+], ($, _, preventDefault) ->
 
   $.fn.fixDialogButtons = ->
     this.each ->
@@ -31,4 +32,7 @@ define [
             click: -> $button.click()
             class: classes
           }
+        # put the primary button(s) on the far right
+        buttons = _.sortBy buttons, (button) ->
+          if button.class.match(/btn-primary|button-default/) then 1 else 0
         $dialog.dialog "option", "buttons", buttons
