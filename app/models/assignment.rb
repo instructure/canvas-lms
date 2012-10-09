@@ -1029,7 +1029,7 @@ class Assignment < ActiveRecord::Base
                           :graded_at, :turnitin_data, :submission_type, :score,
                           :assignment_id, :submission_comments ]
 
-    comment_fields = [:comment, :id, :author_name, :posted_at, :author_id,
+    comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                       :media_comment_type, :media_comment_id,
                       :cached_attachments, :attachments]
 

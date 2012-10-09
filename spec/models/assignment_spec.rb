@@ -1924,6 +1924,16 @@ describe Assignment do
       @topic.reload.should be_deleted
     end
   end
+
+  describe "speed_grader_json" do
+    it "should include comments' created_at" do
+      setup_assignment_with_homework
+      @submission = @assignment.submissions.first
+      @comment = @submission.add_comment(:comment => 'comment')
+      json = @assignment.speed_grader_json(@user)
+      json[:submissions].first[:submission_comments].first[:created_at].should == @comment.created_at
+    end
+  end
 end
 
 def setup_assignment_with_group
