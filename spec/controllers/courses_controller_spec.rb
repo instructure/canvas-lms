@@ -34,6 +34,22 @@ describe CoursesController do
       assigns[:current_enrollments].should_not be_empty
       assigns[:current_enrollments][0].should eql(@enrollment)
       assigns[:past_enrollments].should_not be_nil
+      assigns[:future_enrollments].should_not be_nil
+    end
+
+    it "should not duplicate enrollments in variables" do
+      course_with_student_logged_in(:active_all => true)
+      course
+      @course.start_at = Time.now + 2.weeks
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @course.offer!
+      @course.enroll_student(@user)
+      get 'index'
+      response.should be_success
+      assigns[:future_enrollments].each do |e|
+        assigns[:current_enrollments].should_not include e
+      end
     end
   end
   
