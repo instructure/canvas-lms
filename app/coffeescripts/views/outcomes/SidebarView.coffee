@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2012 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 define [
   'i18n!outcomes'
   'jquery'
@@ -136,6 +154,7 @@ define [
     # Go up a directory.
     goBack: =>
       i = _.indexOf @directories, @selectedDir()
+      @goingBack = true
       if i < 1
         @directories[0].clearSelection()
         @selectDir @directories[0]
@@ -144,13 +163,16 @@ define [
         @selectDir prevDir, prevDir.selectedModel()
 
     updateSidebarWidth: ->
+      sidebarWidth = if @directories.length is 1 then @directoryWidth + 1 else (@directoryWidth * 2) + 2
       @$el.css width: (@directoryWidth * @directories.length) + @directories.length
-      @$sidebar.animate width: (if @directories.length is 1 then @directoryWidth + 1 else (@directoryWidth * 2) + 2)
+      @$sidebar.animate width: sidebarWidth
 
     renderDir: (dir) =>
       @$el.append dir.render().el
-      sidebar = @$el.parent()
-      @$sidebar.animate scrollLeft: @$sidebar.get(0).scrollWidth - @$sidebar.get(0).clientWidth
+      @$sidebar.animate scrollLeft: @scrollNextPosition
+
+    scrollNextPosition: ->
+      @$sidebar.get(0).scrollWidth - @$sidebar.get(0).clientWidth
 
     render: ->
       @$el.empty()

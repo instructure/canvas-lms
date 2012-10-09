@@ -109,6 +109,12 @@ ul.outcome-level
     overflow: hidden
     list-style: none
     width: 200px
+    &:hover, &:focus
+      outline: none
+      a
+        background: white
+      i[class*=icon-]
+        background-image: url(/images/blue/canvas-icons-16x16-blue.png)
     a
       text-decoration: none
       display: block
@@ -137,6 +143,8 @@ ul.outcome-level
         border-top-color: lighten($activeBG, 2%)
     a.loading-more
       background-color: darken($lightBackground, 3%)
+    &[aria-grabbed=true] a, &[aria-grabbed=true] i
+      +opacity(0.75)
 
 #import_dialog
   padding: 0
