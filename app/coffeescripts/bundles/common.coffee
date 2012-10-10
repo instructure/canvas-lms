@@ -45,7 +45,13 @@ require [
 ], (courseList, helpDialog) ->
   courseList.init()
   helpDialog.initTriggers()
+
   $('#skip_navigation_link').on 'click', ->
     $($(this).attr('href')).attr('tabindex', -1).focus()
 
+  # TODO: remove this code once people have had time to update their logo-related
+  # custom css. see related code in app/stylesheets/base/_#header.sass.
+  $logo = $('#header-logo')
+  if $logo.length > 0 and $logo.css('background').match(/header_canvas_logo/)
+    $logo.addClass('original')
 
