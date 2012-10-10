@@ -57,8 +57,16 @@ class ContentParticipationCount < ActiveRecord::Base
 
   def self.unread_count_for(type, context, user)
     return 0 unless user.present? && context.present?
-    return 0 unless %w(DiscussionTopic Announcement Submission).include?(type)
-    send("unread_#{type.underscore}_count_for", context, user)
+    case type
+    when "DiscussionTopic"
+      self.unread_discussion_topic_count_for(context, user)
+    when "Announcement"
+      self.unread_announcement_count_for(context, user)
+    when "Submission"
+      self.unread_submission_count_for(context, user)
+    else
+      0
+    end
   end
 
   def self.unread_discussion_topic_count_for(context, user)
