@@ -21,6 +21,7 @@
 # "External tools" are IMS LTI links: http://www.imsglobal.org/developers/LTI/index.cfm
 class ExternalToolsController < ApplicationController
   before_filter :require_context, :require_user
+  before_filter :get_context, :only => [:retrieve, :show, :resource_selection]
   include Api::V1::ExternalTools
 
   # @API List external tools
@@ -84,7 +85,6 @@ class ExternalToolsController < ApplicationController
   end
   
   def retrieve
-    get_context
     if authorized_action(@context, @current_user, :read)
       @tool = ContextExternalTool.find_external_tool(params[:url], @context)
       if !@tool
@@ -141,7 +141,6 @@ class ExternalToolsController < ApplicationController
   #        "resource_selection":{"url":"...", "selection_width":50, "selection_height":50}
   #      }
   def show
-    get_context
     if api_request?
       if tool = @context.context_external_tools.active.find_by_id(params[:external_tool_id])
         render :json => external_tool_json(tool, @context, @current_user, session)
@@ -156,19 +155,19 @@ class ExternalToolsController < ApplicationController
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
   end
-  
+
   def resource_selection
-    get_context
-    if authorized_action(@context, @current_user, :update)
-      selection_type = params[:editor] ? 'editor_button' : 'resource_selection'
-      add_crumb(@context.name, named_context_url(@context, :context_url))
-      @return_url = external_content_success_url('external_tool')
-      @headers = false
-      @self_target = true
-      render_tool(params[:external_tool_id], selection_type)
-    end
+    return unless authorized_action(@context, @current_user, :read)
+    add_crumb(@context.name, named_context_url(@context, :context_url))
+
+    selection_type = params[:editor].present? ? 'editor_button' : 'resource_selection'
+    @return_url    = external_content_success_url('external_tool')
+    @headers       = false
+    @self_target   = true
+
+    render_tool(params[:external_tool_id], selection_type)
   end
-  
+
   def render_tool(id, selection_type)
     begin
       @tool = ContextExternalTool.find_for(id, @context, selection_type) 
