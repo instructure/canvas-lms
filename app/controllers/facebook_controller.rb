@@ -107,13 +107,16 @@ class FacebookController < ApplicationController
     if params[:signed_request]
       data, sig = Facebook.parse_signed_request(params[:signed_request])
       if data && sig
-        @facebook_user_id = data['user_id']
-        Shard.with_each_shard do
-          @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
-          break if @service
+        if @facebook_user_id = data['user_id']
+          Shard.with_each_shard do
+            @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
+            break if @service
+          end
         end
-        @service.update_attribute(:token, data['oauth_token']) if @service && !@service.token && data['oauth_token']
-        @user = @service && @service.user
+        if @service
+          @service.update_attribute(:token, data['oauth_token']) if !@service.token && data['oauth_token']
+          @user = @service.user
+        end
         session[:facebook_canvas_user_id] = @user.id if @user
         return true
       else
