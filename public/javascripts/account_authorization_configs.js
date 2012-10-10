@@ -1,9 +1,10 @@
 define([
+  'i18n!account_authorization_configs',
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */
-], function($) {
+], function(I18n, $) {
 
   var new_type = null;
   
@@ -50,7 +51,20 @@ define([
         }
       });
   });
-  
+
+  $("#discovery_url_form").formSubmit({
+    success: function(data) {
+      window.location.reload();
+    }
+  });
+
+  $('#discovery_url_config .delete_url').click(function(){
+    $.ajaxJSON( $(this).data('url'), "DELETE", {}, function(){
+      $('#discovery_url_input').val("");
+      $('#discovery_url_display').html(I18n.t('no_discovery_url', "None set"));
+    });
+  });
+
   $(".add_secondary_ldap_link").click(function(event) {
     event.preventDefault();
     $(".ldap_secondary").show();

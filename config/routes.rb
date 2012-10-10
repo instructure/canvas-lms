@@ -821,8 +821,8 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
       authorization_configs.get 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :show_discovery_url
-      authorization_configs.put 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :update_discovery_url
-      authorization_configs.delete 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :destroy_discovery_url
+      authorization_configs.put 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :update_discovery_url, :path_name => 'account_update_discovery_url'
+      authorization_configs.delete 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :destroy_discovery_url, :path_name => 'account_destroy_discovery_url'
 
       authorization_configs.get 'accounts/:account_id/account_authorization_configs', :action => :index
       authorization_configs.get 'accounts/:account_id/account_authorization_configs/:id', :action => :show

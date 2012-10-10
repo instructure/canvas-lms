@@ -101,6 +101,7 @@ class Account < ActiveRecord::Base
 
   validates_locale :default_locale, :allow_nil => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
+  validate :validate_auth_discovery_url
 
   include StickySisFields
   are_sis_sticky :name
@@ -683,6 +684,17 @@ class Account < ActiveRecord::Base
 
   def auth_discovery_url
     self.settings[:auth_discovery_url]
+  end
+
+  def validate_auth_discovery_url
+    return if self.settings[:auth_discovery_url].blank?
+
+    begin
+      value, uri = CustomValidations.validate_url(self.settings[:auth_discovery_url])
+      self.auth_discovery_url = value
+    rescue URI::InvalidURIError, ArgumentError
+      errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
+    end
   end
   
   # When a user is invited to a course, do we let them see a preview of the
