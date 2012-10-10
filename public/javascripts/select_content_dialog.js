@@ -81,14 +81,16 @@ $(document).ready(function() {
     $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
   }
   $("#select_context_content_dialog .cancel_button").click(function() {
-    $("#select_context_content_dialog").dialog('close');
+    $dialog.find('.alert').remove();
+    $dialog.dialog('close');
   });
   $("#select_context_content_dialog .item_title").keycodes('return', function() {
     $(this).parents(".module_item_option").find(".add_item_button").click();
   });
   $("#select_context_content_dialog .add_item_button").click(function() {
     var submit = function(item_data) {
-      $("#select_context_content_dialog").dialog('close');
+      $dialog.dialog('close');
+      $dialog.find('.alert').remove();
       var submitted = $dialog.data('submitted_function');
       if(submitted && $.isFunction(submitted)) {
         submitted(item_data);
@@ -113,7 +115,14 @@ $(document).ready(function() {
       }
       item_data['item[url]'] = $("#external_tool_create_url").val();
       item_data['item[title]'] = $("#external_tool_create_title").val();
-      submit(item_data);   
+      $dialog.find('.alert-error').remove();
+      if (item_data['item[url]'] === '') {
+        var $errorBox = $('<div />', { 'class': 'alert alert-error', role: 'alert' }).css({marginTop: 8 });
+        $errorBox.text(I18n.t('errors.external_tool_url', "An external tool can't be saved without a URL."));
+        $dialog.prepend($errorBox);
+      } else {
+        submit(item_data);
+      }
     } else if(item_type == 'context_module_sub_header') {
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),

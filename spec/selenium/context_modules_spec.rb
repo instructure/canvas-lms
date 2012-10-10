@@ -463,6 +463,15 @@ describe "context_modules" do
     add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
   end
 
+  it "should not save an invalid external tool" do
+    add_module 'Test module'
+    f('.add_module_item_link').click
+    select_module_item('#add_module_item_select', 'External Tool')
+    find_with_jquery('.add_item_button:visible').click
+    ff('.alert.alert-error').length.should == 1
+    find_with_jquery('.alert.alert-error:visible').text.should == "An external tool can't be saved without a URL."
+  end
+
   it "should hide module contents" do
     add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
     f('.collapse_module_link').click
