@@ -169,6 +169,15 @@ module BasicLTI::BasicOutcomes
       if error_message
         self.code_major = 'failure'
         self.description = error_message
+      elsif assignment.points_possible.nil?
+        submission = Submission.create!(submission_hash.merge(:user       => user,
+                                                              :assignment => assignment))
+        submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<-NO_POINTS, :grade => submission_hash[:grade]))
+An external tool attempted to grade this assignment as %{grade}, but was unable
+to because the assignment has no points possible.
+        NO_POINTS
+        self.code_major = 'failure'
+        self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
       else
         if submission_hash[:submission_type] != 'external_tool'
           assignment.submit_homework(user, submission_hash.clone)
