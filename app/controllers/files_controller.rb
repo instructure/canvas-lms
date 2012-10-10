@@ -809,7 +809,7 @@ class FilesController < ApplicationController
 
     render :json => json.to_json(:allow => :uuid,
       :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
-      :permissions => {:user => @current_user, :session => session}, :include_root => false,
-      :as_text => true)
+      :permissions => {:user => @current_user, :session => session}, :include_root => false),
+      :as_text => true
   end
 end
