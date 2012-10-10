@@ -100,8 +100,8 @@ define([
             window.location = window.location.href.replace(window.location.hash, "");
           },
           error: function(data) {
-            $(this).find("button[type='submit']").text(I18n.t('messages.submit_failed', "Submit Failed, please try again"));
-            $(this).find("button").attr('disabled', false);
+            submissionForm.find("button[type='submit']").text(I18n.t('messages.submit_failed', "Submit Failed, please try again"));
+            submissionForm.find("button").attr('disabled', false);
           }
         });
       } else {
