@@ -40,7 +40,7 @@ define [
       @tracker.batchPoller()
 
     height: ->
-      @form?.height() ? 0
+      (@form?.height() ? 0) + @tracker.height()
 
     reset: (@options) ->
       @form?.destroy()
