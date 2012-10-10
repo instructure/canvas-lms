@@ -17,7 +17,10 @@
         <li><a class="gradebook_upload_link" href="#"><%= t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
       <% end %>
       <% if @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) %>
-      <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url, :fragment => "tab-grade-publishing") %>"><%= t('publish_to_sis', 'Publish grades to SIS') %></a></li>
+      <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url,
+                                                       :anchor => 'tab-grade-publishing') %>">
+        <%= t('publish_to_sis', 'Publish grades to SIS') %>
+      </a></li>
       <% end %>
       <% if @gradebook_is_editable %>
         <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('set_group_weights', 'Set Group Weights') %></a></li>
