@@ -248,6 +248,30 @@ describe "account" do
         end
       end
     end
+
+    it "should configure discovery_url" do
+      auth_url = "http://example.com"
+      @account = Account.default
+      @account.account_authorization_configs.create!(:auth_type => 'saml')
+      @account.account_authorization_configs.create!(:auth_type => 'saml')
+      get "/accounts/#{Account.default.id}/account_authorization_configs"
+      f("#discovery_url_config .admin-links button").click
+      f("#discovery_url_config .admin-links a").click
+      f("#discovery_url_input").send_keys(auth_url)
+      expect_new_page_load { submit_form("#discovery_url_form") }
+
+      @account.reload
+      @account.auth_discovery_url.should == auth_url
+
+      f("#discovery_url_config .admin-links button").click
+      f("#discovery_url_config .delete_url").click
+
+      wait_for_ajax_requests
+
+      f("#discovery_url_input").attribute(:value).should == ''
+      @account.reload
+      @account.auth_discovery_url.should == nil
+    end
   end
 
   describe "user/course search" do

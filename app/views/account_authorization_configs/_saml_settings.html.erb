@@ -8,7 +8,46 @@
    debugging = @account_config && @account_config.debugging?
 %>
 <div id="saml_div" <%= raw active %>>
-
+ <% if @account_configs.count >= 2 %>
+    <div id="discovery_url_config">
+      <div class="admin-link-hover-area well discovery_url"
+           aria-controls="discovery_url_form"
+           data-hide-while-target-shown=true>
+        <p><%= t('discovery_url_description', <<-TEXT)
+        If a discovery url is set, canvas will forward all users to that URL when they need to be authenticated.
+        That page will need to then help the user figure out where they need to go to log in.
+        If no discovery url is configured, the first SAML configuration will be used to attempt to authenticate the user.
+        TEXT
+        %></p>
+        <div class="admin-links">
+          <button class="al-trigger ui-button">
+            <span class="al-trigger-inner">Manage</span>
+          </button>
+          <ul class="al-options">
+            <li>
+              <a href="#" class="element_toggler" aria-controls="discovery_url_form"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
+            </li>
+            <li>
+              <a href="#" data-url="<%= api_v1_account_destroy_discovery_url_path(@account) %>"
+                 rel="nofollow"
+                 class="delete_url"><span class="ui-icon ui-icon-trash"></span>Delete</a>
+            </li>
+          </ul>
+        </div>
+        <table class="formtable" style="margin-left: 20px;">
+          <tr>
+            <td><%= t :discovery_url, "Discovery URL:" %></td>
+            <td><span id="discovery_url_display"><%= @account.auth_discovery_url || t(:no_discovery_url, "None set" ) %></span></td>
+          </tr>
+        </table>
+      </div>
+      <% form_tag(api_v1_account_update_discovery_url_path(@account), :method => :put, :id => 'discovery_url_form', :class => "form-horizontal bootstrap-form discovery_url_form well", :style => hidden) do %>
+        <input type="text" name="discovery_url" id="discovery_url_input" class="input-xlarge" value="<%= @account.auth_discovery_url %>">
+        <button type="submit" class="button btn-primary">Submit</button>
+        <button class="element_toggler button" aria-controls="discovery_url_form">Cancel</button>
+      <% end %>
+    </div>
+  <% end %>
     <% @saml_configs.each_with_index do |config, i|
        form_id = "saml_config_#{config.id}_form"
        delete_url = config.new_record? ? '' : api_v1_account_delete_aac_path(@account, config)

@@ -459,9 +459,12 @@ class AccountAuthorizationConfigsController < ApplicationController
     else
       @account.auth_discovery_url = nil
     end
-    @account.save!
 
-    render :json => {:discovery_url => @account.auth_discovery_url}
+    if @account.save
+      render :json => {:discovery_url => @account.auth_discovery_url}
+    else
+      render :json => @account.errors, :status => :bad_request
+    end
   end
 
   # @API Delete discovery url
