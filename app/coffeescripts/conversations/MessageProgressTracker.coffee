@@ -79,3 +79,6 @@ define [
         delete @batchItems[id]
       if completed.length
         @app.updateView(true)
+
+    height: ->
+      @$list.outerHeight(true)
