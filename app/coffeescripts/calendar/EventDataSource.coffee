@@ -329,7 +329,9 @@ define [
 
       $.publish "EventDataSource/ajaxStarted"
 
-      params.per_page = 50
+      unless url.match(/per_page=/) or params.per_page?
+        params.per_page = 50
+
       $.ajaxJSON url, 'GET', params, (data, xhr) =>
         $.publish "EventDataSource/ajaxEnded"
 
@@ -338,7 +340,7 @@ define [
 
         if rels?.next
           cb(data, false)
-          @fetchNextBatch rels.next, params, cb
+          @fetchNextBatch rels.next, {}, cb
           return
 
         cb(data, true)
