@@ -190,18 +190,21 @@ class CalendarEventsApiController < ApplicationController
   # Retrieve the list of calendar events or assignments for the current user
   #
   # @argument type [Optional, "event"|"assignment"] Defaults to "event"
-  # @argument start_date [Optional] Only return events since the start_date
-  #   (inclusive)
-  # @argument end_date [Optional] Only return events before the end_date
-  #   (inclusive)
+  # @argument start_date [Optional] Only return events since the start_date (inclusive). 
+  #   Defaults to today. The value should be formatted as: yyyy-mm-dd.
+  # @argument end_date [Optional] Only return events before the end_date (inclusive). 
+  #   Defaults to start_date. The value should be formatted as: yyyy-mm-dd.
+  #   If end_date is the same as start_date, then only events on that day are 
+  #   returned.
   # @argument undated [Optional] Boolean, defaults to false (dated events only).
-  #   If true, only return undated events
-  # @argument context_codes[] [optional] List of context codes of courses/groups/users
-  #   (e.g. course_123) whose events you want to see. If not specified, defaults
-  #   to the current user (i.e personal calendar, no course/group events).
-  #   Limited to 10 context codes, additional ones are ignored
+  #   If true, only return undated events and ignore start_date and end_date.
+  # @argument context_codes[] [Optional] List of context codes of courses/groups/users whose events you want to see.
+  #   If not specified, defaults to the current user (i.e personal calendar, 
+  #   no course/group events). Limited to 10 context codes, additional ones are 
+  #   ignored. The format of this field is the context type, followed by an 
+  #   underscore, followed by the context id. For example: course_42
   def index
-    codes = (params[:context_codes] || [])[0, 10]
+    codes = (params[:context_codes] || [@current_user.asset_string])[0, 10]
     get_options(codes)
 
     scope = if @type == :assignment
