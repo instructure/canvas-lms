@@ -216,9 +216,11 @@ describe Assignment do
 
       # check the teacher sees both, the TA sees one
       @assignment.needs_grading_count_for_user(@teacher).should eql(2)
-      @assignment.needs_grading_count_for_user(@ta).should eql(1)
       @teacher.assignments_needing_grading.collect(&:id).should == [@assignment.id]
+      @teacher.assignments_needing_grading_total_count.should eql(1)
+      @assignment.needs_grading_count_for_user(@ta).should eql(1)
       @ta.assignments_needing_grading.collect(&:id).should == [@assignment.id]
+      @ta.assignments_needing_grading_total_count.should eql(1)
 
       # grade an assignment
       @assignment.grade_student(@user1, :grade => "1")
@@ -226,9 +228,11 @@ describe Assignment do
 
       # check that the numbers changed
       @assignment.needs_grading_count_for_user(@teacher).should eql(1)
-      @assignment.needs_grading_count_for_user(@ta).should eql(0)
       @teacher.assignments_needing_grading.collect(&:id).should == [@assignment.id]
+      @teacher.assignments_needing_grading_total_count.should eql(1)
+      @assignment.needs_grading_count_for_user(@ta).should eql(0)
       @ta.assignments_needing_grading.collect(&:id).should == []
+      @ta.assignments_needing_grading_total_count.should eql(0)
 
       # test limited enrollment in multiple sections
       @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section,
@@ -236,6 +240,7 @@ describe Assignment do
       @assignment.reload
       @assignment.needs_grading_count_for_user(@ta).should eql(1)
       @ta.assignments_needing_grading.collect(&:id).should == [@assignment.id]
+      @ta.assignments_needing_grading_total_count.should == 1
     end
   end
 
