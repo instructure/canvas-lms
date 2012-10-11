@@ -491,11 +491,11 @@ ActionController::Routing::Routes.draw do |map|
   map.grades "grades", :controller => "users", :action => "grades"
 
   map.login "login", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
-  map.aac_login "login/:account_authorization_config_id", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.connect "login", :controller => "pseudonym_sessions", :action=> "create", :conditions => {:method => :post}
   map.logout "logout", :controller => "pseudonym_sessions", :action => "destroy"
   map.cas_login "login/cas", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.otp_login "login/otp", :controller => "pseudonym_sessions", :action => "otp_login", :conditions => { :method => [:get, :post] }
+  map.aac_login "login/:account_authorization_config_id", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.disable_mfa "users/:user_id/mfa", :controller => "pseudonym_sessions", :action => "disable_otp_login", :conditions => { :method => :delete }
   map.clear_file_session "file_session/clear", :controller => "pseudonym_sessions", :action => "clear_file_session"
   map.register "register", :controller => "users", :action => "new"
