@@ -149,7 +149,10 @@ describe "context_modules" do
     a2_img = fj('.context_module_items .context_module_item:last .move_item_link img')
 
     #performs the change position
-    driver.action.drag_and_drop(a2_img, a1_img).perform
+    with_focus_icons_visible do
+      driver.action.drag_and_drop(a2_img, a1_img).perform
+    end
+
     wait_for_ajax_requests
 
     #validates the assignments switched, the number convention doesn't make sense, should be assignment == 2 and assignment2 == 1 but this is working
@@ -172,7 +175,10 @@ describe "context_modules" do
     a2_img = fj('#context_modules .context_module:last-child .context_module_items .context_module_item:first .move_item_link img')
 
     #performs the change position
-    driver.action.drag_and_drop(a2_img, a1_img).perform
+    with_focus_icons_visible do
+      driver.action.drag_and_drop(a2_img, a1_img).perform
+    end
+
     wait_for_ajax_requests
 
     #validates the module 1 assignments are in the expected places and that module 2 context_module_items isn't present
@@ -235,10 +241,13 @@ describe "context_modules" do
 
   it "should delete a module" do
     add_module('Delete Module')
-    driver.execute_script("$('.context_module').addClass('context_module_hover')")
-    f('.delete_module_link').click
-    driver.switch_to.alert.should_not be_nil
-    driver.switch_to.alert.accept
+
+    with_focus_icons_visible do
+      f('.delete_module_link').click
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.accept
+    end
+
     wait_for_ajaximations
     refresh_page
     f('#no_context_modules_message').should be_displayed
@@ -249,7 +258,9 @@ describe "context_modules" do
     add_module('Edit Module')
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
-    f('.edit_module_link').click
+    with_focus_icons_visible do
+      f('.edit_module_link').click
+    end
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
     edit_form.find_element(:id, 'context_module_name').send_keys(edit_text)
@@ -265,7 +276,9 @@ describe "context_modules" do
     # add completion criterion
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
-    f('.edit_module_link').click
+    with_focus_icons_visible do
+      f('.edit_module_link').click
+    end
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
     f('.add_completion_criterion_link', edit_form).click
@@ -285,7 +298,11 @@ describe "context_modules" do
 
     # delete the criterion, then cancel the form
     driver.action.move_to(context_module).perform
-    f('.edit_module_link').click
+
+    with_focus_icons_visible do
+      f('.edit_module_link').click
+    end
+
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
     f('.completion_entry .delete_criterion_link', edit_form).click
@@ -296,7 +313,11 @@ describe "context_modules" do
     # now delete the criterion frd
     # (if the previous step did even though it shouldn't have, this will error)
     driver.action.move_to(context_module).perform
-    f('.edit_module_link').click
+
+    with_focus_icons_visible do
+      f('.edit_module_link').click
+    end
+
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
     f('.completion_entry .delete_criterion_link', edit_form).click
@@ -310,7 +331,11 @@ describe "context_modules" do
 
     # and also make sure the form remembers that it's gone (#8329)
     driver.action.move_to(context_module).perform
-    f('.edit_module_link').click
+
+    with_focus_icons_visible do
+      f('.edit_module_link').click
+    end
+    
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
     ff('.completion_entry .delete_criterion_link', edit_form).should be_empty
@@ -515,7 +540,11 @@ describe "context_modules" do
 
     m1_img = fj('#context_modules .context_module:first-child .reorder_module_link img')
     m2_img = fj('#context_modules .context_module:last-child .reorder_module_link img')
-    driver.action.drag_and_drop(m2_img, m1_img).perform
+    
+    with_focus_icons_visible do
+      driver.action.drag_and_drop(m2_img, m1_img).perform
+    end
+
     wait_for_ajax_requests
 
     m1.reload
@@ -594,7 +623,11 @@ describe "context_modules" do
     # add completion criterion
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
-    f('.edit_module_link').click
+    
+    with_focus_icons_visible do
+      f('.edit_module_link').click
+    end
+
     edit_form = f('#add_context_module_form')
     f('.add_completion_criterion_link', edit_form).click
     wait_for_ajaximations
@@ -618,6 +651,37 @@ describe "context_modules" do
     module_item.attribute('class').split.should include 'must_contribute_requirement'
     f('.criterion', module_item).attribute('class').split.should include 'defined'
     driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
+  end
+
+  it "should allow editing external tools settings for a tool in a module" do
+    # moved from external_tools_spec
+
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({
+                                :type => 'context_external_tool',
+                                :title => 'Example',
+                                :url => 'http://www.example.com',
+                                :new_tab => '1'
+                            })
+    get "/courses/#{@course.id}/modules"
+    keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
+
+    with_focus_icons_visible do
+      f("#context_module_item_#{@tag.id} .edit_item_link").click
+    end
+
+    f("#edit_item_form").should be_displayed
+    replace_content(f("#edit_item_form #content_tag_title"), "Example 2")
+    f("#edit_item_form #content_tag_new_tab").click
+    submit_form("#edit_item_form")
+
+    wait_for_ajax_requests
+
+    @tag.reload
+    @tag.should_not be_nil
+    @tag.title.should == "Example 2"
+    @tag.new_tab.should == false
+    @tag.url.should == "http://www.example.com"
   end
 end
 

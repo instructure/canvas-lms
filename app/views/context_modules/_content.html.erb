@@ -12,6 +12,7 @@ You can also sequence modules by defining criteria and prerequisites for each mo
 
 To start organizing your course into modules, click the "%{button}" button to the right.
 TEXT
+ #'
 %>
   <% else %>
     <p><%= t('help.no_modules', %{No modules have been defined for this course.}) %></p>
@@ -36,7 +37,7 @@ TEXT
       <tr>
         <td>
           <div class="module_name">
-            <%= before_label('module_name', %{Name}) %>
+            <%= f.label :name, before_label('module_name', %{Name}) %>
           </div>
         </td><td>
           <div class="module_name">
@@ -45,21 +46,22 @@ TEXT
         </td>
       </tr><tr>
         <td colspan="2">
-          <input type="checkbox" id="unlock_module_at"/>
-          <label for="unlock_module_at"><%= t('#labels.lock_module_until', %{lock module until a given date}) %></label>
+          <%- label = t("#labels.lock_module_until", %{lock module until a given date}) %>
+          <input type="checkbox" id="unlock_module_at" title="<%= label %>"/>
+          <label for="unlock_module_at"><%= label %></label>
         </td>
       </tr><tr class="unlock_module_at_details">
         <td>
-          <%= before_label('unlock_at', %{Unlock At}) %>
+          <%= f.label :unlock_at, before_label('unlock_at', %{Unlock At}) %>
         </td><td>
           <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 125px;" %>
         </td>
       </tr><tr>
         <td colspan="2">
         <div class="prerequisites_entry">
-          <b><%= before_label('modules.before_students_view', %{Before students can view this module}) %></b>
+          <b tabindex="0"><%= before_label('modules.before_students_view', %{Before students can view this module}) %></b>
           <div style="margin: 2px 10px 5px 20px;" class="prerequisites_list">
-            <div class="no_prerequisites_message"><%= t('no_preprequisites', %{No prerequisites defined}) %></div>
+            <div class="no_prerequisites_message" tabindex="0"><%= t('no_preprequisites', %{No prerequisites defined}) %></div>
             <div class="criteria_list" style="display: none;">
             </div>
             <div id="criterion_blank" class="criterion" style="display: none;">

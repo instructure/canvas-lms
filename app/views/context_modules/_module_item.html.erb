@@ -5,10 +5,10 @@
   'must_view' => image_tag("preview_dim.png", :class => "image not_blank", :alt => t('images.alt.must_view', "must view"), :title => t('images.title.must_view', "Students must view this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
   'must_contribute' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => t('images.alt.must_contribute', "must contribute"), :title => t('images.title.must_contribute', "Students must contribute to this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
   'must_submit' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => t('images.alt.must_submit', "must submit"), :title => t('images.title.must_submit', "Students must submit this assignment before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
-  'indent' => image_tag('indent_thin.png'),
-  'outdent' => image_tag('outdent_thin.png'),
-  'edit' => image_tag('edit.png'),
-  'delete' => image_tag('delete_circle.png'),
+  'indent' => image_tag('indent_thin.png', :alt => t('images.alt.indent', 'indent')),
+  'outdent' => image_tag('outdent_thin.png', :alt => t('images.alt.outdent', 'outdent')),
+  'edit' => image_tag('edit.png', :alt => t('images.alt.edit', 'edit')),
+  'delete' => image_tag('delete_circle.png', :alt => t('images.alt.delete', 'delete')),
   'other' => image_tag("blank.png", :class => "image", :alt => '')
 }
  %>
@@ -19,7 +19,10 @@
   <tr>
     <td class="module_item_icons">
       <div class="nobr">
-      <span style="cursor: move;" title="<%= t('drag_to_reorder', %{Drag to reorder or move item to another module}) %>" class="move_item_link"><%= image_tag "move.png" %></span>
+      <%- title = t('drag_to_reorder', %{Drag to reorder or move item to another module}) %>
+      <span title="<%= title %>" class="move_item_link">
+        <%= image_tag "move.png", :class => 'hidden_tabbable', :alt => title, :tabindex => '0' %>
+      </span>
       <span class="completion_status">
         <%= image_tag "blank.png", :alt => t('images.alt.complete', "done"), :title => t('images.title.complete', "Module Item Completed"), :class => "complete_item_icon" %>
         <%= image_tag "blank.png", :alt => t('images.alt.incomplete', "incomplete"), :title => t('images.title.incomplete', "Module Item Incomplete"), :class => "incomplete_item_icon" %>
@@ -71,10 +74,10 @@
     <td class="points_possible_display">&nbsp;</td>
     <td class="links">
       &nbsp;
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('links.outdent', %{Outdent item}) %>"><%= @module_item_image_tags['outdent'] %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('links.indent', %{Indent item}) %>"><%= @module_item_image_tags['indent'] %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('links.edit_item', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('links.remove_item', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="outdent_item_link hidden_tabbable" title="<%= t('links.outdent', %{Outdent item}) %>"><%= @module_item_image_tags['outdent'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="indent_item_link hidden_tabbable" title="<%= t('links.indent', %{Indent item}) %>"><%= @module_item_image_tags['indent'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="edit_item_link edit_link hidden_tabbable" title="<%= t('links.edit_item', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link hidden_tabbable" title="<%= t('links.remove_item', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %></a>
     </td>
   </tr>
 </table>

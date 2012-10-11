@@ -93,4 +93,11 @@ shared_examples_for "context module tests" do
     submit_form(edit_form)
     wait_for_ajaximations
   end
+
+  def with_focus_icons_visible(&block)
+    # reveals 'hidden_tabbable' icons that are only visible on focus or hover for the duration of the block
+    driver.execute_script("$('.hidden_tabbable').addClass('focus');")
+    yield(block)
+    driver.execute_script("$('.hidden_tabbable').removeClass('focus');")
+  end
 end

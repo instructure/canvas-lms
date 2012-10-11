@@ -6,7 +6,7 @@
     <div style="<%= hidden if only && only.size == 1 %>">
       <a href="<%= context_url(@context, :context_external_tool_resource_selection_url, "{{ id }}") %>" id="select_content_resource_selection_url" style="display: none;">&nbsp;</a>
       <% ot :add_to_module, "Add %{item} to *module*", :item => capture { %>
-      <select id="add_module_item_select">
+      <select id="add_module_item_select" aria-label="<%= t('titles.add_item_to_module', "Add Item to Module") %>">
         <% if !only || only.include?(:assignments) %>
         <option value="assignment"><%= t :assignment_item, "Assignment" %></option>
         <% end %>
@@ -38,12 +38,14 @@
       <% if !only || only.include?(:sub_headers) %>
       <div id="context_module_sub_headers_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= t :sub_header_notice, "Type the text you'd like to add as a *module* sub-header", :wrapper => '<span class="holder_type">\1</span>' %>
+          <span class="holder_type" id="sub_header_notice">
+            <%= t :sub_header_notice, "Type the text you'd like to add as a *module* sub-header" %>
+          </span>
         </div>
         <table>
           <tr>
-            <td><label for="sub_header_title"><%= before_label :header, "Header" %></label></td>
-            <td><input type="text" name="title" id="sub_header_title" style="width: 200px;"/></td>
+            <td><label for="sub_header_title"><%= label_tag :sub_header_title, before_label(:header, "Header") %></label></td>
+            <td><input type="text" name="title" id="sub_header_title" style="width: 200px;" aria-describedby="sub_header_notice" /></td>
           </tr>
         </table>
       </div>
@@ -52,20 +54,22 @@
       <div id="external_urls_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
           <%= image_tag "link.png", :alt => t(:external_url_link_alt, "External URL") %>
-          <%= t :external_url_notice, "Enter a URL and page name to add a link to any website URL to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
+          <span class="holder_type" id="external_url_notice">
+            <%= t :external_url_notice, "Enter a URL and page name to add a link to any website URL to this *module*." %>
+          </span>
         </div>
         <table>
           <tr>
-            <td><label for="content_tag_create_url"><%= before_label :url, "URL" %></label></td>
+            <td><%= label_tag :content_tag_create_url, before_label(:url, "URL") %></td>
             <td>
-              <input type="text" name="url" id="content_tag_create_url" style="width: 200px;"/>
+              <input type="text" name="url" id="content_tag_create_url" style="width: 200px;" aria-describedby="external_url_notice" />
               <div id="content_tag_services">
               
               </div>
             </td>
           </tr>
           <tr class='select_item_name'>
-            <td><label for="content_tag_create_title"><%= before_label :page_name, "Page Name" %></label></td>
+            <td><%= label_tag :content_tag_create_title, before_label(:page_name, "Page Name") %></label></td>
             <td><input type="text" name="title" id="content_tag_create_title" style="width: 120px;"/></td>
           </tr>
         </table>
@@ -114,10 +118,12 @@
       <div id="wiki_pages_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
           <%= image_tag "file.png", :alt => t(:wiki_page_alt, "Wiki page") %>
-          <%= t :wiki_page_notice, 'Select the wiki page you want to associate with this *module*, or add a new page by selecting "New Page".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <span class="holder_type">
+            <%= label_tag :wiki_select, t(:wiki_page_notice, 'Select the wiki page you want to associate with this *module*, or add a new page by selecting "New Page".') %>
+          </span>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" multiple>
+        <select class="module_item_select" id="wiki_select" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
           <% cache([@context.wiki, 'active_wiki_pages']) do  %>
             <% @context.wiki.wiki_pages.active.scoped({:select => "id, title"}).each do |page| %>
@@ -130,8 +136,8 @@
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          <%= before_label :page_name, "Page Name" %>
-          <input type="text" name="wiki_page[title]" class="item_title"/>
+          <%= label_tag :wiki_page_title, before_label(:page_name, "Page Name") %>
+          <input type="text" name="wiki_page[title]" class="item_title" id="wiki_page_title"/>
           <a href="<%= context_url(@context, :context_wiki_pages_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
@@ -139,11 +145,15 @@
       <% if !only || only.include?(:attachments) %>
       <div id="attachments_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "file_download.png" %>
-          <%= t :file_notice, 'Select the file you want to associate with this *module*, or add a file by selecting "New File".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <%= image_tag "file_download.png", :alt => "Upload" %>
+          <label for="module_item_select">
+            <span class="holder_type">
+              <%= label_tag :module_item_select, t(:file_notice, 'Select the file you want to associate with this *module*, or add a file by selecting "New File".') %>
+            </span>
+          </label>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" multiple>
+        <select class="module_item_select" id="module_item_select" multiple>
           <% @context.folders.active.scoped({:limit => 200}).sort_by{|f| f.full_name}.each do |folder| %>
             <optgroup label="<%= folder.full_name %>">
               <% 
@@ -164,12 +174,12 @@
         <div class="new" style="margin-top: 5px;">
           <table>
             <tr>
-              <td><%= before_label :file, "File" %></td>
+              <td><%= label_tag :module_attachment_uploaded_data, before_label(:file, "File") %></td>
               <td><input id="module_attachment_uploaded_data" type="file" name="attachment[uploaded_data]" class="item_title"/></td>
             </tr><tr>
               <td>
                 <a href="<%= context_url(@context, :context_files_url, :format => :text) %>" style="display: none;" class="add_item_url">&nbsp;</a>
-                <%= before_label :folder, "Folder" %>
+                <%= label_tag :attachment_folder_id, before_label(:folder, "Folder") %>
               </td><td>
                 <% Folder.root_folders(@context) %>
                 <% folders = @context.active_folders_with_sub_folders.by_position %>
@@ -187,10 +197,12 @@
       <div id="quizs_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
           <%= image_tag "quiz.png", :alt => t(:quiz_alt, "Quiz") %>
-          <%= t :quiz_notice, 'Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <span class="holder_type">
+            <%= label_tag :quiz_select, t(:quiz_notice, 'Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".') %>
+          </span>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" multiple>
+        <select class="module_item_select" id="quiz_select" multiple>
           <% @context.quizzes.active.scoped({:limit => 400}).each do |quiz| %>
             <option value="<%= quiz.id %>"><%= quiz.title %></option>
           <% end %>
@@ -201,12 +213,12 @@
           <input type="hidden" name="quiz[quiz_type]" value="assignment" />
           <table>
             <tr>
-              <td><%= before_label :quiz_name, "Quiz Name" %></td>
-              <td><input type="text" name="quiz[title]" class="item_title"/></td>
+              <td><%= label_tag :quiz_title, before_label(:quiz_name, "Quiz Name") %></td>
+              <td><input type="text" name="quiz[title]" class="item_title" id="quiz_title"/></td>
             </tr><tr>
-              <td><%= before_label :quiz_group, "Group" %></td>
+              <td><%= label_tag :quiz_assignment_group_id, before_label(:quiz_group, "Group") %></td>
               <td>
-                <select name="quiz[assignment_group_id]">
+                <select name="quiz[assignment_group_id]" id="quiz_assignment_group_id">
                   <% cnt = 0 %>
                   <% @context.assignment_groups.active.each do |group| %>
                     <% cnt += 1 %>
@@ -227,10 +239,12 @@
       <div id="assignments_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
           <%= image_tag "grading_icon.png", :alt => t(:assignment_alt, "Assignment") %>
-          <%= t :assignment_notice, 'Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <span class="holder_type">
+            <%= label_tag :assignment_select, t(:assignment_notice, 'Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".') %>
+          </span>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" multiple>
+        <select class="module_item_select" id="assignment_select" multiple>
           <% @context.assignment_groups.active.include_active_assignments.each do |group| %>
             <optgroup label="<%= group.name %>">
             <% group.active_assignments.no_graded_quizzes_or_topics.scoped({:limit => 200}).each do |assignment| %>
@@ -242,8 +256,8 @@
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          <%= before_label :assignment_name, "Assignment Name" %>
-          <input type="text" name="assignment[title]" class="item_title"/>
+          <%= label_tag :assignment_title, before_label(:assignment_name, "Assignment Name") %>
+          <input type="text" name="assignment[title]" class="item_title" id="assignment_title" />
           <a href="<%= context_url(@context, :context_assignments_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
@@ -252,10 +266,12 @@
       <div id="discussion_topics_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
           <%= image_tag "word_bubble.png", :alt => t(:topic_alt, "Topic") %>
-          <%= t :topic_notice, 'Select the topic you want to associate with this *module*, or add a topic by selecting "New Topic".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <span class="holder_type">
+            <%= label_tag :topic_select, t(:topic_notice, 'Select the topic you want to associate with this *module*, or add a topic by selecting "New Topic".') %>
+          </span>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" multiple>
+        <select class="module_item_select" id="topic_select" multiple>
           <% @context.discussion_topics.active.only_discussion_topics.scoped({:limit => 200}).each do |topic| %>
             <option value="<%= topic.id %>"><%= topic.title %></option>
           <% end %>
@@ -263,15 +279,15 @@
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          <%= before_label :topic_name, "Topic Name" %>
-          <input type="text" name="title" class="item_title"/>
+          <%= label_tag :topic_name, before_label(:topic_name, "Topic Name") %>
+          <input type="text" name="title" class="item_title" id="topic_name"/>
           <a href="<%= context_url(@context, :api_v1_context_discussion_topics_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
       <% end %>
       <% if !only || only.include?(:indentation) %>
       <div style="margin: 0px 20px 5px;" class="context_module_content">
-        <%= before_label :indentation, "Indentation" %>
+        <%= label_tag :content_tag_indent, before_label(:indentation, "Indentation") %>
         <select name="content_tag[indent]" id="content_tag_indent">
           <% (0..3).each do |level| %>
             <%= t(:indent_level, { :zero => "*Don't Indent*", :one => "*Indent 1 Level*", :other => "*Indent %{count} levels*" }, :count => level, :wrapper => "<option value=\"#{level}\">\\1</option>") %>
