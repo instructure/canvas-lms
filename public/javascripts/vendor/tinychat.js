@@ -174,7 +174,7 @@ TinychatEmbed.prototype.getApplicationUrl = function(majorVersion, minorVersion)
   var swfName;
 
   if (majorVersion > 10) {
-    swfName = 'Tinychat-11.1-1.0.0.0546.swf';
+    swfName = 'Tinychat-11.1-1.0.0.0556.swf';
   } else if (majorVersion == 10) {
     if (minorVersion >= 3) {
       swfName = 'Tinychat-10.3-1.0.0.0546.swf';
