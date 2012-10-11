@@ -1899,6 +1899,98 @@ describe User do
     end
   end
 
+  context "assignments_needing_grading" do
+    before :each do
+      # create courses and sections
+      @course1 = course_with_teacher(:active_all => true).course
+      @course2 = course_with_teacher(:active_all => true, :user => @teacher).course
+      @section1b = @course1.course_sections.create!(:name => 'section B')
+      @section2b = @course2.course_sections.create!(:name => 'section B')
+
+      # put a student in each section
+      @studentA = user_with_pseudonym(:active_all => true, :name => 'StudentA', :username => 'studentA@instructure.com')
+      @studentB = user_with_pseudonym(:active_all => true, :name => 'StudentB', :username => 'studentB@instructure.com')
+      @course1.enroll_student(@studentA).update_attribute(:workflow_state, 'active')
+      @section1b.enroll_user(@studentB, 'StudentEnrollment', 'active')
+      @course2.enroll_student(@studentA).update_attribute(:workflow_state, 'active')
+      @section2b.enroll_user(@studentB, 'StudentEnrollment', 'active')
+
+      # set up a TA, section-limited in one course and not the other
+      @ta = user_with_pseudonym(:active_all => true, :name => 'TA', :username => 'ta@instructure.com')
+      @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+      @course2.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => false)
+
+      # make some assignments and submissions
+      [@course1, @course2].each do |course|
+        assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+        [@studentA, @studentB].each do |student|
+          assignment.submit_homework student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
+        end
+      end
+    end
+
+    it "should count assignments with ungraded submissions across multiple courses" do
+      @teacher.assignments_needing_grading_total_count.should eql(2)
+      @teacher.assignments_needing_grading.size.should eql(2)
+      @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
+      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+
+      # grade one submission for one assignment; these numbers don't change
+      @course1.assignments.first.grade_student(@studentA, :grade => "1")
+      @teacher = User.find(@teacher.id) # use a new instance, since these are memoized
+      @teacher.assignments_needing_grading_total_count.should eql(2)
+      @teacher.assignments_needing_grading.size.should eql(2)
+      @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
+      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+
+      # grade the other submission; now course1's assignment no longer needs grading
+      @course1.assignments.first.grade_student(@studentB, :grade => "1")
+      @teacher = User.find(@teacher.id)
+      @teacher.assignments_needing_grading_total_count.should eql(1)
+      @teacher.assignments_needing_grading.size.should eql(1)
+      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+    end
+
+    it "should only count submissions in accessible course sections" do
+      @ta.assignments_needing_grading_total_count.should eql(2)
+      @ta.assignments_needing_grading.size.should eql(2)
+      @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
+      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+
+      # grade student A's submissions in both courses; now course1's assignment
+      # should not show up because the TA doesn't have access to studentB's submission
+      @course1.assignments.first.grade_student(@studentA, :grade => "1")
+      @course2.assignments.first.grade_student(@studentA, :grade => "1")
+      @ta = User.find(@ta.id)
+      @ta.assignments_needing_grading_total_count.should eql(1)
+      @ta.assignments_needing_grading.size.should eql(1)
+      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+
+      # but if we enroll the TA in both sections of course1, it should be accessible
+      @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1b,
+                          :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
+      @ta = User.find(@ta.id)
+      @ta.assignments_needing_grading_total_count.should eql(2)
+      @ta.assignments_needing_grading.size.should eql(2)
+      @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
+      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+    end
+
+    it "should limit the number of returned assignments" do
+      20.times do |x|
+        assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
+        assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "o hai"
+        assignment = @course2.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
+        assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "kthxbye"
+      end
+      @teacher.assignments_needing_grading_total_count.should eql(42)
+      @teacher.assignments_needing_grading.size.should < 42
+
+      @ta.assignments_needing_grading_total_count.should eql(22)
+      @ta.assignments_needing_grading.size.should < 22
+    end
+  end
+
   describe ".initial_enrollment_type_from_type" do
     it "should return supported initial_enrollment_type values" do
       User.initial_enrollment_type_from_text('StudentEnrollment').should == 'student'
