@@ -1180,7 +1180,7 @@ define([
                 return obj.attachment.display_name === data.attachment.display_name;
               });
 
-              var index = folder_files.indexOf(folder_file);
+              var index = _.indexOf(folder_files, folder_file);
               var $element = $files_structure.find(".folder_" + attachment.folder_id)
                               .children("ul")
                               .find('li.file')
