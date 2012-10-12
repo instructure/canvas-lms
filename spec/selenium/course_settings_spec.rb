@@ -40,6 +40,24 @@ describe "course settings" do
       test_select_standard_for @course.root_account
     end
 
+    it "should toggle more options correclty" do
+      more_options_text = 'more options'
+      less_options_text = 'less options'
+      get "/courses/#{@course.id}/settings"
+
+      f('.edit_course_link').click
+      more_options_link = f('.course_form_more_options_link')
+      more_options_link.text.should == more_options_text
+      more_options_link.click
+      extra_options = f('.course_form_more_options')
+      extra_options.should be_displayed
+      more_options_link.text.should == less_options_text
+      more_options_link.click
+      wait_for_animations
+      extra_options.should_not be_displayed
+      more_options_link.text.should == more_options_text
+    end
+
     it "should show the self enrollment code and url once enabled" do
       a = Account.default
       a.courses << @course
@@ -282,7 +300,7 @@ describe "course settings" do
       end
       # expect
       obs.reload.not_ended_enrollments.count.should == 2
-      obs.reload.not_ended_enrollments.map {|e| e.associated_user_id}.sort.should include(students[2].id)
+      obs.reload.not_ended_enrollments.map { |e| e.associated_user_id }.sort.should include(students[2].id)
     end
 
     it "should handle deleted observees" do

@@ -369,7 +369,10 @@ define([
     });
     $(".course_form_more_options_link").click(function(event) {
       event.preventDefault();
-      $(".course_form_more_options").slideToggle();
+      var $moreOptions = $(".course_form_more_options");
+      var optionText = $moreOptions.is(':visible') ? I18n.t('links.more_options', 'more options') : I18n.t('links.less_options', 'less options');
+      $(this).text(optionText);
+      $moreOptions.slideToggle();
     });
    $enrollment_dialog.find(".cancel_button").click(function() {
       $enrollment_dialog.dialog('close');
