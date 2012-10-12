@@ -372,7 +372,7 @@ define([
           folder.includes_files = true;
           files.updateFolder(original_folder.context_string, {folder: folder, already_in_place: true}, false);
 
-          data.files = _.sortBy(data.files, function(obj){ return obj.attachment.display_name });
+          data.files = _.sortBy(data.files, function(obj){ return obj.attachment.display_name.toLowerCase() });
 
           for(var idx in data.files) {
             var file = data.files[idx].attachment;
@@ -699,7 +699,7 @@ define([
             }
           };
 
-          data.folders = _.sortBy(data.folders, function(obj){ return obj.folder.name });
+          data.folders = _.sortBy(data.folders, function(obj){ return obj.folder.name.toLowerCase() });
 
           for(var idx in data.folders) {
             if(data.folders[idx].folder.parent_folder_id == root_folder.id) {
@@ -1149,7 +1149,7 @@ define([
               var unsorted_files = fileStructureData[idx][1].files
               fileStructureData[idx][1].files = _.sortBy(
                 unsorted_files, function(obj){ 
-                  return obj.attachment.display_name 
+                  return obj.attachment.display_name.toLowerCase();
                 }
               );
 
@@ -1242,7 +1242,7 @@ define([
                         var $current_folder = $(this);
                         var current_folder_el = $current_folder[0];
 
-                        if(current_folder_el != new_folder_el && (!$current_folder.hasClass('folder') || new_folder_name < current_folder_name))                               {
+                        if(current_folder_el != new_folder_el && (!$current_folder.hasClass('folder') || new_folder_name.toLowerCase() < current_folder_name.toLowerCase()))                               {
                           $before = $current_folder;
                           return false;
                         }
@@ -2239,7 +2239,7 @@ define([
 
           var unsorted_folders = fileStructureData[0][1].folders;
           fileStructureData[0][1].folders = _.sortBy(
-            unsorted_folders, function(obj){ return obj.folder.name }
+            unsorted_folders, function(obj){ return obj.folder.name.toLowerCase() }
           );
 
           var folder = data.folder;
