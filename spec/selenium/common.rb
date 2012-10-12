@@ -938,7 +938,9 @@ end
     "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip'),
     "a_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/a_file.txt'),
     "b_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/b_file.txt'),
-    "c_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/c_file.txt')
+    "c_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/c_file.txt'),
+    "amazing_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/amazing_file.txt'),
+    "Dog_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/Dog_file.txt')
   }
 
   def get_file(filename, data = nil)

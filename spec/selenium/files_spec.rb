@@ -416,6 +416,28 @@ end
 describe "common file behaviors" do
   it_should_behave_like "forked server selenium tests"
 
+  def add_file(file_fullpath)
+    attachment_field = keep_trying_until do
+      fj('#add_file_link').click # fj to avoid selenium caching
+      attachment_field = fj('#attachment_uploaded_data')
+      attachment_field.should be_displayed
+      attachment_field
+    end
+    attachment_field.send_keys(file_fullpath)
+    f('.add_file_form').submit
+    wait_for_ajaximations
+    wait_for_js
+  end
+
+  def get_file_elements
+    file_elements = keep_trying_until do
+      file_elements = ffj('#files_structure_list > .context > ul > .file > .name')
+      file_elements.count.should == 3
+      file_elements
+    end
+    file_elements
+  end
+
   before(:each) do
     course_with_teacher_logged_in
     get "/dashboard/files"
@@ -451,28 +473,6 @@ describe "common file behaviors" do
 
   context "when creating new files" do
 
-    def add_file(file_fullpath)
-      attachment_field = keep_trying_until do
-        fj('#add_file_link').click # fj to avoid selenium caching
-        attachment_field = fj('#attachment_uploaded_data')
-        attachment_field.should be_displayed
-        attachment_field
-      end
-      attachment_field.send_keys(file_fullpath)
-      f('.add_file_form').submit
-      wait_for_ajaximations
-      wait_for_js
-    end
-
-    def get_file_elements
-      file_elements = keep_trying_until do
-        file_elements = ffj('#files_structure_list > .context > ul > .file > .name')
-        file_elements.count.should == 3
-        file_elements
-      end
-      file_elements
-    end
-
     before(:each) do
       sleep 5 # page does a weird load twice which is causing selenium failures so we sleep and wait for the page
       @a_filename, a_fullpath, a_data = get_file("a_file.txt")
@@ -498,6 +498,39 @@ describe "common file behaviors" do
       file_elements[0].text.should == @a_filename
       file_elements[1].text.should == @b_filename
       file_elements[2].text.should == @c_filename
+    end
+  end
+
+  context "letter casing" do
+
+    def add_multiple_folders(folder_names)
+      folder_names.each { |name| add_folders(name) }
+      ff('#files_content .folder')
+    end
+
+    it "should ignore file name case when alphabetizing" do
+      sleep 5 # page does a weird load twice which is causing selenium failures so we sleep and wait for the page
+      amazing_filename, amazing_fullpath, amazing_data = get_file("amazing_file.txt")
+      dog_filename, dog_fullpath, dog_data = get_file("Dog_file.txt")
+      file_paths = [dog_fullpath, amazing_fullpath]
+      file_paths.each { |name| add_file(name) }
+      files = ff('#files_content .file')
+      files.first.should include_text('amazing')
+      files.last.should include_text('Dog')
+    end
+
+    it "should ignore folder name case when alphabetizing" do
+      folder_names = %w(amazing Dog)
+      folders = add_multiple_folders(folder_names)
+      folders.first.should include_text(folder_names[0])
+      folders.last.should include_text(folder_names[1])
+    end
+
+    it "should ignore mixed-casing when adding new folders" do
+      folder_names = %w(ZeEDeE CoOlEst)
+      folders = add_multiple_folders(folder_names)
+      folders.first.should include_text(folder_names[1])
+      folders.last.should include_text(folder_names[0])
     end
   end
 end
