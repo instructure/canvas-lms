@@ -1,5 +1,5 @@
-if Canvas.redis_enabled?
 shared_examples_for 'Delayed::Stats' do
+if Canvas.redis_enabled?
   before do
     Setting.set('delayed_jobs_store_stats', 'redis')
   end
