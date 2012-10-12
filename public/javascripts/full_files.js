@@ -372,7 +372,8 @@ define([
           folder.includes_files = true;
           files.updateFolder(original_folder.context_string, {folder: folder, already_in_place: true}, false);
 
-          data.files = _.sortBy(data.files, function(obj){ return obj.attachment.display_name.toLowerCase() });
+          // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
+          data.files = _.sortBy(data.files, function(obj){ return (obj.attachment.display_name || "").toLowerCase() });
 
           for(var idx in data.files) {
             var file = data.files[idx].attachment;
@@ -699,7 +700,8 @@ define([
             }
           };
 
-          data.folders = _.sortBy(data.folders, function(obj){ return obj.folder.name.toLowerCase() });
+          // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
+          data.folders = _.sortBy(data.folders, function(obj){ return (obj.folder.name || "").toLowerCase() });
 
           for(var idx in data.folders) {
             if(data.folders[idx].folder.parent_folder_id == root_folder.id) {
@@ -1149,7 +1151,9 @@ define([
               var unsorted_files = fileStructureData[idx][1].files
               fileStructureData[idx][1].files = _.sortBy(
                 unsorted_files, function(obj){ 
-                  return obj.attachment.display_name.toLowerCase();
+
+                  // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
+                  return (obj.attachment.display_name || "").toLowerCase();
                 }
               );
 
@@ -1235,10 +1239,10 @@ define([
 
                       var $new_folder = $(this);
                       var new_folder_el = $(this)[0];
-                      var new_folder_name = files.itemData($(this)).name;
+                      var new_folder_name = files.itemData($(this)).name || "";
 
                       $parent.children("ul").children("li:not(.separator)").each(function() {
-                        var current_folder_name = files.itemData($(this)).name;
+                        var current_folder_name = files.itemData($(this)).name || "";
                         var $current_folder = $(this);
                         var current_folder_el = $current_folder[0];
 
@@ -2239,7 +2243,8 @@ define([
 
           var unsorted_folders = fileStructureData[0][1].folders;
           fileStructureData[0][1].folders = _.sortBy(
-            unsorted_folders, function(obj){ return obj.folder.name.toLowerCase() }
+            // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
+            unsorted_folders, function(obj){ return (obj.folder.name || "").toLowerCase() }
           );
 
           var folder = data.folder;
