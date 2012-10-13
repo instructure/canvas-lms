@@ -41,7 +41,6 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
   'vendor/scribd.view' /* scribd */
 ], function(_, INST, I18n, $, htmlEscape) {
 
@@ -825,8 +824,6 @@ define([
         var context = files.currentContext();
         if(context && context.permissions && context.permissions.manage_files) {
           $files_content.find(".folder.draggable_droppable").droppable(files.droppable_options);
-        } else {
-          $files_content.sortable('disable').removeClass('ui-state-disabled');
         }
         if(files.canManageAContext) {
           $files_content.find(".folder.draggable_droppable").draggable(files.draggable_options);
