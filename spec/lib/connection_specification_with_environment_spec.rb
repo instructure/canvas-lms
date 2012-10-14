@@ -114,12 +114,20 @@ describe ActiveRecord::Base::ConnectionSpecification do
     context "non-transactional" do
       self.use_transactional_fixtures = false
 
-      it "should really disconnect" do
+      it "should really disconnect all envs" do
         ActiveRecord::Base.connection
         ActiveRecord::Base.connection_pool.should be_connected
 
+        ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+          ActiveRecord::Base.connection
+          ActiveRecord::Base.connection_pool.should be_connected
+        end
+
         ActiveRecord::Base.clear_all_connections!
         ActiveRecord::Base.connection_pool.should_not be_connected
+        ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+          ActiveRecord::Base.connection_pool.should_not be_connected
+        end
       end
     end
   end
