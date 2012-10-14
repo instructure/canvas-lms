@@ -93,7 +93,7 @@ ActiveRecord::ConnectionAdapters::ConnectionHandler.class_eval do
   %w{clear_active_connections clear_reloadable_connections
      clear_all_connections verify_active_connections }.each do |method|
     # double-require prevention
-    next self.instance_methods.include?("#{method}_without_multiple_environments!")
+    next if self.instance_methods.include?("#{method}_without_multiple_environments!")
     class_eval(<<EOS)
       def #{method}_with_multiple_environments!
         ActiveRecord::Base::ConnectionSpecification.connection_handlers.values.each(&:#{method}_without_multiple_environments!)
