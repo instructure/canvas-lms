@@ -158,8 +158,8 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_participants(user, user_ids, options)
   end
 
-  def add_message(body, options={})
-    conversation.add_message(user, body, options.merge(:generated => false))
+  def add_message(body_or_obj, options={})
+    conversation.add_message(user, body_or_obj, options.merge(:generated => false))
   end
 
   def remove_messages(*to_delete)

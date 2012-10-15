@@ -451,6 +451,45 @@ describe "quizzes question creation" do
     end
   end
 
+  context "quiz attempts" do
+
+    def fill_out_attempts_and_validate(attempts, alert_text, expected_attempt_text)
+      f('#multiple_attempts_option').click
+      f('#limit_attempts_option').click
+      replace_content(f('#quiz_allowed_attempts'), attempts)
+      f('#protect_quiz').click
+      alert = driver.switch_to.alert
+      alert.text.should == alert_text
+      alert.dismiss
+      fj('#quiz_allowed_attempts').should have_attribute('value', expected_attempt_text) # fj to avoid selenium caching
+    end
+
+    it "should not allow quiz attempts that are entered with letters" do
+      fill_out_attempts_and_validate('abc', 'Quiz attempts can only be specified in numbers', '')
+    end
+
+    it "should not allow quiz attempts that are more than 3 digits long" do
+      fill_out_attempts_and_validate('12345', 'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left', '')
+    end
+
+    it "should not allow quiz attempts that are letters and numbers mixed" do
+      fill_out_attempts_and_validate('31das', 'Quiz attempts can only be specified in numbers', '')
+    end
+
+    it "should allow a 3 digit number for a quiz attempt" do
+      attempts = "123"
+      f('#multiple_attempts_option').click
+      f('#limit_attempts_option').click
+      replace_content(f('#quiz_allowed_attempts'), attempts)
+      f('#protect_quiz').click
+      alert_present?.should be_false
+      fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
+      f('.save_quiz_button').click
+      wait_for_ajax_requests
+      Quiz.last.allowed_attempts.should == attempts.to_i
+    end
+  end
+
   it "should show errors for graded quizzes but not surveys" do
     quiz_with_new_questions
     change_quiz_type_to 'Graded Survey'

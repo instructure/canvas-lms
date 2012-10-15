@@ -210,7 +210,7 @@ class CalendarEventsApiController < ApplicationController
       calendar_event_scope
     end
 
-    events = Api.paginate(scope.order('id'), self, api_v1_calendar_events_path(search_params))
+    events = Api.paginate(scope.order('id'), self, api_v1_calendar_events_path)
     CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
     render :json => events.map{ |event| event_json(event, @current_user, session) }
   end

@@ -58,7 +58,11 @@ module Api::V1::User
       if enrollments
         json[:enrollments] = enrollments.map { |e| enrollment_json(e, current_user, session, includes) }
       end
-      json[:email] = user.email if includes.include?('email')
+      # include a permissions check here to only allow teachers and admins
+      # to see user email addresses.
+      if includes.include?('email') && context.grants_right?(current_user, session, :read_as_admin)
+        json[:email] = user.email
+      end
       json[:locale] = user.locale if includes.include?('locale')
 
       if includes.include?('last_login')

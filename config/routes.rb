@@ -16,6 +16,7 @@ ActionController::Routing::Routes.draw do |map|
   map.search_recipients 'search/recipients', :controller => 'search', :action => 'recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
   map.conversations_watched_intro 'conversations/watched_intro', :controller => 'conversations', :action => 'watched_intro', :conditions => {:method => :post}
+  map.conversation_batches 'conversations/batches', :controller => 'conversations', :action => 'batches'
   map.resources :conversations, :only => [:index, :show, :update, :create, :destroy] do |conversation|
     conversation.add_recipients 'add_recipients', :controller => 'conversations', :action => 'add_recipients', :conditions => {:method => :post}
     conversation.add_message 'add_message', :controller => 'conversations', :action => 'add_message', :conditions => {:method => :post}
@@ -105,6 +106,7 @@ ActionController::Routing::Routes.draw do |map|
   def add_chat(context)
     context.resources :chats
     context.chat 'chat', :controller => 'context', :action => 'chat'
+    context.tinychat 'tinychat.html', :controller => 'context', :action => 'chat_iframe'
     context.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
   end
 
@@ -495,6 +497,7 @@ ActionController::Routing::Routes.draw do |map|
   map.logout "logout", :controller => "pseudonym_sessions", :action => "destroy"
   map.cas_login "login/cas", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.otp_login "login/otp", :controller => "pseudonym_sessions", :action => "otp_login", :conditions => { :method => [:get, :post] }
+  map.aac_login "login/:account_authorization_config_id", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.disable_mfa "users/:user_id/mfa", :controller => "pseudonym_sessions", :action => "disable_otp_login", :conditions => { :method => :delete }
   map.clear_file_session "file_session/clear", :controller => "pseudonym_sessions", :action => "clear_file_session"
   map.register "register", :controller => "users", :action => "new"
@@ -819,7 +822,15 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
-      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => 'update_all'
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :show_discovery_url
+      authorization_configs.put 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :update_discovery_url, :path_name => 'account_update_discovery_url'
+      authorization_configs.delete 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :destroy_discovery_url, :path_name => 'account_destroy_discovery_url'
+
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs', :action => :index
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs/:id', :action => :show
+      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => :create, :path_name => 'account_create_aac'
+      authorization_configs.put 'accounts/:account_id/account_authorization_configs/:id', :action => :update, :path_name => 'account_update_aac'
+      authorization_configs.delete 'accounts/:account_id/account_authorization_configs/:id', :action => :destroy, :path_name => 'account_delete_aac'
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
@@ -834,6 +845,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.get 'conversations', :action => :index, :path_name => 'conversations'
       conversations.post 'conversations', :action => :create
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
+      conversations.get 'conversations/batches', :action => :batches, :path_name => 'conversations_batches'
       conversations.get 'conversations/:id', :action => :show
       conversations.put 'conversations/:id', :action => :update # stars, subscribed-ness, workflow_state
       conversations.delete 'conversations/:id', :action => :destroy

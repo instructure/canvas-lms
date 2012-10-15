@@ -55,3 +55,4 @@ shared_examples_for "files selenium shared" do
     end
   end
 end
+

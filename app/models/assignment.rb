@@ -1029,7 +1029,7 @@ class Assignment < ActiveRecord::Base
                           :graded_at, :turnitin_data, :submission_type, :score,
                           :assignment_id, :submission_comments ]
 
-    comment_fields = [:comment, :id, :author_name, :posted_at, :author_id,
+    comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                       :media_comment_type, :media_comment_id,
                       :cached_attachments, :attachments]
 
@@ -1105,7 +1105,7 @@ class Assignment < ActiveRecord::Base
       submission = group.first[:submission]
       user = group.first[:user]
       attachments = group.map { |g| FileInContext.attach(self, g[:filename], g[:display_name]) }
-      comments << submission.add_comment({:comment => comment, :author => commenter, :attachments => attachments})
+      comments << submission.add_comment({:comment => comment, :author => commenter, :attachments => attachments, :hidden => self.muted?})
     end
     [comments.compact, @ignored_files]
   end

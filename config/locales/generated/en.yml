@@ -2780,6 +2780,10 @@ en:
         other: "%{list_of_users} were added to the conversation by %{current_user}"
     subject: "Private message, %{timestamp}"
   conversations: 
+    add_attachment: 
+      titles: 
+        attachment: "File to attach"
+        remove_attachment: "Remove attachment"
     buttons: 
       add_people: "Add People"
       send_message: Send
@@ -2809,6 +2813,8 @@ en:
     crumbs: 
       messages: Conversations
     enrollments_everyone: Everyone
+    errors: 
+      field_is_required: "This field is required"
     filter_by_course: "Filter by this course"
     filter_by_group: "Filter by this group"
     groups_count: 
@@ -2818,12 +2824,7 @@ en:
       new_message: "New Message"
     index: 
       add_recipients_instructions: "People you add to the conversation will see all previous messages."
-      buttons: 
-        send_message: Send
-      headings: 
-        new_message: "New Message"
       inbox_actions: 
-        add_people: "Add People..."
         archive: Archive
         delete: Delete
         forward: Forward
@@ -2843,38 +2844,49 @@ en:
         starred_messages: Starred
         unread_messages: Unread
       labels: 
-        add_to_faculty_journal: "Add as a Faculty Journal entry"
         filter: Filter
-        group_conversation: "This is a group conversation. Participants will see everyone's replies"
         message: Message
         submitted: Submitted
         to: To
       links: 
-        add_attachment: Attach
         compose_new_message: "New Message"
-        media_comment: Record
-      media_comment: "Media Comment"
       more_messages: "%{count} more..."
       page_title: Conversations
       send_private_message: "New message..."
       titles: 
-        add_attachment: "Add an attachment"
-        attachment: "File to attach"
         compose_new_message: "Write a new message"
         download_attachment: "Download attachment"
-        media_comment: "Recorded media comment"
         play_media_comment: "Play media comment"
-        record_media_comment: "Record an audio or video comment"
-        remove_attachment: "Remove attachment"
-        remove_media_comment: "Remove media comment"
         rss: 
           conversations: "Conversations Atom Feed"
         submission_author: "Submission Author"
         submission_score: "Submission Score"
         view_submission: "Open submission in new window."
-    message_blank_error: "No message was specified"
-    message_sent: "Message Sent"
-    messages_sent: "Messages Sent"
+    message_form: 
+      buttons: 
+        send_message: Send
+      headings: 
+        new_message: "New Message"
+      inbox_actions: 
+        add_people: "Add People"
+      labels: 
+        add_to_faculty_journal: "Add as a Faculty Journal entry"
+        group_conversation: "This is a group conversation. Participants will see everyone's replies"
+        message: "Message:"
+        to: "To:"
+      links: 
+        add_attachment: Attach
+        media_comment: Record
+      media_comment: "Media Comment"
+      titles: 
+        add_attachment: "Add an attachment"
+        media_comment: "Recorded media comment"
+        record_media_comment: "Record an audio or video comment"
+        remove_media_comment: "Remove media comment"
+    message_progress_bar_text: 
+      done_sending_message: "Sent *%{message_preview}* to *%{num_people}*"
+      error_sending_message: "Error sending message:"
+      sending_message: "Sending *%{message_preview}* to *%{num_people}*"
     no_results: "No results found"
     not_applicable: N/A
     not_scored: "no score"
@@ -2888,7 +2900,6 @@ en:
     people_count: 
       one: "1 person"
       other: "%{count} people"
-    recipient_blank_error: "No recipients were specified"
     recipient_error: "The course or group you have selected has no valid recipients"
     recipient_field_placeholder: "Enter a name, course, or group"
     sections_count: 
@@ -3210,6 +3221,7 @@ en:
         groups: "Course Groups"
     index: 
       headings: 
+        future_enrollments: "Future Enrollments"
         my_courses: "My Courses"
         past_enrollments: "Past Enrollments"
       start_new_course: "Start a New Course"
@@ -3277,6 +3289,9 @@ en:
       submission_points: 
         with_score: "Score: %{score} *out of %{points_possible}*"
         without_score: "out of %{points_possible}"
+    roster_user: 
+      course_profile: "Course Profile"
+      profile: Profile
     section: 
       enrollment: 
         links: 
@@ -4285,6 +4300,7 @@ en:
       labels: 
         account: account
         category: category
+        comments: comments
         created_at: "created at"
         request_context_id: "request context id"
         url: url
@@ -4443,6 +4459,7 @@ en:
     alts: 
       collaboration: Collaboration
       file: File
+      folder: Folder
       folder_locked: "Locked Folder"
       locked_file: "Locked File"
     buttons: 
@@ -4453,7 +4470,6 @@ en:
     content_file: 
       links: 
         delete: "Delete this file"
-        drag_to_reorder: "Drag to reorder files in this folder"
         edit: "Click to edit, drag to move to another folder"
         preview_file: "Preview this file"
         rename: "Rename this file"
@@ -4484,7 +4500,6 @@ en:
       file: File
     full_index: 
       alts: 
-        drag_to_reorder: "Drag to reorder"
         file_locked: locked
         file_preview: preview
         folder_locked: locked
@@ -4508,6 +4523,8 @@ en:
       drop_here: "Drop files here to add them to this folder."
       drop_zip_files: "You can also drop zip files and choose to extract their contents into this folder."
       edit_html_warning: "The HTML editor alters your HTML, you should download a backup before saving changes."
+      file_details: "File details"
+      file_list: "File list"
       labels: 
         collaborate_using: "Collaborate Using"
         collaborate_with: "Collaborate With"
@@ -4537,7 +4554,6 @@ en:
         preview: preview
         rename_file: "Rename this File"
         rename_folder: "Rename this Folder"
-        reorder_file: "Drag to reorder"
         show_all_files: "see files for all your courses/groups"
         show_personal_files: "just show my personal files"
         unlock_file: "Unlock this File"
@@ -4731,6 +4747,7 @@ en:
     new_assessment: "[New Assessment]"
     no_submission_time: "no submission time"
     nth_student: "Student %{n}"
+    percent: Percent
     publish_to_sis: "Publish grades to SIS"
     reupload_submission_files: "Re-Upload Submission Files"
     reupload_submissions: "Re-Upload Submissions"
@@ -5173,6 +5190,7 @@ en:
         submit_same_score: "Use this same grade for the resubmission"
       loading: loading...
       new_assessment_option: "[New Assessment]"
+      no_annotation: "Annotations are not available for this document"
       not_newest_notice: "Note: This is not the most recent submission"
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       portion_graded: "%{x} / %{y} Graded"
@@ -7525,6 +7543,13 @@ en:
       description: "This enables converting a Common Cartridge packages in the intermediary json format to be imported"
       file_description: "Common Cartridge 1.0/1.1/1.2 Package"
       name: "Common Cartridge Importer"
+    crocodoc: 
+      description: "Enabled Crocodoc as a document preview option"
+      name: Crocodoc
+    crocodoc_settings: 
+      description: "This plugin integrates with Crocodoc to provide an HTML5 document previewer which provides teachers and students with the ability to annotate documents."
+      labels: 
+        api_key: "Crocodoc API Key"
     dim_dim: 
       description: "DimDim web conferencing support"
       name: DimDim
@@ -7536,9 +7561,10 @@ en:
       description: "Pull Embedly info for Collections"
       name: "Embedly Integration"
     embedly_settings: 
-      api_key: "Embedly API Key"
       description: "This plugin integrates with the Embedly service to pre-fill information on collection items. The paid plan returns extra information over the free plan: you can select from multiple images on the page, and it returns the embed information for in-line previewing (playing youtube videos, etc)."
-      plan_type: "Embedly plan type"
+      labels: 
+        api_key: "Embedly API Key"
+        plan_type: "Embedly plan type"
     error_reporting: 
       description: "Default error reporting mechanisms"
       name: "Error Reporting"
@@ -7821,6 +7847,7 @@ en:
       headers: 
         notification_preferences: "Notification Preferences"
       page_title: "Notification Preferences"
+      weekly_notification_range: "Your weekly notifications will be sent %{weekday} between %{start_time} and %{end_time}."
     confirming_contact: Confirming...
     confirms: 
       delete_access_key: "Are you sure you want to delete this access key?"
@@ -8712,6 +8739,7 @@ en:
       muted_quiz_description: "Your quiz score is unavailable because your instructor has not finished grading it. When your instructor finishes grading this quiz, your score will be available on this page."
       muted_quiz_header: "Your quiz has been muted"
     new: 
+      allowed_attempts: "Number of allowed attempts"
       buttons: 
         publish_quiz: "Publish Quiz"
         republish_quiz: "Re-Publish Quiz"
@@ -8737,9 +8765,9 @@ en:
       labels: 
         allow_multiple_attempts: "Allow Multiple Attempts"
         anonymous_submissions: "Keep Submissions Anonymous"
-        code: Code
+        code: "Access Code"
         due_date: "Due Date"
-        filter: Filter
+        filter: "IP Filter"
         group: Group
         hide_results_only_after_last: "Only After their Last Attempt"
         ip_filter: "Filter IP Addresses"
@@ -8748,9 +8776,10 @@ en:
         locked_until: "Locked Until"
         never_hide_results: "Let Students See their Quiz Responses"
         quiz_instructions: "Quiz Instructions"
-        quiz_name: "Quiz Name"
+        quiz_name: Name
         quiz_notify: "Notify users this quiz has changed"
         quiz_score: Score
+        quiz_type: Type
         require_access_code: "Require an access code"
         require_lockdown_browser: "Require Respondus LockDown Browser"
         require_lockdown_browser_for_results: "Required to view quiz results"
@@ -8759,7 +8788,6 @@ en:
         show_correct_answers: "Show Which Answers Were Correct"
         show_question_details: "Show Question Details"
         shuffle_answers: "Shuffle Answers"
-        this_is_a: "This is a"
         time_limit: "Time Limit"
         time_limit_minutes: minutes
       links: 
@@ -8777,6 +8805,7 @@ en:
       points_possible: "%{n} Points Possible"
       practice_quiz: "Practice Quiz"
       retrieving_filters: "Retrieving Filters..."
+      time_limit: "How many minutes?"
       titles: 
         click_to_select_filter: "Click to select this filter"
         find_ip_address_filter: "Find IP Address Filter"
@@ -8828,6 +8857,8 @@ en:
         click_to_show_details: "Click to show full question details"
         delete_this_question: "Delete this Question"
         edit_this_question: "Edit this Question"
+    quiz_attempts_length_error: "Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left"
+    quiz_attempts_nan_error: "Quiz attempts can only be specified in numbers"
     quiz_details: 
       headers: 
         availability: Availability
@@ -9916,13 +9947,14 @@ en:
       cancel: Cancel
       course_cose_explanation: "This will be displayed in places with little space"
       create_course: "Create course"
+      creating_course: "Creating course..."
       labels: 
         course_code: "Short Name"
         license: "Content License"
         name: "Course Name"
       new_course_name_placeholder: "Course Name"
       sample_course_code: Course-101
-      start_a_new_course: "Start A New Course"
+      start_a_new_course: "Start a New Course"
     pending_enrollment: 
       designer: "%{course} as a designer."
       designer_title: "Invited as a designer, click to see the Course"

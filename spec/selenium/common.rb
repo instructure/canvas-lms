@@ -587,7 +587,7 @@ shared_examples_for "all selenium tests" do
 
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
-    driver.switch_to.frame id
+    driver.switch_to.frame(id)
     yield
   ensure
     driver.switch_to.window saved_window_handle
@@ -900,7 +900,10 @@ end
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip'),
     "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip'),
     "canvas_cc_minimum.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/canvas_cc_minimum.zip'),
-    "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip')
+    "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip'),
+    "a_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/a_file.txt'),
+    "b_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/b_file.txt'),
+    "c_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/c_file.txt')
   }
 
   def get_file(filename, data = nil)
@@ -929,6 +932,16 @@ end
 
   def skip_if_ie(additional_error_text)
     pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
+  end
+
+  def alert_present?
+    is_present = true
+    begin
+      driver.switch_to.alert
+    rescue Selenium::WebDriver::Error::NoAlertPresentError
+      is_present = false
+    end
+    is_present
   end
 
   # for when you have something like a textarea's value and you want to match it's contents

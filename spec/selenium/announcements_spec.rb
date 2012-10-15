@@ -142,7 +142,12 @@ describe "announcements" do
 
       #add external feed to announcements
       feed_name = 'http://www.google.com'
+
+      keep_trying_until do
       driver.execute_script("$('#add_external_feed_form').css('display', 'block')")
+        f("#external_feed_url").should be_displayed
+      end
+
       fj('#external_feed_url').send_keys(feed_name)
       fj('input[aria-controls=header_match_container]').click
       fj('input[name=header_match]').send_keys('blah')

@@ -41,6 +41,18 @@ describe "site-wide" do
     response['x-ua-compatible'].should == "IE=edge,chrome=1"
   end
 
+  it "should set no-cache headers for html requests" do
+    get "/login"
+    response['Pragma'].should match(/no-cache/)
+    response['Cache-Control'].should match(/must-revalidate/)
+  end
+
+  it "should NOT set no-cache headers for API/xhr requests" do
+    get "/api/v1/courses"
+    response['Pragma'].should be_nil
+    response['Cache-Control'].should_not match(/must-revalidate/)
+  end
+
   context "user headers" do
     before(:each) do
       course_with_teacher

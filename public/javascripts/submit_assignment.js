@@ -237,6 +237,7 @@ define([
         $("#submit_media_recording_form .media_comment_type").val(type);
         $("#media_media_recording_submission_holder").children().hide();
         $("#media_media_recording_ready").show();
+        $("#media_comment_submit_button").attr('disabled', false);
         $("#media_media_recording_thumbnail").attr('id', 'media_comment_' + id);
       });
     });

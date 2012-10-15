@@ -27,6 +27,7 @@ class Attachment < ActiveRecord::Base
   include ContextModuleItem
 
   MAX_SCRIBD_ATTEMPTS = 3
+  MAX_CROCODOC_ATTEMPTS = 2
   # This value is used as a flag for when we are skipping the submit to scribd for this attachment
   SKIPPED_SCRIBD_ATTEMPTS = 25
 
@@ -458,6 +459,29 @@ class Attachment < ActiveRecord::Base
     end
     ns = nil if ns && ns.empty?
     ns
+  end
+
+  def change_namespace(new_namespace)
+    if self.root_attachment
+      raise "change_namespace must be called on a root attachment"
+    end
+
+    old_namespace = self.namespace
+    return if new_namespace == old_namespace
+    old_full_filename = self.full_filename
+    write_attribute(:namespace, new_namespace)
+
+    if Attachment.s3_storage?
+      AWS::S3::S3Object.rename(old_full_filename,
+                               self.full_filename,
+                               bucket_name,
+                               :access => attachment_options[:s3_access])
+    else
+      FileUtils.mv old_full_filename, full_filename
+    end
+
+    self.save
+    Attachment.update_all({ :namespace => new_namespace }, { :root_attachment_id => self.id })
   end
 
   def process_s3_details!(details)
@@ -1290,7 +1314,7 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def submit_to_crocodoc
+  def submit_to_crocodoc(attempt = 1)
     if crocodocable? && !Attachment.skip_3rd_party_submits?
       crocodoc = crocodoc_document || create_crocodoc_document
       crocodoc.upload
@@ -1299,6 +1323,15 @@ class Attachment < ActiveRecord::Base
   rescue => e
     update_attribute(:workflow_state, 'errored')
     ErrorReport.log_exception(:crocodoc, e, :attachment_id => id)
+
+    if attempt < MAX_CROCODOC_ATTEMPTS
+      send_later_enqueue_args :submit_to_crocodoc, {
+        :n_strand => 'crocodoc_retries',
+        :run_at => 30.seconds.from_now,
+        :max_attempts => 1,
+        :priority => Delayed::LOW_PRIORITY,
+      }, attempt + 1
+    end
   end
 
   def resubmit_to_scribd!

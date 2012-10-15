@@ -93,7 +93,7 @@ define([
         $profile_table.find(".change_password_row").hide().find(":password").val("");
       } else {
         $(this).addClass('showing');
-        $profile_table.find(".change_password_row").show().find(":password:first").focus().select();
+        $profile_table.find(".change_password_row").show().find("#old_password").focus().select();
       }
     })
     .attr('checked', false)
@@ -359,6 +359,14 @@ define([
   });
   $("#add_pic_form").formSubmit({
     fileUpload: true,
+    fileUploadOptions: {
+      preparedFileUpload: true,
+      upload_only: true,
+      singleFile: true,
+      context_code: ENV.context_asset_string,
+      folder_id: ENV.folder_id,
+      formDataTarget: 'uploadDataUrl'
+    },
 
     beforeSubmit: function() {
       $(this).find("button").attr('disabled', true).text(I18n.t('buttons.adding_file', "Adding File..."));
@@ -488,9 +496,7 @@ define([
               .attr('title', image.display_name || image.type)
               .attr('data-type', image.type);
 
-            $img[0].onerror = function() {
-              $span.remove();
-            }
+            $img[0].onerror = $span.remove.bind($span, null);
             $dialog.find(".profile_pic_list div").before($span);
           }
           if (pollThumbnails) thumbnailPoller.start();

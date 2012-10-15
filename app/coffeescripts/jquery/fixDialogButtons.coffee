@@ -18,6 +18,11 @@ define [
           if $button.is('.dialog_closer')
             $button.click preventDefault -> $dialog.dialog('close')
 
+          # make it so if you hit enter in the dialog, you submit the form
+          if $button.prop('type') is 'submit' && $button[0].form
+            $dialog.keypress (e) ->
+              $($button[0].form).submit() if e.keyCode is $.ui.keyCode.ENTER
+
           return {
             text: $button.text()
             "data-text-while-loading": $button.data("textWhileLoading")

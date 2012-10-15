@@ -14,6 +14,25 @@ describe "gradebook2" do
     f('.slick-header-columns').should_not include_text(@ungraded_assignment.title)
   end
 
+  def filter_student(text)
+    f('.gradebook_filter input').send_keys text
+  end
+
+  def get_visible_students
+    ff('.student-name')
+  end
+
+  it 'should filter students' do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    get_visible_students.length.should == 2
+    filter_student 'student 1'
+    sleep 1 # InputFilter has a delay
+    visible_students = get_visible_students
+    visible_students.length.should == 1
+    visible_students[0].text.should == 'student 1'
+  end
+
   it "should link to a student's grades page" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
@@ -164,16 +183,15 @@ describe "gradebook2" do
   end
 
   it "should let you post a group comment to a group assignment" do
-    group_assignment = assignment_model({
-                                            :course => @course,
-                                            :name => 'group assignment',
-                                            :due_at => (Time.now + 1.week),
-                                            :points_possible => ASSIGNMENT_3_POINTS,
-                                            :submission_types => 'online_text_entry',
-                                            :assignment_group => @group,
-                                            :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-                                            :grade_group_students_individually => true
-                                        })
+    group_assignment = @course.assignments.create!({
+                                                       :title => 'group assignment',
+                                                       :due_at => (Time.now + 1.week),
+                                                       :points_possible => ASSIGNMENT_3_POINTS,
+                                                       :submission_types => 'online_text_entry',
+                                                       :assignment_group => @group,
+                                                       :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+                                                       :grade_group_students_individually => true
+                                                   })
     project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
     project_group.users << @student_1
     project_group.users << @student_2
@@ -255,7 +273,24 @@ describe "gradebook2" do
         message_form.find_element(:css, '#body').send_keys(message_text)
         submit_form(message_form)
         wait_for_ajax_requests
-      }.to change(ConversationMessage, :count).by(2)
+      }.to change(ConversationMessage, :count).by_at_least(2)
+    end
+
+    it "should send messages when 'Scored more than' X points" do
+      message_text = "This is a message"
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      open_assignment_options(1)
+      f('[data-action="messageStudentsWho"]').click
+      expect {
+        message_form = f('#message_assignment_recipients')
+        click_option('#message_assignment_recipients .message_types', 'Scored more than')
+        message_form.find_element(:css, '.cutoff_score').send_keys('3')  # both assignments have score of 5
+        message_form.find_element(:css, '#body').send_keys(message_text)
+        submit_form(message_form)
+        wait_for_ajax_requests
+      }.to change(ConversationMessage, :count).by_at_least(2)
     end
 
     it "should have a 'Haven't been graded' option" do
@@ -311,6 +346,21 @@ describe "gradebook2" do
     ff('.ui-state-error').count.should == 0
   end
 
+  it "should display for users with only :manage_grades permissions" do
+    user_logged_in
+    RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+                         :permission => 'manage_grades',
+                         :context => Account.default,
+                         :enabled => true)
+    AccountUser.create!(:user => @user,
+                        :account => Account.default,
+                        :membership_type => 'CustomAdmin')
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    ff('.ui-state-error').count.should == 0
+  end
+
   it "should include student view student for grading" do
     @fake_student = @course.student_view_student
     @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
@@ -322,26 +372,24 @@ describe "gradebook2" do
   end
 
   it "should not include non-graded group assignment in group total" do
-    graded_assignment = assignment_model({
-                                             :course => @course,
-                                             :name => 'group assignment 1',
-                                             :due_at => (Time.now + 1.week),
-                                             :points_possible => 10,
-                                             :submission_types => 'online_text_entry',
-                                             :assignment_group => @group,
-                                             :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
-                                             :grade_group_students_individually => true
-                                         })
-    group_assignment = assignment_model({
-                                            :course => @course,
-                                            :name => 'group assignment 2',
-                                            :due_at => (Time.now + 1.week),
-                                            :points_possible => 0,
-                                            :submission_types => 'not_graded',
-                                            :assignment_group => @group,
-                                            :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
-                                            :grade_group_students_individually => true
-                                        })
+    graded_assignment = @course.assignments.create!({
+                                                        :title => 'group assignment 1',
+                                                        :due_at => (Time.now + 1.week),
+                                                        :points_possible => 10,
+                                                        :submission_types => 'online_text_entry',
+                                                        :assignment_group => @group,
+                                                        :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                                        :grade_group_students_individually => true
+                                                    })
+    group_assignment = @course.assignments.create!({
+                                                       :title => 'group assignment 2',
+                                                       :due_at => (Time.now + 1.week),
+                                                       :points_possible => 0,
+                                                       :submission_types => 'not_graded',
+                                                       :assignment_group => @group,
+                                                       :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                                       :grade_group_students_individually => true
+                                                   })
     project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
     project_group.users << @student_1
     #project_group.users << @student_2
@@ -404,4 +452,5 @@ describe "gradebook2" do
       end
     end
   end
+
 end

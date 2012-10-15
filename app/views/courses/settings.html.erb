@@ -44,7 +44,7 @@
         <td><%= f.blabel :name, :course_name, :en => "Name" %></td>
         <td class="nobr">
           <% if can_rename_course %>
-            <%= f.text_field :name, :class => "course_form", :style => "width: 150px;" %>
+            <%= f.text_field :name, :class => "course_form", :maxlength => '255', :style => "width: 150px;" %>
           <% else %>
             <span class="course_form name"><%= @context.name %></span>
           <% end %>
@@ -66,7 +66,7 @@
         <td class="nobr"><%= f.blabel :course_code, :en => "Course Code" %></td>
         <td class="nobr">
           <% if can_rename_course %>
-            <span class="course_form"><%= f.text_field :course_code, :style => "width: 100px;" %></span>
+            <span class="course_form"><%= f.text_field :course_code, :maxlength => '255', :style => "width: 100px;" %></span>
           <% else %>
             <span class="course_form course_code"><%= @context.course_code %></span>
           <% end %>

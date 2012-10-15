@@ -43,7 +43,7 @@ describe SectionsController, :type => :integration do
 
       @user = @me
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
-                      { :controller => 'sections', :action => 'index', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
+                      { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
       json.size.should == 2
       json.find { |s| s['name'] == section2.name }['sis_section_id'].should == 'sis-section'
       json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => USER_API_FIELDS)
@@ -56,74 +56,87 @@ describe SectionsController, :type => :integration do
       section2.destroy
       section2.save!
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
-                      { :controller => 'sections', :action => 'index', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
+                      { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
       json.size.should == 1
     end
   end
 
   describe "show" do
-    it "should be accessible from the course" do
+    before do
       course_with_teacher_logged_in
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/sections/#{@course.default_section.id}",
-                      { :controller => 'sections', :action => 'show', :course_id => @course.id.to_s, :id => @course.default_section.id.to_s, :format => 'json' })
-      json.should == {
-          'id' => @course.default_section.id,
-          'name' => @course.default_section.name,
+      @section = @course.default_section
+    end
+
+    context "scoped by course" do
+      before do
+        @path_prefix = "/api/v1/courses/#{@course.id}/sections"
+        @path_params = { :controller => 'sections', :action => 'show', :course_id => @course.to_param, :format => 'json' }
+      end
+
+      it "should be accessible from the course" do
+        json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
+        json.should == {
+          'id' => @section.id,
+          'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'sis_section_id' => nil
-          }
-    end
+        }
+      end
 
-    it "should be accessible from the course context via sis id" do
-      course_with_teacher_logged_in
-      @course.default_section.update_attribute(:sis_source_id, 'my_section')
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/sections/sis_section_id:my_section",
-                      { :controller => 'sections', :action => 'show', :course_id => @course.id.to_s, :id => 'sis_section_id:my_section', :format => 'json' })
-      json.should == {
-          'id' => @course.default_section.id,
-          'name' => @course.default_section.name,
+      it "should be accessible from the course context via sis id" do
+        @section.update_attribute(:sis_source_id, 'my_section')
+        json = api_call(:get, "#{@path_prefix}/sis_section_id:my_section", @path_params.merge({ :id => 'sis_section_id:my_section' }))
+        json.should == {
+          'id' => @section.id,
+          'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'sis_section_id' => 'my_section'
-          }
+        }
+      end
+
+      it "should scope course sections to the course" do
+        @other_course = course
+        @other_section = @other_course.default_section
+        site_admin_user
+        api_call(:get, "#{@path_prefix}/#{@other_section.id}", @path_params.merge({ :id => @other_section.to_param }), {}, {}, :expected_status => 404)
+      end
     end
 
-    it "should scope course sections to the course" do
-      @course1 = course
-      @course2 = course
-      user
-      Account.site_admin.add_user(@user)
-      raw_api_call(:get, "/api/v1/courses/#{@course1.id}/sections/#{@course2.default_section.id}",
-                      { :controller => 'sections', :action => 'show', :course_id => @course1.id.to_s, :id => @course2.default_section.id.to_s, :format => 'json' })
-      response.status.should == '404 Not Found'
-    end
+    context "unscoped" do
+      before do
+        @path_prefix = "/api/v1/sections"
+        @path_params = { :controller => 'sections', :action => 'show', :format => 'json' }
+      end
 
-    it "should be accessible without a course context" do
-      course_with_teacher_logged_in
-      json = api_call(:get, "/api/v1/sections/#{@course.default_section.id}",
-                      { :controller => 'sections', :action => 'show', :id => @course.default_section.id.to_s, :format => 'json' })
-      json.should == {
-          'id' => @course.default_section.id,
-          'name' => @course.default_section.name,
+      it "should be accessible without a course context" do
+        json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
+        json.should == {
+          'id' => @section.id,
+          'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'sis_section_id' => nil
-          }
-    end
+        }
+      end
 
-    it "should be accessible without a course context via sis id" do
-      course_with_teacher_logged_in
-      @course.default_section.update_attribute(:sis_source_id, 'my_section')
-      json = api_call(:get, "/api/v1/sections/sis_section_id:my_section",
-                      { :controller => 'sections', :action => 'show', :id => 'sis_section_id:my_section', :format => 'json' })
-      json.should == {
-          'id' => @course.default_section.id,
-          'name' => @course.default_section.name,
+      it "should be accessible without a course context via sis id" do
+        @section.update_attribute(:sis_source_id, 'my_section')
+        json = api_call(:get, "#{@path_prefix}/sis_section_id:my_section", @path_params.merge({ :id => "sis_section_id:my_section" }))
+        json.should == {
+          'id' => @section.id,
+          'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'sis_section_id' => 'my_section'
-          }
+        }
+      end
+
+      it "should not be accessible if the associated course is not accessible" do
+        @course.destroy
+        json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }), {}, {}, :expected_status => 404)
+      end
     end
   end
 end

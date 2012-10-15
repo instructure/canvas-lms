@@ -119,3 +119,20 @@ define [
       # integer is now either in [1, 999], or equal to 0 iff number in (-1, 1).
       # prepend it with the sign
       sign + String(integer) + result
+
+    truncateText: (string, options = {}) ->
+      max = options.max ? 30
+      ellipsis = I18n.t('ellipsis', '...')
+      wordSeparator = I18n.t('word_separator', ' ')
+
+      string = (string ? "").replace(/\s+/g, wordSeparator).trim()
+      return string if not string or string.length <= max
+
+      truncateAt = 0
+      while true
+        pos = string.indexOf(wordSeparator, truncateAt + 1)
+        break if pos < 0 || pos > max - ellipsis.length
+        truncateAt = pos
+      truncateAt or= max - ellipsis.length # first word > max, so we cut it
+
+      string.substring(0, truncateAt) + ellipsis

@@ -12,8 +12,8 @@ describe "conversations" do
     add_recipient("student1")
 
     expect {
-      f('#body').send_keys(new_message)
-      5.times { submit_form('#create_message_form') }
+      f('#create_message_form .conversation_body').send_keys(new_message)
+      5.times { submit_form('#create_message_form form') rescue nil }
       keep_trying_until { get_conversations.size == 1 }
     }.to change(ConversationMessage, :count).by(1)
   end
@@ -122,7 +122,9 @@ describe "conversations" do
       f('#forward_body').send_keys(forward_body_text)
       f('.btn-primary').click
       wait_for_ajaximations
-      f('.messages .message').should include_text(forward_body_text)
+      keep_trying_until {
+        f('.messages .message').should include_text(forward_body_text)
+      }
     end
 
     it "should delete a message" do
@@ -175,13 +177,13 @@ describe "conversations" do
         mo.title = "test title"
         mo.save!
 
-        new_conversation
+        new_conversation(:message => media_comment_type)
 
         message = submit_message_form(:media_comment => [mo.media_id, mo.media_type])
         message = "#message_#{message.id}"
 
-        ffj("#{message} .message_attachments li").size.should == 1
-        fj("#{message} .message_attachments li a .title").text.should == mo.title
+        ff("#{message} .message_attachments li").size.should == 1
+        f("#{message} .message_attachments li a .title").text.should == mo.title
       end
     end
   end
@@ -257,12 +259,14 @@ describe "conversations" do
 
       add_recipient("student1")
       add_recipient("student2")
-      f("#body").send_keys "testing testing"
+      f("#create_message_form .conversation_body").send_keys "testing testing"
       submit_form('#create_message_form')
 
       wait_for_ajaximations
 
-      assert_flash_notice_message /Messages Sent/
+      assert_message_status "sending"
+      run_jobs
+      assert_message_status "sent"
 
       # no conversations should show up in the conversation list
       get_conversations(false).should be_empty

@@ -48,11 +48,11 @@ describe ActiveRecord::Base::ConnectionSpecification do
     spec.config[:database].should == 'master'
   end
 
-  it "should allow using {schema} as an insertion into the username" do
+  it "should allow using hash insertions" do
     conf = {
         :adapter => 'postgresql',
         :database => 'master',
-        :username => '{schema}',
+        :username => '%{schema_search_path}',
         :schema_search_path => 'canvas',
         :deploy => {
             :username => 'deploy'
@@ -70,7 +70,7 @@ describe ActiveRecord::Base::ConnectionSpecification do
     conf = {
         :adapter => 'postgresql',
         :database => 'master',
-        :username => '{schema}',
+        :username => '%{schema_search_path}',
         :schema_search_path => 'canvas',
         :deploy => {
             :username => 'deploy'
@@ -87,5 +87,48 @@ describe ActiveRecord::Base::ConnectionSpecification do
 
     spec.config = conf.dup
     spec.config[:username].should == 'canvas'
+  end
+
+  describe "with_environment" do
+    before do
+      #!!! trick it in to actually switching envs
+      Rails.env.stubs(:test?).returns(false)
+
+      # be sure to test bugs where the current env isn't yet included in this hash
+      ActiveRecord::Base::ConnectionSpecification.connection_handlers.clear
+    end
+
+    it "should call ensure_handler when switching envs" do
+      old_handler = ActiveRecord::Base.connection_handler
+      ActiveRecord::Base::ConnectionSpecification.expects(:ensure_handler).returns(old_handler).twice
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) {}
+    end
+
+    it "should not close connections when switching envs" do
+      conn = ActiveRecord::Base.connection
+      slave_conn = ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) { ActiveRecord::Base.connection }
+      conn.should_not == slave_conn
+      ActiveRecord::Base.connection.should == conn
+    end
+
+    context "non-transactional" do
+      self.use_transactional_fixtures = false
+
+      it "should really disconnect all envs" do
+        ActiveRecord::Base.connection
+        ActiveRecord::Base.connection_pool.should be_connected
+
+        ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+          ActiveRecord::Base.connection
+          ActiveRecord::Base.connection_pool.should be_connected
+        end
+
+        ActiveRecord::Base.clear_all_connections!
+        ActiveRecord::Base.connection_pool.should_not be_connected
+        ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+          ActiveRecord::Base.connection_pool.should_not be_connected
+        end
+      end
+    end
   end
 end

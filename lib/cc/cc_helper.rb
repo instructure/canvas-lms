@@ -276,15 +276,18 @@ module CCHelper
   def self.file_query_string(sub_path)
     return if sub_path.blank?
     qs = []
-    uri = URI.parse(sub_path)
-    unless uri.path == "/preview" # defaults to preview, so no qs added
-      qs << "canvas_#{Rack::Utils.escape(uri.path[1..-1])}=1"
-    end
+    begin
+      uri = URI.parse(sub_path)
+      unless uri.path == "/preview" # defaults to preview, so no qs added
+        qs << "canvas_#{Rack::Utils.escape(uri.path[1..-1])}=1"
+      end
 
-    Rack::Utils.parse_query(uri.query).each do |k,v|
-      qs << "canvas_qs_#{Rack::Utils.escape(k)}=#{Rack::Utils.escape(v)}"
+      Rack::Utils.parse_query(uri.query).each do |k,v|
+        qs << "canvas_qs_#{Rack::Utils.escape(k)}=#{Rack::Utils.escape(v)}"
+      end
+    rescue URI::Error => e
+      # if we can't parse the url, we can't preserve canvas query params
     end
-
     return nil if qs.blank?
     "?#{qs.join("&")}"
   end

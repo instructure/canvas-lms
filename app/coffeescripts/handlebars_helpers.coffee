@@ -208,5 +208,7 @@ define [
         <input #{attributes.join ' '} />
       """
 
+    toPercentage: (number) ->
+      parseInt(100 * number) + "%"
   }
   return Handlebars

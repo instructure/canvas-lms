@@ -24,9 +24,7 @@ describe "Alerts" do
     alert.find_element(:css, '.add_recipient_link').click
     wait_for_animations
     (submit = alert.find_element(:css, '.submit_button')).click
-    wait_for_animations
-    wait_for_ajax_requests
-
+    wait_for_ajaximations
     keep_trying_until do
       @alerts.reload
       @alerts.length.should == 1
@@ -39,8 +37,7 @@ describe "Alerts" do
     add_criterion.click
     wait_for_animations
     submit.click
-    wait_for_animations
-    wait_for_ajax_requests
+    wait_for_ajaximations
 
     keep_trying_until do
       @alerts.first.criteria.reload
@@ -115,6 +112,33 @@ describe "Alerts" do
     @alerts.should be_empty
   end
 
+  it "should validate the form" do
+    get "/accounts/#{@context.id}/settings"
+    f('#tab-alerts-link').click
+    f('.add_alert_link').click
+    alert = f('.alert.new')
+    alert.find_element(:css, 'input[name="repetition"][value="value"]').click
+    sleep 2 #need to wait for javascript to process
+    keep_trying_until do
+      submit_form('#new_alert')
+      wait_for_animations
+      ffj('.error_box').length == 4
+    end
+
+    # clicking "do not repeat" should remove the number of days error
+    alert.find_element(:css, 'input[name="repetition"][value="none"]').click
+    keep_trying_until { ffj('.error_box').length == 3 }
+
+    # adding recipient and criterion make the errors go away
+    alert.find_element(:css, '.add_recipient_link').click
+    alert.find_element(:css, '.add_criterion_link').click
+    keep_trying_until { ffj('.error_box').length == 1 }
+
+    alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
+    submit_form('#new_alert')
+    keep_trying_until { ffj('.error_box').length == 2 }
+  end
+
   context "recipients" do
     it "should hide the add link when all recipients are added" do
       get "/accounts/#{@context.id}/settings"
@@ -158,32 +182,5 @@ describe "Alerts" do
       alertElement.find_element(:css, '.cancel_button').click
       alertElement.find_elements(:css, '.recipients li').length.should == 3
     end
-  end
-
-  it "should validate the form" do
-    get "/accounts/#{@context.id}/settings"
-    f('#tab-alerts-link').click
-    f('.add_alert_link').click
-    alert = f('.alert.new')
-    alert.find_element(:css, 'input[name="repetition"][value="value"]').click
-    sleep 2 #need to wait for javascript to process
-    keep_trying_until do
-      submit_form('#new_alert')
-      wait_for_animations
-      ffj('.error_box').length == 4
-    end
-
-    # clicking "do not repeat" should remove the number of days error
-    alert.find_element(:css, 'input[name="repetition"][value="none"]').click
-    keep_trying_until { ffj('.error_box').length == 3 }
-
-    # adding recipient and criterion make the errors go away
-    alert.find_element(:css, '.add_recipient_link').click
-    alert.find_element(:css, '.add_criterion_link').click
-    keep_trying_until { ffj('.error_box').length == 1 }
-
-    alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
-    submit_form('#new_alert')
-    keep_trying_until { ffj('.error_box').length == 2 }
   end
 end

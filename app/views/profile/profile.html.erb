@@ -19,6 +19,7 @@
   <% end %>
 <% end %>
 
+<% js_env :folder_id => @user.profile_pics_folder.id %>
 <% js_bundle :profile %>
 <% jammit_css :profile_edit %>
 
@@ -35,20 +36,20 @@
     <% editable_name = @user.user_can_edit_name? %>
     <td><%= f.blabel :name, :en => "Full Name" %></td>
     <td><span class="full_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.name %></span>
-      <%= f.text_field :name, :class => "edit_data" if editable_name %>
+      <%= f.text_field :name, :class => "edit_data", :maxlength => 255, :size => 30 if editable_name %>
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.name', "This name will be used for grading.") %></span>
   </tr>
   <tr>
     <td><%= f.blabel :short_name, :en => "Display Name" %></td>
     <td><span class="short_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.short_name %></span>
-      <%= f.text_field :short_name, :class => "edit_data"  if editable_name %>
+      <%= f.text_field :short_name, :class => "edit_data", :maxlength => 255, :size => 30 if editable_name %>
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
     </td>
   </tr>
   <tr>
     <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
     <td><span class="sortable_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.sortable_name %></span>
-      <%= f.text_field :sortable_name, :class => "edit_data"  if editable_name %>
+      <%= f.text_field :sortable_name, :class => "edit_data", :maxlength => 255, :size => 30  if editable_name %>
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
     </td>
   </tr>
@@ -546,7 +547,6 @@ TEXT
   <a href="#" class="add_pic_link add"><%= t('links.upload_new_image', "Upload a new Image") %></a>
   <% form_for :attachment, :url => context_url(@user, :context_files_url, :format => 'json'), :html => {:id => "add_pic_form", :style => "display: none;"} do |f| %>
     <input type="hidden" name="format" value="text" />
-    <%= f.hidden_field :folder_id, :value => @user.profile_pics_folder.id %>
     <%= f.file_field :uploaded_data %>
     <button type="submit" class="button small-button"><%= t('buttons.add_picture_file', "Add File") %></button>
   <% end %>

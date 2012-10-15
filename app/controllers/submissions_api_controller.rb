@@ -91,7 +91,7 @@ class SubmissionsApiController < ApplicationController
   #       }
   #     ]
   def for_students
-    if authorized_action(@context, @current_user, :view_all_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       raise ActiveRecord::RecordNotFound if params[:student_ids].blank?
       student_ids = map_user_ids(params[:student_ids]).map(&:to_i) & visible_user_ids
       return render(:json => []) if student_ids.blank?

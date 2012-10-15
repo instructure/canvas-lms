@@ -355,7 +355,12 @@ define([
             }
           }
         });
-        
+
+        tree.on('keyup', function(e) {
+          if (e.keyPressed !== 13) return;
+          it.ToggleNode(obj, $(e.target));
+        });
+
         tree.dblclick(function(e) {
           var clicked = $(e.target);
 
@@ -388,6 +393,7 @@ define([
       };//ToggleNode
       it.ExpandNode = function(obj, node) {
         node.addClass('open');
+        node.attr('aria-expanded', true);
 
         if (it.opts.autoclose) {
           node.siblings('.open').each(function() {
@@ -420,6 +426,7 @@ define([
   
       it.CollapseNode = function(node) {
         node.removeClass('open');
+        node.attr('aria-expanded', false);
 
         if ($.browser.msie) {
           node.children('ul').hide();

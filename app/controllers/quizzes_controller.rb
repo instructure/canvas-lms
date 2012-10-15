@@ -166,11 +166,10 @@ class QuizzesController < ApplicationController
   end
 
   def managed_quiz_data
-    @submissions = @quiz.quiz_submissions.select{|s| !s.settings_only? }
+    students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a
+    @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).select{|s| !s.settings_only? }
     submission_ids = {}
     @submissions.each{|s| submission_ids[s.user_id] = s.id }
-    submission_users = @submissions.map{|s| s.user_id}
-    students = @context.students.order_by_sortable_name.to_a
     @submitted_students = students.select{|stu| submission_ids[stu.id] }
     if @quiz.survey? && @quiz.anonymous_submissions
       @submitted_students = @submitted_students.sort_by{|stu| submission_ids[stu.id] }
@@ -431,7 +430,7 @@ class QuizzesController < ApplicationController
 
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
-      @all_students = @context.students.order_by_sortable_name
+      @all_students = @context.students_visible_to(@current_user).order_by_sortable_name
       if @quiz.survey? && @quiz.anonymous_submissions
         @students = @all_students.paginate(:per_page => 50, :page => params[:page], :order => :uuid)
       else

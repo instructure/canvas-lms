@@ -275,9 +275,11 @@ module ApplicationHelper
     return if @wiki_sidebar_data
     logger.warn "database lookups happening in view code instead of controller code for wiki sidebar (load_wiki_sidebar)"
     @wiki_sidebar_data = {}
-    includes = [:default_wiki_wiki_pages, :active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
+    includes = [:active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
     includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).scoped({:limit => 150}) if @context.respond_to?(i) }
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
+    @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.scoped(:order => 'title', :limit => 150) if @context.respond_to?(:wiki)
+    @wiki_sidebar_data[:wiki_pages] ||= []
     @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
     @wiki_sidebar_data
   end
@@ -575,7 +577,7 @@ module ApplicationHelper
   end
 
   def jt(key, default, js_options='{}')
-    full_key = key =~ /\A#/ ? key : i18n_scope + '.' + key
+    full_key = key =~ /\A#/ ? key.sub(/\A#/, '') : i18n_scope + '.' + key
     translated_default = I18n.backend.send(:lookup, I18n.locale, full_key) || default # string or hash
     raw "I18n.scoped(#{i18n_scope.to_json}).t(#{key.to_json}, #{translated_default.to_json}, #{js_options})"
   end
@@ -674,7 +676,10 @@ module ApplicationHelper
     css_classes << "support_url" if url
     css_classes << "help_dialog_trigger" if show_feedback_link
     if url || show_feedback_link
-      link_to t('#links.help', "Help"), url || '#', :class => css_classes.join(" ")
+      link_to t('#links.help', "Help"), url || '#',
+        :class => css_classes.join(" "),
+        'data-track-category' => "help system",
+        'data-track-label' => 'help button'
     end
   end
 

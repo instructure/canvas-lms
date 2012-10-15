@@ -118,7 +118,7 @@ module UserContent
       @user = user
       # capture group 1 is the object type, group 2 is the object id, if it's
       # there, and group 3 is the rest of the url, including any beginning '/'
-      @toplevel_regex = %r{/#{context.class.name.tableize}/#{context.id}/(\w+)(?:/(\d+))?(/[^\s"]*)?}
+      @toplevel_regex = %r{/#{context.class.name.tableize}/#{context.id}/(\w+)(?:/(\d+))?(/[^\s"<']*)?}
       @handlers = {}
       @default_handler = nil
       @unknown_handler = nil

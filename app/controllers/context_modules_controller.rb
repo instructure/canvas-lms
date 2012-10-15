@@ -166,7 +166,11 @@ class ContextModulesController < ApplicationController
     code = params[:code].split("_")
     id = code.pop
     type = code.join("_").classify
-    @tag = @context.context_module_tags.active.find_by_context_module_id_and_content_id_and_content_type(params[:context_module_id], id, type)
+    if type == 'ContentTag'
+      @tag = @context.context_module_tags.active.find_by_id(id)
+    else
+      @tag = @context.context_module_tags.active.find_by_context_module_id_and_content_id_and_content_type(params[:context_module_id], id, type)
+    end
     @module = @context.context_modules.active.find(params[:context_module_id])
     @progression = @module.evaluate_for(@current_user)
     @progression.current_position ||= 0 if @progression

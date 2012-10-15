@@ -198,6 +198,19 @@ describe Attachment do
       @attachment.crocodoc_document.uuid.should == '1234567890'
     end
 
+    it "should spawn a delayed job to retry failed uploads (once)" do
+      Crocodoc::API.any_instance.stubs(:upload).returns 'error' => 'blah'
+      crocodocable_attachment_model
+
+      expects_job_with_tag('Attachment#submit_to_crocodoc', 1) do
+        @attachment.submit_to_crocodoc
+      end
+
+      expects_job_with_tag('Attachment#submit_to_crocodoc', 0) do
+        @attachment.submit_to_crocodoc(2)
+      end
+    end
+
     it "should submit to scribd if crocodoc fails to convert" do
       crocodocable_attachment_model
       @attachment.submit_to_crocodoc
@@ -904,6 +917,31 @@ describe Attachment do
 
       # thumbnails should use the same bucket as the attachment they are parented to
       Thumbnail.new(:attachment => @attachment).bucket_name.should == 'pluginsetting_bucket'
+    end
+  end
+
+  context "#change_namespace" do
+    before do
+      Setting.set("file_storage_test_override", "s3")
+      @old_account = account_model
+      Attachment.domain_namespace = @old_account.file_namespace
+      @root = attachment_model
+      @child = attachment_model(:root_attachment => @root)
+      @new_account = account_model
+    end
+
+    it "should fail for non-root attachments" do
+      AWS::S3::S3Object.expects(:rename).never
+      expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error
+      @root.reload.namespace.should == @old_account.file_namespace
+      @child.reload.namespace.should == @root.reload.namespace
+    end
+
+    it "should rename root attachments and update children" do
+      AWS::S3::S3Object.expects(:rename).with(@root.full_filename, @root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), @root.bucket_name, anything)
+      @root.change_namespace(@new_account.file_namespace)
+      @root.namespace.should == @new_account.file_namespace
+      @child.reload.namespace.should == @root.namespace
     end
   end
 

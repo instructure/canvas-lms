@@ -245,7 +245,7 @@ class EnrollmentsApiController < ApplicationController
   #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
   def course_index_enrollments(scope_arguments)
-    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades])
+    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).scoped(scope_arguments)
       unless scope_arguments[:conditions].include?(:workflow_state)
         scope = scope.scoped(:conditions =>  ['enrollments.workflow_state NOT IN (?)', ['rejected', 'completed', 'deleted', 'inactive']])

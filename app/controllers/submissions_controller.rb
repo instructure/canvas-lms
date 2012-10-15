@@ -346,6 +346,9 @@ class SubmissionsController < ApplicationController
         )
         @attachment.save!
         params[:submission][:attachments] << @attachment
+      elsif !api_request? && params[:submission][:submission_type] == 'media_recording' && params[:submission][:media_comment_id].blank?
+        flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
+        return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       end
       params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
 

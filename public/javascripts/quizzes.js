@@ -23,11 +23,12 @@ define([
   'str/pluralize',
   'wikiSidebar',
   'compiled/editor/MultipleChoiceToggle',
+  'compiled/str/TextHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar, /\$\.underscore/, truncateText */,
+  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar, /\$\.underscore/ */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
@@ -40,7 +41,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, calcCmd, htmlEscape, pluralize, wikiSidebar, MultipleChoiceToggle) {
+], function(I18n, $, calcCmd, htmlEscape, pluralize, wikiSidebar, MultipleChoiceToggle, TextHelper) {
 
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
@@ -1106,18 +1107,27 @@ define([
     }).triggerHandler('change');
 
     $("#never_hide_results").change(function() {
-      $(".show_quiz_results_options").showIf($(this).attr('checked'));
-      if (!$(this).attr('checked')) {
+      var $this = $(this);
+      $(".show_quiz_results_options").showIf($this.attr('checked'));
+      if (!$this.attr('checked')) {
         $("#hide_results_only_after_last").attr('checked', false);
         $("#quiz_show_correct_answers").attr('checked', false);
       }
     }).triggerHandler('change');
 
-    $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").bind('change', function() {
-      var checked = $("#multiple_attempts_option").attr('checked') && $("#limit_attempts_option").attr('checked');
-      var cnt = parseInt($("#quiz_allowed_attempts").val(), 10);
-      if (checked && cnt && cnt > 0) {
-        $("#hide_results_only_after_last_holder").show();
+    $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").change(function() {
+      var checked = $("#multiple_attempts_option").prop('checked') && $("#limit_attempts_option").prop('checked');
+      if (checked) {
+          $("#hide_results_only_after_last_holder").show();
+          var $attempts = $('#quiz_allowed_attempts');
+          var $attemptsVal = $attempts.val();
+          if(isNaN($attemptsVal)) {
+              alert(I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers'));
+              $attempts.val("");
+          } else if($attemptsVal.length > 3) {
+              alert(I18n.t('quiz_attempts_length_error', 'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left'));
+              $attempts.val("");
+          }
       } else {
         $("#hide_results_only_after_last").attr('checked', false);
         $("#hide_results_only_after_last_holder").hide();
@@ -1549,7 +1559,7 @@ define([
           $dialog.addClass('loaded');
           for(idx in banks) {
             var bank = banks[idx].assessment_question_bank;
-            bank.title = $.truncateText(bank.title)
+            bank.title = TextHelper.truncateText(bank.title)
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
             $bank.fillTemplateData({data: bank, dataValues: ['id', 'context_type', 'context_id']});
             $dialog.find(".bank_list").append($bank);
@@ -1607,7 +1617,7 @@ define([
           $dialog.addClass('loaded');
           for(idx in banks) {
             var bank = banks[idx].assessment_question_bank;
-            bank.title = $.truncateText(bank.title)
+            bank.title = TextHelper.truncateText(bank.title)
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
             $bank.fillTemplateData({data: bank});
             $dialog.find(".bank_list").append($bank);
@@ -1641,7 +1651,7 @@ define([
         group.id = $(this).attr('id').substring(10);
         group.name = $(this).getTemplateData({textValues: ['name']}).name;
         var $option = $("<option/>");
-        $option.text($.truncateText(group.name));
+        $option.text(TextHelper.truncateText(group.name));
         $option.val(group.id);
         $option.addClass('group');
         $findQuestionDialog.find(".quiz_group_select option.bottom").before($option);
@@ -1724,7 +1734,7 @@ define([
         var question = questionList[idx].assessment_question;
         if (!existingIDs[question.id] || true) {
           $div.html(question.question_data.question_text);
-          question.question_text = $.truncateText($div.text(), 75);
+          question.question_text = TextHelper.truncateText($div.text(), {max: 75});
           question.question_name = question.question_data.question_name;
           var $question = $findQuestionDialog.find(".found_question.blank").clone(true).removeClass('blank');
           $question.toggleClass('already_added', !!existingIDs[question.id]);

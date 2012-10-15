@@ -153,6 +153,7 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation
+  has_many :conversation_batches, :include => :root_conversation_message
   has_many :favorites
   has_many :favorite_courses, :source => :course, :through => :current_and_invited_enrollments, :conditions => "EXISTS (SELECT 1 FROM favorites WHERE context_type = 'Course' AND context_id = enrollments.course_id AND user_id = enrollments.user_id)"
   has_many :zip_file_imports, :as => :context
@@ -264,6 +265,8 @@ class User < ActiveRecord::Base
   end
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  validates_length_of :short_name, :maximum => maximum_string_length, :allow_nil => true
+  validates_length_of :sortable_name, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :name, :if => :require_presence_of_name
   validates_locale :locale, :browser_locale, :allow_nil => true
   validates_acceptance_of :terms_of_use, :if => :require_acceptance_of_terms, :allow_nil => false
@@ -1532,23 +1535,26 @@ class User < ActiveRecord::Base
   end
 
   def self.file_structure_for(context, user)
-    res = {
+    results = {
       :contexts => [context],
       :collaborations => [],
       :folders => [],
       :folders_with_subcontent => [],
       :files => []
     }
-    context_codes = res[:contexts].map{|c| c.asset_string }
+    context_codes = results[:contexts].map{|c| c.asset_string }
+
     if !context.is_a?(User) && user
-      res[:collaborations] = user.collaborations.active.find(:all, :include => [:user, :users]).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
-      res[:collaborations] = res[:collaborations].sort_by{|c| c.created_at}.reverse
+      results[:collaborations] = user.collaborations.active.find(:all, :include => [:user, :users]).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
+      results[:collaborations] = results[:collaborations].sort_by{|c| c.created_at}.reverse
     end
-    res[:contexts].each do |context|
-      res[:folders] += context.active_folders_with_sub_folders
+
+    results[:contexts].each do |context|
+      results[:folders] += context.active_folders_with_sub_folders
     end
-    res[:folders] = res[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
-    res
+
+    results[:folders] = results[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
+    results
   end
 
   def generate_reminders_if_changed
@@ -2570,7 +2576,7 @@ class User < ActiveRecord::Base
   end
 
   def crocodoc_user
-    "#{crocodoc_id!},#{short_name}"
+    "#{crocodoc_id!},#{short_name.gsub(",","")}"
   end
 
   # mfa settings for a user are the most restrictive of any pseudonyms the user has

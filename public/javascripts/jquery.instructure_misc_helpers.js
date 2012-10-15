@@ -22,11 +22,12 @@ define([
   'jquery' /* $ */,
   'underscore',
   'str/htmlEscape',
+  'compiled/str/TextHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSuggestion */,
   'jqueryui/dialog',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(INST, I18n, $, _, htmlEscape) {
+], function(INST, I18n, $, _, htmlEscape, TextHelper) {
 
   // Return the first value which passes a truth test
   $.detect = function(collection, callback) {
@@ -286,7 +287,7 @@ define([
           for(var idx in data) {
             data[idx].short_title = data[idx].title;
             if(data[idx].title == data[idx].description) {
-              data[idx].short_title = $.truncateText(data[idx].description, 30);
+              data[idx].short_title = TextHelper.truncateText(data[idx].description, {max: 30});
             }
             $("<div class='bookmark'/>")
               .appendTo($dialog.find(".results"))
@@ -405,33 +406,6 @@ define([
       },
       height: 320
     });
-  };
-
-  $.truncateText = function(string, max) {
-    max = max || 30;
-    if ( !string ) { 
-      return ""; 
-    } else {
-      var split  = (string || "").split(/\s/),
-          result = "",
-          done   = false;
-
-      for(var idx in split) {
-        var val = split[idx];
-        if ( done ) {
-          // do nothing
-        } else if( val && result.length < max) {
-          if(result.length > 0) {
-            result += " ";
-          }
-          result += val;
-        } else {
-          done = true;
-          result += "...";
-        }
-      }
-      return result;
-    }
   };
 
   $.toSentence = function(array, options) {

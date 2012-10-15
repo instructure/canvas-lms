@@ -20,6 +20,10 @@ module Delayed
         include Delayed::Backend::Base
         set_table_name :delayed_jobs
 
+        def self.reconnect!
+          connection.reconnect!
+        end
+
         class << self
           attr_accessor :batch_size, :select_random
         end

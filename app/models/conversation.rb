@@ -190,7 +190,7 @@ class Conversation < ActiveRecord::Base
   #
   # ==== Arguments
   # * <tt>current_user</tt> - The user who is creating the message.
-  # * <tt>body</tt> - Message body to add.
+  # * <tt>body_or_obj</tt> - Message body or ConversationMessage instance to add
   #
   # ==== Options
   # * <tt>:generated</tt> - Boolean. If the message was generated.
@@ -207,7 +207,7 @@ class Conversation < ActiveRecord::Base
   # * <tt>:attachment_ids</tt> - The attachment_ids to link to the new message. Defaults to nil.
   # * <tt>:media_comment</tt> - The media_comment for the message. Defaults to nil.
   # * <tt>:forwarded_message_ids</tt> - Array of message IDs to forward. Only if forwardable and limited to 1.
-  def add_message(current_user, body, options = {})
+  def add_message(current_user, body_or_obj, options = {})
     transaction do
       lock!
 
@@ -218,32 +218,18 @@ class Conversation < ActiveRecord::Base
       options[:update_for_skips]    = options[:update_for_sender]  unless options.has_key?(:update_for_skips)
       options[:skip_ids]          ||= [current_user.id]
 
+      message = body_or_obj.is_a?(ConversationMessage) ?
+        body_or_obj :
+        Conversation.build_message(current_user, body_or_obj, options)
+      message.conversation = self
+
       # all specified (or implicit) tags, regardless of visibility to individual participants
       new_tags = options[:tags] ? options[:tags] & current_context_strings(1) : []
       new_tags = current_context_strings if new_tags.blank? && tags.empty? # i.e. we're creating the first message and there are no tags yet
       self.tags |= new_tags if new_tags.present?
-      self.root_account_ids |= [options[:root_account_id]] if options[:root_account_id].present?
+      self.root_account_ids |= [message.root_account_id] if message.root_account_id
       save! if new_tags.present? || root_account_ids_changed?
 
-      message = conversation_messages.build
-      message.author_id = current_user.id
-      message.body = body
-      message.generated = options[:generated]
-      if options[:root_account_id]
-        message.context_type = 'Account'
-        message.context_id = options[:root_account_id]
-      end
-      message.asset = options[:asset]
-      message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
-      message.media_comment = options[:media_comment] if options[:media_comment].present?
-      if options[:forwarded_message_ids].present?
-        messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
-        conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
-        raise "can only forward one conversation at a time" if conversation_ids.size != 1
-        raise "user doesn't have permission to forward these messages" unless current_user.conversations.find_by_conversation_id(conversation_ids.first)
-        # TODO: optimize me
-        message.forwarded_message_ids = messages.map(&:id).join(',')
-      end
       # so we can take advantage of other preloaded associations
       ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
       message.save!
@@ -254,6 +240,30 @@ class Conversation < ActiveRecord::Base
       end
       message
     end
+  end
+
+  def self.build_message(current_user, body, options = {})
+    message = ConversationMessage.new
+    message.author_id = current_user.id
+    message.body = body
+    message.generated = options[:generated] || false
+    if options[:root_account_id]
+      message.context_type = 'Account'
+      message.context_id = options[:root_account_id]
+    end
+    message.asset = options[:asset]
+    message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
+    message.media_comment = options[:media_comment] if options[:media_comment].present?
+    if options[:forwarded_message_ids].present?
+      messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
+      conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
+      raise "can only forward one conversation at a time" if conversation_ids.size != 1
+      raise "user doesn't have permission to forward these messages" unless current_user.conversations.find_by_conversation_id(conversation_ids.first)
+      # TODO: optimize me
+      message.forwarded_message_ids = messages.map(&:id).join(',')
+    end
+    message.generate_user_note = true if options[:generate_user_note]
+    message
   end
 
   # Add the message to the conversation for all the participants.

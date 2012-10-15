@@ -32,6 +32,13 @@ module Canvas
     # create the redis cluster connection using config/redis.yml
     redis_settings = Setting.from_config('redis')
     raise("Redis is not enabled for this install") if redis_settings.blank?
+    @redis = redis_from_config(redis_settings)
+  end
+
+  # Builds a redis object using a config hash in the format used by a couple
+  # different config/*.yml files, like redis.yml, cache_store.yml and
+  # delayed_jobs.yml
+  def self.redis_from_config(redis_settings)
     Bundler.require 'redis'
     if redis_settings.is_a?(Array)
       redis_settings = { :servers => redis_settings }
@@ -40,11 +47,11 @@ module Canvas
     redis_settings[:servers].map! { |s|
       ::Redis::Factory.convert_to_redis_client_options(s).merge(:marshalling => false)
     }
-    @redis = ::Redis::Factory.create(redis_settings[:servers])
+    redis = ::Redis::Factory.create(redis_settings[:servers])
     if redis_settings[:database].present?
-      @redis.select(redis_settings[:database])
+      redis.select(redis_settings[:database])
     end
-    @redis
+    redis
   end
 
   def self.redis_enabled?

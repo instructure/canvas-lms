@@ -1886,6 +1886,12 @@ describe User do
       @user.crocodoc_user.should eql '999,Bob'
     end
 
+    it "should scrub commas from the user name" do
+      @user.short_name = "Smith, Bob"
+      @user.save!
+      @user.crocodoc_user.should eql '999,Smith Bob'
+    end
+
     it "should not change a user's crocodoc_id" do
       @user.update_attribute :crocodoc_id, 2
       @user.crocodoc_id!.should eql 2

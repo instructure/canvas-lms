@@ -50,8 +50,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       keep_trying_until do
         images = ffj('#editor_tabs_4 .image_list .img')
         images.length.should == 2
-        images.each { |i| i.attribute('complete').should == 'true' }# - commented out because it is breaking with
-                                                                    #webdriver 2.22 and firefox 12
+        images.each { |i| i.attribute('complete').should == 'true' } # - commented out because it is breaking with
+                                                                     #webdriver 2.22 and firefox 12
       end
     end
 
@@ -177,25 +177,5 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       end
     end
   end
-
-  context "wiki and tiny images as a student" do
-    before (:each) do
-      course(:active_all => true, :name => 'wiki course')
-      @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
-      @teacher = user_with_pseudonym(:active_user => true, :username => 'teacher@example.com', :name => 'teacher@example.com', :password => 'asdfasdf')
-      @course.enroll_student(@student).accept
-      @course.enroll_teacher(@teacher).accept
-    end
-
-    it "should add an image to the page and validate a student can see it" do
-      login_as(@teacher.name)
-      get "/courses/#{@course.id}/wiki"
-      add_image_to_rce
-
-      login_as(@student.name)
-      get "/courses/#{@course.id}/wiki"
-      fj("img[src='/courses/#{@course.id}/files/#{@course.attachments.last.id}/preview']").should be_displayed
-      #check_image would be good to do here but the src on the image in the wiki body is messed up
-    end
-  end
 end
+

@@ -101,6 +101,11 @@ define [
     events:
       'change #onlyUnread, #onlyGraded, #searchTerm' : 'handleFilterChange'
       'input #searchTerm' : 'handleFilterChange'
+
+      # IE doesn't fire 'input' event and doesn't fire 'change' till blur,
+      # so have to listen to all keups too.
+      'keyup #searchTerm' : 'handleFilterChange'
+
       'sortupdate' : 'handleSortUpdate'
       'change #lock' : 'toggleLockingSelectedTopics'
       'click #delete' : 'destroySelectedTopics'
@@ -122,9 +127,10 @@ define [
     handleFilterChange: (event) ->
       input = event.target
       val = if input.type is "checkbox" then input.checked else input.value
-      @[input.id] = val
-      @renderList()
-      @collection.trigger 'aBogusEventToCauseYouToFetchNextPageIfNeeded'
+      if @[input.id] != val
+        @[input.id] = val
+        @renderList()
+        @collection.trigger 'aBogusEventToCauseYouToFetchNextPageIfNeeded'
 
     filters:
       onlyGraded: -> @get 'assignment_id'

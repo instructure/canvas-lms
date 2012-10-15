@@ -123,6 +123,7 @@ describe "eportfolios" do
       before(:each) do
         @assignment = @course.assignments.create(:name => 'new assignment')
         @assignment.submit_homework(@student)
+        attachment_model(:context => @student)
         get "/eportfolios/#{@eportfolio.id}"
         expect_new_page_load { f(".forward").click }
         f(".edit_content_link").click
@@ -140,6 +141,23 @@ describe "eportfolios" do
         wait_for_ajax_requests
         entry_verifier ({:section_type => "rich_text", :content => "hello student"})
         f("#page_content .section_content").should include_text("hello student")
+      end
+
+      it "should add a user file" do
+        f('.add_file_link').click
+        fj('.file_list:visible .sign:visible').click # my files
+        file = fj('li.file .text:visible')
+        file.should include_text @attachment.filename
+        file.click
+        f('.upload_file_button').click
+        download = fj('.eportfolio_download:visible')
+        download.should be_present
+        download.should include_text @attachment.filename
+        submit_form('.form_content')
+        wait_for_ajax_requests
+        f('.section.read_only').should include_text @attachment.filename
+        refresh_page
+        f('.section.read_only').should include_text @attachment.filename
       end
 
       context "adding html content" do

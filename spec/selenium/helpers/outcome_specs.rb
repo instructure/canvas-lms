@@ -20,8 +20,7 @@ shared_examples_for "outcome tests" do
     outcome_form.find_element(:css, '.add_rating_link').click
     rating_table = outcome_form.find_element(:css, '.rubric_criterion')
     new_rating_row = fj('#edit_outcome_form .rubric_criterion tr:nth-child(6)')
-    new_rating_row.find_element(:css, 'input.outcome_rating_description').clear
-    new_rating_row.find_element(:css, 'input.outcome_rating_description').send_keys('New Expectation')
+    replace_content(new_rating_row.find_element(:css, 'input.outcome_rating_description'), 'New Expectation')
     new_rating_points = new_rating_row.find_element(:name, 'learning_outcome[rubric_criterion][ratings][5][description]')
     replace_content(new_rating_points, '1')
     #delete a rating

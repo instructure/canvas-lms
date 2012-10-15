@@ -278,7 +278,7 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  TURNITIN_JOB_OPTS = { :n_strand => 'turnitin', :priority => Delayed::LOW_PRIORITY }
+  TURNITIN_JOB_OPTS = { :n_strand => 'turnitin', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
 
   def submit_to_turnitin_later
     if self.turnitinable? && @submit_to_turnitin
@@ -428,7 +428,7 @@ class Submission < ActiveRecord::Base
       attachments.each do |a|
         a.send_later_enqueue_args :submit_to_crocodoc,
           :n_strand     => 'crocodoc',
-          :max_attempts => 5,
+          :max_attempts => 1,
           :priority => Delayed::LOW_PRIORITY
       end
     end
@@ -464,6 +464,9 @@ class Submission < ActiveRecord::Base
       self.attempt ||= 0
       self.attempt += 1 if self.submitted_at_changed?
       self.attempt = 1 if self.attempt < 1
+    end
+    if self.submission_type == 'media_recording' && !self.media_comment_id
+      raise "Can't create media submission without media object"
     end
     if self.submission_type == 'online_quiz'
       self.quiz_submission ||= QuizSubmission.find_by_submission_id(self.id) rescue nil

@@ -41,7 +41,7 @@
         <h5 class="header"><a href="#"><%= t('links_to.wiki_pages', %{Wiki Pages}) %></a></h5>
         <div>
             <ul class="wiki_pages page_list">
-              <% (@wiki_sidebar_data[:default_wiki_wiki_pages].select{|p| p.active? }.sort_by{|p| p.title || "" } rescue []).each do |wiki_page|  %>
+              <% (@wiki_sidebar_data[:wiki_pages]).each do |wiki_page|  %>
                 <% if !wiki_page.hide_from_students || can_do(@context, @current_user, :manage_content) %>
                   <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title.titleize, context_url(@context, :context_wiki_page_url, wiki_page.url) rescue "" %></li>
                 <% end %>

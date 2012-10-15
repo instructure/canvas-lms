@@ -1,7 +1,7 @@
 <div id="add_group" style="display: none;">
   <% form_for :assignment_group, :url => context_url(@context, :context_assignment_groups_url), :html => {:id => 'add_group_form', :style => 'display: none; padding: 5px;'} do |form| %>
     <div style="float: left;">
-    <%= form.text_field :name, :style => 'width: 175px; font-size: 1.3em;', :title => t('labels.group_name', "Group Name") %>
+    <%= form.text_field :name, :style => 'width: 175px; font-size: 1.3em;', :maxlength => "255", :title => t('labels.group_name', "Group Name") %>
     <span style="padding-left: 30px;" class="percent_weighting">
       <span style="font-size: 0.8em;">
       <%= t :percent_of_total_grade, "%{percent} % of total grade",

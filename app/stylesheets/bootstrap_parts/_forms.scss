@@ -110,7 +110,7 @@ input[type="url"], input[type="search"], input[type="tel"], input[type="color"],
     width: auto; // Override of generic input selector
   }
 
-  input[type="search"] {
+  .webkit & input[type="search"] {
     -webkit-appearance: none;
     height: 28px;
   }

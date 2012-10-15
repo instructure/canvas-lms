@@ -71,7 +71,7 @@ describe 'MessageDispatcher' do
 
       job2.tag.should == 'Message#deliver'
       job2.payload_object.object.should == @messages[1]
-      job2.run_at.should == @messages[1].dispatch_at
+      job2.run_at.to_i.should == @messages[1].dispatch_at.to_i
     end
   end
 end
