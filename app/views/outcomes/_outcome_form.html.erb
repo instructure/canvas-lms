@@ -64,7 +64,7 @@
   <div class="header">
     <div class="title">
     <%= before_label :grouping_name, "Grouping Name" %>
-    <%= f.text_field :title %>
+    <%= f.text_field :title, :maxlength => '255', :size => '30' %>
     </div>
     <div class="clear"></div>
     <div class="description">
