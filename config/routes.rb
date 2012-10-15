@@ -885,7 +885,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :groups) do |groups|
       groups.resources :groups, :except => [:index]
-      groups.get 'users/self/groups', :action => :index
+      groups.get 'users/self/groups', :action => :index, :path_name => "current_user_groups"
       groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
