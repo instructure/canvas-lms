@@ -347,9 +347,9 @@ describe "discussions" do
         edit_text = 'this has been edited '
         text = "new side comment from student"
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
+        @topic.discussion_entries.last.message.should == text
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_js
-        wait_for_ajaximations
+        sleep 5
         validate_entry_text(entry, text)
         edit_entry(entry, edit_text)
       end
