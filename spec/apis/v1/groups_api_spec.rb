@@ -68,6 +68,8 @@ describe "Groups API", :type => :integration do
     @user = @member
     json = api_call(:get, "/api/v1/users/self/groups", @community_path_options.merge(:action => "index"))
     json.should == [group_json(@community, @user), group_json(@group, @user)]
+    links = response.headers['Link'].split(",")
+    links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }.should be_true
   end
 
   it "should allow a member to retrieve the group" do

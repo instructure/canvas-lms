@@ -152,12 +152,12 @@ class GroupsController < ApplicationController
         @groups = scope || []
       end
       format.json do
-        scope = scope.scoped({
-          :include => :group_category,
-          :order => "groups.id ASC",
-        })
-        route = polymorphic_url([:api_v1, :groups])
-        @groups = Api.paginate(scope, self, route)
+        scope = if scope.present?
+          scope.scoped({ :include => :group_category, :order => "groups.id ASC" })
+        else
+          []
+        end
+        @groups = Api.paginate(scope, self, api_v1_current_user_groups_url)
         render :json => @groups.map { |g| group_json(g, @current_user, session) }
       end
     end
