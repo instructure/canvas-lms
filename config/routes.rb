@@ -637,7 +637,7 @@ ActionController::Routing::Routes.draw do |map|
   # Routes for course exports
   map.connect 'xsd/:version.xsd', :controller => 'content_exports', :action => 'xml_schema'
 
-  map.resources :jobs, :only => %w(index), :collection => %w[batch_update]
+  map.resources :jobs, :only => %w(index show), :collection => %w[batch_update]
 
   Jammit::Routes.draw(map) if defined?(Jammit)
 

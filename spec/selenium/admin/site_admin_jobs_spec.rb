@@ -80,6 +80,17 @@ describe "site admin jobs ui" do
       @all_jobs.count { |j| (j.reload rescue nil).try(:locked_by) == 'on hold' }.should == 1
     end
 
+    it "should load handler via ajax" do
+      Delayed::Job.delete_all
+      job = "test".send_later :to_s
+      load_jobs_page
+      fj('#jobs-grid .slick-row .l0.r0').click()
+      fj('#job-id').text.should == job.id.to_s
+      fj('#job-handler-show').click()
+      wait_for_ajax_requests
+      get_value('#job-handler').should == job.handler
+    end
+
     context "all jobs" do
       before (:each) do
         load_jobs_page
