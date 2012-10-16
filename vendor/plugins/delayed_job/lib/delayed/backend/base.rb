@@ -95,12 +95,55 @@ module Delayed
         def db_time_now
           Time.zone.now
         end
+
+        def unlock_orphaned_jobs(name = nil)
+          begin
+            name ||= Socket.gethostname
+          rescue
+            return 0
+          end
+          regex = Regexp.new("^#{Regexp.escape(name)}:(\\d+)$")
+          unlocked_jobs = 0
+          self.running_jobs.each do |job|
+            next unless job.locked_by =~ regex
+            pid = $1.to_i
+            running = Process.kill(0, pid) rescue false
+            if !running
+              unlocked_jobs += 1
+              job.reschedule("process died")
+            end
+          end
+          unlocked_jobs
+        end
       end
 
       def failed?
         failed_at
       end
       alias_method :failed, :failed?
+
+      # Reschedule the job in the future (when a job fails).
+      # Uses an exponential scale depending on the number of failed attempts.
+      def reschedule(error = nil, time = nil)
+        self.attempts += 1
+        if self.attempts >= (self.max_attempts || Delayed::Worker.max_attempts)
+          destroy_self = true
+          if Delayed::Worker.on_max_failures
+            destroy_self = Delayed::Worker.on_max_failures.call(self, error)
+          end
+
+          if destroy_self
+            self.destroy
+          else
+            self.fail!
+          end
+        else
+          time ||= self.reschedule_at
+          self.run_at = time
+          self.unlock
+          self.save!
+        end
+      end
 
       def payload_object
         @payload_object ||= deserialize(self['handler'])

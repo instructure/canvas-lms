@@ -162,31 +162,7 @@ class Worker
   def handle_failed_job(job, error)
     job.last_error = error.message + "\n" + error.backtrace.join("\n")
     say("Failed with #{error.class} [#{error.message}] (#{job.attempts} attempts)", :error)
-    reschedule(job, error)
-  end
-
-  # Reschedule the job in the future (when a job fails).
-  # Uses an exponential scale depending on the number of failed attempts.
-  def reschedule(job, error = nil, time = nil)
-    job.attempts += 1
-    if job.attempts >= (job.max_attempts || self.class.max_attempts)
-      destroy_job = true
-      if self.class.on_max_failures
-        destroy_job = self.class.on_max_failures.call(job, error)
-      end
-
-      if destroy_job
-        say("destroying job because of #{job.attempts} failures", :info)
-        job.destroy
-      else
-        job.fail!
-      end
-    else
-      time ||= job.reschedule_at
-      job.run_at = time
-      job.unlock
-      job.save!
-    end
+    job.reschedule(error)
   end
 
   def id
