@@ -214,8 +214,8 @@ describe "edititing grades" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     assignment_group_cells = ff('.assignment-group-cell')
-    assignment_group_cells.each_with_index do |agc, i|
-      validate_cell_text(agc, expected_totals[i])
+    expected_totals.zip(assignment_group_cells) do |expected, cell|
+      validate_cell_text(cell, expected)
     end
   end
 

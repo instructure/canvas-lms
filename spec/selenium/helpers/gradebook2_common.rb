@@ -10,12 +10,16 @@ shared_examples_for "gradebook2 selenium tests" do
 
   STUDENT_NAME_1 = "student 1"
   STUDENT_NAME_2 = "student 2"
+  STUDENT_NAME_3 = "student 3"
   STUDENT_SORTABLE_NAME_1 = "1, student"
   STUDENT_SORTABLE_NAME_2 = "2, student"
+  STUDENT_SORTABLE_NAME_3 = "3, student"
   STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
   STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
+  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
   STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
   STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
+  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
   DEFAULT_PASSWORD = "qwerty"
 
   def set_default_grade(cell_index, points = "5")
@@ -161,6 +165,17 @@ shared_examples_for "gradebook2 selenium tests" do
     e2.save!
     @course.reload
 
+    #add third student
+    @student_3 = User.create!(:name => STUDENT_NAME_3)
+    @student_3.register!
+    @student_3.pseudonyms.create!(:unique_id => "nobody3@example.com", :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+    e3 = @course.enroll_student(@student_3)
+    e3.workflow_state = 'active'
+    e3.save!
+    @course.reload
+
+    @all_students = [@student_1, @student_2, @student_3]
+
     #first assignment data
     @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 100)
     @first_assignment = assignment_model({
@@ -185,6 +200,12 @@ shared_examples_for "gradebook2 selenium tests" do
     @student_2_submission.score = 5
     @submission.save!
 
+    #third student submission for assignment 1
+    @student_3_submission = @assignment.submit_homework(@student_3, :body => 'student 3 submission assignment 1')
+    @assignment.grade_student(@student_3, :grade => 5)
+    @student_3_submission.score = 5
+    @submission.save!
+
     #second assignment data
     @second_assignment = assignment_model({
                                               :course => @course,
@@ -196,15 +217,12 @@ shared_examples_for "gradebook2 selenium tests" do
                                           })
     @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
 
-    #student 1 submission for assignment 2
-    @second_submission = @second_assignment.submit_homework(@student_1, :body => 'student 1 submission assignment 2')
-    @second_assignment.grade_student(@student_1, :grade => 5)
-    @second_submission.save!
-
-    #student 2 submission for assignment 2
-    @second_submission = @second_assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 2')
-    @second_assignment.grade_student(@student_2, :grade => 5)
-    @second_submission.save!
+    # all students get a 5 on assignment 2
+    @all_students.each do |s|
+      submission = @second_assignment.submit_homework(s, :body => "#{s.name} submission assignment 2")
+      @second_assignment.grade_student(s, :grade => 5)
+      submission.save!
+    end
 
     #third assignment data
     due_date = Time.now + 1.days

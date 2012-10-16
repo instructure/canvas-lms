@@ -43,9 +43,9 @@ describe "assignment column headers" do
     meta_cells = find_slick_cells(0, f('.grid-canvas'))
     grade_cells = find_slick_cells(0, f('#gradebook_grid'))
     #filter validation
-    validate_cell_text(meta_cells[0], STUDENT_NAME_2 + "\n" + @other_section.name)
+    validate_cell_text(meta_cells[0], STUDENT_NAME_3 + "\n" + @course.name)
     validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_2_TOTAL_IGNORING_UNGRADED)
+    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_3_TOTAL_IGNORING_UNGRADED)
   end
 
   it "should validate arrange columns by due date option" do

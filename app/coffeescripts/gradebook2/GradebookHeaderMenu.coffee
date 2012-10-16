@@ -54,6 +54,7 @@ define [
         id: student.id
         name: student.name
         score: student["assignment_#{@assignment.id}"].score
+        submitted_at: student["assignment_#{@assignment.id}"].submitted_at
 
       submissionTypes = @assignment.submission_types
       hasSubmission = true
@@ -78,7 +79,7 @@ define [
           students = $.grep students, ($student, idx) ->
             student = $student.user_data
             if selected == I18n.t("students_who.havent_submitted_yet", "Haven't submitted yet")
-              !student.submitted_at
+              !student.submitted_at and !student.score?
             else if selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")
               !student.score?
             else if selected == I18n.t("students_who.scored_less_than", "Scored less than")
