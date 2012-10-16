@@ -294,6 +294,7 @@ describe UsersController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
+        'default_view' => 'feed'
       },
 
       'user' => {
@@ -381,6 +382,7 @@ describe UsersController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
+        'default_view' => 'feed'
       },
 
       'user' => {

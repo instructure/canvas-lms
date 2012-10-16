@@ -26,7 +26,7 @@ module Api::V1::Course
     include_url = includes.include?('html_url')
     include_description = includes.include?('public_description')
 
-    base_attributes = %w(id name course_code account_id start_at)
+    base_attributes = %w(id name course_code account_id start_at default_view)
     methods = ['end_at']
     methods << 'hide_final_grades' if includes.include?(:hide_final_grades)
     allowed_attributes = includes.is_a?(Array) ? base_attributes + includes : base_attributes

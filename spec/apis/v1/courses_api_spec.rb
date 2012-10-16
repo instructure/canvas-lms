@@ -74,6 +74,7 @@ describe CoursesController, :type => :integration do
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
+    @course2.update_attribute(:default_view, 'wiki')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
@@ -91,7 +92,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
       {
         'id' => @course2.id,
@@ -103,7 +105,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'wiki'
       },
     ]
   end
@@ -138,7 +141,7 @@ describe CoursesController, :type => :integration do
             'hide_final_grades'                     => true,
             'license'                              => 'Creative Commons',
             'sis_course_id'                        => '12345',
-            'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.'
+            'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
           }
         }
         course_response = post_params['course'].merge({
@@ -147,6 +150,7 @@ describe CoursesController, :type => :integration do
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
           'workflow_state' => 'available',
+          'default_view' => 'feed'
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
@@ -226,7 +230,8 @@ describe CoursesController, :type => :integration do
         'open_enrollment' => true,
         'self_enrollment' => true,
         'hide_final_grades' => false,
-        'restrict_enrollments_to_course_dates' => true
+        'restrict_enrollments_to_course_dates' => true,
+        'default_view' => 'new default view'
       }, 'offer' => true }
     end
 
@@ -240,6 +245,7 @@ describe CoursesController, :type => :integration do
         json['start_at'].should eql @new_values['course']['start_at']
         json['end_at'].should eql @new_values['course']['end_at']
         json['sis_course_id'].should eql @new_values['course']['sis_course_id']
+        json['default_view'].should eql @new_values['course']['default_view']
 
         @course.name.should eql @new_values['course']['name']
         @course.course_code.should eql @new_values['course']['course_code']
@@ -256,6 +262,7 @@ describe CoursesController, :type => :integration do
         @course.self_enrollment.should be_true
         @course.restrict_enrollments_to_course_dates.should be_true
         @course.workflow_state.should == 'available'
+        @course.default_view.should == 'new default view'
       end
 
       it "should not change dates that aren't given" do
@@ -298,6 +305,7 @@ describe CoursesController, :type => :integration do
         json['course_code'].should eql @new_values['course']['course_code']
         json['start_at'].should eql @new_values['course']['start_at']
         json['end_at'].should eql @new_values['course']['end_at']
+        json['default_view'].should eql @new_values['course']['default_view']
       end
 
       it "should not be able to update the sis id" do
@@ -389,7 +397,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
       {
         'id' => @course2.id,
@@ -404,7 +413,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'wiki'
       },
     ]
   end
@@ -429,7 +439,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
       {
         'id' => @course2.id,
@@ -441,7 +452,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
         'hide_final_grades' => true,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'wiki'
       }
     ]
   end
@@ -460,7 +472,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       }
     ]
   end
@@ -847,7 +860,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
     ]
   end
@@ -869,7 +883,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
     ]
   end
