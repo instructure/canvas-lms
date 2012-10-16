@@ -300,11 +300,13 @@ class ActiveRecord::Base
       args = args.map{ |a| column_str % a.to_s }
     end
 
-    value = value.to_s.downcase.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
+    value = value.to_s
+    value = value.downcase unless options[:case_sensitive]
+    value = value.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
     value = '%' + value unless options[:type] == :right
     value += '%' unless options[:type] == :left
 
-    cols = args.map{ |col| like_condition(col) }
+    cols = args.map{ |col| like_condition(col, '?', !options[:case_sensitive]) }
     sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
   end
 
