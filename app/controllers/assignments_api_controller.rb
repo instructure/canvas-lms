@@ -182,6 +182,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[due_at] [Timestamp] The day/time the assignment is due. Accepts
   #   times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   # @argument assignment[description] [String] The assignment's description, supports HTML.
+  # @argument assignment[assignment_group_id] [Integer] The assignment group id to put the assignment in. Defaults to the top assignment group in the course.
   # @returns Assignment
   def create
     @assignment = create_api_assignment(@context, params[:assignment])
