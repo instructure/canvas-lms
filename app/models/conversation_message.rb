@@ -122,6 +122,12 @@ class ConversationMessage < ActiveRecord::Base
     write_attribute(:attachment_ids, attachments.map(&:id).join(','))
   end
 
+  def clone
+    copy = super
+    copy.attachments = attachments
+    copy
+  end
+
   def delete_from_participants
     conversation.conversation_participants.each do |p|
       p.remove_messages(self) # ensures cached stuff gets updated, etc.

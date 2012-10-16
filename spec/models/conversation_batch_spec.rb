@@ -78,5 +78,18 @@ describe ConversationBatch do
       @user3.reload.unread_conversations_count.should eql 1
       @user3.conversations.first.tags.should eql [@course.asset_string] # not in group, so it falls back to common contexts
     end
+
+    it "should copy the attachment(s) to each conversation" do
+      attachment = attachment_model(:context => @user1, :folder => @user1.conversation_attachments_folder)
+      @message = Conversation.build_message @user1, "hi all", :attachment_ids => [attachment.id]
+
+      batch = ConversationBatch.generate(@message, [@user2.id, @user3.id], :async)
+      batch.deliver
+
+      ConversationMessage.count.should eql 3
+      ConversationMessage.all.each do |message|
+        message.attachments.should == @message.attachments
+      end
+    end
   end
 end
