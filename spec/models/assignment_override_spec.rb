@@ -338,4 +338,103 @@ describe AssignmentOverride do
       @override.all_day_date.should == Date.today - 1.day
     end
   end
+
+  describe "visible_to named scope" do
+    before :each do
+      @course = course_model
+      @assignment = assignment_model(:course => @course)
+    end
+
+    context "adhoc overrides" do
+      before :each do
+        @student = user_model
+        @section2 = @course.course_sections.create!
+        @course.enroll_student(@student, :section => @section2)
+
+        @override = assignment_override_model(:assignment => @assignment)
+        @override_student = @override.assignment_override_students.build
+        @override_student.user = @student
+        @override_student.save!
+      end
+
+      it "should include adhoc overrides for students the user can see" do
+        AssignmentOverride.visible_to(@teacher, @course).should == [@override]
+      end
+
+      it "should not include adhoc overrides for students the user can't see" do
+        @enrollment = @teacher.enrollments.first
+        @enrollment.limit_privileges_to_course_section = true
+        @enrollment.save!
+        AssignmentOverride.visible_to(@teacher, @course).should be_empty
+      end
+    end
+
+    context "group overrides" do
+      before :each do
+        @assignment.group_category = @course.group_categories.create!
+        @assignment.save!
+
+        @group = @assignment.group_category.groups.create!(:context => @course)
+        @override = assignment_override_model(:assignment => @assignment)
+        @override.set = @group
+        @override.save!
+      end
+
+      it "should include group overrides for groups the user can see" do
+        AssignmentOverride.visible_to(@teacher, @course).should == [@override]
+      end
+
+      it "should not include group overrides for groups the user can't see" do
+        @student = user_model
+        AssignmentOverride.visible_to(@student, @course).should be_empty
+
+        @group.add_user(@student)
+        AssignmentOverride.visible_to(@student, @course).should == [@override]
+      end
+    end
+
+    context "section overrides" do
+      before :each do
+        @section = @course.default_section
+        @override = assignment_override_model(:assignment => @assignment)
+        @override.set = @section
+        @override.save!
+      end
+
+      it "should include section overrides for section the user can see" do
+        AssignmentOverride.visible_to(@teacher, @course).should == [@override]
+      end
+
+      it "should not include section overrides for sections the user can't see" do
+        @enrollment = @teacher.enrollments.first
+        @enrollment.limit_privileges_to_course_section = true
+        @enrollment.save!
+
+        @section2 = @course.course_sections.create!
+        @override.set = @section2
+        @override.save!
+
+        AssignmentOverride.visible_to(@teacher, @course).should be_empty
+      end
+    end
+
+    it "should work with mixed override types" do
+      @student = user_model
+      @course.enroll_student(@student)
+
+      @override1 = assignment_override_model(:assignment => @assignment)
+      @override_student = @override1.assignment_override_students.build
+      @override_student.user = @student
+      @override_student.save!
+
+      @override2 = assignment_override_model(:assignment => @assignment)
+      @override2.set = @course.default_section
+      @override2.save!
+
+      visible_overrides = AssignmentOverride.visible_to(@teacher, @course)
+      visible_overrides.size.should == 2
+      visible_overrides.should include @override1
+      visible_overrides.should include @override2
+    end
+  end
 end

@@ -51,6 +51,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :group_category
   has_many :assignment_reminders, :dependent => :destroy
   has_many :assignment_overrides, :dependent => :destroy
+  has_many :active_assignment_overrides, :class_name => 'AssignmentOverride', :conditions => {:workflow_state => 'active'}
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
@@ -142,6 +143,16 @@ class Assignment < ActiveRecord::Base
 
   def overridden_for(user)
     AssignmentOverrideApplicator.assignment_overridden_for(self, user)
+  end
+
+  def overrides_visible_to(user, overrides=active_assignment_overrides)
+    # the visible_to scope is potentially expensive. skip its conditions if the
+    # initial scope is already empty
+    if overrides.first.present?
+      overrides.visible_to(user, context)
+    else
+      overrides
+    end
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review

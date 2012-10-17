@@ -2572,6 +2572,11 @@ describe Course, "section_visibility" do
     @course.enroll_user(@observer, "ObserverEnrollment")
   end
 
+  it "should return a scope from sections_visible_to" do
+    # can't use "should respond_to", because that delegates to the instantiated Array
+    lambda{ @course.sections_visible_to(@teacher).scoped({}) }.should_not raise_exception
+  end
+
   context "full" do
     it "should return students from all sections" do
       @course.students_visible_to(@teacher).sort_by(&:id).should eql [@student1, @student2]
@@ -2879,6 +2884,51 @@ describe Course do
       c1.read_attribute(:self_enrollment_code).should be_nil
       c1.self_enrollment_code.should_not be_nil
       c1.self_enrollment_code.should =~ /\A[A-Z0-9]{6}\z/
+    end
+  end
+
+  describe "groups_visible_to" do
+    before :each do
+      @course = course_model
+      @user = user_model
+      @group = @course.groups.create!
+    end
+
+    it "should restrict to groups the user is in without course-wide permissions" do
+      @course.groups_visible_to(@user).should be_empty
+      @group.add_user(@user)
+      @course.groups_visible_to(@user).should == [@group]
+    end
+
+    it "should allow course-wide visibility regardless of membership given :manage_groups permission" do
+      @course.groups_visible_to(@user).should be_empty
+      @course.expects(:check_policy).with(@user).returns([:manage_groups])
+      @course.groups_visible_to(@user).should == [@group]
+    end
+
+    it "should allow course-wide visibility regardless of membership given :view_group_pages permission" do
+      @course.groups_visible_to(@user).should be_empty
+      @course.expects(:check_policy).with(@user).returns([:view_group_pages])
+      @course.groups_visible_to(@user).should == [@group]
+    end
+
+    it "should default to active groups only" do
+      @course.expects(:check_policy).with(@user).returns([:manage_groups]).at_least_once
+      @course.groups_visible_to(@user).should == [@group]
+      @group.destroy
+      @course.reload.groups_visible_to(@user).should be_empty
+    end
+
+    it "should allow overriding the scope" do
+      @course.expects(:check_policy).with(@user).returns([:manage_groups]).at_least_once
+      @group.destroy
+      @course.groups_visible_to(@user).should be_empty
+      @course.groups_visible_to(@user, @course.groups).should == [@group]
+    end
+
+    it "should return a scope" do
+      # can't use "should respond_to", because that delegates to the instantiated Array
+      lambda{ @course.groups_visible_to(@user).scoped({}) }.should_not raise_exception
     end
   end
 end

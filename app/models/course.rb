@@ -2425,16 +2425,33 @@ class Course < ActiveRecord::Base
     visibilities = section_visibilities_for(user)
     section_ids = visibilities.map{ |s| s[:course_section_id] }
     case enrollment_visibility_level_for(user, visibilities)
-      when :full
-        if visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
-          return sections.find_all_by_id(section_ids)
-        else
-          return sections
-        end
-      when :sections
-        return sections.find_all_by_id(section_ids)
+    when :full
+      if visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
+        sections.scoped(:conditions => {:id => section_ids})
+      else
+        sections
+      end
+    when :sections
+      sections.scoped(:conditions => {:id => section_ids})
+    else
+      # return an empty set, but keep it as a scope for downstream consistency
+      sections.scoped(:conditions => ['?', false])
     end
-    []
+  end
+
+  # derived from policy for Group#grants_right?(user, nil, :read)
+  def groups_visible_to(user, groups = active_groups)
+    if grants_rights?(user, nil, :manage_groups, :view_group_pages).values.any?
+      # course-wide permissions; all groups are visible
+      groups
+    else
+      # no course-wide permissions; only groups the user is a member of are
+      # visible
+      groups.scoped(
+        :joins => :participating_group_memberships,
+        :conditions => { 'group_memberships.user_id' => user.id }
+      )
+    end
   end
 
   def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user))

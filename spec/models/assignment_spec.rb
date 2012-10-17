@@ -591,6 +591,38 @@ describe Assignment do
     @overridden.due_at.should == @override.due_at
   end
 
+  describe "#overrides_visible_to(user)" do
+    before :each do
+      @assignment = assignment_model
+      @override = assignment_override_model(:assignment => @assignment)
+      @override.set = @course.default_section
+      @override.save!
+    end
+
+    it "should delegate to visible_to on the active overrides by default" do
+      @expected_value = Object.new
+      @assignment.active_assignment_overrides.expects(:visible_to).with(@teacher, @course).returns(@expected_value)
+      @assignment.overrides_visible_to(@teacher).should == @expected_value
+    end
+
+    it "should allow overriding the scope" do
+      @override.destroy
+      @assignment.overrides_visible_to(@teacher).should be_empty
+      @assignment.overrides_visible_to(@teacher, @assignment.assignment_overrides).should == [@override]
+    end
+
+    it "should skip the visible_to application if the scope is already empty" do
+      @override.destroy
+      @assignment.active_assignment_overrides.expects(:visible_to).times(0)
+      @assignment.overrides_visible_to(@teacher)
+    end
+
+    it "should return a scope" do
+      # can't use "should respond_to", because that delegates to the instantiated Array
+      lambda{ @assignment.overrides_visible_to(@teacher).scoped({}) }.should_not raise_exception
+    end
+  end
+
   context "concurrent inserts" do
     def concurrent_inserts
       assignment_model

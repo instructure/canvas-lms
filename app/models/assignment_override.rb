@@ -135,4 +135,30 @@ class AssignmentOverride < ActiveRecord::Base
     write_attribute(:all_day, new_all_day)
     write_attribute(:all_day_date, new_all_day_date)
   end
+
+  named_scope :visible_to, lambda{ |admin, course|
+    scopes = []
+
+    # adhoc overrides for visible students
+    scopes << course.enrollments_visible_to(admin).scoped(
+      :select => "DISTINCT assignment_override_students.assignment_override_id AS id",
+      :joins => "INNER JOIN assignment_override_students ON assignment_override_students.user_id=enrollments.user_id"
+    )
+
+    # group overrides for visible groups
+    scopes << course.groups_visible_to(admin).scoped(
+      :select => "assignment_overrides.id",
+      :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='Group' AND groups.id=assignment_overrides.set_id"
+    )
+
+    # section overrides for visible sections
+    scopes << course.sections_visible_to(admin).scoped(
+      :select => "assignment_overrides.id",
+      :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND course_sections.id=assignment_overrides.set_id"
+    )
+
+    # union the visible override subselects and join against them
+    subselect = scopes.map{ |scope| scope.construct_finder_sql({}) }.join(' UNION ')
+    { :joins => "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id" }
+  }
 end
