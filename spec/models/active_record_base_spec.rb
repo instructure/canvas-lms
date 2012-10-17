@@ -96,7 +96,7 @@ describe ActiveRecord::Base do
           User.create!
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.should raise_error # we don't catch the error the second time 
+      }.should raise_error(ActiveRecord::Base::UniqueConstraintViolation) # we don't catch the error the second time
       Submission.count.should eql 1
       tries.should eql 2
       User.count.should eql @orig_user_count

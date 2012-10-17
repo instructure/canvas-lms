@@ -474,7 +474,7 @@ class ActiveRecord::Base
   module UniqueConstraintViolation
     def self.===(error)
       ActiveRecord::StatementInvalid === error &&
-      error.message.match(/PGError: ERROR: +duplicate key value violates unique constraint|Mysql::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
+      error.message.match(/PG(?:::)?Error: ERROR: +duplicate key value violates unique constraint|Mysql::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
     end
   end
 
@@ -1050,7 +1050,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
       begin
         add_foreign_key(from_table, to_table, options)
       rescue ActiveRecord::StatementInvalid => e
-        raise unless e.message =~ /PGError: ERROR:.+already exists/
+        raise unless e.message =~ /PG(?:::)?Error: ERROR:.+already exists/
       end
     else
       column  = options[:column] || "#{to_table.to_s.singularize}_id"
@@ -1064,7 +1064,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     begin
       remove_foreign_key(table, options)
     rescue ActiveRecord::StatementInvalid => e
-      raise unless e.message =~ /PGError: ERROR:.+does not exist|Mysql::Error: Error on rename/
+      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist|Mysql::Error: Error on rename/
     end
   end
 end
