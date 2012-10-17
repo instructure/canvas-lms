@@ -229,4 +229,14 @@ describe "edititing grades" do
       find_slick_cells(n, grade_grid)[2].text.should == expected_grade
     end
   end
+
+  it "should display an error on failed updates" do
+    SubmissionsApiController.any_instance.expects(:update).returns('bad response')
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
+    keep_trying_until do
+      f('.ui-state-error').text.should match(/refresh/)
+    end
+  end
 end
