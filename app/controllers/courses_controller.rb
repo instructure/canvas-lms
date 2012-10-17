@@ -711,7 +711,7 @@ class CoursesController < ApplicationController
 
     # Look up the explicitly provided invitation
     unless params[:invitation].blank?
-      enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]])
+      enrollment ||= @context.enrollments.find(:first, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state IN ('invited', 'rejected')", params[:invitation]])
     end
 
     enrollment
