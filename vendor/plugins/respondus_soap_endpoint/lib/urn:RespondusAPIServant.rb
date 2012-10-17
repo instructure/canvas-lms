@@ -71,8 +71,8 @@ class RespondusAPIPort
   end
 
   def load_user_with_oauth(token, domain_root_account)
-    token = AccessToken.find_by_token(token)
-    if !token.try(:usable?) || !token.try(:user)
+    token = AccessToken.authenticate(token)
+    if !token.try(:user)
       raise(BadAuthError)
     end
     token.used!

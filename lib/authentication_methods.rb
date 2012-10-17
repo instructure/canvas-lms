@@ -63,8 +63,8 @@ module AuthenticationMethods
     end
 
     if token_string
-      @access_token = AccessToken.find_by_token(token_string)
-      if !@access_token.try(:usable?)
+      @access_token = AccessToken.authenticate(token_string)
+      if !@access_token
         raise AccessTokenError
       end
       @current_user = @access_token.user

@@ -175,7 +175,7 @@ describe "API Authentication", :type => :integration do
           json = JSON.parse(response.body)
           json.size.should == 1
           json.first['enrollments'].should == [{'type' => 'teacher'}]
-          AccessToken.last.token.should == token
+          AccessToken.authenticate(token).should == AccessToken.last
 
           # post requests should work with nothing but an access token
           post "/api/v1/courses/#{@course.id}/assignments.json?access_token=1234", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
@@ -197,7 +197,7 @@ describe "API Authentication", :type => :integration do
         post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
         response.should be_success
         json = JSON.parse(response.body)
-        json['access_token'].should == AccessToken.last.token
+        AccessToken.authenticate(json['access_token']).should == AccessToken.last
       end
 
       it "should execute for password/ldap login" do
@@ -356,7 +356,7 @@ describe "API Authentication", :type => :integration do
           end
 
           @user.access_tokens.first.shard.should == Shard.default
-          @user.access_tokens.first.token.should == @token
+          @user.access_tokens.first.should == AccessToken.authenticate(@token)
         end
       end
     end
@@ -417,7 +417,7 @@ describe "API Authentication", :type => :integration do
             json = JSON.parse(response.body)
             json.size.should == 1
             json.first['enrollments'].should == [{'type' => 'teacher'}]
-            AccessToken.last.token.should == token
+            AccessToken.last.should == AccessToken.authenticate(token)
           end
         end
       end
