@@ -205,7 +205,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "has_more_replies": false } ]
   def entries
     if authorized_action(@topic, @current_user, :read)
-      @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_path(@topic))
+      @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_url(@topic))
       render :json => discussion_entry_api_json(@entries, @context, @current_user, session)
     end
   end
@@ -282,7 +282,7 @@ class DiscussionTopicsApiController < ApplicationController
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
     if authorized_action(@topic, @current_user, :read)
-      @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_path(@parent))
+      @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_url(@parent))
       render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
     end
   end
@@ -327,7 +327,7 @@ class DiscussionTopicsApiController < ApplicationController
     if authorized_action(@topic, @current_user, :read)
       ids = Array(params[:ids])
       entries = @topic.discussion_entries.find(ids, :order => :id)
-      @entries = Api.paginate(entries, self, entry_pagination_path(@topic))
+      @entries = Api.paginate(entries, self, entry_pagination_url(@topic))
       render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [])
     end
   end

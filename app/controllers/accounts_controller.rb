@@ -36,7 +36,7 @@ class AccountsController < ApplicationController
         # TODO: what would be more useful, include sub-accounts here
         # that you implicitly have access to, or have a separate method
         # to get the sub-accounts of an account?
-        @accounts = Api.paginate(@accounts, self, api_v1_accounts_path)
+        @accounts = Api.paginate(@accounts, self, api_v1_accounts_url)
         render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
       end
     end
@@ -78,7 +78,7 @@ class AccountsController < ApplicationController
 
     @courses = @account.associated_courses.scoped(:conditions => { :workflow_state => params[:state] })
     @courses = @courses.with_enrollments if params[:hide_enrollmentless_courses]
-    @courses = Api.paginate(@courses, self, api_v1_account_courses_path, :order => :id)
+    @courses = Api.paginate(@courses, self, api_v1_account_courses_url, :order => :id)
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end

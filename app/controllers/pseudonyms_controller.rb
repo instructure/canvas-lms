@@ -49,10 +49,10 @@ class PseudonymsController < ApplicationController
       scope = @context.pseudonyms.active.scoped(:conditions => { :user_id => @user.id })
       @pseudonyms = Api.paginate(
         scope,
-        self, api_v1_account_pseudonyms_path)
+        self, api_v1_account_pseudonyms_url)
     else
       scope = @user.all_pseudonyms(:conditions => { :workflow_state => 'active' })
-      @pseudonyms = Api.paginate(scope, self, api_v1_user_pseudonyms_path)
+      @pseudonyms = Api.paginate(scope, self, api_v1_user_pseudonyms_url)
     end
 
     render :json => @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }

@@ -130,7 +130,7 @@ class DiscussionTopicsController < ApplicationController
                    @context.active_announcements :
                    @context.active_discussion_topics.only_discussion_topics)
           scope = scope.by_position
-          @topics = Api.paginate(scope, self, topic_pagination_path(:only_announcements => params[:only_announcements]))
+          @topics = Api.paginate(scope, self, topic_pagination_url(:only_announcements => params[:only_announcements]))
           @topics.reject! { |a| a.locked_for?(@current_user, :check_policies => true) }
           @topics.each { |t| t.current_user = @current_user }
           if api_request?

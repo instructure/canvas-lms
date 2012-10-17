@@ -41,6 +41,11 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     response.should be_success, response.body
   end
 
+  if response.headers['Link']
+    # make sure that the link header is properly formed
+    Api.parse_pagination_links(response.headers['Link'])
+  end
+
   case params[:format]
   when 'json'
     response.header['content-type'].should == 'application/json; charset=utf-8'

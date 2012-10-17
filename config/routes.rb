@@ -954,7 +954,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :favorites) do |favorites|
-      favorites.get "users/self/favorites/courses", :action => :list_favorite_courses
+      favorites.get "users/self/favorites/courses", :action => :list_favorite_courses, :path_name => :list_favorite_courses
       favorites.post "users/self/favorites/courses/:id", :action => :add_favorite_course
       favorites.delete "users/self/favorites/courses/:id", :action => :remove_favorite_course
       favorites.delete "users/self/favorites/courses", :action => :reset_course_favorites

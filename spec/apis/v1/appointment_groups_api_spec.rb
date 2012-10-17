@@ -127,13 +127,13 @@ describe AppointmentGroupsController, :type => :integration do
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
                       :scope => 'manageable', :per_page => '10'})
     json.size.should eql 10
-    response.headers['Link'].should match(%r{</api/v1/appointment_groups\?.*page=2.*>; rel="next",</api/v1/appointment_groups\?.*page=1.*>; rel="first",</api/v1/appointment_groups\?.*page=3.*>; rel="last"})
+    response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=10&page=3", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
                       :scope => 'manageable', :per_page => '10', :page => '3'})
     json.size.should eql 5
-    response.headers['Link'].should match(%r{</api/v1/appointment_groups\?.*page=2.*>; rel="prev",</api/v1/appointment_groups\?.*page=1.*>; rel="first",</api/v1/appointment_groups\?.*page=3.*>; rel="last"})
+    response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
   end
 
   it 'should include appointments and child_events, if requested' do
@@ -344,13 +344,13 @@ describe AppointmentGroupsController, :type => :integration do
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :format => 'json', :per_page => '1'})
         json.size.should eql 1
-        response.headers['Link'].should match(%r{</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="next",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
+        response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
 
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?per_page=1&page=2", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :format => 'json', :per_page => '1', :page => '2'})
         json.size.should eql 1
-        response.headers['Link'].should match(%r{</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="prev",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",</api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
+        response.headers['Link'].should match(%r{<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
       end
 
       it "should return registered #{type}" do

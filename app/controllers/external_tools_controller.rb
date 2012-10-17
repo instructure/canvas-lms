@@ -69,7 +69,7 @@ class ExternalToolsController < ApplicationController
       end
       respond_to do |format|
         if api_request?
-          @tools = Api.paginate(@tools, self, tool_pagination_path)
+          @tools = Api.paginate(@tools, self, tool_pagination_url)
           format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}
         else
           format.json { render :json => @tools.to_json(:include_root => false, :methods => [:resource_selection_settings, :custom_fields_string]) }

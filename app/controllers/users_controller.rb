@@ -236,7 +236,7 @@ class UsersController < ApplicationController
 
         if api_request?
           @users = User.of_account(@context).active.order_by_sortable_name
-          @users = Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name)
+          @users = Api.paginate(@users, self, api_v1_account_users_url, :order => :sortable_name)
           user_json_preloads(@users)
         else
           @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
