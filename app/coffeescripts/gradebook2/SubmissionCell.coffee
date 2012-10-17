@@ -41,8 +41,13 @@ define [
       submission = item[@opts.column.field]
       url = @opts.grid.getOptions().change_grade_url
       url = url.replace(":assignment", submission.assignment_id).replace(":submission", submission.user_id)
-      $.ajaxJSON url, "PUT", { "submission[posted_grade]": state }, (submission) =>
-        $.publish 'submissions_updated', [submission.all_submissions]
+      $.ajaxJSON url, "PUT", { "submission[posted_grade]": state }, @onUpdateSuccess, @onUpdateError
+
+    onUpdateSuccess: (submission) ->
+      $.publish('submissions_updated', [submission.all_submissions])
+
+    onUpdateError: ->
+      $.flashError(GRADEBOOK_TRANSLATIONS.submission_update_error)
 
     isValueChanged: () ->
       @val != @$input.val()
