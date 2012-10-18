@@ -2086,7 +2086,7 @@ describe Assignment do
       @submission = @assignment.submissions.first
       @comment = @submission.add_comment(:comment => 'comment')
       json = @assignment.speed_grader_json(@user)
-      json[:submissions].first[:submission_comments].first[:created_at].should == @comment.created_at
+      json[:submissions].first[:submission_comments].first[:created_at].to_i.should eql @comment.created_at.to_i
     end
   end
 end
