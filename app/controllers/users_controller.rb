@@ -1136,12 +1136,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def menu_courses
-    render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
-      @template.map_courses_for_menu(@current_user.menu_courses)
-    }
-  end
-
   def all_menu_courses
     render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
       @template.map_courses_for_menu(@current_user.courses_with_primary_enrollment)

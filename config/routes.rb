@@ -485,7 +485,6 @@ ActionController::Routing::Routes.draw do |map|
   map.report_avatar_image 'images/users/:user_id/report', :controller => 'users', :action => 'report_avatar_image', :conditions => {:method => :post}
   map.update_avatar_image 'images/users/:user_id', :controller => 'users', :action => 'update_avatar_image', :conditions => {:method => :put}
 
-  map.menu_courses 'menu_courses', :controller => 'users', :action => 'menu_courses'
   map.all_menu_courses 'all_menu_courses', :controller => 'users', :action => 'all_menu_courses'
 
   map.grades "grades", :controller => "users", :action => "grades"
