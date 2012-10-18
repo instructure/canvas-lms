@@ -40,8 +40,7 @@ define([
   'media_comments' /* mediaComment */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
-  'jqueryui/progressbar' /* /\.progressbar/ */,
-  'vendor/scribd.view' /* scribd */
+  'jqueryui/progressbar' /* /\.progressbar/ */
 ], function(_, INST, I18n, $, htmlEscape) {
 
   var files = {};
@@ -150,7 +149,7 @@ define([
                   'format': 'json'
                 };
                 var import_id = null;
-                
+
                 var $dialog = $("<div/>");
                 $dialog.append("Uploading and extracting <b>" + htmlEscape(file.name) + "</b><br/>to " + htmlEscape(folder.name) + "...");
                 $dialog.append("<div class='progress'/>");
@@ -166,7 +165,7 @@ define([
                     }, 500);
                   }
                 });
-                
+
                 var importFailed = function(errors) {
                   $dialog.text(I18n.t('errors.extracting', "There were errors extracting the zip file.  Please try again."));
                   var $ul = $("<ul/>");
@@ -904,10 +903,10 @@ define([
                     .attr('title', I18n.t('titles.click_and_drag', 'Click and drag to move folder to another folder'));
           }
 
-          $content.toggleClass('editable_folder_item', !!(!$item.hasClass('context') && 
+          $content.toggleClass('editable_folder_item', !!(!$item.hasClass('context') &&
                 (( data.context &&
-                   data.context.permissions && 
-                   data.context.permissions.manage_files) || 
+                   data.context.permissions &&
+                   data.context.permissions.manage_files) ||
                  (data.permissions && data.permissions.update)
                 )))
 
@@ -933,7 +932,7 @@ define([
               return obj.folder.parent_folder_id === data.parent_folder_id
             });
 
-            var folder = _.find(folders, function(obj){ 
+            var folder = _.find(folders, function(obj){
               return obj.folder.name == data.name;
             });
 
@@ -949,7 +948,7 @@ define([
                     .before($content);
             } else{
               $files_content.append($content);
-            } 
+            }
           }
 
         } else if($item.hasClass('collaboration')) {
@@ -1038,7 +1037,7 @@ define([
               return obj.attachment.folder_id === data.folder_id
             });
 
-            var folder_file = _.find(folder_files, function(obj){ 
+            var folder_file = _.find(folder_files, function(obj){
               return obj.attachment.display_name === data.display_name;
             });
 
@@ -1047,7 +1046,7 @@ define([
                                     .eq(index);
 
             ($target.length) ? $target.before($content) : $files_content.append($content);
-            
+
           }
         }
         return isNew;
@@ -1101,7 +1100,7 @@ define([
 
           var context_is_correct = fileStructureData[idx] &&
              (
-               fileStructureData[idx][0].context_string == context_string || 
+               fileStructureData[idx][0].context_string == context_string ||
                fileStructureData[idx][0].context_string == file_context_string
              )
 
@@ -1147,7 +1146,7 @@ define([
               // Sort files
               var unsorted_files = fileStructureData[idx][1].files
               fileStructureData[idx][1].files = _.sortBy(
-                unsorted_files, function(obj){ 
+                unsorted_files, function(obj){
 
                   // returns adds an empty string to ensure .toLowerCase() isn't calling on an undefined object
                   return (obj.attachment.display_name || "").toLowerCase();
@@ -1177,7 +1176,7 @@ define([
                 return obj.attachment.folder_id === data.attachment.folder_id
               });
 
-              var folder_file = _.find(folder_files, function(obj){ 
+              var folder_file = _.find(folder_files, function(obj){
                 return obj.attachment.display_name === data.attachment.display_name;
               });
 
@@ -1395,7 +1394,7 @@ define([
               context = fileStructureData[idx];
             }
           }
-          
+
           for(var idx in files.foldersStillLoading) {
             if(files.foldersStillLoading[idx].folder.id == id) {
               var folder = files.foldersStillLoading[idx].folder;
@@ -2179,9 +2178,9 @@ define([
         var itemData = files.currentItemData();
         $form.fillFormData({folder_id: itemData.id}, {object_name: 'attachment'});
         $form.find("form")
-             .attr('action', $("#file_context_links ." + 
-                                itemData.context_string + 
-                                "_attachments_url").attr('href') + 
+             .attr('action', $("#file_context_links ." +
+                                itemData.context_string +
+                                "_attachments_url").attr('href') +
                                 ".text");
         $form.mouseover();
         $form.find(":text:first")

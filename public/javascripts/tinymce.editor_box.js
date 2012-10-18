@@ -37,11 +37,8 @@ define([
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                         // tiny can require it themselves or else we have
                         // build problems
-  'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.ba-tinypubsub',
-  'vendor/scribd.view' /* scribd */
+  'vendor/jquery.ba-tinypubsub'
 ], function(I18nObj, $) {
 
   var enableBookmarking = $("body").hasClass('ie');
