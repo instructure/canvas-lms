@@ -84,7 +84,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
     if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('Authorization') && @user
       token = $spec_api_tokens[@user]
       unless token
-        token = $spec_api_tokens[@user] = @user.access_tokens.create!(:purpose => "test").token
+        token = $spec_api_tokens[@user] = @user.access_tokens.create!(:purpose => "test").full_token
       end
       headers['Authorization'] = "Bearer #{token}"
       @user.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :account => opts[:domain_root_account]) unless @user.pseudonym(true)
