@@ -501,24 +501,3 @@
 .mathquill-toolbar * {
   cursor: default !important;
 }
-
-
-
-/*
- * instructure tweaks
- */
-.mathquill-toolbar-panes {
-  background: #ccc url(/images/tinybg.png) repeat-x top left;
-}
-.mathquill-tab-pane li {
-  background: #ccc url(/images/tinybutton.png) repeat-x top left;
-}
-.mathquill-tab-pane li a:hover {
-  text-decoration: none;
-}
-
-.mathquill-editable .textarea textarea {
-  z-index: inherit; /* so that jquery modal dialogs don't cancel its events */
-}
-
-/* the @font-face for symbola is in instructure_equation/editor_plugin.js */

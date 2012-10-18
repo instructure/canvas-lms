@@ -229,16 +229,18 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     f('#wiki_page_body_instructure_equation').click
     wait_for_animations
-    f('#instructure_equation_prompt').should be_displayed
+    f('.mathquill-editor').should be_displayed
     misc_tab = f('.mathquill-tab-bar > li:last-child a')
     driver.action.move_to(misc_tab).perform
     f('#Misc_tab li:nth-child(35) a').click
     basic_tab = f('.mathquill-tab-bar > li:first-child a')
     driver.action.move_to(basic_tab).perform
     f('#Basic_tab li:nth-child(27) a').click
-    submit_form('#instructure_equation_prompt_form')
-    in_frame "wiki_page_body_ifr" do
-      f('#tinymce img').should be_displayed
+    f('.ui-dialog-buttonset .btn-primary').click
+    keep_trying_until do
+      in_frame "wiki_page_body_ifr" do
+        f('#tinymce img.equation_image').should be_displayed
+      end
     end
 
     submit_form('#new_wiki_page')
@@ -256,7 +258,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     f('#wiki_page_body_instructure_equation').click
     wait_for_animations
-    f('#instructure_equation_prompt').should be_displayed
+    f('.mathquill-editor').should be_displayed
     textarea = f('.mathquill-editor .textarea textarea')
     3.times do
       textarea.send_keys(:backspace)
@@ -285,7 +287,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     textarea.send_keys :arrow_right
     textarea.send_keys :arrow_right
     textarea.send_keys "\\text that. is. so. cool."
-    submit_form('#instructure_equation_prompt_form')
+    f('.ui-dialog-buttonset .btn-primary').click
     wait_for_ajax_requests
     in_frame "wiki_page_body_ifr" do
       keep_trying_until { f('.equation_image').attribute('title').should == equation_text }
