@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/cc_spec_helper'
+# encoding: utf-8
+require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 describe CC::CCHelper do
   describe CC::CCHelper::HtmlContentExporter do
@@ -71,7 +72,7 @@ describe CC::CCHelper do
       html = %{<div>My Title\302\240</div>}
       exported = @exporter.html_page(html, "my title page")
       doc = Nokogiri::HTML(exported)
-      doc.encoding.should == 'utf-8'
+      doc.encoding.upcase.should == 'UTF-8'
       doc.at_css('html body div').to_s.should == "<div>My Title\302\240</div>"
     end
 

@@ -77,8 +77,10 @@ describe IncomingMessageProcessor do
         body "\x83\x40"
       }, @message.reply_to_secure_id, @message.id)
     DiscussionTopic.incoming_replies.length.should == 1
-    DiscussionTopic.incoming_replies[0][:text].should == "\xe3\x82\xa1"
-    DiscussionTopic.incoming_replies[0][:html].should == "\xe3\x82\xa1"
+    comparison_string = "\xe3\x82\xa1"
+    comparison_string.force_encoding("UTF-8") if RUBY_VERSION >= '1.9'
+    DiscussionTopic.incoming_replies[0][:text].should == comparison_string
+    DiscussionTopic.incoming_replies[0][:html].should == comparison_string
   end
 
   it "should pick up html from a multipart" do

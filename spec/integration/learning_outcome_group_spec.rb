@@ -30,7 +30,7 @@ describe LearningOutcomeGroup do
     tag.associated_asset = group
     tag.save!
 
-    res = timeout(3) do
+    res = timeout(5) do
       get "/courses/#{@course.id}/outcomes"
     end
     res.should be_true

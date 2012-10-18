@@ -187,14 +187,31 @@ describe TextHelper do
 
     it "should split on multi-byte character boundaries" do
       str = "This\ntext\nhere\n获\nis\nutf-8"
-      th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
-      th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
-      th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n..."
-      th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n..."
-      th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获..."
-      th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\n..."
-      th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\ni..."
-      th.truncate_text(str, :max_length => 80).should == str
+      
+      # In ruby 1.8, unicode characters are counted as multiple characters when calculating length.  
+      # In ruby 1.9, a unicode character is still 1 character.  It seems to me the proper path here
+      # is to allow the counting to take it's course, as the real GOAL of this test is not to 
+      # split mid-unicode-character since that was possible in 1.8.
+
+      if RUBY_VERSION >= '1.9'
+        th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
+        th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
+        th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n获..."
+        th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n获\n..."
+        th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获\ni..."
+        th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\nis..."
+        th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\nis\n..."
+        th.truncate_text(str, :max_length => 80).should == str
+      else
+        th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
+        th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
+        th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n..."
+        th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n..."
+        th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获..."
+        th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\n..."
+        th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\ni..."
+        th.truncate_text(str, :max_length => 80).should == str
+      end
     end
 
     it "should split on words if specified" do
@@ -313,11 +330,18 @@ Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint
   end
 
   it "should strip out invalid utf-8" do
-    TextHelper.strip_invalid_utf8("hai\xfb").should == "hai"
-    TextHelper.strip_invalid_utf8("hai\xfb there").should == "hai there"
-    TextHelper.strip_invalid_utf8("hai\xfba").should == "haia"
-    TextHelper.strip_invalid_utf8("hai\xfbab").should == "haiab"
-    TextHelper.strip_invalid_utf8("hai\xfbabc").should == "haiabc"
-    TextHelper.strip_invalid_utf8("hai\xfbabcd").should == "haiabcd"
+    test_strings = {
+      "hai\xfb" => "hai",
+      "hai\xfb there" => "hai there",
+      "hai\xfba" => "haia",
+      "hai\xfbab" => "haiab",
+      "hai\xfbabc" => "haiabc",
+      "hai\xfbabcd" => "haiabcd"
+    }
+  
+    test_strings.each do |input, output|
+      input = input.dup.force_encoding("UTF-8") if RUBY_VERSION >= '1.9'
+      TextHelper.strip_invalid_utf8(input).should == output
+    end
   end
 end
