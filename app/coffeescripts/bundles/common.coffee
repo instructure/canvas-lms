@@ -42,6 +42,9 @@ require [
   'media_comments'
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
+
+  'compiled/badge_counts'
+
 ], (courseList, helpDialog) ->
   courseList.init()
   helpDialog.initTriggers()
