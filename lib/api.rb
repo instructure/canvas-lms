@@ -27,9 +27,23 @@ module Api
     if collection.table_name == User.table_name && @current_user
       ids = ids.map{|id| id == 'self' ? @current_user.id : id }
     end
+    if collection.table_name == Account.table_name
+      ids = ids.map do |id|
+        case id
+        when 'self'
+          @domain_root_account.id
+        when 'default'
+          Account.default.id
+        when 'site_admin'
+          Account.site_admin.id
+        else
+          id
+        end
+      end
+    end
 
     find_params = Api.sis_find_params_for_collection(collection, ids, @domain_root_account)
-    return [] if find_params[:conditions] == ["?", false]
+    return [] if find_params == :not_found
     find_params[:limit] = limit unless limit.nil?
     return collection.all(find_params)
   end
@@ -44,6 +58,7 @@ module Api
     result = columns.delete(sis_mapping[:lookups]["id"]) || []
     unless columns.empty?
       find_params = sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, root_account)
+      return result if find_params == :not_found
       find_params[:select] = :id
       result.concat collection.all(find_params).map(&:id)
       result.uniq!
@@ -75,6 +90,8 @@ module Api
         :scope => 'root_account_id' },
   }.freeze
 
+  ID_REGEX = %r{\A\d+\z}
+
   def self.sis_parse_id(id, lookups)
     # returns column_name, column_value
     return lookups['id'], id if id.is_a?(Numeric)
@@ -85,8 +102,8 @@ module Api
     elsif id =~ %r{\A(sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
-    elsif id =~ %r{\A\d+\z}
-      return lookups['id'], id.to_i
+    elsif id =~ ID_REGEX
+      return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
     else
       return nil, nil
     end
@@ -125,23 +142,29 @@ module Api
   def self.sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, sis_root_account)
     raise ArgumentError, "sis_root_account required for lookups" unless sis_root_account.is_a?(Account)
 
-    args = [false]
-    query = ["?"]
+    return :not_found if columns.empty?
 
-    columns.keys.sort.each do |column|
-      sis_ids = columns[column]
-      if (sis_mapping[:is_not_scoped_to_account] || []).include?(column)
-        query << " OR (#{column} IN ("
-      else
-        raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
-        query << " OR (#{sis_mapping[:scope]} = #{sis_root_account.id} AND #{column} IN ("
+    not_scoped_to_account = sis_mapping[:is_not_scoped_to_account] || []
+
+    if columns.length == 1 && not_scoped_to_account.include?(columns.keys.first)
+      find_params = {:conditions => columns}
+    else
+      args = []
+      query = []
+      columns.keys.sort.each do |column|
+        if not_scoped_to_account.include?(column)
+          query << "#{column} IN (?)"
+        else
+          raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
+          query << "(#{sis_mapping[:scope]} = #{sis_root_account.id} AND #{column} IN (?))"
+        end
+        args << columns[column]
       end
-      query << sis_ids.map{"?"}.join(", ")
-      args.concat sis_ids
-      query << "))"
+
+      args.unshift(query.join(" OR "))
+      find_params = { :conditions => args }
     end
 
-    find_params = { :conditions => ([query.join] + args) }
     find_params[:include] = sis_mapping[:joins] if sis_mapping[:joins]
     return find_params
   end

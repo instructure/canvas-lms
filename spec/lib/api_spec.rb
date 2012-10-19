@@ -59,6 +59,21 @@ describe Api do
       (lambda {TestApiInstance.new(Account.default, nil).api_find(User, "self")}).should raise_error(ActiveRecord::RecordNotFound)
     end
 
+    it 'should find account id "self"' do
+      account = Account.create!
+      account.should == TestApiInstance.new(account, nil).api_find(Account, 'self')
+    end
+
+    it 'should find account id "default"' do
+      account = Account.create!
+      Account.default.should == TestApiInstance.new(account, nil).api_find(Account, 'default')
+    end
+
+    it 'should find account id "site_admin"' do
+      account = Account.create!
+      Account.site_admin.should == TestApiInstance.new(account, nil).api_find(Account, 'site_admin')
+    end
+
     it 'should not find a user with an invalid AR id' do
       (lambda {@api.api_find(User, "a1")}).should raise_error(ActiveRecord::RecordNotFound)
     end
@@ -155,9 +170,9 @@ describe Api do
     it "should limit results if a limit is provided" do
       collection = mock()
       collection.stubs(:table_name).returns("courses")
-      collection.expects(:all).with({:conditions => ['? OR (id IN (?, ?, ?))', false, 1, 2, 3]}).returns("result")
+      collection.expects(:all).with({:conditions => { 'id' => [1, 2, 3]}}).returns("result")
       @api.api_find_all(collection, [1,2,3]).should == "result"
-      collection.expects(:all).with({:conditions => ['? OR (id IN (?, ?, ?))', false, 1, 2, 3], :limit => 3}).returns("result")
+      collection.expects(:all).with({:conditions => { 'id' => [1, 2, 3]}, :limit => 3}).returns("result")
       @api.api_find_all(collection, [1,2,3], 3).should == "result"
     end
 
@@ -400,32 +415,28 @@ describe Api do
 
   context 'sis_make_params_for_sis_mapping_and_columns' do
     it 'should fail when not given a root account' do
-      Api.sis_make_params_for_sis_mapping_and_columns({}, {}, Account.default).should == { :conditions => ["?", false] }
+      Api.sis_make_params_for_sis_mapping_and_columns({}, {}, Account.default).should == :not_found
       (lambda {Api.sis_make_params_for_sis_mapping_and_columns({}, {}, user)}).should raise_error("sis_root_account required for lookups")
     end
 
     it 'should properly generate an escaped arg string' do
-      Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope"}, Account.default).should == { :conditions => ["? OR (scope = #{Account.default.id} AND id IN (?, ?, ?))", false, "1", 2, 3] }
+      Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope"}, Account.default).should == { :conditions => ["(scope = #{Account.default.id} AND id IN (?))", ["1", 2, 3]] }
     end
 
     it 'should work with no columns' do
-      Api.sis_make_params_for_sis_mapping_and_columns({}, {}, Account.default).should == { :conditions => ["?", false] }
-    end
-
-    it 'should add in joins if the sis_mapping has some with no columns' do
-      Api.sis_make_params_for_sis_mapping_and_columns({}, {:joins => 'some joins'}, Account.default).should == { :conditions => ["?", false], :include => 'some joins' }
+      Api.sis_make_params_for_sis_mapping_and_columns({}, {}, Account.default).should == :not_found
     end
 
     it 'should add in joins if the sis_mapping has some with columns' do
-      Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope", :joins => 'some joins'}, Account.default).should == { :conditions => ["? OR (scope = #{Account.default.id} AND id IN (?, ?, ?))", false, "1", 2, 3], :include => 'some joins' }
+      Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope", :joins => 'some joins'}, Account.default).should == { :conditions => ["(scope = #{Account.default.id} AND id IN (?))", ["1", 2, 3]], :include => 'some joins' }
     end
 
     it 'should work with a few different column types and account scopings' do
-      Api.sis_make_params_for_sis_mapping_and_columns({"id1" => [1,2,3], "id2" => ["a","b","c"], "id3" => ["s1", "s2", "s3"]}, {:scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set}, Account.default).should == { :conditions => ["? OR (some_scope = #{Account.default.id} AND id1 IN (?, ?, ?)) OR (some_scope = #{Account.default.id} AND id2 IN (?, ?, ?)) OR (id3 IN (?, ?, ?))", false, 1, 2, 3, "a", "b", "c", "s1", "s2", "s3"]}
+      Api.sis_make_params_for_sis_mapping_and_columns({"id1" => [1,2,3], "id2" => ["a","b","c"], "id3" => ["s1", "s2", "s3"]}, {:scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set}, Account.default).should == { :conditions => ["(some_scope = #{Account.default.id} AND id1 IN (?)) OR (some_scope = #{Account.default.id} AND id2 IN (?)) OR id3 IN (?)", [1, 2, 3], ["a", "b", "c"], ["s1", "s2", "s3"]]}
     end
 
     it "should scope to accounts by default if :is_not_scoped_to_account doesn't exist" do
-      Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope"}, Account.default).should == { :conditions => ["? OR (scope = #{Account.default.id} AND id IN (?, ?, ?))", false, "1", 2, 3] }
+      Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope"}, Account.default).should == { :conditions => ["(scope = #{Account.default.id} AND id IN (?))", ["1", 2, 3]] }
     end
 
     it "should fail if we're scoping to an account and the scope isn't provided" do
@@ -491,27 +502,27 @@ describe Api do
 
     it 'should correctly query the course table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Course)
-      Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).should == { :conditions => ["? OR (id IN (?)) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", false, "1", "1"] }
+      Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).should == { :conditions => ["id IN (?) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", ["1"], ["1"]] }
     end
 
     it 'should correctly query the enrollment_term table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)
-      Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).should == { :conditions => ["? OR (id IN (?)) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", false, "1", "1"] }
+      Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).should == { :conditions => ["id IN (?) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", ["1"], ["1"]] }
     end
 
     it 'should correctly query the user table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(User)
-      Api.sis_make_params_for_sis_mapping_and_columns({"pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"]}, sis_mapping, Account.default).should == { :include => [:pseudonym], :conditions => ["? OR (pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN (?)) OR (pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN (?)) OR (users.id IN (?))", false, "1", "1", "1"]}
+      Api.sis_make_params_for_sis_mapping_and_columns({"pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"]}, sis_mapping, Account.default).should == { :include => [:pseudonym], :conditions => ["(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN (?)) OR (pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN (?)) OR users.id IN (?)", ["1"], ["1"], ["1"]]}
     end
 
     it 'should correctly query the account table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Account)
-      Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).should == { :conditions => ["? OR (id IN (?)) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", false, "1", "1"] }
+      Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).should == { :conditions => ["id IN (?) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", ["1"], ["1"]] }
     end
 
     it 'should correctly query the course_section table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(CourseSection)
-      Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).should == { :conditions => ["? OR (id IN (?)) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", false, "1", "1"] }
+      Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).should == { :conditions => ["id IN (?) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", ["1"], ["1"]] }
     end
 
   end
