@@ -1022,7 +1022,7 @@ class User < ActiveRecord::Base
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
 
-    given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
+    given {|user| self.courses.any?{|c| c.user_is_instructor?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
 
     given do |user|

@@ -524,29 +524,30 @@ class Course < ActiveRecord::Base
     participating_instructors.restrict_to_sections(section_ids)
   end
 
-  def user_is_teacher?(user)
+  def user_is_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_is_teacher"].cache_key) do
+    Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
       user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
     end
   end
-  memoize :user_is_teacher?
+  memoize :user_is_instructor?
 
   def user_is_student?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
-      self.student_enrollments.find_by_user_id(user.id).present?
+    Rails.cache.fetch([self, user, "course_user_is_student"].cache_key) do
+      user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_student? }
     end
   end
   memoize :user_is_student?
 
-  def user_has_been_teacher?(user)
+  def user_has_been_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_teacher"].cache_key) do
-      self.teacher_enrollments.find_by_user_id(user.id).present?
+    Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
+      # active here is !deleted; it still includes concluded, etc.
+      self.instructor_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_teacher?
+  memoize :user_has_been_instructor?
 
   def user_has_been_student?(user)
     return unless user

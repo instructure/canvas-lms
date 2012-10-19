@@ -2726,40 +2726,45 @@ describe Course, "enrollments" do
   end
 end
 
-describe Course, "user_is_teacher?" do
+describe Course, "user_is_instructor?" do
   it "should be true for teachers" do
     course = Course.create
     teacher = user_with_pseudonym
     course.enroll_teacher(teacher).accept
-    course.user_is_teacher?(teacher).should be_true
+    course.user_is_instructor?(teacher).should be_true
   end
 
-  it "should be false for designers" do
+  it "should be true for tas" do
     course = Course.create
     ta = user_with_pseudonym
     course.enroll_ta(ta).accept
-    course.user_is_teacher?(ta).should be_true
+    course.user_is_instructor?(ta).should be_true
   end
 
   it "should be false for designers" do
     course = Course.create
     designer = user_with_pseudonym
     course.enroll_designer(designer).accept
-    course.user_is_teacher?(designer).should be_false
+    course.user_is_instructor?(designer).should be_false
   end
 end
 
-describe Course, "user_has_been_teacher?" do
+describe Course, "user_has_been_instructor?" do
   it "should be true for teachers, past or present" do
     e = course_with_teacher(:active_all => true)
-    @course.user_has_been_teacher?(@teacher).should be_true
+    @course.user_has_been_instructor?(@teacher).should be_true
 
     e.conclude
     e.reload.workflow_state.should == "completed"
-    @course.user_has_been_teacher?(@teacher).should be_true
+    @course.user_has_been_instructor?(@teacher).should be_true
 
     @course.complete
-    @course.user_has_been_teacher?(@teacher).should be_true
+    @course.user_has_been_instructor?(@teacher).should be_true
+  end
+
+  it "should be true for tas" do
+    e = course_with_ta(:active_all => true)
+    @course.user_has_been_instructor?(@ta).should be_true
   end
 end
 

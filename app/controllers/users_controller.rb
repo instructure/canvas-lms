@@ -1153,7 +1153,7 @@ class UsersController < ApplicationController
         student = User.find(params[:student_id])
         enrollments = student.student_enrollments.active.all(:include => :course)
         enrollments.each do |enrollment|
-          should_include = enrollment.course.user_has_been_teacher?(@teacher) && 
+          should_include = enrollment.course.user_has_been_instructor?(@teacher) && 
                            enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).find_by_id(enrollment.id) &&
                            enrollment.course.grants_right?(@current_user, :read_reports)
           if should_include
@@ -1169,7 +1169,7 @@ class UsersController < ApplicationController
 
       else # implied params[:course_id]
         course = Course.find(params[:course_id])
-        if !course.user_has_been_teacher?(@teacher)
+        if !course.user_has_been_instructor?(@teacher)
           flash[:error] = t('errors.user_not_teacher', "That user is not a teacher in this course")
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
