@@ -64,15 +64,13 @@ class AssignmentOverride < ActiveRecord::Base
     self.save!
   end
 
-  named_scope :active, lambda {
-    {:conditions => {:workflow_state => 'active'} }
-  }
+  named_scope :active, :conditions => { :workflow_state => 'active' }
 
   before_validation :default_values
   def default_values
     self.set_type ||= 'ADHOC'
     self.assignment_version = assignment.version_number if assignment
-    self.title = set.name if set
+    self.title = set.name if set_type != 'ADHOC' && set
   end
   protected :default_values
 
@@ -85,7 +83,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def set_with_adhoc
     if self.set_type == 'ADHOC'
-      nil
+      assignment_override_students.scoped(:include => :user).map(&:user)
     else
       set_without_adhoc
     end
@@ -118,6 +116,8 @@ class AssignmentOverride < ActiveRecord::Base
       end
       true
     end
+
+    named_scope "overriding_#{field}", :conditions => { "#{field}_overridden" => true }
   end
 
   override :due_at

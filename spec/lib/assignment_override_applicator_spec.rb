@@ -299,7 +299,12 @@ describe AssignmentOverrideApplicator do
 
   describe "assignment_with_overrides" do
     before :each do
-      @assignment = assignment_model(:due_at => 5.days.from_now, :title => 'Some Title')
+      Time.zone == 'Alaska'
+      @assignment = assignment_model(
+        :due_at => 5.days.from_now,
+        :unlock_at => 4.days.from_now,
+        :lock_at => 6.days.from_now,
+        :title => 'Some Title')
       @override = assignment_override_model(:assignment => @assignment)
       @override.override_due_at(7.days.from_now)
       @overridden = AssignmentOverrideApplicator.assignment_with_overrides(@assignment, [@override])
@@ -337,6 +342,16 @@ describe AssignmentOverrideApplicator do
     it "should return a readonly assignment object" do
       @overridden.should be_readonly
       lambda{ @overridden.save! }.should raise_exception ActiveRecord::ReadOnlyRecord
+    end
+
+    it "should cast datetimes to the active time zone" do
+      @overridden.due_at.time_zone.should == Time.zone
+      @overridden.unlock_at.time_zone.should == Time.zone
+      @overridden.lock_at.time_zone.should == Time.zone
+    end
+
+    it "should not cast dates to zoned datetimes" do
+      @overridden.all_day_date.class.should == Date
     end
   end
 
@@ -393,17 +408,24 @@ describe AssignmentOverrideApplicator do
       overrides.keys.to_set.should == [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].to_set
     end
 
-    it "should use raw UTC time for date fields" do
+    it "should use raw UTC time for datetime fields" do
       Time.zone = 'Alaska'
       @assignment = assignment_model(
         :due_at => 5.days.from_now,
         :unlock_at => 6.days.from_now,
         :lock_at => 7.days.from_now)
-      @override = assignment_override_model(:assignment => @assignment)
-      overrides = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
-      overrides[:due_at].class.should == Time; overrides[:due_at].should == @assignment.due_at.utc
-      overrides[:unlock_at].class.should == Time; overrides[:unlock_at].should == @assignment.unlock_at.utc
-      overrides[:lock_at].class.should == Time; overrides[:lock_at].should == @assignment.lock_at.utc
+      collapsed = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [])
+      collapsed[:due_at].class.should == Time; collapsed[:due_at].should == @assignment.due_at.utc
+      collapsed[:unlock_at].class.should == Time; collapsed[:unlock_at].should == @assignment.unlock_at.utc
+      collapsed[:lock_at].class.should == Time; collapsed[:lock_at].should == @assignment.lock_at.utc
+    end
+
+    it "should not use raw UTC time for date fields" do
+      Time.zone = 'Alaska'
+      @assignment = assignment_model(:due_at => 5.days.from_now)
+      collapsed = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [])
+      collapsed[:all_day_date].class.should == Date
+      collapsed[:all_day_date].should == @assignment.all_day_date
     end
   end
 

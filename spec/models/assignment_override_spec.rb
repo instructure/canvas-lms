@@ -33,11 +33,23 @@ describe AssignmentOverride do
     @override.set_type.should == 'ADHOC'
   end
 
-  it "should allow reading set and set_id when set_type is adhoc" do
+  it "should allow reading set_id and set when set_type is adhoc" do
     @override = assignment_override_model
     @override.set_type = 'ADHOC'
-    @override.set.should be_nil
     @override.set_id.should be_nil
+    @override.set.should == []
+  end
+
+  it "should return the students as the set when set_type is adhoc" do
+    student_in_course
+    @override = assignment_override_model(:course => @course)
+
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+
+    @override.reload
+    @override.set.should == [@student]
   end
 
   it "should be versioned" do

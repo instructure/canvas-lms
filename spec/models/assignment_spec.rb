@@ -623,6 +623,257 @@ describe Assignment do
     end
   end
 
+  describe "#due_dates_for(user)" do
+    before :each do
+      course_with_student(:active_all => true)
+      @assignment = assignment_model(:course => @course, :due_at => 5.days.ago)
+      @override = assignment_override_model(:assignment => @assignment)
+      @override.set = @course.default_section
+      @override.override_due_at(2.days.ago)
+      @override.save!
+    end
+
+    it "should not return the list of due dates for a student" do
+      _, as_instructor = @assignment.due_dates_for(@student)
+      as_instructor.should be_nil
+    end
+
+    it "should not return an applicable due date for a teacher" do
+      as_student, _ = @assignment.due_dates_for(@teacher)
+      as_student.should be_nil
+    end
+
+    it "should return the applicable due date for a student" do
+      as_student, _ = @assignment.due_dates_for(@student)
+      as_student.should_not be_nil
+    end
+
+    it "should return the list of due dates for a teacher" do
+      _, as_instructor = @assignment.due_dates_for(@teacher)
+      as_instructor.should_not be_nil
+    end
+
+    it "should return both for a user that's both a student and a teacher" do
+      course_with_ta(:course => @course, :user => @student, :active_all => true)
+      as_student, as_instructor = @assignment.due_dates_for(@student)
+      as_student.should_not be_nil
+      as_instructor.should_not be_nil
+    end
+
+    it "should use the overridden due date as the applicable due date" do
+      as_student, _ = @assignment.due_dates_for(@student)
+      as_student.should == {
+        :due_at => @override.due_at,
+        :all_day => @override.all_day,
+        :all_day_date => @override.all_day_date
+      }
+    end
+
+    it "should include the base due date in the list of due dates" do
+      _, as_instructor = @assignment.due_dates_for(@teacher)
+      as_instructor.should include({
+        :base => true,
+        :due_at => @assignment.due_at,
+        :all_day => @assignment.all_day,
+        :all_day_date => @assignment.all_day_date
+      })
+    end
+
+    it "should include visible due date overrides in the list of due dates" do
+      _, as_instructor = @assignment.due_dates_for(@teacher)
+      as_instructor.should include({
+        :title => @course.default_section.name,
+        :due_at => @override.due_at,
+        :all_day => @override.all_day,
+        :all_day_date => @override.all_day_date,
+        :override => @override
+      })
+    end
+
+    it "should exclude visible overrides that don't override due_at from the list of due dates" do
+      @override.clear_due_at_override
+      @override.save!
+
+      _, as_instructor = @assignment.due_dates_for(@teacher)
+      as_instructor.size.should == 1
+      as_instructor.first[:base].should be_true
+    end
+
+    it "should exclude overrides that aren't visible from the list of due dates" do
+      @enrollment = @teacher.enrollments.first
+      @enrollment.limit_privileges_to_course_section = true
+      @enrollment.save!
+
+      @section2 = @course.course_sections.create!
+      @override.set = @section2
+      @override.save!
+
+      _, as_instructor = @assignment.due_dates_for(@teacher)
+      as_instructor.size.should == 1
+      as_instructor.first[:base].should be_true
+    end
+  end
+
+  describe "#unlock_ats_for(user)" do
+    before :each do
+      course_with_student(:active_all => true)
+      @assignment = assignment_model(:course => @course, :unlock_at => 5.days.ago)
+      @override = assignment_override_model(:assignment => @assignment)
+      @override.set = @course.default_section
+      @override.override_unlock_at(2.days.ago)
+      @override.save!
+    end
+
+    it "should not return the list of unlock dates for a student" do
+      _, as_instructor = @assignment.unlock_ats_for(@student)
+      as_instructor.should be_nil
+    end
+
+    it "should not return an applicable unlock date for a teacher" do
+      as_student, _ = @assignment.unlock_ats_for(@teacher)
+      as_student.should be_nil
+    end
+
+    it "should return the applicable unlock date for a student" do
+      as_student, _ = @assignment.unlock_ats_for(@student)
+      as_student.should_not be_nil
+    end
+
+    it "should return the list of unlock dates for a teacher" do
+      _, as_instructor = @assignment.unlock_ats_for(@teacher)
+      as_instructor.should_not be_nil
+    end
+
+    it "should return both for a user that's both a student and a teacher" do
+      course_with_ta(:course => @course, :user => @student, :active_all => true)
+      as_student, as_instructor = @assignment.unlock_ats_for(@student)
+      as_student.should_not be_nil
+      as_instructor.should_not be_nil
+    end
+
+    it "should use the overridden unlock date as the applicable unlock date" do
+      as_student, _ = @assignment.unlock_ats_for(@student)
+      as_student.should == { :unlock_at => @override.unlock_at }
+    end
+
+    it "should include the base unlock date in the list of unlock dates" do
+      _, as_instructor = @assignment.unlock_ats_for(@teacher)
+      as_instructor.should include({ :base => true, :unlock_at => @assignment.unlock_at })
+    end
+
+    it "should include visible unlock date overrides in the list of unlock dates" do
+      _, as_instructor = @assignment.unlock_ats_for(@teacher)
+      as_instructor.should include({
+        :title => @course.default_section.name,
+        :unlock_at => @override.unlock_at,
+        :override => @override
+      })
+    end
+
+    it "should exclude visible overrides that don't override unlock_at from the list of unlock dates" do
+      @override.clear_unlock_at_override
+      @override.save!
+
+      _, as_instructor = @assignment.unlock_ats_for(@teacher)
+      as_instructor.size.should == 1
+      as_instructor.first[:base].should be_true
+    end
+
+    it "should exclude overrides that aren't visible from the list of unlock dates" do
+      @enrollment = @teacher.enrollments.first
+      @enrollment.limit_privileges_to_course_section = true
+      @enrollment.save!
+
+      @section2 = @course.course_sections.create!
+      @override.set = @section2
+      @override.save!
+
+      _, as_instructor = @assignment.unlock_ats_for(@teacher)
+      as_instructor.size.should == 1
+      as_instructor.first[:base].should be_true
+    end
+  end
+
+  describe "#lock_ats_for(user)" do
+    before :each do
+      course_with_student(:active_all => true)
+      @assignment = assignment_model(:course => @course, :lock_at => 5.days.ago)
+      @override = assignment_override_model(:assignment => @assignment)
+      @override.set = @course.default_section
+      @override.override_lock_at(2.days.ago)
+      @override.save!
+    end
+
+    it "should not return the list of lock dates for a student" do
+      _, as_instructor = @assignment.lock_ats_for(@student)
+      as_instructor.should be_nil
+    end
+
+    it "should not return an applicable lock date for a teacher" do
+      as_student, _ = @assignment.lock_ats_for(@teacher)
+      as_student.should be_nil
+    end
+
+    it "should return the applicable lock date for a student" do
+      as_student, _ = @assignment.lock_ats_for(@student)
+      as_student.should_not be_nil
+    end
+
+    it "should return the list of lock dates for a teacher" do
+      _, as_instructor = @assignment.lock_ats_for(@teacher)
+      as_instructor.should_not be_nil
+    end
+
+    it "should return both for a user that's both a student and a teacher" do
+      course_with_ta(:course => @course, :user => @student, :active_all => true)
+      as_student, as_instructor = @assignment.lock_ats_for(@student)
+      as_student.should_not be_nil
+      as_instructor.should_not be_nil
+    end
+
+    it "should use the overridden lock date as the applicable lock date" do
+      as_student, _ = @assignment.lock_ats_for(@student)
+      as_student.should == { :lock_at => @override.lock_at }
+    end
+
+    it "should include the base lock date in the list of lock dates" do
+      _, as_instructor = @assignment.lock_ats_for(@teacher)
+      as_instructor.should include({ :base => true, :lock_at => @assignment.lock_at })
+    end
+
+    it "should include visible lock date overrides in the list of lock dates" do
+      _, as_instructor = @assignment.lock_ats_for(@teacher)
+      as_instructor.should include({
+        :title => @course.default_section.name,
+        :lock_at => @override.lock_at,
+        :override => @override
+      })
+    end
+
+    it "should exclude visible overrides that don't override lock_at from the list of lock dates" do
+      @override.clear_lock_at_override
+      @override.save!
+
+      _, as_instructor = @assignment.lock_ats_for(@teacher)
+      as_instructor.size.should == 1
+      as_instructor.first[:base].should be_true
+    end
+
+    it "should exclude overrides that aren't visible from the list of lock dates" do
+      @enrollment = @teacher.enrollments.first
+      @enrollment.limit_privileges_to_course_section = true
+      @enrollment.save!
+
+      @section2 = @course.course_sections.create!
+      @override.set = @section2
+      @override.save!
+
+      _, as_instructor = @assignment.lock_ats_for(@teacher)
+      as_instructor.size.should == 1
+      as_instructor.first[:base].should be_true
+    end
+  end
+
   context "concurrent inserts" do
     def concurrent_inserts
       assignment_model

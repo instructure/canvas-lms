@@ -155,6 +155,118 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  # returns two values indicating which due dates for this assignment apply
+  # and/or are visible to the user.
+  #
+  # the first is the due date as it applies to the user as a student, if any
+  # (nil if the user has no student enrollment(s) in the assignment's course)
+  #
+  # the second is a list of due dates a they apply to users, sections, or
+  # groups visible to the user as an instructor (nil if the user has no
+  # instructor enrollment(s) in the assignment's course)
+  #
+  # in both cases, "due dates" is a hash with due_at (full timestamp), all_day
+  # flag, and all_day_date. for the "as an instructor" list, each due date from
+  # an override will also have a 'title' key to identify which subset of the
+  # course is affected by that due date, and an 'override' key referencing the
+  # override itself. for the original due date, it will instead have a 'base'
+  # flag (value true).
+  def due_dates_for(user)
+    as_student, as_instructor = nil, nil
+
+    if context.user_has_been_student?(user)
+      overridden = self.overridden_for(user)
+      as_student = {
+        :due_at => overridden.due_at,
+        :all_day => overridden.all_day,
+        :all_day_date => overridden.all_day_date
+      }
+    end
+
+    if context.user_has_been_instructor?(user)
+      overrides = self.overrides_visible_to(user).overriding_due_at
+
+      as_instructor = overrides.map do |override|
+        {
+          :title => override.title,
+          :due_at => override.due_at,
+          :all_day => override.all_day,
+          :all_day_date => override.all_day_date,
+          :override => override
+        }
+      end
+
+      as_instructor << {
+        :base => true,
+        :due_at => self.due_at,
+        :all_day => self.all_day,
+        :all_day_date => self.all_day_date
+      }
+    end
+
+    return as_student, as_instructor
+  end
+
+  # like due_dates_for, but for unlock_at values instead. for consistency, each
+  # unlock_at is still represented by a hash, even though the "as a student"
+  # value will only have one key.
+  def unlock_ats_for(user)
+    as_student, as_instructor = nil, nil
+
+    if context.user_has_been_student?(user)
+      overridden = self.overridden_for(user)
+      as_student = { :unlock_at => overridden.unlock_at }
+    end
+
+    if context.user_has_been_instructor?(user)
+      overrides = self.overrides_visible_to(user).overriding_unlock_at
+
+      as_instructor = overrides.map do |override|
+        {
+          :title => override.title,
+          :unlock_at => override.unlock_at,
+          :override => override
+        }
+      end
+
+      as_instructor << {
+        :base => true,
+        :unlock_at => self.unlock_at
+      }
+    end
+
+    return as_student, as_instructor
+  end
+
+  # like unlock_ats_for, but for lock_at values instead.
+  def lock_ats_for(user)
+    as_student, as_instructor = nil, nil
+
+    if context.user_has_been_student?(user)
+      overridden = self.overridden_for(user)
+      as_student = { :lock_at => overridden.lock_at }
+    end
+
+    if context.user_has_been_instructor?(user)
+      overrides = self.overrides_visible_to(user).overriding_lock_at
+
+      as_instructor = overrides.map do |override|
+        {
+          :title => override.title,
+          :lock_at => override.lock_at,
+          :override => override
+        }
+      end
+
+      as_instructor << {
+        :base => true,
+        :lock_at => self.lock_at
+      }
+    end
+
+    return as_student, as_instructor
+  end
+
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
     if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
       # handle if it has already come due, but has not yet been auto_peer_reviewed
