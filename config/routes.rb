@@ -975,6 +975,10 @@ ActionController::Routing::Routes.draw do |map|
       context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
     end
 
+    api.with_options(:controller => :quizzes_api) do |quizzes|
+      quizzes.get "courses/:course_id/quizzes", :action => :index, :path_name => 'course_quizzes'
+    end
+
     api.with_options(:controller => :media_objects) do |media_objects|
       media_objects.get 'media_objects/:media_object_id', :action => :show, :path_name => 'media_object'
     end
