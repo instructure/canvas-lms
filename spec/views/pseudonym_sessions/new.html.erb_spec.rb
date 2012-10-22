@@ -21,8 +21,23 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/pseudonym_sessions/new" do
   it "should render" do
+    assigns[:domain_root_account] = Account.default
     render "pseudonym_sessions/new"
     response.should_not be_nil
+    doc = Nokogiri::HTML(response.body)
+    doc.at_css('form#login_form')['action'].should == '/login?nonldap=true'
+  end
+
+  it "should not add nonldap param to login form with ldap" do
+    account_model
+    config = @account.account_authorization_configs.create(:auth_type => 'cas')
+    config.auth_type = 'ldap'
+    config.save
+    assigns[:domain_root_account] = @account
+    render "pseudonym_sessions/new"
+    response.should_not be_nil
+    doc = Nokogiri::HTML(response.body)
+    doc.at_css('form#login_form')['action'].should == '/login'
   end
 end
 

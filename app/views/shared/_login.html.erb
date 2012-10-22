@@ -89,7 +89,7 @@ $(document).ready(function() {
         <a href="<%= login_path %>" style="font-size: 1.3em;" class="button"><%= login_message %></a>
       </div>
     <% else %>
-      <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form"} do |f| %>
+      <% form_for :pseudonym_session, :url => login_path(:nonldap => (@domain_root_account && !@domain_root_account.ldap_authentication?).presence), :html => {:id => "login_form"} do |f| %>
         <%= link_to t("register_for_canvas", "*Need a Canvas Account?* **Click Here, It's Free!**", :wrapper => {'*' => '<i>\1</i>', '**' => '<b>\1</b>'}),  Setting.get_cached("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account == Account.default && @domain_root_account.open_registration? && @domain_root_account.no_enrollments_can_create_courses? && !hide_fft %>
         <h2 class="ui-helper-hidden-accessible"><%= t('log_in', 'Log In') %></h2>
         <% login_inner_dialog = yield :login_inner_dialog %>

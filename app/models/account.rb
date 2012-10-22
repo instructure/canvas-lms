@@ -665,11 +665,11 @@ class Account < ActiveRecord::Base
   def cas_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.cas_authentication?)
   end
-  
+
   def ldap_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.ldap_authentication?)
+    self.account_authorization_configs.any? { |aac| aac.ldap_authentication? }
   end
-  
+
   def saml_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?)
   end
