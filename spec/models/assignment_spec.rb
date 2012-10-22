@@ -1540,15 +1540,18 @@ describe Assignment do
     end
 
     it "should create a discussion_topic if none exists and specified" do
-      assignment_model(:submission_types => "discussion_topic")
+      course_model()
+      assignment_model(:course => @course, :submission_types => "discussion_topic", :updating_user => @teacher)
       @a.submission_types.should eql('discussion_topic')
       @a.discussion_topic.should_not be_nil
       @a.discussion_topic.assignment_id.should eql(@a.id)
+      @a.discussion_topic.user_id.should eql(@teacher.id)
       @a.due_at = Time.now
       @a.save
       @a.reload
       @a.discussion_topic.should_not be_nil
       @a.discussion_topic.assignment_id.should eql(@a.id)
+      @a.discussion_topic.user_id.should eql(@teacher.id)
     end
 
     it "should delete a discussion_topic if no longer specified" do

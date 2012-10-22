@@ -472,7 +472,7 @@ class Assignment < ActiveRecord::Base
       quiz.saved_by = :assignment
       quiz.save
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
-      topic = self.discussion_topic || self.context.discussion_topics.build
+      topic = self.discussion_topic || self.context.discussion_topics.build(:user => @updating_user)
       topic.assignment_id = self.id
       topic.title = self.title
       topic.message = self.description
