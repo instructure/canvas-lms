@@ -942,6 +942,30 @@ describe Course, "tabs_available" do
 
     tabs.should_not be_include(t1.asset_string)
   end
+
+  context "a public course" do
+    before do
+      course(:active_all => true).update_attributes(:is_public => true, :indexed => true)
+      @course.announcements.create!(:title => 'Title', :message => 'Message')
+    end
+
+    it "should not show announcements tabs without a current user" do
+      tab_ids = @course.tabs_available(nil).map{|t| t[:id] }
+      tab_ids.should_not include(Course::TAB_ANNOUNCEMENTS)
+    end
+
+    it "should not show announcements to a user not enrolled in the class" do
+      user
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      tab_ids.should_not include(Course::TAB_ANNOUNCEMENTS)
+    end
+
+    it "should show the announcements tab to an enrolled user" do
+      @course.enroll_student(user).accept!
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      tab_ids.should include(Course::TAB_ANNOUNCEMENTS)
+    end
+  end
 end
 
 describe Course, "backup" do

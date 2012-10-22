@@ -2607,6 +2607,10 @@ class Course < ActiveRecord::Base
             tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) }
           end
 
+          unless discussion_topics.new.grants_right?(user, nil, :read)
+            tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
+          end
+
           # remove hidden tabs from students
           tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
         end
