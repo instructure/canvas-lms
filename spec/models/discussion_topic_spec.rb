@@ -414,6 +414,18 @@ describe DiscussionTopic do
       @topic.user_can_see_posts?(@teacher).should == true
     end
 
+    it "should only allow active admins to see posts without posting" do
+      @ta_enrollment = course_with_ta(:course => @course, :active_enrollment => true)
+      # TA should be able to see
+      @topic.user_can_see_posts?(@ta).should == true
+      # Remove user as TA and enroll as student, should not be able to see
+      @ta_enrollment.destroy
+      # enroll as a student.
+      course_with_student(:course => @course, :user => @ta, :active_enrollment => true)
+      @topic.reload
+      @topic.user_can_see_posts?(@ta).should == false
+    end
+
     it "shouldn't allow student (and observer) who hasn't posted to see" do
       @topic.user_can_see_posts?(@student).should == false
     end
