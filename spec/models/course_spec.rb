@@ -922,6 +922,26 @@ describe Course, "tabs_available" do
     tabs.should be_include(t1.asset_string)
     tabs.should_not be_include(t2.asset_string)
   end
+  
+  it "should not include tabs for external tools if opt[:include_external] is false" do
+    course_with_student(:active_all => true)
+
+    t1 = @course.context_external_tools.create!(
+           :url => "http://example.com/ims/lti",
+           :consumer_key => "asdf",
+           :shared_secret => "hjkl",
+           :name => "external tool 1",
+           :course_navigation => {
+             :text => "blah",
+             :url =>  "http://example.com/ims/lti",
+             :default => false,
+           }
+         )
+
+    tabs = @course.tabs_available(nil, :include_external => false).map { |tab| tab[:id] }
+
+    tabs.should_not be_include(t1.asset_string)
+  end
 end
 
 describe Course, "backup" do
