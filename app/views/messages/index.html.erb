@@ -3,5 +3,11 @@
   add_crumb t("#crumbs.messages", "Messages")
 %>
 
-<%= render :partial => 'message', :collection => @messages %>
+<% jammit_css :messages %>
+<% js_bundle  :messages %>
+
+<h1><%= t('titles.messages', 'Messages for %{name}', :name => @context.name) %></h1>
+<ol class="messages">
+  <%= render :partial => 'message', :collection => @messages %>
+</ol>
 <%= will_paginate(@messages) %>
