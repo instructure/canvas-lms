@@ -748,13 +748,38 @@ shared_examples_for 'a backend' do
     job3.create_and_lock!("someoneelse:#{Process.pid}")
     job4.create_and_lock!("Jobworker:notanumber")
 
-    Delayed::Job.unlock_orphaned_jobs("Jobworker").should == 1
+    Delayed::Job.unlock_orphaned_jobs(nil, "Jobworker").should == 1
 
     job1.reload.locked_by.should_not be_nil
     job2.reload.locked_by.should be_nil
     job3.reload.locked_by.should_not be_nil
     job4.reload.locked_by.should_not be_nil
 
-    Delayed::Job.unlock_orphaned_jobs("Jobworker").should == 0
+    Delayed::Job.unlock_orphaned_jobs(nil, "Jobworker").should == 0
+  end
+
+  it "should unlock orphaned jobs given a pid" do
+    job1 = Delayed::Job.new(:tag => 'tag')
+    job2 = Delayed::Job.new(:tag => 'tag')
+    job3 = Delayed::Job.new(:tag => 'tag')
+    job4 = Delayed::Job.new(:tag => 'tag')
+    job1.create_and_lock!("Jobworker:#{Process.pid}")
+    `echo ''`
+    child_pid = $?.pid
+    `echo ''`
+    child_pid2 = $?.pid
+    job2.create_and_lock!("Jobworker:#{child_pid}")
+    job3.create_and_lock!("someoneelse:#{Process.pid}")
+    job4.create_and_lock!("Jobworker:notanumber")
+
+    Delayed::Job.unlock_orphaned_jobs(child_pid2, "Jobworker").should == 0
+    Delayed::Job.unlock_orphaned_jobs(child_pid, "Jobworker").should == 1
+
+    job1.reload.locked_by.should_not be_nil
+    job2.reload.locked_by.should be_nil
+    job3.reload.locked_by.should_not be_nil
+    job4.reload.locked_by.should_not be_nil
+
+    Delayed::Job.unlock_orphaned_jobs(child_pid, "Jobworker").should == 0
   end
 end

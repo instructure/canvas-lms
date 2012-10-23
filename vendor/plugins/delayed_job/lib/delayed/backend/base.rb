@@ -96,18 +96,22 @@ module Delayed
           Time.zone.now
         end
 
-        def unlock_orphaned_jobs(name = nil)
+        def unlock_orphaned_jobs(pid = nil, name = nil)
           begin
             name ||= Socket.gethostname
           rescue
             return 0
           end
-          regex = Regexp.new("^#{Regexp.escape(name)}:(\\d+)$")
+          pid_regex = pid || '(\d+)'
+          regex = Regexp.new("^#{Regexp.escape(name)}:#{pid_regex}$")
           unlocked_jobs = 0
+          running = false if pid
           self.running_jobs.each do |job|
             next unless job.locked_by =~ regex
-            pid = $1.to_i
-            running = Process.kill(0, pid) rescue false
+            unless pid
+              job_pid = $1.to_i
+              running = Process.kill(0, job_pid) rescue false
+            end
             if !running
               unlocked_jobs += 1
               job.reschedule("process died")
