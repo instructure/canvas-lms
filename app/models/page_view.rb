@@ -314,4 +314,65 @@ class PageView < ActiveRecord::Base
   def to_row(format = nil)
     export_columns(format).map { |c| self.send(c) }
   end
+
+  # utility class to migrate a postgresql/mysql/sqlite3 page_views table to cassandra
+  class CassandraMigrator < Struct.new(:cutoff, :last_created_at, :last_request_id, :scope, :logger)
+    def initialize(skip_deleted_accounts = true, cutoff = nil)
+      self.cutoff = cutoff || 52.weeks.ago
+      # summarized is either true or null for all page views, depending on plugin functionality
+      self.logger = Rails.logger
+
+      summarized = (Setting.get("page_views_migration_summarized", "false") == "true") || nil
+      self.scope = PageView.scoped(:conditions => { :summarized => summarized },
+                                   :order => 'created_at DESC, request_id ASC')
+      if skip_deleted_accounts
+        deleted_account_ids = Set.new(Account.root_accounts.all(:conditions => { :workflow_state => 'deleted' }).map(&:id))
+        self.scope = self.scope.scoped(:conditions => ["account_id NOT IN (?)", deleted_account_ids])
+      end
+    end
+
+    def run_once(batch_size = 1000)
+      raise("Must configure page views to use cassandra first") if !PageView.cassandra?
+
+      unless self.last_created_at
+        self.last_created_at, self.last_request_id = PageView.cassandra.execute("SELECT last_created_at, last_request_id FROM page_views_migration_metadata WHERE shard_id = ?", Shard.current.id.to_s).fetch.try(:to_hash).try(:values_at, 'last_created_at', 'last_request_id')
+        self.last_created_at = self.last_created_at.try(:in_time_zone)
+        self.last_created_at ||= Time.zone.now
+        self.last_request_id ||= ''
+      end
+
+      finder_sql = scope.scoped(:limit => batch_size,
+                                :conditions => ["(created_at < ? OR (created_at = ? AND request_id > ?)) AND created_at > ?", last_created_at, last_created_at, last_request_id, cutoff]).construct_finder_sql({})
+      # query just the raw attributes, don't instantiate AR objects
+      rows = PageView.connection.execute(finder_sql).to_a
+
+      return false if rows.empty?
+
+      inserted = rows.count do |attrs|
+        begin
+          # now instantiate the AR object here, as a brand new record, so
+          # it's saved to cassandra as if it was just created (though
+          # created_at comes from the queried db attributes)
+          # we're bypassing the redis queue here, just saving directly to cassandra
+          PageView.create! { |pv| pv.send(:attributes=, attrs, false) }
+          true
+        rescue
+          logger.error "failed migrating request id to cassandra: #{attrs['request_id']} : #{$!}"
+          false
+        end
+      end
+
+      logger.info "added #{inserted} page views starting at #{last_created_at} #{last_request_id}"
+
+      self.last_created_at, self.last_request_id = rows.last.values_at('created_at', 'request_id')
+      self.last_created_at = Time.zone.parse(last_created_at)
+      PageView.cassandra.execute("UPDATE page_views_migration_metadata SET last_created_at = ?, last_request_id = ? WHERE shard_id = ?", last_created_at, last_request_id, Shard.current.id.to_s)
+      true
+    end
+
+    def run
+      while run_once
+      end
+    end
+  end
 end

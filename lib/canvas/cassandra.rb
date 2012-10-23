@@ -53,7 +53,7 @@ module Canvas::Cassandra
       ms = Benchmark.ms do
         result = @db.execute(query, *args)
       end
-      Rails.logger.debug("  CQL (%.2fms)  #{::CassandraCQL::Statement.sanitize(query, args)}" % [ms])
+      Rails.logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{::CassandraCQL::Statement.sanitize(query, args)}")
       result
     end
 

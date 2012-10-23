@@ -72,6 +72,36 @@ describe PageView do
       @page_view.save!
       @user.page_views.paginate(:per_page => 2, :page => '3').should == [@page_view]
     end
+
+    describe "db migrator" do
+      it "should migrate the relevant page views" do
+        a1 = account_model
+        a2 = account_model
+        Setting.set('enable_page_views', 'db')
+        moved = (0..1).map { page_view_model(:account => a1, :created_at => 2.minutes.ago) }
+        # this one is further back in time and will be processed later
+        moved_later = page_view_model(:account => a1, :created_at => 1.day.ago)
+        # this one is in a deleted account
+        deleted = page_view_model(:account => a2, :created_at => 2.minutes.ago)
+        a2.destroy
+        # too far back
+        old = page_view_model(:account => a1, :created_at => 13.months.ago)
+
+        Setting.set('enable_page_views', 'cassandra')
+        migrator = PageView::CassandraMigrator.new
+        PageView.find(moved.map(&:request_id)).size.should == 0
+        migrator.run_once(2)
+        PageView.find(moved.map(&:request_id)).size.should == 2
+        expect { PageView.find(moved_later.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
+        # it should resume where the last migrator left off
+        migrator = PageView::CassandraMigrator.new
+        migrator.run_once(2)
+        PageView.find(moved.map(&:request_id) + [moved_later.request_id]).size.should == 3
+
+        expect { PageView.find(deleted.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { PageView.find(old.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
   end
 
   it "should store directly to the db in db mode" do
