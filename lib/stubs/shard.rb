@@ -75,7 +75,7 @@ ActiveRecord::Base.class_eval do
   end
 
   def shard=(new_shard)
-    raise ReadOnlyRecord unless new_record?
+    raise ReadOnlyRecord if new_record? && self.shard != new_shard
     new_shard
   end
 
@@ -85,9 +85,5 @@ ActiveRecord::Base.class_eval do
 
   def local_id
     id
-  end
-
-  def self.set_shard_override(&block)
-    # pass
   end
 end

@@ -463,7 +463,7 @@ describe "Collections API", :type => :integration do
         end
 
         it "should allow removing an upvote" do
-          @i3.collection_item_data.collection_item_upvotes.create!(:user => @user)
+          @user.collection_item_upvotes.create!(:collection_item_data => @i3.collection_item_data)
           @i3.reload.collection_item_data.upvote_count.should == 1
           json = api_call(:delete, "#{@unscoped_items_path}/#{@i3.id}/upvotes/self", @unscoped_items_path_options.merge(:action => "remove_upvote", :item_id => @i3.to_param))
           @i3.reload.collection_item_data.upvote_count.should == 0

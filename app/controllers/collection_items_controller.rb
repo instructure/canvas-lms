@@ -379,6 +379,6 @@ class CollectionItemsController < ApplicationController
   end
 
   def find_upvote
-    @item.collection_item_data.collection_item_upvotes.find_by_user_id(@current_user.id)
+    @current_user.collection_item_upvotes.find_by_collection_item_data_id(@item.collection_item_data_id)
   end
 end

@@ -47,6 +47,7 @@ describe 'CollectionItem' do
       @shard2.activate { @item = collection_item_model(:collection => group_model.collections.create!, :user => user_model) }
       @upvote = CollectionItemUpvote.create!(:user => @user1, :collection_item_data => @item.data)
       @upvote.shard.should == @user1.shard
+      @upvote.reload.user.should == @user1
       @item.data.reload.upvote_count.should == 1
 
       [ Shard.default, @shard1, @shard2 ].each do |shard|

@@ -162,6 +162,7 @@ class User < ActiveRecord::Base
 
   has_many :collections, :as => :context
   has_many :collection_items, :through => :collections
+  has_many :collection_item_upvotes
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
