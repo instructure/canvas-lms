@@ -98,15 +98,15 @@ describe "external migrations" do
 
   it "should selectively import a common cartridge" do
     run_import("cc_ark_test.zip") do |driver|
-      f('#copy_everything').click
-      f('#copy_assignments_i183e1527a34b34e8151ffc6dec6cd140_').click
-      f('#copy_quizzes_i2da11ea691f704f9b32ed3fa563af30e_').click
-      f('#copy_files_i6d69d81475a73c4214327e7d4ad5630f_').click
-      f('#copy_modules_i2410bad2b8623a94d9b662ced95406e0_').click
-      f('#copy_topics_icdbdc4aab17bdd59c6b07f0336de1ce0_').click
-      f('#copy_topics_ie28afa86290a7c5dfbe78453cc9b8d28_').click
-      f('#copy_assignment_groups_i0928a83d992c891aa083bcffc1913b67_').click
-      f('#copy_all_external_tools').click
+      f('#copy_assignments_ibcb9ab84f8045f00a3463e8380003e67_').click
+      f('#copy_quizzes_i11ae878a000f370b007a8fe081d0ded9_').click
+      f('#copy_files_ic855ab1cf35ada44a34ce4b852b0c0d0_').click
+      f('#copy_modules_i2df6315abd91395f682eb5213a9d1220_').click
+      f('#copy_topics_i5022718bd70b5298815190094ee482b3_').click
+      f('#copy_topics_i2538e409b017a221d89a5f5c3c182605_').click
+      f('#copy_assignment_groups_i8adfc688d7d74aa856838cc3333a4849_').click
+      f('#copy_assignment_groups_i485520d3863b0e293df4c8f4951ab1e2_').click
+      f('#copy_all_wikis').click
     end
 
     # 2 because the announcement is returned for this too.
@@ -128,7 +128,5 @@ describe "external migrations" do
     dt.title.should == "A topic"
     dt.message.should == "<p>description</p>"
   end
-
-
 
 end

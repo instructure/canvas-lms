@@ -203,15 +203,16 @@ define([
           $(this).triggerHandler('change');
         });
       } else if ($(this).hasClass('copy_everything')) {
-        $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything)").prop('checked', $(this).prop('checked')).filter(":not(.copy_all)").each(function () {
+        $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.shift_dates_checkbox)").prop('checked', $(this).prop('checked')).filter(":not(.copy_all)").each(function () {
           $(this).triggerHandler('change');
         });
       } else {
         $(this).parent().find(":checkbox.secondary_checkbox").prop('checked', $(this).prop('checked'));
         if (!$(this).prop('checked')) {
           $(this).parents("ul").each(function () {
-            $(this).prev("h2,h3,h4").find(":checkbox").prop('checked', false);
+            $(this).prevAll("h2,h3,h4").find(":checkbox").prop('checked', false);
           });
+          $("#copy_everything").prop('checked', false);
         }
       }
     });
