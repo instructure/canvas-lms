@@ -188,6 +188,17 @@ describe Api do
       collection.stubs(:table_name).returns("courses")
       @api.api_find_all(collection, ["sis_invalid:1"]).should == []
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should find users from other shards" do
+        @shard1.activate { @user2 = User.create! }
+        @shard2.activate { @user3 = User.create! }
+
+        @api.api_find_all(User, [@user2.id, @user3.id]).sort_by(&:global_id).should == [@user2, @user3].sort_by(&:global_id)
+      end
+    end
   end
 
   context 'map_ids' do
