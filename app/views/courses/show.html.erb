@@ -29,7 +29,7 @@
           <a href="#" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></a>
         </div>
       </div>
-    <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? && (!session["role_course_#{self.id}"]) %>
+    <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? && (!session["role_course_#{@context.id}"]) %>
       <div class="rs-margin-lr rs-margin-top">
         <a href="#" class="button button-sidebar-wide self_unenrollment_link"><%= image_tag "delete_circle.png" %> <%= t('links.drop_course', %{Drop this Course}) %></a>
       </div>

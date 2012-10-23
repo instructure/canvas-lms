@@ -107,7 +107,7 @@ class ContextExternalTool < ActiveRecord::Base
   def custom_fields_string
     (settings[:custom_fields] || {}).map{|key, val|
       "#{key}=#{val}"
-    }.join("\n")
+    }.sort.join("\n")
   end
   
   def config_type=(val)

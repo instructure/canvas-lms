@@ -9,10 +9,10 @@ shared_examples_for "files selenium shared" do
   end
 
   def login(username, password)
-    resp, body = SSLCommon.get "#{app_host}/login"
+    resp = SSLCommon.get "#{app_host}/login"
     resp.code.should == "200"
     @cookie = resp.response['set-cookie']
-    resp, body = SSLCommon.post_form("#{app_host}/login", {
+    resp = SSLCommon.post_form("#{app_host}/login", {
         "pseudonym_session[unique_id]" => username,
         "pseudonym_session[password]" => password,
         "redirect_to_ssl" => "0",
@@ -30,27 +30,30 @@ shared_examples_for "files selenium shared" do
       path = "/dashboard/files"
     end
     context_code = context.asset_string.capitalize
-    resp, body = SSLCommon.get "#{app_host}#{path}",
+    resp = SSLCommon.get "#{app_host}#{path}",
                                "Cookie" => @cookie
+    body = resp.body
     resp.code.should == "200"
     body.should =~ /<div id="ajax_authenticity_token">([^<]*)<\/div>/
     authenticity_token = $1
-    resp, body = SSLCommon.post_form("#{app_host}/files/pending", {
+    resp= SSLCommon.post_form("#{app_host}/files/pending", {
         "attachment[folder_id]" => context.folders.active.first.id,
         "attachment[filename]" => name,
         "attachment[context_code]" => context_code,
         "authenticity_token" => authenticity_token,
         "no_redirect" => true}, {"Cookie" => @cookie})
+    body = resp.body
     resp.code.should == "200"
     data = json_parse(body)
     data["upload_url"] = data["proxied_upload_url"] || data["upload_url"]
     data["upload_url"] = "#{app_host}#{data["upload_url"]}" if data["upload_url"] =~ /^\//
     data["success_url"] = "#{app_host}#{data["success_url"]}" if data["success_url"] =~ /^\//
     data["upload_params"]["file"] = fixture
-    resp, body = SSLCommon.post_multipart_form(data["upload_url"], data["upload_params"], {"Cookie" => @cookie}, ["bucket", "key", "acl"])
+    resp = SSLCommon.post_multipart_form(data["upload_url"], data["upload_params"], {"Cookie" => @cookie}, ["bucket", "key", "acl"])
+    body = resp.body
     resp.code.should =~ /^20/
     if body =~ /<PostResponse>/
-      resp, body = SSLCommon.get data["success_url"]
+      resp = SSLCommon.get data["success_url"]
       resp.code.should == "200"
     end
   end
