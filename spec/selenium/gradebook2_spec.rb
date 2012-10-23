@@ -531,4 +531,40 @@ describe "gradebook2" do
     end
   end
 
+  context "downloading and uploading submissions" do
+    it "updates the dropdown menu after downloading and processes submission uploads" do
+      # Given I have a student with an uploaded submission
+      a = attachment_model(:context => @student_2, :content_type => 'text/plain')
+      s2 = @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
+
+      # When I go to the gradebook
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      # And I click the dropdown menu on the assignment
+      f('.gradebook-header-drop').click
+
+      # And I click the download submissions button
+      f('[data-action="downloadSubmissions"]').click
+
+      # And I close the download submissions dialog
+      fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
+
+      # And I click the dropdown menu on the assignment again
+      f('.gradebook-header-drop').click
+
+      # And I click the re-upload submissions link
+      f('[data-action="reuploadSubmissions"]').click
+
+      # When I attach a submissions zip file
+      fixtureFile = Rails.root.join('spec/fixtures/files/submissions.zip')
+      f('input[name=submissions_zip]').send_keys(fixtureFile)
+
+      # And I upload it
+      fj('button:contains("Upload Files")').click
+
+      # Then I should see a message indicating the file was processed
+      f('body').should include_text 'Attached files to the following user submissions'
+    end
+  end
 end
