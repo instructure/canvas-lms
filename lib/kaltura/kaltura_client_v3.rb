@@ -92,19 +92,7 @@ module Kaltura
 
           if ASSET_STATUSES[asset[:status]] == :READY
             hash = asset.slice :containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal
-            url = flavorAssetGetDownloadUrl(asset[:id])
-
-            # hack alert -- iTunes (and maybe others who follow the same podcast
-            # spec) requires that the download URL for podcast items end in .mp3
-            # or another supported media type. Normally, the Kaltura download URL
-            # doesn't end in .mp3. But Kaltura's first download URL redirects to
-            # the same download url with /relocate/filename.ext appended, so we're
-            # just going to explicitly append that to skip the first redirect, so
-            # that iTunes will download the podcast items. This doesn't appear to
-            # be documented anywhere though, so we're talking with Kaltura about
-            # a more official solution. This also helps http performance to avoid
-            # a needless redirect to get to the file.
-            hash[:url] = "#{url}/relocate/download.#{asset[:fileExt]}"
+            hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])
 
             hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
             sources << hash
@@ -296,6 +284,20 @@ module Kaltura
                            :ks => @ks,
                            :id => assetId)
       return result.content
+    end
+
+    # This is not a true Kaltura API call, but generates the url for a "playlist"
+    # and gets the desired URL from there. These URLs point to any CDN configured
+    # in Kaltura and thus are preferable to using flavorAssetGetDownloadUrl which
+    # will likely download from Kaltura, and not S3 (for example).
+    def flavorAssetGetPlaylistUrl(entryId, flavorId)
+      playlist_url = "/p/#{@partnerId}/playManifest/entryId/#{entryId}/flavorId/#{flavorId}"
+      res = Net::HTTP.get_response(@host, playlist_url)
+      return nil unless res.kind_of?(Net::HTTPSuccess)
+
+      doc = Nokogiri::XML(res.body)
+      mediaNode = doc.css('manifest media').first
+      mediaNode ? mediaNode["url"] : nil
     end
 
     def assetSwfUrl(assetId, protocol = "http")

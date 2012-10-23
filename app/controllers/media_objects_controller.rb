@@ -78,6 +78,14 @@ class MediaObjectsController < ApplicationController
   # @returns Media Object
   def show
     media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
+    unless media_object
+      # Unfortunately, we don't have media_object entities created for everything,
+      # so we use this opportunity to create the object if it does not exist.
+      media_object = MediaObject.create_if_id_exists(params[:media_object_id])
+      media_object.send_later_enqueue_args(:retrieve_details, {
+        :singleton => "retrieve_media_details:#{media_object.media_id}"
+      })
+    end
     media_object.viewed!
     render :json => media_object_api_json(media_object, @current_user, session)
   end
