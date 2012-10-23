@@ -2688,4 +2688,8 @@ class User < ActiveRecord::Base
     end
   end
   memoize :all_pseudonyms
+
+  def prefers_gradebook2?
+    preferences[:use_gradebook2] != false
+  end
 end

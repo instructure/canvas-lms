@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/gradebooks/speed_grader" do
-  it "should render" do
+  before do
     course_with_student
     view_context
     assigns[:students] = [@user]
@@ -28,9 +28,17 @@ describe "/gradebooks/speed_grader" do
     assigns[:submissions] = []
     assigns[:assessments] = []
     assigns[:body_classes] = []
-    render "gradebooks/speed_grader"
-    
+  end
+
+  it "should render" do
+    render "gradebooks/speed_grader"  
     response.should_not be_nil
+  end
+
+  it "includes a link back to the gradebook (gradebook2 by default)" do
+    render "gradebooks/speed_grader"  
+    course_id = @course.id
+    response.body.should include "a href=\"http://test.host/courses/#{course_id}/gradebook2\""
   end
 end
 

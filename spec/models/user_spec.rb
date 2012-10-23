@@ -2182,4 +2182,28 @@ describe User do
       @user.active_pseudonyms.should be_empty
     end
   end
+
+  describe "prefers_gradebook2?" do
+    let(:user) { User.new }
+    subject { user.prefers_gradebook2? }
+
+    context "by default" do
+      it { should be_true }
+    end
+
+    context "with an explicit preference for gradebook 2" do
+      before { user.stubs(:preferences => { :use_gradebook2 => true }) }
+      it { should be_true }
+    end
+
+    context "with an truthy preference for gradebook 2" do
+      before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
+      it { should be_true }
+    end
+
+    context "with an explicit preference for gradebook 1" do
+      before { user.stubs(:preferences => { :use_gradebook2 => false }) }
+      it { should be_false }
+    end
+  end
 end
