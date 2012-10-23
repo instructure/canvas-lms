@@ -36,6 +36,8 @@ module AttachmentHelper
         ErrorReport.log_exception('scribd', e)
       end
     end
+    attrs[:attachment_id] = attachment.id
+    attrs[:mimetype] = attachment.mimetype
     attrs.inject("") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
   end
 end
