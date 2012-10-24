@@ -119,9 +119,14 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    return if self.context.root_account.deleted?
+    raise IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
     user = opts[:user]
-    message = opts[:html].strip
+    if opts[:html]
+      message = opts[:html].strip
+    else
+      message = opts[:text].strip
+      message = format_message(message).first
+    end
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
@@ -132,8 +137,12 @@ class DiscussionEntry < ActiveRecord::Base
       entry.discussion_topic_id = self.discussion_topic_id
       entry.parent_entry = self
       entry.user = user
-      entry.save!
-      entry
+      if entry.grants_right?(user, :create)
+        entry.save!
+        entry
+      else
+        raise IncomingMessageProcessor::ReplyToLockedTopicError
+      end
     end
   end
 

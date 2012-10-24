@@ -30,10 +30,10 @@ module Kaltura
     USER = 0;
     ADMIN = 2;
   end
-  
+
   class ClientV3
     attr_accessor :endpoint, :ks
-    
+
     def initialize
       config = Kaltura::ClientV3.config
       @host = config['domain']
@@ -48,12 +48,86 @@ module Kaltura
 
     def self.config
       res = Canvas::Plugin.find(:kaltura).try(:settings)
-      return nil unless res && res['partner_id'] && res['subpartner_id']		
+      return nil unless res && res['partner_id'] && res['subpartner_id']
 
       # default settings
       res['max_file_size_bytes'] = 500.megabytes unless res['max_file_size_bytes'].to_i > 0
 
       res
+    end
+
+    CONTENT_TYPES = {
+      'mp4' => 'video/mp4',
+      'mp3' => 'audio/mp3',
+      'flv' => 'video/x-flv'
+    }
+    # FLVs are least desirable because the mediaelementjs does not stretch them to
+    # fill the screen when you enter fullscreen mode
+    PREFERENCE = ['mp4', 'mp3', 'flv']
+
+    # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaFlavorAssetStatus
+    ASSET_STATUSES = {
+      '1' => :CONVERTING,
+      '3' => :DELETED,
+      '-1' => :ERROR,
+      '9' => :EXPORTING,
+      '7' => :IMPORTING,
+      '4' => :NOT_APPLICABLE,
+      '0' => :QUEUED,
+      '2' => :READY,
+      '5' => :TEMP,
+      '8' => :VALIDATING,
+      '6' => :WAIT_FOR_CONVERT
+    }
+
+    def media_sources(entryId)
+      cache_key = ['media_sources', entryId].cache_key
+      sources = Rails.cache.read(cache_key)
+      unless sources
+        startSession(Kaltura::SessionType::ADMIN)
+        assets = flavorAssetGetByEntryId(entryId)
+        sources = []
+        all_assets_are_done_converting = true
+        assets.each do |asset|
+
+          if ASSET_STATUSES[asset[:status]] == :READY
+            hash = asset.slice :containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal
+            url = flavorAssetGetDownloadUrl(asset[:id])
+
+            # hack alert -- iTunes (and maybe others who follow the same podcast
+            # spec) requires that the download URL for podcast items end in .mp3
+            # or another supported media type. Normally, the Kaltura download URL
+            # doesn't end in .mp3. But Kaltura's first download URL redirects to
+            # the same download url with /relocate/filename.ext appended, so we're
+            # just going to explicitly append that to skip the first redirect, so
+            # that iTunes will download the podcast items. This doesn't appear to
+            # be documented anywhere though, so we're talking with Kaltura about
+            # a more official solution. This also helps http performance to avoid
+            # a needless redirect to get to the file.
+            hash[:url] = "#{url}/relocate/download.#{asset[:fileExt]}"
+
+            hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
+            sources << hash
+          else
+            # if it was deleted or if it did not convert because it did not need to
+            # (e.g, a high quality flavor for a file low quality original, like a webcam recording),
+            # don't mark it as needing conversion.
+            all_assets_are_done_converting = false unless [:NOT_APPLICABLE, :DELETED].include? ASSET_STATUSES[asset[:status]]
+          end
+
+        end
+        sources.sort! do |a, b|
+          comparison = PREFERENCE.index(a[:fileExt]) <=> PREFERENCE.index(b[:fileExt])
+          if comparison == 0
+            comparison = b[:bitrate] <=> a[:bitrate]
+          end
+          comparison
+        end
+        # only cache if all the sources are done converting
+        # purposely not setting an expires because it does not look like the kaltura urls actually expire.
+        Rails.cache.write(cache_key, sources) if sources.present? && all_assets_are_done_converting
+      end
+      sources
     end
 
     def thumbnail_url(entryId, opts = {})
@@ -85,14 +159,14 @@ module Kaltura
     def startSession(type = SessionType::USER, userId = nil)
       partnerId = @partnerId
       secret = type == SessionType::USER ? @user_secret : @secret
-      result = sendRequest(:session, :start, 
+      result = sendRequest(:session, :start,
                            :secret => secret,
-                           :partnerId => partnerId, 
+                           :partnerId => partnerId,
                            :userId => userId,
                            :type => type)
       @ks = result.content
     end
-    
+
     def mediaGet(entryId)
       result = sendRequest(:media, :get,
                             :ks => @ks,
@@ -103,7 +177,7 @@ module Kaltura
       end
       item
     end
-    
+
     def mediaUpdate(entryId, attributes)
       hash = {
         :ks => @ks,
@@ -119,7 +193,7 @@ module Kaltura
       end
       item
     end
-    
+
     def mediaDelete(entryId)
       hash = {
         :ks => @ks,
@@ -128,7 +202,7 @@ module Kaltura
       result = sendRequest(:media, :delete, hash)
       result
     end
-    
+
     def mediaTypeToSymbol(type)
       case type.to_i
       when 1
@@ -141,7 +215,7 @@ module Kaltura
         :video
       end
     end
-    
+
     def bulkUploadGet(id)
       result = sendRequest(:bulkUpload, :get,
                            :ks => @ks,
@@ -149,7 +223,7 @@ module Kaltura
                           )
       parseBulkUpload(result)
     end
-    
+
     def parseBulkUpload(result)
       data = {}
       data[:result] = result
@@ -168,7 +242,7 @@ module Kaltura
       data[:ready] = !csv.empty? && csv[0][0] != "Log file is not ready"
       data
     end
-    
+
     def bulkUploadCsv(csv)
       result = postRequest(:bulkUpload, :add,
                            :ks => @ks,
@@ -178,7 +252,7 @@ module Kaltura
       parseBulkUpload(result)
       # results will have entryId values -- do we get them right away?
     end
-    
+
     def bulkUploadAdd(files)
       rows = []
       files.each do |file|
@@ -194,7 +268,7 @@ module Kaltura
       end
       bulkUploadCsv(res)
     end
-    
+
     def flavorAssetGetByEntryId(entryId)
       result = sendRequest(:flavorAsset, :getByEntryId,
                            :ks => @ks,
@@ -223,7 +297,7 @@ module Kaltura
                            :id => assetId)
       return result.content
     end
-    
+
     def assetSwfUrl(assetId, protocol = "http")
       config = Kaltura::ClientV3.config
       return nil unless config
@@ -244,7 +318,7 @@ module Kaltura
         rescue => e
           puts "POSTING Failed #{e}... #{Time.now}"
         end
-      }      
+      }
       doc = Nokogiri::XML(res.body)
       doc.css('result').first
     end

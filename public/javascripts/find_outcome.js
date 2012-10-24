@@ -1,11 +1,11 @@
 define([
   'i18n!find_outcome',
   'jquery' /* $ */,
+  'compiled/str/TextHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* truncateText */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */
-], function(I18n, $) {
+], function(I18n, $, TextHelper) {
 
 var find_outcome = (function() {
   return {
@@ -42,7 +42,7 @@ var find_outcome = (function() {
               outcome.title = outcome.short_description;
               var $text = $("<div/>");
               $text.text(outcome.short_description);
-              outcome.title = $.truncateText($.trim($text.text()), 35);
+              outcome.title = TextHelper.truncateText($.trim($text.text()), {max: 35});
               outcome.display_name = outcome.cached_context_short_name || "";
               $name.fillTemplateData({data: outcome});
               $dialog.find(".outcomes_selects").append($name.show());

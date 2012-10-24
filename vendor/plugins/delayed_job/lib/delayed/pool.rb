@@ -36,6 +36,8 @@ class Pool
       opts.on("-c", "--config", "Use alternate config file (default #{options[:config_file]})") { |c| options[:config_file] = c }
       opts.on("-p", "--pid", "Use alternate folder for PID files (default #{options[:pid_folder]})") { |p| options[:pid_folder] = p }
       opts.on("--no-tail", "Don't tail the logs (only affects non-daemon mode)") { options[:tail_logs] = false }
+      opts.on("--with-prejudice", "When stopping, interrupt jobs in progress, instead of letting them drain") { options[:kill] ||= true }
+      opts.on("--with-extreme-prejudice", "When stopping, immediately kill jobs in progress, instead of letting them drain") { options[:kill] = 9 }
       opts.on_tail("-h", "--help", "Show this message") { puts opts; exit }
     end
     op.parse!(@args)
@@ -43,10 +45,11 @@ class Pool
     command = @args.shift
     case command
     when 'start'
+      exit 1 if status(:alive) == :running
       daemonize
       start
     when 'stop'
-      stop
+      stop(options[:kill])
     when 'run'
       start
     when 'status'
@@ -56,8 +59,15 @@ class Pool
         exit 1
       end
     when 'restart'
-      stop if status(false)
-      sleep(0.5) while status(false)
+      alive = status(false)
+      if alive == :running || (options[:kill] && alive == :draining)
+        stop(options[:kill])
+        if options[:kill]
+          sleep(0.5) while status(false)
+        else
+          sleep(0.5) while status(false) == :running
+        end
+      end
       daemonize
       start
     when nil
@@ -86,8 +96,6 @@ class Pool
   rescue Exception => e
     say "Job master died with error: #{e.inspect}\n#{e.backtrace.join("\n")}", :fatal
     raise
-  ensure
-    remove_pid_file
   end
 
   def say(msg, level = :debug)
@@ -122,7 +130,7 @@ class Pool
     end
 
     pid = fork do
-      Delayed::Job.connection.reconnect!
+      Delayed::Job.reconnect!
       Delayed::Periodic.load_periodic_jobs_config
       worker.start
     end
@@ -194,6 +202,7 @@ class Pool
     exit if fork
     Process.setsid
     exit if fork
+    Process.setpgrp
 
     @daemon = true
     File.open(pid_file, 'wb') { |f| f.write(Process.pid.to_s) }
@@ -223,12 +232,21 @@ class Pool
     end
   end
 
-  def stop
-    pid = File.read(pid_file) if File.file?(pid_file)
-    if pid.to_i > 0
+  def stop(kill = false)
+    pid = status(false) && File.read(pid_file).to_i if File.file?(pid_file)
+    if pid && pid > 0
       puts "Stopping pool #{pid}..."
+      signal = 'INT'
+      if kill
+        pid = -pid # send to the whole group
+        if kill == 9
+          signal = 'KILL'
+        else
+          signal = 'TERM'
+        end
+      end
       begin
-        Process.kill('INT', pid.to_i)
+        Process.kill(signal, pid)
       rescue Errno::ESRCH
         # ignore if the pid no longer exists
       end
@@ -239,11 +257,12 @@ class Pool
 
   def status(print = true)
     pid = File.read(pid_file) if File.file?(pid_file)
-    alive = pid && pid.to_i > 0 && Process.kill(0, pid.to_i) rescue false
+    alive = pid && pid.to_i > 0 && (Process.kill(0, pid.to_i) rescue false) && :running
+    alive ||= :draining if pid.to_i > 0 && Process.kill(0, -pid.to_i) rescue false
     if alive
-      puts "Delayed jobs running, pool PID: #{pid}" if print
+      puts "Delayed jobs #{alive}, pool PID: #{pid}" if print
     else
-      puts "No delayed jobs pool running" if print
+      puts "No delayed jobs pool running" if print && print != :alive
     end
     alive
   end

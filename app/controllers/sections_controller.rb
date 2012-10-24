@@ -50,7 +50,7 @@ class SectionsController < ApplicationController
   #
   # @returns [Section]
   def index
-    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades])
+    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       includes = Array(params[:include])
 
       result = @context.active_course_sections.map { |section| section_json(section, @current_user, session, includes) }
@@ -152,24 +152,27 @@ class SectionsController < ApplicationController
   # @returns Section
   def show
     @section = @context if @context.is_a?(CourseSection)
+    # if section is set directly by get_context, ensure course is active
+    raise ActiveRecord::RecordNotFound if @section.present? && @section.course.try(:deleted?)
     @section ||= api_request? ? api_find(@context.course_sections, params[:id]) :
         @context.course_sections.find(params[:id])
-    return unless authorized_action(@section, @current_user, :read)
 
-    respond_to do |format|
-      format.html do
-        add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
-        @enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => 'active' }).count
-        @completed_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => 'completed' }).count
-        @pending_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => %w{invited pending} }).count
-        @student_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :type => 'StudentEnrollment' }).count
-        js_env(
-          :PERMISSIONS => {
-            :manage_students => @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users),
-            :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings)
-          })
+    if authorized_action(@section, @current_user, :read)
+      respond_to do |format|
+        format.html do
+          add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
+          @enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => 'active' }).count
+          @completed_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => 'completed' }).count
+          @pending_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => %w{invited pending} }).count
+          @student_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :type => 'StudentEnrollment' }).count
+          js_env(
+            :PERMISSIONS => {
+              :manage_students => @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users),
+              :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings)
+            })
+        end
+        format.json { render :json => section_json(@section, @current_user, session, []) }
       end
-      format.json { render :json => section_json(@section, @current_user, session, []) }
     end
   end
 

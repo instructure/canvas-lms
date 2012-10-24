@@ -661,6 +661,27 @@ describe Quiz do
         stats[11].size.should == 3
         stats[11][2].should == ',baz'
       end
+
+      it 'should contain answers to numerical questions' do
+        @quiz.quiz_questions.create!(:question_data => { :name => "numerical_question",
+          :question_type => 'numerical_question',
+          :question_text => "[num1]",
+          :answers => {'answer_0' => {:numerical_answer_type => 'exact_answer'}}})
+
+        @quiz.quiz_questions.last.question_data[:answers].first[:exact] = 5
+
+        @quiz.generate_quiz_data
+        @quiz.save!
+
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = {
+          "question_#{@quiz.quiz_questions[1].id}" => 5
+        }
+        qs.grade_submission
+
+        stats = FasterCSV.parse(@quiz.statistics_csv)
+        stats[9][2].should == '5'
+      end
     end
 
     it 'should strip tags from html multiple-choice/multiple-answers' do

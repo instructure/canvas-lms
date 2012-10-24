@@ -1,0 +1,44 @@
+<div title="Upload Subtitles" class="uploadMediaTrackForm bootstrap-form form-horizontal">
+  <form action="http://www.universalsubtitles.org/en/videos/create/" method="POST" target="_blank" class="alert alert-info">
+    To assist users who are deaf or speak a different language,
+    you can upload a subtitle track to this media file.
+    An easy way to get started is to use the universalsubtitles.org service.
+    It has a very easy, straightforward interface that will let you subtitle
+    into any language. When you are done, it will give you the option to download your
+    transcription in the SRT format.
+    <input type="hidden" name="video_url" value="{{video_url}}">
+    <br>
+    <button class="btn btn-small" type="submit" value="Begin">Begin Subtitling Now</button>
+  </form>
+
+  <p>
+    {{#t "upload_media_track_form_description"}}
+      Once you have a subtitle track in either the SRT or <a target="_blank" href="http://dev.w3.org/html5/webvtt/">WebVTT</a> format,
+      you can upload it here.
+    {{/t}}
+  </p>
+
+  <div class="invalidInputMsg alert alert-error" style="display:none;">
+    {{#t "error_message"}}<strong>Error:</strong> You must choose a language and a valid track file.{{/t}}
+  </div>
+
+  <div class="control-group">
+    <label class="control-label" for="umtf_locale">{{#t "language"}}Language{{/t}}</label>
+    <div class="controls">
+      <select name="locale" id="umtf_locale">
+        <option value=''>{{#t "choose_a_language"}}--Choose a Language--{{/t}}</option>
+        {{#each languages}}
+          <option value="{{code}}">{{name}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label" for="umtf_content">{{#t "file"}}File{{/t}}</label>
+    <div class="controls">
+      <input class="input-file" id="umtf_content" name="content" type="file">
+    </div>
+  </div>
+
+</div>

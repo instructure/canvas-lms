@@ -204,6 +204,7 @@ define([
           width: 400,
           title: I18n.t('titles.configure_report', 'Configure Report')
         });
+        $dialog.find(".datetime_field").datetime_field()
       }
       $dialog.dialog('open');
     })

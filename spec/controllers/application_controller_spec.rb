@@ -162,6 +162,7 @@ describe ApplicationController do
       @controller.stubs(:params).returns({ :course_id => @course.id })
       @controller.stubs(:api_request?).returns(false)
       @controller.stubs(:session).returns({})
+      @controller.stubs(:js_env).returns({})
       @controller.send(:get_context)
       @controller.instance_variable_get(:@context).should == @course
       I18n.set_locale_with_localizer # this is what t() triggers

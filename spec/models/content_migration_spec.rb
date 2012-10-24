@@ -105,7 +105,6 @@ describe ContentMigration do
       @copy_from.publish_grades_immediately = false
       @copy_from.allow_student_wiki_edits = true
       @copy_from.allow_student_assignment_edits = true
-      @copy_from.hashtag = 'oi'
       @copy_from.show_public_context_messages = false
       @copy_from.allow_student_forum_attachments = false
       @copy_from.default_wiki_editing_roles = 'teachers'
@@ -193,62 +192,6 @@ describe ContentMigration do
     end
 
 
-    it "should copy external tools" do
-      tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
-      tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-      tool_from.save
-
-      run_course_copy
-
-      @copy_to.context_external_tools.count.should == 1
-
-      tool_to = @copy_to.context_external_tools.first
-      tool_to.name.should == tool_from.name
-      tool_to.custom_fields.should == tool_from.custom_fields
-      tool_to.has_course_navigation.should == true
-      tool_to.consumer_key.should == tool_from.consumer_key
-      tool_to.shared_secret.should == tool_from.shared_secret
-    end
-
-    it "should not duplicate external tools used in modules" do
-      tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
-      tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
-      tool_from.save
-
-      mod1 = @copy_from.context_modules.create!(:name => "some module")
-      tag = mod1.add_item({:type => 'context_external_tool',
-                           :title => 'Example URL',
-                           :url => "http://www.example.com",
-                           :new_tab => true})
-      tag.save
-
-      run_course_copy
-
-      @copy_to.context_external_tools.count.should == 1
-
-      tool_to = @copy_to.context_external_tools.first
-      tool_to.name.should == tool_from.name
-      tool_to.consumer_key.should == tool_from.consumer_key
-      tool_to.has_course_navigation.should == true
-    end
-
-    it "should copy external tool assignments" do
-      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
-      tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
-      tag_from.content_type = 'ContextExternalTool'
-      tag_from.save!
-
-      run_course_copy
-
-      asmnt_2 = @copy_to.assignments.first
-      asmnt_2.submission_types.should == "external_tool"
-      asmnt_2.external_tool_tag.should_not be_nil
-      tag_to = asmnt_2.external_tool_tag
-      tag_to.content_type.should == tag_from.content_type
-      tag_to.url.should == tag_from.url
-      tag_to.new_tab.should == tag_from.new_tab
-    end
-
     def mig_id(obj)
       CC::CCHelper.create_key(obj)
     end
@@ -298,6 +241,19 @@ describe ContentMigration do
       tag_to = mod1_to.content_tags.first
       page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
       page_to.body.should == body % [@copy_to.id, tag_to.id]
+    end
+
+    it "should find and fix wiki links by title or id" do
+      # simulating what happens when the user clicks "link to new page" and enters a title that isn't
+      # urlified the same way by the client vs. the server.  this doesn't break navigation because
+      # ApplicationController#get_wiki_page can match by urlified title, but it broke import (see #9945)
+      main_page = @copy_from.wiki.wiki_page
+      main_page.body = %{<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>}
+      main_page.save!
+      @copy_from.wiki.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
+      run_course_copy
+      @copy_to.wiki.wiki_page.body.should == %{<a href="/courses/#{@copy_to.id}/wiki/online-unit-pages">wut</a>}
+      @copy_to.wiki.wiki_pages.find_by_url!("online-unit-pages").body.should == %{<a href="/courses/#{@copy_to.id}/wiki/#{main_page.url}">whoa</a>}
     end
 
     it "should selectively copy items" do
@@ -1486,6 +1442,97 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         @cm.messages_sent['Migration Import Finished'].should_not be_blank
       end
     end
+
+    context "external tools" do
+      append_before do
+        @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+        @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+        @tool_from.save!
+      end
+
+      it "should copy external tools" do
+
+        run_course_copy
+
+        @copy_to.context_external_tools.count.should == 1
+
+        tool_to = @copy_to.context_external_tools.first
+        tool_to.name.should == @tool_from.name
+        tool_to.custom_fields.should == @tool_from.custom_fields
+        tool_to.has_course_navigation.should == true
+        tool_to.consumer_key.should == @tool_from.consumer_key
+        tool_to.shared_secret.should == @tool_from.shared_secret
+      end
+
+      it "should not duplicate external tools used in modules" do
+        mod1 = @copy_from.context_modules.create!(:name => "some module")
+        tag = mod1.add_item({:type => 'context_external_tool',
+                             :title => 'Example URL',
+                             :url => "http://www.example.com",
+                             :new_tab => true})
+        tag.save
+
+        run_course_copy
+
+        @copy_to.context_external_tools.count.should == 1
+
+        tool_to = @copy_to.context_external_tools.first
+        tool_to.name.should == @tool_from.name
+        tool_to.consumer_key.should == @tool_from.consumer_key
+        tool_to.has_course_navigation.should == true
+      end
+
+      it "should copy external tool assignments" do
+        assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
+        tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
+        tag_from.content_type = 'ContextExternalTool'
+        tag_from.save!
+
+        run_course_copy
+
+        asmnt_2 = @copy_to.assignments.first
+        asmnt_2.submission_types.should == "external_tool"
+        asmnt_2.external_tool_tag.should_not be_nil
+        tag_to = asmnt_2.external_tool_tag
+        tag_to.content_type.should == tag_from.content_type
+        tag_to.url.should == tag_from.url
+        tag_to.new_tab.should == tag_from.new_tab
+      end
+
+      it "should copy vendor extensions" do
+        @tool_from.settings[:vendor_extensions] = [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}]
+        @tool_from.save!
+
+        run_course_copy
+
+        tool = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+        tool.settings[:vendor_extensions].should == [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
+      end
+
+      it "should copy canvas extensions" do
+        @tool_from.user_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.course_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.account_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.resource_selection = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.editor_button = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+        @tool_from.save!
+
+        run_course_copy
+
+        tool = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+        tool.course_navigation.should_not be_nil
+        tool.course_navigation.should == @tool_from.course_navigation
+        tool.editor_button.should_not be_nil
+        tool.editor_button.should == @tool_from.editor_button
+        tool.resource_selection.should_not be_nil
+        tool.resource_selection.should == @tool_from.resource_selection
+        tool.account_navigation.should_not be_nil
+        tool.account_navigation.should == @tool_from.account_navigation
+        tool.user_navigation.should_not be_nil
+        tool.user_navigation.should == @tool_from.user_navigation
+      end
+    end
+
   end
 
   context "import_object?" do

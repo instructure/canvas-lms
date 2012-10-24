@@ -54,7 +54,7 @@ require [
       @$linkFields ?= @$ '#profile_link_fields'
       $row = $ """
         <tr>
-          <td><input type="text" name="link_titles[]" value="#{htmlEscape title}"></td>
+          <td><input type="text" maxlength="255" name="link_titles[]" value="#{htmlEscape title}"></td>
           <td>→</td>
           <td><input type="text" name="link_urls[]" value="#{htmlEscape url}"></td>
           <td><a href="#" data-event="removeLinkRow"><i class="icon-end"></i></a></td>

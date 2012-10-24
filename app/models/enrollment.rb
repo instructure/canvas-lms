@@ -31,6 +31,9 @@ class Enrollment < ActiveRecord::Base
 
   validates_presence_of :user_id, :course_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
+  validates_inclusion_of :associated_user_id, :in => [nil],
+                         :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
+                         :message => "only ObserverEnrollments may have an associated_user_id"
 
   before_save :assign_uuid
   before_save :assert_section
@@ -54,33 +57,36 @@ class Enrollment < ActiveRecord::Base
 
   def self.needs_grading_trigger_sql
     no_other_enrollments_sql = "NOT " + active_student_subselect("user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id")
-
-    # IN (...) subselects perform poorly in mysql, plus we want to avoid
-    # locking rows in other tables
-    {:default => <<-SQL, :mysql => <<-MYSQL}
-      UPDATE assignments SET needs_grading_count = needs_grading_count + %s
+    default_sql = <<-SQL
+      UPDATE assignments SET needs_grading_count = needs_grading_count + %s, updated_at = {{now}}
       WHERE context_id = NEW.course_id
-        AND context_type = 'Course'
-        AND EXISTS (
-          SELECT 1
-          FROM submissions
-          WHERE user_id = NEW.user_id
-            AND assignment_id = assignments.id
-            AND (#{Submission.needs_grading_conditions})
-          LIMIT 1
-        )
-        AND #{no_other_enrollments_sql};
-    SQL
+      AND context_type = 'Course'
+      AND EXISTS (
+        SELECT 1
+        FROM submissions
+        WHERE user_id = NEW.user_id
+        AND assignment_id = assignments.id
+        AND (#{Submission.needs_grading_conditions})
+                LIMIT 1
+      )
+      AND #{no_other_enrollments_sql};
+      SQL
 
-      IF #{no_other_enrollments_sql} THEN
-        UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s
-        WHERE context_id = NEW.course_id
-          AND context_type = 'Course'
-          AND assignments.id = submissions.assignment_id
-          AND submissions.user_id = NEW.user_id
-          AND (#{Submission.needs_grading_conditions});
-      END IF;
-    MYSQL
+    # IN (...) subselects perform poorly in mysql, plus we want to avoid locking rows in other tables
+    # also, every database uses a different construct for a current UTC timestamp
+    { :default    => default_sql.gsub("{{now}}", "now()"),
+      :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
+      :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
+      :mysql => <<-MYSQL }
+        IF #{no_other_enrollments_sql} THEN
+          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, updated_at = utc_timestamp()
+          WHERE context_id = NEW.course_id
+            AND context_type = 'Course'
+            AND assignments.id = submissions.assignment_id
+            AND submissions.user_id = NEW.user_id
+            AND (#{Submission.needs_grading_conditions});
+        END IF;
+      MYSQL
   end
 
   trigger.after(:insert).where(active_student_conditions('NEW')) do
@@ -163,7 +169,21 @@ class Enrollment < ActiveRecord::Base
   named_scope :ended,
               :joins => :course,
               :conditions => "courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
-  
+
+  named_scope :future, lambda { {
+    :joins => :course,
+    :conditions => ["courses.start_at > ?
+                    AND courses.workflow_state = 'available'
+                    AND courses.restrict_enrollments_to_course_dates = TRUE
+                    AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now]
+  } }
+
+  named_scope :past,
+              :joins => :course,
+              :conditions => "courses.workflow_state = 'completed' OR
+                              enrollments.workflow_state IN ('rejected', 'completed')
+                              AND enrollments.workflow_state NOT IN ('invited', 'deleted')"
+
   named_scope :not_fake, :conditions => "enrollments.type != 'StudentViewEnrollment'"
 
 
@@ -435,7 +455,6 @@ class Enrollment < ActiveRecord::Base
     Message.delete_all({:id => ids}) if ids && !ids.empty?
     update_attribute(:workflow_state, 'active')
     user.touch
-    true
   end
 
   workflow do
@@ -486,25 +505,26 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    if [:invited, :active].include?(state)
-      ranges = self.enrollment_dates
-      now = Time.now
-      ranges.each do |range|
-        start_at, end_at = range
-        # start_at <= now <= end_at, allowing for open ranges on either end
-        return state if (start_at || now) <= now && now <= (end_at || now)
-      end
-      # not strictly within any range
-      global_start_at = ranges.map(&:first).compact.min
-      return state unless global_start_at
-      if global_start_at < Time.now
-        :completed
-      # Allow student view students to use course before the term starts
-      elsif !self.fake_student?
-        :inactive
-      else
-        state
-      end
+    return state unless [:invited, :active].include?(state)
+
+    ranges = self.enrollment_dates
+    now    = Time.now
+    ranges.each do |range|
+      start_at, end_at = range
+      # start_at <= now <= end_at, allowing for open ranges on either end
+      return state if (start_at || now) <= now && now <= (end_at || now)
+      return state if state == :invited &&
+        course.restrict_enrollments_to_course_dates &&
+        now < start_at
+    end
+
+    # Not strictly within any range
+    return state unless global_start_at = ranges.map(&:first).compact.min
+    if global_start_at < now
+      :completed
+    # Allow student view students to use the course before the term starts
+    elsif !self.fake_student?
+      :inactive
     else
       state
     end

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/cc_spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 describe "Common Cartridge exporting" do
   it "should collect errors and finish running" do
@@ -303,6 +303,30 @@ describe "Common Cartridge exporting" do
 
       # this checks that there are no export errors, so the test is in there
       run_export
+    end
+
+    it "should deal with file URLs in anchor bodies" do
+      @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      link_thing = %{<a href="/courses/#{@course.id}/files/#{@att.id}/download?wrap=1">/courses/#{@course.id}/files/#{@att.id}/download?wrap=1</a>}
+      @course.syllabus_body = link_thing
+      @course.save!
+      @ag = @course.assignment_groups.create!(:name => 'group1')
+      @asmnt = @course.assignments.create!(:title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag,
+                                           :description => link_thing)
+      @ag2 = @course.assignment_groups.create!(:name => 'group2')
+      @asmnt2 = @course.assignments.create!(:title => 'Assignment 2', :points_possible => 10, :assignment_group => @ag2)
+
+      # verifies there were no export errors
+      run_export
+
+      # both assignments should be present, including the one with the link in the description
+      check_resource_node(@asmnt, CC::CCHelper::LOR)
+      check_resource_node(@asmnt2, CC::CCHelper::LOR)
+
+      # both assignment groups should be present as well
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/assignment_groups.xml"))
+      doc.at_css("assignmentGroup[identifier=#{mig_id(@ag)}]").should_not be_nil
+      doc.at_css("assignmentGroup[identifier=#{mig_id(@ag2)}]").should_not be_nil
     end
 
   end

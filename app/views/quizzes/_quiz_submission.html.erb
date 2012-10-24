@@ -19,9 +19,7 @@
     <% else %>
       <%= before_label(:score_for_quiz, "Score for this quiz") %>
     <% end %>
-    <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-              :score => raw("<span class=\"score_value\">#{@submission.score}</span>"),
-              :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
+    <%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible, :class => 'score_value') %>
     <% if (@current_submission || @submission).try(:pending_review?) %>
       *
       <div class='question-not-graded-text'>
@@ -72,9 +70,7 @@
   <% else %>
     <%= before_label(:score_for_quiz, "Score for this quiz") %>
   <% end %>
-  <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-            :score => raw("<span class=\"score_value\">#{@submission.score}</span>"),
-            :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
+  <%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible, :class => 'score_value') %>
   <%= '*' if @submission.pending_review? %>
     </div>
 <% if @submission.pending_review? %>
@@ -196,9 +192,7 @@ $(document).ready(function() {
       </tr>
         <td style="white-space: nowrap; font-size: 1.2em;"><b><%= before_label(:final_score, "Final Score") %></b></td>
         <td>
-          <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-                :score => raw("<span id=\"after_fudge_points_total\" style=\"font-size: 1.5em; padding-left: 5px;\">#{@submission.score || 0}</span>"),
-                :points_possible => @quiz.points_possible || 0) %>
+          <%= score_out_of_points_possible(@submission.score || 0, @quiz.points_possible || 0, :id => 'after_fudge_points_total', :style => 'font-size: 1.5em; padding-left: 5px') %>
         </td>
     </table>
   <% elsif @submission.fudge_points && @submission.fudge_points != 0 %>
@@ -226,9 +220,7 @@ $(document).ready(function() {
   <% else %>
     <%= before_label(:quiz_score, "Quiz Score") %>
   <% end %>
-  <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
-        :score => raw("<span class=\"score_value\">#{@submission.score}</span>"),
-        :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
+  <%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible, :class => 'score_value') %>
   <% if @submission.pending_review? %>
     <div class='question-not-graded-text'>
       *

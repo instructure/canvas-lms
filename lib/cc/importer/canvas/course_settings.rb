@@ -50,7 +50,7 @@ module CC::Importer::Canvas
       return course unless doc
       course[:migration_id] = get_node_att(doc, 'course',  'identifier')
 
-      ['title', 'course_code', 'hashtag', 'default_wiki_editing_roles',
+      ['title', 'course_code', 'default_wiki_editing_roles',
        'turnitin_comments', 'default_view', 'license', 'locale',
        'group_weighting_scheme', 'storage_quota', 'grading_standard_identifier_ref'].each do |string_type|
         val = get_node_val(doc, string_type)

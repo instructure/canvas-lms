@@ -13,7 +13,12 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
     if self.class.environment && @config.has_key?(self.class.environment)
       @current_config.merge!(@config[self.class.environment].symbolize_keys)
     end
-    @current_config[:username] = @current_config[:username].gsub('{schema}', @current_config[:schema_search_path]) if @current_config[:username] && @current_config[:schema_search_path]
+
+    @current_config.keys.each do |key|
+      next unless @current_config[key].is_a?(String)
+      @current_config[key] = I18n.interpolate_hash(@current_config[key], @current_config)
+    end
+
     if self.class.explicit_user
       @current_config[:username] = self.class.explicit_user
       @current_config.delete(:password)
@@ -36,23 +41,63 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
   def self.with_environment(environment)
     return yield if environment == self.environment
     begin
+      self.save_handler
       old_environment = self.environment
       self.environment = environment
-      ActiveRecord::Base.connection_handler.clear_all_connections! unless Rails.env.test?
+      ActiveRecord::Base.connection_handler = self.ensure_handler unless Rails.env.test?
       yield
     ensure
       self.environment = old_environment
-      ActiveRecord::Base.connection_handler.clear_all_connections! unless Rails.env.test?
+      ActiveRecord::Base.connection_handler = self.ensure_handler unless Rails.env.test?
     end
   end
 
-  # for use from script/console ONLY
+  def self.save_handler
+    @connection_handlers ||= {}
+    @connection_handlers[self.environment] ||= ActiveRecord::Base.connection_handler
+  end
+
+  unless self.respond_to?(:ensure_handler)
+    def self.ensure_handler
+      new_handler = @connection_handlers[self.environment]
+      if !new_handler
+        new_handler = @connection_handlers[self.environment] = ActiveRecord::ConnectionAdapters::ConnectionHandler.new
+        ActiveRecord::Base.connection_handler.connection_pools.each do |model, pool|
+          new_handler.establish_connection(model, pool.spec)
+        end
+      end
+      new_handler
+    end
+  end
+
+  def self.connection_handlers
+    self.save_handler
+    @connection_handlers
+  end
+
+  # for use from script/console ONLY; these will still disconnect
   def self.switch_user!(user)
     self.explicit_user = user
     ActiveRecord::Base.connection_handler.clear_all_connections!
   end
+
   def self.switch_environment!(environment)
+    self.save_handler
     self.environment = environment
-    ActiveRecord::Base.connection_handler.clear_all_connections!
+    ActiveRecord::Base.connection_handler = self.ensure_handler
+  end
+end
+
+ActiveRecord::ConnectionAdapters::ConnectionHandler.class_eval do
+  %w{clear_active_connections clear_reloadable_connections
+     clear_all_connections verify_active_connections }.each do |method|
+    # double-require prevention
+    next if self.instance_methods.include?("#{method}_without_multiple_environments!")
+    class_eval(<<EOS)
+      def #{method}_with_multiple_environments!
+        ActiveRecord::Base::ConnectionSpecification.connection_handlers.values.each(&:#{method}_without_multiple_environments!)
+      end
+EOS
+    alias_method_chain "#{method}!".to_sym, :multiple_environments
   end
 end

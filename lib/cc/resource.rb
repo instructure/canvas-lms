@@ -73,7 +73,7 @@ module CC
         # these need to go last, to gather up all the references to the files
         run_and_set_progress(:add_course_files, 70, I18n.t('course_exports.errors.files', "Failed to export some files"))
         run_and_set_progress(:add_media_objects, 90, I18n.t('course_exports.errors.media_files', "Failed to export some media files"), @html_exporter)
-        run_and_set_progress(:create_basic_lti_links, 91, I18n.t('course_exports.errors.lti_links', "Failed to export some web links"))
+        run_and_set_progress(:create_basic_lti_links, 91, I18n.t('course_exports.errors.lti_links', "Failed to export some external tool configurations"))
       end
     end
 

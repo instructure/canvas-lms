@@ -9,14 +9,14 @@
 
   content_for :pre_html do
     @body_class_no_headers = @headers == false
-    @show_fixed_bottom = @fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user && (!@body_class_no_headers || @outer_frame))
+    @show_fixed_bottom = (@fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user)) && (!@body_class_no_headers || @outer_frame)
     @body_classes << "no-headers" if @body_class_no_headers
     unless (@body_classes.include? "no-headers") || (@show_left_side == false)
       left_side = yield :left_side
       left_side_custom = yield :left_side_custom
       @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length))
     end
-     @body_classes << "with-left-side" if @show_left_side
+    @body_classes << "with-left-side" if @show_left_side
     #we dont want to render a right side unless there is actually content in it.
     @body_classes << "with-right-side" if right_side and not right_side.strip.empty?
     @body_classes << "padless-content" if @padless
@@ -50,7 +50,7 @@
     </div>
     <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
     <% if @current_user %>
-    <ul role="navigation" id="menu" aria-label="main">
+    <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
       <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
       <li id="courses_menu_item" class="menu-item">
         <%- if show_home_menu? -%>
@@ -130,14 +130,14 @@
         <%= left_side %>
       <% else %>
         <% if @context.try(:short_name) %>
-          <h1 id="section-tabs-header">
+          <h2 id="section-tabs-header">
             <%= @context.short_name %>
             <% if @context && @context.respond_to?(:context)  %>
               <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
             <% elsif @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
               <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
             <% end %>
-          </h1>
+          </h2>
         <% end %>
         <%= section_tabs %>
       <% end %>
@@ -150,7 +150,7 @@
     <% end %>
     <div id="main">
       <div id="right-side-wrapper">
-        <aside id="right-side" role="complementary" aria-label="sidebar">
+        <aside id="right-side" role="complementary">
           <%= right_side %>
         </aside>
       </div>
@@ -182,7 +182,7 @@
 
 <% if wizard %>
   <div id="wizard_spacer_box"></div>
-  <div id="wizard_box" role="dialog">
+  <div id="wizard_box" role="dialog" tabindex="-1">
     <div class="shadow shadow_1"></div>
     <div class="shadow shadow_3"></div>
     <div class="shadow shadow_5"></div>

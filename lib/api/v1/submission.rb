@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -75,7 +75,7 @@ module Api::V1::Submission
     hash
   end
 
-  SUBMISSION_JSON_FIELDS = %w(id user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission workflow_state).freeze
+  SUBMISSION_JSON_FIELDS = %w(id user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission grader_id workflow_state).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries)
 
   def submission_attempt_json(attempt, assignment, user, session, version_idx = nil, context = nil)

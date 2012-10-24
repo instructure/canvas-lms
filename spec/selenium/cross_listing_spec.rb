@@ -21,7 +21,7 @@ describe "cross-listing" do
     form = f('#crosslist_course_form')
     submit_btn = form.find_element(:css, '.submit_button')
     form.should_not be_nil
-    form.find_element(:css, '.submit_button').attribute(:disabled).should eql 'true'
+    form.find_element(:css, '.submit_button').should have_attribute(:disabled,'true')
 
     course_id   = form.find_element(:id, 'course_id')
     course_name = f('#course_autocomplete_name')
@@ -31,8 +31,8 @@ describe "cross-listing" do
     course_id.clear
     course_id.send_keys([:control, 'a'], @course2.id.to_s, "\n")
     keep_trying_until { course_name.text != "Confirming Course ID \"#{@course2.id}\"..." }
-    course_name.text.should eql @course2.name
-    form.find_element(:id, 'course_autocomplete_id').attribute(:value).should eql @course.id.to_s
+    course_name.text.should == @course2.name
+    form.find_element(:id, 'course_autocomplete_id').should have_attribute(:value, @course.id.to_s)
     submit_btn.should_not have_class('disabled')
     submit_form(form)
     wait_for_ajaximations
@@ -40,7 +40,7 @@ describe "cross-listing" do
 
     # verify teacher doesn't have de-crosslist privileges
     get "/courses/#{@course2.id}/sections/#{@section.id}"
-    ff('.uncrosslist_link').length.should eql 0
+    ff('.uncrosslist_link').length.should == 0
 
     # enroll teacher and de-crosslist
     @course1.enroll_teacher(@user).accept
@@ -60,7 +60,7 @@ describe "cross-listing" do
     course_id.click
     course_id.send_keys "-1\n"
     keep_trying_until { course_name.text != 'Confirming Course ID "-1"...' }
-    course_name.text.should eql 'Course ID "-1" not authorized for cross-listing'
+    course_name.text.should == 'Course ID "-1" not authorized for cross-listing'
   end
 
 
@@ -80,23 +80,23 @@ describe "cross-listing" do
     get "/courses/#{course.id}/sections/#{section.id}"
     f(".crosslist_link").click
     form = f("#crosslist_course_form")
-    form.find_element(:css, ".submit_button").attribute(:disabled).should eql("true")
+    form.find_element(:css, ".submit_button").should have_attribute(:disabled, "true")
     form.should_not be_nil
 
     # let's try and crosslist an invalid course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").send_keys("-1\n")
     keep_trying_until { f("#course_autocomplete_name").text != "Confirming Course ID \"-1\"..." }
-    f("#course_autocomplete_name").text.should eql("Course ID \"-1\" not authorized for cross-listing")
+    f("#course_autocomplete_name").text.should ==("Course ID \"-1\" not authorized for cross-listing")
 
     # k, let's crosslist to the other course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").clear
     form.find_element(:css, "#course_id").send_keys([:control, 'a'], other_course.id.to_s, "\n")
     keep_trying_until { f("#course_autocomplete_name").text != "Confirming Course ID \"#{other_course.id}\"..." }
-    f("#course_autocomplete_name").text.should eql(other_course.name)
-    form.find_element(:css, "#course_autocomplete_id").attribute(:value).should eql(other_course.id.to_s)
-    form.find_element(:css, ".submit_button").attribute(:disabled).should eql("false")
+    f("#course_autocomplete_name").text.should == other_course.name
+    form.find_element(:css, "#course_autocomplete_id").attribute(:value).should ==(other_course.id.to_s)
+    form.find_element(:css, ".submit_button").attribute(:disabled).should == "false"
     submit_form(form)
     keep_trying_until { driver.current_url.match(/courses\/#{other_course.id}/) }
 
@@ -104,7 +104,7 @@ describe "cross-listing" do
     # they were enrolled in got moved). they don't have the rights to
     # uncrosslist.
     get "/courses/#{other_course.id}/sections/#{section.id}"
-    ff(".uncrosslist_link").length.should eql(0)
+    ff(".uncrosslist_link").length.should == 0
 
     # enroll, and make sure the teacher can uncrosslist.
     course.enroll_teacher(@user).accept

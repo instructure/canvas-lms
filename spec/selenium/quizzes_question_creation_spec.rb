@@ -228,11 +228,11 @@ describe "quizzes question creation" do
     fj('.combination_count:visible').send_keys('20') # over the limit
     button = fj('button.compute_combinations:visible')
     button.click
-    fj('.combination_count:visible').attribute(:value).should eql "10"
+    fj('.combination_count:visible').should have_attribute(:value, "10")
     keep_trying_until {
       button.text == 'Generate'
     }
-    ffj('table.combinations:visible tr').size.should eql 11 # plus header row
+    ffj('table.combinations:visible tr').size.should == 11 # plus header row
 
     submit_form(question)
     wait_for_ajax_requests
@@ -448,6 +448,45 @@ describe "quizzes question creation" do
       edit_first_question
       html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
       html.should == '<p>HTML</p>'
+    end
+  end
+
+  context "quiz attempts" do
+
+    def fill_out_attempts_and_validate(attempts, alert_text, expected_attempt_text)
+      f('#multiple_attempts_option').click
+      f('#limit_attempts_option').click
+      replace_content(f('#quiz_allowed_attempts'), attempts)
+      f('#protect_quiz').click
+      alert = driver.switch_to.alert
+      alert.text.should == alert_text
+      alert.dismiss
+      fj('#quiz_allowed_attempts').should have_attribute('value', expected_attempt_text) # fj to avoid selenium caching
+    end
+
+    it "should not allow quiz attempts that are entered with letters" do
+      fill_out_attempts_and_validate('abc', 'Quiz attempts can only be specified in numbers', '')
+    end
+
+    it "should not allow quiz attempts that are more than 3 digits long" do
+      fill_out_attempts_and_validate('12345', 'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left', '')
+    end
+
+    it "should not allow quiz attempts that are letters and numbers mixed" do
+      fill_out_attempts_and_validate('31das', 'Quiz attempts can only be specified in numbers', '')
+    end
+
+    it "should allow a 3 digit number for a quiz attempt" do
+      attempts = "123"
+      f('#multiple_attempts_option').click
+      f('#limit_attempts_option').click
+      replace_content(f('#quiz_allowed_attempts'), attempts)
+      f('#protect_quiz').click
+      alert_present?.should be_false
+      fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
+      f('.save_quiz_button').click
+      wait_for_ajax_requests
+      Quiz.last.allowed_attempts.should == attempts.to_i
     end
   end
 

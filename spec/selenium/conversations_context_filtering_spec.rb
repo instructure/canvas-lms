@@ -49,8 +49,8 @@ describe "conversations context filtering" do
     @course2.complete!
     new_conversation
     @input = fj("#context_tags_filter input:visible")
-    search("th", "context_tags") do
-      menu.should eql ["the course", "the group", "that course"]
+    search("th", "#context_tags") do
+      menu.should == ["the course", "the group", "that course"]
     end
   end
 
@@ -60,24 +60,24 @@ describe "conversations context filtering" do
     @input = fj("#context_tags_filter input:visible")
     browse_menu
 
-    menu.should eql ["that course", "the course", "the group"]
+    menu.should == ["that course", "the course", "the group"]
     browse "that course" do
-      menu.should eql ["that course", "Everyone", "Teachers", "Students"]
-      browse("Everyone") { menu.should eql ["nobody@example.com", "student1", "User"] }
-      browse("Teachers") { menu.should eql ["nobody@example.com", "User"] }
-      browse("Students") { menu.should eql ["student1"] }
+      menu.should == ["that course", "Everyone", "Teachers", "Students"]
+      browse("Everyone") { menu.should == ["nobody@example.com", "student1", "User"] }
+      browse("Teachers") { menu.should == ["nobody@example.com", "User"] }
+      browse("Students") { menu.should == ["student1"] }
     end
     browse "the course" do
-      menu.should eql ["the course", "Everyone", "Teachers", "Students", "Student Groups"]
-      browse("Everyone") { menu.should eql ["nobody@example.com", "student1", "student2"] }
-      browse("Teachers") { menu.should eql ["nobody@example.com"] }
-      browse("Students") { menu.should eql ["student1", "student2"] }
+      menu.should == ["the course", "Everyone", "Teachers", "Students", "Student Groups"]
+      browse("Everyone") { menu.should == ["nobody@example.com", "student1", "student2"] }
+      browse("Teachers") { menu.should == ["nobody@example.com"] }
+      browse("Students") { menu.should == ["student1", "student2"] }
       browse "Student Groups" do
-        menu.should eql ["the group"]
-        browse("the group") { menu.should eql ["the group", "nobody@example.com", "student1", "student2"] }
+        menu.should == ["the group"]
+        browse("the group") { menu.should == ["the group", "nobody@example.com", "student1", "student2"] }
       end
     end
-    browse("the group") { menu.should eql ["the group", "nobody@example.com", "student1", "student2"] }
+    browse("the group") { menu.should == ["the group", "nobody@example.com", "student1", "student2"] }
   end
 
   it "should let you filter by a course" do
@@ -93,19 +93,19 @@ describe "conversations context filtering" do
     browse("that course", "Everyone") { click "Select All" }
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
-    get_conversations.size.should eql 2
+    get_conversations.size.should == 2
 
     @input = fj("#context_tags_filter input:visible")
-    search("the course", "context_tags") { browse("the course") { click("the course") } }
+    search("the course", "#context_tags") { browse("the course") { click("the course") } }
 
     keep_trying_until do
       conversations = get_conversations
-      conversations.size.should eql 1
-      conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+      conversations.size.should == 1
+      conversations.first.find_element(:css, 'p').text.should == 'asdf'
     end
 
     #filtered course should be first in the audience's contexts
-    get_conversations.first.find_element(:css, '.audience em').text.should eql 'the course and that course'
+    get_conversations.first.find_element(:css, '.audience em').text.should == 'the course and that course'
   end
 
   it "should let you filter by a course that was concluded a long time ago" do
@@ -119,7 +119,7 @@ describe "conversations context filtering" do
     browse("that course", "Everyone") { click "Select All" }
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
-    get_conversations.size.should eql 2
+    get_conversations.size.should == 2
 
     @course1.complete!
     @course1.update_attribute :conclude_at, 1.year.ago
@@ -127,12 +127,12 @@ describe "conversations context filtering" do
     get "/conversations/sent"
 
     @input = fj("#context_tags_filter input:visible")
-    search("the course", "context_tags") { browse("the course") { click("the course") } }
+    search("the course", "#context_tags") { browse("the course") { click("the course") } }
 
     keep_trying_until do
       conversations = get_conversations
-      conversations.size.should eql 1
-      conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+      conversations.size.should == 1
+      conversations.first.find_element(:css, 'p').text.should == 'asdf'
     end
   end
 
@@ -148,16 +148,16 @@ describe "conversations context filtering" do
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
     @input = fj("#context_tags_filter input:visible")
-    search("student2", "context_tags") { click("student2") }
+    search("student2", "#context_tags") { click("student2") }
 
     keep_trying_until do
       conversations = get_conversations
-      conversations.size.should eql 1
-      conversations.first.find_element(:css, 'p').text.should eql 'asdf'
+      conversations.size.should == 1
+      conversations.first.find_element(:css, 'p').text.should == 'asdf'
     end
 
     # filtered student should be first in the audience
-    get_conversations.first.find_element(:css, '.audience').text.should eql 'student2 and student1 the course'
+    get_conversations.first.find_element(:css, '.audience').text.should == 'student2 and student1 the course'
   end
 
   it "should let you filter by a group" do
@@ -172,16 +172,16 @@ describe "conversations context filtering" do
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
     @input = fj("#context_tags_filter input:visible")
-    search("the group", "context_tags") {
-      menu.should eql ["the group"]
+    search("the group", "#context_tags") {
+      menu.should == ["the group"]
       elements.first.first.text.should include "the course" # make sure the group context is shown
       browse("the group") { click("the group") }
     }
 
     keep_trying_until do
       conversations = get_conversations
-      conversations.size.should eql 1
-      conversations.first.find_element(:css, 'p').text.should eql 'qwerty'
+      conversations.size.should == 1
+      conversations.first.find_element(:css, 'p').text.should == 'qwerty'
     end
   end
 
@@ -193,7 +193,7 @@ describe "conversations context filtering" do
     submit_message_form(:add_recipient => false)
 
     @input = fj("#context_tags_filter input:visible")
-    search("the course", "context_tags") do
+    search("the course", "#context_tags") do
       term_info = f('.autocomplete_menu .name .context_info')
       term_info.text.should == "(#{@course1.enrollment_term.name})"
     end
@@ -207,7 +207,7 @@ describe "conversations context filtering" do
     submit_message_form(:add_recipient => false)
 
     @input = fj("#context_tags_filter input:visible")
-    search("that course", "context_tags") do
+    search("that course", "#context_tags") do
       term_info = f('.autocomplete_menu .name')
       term_info.text.should == "that course"
     end

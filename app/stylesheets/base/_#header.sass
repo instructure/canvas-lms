@@ -24,6 +24,10 @@
   bottom: 21px
   position: absolute
   text-indent: -9999px
+// TODO: remove this style once people have time to update their logo-related custom
+// css. See related code in app/coffeescripts/bundles/common.coffee too.
+#header-logo.original, #header.no-user #header-logo.original
+  bottom: 12px
 #header-logo-secondary
   display: none
   background: url("/images/canvas/header_canvas_logo.png") no-repeat
@@ -102,7 +106,6 @@
       background-color: $highlight-color
       padding: 1px 6px
   #identity-help-container a
-    color: $help-link-color
     padding: 1px 8px
 
 #menu
@@ -176,7 +179,8 @@
       min-width: 270px
       width: 270px
       vertical-align: top
-      h2
+      .h2
+        display: block
         padding: 9px 12px 3px
         border-bottom: 1px solid lighten($borderColor, 22%)
         color: $menu-text-color

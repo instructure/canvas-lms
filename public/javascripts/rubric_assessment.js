@@ -19,13 +19,13 @@ define([
   'i18n!rubric_assessment',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'compiled/str/TextHelper',
   'jquery.instructure_forms' /* fillFormData */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* truncateText */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape, TextHelper) {
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 window.rubricAssessment = {
@@ -212,7 +212,7 @@ window.rubricAssessment = {
         $saved_custom_rating.empty().append('<option value="">' + I18n.t('options.select', '[ Select ]') + '</option>');
         for(var jdx in comments) {
           if(comments[jdx]) {
-            $saved_custom_rating.append('<option value="' + escape(comments[jdx])+ '">' + $.truncateText(comments[jdx], 50) + '</option>');
+            $saved_custom_rating.append('<option value="' + escape(comments[jdx])+ '">' + TextHelper.truncateText(comments[jdx], {max: 50}) + '</option>');
             $holder.show();
           }
         }

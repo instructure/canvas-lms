@@ -27,7 +27,7 @@ class ActiveRecord::Base
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on),
     'content_tags' => %w(sequence_position context_module_association_id),
     'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist sis_name students_can_participate_before_start_at section_organization_name long_section_code),
-    'courses' => %w(section hidden_tabs sis_name sis_course_code),
+    'courses' => %w(section hidden_tabs sis_name sis_course_code hashtag),
     'discussion_topics' => %w(authorization_list_id),
     'enrollment_terms' => %w(sis_data sis_name),
     'enrollments' => %w(invitation_email can_participate_before_start_at limit_priveleges_to_course_sections),
@@ -35,7 +35,7 @@ class ActiveRecord::Base
     'notification_policies' => %w(user_id),
     'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id crypted_webdav_access_code),
     'role_overrides' => %w(context_code),
-    'users' => %w(type creation_unique_id creation_sis_batch_id creation_email sis_name),
+    'users' => %w(type creation_unique_id creation_sis_batch_id creation_email sis_name bio),
     'quizzes' => %w(root_quiz_id),
   }.freeze
 

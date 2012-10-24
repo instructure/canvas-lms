@@ -25,8 +25,8 @@ describe "course copy" do
     select_box = f('#copy_from_course')
     select_box.find_elements(:css, 'optgroup').length.should == 2
     optgroups = select_box.find_elements(:css, 'optgroup')
-    optgroups.map { |og| og.attribute('label') }.sort.should eql ["Default Term", "Test Term"]
-    optgroups.map { |og| og.find_elements(:css, 'option').length }.should eql [1, 1]
+    optgroups.map { |og| og.attribute('label') }.sort.should == ["Default Term", "Test Term"]
+    optgroups.map { |og| og.find_elements(:css, 'option').length }.should == [1, 1]
 
     click_option('#copy_from_course', 'second course')
     f('button[type="submit"]').click
@@ -140,11 +140,9 @@ describe "course copy" do
       get "/courses/#{@course.id}/copy"
 
       name = f('#course_name')
-      name.clear
-      name.send_keys("course name of testing")
+      replace_content(name, "course name of testing")
       name = f('#course_course_code')
-      name.clear
-      name.send_keys("course code of testing")
+      replace_content(name, "course code of testing")
 
       expect_new_page_load { f('button[type="submit"]').click }
       submit_form('#copy_context_form')

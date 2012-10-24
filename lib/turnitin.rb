@@ -313,8 +313,9 @@ module Turnitin
           params[:ufn] = user.name
           params[:uln] = "Course"
         else
-          params[:ufn] = user.name
-          params[:uln] = "Student"
+          params[:ufn] = user.first_name
+          params[:uln] = user.last_name
+          params[:uln] = "Student" if params[:uln].empty?
         end
       end
       if course

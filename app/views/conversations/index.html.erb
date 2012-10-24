@@ -62,51 +62,8 @@
       </ul>
       <a href="#" id="cancel_bulk_message_action"><%= t '#buttons.cancel', 'Cancel' %></a>
     </div>
-    <% form_tag conversations_url, :id => 'create_message_form' do %>
-      <ul class="conversations">
-        <li>
-          <span class="audience"><%= t('headings.new_message', 'New Message') %></span>
-          <%= link_to t('inbox_actions.add_people', "Add People..."), conversation_add_recipients_url('{{ id }}'), :id => :action_add_recipients %>
-        </li>
-      </ul>
-      <table>
-        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, 'data-finder_url' => search_recipients_url, :class => "recipients" %></td></tr>
-        <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
-        <tr id="group_conversation_info"><th></th><td><%= check_box_tag :group_conversation %> <%= label_tag :group_conversation, :en => "This is a group conversation. Participants will see everyone's replies" %></td></tr>
-        <tr id="user_note_info"><th></th><td><%= check_box_tag :user_note, "1", false, :id => :add_to_faculty_journal %> <%= label_tag :add_to_faculty_journal, :en => "Add as a Faculty Journal entry" %></td></tr>
-        <tr>
-          <th>&nbsp;</th>
-          <td>
-            <% if feature_enabled?(:kaltura) %>
-              <div class="media_comment" style="display: none;" title="<%= t('titles.media_comment', "Recorded media comment") %>">
-                <%= image_tag "messages/media-gray.png" %>
-                <%= t('media_comment', %{Media Comment}) %>
-                <a href="#" class="remove_link" style="float: right;" title="<%= t('titles.remove_media_comment', "Remove media comment") %>"><%= image_tag "delete_circle.png" %></a>
-                <div class="clear"></div>
-              </div>
-              <input type="hidden" name="media_comment_id" id="media_comment_id">
-              <input type="hidden" name="media_comment_type" id="media_comment_type">
-            <% end %>
-            <ul id="attachment_list">
-              <li id="attachment_blank" class="attachment" style="display: none;" title="<%= t('titles.attachment', "File to attach") %>">
-                <%= image_tag "messages/attach-gray.png" %> 
-                <input type="file" class="file_input"/>
-                <a href="#" class="remove_link" style="float: right;" title="<%= t('titles.remove_attachment', "Remove attachment") %>"><%= image_tag "delete_circle.png" %></a>
-                <div class="clear"></div>
-              </li>
-            </ul>
-            <a id="action_add_attachment" href="#" title="<%= t('titles.add_attachment', "Add an attachment") %>"><%= image_tag "messages/attach-blue.png" %> <%= t('links.add_attachment', %{Attach}) %></a>
-            <% if feature_enabled?(:kaltura) %>
-              <a id="action_media_comment" href="#" title="<%= t('titles.record_media_comment', "Record an audio or video comment") %>"><%= image_tag "messages/media-blue.png" %> <%= t('links.media_comment', %{Record}) %></a>
-            <% end %>
-            <div style="float: right">
-              <input type="hidden" name="from_conversation_id" id="from_conversation_id">
-              <button type="submit" class="button"><%= t('buttons.send_message', 'Send') %></button>
-            </div>
-          </td>
-        </tr>
-      </table>
-    <% end %>
+    <ul id="message_status"></ul>
+    <div id="create_message_form"></div>
     <ul class="messages">
     </ul>
   </div>

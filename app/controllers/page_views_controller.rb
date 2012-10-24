@@ -39,7 +39,7 @@ class PageViewsController < ApplicationController
   def index
     @user = api_find(User, params[:user_id])
     if authorized_action(@user, @current_user, :view_statistics)
-      @page_views = Api.paginate(@user.page_views, self, api_v1_user_page_views_path(:user_id => @user), :order => 'created_at DESC', :without_count => :true)
+      @page_views = Api.paginate(@user.page_views, self, api_v1_user_page_views_url(:user_id => @user), :order => 'created_at DESC', :without_count => :true)
       respond_to do |format|
         format.html do
           if params[:html_xhr]

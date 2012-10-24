@@ -462,7 +462,7 @@ class FilesController < ApplicationController
       @group = @asset.group_category.group_for(@current_user) if @asset.has_group_category?
       @context = @group || @current_user
       @check_quota = false
-      @attachment.do_submit_to_scribd = true
+      @attachment.submission_attachment = true
     elsif @context && intent == 'attach_discussion_file'
       permission_object = @context.discussion_topics.new
       permission = :attach
@@ -520,11 +520,7 @@ class FilesController < ApplicationController
     if @attachment && details
       deleted_attachments = @attachment.handle_duplicates(params[:duplicate_handling])
       @attachment.process_s3_details!(details)
-      render :json => {
-        :attachment => @attachment,
-        :deleted_attachment_ids => deleted_attachments.map(&:id)
-      }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}, :include_root => false),
-             :as_text => true
+      render_attachment_json(@attachment, deleted_attachments)
     else
       render :text => ""
     end
@@ -633,28 +629,10 @@ class FilesController < ApplicationController
           @attachment.move_to_bottom
           format.html { return_to(params[:return_to], named_context_url(@context, :context_files_url)) }
           format.json do
-            json = { :attachment => @attachment,
-              :deleted_attachment_ids => deleted_attachments.map(&:id) }
-            if @folder.name == 'profile pictures'
-              json[:avatar] = avatar_json(@current_user, @attachment, { :type => 'attachment' })
-            end
-
-            render :json => json.to_json(:allow => :uuid,
-              :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
-              :permissions => {:user => @current_user, :session => session}, :include_root => false,
-              :as_text => true)
+            render_attachment_json(@attachment, deleted_attachments, @folder)
           end
           format.text do
-            json = { :attachment => @attachment,
-              :deleted_attachment_ids => deleted_attachments.map(&:id) }
-            if @folder.name == 'profile pictures'
-              json[:avatar] = avatar_json(@current_user, @attachment, { :type => 'attachment' })
-            end
-
-            render :json => json.to_json(:allow => :uuid,
-              :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
-              :permissions => {:user => @current_user, :session => session}, :include_root => false,
-              :as_text => true)
+            render_attachment_json(@attachment, deleted_attachments, @folder)
           end
         else
           format.html { render :action => "new" }
@@ -819,5 +797,19 @@ class FilesController < ApplicationController
     respond_to do |format|
       format.atom { render :text => feed.to_xml }
     end    
+  end
+
+  private
+  def render_attachment_json(attachment, deleted_attachments, folder = attachment.folder)
+    json = { :attachment => attachment,
+      :deleted_attachment_ids => deleted_attachments.map(&:id) }
+    if folder.name == 'profile pictures'
+      json[:avatar] = avatar_json(@current_user, attachment, { :type => 'attachment' })
+    end
+
+    render :json => json.to_json(:allow => :uuid,
+      :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
+      :permissions => {:user => @current_user, :session => session}, :include_root => false),
+      :as_text => true
   end
 end

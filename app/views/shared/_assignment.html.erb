@@ -1,72 +1,123 @@
 <%
-  assignment_id = assignment ? assignment.id : "{{ id }}"
+  assignment ||= Assignment.new.tap do |a|
+    a.submission_types    = nbsp
+    a.position            = nbsp
+    a.assignment_group_id = nbsp
+  end
   context ||= nil
-  if !context || !context.is_a?(Course)
-    context = assignment.try_rescue(:context) || @context
+  unless context && context.is_a?(Course)
+    context = assignment.context || @context
   end
 %>
-<% cache(['assignment_render', assignment || context.asset_string, Time.zone.utc_offset].cache_key, :expires_in => (tomorrow_at_midnight - Time.zone.now).to_i) do %>
-<% assignment_url = context_url(context, :context_assignment_url, assignment_id) %>
-<% submission_url = context_url(context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}") %>
-<div class=" group_assignment <%= 'frozen' if assignment && assignment.att_frozen?(:assignment_group_id, @current_user) %> <%= 'points_uneditable' if assignment && assignment.points_uneditable? %> assignment_<%= assignment ? assignment.id : "blank" %> <%= "muted" if assignment && assignment.muted? %>" id="assignment_<%= assignment ? assignment.id : "blank" %>" style="<%= hidden unless assignment %>">
-  <div class="content">
-    <div class="move data">
-      <% if assignment.nil? || (assignment && !assignment.att_frozen?(:assignment_group_id, @current_user)) %>
-        <%= image_tag 'move.png', :alt => t('tiles.sort_or_move', 'Sort Assignments or Move to Another Group'), :class => "move_icon", :style => "margin-top: 3px;", :tabindex => '0' %>
-      <% end %>
-    </div>
-    <div class="data assignment_title ellipsis">
-      <a href="<%= assignment_url %>" class="title" title="<%= assignment.try_rescue(:title) %>"><%= assignment.try_rescue(:title) %> <%= image_tag("sound_mute.png", :title => t(:student_mute_notification, "Instructor is working on grades")) if assignment && assignment.muted? %></a>
-      <div class="context_name" style="<%= hidden if @just_viewing_one_course %>"><a href="<%= url_for(context) %>" class="course_name <%= dom_id(context) %>"><%= context.name %></a></div>
-    </div>
-    <div class="data assignment_due">
-      <div class="date_text" style="<%= hidden unless assignment && assignment.due_at %>">
-        <% ot(:due_at, '%{date} at %{time}', :date => capture { %>
-        <span class="due_date"><%= date_string(assignment.try_rescue(:due_at)) || nbsp %></span><% }, :time => capture { %>
-        <span class="due_time"><%= time_string(assignment.try_rescue(:due_at)) || nbsp %></span><% }) %>
+<% cache(['assignment_render',
+          assignment,
+          Time.zone.utc_offset].cache_key,
+         :expires_in => (tomorrow_at_midnight - Time.zone.now).to_i) do %>
+  <% assignment_url = context_url(context, :context_assignment_url, assignment.id || '{{ id }}') %>
+  <% submission_url = context_url(context,
+                                  :context_assignment_submission_url,
+                                  '{{ assignment_id }}',
+                                  '{{ user_id }}') %>
+
+  <div id="assignment_<%= assignment.id || 'blank' %>"
+       style="<%= hidden if assignment.new_record? %>"
+       class="group_assignment
+              <%= 'frozen' if assignment.att_frozen?(:assignment_group_id, @current_user) %>
+              <%= 'points_uneditable' if assignment.points_uneditable? %>
+              <%= 'muted' if assignment.muted? %>
+              assignment_<%= assignment.id || 'blank' %>">
+    <div class="content">
+      <div class="move data">
+        <% if assignment.new_record? || !assignment.att_frozen?(:assignment_group_id, @current_user) %>
+          <%= image_tag 'move.png', :alt => t('tiles.sort_or_move', 'Sort Assignments or Move to Another Group'),
+                                    :title => t('tiles.sort_or_move', 'Sort Assignments or Move to Another Group'),
+                                    :class => 'move_icon',
+                                    :tabindex => 0 %>
+        <% end %>
       </div>
-    </div>
-    <div class="data assignment_points">
-      <div class="points_text" style="<%= hidden unless assignment && assignment.points_possible %>">
-        <% ot(:points_out_of, "%{points} out of %{possible}", :points => capture { %>
-        <a href="<%= submission_url %>" class="grade" style="display: none;">--</a><% }, :possible => capture { %>
-        <span class="points_possible"><%= assignment.try_rescue(:points_possible) || nbsp %></span><% }) %>
-        <a title="<%= t 'links.submission_comments', "Submission Comments" %>" style="display: none;" href="<%= submission_url %>" class="no-hover submission_comment_link"> <%= image_tag "word_bubble.png" %></a>
-        <a title="<%= t 'links.view_rubric_evaluation', "View Rubric Evaluation" %>" href="<%= submission_url %>#rubric" class="no-hover rubric_assessment_link" style="display: none;"> <%= image_tag "rubric.png" %></a>
-      </div>
-    </div>
-    <div class="links data">
-      <div style="display: none;">
-        <span class="needs_grading_count">&nbsp;</span>
-        <span class="timestamp"><%= (assignment.try_rescue(:due_at).try_rescue(:to_i) || "0") %></span>
-        <span class="submission_types"><%= assignment.try_rescue(:submission_types) || nbsp %></span>
-        <span class="due_date_string"><%= assignment.try_rescue(:due_at).try_rescue(:strftime, "%m/%d/%Y") || nbsp %></span>
-        <span class="due_time_string"><%= assignment.try_rescue(:due_at).try_rescue(:strftime, "%I:%M%p").try_rescue(:downcase) || nbsp %></span>
-        <span class="id"><%= assignment ? assignment.id : nbsp %></span>
-        <span class="position"><%= assignment.try_rescue(:position) || nbsp %></span>
-        <span class="assignment_group_id"><%= assignment.try_rescue(:assignment_group_id) || nbsp %></span>
-      </div>
-      <a href="<%= assignment_url %>" class="preview_assignment_link no-hover" style="<%= hidden unless false %>">
-        <%= image_tag 'preview.png', :alt => "Preview", :title => t('links.preview_assignment', "Preview Assignment"), :style => "display: none;" %>
-      </a>
-      <% if assignment.nil? || (assignment && !assignment.frozen_for_user?(@current_user)) %>
-        <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
-          <%= image_tag 'edit.png', :alt => "Edit", :title => t('links.edit_assignment', "Edit Assignment") %>
+
+      <div class="data assignment_title ellipsis">
+        <a href="<%= assignment_url %>" class="title" title="<%= assignment.title %>">
+          <% if assignment.muted? %>
+            <%= image_tag 'sound_mute.png',
+                          :alt => t(:student_mute_notification, 'Instructor is working on grades'),
+                          :title => t(:student_mute_notification, 'Instructor is working on grades') %>
+          <% end %>
+          <%= assignment.title %>
         </a>
-        <a href="<%= assignment_url %>" rel="nofollow" class="delete_assignment_link no-hover">
-          <%= image_tag 'delete.png', :alt => "Delete", :title => t('links.delete_assignment', "Delete Assignment") %>
+        <div class="context_name" style="<%= hidden if @just_viewing_one_course %>">
+          <a href="<%= url_for(context) %>" class="course_name <%= dom_id(context) %>">
+            <%= context.name %>
+          </a>
+        </div>
+      </div>
+
+      <div class="data assignment_due">
+        <div class="date_text" style="<%= hidden unless assignment && assignment.due_at %>">
+          <% ot(:due_at, '%{date} at %{time}', :date => capture { %>
+          <span class="due_date"><%= date_string(assignment.due_at) || nbsp %></span><% }, :time => capture { %>
+          <span class="due_time"><%= time_string(assignment.due_at) || nbsp %></span><% }) %>
+        </div>
+      </div>
+
+      <div class="data assignment_points">
+        <div class="points_text" style="<%= hidden unless assignment && assignment.points_possible %>">
+          <% ot(:points_out_of, '%{points} out of %{possible}', :points => capture { %>
+          <a href="<%= submission_url %>" class="grade" style="display: none;">--</a><% }, :possible => capture { %>
+          <span class="points_possible"><%= assignment.points_possible %></span><% }) %>
+          <a title="<%= t 'links.submission_comments', 'Submission Comments' %>"
+             style="display: none;"
+             href="<%= submission_url %>" class="no-hover submission_comment_link">
+            <%= image_tag 'word_bubble.png' %>
+          </a>
+          <a title="<%= t 'links.view_rubric_evaluation', 'View Rubric Evaluation' %>"
+             href="<%= submission_url %>#rubric"
+             class="no-hover rubric_assessment_link" style="display: none;">
+            <%= image_tag "rubric.png" %>
+          </a>
+        </div>
+      </div>
+
+      <div class="links data">
+        <div style="display: none;">
+          <span class="needs_grading_count">&nbsp;</span>
+          <span class="timestamp"><%= assignment.due_at.to_i %></span>
+          <span class="submission_types"><%= assignment.submission_types %></span>
+          <span class="due_date_string"><%= assignment.due_at.try_rescue(:strftime, '%m/%d/%Y') || nbsp %></span>
+          <span class="due_time_string"><%= assignment.due_at.try_rescue(:strftime, '%I:%M%p').try_rescue(:downcase) || nbsp %></span>
+          <span class="id"><%= assignment.id || nbsp %></span>
+          <span class="position"><%= assignment.position %></span>
+          <span class="assignment_group_id"><%= assignment.assignment_group_id %></span>
+        </div>
+
+        <a href="<%= assignment_url %>" class="preview_assignment_link no-hover" style="<%= hidden unless false %>">
+          <%= image_tag 'preview.png', :alt => t('links.preview_assignment', 'Preview Assignment'),
+                                       :title => t('links.preview_assignment', 'Preview Assignment'),
+                                       :style => 'display: none;' %>
         </a>
-      <% end %>
+        <% if assignment.new_record? || (assignment && !assignment.frozen_for_user?(@current_user)) %>
+          <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
+            <%= image_tag 'edit.png',
+                          :alt => t('links.edit_assignment', 'Edit Assignment'),
+                          :title => t('links.edit_assignment', 'Edit Assignment') %>
+          </a>
+          <a href="<%= assignment_url %>" rel="nofollow" class="delete_assignment_link no-hover">
+            <%= image_tag 'delete.png',
+                          :alt => t('links.delete_assignment', 'Delete Assignment'),
+                          :title => t('links.delete_assignment', 'Delete Assignment') %>
+          </a>
+        <% end %>
+      </div>
     </div>
-    <div class="clear"></div>
-  </div>
-  <div class="details">
-    <div style="float: left; display: none;" class="submitted_details">
-      <span class="submitted_and_graded"><%= t :submitted_and_graded_count, "%{submitted_count} Submitted, %{graded_count} Graded", :submitted_count => '<span class="submitted_count">&nbsp;</span>'.html_safe, :graded_count => '<span class="graded_count">&nbsp;</span>'.html_safe %></span>
-      <span class="submitted"><%= t :submitted_count, "%{submitted_count} Submitted", :submitted_count => '<span class="submitted_count">&nbsp;</span>'.html_safe %></span>
-      <span class="graded"><%= t :graded_count, "%{graded_count} Graded", :graded_count => '<span class="graded_count">&nbsp;</span>'.html_safe %></span>
+
+    <div class="details">
+      <div style="float: left; display: none;" class="submitted_details">
+        <span class="submitted_and_graded"><%= t :submitted_and_graded_count, "%{submitted_count} Submitted, %{graded_count} Graded", :submitted_count => '<span class="submitted_count">&nbsp;</span>'.html_safe, :graded_count => '<span class="graded_count">&nbsp;</span>'.html_safe %></span>
+        <span class="submitted"><%= t :submitted_count, "%{submitted_count} Submitted", :submitted_count => '<span class="submitted_count">&nbsp;</span>'.html_safe %></span>
+        <span class="graded"><%= t :graded_count, "%{graded_count} Graded", :graded_count => '<span class="graded_count">&nbsp;</span>'.html_safe %></span>
+      </div>
+
+      <div class="clear"></div>
     </div>
-    <div class="clear"></div>
   </div>
-</div>
 <% end %>

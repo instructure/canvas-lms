@@ -133,7 +133,8 @@ describe DiscussionEntry do
     it "should send to inbox" do
       course
       @course.offer
-      topic = @course.discussion_topics.create!
+      topic = @course.discussion_topics.create!(:title => "abc " * 63 + "abc")
+      topic.title.length.should == 255
       @u = user_model
       entry = topic.discussion_entries.create!(:user => @u)
       @u2 = user_model
@@ -144,6 +145,9 @@ describe DiscussionEntry do
       sub_entry.inbox_item_recipient_ids.should_not be_nil
       sub_entry.inbox_item_recipient_ids.should_not be_empty
       sub_entry.inbox_item_recipient_ids.should be_include(entry.user_id)
+      item = InboxItem.last
+      item.subject.length.should <= 255
+      item.subject.should match /abc /
     end
   end
 
@@ -386,7 +390,24 @@ describe DiscussionEntry do
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       Account.default.destroy
       root.reload
-      root.reply_from(:user => @teacher, :text => "sub entry").should be_nil
+      lambda { root.reply_from(:user => @teacher, :text => "sub entry") }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
+    end
+
+    it "should prefer html to text" do
+      course_with_teacher
+      discussion_topic_model
+      @entry = @topic.reply_from(:user => @teacher, :text => "topic")
+      msg = @entry.reply_from(:user => @teacher, :text => "text body", :html => "<p>html body</p>")
+      msg.should_not be_nil
+      msg.message.should == "<p>html body</p>"
+    end
+
+    it "should not allow replies to locked topics" do
+      course_with_teacher
+      discussion_topic_model
+      @entry = @topic.reply_from(:user => @teacher, :text => "topic")
+      @topic.lock!
+      lambda { @entry.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMessageProcessor::ReplyToLockedTopicError)
     end
   end
 end

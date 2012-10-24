@@ -143,6 +143,7 @@ module SeleniumTestsHelperMethods
   end
 
   def self.setup_host_and_port(tries = 60)
+    ENV['CANVAS_CDN_HOST'] = "canvas.instructure.com"
     if SELENIUM_CONFIG[:server_port]
       $server_port = SELENIUM_CONFIG[:server_port]
       $app_host_and_port = "#{SERVER_IP}:#{$server_port}"
@@ -587,7 +588,7 @@ shared_examples_for "all selenium tests" do
 
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
-    driver.switch_to.frame id
+    driver.switch_to.frame(id)
     yield
   ensure
     driver.switch_to.window saved_window_handle
@@ -686,6 +687,34 @@ shared_examples_for "all selenium tests" do
     Kaltura::ClientV3.stubs(:new).returns(kal)
   end
 
+  def page_view(opts={})
+    course = opts[:course] || @course
+    user = opts[:user] || @student
+    controller = opts[:controller] || 'assignments'
+    summarized = opts[:summarized] || nil
+    url = opts[:url]
+    user_agent = opts[:user_agent] || 'firefox'
+
+    page_view = course.page_views.build(
+        :user => user,
+        :controller => controller,
+        :url => url,
+        :user_agent => user_agent)
+
+    page_view.summarized = summarized
+    page_view.request_id = ActiveSupport::SecureRandom.hex(10)
+    page_view.created_at = opts[:created_at] || Time.now
+
+    if opts[:participated]
+      page_view.participated = true
+      access = page_view.build_asset_user_access
+      access.display_name = 'Some Asset'
+    end
+
+    page_view.store
+    page_view
+  end
+
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
   def get(link, wait_for_dom = true)
@@ -734,7 +763,13 @@ shared_examples_for "all selenium tests" do
   # can pass in either an element or a forms css
   def submit_form(form)
     submit_button_css = 'button[type="submit"]'
-    form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css).click : f("#{form} #{submit_button_css}").click
+    button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
+    # the button may have been hidden via fixDialogButtons
+    if !button.displayed? && dialog = button.find_element(:xpath, "ancestor::div[contains(@class, 'ui-dialog')]")
+      submit_dialog(dialog, ".ui-dialog-buttonpane .button_type_submit")
+    else
+      button.click
+    end
   end
 
   def submit_dialog(dialog, submit_button_css = '.submit_button')
@@ -900,7 +935,12 @@ end
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip'),
     "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip'),
     "canvas_cc_minimum.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/canvas_cc_minimum.zip'),
-    "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip')
+    "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip'),
+    "a_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/a_file.txt'),
+    "b_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/b_file.txt'),
+    "c_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/c_file.txt'),
+    "amazing_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/amazing_file.txt'),
+    "Dog_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/Dog_file.txt')
   }
 
   def get_file(filename, data = nil)
@@ -929,6 +969,16 @@ end
 
   def skip_if_ie(additional_error_text)
     pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
+  end
+
+  def alert_present?
+    is_present = true
+    begin
+      driver.switch_to.alert
+    rescue Selenium::WebDriver::Error::NoAlertPresentError
+      is_present = false
+    end
+    is_present
   end
 
   # for when you have something like a textarea's value and you want to match it's contents

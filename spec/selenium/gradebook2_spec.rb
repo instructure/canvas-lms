@@ -59,7 +59,7 @@ describe "gradebook2" do
     submit_dialog(dialog, '.ui-button')
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
-      driver.switch_to.alert.text.should eql 'None to Update'
+      driver.switch_to.alert.text.should == 'None to Update'
       driver.switch_to.alert.dismiss
       true
     end
@@ -73,12 +73,37 @@ describe "gradebook2" do
     ff('.student-name').count.should == @course.students.count
   end
 
-  it "should not show concluded enrollments" do
-    conclude_and_unconclude_course
+  it "should not show concluded enrollments in active courses by default" do
+    @student_1.enrollments.find_by_course_id(@course.id).conclude
+
+    @course.students.count.should == 1
+    @course.all_students.count.should == 2
+
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
     ff('.student-name').count.should == @course.students.count
+
+    # select the option and we'll now show concluded
+    expect_new_page_load { open_gradebook_settings(driver.find_element(:css, 'label[for="show_concluded_enrollments"]')) }
+    wait_for_ajaximations
+
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+  end
+
+  it "should show concluded enrollments in concluded courses by default" do
+    @course.complete!
+
+    @course.students.count.should == 0
+    @course.all_students.count.should == 2
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+
+    # the checkbox should fire an alert rather than changing to not showing concluded
+    expect_fired_alert { open_gradebook_settings(driver.find_element(:css, 'label[for="show_concluded_enrollments"]')) }
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
   end
 
   it "should show students sorted by their sortable_name" do
@@ -156,6 +181,29 @@ describe "gradebook2" do
     @second_assignment.reload.should_not be_muted
   end
 
+  context "concluded course" do
+    before do
+      @course.complete!
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+    end
+
+    it "should not allow editing grades" do
+      cell = driver.find_element(:css, '#gradebook_grid [row="0"] .l0')
+      cell.text.should == '10'
+      cell.click
+      ff('.grade', cell).should be_blank
+    end
+
+    it "should hide mutable actions from the menu" do
+      open_gradebook_settings do |menu|
+        ff("a.gradebook_upload_link", menu).should be_blank
+        ff("a.set_group_weights", menu).should be_blank
+      end
+    end
+  end
+
   it "should validate that gradebook settings is displayed when button is clicked" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
@@ -183,16 +231,15 @@ describe "gradebook2" do
   end
 
   it "should let you post a group comment to a group assignment" do
-    group_assignment = assignment_model({
-                                            :course => @course,
-                                            :name => 'group assignment',
-                                            :due_at => (Time.now + 1.week),
-                                            :points_possible => ASSIGNMENT_3_POINTS,
-                                            :submission_types => 'online_text_entry',
-                                            :assignment_group => @group,
-                                            :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-                                            :grade_group_students_individually => true
-                                        })
+    group_assignment = @course.assignments.create!({
+                                                       :title => 'group assignment',
+                                                       :due_at => (Time.now + 1.week),
+                                                       :points_possible => ASSIGNMENT_3_POINTS,
+                                                       :submission_types => 'online_text_entry',
+                                                       :assignment_group => @group,
+                                                       :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+                                                       :grade_group_students_individually => true
+                                                   })
     project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
     project_group.users << @student_1
     project_group.users << @student_2
@@ -274,7 +321,24 @@ describe "gradebook2" do
         message_form.find_element(:css, '#body').send_keys(message_text)
         submit_form(message_form)
         wait_for_ajax_requests
-      }.to change(ConversationMessage, :count).by(2)
+      }.to change(ConversationMessage, :count).by_at_least(2)
+    end
+
+    it "should send messages when 'Scored more than' X points" do
+      message_text = "This is a message"
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      open_assignment_options(1)
+      f('[data-action="messageStudentsWho"]').click
+      expect {
+        message_form = f('#message_assignment_recipients')
+        click_option('#message_assignment_recipients .message_types', 'Scored more than')
+        message_form.find_element(:css, '.cutoff_score').send_keys('3')  # both assignments have score of 5
+        message_form.find_element(:css, '#body').send_keys(message_text)
+        submit_form(message_form)
+        wait_for_ajax_requests
+      }.to change(ConversationMessage, :count).by_at_least(2)
     end
 
     it "should have a 'Haven't been graded' option" do
@@ -286,12 +350,12 @@ describe "gradebook2" do
 
       # expect dialog to show 1 fewer student with the "Haven't been graded" option
       f('[data-action="messageStudentsWho"]').click
-      ffj('.student_list li:visible').size.should eql 2
+      ffj('.student_list li:visible').size.should == 2
       # select option
       select = f('#message_assignment_recipients select.message_types')
       select.click
       select.all(:tag_name => 'option').find { |o| o.text == "Haven't been graded" }.click
-      ffj('.student_list li:visible').size.should eql 1
+      ffj('.student_list li:visible').size.should == 1
     end
   end
 
@@ -330,6 +394,21 @@ describe "gradebook2" do
     ff('.ui-state-error').count.should == 0
   end
 
+  it "should display for users with only :manage_grades permissions" do
+    user_logged_in
+    RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+                         :permission => 'manage_grades',
+                         :context => Account.default,
+                         :enabled => true)
+    AccountUser.create!(:user => @user,
+                        :account => Account.default,
+                        :membership_type => 'CustomAdmin')
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    ff('.ui-state-error').count.should == 0
+  end
+
   it "should include student view student for grading" do
     @fake_student = @course.student_view_student
     @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
@@ -341,26 +420,24 @@ describe "gradebook2" do
   end
 
   it "should not include non-graded group assignment in group total" do
-    graded_assignment = assignment_model({
-                                             :course => @course,
-                                             :name => 'group assignment 1',
-                                             :due_at => (Time.now + 1.week),
-                                             :points_possible => 10,
-                                             :submission_types => 'online_text_entry',
-                                             :assignment_group => @group,
-                                             :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
-                                             :grade_group_students_individually => true
-                                         })
-    group_assignment = assignment_model({
-                                            :course => @course,
-                                            :name => 'group assignment 2',
-                                            :due_at => (Time.now + 1.week),
-                                            :points_possible => 0,
-                                            :submission_types => 'not_graded',
-                                            :assignment_group => @group,
-                                            :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
-                                            :grade_group_students_individually => true
-                                        })
+    graded_assignment = @course.assignments.create!({
+                                                        :title => 'group assignment 1',
+                                                        :due_at => (Time.now + 1.week),
+                                                        :points_possible => 10,
+                                                        :submission_types => 'online_text_entry',
+                                                        :assignment_group => @group,
+                                                        :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                                        :grade_group_students_individually => true
+                                                    })
+    group_assignment = @course.assignments.create!({
+                                                       :title => 'group assignment 2',
+                                                       :due_at => (Time.now + 1.week),
+                                                       :points_possible => 0,
+                                                       :submission_types => 'not_graded',
+                                                       :assignment_group => @group,
+                                                       :group_category => GroupCategory.create!(:name => 'groups', :context => @course),
+                                                       :grade_group_students_individually => true
+                                                   })
     project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
     project_group.users << @student_1
     #project_group.users << @student_2
@@ -410,7 +487,7 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       icons = ffj('.gradebook-cell-turnitin')
-      icons.size.should eql 2
+      icons.size.should == 2
 
       # make sure it appears in each submission dialog
       icons.each do |icon|

@@ -10,7 +10,9 @@
     <a href="<%= context_prefix(context_code) %>/assignments/<%= dashboard_submission ? dashboard_submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= dashboard_submission ? dashboard_submission.user_id : "{{ user_id }}" %>" class="title subject"><%= dashboard_submission.try_rescue(:assignment).try_rescue(:title) || t('#defaults.assignment', %{Assignment}) %>, <%= context_user_name(context_code, dashboard_submission.user_id) %></a>
     <div class="sub_title">
       <span class="points_possible" style="<%= hidden unless dashboard_submission && dashboard_submission.score && dashboard_submission.assignment && dashboard_submission.assignment.points_possible %>">
-        <%= t('#score_out_of', '%{score} out of %{points_possible}', :score => (dashboard_submission.score || ""), :points_possible => dashboard_submission.try_rescue(:assignment).try_rescue(:points_possible)) %>
+        <%= score_out_of_points_possible(
+              dashboard_submission.score || "",
+              dashboard_submission.try_rescue(:assignment).try_rescue(:points_possible)) %>
         <%= t('pending_review', %{(still needs teacher review)}) if dashboard_submission && dashboard_submission.workflow_state == 'pending_review' %>
       </span>
       <span class="context_code group_<%= context_code %>"><%= cached_context_short_name(context_code) %></span>
@@ -21,9 +23,7 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((submission_comment.try_rescue(:author_id)), context_code) %></div>
     <div class="message user_content"><%= raw(submission_comment.try_rescue(:formatted_body) || nbsp) %>
-      <% if submission_comment && submission_comment.media_comment_id %>
-        <a href="#" class="instructure_inline_media_comment no-underline"><span class="media_comment_id" style="display: none;"><%= submission_comment.media_comment_id %></span>&nbsp;</a>
-      <% end %>
+      <%= inline_media_comment_link(submission_comment) %>
     </div>
     <div class="attachments_list" style="margin-top: 5px; <%= hidden unless submission_comment.try(:cached_attachments) && !submission_comment.cached_attachments.empty? %>">
       <% (submission_comment.try_rescue(:cached_attachments) || []).each do |attachment| %>

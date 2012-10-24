@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -83,6 +83,9 @@
 #       // The id of the user who created the submission
 #       user_id: 134
 #
+#       // The id of the user who graded the submission
+#       grader_id: 86
+#
 #       // The submissions user (see user API) (optional)
 #       user: User
 #     }
@@ -147,7 +150,7 @@ class SubmissionsController < ApplicationController
           end
 
           @headers = false
-          if @assignment.quiz && @context.is_a?(Course) && @context.user_is_student?(@current_user) && !@context.user_is_teacher?(@current_user)
+          if @assignment.quiz && @context.is_a?(Course) && @context.user_is_student?(@current_user) && !@context.user_is_instructor?(@current_user)
             format.html { redirect_to(named_context_url(@context, :context_quiz_url, @assignment.quiz.id, :headless => 1)) }
           elsif @submission.submission_type == "online_quiz" && @submission.quiz_submission_version
             format.html { redirect_to(named_context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version)) }
@@ -346,6 +349,9 @@ class SubmissionsController < ApplicationController
         )
         @attachment.save!
         params[:submission][:attachments] << @attachment
+      elsif !api_request? && params[:submission][:submission_type] == 'media_recording' && params[:submission][:media_comment_id].blank?
+        flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
+        return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       end
       params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
 
@@ -433,6 +439,7 @@ class SubmissionsController < ApplicationController
     end
     if authorized_action(@submission, @current_user, :comment)
       params[:submission][:commenter] = @current_user
+      admin_in_context = !@context_enrollment || @context_enrollment.admin?
       if params[:attachments]
         attachments = []
         params[:attachments].each do |idx, attachment|
@@ -451,7 +458,7 @@ class SubmissionsController < ApplicationController
           :commenter => @current_user,
           :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
-          :hidden => @assignment.muted? && @context_enrollment.admin?
+          :hidden => @assignment.muted? && admin_in_context
         }
       end
       begin
@@ -471,7 +478,7 @@ class SubmissionsController < ApplicationController
           json_args = Submission.json_serialization_full_parameters({
             :exclude => @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score, :turnitin_data] : [],
             :except => [:quiz_submission,:submission_history],
-            :comments => @context_enrollment.admin? ? :submission_comments : :visible_submission_comments
+            :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
           format.json { 
             render :json => @submissions.to_json(json_args), :status => :created, :location => course_gradebook_url(@submission.assignment.context)

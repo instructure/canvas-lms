@@ -391,7 +391,7 @@ describe ConversationsController, :type => :integration do
         ]
       end
 
-      it "should create/update bulk private conversations" do
+      it "should create/update bulk private conversations synchronously" do
         # set up one private conversation in advance
         conversation(@bob)
 
@@ -400,6 +400,31 @@ describe ConversationsController, :type => :integration do
                 { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test" })
         json.size.should eql 3
         json.map{ |c| c['id'] }.sort.should eql @me.all_conversations.map(&:conversation_id).sort
+
+        batch = ConversationBatch.first
+        batch.should_not be_nil
+        batch.should be_sent
+
+        @me.all_conversations.size.should eql(3)
+        @me.conversations.size.should eql(1) # just the initial conversation with bob is visible to @me
+        @bob.conversations.size.should eql(1)
+        @billy.conversations.size.should eql(1)
+        @joe.conversations.size.should eql(1)
+      end
+
+      it "should create/update bulk private conversations asynchronously" do
+        # set up one private conversation in advance
+        conversation(@bob)
+
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test", :mode => "async" })
+        json.should eql([])
+
+        batch = ConversationBatch.first
+        batch.should_not be_nil
+        batch.should be_created
+        batch.deliver
 
         @me.all_conversations.size.should eql(3)
         @me.conversations.size.should eql(1) # just the initial conversation with bob is visible to @me
@@ -900,6 +925,22 @@ describe ConversationsController, :type => :integration do
         {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
       ]
+    end
+  end
+
+  context "batches" do
+    it "should return all in-progress batches" do
+      batch1 = ConversationBatch.generate(Conversation.build_message(@me, "hi all"), [@bob.id, @billy.id], :async)
+      batch2 = ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob.id, @billy.id], :sync)
+      batch3 = ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me.id, @billy.id], :async)
+
+      json = api_call(:get, "/api/v1/conversations/batches",
+                      :controller => 'conversations',
+                      :action => 'batches',
+                      :format => 'json')
+
+      json.size.should eql 1 # batch2 already ran, batch3 belongs to someone else
+      json[0]["id"].should eql batch1.id
     end
   end
 end

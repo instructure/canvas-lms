@@ -62,7 +62,7 @@ module Api::V1::Attachment
     atts = process_attachment_params(params)
     atts.delete(:display_name)
     @attachment.attributes = atts
-    @attachment.do_submit_to_scribd = true if opts[:do_submit_to_scribd]
+    @attachment.submission_attachment = true if opts[:submission_attachment]
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
     @attachment.content_type = request.params[:content_type].presence || Attachment.mimetype(@attachment.filename)

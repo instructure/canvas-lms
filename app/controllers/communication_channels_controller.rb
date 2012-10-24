@@ -69,7 +69,7 @@ class CommunicationChannelsController < ApplicationController
     return unless authorized_action(@user, @current_user, :read)
 
     channels = Api.paginate(@user.communication_channels.unretired, self,
-      api_v1_communication_channels_path).map do |cc|
+      api_v1_communication_channels_url).map do |cc|
         communication_channel_json(cc, @current_user, session)
       end
 

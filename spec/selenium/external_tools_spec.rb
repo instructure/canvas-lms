@@ -42,10 +42,10 @@ describe "editing external tools" do
     tool_elem = fj("#external_tools .external_tool:visible").should be_displayed
     tool_elem.should_not be_nil
     tool.reload
-    tool.name.should eql "new tool (updated)"
-    tool.consumer_key.should eql "key (updated)"
-    tool.shared_secret.should eql "secret (updated)"
-    tool.domain.should eql "example2.com"
+    tool.name.should == "new tool (updated)"
+    tool.consumer_key.should == "key (updated)"
+    tool.shared_secret.should == "secret (updated)"
+    tool.domain.should == "example2.com"
     tool.settings[:custom_fields].should == {'a' => '9', 'b' => '8'}
   end
 
@@ -60,10 +60,10 @@ describe "editing external tools" do
     f("#external_tool_create_url").send_keys("http://www.example.com")
     f("#external_tool_create_title").send_keys("Example")
     f("#external_tool_create_new_tab").click
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
-    ff("#context_module_item_new").length.should eql 0
+    ff("#context_module_item_new").length.should == 0
 
     @tag = ContentTag.last
     @tag.should_not be_nil
@@ -115,10 +115,10 @@ describe "editing external tools" do
     ff("#context_external_tools_select .tools .tool")[0].click
     f("#external_tool_create_url").should have_value @tool1.url
     f("#external_tool_create_title").should have_value @tool1.name
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
-    keep_trying_until { ff("#context_module_item_new").length.should eql 0 }
+    keep_trying_until { ff("#context_module_item_new").length.should == 0 }
 
     @tag = ContentTag.last
     @tag.should_not be_nil
@@ -131,10 +131,10 @@ describe "editing external tools" do
     ff("#context_external_tools_select .tools .tool")[1].click
     f("#external_tool_create_url").should have_value @tool2.url
     f("#external_tool_create_title").should have_value @tool2.name
-    f("#select_context_content_dialog .add_item_button").click
+    fj(".add_item_button:visible").click
     wait_for_ajax_requests
     f("#select_context_content_dialog").should_not be_displayed
-    ff("#context_module_item_new").length.should eql 0
+    ff("#context_module_item_new").length.should == 0
 
     @tag = ContentTag.last
     @tag.should_not be_nil
@@ -174,7 +174,7 @@ describe "editing external tools" do
 
     in_frame('resource_selection_iframe') do
       keep_trying_until { ff("#basic_lti_link").length > 0 }
-      ff(".link").length.should eql 4
+      ff(".link").length.should == 4
       f("#basic_lti_link").click
       wait_for_ajax_requests
     end
@@ -217,7 +217,7 @@ describe "editing external tools" do
     expect_fired_alert do
       in_frame('resource_selection_iframe') do
         keep_trying_until { ff("#basic_lti_link").length > 0 }
-        ff(".link").length.should eql 4
+        ff(".link").length.should == 4
         f("#bad_url_basic_lti_link").click
       end
     end
@@ -233,7 +233,7 @@ describe "editing external tools" do
     expect_fired_alert do
       in_frame('resource_selection_iframe') do
         keep_trying_until { ff("#basic_lti_link").length > 0 }
-        ff(".link").length.should eql 4
+        ff(".link").length.should == 4
         f("#no_url_basic_lti_link").click
       end
     end
@@ -274,7 +274,7 @@ describe "editing external tools" do
     keep_trying_until { f("#resource_selection_dialog").should be_displayed }
     in_frame('resource_selection_iframe') do
       keep_trying_until { ff("#basic_lti_link").length > 0 }
-      ff(".link").length.should eql 4
+      ff(".link").length.should == 4
       f("#no_text_basic_lti_link").click
       wait_for_ajax_requests
     end
@@ -283,33 +283,6 @@ describe "editing external tools" do
     f("#external_tool_create_title").should have_value "bob"
   end
 
-  it "should allow editing the settings for a tool in a module" do
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({
-                                :type => 'context_external_tool',
-                                :title => 'Example',
-                                :url => 'http://www.example.com',
-                                :new_tab => '1'
-                            })
-    get "/courses/#{@course.id}/modules"
-    keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
-
-    f("#context_module_item_#{@tag.id}").click
-    f("#context_module_item_#{@tag.id} .edit_item_link").click
-
-    f("#edit_item_form").should be_displayed
-    replace_content(f("#edit_item_form #content_tag_title"), "Example 2")
-    f("#edit_item_form #content_tag_new_tab").click
-    submit_form("#edit_item_form")
-
-    wait_for_ajax_requests
-
-    @tag.reload
-    @tag.should_not be_nil
-    @tag.title.should == "Example 2"
-    @tag.new_tab.should == false
-    @tag.url.should == "http://www.example.com"
-  end
 
   it "should launch assignment external tools when viewing assignment" do
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
@@ -334,7 +307,7 @@ describe "editing external tools" do
                             })
     get "/courses/#{@course.id}/modules/items/#{@tag.id}"
 
-    ff("#tool_content").length.should eql 1
+    ff("#tool_content").length.should == 1
     keep_trying_until { f("#tool_content").should be_displayed }
   end
 
@@ -349,8 +322,8 @@ describe "editing external tools" do
                             })
     get "/courses/#{@course.id}/modules/items/#{@tag.id}"
 
-    ff("#tool_content").length.should eql 0
+    ff("#tool_content").length.should == 0
     f("#tool_form").should be_displayed
-    ff("#tool_form .load_tab").length.should eql 1
+    ff("#tool_form .load_tab").length.should == 1
   end
 end

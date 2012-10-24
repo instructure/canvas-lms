@@ -159,6 +159,36 @@ describe SubmissionsController do
       assigns[:submission].submission_comments[0].comment.should eql("some comment")
     end
 
+    it "should allow a non-enrolled admin to add comments" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@user)
+      site_admin_user
+      user_session(@user)
+      put 'update', :course_id => @course.id, :assignment_id => @assignment.id, :id => @student.id, :submission => {:comment => "some comment"}
+      response.should be_redirect
+      assigns[:submission].should eql(@submission)
+      assigns[:submission].submission_comments.length.should eql(1)
+      assigns[:submission].submission_comments[0].comment.should eql("some comment")
+      assigns[:submission].submission_comments[0].should_not be_hidden
+    end
+
+    it "should allow a non-enrolled admin to add comments on a submission to muted assignment" do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@user)
+      @assignment.muted = true
+      @assignment.save!
+      site_admin_user
+      user_session(@user)
+      put 'update', :course_id => @course.id, :assignment_id => @assignment.id, :id => @student.id, :submission => {:comment => "some comment"}
+      response.should be_redirect
+      assigns[:submission].should eql(@submission)
+      assigns[:submission].submission_comments.length.should eql(1)
+      assigns[:submission].submission_comments[0].comment.should eql("some comment")
+      assigns[:submission].submission_comments[0].should be_hidden
+    end
+
     it "should comment as the current user for all submissions in the group" do
       course_with_student_logged_in(:active_all => true)
       @u1 = @user

@@ -43,6 +43,17 @@ describe StreamItem do
     course_items.should == [item]
   end
 
+  describe "destroy_stream_items_using_setting" do
+    it "should have a default ttl" do
+      si1 = StreamItem.create!
+      si2 = StreamItem.create!
+      StreamItem.update_all({:updated_at => 1.year.ago}, {:id => si2.id})
+      expect {
+        StreamItem.destroy_stream_items_using_setting
+      }.to change(StreamItem, :count).by(-1)
+    end
+  end
+
   context "across shards" do
     it_should_behave_like "sharding"
 

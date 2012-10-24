@@ -18,12 +18,14 @@
 
 module Canvas::AccountReports
   class SisExporter
+    include Api
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections", "enrollments", "groups", "group_membership", "xlist"]
 
     def initialize(account_report, params = {})
       @account_report = account_report
-      @term = @account_report.parameters["enrollment_term"].presence
       @account = @account_report.account
+      @domain_root_account = @account.root_account
+      @term = api_find(@account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.parameters["enrollment_term"]
       @reports = SIS_CSV_REPORTS & @account_report.parameters.keys
       @sis_format = params[:sis_format]
     end
@@ -76,9 +78,9 @@ module Canvas::AccountReports
         headers = ['account_id','parent_account_id', 'name','status']
         headers.unshift 'canvas_account_id' unless @sis_format
         csv << headers
-        accounts = Account.active.scoped(:conditions => ["accounts.root_account_id=?", @account.id],
-                                      :select => "accounts.*, parent_account.sis_source_id as parent_sis_source_id",
-                                      :joins => "INNER JOIN accounts as parent_account ON accounts.parent_account_id = parent_account.id")
+        accounts = @account.all_accounts.active.scoped(
+          :select => "accounts.*, parent_account.sis_source_id as parent_sis_source_id",
+          :joins => "INNER JOIN accounts as parent_account ON accounts.parent_account_id = parent_account.id")
         accounts = accounts.scoped(:conditions => "accounts.sis_source_id IS NOT NULL") if @sis_format
         accounts.find_each do |a|
           row = []
@@ -119,12 +121,13 @@ module Canvas::AccountReports
         headers = ['course_id','short_name', 'long_name','account_id','term_id', 'status', 'start_date', 'end_date']
         headers.unshift 'canvas_course_id' unless @sis_format
         csv << headers
-        courses = @account.all_courses.active.scoped(:include => [:account, :enrollment_term],
-                                                     :select => "courses.*,
-          CASE WHEN courses.workflow_state = 'claimed' THEN 'unpublished'
-               WHEN courses.workflow_state = 'created' THEN 'unpublished'
-               WHEN courses.workflow_state = 'completed' THEN 'concluded'
-               WHEN courses.workflow_state = 'available' THEN 'active' END as course_state")
+        courses = @account.all_courses.active.scoped(
+          :include => [:account, :enrollment_term],
+          :select => "courses.*,
+                 CASE WHEN courses.workflow_state = 'claimed' THEN 'unpublished'
+                      WHEN courses.workflow_state = 'created' THEN 'unpublished'
+                      WHEN courses.workflow_state = 'completed' THEN 'concluded'
+                      WHEN courses.workflow_state = 'available' THEN 'active' END as course_state")
         courses = courses.scoped(:conditions => ["enrollment_term_id=?", @term]) if @term
         courses = courses.scoped(:conditions => "sis_source_id IS NOT NULL") if @sis_format
 
@@ -199,30 +202,25 @@ module Canvas::AccountReports
           headers = ['canvas_course_id', 'course_id', 'canvas_user_id', 'user_id', 'role', 'canvas_section_id', 'section_id', 'status', 'canvas_associated_user_id', 'associated_user_id']
         end
         csv << headers
-        parameters = {}
-        parameters[:root_account_id] = @account.id
-        if @term
-          parameters[:term ] = @term
-        end
-        enrollments = Enrollment.active.scoped(:select => "enrollments.*, courses.sis_source_id as course_sis_id,
-                                                           course_sections.sis_source_id as course_section_sis_id,
-                                                           pseudonyms.sis_user_id as pseudonym_sis_id,
-                                                           associated_user.sis_user_id as associated_user_sis_id,
-                                                      CASE WHEN enrollments.type = 'TeacherEnrollment' THEN 'teacher'
-                                                           WHEN enrollments.type='TaEnrollment' THEN 'ta'
-                                                           WHEN enrollments.type='StudentEnrollment' THEN 'student'
-                                                           WHEN enrollments.type='ObserverEnrollment' THEN 'observer' END as enrollment_type",
-                                               :joins => "INNER JOIN courses on courses.id = enrollments.course_id
-                                                          INNER JOIN course_sections on course_sections.id = enrollments.course_section_id
-                                                          INNER JOIN pseudonyms ON pseudonyms.user_id=enrollments.user_id
-                                                          LEFT OUTER JOIN pseudonyms as associated_user on associated_user.user_id = enrollments.associated_user_id
-                                                          AND associated_user.account_id = #{@account.id}",
-                                               :conditions => ["enrollments.root_account_id = :root_account_id
-                                                                AND enrollments.workflow_state = 'active'
-                                                                AND pseudonyms.account_id = :root_account_id", parameters])
-        enrollments = enrollments.scoped(:conditions => ["courses.enrollment_term_id = :term", parameters]) if @term
+        enrollments = @account.enrollments.active.scoped(
+          :select => "enrollments.*, courses.sis_source_id as course_sis_id,
+                      course_sections.sis_source_id as course_section_sis_id,
+                      pseudonyms.sis_user_id as pseudonym_sis_id,
+                      associated_user.sis_user_id as associated_user_sis_id,
+                 CASE WHEN enrollments.type = 'TeacherEnrollment' THEN 'teacher'
+                      WHEN enrollments.type='TaEnrollment' THEN 'ta'
+                      WHEN enrollments.type='StudentEnrollment' THEN 'student'
+                      WHEN enrollments.type='ObserverEnrollment' THEN 'observer' END as enrollment_type",
+          :joins => "INNER JOIN courses on courses.id = enrollments.course_id
+                     INNER JOIN course_sections on course_sections.id = enrollments.course_section_id
+                     INNER JOIN pseudonyms ON pseudonyms.user_id=enrollments.user_id
+                     LEFT OUTER JOIN pseudonyms as associated_user on associated_user.user_id = enrollments.associated_user_id
+                     AND associated_user.account_id = enrollments.root_account_id",
+          :conditions => "pseudonyms.account_id = enrollments.root_account_id
+                          AND enrollments.workflow_state = 'active'")
+        enrollments = enrollments.scoped(:conditions => ["courses.enrollment_term_id = ?", @term]) if @term
         enrollments = enrollments.scoped(:conditions => "pseudonyms.sis_user_id IS NOT NULL
-                                                         AND (courses.sis_source_id IS NOT NULL or course_sections.sis_source_id IS NOT NULL)") if @sis_format
+                                                         AND (courses.sis_source_id IS NOT NULL OR course_sections.sis_source_id IS NOT NULL)") if @sis_format
         enrollments.find_each do |e|
           row = []
           row << e.course_id unless @sis_format
@@ -248,9 +246,8 @@ module Canvas::AccountReports
           headers = ['canvas_group_id', 'group_id', 'canvas_account_id', 'account_id', 'name', 'status']
         end
         csv << headers
-        groups = Group.active.scoped(:select => "groups.*, accounts.sis_source_id as account_sis_id",
-                                     :joins => "INNER JOIN accounts on accounts.id = groups.account_id",
-                                     :conditions => ["groups.root_account_id=?", @account.id])
+        groups = @account.all_groups.active.scoped(:select => "groups.*, accounts.sis_source_id as account_sis_id",
+                                                   :joins => "INNER JOIN accounts on accounts.id = groups.account_id")
         groups = groups.scoped(:conditions => "groups.sis_source_id IS NOT NULL") if @sis_format
         groups.find_each do |g|
           row = []
@@ -273,19 +270,18 @@ module Canvas::AccountReports
           headers = ['canvas_group_id', 'group_id','canvas_user_id', 'user_id', 'status']
         end
         csv << headers
-        group_members = GroupMembership.active.scoped(:select => "group_memberships.*, groups.sis_source_id as group_sis_id, pseudonyms.sis_user_id as user_sis_id",
-                                                      :joins => "INNER JOIN groups on groups.id = group_memberships.group_id
+        group_members = @account.all_groups.active.scoped(:select => "groups.*, group_memberships.*, pseudonyms.sis_user_id as user_sis_id",
+                                                          :joins => "INNER JOIN group_memberships on groups.id = group_memberships.group_id
                                                                  INNER JOIN pseudonyms ON pseudonyms.user_id=group_memberships.user_id",
-                                                      :conditions => ["groups.root_account_id=?
-                                                                       AND pseudonyms.account_id=?
-                                                                       AND group_memberships.workflow_state in ('accepted', 'invited')", @account.id, @account.id])
+                                                          :conditions => "pseudonyms.account_id = groups.root_account_id
+                                                                      AND group_memberships.workflow_state in ('accepted', 'invited')")
         group_members = group_members.scoped(:conditions => "pseudonyms.sis_user_id IS NOT NULL
                                                              AND group_memberships.sis_batch_id IS NOT NULL
                                                              AND group_memberships.workflow_state in ('accepted')") if @sis_format
         group_members.find_each do |gm|
           row = []
           row << gm.group_id  unless @sis_format
-          row << gm.group_sis_id
+          row << gm.sis_source_id
           row << gm.user_id  unless @sis_format
           row << gm.user_sis_id
           row << gm.workflow_state

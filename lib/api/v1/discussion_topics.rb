@@ -62,6 +62,7 @@ module Api::V1::DiscussionTopics
                                             :include_host => true)
       json[:url] = json[:html_url] # deprecated
       if include_assignment && topic.assignment
+        extend Api::V1::Assignment
         json[:assignment] = assignment_json(topic.assignment, user, session, !:include_discussion_topic)
       end
       json
@@ -105,27 +106,27 @@ module Api::V1::DiscussionTopics
     end
   end
 
-  def topic_pagination_path(options = {})
+  def topic_pagination_url(options = {})
     if @context.is_a? Course
-      api_v1_course_discussion_topics_path(@context, options)
+      api_v1_course_discussion_topics_url(@context, options)
     else
-      api_v1_group_discussion_topics_path(@context, options)
+      api_v1_group_discussion_topics_url(@context, options)
     end
   end
 
-  def entry_pagination_path(topic)
+  def entry_pagination_url(topic)
     if @context.is_a? Course
-      api_v1_course_discussion_entries_path(@context)
+      api_v1_course_discussion_entries_url(@context)
     else
-      api_v1_group_discussion_entries_path(@context)
+      api_v1_group_discussion_entries_url(@context)
     end
   end
 
-  def reply_pagination_path(entry)
+  def reply_pagination_url(entry)
     if @context.is_a? Course
-      api_v1_course_discussion_replies_path(@context)
+      api_v1_course_discussion_replies_url(@context)
     else
-      api_v1_group_discussion_replies_path(@context)
+      api_v1_group_discussion_replies_url(@context)
     end
   end
 end

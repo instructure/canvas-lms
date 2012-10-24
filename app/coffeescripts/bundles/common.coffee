@@ -19,10 +19,12 @@ require [
   'compiled/behaviors/ujsLinks'
   'compiled/behaviors/admin-links'
   'compiled/behaviors/elementToggler'
-  'compiled/behaviors/upvote-item'
-  'compiled/behaviors/repin-item'
-  'compiled/behaviors/follow'
+  # uncomment these to turn on collection pinning and voting
+  # 'compiled/behaviors/upvote-item'
+  # 'compiled/behaviors/repin-item'
+  # 'compiled/behaviors/follow'
   'compiled/behaviors/tooltip'
+  'compiled/behaviors/instructure_inline_media_comment'
 
   # other stuff several bundles use
   'media_comments'
@@ -43,7 +45,13 @@ require [
 ], (courseList, helpDialog) ->
   courseList.init()
   helpDialog.initTriggers()
+
   $('#skip_navigation_link').on 'click', ->
     $($(this).attr('href')).attr('tabindex', -1).focus()
 
+  # TODO: remove this code once people have had time to update their logo-related
+  # custom css. see related code in app/stylesheets/base/_#header.sass.
+  $logo = $('#header-logo')
+  if $logo.length > 0 and $logo.css('background-image').match(/\/canvas\/header_canvas_logo\.png/)
+    $logo.addClass('original')
 

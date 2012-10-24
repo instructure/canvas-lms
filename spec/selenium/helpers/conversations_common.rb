@@ -17,7 +17,7 @@ shared_examples_for "conversations selenium tests" do
   def new_conversation(reload=true)
     if reload
       get "/conversations"
-      keep_trying_until { fj("#create_message_form:visible") }
+      keep_trying_until { fj("#create_message_form form:visible") }
     else
       f("#action_compose_message").click
     end
@@ -28,16 +28,16 @@ shared_examples_for "conversations selenium tests" do
     @elements = nil
   end
 
-  def add_recipient(search, input_id = "recipients")
-    input = driver.execute_script("return $('\##{input_id}').data('token_input').$input[0]")
+  def add_recipient(search, input_selector=".recipients")
+    input = driver.execute_script("return $('#{input_selector}').data('token_input').$input[0]")
     input.send_keys(search)
-    keep_trying_until { driver.execute_script("return $('\##{input_id}').data('token_input').selector.lastSearch") == search }
+    keep_trying_until { driver.execute_script("return $('#{input_selector}').data('token_input').selector.lastSearch") == search }
     input.send_keys(:return)
   end
 
   def browse_menu
     @browser.click
-    keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should eql(@level) }
+    keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
     wait_for_animations
   end
 
@@ -49,7 +49,7 @@ shared_examples_for "conversations selenium tests" do
 
     element.first.click
     wait_for_ajaximations(150)
-    keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should eql(@level) }
+    keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
     @elements = nil
     elements
 
@@ -93,16 +93,16 @@ shared_examples_for "conversations selenium tests" do
     ffj("#create_message_form .token_input li div").map(&:text)
   end
 
-  def search(text, input_id="recipients")
+  def search(text, input_selector=".recipients")
     @input.send_keys(text)
-    keep_trying_until { driver.execute_script("return $('\##{input_id}').data('token_input').selector.lastSearch") == text }
+    keep_trying_until { driver.execute_script("return $('#{input_selector}').data('token_input').selector.lastSearch") == text }
     @elements = nil
     yield
     @elements = nil
-    if input_id == "recipients"
+    if input_selector == ".recipients"
       @input.send_keys(*@input.attribute('value').size.times.map { :backspace })
       keep_trying_until do
-        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 || driver.execute_script("return $('\##{input_id}').data('token_input').selector.lastSearch") == ''
+        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 || driver.execute_script("return $('#{input_selector}').data('token_input').selector.lastSearch") == ''
       end
     end
   end
@@ -127,35 +127,42 @@ shared_examples_for "conversations selenium tests" do
     fj("#create_message_form textarea").send_keys(opts[:message])
 
     opts[:attachments].each_with_index do |fullpath, i|
-      f("#action_add_attachment").click
+      f(".action_add_attachment").click
 
       keep_trying_until { ffj("#create_message_form .file_input:visible")[i] }.send_keys(fullpath)
     end
 
     if opts[:media_comment]
       driver.execute_script <<-JS
-        $("#media_comment_id").val(#{opts[:media_comment].first.inspect})
-        $("#media_comment_type").val(#{opts[:media_comment].last.inspect})
+        $("#create_message_form input[name=media_comment_id]").val(#{opts[:media_comment].first.inspect})
+        $("#create_message_form input[name=media_comment_type]").val(#{opts[:media_comment].last.inspect})
         $("#create_message_form .media_comment").show()
-        $("#action_media_comment").hide()
+        $("#create_message_form .action_media_comment").hide()
       JS
     end
 
-    group_conversation_link = f("#group_conversation")
-    group_conversation_link.click if group_conversation_link.displayed? && opts[:group_conversation]
+    group_conversation_link = f(".group_conversation")
+    group_conversation_link.click if group_conversation_link && group_conversation_link.displayed? && opts[:group_conversation]
 
     expect {
-      # ensure that we've focused on the button, since file inputs go away
-      submit_form('#create_message_form')
-      # file uploads can trigger multiple ajax requests, so we just wait for stuff to get reenabled
-      keep_trying_until { f('#create_message_form textarea').enabled? }
-    }.to change(ConversationMessage, :count).by(opts[:group_conversation] ? 1 : ff('.token_input li').size)
+      submit_form('#create_message_form form')
+      # file uploads can trigger multiple ajax requests, so we just wait for the
+      # sent notification
+      assert_message_status("sent", opts[:message][0, 10])
+    }.to change(ConversationMessage, :count).by_at_least(opts[:group_conversation] ? 1 : ff('.token_input li').size)
 
     if opts[:group_conversation]
       message = ConversationMessage.last
       f("#message_#{message.id}").should_not be_nil
       message
     end
+  end
+
+  def assert_message_status(status = "sent", text = '')
+    keep_trying_until {
+      e = ff('#message_status li').last
+      e.text.downcase.should include("#{status} #{text.downcase}") #rescue false
+    }
   end
 
   def get_messages(load_convo = true, keep_trying = true)
@@ -191,7 +198,7 @@ shared_examples_for "conversations selenium tests" do
     driver.switch_to.alert.accept
 
     if confirm_conversation_deleted
-      keep_trying_until { get_conversations(false).size.should eql(orig_size - 1) }
+      keep_trying_until { get_conversations(false).size.should == orig_size - 1 }
     end
   end
 

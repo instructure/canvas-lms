@@ -27,8 +27,7 @@ describe "people" do
     expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
     open_student_group_dialog
     inputs = ffj('input:visible')
-    inputs[0].clear
-    inputs[0].send_keys(group_text)
+    replace_content(inputs[0], group_text)
     submit_form('#add_category_form')
     wait_for_ajaximations
     f('#category_list').should include_text(group_text)
@@ -92,8 +91,8 @@ describe "people" do
 
     it "should validate the main page" do
       users = ff('.user_name')
-      users[0].text.should == @teacher.name
-      users[1].text.should == @student_1.name
+      users[0].text.should match @teacher.name
+      users[1].text.should match @student_1.name
     end
 
     it "should navigate to registered services on profile page" do
@@ -140,20 +139,23 @@ describe "people" do
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
       submit_form('#add_category_form')
       wait_for_ajaximations
-      ff('.left_side .group_name').count.should == group_count.to_i
+      @course.groups.count.should == 4
+      f('.group_count').should include_text("#{group_count} Groups")
     end
 
     it "should test group structure functionality" do
       enroll_more_students
 
-      group_count = 4
+      group_count = "4"
       expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_groups').click
-      dialog.find_element(:css, '#category_split_group_count').send_keys(group_count)
+      replace_content(f('#category_split_group_count'), group_count)
+      @course.groups.count.should == 0
       submit_form('#add_category_form')
       wait_for_ajaximations
-      ff('.left_side .group_name').count.should == group_count.to_i
+      @course.groups.count.should == group_count.to_i
+      ffj('.left_side .group_name:visible').count.should == group_count.to_i
     end
 
     it "should edit a student group" do

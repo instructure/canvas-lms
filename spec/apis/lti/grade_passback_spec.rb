@@ -254,7 +254,30 @@ describe LtiApiController, :type => :integration do
     
       @assignment.submissions.find_by_user_id(@student.id).should be_nil
     end
-    
+
+    it "should fail if assignment has no points possible" do
+      @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
+      make_call('body' => replace_result('0.75', nil))
+      response.should be_success
+      xml = Nokogiri::XML.parse(response.body)
+      xml.at_css('imsx_codeMajor').content.should == 'failure'
+      xml.at_css('imsx_description').content.should == "Assignment has no points possible."
+    end
+
+    it "should notify users if it fails because the assignment has no points" do
+      @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
+      make_call('body' => replace_result('0.75', nil))
+      response.should be_success
+      submissions = @assignment.submissions.find_all_by_user_id(@student.id)
+      comments    = submissions.first.submission_comments
+      submissions.count.should == 1
+      comments.count.should == 1
+      comments.first.comment.should == <<-NO_POINTS
+An external tool attempted to grade this assignment as 75%, but was unable
+to because the assignment has no points possible.
+      NO_POINTS
+    end
+
     it "should reject out of bound scores" do
       @assignment.submissions.find_by_user_id(@student.id).should be_nil
       make_call('body' => replace_result('-1'))

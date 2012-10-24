@@ -290,8 +290,9 @@ describe Instructure::AdheresToPolicy::InstanceMethods do
             set_policy {}
             def is_a_context?; false; end
           end
+          user(:name => 'bob')
           Rails.cache.expects(:fetch).never
-          B.new.grants_rights?(user(:name => 'bob'))
+          B.new.grants_rights?(@user)
         end
       end
 
@@ -306,9 +307,10 @@ describe Instructure::AdheresToPolicy::InstanceMethods do
             }
             def is_a_context?; false; end
           end
+          user(:name => 'bob')
           Rails.cache.expects(:fetch).never
           b = B.new
-          b.grants_rights?(user(:name => 'bob'), {})
+          b.grants_rights?(@user, {})
           b.session.should_not be_nil
         end
       end

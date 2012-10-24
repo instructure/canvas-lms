@@ -147,6 +147,7 @@ module SIS
             # commit pending incremental account associations
             incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
 
+            associated_enrollment = nil
             type = if role =~ /\Ateacher\z/i
                 'TeacherEnrollment'
               elsif role =~ /student/i
@@ -156,7 +157,12 @@ module SIS
               elsif role =~ /\Aobserver\z/i
                 if associated_user_id
                   pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, associated_user_id)
-                  associated_enrollment = pseudo && @course.student_enrollments.find_by_user_id(pseudo.user_id)
+                  if status =~ /\Aactive/i
+                    associated_enrollment = pseudo && @course.student_enrollments.find_by_user_id(pseudo.user_id)
+                  else
+                    # the observed user may have already been concluded
+                    associated_enrollment = pseudo && @course.all_student_enrollments.find_by_user_id(pseudo.user_id)
+                  end
                 end
                 'ObserverEnrollment'
               elsif role =~ /\Adesigner\z/i

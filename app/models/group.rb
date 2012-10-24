@@ -51,19 +51,16 @@ class Group < ActiveRecord::Base
   has_many :external_feeds, :as => :context, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
   belongs_to :wiki
-  has_many :default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages
-  has_many :active_default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages, :conditions => ['wiki_pages.workflow_state = ?', 'active']
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
-  has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
-  has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :collections, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
   has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
   has_many :user_follows, :foreign_key => 'following_user_id'
+  has_many :content_participation_counts, :as => :context, :dependent => :destroy
 
   before_save :ensure_defaults, :maintain_category_attribute
   after_save :close_memberships_if_deleted
@@ -220,6 +217,8 @@ class Group < ActiveRecord::Base
     else
       member = self.group_memberships.create(attrs)
     end
+    # permissions for this user in the group are probably different now
+    Rails.cache.delete(permission_cache_key_for(user))
     return member
   end
 
@@ -416,7 +415,7 @@ class Group < ActiveRecord::Base
       { :id => TAB_HOME,          :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
       { :id => TAB_ANNOUNCEMENTS, :label => t('#tabs.announcements', "Announcements"), :css_class => 'announcements', :href => :group_announcements_path },
       { :id => TAB_PAGES,         :label => t("#group.tabs.pages", "Pages"), :css_class => 'pages', :href => :group_wiki_pages_path },
-      { :id => TAB_PEOPLE,        :label => t("#group.tabs.people", "People"), :css_class => 'peopel', :href => :group_users_path },
+      { :id => TAB_PEOPLE,        :label => t("#group.tabs.people", "People"), :css_class => 'people', :href => :group_users_path },
       { :id => TAB_DISCUSSIONS,   :label => t("#group.tabs.discussions", "Discussions"), :css_class => 'discussions', :href => :group_discussion_topics_path },
       { :id => TAB_CHAT,          :label => t("#group.tabs.chat", "Chat"), :css_class => 'chat', :href => :group_chat_path },
       { :id => TAB_FILES,         :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path },

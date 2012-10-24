@@ -26,7 +26,7 @@ class AssessmentQuestion < ActiveRecord::Base
   belongs_to :assessment_question_bank, :touch => true
   simply_versioned :automatic => false
   acts_as_list :scope => :assessment_question_bank_id
-  before_save :infer_defaults
+  before_validation :infer_defaults
   after_save :translate_links_if_changed
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
 

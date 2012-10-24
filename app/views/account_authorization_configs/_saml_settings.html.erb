@@ -1,101 +1,235 @@
-<% @account_config = @account_configs.first %>
-<% form_id = @account_config.saml_authentication? ? 'auth_form' : 'saml_form' %>
-<% active = @account_config.saml_authentication? ? 'class="active"' : '' %>
-<% debugging = @account_config && @account_config.debugging? %>
+<%
+   @saml_configs = @account_configs.clone
+   @saml_configs << @account.account_authorization_configs.new
+   @account_config = @saml_configs.first
+   active = @account_config.saml_authentication? ? 'class="active"' : ''
+   position_options = []
+   (@saml_configs.length - 1).times {|i|position_options << [i + 1,i + 1]}
+   debugging = @account_config && @account_config.debugging?
+%>
 <div id="saml_div" <%= raw active %>>
-<% form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class => "auth_type saml_form") do %>
-  <% fields_for @account_config, :index => 0 do |f| %>
-    <%= f.hidden_field :auth_type, :value => 'saml' %>
-    <%= f.hidden_field :id %>
-    <table class="formtable" style="margin-left: 20px;">
-      <tr>
-        <td><%= f.blabel :auth_type, :en => "Type" %></td>
-        <td>
-          <span class="auth_form">
-            <%= @account_config.auth_type || 'SAML' %>
-          </span>
-          <span class="auth_info"><%= @account_config.auth_type || 'SAML' %></span>
-        </td>
-      </tr>
-      <tr>
-        <td><%= f.blabel :log_in_url, :en => "Log On URL" %></td>
-        <td class="nobr">
-          <%= f.text_field :log_in_url, :class => "auth_form", :style => "width: 450px;" %>
-          <span class="auth_info log_in_url"><%= @account_config.log_in_url %></span>
-        </td>
-      </tr>
-      <tr>
-        <td><%= f.blabel :log_out_url, :en => "Log Out URL" %></td>
-        <td class="nobr">
-          <%= f.text_field :log_out_url, :class => "auth_form", :style => "width: 450px;" %>
-          <span class="auth_info log_out_url"><%= @account_config.log_out_url %></span>
-        </td>
-      </tr>
-      <tr>
-        <td><%= f.blabel :change_password_url, :en => "Change Password Link" %></td>
-        <td class="nobr">
-          <%= f.text_field :change_password_url, :class => "auth_form", :style => "width: 450px;" %>
-          <span class="auth_info change_password_url"><%= @account_config.change_password_url %></span>
-        </td>
-      </tr>
-      <tr>
-        <td><%= f.blabel :certificate_fingerprint, :en => "Certificate Fingerprint" %></td>
-        <td class="nobr">
-          <%= f.text_field :certificate_fingerprint, :class => "auth_form", :style => "width: 450px;" %>
-          <span class="auth_info certificate_fingerprint"><%= @account_config.certificate_fingerprint %></span>
-        </td>
-      </tr>
-      <tr>
-        <td><%= f.blabel :login_attribute, :en => "Login Attribute" %></td>
-        <td class="nobr">
-          <%= f.select :login_attribute, @saml_login_attributes, {}, {:class => "auth_form"} %>
-          <span class="auth_info login_attribute"><%= @saml_login_attributes.invert[@account_config.login_attribute] %></span>
-        </td>
-      </tr>
-      <tr>
-        <td><%= f.blabel :identifier_format, :en => "Identifier Format" %></td>
-        <td class="nobr">
-          <%= f.select :identifier_format, @saml_identifiers, {}, {:class => "auth_form"} %>
-          <span class="auth_info identifier_format"><%= @account_config.identifier_format %></span>
-        </td>
-      </tr>
-      <tr>
-        <td><%= f.blabel :requested_authn_context, :en => "Authentication Context" %></td>
-        <td class="nobr">
-          <%= f.select :requested_authn_context, @saml_authn_contexts, {}, {:class => "auth_form"} %>
-          <span class="auth_info requested_authn_context"><%= @account_config.requested_authn_context %></span>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 200px;"><%= f.blabel :login_handle_name, :en => "Login Label" %></td>
-        <td style="vertical-align: top;" class="nobr">
-          <%= f.text_field :login_handle_name, :class => "auth_form", :style => "width: 300px;", :placeholder => AccountAuthorizationConfig.default_delegated_login_handle_name %>
-          <span class="auth_info auth_login_handle_name"><%= @account_configs[0].login_handle_name || AccountAuthorizationConfig.default_login_handle_name %></span>
-          <span class="auth_form" style="font-size: smaller;">
-            <br><%= t(:login_handle_name_description, "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc.") %>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="4">
-          <span class="auth_form">
-            <button type="submit" class="button"><%= t(:save_button, "Save Authentication Settings") %></button>
-            <button type="button" class="cancel_button button-secondary"><%= t("#buttons.cancel", "Cancel") %></button>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <span class="auth_info">
-            <%= link_to(t(:saml_meta_data_link, "Click here to see the service provider identity XML for this account."), :saml_meta_data) %>
-          </span>
-        </td>
-      </tr>
-    </table>
-      
-    <div class="debugging">
+ <% if @account_configs.count >= 2 %>
+    <div id="discovery_url_config">
+      <div class="admin-link-hover-area well discovery_url"
+           aria-controls="discovery_url_form"
+           data-hide-while-target-shown=true>
+        <p><%= t('discovery_url_description', <<-TEXT)
+        If a discovery url is set, canvas will forward all users to that URL when they need to be authenticated.
+        That page will need to then help the user figure out where they need to go to log in.
+        If no discovery url is configured, the first SAML configuration will be used to attempt to authenticate the user.
+        TEXT
+        %></p>
+        <div class="admin-links">
+          <button class="al-trigger ui-button">
+            <span class="al-trigger-inner">Manage</span>
+          </button>
+          <ul class="al-options">
+            <li>
+              <a href="#" class="element_toggler" aria-controls="discovery_url_form"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
+            </li>
+            <li>
+              <a href="#" data-url="<%= api_v1_account_destroy_discovery_url_path(@account) %>"
+                 rel="nofollow"
+                 class="delete_url"><span class="ui-icon ui-icon-trash"></span>Delete</a>
+            </li>
+          </ul>
+        </div>
+        <table class="formtable" style="margin-left: 20px;">
+          <tr>
+            <td><%= t :discovery_url, "Discovery URL:" %></td>
+            <td><span id="discovery_url_display"><%= @account.auth_discovery_url || t(:no_discovery_url, "None set" ) %></span></td>
+          </tr>
+        </table>
+      </div>
+      <% form_tag(api_v1_account_update_discovery_url_path(@account), :method => :put, :id => 'discovery_url_form', :class => "form-horizontal bootstrap-form discovery_url_form well", :style => hidden) do %>
+        <input type="text" name="discovery_url" id="discovery_url_input" class="input-xlarge" value="<%= @account.auth_discovery_url %>">
+        <button type="submit" class="button btn-primary">Submit</button>
+        <button class="element_toggler button" aria-controls="discovery_url_form">Cancel</button>
+      <% end %>
+    </div>
+  <% end %>
+    <% @saml_configs.each_with_index do |config, i|
+       form_id = "saml_config_#{config.id}_form"
+       delete_url = config.new_record? ? '' : api_v1_account_delete_aac_path(@account, config)
+    %>
+
+      <div>
+        <div class="admin-link-hover-area well auth_config"
+             aria-controls="<%= form_id %>"
+             data-hide-while-target-shown=true
+             <%= hidden(true) if config.new_record? %>>
+          <div class="admin-links">
+            <button class="al-trigger ui-button">
+              <span class="al-trigger-inner">Manage</span>
+            </button>
+            <ul class="al-options">
+              <li><a href="#" class="element_toggler" aria-controls="<%= form_id %>"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
+              </li>
+              <li>
+                <a href="#" data-url="<%= delete_url %>"
+                   data-remove=".auth_config"
+                   rel="nofollow"
+                   data-confirm="Are you sure?"><span class="ui-icon ui-icon-trash"></span>Delete</a></li>
+            </ul>
+
+          </div>
+          <table class="formtable" style="margin-left: 20px;">
+            <tr>
+              <td><%= t :auth_type, "Type" %></td>
+              <td><%= config.auth_type || 'SAML' %></td>
+            </tr>
+            <% if @account.multi_auth? %>
+              <tr>
+                <td><%= t :auth_url, "Login url for this config" %></td>
+                <td><%= aac_login_url(config) %></td>
+              </tr>
+            <% end %>
+            <tr>
+              <td><%= t :idp_entity_id, "IdP Entity ID" %></td>
+              <td class="nobr"><%= config.idp_entity_id %></td>
+            </tr>
+            <tr>
+              <td><%= t :log_in_url, "Log On URL" %></td>
+              <td class="nobr"><%= config.log_in_url %></td>
+            </tr>
+            <tr>
+              <td><%= t :log_out_url, "Log Out URL" %></td>
+              <td class="nobr"><%= config.log_out_url %></td>
+            </tr>
+            <tr>
+              <td><%= t :change_password_url, "Change Password Link" %></td>
+              <td class="nobr"><%= config.change_password_url %></td>
+            </tr>
+            <tr>
+              <td><%= t :certificate_fingerprint, "Certificate Fingerprint" %></td>
+              <td class="nobr"><%= config.certificate_fingerprint %></td>
+            </tr>
+            <tr>
+              <td><%= t :login_attribute, "Login Attribute" %></td>
+              <td class="nobr"><%= @saml_login_attributes.invert[config.login_attribute] %></td>
+            </tr>
+            <tr>
+              <td><%= t :identifier_format, "Identifier Format" %></td>
+              <td class="nobr"><%= config.identifier_format %></td>
+            </tr>
+            <tr>
+              <td><%= t :requested_authn_context, "Authentication Context" %></td>
+              <td class="nobr"><%= config.requested_authn_context %></td>
+            </tr>
+            <tr>
+              <td style="vertical-align: top; width: 200px;"><%= t :login_handle_name, "Login Label" %></td>
+              <td style="vertical-align: top;" class="nobr"><%= config.login_handle_name || AccountAuthorizationConfig.default_login_handle_name %></td>
+            </tr>
+            <% if @account.multi_auth? %>
+              <tr>
+                <td><%= t :position, "Position" %></td>
+                <td><%= config.position %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+
+        <%
+           url = config.new_record? ? api_v1_account_create_aac_path(@account) : api_v1_account_update_aac_path(@account, config)
+           method = config.new_record? ? :post : :put
+           form_tag(url, :method => method, :id => form_id, :class => "form-horizontal bootstrap-form auth_type saml_form well", :style => hidden) do
+        %>
+          <% fields_for config do |f| %>
+            <%= f.hidden_field :auth_type, :value => 'saml' %>
+            <%= f.hidden_field :id %>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :idp_entity_id, :en => "IdP Entity ID" %></label>
+              <div class="controls">
+                <%= f.text_field :idp_entity_id, :class => "input-xlarge" %>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :log_in_url, :en => "Log On URL" %></label>
+              <div class="controls">
+                <%= f.text_field :log_in_url, :class => "input-xlarge" %>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :log_out_url, :en => "Log Out URL" %></label>
+              <div class="controls">
+                <%= f.text_field :log_out_url, :class => "input-xlarge" %>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :change_password_url, :en => "Change Password Link" %></label>
+              <div class="controls">
+                <%= f.text_field :change_password_url, :class => "input-xlarge" %>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :certificate_fingerprint, :en => "Certificate Fingerprint" %></label>
+              <div class="controls">
+                <%= f.text_field :certificate_fingerprint, :class => "input-xlarge" %>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :login_attribute, :en => "Login Attribute" %></label>
+              <div class="controls">
+                <%= f.select :login_attribute, @saml_login_attributes, {}, {:class => "input-xlarge"} %>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :identifier_format, :en => "Identifier Format" %></label>
+              <div class="controls">
+                <%= f.select :identifier_format, @saml_identifiers, {}, {:class => "input-xlarge"} %>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :requested_authn_context, :en => "Authentication Context" %></label>
+              <div class="controls">
+                <%= f.select :requested_authn_context, @saml_authn_contexts, {}, {:class => "input-xlarge"} %>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="input01"><%= f.blabel :login_handle_name, :en => "Login Label" %></label>
+              <div class="controls">
+                <%= f.text_field :login_handle_name, :class => "input-xlarge" %>
+                <p class="help-block"><%= t(:login_handle_name_description, "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc.") %></p>
+              </div>
+            </div>
+            <% if @saml_configs.length > 1 %>
+              <div class="control-group">
+                <label class="control-label" for="input01"><%= f.blabel :position, :en => "Position" %></label>
+                <div class="controls">
+                  <% options = config.new_record? ? [["Last", nil]] + position_options : position_options %>
+                  <%= f.select :position, options, {}, {:class => "input-xlarge"} %>
+                </div>
+              </div>
+            <% end %>
+            <button type="submit" class="button btn-primary">Submit</button>
+            <% unless config.new_record? %>
+              <button class="element_toggler button" aria-controls="<%= form_id %>">Cancel</button>
+            <% end %>
+
+          <% end %>
+        <% end %>
+      </div>
+
+    <% end %>
+
+
+  <button class="element_toggler button"
+          aria-controls="saml_config__form"
+          data-hide-while-target-shown=true>Add New SAML Config</button>
+
+
+  <div class="debugging">
       <h3 style="margin-top: 10px"><%= t(:saml_debugging, "Debugging") %></h3>
-      
+
       <div id="saml_debug_console">
         <p>
           <%= t 'saml_debug_instructions', <<-TEXT
@@ -110,7 +244,7 @@
           <a href="<%= account_saml_testing_url(@account) %>" id="refresh_saml_debugging" class="button" style="<%= hidden(debugging) %>"><%= t('refresh_debugging', 'Refresh') %></a>
           <a href="<%= account_saml_testing_stop_url(@account) %>" id="stop_saml_debugging" class="button" style="<%= hidden(debugging) %>"><%= t('stop_debugging', 'Stop Debugging') %></a>
         </p>
-        
+
         <div id="saml_debug_info" style="<%= hidden(debugging) %>">
           <% if @account_config && @account_config.debugging? %>
             <%= render :partial => 'saml_testing.html' %>
@@ -118,7 +252,5 @@
         </div>
       </div>
     </div>
-      
-  <% end %>
-<% end %>
+
 </div>

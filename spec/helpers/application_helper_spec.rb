@@ -404,4 +404,22 @@ describe ApplicationHelper do
       img['style'].should match %r"width: 30px"
     end
   end
+
+  describe "jt" do
+    after do
+      I18n.locale = nil
+    end
+
+    it "should output the translated default" do
+      def i18n_scope; "date.days"; end
+      (I18n.available_locales - [:en]).each do |locale|
+        I18n.locale = locale
+        expected = I18n.t("#date.days.today").to_json
+        # relative
+        jt("today", nil).should include expected
+        # and absolute
+        jt("#date.days.today", nil).should include expected
+      end
+    end
+  end
 end

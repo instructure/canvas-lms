@@ -16,6 +16,7 @@ ActionController::Routing::Routes.draw do |map|
   map.search_recipients 'search/recipients', :controller => 'search', :action => 'recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
   map.conversations_watched_intro 'conversations/watched_intro', :controller => 'conversations', :action => 'watched_intro', :conditions => {:method => :post}
+  map.conversation_batches 'conversations/batches', :controller => 'conversations', :action => 'batches'
   map.resources :conversations, :only => [:index, :show, :update, :create, :destroy] do |conversation|
     conversation.add_recipients 'add_recipients', :controller => 'conversations', :action => 'add_recipients', :conditions => {:method => :post}
     conversation.add_message 'add_message', :controller => 'conversations', :action => 'add_message', :conditions => {:method => :post}
@@ -105,6 +106,7 @@ ActionController::Routing::Routes.draw do |map|
   def add_chat(context)
     context.resources :chats
     context.chat 'chat', :controller => 'context', :action => 'chat'
+    context.tinychat 'tinychat.html', :controller => 'context', :action => 'chat_iframe'
     context.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
   end
 
@@ -266,7 +268,6 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     course.resources :collaborations
-    course.resources :short_messages
 
     course.resources :gradebook_uploads
     course.resources :rubrics
@@ -319,7 +320,14 @@ ActionController::Routing::Routes.draw do |map|
     course.test_student 'test_student', :controller => 'courses', :action => 'reset_test_student', :conditions => {:method => :delete}
   end
 
-  map.resources :page_views, :only => [:update,:index]
+  map.connect '/submissions/:submission_id/attachments/:attachment_id/crocodoc_sessions',
+    :controller => :crocodoc_sessions, :action => :create,
+    :conditions => {:method => :post}
+  map.connect '/attachments/:attachment_id/crocodoc_sessions',
+    :controller => :crocodoc_sessions, :action => :create,
+    :conditions => {:method => :post}
+
+  map.resources :page_views, :only => [:update]
   map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
@@ -400,7 +408,6 @@ ActionController::Routing::Routes.draw do |map|
     add_conferences(group)
     add_media(group)
     group.resources :collaborations
-    group.resources :short_messages
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
     group.profile 'profile', :controller => :groups, :action => 'profile', :conditions => {:method => :get}
   end
@@ -476,7 +483,6 @@ ActionController::Routing::Routes.draw do |map|
   map.report_avatar_image 'images/users/:user_id/report', :controller => 'users', :action => 'report_avatar_image', :conditions => {:method => :post}
   map.update_avatar_image 'images/users/:user_id', :controller => 'users', :action => 'update_avatar_image', :conditions => {:method => :put}
 
-  map.menu_courses 'menu_courses', :controller => 'users', :action => 'menu_courses'
   map.all_menu_courses 'all_menu_courses', :controller => 'users', :action => 'all_menu_courses'
 
   map.grades "grades", :controller => "users", :action => "grades"
@@ -486,6 +492,7 @@ ActionController::Routing::Routes.draw do |map|
   map.logout "logout", :controller => "pseudonym_sessions", :action => "destroy"
   map.cas_login "login/cas", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.otp_login "login/otp", :controller => "pseudonym_sessions", :action => "otp_login", :conditions => { :method => [:get, :post] }
+  map.aac_login "login/:account_authorization_config_id", :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.disable_mfa "users/:user_id/mfa", :controller => "pseudonym_sessions", :action => "disable_otp_login", :conditions => { :method => :delete }
   map.clear_file_session "file_session/clear", :controller => "pseudonym_sessions", :action => "clear_file_session"
   map.register "register", :controller => "users", :action => "new"
@@ -499,7 +506,7 @@ ActionController::Routing::Routes.draw do |map|
     user.delete 'delete', :controller => 'users', :action => 'delete'
     add_files(user, :images => true)
     add_zip_file_imports(user)
-    user.resources :page_views, :only => [:index]
+    user.resources :page_views, :only => 'index'
     user.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
@@ -652,6 +659,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.post 'courses/:course_id/files', :action => :create_file
       courses.post 'courses/:course_id/folders', :controller => :folders, :action => :create
       courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
+      courses.get  'courses/:course_id/tabs', :action => :tabs, :path_name => "course_tabs"
     end
 
     api.with_options(:controller => :sections) do |sections|
@@ -810,7 +818,15 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
-      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => 'update_all'
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :show_discovery_url
+      authorization_configs.put 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :update_discovery_url, :path_name => 'account_update_discovery_url'
+      authorization_configs.delete 'accounts/:account_id/account_authorization_configs/discovery_url', :action => :destroy_discovery_url, :path_name => 'account_destroy_discovery_url'
+
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs', :action => :index
+      authorization_configs.get 'accounts/:account_id/account_authorization_configs/:id', :action => :show
+      authorization_configs.post 'accounts/:account_id/account_authorization_configs', :action => :create, :path_name => 'account_create_aac'
+      authorization_configs.put 'accounts/:account_id/account_authorization_configs/:id', :action => :update, :path_name => 'account_update_aac'
+      authorization_configs.delete 'accounts/:account_id/account_authorization_configs/:id', :action => :destroy, :path_name => 'account_delete_aac'
     end
 
     api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index, :path_name => 'user_page_views'
@@ -825,6 +841,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.get 'conversations', :action => :index, :path_name => 'conversations'
       conversations.post 'conversations', :action => :create
       conversations.post 'conversations/mark_all_as_read', :action => :mark_all_as_read
+      conversations.get 'conversations/batches', :action => :batches, :path_name => 'conversations_batches'
       conversations.get 'conversations/:id', :action => :show
       conversations.put 'conversations/:id', :action => :update # stars, subscribed-ness, workflow_state
       conversations.delete 'conversations/:id', :action => :destroy
@@ -866,7 +883,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :groups) do |groups|
       groups.resources :groups, :except => [:index]
-      groups.get 'users/self/groups', :action => :index
+      groups.get 'users/self/groups', :action => :index, :path_name => "current_user_groups"
       groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
@@ -935,7 +952,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :favorites) do |favorites|
-      favorites.get "users/self/favorites/courses", :action => :list_favorite_courses
+      favorites.get "users/self/favorites/courses", :action => :list_favorite_courses, :path_name => :list_favorite_courses
       favorites.post "users/self/favorites/courses/:id", :action => :add_favorite_course
       favorites.delete "users/self/favorites/courses/:id", :action => :remove_favorite_course
       favorites.delete "users/self/favorites/courses", :action => :reset_course_favorites
@@ -982,6 +999,16 @@ ActionController::Routing::Routes.draw do |map|
       outcomes.get "outcomes/:id", :action => :show, :path_name => "outcome"
       outcomes.put "outcomes/:id", :action => :update
       outcomes.delete "outcomes/:id", :action => :destroy
+    end
+
+    api.with_options(:controller => :media_objects) do |media_objects|
+      media_objects.get 'media_objects/:media_object_id', :action => :show, :path_name => 'media_object'
+    end
+
+    api.with_options(:controller => :media_tracks) do |media_tracks|
+      media_tracks.post   'media_objects/:media_object_id/media_tracks', :action => :create, :path_name => 'create_media_track'
+      media_tracks.delete "media_objects/:media_object_id/media_tracks/:media_track_id", :action => :destroy, :path_name => 'destroy_media_track'
+      media_tracks.get    "media_objects/:media_object_id/media_tracks/:id", :action => :show, :path_name => 'media_track'
     end
   end
 

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -53,6 +53,7 @@ describe 'Submissions API', :type => :integration do
       "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}?preview=1",
       "user_id"=>student.id,
       "grade"=>nil,
+      "grader_id"=>nil,
       "body"=>nil,
       "submitted_at"=>nil,
       "submission_history"=>[],
@@ -119,7 +120,7 @@ describe 'Submissions API', :type => :integration do
 
     it "should post to submissions" do
       @a1 = @course.assignments.create!({:title => 'assignment1', :grading_type => 'percent', :points_possible => 10})
-      raw_api_call(:put,
+      json = raw_api_call(:put,
                       "/api/v1/sections/#{@default_section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
       { :controller => 'submissions_api', :action => 'update',
         :format => 'json', :section_id => @default_section.id.to_s,
@@ -127,12 +128,15 @@ describe 'Submissions API', :type => :integration do
         { :submission => { :posted_grade => '75%' } })
       response.status.should == "404 Not Found"
 
+      expect {
       json = api_call(:put,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
       { :controller => 'submissions_api', :action => 'update',
         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
         :assignment_id => @a1.id.to_s, :id => @student1.id.to_s },
         { :submission => { :posted_grade => '75%' } })
+        # never more than 1 job added, because it's in a Delayed::Batch
+      }.to change { Delayed::Job.jobs_count(:current) }.by(1)
 
       Submission.count.should == 2
       @submission = Submission.last(:order => :id)
@@ -364,7 +368,7 @@ describe 'Submissions API', :type => :integration do
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     sub1 = submit_homework(a1, student1)
     media_object(:media_id => "3232", :media_type => "audio")
-    a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio"})
+    a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher})
     comment = sub1.submission_comments.first
 
     @user = student1
@@ -378,6 +382,7 @@ describe 'Submissions API', :type => :integration do
     json.should == {
         "id"=>sub1.id,
         "grade"=>"A-",
+        "grader_id"=>@teacher.id,
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -398,7 +403,7 @@ describe 'Submissions API', :type => :integration do
            },
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
-           "author_id"=>student1.id}],
+           "author_id"=>@teacher.id}],
         "score"=>13.5,
         "workflow_state"=>"graded"}
 
@@ -455,9 +460,9 @@ describe 'Submissions API', :type => :integration do
     media_object(:media_id => "54321", :context => student1, :user => student1)
     mock_kaltura = mock('Kaltura::ClientV3')
     Kaltura::ClientV3.stubs(:new).returns(mock_kaltura)
-    mock_kaltura.expects :startSession
-    mock_kaltura.expects(:flavorAssetGetByEntryId).returns([{:fileExt => 'mp4', :id => 'fake'}])
-    mock_kaltura.expects(:flavorAssetGetDownloadUrl).returns("https://kaltura.example.com/some/url")
+    mock_kaltura.expects(:media_sources).returns([{"height"=>"240","bitrate"=>"382","isOriginal"=>"0","width"=>"336","content_type"=>"video/mp4",
+                                                   "containerFormat"=>"isom","url"=>"https://kaltura.example.com/some/url","size"=>"204","fileExt"=>"mp4"}])
+
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     stub_kaltura
     json = api_call(:get,
@@ -494,7 +499,7 @@ describe 'Submissions API', :type => :integration do
     sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") { |s| s.attachment = attachment_model(:context => s, :filename => 'snapshot.png', :content_type => 'image/png'); s.attachments = [attachment_model(:context => a1, :filename => 'ss2.png', :content_type => 'image/png')] }
 
     media_object(:media_id => "3232", :context => student1, :user => student1, :media_type => "audio")
-    a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio"})
+    a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher})
     sub1.reload
     sub1.submission_comments.size.should == 1
     comment = sub1.submission_comments.first
@@ -508,13 +513,14 @@ describe 'Submissions API', :type => :integration do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => a1.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
-    
+
     sub1.reload
     sub2.reload
-    
+
     res =
       [{"id"=>sub1.id,
         "grade"=>"A-",
+        "grader_id"=>@teacher.id,
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -540,6 +546,7 @@ describe 'Submissions API', :type => :integration do
         "submission_history"=>
          [{"id"=>sub1.id,
            "grade"=>nil,
+           "grader_id"=>nil,
            "body"=>"test!",
            "assignment_id" => a1.id,
            "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -553,6 +560,7 @@ describe 'Submissions API', :type => :integration do
            "workflow_state" => "submitted"},
           {"id"=>sub1.id,
            "grade"=>nil,
+           "grader_id"=>nil,
            "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
@@ -572,6 +580,7 @@ describe 'Submissions API', :type => :integration do
            "workflow_state" => "submitted"},
           {"id"=>sub1.id,
            "grade"=>"A-",
+           "grader_id"=>@teacher.id,
            "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
@@ -620,7 +629,7 @@ describe 'Submissions API', :type => :integration do
            },
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
-           "author_id"=>student1.id}],
+           "author_id"=>@teacher.id}],
         "media_comment" =>
          { "media_type"=>"video",
            "media_id"=>"54321",
@@ -631,6 +640,7 @@ describe 'Submissions API', :type => :integration do
         "workflow_state"=>"graded"},
        {"id"=>sub2.id,
         "grade"=>"F",
+        "grader_id"=>@teacher.id,
         "assignment_id" => a1.id,
         "body"=>nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1",
@@ -639,6 +649,7 @@ describe 'Submissions API', :type => :integration do
         "submission_history"=>
          [{"id"=>sub2.id,
            "grade"=>"F",
+           "grader_id"=>@teacher.id,
            "assignment_id" => a1.id,
            "body"=>nil,
            "submitted_at"=>"1970-01-01T04:00:00Z",
@@ -785,7 +796,7 @@ describe 'Submissions API', :type => :integration do
     }
     submission.turnitin_data = sample_turnitin_data
     submission.save!
-    
+
     # as teacher
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
@@ -795,7 +806,7 @@ describe 'Submissions API', :type => :integration do
     json.should have_key 'turnitin_data'
     sample_turnitin_data.delete :last_processed_attempt
     json['turnitin_data'].should == sample_turnitin_data.with_indifferent_access
-    
+
     # as student before graded
     @user = student
     json = api_call(:get,
@@ -804,7 +815,7 @@ describe 'Submissions API', :type => :integration do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => a1.id.to_s, :id => student.id.to_s })
     json.should_not have_key 'turnitin_data'
-    
+
     # as student after grading
     a1.grade_student(student, {:grade => 11})
     @user = student
@@ -815,7 +826,7 @@ describe 'Submissions API', :type => :integration do
             :assignment_id => a1.id.to_s, :id => student.id.to_s })
     json.should have_key 'turnitin_data'
     json['turnitin_data'].should == sample_turnitin_data.with_indifferent_access
-    
+
   end
 
   it "should return all submissions for a student" do
@@ -874,6 +885,18 @@ describe 'Submissions API', :type => :integration do
     json.all? { |submission| submission['assignment_id'].should == a1.id }.should be_true
 
     # by sis login id!
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, "sis_login_id:#{student2.pseudonym.unique_id}"],
+            :assignment_ids => [a1.to_param] })
+
+    json.size.should == 2
+    json.all? { |submission| submission['assignment_id'].should == a1.id }.should be_true
+
+    # concluded enrollments!
+    student2.enrollments.first.conclude
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/students/submissions.json",
           { :controller => 'submissions_api', :action => 'for_students',
@@ -1681,7 +1704,7 @@ describe 'Submissions API', :type => :integration do
       def has_query_exemption?
         true
       end
-      
+
       it "should reject uploading files to other students' submissions" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
                         { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student2.to_param }, {}, {}, { :expected_status => 401 })

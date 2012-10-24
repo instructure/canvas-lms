@@ -24,32 +24,32 @@
     <div id="file_uploads_progress" style="display: none; position: absolute; right: 5px; background-color: #eee; z-index: 2; border: 1px solid #aaa; border-top-width: 0; padding: 2px 5px;">
       <a href="#" id="file_uploads_dialog_link"><%= t 'messages.uploading', "Uploading 5 Files..." %></a>
     </div>
-    <ul id="files_structure_list">
+    <ul id="files_structure_list" role="tree" aria-label="<%= t('file_list', 'File list') %>" aria-live="polite">
       <li id="swfupload_holder">
         <div id="file_swf"></div>
       </li>
       <% @contexts.each do |context| %>
         <% root_folder = Folder.root_folders(context).first %>
-        <li class="context folder folder_<%= root_folder.id %> <%= context.asset_string %>" style="display: none;">
-          <span class="text name"><%= context.name %></span>
+        <li id="folder_<%= root_folder.id %>" class="context folder folder_<%= root_folder.id %> <%= context.asset_string %>" style="display: none;" role="treeitem" tabindex="0" aria-expanded="true">
+          <span class="text name" role="link" aria-controls="folder_<%= root_folder.id %> "><%= context.name %></span>
           <span class="text id" style="display: none;"><%= root_folder.id %></span>
           <ul>
           </ul>
         </li>
       <% end %>
-      <li class="file file_blank" style="display: none;">
+      <li class="file file_blank" style="display: none;" role="treeitem" tabindex="0">
         <span class="id" style="display: none;">&nbsp;</span>
-        <span class="text name">&nbsp;</span>
+        <span class="text name" role="link">&nbsp;</span>
       </li>
-      <li class="folder_blank" style="display: none;">
+      <li class="folder_blank" style="display: none;" role="treeitem" tabindex="0" aria-expanded="false">
         <span class="id" style="display: none;">&nbsp;</span>
-        <span class="text name">&nbsp;</span>
+        <span class="text name" role="link">&nbsp;</span>
         <ul>
         </ul>
       </li>
     </ul>
   </div>
-  <ul id="files_content" class="files_content">
+  <ul id="files_content" class="files_content" aria-label="<%= t('file_details', 'File details') %>">
   </ul>
 </div>
 <% unless showing_all_contexts %>
@@ -126,7 +126,6 @@
         <a href="#" class="lock_item_link no-hover folder_url" title="<%= t 'links.lock_folder', "Lock this Folder" %>"><%= image_tag "lock.png" %></a>
         <a href="#" class="unlock_item_link no-hover folder_url" style="display: none;" title="<%= t 'links.unlock_folder', "Unlock this Folder" %>"><%= image_tag "unlock.png" %></a>
       </span>
-      <a href="#" class="sort_icon" title="<%= t 'alts.drag_to_reorder', "Drag to reorder" %>""><%= image_tag "move-ns.png" %></a>
       <a href="#" class="rename_item_link no-hover"><%= image_tag "edit.png" %></a>
       <a href="#" class="delete_item_link no-hover"><%= image_tag "delete.png" %></a>
     </div>
@@ -149,7 +148,6 @@
         <a href="#" class="lock_item_link no-hover attachment_url" title="<%= t 'links.lock_file', "Lock this File" %>"><%= image_tag "lock.png" %></a>
         <a href="#" class="unlock_item_link no-hover attachment_url" style="display: none;" title="<%= t 'links.unlock_file', "Unlock this File" %>"><%= image_tag "unlock.png" %></a>
       </span>
-      <a href="#" class="sort_icon" title="<%= t 'links.reorder_file', 'Drag to reorder' %>"><%= image_tag "move-ns.png" %></a>
       <a href="#" class="rename_item_link no-hover attachment_url" title="<%= t 'links.rename_file', "Rename this File" %>"><%= image_tag "edit.png" %></a>
       <a href="#" class="delete_item_link no-hover attachment_url" title="<%= t 'links.delete_file', "Delete this File" %>"><%= image_tag "delete.png" %></a>
     </div>
@@ -294,7 +292,7 @@
       <%= f.hidden_field :parent_folder_id %>
       <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <span class="name" style="display: none;">&nbsp;</span>
-      <%= f.text_field :name, :title => "Folder Name" %>
+      <%= f.text_field :name, :maxlength => "255", :size => '30', :title => "Folder Name" %>
     <% end %>
     <div class="clear"></div>
   </li>

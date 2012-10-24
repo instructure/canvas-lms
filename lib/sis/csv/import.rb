@@ -334,7 +334,7 @@ module SIS
         headers = @headers[importer].to_a
         path = nil
         begin
-          Attachment.skip_scribd_submits
+          Attachment.skip_3rd_party_submits
           @csvs[importer].each do |csv|
             remaining_in_batch = 0
             FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS) do |row|
@@ -375,7 +375,7 @@ module SIS
           end
         ensure
           out_csv.close if out_csv
-          Attachment.skip_scribd_submits(false)
+          Attachment.skip_3rd_party_submits(false)
         end
         @csvs[importer] = new_csvs
       end

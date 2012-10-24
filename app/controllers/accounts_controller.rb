@@ -36,7 +36,7 @@ class AccountsController < ApplicationController
         # TODO: what would be more useful, include sub-accounts here
         # that you implicitly have access to, or have a separate method
         # to get the sub-accounts of an account?
-        @accounts = Api.paginate(@accounts, self, api_v1_accounts_path)
+        @accounts = Api.paginate(@accounts, self, api_v1_accounts_url)
         render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
       end
     end
@@ -66,7 +66,7 @@ class AccountsController < ApplicationController
   # Retrieve the list of courses in this account.
   #
   # @argument hide_enrollmentless_courses [optional] If set, only return courses that have at least one enrollment.
-  # @argument state[] [optional] If set, only return courses that are in the given state[s]. Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
+  # @argument state[] [optional] If set, only return courses that are in the given state(s). Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
   #
   # @example_response
   #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'sis_course_id': 'first-sis' },
@@ -78,7 +78,7 @@ class AccountsController < ApplicationController
 
     @courses = @account.associated_courses.scoped(:conditions => { :workflow_state => params[:state] })
     @courses = @courses.with_enrollments if params[:hide_enrollmentless_courses]
-    @courses = Api.paginate(@courses, self, api_v1_account_courses_path, :order => :id)
+    @courses = Api.paginate(@courses, self, api_v1_account_courses_url, :order => :id)
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end
@@ -362,7 +362,9 @@ class AccountsController < ApplicationController
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      list = UserList.new(params[:user_list], @context.root_account, @context.user_list_search_mode_for(@current_user))
+      list = UserList.new(params[:user_list],
+                          :root_account => @context.root_account,
+                          :search_method => @context.user_list_search_mode_for(@current_user))
       users = list.users
       account_users = users.map do |user|
         admin = user.flag_as_admin(@context, params[:membership_type])

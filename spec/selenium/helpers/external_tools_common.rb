@@ -25,9 +25,9 @@ shared_examples_for "external tools tests" do
     wait_for_ajax_requests
     ContextExternalTool.count > 0
     tool = ContextExternalTool.last
-    tool.name.should eql name
-    tool.consumer_key.should eql key
-    tool.shared_secret.should eql secret
+    tool.name.should == name
+    tool.consumer_key.should == key
+    tool.shared_secret.should == secret
     tool_checker tool, opts
   end
 
@@ -35,59 +35,59 @@ shared_examples_for "external tools tests" do
 
     if (opts.include? :xml)
       url = "http://example.com/other_url"
-      tool.url.should eql url
-      tool.workflow_state.should eql "public"
-      tool.description.should eql "Description"
+      tool.url.should == url
+      tool.workflow_state.should == "public"
+      tool.description.should == "Description"
       tool.has_editor_button.should be_true
       tool.has_resource_selection.should be_true
       tool.has_course_navigation.should be_true
       tool.has_account_navigation.should be_true
       tool.has_user_navigation.should be_true
-      f("#external_tool_#{tool.id} .url").text.should eql url
+      f("#external_tool_#{tool.id} .url").text.should == url
       f("#external_tool_#{tool.id} .editor_button").should be_displayed
       f("#external_tool_#{tool.id} .resource_selection").should be_displayed
       f("#external_tool_#{tool.id} .course_navigation").should be_displayed
       f("#external_tool_#{tool.id} .user_navigation").should be_displayed
       f("#external_tool_#{tool.id} .account_navigation").should be_displayed
-      f("#external_tool_#{tool.id} .readable_state").text.should eql "Public"
-      f("#external_tool_#{tool.id} .description").text.should eql "Description"
+      f("#external_tool_#{tool.id} .readable_state").text.should == "Public"
+      f("#external_tool_#{tool.id} .description").text.should == "Description"
     elsif opts.include? :url
       url = "https://lti-examples.heroku.com/tool_redirect"
       kitten_text = "pictures of kittens to your site"
-      tool.workflow_state.should eql "anonymous"
-      tool.url.should eql url
+      tool.workflow_state.should == "anonymous"
+      tool.url.should == url
       tool.description.should include_text kitten_text
       tool.has_editor_button.should be_true
       tool.settings.should be_present
       tool.settings[:editor_button].should be_present
-      f("#external_tool_#{tool.id} .url").text.should eql url
+      f("#external_tool_#{tool.id} .url").text.should == url
       f("#external_tool_#{tool.id} .description").text.should include_text kitten_text
       f("#external_tool_#{tool.id} .editor_button").should be_displayed
 
     else
-      tool.description.should eql @description
+      tool.description.should == @description
       tool.settings.count > 0
       tool.settings[:custom_fields].keys.count >0
       custom_hash = {@custom_key => @custom_value}
-      tool.settings[:custom_fields].should eql custom_hash
-      f("#external_tool_#{tool.id} .description").text.should eql @description
+      tool.settings[:custom_fields].should == custom_hash
+      f("#external_tool_#{tool.id} .description").text.should == @description
 
       if (opts.include? :manual_url)
-        f("#external_tool_#{tool.id} .url").text.should eql @manual_url
-        tool.url.should eql @manual_url
+        f("#external_tool_#{tool.id} .url").text.should == @manual_url
+        tool.url.should == @manual_url
       else
-        tool.domain.should eql @domain
+        tool.domain.should == @domain
       end
 
       if (opts.include? :name_only)
-        tool.workflow_state.should eql "name_only"
-        f("#external_tool_#{tool.id} .readable_state").text.should eql "Name Only"
+        tool.workflow_state.should == "name_only"
+        f("#external_tool_#{tool.id} .readable_state").text.should == "Name Only"
       elsif (opts.include? :public)
-        tool.workflow_state.should eql "public"
-        f("#external_tool_#{tool.id} .readable_state").text.should eql "Public"
+        tool.workflow_state.should == "public"
+        f("#external_tool_#{tool.id} .readable_state").text.should == "Public"
       else
-        tool.workflow_state.should eql "anonymous"
-        f("#external_tool_#{tool.id} .readable_state").text.should eql "Anonymous"
+        tool.workflow_state.should == "anonymous"
+        f("#external_tool_#{tool.id} .readable_state").text.should == "Anonymous"
       end
     end
 

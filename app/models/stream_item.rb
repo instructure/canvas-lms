@@ -264,7 +264,7 @@ class StreamItem < ActiveRecord::Base
 
   # call destroy_stream_items using a before_date based on the global setting
   def self.destroy_stream_items_using_setting
-    ttl = Setting.get('stream_items_ttl', 4.weeks.to_s).ago
+    ttl = Setting.get('stream_items_ttl', 4.weeks).to_i.ago
     # we pass false for the touch_users argument, on the assumption that these
     # stream items that we delete aren't visible on the user's dashboard anymore
     # anyway, so there's no need to invalidate all the caches.

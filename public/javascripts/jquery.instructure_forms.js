@@ -171,7 +171,7 @@ define([
         xhrSuccess.call(this, formData, {});
       } else if(doUploadFile && options.preparedFileUpload && options.context_code) {
         $.ajaxJSONPreparedFiles.call(this, {
-          handle_files: (options.upload_only ? options.success : options.handle_files),
+          handle_files: (options.upload_only ? xhrSuccess : options.handle_files),
           single_file: options.singleFile,
           context_code: $.isFunction(options.context_code) ? (options.context_code.call($form)) : options.context_code,
           asset_string: options.asset_string,

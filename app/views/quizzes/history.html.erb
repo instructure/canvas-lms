@@ -31,7 +31,7 @@
                 <%= image_tag "hourglass.png", :title => t('titles.score_pending_review', "This score is pending review, and may change") %>
               <% end %>
             <% end %>
-            <%= t(:score_for_attempt, "Attempt %{attempt_number}: %{score}", :attempt_number => version_instance.attempt, :score => version_instance.score) %>
+            <%= t(:score_for_attempt, "Attempt %{attempt_number}: %{score}", :attempt_number => version_instance.attempt, :score => render_score(version_instance.score)) %>
           </a>
         </li>
       <% end %>

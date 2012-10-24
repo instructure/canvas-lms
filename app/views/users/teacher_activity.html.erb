@@ -33,7 +33,7 @@
         <th><%= t('headings.current_score', %{Current Score}) %></th>
         <th><%= t('headings.final_score', %{Final Score}) %></th>
         <th><%= t('headings.ungraded', %{Ungraded Assignments}) %></th>
-        <% if course.user_has_been_teacher?(@current_user) %>
+        <% if course.user_has_been_instructor?(@current_user) %>
           <th>&nbsp;</th>
         <% end %>
       </tr>
@@ -73,7 +73,7 @@
               </div>
             <% end %>
           </td>
-          <% if course.user_has_been_teacher?(@current_user) %>
+          <% if course.user_has_been_instructor?(@current_user) %>
           <td>
             <a href="<%= message_user_path(student[:enrollment].user) %>" class="message_student_link" title="<%= t 'message_student', 'Message this student' %>"><%= image_tag "email.png" %></a>
           </td>

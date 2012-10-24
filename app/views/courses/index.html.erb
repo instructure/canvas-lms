@@ -30,10 +30,19 @@
 <% end %>
 
 <% unless @past_enrollments.empty? %>
-<h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
-<ul class="unstyled_list context_list past_enrollments">
-  <% @past_enrollments.each do |enrollment| %>
-    <%= render :partial => "shared/current_enrollment", :object => enrollment %>
-  <% end %>
-</ul>
+  <h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
+  <ul class="unstyled_list context_list past_enrollments">
+    <% @past_enrollments.each do |enrollment| %>
+      <%= render :partial => "shared/current_enrollment", :object => enrollment %>
+    <% end %>
+  </ul>
+<% end %>
+
+<% unless @future_enrollments.empty? %>
+  <h2><%= t('headings.future_enrollments', 'Future Enrollments') %></h2>
+  <ul class="unstyled_list context_list future_enrollments">
+    <% @future_enrollments.each do |enrollment| %>
+      <%= render :partial => 'shared/current_enrollment', :object => enrollment %>
+    <% end %>
+  </ul>
 <% end %>

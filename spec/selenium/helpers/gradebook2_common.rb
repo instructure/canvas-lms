@@ -75,6 +75,7 @@ shared_examples_for "gradebook2 selenium tests" do
       ff('#gradebook-toolbar ul.ui-kyle-menu').last.should be_displayed
       true
     end
+    yield(driver.find_element(:css, '#gradebook_settings')) if block_given?
     element_to_click.click if element_to_click != nil
   end
 
@@ -115,7 +116,7 @@ shared_examples_for "gradebook2 selenium tests" do
     keep_trying_until do
       students.each do |student_id, expected_score|
         row_total = f(".final_grade .student_#{student_id} .grade").text + '%'
-        row_total.should eql expected_score
+        row_total.should == expected_score
       end
     end
   end

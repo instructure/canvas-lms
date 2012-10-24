@@ -102,9 +102,9 @@ describe "Modules API", :type => :integration do
           {
               "type" => "Assignment",
               "id" => @assignment_tag.id,
-              "url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@assignment_tag.id}",
+              "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@assignment_tag.id}",
               "position" => 1,
-              "data_api_endpoint" => "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+              "url" => "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
               "title" => @assignment_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "must_submit" }
@@ -112,7 +112,7 @@ describe "Modules API", :type => :integration do
           {
               "type" => "Quiz",
               "id" => @quiz_tag.id,
-              "url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@quiz_tag.id}",
+              "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@quiz_tag.id}",
               "position" => 2,
               "title" => @quiz_tag.title,
               "indent" => 0,
@@ -121,9 +121,9 @@ describe "Modules API", :type => :integration do
           {
               "type" => "Discussion",
               "id" => @topic_tag.id,
-              "url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@topic_tag.id}",
+              "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@topic_tag.id}",
               "position" => 3,
-              "data_api_endpoint" => "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+              "url" => "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
               "title" => @topic_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "must_contribute" }
@@ -138,7 +138,7 @@ describe "Modules API", :type => :integration do
           {
               "type" => "ExternalUrl",
               "id" => @external_url_tag.id,
-              "url" => "http://www.example.com/api/v1/courses/#{@course.id}/module_item_redirect/#{@external_url_tag.id}",
+              "html_url" => "http://www.example.com/api/v1/courses/#{@course.id}/module_item_redirect/#{@external_url_tag.id}",
               "position" => 5,
               "title" => @external_url_tag.title,
               "indent" => 1,
@@ -155,11 +155,11 @@ describe "Modules API", :type => :integration do
       json.should == {
         "type" => "Page",
         "id" => @wiki_page_tag.id,
-        "url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@wiki_page_tag.id}",
+        "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@wiki_page_tag.id}",
         "position" => 1,
         "title" => @wiki_page_tag.title,
         "indent" => 0,
-        "data_api_endpoint" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}"
+        "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}"
       }
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@attachment_tag.id}",
@@ -169,11 +169,11 @@ describe "Modules API", :type => :integration do
       json.should == {
         "type" => "File",
         "id" => @attachment_tag.id,
-        "url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@attachment_tag.id}",
+        "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@attachment_tag.id}",
         "position" => 2,
         "title" => @attachment_tag.title,
         "indent" => 0,
-        "data_api_endpoint" => "http://www.example.com/api/v1/files/#{@attachment.id}"
+        "url" => "http://www.example.com/api/v1/files/#{@attachment.id}"
       }
     end
 

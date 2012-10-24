@@ -27,6 +27,8 @@ class ContentExport < ActiveRecord::Base
   serialize :settings
   attr_accessible
 
+  alias_method :context, :course
+
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'

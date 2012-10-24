@@ -30,4 +30,17 @@ describe GroupsController do
     html = Nokogiri::HTML(response.body)
     html.css('.floating_links a.add').attribute("href").text.should == "/groups/#{@group.id}/announcements#new"
   end
+
+  it "should not rendering 'pending' page when joining a self-signup group" do
+    enable_cache do
+      course_with_student_logged_in(:active_all => true)
+      category1 = @course.group_categories.create!(:name => "category 1")
+      category1.configure_self_signup(true, false)
+      category1.save!
+      g1 = @course.groups.create!(:name => "some group", :group_category => category1)
+
+      get "/courses/#{@course.id}/groups/#{g1.id}?join=1"
+      response.body.should_not =~ /This group has received your request to join/
+    end
+  end
 end

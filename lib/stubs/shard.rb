@@ -30,10 +30,11 @@ class Shard
   end
 
   def self.partition_by_shard(array, partition_proc = nil)
+    return [] if array.empty?
     Array(yield array)
   end
 
-  def self.with_each_shard
+  def self.with_each_shard(shards = nil)
     Array(yield)
   end
 
@@ -49,7 +50,7 @@ class Shard
     {}
   end
 
-  def description
+  def id
     "default"
   end
 
@@ -74,6 +75,10 @@ ActiveRecord::Base.class_eval do
   end
 
   def global_id
+    id
+  end
+
+  def local_id
     id
   end
 

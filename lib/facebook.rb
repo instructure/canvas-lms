@@ -39,7 +39,7 @@ module Facebook
   
   def self.authorize_url(oauth_request)
     callback_url = "#{protocol}://#{config['canvas_domain']}/facebook_success.html"
-    state = Canvas::Security.encrypt_password(oauth_request.id.to_s, 'facebook_oauth_request').join('.')
+    state = Canvas::Security.encrypt_password(oauth_request.global_id.to_s, 'facebook_oauth_request').join('.')
     "https://www.facebook.com/dialog/oauth?client_id=#{config['app_id']}&redirect_uri=#{CGI.escape(callback_url)}&response_type=token&scope=offline_access&state=#{CGI.escape(state)}"
   end
   
@@ -62,7 +62,7 @@ module Facebook
   end
   
   def self.app_url
-    "http://apps.facebook.com/#{ self.config['canvas_name'] }"
+    "http://apps.facebook.com/#{ URI.escape(self.config['canvas_name']) }"
   end
   
   def self.config_check(settings)

@@ -18,17 +18,17 @@ define [
         (s, n) -> s + $(n).outerHeight()
       , 0)
 
-  flashBox = (type, content, timeout) ->
+  flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
-      <li class='ui-state-#{type}'>
+      <li class="ui-state-#{type}" role="alert">
         <i></i>
         #{content}
-        <a href='#' class='close_link'>#{I18n.t("close", "Close")}</a>
+        <a href="#" class="close_link">#{I18n.t("close", "Close")}</a>
       </li>
     """)
 
     $node.appendTo($holder).
-      css('z-index', 1).
+      css(_.extend(zIndex: 1, cssOptions)).
       show('drop', direction: "up", 'fast', -> $(this).css('z-index', 2)).
       delay(timeout || 7000).
       animate({'z-index': 1}, 0).
@@ -42,3 +42,8 @@ define [
   $.flashError = (content, timeout) ->
     flashBox("error", content, timeout);
 
+  $.screenReaderFlashMessage = (content, timeout = 3000) ->
+    flashBox('success', content, timeout, position: 'absolute', left: -10000)
+
+  $.screenReaderFlashError = (content, timeout = 3000) ->
+    flashBox('error', content, timeout, position: 'absolute', left: -10000)

@@ -115,11 +115,10 @@ describe ConversationMessage do
       student = student_in_course.user
       student.associated_accounts << Account.default
       conversation = @teacher.initiate_conversation([student.id])
-      message = conversation.add_message("reprimanded!")
-      message.created_at = Time.at(0) # Jan 1, 1970 00:00:00 UTC
-      note = message.generate_user_note
+      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.at(0))
+      conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(1)
-      student.user_notes.first.should eql(note)
+      note = student.user_notes.first
       note.creator.should eql(@teacher)
       note.title.should eql("Private message, Jan 1, 1970")
       note.note.should eql("reprimanded!")
@@ -132,8 +131,7 @@ describe ConversationMessage do
       student = student_in_course.user
       student.associated_accounts << Account.default
       conversation = @teacher.initiate_conversation([student.id])
-      message = conversation.add_message("reprimanded!")
-      message.generate_user_note.should be_nil
+      conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(0)
     end
 
@@ -146,8 +144,7 @@ describe ConversationMessage do
       student2 = student_in_course.user
       student2.associated_accounts << Account.default
       conversation = @teacher.initiate_conversation([student1.id, student2.id])
-      message = conversation.add_message("message")
-      message.generate_user_note.should be_nil
+      conversation.add_message("reprimanded!", :generate_user_note => true)
       student1.user_notes.size.should be(0)
       student2.user_notes.size.should be(0)
     end
@@ -273,14 +270,13 @@ describe ConversationMessage do
       Account.default.destroy
       cm.reload
 
-      cm2 = cm.reply_from({
+      lambda { cm.reply_from({
         :purpose => 'general',
         :user => @teacher,
         :subject => "an email reply",
         :html => "body",
         :text => "body"
-      })
-      cm2.should be_nil
+      }) }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
     end
   end
 end

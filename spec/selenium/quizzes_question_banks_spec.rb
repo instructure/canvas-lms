@@ -113,7 +113,7 @@ describe "quizzes question banks" do
       wait_for_ajaximations
       f(".select_all_link").should be_displayed
     }
-    ffj("#find_question_dialog .bank:visible").size.should eql 1
+    ffj("#find_question_dialog .bank:visible").size.should == 1
 
     close_visible_dialog
     keep_trying_until {
@@ -122,7 +122,7 @@ describe "quizzes question banks" do
     }
     f(".find_bank_link").click
     wait_for_ajaximations
-    ffj("#find_bank_dialog .bank:visible").size.should eql 1
+    ffj("#find_bank_dialog .bank:visible").size.should == 1
   end
 
   it "should import questions from a question bank" do

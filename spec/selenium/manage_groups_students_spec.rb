@@ -8,120 +8,122 @@ describe "manage groups students" do
     course_with_teacher_logged_in
   end
 
-  it "should click on  the self signup help link " do
-    @student = @course.enroll_student(user_model(:name => "John Doe")).user
-    get "/courses/#{@course.id}/groups"
-    f(".add_category_link").click
-    form = f("#add_category_form")
-    form.find_element(:css, ".self_signup_help_link").click
-    f("#self_signup_help_dialog").should be_displayed
-  end
-
-  it "should move students from a deleted group back to unassigned" do
-    student = groups_student_enrollment(1).last
-    group_category = @course.group_categories.create(:name => "Some Category")
-    group = add_groups_in_category(group_category, 1).last
-    group.add_user student
-
-    get "/courses/#{@course.id}/groups"
-    category = fj(".group_category:visible")
-    category.find_elements(:css, ".group_blank .user_id_#{student.id}").should be_empty
-
-    driver.execute_script("$('#group_#{group.id} .delete_group_link').hover().click()") #move_to occasionally breaks in the hudson build
-    keep_trying_until do
-      driver.switch_to.alert.should_not be_nil
-      driver.switch_to.alert.accept
-      true
-    end
-    wait_for_ajaximations
-    category.find_elements(:css, ".group_blank .user_id_#{student.id}").should_not be_empty
-  end
-
-  it "should list all sections a student belongs to" do
-    @other_section = @course.course_sections.create!(:name => "Other Section")
-    student_in_course(:active_all => true)
-    @course.enroll_student(@student,
-                           :enrollment_state => "active",
-                           :section => @other_section,
-                           :allow_multiple_enrollments => true)
-
-    gc1 = @course.group_categories.create(:name => "Group Category 1")
-
-    get "/courses/#{@course.id}/groups"
-    wait_for_ajaximations
-
-    sections = f(".user_id_#{@student.id} .section_code")
-    sections.should include_text(@course.default_section.name)
-    sections.should include_text(@other_section.name)
-
-    f("#category_#{gc1.id} .group_blank .user_count").should include_text("1")
-  end
-
-  it "should not show sections for students when managing from an account" do
-    course_with_admin_logged_in(:course => @course, :username => "admin@example.com")
-    student_in_course(:name => "Student 1", :active_all => true)
-
-    @account = Account.default
-    gc1 = @account.group_categories.create(:name => "Group Category 1")
-
-    get "/accounts/#{@account.id}/groups"
-    wait_for_ajaximations
-
-    f(".group_blank .user_id_#{@student.id} .name").should include_text @student.sortable_name
-    f(".group_blank .user_id_#{@student.id} .section_code").text.should be_blank
-  end
-
-  it "should paginate and count users correctly" do
-    students_count = 20
-    students_count.times do |i|
-      student_in_course(:name => "Student #{i}")
+  context "misc" do
+    it "should click on  the self signup help link " do
+      @student = @course.enroll_student(user_model(:name => "John Doe")).user
+      get "/courses/#{@course.id}/groups"
+      f(".add_category_link").click
+      form = f("#add_category_form")
+      form.find_element(:css, ".self_signup_help_link").click
+      f("#self_signup_help_dialog").should be_displayed
     end
 
-    @other_section = @course.course_sections.create!(:name => "Other Section")
-    @course.enroll_student(@student,
-                           :enrollment_state => "active",
-                           :section => @other_section,
-                           :allow_multiple_enrollments => true)
+    it "should move students from a deleted group back to unassigned" do
+      student = groups_student_enrollment(1).last
+      group_category = @course.group_categories.create(:name => "Some Category")
+      group = add_groups_in_category(group_category, 1).last
+      group.add_user student
 
-    group_category = @course.group_categories.create(:name => "My Groups")
+      get "/courses/#{@course.id}/groups"
+      category = fj(".group_category:visible")
+      category.find_elements(:css, ".group_blank .user_id_#{student.id}").should be_empty
 
-    get "/courses/#{@course.id}/groups"
-    wait_for_ajaximations
+      driver.execute_script("$('#group_#{group.id} .delete_group_link').hover().click()") #move_to occasionally breaks in the hudson build
+      keep_trying_until do
+        driver.switch_to.alert.should_not be_nil
+        driver.switch_to.alert.accept
+        true
+      end
+      wait_for_ajaximations
+      category.find_elements(:css, ".group_blank .user_id_#{student.id}").should_not be_empty
+    end
 
-    category = f(".group_category")
-    unassigned_div = category.find_element(:css, ".group_blank")
+    it "should list all sections a student belongs to" do
+      @other_section = @course.course_sections.create!(:name => "Other Section")
+      student_in_course(:active_all => true)
+      @course.enroll_student(@student,
+                             :enrollment_state => "active",
+                             :section => @other_section,
+                             :allow_multiple_enrollments => true)
 
-    unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
-    unassigned_div.find_elements(:css, ".student").length.should == 15
-    # 15 comes from window.contextGroups.autoLoadGroupThreshold
+      gc1 = @course.group_categories.create(:name => "Group Category 1")
 
-    f(".next_page").click
-    wait_for_ajaximations
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
 
-    unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
-    unassigned_div.find_elements(:css, ".student").length.should == 5
-  end
+      sections = f(".user_id_#{@student.id} .section_code")
+      sections.should include_text(@course.default_section.name)
+      sections.should include_text(@other_section.name)
 
-  it "should not include student view student in the unassigned student list at the course level" do
-    @fake_student = @course.student_view_student
-    group_category1 = @course.group_categories.create(:name => "Group Category 1")
+      f("#category_#{gc1.id} .group_blank .user_count").should include_text("1")
+    end
 
-    get "/courses/#{@course.id}/groups"
-    wait_for_ajaximations
+    it "should not show sections for students when managing from an account" do
+      course_with_admin_logged_in(:course => @course, :username => "admin@example.com")
+      student_in_course(:name => "Student 1", :active_all => true)
 
-    ffj(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
-  end
+      @account = Account.default
+      gc1 = @account.group_categories.create(:name => "Group Category 1")
 
-  it "should not include student view student in the unassigned student list at the account level" do
-    site_admin_logged_in
-    @account = Account.default
-    @fake_student = @course.student_view_student
-    group_category1 = @account.group_categories.create(:name => "Group Category 1")
+      get "/accounts/#{@account.id}/groups"
+      wait_for_ajaximations
 
-    get "/accounts/#{@account.id}/groups"
-    wait_for_ajaximations
+      f(".group_blank .user_id_#{@student.id} .name").should include_text @student.sortable_name
+      f(".group_blank .user_id_#{@student.id} .section_code").text.should be_blank
+    end
 
-    ffj(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+    it "should paginate and count users correctly" do
+      students_count = 20
+      students_count.times do |i|
+        student_in_course(:name => "Student #{i}")
+      end
+
+      @other_section = @course.course_sections.create!(:name => "Other Section")
+      @course.enroll_student(@student,
+                             :enrollment_state => "active",
+                             :section => @other_section,
+                             :allow_multiple_enrollments => true)
+
+      group_category = @course.group_categories.create(:name => "My Groups")
+
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      category = f(".group_category")
+      unassigned_div = category.find_element(:css, ".group_blank")
+
+      unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
+      unassigned_div.find_elements(:css, ".student").length.should == 15
+      # 15 comes from window.contextGroups.autoLoadGroupThreshold
+
+      f(".next_page").click
+      wait_for_ajaximations
+
+      unassigned_div.find_element(:css, ".user_count").should include_text(students_count.to_s)
+      unassigned_div.find_elements(:css, ".student").length.should == 5
+    end
+
+    it "should not include student view student in the unassigned student list at the course level" do
+      @fake_student = @course.student_view_student
+      group_category1 = @course.group_categories.create(:name => "Group Category 1")
+
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      ffj(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+    end
+
+    it "should not include student view student in the unassigned student list at the account level" do
+      site_admin_logged_in
+      @account = Account.default
+      @fake_student = @course.student_view_student
+      group_category1 = @account.group_categories.create(:name => "Group Category 1")
+
+      get "/accounts/#{@account.id}/groups"
+      wait_for_ajaximations
+
+      ffj(".group_category:visible .user_id_#{@fake_student.id}").should be_empty
+    end
   end
 
   context "dragging a user between groups" do
@@ -275,7 +277,7 @@ describe "manage groups students" do
       confirm_dialog.accept
       wait_for_ajaximations
       ff(".left_side .group").should be_empty
-      @course.group_categories.all.count.should eql 0
+      @course.group_categories.all.count.should == 0
     end
 
     it "should edit an individual group" do
@@ -312,7 +314,7 @@ describe "manage groups students" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajax_requests
-      keep_trying_until { f('.right_side .group .user_count').text.should eql '0 students' }
+      keep_trying_until { f('.right_side .group .user_count').text.should == '0 students' }
     end
 
     before (:each) do
@@ -364,21 +366,22 @@ describe "manage groups students" do
     end
 
     it "should give 'Assigning Students...' visual feedback" do
-      assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
-      assign_students.should_not be_nil
-      assign_students.click
-      # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
-      lock = Mutex.new
-      lock.lock
-      GroupsController.before_filter { lock.lock; lock.unlock; true }
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
-      loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
-      loading.text.should == 'Assigning Students...'
-      lock.unlock
-      GroupsController.filter_chain.pop
-      # make sure we wait before moving on
-      wait_for_ajax_requests
+      pending "causes whatever spec follows this to fail even in different files"
+        assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
+        assign_students.should_not be_nil
+        assign_students.click
+        # Do some magic to make sure the next ajax request doesn't complete until we're ready for it to
+        lock = Mutex.new
+        lock.lock
+        GroupsController.before_filter { lock.lock; lock.unlock; true }
+        confirm_dialog = driver.switch_to.alert
+        confirm_dialog.accept
+        loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
+        loading.text.should == 'Assigning Students...'
+        lock.unlock
+        GroupsController.filter_chain.pop
+        # make sure we wait before moving on
+        wait_for_ajax_requests
+      end
     end
   end
-end

@@ -32,7 +32,6 @@ class Course < ActiveRecord::Base
                   :publish_grades_immediately,
                   :allow_student_wiki_edits,
                   :allow_student_assignment_edits,
-                  :hashtag,
                   :show_public_context_messages,
                   :syllabus_body,
                   :public_description,
@@ -136,7 +135,6 @@ class Course < ActiveRecord::Base
   has_many :messages, :as => :context, :dependent => :destroy
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   belongs_to :wiki
-  has_many :default_wiki_wiki_pages, :class_name => 'WikiPage', :through => :wiki, :source => :wiki_pages, :conditions => ['wiki_pages.workflow_state != ?', 'deleted'], :order => 'wiki_pages.view_count DESC'
   has_many :quizzes, :as => :context, :dependent => :destroy, :order => 'lock_at, title'
   has_many :active_quizzes, :class_name => 'Quiz', :as => :context, :include => :assignment, :conditions => ['quizzes.workflow_state != ?', 'deleted'], :order => 'created_at'
   has_many :assessment_questions, :through => :assessment_question_banks
@@ -154,8 +152,6 @@ class Course < ActiveRecord::Base
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
-  has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
-  has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :grading_standards, :as => :context
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
   has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
@@ -173,6 +169,7 @@ class Course < ActiveRecord::Base
   has_many :appointment_participants, :class_name => 'CalendarEvent', :foreign_key => :effective_context_code, :primary_key => :asset_string, :conditions => "workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL"
   attr_accessor :import_source
   has_many :zip_file_imports, :as => :context
+  has_many :content_participation_counts, :as => :context, :dependent => :destroy
 
   before_save :assign_uuid
   before_save :assert_defaults
@@ -183,6 +180,8 @@ class Course < ActiveRecord::Base
   after_save :set_self_enrollment_code
   before_validation :verify_unique_sis_source_id
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :course_code, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_locale :allow_nil => true
 
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
@@ -517,29 +516,30 @@ class Course < ActiveRecord::Base
     participating_instructors.restrict_to_sections(section_ids)
   end
 
-  def user_is_teacher?(user)
+  def user_is_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_is_teacher"].cache_key) do
+    Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
       user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
     end
   end
-  memoize :user_is_teacher?
+  memoize :user_is_instructor?
 
   def user_is_student?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
-      self.student_enrollments.find_by_user_id(user.id).present?
+    Rails.cache.fetch([self, user, "course_user_is_student"].cache_key) do
+      user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_student? }
     end
   end
   memoize :user_is_student?
 
-  def user_has_been_teacher?(user)
+  def user_has_been_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_teacher"].cache_key) do
-      self.teacher_enrollments.find_by_user_id(user.id).present?
+    Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
+      # active here is !deleted; it still includes concluded, etc.
+      self.instructor_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_teacher?
+  memoize :user_has_been_instructor?
 
   def user_has_been_student?(user)
     return unless user
@@ -580,7 +580,6 @@ class Course < ActiveRecord::Base
   end
 
   def assert_defaults
-    Hashtag.find_or_create_by_hashtag(self.hashtag) if self.hashtag && self.hashtag != ""
     self.tab_configuration ||= [] unless self.tab_configuration == []
     self.name = nil if self.name && self.name.strip.empty?
     self.name ||= t('missing_name', "Unnamed Course")
@@ -762,10 +761,6 @@ class Course < ActiveRecord::Base
     self.enrollments.find_all_by_workflow_state("creation_pending").each do |e|
       e.invite!
     end
-  end
-
-  def hashtag_model
-    Hashtag.find_by_hashtag(self.hashtag) if self.hashtag
   end
 
   workflow do
@@ -2231,7 +2226,7 @@ class Course < ActiveRecord::Base
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public,
       :publish_grades_immediately, :allow_student_wiki_edits,
-      :allow_student_assignment_edits, :hashtag, :show_public_context_messages,
+      :allow_student_assignment_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
@@ -2419,16 +2414,33 @@ class Course < ActiveRecord::Base
     visibilities = section_visibilities_for(user)
     section_ids = visibilities.map{ |s| s[:course_section_id] }
     case enrollment_visibility_level_for(user, visibilities)
-      when :full
-        if visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
-          return sections.find_all_by_id(section_ids)
-        else
-          return sections
-        end
-      when :sections
-        return sections.find_all_by_id(section_ids)
+    when :full
+      if visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
+        sections.scoped(:conditions => {:id => section_ids})
+      else
+        sections
+      end
+    when :sections
+      sections.scoped(:conditions => {:id => section_ids})
+    else
+      # return an empty set, but keep it as a scope for downstream consistency
+      sections.scoped(:conditions => ['?', false])
     end
-    []
+  end
+
+  # derived from policy for Group#grants_right?(user, nil, :read)
+  def groups_visible_to(user, groups = active_groups)
+    if grants_rights?(user, nil, :manage_groups, :view_group_pages).values.any?
+      # course-wide permissions; all groups are visible
+      groups
+    else
+      # no course-wide permissions; only groups the user is a member of are
+      # visible
+      groups.scoped(
+        :joins => :participating_group_memberships,
+        :conditions => { 'group_memberships.user_id' => user.id }
+      )
+    end
   end
 
   def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user))
@@ -2532,12 +2544,13 @@ class Course < ActiveRecord::Base
   def tabs_available(user=nil, opts={})
     # make sure t() is called before we switch to the slave, in case we update the user's selected locale in the process
     default_tabs = Course.default_tabs
+    opts.reverse_merge!(:include_external => true)
 
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
       tabs = self.tab_configuration.compact
       settings_tab = default_tabs[-1]
-      external_tabs = external_tool_tabs(opts)
+      external_tabs = (opts[:include_external] && external_tool_tabs(opts)) || []
       tabs = tabs.map do |tab|
         default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
         if default_tab

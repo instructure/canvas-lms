@@ -41,7 +41,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'compiled/jquery/fixDialogButtons',
-  'media_comments' /* mediaComment, mediaCommentThumbnail */,
+  'compiled/jquery/mediaCommentThumbnail',
   'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
@@ -50,6 +50,7 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'compiled/behaviors/trackEvent',
+  'compiled/badge_counts',
   'vendor/scribd.view' /* scribd */,
   'vendor/jquery.placeholder'
 ], function(ENV, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
@@ -264,35 +265,6 @@ define([
       var control = $dialog.data('searchControl');
       if(control) {
         control.execute($("title").text());
-      }
-    });
-
-    $("a.instructure_inline_media_comment").live('click', function(event) {
-      event.preventDefault();
-      if(INST.kalturaSettings) {
-        var $link = $(this),
-            $div = $("<span><span></span></span>"),
-            mediaType = 'video',
-            id = $link.data('media_comment_id') || $link.find(".media_comment_id:first").text();
-        $div.css('display', 'block');
-
-        if(!id && $link.attr('id') && $link.attr('id').match(/^media_comment_/)) {
-          id = $link.attr('id').substring(14);
-        }
-        $link.after($div);
-        $link.hide(); //remove();
-        if($link.data('media_comment_type') === 'audio' || $link.is('.audio_playback, .audio_comment, .instructure_audio_link')) { mediaType = 'audio'; }
-        $div.children("span").mediaComment('show_inline', id, mediaType, $link.attr('href'));
-        $div.append("<br/><a href='#' style='font-size: 0.8em;' class='hide_flash_embed_link'>" + I18n.t('links.minimize_embedded_kaltura_content', "Minimize Embedded Content") + "</a>");
-        $div.find(".hide_flash_embed_link").click(function(event) {
-          event.preventDefault();
-          $div.remove();
-          $link.show();
-          $.trackEvent('hide_embedded_content', 'hide_media');
-        });
-        $.trackEvent('show_embedded_content', 'show_media');
-      } else {
-        alert(I18n.t('alerts.kaltura_disabled', "Kaltura has been disabled for this Canvas site"));
       }
     });
 
@@ -924,6 +896,7 @@ define([
       userSettings.set('hide_wizard_' + pathname, true);
       $wizard_box.slideUp('fast', function() {
         $(".wizard_popup_link").slideDown('fast');
+        $('.wizard_popup_link').focus();
         setWizardSpacerBoxDispay('hide');
       });
     });
@@ -933,6 +906,7 @@ define([
       $(".wizard_popup_link").slideUp('fast');
       $wizard_box.slideDown('fast', function() {
         $wizard_box.triggerHandler('wizard_opened');
+        $wizard_box.focus();
         $([document, window]).triggerHandler('scroll');
       });
     });
@@ -1021,17 +995,6 @@ define([
         remove(url + "?permanent=1");
       }
     });
-    // if there is not a h1 or h2 on the page, then stick one in there for accessibility.
-    if (!$('h1').length) {
-      $('<h1 class="ui-helper-hidden-accessible" />').text(document.title).prependTo('#content');
-    }
-    if(!$('h2').length && $('#breadcrumbs li:last').text().length ) {
-      var $h2 = $('<h2 class="ui-helper-hidden-accessible" />').text($('#breadcrumbs li:last').text()),
-          $h1 = $('#content h1');
-      $h1.length ?
-        $h1.after($h2) :
-        $h2.prependTo('#content');
-    }
 
     // in 2 seconds (to give time for everything else to load), find all the external links and add give them
     // the external link look and behavior (force them to open in a new tab)
@@ -1047,7 +1010,6 @@ define([
           .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
       });
     }, 2000);
-
   });
 
   $('input[placeholder], textarea[placeholder]').placeholder();

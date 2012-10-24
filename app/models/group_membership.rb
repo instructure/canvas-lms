@@ -43,6 +43,8 @@ class GroupMembership < ActiveRecord::Base
   
   named_scope :active, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
   named_scope :moderators, :conditions => { :moderator => true }
+
+  alias_method :context, :group
   
   set_broadcast_policy do |p|
     p.dispatch :new_context_group_membership

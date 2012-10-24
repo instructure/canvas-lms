@@ -414,6 +414,18 @@ describe DiscussionTopic do
       @topic.user_can_see_posts?(@teacher).should == true
     end
 
+    it "should only allow active admins to see posts without posting" do
+      @ta_enrollment = course_with_ta(:course => @course, :active_enrollment => true)
+      # TA should be able to see
+      @topic.user_can_see_posts?(@ta).should == true
+      # Remove user as TA and enroll as student, should not be able to see
+      @ta_enrollment.destroy
+      # enroll as a student.
+      course_with_student(:course => @course, :user => @ta, :active_enrollment => true)
+      @topic.reload
+      @topic.user_can_see_posts?(@ta).should == false
+    end
+
     it "shouldn't allow student (and observer) who hasn't posted to see" do
       @topic.user_can_see_posts?(@student).should == false
     end
@@ -684,6 +696,31 @@ describe DiscussionTopic do
       DiscussionTopic.expects(:unique_constraint_retry).once
       @topic.change_all_read_state("unread", @student)
     end
+
+    it "should update content participation count normally" do
+      cpc = ContentParticipationCount.create_or_update({
+        :user => @student,
+        :context => @course,
+        :content_type => "DiscussionTopic"
+      })
+      old_count = cpc.unread_count
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
+      cpc.reload.unread_count.should == old_count + 1
+    end
+
+    it "should not update content participation count if discussion belongs to locked assignment" do
+      cpc = ContentParticipationCount.create_or_update({
+        :user => @student,
+        :context => @course,
+        :content_type => "DiscussionTopic"
+      })
+      old_count = cpc.unread_count
+      assignment_model({
+        :submission_types => "discussion_topic",
+        :lock_at => 1.day.ago,
+      })
+      cpc.reload.unread_count.should == old_count
+    end
   end
 
   context "materialized view" do
@@ -755,7 +792,23 @@ describe DiscussionTopic do
       @context = @course
       discussion_topic_model(:user => @teacher)
       account.destroy
-      @topic.reply_from(:user => @teacher, :text => "entry").should be_nil
+      lambda { @topic.reply_from(:user => @teacher, :text => "entry") }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
     end
+
+    it "should prefer html to text" do
+      course_with_teacher
+      discussion_topic_model
+      msg = @topic.reply_from(:user => @teacher, :text => "text body", :html => "<p>html body</p>")
+      msg.should_not be_nil
+      msg.message.should == "<p>html body</p>"
+    end
+
+    it "should not allow replies to locked topics" do
+      course_with_teacher
+      discussion_topic_model
+      @topic.lock!
+      lambda { @topic.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMessageProcessor::ReplyToLockedTopicError)
+    end
+
   end
 end

@@ -92,7 +92,7 @@ describe Attachment do
       scribd_mime_type_model(:extension => 'pdf')
       course_model
       @course.scribd_account.should be_nil
-      attachment_obj_with_context(@course, :content_type => 'pdf')
+      attachment_obj_with_context(@course, :content_type => 'application/pdf')
       @attachment.context.should eql(@course)
       @attachment.context.scribd_account.should be_nil
       previous_scribd_account_count = ScribdAccount.all.size
@@ -163,6 +163,68 @@ describe Attachment do
 
   end
 
+  context "crocodoc" do
+    before do
+      PluginSetting.create! :name => 'crocodoc',
+                            :settings => { :api_key => "blahblahblahblahblah" }
+      Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
+    end
+
+    it "crocodocable?" do
+      crocodocable_attachment_model
+      @attachment.should be_crocodocable
+    end
+
+    it "should not submit to auto-submit to scribd if a crocodoc is present" do
+      expects_job_with_tag('Attachment#submit_to_scribd!', 0) do
+        attachment_model(:content_type => 'application/pdf', :submission_attachment => true)
+        @attachment.after_attachment_saved
+      end
+
+      expects_job_with_tag('Attachment#submit_to_scribd!') do
+        scribd_mime_type_model(:extension => 'odt', :name => 'openoffice')
+        attachment_model(:content_type => 'openoffice')
+        @attachment.crocodocable?.should_not be_true
+        @attachment.after_attachment_saved
+      end
+    end
+
+    it "should submit to crocodoc" do
+      crocodocable_attachment_model
+      @attachment.crocodoc_available?.should be_false
+      @attachment.submit_to_crocodoc
+
+      @attachment.crocodoc_available?.should be_true
+      @attachment.crocodoc_document.uuid.should == '1234567890'
+    end
+
+    it "should spawn a delayed job to retry failed uploads (once)" do
+      Crocodoc::API.any_instance.stubs(:upload).returns 'error' => 'blah'
+      crocodocable_attachment_model
+
+      expects_job_with_tag('Attachment#submit_to_crocodoc', 1) do
+        @attachment.submit_to_crocodoc
+      end
+
+      expects_job_with_tag('Attachment#submit_to_crocodoc', 0) do
+        @attachment.submit_to_crocodoc(2)
+      end
+    end
+
+    it "should submit to scribd if crocodoc fails to convert" do
+      crocodocable_attachment_model
+      @attachment.submit_to_crocodoc
+
+      Crocodoc::API.any_instance.stubs(:status).returns [
+        {'uuid' => '1234567890', 'status' => 'ERROR'}
+      ]
+
+      expects_job_with_tag('Attachment.submit_to_scribd') {
+        CrocodocDocument.update_process_states
+      }
+    end
+  end
+
   it "should set the uuid" do
     attachment_model
     @attachment.uuid.should_not be_nil
@@ -206,6 +268,7 @@ describe Attachment do
     before(:all) do
       ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
+      Canvas::Crocodoc.instance_variable_set :@settings, nil
     end
 
     describe "submit_to_scribd job" do
@@ -230,7 +293,7 @@ describe Attachment do
           Attachment.stubs(:filtering_scribd_submits?).returns(true)
           expects_job_with_tag('Attachment#submit_to_scribd!') do
             scribd_mime_type_model(:extension => 'pdf')
-            attachment_model(:content_type => 'pdf', :do_submit_to_scribd => true)
+            attachment_model(:content_type => 'application/pdf', :submission_attachment => true)
             @attachment.after_attachment_saved
           end
           @attachment.should be_pending_upload
@@ -826,13 +889,13 @@ describe Attachment do
 
     it "should infer scribd mime type regardless of shard" do
       scribd_mime_type_model(:extension => 'pdf')
-      attachment_model(:content_type => 'pdf')
+      attachment_model(:content_type => 'application/pdf')
       @attachment.should be_scribdable
       Attachment.clear_cached_mime_ids
       @shard1.activate do
         # need to create a context on this shard
         @context = course_model(:account => Account.create!)
-        attachment_model(:content_type => 'pdf')
+        attachment_model(:content_type => 'application/pdf')
         @attachment.should be_scribdable
       end
     end
@@ -854,6 +917,31 @@ describe Attachment do
 
       # thumbnails should use the same bucket as the attachment they are parented to
       Thumbnail.new(:attachment => @attachment).bucket_name.should == 'pluginsetting_bucket'
+    end
+  end
+
+  context "#change_namespace" do
+    before do
+      Setting.set("file_storage_test_override", "s3")
+      @old_account = account_model
+      Attachment.domain_namespace = @old_account.file_namespace
+      @root = attachment_model
+      @child = attachment_model(:root_attachment => @root)
+      @new_account = account_model
+    end
+
+    it "should fail for non-root attachments" do
+      AWS::S3::S3Object.expects(:rename).never
+      expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error
+      @root.reload.namespace.should == @old_account.file_namespace
+      @child.reload.namespace.should == @root.reload.namespace
+    end
+
+    it "should rename root attachments and update children" do
+      AWS::S3::S3Object.expects(:rename).with(@root.full_filename, @root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), @root.bucket_name, anything)
+      @root.change_namespace(@new_account.file_namespace)
+      @root.namespace.should == @new_account.file_namespace
+      @child.reload.namespace.should == @root.namespace
     end
   end
 
@@ -1010,5 +1098,9 @@ end
 # Makes sure we have a value in scribd_mime_types and that the attachment model points to that.
 def scribdable_attachment_model
   scribd_mime_type_model(:extension => 'pdf')
-  attachment_model(:content_type => 'pdf')
+  attachment_model(:content_type => 'application/pdf')
+end
+
+def crocodocable_attachment_model
+  attachment_model(:content_type => 'application/pdf')
 end

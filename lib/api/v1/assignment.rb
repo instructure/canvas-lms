@@ -18,7 +18,6 @@
 
 module Api::V1::Assignment
   include Api::V1::Json
-  include Api::V1::DiscussionTopics
   include ApplicationHelper
 
   def assignment_json(assignment, user, session, include_discussion_topic = true)
@@ -34,7 +33,7 @@ module Api::V1::Assignment
     end
 
     if assignment.grants_right?(user, :grade)
-      hash['needs_grading_count'] = assignment.needs_grading_count
+      hash['needs_grading_count'] = assignment.needs_grading_count_for_user(user)
     end
 
     hash['submission_types'] = assignment.submission_types.split(',')
@@ -72,6 +71,7 @@ module Api::V1::Assignment
     end
 
     if include_discussion_topic && assignment.discussion_topic
+      extend Api::V1::DiscussionTopics
       hash['discussion_topic'] = discussion_topic_api_json(assignment.discussion_topic, assignment.discussion_topic.context, user, session, !:include_assignment)
     end
 
@@ -90,6 +90,7 @@ module Api::V1::Assignment
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_FIELDS)
     update_params["time_zone_edited"] = Time.zone.name if update_params["due_at"]
 
+    assignment.assignment_group = assignment.context.assignment_groups.find(assignment_params[:assignment_group_id]) if assignment_params[:assignment_group_id]
     assignment.update_attributes(update_params)
     assignment.infer_due_at
     # TODO: allow rubric creation

@@ -17,15 +17,15 @@ shared_examples_for "conversations attachments selenium tests" do
   it "should be able to remove attachments from the message form" do
     new_conversation
 
-    add_attachment_link = f("#action_add_attachment")
+    add_attachment_link = f(".action_add_attachment")
     add_attachment_link.click
     wait_for_animations
     add_attachment_link.click
     wait_for_animations
-    ffj("#attachment_list > .attachment:visible .remove_link")[1].click
+    ffj(".attachment_list > .attachment:visible .remove_link")[1].click
     wait_for_animations
-    ffj("#attachment_list > .attachment:visible").size.should == 1
-    ffj("#attachment_list > .attachment:visible .remove_link")[0].click
+    ffj(".attachment_list > .attachment:visible").size.should == 1
+    ffj(".attachment_list > .attachment:visible .remove_link")[0].click
     submit_message_form
     @user.conversations.last.has_attachments.should be_false
   end
@@ -41,9 +41,11 @@ shared_examples_for "conversations attachments selenium tests" do
     add_recipient("student1")
     add_recipient("student2")
     add_recipient("student3")
-    expect {
-      submit_message_form(:attachments => [fullpath], :add_recipient => false, :group_conversation => false)
-    }.to change(Attachment, :count).by(1)
+    enable_jobs do
+      expect {
+        submit_message_form(:attachments => [fullpath], :add_recipient => false, :group_conversation => false)
+      }.to change(Attachment, :count).by(1)
+    end
   end
 
   it "should save attachments on new messages on existing conversations" do
@@ -87,13 +89,13 @@ shared_examples_for "conversations attachments selenium tests" do
     wait_for_animations
     f('#action_forward').click
 
-    add_recipient('student2', 'forward_recipients')
+    add_recipient('student2', '#forward_recipients')
     f('#forward_body').send_keys('ohai look an attachment')
     f('#forward_message_form').submit
 
     wait_for_ajaximations
 
-    ff('img.attachments').size.should eql 2
+    ff('img.attachments').size.should == 2
     messages = get_messages(false) # new conversation auto-selected
     messages.size.should == 1
     messages.first.text.should include "ohai look an attachment"

@@ -89,9 +89,9 @@ describe "enhanceable_content" do
     accordion = f(".enhanceable_content.accordion")
     accordion.should have_class('ui-accordion')
     headers = accordion.find_elements(:css, ".ui-accordion-header")
-    headers.length.should eql(3)
+    headers.length.should == 3
     divs = accordion.find_elements(:css, ".ui-accordion-content")
-    divs.length.should eql(3)
+    divs.length.should == 3
     headers[0].should have_class('ui-state-active')
     divs[0].should be_displayed
     divs[1].should_not be_displayed
@@ -106,9 +106,9 @@ describe "enhanceable_content" do
     tabs = f(".enhanceable_content.tabs")
     tabs.should have_class('ui-tabs')
     headers = tabs.find_elements(:css, ".ui-tabs-nav li")
-    headers.length.should eql(3)
+    headers.length.should == 3
     divs = tabs.find_elements(:css, ".ui-tabs-panel")
-    divs.length.should eql(3)
+    divs.length.should == 3
     headers[0].should have_class('ui-state-active')
     headers[1].should have_class('ui-state-default')
     divs[0].should be_displayed

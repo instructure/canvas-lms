@@ -17,6 +17,7 @@ body
   background: #dddde1 url(/images/messages/actions-bg.png) 0 0 repeat-x
   border-top: 1px solid #eaeaec
   border-bottom: 1px solid #acacac
+  border-right: 1px solid #acacac
   position: relative
   ul, li
     margin: 0
@@ -36,7 +37,7 @@ body
       background-position: 0 -27px
     a.active
       background-position: 0 -54px
-    
+
   .menus
     float: left
     font-size: 0.9em
@@ -200,39 +201,15 @@ ul.messages, ul.conversations, div.conversations > ul
       cursor: pointer
       color: #2571bd
       > span
-        display: block
-        cursor: auto
-        z-index: 4
-        background: #fff
-        border: 1px solid #ccc
-        padding: 0.5em
         display: none
-        position: absolute
-        +border-radius(10px)
-        box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2)
-      ul
-        padding: 0
-        margin: 0
-        max-height: 120px
-        overflow: auto
-        list-style: none
-        li
-          font-weight: normal
-          padding: 0 1em
-          border: none
-          color: #000 !important
-          a
-            color: #000 !important
   > li
     overflow: hidden
-    > .audience
+    > .conversation-summary
       min-width: 340px
       overflow: hidden
-      display: block
       white-space: nowrap
     p
       overflow: hidden
-      max-height: 40px
   > li.selected, > li.submission.selected ul > li, > li.submission.selected ul > li.header
     background-color: #e5f3ff
   .audience
@@ -250,6 +227,30 @@ ul.messages, ul.conversations, div.conversations > ul
       padding: 0 2px
       background-color: #2571bd
       color: #fff
+#others_popup
+  z-index: 10
+  position: absolute
+  > span
+    display: block
+    cursor: auto
+    background: #fff
+    border: 1px solid #ccc
+    padding: 0.5em
+    +border-radius(10px)
+    box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2)
+  ul
+    padding: 0
+    margin: 0
+    max-height: 120px
+    overflow: auto
+    list-style: none
+    li
+      font-weight: normal
+      padding: 0 1em
+      border: none
+      color: #000 !important
+      a
+        color: #000 !important
 #inbox form ul.conversations .audience em a
   color: #777
 
@@ -314,7 +315,7 @@ ul.messages
     padding: 14px 50px 14px 78px
     background: #fff
     margin: 12px
-    input
+    input[type='checkbox']
       position: absolute
       right: 8px
       top: 50%
@@ -431,15 +432,11 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
   #message_actions
     display: none
     position: absolute
-    height: 42px
-    border-top: 1px solid #f4f5f7
-    border-bottom: 1px solid #acacac
+    z-index: 4
     width: 100%
-    background-color: #edeef2
-    z-index: 3
     box-shadow: 0 0 6px 3px rgba(0,0,0,0.25)
     a
-      background-image: url(/images/messages/message-action-sprites.png) 
+      background-image: url(/images/messages/message-action-sprites.png)
       background-repeat: no-repeat
     a:hover
       background-color: #fff
@@ -595,7 +592,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
         display: block
     > li.attachments .attachments, > li.media_objects .media_objects
       display: inline
-    
+
 #message_blank
   display: none
 
@@ -719,7 +716,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       background: #f4fbff
       border-top-color: #fff
       border-bottom-color: #d4d5d7
-        
+
 
 .autocomplete_menu
   ul
@@ -820,22 +817,21 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
         margin: 0 14px 0 0
 
 
-#create_message_form
-  display: none
+#create_message_form form
   position: relative
   z-index: 2
   background: #fff
   margin: 0
   padding: 1em
   border-bottom: 1px solid #ddd
-  #action_add_recipients
+  .action_add_recipients
     padding: 0 0 0 20px
     background: transparent url(/images/messages/add-person-sprite.png) 0 0 no-repeat
     float: right
     font-size: 1.1em
-  #action_add_recipients:hover
+  .action_add_recipients:hover
     background-position: 0 -18px
-  #action_add_attachment, #action_media_comment
+  .action_add_attachment, .action_media_comment
     padding-right: 1em
   ul.conversations
     overflow: visible
@@ -845,7 +841,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     > li
       padding: 0
       border: 0
-  #attachment_list
+  .attachment_list
     overflow: visible
     border: 0
     padding: 0
@@ -861,8 +857,14 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     border: 0
     padding: 0 0 5px 0
     margin: 0
+  table
+    position: relative
+    // ensure errorBoxes are visible, since it only considers the first
+    // positioned ancestor's z-index when determining its own (doesn't consider
+    // ones further up the chain that might have higher stacking)
+    z-index: 10
   box-shadow: 0 0 6px 3px rgba(0,0,0,0.25)
-#create_message_form.new
+#create_message_form form.new
   .audience
     display: block
     padding-left: 24px
@@ -882,8 +884,8 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       text-align: right
       padding: 0 8px 2px 0
       color: #2571bd
-#create_message_form.disabled
-  opacity: 0.3  
+#create_message_form form.disabled
+  opacity: 0.3
 form
   input[type=text]
     width: 100%
@@ -945,4 +947,58 @@ form
   top: 50%
   z-index: 3
 
- 
+#message_actions, #message_status
+  height: 42px
+  border-top: 1px solid #f4f5f7
+  border-bottom: 1px solid #acacac
+  background-color: #edeef2
+
+#message_status
+  background: #dddde1 url(/images/messages/actions-bg.png) 0 0 repeat-x
+  overflow: hidden
+  position: relative
+  z-index: 3
+  list-style: none
+  border-left: 1px solid #eaeaec
+  border-top: 1px solid #eaeaec
+  padding: 0 0 0 10px
+  margin: 0 0 0 0
+
+.progress-bar
+  float: left
+  height: 37px
+  padding: 5px 0 0 5px
+  margin: 0 27px 0 0
+  width: 202px
+  background: inherit
+  font-size: 0.75em
+  color: #525252
+  white-space: nowrap
+  em
+    display: block
+    color: #800
+    font-weight: bold
+  div
+    border: 1px solid #acacac
+    +border-radius(4px)
+    background: #fff
+    height: 8px
+    overflow: hidden
+    width: 200px
+    &:focus
+      outline: none
+      border-color: #888
+    b
+      text-indent: -1000em
+      display: block
+      background: #d0d0d0
+      border-top: 1px solid #e7e7e7
+      border-right: 1px solid #acacac
+      height: 7px
+  &.progress-bar-complete
+    color: #000
+  &.progress-bar-indeterminate
+    div
+      background: #e7e7e7 url(/images/messages/indeterminate-progress.gif) 0 0 repeat-x
+      b
+        display: none

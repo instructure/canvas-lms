@@ -106,7 +106,11 @@ $(document).ready(function() {
             <% url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || "#" %><br />
             <%= link_to t('dont_know_password', "Don't know your password?"), url, :class => (url != '#' ? "not_external" : "forgot_password_link"), :id => "login_forgot_password" %>
           </div>
-          <button type="submit" class="button btn-primary"><%= t('log_in', 'Log In') %></button> 
+
+          <!-- crazy IE 8-9 workaround!, if you take this input type=submit out, you cannot just submit the form by hitting enter in ie8-9 -->
+          <input type="submit" style="position: absolute; height: 0px; width: 0px; border: none; padding: 0px;" hidefocus="true" tabindex="-1" />
+
+          <button type="submit" class="button btn-primary"><%= t('log_in', 'Log In') %></button>
         </div>
       <% end %>
     <% end %>

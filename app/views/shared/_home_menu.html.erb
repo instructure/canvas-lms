@@ -1,4 +1,4 @@
-<a href="<%= courses_path %>" class="menu-item-title">
+<a href="<%= dashboard_path %>" class="menu-item-title">
   <%= @current_user.menu_data[:group_memberships_count].zero? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
   <span class="menu-item-title-icon"></span></a>
 <div class="menu-item-drop">

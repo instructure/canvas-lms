@@ -22,9 +22,9 @@ describe "conversations sent filter" do
     get "/conversations/sent"
 
     conversations = get_conversations
-    conversations.first.attribute('data-id').should eql(@c1.conversation_id.to_s)
+    conversations.first.attribute('data-id').should == @c1.conversation_id.to_s
     conversations.first.should include_text('yay i sent this')
-    conversations.last.attribute('data-id').should eql(@c2.conversation_id.to_s)
+    conversations.last.attribute('data-id').should == @c2.conversation_id.to_s
     conversations.last.should include_text('test')
   end
 
@@ -60,10 +60,12 @@ describe "conversations sent filter" do
     add_recipient("student2")
     add_recipient("student3")
 
-    submit_message_form(:message => message_text, :add_recipient => false, :group_conversation => false)
+    enable_jobs do
+      submit_message_form(:message => message_text, :add_recipient => false, :group_conversation => false)
+    end
 
     conversations = get_conversations
-    conversations.size.should eql 3
+    conversations.size.should == 3
     conversations.each { |conversation| conversation.should include_text(message_text) }
   end
 end

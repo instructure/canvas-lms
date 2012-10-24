@@ -129,6 +129,8 @@ module CC::Importer
           props[property['name']] = property.text
         elsif property.name == 'options'
           props[property['name']] = get_custom_properties(property)
+        elsif property.name == 'custom'
+          props[:custom_fields] = get_custom_properties(property)
         end
       end
       props

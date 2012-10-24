@@ -108,25 +108,26 @@
 <table style="width: 100%;" id="grades_summary" class="<%= 'editable' if editable %>">
   <thead>
     <tr>
-      <th><%= t('headers.name', "Name") %></th>
-      <th><%= t('headers.due', "Due") %></th>
-      <th><%= t('headers.score', "Score") %></th>
-      <th style="text-align: right; white-space: nowrap;"><%= t('headers.out_of', "Out of") %></th>
-      <th>&nbsp;</th>
+      <th scope="row"><%= t('headers.name', "Name") %></th>
+      <th scope="row"><%= t('headers.due', "Due") %></th>
+      <th scope="row"><%= t('headers.score', "Score") %></th>
+      <th scope="row" style="text-align: right; white-space: nowrap;"><%= t('headers.out_of', "Out of") %></th>
+      <th scope="row"></th>
     </tr>
   </thead>
 <% turnitin_enabled = @context.turnitin_enabled? && @assignments.any?(&:turnitin_enabled) %>
 <% @assignments.each do |assignment| %>
   <%
      submission = @submissions.find {|s| s.assignment_id == assignment.id }
-     # load up the object to avoid a database query (assignment was loaded with a broad query,
-     # so this wouldn't hit the query cache)
-     submission.assignment = assignment if submission
+     submission_unread = (submission.present? ? @unread_submission_ids.include?(submission.id) : false)
      visible_rubric_assessments = []
      visible_rubric_assessments = submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] } if submission && !assignment.muted?
   %>
   <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %> <%= assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable" %>" data-muted="<%= assignment.muted? %>" id="<%= "submission_" + assignment.id.to_s %>">
     <td class="title">
+      <% if submission_unread %>
+        <div class="unread-grade">&nbsp;</div>
+      <% end %>
       <% if assignment.class.to_s == "Assignment" %>
         <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @student.id) %>"><%= assignment.title %></a>
       <% else %>

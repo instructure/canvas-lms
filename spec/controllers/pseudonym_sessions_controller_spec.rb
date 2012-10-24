@@ -189,7 +189,7 @@ describe PseudonymSessionsController do
       @pseudonym.save!
 
       controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil)
+        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
       )
 
       controller.request.env['canvas.domain_root_account'] = account1
@@ -202,7 +202,7 @@ describe PseudonymSessionsController do
       session.reset
 
       controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil)
+        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
       )
 
       controller.request.env['canvas.domain_root_account'] = account2
@@ -212,6 +212,173 @@ describe PseudonymSessionsController do
       Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
 
       Setting.set_config("saml", nil)
+    end
+
+    context "multiple SAML configs" do
+      before do
+        @account = account_with_saml(:saml_log_in_url => "https://example.com/idp1/sli")
+        @unique_id = 'foo@example.com'
+        @user1 = user_with_pseudonym(:active_all => true, :username => @unique_id, :account => @account)
+        @aac1 = @account.account_authorization_configs.first
+        @aac1.idp_entity_id = "https://example.com/idp1"
+        @aac1.log_out_url = "https://example.com/idp1/slo"
+        @aac1.save!
+
+        @aac2 = @aac1.clone
+        @aac2.idp_entity_id = "https://example.com/idp2"
+        @aac2.log_in_url = "https://example.com/idp2/sli"
+        @aac2.log_out_url = "https://example.com/idp2/slo"
+        @aac2.position = nil
+        @aac2.save!
+
+        @stub_hash = {:issuer => @aac2.idp_entity_id, :is_valid? => true, :success_status? => true, :name_id => @unique_id, :name_qualifier => nil, :session_index => nil, :process => nil}
+      end
+
+      context "/saml_consume" do
+        def get_consume
+          controller.stubs(:saml_response).returns(
+                  stub('response', @stub_hash)
+          )
+
+          controller.request.env['canvas.domain_root_account'] = @account
+          get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
+        end
+
+        it "should find the SAML config by entity_id" do
+          @aac1.any_instantiation.expects(:saml_settings).never
+          @aac2.any_instantiation.expects(:saml_settings)
+
+          get_consume
+
+          response.should redirect_to(courses_url)
+          session[:saml_unique_id].should == @unique_id
+        end
+
+        it "/saml_consume should redirect to auth url if no AAC found" do
+          @account.auth_discovery_url = "http://example.com/discover"
+          @account.save!
+          @stub_hash[:issuer] = "hahahahahahaha"
+
+          get_consume
+
+          response.should redirect_to(@account.auth_discovery_url + "?message=Canvas%20did%20not%20recognize%20your%20identity%20provider")
+        end
+
+        it "/saml_consume should redirect to login screen with message if no AAC found" do
+          @stub_hash[:issuer] = "hahahahahahaha"
+
+          get_consume
+
+          flash[:delegated_message].should == "The institution you logged in from is not configured on this account."
+          response.should redirect_to(login_url(:no_auto=>'true'))
+        end
+      end
+
+      context "/new" do
+        def get_new(aac_id=nil)
+          controller.request.env['canvas.domain_root_account'] = @account
+          if aac_id
+            get 'new', :account_authorization_config_id => aac_id
+          else
+            get 'new'
+          end
+        end
+
+        it "should redirect to auth discovery url" do
+          @account.auth_discovery_url = "http://example.com/discover"
+          @account.save!
+
+          get_new
+
+          response.should redirect_to(@account.auth_discovery_url)
+        end
+
+        it "should redirect to default login" do
+          get_new
+          response.headers['Location'].starts_with?(controller.delegated_auth_redirect_uri(@aac1.log_in_url)).should be_true
+        end
+
+        it "should use the specified AAC" do
+          get_new("#{@aac1.id}")
+          response.headers['Location'].starts_with?(controller.delegated_auth_redirect_uri(@aac1.log_in_url)).should be_true
+          get_new("#{@aac2.id}")
+          response.headers['Location'].starts_with?(controller.delegated_auth_redirect_uri(@aac2.log_in_url)).should be_true
+        end
+
+        it "should redirect to auth discovery with unknown specified AAC" do
+          @account.auth_discovery_url = "http://example.com/discover"
+          @account.save!
+          get_new("0")
+          response.should redirect_to(@account.auth_discovery_url + "?message=The%20Canvas%20account%20has%20no%20authentication%20configuration%20with%20that%20id")
+        end
+
+        it "should redirect to login screen with message if unknown specified AAC" do
+          get_new("0")
+          flash[:delegated_message].should == "The Canvas account has no authentication configuration with that id"
+          response.should redirect_to(login_url(:no_auto=>'true'))
+        end
+      end
+
+      context "logging out" do
+        append_before do
+          controller.stubs(:saml_response).returns(
+                  stub('response', @stub_hash)
+          )
+
+          controller.request.env['canvas.domain_root_account'] = @account
+          get 'saml_consume', :SAMLResponse => "foo", :RelayState => "/courses"
+
+          response.should redirect_to(courses_url)
+          session[:saml_unique_id].should == @unique_id
+          session[:saml_aac_id].should == @aac2.id
+        end
+
+        context '/destroy' do
+          it "should forward to correct IdP" do
+            get 'destroy'
+
+            response.headers['Location'].starts_with?(@aac2.log_out_url + "?SAMLRequest=").should be_true
+          end
+
+          it "should fail gracefully if AAC id gone" do
+            session[:saml_aac_id] = 0
+
+            get 'destroy'
+            flash[:message].should == "Canvas was unable to log you out at your identity provider"
+            response.should redirect_to(login_url(:no_auto=>'true'))
+          end
+        end
+
+        context '/saml_logout' do
+          def get_saml_consume
+            controller.stubs(:saml_logout_response).returns(
+                    stub('response', @stub_hash)
+            )
+
+            controller.request.env['canvas.domain_root_account'] = @account
+            get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
+          end
+
+          it "should find the correct AAC" do
+            @aac1.any_instantiation.expects(:saml_settings).never
+            @aac2.any_instantiation.expects(:saml_settings)
+
+            get_saml_consume
+
+            response.should redirect_to(:action => :destroy)
+          end
+
+          it "should still logout if AAC config not found" do
+            @aac1.any_instantiation.expects(:saml_settings).never
+            @aac2.any_instantiation.expects(:saml_settings).never
+
+            @stub_hash[:issuer] = "nobody eh"
+            get_saml_consume
+
+            response.should redirect_to(:action => :destroy)
+          end
+        end
+      end
     end
 
     context "login attributes" do
@@ -232,7 +399,7 @@ describe PseudonymSessionsController do
         @aac.save
 
         controller.stubs(:saml_response).returns(
-          stub('response', :is_valid? => true, :success_status? => true, :name_id => nil, :name_qualifier => nil, :session_index => nil,
+          stub('response', :is_valid? => true, :success_status? => true, :name_id => nil, :name_qualifier => nil, :session_index => nil, :process => nil,
             :saml_attributes => {
               'eduPersonPrincipalName' => "#{@unique_id}@example.edu"
             })
@@ -249,7 +416,7 @@ describe PseudonymSessionsController do
         @aac.save
 
         controller.stubs(:saml_response).returns(
-          stub('response', :is_valid? => true, :success_status? => true, :name_id => @unique_id, :name_qualifier => nil, :session_index => nil)
+          stub('response', :is_valid? => true, :success_status? => true, :name_id => @unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
         )
 
         controller.request.env['canvas.domain_root_account'] = @account
@@ -273,7 +440,7 @@ describe PseudonymSessionsController do
       @pseudonym.save!
 
       controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => nil, :name_qualifier => nil, :session_index => nil,
+        stub('response', :is_valid? => true, :success_status? => true, :name_id => nil, :name_qualifier => nil, :session_index => nil, :process => nil,
           :saml_attributes => {
             'eduPersonPrincipalName' => "#{unique_id}@example.edu"
           })
@@ -295,7 +462,7 @@ describe PseudonymSessionsController do
       @pseudonym.save!
 
       controller.stubs(:saml_response).returns(
-        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil)
+        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
       )
 
       controller.request.env['canvas.domain_root_account'] = account

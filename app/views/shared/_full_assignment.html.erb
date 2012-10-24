@@ -177,7 +177,7 @@
           <%= assignment.title %>
           <%= f.hidden_field :title, :class => "title" %>
         <% else %>
-          <%= f.text_field :title, :style => "width: 140px;" %>
+          <%= f.text_field :title, :maxlength => "255", :style => "width: 140px;" %>
         <% end %>
       </td>
       <td style="width: 25%;" class="more_assignment_values"><%= f.blabel :assignment_group_id, :en => "Assignment Group" %></td>

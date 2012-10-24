@@ -63,8 +63,8 @@ module AuthenticationMethods
     end
 
     if token_string
-      @access_token = AccessToken.find_by_token(token_string)
-      if !@access_token.try(:usable?)
+      @access_token = AccessToken.authenticate(token_string)
+      if !@access_token
         raise AccessTokenError
       end
       @current_user = @access_token.user
@@ -247,9 +247,9 @@ module AuthenticationMethods
     delegated_auth_redirect(cas_client.add_service_to_login_url(cas_login_url))
   end
 
-  def initiate_saml_login(current_host=nil)
+  def initiate_saml_login(current_host=nil, aac=nil)
     reset_session_for_login
-    aac = @domain_root_account.account_authorization_config
+    aac ||= @domain_root_account.account_authorization_config
     settings = aac.saml_settings(current_host)
     request = Onelogin::Saml::AuthRequest.new(settings)
     forward_url = request.generate_request

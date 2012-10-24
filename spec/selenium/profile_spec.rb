@@ -112,7 +112,7 @@ describe "profile" do
       link = f("#channel_#{channel.id} td:first-child a")
       link.click
       wait_for_ajaximations
-      row.attribute(:class).should match(/default/)
+      row.should have_class("default")
     end
 
     it "should display file uploader link on files page" do
@@ -200,11 +200,11 @@ describe "profile" do
 
       f('#show_user_services').click
       wait_for_ajaximations
-      @user.reload.show_user_services.should_not eql initial_state
+      @user.reload.show_user_services.should_not == initial_state
 
       f('#show_user_services').click
       wait_for_ajaximations
-      @user.reload.show_user_services.should eql initial_state
+      @user.reload.show_user_services.should == initial_state
     end
 
     it "should generate a new access token" do
@@ -248,7 +248,7 @@ describe "profile" do
       submit_form(edit_form)
       wait_for_ajaximations
       @user.reload
-      @user.birthdate.should eql(Time.utc(1980, 1, 31))
+      @user.birthdate.should == Time.utc(1980, 1, 31)
     end
 
     it "should not accept a partial birthdate" do
@@ -299,13 +299,12 @@ shared_examples_for "profile pictures selenium tests" do
     a = Account.default
     a.enable_service('avatars')
     a.save!
-    IMAGE_SRC = ''
+    image_src = ''
 
     get "/profile/settings"
     keep_trying_until { f(".profile_pic_link") }.click
     dialog = f("#profile_pic_dialog")
     dialog.should be_displayed
-    dialog.find_elements(:css, ".profile_pic_list span.img").length.should == 2
     dialog.find_element(:css, ".add_pic_link").click
     filename, fullpath, data = get_file("graded.png")
     dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
@@ -321,18 +320,17 @@ shared_examples_for "profile pictures selenium tests" do
 
     keep_trying_until do
       spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-      spans.length.should == 3
       spans.last.attribute('class') =~ /selected/
       uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
-      IMAGE_SRC = uploaded_image.attribute('src')
-      IMAGE_SRC.should =~ %r{/images/thumbnails/}
+      image_src = uploaded_image.attribute('src')
+      image_src.should =~ %r{/images/thumbnails/}
       new_image.attribute('alt').should =~ /graded/
     end
     dialog.find_element(:css, '.select_button').click
     wait_for_ajaximations
     keep_trying_until do
       profile_pic = fj('.profile_pic_link img')
-      profile_pic.attribute('src').should == IMAGE_SRC
+      profile_pic.should have_attribue('src', image_src)
     end
     Attachment.last.folder.should == @user.profile_pics_folder
   end
@@ -343,4 +341,11 @@ describe "profile pictures local tests" do
   prepend_before(:each) do
     Setting.set("file_storage_test_override", "local")
   end
+end
+
+describe "profile pictures s3 tests" do
+  it_should_behave_like "profile pictures selenium tests"
+  prepend_before(:all) {
+    Setting.set("file_storage_test_override", "s3")
+  }
 end

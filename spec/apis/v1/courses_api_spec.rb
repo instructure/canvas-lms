@@ -74,6 +74,7 @@ describe CoursesController, :type => :integration do
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
+    @course2.update_attribute(:default_view, 'wiki')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
@@ -91,7 +92,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
       {
         'id' => @course2.id,
@@ -103,7 +105,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'wiki'
       },
     ]
   end
@@ -138,7 +141,7 @@ describe CoursesController, :type => :integration do
             'hide_final_grades'                     => true,
             'license'                              => 'Creative Commons',
             'sis_course_id'                        => '12345',
-            'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.'
+            'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
           }
         }
         course_response = post_params['course'].merge({
@@ -147,6 +150,7 @@ describe CoursesController, :type => :integration do
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
           'workflow_state' => 'available',
+          'default_view' => 'feed'
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
@@ -226,7 +230,8 @@ describe CoursesController, :type => :integration do
         'open_enrollment' => true,
         'self_enrollment' => true,
         'hide_final_grades' => false,
-        'restrict_enrollments_to_course_dates' => true
+        'restrict_enrollments_to_course_dates' => true,
+        'default_view' => 'new default view'
       }, 'offer' => true }
     end
 
@@ -240,6 +245,7 @@ describe CoursesController, :type => :integration do
         json['start_at'].should eql @new_values['course']['start_at']
         json['end_at'].should eql @new_values['course']['end_at']
         json['sis_course_id'].should eql @new_values['course']['sis_course_id']
+        json['default_view'].should eql @new_values['course']['default_view']
 
         @course.name.should eql @new_values['course']['name']
         @course.course_code.should eql @new_values['course']['course_code']
@@ -256,6 +262,7 @@ describe CoursesController, :type => :integration do
         @course.self_enrollment.should be_true
         @course.restrict_enrollments_to_course_dates.should be_true
         @course.workflow_state.should == 'available'
+        @course.default_view.should == 'new default view'
       end
 
       it "should not change dates that aren't given" do
@@ -298,6 +305,7 @@ describe CoursesController, :type => :integration do
         json['course_code'].should eql @new_values['course']['course_code']
         json['start_at'].should eql @new_values['course']['start_at']
         json['end_at'].should eql @new_values['course']['end_at']
+        json['default_view'].should eql @new_values['course']['default_view']
       end
 
       it "should not be able to update the sis id" do
@@ -389,7 +397,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
       {
         'id' => @course2.id,
@@ -404,7 +413,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'wiki'
       },
     ]
   end
@@ -429,7 +439,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
       {
         'id' => @course2.id,
@@ -441,7 +452,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
         'hide_final_grades' => true,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'wiki'
       }
     ]
   end
@@ -460,7 +472,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       }
     ]
   end
@@ -596,14 +609,13 @@ describe CoursesController, :type => :integration do
     end
 
     it "returns a list of users with emails" do
+      @user = @course1.teachers.first
       # when
       json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                       { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                       :include => ['email'])
       # expect
-      json.sort_by{|x| x["id"]}.should == api_json_response(@course1.users.uniq,
-                                                            :only => USER_API_FIELDS, :methods => ['email']
-                                                            ).sort_by{|x| x["id"]}
+      json.each { |u| u.keys.should include('email') }
     end
 
     it "returns a list of users and enrollments with enrollments option" do
@@ -730,6 +742,22 @@ describe CoursesController, :type => :integration do
       json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
     end
 
+    it "should not return email addresses if the requestor is a student" do
+      user
+      @course1.enroll_student(user).accept!
+      json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
+                      { :controller => 'courses', :action => 'users',
+                      :course_id => @course1.to_param, :format => 'json' },
+                      { :include => %w{email} })
+      json.each do |u|
+        if u['id'] == @user.id
+          u['email'].should == @user.email
+        else
+          u.keys.should_not include(:email)
+        end
+      end
+    end
+
     it "should allow specifying course sis id" do
       @user = @me
       first_user = @user
@@ -832,7 +860,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
     ]
   end
@@ -854,7 +883,8 @@ describe CoursesController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
         'start_at' => nil,
-        'end_at' => nil
+        'end_at' => nil,
+        'default_view' => 'feed'
       },
     ]
   end
@@ -919,6 +949,95 @@ describe CoursesController, :type => :integration do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/recent_students",
                       { :controller => 'courses', :action => 'recent_students', :course_id => @course.to_param, :format => 'json' })
       json.map{ |el| el['id'] }.should == [@student2.id, @student3.id, @student1.id]
+    end
+  end
+
+  describe '/tabs' do
+    it 'should list navigation tabs' do
+      @user = @course1.teachers.first
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/tabs",
+                      { :controller => 'courses', :action => 'tabs', :course_id => @course1.to_param, :format => 'json'},
+                      { :include => ['external']})
+      json.should == [
+        {
+          "id" => "home",
+          "html_url" => "/courses/#{@course1.id}",
+          "type" => "internal",
+          "label" => "Home"
+        },
+        {
+          "id" => "announcements",
+          "label" => "Announcements",
+          "html_url" => "/courses/#{@course1.id}/announcements",
+          "type" => "internal"
+        },
+        {
+          "id" => "assignments",
+          "html_url" => "/courses/#{@course1.id}/assignments",
+          "label" => "Assignments",
+          "type" => "internal"
+        },
+        {
+          "id" => "discussions",
+          "html_url" => "/courses/#{@course1.id}/discussion_topics",
+          "label" => "Discussions",
+          "type" => "internal"
+        },
+        {
+          "id" => "grades",
+          "html_url" => "/courses/#{@course1.id}/grades",
+          "label" => "Grades",
+          "type" => "internal"
+        },
+        {
+          "id" => "people",
+          "html_url" => "/courses/#{@course1.id}/users",
+          "label" => "People",
+          "type" => "internal"
+        },
+        {
+          "id" => "pages",
+          "html_url" => "/courses/#{@course1.id}/wiki",
+          "label" => "Pages",
+          "type" => "internal"
+        },
+        {
+          "id" => "files",
+          "html_url" => "/courses/#{@course1.id}/files",
+          "label" => "Files",
+          "type" => "internal"
+        },
+        {
+          "id" => "syllabus",
+          "html_url" => "/courses/#{@course1.id}/assignments/syllabus",
+          "label" => "Syllabus",
+          "type" => "internal"
+        },
+        {
+          "id" => "outcomes",
+          "html_url" => "/courses/#{@course1.id}/outcomes",
+          "label" => "Outcomes",
+          "type" => "internal"
+        },
+        {
+          "id" => "quizzes",
+          "html_url" => "/courses/#{@course1.id}/quizzes",
+          "label" => "Quizzes",
+          "type" => "internal"
+        },
+        {
+          "id" => "modules",
+          "html_url" => "/courses/#{@course1.id}/modules",
+          "label" => "Modules",
+          "type" => "internal"
+        },
+        {
+          "id" => "settings",
+          "html_url" => "/courses/#{@course1.id}/settings",
+          "label" => "Settings",
+          "type" => "internal"
+        }
+      ]
     end
   end
 end

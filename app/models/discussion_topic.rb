@@ -208,7 +208,18 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def create_participant
-    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
+    transaction do
+      self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
+
+      # no specific user, so we can only check generic cases like post_delayed
+      # or locked assignment.
+      if !locked_for?(nil)
+        update_type = self.attributes['type'] || "DiscussionTopic"
+        cp_conditions = sanitize_sql(["context_id = ? AND context_type = ? AND content_type = ?", self.context_id, self.context_type, update_type])
+        cp_conditions += " AND user_id <> #{self.user_id}" if self.user
+        ContentParticipationCount.update_all("unread_count = unread_count + 1, updated_at = '#{Time.now.to_s(:db)}'", cp_conditions)
+      end
+    end
   end
 
   def update_materialized_view
@@ -237,13 +248,20 @@ class DiscussionTopic < ActiveRecord::Base
   def change_read_state(new_state, current_user = nil)
     current_user ||= self.current_user
     return nil unless current_user
+    return true if new_state == self.read_state(current_user)
 
-    if new_state != self.read_state(current_user)
-      self.context_module_action(current_user, :read) if new_state == 'read'
-      self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
-    else
-      true
+    self.context_module_action(current_user, :read) if new_state == 'read'
+    topic_participant = self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
+    if topic_participant.present? && topic_participant.valid?
+      update_type = self.attributes['type'] || "DiscussionTopic"
+      ContentParticipationCount.create_or_update({
+        :context => context,
+        :user => current_user,
+        :content_type => update_type,
+        :offset => (new_state == "unread" ? 1 : -1),
+      })
     end
+    topic_participant
   end
 
   def change_all_read_state(new_state, current_user = nil)
@@ -254,7 +272,16 @@ class DiscussionTopic < ActiveRecord::Base
       self.context_module_action(current_user, :read) if new_state == 'read'
 
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
-      self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
+      topic_participant = self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
+      if topic_participant.present? && topic_participant.valid?
+        update_type = self.attributes['type'] || "DiscussionTopic"
+        ContentParticipationCount.create_or_update({
+          :context => context,
+          :user => current_user,
+          :content_type => update_type,
+          :offset => (new_state == "unread" ? 1 : -1),
+        })
+      end
 
       entry_ids = self.discussion_entries.map(&:id)
       if entry_ids.present?
@@ -396,7 +423,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def user_ids_who_have_posted_and_admins
     ids = DiscussionEntry.active.scoped(:select => "distinct user_id").find_all_by_discussion_topic_id(self.id).map(&:user_id)
-    ids += self.context.admin_enrollments.scoped(:select => 'user_id').map(&:user_id) if self.context.respond_to?(:admin_enrollments)
+    ids += self.context.admin_enrollments.active.scoped(:select => 'user_id').map(&:user_id) if self.context.respond_to?(:admin_enrollments)
     ids
   end
   memoize :user_ids_who_have_posted_and_admins
@@ -407,25 +434,33 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    return if self.context.root_account.deleted?
+    raise IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
     user = opts[:user]
-    if opts[:text]
+    if opts[:html]
+      message = opts[:html].strip
+    else
       message = opts[:text].strip
       message = format_message(message).first
-    else
-      message = opts[:html].strip
     end
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
     elsif !message || message.empty?
       raise "Message body cannot be blank"
+    elsif !self.grants_right?(user, :read)
+      nil
     else
-      DiscussionEntry.create!({
+      entry = DiscussionEntry.new({
         :message => message,
         :discussion_topic => self,
         :user => user,
       })
+      if !entry.grants_right?(user, :create)
+        raise IncomingMessageProcessor::ReplyToLockedTopicError
+      else
+        entry.save!
+        entry
+      end
     end
   end
 

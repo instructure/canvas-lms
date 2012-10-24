@@ -17,7 +17,7 @@ gem 'encrypted_cookie_store-instructure', '1.0.1', :require => 'encrypted_cookie
 gem 'erubis',         '2.7.0'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.1.13'
-gem 'haml',           '3.1.6'
+gem 'sass',           '3.2.1'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
 end
@@ -52,7 +52,7 @@ gem 'rotp',           '1.4.1'
 gem 'rqrcode',        '0.4.2'
 gem 'rscribd',        '1.2.0'
 gem 'net-ldap',       '0.3.1',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.18'
+gem 'ruby-saml-mod',  '0.1.19'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '2.0.3'
@@ -62,6 +62,7 @@ gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 # this is only needed by jammit, but we're pinning at 0.9.4 because 0.9.5 breaks
 gem 'yui-compressor', '0.9.4'
 gem 'foreigner',      '0.9.2'
+gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
 
 group :assets do
   gem 'compass-rails', '1.0.2'
@@ -85,7 +86,7 @@ group :test do
   gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
-  gem 'parallelized_specs', '0.1.9'
+  gem 'parallelized_specs', '0.3.03'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'

@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/cc_spec_helper'
+# encoding: utf-8
+require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 describe CC::CCHelper do
   describe CC::CCHelper::HtmlContentExporter do
@@ -71,7 +72,7 @@ describe CC::CCHelper do
       html = %{<div>My Title\302\240</div>}
       exported = @exporter.html_page(html, "my title page")
       doc = Nokogiri::HTML(exported)
-      doc.encoding.should == 'utf-8'
+      doc.encoding.upcase.should == 'UTF-8'
       doc.at_css('html body div').to_s.should == "<div>My Title\302\240</div>"
     end
 
@@ -89,6 +90,21 @@ describe CC::CCHelper do
       html = %{<a href="/courses/#{@course.id}/files">File page index</a>}
       translated = @exporter.html_content(html)
       translated.should match %r{\$CANVAS_COURSE_REFERENCE\$/files}
+    end
+
+    it "should prepend the domain to links outside the course" do
+      HostUrl.stubs(:protocol).returns('http')
+      HostUrl.stubs(:context_host).returns('www.example.com:8080')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
+      @othercourse = Course.create!
+      html = <<-HTML
+        <a href="/courses/#{@course.id}/wiki/front-page">This course's front page</a>
+        <a href="/courses/#{@othercourse.id}/wiki/front-page">Other course's front page</a>
+      HTML
+      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      urls = doc.css('a').map{ |attr| attr[:href] }
+      urls[0].should == "%24WIKI_REFERENCE%24/wiki/front-page"
+      urls[1].should == "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
   end
 end

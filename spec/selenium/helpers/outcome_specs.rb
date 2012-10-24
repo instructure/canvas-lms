@@ -20,8 +20,7 @@ shared_examples_for "outcome tests" do
     outcome_form.find_element(:css, '.add_rating_link').click
     rating_table = outcome_form.find_element(:css, '.rubric_criterion')
     new_rating_row = fj('#edit_outcome_form .rubric_criterion tr:nth-child(6)')
-    new_rating_row.find_element(:css, 'input.outcome_rating_description').clear
-    new_rating_row.find_element(:css, 'input.outcome_rating_description').send_keys('New Expectation')
+    replace_content(new_rating_row.find_element(:css, 'input.outcome_rating_description'), 'New Expectation')
     new_rating_points = new_rating_row.find_element(:name, 'learning_outcome[rubric_criterion][ratings][5][description]')
     replace_content(new_rating_points, '1')
     #delete a rating
@@ -32,7 +31,7 @@ shared_examples_for "outcome tests" do
     wait_for_ajaximations
     keep_trying_until { fj("#outcomes .learning_outcome .short_description").text.should == outcome_name }
     f('.show_details_link').click
-    ffj('#outcomes .rubric_criterion .rating:visible').size.should eql(3)
+    ffj('#outcomes .rubric_criterion .rating:visible').size.should == 3
   end
 
   it "should edit a learning outcome" do
@@ -103,7 +102,7 @@ shared_examples_for "outcome tests" do
       draggable = f('.outcome_group .reorder_link')
       drag_to = f('#section-tabs')
       driver.action.drag_and_drop(draggable, drag_to).perform
-      driver.execute_script('return INST.errorCount;').should eql 0
+      driver.execute_script('return INST.errorCount;').should == 0
     end
 
     it "should nest an outcome into a group" do

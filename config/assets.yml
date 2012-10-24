@@ -110,6 +110,7 @@ stylesheets:
   common:
     - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/g_base.css
+    - public/stylesheets/static/mediaelementplayer.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css
@@ -223,6 +224,8 @@ stylesheets:
     - public/stylesheets/compiled/grade_summary.css
   context_list:
     - public/stylesheets/compiled/context_list.css
+  page_views:
+    - public/stylesheets/compiled/page_views.css
   prior_users:
     - public/stylesheets/compiled/prior_users.css
   popup:

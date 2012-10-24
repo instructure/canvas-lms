@@ -72,6 +72,10 @@ class AssessmentRequest < ActiveRecord::Base
     @send_reminder = nil
     true
   end
+
+  def context
+    submission.try(:context)
+  end
   
   def assessor_name
     self.rubric_assessment.assessor_name rescue ((self.assessor.name rescue nil) || t("#unknown", "Unknown"))

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -33,6 +33,7 @@ class Account < ActiveRecord::Base
   has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
+  has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
@@ -56,7 +57,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :account_authorization_configs, :order => 'id'
+  has_many :account_authorization_configs, :order => "position"
   has_many :account_reports
   has_many :grading_standards, :as => :context
   has_many :assessment_questions, :through => :assessment_question_banks
@@ -96,6 +97,7 @@ class Account < ActiveRecord::Base
 
   validates_locale :default_locale, :allow_nil => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
+  validate :validate_auth_discovery_url
 
   include StickySisFields
   are_sis_sticky :name
@@ -146,6 +148,7 @@ class Account < ActiveRecord::Base
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
+  add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :mfa_settings, :root_only => true
   add_setting :canvas_authentication, :boolean => true, :root_only => true
@@ -661,6 +664,29 @@ class Account < ActiveRecord::Base
   
   def saml_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?)
+  end
+
+  def multi_auth?
+    self.account_authorization_configs.count > 1
+  end
+
+  def auth_discovery_url=(url)
+    self.settings[:auth_discovery_url] = url
+  end
+
+  def auth_discovery_url
+    self.settings[:auth_discovery_url]
+  end
+
+  def validate_auth_discovery_url
+    return if self.settings[:auth_discovery_url].blank?
+
+    begin
+      value, uri = CustomValidations.validate_url(self.settings[:auth_discovery_url])
+      self.auth_discovery_url = value
+    rescue URI::InvalidURIError, ArgumentError
+      errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
+    end
   end
   
   # When a user is invited to a course, do we let them see a preview of the

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe PseudonymsController do
 
@@ -277,6 +277,87 @@ describe PseudonymsController do
       @pseudonym1.reload
       @pseudonym1.valid_password?('qwerty1').should be_true
       @pseudonym1.valid_password?('bobob').should be_false
+    end
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    before do
+      user_with_pseudonym(:active_all => 1)
+      @admin = @user
+      Account.site_admin.add_user(@admin)
+      user_session(@admin, @pseudonym)
+
+      @shard1.activate do
+        @account = Account.create!
+        user_with_pseudonym(:active_all => 1, :account => @account)
+      end
+    end
+
+    describe 'index' do
+      it "should list pseudonyms from all shards" do
+        @p1 = @pseudonym
+        @p2 = Account.default.pseudonyms.create!(:user => @user, :unique_id => @p1.unique_id)
+
+        get 'index', :format => 'json', :user_id => @user.id
+        response.should be_success
+        assigns['pseudonyms'].should == [@p1, @p2]
+      end
+    end
+
+    describe 'create' do
+      it "should create a new pseudonym for a user in a different shard (cross-shard)" do
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :password => 'bobobob', :password_confirmation => 'bobobob', :account_id => Account.default.id, :unique_id => 'bobob' }
+        response.should be_success
+
+        @user.reload
+        @user.all_pseudonyms.length.should == 2
+        @user.all_pseudonyms.map(&:shard).should == [@shard1, Shard.default]
+      end
+
+      it "should create a new pseudonym for a user in a different shard (same-shard)" do
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :password => 'bobobob', :password_confirmation => 'bobobob', :account_id => @account.id, :unique_id => 'bobob' }
+        response.should be_success
+
+        @user.all_pseudonyms.length.should == 2
+        @user.all_pseudonyms.map(&:shard).should == [@shard1, @shard1]
+      end
+    end
+
+    describe 'update' do
+      it "should update a pseudonym on another shard" do
+        post 'update', :format => 'json', :user_id => @user.id, :id => @pseudonym.id, :pseudonym => { :unique_id => 'yoyoyo' }
+        response.should be_success
+
+        @pseudonym.reload.unique_id.should == 'yoyoyo'
+      end
+
+      it "should update a pseudonym on the requesting shard for a user from another shard" do
+        @pseudonym = Account.default.pseudonyms.create!(:user => @user, :unique_id => 'bobob')
+        post 'update', :format => 'json', :user_id => @user.id, :id => @pseudonym.id, :pseudonym => { :unique_id => 'yoyoyo' }
+        response.should be_success
+
+        @pseudonym.reload.unique_id.should == 'yoyoyo'
+      end
+    end
+
+    describe 'destroy' do
+      it "should destroy a pseudonym on another shard" do
+        @pseudonym = @account.pseudonyms.create!(:user => @user, :unique_id => 'bobob')
+        post 'destroy', :format => 'json', :user_id => @user.id, :id => @pseudonym.id
+        response.should be_success
+
+        @pseudonym.reload.should be_deleted
+      end
+
+      it "should destroy a pseudonym on the requesting shard for a user from another shard" do
+        @pseudonym = Account.default.pseudonyms.create!(:user => @user, :unique_id => 'bobob')
+        post 'destroy', :format => 'json', :user_id => @user.id, :id => @pseudonym.id
+        response.should be_success
+
+        @pseudonym.reload.should be_deleted
+      end
     end
   end
 end

@@ -179,7 +179,7 @@ define([
       },
       beforeSubmit: function(data) {
         $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing').removeClass('previewing');
-        $("#page_content .section.unsaved").remove();
+        $("#page_content .section.unsaved,#page_content .section .form_content").remove();
         $("#edit_page_form .edit_section").each(function() {
           $(this).editorBox('destroy');
           $(this).remove();
@@ -301,7 +301,7 @@ define([
       });
       $(this).parents(".section").find(".section_content").empty().append($message.show());
       var $form = $("#upload_file_form").clone(true).attr('id', '');
-      $("body").append($form.hide());
+      $("body").append($form.css({position: 'absolute', zIndex: -1}));
       $form.data('section', $section);
       $form.find(".file_upload").remove().end()
         .append($upload)
@@ -310,6 +310,14 @@ define([
     });
     $("#upload_file_form").formSubmit({
       fileUpload: true,
+      fileUploadOptions: {
+        preparedFileUpload: true,
+        upload_only: true,
+        singleFile: true,
+        context_code: ENV.context_code,
+        folder_id: ENV.folder_id,
+        formDataTarget: 'uploadDataUrl'
+      },
       object_name: 'attachment',
       processData: function(data) {
         if(!data.uploaded_data) {

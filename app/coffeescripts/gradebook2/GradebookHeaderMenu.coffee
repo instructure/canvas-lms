@@ -50,7 +50,11 @@ define [
       new AssignmentDetailsDialog(@assignment, @gradebook)
 
     messageStudentsWho: =>
-      students = ($.extend({ id: student.id, name: student.name}, student["assignment_#{@assignment.id}"]) for i, student of @gradebook.students)
+      students = _.map @gradebook.students, (student)=>
+        id: student.id
+        name: student.name
+        score: student["assignment_#{@assignment.id}"].score
+
       submissionTypes = @assignment.submission_types
       hasSubmission = true
       if submissionTypes.length == 0

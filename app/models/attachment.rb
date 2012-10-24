@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -27,6 +27,7 @@ class Attachment < ActiveRecord::Base
   include ContextModuleItem
 
   MAX_SCRIBD_ATTEMPTS = 3
+  MAX_CROCODOC_ATTEMPTS = 2
   # This value is used as a flag for when we are skipping the submit to scribd for this attachment
   SKIPPED_SCRIBD_ATTEMPTS = 25
 
@@ -44,6 +45,7 @@ class Attachment < ActiveRecord::Base
   has_one :sis_batch
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
   has_many :thumbnails, :foreign_key => "parent_id"
+  has_one :crocodoc_document
 
   before_save :infer_display_name
   before_save :default_values
@@ -55,7 +57,7 @@ class Attachment < ActiveRecord::Base
   after_save :touch_context_if_appropriate
   after_save :build_media_object
 
-  attr_accessor :podcast_associated_asset, :do_submit_to_scribd
+  attr_accessor :podcast_associated_asset, :submission_attachment
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment fond
@@ -112,13 +114,11 @@ class Attachment < ActiveRecord::Base
   # it to scribd from that point does not make the user wait since that
   # does happen asynchronously and the data goes directly from s3 to scribd.
   def after_attachment_saved
-    if !self.scribdable?
-      # We aren't scribdable, so just mark as processed. (pending_upload and processing are the
-      # only states that define transitions to process, so for other states this is correctly
-      # a no-op.)
+    if scribdable? && !Attachment.skip_3rd_party_submits?
+      send_later_enqueue_args(:submit_to_scribd!,
+                              {:n_strand => 'scribd', :max_attempts => 1})
+    else
       self.process
-    elsif ScribdAPI.enabled? && !Attachment.skip_scribd_submits?
-      send_later_enqueue_args(:submit_to_scribd!, { :n_strand => 'scribd', :max_attempts => 1 })
     end
 
     # try an infer encoding if it would be useful to do so
@@ -402,7 +402,11 @@ class Attachment < ActiveRecord::Base
     end
 
     # if we're filtering scribd submits, update the scribd_attempts here to skip the submission process
-    if self.new_record? && Attachment.filtering_scribd_submits? && !self.do_submit_to_scribd
+    if self.new_record? && Attachment.filtering_scribd_submits? && !self.submission_attachment
+      self.scribd_attempts = SKIPPED_SCRIBD_ATTEMPTS
+    end
+    # i'm also hijacking SKIPPED_SCRIBD_ATTEMPTS to flag whether a document was probably sent to crocodoc
+    if new_record? && submission_attachment && crocodocable?
       self.scribd_attempts = SKIPPED_SCRIBD_ATTEMPTS
     end
 
@@ -455,6 +459,29 @@ class Attachment < ActiveRecord::Base
     end
     ns = nil if ns && ns.empty?
     ns
+  end
+
+  def change_namespace(new_namespace)
+    if self.root_attachment
+      raise "change_namespace must be called on a root attachment"
+    end
+
+    old_namespace = self.namespace
+    return if new_namespace == old_namespace
+    old_full_filename = self.full_filename
+    write_attribute(:namespace, new_namespace)
+
+    if Attachment.s3_storage?
+      AWS::S3::S3Object.rename(old_full_filename,
+                               self.full_filename,
+                               bucket_name,
+                               :access => attachment_options[:s3_access])
+    else
+      FileUtils.mv old_full_filename, full_filename
+    end
+
+    self.save
+    Attachment.update_all({ :namespace => new_namespace }, { :root_attachment_id => self.id })
   end
 
   def process_s3_details!(details)
@@ -1220,18 +1247,23 @@ class Attachment < ActiveRecord::Base
     !!(ScribdAPI.enabled? && self.scribd_mime_type_id && self.scribd_attempts != SKIPPED_SCRIBD_ATTEMPTS)
   end
 
+  def crocodocable?
+    Canvas::Crocodoc.config &&
+      CrocodocDocument::MIME_TYPES.include?(content_type)
+  end
+
   def self.submit_to_scribd(ids)
     Attachment.find_all_by_id(ids).compact.each do |attachment|
       attachment.submit_to_scribd! rescue nil
     end
   end
 
-  def self.skip_scribd_submits(skip=true)
-    @skip_scribd_submits = skip
+  def self.skip_3rd_party_submits(skip=true)
+    @skip_3rd_party_submits = skip
   end
 
-  def self.skip_scribd_submits?
-    !!@skip_scribd_submits
+  def self.skip_3rd_party_submits?
+    !!@skip_3rd_party_submits
   end
 
   def self.skip_media_object_creation(&block)
@@ -1279,6 +1311,26 @@ class Attachment < ActiveRecord::Base
       return true
     else
       return false
+    end
+  end
+
+  def submit_to_crocodoc(attempt = 1)
+    if crocodocable? && !Attachment.skip_3rd_party_submits?
+      crocodoc = crocodoc_document || create_crocodoc_document
+      crocodoc.upload
+      update_attribute(:workflow_state, 'processing')
+    end
+  rescue => e
+    update_attribute(:workflow_state, 'errored')
+    ErrorReport.log_exception(:crocodoc, e, :attachment_id => id)
+
+    if attempt < MAX_CROCODOC_ATTEMPTS
+      send_later_enqueue_args :submit_to_crocodoc, {
+        :n_strand => 'crocodoc_retries',
+        :run_at => 30.seconds.from_now,
+        :max_attempts => 1,
+        :priority => Delayed::LOW_PRIORITY,
+      }, attempt + 1
     end
   end
 
@@ -1425,7 +1477,7 @@ class Attachment < ActiveRecord::Base
     @@domain_namespace ||= nil
   end
 
-  def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked]; end
+  def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails
 
 
@@ -1541,5 +1593,9 @@ class Attachment < ActiveRecord::Base
       end
       self.save!
     end
+  end
+
+  def crocodoc_available?
+    crocodoc_document.try(:available?)
   end
 end

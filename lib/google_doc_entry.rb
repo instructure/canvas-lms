@@ -23,7 +23,7 @@ class GoogleDocEntry
     if entry.is_a?(String)
       @entry = Atom::Entry.load_entry(entry)
     end
-    @document_id = @entry.simple_extensions["{http://schemas.google.com/g/2005,resourceId}"].to_s
+    set_document_id_from @entry
     @folder = @entry.categories.find{|c| c.scheme.match(/\Ahttp:\/\/schemas.google.com\/docs\/2007\/folders/)}.label rescue nil
   end
   
@@ -66,5 +66,12 @@ class GoogleDocEntry
 
   def download_url
     @entry.content.src
+  end
+
+  private
+
+  def set_document_id_from(entry)
+    doc_id = entry.simple_extensions["{http://schemas.google.com/g/2005,resourceId}"]
+    @document_id = doc_id.first.to_s
   end
 end

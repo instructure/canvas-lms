@@ -236,7 +236,7 @@ class UsersController < ApplicationController
 
         if api_request?
           @users = User.of_account(@context).active.order_by_sortable_name
-          @users = Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name)
+          @users = Api.paginate(@users, self, api_v1_account_users_url, :order => :sortable_name)
           user_json_preloads(@users)
         else
           @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
@@ -623,7 +623,6 @@ class UsersController < ApplicationController
     @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
     if authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
-      @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC', :per_page => 50, :without_count => true
 
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
@@ -901,32 +900,10 @@ class UsersController < ApplicationController
   end
 
   def media_download
-    url = Rails.cache.fetch(['media_download_url', params[:entryId], params[:type]].cache_key, :expires_in => 30.minutes) do
-      client = Kaltura::ClientV3.new
-      client.startSession(Kaltura::SessionType::ADMIN)
-      assets = client.flavorAssetGetByEntryId(params[:entryId])
-      asset = assets.find {|a| a[:fileExt] == params[:type] }
-      if asset
-        client.flavorAssetGetDownloadUrl(asset[:id])
-      else
-        nil
-      end
-    end
-
+    asset = Kaltura::ClientV3.new.media_sources(params[:entryId]).find{|a| a['fileExt'] == params[:type] }
+    url = asset && asset['url']
     if url
       if params[:redirect] == '1'
-        if %w(mp3 mp4).include?(params[:type])
-          # hack alert -- iTunes (and maybe others who follow the same podcast
-          # spec) requires that the download URL for podcast items end in .mp3
-          # or another supported media type. Normally, the Kaltura download URL
-          # doesn't end in .mp3. But Kaltura's first download URL redirects to
-          # the same download url with /relocate/filename.ext appended, so we're
-          # just going to explicitly append that to skip the first redirect, so
-          # that iTunes will download the podcast items. This doesn't appear to
-          # be documented anywhere though, so we're talking with Kaltura about
-          # a more official solution.
-          url = "#{url}/relocate/download.#{params[:type]}"
-        end
         redirect_to url
       else
         render :json => { 'url' => url }
@@ -1134,7 +1111,7 @@ class UsersController < ApplicationController
       @entries.concat context.assignments.active
       @entries.concat context.calendar_events.active
       @entries.concat context.discussion_topics.active
-      @entries.concat context.default_wiki_wiki_pages.select{|p| !p.deleted? }
+      @entries.concat context.wiki.wiki_pages.not_deleted
     end
     @entries = @entries.select{|e| e.updated_at > 1.weeks.ago }
     @entries.each do |entry|
@@ -1159,12 +1136,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def menu_courses
-    render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
-      @template.map_courses_for_menu(@current_user.menu_courses)
-    }
-  end
-
   def all_menu_courses
     render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
       @template.map_courses_for_menu(@current_user.courses_with_primary_enrollment)
@@ -1182,7 +1153,7 @@ class UsersController < ApplicationController
         student = User.find(params[:student_id])
         enrollments = student.student_enrollments.active.all(:include => :course)
         enrollments.each do |enrollment|
-          should_include = enrollment.course.user_has_been_teacher?(@teacher) && 
+          should_include = enrollment.course.user_has_been_instructor?(@teacher) && 
                            enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).find_by_id(enrollment.id) &&
                            enrollment.course.grants_right?(@current_user, :read_reports)
           if should_include
@@ -1198,7 +1169,7 @@ class UsersController < ApplicationController
 
       else # implied params[:course_id]
         course = Course.find(params[:course_id])
-        if !course.user_has_been_teacher?(@teacher)
+        if !course.user_has_been_instructor?(@teacher)
           flash[:error] = t('errors.user_not_teacher', "That user is not a teacher in this course")
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)

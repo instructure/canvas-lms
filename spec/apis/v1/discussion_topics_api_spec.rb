@@ -23,6 +23,7 @@ class TestCourseApi
   include Api::V1::DiscussionTopics
   def feeds_topic_format_path(topic_id, code, format); "feeds_topic_format_path(#{topic_id.inspect}, #{code.inspect}, #{format.inspect})"; end
   def named_context_url(*args); "named_context_url(#{args.inspect[1..-2]})"; end
+  def course_assignment_url(*args); "course_assignment_url(#{args.inspect[1..-2]})"; end
 end
 
 describe Api::V1::DiscussionTopics do
@@ -53,6 +54,17 @@ describe Api::V1::DiscussionTopics do
     @topic.context.update_attribute(:allow_student_forum_attachments, true)
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @student, nil)
     data[:permissions][:attach].should == true
+  end
+
+  it "should recognize include_assignment flag" do
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
+    data[:assignment].should be_nil
+
+    @topic.assignment = assignment_model(:course => @course)
+    @topic.save!
+
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil, true)
+    data[:assignment].should_not be_nil
   end
 end
 
@@ -349,6 +361,25 @@ describe DiscussionTopicsController, :type => :integration do
 
         @topic.reload
         @topic.should_not be_locked
+      end
+
+      it "should handle position_after" do
+        other_topics = (1..4).map do |i|
+          @course.discussion_topics.create!(:title => i.to_s, :message => i.to_s)
+        end
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :position_after => other_topics[2].id})
+        @topic.reload.position.should eql other_topics[2].reload.position + 1
+      end
+      it "should handle position_after with value of 'top'" do
+        other_topics = (1..4).map do |i|
+          @course.discussion_topics.create!(:title => i.to_s, :message => i.to_s)
+        end
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :position_after => 'top'})
+        @topic.reload.should eql @course.discussion_topics.first
       end
     end
 

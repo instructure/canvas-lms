@@ -474,7 +474,7 @@ class ActiveRecord::Base
   module UniqueConstraintViolation
     def self.===(error)
       ActiveRecord::StatementInvalid === error &&
-      error.message.match(/PGError: ERROR: +duplicate key value violates unique constraint|Mysql::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
+      error.message.match(/PG(?:::)?Error: ERROR: +duplicate key value violates unique constraint|Mysql::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
     end
   end
 
@@ -606,6 +606,11 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       if Hash === options # legacy support, since this param was a string
         index_type = options[:unique] ? "UNIQUE" : ""
         index_name = options[:name].to_s if options[:name]
+        concurrently = "CONCURRENTLY " if options[:concurrently]
+        conditions = options[:conditions]
+        if conditions
+          conditions = " WHERE #{ActiveRecord::Base.send(:sanitize_sql, conditions, table_name.to_s.dup)}"
+        end
       else
         index_type = options
       end
@@ -620,7 +625,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       end
       quoted_column_names = quoted_columns_for_index(column_names, options).join(", ")
 
-      execute "CREATE #{index_type} INDEX #{"CONCURRENTLY " if options[:concurrently]}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})"
+      execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
     end
   end
 end
@@ -1045,7 +1050,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
       begin
         add_foreign_key(from_table, to_table, options)
       rescue ActiveRecord::StatementInvalid => e
-        raise unless e.message =~ /PGError: ERROR:.+already exists/
+        raise unless e.message =~ /PG(?:::)?Error: ERROR:.+already exists/
       end
     else
       column  = options[:column] || "#{to_table.to_s.singularize}_id"
@@ -1059,7 +1064,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     begin
       remove_foreign_key(table, options)
     rescue ActiveRecord::StatementInvalid => e
-      raise unless e.message =~ /PGError: ERROR:.+does not exist|Mysql::Error: Error on rename/
+      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist|Mysql::Error: Error on rename/
     end
   end
 end

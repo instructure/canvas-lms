@@ -22,7 +22,7 @@ shared_examples_for 'a backend' do
 
   it "should increase count after enqueuing items" do
     Delayed::Job.enqueue SimpleJob.new
-    Delayed::Job.count.should == 1
+    Delayed::Job.jobs_count(:current).should == 1
   end
 
   it "should be able to set priority when enqueuing items" do
@@ -367,9 +367,9 @@ shared_examples_for 'a backend' do
     end
 
     it "should schedule jobs if they aren't scheduled yet" do
-      Delayed::Job.count.should == 0
+      Delayed::Job.jobs_count(:current).should == 0
       Delayed::Periodic.perform_audit!
-      Delayed::Job.count.should == 1
+      Delayed::Job.jobs_count(:current).should == 1
       job = Delayed::Job.get_and_lock_next_available('test1')
       job.tag.should == 'periodic: my SimpleJob'
       job.payload_object.should == Delayed::Periodic.scheduled['my SimpleJob']
@@ -379,28 +379,28 @@ shared_examples_for 'a backend' do
     end
 
     it "should schedule jobs if there are only failed jobs on the queue" do
-      Delayed::Job.count.should == 0
-      expect { Delayed::Periodic.perform_audit! }.to change(Delayed::Job, :count).by(1)
-      Delayed::Job.count.should == 1
+      Delayed::Job.jobs_count(:current).should == 0
+      expect { Delayed::Periodic.perform_audit! }.to change { Delayed::Job.jobs_count(:current) }.by(1)
+      Delayed::Job.jobs_count(:current).should == 1
       job = Delayed::Job.get_and_lock_next_available('test1')
       job.fail!
-      expect { Delayed::Periodic.perform_audit! }.to change(Delayed::Job, :count).by(1)
+      expect { Delayed::Periodic.perform_audit! }.to change{ Delayed::Job.jobs_count(:current) }.by(1)
     end
 
     it "should not schedule jobs that are already scheduled" do
-      Delayed::Job.count.should == 0
+      Delayed::Job.jobs_count(:current).should == 0
       Delayed::Periodic.perform_audit!
-      Delayed::Job.count.should == 1
+      Delayed::Job.jobs_count(:current).should == 1
       job = Delayed::Job.find_available(1).first
       Delayed::Periodic.perform_audit!
-      Delayed::Job.count.should == 1
+      Delayed::Job.jobs_count(:current).should == 1
       # verify that the same job still exists, it wasn't just replaced with a new one
       job.should == Delayed::Job.find_available(1).first
     end
 
     it "should schedule the next job run after performing" do
       Delayed::Periodic.perform_audit!
-      Delayed::Job.count.should == 1
+      Delayed::Job.jobs_count(:current).should == 1
       job = Delayed::Job.get_and_lock_next_available('test')
       run_job(job)
 
@@ -460,8 +460,8 @@ shared_examples_for 'a backend' do
     lambda { [story, 1, story, false].send_later(:first) }.should raise_error
   end
 
-  # the sort order of current_jobs depends on the back-end implementation,
-  # so sort order isn't tested in these specs
+  # the sort order of current_jobs and list_jobs depends on the back-end
+  # implementation, so sort order isn't tested in these specs
   describe "current jobs, queue size, strand_size" do
     before do
       @jobs = []
@@ -502,6 +502,40 @@ shared_examples_for 'a backend' do
       Delayed::Job.strand_size("test1").should == 2
       Delayed::Job.strand_size("bogus").should == 0
     end
+  end
+
+  it "should return the jobs in a strand" do
+    strand_jobs = []
+    3.times { strand_jobs << create_job(:strand => 'test1') }
+    2.times { create_job(:strand => 'test2') }
+    strand_jobs << create_job(:strand => 'test1', :run_at => 5.hours.from_now)
+    create_job
+
+    jobs = Delayed::Job.list_jobs(:strand, 3, 0, "test1")
+    jobs.size.should == 3
+
+    jobs += Delayed::Job.list_jobs(:strand, 3, 3, "test1")
+    jobs.size.should == 4
+
+    jobs.sort_by { |j| j.id }.should == strand_jobs.sort_by { |j| j.id }
+  end
+
+  it "should return the jobs for a tag" do
+    tag_jobs = []
+    3.times { tag_jobs << "test".send_later(:to_s) }
+    2.times { "test".send_later(:to_i) }
+    tag_jobs << "test".send_later_enqueue_args(:to_s, :run_at => 5.hours.from_now)
+    tag_jobs << "test".send_later_enqueue_args(:to_s, :strand => "test1")
+    "test".send_later_enqueue_args(:to_i, :strand => "test1")
+    create_job
+
+    jobs = Delayed::Job.list_jobs(:tag, 3, 0, "String#to_s")
+    jobs.size.should == 3
+
+    jobs += Delayed::Job.list_jobs(:tag, 3, 3, "String#to_s")
+    jobs.size.should == 5
+
+    jobs.sort_by { |j| j.id }.should == tag_jobs.sort_by { |j| j.id }
   end
 
   describe "running_jobs" do
@@ -564,13 +598,16 @@ shared_examples_for 'a backend' do
         @ignored_jobs = []
       end
 
-      it "should hold and un-hold a scope of jobs" do
+      it "should hold a scope of jobs" do
         @affected_jobs.all? { |j| j.on_hold? }.should be_false
         @ignored_jobs.any? { |j| j.on_hold? }.should be_false
         Delayed::Job.bulk_update('hold', :flavor => @flavor, :query => @query).should == @affected_jobs.size
 
         @affected_jobs.all? { |j| j.reload.on_hold? }.should be_true
         @ignored_jobs.any? { |j| j.reload.on_hold? }.should be_false
+      end
+
+      it "should un-hold a scope of jobs" do
         Delayed::Job.bulk_update('unhold', :flavor => @flavor, :query => @query).should == @affected_jobs.size
 
         @affected_jobs.any? { |j| j.reload.on_hold? }.should be_false
@@ -579,8 +616,8 @@ shared_examples_for 'a backend' do
 
       it "should delete a scope of jobs" do
         Delayed::Job.bulk_update('destroy', :flavor => @flavor, :query => @query).should == @affected_jobs.size
-        @affected_jobs.map { |j| Delayed::Job.find_by_id(j.id) }.compact.should be_blank
-        @ignored_jobs.map { |j| Delayed::Job.find_by_id(j.id) }.compact.size.should == @ignored_jobs.size
+        @affected_jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact.should be_blank
+        @ignored_jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact.size.should == @ignored_jobs.size
       end
     end
 
@@ -647,37 +684,55 @@ shared_examples_for 'a backend' do
 
     it "should delete given job ids" do
       jobs = (0..2).map { create_job }
-      Delayed::Job.bulk_update('destroy', :ids => jobs[0,2]).should == 2
-      jobs.map { |j| Delayed::Job.find_by_id(j.id) }.compact.should == jobs[2,1]
+      Delayed::Job.bulk_update('destroy', :ids => jobs[0,2].map(&:id)).should == 2
+      jobs.map { |j| Delayed::Job.find(j.id) rescue nil }.compact.should == jobs[2,1]
     end
   end
 
   describe "tag_counts" do
     before do
-      2.times { "test".send_later :to_s }
-      4.times { "test".send_later :to_i }
-      3.times { "test".send_later :upcase }
+      @cur = []
+      3.times { @cur << "test".send_later(:to_s) }
+      5.times { @cur << "test".send_later(:to_i) }
+      2.times { @cur << "test".send_later(:upcase) }
       ("test".send_later :downcase).fail!
-      5.times { "test".send_at 3.hours.from_now, :downcase }
-      "test".send_later :downcase
+      @future = []
+      5.times { @future << "test".send_at(3.hours.from_now, :downcase) }
+      @cur << "test".send_later(:downcase)
     end
 
     it "should return a sorted list of popular current tags" do
-      Delayed::Job.tag_counts(:current, 1).should == [{ :tag => "String#to_i", :count => 4 }]
-      Delayed::Job.tag_counts(:current, 1, 1).should == [{ :tag => "String#upcase", :count => 3 }]
-      Delayed::Job.tag_counts(:current, 5).should == [{ :tag => "String#to_i", :count => 4 },
-                                                      { :tag => "String#upcase", :count => 3 },
-                                                      { :tag => "String#to_s", :count => 2 },
+      Delayed::Job.tag_counts(:current, 1).should == [{ :tag => "String#to_i", :count => 5 }]
+      Delayed::Job.tag_counts(:current, 1, 1).should == [{ :tag => "String#to_s", :count => 3 }]
+      Delayed::Job.tag_counts(:current, 5).should == [{ :tag => "String#to_i", :count => 5 },
+                                                      { :tag => "String#to_s", :count => 3 },
+                                                      { :tag => "String#upcase", :count => 2 },
                                                       { :tag => "String#downcase", :count => 1 }]
+      @cur[0,4].each { |j| j.destroy }
+      @future[0].update_attribute(:run_at, 1.hour.ago)
+      @future[1].update_attribute(:run_at, 1.hour.ago)
+
+      Delayed::Job.tag_counts(:current, 5).should == [{ :tag => "String#to_i", :count => 4 },
+                                                      { :tag => "String#downcase", :count => 3 },
+                                                      { :tag => "String#upcase", :count => 2 },]
     end
 
     it "should return a sorted list of all popular tags" do
       Delayed::Job.tag_counts(:all, 1).should == [{ :tag => "String#downcase", :count => 6 }]
-      Delayed::Job.tag_counts(:all, 1, 1).should == [{ :tag => "String#to_i", :count => 4 }]
+      Delayed::Job.tag_counts(:all, 1, 1).should == [{ :tag => "String#to_i", :count => 5 }]
       Delayed::Job.tag_counts(:all, 5).should == [{ :tag => "String#downcase", :count => 6 },
-                                                  { :tag => "String#to_i", :count => 4 },
-                                                  { :tag => "String#upcase", :count => 3 },
-                                                  { :tag => "String#to_s", :count => 2 },]
+                                                  { :tag => "String#to_i", :count => 5 },
+                                                  { :tag => "String#to_s", :count => 3 },
+                                                  { :tag => "String#upcase", :count => 2 },]
+
+      @cur[0,4].each { |j| j.destroy }
+      @future[0].destroy
+      @future[1].fail!
+      @future[2].fail!
+
+      Delayed::Job.tag_counts(:all, 5).should == [{ :tag => "String#to_i", :count => 4 },
+                                                  { :tag => "String#downcase", :count => 3 },
+                                                  { :tag => "String#upcase", :count => 2 },]
     end
   end
 end

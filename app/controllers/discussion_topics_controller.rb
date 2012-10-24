@@ -130,7 +130,7 @@ class DiscussionTopicsController < ApplicationController
                    @context.active_announcements :
                    @context.active_discussion_topics.only_discussion_topics)
           scope = scope.by_position
-          @topics = Api.paginate(scope, self, topic_pagination_path(:only_announcements => params[:only_announcements]))
+          @topics = Api.paginate(scope, self, topic_pagination_url(:only_announcements => params[:only_announcements]))
           @topics.reject! { |a| a.locked_for?(@current_user, :check_policies => true) }
           @topics.each { |t| t.current_user = @current_user }
           if api_request?
@@ -281,7 +281,10 @@ class DiscussionTopicsController < ApplicationController
     process_discussion_topic(!!:is_new)
   end
 
-  # @API Update a topic, accepts the same parameters as create
+  # @API Update a topic
+  #
+  # Accepts the same parameters as create
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
   #         -F title='This will be positioned after Topic #1234' \ 
@@ -393,10 +396,16 @@ class DiscussionTopicsController < ApplicationController
       if @topic.update_attributes(discussion_topic_hash)
         log_asset_access(@topic, 'topics', 'topics', 'participate')
 
-        # handle sort positioning
+        # handle sort positioning:
+        # if you pass params[:position_after], it must be either the id of the model you want to position
+        # this after or the string "top" (meaning you want to put this topic at the top of the list)
         if params[:position_after] && @context.grants_right?(@current_user, session, :moderate_forum)
-          other_topic = @context.discussion_topics.active.find(params[:position_after])
-          @topic.insert_at(other_topic.position)
+          if params[:position_after] == 'top'
+            @topic.move_to_bottom
+          else
+            other_topic = @context.discussion_topics.active.find(params[:position_after])
+            @topic.insert_at(other_topic.position)
+          end
         end
 
         # handle creating/removing attachment
@@ -428,7 +437,7 @@ class DiscussionTopicsController < ApplicationController
               @topic.save!
               assignment.destroy
             end
-          
+
           elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
                  @assignment.grants_right?(@current_user, session, :update)
             update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))

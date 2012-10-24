@@ -5,10 +5,10 @@ define ['jquery'], ($) ->
 
   ##
   # Handles "data-method" on links such as:
-  # <a href="/users/5" data-method="delete" rel="nofollow" data-confirm="Are you sure?">Delete</a>
+  # <a data-url="/users/5" data-method="delete" rel="nofollow" data-confirm="Are you sure?">Delete</a>
   handleMethod = (link) ->
     link.data 'handled', true
-    href = link.attr('href')
+    href = link.data('url') || link.attr('href')
     method = link.data('method')
     target = link.attr('target')
     form = $("<form method='post' action='#{href}'></form>")
@@ -65,14 +65,16 @@ define ['jquery'], ($) ->
     # bind the 'beforeremove' and 'remove' events if you want to handle this with your own code
     # if you stop propigation this will not remove it
     $elToRemove.bind
-      beforeremove: $.proxy($elToRemove, 'hide')
-      remove: $.proxy($elToRemove, 'remove')
+      beforeremove: -> $elToRemove.hide()
+      remove: -> $elToRemove.remove()
 
     $elToRemove.trigger 'beforeremove'
+
     triggerRemove = -> $elToRemove.trigger 'remove'
+    revert = -> $elToRemove.show()
 
     if url
-      $.ajaxJSON url, "DELETE", triggerRemove, $.proxy($elToRemove, 'show')
+      $.ajaxJSON url, "DELETE", {}, triggerRemove, revert
     else
       triggerRemove()
 

@@ -20,6 +20,14 @@ module Delayed
         include Delayed::Backend::Base
         set_table_name :delayed_jobs
 
+        def self.reconnect!
+          connection.reconnect!
+        end
+
+        class << self
+          attr_accessor :batch_size, :select_random
+        end
+
         # be aware that some strand functionality is controlled by triggers on
         # the database. see
         # db/migrate/20110831210257_add_delayed_jobs_next_in_strand.rb
@@ -193,10 +201,16 @@ module Delayed
           check_queue(queue)
           check_priorities(min_priority, max_priority)
 
-          @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          self.batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          if self.select_random.nil?
+            self.select_random = Setting.get_cached('jobs_select_random', 'false') == 'true'
+          end
           loop do
             jobs = find_available(@batch_size, queue, min_priority, max_priority)
             return nil if jobs.empty?
+            if self.select_random
+              jobs = jobs.sort_by { rand }
+            end
             job = jobs.detect do |job|
               job.lock_exclusively!(worker_name)
             end

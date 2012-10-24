@@ -92,8 +92,8 @@ class OutcomeGroupsApiController < ApplicationController
 
       # get and paginate links from group
       link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title
-      path = polymorphic_path [:api_v1, @context, :outcome_group_outcomes], :id => @outcome_group.id
-      @links = Api.paginate(link_scope, self, path)
+      url = polymorphic_url [:api_v1, @context, :outcome_group_outcomes], :id => @outcome_group.id
+      @links = Api.paginate(link_scope, self, url)
 
       # pre-populate the links' groups and contexts to prevent
       # extraneous loads
@@ -154,8 +154,8 @@ class OutcomeGroupsApiController < ApplicationController
 
       # get and paginate subgroups from group
       subgroup_scope = @outcome_group.child_outcome_groups.active.order_by_title
-      path = polymorphic_path [:api_v1, @context, :outcome_group_subgroups], :id => @outcome_group.id
-      @subgroups = Api.paginate(subgroup_scope, self, path)
+      url = polymorphic_url [:api_v1, @context, :outcome_group_subgroups], :id => @outcome_group.id
+      @subgroups = Api.paginate(subgroup_scope, self, url)
 
       # pre-populate the subgroups' parent groups to prevent extraneous
       # loads

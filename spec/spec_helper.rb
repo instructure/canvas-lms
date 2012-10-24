@@ -131,6 +131,7 @@ Spec::Runner.configure do |config|
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
+    Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
   end
 
@@ -778,6 +779,19 @@ Spec::Runner.configure do |config|
       Delayed::MAX_PRIORITY)
       run_job(job)
     end
+  end
+
+  def enable_jobs
+    job_thread = Thread.new do
+      Thread.current[:done] = false
+      while !Thread.current[:done]
+        run_jobs
+        sleep 1
+      end
+    end
+    yield
+    job_thread[:done] = true
+    job_thread.join
   end
 
   def track_jobs

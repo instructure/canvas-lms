@@ -138,6 +138,74 @@ describe QuizzesController do
       assigns[:just_graded].should eql(false)
       assigns[:stored_params].should_not be_nil
     end
+
+    it "should respect section privilege limitations" do
+      course(:active_all => 1)
+      @section = @course.course_sections.create!(:name => 'section 2')
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+      @section.enroll_user(@user2, 'StudentEnrollment', 'active')
+      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+      @course.enroll_student(@user1)
+      @ta1 = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
+      @course.enroll_ta(@ta1).update_attribute(:limit_privileges_to_course_section, true)
+      course_quiz
+      @sub1 = @quiz.generate_submission(@user1)
+      @sub2 = @quiz.generate_submission(@user2)
+
+      user_session @teacher
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      assigns[:submissions].sort_by(&:id).should ==[@sub1, @sub2].sort_by(&:id)
+      assigns[:submitted_students].sort_by(&:id).should == [@user1, @user2].sort_by(&:id)
+
+      user_session @ta1
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      assigns[:submissions].should ==[@sub1]
+      assigns[:submitted_students].should == [@user1]
+    end
+  end
+
+  describe "GET 'moderate''" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      course_quiz
+      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
+      assert_unauthorized
+    end
+
+    it "should assign variables" do
+      @student = course_with_student(:active_all => true).user
+      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      course_quiz
+      @sub = @quiz.generate_submission(@student)
+      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
+      assigns[:quiz].should == @quiz
+      assigns[:students].should == [@student]
+      assigns[:submissions].should == [@sub]
+    end
+
+    it "should respect section privilege limitations" do
+      course_with_teacher(:active_all => 1)
+      @section = @course.course_sections.create!(:name => 'section 2')
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+      @section.enroll_user(@user2, 'StudentEnrollment', 'active')
+      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+      @course.enroll_student(@user1)
+      @ta1 = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
+      @course.enroll_ta(@ta1).update_attribute(:limit_privileges_to_course_section, true)
+      course_quiz
+      @sub1 = @quiz.generate_submission(@user1)
+      @sub2 = @quiz.generate_submission(@user2)
+
+      user_session @teacher
+      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
+      assigns[:students].sort_by(&:id).should == [@user1, @user2].sort_by(&:id)
+      assigns[:submissions].sort_by(&:id).should == [@sub1, @sub2].sort_by(&:id)
+
+      user_session @ta1
+      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
+      assigns[:students].should == [@user1]
+      assigns[:submissions].should == [@sub1]
+    end
   end
 
   describe "POST 'reorder'" do

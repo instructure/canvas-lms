@@ -402,6 +402,7 @@ class ApplicationController < ActionController::Base
           end
         end
       end
+      set_badge_counts_for(@context, @current_user, @current_enrollment)
       assign_localizer if @context.present?
       add_crumb(@context.short_name, named_context_url(@context, :context_url), :id => "crumb_#{@context.asset_string}") if @context && @context.respond_to?(:short_name)
     end
@@ -449,6 +450,29 @@ class ApplicationController < ActionController::Base
     Course.require_assignment_groups(@contexts)
     @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)
     @context_membership = @context_enrollment
+  end
+
+  def set_badge_counts_for(context, user, enrollment=nil)
+    return if @js_env && @js_env[:badge_counts].present?
+    return unless context.present? && user.present?
+    return unless context.respond_to?(:content_participation_counts) # just Course and Group so far
+    js_env(:badge_counts => badge_counts_for(context, user, enrollment))
+  end
+
+  def badge_counts_for(context, user, enrollment=nil)
+    badge_counts = {}
+    ['Announcement', 'DiscussionTopic', 'Submission'].each do |type|
+      participation_count = context.content_participation_counts.find(:first, {
+        :conditions => { :user_id => user.id, :content_type => type },
+      })
+      participation_count ||= ContentParticipationCount.create_or_update({
+        :context => context,
+        :user => user,
+        :content_type => type,
+      })
+      badge_counts[type.underscore.pluralize] = participation_count.unread_count
+    end
+    badge_counts
   end
 
   # Retrieves all assignments for all contexts held in the @contexts variable.
@@ -502,7 +526,7 @@ class ApplicationController < ActionController::Base
     @ungraded_assignments = @assignments.select{|a| 
       a.grants_right?(@current_user, session, :grade) && 
       a.expects_submission? &&
-      a.needs_grading_count > 0
+      a.needs_grading_count_for_user(@current_user) > 0
     }
     @assignment_groups = @groups
     @past_assignments = @assignments.select{ |a| a.due_at && a.due_at < Time.now }
@@ -644,7 +668,7 @@ class ApplicationController < ActionController::Base
     # Annoying problem.  If I set the cache-control to anything other than "no-cache, no-store" 
     # then the local cache is used when the user clicks the 'back' button.  I don't know how
     # to tell the browser to ALWAYS check back other than to disable caching...
-    return true if @cancel_cache_buster
+    return true if @cancel_cache_buster || request.xhr? || api_request?
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
@@ -956,7 +980,7 @@ class ApplicationController < ActionController::Base
     elsif tag.content_type == 'ExternalUrl'
       @tag = tag
       @module = tag.context_module
-      tag.context_module_action(@current_user, :read)
+      tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
       render :template => 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
@@ -1106,6 +1130,8 @@ class ApplicationController < ActionController::Base
         !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
+      elsif feature == :crocodoc
+        !!Canvas::Crocodoc.config
       elsif feature == :lockdown_browser
         Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
       else
@@ -1372,5 +1398,14 @@ class ApplicationController < ActionController::Base
   def complete_request_uri
     uri = Canvas::LoggingFilter.filter_uri(request.request_uri)
     "#{request.protocol}#{request.host}#{uri}"
+  end
+
+  def self.batch_jobs_in_actions(opts = {})
+    batch_opts = opts.delete(:batch)
+    around_filter(opts) do |controller, action|
+      Delayed::Batch.serial_batch(batch_opts || {}) do
+        action.call
+      end
+    end
   end
 end

@@ -20,22 +20,32 @@ class SummaryMessageConsolidator
   def self.process
     SummaryMessageConsolidator.new.process
   end
-  
+
   def initialize(n=nil)
     @logger = RAILS_DEFAULT_LOGGER
   end
-  
+
   def process
     cc_ids = ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       CommunicationChannel.ids_with_pending_delayed_messages
     end
+    dm_id_batches = []
     cc_ids.each do |cc_id|
       dm_ids = DelayedMessage.ids_for_messages_with_communication_channel_id(cc_id)
-      DelayedMessage.update_all({ :batched_at => Time.now.utc, :workflow_state => 'sent', :updated_at => Time.now.utc },
-                                { :id => dm_ids })
-      DelayedMessage.send_later(:summarize, dm_ids)
-      
+      dm_id_batches << dm_ids
       @logger.info("Scheduled summary with #{dm_ids.length} messages for communication channel id #{cc_id}")
     end
+
+    dm_id_batches.in_groups_of(Setting.get('summary_message_consolidator_batch_size', '500').to_i, false) do |batches|
+      DelayedMessage.update_all({ :batched_at => Time.now.utc, :workflow_state => 'sent', :updated_at => Time.now.utc },
+                                { :id => batches.flatten })
+
+      Delayed::Batch.serial_batch do
+        batches.each do |dm_ids|
+          DelayedMessage.send_later_enqueue_args(:summarize, { :priority => Delayed::LOWER_PRIORITY }, dm_ids)
+        end
+      end
+    end
+    dm_id_batches.size
   end
 end

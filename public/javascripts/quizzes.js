@@ -23,11 +23,12 @@ define([
   'str/pluralize',
   'wikiSidebar',
   'compiled/editor/MultipleChoiceToggle',
+  'compiled/str/TextHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar, /\$\.underscore/, truncateText */,
+  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar, /\$\.underscore/ */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
@@ -40,7 +41,11 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, calcCmd, htmlEscape, pluralize, wikiSidebar, MultipleChoiceToggle) {
+], function(I18n, $, calcCmd, htmlEscape, pluralize, wikiSidebar, MultipleChoiceToggle, TextHelper) {
+
+  var clickSetCorrect = I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"),
+      isSetCorrect = I18n.t('titles.set_as_correct', "This answer is set as correct"),
+      clickUnsetCorrect = I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct");
 
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
@@ -115,10 +120,19 @@ define([
         if ($answers.filter(".correct_answer").length === 0) {
           $answers.filter(":first").addClass('correct_answer');
         }
-        $answers.find('.select_answer_link').attr('title', I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"));
+        $answers.find('.select_answer_link')
+          .attr('title', clickSetCorrect)
+          .find('img').attr('alt', clickSetCorrect);
+        $answers.filter('.correct_answer').find('.select_answer_link')
+          .attr('title', isSetCorrect)
+          .find('img').attr('alt', isSetCorrect);
       } else {
-        $answer.filter(".correct_answer").find('.select_answer_link').attr('title', I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct"));
-        $answer.filter(":not(.correct_answer)").find('.select_answer_link').attr('title', I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"));
+        $answer.filter(".correct_answer").find('.select_answer_link')
+          .attr('title', clickUnsetCorrect)
+          .find('img').attr('alt', clickUnsetCorrect);
+        $answer.filter(":not(.correct_answer)").find('.select_answer_link')
+          .attr('title', clickSetCorrect)
+          .find('img').attr('alt', clickSetCorrect);
       }
 
       $answer.find(".numerical_answer_type").change();
@@ -127,7 +141,7 @@ define([
         answer_text: answer.answer_text,
         id: answer.id,
         match_id: answer.match_id
-      }
+      };
       templateData.comments_header = I18n.beforeLabel('comments_on_answer', "Comments, if the user chooses this answer");
       templateData.short_answer_header = I18n.beforeLabel('possible_answer', "Possible Answer");
 
@@ -171,7 +185,9 @@ define([
       if (answer.answer_weight > 0) {
         $answer.addClass('correct_answer');
         if (answer.answer_selection_type == "multiple_answer") {
-          $answer.find('.select_answer_link').attr('title', I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct"));
+          $answer.find('.select_answer_link')
+            .attr('title', clickUnsetCorrect)
+            .find('img').attr('alt', clickUnsetCorrect);
         }
       } else if (answer.answer_weight < 0) {
         $answer.addClass('negative_answer');
@@ -202,7 +218,7 @@ define([
         // we show and then hide the form so that the layout for the editorBox is computed correctly
         $form.show();
         $form.find(".question_content").attr('id', 'question_content_' + quiz.questionContentCounter++);
-        $form.find(".question_content").editorBox();
+        $form.find(".question_content").editorBox({tinyOptions: {aria_label: I18n.t('label.question.instructions', 'Question instructions, rich text area')}});
         $form.find(".text_after_answers").attr('id', 'text_after_answers_' + quiz.questionContentCounter++);
         $form.find(".text_after_answers").editorBox();
         $form.hide();
@@ -417,7 +433,8 @@ define([
           }
           if (data.answer_weight > 0) { hadOne = true; }
           var $displayAnswer = makeDisplayAnswer(data, escaped);
-          $question.find(".answers").append($displayAnswer);
+          // must use > in selector
+          $question.find(".text > .answers").append($displayAnswer);
           var $option = $(document.createElement("option"));
           $option.val("option_" + i).text(data.answer_text);
           $select.append($option);
@@ -836,7 +853,8 @@ define([
         });
       }
       if (question.question_type != 'calculated_question') {
-        $question.find(".answer").each(function() {
+        // must use > in selector
+        $question.find(".text > .answers .answer").each(function() {
           var $answer = $(this);
           var answerData = $answer.getTemplateData({
             textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment'],
@@ -1106,18 +1124,27 @@ define([
     }).triggerHandler('change');
 
     $("#never_hide_results").change(function() {
-      $(".show_quiz_results_options").showIf($(this).attr('checked'));
-      if (!$(this).attr('checked')) {
+      var $this = $(this);
+      $(".show_quiz_results_options").showIf($this.attr('checked'));
+      if (!$this.attr('checked')) {
         $("#hide_results_only_after_last").attr('checked', false);
         $("#quiz_show_correct_answers").attr('checked', false);
       }
     }).triggerHandler('change');
 
-    $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").bind('change', function() {
-      var checked = $("#multiple_attempts_option").attr('checked') && $("#limit_attempts_option").attr('checked');
-      var cnt = parseInt($("#quiz_allowed_attempts").val(), 10);
-      if (checked && cnt && cnt > 0) {
-        $("#hide_results_only_after_last_holder").show();
+    $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").change(function() {
+      var checked = $("#multiple_attempts_option").prop('checked') && $("#limit_attempts_option").prop('checked');
+      if (checked) {
+          $("#hide_results_only_after_last_holder").show();
+          var $attempts = $('#quiz_allowed_attempts');
+          var $attemptsVal = $attempts.val();
+          if(isNaN($attemptsVal)) {
+              alert(I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers'));
+              $attempts.val("");
+          } else if($attemptsVal.length > 3) {
+              alert(I18n.t('quiz_attempts_length_error', 'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left'));
+              $attempts.val("");
+          }
       } else {
         $("#hide_results_only_after_last").attr('checked', false);
         $("#hide_results_only_after_last_holder").hide();
@@ -1340,10 +1367,12 @@ define([
           }
           var $th = $("<th/>");
           $th.text(question.variables[idx].name);
+          $th.attr('id', 'possible_solution_' + question.variables[idx].name);
           $form.find(".combinations_holder .combinations thead tr").append($th);
         }
         var $th = $("<th class='final_answer'/>");
         $th.text(I18n.t('final_answer', "Final Answer"));
+        $th.attr('id', 'possible_solution_final');
         $form.find(".combinations_holder .combinations thead tr").append($th);
         for(var idx in question.formulas) {
           $form.find(".supercalc").val(question.formulas[idx]);
@@ -1359,6 +1388,7 @@ define([
           for(var jdx in question.answers[idx].variables) {
             var $td = $("<td/>");
             $td.text(question.answers[idx].variables[jdx].value);
+            $td.attr('aria-labelledby', 'possible_solution_' + question.answers[idx].variables[jdx].name);
             $tr.append($td);
           }
           var text = question.answers[idx].answer_text;
@@ -1367,6 +1397,7 @@ define([
           }
           var $td = $("<td class='final_answer'/>");
           $td.html(text);
+          $td.attr('aria-labelledby', 'possible_solution_final');
           $tr.append($td);
           $form.find(".combinations tbody").append($tr);
           $form.find(".combinations_holder").show();
@@ -1374,7 +1405,8 @@ define([
         $form.triggerHandler('settings_change', false);
         $formQuestion.triggerHandler('recompute_variables', true);
       } else {
-        $question.find(".answers .answer").each(function() {
+        // must use > in selector
+        $question.find(".text > .answers .answer").each(function() {
           var answer = $(this).getTemplateData({
             textValues: data.textValues,
             htmlValues: data.htmlValues
@@ -1448,17 +1480,25 @@ define([
       var $question = $(this).parents(".question");
       if (!$question.hasClass('selectable')) { return; }
       if ($question.find(":input[name='question_type']").val() != "multiple_answers_question") {
-        $question.find(".answer:visible").removeClass('correct_answer');
-        $(this).parents(".answer").addClass('correct_answer');
+        $question.find(".answer:visible").removeClass('correct_answer')
+          .find('.select_answer_link').attr('title', clickSetCorrect)
+          .find('img').attr('alt', clickSetCorrect);
+        $(this)
+          .attr('title', isSetCorrect)
+          .find('img').attr('alt', isSetCorrect)
+          .closest(".answer").addClass('correct_answer');
       } else {
         $(this).parents(".answer").toggleClass('correct_answer');
         if ($(this).parents(".answer").hasClass('correct_answer')) {
-          $(this).attr('title', I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct"));
+          $(this)
+            .attr('title', clickUnsetCorrect)
+            .find('img').attr('alt', clickUnsetCorrect);
         } else {
-          $(this).attr('title', I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"));
+          $(this)
+            .attr('title', clickSetCorrect)
+            .find('img').attr('alt', clickSetCorrect);
         }
       }
-      $(this).blur();
     });
 
     $(".question_form :input").change(function() {
@@ -1478,7 +1518,10 @@ define([
 
     $(".delete_answer_link").click(function(event) {
       event.preventDefault();
-      $(this).parents(".answer").remove();
+      var $ans = $(this).parents(".answer");
+      var $ansHeader = $ans.closest('.question').find('.answers_header');
+      $ans.remove();
+      $ansHeader.focus();
     });
 
     $(".add_question_group_link").click(function(event) {
@@ -1549,7 +1592,7 @@ define([
           $dialog.addClass('loaded');
           for(idx in banks) {
             var bank = banks[idx].assessment_question_bank;
-            bank.title = $.truncateText(bank.title)
+            bank.title = TextHelper.truncateText(bank.title)
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
             $bank.fillTemplateData({data: bank, dataValues: ['id', 'context_type', 'context_id']});
             $dialog.find(".bank_list").append($bank);
@@ -1607,7 +1650,7 @@ define([
           $dialog.addClass('loaded');
           for(idx in banks) {
             var bank = banks[idx].assessment_question_bank;
-            bank.title = $.truncateText(bank.title)
+            bank.title = TextHelper.truncateText(bank.title)
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
             $bank.fillTemplateData({data: bank});
             $dialog.find(".bank_list").append($bank);
@@ -1641,7 +1684,7 @@ define([
         group.id = $(this).attr('id').substring(10);
         group.name = $(this).getTemplateData({textValues: ['name']}).name;
         var $option = $("<option/>");
-        $option.text($.truncateText(group.name));
+        $option.text(TextHelper.truncateText(group.name));
         $option.val(group.id);
         $option.addClass('group');
         $findQuestionDialog.find(".quiz_group_select option.bottom").before($option);
@@ -1724,7 +1767,7 @@ define([
         var question = questionList[idx].assessment_question;
         if (!existingIDs[question.id] || true) {
           $div.html(question.question_data.question_text);
-          question.question_text = $.truncateText($div.text(), 75);
+          question.question_text = TextHelper.truncateText($div.text(), {max: 75});
           question.question_name = question.question_data.question_name;
           var $question = $findQuestionDialog.find(".found_question.blank").clone(true).removeClass('blank');
           $question.toggleClass('already_added', !!existingIDs[question.id]);
@@ -2082,6 +2125,7 @@ define([
       quiz.updateDisplayComments();
       $.ajaxJSON(url, method, questionData, function(data) {
         $displayQuestion.loadingImage('remove');
+        $displayQuestion.find('.question_name').focus();
         var question = data.quiz_question || data.assessment_question;
         var questionData = $.extend({}, question, question.question_data);
         // questionData.assessment_question_id might be null now because
@@ -2421,7 +2465,7 @@ define([
       wikiSidebar.attachToEditor($("#quiz_description"));
     }
 
-    $("#quiz_description").editorBox();
+    $("#quiz_description").editorBox({tinyOptions: {aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')}});
 
     $(".toggle_description_views_link").click(function(event) {
       event.preventDefault();
@@ -2786,7 +2830,12 @@ define([
             if (!matchHash[variable]) {
               var $variable = $question.find(".variables tr.variable").eq(idx);
               if ($variable.length === 0) {
-                $variable = $("<tr class='variable'><td class='name'></td><td><input type='text' name='min' class='min variable_setting' style='width: 30px;' value='1'/></td><td><input type='text' name='max' class='max variable_setting' style='width: 30px;' value='10'/></td><td><select name='round' class='round variable_setting'><option>0</option><option>1</option><option>2</option><option>3</option></td><td class='value'></td></tr>");
+                $variable = $("<tr class='variable'>"
+                              + "<td aria-labelledby='equation_var_name' class='name'></td>"
+                              + "<td aria-labelledby='equation_var_minimum'><input aria-labelledby='equation_var_minimum' type='text' name='min' class='min variable_setting' style='width: 30px;' value='1'/></td>"
+                              + "<td aria-labelledby='equation_var_maximum'><input aria-labelledby='equation_var_maximum' type='text' name='max' class='max variable_setting' style='width: 30px;' value='10'/></td>"
+                              + "<td aria-labelledby='equation_var_precision'><select aria-labelledby='equation_var_precision' name='round' class='round variable_setting'><option>0</option><option>1</option><option>2</option><option>3</option></td>"
+                              + "<td aria-labelledby='equation_var_example' class='value'></td></tr>");
                 $question.find(".variables tbody").append($variable);
                 $variable.find(".variable_setting:first").triggerHandler('change');
               }
@@ -2813,7 +2862,7 @@ define([
 
     // create toggler instance on the first click
     if (!toggler) {
-      toggler = new MultipleChoiceToggle($this);
+      toggler = new MultipleChoiceToggle($this, {editorBoxLabel: I18n.t('label.answer.text', 'Answer text, rich text area')});
       $this.data('editorToggle', toggler);
     }
 

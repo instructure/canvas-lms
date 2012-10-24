@@ -152,12 +152,12 @@ class GroupsController < ApplicationController
         @groups = scope || []
       end
       format.json do
-        scope = scope.scoped({
-          :include => :group_category,
-          :order => "groups.id ASC",
-        })
-        route = polymorphic_url([:api_v1, :groups])
-        @groups = Api.paginate(scope, self, route)
+        scope = if scope.present?
+          scope.scoped({ :include => :group_category, :order => "groups.id ASC" })
+        else
+          []
+        end
+        @groups = Api.paginate(scope, self, api_v1_current_user_groups_url)
         render :json => @groups.map { |g| group_json(g, @current_user, session) }
       end
     end
@@ -242,6 +242,7 @@ class GroupsController < ApplicationController
           end
         end
         if authorized_action(@group, @current_user, :read)
+          set_badge_counts_for(@group, @current_user)
           #if show_new_dashboard?
           #  @use_new_styles = true
           #  js_env :GROUP_ID => @group.id
@@ -469,7 +470,7 @@ class GroupsController < ApplicationController
     find_group
     if authorized_action(@group, @current_user, :manage)
       root_account = @group.context.try(:root_account) || @domain_root_account
-      ul = UserList.new(params[:invitees], root_account, :preferred)
+      ul = UserList.new(params[:invitees], :root_account => root_account, :search_method => :preferred)
       @memberships = []
       ul.users.each{ |u| @memberships << @group.invite_user(u) }
       render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }
@@ -685,6 +686,9 @@ class GroupsController < ApplicationController
       return false
     elsif @context.group_categories.other_than(@group_category).find_by_name(name)
       render :json => { 'category[name]' => t('errors.category_name_unavailable', "%{category_name} is already in use.", :category_name => name) }, :status => :bad_request
+      return false
+    elsif name.length >= 250 && params[:category][:split_group_count].to_i > 0
+      render :json => { 'category[name]' => t('errors.category_name_too_long', "Enter a shorter category name to split students into groups") }, :status => :bad_request
       return false
     end
 

@@ -37,8 +37,8 @@ describe "assignment rubrics" do
       submit_form('#edit_rubric_form')
       wait_for_ajaximations
       rubric = Rubric.last
-      rubric.data.first[:points].should eql(initial_points)
-      rubric.data.first[:ratings].first[:points].should eql(initial_points)
+      rubric.data.first[:points].should == initial_points
+      rubric.data.first[:ratings].first[:points].should == initial_points
       f('#rubrics .rubric .rubric_title .displaying .title').should include_text(rubric_name)
 
       #Commented out because we still want this test to run but this is the part where the bug is

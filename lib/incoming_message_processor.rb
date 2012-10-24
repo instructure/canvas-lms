@@ -18,6 +18,11 @@
 require 'iconv'
 
 class IncomingMessageProcessor
+  
+  class ReplyFromError < StandardError; end
+  class UnknownAddressError < ReplyFromError; end
+  class ReplyToLockedTopicError < ReplyFromError; end
+  
   def self.utf8ify(string, encoding)
     encoding ||= 'UTF-8'
     encoding = encoding.upcase
@@ -39,25 +44,23 @@ class IncomingMessageProcessor
       html_body = format_message(body).first
     end
 
-    msg = Message.find_by_id(message_id)
-    if msg
+    begin
+      msg = Message.find_by_id(message_id)
+      raise IncomingMessageProcessor::UnknownAddressError unless msg
       msg.shard.activate do
         context = msg.context if secure_id == msg.reply_to_secure_id
         user = msg.user
-        if user && context && context.respond_to?(:reply_from)
-          context.reply_from({
-            :purpose => 'general',
-            :user => user,
-            :subject => utf8ify(message.subject, message.header[:subject].try(:charset)),
-            :html => html_body,
-            :text => body
-          })
-        else
-          IncomingMessageProcessor.ndr(message.from.first, message.subject) if message.from.try(:first)
-        end
+        raise IncomingMessageProcessor::UnknownAddressError unless user && context && context.respond_to?(:reply_from)
+        context.reply_from({
+          :purpose => 'general',
+          :user => user,
+          :subject => utf8ify(message.subject, message.header[:subject].try(:charset)),
+          :html => html_body,
+          :text => body
+        })
       end
-    else
-      IncomingMessageProcessor.ndr(message.from.first, message.subject) if message.from.try(:first)
+    rescue IncomingMessageProcessor::ReplyFromError => error
+      IncomingMessageProcessor.ndr(message.from.first, message.subject, error) if message.from.try(:first)
     end
   end
 
@@ -79,23 +82,45 @@ class IncomingMessageProcessor
     end
   end
 
-  def self.ndr(from, subject)
+  def self.ndr(from, subject, error = IncomingMessageProcessor::UnknownAddressError)
+    ndr_subject, ndr_body = IncomingMessageProcessor.ndr_strings(subject, error)
+
     message = Message.create!(
       :to => from,
       :from => HostUrl.outgoing_email_address,
-      :subject => I18n.t('lib.incoming_message_processor.failure_message.subject', "Message Reply Failed: %{subject}", :subject => subject),
-      :body => I18n.t('lib.incoming_message_processor.failure_message.body', <<-BODY, :subject => subject),
-The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
-
-Thank you,
-Canvas Support
-      BODY
+      :subject => ndr_subject,
+      :body => ndr_body,
       :delay_for => 0,
       :context => nil,
       :path_type => 'email',
       :from_name => "Instructure"
     )
     message.deliver
+  end
+
+  def self.ndr_strings(subject, error)
+    ndr_subject = ""
+    ndr_body = ""
+    case error
+    when IncomingMessageProcessor::ReplyToLockedTopicError
+      ndr_subject = I18n.t('lib.incoming_message_processor.locked_topic.subject', "Message Reply Failed: %{subject}", :subject => subject)
+      ndr_body = I18n.t('lib.incoming_message_processor.locked_topic.body', <<-BODY, :subject => subject).strip_heredoc
+        The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+
+        Thank you,
+        Canvas Support
+      BODY
+    else # including IncomingMessageProcessor::UnknownAddressError
+      ndr_subject = I18n.t('lib.incoming_message_processor.failure_message.subject', "Message Reply Failed: %{subject}", :subject => subject)
+      ndr_body = I18n.t('lib.incoming_message_processor.failure_message.body', <<-BODY, :subject => subject).strip_heredoc
+        The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+
+        Thank you,
+        Canvas Support
+      BODY
+    end
+
+    [ndr_subject, ndr_body]
   end
 
 end

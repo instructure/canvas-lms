@@ -1,7 +1,7 @@
 <% cache([@context, 'add_assignment']) do %>
   <div id="add_assignment_inline" class="add_assignment_inline" style="padding: 0; display: none; position: relative;">
     <% form_for :assignment, :url => (context_url(@context, :context_assignments_url) rescue "."), :html => {:id => "add_assignment_inline_form", :style => "padding: 10px;"} do |f| %>
-    <table class="formtable">
+    <table class="formtable" style="width: 100%">
       <tr>
         <td><%= f.blabel :title, :en => "Name" %></td>
         <td><%= f.text_field :title, :style => "width:150px;" %></td>
@@ -27,9 +27,9 @@
         <td style="vertical-align: top;"><%= f.blabel :due_at, :en => "Due" %></td>
         <td><%= f.text_field :due_at, :style => "width: 100px;", :class => "datetime_field" %></td>
       </tr><tr>
-        <td colspan="2">
-          <button type="submit" class="button"><%= t 'buttons.add_assignment', "Add Assignment" %></button>
-          <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+        <td class="button-container" colspan="2">
+          <button type="button" class="button cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="button btn-primary "><%= t 'buttons.add_assignment', "Add Assignment" %></button>
         </td>
       </tr>
     </table>
@@ -57,7 +57,6 @@
       $group.change(function(event) {
         var $group = $(this);
         if($(this).val() == "new") {
-          $("#add_assignment_inline").dialog('close');
           $("#add_assignment_inline").show().dialog({
             title: <%= jt('titles.add_assignment', "Add Assignment") %>,
             width: 300,
@@ -85,7 +84,7 @@
                 $group[0].selectedIndex = 0;
               }
             }
-          }).dialog('open');
+          }).dialog('open').fixDialogButtons();
         }
       });
       if($group.val() == "new") {

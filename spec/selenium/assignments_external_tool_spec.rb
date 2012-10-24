@@ -19,8 +19,7 @@ describe "external tool assignments" do
     f('.ui-datepicker-trigger').click
     datepicker = datepicker_next
     datepicker.find_element(:css, '.ui-datepicker-ok').click
-    f('#assignment_points_possible').clear
-    f('#assignment_points_possible').send_keys('5')
+    replace_content(f('#assignment_points_possible'), '5')
     click_option('.assignment_submission_types', 'External Tool')
     expect_new_page_load { f('.more_options_link').click }
     keep_trying_until do
@@ -32,7 +31,7 @@ describe "external tool assignments" do
       ff('#context_external_tools_select td.tools .tool')[1].click
       f('#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t2.url
     end
-    f('#select_context_content_dialog .add_item_button').click
+    fj('.add_item_button:visible').click
     f('#assignment_external_tool_tag_attributes_url').attribute('value').should == @t2.url
     submit_form('form.new_assignment')
 
@@ -56,7 +55,7 @@ describe "external tool assignments" do
     f('#assignment_external_tool_tag_attributes_url').click
     ff('#context_external_tools_select td.tools .tool')[0].click
     f('#context_external_tools_select input#external_tool_create_url').attribute('value').should == @t1.url
-    f('#select_context_content_dialog .add_item_button').click
+    fj('.add_item_button:visible').click
     f('#assignment_external_tool_tag_attributes_url').attribute('value').should == @t1.url
     submit_form('form.edit_assignment')
 

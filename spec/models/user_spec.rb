@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe User do
   
@@ -673,6 +673,123 @@ describe User do
       @oe.update_attribute(:associated_user_id, @user1.id)
       @user1.move_to_user(@user2)
       @oe.reload.associated_user_id.should == @user2.id
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should merge a user across shards" do
+        @user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
+        @p1 = @pseudonym
+        @cc1 = @cc
+        @shard1.activate do
+          account = Account.create!
+          @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
+          @p2 = @pseudonym
+        end
+
+        @shard2.activate do
+          @user1.move_to_user(@user2)
+        end
+
+        @user1.should be_deleted
+        @p1.reload.user.should == @user2
+        @cc1.reload.should be_retired
+        @user2.communication_channels.all.map(&:path).sort.should == ['user1@example.com', 'user2@example.com']
+        @user2.all_pseudonyms.should == [@p2, @p1]
+        @user2.associated_shards.should == [@shard1, Shard.default]
+      end
+
+      it "should move ccs to the new user (but only if they don't already exist)" do
+        @user1 = user_model
+        @shard1.activate do
+          @user2 = user_model
+        end
+
+        # unconfirmed => active conflict
+        @user1.communication_channels.create!(:path => 'a@instructure.com')
+        @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'B@instructure.com')
+        # active => active conflict
+        @user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # unconfirmed => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'd@instructure.com')
+        @user2.communication_channels.create!(:path => 'D@instructure.com')
+        # retired => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'E@instructure.com')
+        # unconfirmed => retired conflict
+        @user1.communication_channels.create!(:path => 'f@instructure.com')
+        @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => active conflict
+        @user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => retired conflict
+        @user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => retired conflict
+        @user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # <nothing> => active
+        @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => <nothing>
+        @user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # <nothing> => unconfirmed
+        @user2.communication_channels.create!(:path => 'l@instructure.com')
+        # unconfirmed => <nothing>
+        @user1.communication_channels.create!(:path => 'm@instructure.com')
+        # <nothing> => retired
+        @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => <nothing>
+        @user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
+
+        @shard2.activate do
+          @user1.move_to_user(@user2)
+        end
+
+        @user1.reload
+        @user2.reload
+        @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+            ['A@instructure.com', 'active'],
+            ['B@instructure.com', 'retired'],
+            ['C@instructure.com', 'active'],
+            ['D@instructure.com', 'unconfirmed'],
+            ['E@instructure.com', 'unconfirmed'],
+            ['F@instructure.com', 'retired'],
+            ['G@instructure.com', 'active'],
+            ['H@instructure.com', 'retired'],
+            ['I@instructure.com', 'retired'],
+            ['b@instructure.com', 'active'],
+            ['f@instructure.com', 'unconfirmed'],
+            ['h@instructure.com', 'active'],
+            ['i@instructure.com', 'retired'],
+            ['j@instructure.com', 'active'],
+            ['k@instructure.com', 'active'],
+            ['l@instructure.com', 'unconfirmed'],
+            ['m@instructure.com', 'unconfirmed'],
+            ['n@instructure.com', 'retired'],
+            ['o@instructure.com', 'retired']
+        ]
+        # on cross shard merges, the deleted user retains all CCs (pertinent ones were
+        # duplicated over to the surviving shard)
+        @user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+            ['a@instructure.com', 'retired'],
+            ['b@instructure.com', 'retired'],
+            ['c@instructure.com', 'retired'],
+            ['d@instructure.com', 'retired'],
+            ['e@instructure.com', 'retired'],
+            ['f@instructure.com', 'retired'],
+            ['g@instructure.com', 'retired'],
+            ['h@instructure.com', 'retired'],
+            ['i@instructure.com', 'retired'],
+            ['k@instructure.com', 'retired'],
+            ['m@instructure.com', 'retired'],
+            ['o@instructure.com', 'retired']
+        ]
+      end
     end
   end
 
@@ -1871,6 +1988,183 @@ describe User do
       Account.default.add_user(user)
 
       user.mfa_settings.should == :optional
+    end
+  end
+
+  context "crocodoc attributes" do
+    before do
+      Setting.set 'crocodoc_counter', 998
+      @user = User.create! :short_name => "Bob"
+    end
+
+    it "should generate a unique crocodoc_id" do
+      @user.crocodoc_id.should be_nil
+      @user.crocodoc_id!.should eql 999
+      @user.crocodoc_user.should eql '999,Bob'
+    end
+
+    it "should scrub commas from the user name" do
+      @user.short_name = "Smith, Bob"
+      @user.save!
+      @user.crocodoc_user.should eql '999,Smith Bob'
+    end
+
+    it "should not change a user's crocodoc_id" do
+      @user.update_attribute :crocodoc_id, 2
+      @user.crocodoc_id!.should eql 2
+      Setting.get('crocodoc_counter', 0).to_i.should eql 998
+    end
+  end
+
+  context "assignments_needing_grading" do
+    before :each do
+      # create courses and sections
+      @course1 = course_with_teacher(:active_all => true).course
+      @course2 = course_with_teacher(:active_all => true, :user => @teacher).course
+      @section1b = @course1.course_sections.create!(:name => 'section B')
+      @section2b = @course2.course_sections.create!(:name => 'section B')
+
+      # put a student in each section
+      @studentA = user_with_pseudonym(:active_all => true, :name => 'StudentA', :username => 'studentA@instructure.com')
+      @studentB = user_with_pseudonym(:active_all => true, :name => 'StudentB', :username => 'studentB@instructure.com')
+      @course1.enroll_student(@studentA).update_attribute(:workflow_state, 'active')
+      @section1b.enroll_user(@studentB, 'StudentEnrollment', 'active')
+      @course2.enroll_student(@studentA).update_attribute(:workflow_state, 'active')
+      @section2b.enroll_user(@studentB, 'StudentEnrollment', 'active')
+
+      # set up a TA, section-limited in one course and not the other
+      @ta = user_with_pseudonym(:active_all => true, :name => 'TA', :username => 'ta@instructure.com')
+      @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+      @course2.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => false)
+
+      # make some assignments and submissions
+      [@course1, @course2].each do |course|
+        assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+        [@studentA, @studentB].each do |student|
+          assignment.submit_homework student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
+        end
+      end
+    end
+
+    it "should count assignments with ungraded submissions across multiple courses" do
+      @teacher.assignments_needing_grading_total_count.should eql(2)
+      @teacher.assignments_needing_grading.size.should eql(2)
+      @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
+      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+
+      # grade one submission for one assignment; these numbers don't change
+      @course1.assignments.first.grade_student(@studentA, :grade => "1")
+      @teacher = User.find(@teacher.id) # use a new instance, since these are memoized
+      @teacher.assignments_needing_grading_total_count.should eql(2)
+      @teacher.assignments_needing_grading.size.should eql(2)
+      @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
+      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+
+      # grade the other submission; now course1's assignment no longer needs grading
+      @course1.assignments.first.grade_student(@studentB, :grade => "1")
+      @teacher = User.find(@teacher.id)
+      @teacher.assignments_needing_grading_total_count.should eql(1)
+      @teacher.assignments_needing_grading.size.should eql(1)
+      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+    end
+
+    it "should only count submissions in accessible course sections" do
+      @ta.assignments_needing_grading_total_count.should eql(2)
+      @ta.assignments_needing_grading.size.should eql(2)
+      @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
+      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+
+      # grade student A's submissions in both courses; now course1's assignment
+      # should not show up because the TA doesn't have access to studentB's submission
+      @course1.assignments.first.grade_student(@studentA, :grade => "1")
+      @course2.assignments.first.grade_student(@studentA, :grade => "1")
+      @ta = User.find(@ta.id)
+      @ta.assignments_needing_grading_total_count.should eql(1)
+      @ta.assignments_needing_grading.size.should eql(1)
+      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+
+      # but if we enroll the TA in both sections of course1, it should be accessible
+      @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1b,
+                          :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
+      @ta = User.find(@ta.id)
+      @ta.assignments_needing_grading_total_count.should eql(2)
+      @ta.assignments_needing_grading.size.should eql(2)
+      @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
+      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+    end
+
+    it "should limit the number of returned assignments" do
+      20.times do |x|
+        assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
+        assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "o hai"
+        assignment = @course2.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
+        assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "kthxbye"
+      end
+      @teacher.assignments_needing_grading_total_count.should eql(42)
+      @teacher.assignments_needing_grading.size.should < 42
+
+      @ta.assignments_needing_grading_total_count.should eql(22)
+      @ta.assignments_needing_grading.size.should < 22
+    end
+  end
+
+  describe ".initial_enrollment_type_from_type" do
+    it "should return supported initial_enrollment_type values" do
+      User.initial_enrollment_type_from_text('StudentEnrollment').should == 'student'
+      User.initial_enrollment_type_from_text('StudentViewEnrollment').should == 'student'
+      User.initial_enrollment_type_from_text('TeacherEnrollment').should == 'teacher'
+      User.initial_enrollment_type_from_text('TaEnrollment').should == 'ta'
+      User.initial_enrollment_type_from_text('ObserverEnrollment').should == 'observer'
+      User.initial_enrollment_type_from_text('DesignerEnrollment').should be_nil
+      User.initial_enrollment_type_from_text('UnknownThing').should be_nil
+      User.initial_enrollment_type_from_text(nil).should be_nil
+      # Non-enrollment type strings
+      User.initial_enrollment_type_from_text('student').should == 'student'
+      User.initial_enrollment_type_from_text('teacher').should == 'teacher'
+      User.initial_enrollment_type_from_text('ta').should == 'ta'
+      User.initial_enrollment_type_from_text('observer').should == 'observer'
+    end
+  end
+
+  describe "accounts" do
+    it_should_behave_like "sharding"
+
+    it "should include accounts from multiple shards" do
+      user
+      Account.site_admin.add_user(@user)
+      @shard1.activate do
+        @account2 = Account.create!
+        @account2.add_user(@user)
+      end
+
+      @user.accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+    end
+  end
+
+  describe "all_pseudonyms" do
+    it_should_behave_like "sharding"
+
+    it "should include pseudonyms from multiple shards" do
+      user_with_pseudonym(:active_all => 1)
+      @p1 = @pseudonym
+      @shard1.activate do
+        account = Account.create!
+        @p2 = account.pseudonyms.create!(:user => @user, :unique_id => 'abcd')
+      end
+
+      @user.all_pseudonyms.should == [@p1, @p2]
+    end
+
+    it "should allow conditions to be passed" do
+      user_with_pseudonym(:active_all => 1)
+      @p1 = @pseudonym
+      @shard1.activate do
+        account = Account.create!
+        @p2 = account.pseudonyms.create!(:user => @user, :unique_id => 'abcd')
+      end
+      @p1.destroy
+
+      @user.all_pseudonyms(:conditions => { :workflow_state => 'active' }).should == [@p2]
     end
   end
 end

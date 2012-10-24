@@ -93,8 +93,8 @@ $cell_height: 33px
     text-overflow: ellipsis
     white-space: nowrap
   .muted
-    background: url('/images/sound_mute.png') no-repeat center right
-    padding-right: 16px
+    background: url('/images/sound_mute.png') no-repeat center left
+    padding-left: 16px
   .assignment-points-possible
     font-weight: normal
     text-shadow: #84848a 0 0 1px
@@ -216,12 +216,10 @@ $cell_height: 33px
 
   &.late
     background-image: url("/images/gradebook-late-indicator.png")
+  &.dropped
+    background-image: url("/images/gradebook-dropped-indicator.png")
   &.resubmitted
     background-image: url("/images/gradebook-resubmitted-indicator.png")
-
-.slick-cell.dropped
-  background-image: url("/images/gradebook-dropped-indicator.png")
-  background-repeat: repeat
 
 .gradebook-cell-turnitin
   position: absolute
@@ -254,8 +252,8 @@ $cell_height: 33px
   z-index: 2 //needs to be above "normal but below tooltips"
   overflow: hidden
 
-  &:hover,
-  &:focus
+  #gradebook_grid.editable &:hover,
+  #gradebook_grid.editable &:focus
     visibility: visible
     background-position: 100% -88px !important
     width: 17px
@@ -263,8 +261,8 @@ $cell_height: 33px
 
   .slick-cell.with-comments &
     visibility: visible
-  .slick-cell.focus &,
-  .slick-cell.hover &
+  #gradebook_grid.editable .slick-cell.focus &,
+  #gradebook_grid.editable .slick-cell.hover &
     visibility: visible
     background-position: 100% -41px
     width: 25px

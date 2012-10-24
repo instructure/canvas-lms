@@ -58,6 +58,12 @@ describe GroupsController do
       get 'index'
       assigns[:groups].should_not be_nil
     end
+
+    it "should return an empty list for json" do
+      get 'index', :format => 'json'
+      response.should be_success
+      response.body.should == "[]"
+    end
   end
 
   describe "GET show" do

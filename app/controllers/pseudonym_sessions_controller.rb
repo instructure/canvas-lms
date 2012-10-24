@@ -88,7 +88,25 @@ class PseudonymSessionsController < ApplicationController
 
       initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
-      initiate_saml_login(request.host_with_port)
+      if params[:account_authorization_config_id]
+        if aac = @domain_root_account.account_authorization_configs.find_by_id(params[:account_authorization_config_id])
+          initiate_saml_login(request.host_with_port, aac)
+        else
+          message = t('errors.login_errors.no_config_for_id', "The Canvas account has no authentication configuration with that id")
+          if @domain_root_account.auth_discovery_url
+            redirect_to @domain_root_account.auth_discovery_url + "?message=#{URI.escape message}"
+          else
+            flash[:delegated_message] = message
+            redirect_to login_url(:no_auto=>'true')
+          end
+        end
+      else
+        if @domain_root_account.auth_discovery_url
+          redirect_to @domain_root_account.auth_discovery_url
+        else
+          initiate_saml_login(request.host_with_port)
+        end
+      end
     else
       flash[:delegated_message] = session.delete :delegated_message if session[:delegated_message]
       maybe_render_mobile_login
@@ -185,22 +203,26 @@ class PseudonymSessionsController < ApplicationController
     if @domain_root_account.saml_authentication? and session[:saml_unique_id]
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
-      aac = @domain_root_account.account_authorization_config
-      settings = aac.saml_settings(request.host_with_port)
-      request = Onelogin::Saml::LogOutRequest.new(settings, session)
-      forward_url = request.generate_request
-      
-      if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
-        aac.debug_set(:logout_request_id, request.id)
-        aac.debug_set(:logout_to_idp_url, forward_url)
-        aac.debug_set(:logout_to_idp_xml, request.request_xml)
-        aac.debug_set(:debugging, t('debug.logout_redirect', "LogoutRequest sent to IdP"))
+      if aac = @domain_root_account.account_authorization_configs.find_by_id(session[:saml_aac_id])
+        settings = aac.saml_settings(request.host_with_port)
+        request = Onelogin::Saml::LogOutRequest.new(settings, session)
+        forward_url = request.generate_request
+
+        if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
+          aac.debug_set(:logout_request_id, request.id)
+          aac.debug_set(:logout_to_idp_url, forward_url)
+          aac.debug_set(:logout_to_idp_xml, request.request_xml)
+          aac.debug_set(:debugging, t('debug.logout_redirect', "LogoutRequest sent to IdP"))
+        end
+
+        reset_session
+        session[:delegated_message] = message if message
+        redirect_to(forward_url)
+        return
+      else
+        reset_session
+        flash[:message] = t('errors.logout_errors.no_idp_found', "Canvas was unable to log you out at your identity provider")
       end
-      
-      reset_session
-      session[:delegated_message] = message if message
-      redirect_to(forward_url)
-      return
     elsif @domain_root_account.cas_authentication? and session[:cas_login]
       reset_session
       session[:delegated_message] = message if message
@@ -238,9 +260,29 @@ class PseudonymSessionsController < ApplicationController
         logger.info "SAMLResponse[#{idx+1}/#{chunks.length}] #{chunk}"
       end
 
-      aac = @domain_root_account.account_authorization_config
+      response = saml_response(params[:SAMLResponse])
+
+      if @domain_root_account.account_authorization_configs.count > 1
+        aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
+        if aac.nil?
+          logger.error "Attempted SAML login for #{response.issuer} on account without that IdP"
+          @pseudonym_session.destroy rescue true
+          reset_session
+          if @domain_root_account.auth_discovery_url
+            message = t('errors.login_errors.unrecognized_idp', "Canvas did not recognize your identity provider")
+            redirect_to @domain_root_account.auth_discovery_url + "?message=#{URI.escape message}"
+          else
+            flash[:delegated_message] = t 'errors.login_errors.no_idp_set', "The institution you logged in from is not configured on this account."
+            redirect_to login_url(:no_auto=>'true')
+          end
+          return
+        end
+      else
+        aac = @domain_root_account.account_authorization_config
+      end
+
       settings = aac.saml_settings(request.host_with_port)
-      response = saml_response(params[:SAMLResponse], settings)
+      response.process(settings)
 
       unique_id = nil
       if aac.login_attribute == 'nameid'
@@ -265,7 +307,9 @@ class PseudonymSessionsController < ApplicationController
         aac.debug_set(:fingerprint_from_idp, response.fingerprint_from_idp)
         aac.debug_set(:login_to_canvas_success, 'false')
       end
-      
+
+      login_error_message = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
+
       if response.is_valid?
         aac.debug_set(:is_valid_login_response, 'true') if debugging
         
@@ -291,6 +335,7 @@ class PseudonymSessionsController < ApplicationController
             session[:name_qualifier] = response.name_qualifier
             session[:session_index] = response.session_index
             session[:return_to] = params[:RelayState] if params[:RelayState] && params[:RelayState] =~ /\A\/(\z|[^\/])/
+            session[:saml_aac_id] = aac.id
 
             successful_login(@user, @pseudonym)
           else
@@ -305,13 +350,13 @@ class PseudonymSessionsController < ApplicationController
           message = "Failed to log in correctly at IdP"
           logger.warn message
           aac.debug_set(:canvas_login_fail_message, message) if debugging
-          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
+          flash[:delegated_message] = login_error_message
           redirect_to login_url(:no_auto=>'true')
         elsif response.no_authn_context?
           message = "Attempted SAML login for unsupported authn_context at IdP."
           logger.warn message
           aac.debug_set(:canvas_login_fail_message, message) if debugging
-          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
+          flash[:delegated_message] = login_error_message
           redirect_to login_url(:no_auto=>'true')
         else
           message = "Unexpected SAML status code - status code: #{response.status_code rescue ""} - Status Message: #{response.status_message rescue ""}"
@@ -327,37 +372,38 @@ class PseudonymSessionsController < ApplicationController
         logger.error "Failed to verify SAML signature."
         @pseudonym_session.destroy rescue true
         reset_session
-        flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
+        flash[:delegated_message] = login_error_message
         redirect_to login_url(:no_auto=>'true')
       end
     elsif !params[:SAMLResponse]
       logger.error "saml_consume request with no SAMLResponse parameter"
       @pseudonym_session.destroy rescue true
       reset_session
-      flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
+      flash[:delegated_message] = login_error_message
       redirect_to login_url(:no_auto=>'true')
     else
       logger.error "Attempted SAML login on non-SAML enabled account."
       @pseudonym_session.destroy rescue true
       reset_session
-      flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
+      flash[:delegated_message] = login_error_message
       redirect_to login_url(:no_auto=>'true')
     end
   end
 
   def saml_logout
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
-      aac = @domain_root_account.account_authorization_config
-      settings = aac.saml_settings(request.host_with_port)
-      response = Onelogin::Saml::LogoutResponse.new(params[:SAMLResponse], settings)
-      response.logger = logger
+      response = saml_logout_response(params[:SAMLResponse])
+      if  aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
+        settings = aac.saml_settings(request.host_with_port)
+        response.process(settings)
 
-      if aac.debugging? && aac.debug_get(:logout_request_id) == response.in_response_to
-        aac.debug_set(:idp_logout_response_encoded, params[:SAMLResponse])
-        aac.debug_set(:idp_logout_response_xml_encrypted, response.xml)
-        aac.debug_set(:idp_logout_in_response_to, response.in_response_to)
-        aac.debug_set(:idp_logout_destination, response.destination)
-        aac.debug_set(:debugging, t('debug.logout_redirect_from_idp', "Received LogoutResponse from IdP"))
+        if aac.debugging? && aac.debug_get(:logout_request_id) == response.in_response_to
+          aac.debug_set(:idp_logout_response_encoded, params[:SAMLResponse])
+          aac.debug_set(:idp_logout_response_xml_encrypted, response.xml)
+          aac.debug_set(:idp_logout_in_response_to, response.in_response_to)
+          aac.debug_set(:idp_logout_destination, response.destination)
+          aac.debug_set(:debugging, t('debug.logout_redirect_from_idp', "Received LogoutResponse from IdP"))
+        end
       end
     end
     redirect_to :action => :destroy
@@ -369,8 +415,14 @@ class PseudonymSessionsController < ApplicationController
     @cas_client = CASClient::Client.new(config)
   end
 
-  def saml_response(raw_response, settings)
+  def saml_response(raw_response, settings=nil)
     response = Onelogin::Saml::Response.new(raw_response, settings)
+    response.logger = logger
+    response
+  end
+
+  def saml_logout_response(raw_response, settings=nil)
+    response = Onelogin::Saml::LogoutResponse.new(raw_response, settings)
     response.logger = logger
     response
   end
@@ -571,7 +623,7 @@ class PseudonymSessionsController < ApplicationController
     user = User.find(code_data['user'])
     token = user.access_tokens.create!(:developer_key => key)
     render :json => {
-      'access_token' => token.token,
+      'access_token' => token.full_token,
       'user' => user.as_json(:only => [:id, :name], :include_root => false),
     }
   end

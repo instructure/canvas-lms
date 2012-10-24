@@ -109,10 +109,16 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html {
         @current_enrollments = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).sort_by{|e| [e.active? ? 1 : 0, e.long_name] }
-        @past_enrollments = @current_user.enrollments.ended.scoped(:conditions=>"enrollments.workflow_state NOT IN ('invited', 'deleted')")
+        @past_enrollments    = @current_user.enrollments.past
+        @future_enrollments  = @current_user.enrollments.future
+
         @past_enrollments.concat(@current_enrollments.select { |e| e.state_based_on_date == :completed })
-        @current_enrollments.reject! { |e| [:inactive, :completed].include?(e.state_based_on_date) }
+        @current_enrollments.reject! do |e|
+          [:inactive, :completed].include?(e.state_based_on_date) ||
+            @future_enrollments.include?(e)
+        end
       }
+
       format.json {
         enrollments = @current_user.cached_current_enrollments
         if params[:enrollment_type]
@@ -545,50 +551,71 @@ class CoursesController < ApplicationController
 
   def enrollment_invitation
     get_context
-    return if check_enrollment
-    if !@pending_enrollment
-      redirect_to course_url(@context.id)
-      return true
-    end
+
+    return if check_enrollment(true)
+    return !!redirect_to(course_url(@context.id)) unless @pending_enrollment
+
     if params[:reject]
-      if @pending_enrollment.invited?
-        @pending_enrollment.reject!
-        flash[:notice] = t('notices.invitation_cancelled', "Invitation canceled.")
-      end
-      session.delete(:enrollment_uuid)
-      if @current_user
-        redirect_to dashboard_url
-      else
-        redirect_to root_url
-      end
+      return reject_enrollment(@pending_enrollment)
     elsif params[:accept]
-      if @current_user && @pending_enrollment.user == @current_user
-        if @pending_enrollment.invited?
-          @pending_enrollment.accept!
-          flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
-        end
-        session[:accepted_enrollment_uuid] = @pending_enrollment.uuid
-        if params[:action] != 'show'
-          redirect_to course_url(@context.id)
-        else
-          @context_enrollment = @pending_enrollment
-          @pending_enrollment = nil
-          return false
-        end
-      elsif !@current_user && @pending_enrollment.user.registered? || !@pending_enrollment.user.email_channel
-        session[:return_to] = course_url(@context.id)
-        flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
-        return redirect_to login_url(:re_login => 1) if @current_user
-        redirect_to login_url
-      else
-        # defer to CommunicationChannelsController#confirm for the logic of merging users
-        redirect_to registration_confirmation_path(@pending_enrollment.user.email_channel.confirmation_code, :enrollment => @pending_enrollment.uuid)
-      end
+      return accept_enrollment(@pending_enrollment)
     else
       redirect_to course_url(@context.id)
     end
-    true
   end
+
+  # Internal: Accept an enrollment invitation and redirect.
+  #
+  # enrollment - An enrollment object to accept.
+  #
+  # Returns nothing.
+  def accept_enrollment(enrollment)
+    if @current_user && enrollment.user == @current_user
+      if enrollment.workflow_state == 'invited'
+        enrollment.accept!
+        flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
+      end
+
+      session[:accepted_enrollment_uuid] = enrollment.uuid
+
+      if params[:action] != 'show'
+        if @context.restrict_enrollments_to_course_dates?
+          redirect_to courses_url
+        else
+          redirect_to course_url(@context.id)
+        end
+      else
+        @context_enrollment = enrollment
+        enrollment = nil
+        return false
+      end
+    elsif !@current_user && enrollment.user.registered? || !enrollment.user.email_channel
+      session[:return_to] = course_url(@context.id)
+      flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
+      return redirect_to login_url(:re_login => 1) if @current_user
+      redirect_to login_url
+    else
+      # defer to CommunicationChannelsController#confirm for the logic of merging users
+      redirect_to registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid)
+    end
+  end
+  protected :accept_enrollment
+
+  # Internal: Reject an enrollment invitation and redirect.
+  #
+  # enrollment - An enrollment object to reject.
+  #
+  # Returns nothing.
+  def reject_enrollment(enrollment)
+    if enrollment.invited?
+      enrollment.reject!
+      flash[:notice] = t('notices.invitation_cancelled', 'Invitation canceled.')
+    end
+
+    session.delete(:enrollment_uuid)
+    redirect_to(@current_user ? dashboard_url : root_url)
+  end
+  protected :reject_enrollment
 
   def claim_course
     if params[:verification] == @context.uuid
@@ -601,37 +628,38 @@ class CoursesController < ApplicationController
   end
   protected :claim_course
 
-  def check_enrollment
+  # Protected: Check a user's enrollment in the current course and redirect
+  #   them/clean up the session as needed.
+  #
+  # ignore_restricted_courses - if true, don't exit on enrollments to non-active,
+  #   date-restricted courses.
+  #
+  # Returns boolean (true if parent request should be cancelled).
+  def check_enrollment(ignore_restricted_courses = false)
     return false if @pending_enrollment
 
-    # Use the enrollment we already fetched, if possible
-    enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
-    # Overwrite with the session enrollment, if one exists, and it's different than the current user's
-    enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited") if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] && params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
-    # Look for enrollments to matching temporary users
-    enrollment ||= @current_user.temporary_invitations.find { |i| i.course_id == @context.id } if @current_user
-    # Look up the explicitly provided invitation
-    enrollment ||= @context.enrollments.find(:first, :conditions => ["uuid=? AND workflow_state IN ('invited', 'rejected')", params[:invitation]]) unless params[:invitation].blank?
-    if enrollment && enrollment.state_based_on_date == :inactive
-      flash[:notice] = t('notices.enrollment_not_active', "Your membership in the course, %{course}, is not yet activated", :course => @context.name)
-      redirect_to dashboard_url
-      return true
-    end
-    if enrollment
+    if enrollment = fetch_enrollment
+      if enrollment.state_based_on_date == :inactive && !ignore_restricted_courses
+        flash[:notice] = t('notices.enrollment_not_active', 'Your membership in the course, %{course}, is not yet activated', :course => @context.name)
+        return !!redirect_to(enrollment.workflow_state == 'invited' ? courses_url : dashboard_url)
+      end
+
       if enrollment.rejected?
         enrollment.workflow_state = 'invited'
         enrollment.save_without_broadcasting
       end
+
       if enrollment.self_enrolled?
-        redirect_to registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid)
-        return true
+        return !!redirect_to(registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid))
       end
-      e = enrollment
-      session[:enrollment_uuid] = e.uuid
+
+      session[:enrollment_uuid]             = enrollment.uuid
       session[:session_affects_permissions] = true
-      session[:enrollment_as_student] = true if e.student?
-      session[:enrollment_uuid_course_id] = e.course_id
+      session[:enrollment_as_student]       = true if enrollment.student?
+      session[:enrollment_uuid_course_id]   = enrollment.course_id
+
       @pending_enrollment = enrollment
+
       if @context.root_account.allow_invitation_previews?
         flash[:notice] = t('notices.preview_course', "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
@@ -641,18 +669,54 @@ class CoursesController < ApplicationController
         return enrollment_invitation
       end
     end
-    if session[:accepted_enrollment_uuid] && (e = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid]))
-      if e.invited?
-        e.accept!
-        flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
+
+    if session[:accepted_enrollment_uuid].present? &&
+      enrollment = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid])
+
+      success = false
+      if enrollment.invited?
+        success = enrollment.accept!
+        flash[:notice] = message || t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       end
+
+      session.delete(:enrollment_uuid) if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
       session.delete(:accepted_enrollment_uuid)
       session.delete(:enrollment_uuid_course_id)
-      session.delete(:enrollment_uuid) if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
     end
+
     false
   end
   protected :check_enrollment
+
+  # Internal: Get the current user's enrollment (if any) in the requested course.
+  #
+  # Returns enrollment (or nil).
+  def fetch_enrollment
+    # Use the enrollment we already fetched, if possible
+    enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
+
+    # Overwrite with the session enrollment, if one exists, and it's different than the current user's
+    if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] &&
+      params[:invitation].blank? && session[:enrollment_uuid_course_id] == @context.id
+
+      enrollment = @context.enrollments.find_by_uuid_and_workflow_state(session[:enrollment_uuid], "invited")
+    end
+
+    # Look for enrollments to matching temporary users
+    if @current_user
+      enrollment ||= @current_user.temporary_invitations.find do |invitation|
+        invitation.course_id == @context.id
+      end
+    end
+
+    # Look up the explicitly provided invitation
+    unless params[:invitation].blank?
+      enrollment ||= @context.enrollments.find(:first, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state IN ('invited', 'rejected')", params[:invitation]])
+    end
+
+    enrollment
+  end
+  protected :fetch_enrollment
 
   def locks
     if authorized_action(@context, @current_user, :read)
@@ -815,6 +879,7 @@ class CoursesController < ApplicationController
       end
 
       add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")
+      set_badge_counts_for(@context, @current_user, @current_enrollment)
 
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'
 
@@ -960,7 +1025,15 @@ class CoursesController < ApplicationController
       params[:user_list] ||= ""
 
       respond_to do |format|
-        if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account, @context.user_list_search_mode_for(@current_user)), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_privileges_to_course_section => params[:limit_privileges_to_course_section] == '1'))
+        # Enrollment settings hash
+        # Change :limit_privileges_to_course_section to be an explicit true/false value
+        enrollment_options = params.slice(:course_section_id, :enrollment_type, :limit_privileges_to_course_section)
+        enrollment_options[:limit_privileges_to_course_section] = enrollment_options[:limit_privileges_to_course_section] == '1'
+        list = UserList.new(params[:user_list],
+                            :root_account => @context.root_account,
+                            :search_method => @context.user_list_search_mode_for(@current_user),
+                            :initial_type => params[:enrollment_type])
+        if (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
           format.json do
             Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
             json = @enrollments.map { |e|
@@ -1254,5 +1327,54 @@ class CoursesController < ApplicationController
     else
       :nothing
     end
+  end
+
+  include Api::V1::Tab
+  # @API List available tabs
+  # Returns a list of navigation tabs available in the current context.
+  #
+  # @argument include[] ["external"] Optionally include external tool tabs in the returned list of tabs
+  #  
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \ 
+  #          https://<canvas>/api/v1/courses/<course_id>/tabs\?include\="external"
+  #
+  # @example_response
+  #     [
+  #       {
+  #         "html_url": "/courses/1", 
+  #         "id": "home",
+  #         "label": "Home",
+  #         "type": "internal"
+  #       }, 
+  #       {
+  #         "html_url": "/courses/1/external_tools/4", 
+  #         "id": "context_external_tool_4",
+  #         "label": "WordPress",
+  #         "type": "external"
+  #       }, 
+  #       {
+  #         "html_url": "/courses/1/grades",
+  #         "id": "grades",
+  #         "label": "Grades",
+  #         "type": "internal"
+  #       }
+  #     ]
+  def tabs
+    get_context
+    includes = Array(params[:include])
+    tabs = @context.tabs_available(@current_user, :include_external => includes.include?('external'))
+    tabs = tabs.select do |tab|
+      if (tab[:id] == @context.class::TAB_CHAT rescue false)
+        tab[:href] && tab[:label] && feature_enabled?(:tinychat)
+      elsif (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
+        tab[:href] && tab[:label] && Collaboration.any_collaborations_configured?
+      elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
+        tab[:href] && tab[:label] && feature_enabled?(:web_conferences)
+      else
+        tab[:href] && tab[:label]
+      end
+    end
+    render :json => tabs_available_json(tabs, @current_user, session)
   end
 end

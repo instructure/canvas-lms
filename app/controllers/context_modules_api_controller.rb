@@ -30,7 +30,7 @@
 #       // the unique identifier for the module
 #       id: 123,
 #
-#       // the 0-based position of this module (0 == first)
+#       // the position of this module in the course (1-based)
 #       position: 2,
 #
 #       // the name of this module
@@ -60,8 +60,8 @@
 #       // the unique identifier for the module item
 #       id: 768,
 #
-#       // the 0-based position of this item in the module
-#       position: 0,
+#       // the position of this item in the module (1-based)
+#       position: 1,
 #
 #       // the title of this item
 #       title: "Square Roots: Irrational numbers or boxy vegetables?",
@@ -75,13 +75,12 @@
 #       type: "Assignment",
 #
 #       // link to the item in Canvas
-#       url: "https://canvas.example.edu/courses/222/modules/items/768",
+#       html_url: "https://canvas.example.edu/courses/222/modules/items/768",
 #
 #       // (Optional) link to the Canvas API object, if applicable
-#       data_api_endpoint: "https://canvas.example.edu/api/v1/courses/222/assignments/987",
+#       url: "https://canvas.example.edu/api/v1/courses/222/assignments/987",
 #
 #       // Completion requirement for this module item
-#       // (Optional; present only if the caller is a student)
 #       completion_requirement: {
 #         // one of "must_view", "must_submit", "must_contribute", "min_score"
 #         type: "min_score",
@@ -90,6 +89,7 @@
 #         min_score: 10,
 #
 #         // whether the calling user has met this requirement
+#         // (Optional; present only if the caller is a student)
 #         completed: true
 #       }
 #     }

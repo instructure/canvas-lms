@@ -133,7 +133,10 @@ describe AssignmentsApiController, :type => :integration do
 
   it "should allow creating an assignment via the API" do
     course_with_teacher(:active_all => true)
+    @course.assignment_groups.create!({:name => "first group"})
     @group = @course.assignment_groups.create!({:name => "some group"})
+    @course.assignment_groups.create!({:name => "last group"})
+
 
     # make sure we can assign a custom field during creation
     CustomField.create!(:name => 'test_custom',
@@ -149,12 +152,13 @@ describe AssignmentsApiController, :type => :integration do
               'position' => '1', 'points_possible' => '12',
               'due_at' => '2011-01-01',
               'description' => 'assignment description',
+              'assignment_group_id' => @group.id,
               'grading_type' => 'points', 'set_custom_field_values' => { 'test_custom' => { 'value' => '1' } } } })
 
     assignment = Assignment.first
     json.should == {
       'id' => assignment.id,
-      'assignment_group_id' => assignment.assignment_group_id,
+      'assignment_group_id' => @group.id,
       'name' => 'some assignment',
       'course_id' => @course.id,
       'description' => 'assignment description',
@@ -178,8 +182,11 @@ describe AssignmentsApiController, :type => :integration do
 
   it "should allow updating an assignment via the API" do
     course_with_teacher(:active_all => true)
-    @group = @course.assignment_groups.create!({:name => "some group"})
+    @start_group = @course.assignment_groups.create!({:name => "start group"})
+    @group = @course.assignment_groups.create!({:name => "new group"})
     @assignment = @course.assignments.create!(:title => "some assignment", :points_possible => 12)
+    @assignment.assignment_group = @start_group
+    @assignment.save!
 
     # make sure we can assign a custom field during update
     CustomField.create!(:name => 'test_custom',
@@ -193,11 +200,12 @@ describe AssignmentsApiController, :type => :integration do
             :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s },
           { :assignment => { 'name' => 'some assignment again',
               'points_possible' => '15',
+              'assignment_group_id' => @group.id,
               'set_custom_field_values' => { 'test_custom' => { 'value' => '1' } } } })
 
     json.should == {
       'id' => @assignment.id,
-      'assignment_group_id' => @assignment.assignment_group_id,
+      'assignment_group_id' => @group.id,
       'name' => 'some assignment again',
       'course_id' => @course.id,
       'description' => nil,
