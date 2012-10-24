@@ -366,7 +366,18 @@ class Message < ActiveRecord::Base
       body
     end
   end
-    
+  
+  def context_root_account
+    context = self.context
+    unbounded_loop_paranoia_counter = 10
+    until context.respond_to?(:root_account) do
+      context = context.context
+      unbounded_loop_paranoia_counter -= 1
+      return nil if unbounded_loop_paranoia_counter <= 0 || context.nil?
+    end
+    context.root_account
+  end
+
   def infer_defaults
     self.notification_name ||= self.notification.name if self.notification
     self.notification_category ||= self.notification.category if self.notification
@@ -374,7 +385,10 @@ class Message < ActiveRecord::Base
     self.path_type = 'summary' if self.to == 'dashboard'
     self.path_type = 'email' if self.context_type == 'ErrorReport'
     self.to_email = true if self.path_type == 'email' || self.path_type == 'sms'
-    self.from_name = HostUrl.outgoing_email_default_name
+
+    self.from_name = context_root_account.settings[:outgoing_email_default_name] rescue nil
+
+    self.from_name ||= HostUrl.outgoing_email_default_name
     self.from_name = self.asset_context.name if (self.asset_context && !self.asset_context.is_a?(Account) && self.asset_context.name && self.notification.dashboard? rescue false)
     self.from_name = self.from_name if self.respond_to?(:from_name)
     true

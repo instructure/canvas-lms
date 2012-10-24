@@ -153,6 +153,7 @@ class Account < ActiveRecord::Base
   add_setting :mfa_settings, :root_only => true
   add_setting :canvas_authentication, :boolean => true, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
+  add_setting :outgoing_email_default_name
 
   def settings=(hash)
     if hash.is_a?(Hash)

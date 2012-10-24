@@ -225,6 +225,32 @@ define([
         })
         .appendTo('label[for="account_services_' + serviceName + '"]');
     });
+
+    function displayCustomEmailFromName(){
+      var displayText = $('#account_settings_outgoing_email_default_name').val();
+      if (displayText == '') {
+        displayText = I18n.t('custom_text_blank', '[Custom Text]');
+      }
+      $('#custom_default_name_display').text(displayText);
+    }
+    $('.notification_from_name_option').on('change', function(){
+      var $useCustom = $('#account_settings_outgoing_email_default_name_option_custom');
+      var $customName = $('#account_settings_outgoing_email_default_name');
+      if ($useCustom.attr('checked')) {
+        $customName.removeAttr('disabled');
+        $customName.focus()
+      }
+      else {
+        $customName.attr('disabled', 'disabled');
+      }
+    });
+    $('#account_settings_outgoing_email_default_name').on('keyup', function(){
+      displayCustomEmailFromName();
+    });
+    // Setup initial display state
+    displayCustomEmailFromName();
+    $('.notification_from_name_option').trigger('change');
+
   });
 
 });
