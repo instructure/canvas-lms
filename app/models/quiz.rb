@@ -368,14 +368,13 @@ class Quiz < ActiveRecord::Base
   # but the version being held in Quiz.quiz_data.  Caches the result
   # in @stored_questions.
   def stored_questions(hashes=nil)
-    non_shuffled_questions = ["true_false_question", "matching_question"]
     res = []
     return @stored_questions if @stored_questions && !hashes
     questions = hashes || self.quiz_data || []
     questions.each do |val|
       
       if val[:answers]
-        val[:answers] = val[:answers].sort_by{|a| rand} if self.shuffle_answers && !non_shuffled_questions.include?(val[:question_type])
+        val[:answers] = prepare_answers(val)
         val[:matches] = val[:matches].sort_by{|m| m[:text] || "" } if val[:matches]
       elsif val[:questions] # It's a QuizGroup
         if val[:assessment_question_bank_id]
@@ -385,7 +384,7 @@ class Quiz < ActiveRecord::Base
           questions = []
           val[:questions].each do |question|
             if question[:answers]
-              question[:answers] = question[:answers].sort_by{|a| rand} if self.shuffle_answers && !non_shuffled_questions.include?(question[:question_type])
+              question[:answers] = prepare_answers(question)
               question[:matches] = question[:matches].sort_by{|m| m[:text] || ""} if question[:matches]
             end
             questions << question
@@ -491,7 +490,6 @@ class Quiz < ActiveRecord::Base
       @submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
     end
     
-    non_shuffled_questions = ["true_false_question", "matching_question"]
     exclude_ids = @submission_questions.map{ |q| q[:assessment_question_id] }.compact
     @submission_questions.each do |q|
       if q[:pick_count] #QuizGroup
@@ -502,7 +500,7 @@ class Quiz < ActiveRecord::Base
             questions = questions.map{|aq| aq.data}
             questions.each do |question|
               if question[:answers]
-                question[:answers] = question[:answers].sort_by{|a| rand} if self.shuffle_answers && !non_shuffled_questions.include?(question[:question_type])
+                question[:answers] = prepare_answers(question)
                 question[:matches] = question[:matches].sort_by{|m| m[:text] || ""} if question[:matches]
               end
               question[:points_possible] = q[:question_points]
@@ -545,6 +543,16 @@ class Quiz < ActiveRecord::Base
       submission.with_versioning(true, &:save!)
     end
     submission
+  end
+
+  def prepare_answers(question)
+    if answers = question[:answers]
+      if shuffle_answers && Quiz.shuffleable_question_type?(question[:question_type])
+        answers.sort_by { |a| rand }
+      else
+        answers
+      end
+    end
   end
   
   # Takes the PRE-SAVED version of the quiz and uses it to generate a 
@@ -1336,4 +1344,12 @@ class Quiz < ActiveRecord::Base
     self[:require_lockdown_browser_for_results] && Quiz.lockdown_browser_plugin_enabled?
   end
   alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
+
+  def self.non_shuffled_questions
+    ["true_false_question", "matching_question", "fill_in_multiple_blanks_question"]
+  end
+
+  def self.shuffleable_question_type?(question_type)
+    !non_shuffled_questions.include?(question_type)
+  end
 end
