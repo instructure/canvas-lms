@@ -61,7 +61,9 @@ define [
         g.on 'change', @revertTitle
         g.fetch()
 
-      @$el.disableWhileLoading $.when(dfds...).done @reset
+      @$el.disableWhileLoading $.when(dfds...).done =>
+        @reset()
+        @$el.find('[tabindex=0]:first').focus()
 
       # super call not needed
 

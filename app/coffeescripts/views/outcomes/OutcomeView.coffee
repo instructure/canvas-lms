@@ -53,13 +53,24 @@ define [
 
     editRating: (e) =>
       e.preventDefault()
-      $(e.currentTarget).parent().hide().next().show()
+      $(e.currentTarget).parent().hide()
 
     # won't allow deleting the last rating
     deleteRating: (e) =>
       e.preventDefault()
       if @$('.rating').length > 1
-        $(e.currentTarget).closest('td').remove()
+        deleteBtn = $(e.currentTarget)
+        focusTarget = deleteBtn
+                     .closest('.rating')
+                     .prev()
+                     .find('.insert_rating')
+        if focusTarget.length == 0
+          focusTarget = deleteBtn
+                       .closest('.rating')
+                       .next()
+                       .find('.edit_rating')
+        deleteBtn.closest('td').remove()
+        focusTarget.focus()
         @updateRatings()
 
     saveRating: (e) ->
@@ -68,8 +79,9 @@ define [
       $showWrapper = $editWrapper.prev()
       $showWrapper.find('h5').text($editWrapper.find('input.outcome_rating_description').val())
       $showWrapper.find('.points').text($editWrapper.find('input.outcome_rating_points').val() or 0)
-      $editWrapper.hide()
+      $editWrapper.attr('aria-expanded', false).hide()
       $showWrapper.show()
+      $showWrapper.find('.edit_rating').focus()
 
     insertRating: (e) =>
       e.preventDefault()
@@ -98,6 +110,7 @@ define [
         autoOpen: false
         title: I18n.t("outcome_criterion", "Learning Outcome Criterion")
         width: 400
+        close: -> $(e.target).focus()
       ).dialog('open')
 
     render: ->

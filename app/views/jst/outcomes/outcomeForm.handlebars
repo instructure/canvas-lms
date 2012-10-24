@@ -1,8 +1,8 @@
 <form action="{{url}}" class="learning_outcome" method="post">
   <label for="title">{{#t "title"}}Name this outcome{{/t}}:</label>
-  <input class="outcome_title" name="title" size="50" type="text" value="{{title}}">
+  <input class="outcome_title" name="title" id=title size="50" type="text" value="{{title}}">
   <label for="description">{{#t "description"}}Describe this outcome{{/t}}:</label>
-  <textarea cols="40" name="description" rows="20" style="width: 100%; height: 150px;">{{description}}</textarea>
+  <textarea cols="40" name="description" id=description rows="20" style="width: 100%; height: 150px;">{{description}}</textarea>
   <div id="outcome_criterion_dialog" style="display: none;">
     {{#t "criterion_dialog"}}Learning outcomes can be included in assignment rubrics as an easy way
     to assess mastery of outcomes aligned to specific assignments.  When you define
@@ -13,7 +13,7 @@
   </div>
   <label>
     {{#t "criterion"}}Criterion ratings{{/t}}:
-    <a class="outcome_information_link" title="{{#t "criterion_info_link"}}Click to learn about criterion ratings{{/t}}"><i class="icon-question"></i></a>
+    <a class="outcome_information_link" title="{{#t "criterion_info_link"}}Click to learn about criterion ratings{{/t}}" tabindex=0 href="#"><i class="icon-question"></i></a>
   </label>
   <table class="criterion">
     <tbody>
@@ -31,8 +31,8 @@
     </tbody>
   </table>
   <div>
-    {{#t "mastery"}}Mastery at{{/t}}:
-    <input type="text" name="mastery_points" style="width: 20px;" class="mastery_points" value="{{mastery_points}}">
+    <label for="mastery_points" style="display:inline">{{#t "mastery"}}Mastery at{{/t}}:</label>
+    <input type="text" name="mastery_points" style="width: 20px;" class="mastery_points" id="mastery_points" value="{{mastery_points}}">
   </div>
   <div class="button-container-right-aligned">
     <button type="button" class="button cancel_button">{{#t "#buttons.cancel"}}Cancel{{/t}}</button>

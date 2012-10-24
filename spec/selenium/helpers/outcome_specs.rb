@@ -56,19 +56,17 @@ shared_examples_for "outcome tests" do
       # create group
       f('.add_outcome_group').click
       group_title = 'my group'
-      group_description = 'new group description'
       replace_content f('.outcomes-content input[name=title]'), group_title
-      type_in_tiny '.outcomes-content textarea[name=description]', group_description
       # submit
       f('.submit_button').click
       wait_for_ajaximations
 
       # create outcome
       f('.add_outcome_link').click
+      wait_for_ajaximations
       outcome_name = 'first new outcome'
-      outcome_description = 'new learning outcome'
       replace_content f('.outcomes-content input[name=title]'), outcome_name
-      type_in_tiny '.outcomes-content textarea[name=description]', outcome_description
+
       # submit
       f('.submit_button').click
       wait_for_ajaximations
@@ -171,9 +169,7 @@ shared_examples_for "outcome tests" do
       # create group
       f('.add_outcome_group').click
       group_title = 'my group'
-      group_description = 'new group description'
       replace_content f('.outcomes-content input[name=title]'), group_title
-      type_in_tiny '.outcomes-content textarea[name=description]', group_description
       # submit
       f('.submit_button').click
       wait_for_ajaximations
@@ -184,8 +180,6 @@ shared_examples_for "outcome tests" do
       # should show outcome in main content window
       # title
       f(".outcomes-content .title").text.should == group_title
-      # description
-      f(".outcomes-content .description").text.should == group_description
       # db
       LearningOutcomeGroup.find_by_title(group_title).should be_present
     end
@@ -198,9 +192,7 @@ shared_examples_for "outcome tests" do
       # create group
       f('.add_outcome_group').click
       group_title = 'my group'
-      group_description = 'new group description'
       replace_content f('.outcomes-content input[name=title]'), group_title
-      type_in_tiny '.outcomes-content textarea[name=description]', group_description
       # submit
       f('.submit_button').click
       wait_for_ajaximations
@@ -208,9 +200,7 @@ shared_examples_for "outcome tests" do
       # create nested group
       f('.add_outcome_group').click
       nested_group_title = 'my nested group'
-      nested_group_description = 'new nested group description'
       replace_content f('.outcomes-content input[name=title]'), nested_group_title
-      type_in_tiny '.outcomes-content textarea[name=description]', nested_group_description
       # submit
       f('.submit_button').click
       wait_for_ajaximations

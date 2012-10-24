@@ -3,27 +3,38 @@
     <div class="show">
       <h5>{{description}}</h5>
       <span class="points">{{points}}</span> {{#t "points"}}Points{{/t}}
-      <a href="#" class="edit_rating active" title="{{#t "edit_criterion_rating"}}Edit criterion rating{{/t}}"><i class="icon-edit"></i></a>
+      <a
+        href="#"
+        class="edit_rating active element_toggler"
+        title='{{#t "edit_criterion_rating_title"}}Edit "%{description} criterion rating{{/t}}'
+        aria-label='{{#t "edit_criterion_rating_title"}}Edit "%{description} criterion rating{{/t}}'
+        role=button
+        tabindex=0
+        aria-controls="edit_rating_{{_index}}"><i class="icon-edit"></i></a>
     </div>
-    <div class="edit">
+    <div class="edit" id="edit_rating_{{_index}}" role=region tabindex=-1>
       <div class="row-fluid">
         <div class="span8">
-          <input type="text" name="ratings[{{_index}}][description]" class="outcome_rating_description" value="{{description}}">
+          <input type="text" name="ratings[{{_index}}][description]" class="outcome_rating_description" value="{{description}}" aria-label="{{#t "rating_description"}}Criterion rating description{{/t}}">
         </div>
         <div class="span4">
-          <input type="text" name="ratings[{{_index}}][points]" style="width: 20px;" class="outcome_rating_points" value="{{points}}"> {{#t "pts"}}pts{{/t}}
+          <input type="text" name="ratings[{{_index}}][points]" style="width: 20px;" class="outcome_rating_points" value="{{points}}" aria-label="{{#t "criterion_rating_points"}}Criterion rating points{{/t}}"> {{#t "pts"}}pts{{/t}}
         </div>
       </div>
 
       <div class="buttons row-fluid">
         <div class="span12">
-          <button class="btn btn-small btn-primary save_rating_link" type="button">{{#t "close_rating"}}Ok{{/t}}</button>
+          <button
+            class="btn btn-small btn-primary save_rating_link"
+            aria-controls="edit_rating_{{_index}}"
+            type="button"
+          >{{#t "close_rating"}}Ok{{/t}}</button>
           <button class="btn btn-small delete_rating_link" type="button">{{#t "delete_criterion"}}Delete{{/t}}</button>
         </div>
       </div>
     </div>
     <div class="insert">
-      <a href="#" class="insert_rating" title="{{#t "insert_criterion_rating"}}Insert criterion rating{{/t}}">
+      <a href="#" class="insert_rating" title="{{#t "insert_criterion_rating"}}Insert criterion rating{{/t}}" tabindex=0 role=button>
         {{#t "insert_rating"}}Insert{{/t}}
         <span class="arrow-icon"></span>
       </a>

@@ -82,6 +82,7 @@ define [
       @getTinyMceCode()
       if @isValid()
         super e
+        $('.edit_button').focus()
       else
         @showErrors @errors
 
@@ -93,6 +94,8 @@ define [
         $.flashMessage I18n.t 'flash.updateSuccess', 'Update successful'
       @state = 'show'
       @render()
+      $('.edit_button').focus()
+      this
 
     fail: ->
       $.flashError I18n.t 'flash.error', "An error occurred. Please refresh the page and try again."
@@ -124,9 +127,12 @@ define [
         @$el.empty()
         @model.destroy()
         @state = 'show'
+        $('.add_outcome_link').focus()
       else
         @state = 'show'
         @render()
+        $('.edit_button').focus()
+      this
 
     edit: (e) =>
       e.preventDefault()
@@ -145,6 +151,7 @@ define [
           $.flashMessage I18n.t('flash.deleteSuccess', 'Deletion successful')
           @trigger 'deleteSuccess'
           @remove()
+          $('.add_outcome_link').focus()
         error: => $.flashError I18n.t('flash.deleteError', 'Something went wrong. Unable to delete at this time.')
 
     resetModel: ->

@@ -38,6 +38,7 @@ define [
       title: @title
       width: 1000
       resizable: true
+      close: -> $('.find_outcome').focus()
       buttons: [
         text: I18n.t '#buttons.cancel', 'Cancel'
         click: @cancel
