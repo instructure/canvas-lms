@@ -759,16 +759,16 @@ class User < ActiveRecord::Base
   end
 
   def self.clone_communication_channel(cc, new_user, max_position)
-    new_user.shard.activate do
-      new_cc = cc.clone
-      new_cc.position += max_position
-      new_cc.user = new_user
-      new_cc.save!
-      cc.notification_policies.each do |np|
-        new_np = np.clone
-        new_np.communication_channel = new_cc
-        new_np.save!
-      end
+    new_cc = cc.clone
+    new_cc.shard = new_user.shard
+    new_cc.position += max_position
+    new_cc.user = new_user
+    new_cc.save!
+    cc.notification_policies.each do |np|
+      new_np = np.clone
+      new_np.shard = new_user.shard
+      new_np.communication_channel = new_cc
+      new_np.save!
     end
   end
 
@@ -834,11 +834,10 @@ class User < ActiveRecord::Base
       self.communication_channels.update_all(:workflow_state => 'retired') unless self.communication_channels.empty?
 
       self.user_services.each do |us|
-        new_user.shard.activate do
-          new_us = us.clone
-          new_us.user = new_user
-          new_us.save!
-        end
+        new_us = us.clone
+        new_us.shard = new_user.shard
+        new_us.user = new_user
+        new_us.save!
       end
       self.user_services.delete_all
     else
