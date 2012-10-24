@@ -199,6 +199,8 @@ describe "speed grader" do
   end
 
   it "should create a comment on assignment" do
+    pending("failing because it is dependant on an external kaltura system")
+
     student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_animations
