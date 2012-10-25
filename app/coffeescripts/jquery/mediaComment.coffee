@@ -22,7 +22,7 @@ define [
 
   getSourcesAndTracks = (id) ->
     dfd = new $.Deferred
-    $.getJSON "/api/v1/media_objects/#{id}", (data) ->
+    $.getJSON "/media_objects/#{id}/info", (data) ->
       sources = _.map data.media_sources, (source) -> "<source type='#{source.content_type}' src='#{source.url}' />"
       tracks = _.map data.media_tracks, (track) ->
           languageName = mejs.language.codes[track.locale] || track.locale
@@ -96,7 +96,7 @@ define [
           height: height
           modal: false
           resizable: false
-          close: -> $this.data('mediaelementplayer').pause()
+          close: -> $this.data('mediaelementplayer')?.pause()
 
         $dialog.disableWhileLoading getSourcesAndTracks(id).done (sourcesAndTracks) ->
           if sourcesAndTracks.sources.length
