@@ -16,7 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API Media Objects
+# This controller was originally designed to be an API endpoint but we needed it to be able
+# handle requests when there is no logged in user (viewing a video in a public course)
+# but that is not something the API supports right now so that is why you see the {not yet} part in
+# the docs
+
+# @{not yet}API Media Objects
 #
 # When you upload or record webcam video/audio to kaltura, it makes a Media Object
 #
@@ -67,13 +72,9 @@
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
 
-  # @API Show Media Object Details
+  # @{not yet}API Show Media Object Details
   #
   # Returns the Details of the given Media Object.
-  #
-  # @example_request
-  #     curl https://<canvas>/api/v1/media_objects/<media_object_id> \ 
-  #          -H 'Authorization: Bearer <token>'
   #
   # @returns Media Object
   def show

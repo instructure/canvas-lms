@@ -335,6 +335,7 @@ ActionController::Routing::Routes.draw do |map|
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
   map.media_object_redirect 'media_objects/:id/redirect', :controller => 'context', :action => 'media_object_redirect'
   map.media_object_thumbnail 'media_objects/:id/thumbnail', :controller => 'context', :action => 'media_object_thumbnail'
+  map.media_object_info 'media_objects/:media_object_id/info', :controller => 'media_objects', :action => 'show'
 
   map.external_content_success 'external_content/success/:service', :controller => 'external_content', :action => 'success'
   map.external_content_oembed_retrieve 'external_content/retrieve/oembed', :controller => 'external_content', :action => 'oembed_retrieve'
@@ -972,10 +973,6 @@ ActionController::Routing::Routes.draw do |map|
       context_modules.get "courses/:course_id/modules/:module_id/items", :action => :list_module_items, :path_name => 'course_context_module_items'
       context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
       context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
-    end
-
-    api.with_options(:controller => :media_objects) do |media_objects|
-      media_objects.get 'media_objects/:media_object_id', :action => :show, :path_name => 'media_object'
     end
 
     api.with_options(:controller => :media_tracks) do |media_tracks|
