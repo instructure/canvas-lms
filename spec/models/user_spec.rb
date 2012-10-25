@@ -1487,6 +1487,24 @@ describe User do
 
       @user1.cached_current_enrollments.should == [@enrollment]
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should include enrollments from all shards" do
+        user = User.create!
+        course1 = Account.default.courses.create!
+        course1.offer!
+        e1 = course1.enroll_student(user)
+        e2 = @shard1.activate do
+          account2 = Account.create!
+          course2 = account2.courses.create!
+          course2.offer!
+          course2.enroll_student(user)
+        end
+        user.cached_current_enrollments.should == [e1, e2]
+      end
+    end
   end
 
   describe "pseudonym_for_account" do

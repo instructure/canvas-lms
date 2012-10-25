@@ -1101,6 +1101,8 @@ describe Enrollment do
       @user.reload
       @user.cached_current_enrollments.should == [@enrollment]
       @enrollment.reject!
+      # have to get the new updated_at
+      @user.reload
       @user.cached_current_enrollments(true).should == []
     end
   end

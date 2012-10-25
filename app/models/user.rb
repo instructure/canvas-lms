@@ -1668,16 +1668,20 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
-    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
-      courses = send(association).distinct_on(["courses.id"],
-        :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-        :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
-      unless options[:include_completed_courses]
-        date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
-        courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
-      end
-      courses
-    end.dup
+    res = self.shard.activate do
+      Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
+        courses = send(association).with_each_shard do |scope|
+          scope.distinct_on(["courses.id"],
+            :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+            :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
+        end
+        unless options[:include_completed_courses]
+          date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
+          courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
+        end
+        courses
+      end.dup
+    end
     if association == :current_and_invited_courses
       if enrollment_uuid && pending_course = Course.find(:first,
         :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
@@ -1697,8 +1701,10 @@ class User < ActiveRecord::Base
   memoize :courses_with_primary_enrollment
 
   def cached_active_emails
-    Rails.cache.fetch([self, 'active_emails'].cache_key) do
-      self.communication_channels.active.email.map(&:path)
+    self.shard.activate do
+      Rails.cache.fetch([self, 'active_emails'].cache_key) do
+        self.communication_channels.active.email.map(&:path)
+      end
     end
   end
 
@@ -1712,26 +1718,32 @@ class User < ActiveRecord::Base
 
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
-    res = Rails.cache.fetch([self, 'current_enrollments', opts[:include_enrollment_uuid] ].cache_key) do
-      res = self.current_and_invited_enrollments(true).to_a.dup
-      if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
-        res << pending_enrollment
-        res.uniq!
+    self.shard.activate do
+      res = Rails.cache.fetch([self, 'current_enrollments', opts[:include_enrollment_uuid] ].cache_key) do
+        res = self.current_and_invited_enrollments.with_each_shard
+        if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
+          res << pending_enrollment
+          res.uniq!
+        end
+        res
       end
-      res
     end + temporary_invitations
   end
   memoize :cached_current_enrollments
 
   def cached_not_ended_enrollments
-    @cached_all_enrollments = Rails.cache.fetch([self, 'not_ended_enrollments'].cache_key) do
-      self.not_ended_enrollments.to_a
+    self.shard.activate do
+      @cached_all_enrollments = Rails.cache.fetch([self, 'not_ended_enrollments'].cache_key) do
+        self.not_ended_enrollments.with_each_shard
+      end
     end
   end
 
   def cached_current_group_memberships
-    @cached_current_group_memberships = Rails.cache.fetch([self, 'current_group_memberships'].cache_key) do
-      self.current_group_memberships.to_a
+    self.shard.activate do
+      @cached_current_group_memberships = Rails.cache.fetch([self, 'current_group_memberships'].cache_key) do
+        self.current_group_memberships.with_each_shard
+      end
     end
   end
 
@@ -2676,16 +2688,12 @@ class User < ActiveRecord::Base
   end
 
   def accounts
-    Shard.with_each_shard(self.associated_shards) do
-      AccountUser.find(:all, :conditions => { :user_id => self.id }, :include => :account).map(&:account).uniq
-    end
+    self.account_users.with_each_shard(:include => :account).map(&:account).uniq
   end
   memoize :accounts
 
   def all_pseudonyms(options = {})
-    Shard.with_each_shard(self.associated_shards) do
-      Pseudonym.scoped(options).find(:all, :conditions => { :user_id => self.id })
-    end
+    self.pseudonyms.with_each_shard(options)
   end
   memoize :all_pseudonyms
 
