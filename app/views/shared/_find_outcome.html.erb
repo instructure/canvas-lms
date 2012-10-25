@@ -17,22 +17,7 @@
       </td>
       <td class="right">
         <div class="side_tabs_content outcomes_list" style="max-height: 350px;">
-            <div class="outcome blank" style="display: none; cursor: pointer;" title="<%= t 'titles.select_and_add_criterion', "Select and Add Criterion" %>">
-              <div class="button-container" style="margin-bottom: 0.5em;">
-                <button type="button" class="button select_outcome_link"><%= t 'buttons.add_outcome', "Add Outcome" %></button>
-                <% if purpose == 'rubric' %>
-                  <div>
-                    <input type="checkbox" class="criterion_for_scoring" checked /><label><%= t 'labels.use_for_scoring', "use this criterion for scoring" %></label>
-                  </div>
-                <% elsif purpose == 'question_bank' %>
-                  <div>
-                    <label for="outcome_question_bank_mastery" class="mastery_level_text">
-                      <%= before_label :master_level, "set mastery for any score at or above" %>
-                    </label>
-                    <input type="text" class="mastery_level" id="outcome_question_bank_mastery" title="<%= t 'titles.mastery_level', "percent above which to set mastery" %>" style="width: 40px;"/>%
-                  </div>
-                <% end %>
-              </div>
+          <div class="outcome blank" style="display: none; cursor: pointer;" title="<%= t 'titles.select_and_add_criterion', "Select and Add Criterion" %>">
             <div class="learning_outcome_id" style="display: none;"></div>
             <div class="header short_description" style="font-weight: bold; font-size: 1.2em;"></div>
             <div class="body description" style="margin: 10px 0; font-size: 0.8em;"></div>
@@ -51,6 +36,21 @@
                 <%= t :points_threshold, "threshold: %{points} pts", :points => '<span class="mastery_points">&nbsp;</span>'.html_safe %>
               </div>
             <% end %>
+            <div class="button-container">
+              <button type="button" class="button select_outcome_link" style="float: right; margin: 0 0.5em 0.5em 0.5em;">
+                <%= t 'buttons.add_outcome', "Add Outcome" %>
+              </button>
+              <div style="float: right; margin-top: 0.5em;">
+                <% if purpose == 'rubric' %>
+                  <input type="checkbox" class="criterion_for_scoring" checked /><label><%= t 'labels.use_for_scoring', "use this criterion for scoring" %></label>
+                <% elsif purpose == 'question_bank' %>
+                  <label for="outcome_question_bank_mastery" class="mastery_level_text">
+                    <%= before_label :master_level, "set mastery for any score at or above" %>
+                  </label>
+                  <input type="text" class="mastery_level" id="outcome_question_bank_mastery" title="<%= t 'titles.mastery_level', "percent above which to set mastery" %>" style="width: 40px;"/>%
+                <% end %>
+              </div>
+            </div>
           </div>
         </div>
       </td>

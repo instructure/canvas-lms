@@ -1,2 +1,61 @@
-require ['learning_outcomes']
+#
+# Copyright (C) 2012 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
+require [
+  'compiled/views/outcomes/ToolbarView'
+  'compiled/views/outcomes/SidebarView'
+  'compiled/views/outcomes/ContentView'
+  'compiled/views/outcomes/FindDialog'
+  'compiled/models/OutcomeGroup'
+  'jst/outcomes/browser'
+  'jst/outcomes/mainInstructions'
+], (ToolbarView, SidebarView, ContentView, FindDialog, OutcomeGroup, browserTemplate, instructionsTemplate) ->
+
+  $el = $ '#outcomes'
+  $el.html browserTemplate
+    canManageOutcomes: ENV.PERMISSIONS.manage_outcomes
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+
+  toolbar = new ToolbarView
+    el: $el.find('.toolbar')
+
+  sidebar = new SidebarView
+    el: $el.find('.outcomes-sidebar .wrapper')
+    rootOutcomeGroup: new OutcomeGroup ENV.ROOT_OUTCOME_GROUP
+  sidebar.$el.data('view', sidebar)
+
+  content = new ContentView
+    el: $el.find('.outcomes-content')
+    instructionsTemplate: instructionsTemplate
+
+  # toolbar events
+  toolbar.on 'goBack', sidebar.goBack
+  toolbar.on 'goBack', content.show
+  toolbar.on 'add', sidebar.addAndSelect
+  toolbar.on 'add', content.add
+  toolbar.on 'find', -> sidebar.findDialog FindDialog
+  # sidebar events
+  sidebar.on 'select', content.show
+  sidebar.on 'select', toolbar.resetBackButton
+  # content events
+  content.on 'addSuccess', sidebar.refreshSelection
+
+  app =
+    toolbar: toolbar
+    sidebar: sidebar
+    content: content

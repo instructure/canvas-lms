@@ -1,0 +1,21 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <%= mt :description, "You will need access to an [Academic Benchmark](%{url}) account.", :url => "http://www.academicbenchmarks.com/" %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :api_url, :en => "Api Url" %></td>
+      <td>
+        <%= f.text_field :api_url,:size => "90" %> <%= t :api_url_description, "(e.g. %{url})", :url => AcademicBenchmark::API_BASE_URL %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :api_key, :en => "API Key" %></td>
+      <td>
+        <%= f.text_field :api_key %>
+      </td>
+    </tr>
+  </table>
+<% end %>

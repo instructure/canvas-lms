@@ -100,6 +100,5 @@ $(document).ready(function() {
     </div>
     <%= render :partial => "shared/rubric_forms" %>
   <% end %>
-  <%= render :partial => "shared/aligned_outcomes", :locals => {:asset => @assignment} %>
   <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>
 <% end %>

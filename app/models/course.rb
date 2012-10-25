@@ -104,10 +104,8 @@ class Course < ActiveRecord::Base
   has_many :student_view_enrollments, :class_name => 'StudentViewEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :participating_typical_users, :through => :typical_current_enrollments, :source => :user
 
-  has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content, :conditions => "content_tags.content_type = 'LearningOutcome'"
-  has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
-  has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
-  has_many :learning_outcome_groups, :as => :context
+  include LearningOutcomeContext
+
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
   has_many :users, :through => :enrollments, :source => :user, :uniq => true
@@ -406,12 +404,6 @@ class Course < ActiveRecord::Base
     end
     User.update_account_associations(user_ids_to_update_account_associations, :account_chain_cache => account_chain_cache) unless user_ids_to_update_account_associations.empty? || opts[:skip_user_account_associations]
     user_ids_to_update_account_associations
-  end
-
-  def has_outcomes
-    Rails.cache.fetch(['has_outcomes', self].cache_key) do
-      self.learning_outcomes.count > 0
-    end
   end
 
   def update_account_associations
@@ -1031,10 +1023,6 @@ class Course < ActiveRecord::Base
     else
       6
     end
-  end
-
-  def has_outcomes?
-    self.learning_outcomes.count > 0
   end
 
   def account_chain
@@ -2160,18 +2148,18 @@ class Course < ActiveRecord::Base
       end
     end
 
-    orig_root = LearningOutcomeGroup.default_for(course)
-    new_root = LearningOutcomeGroup.default_for(self)
-    orig_root.sorted_content.each do |item|
+    course.root_outcome_group.child_outcome_groups.each do |group|
       course_import.tick(85) if course_import
       use_outcome = lambda {|lo| bool_res(options[:everything] ) || bool_res(options[:all_outcomes] ) || bool_res(options[lo.asset_string.to_sym] ) }
-      if item.is_a? LearningOutcome
-        next unless use_outcome[item]
-        lo = item.clone_for(self, new_root)
+      f = group.clone_for(self, root_outcome_group, use_outcome)
+      added_items << f if f
+    end
+
+    course.root_outcome_group.child_outcome_links.each do |link|
+      course_import.tick(85) if course_import
+      if bool_res(options[:everything]) || bool_res(options[:all_outcomes]) || bool_res(options[link.content.asset_string.to_sym])
+        lo = link.content.clone_for(self, root_outcome_group)
         added_items << lo
-      else
-        f = item.clone_for(self, new_root, use_outcome)
-        added_items << f if f
       end
     end
 

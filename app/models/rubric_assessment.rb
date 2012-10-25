@@ -48,14 +48,55 @@ class RubricAssessment < ActiveRecord::Base
   
   def update_outcomes_for_assessment(outcome_ids=[])
     return if outcome_ids.empty?
-    tags = self.rubric_association.association.learning_outcome_tags.find_all_by_learning_outcome_id(outcome_ids)
+    alignments = self.rubric_association.association.learning_outcome_alignments.find_all_by_learning_outcome_id(outcome_ids)
     (self.data || []).each do |rating|
       if rating[:learning_outcome_id]
-        tags.select{|t| t.learning_outcome_id == rating[:learning_outcome_id]}.each do |tag|
-          tag.create_outcome_result(self.user, self.rubric_association.association, self)
+        alignments.each do |alignment|
+          if alignment.learning_outcome_id == rating[:learning_outcome_id]
+            create_outcome_result(alignment)
+          end
         end
       end
     end
+  end
+
+  def create_outcome_result(alignment)
+    # find or create the user's unique LearningOutcomeResult for this alignment
+    # of the assessment's associated object.
+    result = alignment.learning_outcome_results.
+      for_association(rubric_association).
+      find_or_initialize_by_user_id(user.id)
+
+    # force the context and artifact
+    result.artifact = self
+    result.context = alignment.context
+
+    # mastery
+    criterion = rubric_association.rubric.data.find{|c| c[:learning_outcome_id] == alignment.learning_outcome_id }
+    criterion_result = self.data.find{|c| c[:criterion_id] == criterion[:id] }
+    if criterion
+      result.possible = criterion[:points]
+      result.score = criterion_result && criterion_result[:points]
+      result.mastery = result.score && (criterion[:mastery_points] || result.possible) && result.score >= (criterion[:mastery_points] || result.possible)
+    else
+      result.possible = nil
+      result.score = nil
+      result.mastery = nil
+    end
+
+    # attempt
+    if self.artifact && self.artifact.is_a?(Submission)
+      result.attempt = self.artifact.attempt || 1
+    else
+      result.attempt = self.version_number
+    end
+
+    # title
+    result.title = "#{user.name}, #{rubric_association.title}"
+
+    result.assessed_at = Time.now
+    result.save_to_version(result.attempt)
+    result
   end
 
   def update_artifact_parameters

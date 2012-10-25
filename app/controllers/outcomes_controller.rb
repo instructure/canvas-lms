@@ -17,6 +17,7 @@
 #
 
 class OutcomesController < ApplicationController
+  include Api::V1::Outcome
   before_filter :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_filter { |c| c.active_tab = "outcomes" }
@@ -24,13 +25,27 @@ class OutcomesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_OUTCOMES)
-      @root_outcome_group = LearningOutcomeGroup.default_for(@context)
-      @outcomes = @context.learning_outcomes
+      @root_outcome_group = @context.root_outcome_group
+      if common_core_group_id = Setting.get(:common_core_outcome_group_id, nil)
+        common_core_group_id = common_core_group_id.to_i
+        common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
+      end
+
+      js_env(:COURSE_ID => @context.id,
+             :ROOT_OUTCOME_GROUP => outcome_group_json(@root_outcome_group, @current_user, session),
+             :CONTEXT_URL_ROOT => polymorphic_path([@context]),
+             :ACCOUNT_CHAIN_URL => polymorphic_path([:api_v1, @context, :account_chain]),
+             :STATE_STANDARDS_URL => api_v1_global_redirect_path,
+             :COMMON_CORE_GROUP_ID => common_core_group_id,
+             :COMMON_CORE_GROUP_URL => common_core_group_url,
+             :PERMISSIONS => {
+               :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes)
+             })
     end
   end
-  
+
   def show
-    @outcome = @context.learning_outcomes.find(params[:id])
+    @outcome = @context.linked_learning_outcomes.find(params[:id])
     if authorized_action(@context, @current_user, :manage_outcomes)
       codes = [@context].map(&:asset_string)
       if @context.is_a?(Account)
@@ -40,14 +55,14 @@ class OutcomesController < ApplicationController
           codes = @context.all_courses.scoped({:select => 'id'}).map(&:asset_string)
         end
       end
-      @tags = @outcome.content_tags.active.for_context(@context)
+      @alignments = @outcome.alignments.active.for_context(@context)
       add_crumb(@outcome.short_description, named_context_url(@context, :context_outcome_url, @outcome.id))
       @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
     end
   end
 
   def details
-    @outcome = @context.learning_outcomes.find(params[:outcome_id])
+    @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
     if authorized_action(@context, @current_user, :read)
       @outcome.tie_to(@context)
       render :json => @outcome.to_json(
@@ -57,7 +72,7 @@ class OutcomesController < ApplicationController
   end
 
   def outcome_results
-    @outcome = @context.learning_outcomes.find(params[:outcome_id])
+    @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
     if authorized_action(@context, @current_user, :read)
       codes = [@context].map(&:asset_string)
       if @context.is_a?(Account)
@@ -85,8 +100,7 @@ class OutcomesController < ApplicationController
       if @user == @context
         @outcomes = LearningOutcome.has_result_for(@user).active
       else
-        @root_outcome_group = LearningOutcomeGroup.default_for(@context)
-        @outcomes = @root_outcome_group.sorted_all_outcomes
+        @outcomes = @context.available_outcomes
       end
       @results = LearningOutcomeResult.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) #.for_context_codes(@codes)
       @results_for_outcome = @results.group_by(&:learning_outcome_id)
@@ -96,8 +110,8 @@ class OutcomesController < ApplicationController
   def list
     if authorized_action(@context, @current_user, :manage_outcomes)
       @account_contexts = @context.associated_accounts rescue []
-      @current_outcomes = @context.learning_outcomes
-      @outcomes = LearningOutcome.available_in_context(@context)
+      @current_outcomes = @context.linked_learning_outcomes
+      @outcomes = @context.available_outcomes.sort_by{ |o| o.title }
       if params[:unused]
         @outcomes -= @current_outcomes
       end
@@ -113,55 +127,49 @@ class OutcomesController < ApplicationController
       codes = @account_contexts.map(&:asset_string)
       @outcome = LearningOutcome.for_context_codes(codes).find(params[:learning_outcome_id])
       @group = @context.learning_outcome_groups.find(params[:learning_outcome_group_id])
-      @tag = @group.add_item(@outcome)
+      # this is silly. there should be different actions for moving a link
+      # (adopt_outcome_link) and adding a new link (add_outcome). as is, you
+      # can't add a second link to the same outcome under a new group. but just
+      # refactoring the model layer for now...
+      if outcome_link = @group.child_outcome_links.find_by_content_id(@outcome.id)
+        @group.adopt_outcome_link(outcome_link)
+      else
+        @group.add_outcome(@outcome)
+      end
       render :json => @outcome.to_json(:methods => :cached_context_short_name, :permissions => {:user => @current_user, :session => session})
-    end
-  end
-  
-  def add_outcome_group
-    if authorized_action(@context, @current_user, :manage_outcomes)
-      @group = Account.template.learning_outcome_groups.find(params[:learning_outcome_group_id])
-      @root_outcome_group = LearningOutcomeGroup.default_for(@context)
-      @tag = @root_outcome_group.add_item(@group, params)
-      render :json => @group.to_json(:include => :learning_outcomes)
     end
   end
   
   def align
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome = @context.learning_outcomes.find(params[:outcome_id])
+      @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
       @asset = @context.find_asset(params[:asset_string])
       mastery_type = @asset.is_a?(Assignment) ? "points" : "none"
-      @tag = @outcome.align(@asset, @context, :mastery_type => mastery_type) if @asset
-      render :json => @tag.to_json(:include => :learning_outcome)
+      @alignment = @outcome.align(@asset, @context, :mastery_type => mastery_type) if @asset
+      render :json => @alignment.to_json(:include => :learning_outcome)
     end
   end
   
   def alignment_redirect
     if authorized_action(@context, @current_user, :read)
-      # TODO LearningOutcome.available_in_context is a horrible horrible
-      # method. It runs way too many queries, and then throws most of the
-      # results away. But it has the semantics we want, and will need to be
-      # fixed for its other use cases anyways, so we'll use it here and in
-      # remove_alignment.
-      @outcome = LearningOutcome.available_in_context(@context, [params[:outcome_id].to_i]).first
-      @tag = @outcome.content_tags.find(params[:id])
-      content_tag_redirect(@context, @tag, :context_outcomes_url)
+      @outcome = @context.available_outcome(params[:outcome_id].to_i)
+      @alignment = @outcome.alignments.find(params[:id])
+      content_tag_redirect(@context, @alignment, :context_outcomes_url)
     end
   end
   
   def remove_alignment
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome = LearningOutcome.available_in_context(@context, [params[:outcome_id].to_i]).first
-      @tag = @outcome.content_tags.find(params[:id])
-      @tag = @outcome.remove_alignment(@tag.content, @context)
-      render :json => @tag.to_json(:include => :learning_outcome)
+      @outcome = @context.available_outcome(params[:outcome_id].to_i)
+      @alignment = @outcome.alignments.find(params[:id])
+      @outcome.remove_alignment(@alignment.content, @context)
+      render :json => @alignment.to_json(:include => :learning_outcome)
     end
   end
   
   def outcome_result
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome = @context.learning_outcomes.find(params[:outcome_id])
+      @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
       @result = @outcome.learning_outcome_results.find(params[:id])
       if authorized_action(@result.context, @current_user, :manage_outcomes)
         if @result.artifact.is_a?(Submission)
@@ -191,63 +199,22 @@ class OutcomesController < ApplicationController
   
   def reorder_alignments
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome = @context.learning_outcomes.find(params[:outcome_id])
-      @tags = @outcome.reorder_alignments(@context, params[:order].split(","))
-      render :json => @tags.to_json(:include => :learning_outcome)
-    end
-  end
-  
-  def update_outcomes_for_asset
-    if authorized_action(@context, @current_user, :manage_outcomes)
-      @asset = @context.find_asset(params[:asset_string])
-      @assignment = @asset.respond_to?(:assignment) && @asset.assignment
-      @tags = ContentTag.learning_outcome_tags_for(@asset).select{|t| !t.rubric_association_id }
-      @outcomes = @context.learning_outcomes.active
-      outcome_ids = params[:outcome_ids].split(",").map(&:to_i)
-      selected_outcomes = @outcomes.select{|o| outcome_ids.include?(o.id) }
-      outcome_ids = selected_outcomes.map(&:id)
-      existing_tags = @tags.select{|t| outcome_ids.include?(t.learning_outcome_id) }
-      existing_outcome_ids = existing_tags.map(&:learning_outcome_id).uniq
-      tags_to_delete = @tags.select{|t| !existing_outcome_ids.include?(t.learning_outcome_id) }
-      new_outcome_ids = outcome_ids - existing_outcome_ids
-      new_outcomes = @outcomes.select{|o| new_outcome_ids.include?(o.id) }
-      tags_to_delete.each{|t| t.destroy }
-      new_outcomes.each do |outcome|
-        outcome.align(@assignment || @asset, @context, @assignment ? "points" : "none")
-      end
-      if @assignment && params[:mastery_score] && !params[:mastery_score].empty?
-        @assignment.update_attribute(:mastery_score, params[:mastery_score].to_f)
-      end
-      @all_tags = []
-      if @asset
-        @all_tags = ContentTag.learning_outcome_tags_for(@asset)
-      end
-      @asset.class.update_all({:updated_at => Time.now.utc}, {:id => @asset.id})
-      render :json => @all_tags.to_json(:include => :learning_outcome)
-    end
-  end
-  
-  def outcomes_for_asset
-    if authorized_action(@context, @current_user, :read)
-      @asset = @context.find_asset(params[:asset_string])
-      @tags = []
-      if @asset
-        @tags = ContentTag.learning_outcome_tags_for(@asset)
-      end
-      render :json => @tags.to_json(:include => :learning_outcome)
+      @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
+      @alignments = @outcome.reorder_alignments(@context, params[:order].split(","))
+      render :json => @alignments.to_json(:include => :learning_outcome)
     end
   end
   
   def create
     if authorized_action(@context, @current_user, :manage_outcomes)
       if params[:learning_outcome_group_id].present?
-        @outcome_group = @context.learning_outcome_groups.find_by_id(params[:learning_outcome_group_id])
+        @outcome_group = @context.learning_outcome_groups.find(params[:learning_outcome_group_id])
       end
-      @outcome_group ||= LearningOutcomeGroup.default_for(@context)
+      @outcome_group ||= @context.root_outcome_group
       @outcome = @context.created_learning_outcomes.build(params[:learning_outcome])
       respond_to do |format|
         if @outcome.save
-          @outcome_group.add_item(@outcome)
+          @outcome_group.add_outcome(@outcome)
           flash[:notice] = t :successful_outcome_creation, "Outcome successfully created!"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
           format.json { render :json => @outcome.to_json }
@@ -262,7 +229,7 @@ class OutcomesController < ApplicationController
   
   def update
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome = @context.learning_outcomes.find(params[:id])
+      @outcome = @context.created_learning_outcomes.find(params[:id])
       respond_to do |format|
       
         if @outcome.update_attributes(params[:learning_outcome])
@@ -280,25 +247,24 @@ class OutcomesController < ApplicationController
   
   def destroy
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome = @context.learning_outcomes.find_by_id(params[:id]) if params[:id].present?
-      @outcome ||= @context.learning_outcome_tags.find_by_learning_outcome_id(params[:id]) if params[:id].present?
       respond_to do |format|
-        if @outcome
-          if @outcome.context_code == @context.asset_string
-            @outcome.destroy
-            flash[:notice] = t :successful_outcome_delete, "Outcome successfully deleted"
-          else
-            @tags = LearningOutcomeGroup.default_for(@context).all_tags_for_context.select{|t| t.content_type == 'LearningOutcome' && t.content_id == @outcome.id }
-            @tags.each{|t| t.destroy }
-            flash[:notice] = t :successful_outcome_removal, "Outcome successfully removed"
-          end
-          format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
+        # TODO: params[:id] is overloaded to be either a native outcome id or
+        # the id of a link to a foreign outcome. therefore it's possible to
+        # intend to delete a link to a foreign but accidentally delete a
+        # completely unrelated native outcome. needs to be decoupled.
+        if params[:id].present? && @outcome = @context.created_learning_outcomes.find_by_id(params[:id])
+          @outcome.destroy
+          flash[:notice] = t :successful_outcome_delete, "Outcome successfully deleted"
           format.json { render :json => @outcome.to_json }
+        elsif params[:id].present? && @link = @context.learning_outcome_links.find_by_id(params[:id])
+          @link.destroy
+          flash[:notice] = t :successful_outcome_removal, "Outcome successfully removed"
+          format.json { render :json => @link.learning_outcome.to_json }
         else
           flash[:notice] = t :missing_outcome, "Couldn't find that learning outcome"
-          format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
           format.json { render :json => {:errors => {:base => t(:missing_outcome, "Couldn't find that learning outcome")}}, :status => :bad_request }
         end
+        format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
       end
     end
   end

@@ -73,7 +73,7 @@ describe ContentTag do
 
   it "should include tags from an account in the for_context named scope" do
     account = Account.default
-    outcome = account.learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>')
+    outcome = account.created_learning_outcomes.create!(:title => 'outcome', :description => '<p>This is <b>awesome</b>.</p>')
     tag = ContentTag.create!(:content => outcome, :context => account)
     tags = ContentTag.for_context(account)
     tags.should_not be_empty

@@ -23,8 +23,8 @@ class ContentTag < ActiveRecord::Base
   belongs_to :associated_asset, :polymorphic => true
   belongs_to :context_module
   belongs_to :learning_outcome
+  # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
   belongs_to :learning_outcome_content, :class_name => 'LearningOutcome', :foreign_key => :content_id
-  belongs_to :rubric_association
   belongs_to :cloned_item
   has_many :learning_outcome_results
   # This allows bypassing loading context for validation if we have
@@ -39,7 +39,7 @@ class ContentTag < ActiveRecord::Base
   include CustomValidations
   validates_as_url :url
 
-  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab
+  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab, :content_type
 
   set_policy do
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}
@@ -166,18 +166,52 @@ class ContentTag < ActiveRecord::Base
       end
     end
   end
-  
+
   def self.delete_for(asset)
     ContentTag.find_all_by_content_id_and_content_type(asset.id, asset.class.to_s).each{|t| t.destroy }
     ContentTag.find_all_by_context_id_and_context_type(asset.id, asset.class.to_s).each{|t| t.destroy }
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
+    # if it's a learning outcome link...
+    if self.tag_type == 'learning_outcome_association'
+      # and there are no other links to the same outcome in the same context...
+      outcome = self.content
+      other_link = ContentTag.learning_outcome_links.active.
+        scoped(:conditions => {:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome.id}).
+        scoped(:conditions => ["id != ?", self.id]).first
+      if !other_link
+        # and there are alignments to the outcome (in the link's context for
+        # foreign links, in any context for native links)
+        alignment_conditions = { :learning_outcome_id => outcome.id }
+        native = outcome.context_type == self.context_type && outcome.context_id == self.context_id
+        if !native
+          alignment_conditions[:context_id] = self.context_id
+          alignment_conditions[:context_type] = self.context_type
+        end
+        alignment = ContentTag.learning_outcome_alignments.scoped(:conditions => alignment_conditions).first
+        if alignment
+          # then don't let them delete the link
+          raise ActiveRecord::RecordNotSaved
+        end
+      end
+    end
+
     self.workflow_state = 'deleted'
-    self.save
+    self.save!
+
+    # after deleting the last native link to an unaligned outcome, delete the
+    # outcome. we do this here instead of in LearningOutcome#destroy because
+    # (a) LearningOutcome#destroy *should* only ever be called from here, and
+    # (b) we've already determined other_link and native
+    if self.tag_type == 'learning_outcome_association' && !other_link && native
+      outcome.destroy
+    end
+
+    true
   end
-  
+
   def locked_for?(user, deep_check=false)
     self.context_module.locked_for?(user, self, deep_check)
   end
@@ -224,94 +258,9 @@ class ContentTag < ActiveRecord::Base
       self.content_id = id
     end
   end
-  
-  def create_outcome_result(user, association, artifact, opts={})
-    raise "This tag has no associated learning outcome" unless self.learning_outcome_id
-    raise "User required" unless user
-    raise "Outcome association required" unless association
-    raise "Cannot evaluate a rubric alignment for a non-rubric artifact" if self.rubric_association_id && !artifact.is_a?(RubricAssessment)
-    raise "Cannot evaluate a non-rubric alignment for a rubric artifact" if !self.rubric_association_id && artifact.is_a?(RubricAssessment)
-    assessment_question = opts[:assessment_question]
-    raise "Assessment question required for quiz outcomes" if association.is_a?(Quiz) && !opts[:assessment_question]
-    association_type = association.class.to_s
-    result = nil
-    attempts = 0
-    if association.is_a?(Quiz)
-      result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id_and_associated_asset_type_and_associated_asset_id(self.learning_outcome_id, user.id, association.id, association_type, self.id, 'AssessmentQuestion', assessment_question.id)
-      result ||= LearningOutcomeResult.new(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self, :associated_asset => assessment_question)
-    else
-      result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
-      result ||= LearningOutcomeResult.new(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self)
-    end
-    result.context = self.context
-    if artifact
-      result.artifact_id = artifact.id
-      result.artifact_type = artifact.class.to_s
-    end
-    case association
-    when Quiz
-      question_index = nil
-      cached_question = artifact.quiz_data.detect{|q| q[:assessment_question_id] == assessment_question.id }
-      cached_answer = artifact.submission_data.detect{|q| q[:question_id] == cached_question[:id] }
-      raise "Could not find valid question" unless cached_question
-      raise "Could not find valid answer" unless cached_answer
-      
-      result.score = cached_answer[:points]
-      result.context = association.context || result.context
-      result.possible = cached_question['points_possible']
-      if self.mastery_score && result.score && result.possible
-        result.mastery = (result.score / result.possible) > self.mastery_score 
-      end
-      result.attempt = artifact.attempt
-      result.title = "#{user.name}, #{association.title}: #{cached_question[:name]}"
-    when Assignment
-      if self.rubric_association_id && artifact.is_a?(RubricAssessment)
-        association = self.rubric_association
-        criterion = association.rubric.data.find{|c| c[:learning_outcome_id] == self.learning_outcome_id }
-        criterion_result = artifact.data.find{|c| c[:criterion_id] == criterion[:id] }
-        result.possible = criterion[:points]
-        if criterion
-          result.score = criterion_result[:points]
-          result.mastery = criterion_result && criterion_result[:points] && criterion[:mastery_points] && criterion_result[:points] >= criterion[:mastery_points]
-          result.mastery = true if criterion_result && criterion_result[:points] && result.possible && criterion_result[:points] >= result.possible
-          result.possible = criterion[:points]
-        else
-          result.score = nil
-          result.mastery = nil
-          result.possible = nil
-        end
-        result.attempt = artifact.version_number
-        if(artifact.artifact && artifact.artifact.is_a?(Submission))
-          result.attempt = artifact.artifact.attempt || 1
-        end
-        result.title = "#{user.name}, #{association.title}"
-      elsif !self.rubric_association_id && artifact.is_a?(Submission)
-        result.possible = association.points_possible
-        result.score = artifact.score
-        if artifact.score && association.mastery_score
-          result.mastery = artifact.score > association.mastery_score && self.tag == "points_mastery"
-        end
-        result.mastery = true if association.points_possible && artifact.score >= association.points_possible && self.tag == "points_mastery"
-        result.mastery = true if self.tag == "explicit_mastery" && opts[:mastery] == true
-        result.attempt = artifact.attempt
-        result.title = "#{user.name}, #{association.title}"
-      end
-    else
-      result.score = artifact[:score] rescue nil
-      result.mastery = !!artifact[:mastery] rescue nil
-    end
-    result.assessed_at = Time.now
-    result.save_to_version(result.attempt)
-    result 
-  end
-  
-  def self.learning_outcome_tags_for(asset)
-    tags = ContentTag.active.include_outcome.find_all_by_tag_type_and_content_id_and_content_type('learning_outcome', asset.id, asset.class.to_s)
-    if asset.respond_to?(:assignment) && asset.assignment
-      assignment = asset.assignment
-      tags += ContentTag.active.include_outcome.find_all_by_tag_type_and_content_id_and_content_type('learning_outcome', assignment.id, assignment.class.to_s)
-    end
-    tags.select{|t| !t.learning_outcome.deleted? }
+
+  def has_rubric_association?
+    content.respond_to?(:rubric_association) && content.rubric_association
   end
   
   attr_accessor :clone_updated
@@ -354,9 +303,6 @@ class ContentTag < ActiveRecord::Base
     dup
   end
   
-  named_scope :not_rubric, lambda{
-    {:conditions => ['content_tags.content_type != ?', 'Rubric'] }
-  }
   named_scope :for_tagged_url, lambda{|url, tag|
     {:conditions => ['content_tags.url = ? AND content_tags.tag = ?', url, tag] }
   }
@@ -380,11 +326,36 @@ class ContentTag < ActiveRecord::Base
   named_scope :include_progressions, lambda{
     { :include => {:context_module => :context_module_progressions} }
   }
-  named_scope :include_outcome, lambda{
-    { :include => :learning_outcome }
+  named_scope :learning_outcome_alignments, lambda{
+    { :conditions => {:tag_type => 'learning_outcome'} }
   }
-  named_scope :outcome_tags_for_banks, lambda{|bank_ids|
-    raise "bank_ids required" if bank_ids.blank?
-    { :conditions => ["content_tags.tag_type = ? AND content_tags.workflow_state != ? AND content_tags.content_type = ? AND content_tags.content_id IN (#{bank_ids.join(',')})", 'learning_outcome', 'deleted', 'AssessmentQuestionBank'] }
+  named_scope :learning_outcome_links, lambda{
+    { :conditions => {:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome'} }
   }
+
+  # only intended for learning outcome links
+  def self.outcome_title_order_by_clause
+    best_unicode_collation_key("learning_outcomes.short_description")
+  end
+
+  module OutcomeTitleExtension
+    # only works with scopes i.e. named_scopes and scoped()
+    def find(*args)
+      options = args.last.is_a?(::Hash) ? args.last : {}
+      scope = scope(:find)
+      select = if options[:select]
+                 options[:select]
+               elsif scope[:select]
+                 scope[:select]
+               else
+                 "#{proxy_scope.quoted_table_name}.*"
+               end
+      options[:select] = select + ', ' + ContentTag.outcome_title_order_by_clause
+      super args.first, options
+    end
+  end
+
+  def self.order_by_outcome_title
+    scoped(:include => :learning_outcome_content, :order => outcome_title_order_by_clause, :extend => OutcomeTitleExtension)
+  end
 end

@@ -1,0 +1,10 @@
+<form action="{{url}}" class="outcome_group" method="post">
+  <label for="title">{{#t "title"}}Name this group{{/t}}:</label>
+  <input class="outcome_title" name="title" size="50" type="text" value="{{title}}">
+  <label for="description">{{#t "group_description"}}Describe this group{{/t}}:</label>
+  <textarea cols="40" name="description" rows="20" style="width: 100%; height: 150px;">{{description}}</textarea>
+  <div class="button-container-right-aligned">
+    <button type="button" class="button cancel_button">{{#t "#buttons.cancel"}}Cancel{{/t}}</button>
+    <button type="submit" class="button btn-primary submit_button">{{#t "#buttons.save"}}Save{{/t}}</button>
+  </div>
+</form>

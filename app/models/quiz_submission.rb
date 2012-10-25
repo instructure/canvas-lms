@@ -95,35 +95,86 @@ class QuizSubmission < ActiveRecord::Base
     end
     true
   end
-  
-  def track_outcomes(attempt)
-    return unless user_id
-    question_ids = (self.quiz_data || []).map{|q| q[:assessment_question_id] }.compact.uniq
-    questions = question_ids.empty? ? [] : AssessmentQuestion.find_all_by_id(question_ids).compact
-    bank_ids = questions.map(&:assessment_question_bank_id).uniq
-    tagged_bank_ids = (bank_ids.empty? ? [] : ContentTag.outcome_tags_for_banks(bank_ids).scoped(:select => 'content_id')).map(&:content_id).uniq
-    if !tagged_bank_ids.empty?
-      question_ids = questions.select{|q| tagged_bank_ids.include?(q.assessment_question_bank_id) }
-      send_later_if_production(:update_outcomes_for_assessment_questions, question_ids, self.id, attempt) unless question_ids.empty?
-    end
-  end
-  
-  def update_outcomes_for_assessment_questions(question_ids, submission_id, attempt)
-    return if question_ids.empty?
-    submission = QuizSubmission.find(submission_id)
-    versioned_submission = submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect{|s| s.attempt == attempt }
+
+  def questions_and_alignments(question_ids)
+    return [], [] if question_ids.empty?
+
     questions = AssessmentQuestion.find_all_by_id(question_ids).compact
     bank_ids = questions.map(&:assessment_question_bank_id).uniq
-    return if bank_ids.empty?
-    tags = ContentTag.outcome_tags_for_banks(bank_ids)
+    return questions, [] if bank_ids.empty?
+
+    # equivalent to AssessmentQuestionBank#learning_outcome_alignments, but for multiple banks at once
+    return questions, ContentTag.learning_outcome_alignments.active.scoped(
+      :conditions => {
+        :content_type => 'AssessmentQuestionBank',
+        :content_id => bank_ids
+      },
+      :include => [:learning_outcome, :context]
+    ).all
+  end
+
+  def track_outcomes(attempt)
+    return unless user_id
+
+    question_ids = (self.quiz_data || []).map{|q| q[:assessment_question_id] }.compact.uniq
+    questions, alignments = questions_and_alignments(question_ids)
+    return if questions.empty? || alignments.empty?
+
+    tagged_bank_ids = Set.new(alignments.map(&:content_id))
+    question_ids = questions.select{|q| tagged_bank_ids.include?(q.assessment_question_bank_id) }
+    send_later_if_production(:update_outcomes_for_assessment_questions, question_ids, self.id, attempt) unless question_ids.empty?
+  end
+
+  def update_outcomes_for_assessment_questions(question_ids, submission_id, attempt)
+    questions, alignments = questions_and_alignments(question_ids)
+    return if questions.empty? || alignments.empty?
+
+    submission = QuizSubmission.find(submission_id)
+    versioned_submission = submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect{|s| s.attempt == attempt }
+
     questions.each do |question|
-      question_tags = tags.select{|t| t.content_id == question.assessment_question_bank_id }
-      question_tags.each do |tag|
-        tag.create_outcome_result(self.user, self.quiz, versioned_submission, {:assessment_question => question})
+      alignments.each do |alignment|
+        if alignment.content_id == question.assessment_question_bank_id
+          versioned_submission.create_outcome_result(question, alignment)
+        end
       end
     end
   end
-  
+
+  def create_outcome_result(question, alignment)
+    # find or create the user's unique LearningOutcomeResult for this alignment
+    # of the quiz question.
+    result = alignment.learning_outcome_results.
+      for_association(quiz).
+      for_associated_asset(question).
+      find_or_initialize_by_user_id(user.id)
+
+    # force the context and artifact
+    result.artifact = self
+    result.context = quiz.context || alignment.context
+
+    # update the result with stuff from the quiz submission's question result
+    cached_question = quiz_data.detect{|q| q[:assessment_question_id] == question.id }
+    cached_answer = submission_data.detect{|q| q[:question_id] == cached_question[:id] }
+    raise "Could not find valid question" unless cached_question
+    raise "Could not find valid answer" unless cached_answer
+
+    # mastery
+    result.score = cached_answer[:points]
+    result.possible = cached_question['points_possible']
+    result.mastery = alignment.mastery_score && result.score && result.possible && (result.score / result.possible) > alignment.mastery_score
+
+    # attempt
+    result.attempt = attempt
+
+    # title
+    result.title = "#{user.name}, #{quiz.title}: #{cached_question[:name]}"
+
+    result.assessed_at = Time.now
+    result.save_to_version(result.attempt)
+    result
+  end
+
   def temporary_data
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
     raise "Cannot view temporary data for completed quiz" if self.submission_data && !self.submission_data.is_a?(Hash)

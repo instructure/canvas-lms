@@ -29,7 +29,7 @@ module Canvas::Migration
           settings[:attachment_id] = cm.attachment.id rescue nil
           settings[:content_migration] = cm
           
-          converter_class = Worker::get_converter(settings)
+          converter_class = settings[:converter_class] || Worker::get_converter(settings)
           converter = converter_class.new(settings)
 
           course = converter.export
@@ -53,7 +53,15 @@ module Canvas::Migration
           end
           cm.workflow_state = :exported
           cm.progress = 0
-          cm.save
+          saved = cm.save
+          
+          if cm.import_immediately?
+            cm.import_content_without_send_later
+            cm.progress = 100
+            saved = cm.save
+          end
+          
+          saved
         rescue => e
           report = ErrorReport.log_exception(:content_migration, e)
           if cm

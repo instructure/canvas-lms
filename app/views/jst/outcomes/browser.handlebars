@@ -1,0 +1,37 @@
+<div class="outcomes-browser content-box">
+
+  {{#unless skipToolbar}}
+  <div class="toolbar">
+    <a href="#" class="go_back ui-button ui-widget ui-state-default ui-corner-all" role="button" style="display:none">
+      {{#t "links.back"}}Back{{/t}}
+    </a>
+
+    {{#if canManageOutcomes}}
+    <a href="#" class="add_outcome_link ui-button ui-widget ui-state-default ui-corner-all" role="button">
+      <i class="icon-add"></i>
+      <span class="ui-button-text">{{#t "links.new"}}New{{/t}}</span>
+    </a>
+    <a href="#" class="add_outcome_group ui-button ui-widget ui-state-default ui-corner-all" role="button">
+      <i class="icon-add"></i>
+      <span class="ui-button-text">{{#t "links.new_group"}}New Group{{/t}}</span>
+    </a>
+    <a href="#" class="find_outcome ui-button ui-widget ui-state-default ui-corner-all" role="button">
+      <i class="icon-search"></i>
+      <span class="ui-button-text">{{#t "links.find"}}Find{{/t}}</span>
+    </a>
+    <a href="{{contextUrlRoot}}/rubrics" class="manage_rubrics ui-button ui-widget ui-state-default ui-corner-all" role="button">
+      <i class="icon-rubric"></i>
+      <span class="ui-button-text">{{#t "#buttons.manage_rubrics"}}Manage Rubrics{{/t}}</span>
+    </a>
+    {{/if}}
+  </div>
+  {{/unless}}
+
+  <div class="outcomes-main border border-rbl">
+    <div class="outcomes-sidebar" role="application">
+      <div class="wrapper" role="tree"></div>
+    </div>
+    <div class="outcomes-content">
+    </div>
+  </div>
+</div>
