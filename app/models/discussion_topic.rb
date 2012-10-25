@@ -208,18 +208,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def create_participant
-    transaction do
-      self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
-
-      # no specific user, so we can only check generic cases like post_delayed
-      # or locked assignment.
-      if !locked_for?(nil)
-        update_type = self.attributes['type'] || "DiscussionTopic"
-        cp_conditions = sanitize_sql(["context_id = ? AND context_type = ? AND content_type = ?", self.context_id, self.context_type, update_type])
-        cp_conditions += " AND user_id <> #{self.user_id}" if self.user
-        ContentParticipationCount.update_all("unread_count = unread_count + 1, updated_at = '#{Time.now.to_s(:db)}'", cp_conditions)
-      end
-    end
+    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0) if self.user
   end
 
   def update_materialized_view
@@ -251,17 +240,7 @@ class DiscussionTopic < ActiveRecord::Base
     return true if new_state == self.read_state(current_user)
 
     self.context_module_action(current_user, :read) if new_state == 'read'
-    topic_participant = self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
-    if topic_participant.present? && topic_participant.valid?
-      update_type = self.attributes['type'] || "DiscussionTopic"
-      ContentParticipationCount.create_or_update({
-        :context => context,
-        :user => current_user,
-        :content_type => update_type,
-        :offset => (new_state == "unread" ? 1 : -1),
-      })
-    end
-    topic_participant
+    self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
   end
 
   def change_all_read_state(new_state, current_user = nil)
@@ -272,16 +251,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.context_module_action(current_user, :read) if new_state == 'read'
 
       new_count = (new_state == 'unread' ? self.default_unread_count : 0)
-      topic_participant = self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
-      if topic_participant.present? && topic_participant.valid?
-        update_type = self.attributes['type'] || "DiscussionTopic"
-        ContentParticipationCount.create_or_update({
-          :context => context,
-          :user => current_user,
-          :content_type => update_type,
-          :offset => (new_state == "unread" ? 1 : -1),
-        })
-      end
+      self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
 
       entry_ids = self.discussion_entries.map(&:id)
       if entry_ids.present?
