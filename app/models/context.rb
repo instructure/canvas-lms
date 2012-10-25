@@ -156,7 +156,7 @@ module Context
       res[:pages] = self.respond_to?(:wiki) && self.wiki_id && !self.wiki.wiki_pages.active.empty?
       res[:conferences] = self.respond_to?(:web_conferences) && !self.web_conferences.active.empty?
       res[:announcements] = self.respond_to?(:announcements) && !self.announcements.active.empty?
-      res[:outcomes] = self.respond_to?(:learning_outcomes) && !self.learning_outcomes.empty?
+      res[:outcomes] = self.respond_to?(:has_outcomes?) && self.has_outcomes?
       res
     end
   end

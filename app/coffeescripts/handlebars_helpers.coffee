@@ -109,6 +109,9 @@ define [
         return fn(this) if arg
       inverse(this)
 
+    # {{#eachWithIndex records}}
+    #   <li class="legend_item{{_index}}"><span></span>{{Name}}</li>
+    # {{/each_with_index}}
     eachWithIndex: (context, options) ->
       fn = options.fn
       inverse = options.inverse

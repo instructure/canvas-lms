@@ -189,17 +189,19 @@ describe "account admin question bank" do
     end
 
     def create_outcome (short_description = "good student")
-      ratings = [{:description => "Exceeds Expectations", :points => 5},
-                 {:description => "Meets Expectations", :points => 3},
-                 {:description => "Does Not Meet Expectations", :points => 0}]
-      rubric_criterion =
-          {:ratings => ratings,
-           :description => "test description", :points_possible => 10, :mastery_points => 9}
-      data = {:rubric_criterion => rubric_criterion}
-      outcome = LearningOutcome.create!(:short_description => short_description)
-      outcome.data = data
-      outcome.save
-      Account.default.learning_outcomes << outcome
+      outcome = Account.default.created_learning_outcomes.build(:short_description => short_description)
+      outcome.rubric_criterion = {
+        :description => "test description",
+        :points_possible => 10,
+        :mastery_points => 9,
+        :ratings => [
+          { :description => "Exceeds Expectations", :points => 5 },
+          { :description => "Meets Expectations", :points => 3 },
+          { :description => "Does Not Meet Expectations", :points => 0 }
+        ]
+      }
+      outcome.save!
+      Account.default.root_outcome_group.add_outcome(outcome)
       outcome
     end
 
@@ -217,12 +219,12 @@ describe "account admin question bank" do
       mastery_points = @outcome[:data][:rubric_criterion][:mastery_points]
       possible_points = @outcome[:data][:rubric_criterion][:points_possible]
       percentage = mastery_points.to_f/possible_points.to_f
-      @question_bank.learning_outcome_tags.count.should == 0
+      @question_bank.learning_outcome_alignments.count.should == 0
       add_outcome_to_bank(@outcome)
       f("[data-id = '#{@outcome.id}']").should include_text("#{(percentage*100).to_i}%")
       @question_bank.reload
-      @question_bank.learning_outcome_tags.count.should be > 0
-      learning_outcome_tag = @question_bank.learning_outcome_tags.find_by_mastery_score(percentage)
+      @question_bank.learning_outcome_alignments.count.should be > 0
+      learning_outcome_tag = @question_bank.learning_outcome_alignments.find_by_mastery_score(percentage)
       learning_outcome_tag.should be_present
     end
 
@@ -235,7 +237,7 @@ describe "account admin question bank" do
       f(".outcome_#{@outcome.id} .select_outcome_link").click
       wait_for_ajax_requests
       f("[data-id = '#{@outcome.id}'] .content").should include_text("mastery at #{percentage}%")
-      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_tags.find_by_mastery_score(0.4)
+      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.find_by_mastery_score(0.4)
       learning_outcome_tag.should be_present
     end
 

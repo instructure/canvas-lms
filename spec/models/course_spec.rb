@@ -966,92 +966,26 @@ describe Course, "backup" do
     parse.should be_is_a(Array)
     parse.length.should > 0
   end
-    
-  context "merge_into_course" do
-
-    it "should merge implied content into another course" do
-      course_model
-      attachment_model
-      @old_attachment = @attachment
-      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
-      html = @old_topic.message
-      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
-      @old_course = @course
-      @new_course = course_model
-      @new_course.merge_into_course(@old_course, :all_topics => true)
-      @old_attachment.reload
-      @old_attachment.cloned_item_id.should_not be_nil
-      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
-      @new_attachment.should_not be_nil
-      @old_topic.reload
-      @old_topic.cloned_item_id.should_not be_nil
-      @new_topic = @new_course.discussion_topics.find_by_cloned_item_id(@old_topic.cloned_item_id)
-      @new_topic.should_not be_nil
-      html = @new_topic.message
-      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
-    end
-
-    it "should bring over linked files if not already brought over" do
-      course_model
-      attachment_model
-      @old_attachment = @attachment
-      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
-      html = @old_topic.message
-      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
-      @old_course = @course
-      @new_course = course_model
-      html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
-      @old_attachment.reload
-      @old_attachment.cloned_item_id.should_not be_nil
-      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
-      @new_attachment.should_not be_nil
-      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
-    end
-
-    it "should bring over linked files that have been replaced" do
-      course_model
-      attachment_model
-      @orig_attachment = @attachment
-
-      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
-      html = @old_topic.message
-      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
-
-      @orig_attachment.destroy
-      attachment_model
-      @old_attachment = @attachment
-      @old_attachment.handle_duplicates(:overwrite)
-
-      @old_course = @course
-      @new_course = course_model
-      html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
-      @old_attachment.reload
-      @old_attachment.cloned_item_id.should_not be_nil
-      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
-      @new_attachment.should_not be_nil
-      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
-    end
-  end
   
   it "should not cross learning outcomes with learning outcome groups in the association" do
     pending('fails when being run in the single thread rake task')
     # set up two courses with two outcomes
     course = course_model
-    default_group = LearningOutcomeGroup.default_for(course)
+    default_group = course.root_outcome_group
     outcome = course.created_learning_outcomes.create!
-    default_group.add_item(outcome)
+    default_group.add_outcome(outcome)
 
     other_course = course_model
-    other_default_group = LearningOutcomeGroup.default_for(other_course)
+    other_default_group = other_course.root_outcome_group
     other_outcome = other_course.created_learning_outcomes.create!
-    other_default_group.add_item(other_outcome)
+    other_default_group.add_outcome(other_outcome)
 
     # add another group to the first course, which "coincidentally" has the
     # same id as the second course's outcome
     other_group = course.learning_outcome_groups.build
     other_group.id = other_outcome.id
     other_group.save!
-    default_group.add_item(other_group)
+    default_group.adopt_outcome_group(other_group)
 
     # reload and check
     course.reload
@@ -1063,11 +997,11 @@ describe Course, "backup" do
 
   it "should not count learning outcome groups as having outcomes" do
     course = course_model
-    default_group = LearningOutcomeGroup.default_for(course)
-    other_group = course.learning_outcome_groups.create!
-    default_group.add_item(other_group)
+    default_group = course.root_outcome_group
+    other_group = course.learning_outcome_groups.create!(:title => 'other group')
+    default_group.adopt_outcome_group(other_group)
     
-    course.has_outcomes.should == false
+    course.should_not have_outcomes
   end
 
 end

@@ -25,14 +25,16 @@ describe "Importing Rubrics" do
       it "should import from #{system}" do
         data = get_import_data(system, 'rubric')
         context = get_import_context(system)
+        migration = stub()
+        migration.stubs(:context).returns(context)
 
         data[:rubrics_to_import] = {}
-        Rubric.import_from_migration(data, context).should be_nil
+        Rubric.import_from_migration(data, migration).should be_nil
         Rubric.count.should == 0
 
         data[:rubrics_to_import][data[:migration_id]] = true
-        Rubric.import_from_migration(data, context)
-        Rubric.import_from_migration(data, context)
+        Rubric.import_from_migration(data, migration)
+        Rubric.import_from_migration(data, migration)
         Rubric.count.should == 1
         r = Rubric.find_by_migration_id(data[:migration_id])
         

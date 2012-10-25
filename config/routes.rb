@@ -277,8 +277,6 @@ ActionController::Routing::Routes.draw do |map|
       association.resources :rubric_assessments, :as => 'assessments'
     end
     course.user_outcomes_results 'outcomes/users/:user_id', :controller => 'outcomes', :action => 'user_outcome_results'
-    course.outcomes_for_asset "outcomes/assets/:asset_string", :controller => 'outcomes', :action => 'outcomes_for_asset', :conditions => {:method => :get}
-    course.update_outcomes_for_asset "outcomes/assets/:asset_string", :controller => 'outcomes', :action => 'update_outcomes_for_asset', :conditions => {:method => :post}
     course.resources :outcomes, :collection => {:list => :get, :add_outcome => :post} do |outcome|
       outcome.reorder_alignments 'alignments/reorder', :controller => 'outcomes', :action => 'reorder_alignments', :conditions => {:method => :post}
       outcome.alignment_redirect 'alignments/:id', :controller => 'outcomes', :action => 'alignment_redirect', :conditions => {:method => :get}
@@ -979,6 +977,36 @@ ActionController::Routing::Routes.draw do |map|
       quizzes.get "courses/:course_id/quizzes", :action => :index, :path_name => 'course_quizzes'
     end
 
+    api.with_options(:controller => :outcome_groups_api) do |outcome_groups|
+      def og_routes(route_object, context)
+        prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
+        route_object.get "#{prefix}/root_outcome_group", :action => :redirect, :path_name => "#{context}_redirect"
+        route_object.get "#{prefix}/outcome_groups/account_chain", :action => :account_chain, :path_name => "#{context}_account_chain"
+        route_object.get "#{prefix}/outcome_groups/:id", :action => :show, :path_name => "#{context}_outcome_group"
+        route_object.put "#{prefix}/outcome_groups/:id", :action => :update
+        route_object.delete "#{prefix}/outcome_groups/:id", :action => :destroy
+        route_object.get "#{prefix}/outcome_groups/:id/outcomes", :action => :outcomes, :path_name => "#{context}_outcome_group_outcomes"
+        route_object.get "#{prefix}/outcome_groups/:id/available_outcomes", :action => :available_outcomes, :path_name => "#{context}_outcome_group_available_outcomes"
+        route_object.post "#{prefix}/outcome_groups/:id/outcomes", :action => :link
+        route_object.put "#{prefix}/outcome_groups/:id/outcomes/:outcome_id", :action => :link, :path_name => "#{context}_outcome_link"
+        route_object.delete "#{prefix}/outcome_groups/:id/outcomes/:outcome_id", :action => :unlink
+        route_object.get "#{prefix}/outcome_groups/:id/subgroups", :action => :subgroups, :path_name => "#{context}_outcome_group_subgroups"
+        route_object.post "#{prefix}/outcome_groups/:id/subgroups", :action => :create
+        route_object.post "#{prefix}/outcome_groups/:id/import", :action => :import, :path_name => "#{context}_outcome_group_import"
+        route_object.post "#{prefix}/outcome_groups/:id/batch", :action => :batch, :path_name => "#{context}_outcome_group_batch"
+      end
+
+      og_routes(outcome_groups, 'global')
+      og_routes(outcome_groups, 'account')
+      og_routes(outcome_groups, 'course')
+    end
+
+    api.with_options(:controller => :outcomes_api) do |outcomes|
+      outcomes.get "outcomes/:id", :action => :show, :path_name => "outcome"
+      outcomes.put "outcomes/:id", :action => :update
+      outcomes.delete "outcomes/:id", :action => :destroy
+    end
+
     api.with_options(:controller => :media_objects) do |media_objects|
       media_objects.get 'media_objects/:media_object_id', :action => :show, :path_name => 'media_object'
     end
@@ -1029,7 +1057,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :rubrics do |rubric|
     rubric.resources :rubric_assessments, :as => 'assessments'
   end
-  map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
 
   # commenting out all collection urls until collections are live

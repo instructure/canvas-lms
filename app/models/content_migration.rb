@@ -54,6 +54,7 @@ class ContentMigration < ActiveRecord::Base
           'wikis' => false
   }
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options
+  attr_accessor :outcome_to_id_map
 
   workflow do
     state :created
@@ -109,7 +110,19 @@ class ContentMigration < ActiveRecord::Base
       end
     end
   end
-
+  
+  def import_immediately?
+    !!migration_settings[:import_immediately]
+  end
+  
+  def converter_class=(c_class)
+    migration_settings[:converter_class] = c_class
+  end
+  
+  def converter_class
+    migration_settings[:converter_class]
+  end
+  
   def migration_ids_to_import=(val)
     migration_settings[:migration_ids_to_import] = val
   end
@@ -215,7 +228,7 @@ class ContentMigration < ActiveRecord::Base
     if !migration_settings[:id_prepender] && !migration_settings[:overwrite_questions]
       # only prepend an id if the course already has some migrated questions/quizzes
       if self.context.assessment_questions.scoped(:conditions => 'assessment_questions.migration_id IS NOT NULL').any? ||
-         self.context.quizzes.scoped(:conditions => 'quizzes.migration_id IS NOT NULL').any?
+         (self.context.respond_to?(:quizzes) && self.context.quizzes.scoped(:conditions => 'quizzes.migration_id IS NOT NULL').any?)
         migration_settings[:id_prepender] = self.id
       end
     end

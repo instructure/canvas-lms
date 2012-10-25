@@ -31,30 +31,10 @@
   </ul>
 <% end %>
 
-<% if @source_course.learning_outcomes.active.length > 0 %>
+<% if @source_course.created_learning_outcomes.active.length > 0 %>
   <h3><%= check_box :copy, :all_learning_outcomes, :class => "copy_all", :checked => true %><%= label :copy, :all_learning_outcomes, image_tag('flagged_question_dim.png') + " " + t('labels.learning_outcomes', "Learning Outcomes for %{course}", :course => @source_course.name) %></h3>
   <ul class="unstyled_list root_asset_list">
-    <% root = LearningOutcomeGroup.default_for(@source_course) %>
-    <% root.sorted_content.each do |item| %>
-      <% if item.is_a? LearningOutcome %>
-        <li>
-          <%= check_box "copy[learning_outcomes]", mig_id(item) %>
-          <%= label "copy[learning_outcomes]", mig_id(item), item.short_description %>
-        </li>
-      <% else %>
-        <h4><%= check_box "copy[learning_outcome_groups]", mig_id(item), :class => "copy_all" %><%= label "copy[learning_outcome_groups]", mig_id(item), item.title %></h4>
-        <ul class="unstyled_list asset_list">
-          <% item.sorted_content.each do |sub| %>
-              <% if sub.is_a? LearningOutcome %>
-                <li>
-                  <%= check_box "copy[learning_outcomes]", mig_id(sub) %>
-                  <%= label "copy[learning_outcomes]", mig_id(sub), sub.short_description %>
-                </li>
-              <% end %>
-          <% end %>
-        </ul>
-      <% end %>
-    <% end %>
+    <%= render :partial => 'outcome_group_item_selection', :locals => {:group => @source_course.root_outcome_group}  %>
   </ul>
 <% end %>
 

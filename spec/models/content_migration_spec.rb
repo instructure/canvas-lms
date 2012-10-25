@@ -65,11 +65,11 @@ describe ContentMigration do
     def run_course_copy(warnings=[])
       @cm.copy_course_without_send_later
       @cm.reload
-      @cm.warnings.should == warnings
       if @cm.migration_settings[:last_error]
         er = ErrorReport.last
         "#{er.message} - #{er.backtrace}".should == ""
       end
+      @cm.warnings.should == warnings
       @cm.workflow_state.should == 'imported'
       @copy_to.reload
     end
@@ -275,47 +275,47 @@ describe ContentMigration do
       rub2.data = data
       rub2.save!
       rub2.associate_with(@copy_from, @copy_from)
-      default = LearningOutcomeGroup.default_for(@copy_from)
+      default = @copy_from.root_outcome_group
       log = @copy_from.learning_outcome_groups.new
       log.context = @copy_from
       log.title = "outcome group"
       log.description = "<p>Groupage</p>"
       log.save!
-      default.add_item(log)
+      default.adopt_outcome_group(log)
       log2 = @copy_from.learning_outcome_groups.new
       log2.context = @copy_from
       log2.title = "empty group"
       log2.description = "<p>Groupage</p>"
       log2.save!
-      default.add_item(log2)
+      default.adopt_outcome_group(log2)
       log3 = @copy_from.learning_outcome_groups.new
       log3.context = @copy_from
       log3.title = "empty group"
       log3.description = "<p>Groupage</p>"
       log3.save!
-      default.add_item(log3)
-      lo = @copy_from.learning_outcomes.new
+      default.adopt_outcome_group(log3)
+      lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
       lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo.save!
-      lo2 = @copy_from.learning_outcomes.new
+      lo2 = @copy_from.created_learning_outcomes.new
       lo2.context = @copy_from
       lo2.short_description = "outcome2"
       lo2.workflow_state = 'active'
       lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo2.save!
-      lo3 = @copy_from.learning_outcomes.new
+      lo3 = @copy_from.created_learning_outcomes.new
       lo3.context = @copy_from
       lo3.short_description = "outcome3"
       lo3.workflow_state = 'active'
       lo3.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo3.save!
 
-      default.add_item(lo)
-      log.add_item(lo2)
-      default.add_item(lo3)
+      default.add_outcome(lo)
+      log.add_outcome(lo2)
+      default.add_outcome(lo3)
 
       # only select one of each type
       @cm.copy_options = {
@@ -325,7 +325,7 @@ describe ContentMigration do
               :wiki_pages => {mig_id(wiki) => "1", mig_id(wiki2) => "0"},
               :rubrics => {mig_id(rub1) => "1", mig_id(rub2) => "0"},
               :learning_outcomes => {mig_id(lo) => "1", mig_id(lo2) => "1", mig_id(lo3) => "0"},
-              :learning_outcome_groups => {mig_id(log) => "0", mig_id(log2) => "1", mig_id(log3) => "0"},
+              :learning_outcome_groups => {mig_id(log) => "1", mig_id(log2) => "1", mig_id(log3) => "0"},
       }
       @cm.save!
 
@@ -347,9 +347,9 @@ describe ContentMigration do
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).should_not be_nil
       @copy_to.rubrics.find_by_migration_id(mig_id(rub2)).should be_nil
 
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo2)).should_not be_nil
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo3)).should be_nil
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo2)).should_not be_nil
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo3)).should be_nil
 
       @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
       @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log2)).should_not be_nil
@@ -373,14 +373,14 @@ describe ContentMigration do
       rub1.data = data
       rub1.save!
       rub1.associate_with(@copy_from, @copy_from)
-      default = LearningOutcomeGroup.default_for(@copy_from)
-      lo = @copy_from.learning_outcomes.new
+      default = @copy_from.root_outcome_group
+      lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
       lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo.save!
-      default.add_item(lo)
+      default.add_outcome(lo)
       gs = @copy_from.grading_standards.new
       gs.title = "Standard eh"
       gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
@@ -393,7 +393,7 @@ describe ContentMigration do
       @copy_to.attachments.find_by_migration_id(mig_id(att)).destroy
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).destroy
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).destroy
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).destroy
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).destroy
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).destroy if Qti.qti_enabled?
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).destroy
       @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).destroy
@@ -413,7 +413,7 @@ describe ContentMigration do
       @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).workflow_state.should == 'active'
-      @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'
       @copy_to.assignment_groups.find_by_migration_id(mig_id(ag)).workflow_state.should == 'available'
@@ -421,60 +421,174 @@ describe ContentMigration do
       @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).workflow_state.should == 'active'
       @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).workflow_state.should == 'active'
     end
+    
+    def create_outcome(context, group=nil)
+      lo = LearningOutcome.new
+      lo.context = context
+      lo.short_description = "haha_#{rand(10_000)}"
+      lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}], :description=>"First outcome", :points_possible=>5}} 
+      lo.save!
+      if group
+        group.add_outcome(lo)
+      elsif context
+        context.root_outcome_group.add_outcome(lo)
+      end
+      
+      lo
+    end
 
     it "should copy learning outcomes into the new course" do
-      lo = @copy_from.learning_outcomes.new
-      lo.context = @copy_from
-      lo.short_description = "Lone outcome"
-      lo.description = "<p>Descriptions are boring</p>"
-      lo.workflow_state = 'active'
-      lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
-      lo.save!
+      old_root = @copy_from.root_outcome_group
+      
+      lo = create_outcome(@copy_from, old_root)
 
-      old_root = LearningOutcomeGroup.default_for(@copy_from)
-      old_root.add_item(lo)
+      log = @copy_from.learning_outcome_groups.new
+      log.context = @copy_from
+      log.title = "An outcome group"
+      log.description = "<p>Groupage</p>"
+      log.save!
+      old_root.adopt_outcome_group(log)
 
-      lo_g = @copy_from.learning_outcome_groups.new
-      lo_g.context = @copy_from
-      lo_g.title = "Lone outcome group"
-      lo_g.description = "<p>Groupage</p>"
-      lo_g.save!
-      old_root.add_item(lo_g)
-
-      lo2 = @copy_from.learning_outcomes.new
-      lo2.context = @copy_from
-      lo2.short_description = "outcome in group"
-      lo2.workflow_state = 'active'
-      lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
-      lo2.save!
-      lo_g.add_item(lo2)
-      old_root.reload
+      lo2 = create_outcome(@copy_from, log)
+      
+      log_sub = @copy_from.learning_outcome_groups.new
+      log_sub.context = @copy_from
+      log_sub.title = "Sub group"
+      log_sub.description = "<p>SubGroupage</p>"
+      log_sub.save!
+      log.adopt_outcome_group(log_sub)
+      
+      log_sub2 = @copy_from.learning_outcome_groups.new
+      log_sub2.context = @copy_from
+      log_sub2.title = "Sub group2"
+      log_sub2.description = "<p>SubGroupage2</p>"
+      log_sub2.save!
+      log_sub.adopt_outcome_group(log_sub2)
+      
+      lo3 = create_outcome(@copy_from, log_sub2)
 
       # copy outcomes into new course
-      new_root = LearningOutcomeGroup.default_for(@copy_to)
+      new_root = @copy_to.root_outcome_group
 
       run_course_copy
 
-      @copy_to.learning_outcomes.count.should == @copy_from.learning_outcomes.count
+      @copy_to.created_learning_outcomes.count.should == @copy_from.created_learning_outcomes.count
       @copy_to.learning_outcome_groups.count.should == @copy_from.learning_outcome_groups.count
-      new_root.sorted_content.count.should == old_root.sorted_content.count
+      new_root.child_outcome_links.count.should == old_root.child_outcome_links.count
+      new_root.child_outcome_groups.count.should == old_root.child_outcome_groups.count
 
-      lo_2 = new_root.sorted_content.first
-      lo_2.short_description.should == lo.short_description
-      lo_2.description.should == lo.description
-      lo_2.data.should == lo.data
+      lo_new = new_root.child_outcome_links.first.content
+      lo_new.short_description.should == lo.short_description
+      lo_new.description.should == lo.description
+      lo_new.data.should == lo.data
 
-      lo_g_2 = new_root.sorted_content.last
-      lo_g_2.title.should == lo_g.title
-      lo_g_2.description.should == lo_g.description
-      lo_g_2.sorted_content.length.should == 1
-      lo_g_2.root_learning_outcome_group_id.should == new_root.id
-      lo_g_2.learning_outcome_group_id.should == new_root.id
+      log_new = new_root.child_outcome_groups.first
+      log_new.title.should == log.title
+      log_new.description.should == log.description
+      log_new.child_outcome_links.length.should == 1
 
-      lo_2 = lo_g_2.sorted_content.first
-      lo_2.short_description.should == lo2.short_description
-      lo_2.description.should == lo2.description
-      lo_2.data.should == lo2.data
+      lo_new = log_new.child_outcome_links.first.content
+      lo_new.short_description.should == lo2.short_description
+      lo_new.description.should == lo2.description
+      lo_new.data.should == lo2.data
+      
+      log_sub_new = log_new.child_outcome_groups.first
+      log_sub_new.title.should == log_sub.title
+      log_sub_new.description.should == log_sub.description
+      
+      log_sub2_new = log_sub_new.child_outcome_groups.first
+      log_sub2_new.title.should == log_sub2.title
+      log_sub2_new.description.should == log_sub2.description
+      
+      lo3_new = log_sub2_new.child_outcome_links.first.content
+      lo3_new.short_description.should == lo3.short_description
+      lo3_new.description.should == lo3.description
+      lo3_new.data.should == lo3.data
+    end
+    
+    it "should relink to external outcomes" do
+      account = @copy_from.account
+      a_group = account.root_outcome_group
+      
+      root_group = LearningOutcomeGroup.create!(:title => "contextless group")
+      
+      lo = create_outcome(nil, root_group)
+      
+      lo2 = create_outcome(account, a_group)
+      
+      from_root = @copy_from.root_outcome_group
+      from_root.add_outcome(lo)
+      from_root.add_outcome(lo2)
+      
+      run_course_copy
+      
+      to_root = @copy_to.root_outcome_group
+      to_root.child_outcome_links.count.should == 2
+      to_root.child_outcome_links.find_by_content_id(lo.id).should_not be_nil
+      to_root.child_outcome_links.find_by_content_id(lo2.id).should_not be_nil
+    end
+    
+    it "should create outcomes in new course if external context not found" do 
+      hash = {"is_global_outcome"=>true,
+               "points_possible"=>nil,
+               "type"=>"learning_outcome",
+               "ratings"=>[],
+               "description"=>nil,
+               "mastery_points"=>nil,
+               "external_identifier"=>"0",
+               "title"=>"root outcome",
+               "migration_id"=>"id1072dcf40e801c6468d9eaa5774e56d"}
+      
+      @cm.outcome_to_id_map = {}
+      LearningOutcome.import_from_migration(hash, @cm)
+      
+      @cm.warnings.should == ["The external Learning Outcome couldn't be found for \"root outcome\", creating a copy."]
+      
+      to_root = @copy_to.root_outcome_group
+      to_root.child_outcome_links.count.should == 1
+      new_lo = to_root.child_outcome_links.first.content
+      new_lo.id.should_not == 0
+      new_lo.short_description.should == hash["title"]
+    end
+    
+    it "should link rubric to outcomes" do 
+      root_group = LearningOutcomeGroup.create!(:title => "contextless group")
+      
+      lo = create_outcome(nil, root_group)
+      lo2 = create_outcome(@copy_from)
+      
+      from_root = @copy_from.root_outcome_group
+      from_root.add_outcome(lo)
+      from_root.add_outcome(lo2)
+      
+      rub = Rubric.new(:context => @copy_from)
+      rub.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}],
+          :learning_outcome_id => lo.id
+        },
+        {
+          :points => 3,
+          :description => "Outcome row 2",
+          :id => 2,
+          :ratings => [{:points => 3,:description => "lame'",:criterion_id => 2,:id => 3}],
+          :learning_outcome_id => lo2.id
+        }
+      ]
+      rub.instance_variable_set('@outcomes_changed', true)
+      rub.save!
+      rub.associate_with(@copy_from, @copy_from)
+      
+      run_course_copy
+      
+      new_lo2 = @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo2))
+      to_rub = @copy_to.rubrics.first
+      
+      to_rub.data[1]["learning_outcome_id"].should == new_lo2.id
+      to_rub.data[0]["learning_outcome_id"].should == lo.id
     end
 
     it "should copy a quiz when assignment is selected" do

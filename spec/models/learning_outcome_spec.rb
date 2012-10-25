@@ -22,7 +22,7 @@ describe LearningOutcome do
   context "outcomes" do
     it "should allow learning outcome rows in the rubric" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -46,16 +46,17 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.first.learning_outcome_id.should eql(@outcome.id)
+      @rubric.reload
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
     end
     
-    it "should delete learning outcome tags when they no longer exist" do
+    it "should delete learning outcome alignments when they no longer exist" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -79,11 +80,12 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.first.learning_outcome_id.should eql(@outcome.id)
+      @rubric.reload
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @rubric.data = [{
         :points => 5,
         :description => "Row",
@@ -104,13 +106,14 @@ describe LearningOutcome do
         ]
       }]
       @rubric.save!
-      @rubric.learning_outcome_tags.active.should be_empty
+      @rubric.reload
+      @rubric.learning_outcome_alignments.active.should be_empty
     end
     
     it "should create learning outcome associations for multiple outcome rows" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
-      @outcome2 = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      @outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -154,16 +157,17 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome2.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
+      @rubric.reload
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
     end
     
     it "should create outcome results when outcome-aligned rubrics are assessed" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -187,17 +191,18 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
+      @rubric.reload
       @rubric.should_not be_new_record
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.first.learning_outcome_id.should eql(@outcome.id)
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
-      @assignment.learning_outcome_tags.should_not be_empty
-      @assignment.learning_outcome_tags.count.should eql(1)
+      @assignment.learning_outcome_alignments.count.should eql(1)
+      @assignment.rubric_association.should_not be_nil
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @assessment = @a.assess({
         :user => @user,
@@ -218,7 +223,7 @@ describe LearningOutcome do
       @result.possible.should eql(3.0)
       @result.original_score.should eql(2.0)
       @result.original_possible.should eql(3.0)
-      @result.mastery.should eql(nil)
+      @result.mastery.should eql(false)
       @result.versions.length.should eql(1)
       n = @result.version_number
       @assessment = @a.assess({
@@ -244,11 +249,11 @@ describe LearningOutcome do
     
     it "should override non-rubric-based alignments with rubric-based alignments for the same assignment" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
-      @tag = @outcome.align(@assignment, @course, :mastery_type => "points")
-      @tag.should_not be_nil
-      @tag.content.should eql(@assignment)
-      @tag.context.should eql(@course)
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      @alignment = @outcome.align(@assignment, @course, :mastery_type => "points")
+      @alignment.should_not be_nil
+      @alignment.content.should eql(@assignment)
+      @alignment.context.should eql(@course)
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -272,21 +277,22 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
+      @rubric.reload
       @rubric.should_not be_new_record
       
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.first.learning_outcome_id.should eql(@outcome.id)
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
-      @assignment.learning_outcome_tags.count.should eql(1)
-      @assignment.learning_outcome_tags.first.should eql(@tag)
-      @assignment.learning_outcome_tags.first.rubric_association_id.should eql(@a.id)
-      @tag.reload
-      @tag.rubric_association_id.should eql(@a.id)
+      @assignment.learning_outcome_alignments.count.should eql(1)
+      @assignment.learning_outcome_alignments.first.should eql(@alignment)
+      @assignment.learning_outcome_alignments.first.should have_rubric_association
+      @alignment.reload
+      @alignment.should have_rubric_association
 
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @outcome.learning_outcome_results.should be_empty
@@ -312,12 +318,12 @@ describe LearningOutcome do
       @result.possible.should eql(3.0)
       @result.original_score.should eql(2.0)
       @result.original_possible.should eql(3.0)
-      @result.mastery.should eql(nil)
+      @result.mastery.should eql(false)
       n = @result.version_number
     end
     it "should not override rubric-based alignments with non-rubric-based alignments for the same assignment" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -341,19 +347,21 @@ describe LearningOutcome do
           :learning_outcome_id => @outcome.id
         }
       ]
-      @rubric.instance_variable_set('@outcomes_changed', true)
+      @rubric.instance_variable_set('@alignments_changed', true)
       @rubric.save!
+      @rubric.reload
       @rubric.should_not be_new_record
       
-      @rubric.learning_outcome_tags.should_not be_empty
-      @rubric.learning_outcome_tags.first.learning_outcome_id.should eql(@outcome.id)
+      @rubric.learning_outcome_alignments.should_not be_empty
+      @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
-      @assignment.learning_outcome_tags.count.should eql(1)
-      @tags = ContentTag.learning_outcome_tags_for(@assignment)
-      @tags.length.should eql(1)
-      @tags[0].rubric_association_id.should eql(@a.id)
+      @assignment.reload
+      @assignment.learning_outcome_alignments.count.should eql(1)
+      @alignment = @assignment.learning_outcome_alignments.first
+      @alignment.learning_outcome.should_not be_deleted
+      @alignment.should have_rubric_association
       @assignment.reload
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @assessment = @a.assess({
@@ -377,24 +385,26 @@ describe LearningOutcome do
       @result.possible.should eql(3.0)
       @result.original_score.should eql(2.0)
       @result.original_possible.should eql(3.0)
-      @result.mastery.should eql(nil)
+      @result.mastery.should eql(false)
       n = @result.version_number
     end
     it "should build an outcome result for a non-rubric alignment" do
       assignment_model
-      @outcome = @course.learning_outcomes.create!
-      @tag = @outcome.align(@assignment, @course, :mastery_type => "points")
-      @tag.should_not be_nil
-      @tag.content.should eql(@assignment)
-      @tag.context.should eql(@course)
+      @assignment.mastery_score = 2
+      @assignment.save!
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      @alignment = @outcome.align(@assignment, @course, :mastery_type => "points")
+      @alignment.should_not be_nil
+      @alignment.content.should eql(@assignment)
+      @alignment.context.should eql(@course)
 
       @user = user(:active_all => true)
       @e = @course.enroll_student(@user)
-      @tag.rubric_association_id.should eql(nil)
+      @alignment.rubric_association_id.should eql(nil)
       @assignment.reload
-      @assignment.learning_outcome_tags.should_not be_empty
-      @assignment.learning_outcome_tags.length.should eql(1)
-      @assignment.learning_outcome_tags.map(&:learning_outcome_id).uniq.should eql([@outcome.id])
+      @assignment.learning_outcome_alignments.should_not be_empty
+      @assignment.learning_outcome_alignments.length.should eql(1)
+      @assignment.learning_outcome_alignments.map(&:learning_outcome_id).uniq.should eql([@outcome.id])
       
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @outcome.learning_outcome_results.should_not be_empty

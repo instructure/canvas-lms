@@ -68,7 +68,7 @@ define([
           if (disabled) {
             $spinHolder.css('display', previousSpinHolderDisplay).spin(false); // stop spinner
             $disabledArea.css('opacity', function(){
-              return $(this).data(dataKey+'opacityBefore');
+              return $(this).data(dataKey+'opacityBefore') || 1;
             });
             $inputsToDisable.prop('disabled', false);
             $.each(opts.buttons, function(selector, text) {

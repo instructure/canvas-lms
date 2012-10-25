@@ -68,19 +68,19 @@ describe "Common Cartridge exporting" do
       @et2 = @course.context_external_tools.create!(:name => "new tool2", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com')
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
-      @log = LearningOutcomeGroup.default_for(@course)
-      @lo = @course.learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
+      @log = @course.root_outcome_group
+      @lo = @course.created_learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
       @lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
       @lo.save
-      @lo2 = @course.learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
+      @lo2 = @course.created_learning_outcomes.create!(:description => "outcome 2", :short_description => "for testing 2", :context => @course)
       @lo2.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
       @lo2.save
       @log2 = @course.learning_outcome_groups.create!(:title => 'groupage', :context => @course)
-      @log2.add_item(@lo)
-      @log2.add_item(@lo2)
+      @log2.add_outcome(@lo)
+      @log2.add_outcome(@lo2)
       @log3 = @course.learning_outcome_groups.create!(:title => 'groupage2', :context => @course)
-      @log.add_item(@log2)
-      @log.add_item(@log3)
+      @log.adopt_outcome_group(@log2)
+      @log.adopt_outcome_group(@log3)
       @ag = @course.assignment_groups.create!(:name => 'group1')
       @ag2 = @course.assignment_groups.create!(:name => 'group2')
       @asmnt = @course.assignments.create!(:title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag)

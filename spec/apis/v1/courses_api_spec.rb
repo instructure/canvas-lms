@@ -1045,7 +1045,7 @@ end
 def each_copy_option
   [[:assignments, :assignments], [:external_tools, :context_external_tools], [:files, :attachments], 
    [:topics, :discussion_topics], [:calendar_events, :calendar_events], [:quizzes, :quizzes], 
-   [:modules, :context_modules], [:outcomes, :learning_outcomes]].each{|o| yield o}
+   [:modules, :context_modules], [:outcomes, :created_learning_outcomes]].each{|o| yield o}
 end
 
 describe ContentImportsController, :type => :integration do
@@ -1065,7 +1065,7 @@ describe ContentImportsController, :type => :integration do
     @copy_from.calendar_events.create!(:title => 'event', :description => 'hi', :start_at => 1.day.from_now)
     @copy_from.context_modules.create!(:name => "a module")
     @copy_from.quizzes.create!(:title => 'quiz')
-    LearningOutcomeGroup.default_for(@copy_from).add_item(@copy_from.learning_outcomes.create!(:short_description => 'oi', :context => @copy_from))
+    @copy_from.root_outcome_group.add_outcome(@copy_from.created_learning_outcomes.create!(:short_description => 'oi', :context => @copy_from))
     @copy_from.save!
     
     course_with_teacher(:active_all => true, :name => 'whatever', :user => @user)

@@ -22,92 +22,34 @@ describe LearningOutcomeGroup do
   
   before do
     course
-    @root = LearningOutcomeGroup.default_for(@course)
+    @root = @course.root_outcome_group
   end
   
   it "should not create multiple default groups" do
-    group = LearningOutcomeGroup.default_for(@course)
+    group = @course.root_outcome_group
     group.should == @root
   end
   
   it "should not add itself as a child" do
-    @root.content_tags.count.should == 0
-    @root.add_item(LearningOutcomeGroup.find(@root.id))
-    @root.content_tags.count.should == 0
+    @root.child_outcome_groups.count.should == 0
+    @root.adopt_outcome_group(LearningOutcomeGroup.find(@root.id))
+    @root.child_outcome_groups.count.should == 0
   end
   
-  it "should not let add_item cause disgusting ancestral relations" do
+  it "should not let adopt_outcome_group cause disgusting ancestral relations" do
     group = @course.learning_outcome_groups.create!(:title => 'groupage')
     group2 = @course.learning_outcome_groups.create!(:title => 'groupage2')
-    @root.add_item(group)
-    @root.add_item(group2)
+    @root.adopt_outcome_group(group)
+    @root.adopt_outcome_group(group2)
     
-    group.add_item(group2)
-    group.content_tags.count.should == 1
-    @root.content_tags.count.should == 1
+    group.adopt_outcome_group(group2)
+    group.child_outcome_groups.count.should == 1
+    @root.child_outcome_groups.count.should == 1
 
     # shouldn't work because group is already group2's parent
-    group2.add_item(group)
-    group2.content_tags.count.should == 0
-    group.content_tags.count.should == 1
-    @root.content_tags.count.should == 1
+    group2.adopt_outcome_group(group)
+    group2.child_outcome_groups.count.should == 0
+    group.child_outcome_groups.count.should == 1
+    @root.child_outcome_groups.count.should == 1
   end
-  
-  it "should not let reorder_content cause disgusting ancestral relations" do
-    group = @course.learning_outcome_groups.create!(:title => 'groupage')
-    group2 = @course.learning_outcome_groups.create!(:title => 'groupage2')
-    @root.add_item(group)
-    @root.add_item(group2)
-    @root.content_tags.count.should == 2
-    
-    # this is trying to rearrange itself into itself
-    group.reorder_content({"learning_outcome_group_#{group.id}"=>"0"})
-    group.reload
-    group.content_tags.count.should == 0
-
-    # this is okay
-    group.reorder_content({"learning_outcome_group_#{group2.id}"=>"0"})
-    group.reload
-    group.content_tags.count.should == 1
-
-    # this should not work because group is an ancestor of group2
-    group2.reorder_content({"learning_outcome_group_#{group.id}"=>"0"})
-    group2.reload
-    group2.content_tags.count.should == 0
-    group.content_tags.count.should == 1
-  end
-  
-  it "should return valid sorted content even if disgusting ancestral relations exist" do
-    group = @course.learning_outcome_groups.create!(:title => 'groupage')
-    group2 = @course.learning_outcome_groups.create!(:title => 'groupage2')
-    group3 = @course.learning_outcome_groups.create!(:title => 'groupage3')
-    @root.add_item(group)
-    @root.add_item(group2)
-    group2.add_item(group3)
-
-    add_group_to_group(group, group, 1)
-    add_group_to_group(group2, group, 2)
-    add_group_to_group(group, group2, 2)
-    add_group_to_group(group2, group2, 3)
-    add_group_to_group(group, group3, 1)
-    
-    @root.sorted_content.map(&:id).should == [group.id, group2.id]
-    group.sorted_content.map(&:id).should == []
-    group2.sorted_content.map(&:id).should == [group3.id, group.id]
-    group3.sorted_content.map(&:id).should == []
-  end
-  
-  
-  # used to emulate bad group relations previously created by LearningOutcomeGroup#reorder_content
-  # groups could be their own parent/ancestor which isn't possible anymore.
-  def add_group_to_group(child, parent, position)
-    tag = ContentTag.create(:context => parent.context)
-    tag.content = child
-    tag.associated_asset = parent
-    tag.title = child.title
-    tag.tag_type = 'learning_outcome_association'
-    tag.position = position
-    tag.save!
-  end
-  
 end

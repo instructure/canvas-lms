@@ -508,9 +508,9 @@ Spec::Runner.configure do |config|
   end
 
   def outcome_with_rubric(opts={})
-    @outcome_group ||= LearningOutcomeGroup.default_for(@course)
+    @outcome_group ||= @course.root_outcome_group
     @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
-    @outcome_group.add_item(@outcome)
+    @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
     @rubric = Rubric.generate(:context => @course,
@@ -556,9 +556,9 @@ Spec::Runner.configure do |config|
                                       }
                                   }
                               })
-    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.instance_variable_set('@alignments_changed', true)
     @rubric.save!
-    @rubric.update_outcome_tags
+    @rubric.update_alignments
   end
 
   def grading_standard_for(context)
