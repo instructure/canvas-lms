@@ -139,6 +139,30 @@ describe ImportedHtmlConverter do
       
       ImportedHtmlConverter.convert(test_string, @course).should == %{<p><a href="/media_objects/0_l4l5n0wt" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
     end
+
+    it "should only convert url params" do
+      test_string = <<-HTML
+<object>
+<param name="controls" value="CONSOLE" />
+<param name="controller" value="true" />
+<param name="autostart" value="false" />
+<param name="loop" value="false" />
+<param name="src" value="%24IMS_CC_FILEBASE%24/test.mp3" />
+<EMBED name="tag"  src="%24IMS_CC_FILEBASE%24/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE" >
+</EMBED>
+</object>
+      HTML
+
+      ImportedHtmlConverter.convert(test_string, @course).should == <<-HTML.strip
+<object>
+<param name="controls" value="CONSOLE">
+<param name="controller" value="true">
+<param name="autostart" value="false">
+<param name="loop" value="false">
+<param name="src" value="/courses/#{@course.id}/file_contents/course%20files/test.mp3">
+<embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></embed></object>
+    HTML
+    end
     
   end
   
