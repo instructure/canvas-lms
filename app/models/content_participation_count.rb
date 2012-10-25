@@ -58,35 +58,11 @@ class ContentParticipationCount < ActiveRecord::Base
   def self.unread_count_for(type, context, user)
     return 0 unless user.present? && context.present?
     case type
-    when "DiscussionTopic"
-      self.unread_discussion_topic_count_for(context, user)
-    when "Announcement"
-      self.unread_announcement_count_for(context, user)
     when "Submission"
       self.unread_submission_count_for(context, user)
     else
       0
     end
-  end
-
-  def self.unread_discussion_topic_count_for(context, user)
-    unread_count = 0
-    if context.respond_to?(:active_discussion_topics)
-      unread_count = context.active_discussion_topics.only_discussion_topics.
-        reject{ |dt| dt.read?(user) || dt.locked_for?(user, :check_policies => true) }.
-        count
-    end
-    unread_count
-  end
-
-  def self.unread_announcement_count_for(context, user)
-    unread_count = 0
-    if context.respond_to?(:active_announcements)
-      unread_count = context.active_announcements.
-        reject{ |dt| dt.read?(user) || dt.locked_for?(user, :check_policies => true) }.
-        count
-    end
-    unread_count
   end
 
   def self.unread_submission_count_for(context, user, enrollment = nil)

@@ -23,20 +23,18 @@ describe ContentParticipationCount do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
 
-    @course.discussion_topics.create!(:user => @teacher, :title => "hi", :message => "a")
-    @course.announcements.create!(:user => @teacher, :title => "to read", :message => "a")
-
-    @group_category = @course.group_categories.create!(:name => "course groups")
-    @group = @group_category.groups.create!(:context => @course, :name => "course groups 1")
-    @group.add_user(@student, 'accepted')
-
-    @group.discussion_topics.create!(:user => @teacher, :title => "hi", :message => "a")
-    @group.announcements.create!(:user => @teacher, :title => "to read", :message => "a")
+    @assignment = @course.assignments.new(:title => "some assignment")
+    @assignment.workflow_state = "published"
+    @assignment.save
   end
 
   describe "create_or_update" do
+    before do
+      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+    end
+
     it "should count current unread objects correctly" do
-      ["DiscussionTopic", "Announcement"].each do |type|
+      ["Submission"].each do |type|
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
         cpc.expects(:refresh_unread_count).never
         cpc.unread_count.should == 0
@@ -44,20 +42,12 @@ describe ContentParticipationCount do
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => type)
         cpc.expects(:refresh_unread_count).never
         cpc.unread_count.should == 1
-
-        cpc = ContentParticipationCount.create_or_update(:context => @group, :user => @teacher, :content_type => type)
-        cpc.expects(:refresh_unread_count).never
-        cpc.unread_count.should == 0
-
-        cpc = ContentParticipationCount.create_or_update(:context => @group, :user => @student, :content_type => type)
-        cpc.expects(:refresh_unread_count).never
-        cpc.unread_count.should == 1
       end
     end
 
     it "should update if the object already exists" do
-      cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Announcement")
-      ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Announcement", :offset => -1)
+      cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
+      ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission", :offset => -1)
       cpc.reload
       cpc.expects(:refresh_unread_count).never
       cpc.unread_count.should == 0
@@ -65,25 +55,27 @@ describe ContentParticipationCount do
 
     it "should not save if not changed" do
       time = Time.now.utc - 1.day
-      cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Announcement")
+      cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       ContentParticipationCount.update_all({:updated_at => time}, {:id => cpc.id})
-      ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Announcement")
+      ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       cpc.reload.updated_at.to_i.should == time.to_i
     end
   end
 
   describe "unread_count_for" do
+    before do
+      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+    end
+
     it "should find the unread count for different types" do
-      ["DiscussionTopic", "Announcement"].each do |type|
+      ["Submission"].each do |type|
         ContentParticipationCount.unread_count_for(type, @course, @teacher).should == 0
         ContentParticipationCount.unread_count_for(type, @course, @student).should == 1
-        ContentParticipationCount.unread_count_for(type, @group, @teacher).should == 0
-        ContentParticipationCount.unread_count_for(type, @group, @student).should == 1
       end
     end
 
     it "should handle invalid contexts" do
-      ["DiscussionTopic", "Announcement"].each do |type|
+      ["Submission"].each do |type|
         ContentParticipationCount.unread_count_for(type, Account.default, @student).should == 0
       end
     end
@@ -93,7 +85,7 @@ describe ContentParticipationCount do
     end
 
     it "should handle missing contexts or users" do
-      ["DiscussionTopic", "Announcement"].each do |type|
+      ["Submission"].each do |type|
         ContentParticipationCount.unread_count_for(type, nil, @student).should == 0
         ContentParticipationCount.unread_count_for(type, @course, nil).should == 0
       end
@@ -102,7 +94,7 @@ describe ContentParticipationCount do
 
   describe "unread_count" do
     it "should not refresh if just created" do
-      ["DiscussionTopic", "Announcement"].each do |type|
+      ["Submission"].each do |type|
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
         cpc.expects(:refresh_unread_count).never
         cpc.unread_count.should == 0
@@ -110,7 +102,7 @@ describe ContentParticipationCount do
     end
 
     it "should refresh if data could be stale" do
-      ["DiscussionTopic", "Announcement"].each do |type|
+      ["Submission"].each do |type|
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
         cpc.expects(:refresh_unread_count).never
         cpc.unread_count.should == 0
@@ -123,12 +115,6 @@ describe ContentParticipationCount do
   end
 
   describe "unread_submission_count_for" do
-    before do
-      @assignment = @course.assignments.new(:title => "some assignment")
-      @assignment.workflow_state = "published"
-      @assignment.save
-    end
-
     it "should be read if a submission exists with no grade" do
       @submission = @assignment.submit_homework(@student)
       ContentParticipationCount.unread_submission_count_for(@course, @student).should == 0

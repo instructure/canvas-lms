@@ -242,7 +242,6 @@ class GroupsController < ApplicationController
           end
         end
         if authorized_action(@group, @current_user, :read)
-          set_badge_counts_for(@group, @current_user)
           #if show_new_dashboard?
           #  @use_new_styles = true
           #  js_env :GROUP_ID => @group.id
