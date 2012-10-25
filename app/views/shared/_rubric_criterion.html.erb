@@ -21,7 +21,7 @@
     <% if rubric && !rubric.free_form_criterion_comments && assessment_rating && assessment_rating[:comments] %>
       <div class="assessment-comments">
         <h6><%= t('instructor_comments', 'Instructor Comments') %></h6>
-        <div><%= format_message assessment_rating[:comments] %></div>
+        <div><%= format_message( assessment_rating[:comments] ).first %></div>
       </div>
     <% end %>
   </td>
