@@ -486,21 +486,27 @@ class Enrollment < ActiveRecord::Base
 
   def enrollment_dates
     Rails.cache.fetch([self, self.course, 'enrollment_date_ranges'].cache_key) do
-      result = []
+      enrollment_dates = []
+
       if self.start_at && self.end_at
-        result << [self.start_at, self.end_at]
-      elsif course_section.try(:restrict_enrollments_to_section_dates)
-        result << [course_section.start_at, course_section.end_at]
-        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
-      elsif course.try(:restrict_enrollments_to_course_dates)
-        result << [course.start_at, course.conclude_at]
-        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
-      elsif course.try(:enrollment_term)
-        result << course.enrollment_term.enrollment_dates_for(self)
+        enrollment_dates << [self.start_at, self.end_at]
+      elsif self.course && self.course.enrollment_term
+        term_dates = course.enrollment_term.enrollment_dates_for(self)
+
+        if self.course_section && self.course_section.restrict_enrollments_to_section_dates
+          enrollment_dates << [course_section.start_at, course_section.end_at]
+          enrollment_dates << term_dates if self.admin? && term_dates != [nil,nil]
+        elsif course.restrict_enrollments_to_course_dates
+          enrollment_dates << [course.start_at, course.end_at]
+          enrollment_dates << term_dates if self.admin? && term_dates != [nil,nil]
+        else
+          enrollment_dates << term_dates
+        end
       else
-        result << [nil, nil]
+        enrollment_dates << [nil, nil]
       end
-      result
+
+      enrollment_dates
     end
   end
 

@@ -329,8 +329,7 @@ describe Enrollment do
 
   context "date restrictions" do
     context "accept" do
-      it "should accept into the right state based on availability dates on enrollment" do
-        course_with_student(:active_all => true)
+      def enrollment_availability_test
         @enrollment.start_at = 2.days.ago
         @enrollment.end_at = 2.days.from_now
         @enrollment.workflow_state = 'invited'
@@ -357,8 +356,7 @@ describe Enrollment do
         @enrollment.accept.should be_false
       end
 
-      it "should accept into the right state based on availability dates on course_section" do
-        course_with_student(:active_all => true)
+      def course_section_availability_test
         @section = @course.course_sections.first
         @section.should_not be_nil
         @enrollment.course_section = @section
@@ -391,8 +389,7 @@ describe Enrollment do
         @enrollment.accept.should be_false
       end
 
-      it "should accept into the right state based on availability dates on course" do
-        course_with_student(:active_all => true)
+      def course_availability_test
         @course.start_at = 2.days.ago
         @course.conclude_at = 2.days.from_now
         @course.restrict_enrollments_to_course_dates = true
@@ -425,8 +422,7 @@ describe Enrollment do
         @enrollment.accept.should be_true
       end
 
-      it "should accept into the right state based on availability dates on enrollment_term" do
-        course_with_student(:active_all => true)
+      def enrollment_term_availability_test
         @term = @course.enrollment_term
         @term.should_not be_nil
         @term.start_at = 2.days.ago
@@ -460,12 +456,11 @@ describe Enrollment do
         @enrollment.accept.should be_false
       end
 
-      it "should accept into the right state based on availability dates on enrollment_dates_override" do
-        course_with_student(:active_all => true)
+      def enrollment_dates_override_test(enrollment_type)
         @term = @course.enrollment_term
         @term.should_not be_nil
         @term.save!
-        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term)
+        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => enrollment_type, :enrollment_term => @term)
         @override.start_at = 2.days.ago
         @override.end_at = 2.days.from_now
         @override.save!
@@ -504,6 +499,58 @@ describe Enrollment do
         @term.end_at = 4.days.from_now
         @term.save!
         @enrollment.reload.state_based_on_date.should eql(:inactive)
+      end
+
+      context "as a student" do
+        before do
+          course_with_student(:active_all => true)
+        end
+
+        it "should accept into the right state based on availability dates on enrollment" do
+          enrollment_availability_test
+        end
+
+        it "should accept into the right state based on availability dates on course_section" do
+          course_section_availability_test
+        end
+
+        it "should accept into the right state based on availability dates on course" do
+          course_availability_test
+        end
+
+        it "should accept into the right state based on availability dates on enrollment_term" do
+          enrollment_term_availability_test
+        end
+
+        it "should accept into the right state based on availability dates on enrollment_dates_override" do
+          enrollment_dates_override_test('StudentEnrollment')
+        end
+      end
+
+      context "as a teacher" do
+        before do
+          course_with_teacher(:active_all => true)
+        end
+
+        it "should accept into the right state based on availability dates on enrollment" do
+          enrollment_availability_test
+        end
+
+        it "should accept into the right state based on availability dates on course_section" do
+          course_section_availability_test
+        end
+
+        it "should accept into the right state based on availability dates on course" do
+          course_availability_test
+        end
+
+        it "should accept into the right state based on availability dates on enrollment_term" do
+          enrollment_term_availability_test
+        end
+
+        it "should accept into the right state based on availability dates on enrollment_dates_override" do
+          enrollment_dates_override_test("TeacherEnrollment")
+        end
       end
     end
 

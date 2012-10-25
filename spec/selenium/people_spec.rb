@@ -210,9 +210,7 @@ describe "people" do
     end
 
     it "should test prior enrollment functionality" do
-      expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
-      expect_new_page_load { driver.find_element(:link, 'End this Course').click }
-      expect_new_page_load { f('.button-container .big-button').click }
+      @course.complete
       get "/courses/#{@course.id}/users"
       expect_new_page_load { driver.find_element(:link, 'View Prior Enrollments').click }
       f('#users').should include_text(@student_1.name)

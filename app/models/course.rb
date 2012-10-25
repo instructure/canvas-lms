@@ -1004,6 +1004,11 @@ class Course < ActiveRecord::Base
     end_at.try(:<, Time.now) || enrollment_term.end_at.try(:<, Time.now)
   end
 
+  def soft_conclude!
+    self.conclude_at = Time.now
+    self.restrict_enrollments_to_course_dates = true
+  end
+
   def state_sortable
     case state
     when :invited

@@ -31,7 +31,7 @@
     <% elsif !@context.soft_concluded? %>
       <% link_to context_url(@context, :context_confirm_action_url, :event => 'conclude'), :class => 'button button-sidebar-wide' do %>
         <%= image_tag 'delete.png' %>
-        <%= t('links.conclude', 'End this Course') %>
+        <%= t('links.conclude', 'Conclude this Course') %>
       <% end %>
     <% end %>
   <% end %>

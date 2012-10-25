@@ -431,8 +431,13 @@ class CoursesController < ApplicationController
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
-      @context.complete
-      flash[:notice] = t('notices.concluded', "Course successfully concluded")
+
+      @context.soft_conclude!
+      if @context.save
+        flash[:notice] = t('notices.concluded', "Course successfully concluded")
+      else
+        flash[:notice] = t('notices.failed_conclude', "Course failed to conclude")
+      end
     end
     @current_user.touch
     respond_to do |format|
@@ -1205,6 +1210,7 @@ class CoursesController < ApplicationController
         @course.hide_final_grades = value_to_boolean(hide_final_grades)
       end
       params[:course][:event] = :offer if params[:offer].present?
+
       @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
