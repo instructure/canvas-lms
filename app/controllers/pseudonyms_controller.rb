@@ -225,6 +225,7 @@ class PseudonymsController < ApplicationController
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])
       return unless @user = @pseudonym.user
+      params[:login][:password_confirmation] = params[:login][:password]
       params[:pseudonym]  = params[:login]
     else
       return unless get_user
