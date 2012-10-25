@@ -164,12 +164,15 @@ define([
   // of the browser. We want to display times in the timezone of their profile. Use
   // unfudgeDateForProfileTimezone to remove the correction before sending dates back to the server.
   $.fudgeDateForProfileTimezone = function(date, unfudge) {
-    var today = new Date();
-    var user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
+    var today, user_offset, minutes_shift, time, newDate;
+
+    if (!date) return;
+    today = new Date();
+    user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
     if (date.getTimezoneOffset() != today.getTimezoneOffset()) {
       user_offset = user_offset - (date.getTimezoneOffset() - today.getTimezoneOffset());
     }
-    var minutes_shift = user_offset + date.getTimezoneOffset();
+    minutes_shift = user_offset + date.getTimezoneOffset();
 
     if (minutes_shift == 0) {
       return date;
@@ -177,14 +180,15 @@ define([
 
     time = date.getTime(); // in ms
     time += minutes_shift * 60 * 1000 * (unfudge === true ? -1 : 1);
-    var newDate = new Date();
+    newDate = new Date();
     newDate.setTime(time);
     return newDate;
   }
+
   $.unfudgeDateForProfileTimezone = function(date) {
     return $.fudgeDateForProfileTimezone(date, true);
   }
-  
+
   // The following method is simply a helper to use the logic from $.parseFromISO on
   // an existing Date() object. This is not the right solution and should be replaced.
   $.parseFromDateUTC = function(date, datetime_type) {
