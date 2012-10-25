@@ -8,6 +8,7 @@ define [
   'i18n!calendar'
   'jquery'
   'underscore'
+  'compiled/userSettings'
   'compiled/util/hsvToRgb'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
@@ -22,7 +23,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, calendarDefaults) ->
+], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, calendarDefaults) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -242,7 +243,9 @@ define [
         return
 
       # create a new dummy event
-      event = commonEventFactory(null, @contexts)
+      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
+      activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
+      event = commonEventFactory(null, activeContexts)
       event.allDay = allDay
       event.date = date
 
