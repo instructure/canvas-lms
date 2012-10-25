@@ -63,7 +63,7 @@ module Kaltura
     }
     # FLVs are least desirable because the mediaelementjs does not stretch them to
     # fill the screen when you enter fullscreen mode
-    PREFERENCE = ['mp4', 'mp3', 'flv']
+    PREFERENCE = ['mp4', 'mp3', 'flv', '']
 
     # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaFlavorAssetStatus
     ASSET_STATUSES = {
@@ -104,18 +104,20 @@ module Kaltura
           end
 
         end
-        sources.sort! do |a, b|
-          comparison = PREFERENCE.index(a[:fileExt]) <=> PREFERENCE.index(b[:fileExt])
-          if comparison == 0
-            comparison = b[:bitrate] <=> a[:bitrate]
-          end
-          comparison
-        end
+        sources = sort_source_list(sources)
         # only cache if all the sources are done converting
         # purposely not setting an expires because it does not look like the kaltura urls actually expire.
         Rails.cache.write(cache_key, sources) if sources.present? && all_assets_are_done_converting
       end
       sources
+    end
+
+    # Given an array of sources, it will sort them putting preferred file types at the front,
+    # and sorting by descending bitrate for identical file types.
+    def sort_source_list(sources)
+      sources.sort_by do |a|
+        [ PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i ]
+      end
     end
 
     def thumbnail_url(entryId, opts = {})
