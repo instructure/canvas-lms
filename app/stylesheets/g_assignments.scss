@@ -45,6 +45,10 @@
     @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground);
   }
 
+  .assignment_list {
+    min-height: 8px;
+  }
+
   /*== Individual assignments ==*/
   .group_assignment {
     display: table;
