@@ -396,16 +396,10 @@ class DiscussionTopicsController < ApplicationController
       if @topic.update_attributes(discussion_topic_hash)
         log_asset_access(@topic, 'topics', 'topics', 'participate')
 
-        # handle sort positioning:
-        # if you pass params[:position_after], it must be either the id of the model you want to position
-        # this after or the string "top" (meaning you want to put this topic at the top of the list)
+        # handle sort positioning
         if params[:position_after] && @context.grants_right?(@current_user, session, :moderate_forum)
-          if params[:position_after] == 'top'
-            @topic.move_to_bottom
-          else
-            other_topic = @context.discussion_topics.active.find(params[:position_after])
-            @topic.insert_at(other_topic.position)
-          end
+          other_topic = @context.discussion_topics.active.find(params[:position_after])
+          @topic.insert_at(other_topic.position)
         end
 
         # handle creating/removing attachment
@@ -437,7 +431,7 @@ class DiscussionTopicsController < ApplicationController
               @topic.save!
               assignment.destroy
             end
-
+          
           elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
                  @assignment.grants_right?(@current_user, session, :update)
             update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
