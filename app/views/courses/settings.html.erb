@@ -485,12 +485,14 @@ TEXT
     <% end %>
   </div>
   <% end %>
+
   <% if can_do @context, @current_user, :update %>
     <div id="tab-tools">
       <h2><%= t('headings.external_tools', %{External Tools}) %></h2>
       <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
     </div>
   <% end %>
+
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
@@ -499,13 +501,15 @@ TEXT
       <ul id="publish_grades_messages"></ul>
     </div>
   <% end %>
+
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
     <div id="tab-alerts">
       <h2><%= t(:alerts_title, "Alerts") %></h2>
       <%= render :partial => 'alerts/alerts' %>
     </div>
   <% end %>
-</div>
+</div><!-- end course details tab -->
+
 <% if Account.site_admin.grants_right?(@current_user, nil, :manage_courses) %>
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
