@@ -68,7 +68,9 @@ module SIS
         course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id)
         course ||= Course.new
         course_enrollment_term_id_stuck = course.stuck_sis_fields.include?(:enrollment_term_id)
-        term = course_enrollment_term_id_stuck ? nil : @root_account.enrollment_terms.find_by_sis_source_id(term_id)
+        if !course_enrollment_term_id_stuck && term_id
+          term = @root_account.enrollment_terms.active.find_by_sis_source_id(term_id)
+        end
         course.enrollment_term = term if term
         course.root_account = @root_account
 

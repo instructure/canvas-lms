@@ -459,6 +459,18 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
+  it "should use the default term if none given" do
+    @default_term = @account.default_enrollment_term
+    @default_term.should be_present
+    @nil_id_term = @account.enrollment_terms.create!(:name => "nil")
+    @with_id_term = @account.enrollment_terms.create!(:name => "test") { |t| t.sis_source_id = "test" }
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,status",
+      "c1,c1,c1,active")
+    @course = @account.courses.find_by_sis_source_id("c1")
+    @course.enrollment_term.should == @default_term
+  end
+
   context 'account associations' do
     before(:each) do
       process_csv_data_cleanly(
