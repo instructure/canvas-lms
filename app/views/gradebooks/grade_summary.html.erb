@@ -120,6 +120,7 @@
   <%
      submission = @submissions.find {|s| s.assignment_id == assignment.id }
      submission_unread = (submission.present? ? @unread_submission_ids.include?(submission.id) : false)
+     assignment_submissions = @all_submissions.select { |s| s.assignment_id == assignment.id }
      visible_rubric_assessments = []
      visible_rubric_assessments = submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] } if submission && !assignment.muted?
   %>
@@ -251,8 +252,9 @@
   <tr id="grade_info_<%= assignment.id %>" aria-expanded="false" role="region" class="comments <%= 'assignment_graded' if submission && submission.grade && !assignment.muted? %>" style="display: none;">
     <% if !assignment.special_class && (has_comments || has_scoring_details) %>
       <td colspan="5" style="padding-bottom: 20px;">
-        <% if assignment && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted? %>
-        <% high, low, mean = assignment.grade_distribution(@all_submissions.select { |s| s.assignment_id == assignment.id }) %>
+        <% can_view_distribution = can_do(@context, @current_user, :read_as_admin) || assignment_submissions.length >= 5 %>
+        <% if assignment && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted? && can_view_distribution %>
+        <% high, low, mean = assignment.grade_distribution(assignment_submissions) %>
         <% title = "" %>
         <% title += " " + before_label(:mean_score, "Mean") + " " + (mean.round(1) rescue 0).to_s %>
         <% title += " " + before_label(:high_score, "High") + " " + high.to_s unless assignment && assignment.hide_max_scores_for_assignments %>

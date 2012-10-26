@@ -114,11 +114,11 @@ describe "grades" do
   context "as a student" do
     before(:each) do
       user_session(@student_1)
-      get "/courses/#{@course.id}/grades"
-      @grade_tbody = f('#grades_summary > tbody')
     end
 
     it "should allow student to test modifying grades" do
+      get "/courses/#{@course.id}/grades"
+
       # just one ajax request
       Assignment.expects(:find_or_create_submission).once.returns(@submission)
 
@@ -142,6 +142,8 @@ describe "grades" do
     end
 
     it "should display rubric on assignment" do
+      get "/courses/#{@course.id}/grades"
+
       #click rubric
       f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
       wait_for_animations
@@ -153,6 +155,8 @@ describe "grades" do
     end
 
     it "should not display rubric on muted assignment" do
+      get "/courses/#{@course.id}/grades"
+
       @first_assignment.muted = true
       @first_assignment.save!
       get "/courses/#{@course.id}/grades"
@@ -161,6 +165,8 @@ describe "grades" do
     end
 
     it "should not display letter grade score on muted assignment" do
+      get "/courses/#{@course.id}/grades"
+
       @another_assignment = assignment_model({
                                                  :course => @course,
                                                  :title => 'another assignment',
@@ -178,6 +184,14 @@ describe "grades" do
     end
 
     it "should display teacher comment and assignment statistics" do
+      # get up to a point where statistics can be shown
+      5.times do
+        s = student_in_course(:active_all => true).user
+        @first_assignment.grade_student(s, :grade => 4)
+      end
+
+      get "/courses/#{@course.id}/grades"
+
       #check comment
       f('.toggle_comments_link img').click
       comment_row = f('#grades_summary tr.comments')
@@ -186,9 +200,14 @@ describe "grades" do
       #check tooltip text statistics
       driver.execute_script('$("#grades_summary tr.comments span.tooltip_text").css("visibility", "visible");')
       statistics_text = comment_row.find_element(:css, 'span.tooltip_text').text
-      statistics_text.include?("#{before_label(:mean_score, "Mean")} 3.5").should be_true
+      statistics_text.include?("Mean:").should be_true
       statistics_text.include?('High: 4').should be_true
       statistics_text.include?('Low: 3').should be_true
+    end
+
+    it "should not show assignment statistics on assignments with less than 5 submissions" do
+      get "/courses/#{@course.id}/grades"
+      f("#grade_info_#{@first_assignment.id} .tooltip").should be_nil
     end
 
     it "should show rubric even if there are no comments" do
