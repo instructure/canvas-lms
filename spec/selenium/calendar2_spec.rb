@@ -386,7 +386,7 @@ describe "calendar2" do
         wait_for_ajaximations
         f('label[for=week]').click
         keep_trying_until do
-          events = ff('.fc-event').select { |e| e.text =~ /11:59.*super important/ }
+          events = ff('.fc-event').select { |e| e.text =~ /due.*super important/ }
           # shows on monday night and tuesday morning
           events.size.should == 2
         end
