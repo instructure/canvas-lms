@@ -1862,8 +1862,150 @@ describe Assignment do
       end
     end
 
+    context "varied due date notifications" do
+      before do
+        course_with_teacher(:active_all => true)
+        @teacher.communication_channels.create(:path => "teacher@instructure.com").confirm!
 
+        @studentA = user_with_pseudonym(:active_all => true, :name => 'StudentA', :username => 'studentA@instructure.com')
+        @studentA.communication_channels.create(:path => "studentA@instructure.com").confirm!
+        @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
+        @ta.communication_channels.create(:path => "ta1@instructure.com").confirm!
+        @course.enroll_student(@studentA).update_attribute(:workflow_state, 'active')
+        @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+
+        @section2 = @course.course_sections.create!(:name => 'section 2')
+        @studentB = user_with_pseudonym(:active_all => true, :name => 'StudentB', :username => 'studentB@instructure.com')
+        @studentB.communication_channels.create(:path => "studentB@instructure.com").confirm!
+        @ta2 = user_with_pseudonym(:active_all => true, :name => 'TA2', :username => 'ta2@instructure.com')
+        @ta2.communication_channels.create(:path => "ta2@instructure.com").confirm!
+        @section2.enroll_user(@studentB, 'StudentEnrollment', 'active')
+        @course.enroll_user(@ta2, 'TaEnrollment', :section => @section2, :enrollment_state => 'active', :limit_privileges_to_course_section => true)
+
+        Time.zone = 'Alaska'
+        default_due = DateTime.parse("01 Jan 2011 14:00 AKST")
+        section_2_due = DateTime.parse("02 Jan 2011 14:00 AKST")
+        @assignment = @course.assignments.build(:title => "some assignment", :due_at => default_due, :submission_types => ['online_text_entry'])
+        @assignment.save_without_broadcasting!
+        override = @assignment.assignment_overrides.build
+        override.set = @section2
+        override.override_due_at(section_2_due)
+        override.save!
+      end
+
+      context "assignment created" do
+        before do
+          Notification.create(:name => 'Assignment Created')
+        end
+
+        it "should notify of the correct due date for the recipient, or 'multiple'" do
+          @assignment.do_notifications!
+
+          messages_sent = @assignment.messages_sent['Assignment Created']
+          messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Multiple Dates"
+          messages_sent.detect{|m|m.user_id == @studentA.id}.body.should be_include "Jan 1, 2011"
+          messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Jan 1, 2011"
+          messages_sent.detect{|m|m.user_id == @studentB.id}.body.should be_include "Jan 2, 2011"
+          messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Multiple Dates"
+        end
+
+        it "should collapse identical instructor due dates" do
+          # change the override to match the default due date
+          override = @assignment.assignment_overrides.first
+          override.override_due_at(@assignment.due_at)
+          override.save!
+          @assignment.do_notifications!
+
+          # when the override matches the default, show the default and not "Multiple"
+          messages_sent = @assignment.messages_sent['Assignment Created']
+          messages_sent.each{|m| m.body.should be_include "Jan 1, 2011"}
+        end
+      end
+
+      context "assignment due date changed" do
+        before do
+          Notification.create(:name => 'Assignment Due Date Changed')
+          Notification.create(:name => 'Assignment Due Date Override Changed')
+        end
+
+        it "should notify appropriate parties when the default due date changes" do
+          @assignment.update_attribute(:created_at, 1.day.ago)
+
+          @assignment.due_at = DateTime.parse("09 Jan 2011 14:00 AKST")
+          @assignment.save!
+
+          messages_sent = @assignment.messages_sent['Assignment Due Date Changed']
+          messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Jan 9, 2011"
+          messages_sent.detect{|m|m.user_id == @studentA.id}.body.should be_include "Jan 9, 2011"
+          messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Jan 9, 2011"
+          messages_sent.detect{|m|m.user_id == @studentB.id}.should be_nil
+          messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Jan 9, 2011"
+        end
+
+        it "should notify appropriate parties when an override due date changes" do
+          @assignment.update_attribute(:created_at, 1.day.ago)
+
+          override = @assignment.assignment_overrides.first.reload
+          override.override_due_at(DateTime.parse("11 Jan 2011 11:11 AKST"))
+          override.save!
+
+          messages_sent = override.messages_sent['Assignment Due Date Changed']
+          messages_sent.detect{|m|m.user_id == @studentA.id}.should be_nil
+          messages_sent.detect{|m|m.user_id == @studentB.id}.body.should be_include "Jan 11, 2011"
+
+          messages_sent = override.messages_sent['Assignment Due Date Override Changed']
+          messages_sent.detect{|m|m.user_id == @ta.id}.should be_nil
+          messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Jan 11, 2011"
+          messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Jan 11, 2011"
+        end
+      end
+
+      context "assignment submitted late" do
+        before do
+          Notification.create(:name => 'Assignment Submitted')
+          Notification.create(:name => 'Assignment Submitted Late')
+        end
+
+        it "should send a late submission notification iff the submit date is late for the submitter" do
+          fake_submission_time = Time.parse "Jan 01 17:00:00 -0900 2011"
+          Time.stubs(:now).returns(fake_submission_time)
+          subA = @assignment.submit_homework @studentA, :submission_type => "online_text_entry", :body => "ooga"
+          subB = @assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "booga"
+          Time.unstub(:now)
+
+          subA.messages_sent["Assignment Submitted Late"].should_not be_nil
+          subB.messages_sent["Assignment Submitted Late"].should be_nil
+        end
+      end
+
+      context "group assignment submitted late" do
+        before do
+          Notification.create(:name => 'Group Assignment Submitted Late')
+        end
+
+        it "should send a late submission notification iff the submit date is late for the group" do
+          @a = assignment_model(:course => @course, :group_category => "Study Groups", :due_at => Time.parse("Jan 01 17:00:00 -0900 2011"), :submission_types => ["online_text_entry"])
+          @group1 = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
+          @group1.add_user(@studentA)
+          @group2 = @a.context.groups.create!(:name => "Study Group 2", :group_category => @a.group_category)
+          @group2.add_user(@studentB)
+          override = @a.assignment_overrides.new
+          override.set = @group2
+          override.override_due_at(Time.parse("Jan 03 17:00:00 -0900 2011"))
+          override.save!
+          fake_submission_time = Time.parse("Jan 02 17:00:00 -0900 2011")
+          Time.stubs(:now).returns(fake_submission_time)
+          subA = @assignment.submit_homework @studentA, :submission_type => "online_text_entry", :body => "eenie"
+          subB = @assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "meenie"
+          Time.unstub(:now)
+
+          subA.messages_sent["Group Assignment Submitted Late"].should_not be_nil
+          subB.messages_sent["Group Assignment Submitted Late"].should be_nil
+        end
+      end
+    end
   end
+
   context "group assignment" do
     it "should submit the homework for all students in the same group" do
       setup_assignment_with_group

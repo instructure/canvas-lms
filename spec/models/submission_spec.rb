@@ -131,25 +131,65 @@ describe Submission do
   end
 
   context "broadcast policy" do
-    context "Assignment Submitted Late" do
-      it "should create a message when the assignment is turned in late" do
+    context "Submission Notifications" do
+      before do
+        Notification.create(:name => 'Assignment Submitted')
+        Notification.create(:name => 'Assignment Resubmitted')
         Notification.create(:name => 'Assignment Submitted Late')
-        t = User.create(:name => "some teacher")
-        s = User.create(:name => "late student")
-        @context.enroll_teacher(t)
-        @context.enroll_student(s)
-#        @context.stubs(:teachers).returns([@user])
+        Notification.create(:name => 'Group Assignment Submitted Late')
+
+        @teacher = User.create(:name => "some teacher")
+        @student = User.create(:name => "a student")
+        @context.enroll_teacher(@teacher)
+        @context.enroll_student(@student)
+      end
+
+      it "should send the correct message when an assignment is turned in on-time" do
+        @assignment.workflow_state = "published"
+        @assignment.update_attributes(:due_at => Time.now + 1000)
+
+        submission_spec_model(:user => @student)
+        @submission.messages_sent.keys.should == ['Assignment Submitted']
+      end
+
+      it "should send the correct message when an assignment is turned in late" do
         @assignment.workflow_state = "published"
         @assignment.update_attributes(:due_at => Time.now - 1000)
-#        @assignment.stubs(:due_at).returns(Time.now - 100)
-        submission_spec_model(:user => s)
-        
-#        @submission.stubs(:validate_enrollment).returns(true)
-#        @submission.save
-        @submission.messages_sent.should be_include('Assignment Submitted Late')
+
+        submission_spec_model(:user => @student)
+        @submission.messages_sent.keys.should == ['Assignment Submitted Late']
+      end
+
+      it "should send the correct message when an assignment is resubmitted on-time" do
+        @assignment.submission_types = ['online_text_entry']
+        @assignment.due_at = Time.now + 1000
+        @assignment.save!
+
+        @assignment.submit_homework(@student, :body => "lol")
+        resubmission = @assignment.submit_homework(@student, :body => "frd")
+        resubmission.messages_sent.keys.should == ['Assignment Resubmitted']
+      end
+
+      it "should send the correct message when an assignment is resubmitted late" do
+        @assignment.submission_types = ['online_text_entry']
+        @assignment.due_at = Time.now - 1000
+        @assignment.save!
+
+        @assignment.submit_homework(@student, :body => "lol")
+        resubmission = @assignment.submit_homework(@student, :body => "frd")
+        resubmission.messages_sent.keys.should == ['Assignment Submitted Late']
+      end
+
+      it "should send the correct message when a group assignment is submitted late" do
+        @a = assignment_model(:course => @context, :group_category => "Study Groups", :due_at => Time.now - 1000, :submission_types => ["online_text_entry"])
+        @group1 = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
+        @group1.add_user(@student)
+        submission = @a.submit_homework @student, :submission_type => "online_text_entry", :body => "blah"
+
+        submission.messages_sent.keys.should == ['Group Assignment Submitted Late']
       end
     end
-    
+
     context "Submission Graded" do
       it "should create a message when the assignment has been graded and published" do
         Notification.create(:name => 'Submission Graded')

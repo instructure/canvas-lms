@@ -563,6 +563,10 @@ class Submission < ActiveRecord::Base
   def <=>(other)
     self.updated_at <=> other.updated_at
   end
+
+  def submitted_late?
+    self.assignment.overridden_for(self.user).due_at <= Time.now.localtime
+  end
   
   # Submission:
   #   Online submission submitted AFTER the due date (notify the teacher) - "Grade Changes"
@@ -573,45 +577,48 @@ class Submission < ActiveRecord::Base
     p.to { assignment.context.instructors_in_charge_of(user_id) }
     p.whenever {|record| 
       !record.suppress_broadcast and
+      !record.group_broadcast_submission and
       record.assignment.context.state == :available and 
-      ((record.just_created && record.submitted?) || record.changed_state_to(:submitted)) and 
+      ((record.just_created && record.submitted?) || record.changed_state_to(:submitted) || record.prior_version.try(:submitted_at) != record.submitted_at) and
       record.state == :submitted and
       record.has_submission? and 
-      record.assignment.due_at <= Time.now.localtime
+      record.submitted_late?
     }
-    
+
     p.dispatch :assignment_submitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
     p.whenever {|record| 
       !record.suppress_broadcast and
-      record.assignment.context.state == :available and 
-      ((record.just_created && record.submitted?) || record.changed_state_to(:submitted) || record.prior_version.submitted_at != record.submitted_at) and 
+      record.assignment.context.state == :available and
+      ((record.just_created && record.submitted?) || record.changed_state_to(:submitted)) and
       record.state == :submitted and
-      record.has_submission?
+      record.has_submission? and
+      # don't send a submitted message because we already sent an :assignment_submitted_late message
+      !record.submitted_late?
     }
 
     p.dispatch :assignment_resubmitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
     p.whenever {|record| 
       !record.suppress_broadcast and
-      record.assignment.context.state == :available and 
+      record.assignment.context.state == :available and
       record.submitted? and
       record.prior_version.submitted_at and
       record.prior_version.submitted_at != record.submitted_at and
       record.has_submission? and
       # don't send a resubmitted message because we already sent a :assignment_submitted_late message.
-      record.assignment.due_at > Time.now.localtime
+      !record.submitted_late?
     }
 
     p.dispatch :group_assignment_submitted_late
     p.to { assignment.context.instructors_in_charge_of(user_id) }
     p.whenever {|record| 
       !record.suppress_broadcast and
-      record.group_submission_broadcast and
+      record.group_broadcast_submission and
       record.assignment.context.state == :available and 
-      ((record.just_created && record.submitted?) || record.changed_state_to(:submitted)) and 
+      ((record.just_created && record.submitted?) || record.changed_state_to(:submitted) || record.prior_version.try(:submitted_at) != record.submitted_at) and
       record.state == :submitted and
-      record.assignment.due_at <= Time.now.localtime
+      record.submitted_late?
     }
 
     p.dispatch :submission_graded

@@ -26,6 +26,7 @@ class Notification < ActiveRecord::Base
     "Assignment Created",
     "Assignment Changed",
     "Assignment Due Date Changed",
+    "Assignment Due Date Override Changed",
 
     # Submissions / Grading
     "Assignment Graded",
@@ -182,15 +183,20 @@ class Notification < ActiveRecord::Base
         user = recipient
         cc = user.email_channel
       end
+
+      user_asset = asset.respond_to?(:filter_asset_by_recipient) ?
+          asset.filter_asset_by_recipient(self, user) : asset
+      next unless user_asset
+
       I18n.locale = infer_locale(:user => user,
-        :context => asset.is_a?(Context) ? asset : asset.try_rescue(:context))
+        :context => user_asset.is_a?(Context) ? user_asset : user_asset.try_rescue(:context))
 
       # For non-essential messages, check if too many have gone out, and if so
       # send this message as a daily summary message instead of immediate.
       should_summarize = user && self.summarizable? && too_many_messages?(user)
       channels = CommunicationChannel.find_all_for(user, self, cc)
       fallback_channel = channels.sort_by{|c| c.path_type }.first
-      record_delayed_messages((options || {}).merge(:user => user, :communication_channel => cc, :asset => asset, :fallback_channel => should_summarize ? channels.first : nil))
+      record_delayed_messages((options || {}).merge(:user => user, :communication_channel => cc, :asset => user_asset, :fallback_channel => should_summarize ? channels.first : nil))
       if should_summarize
         channels = channels.select{|cc| cc.path_type != 'email' && cc.path_type != 'sms' }
       end
@@ -212,8 +218,8 @@ class Notification < ActiveRecord::Base
         message.communication_channel = c if c.is_a?(CommunicationChannel)
         message.dispatch_at = nil
         message.user = user
-        message.context = asset
-        message.asset_context = options[:asset_context] || asset.context(user) rescue asset
+        message.context = user_asset
+        message.asset_context = options[:asset_context] || user_asset.context(user) rescue user_asset
         message.notification_category = self.category
         message.delay_for = self.delay_for if self.delay_for 
         message.data = data if data
@@ -444,6 +450,7 @@ class Notification < ActiveRecord::Base
     t 'names.assignment_changed', 'Assignment Changed'
     t 'names.assignment_created', 'Assignment Created'
     t 'names.assignment_due_date_changed', 'Assignment Due Date Changed'
+    t 'names.assignment_due_date_override_changed', 'Assignment Due Date Override Changed'
     t 'names.assignment_graded', 'Assignment Graded'
     t 'names.assignment_resubmitted', 'Assignment Resubmitted'
     t 'names.assignment_submitted', 'Assignment Submitted'

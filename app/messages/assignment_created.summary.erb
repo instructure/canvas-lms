@@ -6,7 +6,9 @@
   <%= t('assignment_created', 'Assignment Created - %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 <% end %>
 
-<% if asset.due_at %>
+<% if asset.multiple_due_dates_apply_to(user) %>
+  <%= t('multiple_due_dates', 'due: Multiple Dates') %>
+<% elsif asset.due_at %>
   <%= t('due_at', 'due: %{assignment_due_date_time}', :assignment_due_date_time => datetime_string(force_zone(asset.due_at))) %>
 <% else %>
   <%= t('no_due_date', 'due: No Due Date') %>

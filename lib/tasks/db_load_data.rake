@@ -256,8 +256,26 @@ namespace :db do
       <%= asset.title %>, <%= asset.context.name %>, is now due:
       <%= asset.due_at.strftime("%b %d at %I:%M") rescue "No Due Date" %><%= asset.due_at.strftime("%p").downcase rescue "" %>
     }
-    
-    create_notification 'Assignment', 'Course Content', 30*60,
+
+    create_notification 'AssignmentOverride', 'Due Date', 5*60,
+                        'http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>', %{
+      Assignment Due Date Override Changed
+
+      Assignment Due Date Changed: <%= asset.assignment.title %>, <%= asset.assignment.context.name %> (<%= asset.title %>)
+
+      The due date for the assignment, <%= asset.assignment.title %>, for the course, <%= asset.assignment.context.name %> (<%= asset.title %>) has changed to:
+
+      <%= asset.due_at.strftime("%b %d at %I:%M") rescue "No Due Date" %><%= asset.due_at.strftime("%p").downcase rescue "" %>
+
+
+      Click here to view the assignment:
+      <%= main_link %>
+    }, %{
+      <%= asset.assignment.title %>, <%= asset.assignment.context.name %> (<%= asset.title %>, is now due:
+      <%= asset.due_at.strftime("%b %d at %I:%M") rescue "No Due Date" %><%= asset.due_at.strftime("%p").downcase rescue "" %>
+    }
+
+    create_notification 'Assignment', 'Course Content', 30*60, 
     'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>', %{
       Assignment Changed
       

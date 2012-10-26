@@ -228,6 +228,21 @@ class Assignment < ActiveRecord::Base
       :all_day_date => all_day_date }
   end
 
+  def self.due_date_compare_value(date)
+    # due dates are considered equal if they're the same up to the minute
+    date.to_i / 60
+  end
+
+  def self.due_dates_equal?(date1, date2)
+    due_date_compare_value(date1) == due_date_compare_value(date2)
+  end
+
+  def multiple_due_dates_apply_to(user)
+    as_instructor = self.due_dates_for(user).second
+    as_instructor && as_instructor.map{ |hash|
+      Assignment.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
+  end
+
   # like due_dates_for, but for unlock_at values instead. for consistency, each
   # unlock_at is still represented by a hash, even though the "as a student"
   # value will only have one key.
@@ -515,13 +530,26 @@ class Assignment < ActiveRecord::Base
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
 
+  # call this to perform notifications on an Assignment that is not being saved
+  # (useful when a batch of overrides associated with a new assignment have been saved)
+  def do_notifications!
+    @broadcasted = false
+    self.prior_version = self.versions.previous(self.current_version.number).try(:model)
+    self.just_created = self.prior_version.nil?
+    broadcast_notifications
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
-    p.to { participants }
+    p.to {
+      # everyone who is _not_ covered by an assignment override affecting due_at
+      # (the AssignmentOverride records will take care of notifying those users)
+      participants - participants_with_overridden_due_at
+    }
     p.whenever { |record|
       !self.suppress_broadcast and
       record.context.state == :available and record.changed_in_states([:available,:published], :fields => :due_at) and
-      record.prior_version && (record.due_at.to_i.divmod(60)[0]) != (record.prior_version.due_at.to_i.divmod(60)[0]) and
+      record.prior_version && !Assignment.due_dates_equal?(record.due_at, record.prior_version.due_at) and
       record.created_at < 3.hours.ago
     }
 
@@ -540,6 +568,9 @@ class Assignment < ActiveRecord::Base
     p.whenever { |record|
       !self.suppress_broadcast and
       record.context.state == :available and record.just_created
+    }
+    p.filter_asset_by_recipient { |record, user|
+      record.overridden_for(user)
     }
 
     p.dispatch :assignment_graded
@@ -638,6 +669,12 @@ class Assignment < ActiveRecord::Base
 
   def participants
     self.context.participants
+  end
+
+  def participants_with_overridden_due_at
+    assignment_overrides.active.overriding_due_at.inject([]) do |overridden_users, o|
+      overridden_users.concat(o.applies_to_students)
+    end
   end
 
   def infer_state_from_course
@@ -1161,14 +1198,21 @@ class Assignment < ActiveRecord::Base
           homework.submitted_at = Time.now
 
           homework.with_versioning(:explicit => true) do
-            group ? homework.save_without_broadcast : homework.save!
+            if group
+              if student == original_student
+                homework.broadcast_group_submission
+              else
+                homework.save_without_broadcasting!
+              end
+            else
+              homework.save!
+            end
           end
           homeworks << homework
           primary_homework = homework if student == original_student
         end
       end
     end
-    primary_homework.broadcast_group_submission if group
     homeworks.each do |homework|
       context_module_action(homework.student, :submitted)
       homework.add_comment({:comment => comment, :author => original_student}) if comment && (group_comment || homework == primary_homework)

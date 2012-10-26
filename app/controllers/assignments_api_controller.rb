@@ -241,11 +241,17 @@ class AssignmentsApiController < ApplicationController
     return if overrides && !overrides.is_a?(Array)
 
     # do the updating
-    update_api_assignment(assignment, assignment_params)
-    assignment.transaction do
+    update_api_assignment(assignment, assignment_params, false)
+    if overrides
+      assignment.transaction do
+        assignment.save_without_broadcasting!
+        batch_update_assignment_overrides(assignment, overrides)
+      end
+      assignment.do_notifications!
+    else
       assignment.save!
-      batch_update_assignment_overrides(assignment, overrides) if overrides
     end
+
     return true
   rescue ActiveRecord::RecordInvalid
     return false

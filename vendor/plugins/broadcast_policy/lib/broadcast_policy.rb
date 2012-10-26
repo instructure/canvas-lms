@@ -96,13 +96,21 @@ module Instructure #:nodoc:
         self.current_notification.data = block
       end
 
+      def filter_asset_by_recipient(&block)
+        self.current_notification.recipient_filter = block
+      end
+
+      def find_policy_for(notification)
+        @notifications.detect{|policy| policy.dispatch == notification.name}
+      end
     end
 
     class NotificationPolicy
-      attr_accessor :dispatch, :to, :whenever, :context, :data
+      attr_accessor :dispatch, :to, :whenever, :context, :data, :recipient_filter
 
       def initialize(dispatch)
         self.dispatch = dispatch
+        self.recipient_filter = lambda { |record, user| record }
       end
 
       # This should be called for an instance.  It can only be sent out if the
@@ -283,15 +291,21 @@ module Instructure #:nodoc:
       attr_accessor :skip_broadcasts
 
       def save_without_broadcasting
-        @skip_broadcasts = true
-        self.save
-        @skip_broadcasts = false
+        begin
+          @skip_broadcasts = true
+          self.save
+        ensure
+          @skip_broadcasts = false
+        end
       end
 
       def save_without_broadcasting!
-        @skip_broadcasts = true
-        self.save!
-        @skip_broadcasts = false
+        begin
+          @skip_broadcasts = true
+          self.save!
+        ensure
+          @skip_broadcasts = false
+        end
       end
 
       # The rest of the methods here should just be helper methods to make
@@ -350,6 +364,10 @@ module Instructure #:nodoc:
       end
       alias :changed_state_to :changed_state
 
+      def filter_asset_by_recipient(notification, recipient)
+        policy = self.class.broadcast_policy_list.find_policy_for(notification)
+        policy ? policy.recipient_filter.call(self, recipient) : self
+      end
 
     end # InstanceMethods
   end # BroadcastPolicy

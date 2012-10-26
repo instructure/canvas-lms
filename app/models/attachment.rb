@@ -838,15 +838,21 @@ class Attachment < ActiveRecord::Base
   end
 
   def save_without_broadcasting
-    @skip_broadcasts = true
-    save
-    @skip_broadcasts = false
+    begin
+      @skip_broadcasts = true
+      save
+    ensure
+      @skip_broadcasts = false
+    end
   end
 
   def save_without_broadcasting!
-    @skip_broadcasts = true
-    save!
-    @skip_broadcasts = false
+    begin
+      @skip_broadcasts = true
+      save!
+    ensure
+      @skip_broadcasts = false
+    end
   end
 
   # called before save
