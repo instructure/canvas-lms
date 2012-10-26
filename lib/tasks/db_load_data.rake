@@ -257,49 +257,7 @@ namespace :db do
       <%= asset.due_at.strftime("%b %d at %I:%M") rescue "No Due Date" %><%= asset.due_at.strftime("%p").downcase rescue "" %>
     }
     
-    create_notification 'Assignment', 'Reminder', 0, 
-    'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>', %{
-      Assignment Publishing Reminder
-      
-      Unpublished Assignment: <%= asset.title %>, <%= asset.context.name %>
-      
-      The assignment, <%= asset.title %>, for the course, <%= asset.context.name %> appears to have been graded, but not published.  Publishing assignments notifies students that their grades have been entered and finalized.
-      
-      Click here to view the assignment: 
-      <%= main_link %>
-    }, %{
-      <%= asset.title %>, <%= asset.context.name %>, still needs to be published so students know their grades are entered and official
-    }
-    
-    create_notification 'Assignment', 'Reminder', 0, 
-    'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>', %{
-      Assignment Grading Reminder
-      
-      Ungraded Assignment: <%= asset.title %>, <%= asset.context.name %>
-      
-      It looks like the assignment, <%= asset.title %>, for the course, <%= asset.context.name %> hasn't been graded.  It was due <%= datetime_string(asset.due_at) %>.
-      
-      Click here to view the assignment: 
-      <%= main_link %>
-    }, %{
-      <%= asset.title %>, <%= asset.context.name %>, hasn't been graded, even though it was due <%= datetime_string(asset.due_at) %>
-    }
-    
-    create_notification 'Assignment', 'Reminder', 0, 
-    '<%= a = asset.assignment %>http://<%= HostUrl.context_host(a.context) %>/<%= a.context.class.to_s.downcase.pluralize %>/<%= a.context_id %>/assignments/<%= a.id %>', %{
-      Assignment Due Date Reminder
-      
-      Due: <%= asset.assignment.title %>, <%= asset.assignment.context.name %>
-      
-      This is a reminder that the assignment <%= asset.assignment.title %>, for the course, <%= asset.assignment.context.name %> is due <%= datetime_string(asset.assignment.due_at) %>.
-      
-      Click here to view the assignment: 
-      <%= main_link %>
-    }, %{
-      <%= asset.assignment.title %>, <%= asset.assignment.context.name %> is due <%= datetime_string(asset.assignment.due_at) %>
-    }
-    
-    create_notification 'Assignment', 'Course Content', 30*60, 
+    create_notification 'Assignment', 'Course Content', 30*60,
     'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>', %{
       Assignment Changed
       

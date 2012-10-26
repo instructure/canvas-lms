@@ -49,7 +49,6 @@ class Assignment < ActiveRecord::Base
   belongs_to :cloned_item
   belongs_to :grading_standard
   belongs_to :group_category
-  has_many :assignment_reminders, :dependent => :destroy
   has_many :assignment_overrides, :dependent => :destroy
   has_many :active_assignment_overrides, :class_name => 'AssignmentOverride', :conditions => {:workflow_state => 'active'}
 
@@ -128,7 +127,6 @@ class Assignment < ActiveRecord::Base
                 :process_if_topic
 
   after_save    :update_grades_if_details_changed,
-                :generate_reminders_if_changed,
                 :touch_assignment_group,
                 :touch_context,
                 :update_grading_standard,
@@ -1464,10 +1462,6 @@ class Assignment < ActiveRecord::Base
 
   named_scope :expecting_submission, :conditions=>"submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL"
 
-  named_scope :mismatched_reminders, lambda {
-    {:conditions => ['assignments.due_at IS NOT NULL AND (assignments.reminders_created_for_due_at IS NULL or assignments.due_at != assignments.reminders_created_for_due_at)']}
-  }
-
   named_scope :gradeable, lambda {
     {:conditions => ['assignments.submission_types != ?', 'not_graded'] }
   }
@@ -1488,62 +1482,6 @@ class Assignment < ActiveRecord::Base
 
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?
-  end
-
-  def generate_reminders_if_changed
-    send_later(:generate_reminders!) if (@due_at_was != self.due_at || @submission_types_was != self.submission_types) && due_at && submittable_type?
-    true
-  end
-
-  def generate_reminders!
-    return false unless due_at
-    due_user_ids = []
-    grading_user_ids = []
-    assignment_reminders.each do |r|
-      res = r.update_for(self)
-      if r.reminder_type == 'grading' && res
-        grading_user_ids << r.user_id
-      elsif r.reminder_type == 'due_at' && res
-        due_user_ids << r.user_id
-      end
-    end
-    if submittable_type?
-      students = self.context.students
-      needed_ids = students.map{|s| s.id} - due_user_ids
-      students.select{|s| needed_ids.include?(s.id)}.each do |s|
-        r = assignment_reminders.build(:user => s, :reminder_type => 'due_at')
-        r.update_for(self)
-      end
-    end
-    admins = self.context.instructors
-    needed_ids = admins.map{|a| a.id} - grading_user_ids
-    admins.select{|a| needed_ids.include?(a.id)}.each do |a|
-      r = assignment_reminders.build(:user => a, :reminder_type => 'grading')
-      r.update_for(self)
-    end
-    reminders_created_for_due_at = due_at
-    save
-  end
-
-  def due_reminder_time_for(context, user)
-    user.reminder_time_for_due_dates rescue nil
-  end
-
-  def grading_reminder_time_for(context, user)
-    user.reminder_time_for_grading rescue nil
-  end
-
-  def reminder_teacher_to_publish!
-    @remind_teacher_to_publish = true
-    self.publishing_reminder_sent = true
-    self.save!
-    @remind_teacher_to_publish = false
-  end
-
-  def reminder_teacher_to_grade!
-    @remind_teacher_to_grade = true
-    self.save!
-    @remind_teacher_to_grade = false
   end
 
   def overdue?
@@ -1577,7 +1515,7 @@ class Assignment < ActiveRecord::Base
   end
   protected :readable_submission_type
 
-  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :reminders_created_for_due_at, :publishing_reminder_sent, :previously_published, :needs_grading_count]
+  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :previously_published, :needs_grading_count]
 
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={}) #migrate=true)

@@ -1,9 +1,0 @@
-<% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
-<% end %>
-
-<% define_content :subject do %>
-  <%= t('ungraded_assignment', 'Ungraded Assignment: %{assignment_name}, %{course_name}', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>
-<% end %>
-
-<%= t('not_graded', "%{assignment_name}, %{course_name}, hasn't been graded. It was due %{due_date}", :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :due_date => datetime_string(force_zone(asset.assignment.due_at)))  %>

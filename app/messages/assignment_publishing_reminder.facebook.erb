@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
-<% end %>
-
-<%= t('ungraded_assignment_sentence', "The assignment *%{assignment_name}* for %{course_name} appears to have been graded, but not published.  Publishing assignments notifies students that their grades have been entered and finalized.", :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>") %>

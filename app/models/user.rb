@@ -130,7 +130,6 @@ class User < ActiveRecord::Base
   has_many :context_rubrics, :as => :context, :class_name => 'Rubric'
   has_many :grading_standards
   has_many :context_module_progressions
-  has_many :assignment_reminders
   has_many :assessment_question_bank_users
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
@@ -295,7 +294,6 @@ class User < ActiveRecord::Base
 
   before_save :assign_uuid
   before_save :update_avatar_image
-  after_save :generate_reminders_if_changed
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
@@ -603,7 +601,6 @@ class User < ActiveRecord::Base
     self.reminder_time_for_grading ||= 0
     self.initial_enrollment_type = nil unless ['student', 'teacher', 'ta', 'observer'].include?(initial_enrollment_type)
     User.invalidate_cache(self.id) if self.id
-    @reminder_times_changed = self.reminder_time_for_due_dates_changed? || self.reminder_time_for_grading_changed?
     true
   end
 
@@ -954,7 +951,7 @@ class User < ActiveRecord::Base
       all_conversations.find_each{ |c| c.move_to_user(new_user) } unless Shard.current != new_user.shard
       updates = {}
       ['account_users','asset_user_accesses',
-        'assignment_reminders','attachments',
+        'attachments',
         'calendar_events','collaborations',
         'context_module_progressions','discussion_entries','discussion_topics',
         'enrollments','group_memberships','page_comments',
@@ -1600,41 +1597,6 @@ class User < ActiveRecord::Base
 
     results[:folders] = results[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
     results
-  end
-
-  def generate_reminders_if_changed
-    send_later(:generate_reminders!) if @reminder_times_changed
-  end
-
-  def generate_reminders!
-    enrollments = self.current_enrollments
-    mgmt_course_ids = enrollments.select{|e| e.instructor? }.map(&:course_id).uniq
-    student_course_ids = enrollments.select{|e| !e.admin? }.map(&:course_id).uniq
-    assignments = Assignment.for_courses(mgmt_course_ids + student_course_ids).active.due_after(Time.now)
-    student_assignments = assignments.select{|a| student_course_ids.include?(a.context_id) }
-    mgmt_assignments = assignments - student_assignments
-
-    due_assignment_ids = []
-    grading_assignment_ids = []
-    assignment_reminders.each do |r|
-      res = r.update_for(self)
-      if r.reminder_type == 'grading' && res
-        grading_assignment_ids << r.assignment_id
-      elsif r.reminder_type == 'due_at' && res
-        due_assignment_ids << r.assignment_id
-      end
-    end
-    needed_ids = student_assignments.map(&:id) - due_assignment_ids
-    student_assignments.select{|a| needed_ids.include?(a.id) }.each do |assignment|
-      r = assignment_reminders.build(:user => self, :assignment => assignment, :reminder_type => 'due_at')
-      r.update_for(assignment)
-    end
-    needed_ids = mgmt_assignments.map(&:id) - grading_assignment_ids
-    mgmt_assignments.select{|a| needed_ids.include?(a.id) }.each do |assignment|
-      r = assignment_reminders.build(:user => self, :assignment => assignment, :reminder_type => 'grading')
-      r.update_for(assignment)
-    end
-    save
   end
 
   def self_enroll_if_necessary

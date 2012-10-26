@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
-<% end %>
-
-<%= t('ungraded_assignment_sentence', "It looks like the assignment, [%{assignment_name}](%{assignment_url}), for the course, %{course_name}, hasn't been graded.  It was due %{due_date}.", :assignment_name => asset.assignment.title, :assignment_url => content(:link), :course_name => asset.assignment.context.name, :due_date => datetime_string(force_zone(asset.assignment.due_at))) %>

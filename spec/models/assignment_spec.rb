@@ -1951,19 +1951,6 @@ describe Assignment do
     end
   end
 
-  context "assignment reminders" do
-    it "should generate reminders" do
-      course_with_student
-      d = Time.now
-      @assignment = @course.assignments.create!(:title => "some assignment", :due_at => d + 1.week, :submission_types => "online_url")
-      @assignment.generate_reminders!
-      @assignment.assignment_reminders.should_not be_nil
-      @assignment.assignment_reminders.length.should eql(1)
-      @assignment.assignment_reminders[0].user_id.should eql(@user.id)
-      @assignment.assignment_reminders[0].remind_at.should eql(@assignment.due_at - @user.reminder_time_for_due_dates)
-    end
-  end
-
   context "clone_for" do
     it "should clone for another course" do
       course_with_teacher
