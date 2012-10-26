@@ -660,7 +660,11 @@ ActionController::Routing::Routes.draw do |map|
       courses.post 'courses/:course_id/files', :action => :create_file
       courses.post 'courses/:course_id/folders', :controller => :folders, :action => :create
       courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
-      courses.get  'courses/:course_id/tabs', :action => :tabs, :path_name => "course_tabs"
+    end
+
+    api.with_options(:controller => :tabs) do |tabs|
+      tabs.get "courses/:course_id/tabs", :action => :index, :path_name => 'course_tabs'
+      tabs.get "groups/:group_id/tabs", :action => :index, :path_name => 'group_tabs'
     end
 
     api.with_options(:controller => :sections) do |sections|
