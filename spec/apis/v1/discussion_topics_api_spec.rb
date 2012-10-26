@@ -362,25 +362,6 @@ describe DiscussionTopicsController, :type => :integration do
         @topic.reload
         @topic.should_not be_locked
       end
-
-      it "should handle position_after" do
-        other_topics = (1..4).map do |i|
-          @course.discussion_topics.create!(:title => i.to_s, :message => i.to_s)
-        end
-        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :position_after => other_topics[2].id})
-        @topic.reload.position.should eql other_topics[2].reload.position + 1
-      end
-      it "should handle position_after with value of 'top'" do
-        other_topics = (1..4).map do |i|
-          @course.discussion_topics.create!(:title => i.to_s, :message => i.to_s)
-        end
-        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :position_after => 'top'})
-        @topic.reload.should eql @course.discussion_topics.first
-      end
     end
 
     describe "DELETE 'destroy'" do

@@ -116,9 +116,7 @@ define [
 
     handleSortUpdate: (event, ui) =>
       id = ui.item.data 'id'
-
-      # if there is a prev element, position after it. if not, that means we got put on top
-      otherId = ui.item.prev('.discussion-topic').data('id') || 'top'
+      otherId = ui.item.next('.discussion-topic').data 'id'
       @collection.get(id).positionAfter otherId
 
     activeFilters: ->
