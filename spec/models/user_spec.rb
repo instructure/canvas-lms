@@ -2167,4 +2167,19 @@ describe User do
       @user.all_pseudonyms(:conditions => { :workflow_state => 'active' }).should == [@p2]
     end
   end
+
+  describe "active_pseudonyms" do
+    before :each do
+      user_with_pseudonym(:active_all => 1)
+    end
+
+    it "should include active pseudonyms" do
+      @user.active_pseudonyms.should == [@pseudonym]
+    end
+
+    it "should not include deleted pseudonyms" do
+      @pseudonym.destroy
+      @user.active_pseudonyms.should be_empty
+    end
+  end
 end
