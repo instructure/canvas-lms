@@ -185,7 +185,7 @@ module QuizzesHelper
     else
       duration_minutes = (duration_seconds / 60).round
     end
-    t("#quizzes.helpers.duration_in_minutes",
+    I18n.t("quizzes.helpers.duration_in_minutes",
       { :zero => "less than 1 minute",
         :one => "1 minute",
         :other => "%{count} minutes" },

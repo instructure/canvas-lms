@@ -8481,6 +8481,7 @@ ru:
       wrong_answer_comments: "Комментарии к неправильному ответу"
     helpers: 
       duration_in_minutes: 
+        one: "%{count} минут(ы)"
         other: "%{count} минут(ы)"
       score_out_of_points_possible: "%{score} из %{points_possible}"
     history: 
