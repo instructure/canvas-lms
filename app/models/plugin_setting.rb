@@ -35,6 +35,8 @@ class PluginSetting < ActiveRecord::Base
   attr_writer :plugin
 
   before_save :encrypt_settings
+  after_save :clear_cache
+  after_destroy :clear_cache
   
   def validate_uniqueness_of_name?
     true
@@ -115,6 +117,10 @@ class PluginSetting < ActiveRecord::Base
 
   def self.settings_cache_key(name)
     ["settings_for_plugin", name].cache_key
+  end
+
+  def clear_cache
+    Rails.cache.delete(PluginSetting.settings_cache_key(self.name))
   end
 
   def self.encrypt(text)
