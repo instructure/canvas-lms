@@ -293,7 +293,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     transaction do
       group = scope.active.root.first
       if !group && force
-        group = scope.build :title => 'ROOT'
+        group = scope.build :title => context.try(:name) || 'ROOT'
         group.building_default = true
         group.save!
       end
