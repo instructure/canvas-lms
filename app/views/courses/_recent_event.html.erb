@@ -1,11 +1,15 @@
 <% 
   show_context ||= false; upcoming ||= false
-  if recent_event.is_a?(Assignment)
+  is_assignment = recent_event.is_a?(Assignment)
+  is_calendar_event = recent_event.is_a?(CalendarEvent)
+  if is_assignment
     if @current_user_submissions
       submission = @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
     elsif @current_user
       submission = @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => { :assignment_id => recent_event.id }).first
     end
+    
+    due_date = VariedDueDate.new(recent_event, @current_user)
   end
 
   cache([ 'recent_event_render',
@@ -14,13 +18,16 @@
           Date.today,
           Time.zone.name,
           recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades),
-          recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)].cache_key) do
+          recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student),
+          (due_date.all_due_dates if is_assignment)].cache_key) do
     icon_explanation, icon_class = icon_data(:context => @context, 
                                              :contexts => @contexts, 
                                              :current_user => @current_user, 
                                              :recent_event => recent_event, 
                                              :submission => submission)
-  %>
+
+%>
+
 <li style="<%= hidden if is_hidden %>" class="event">
   <a
     data-track-category="dashboard"
@@ -30,8 +37,10 @@
     <span class="tooltip_wrap">
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
-        <% if recent_event.is_a?(Assignment) %>
-          <span style="display: block;">due: <%= datetime_string(recent_event.due_at) %></span>
+        <% if is_assignment %>
+          <span style="display: block;"><%= t(:due, "due") %>: 
+            <%= due_at(due_date) %>
+          </span>
           <% if icon_explanation %>
             <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
           <% end %>
@@ -46,13 +55,19 @@
         <% end %>
         <% if show_context %>
           <span style="display: block; font-size: 0.8em;">
-            <%= recent_event.is_a?(CalendarEvent) ? recent_event.effective_context.short_name : recent_event.context.short_name %>
+            <%= is_calendar_event ? recent_event.effective_context.short_name : recent_event.context.short_name %>
           </span>
         <% end %>
       </span>
     </span>
     <b><%= recent_event.title %></b>
-    <em><%= date_string(recent_event.start_at, :short) %></em>
+    <em>
+      <% if is_assignment %>
+        <%= due_at(due_date, 'date') %>
+      <% else %>
+        <%= datetime_string(recent_event.start_at, :short ) %>
+      <% end %>
+    </em>
   </a>
 </li>
 

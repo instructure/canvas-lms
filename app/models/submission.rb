@@ -1196,4 +1196,20 @@ class Submission < ActiveRecord::Base
       :workflow_state => new_state,
     })
   end
+
+  def mute
+    self.published_score = 
+      self.published_grade = 
+      self.graded_at = 
+      self.grade =
+      self.score = nil
+  end
+
+  def muted_assignment?
+    self.assignment.muted?
+  end
+
+  def without_graded_submission?
+    !self.has_submission? && !self.graded?
+  end
 end

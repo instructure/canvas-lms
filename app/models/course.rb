@@ -568,6 +568,24 @@ class Course < ActiveRecord::Base
   end
   memoize :user_has_been_instructor?
 
+  def user_has_been_admin?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
+      # active here is !deleted; it still includes concluded, etc.
+      self.admin_enrollments.active.find_by_user_id(user.id).present?
+    end
+  end
+  memoize :user_has_been_admin?
+
+  def user_has_been_observer?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
+      # active here is !deleted; it still includes concluded, etc.
+      self.observer_enrollments.active.find_by_user_id(user.id).present?
+    end
+  end
+  memoize :user_has_been_observer?
+
   def user_has_been_student?(user)
     return unless user
     Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
@@ -575,6 +593,15 @@ class Course < ActiveRecord::Base
     end
   end
   memoize :user_has_been_student?
+
+  def user_has_no_enrollments?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
+      enrollments.find_by_user_id(user.id).nil?
+    end
+  end
+  memoize :user_has_no_enrollments?
+
 
   # Public: Determine if a group weighting scheme should be applied.
   #

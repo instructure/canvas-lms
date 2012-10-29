@@ -131,6 +131,12 @@ describe AssignmentOverrideApplicator do
         overrides.should == [@override]
       end
 
+      it "should include section overrides for sections with an active observer enrollment" do
+        course_with_observer(:course => @course, :active_all => true)
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
+        overrides.should == [@override]
+      end
+
       it "should not include section overrides for sections without an enrollment" do
         @override.set = @course.course_sections.create!
         @override.save!

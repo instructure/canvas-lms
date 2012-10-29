@@ -1,0 +1,259 @@
+#
+# Copyright (C) 2012 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
+describe "varied due dates" do
+  include TextHelper
+
+  let(:multiple_due_dates) { "Multiple Due Dates" }
+
+  context "on the assignments page" do
+
+    def assert_due_date(response, expected)
+      doc = Nokogiri::XML(response.body)
+
+      [ "#assignment_#{@assignment.id} .date_text",
+        "#right-side .event a em"
+      ].each do |selector|
+        doc.at_css(selector).text.should include(
+          expected.is_a?(String) ? expected : date_string(expected)
+        )
+      end
+
+      doc.at_css("#right-side .event a .tooltip_text").text.should include(
+        expected.is_a?(String) ? expected : datetime_string(expected)
+      )
+    end
+
+    def formatted_date(string)
+      TextHelper.date_string(string)
+    end
+
+    context "an assignment that has a course due date and a section due date" do
+      before do
+        # Create a course with a student
+        course_with_student(:active_all => true)
+        @student1 = @student
+
+        # Enroll another student
+        @s2enrollment = student_in_course(:course => @course, :active_all => true)
+        @student2 = @user
+
+        # Create another section
+        @section = @course.course_sections.create!
+
+        # Add the second student to the new section
+        @s2enrollment.course_section = @section; @s2enrollment.save!
+
+        # Let's enroll another student, this one in both sections
+        @s3enrollment1 = student_in_course(:course => @course, :active_all => true)
+        @student3 = @user
+
+        @s3enrollment2 = @s3enrollment1.clone
+        @s3enrollment2.course_section = @section ; @s3enrollment2.save!
+
+        # Create an assignment
+        @course_due_date = 3.days.from_now
+        @section_due_date = 5.days.from_now
+
+        @assignment = @course.assignments.create!(:title => "Test Assignment", :due_at => @course_due_date)
+
+        # Create an assignment override for this assignment for the section
+        override = AssignmentOverride.new
+        override.assignment = @assignment
+        override.set = @section
+        override.due_at = @section_due_date
+        override.due_at_overridden = true
+        override.save!
+      end
+
+      context "as a student" do
+        context "in the base section" do
+          it "shows the course due date" do
+            user_session(@student1)
+            get "/assignments"
+
+            assert_due_date response, @course_due_date
+            response.body.should_not include formatted_date(@section_due_date)
+            response.body.should_not include multiple_due_dates
+          end
+        end
+
+        context "in the overridden section" do
+          it "shows the section due date" do
+            user_session(@student2)
+            get "/assignments"
+
+            assert_due_date response, @section_due_date
+            response.body.should_not include formatted_date(@course_due_date)
+            response.body.should_not include multiple_due_dates
+          end
+        end
+
+        context "in both the base section and the overridden section (it could happen)" do
+          it "shows the more lenient due date (section due date in this case)" do
+            user_session(@student2)
+            get "/assignments"
+
+            assert_due_date response, @section_due_date
+            response.body.should_not include formatted_date(@course_due_date)
+            response.body.should_not include multiple_due_dates            
+          end
+        end
+      end
+
+      context "as the teacher" do
+        it "shows multiple due dates" do
+          course_with_teacher_logged_in(:course => @course, :active_all => true)
+          get "/assignments"
+
+          assert_due_date response, multiple_due_dates
+          response.body.should_not include formatted_date(@course_due_date)
+          response.body.should_not include formatted_date(@section_due_date)
+        end
+      end
+
+      context "as a TA" do
+        it "shows multiple due dates" do
+          course_with_ta(:course => @course, :active_all => true)
+          user_session(@ta)
+
+          get "/assignments"
+
+          assert_due_date response, multiple_due_dates
+          response.body.should_not include formatted_date(@course_due_date)
+          response.body.should_not include formatted_date(@section_due_date)          
+        end
+      end
+
+      context "as an observer" do
+        before do
+          course_with_observer(:course => @course, :active_all => true)
+          user_session(@observer)
+        end
+
+        context "assigned to students" do
+          context "assigned to a student in the base section" do
+            it "shows the course due date" do
+              @enrollment.update_attribute(:associated_user_id, @student1.id)
+              get "/assignments"
+
+              assert_due_date response, @course_due_date
+              response.body.should_not include formatted_date(@section_due_date)
+              response.body.should_not include multiple_due_dates
+            end
+          end
+
+          context "assigned to a student in the overridden section" do
+            it "shows the section due date" do
+              @enrollment.update_attribute(:associated_user_id, @student2.id)
+              get "/assignments"
+
+              assert_due_date response, @section_due_date
+              response.body.should_not include formatted_date(@course_due_date)
+              response.body.should_not include multiple_due_dates              
+            end
+          end
+
+          context "assigned to a student in multiple sections" do
+            it "shows the more lenient due date (section in this case)" do
+              @enrollment.update_attribute(:associated_user_id, @student3.id)
+              get "/assignments"
+
+              assert_due_date response, @section_due_date
+              response.body.should_not include formatted_date(@course_due_date)
+              response.body.should_not include multiple_due_dates              
+            end
+          end
+        end
+
+        context "not assigned to any students" do
+          context "enrolled in the base section" do
+            it "shows the course due date" do
+              get "/assignments"
+
+              assert_due_date response, @course_due_date
+              response.body.should_not include formatted_date(@section_due_date)
+              response.body.should_not include multiple_due_dates
+            end
+          end
+
+          context "enrolled in the overridden section" do
+            it "shows the section due date" do
+              @enrollment.course_section = @section ; @enrollment.save!
+
+              get "/assignments"
+
+              assert_due_date response, @section_due_date
+              response.body.should_not include formatted_date(@course_due_date)
+              response.body.should_not include multiple_due_dates
+            end
+          end
+        end
+      end
+
+      context "as a course designer" do
+        it "shows multiple due dates" do
+          course_with_designer(:course => @course, :active_all => true)
+          user_session(@designer)
+
+          get "/assignments"
+
+          assert_due_date response, multiple_due_dates
+          response.body.should_not include formatted_date(@course_due_date)
+          response.body.should_not include formatted_date(@section_due_date)          
+        end
+      end
+
+      describe "as an account admin, accessing the course assignments page" do
+        before do
+          account_admin_user
+          user_session(@admin)
+        end
+
+        context "with overrides" do
+          it "shows multiple due dates" do
+            get course_assignments_path(@course)
+            response.body.should include multiple_due_dates
+          end
+        end
+
+        context "with no overrides" do
+          it "shows the course due date" do
+            AssignmentOverride.delete_all
+            get course_assignments_path(@course)
+            response.body.should include formatted_date(@course_due_date)
+          end
+        end
+      end
+
+      describe "with caching" do
+        it "shows the right due dates" do
+          enable_cache do
+            { @student1 => @course_due_date, @student2 => @section_due_date }.each do |student, due_date|
+              user_session(student)
+              get "/assignments"
+              assert_due_date response, due_date
+            end
+          end
+        end
+      end
+    end
+  end
+end

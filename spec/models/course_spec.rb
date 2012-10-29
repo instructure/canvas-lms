@@ -2782,6 +2782,30 @@ describe Course, "user_has_been_instructor?" do
   end
 end
 
+describe Course, "user_has_been_admin?" do
+  it "should be true for teachers, past or present" do
+    e = course_with_teacher(:active_all => true)
+    @course.user_has_been_admin?(@teacher).should be_true
+
+    e.conclude
+    e.reload.workflow_state.should == "completed"
+    @course.user_has_been_admin?(@teacher).should be_true
+
+    @course.complete
+    @course.user_has_been_admin?(@teacher).should be_true
+  end
+
+  it "should be true for tas" do
+    e = course_with_ta(:active_all => true)
+    @course.user_has_been_admin?(@ta).should be_true
+  end
+
+  it "should be true for designers" do
+    e = course_with_designer(:active_all => true)
+    @course.user_has_been_admin?(@designer).should be_true
+  end
+end
+
 describe Course, "user_has_been_student?" do
   it "should be true for students, past or present" do
     e = course_with_student(:active_all => true)
@@ -2793,6 +2817,23 @@ describe Course, "user_has_been_student?" do
 
     @course.complete
     @course.user_has_been_student?(@student).should be_true
+  end
+end
+
+describe Course, "user_has_been_observer?" do
+  it "should be false for teachers" do
+    e = course_with_teacher(:active_all => true)
+    @course.user_has_been_observer?(@teacher).should be_false
+  end
+
+  it "should be false for tas" do
+    e = course_with_ta(:active_all => true)
+    @course.user_has_been_observer?(@ta).should be_false
+  end
+
+  it "should be true for observers" do
+    course_with_observer(:active_all => true)
+    @course.user_has_been_observer?(@observer).should be_true
   end
 end
 

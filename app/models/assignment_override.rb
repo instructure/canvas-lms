@@ -139,6 +139,14 @@ class AssignmentOverride < ActiveRecord::Base
     write_attribute(:all_day_date, new_all_day_date)
   end
 
+  def as_hash
+    { :title => title,
+      :due_at => due_at,
+      :all_day => all_day,
+      :all_day_date => all_day_date,
+      :override => self }
+  end
+
   named_scope :visible_to, lambda{ |admin, course|
     scopes = []
 

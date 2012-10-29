@@ -8,12 +8,15 @@
   unless context && context.is_a?(Course)
     context = assignment.context || @context
   end
+
+  due_date = VariedDueDate.new(assignment, @current_user)
 %>
 <% cache(['assignment_render',
           context,
           assignment,
           @just_viewing_one_course,
-          Time.zone.utc_offset].cache_key,
+          Time.zone.utc_offset,
+          due_date.all_due_dates].cache_key,
          :expires_in => (tomorrow_at_midnight - Time.zone.now).to_i) do %>
   <% assignment_url = context_url(context, :context_assignment_url, assignment.id || '{{ id }}') %>
   <% submission_url = context_url(context,
@@ -56,9 +59,13 @@
 
       <div class="data assignment_due">
         <div class="date_text" style="<%= hidden unless assignment && assignment.due_at %>">
-          <% ot(:due_at, '%{date} at %{time}', :date => capture { %>
-          <span class="due_date"><%= date_string(assignment.due_at) || nbsp %></span><% }, :time => capture { %>
-          <span class="due_time"><%= time_string(assignment.due_at) || nbsp %></span><% }) %>
+          <% if due_date.multiple? %>
+            <%= multiple_due_dates(due_date) %>
+          <% else %>
+            <% ot(:due_at, '%{date} at %{time}', :date => capture { %>
+            <span class="due_date"><%= date_string(due_date.due_at) || nbsp %></span><% }, :time => capture { %>
+            <span class="due_time"><%= time_string(due_date.due_at) || nbsp %></span><% }) %>
+          <% end %>
         </div>
       </div>
 

@@ -46,7 +46,10 @@ module AssignmentOverrideApplicator
         overrides << group_override if group_override
       end
 
-      section_ids = user.student_enrollments.active.scoped(:conditions => {:course_id => assignment.context_id}).map(&:course_section_id)
+      section_ids = user.enrollments.active.scoped(:conditions =>
+        { :type => ['StudentEnrollment', 'ObserverEnrollment'],
+          :course_id => assignment.context_id}).map(&:course_section_id)
+      
       section_overrides = assignment.assignment_overrides.
         scoped(:conditions => {:set_type => 'CourseSection', :set_id => section_ids})
 

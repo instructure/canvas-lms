@@ -714,6 +714,32 @@ describe Assignment do
     end
   end
 
+  describe "due_date_hash" do
+    it "returns the due at, all day, and all day date params" do
+      due = 5.days.from_now
+      a = Assignment.new(:due_at => due)
+      a.due_date_hash.should == { :due_at => due, :all_day => false, :all_day_date => nil }
+    end
+  end
+
+  describe "observed_student_due_dates" do
+    it "returns a list of overridden due date hashes" do
+      a = Assignment.new
+      u = User.new
+      student1, student2 = [mock, mock]
+
+      { student1 => '1', student2 => '2' }.each do |student, value|
+        a.expects(:overridden_for).with(student).returns \
+          mock(:due_date_hash => { :student => value })
+      end
+      
+      ObserverEnrollment.expects(:observed_students).returns({student1 => [], student2 => []})
+
+      override_hashes = a.observed_student_due_dates(u).sort_by { |h| h[:student] }
+      override_hashes.should == [ { :student => '1' }, { :student => '2' } ]
+    end
+  end
+
   describe "#unlock_ats_for(user)" do
     before :each do
       course_with_student(:active_all => true)

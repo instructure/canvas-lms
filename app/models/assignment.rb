@@ -168,49 +168,64 @@ class Assignment < ActiveRecord::Base
   # (nil if the user has no student enrollment(s) in the assignment's course)
   #
   # the second is a list of due dates a they apply to users, sections, or
-  # groups visible to the user as an instructor (nil if the user has no
-  # instructor enrollment(s) in the assignment's course)
+  # groups visible to the user as an admin (nil if the user has no
+  # admin/observer enrollment(s) in the assignment's course)
   #
   # in both cases, "due dates" is a hash with due_at (full timestamp), all_day
-  # flag, and all_day_date. for the "as an instructor" list, each due date from
+  # flag, and all_day_date. for the "as an admin" list, each due date from
   # an override will also have a 'title' key to identify which subset of the
   # course is affected by that due date, and an 'override' key referencing the
   # override itself. for the original due date, it will instead have a 'base'
   # flag (value true).
   def due_dates_for(user)
-    as_student, as_instructor = nil, nil
+    as_student, as_admin = nil, nil
+    return nil, nil if context.nil?
 
     if context.user_has_been_student?(user)
-      overridden = self.overridden_for(user)
-      as_student = {
-        :due_at => overridden.due_at,
-        :all_day => overridden.all_day,
-        :all_day_date => overridden.all_day_date
-      }
+      as_student = self.overridden_for(user).due_date_hash
     end
 
-    if context.user_has_been_instructor?(user)
-      overrides = self.overrides_visible_to(user).overriding_due_at
+    if context.user_has_been_admin?(user)
+      as_admin = due_dates_visible_to(user)
 
-      as_instructor = overrides.map do |override|
-        {
-          :title => override.title,
-          :due_at => override.due_at,
-          :all_day => override.all_day,
-          :all_day_date => override.all_day_date,
-          :override => override
-        }
+    elsif context.user_has_been_observer?(user)
+      as_admin = observed_student_due_dates(user).uniq
+
+      if as_admin.empty?
+        as_admin = [self.overridden_for(user).due_date_hash]
       end
 
-      as_instructor << {
-        :base => true,
-        :due_at => self.due_at,
-        :all_day => self.all_day,
-        :all_day_date => self.all_day_date
-      }
+    elsif context.user_has_no_enrollments?(user)
+      as_admin = all_due_dates
     end
 
-    return as_student, as_instructor
+    return as_student, as_admin
+  end
+
+  def all_due_dates
+    all_dates = assignment_overrides.overriding_due_at.map(&:as_hash)
+    all_dates << due_date_hash.merge(:base => true)
+  end
+
+  def due_dates_visible_to(user)
+    # Overrides
+    overrides = overrides_visible_to(user).overriding_due_at
+    list = overrides.map(&:as_hash)
+
+    # Base
+    list << self.due_date_hash.merge(:base => true)
+  end
+
+  def observed_student_due_dates(user)
+    ObserverEnrollment.observed_students(context, user).map do |student, enrollments|
+      self.overridden_for(student).due_date_hash
+    end
+  end
+
+  def due_date_hash
+    { :due_at => due_at,
+      :all_day => all_day,
+      :all_day_date => all_day_date }
   end
 
   # like due_dates_for, but for unlock_at values instead. for consistency, each

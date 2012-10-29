@@ -479,85 +479,72 @@ class ApplicationController < ActionController::Base
   # Also retrieves submissions and sorts the assignments based on
   # their due dates and submission status for the given user.
   def get_sorted_assignments
-    @assignment_groups    = []
-    @upcoming_assignments = []
-    @assignments          = []
-    @submissions          = []
-    @overdue_assignments  = []
     @courses = @contexts.select{ |c| c.is_a?(Course) }
     @just_viewing_one_course = @context.is_a?(Course) && @courses.length == 1
     @context_codes = @courses.map(&:asset_string)
     @context = @courses.first
+
     if @just_viewing_one_course
-      @courses.each do |course|
-        # if there is just one context this will leave @groups set up for the view group by assignment group
-        @groups = course.assignment_groups.active(:include => :active_assignments)
-        assignments_for_this_course = @groups.map(&:active_assignments).flatten
-        @assignments += assignments_for_this_course
-        @upcoming_assignments += assignments_for_this_course.select{ |a| 
-          a.due_at && 
-          a.due_at <= 1.weeks.from_now && 
-          a.due_at >= Time.now
-        }
-        log_asset_access("assignments:#{course.asset_string}", "assignments", "other")
-      end
+      @groups = @courses.first.assignment_groups.active.scoped(:include => :active_assignments)
+      @assignments = @groups.map(&:active_assignments).flatten
     else
-      @groups = AssignmentGroup.for_context_codes(@context_codes).active(:include => {:active_assignments => {:submissions => {}, :quiz => {}, :discussion_topic => {}} })
+      @groups = AssignmentGroup.for_context_codes(@context_codes).active
       @assignments = Assignment.active.for_context_codes(@context_codes)
-      @courses.each do |course|
-        log_asset_access("assignments:#{course.asset_string}", "assignments", "other")
-      end
     end
-    @upcoming_assignments = @assignments.select{|a|
-      a.due_at &&
-      a.due_at <= 1.weeks.from_now &&
-      a.due_at >= Time.now
-    }
-    @submissions = @current_user.submissions(:include => {:submission_comments => {}, :rubric_assessment => {}}).to_a if @current_user
-    @submissions_hash = {}
-    @submissions.each{|s|
-      @submissions_hash[s.assignment_id] = s
-      assignment = @assignments.select { |a| a.id == s.assignment_id }[0]
-      if assignment && assignment.muted?
-        submission = @submissions_hash[s.assignment_id]
-        submission.published_score = submission.published_grade = submission.graded_at = submission.grade = submission.score = nil
-      end
-    }
-    @ungraded_assignments = @assignments.select{|a| 
-      a.grants_right?(@current_user, session, :grade) && 
-      a.expects_submission? &&
-      a.needs_grading_count_for_user(@current_user) > 0
-    }
     @assignment_groups = @groups
-    @past_assignments = @assignments.select{ |a| a.due_at && a.due_at < Time.now }
-    @undated_assignments = @assignments.select{ |a| !a.due_at }
-    @past_assignments.each do |assignment|
-      submission = @submissions_hash[assignment.id]
-      if assignment.overdue? && 
-         assignment.expects_submission? && 
-         ( !submission || (!submission.has_submission? && !submission.graded?) ) &&
-         assignment.grants_right?(@current_user, session, :submit)
-      
-        @overdue_assignments << assignment
-      end
-    end
-    @future_assignments = @assignments - @past_assignments
-    if request.path.match(/\A\/assignments/)
-      if @future_assignments.length > 5
-        @future_assignments = @future_assignments.select{|a| a.due_at && a.due_at < 2.weeks.from_now }
-      else
-        @future_assignments = @future_assignments.select{|a| a.due_at && a.due_at < 4.weeks.from_now }
-      end
-      if @past_assignments.length > 5
-        @past_assignments = @past_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
-      else
-        @past_assignments = @past_assignments.select{|a| a.due_at && a.due_at > 4.weeks.ago }
-      end
-      @overdue_assignments = @overdue_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
-      @ungraded_assignments = @ungraded_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
-    end
-    
-    [@assignments, @upcoming_assignments, @past_assignments, @overdue_assignments, @ungraded_assignments, @undated_assignments, @future_assignments].map(&:sort!)
+
+    @courses.each { |course| log_course(course) }
+
+    @submissions = @current_user.try(:submissions).to_a
+    @submissions.each{ |s| s.mute if s.muted_assignment? }
+
+    sorted_by_vdd = SortsAssignments.by_varied_due_date({
+      :assignments => @assignments,
+      :user => @current_user,
+      :session => session,
+      :upcoming_limit => 1.week.from_now,
+      :submissions => @submissions
+    })
+
+    @past_assignments = sorted_by_vdd.past
+    @undated_assignments = sorted_by_vdd.undated
+    @ungraded_assignments = sorted_by_vdd.ungraded
+    @upcoming_assignments = sorted_by_vdd.upcoming
+    @future_assignments = sorted_by_vdd.future
+    @overdue_assignments = sorted_by_vdd.overdue
+
+    condense_assignments if requesting_main_assignments_page?
+
+    categorized_assignments.each(&:sort!)
+  end
+
+  def categorized_assignments
+    [
+      @assignments,
+      @upcoming_assignments,
+      @past_assignments,
+      @ungraded_assignments,
+      @undated_assignments,
+      @future_assignments
+    ]
+  end
+
+  def condense_assignments
+    num_weeks = @future_assignments.length > 5 ? 2 : 4
+    @future_assignments = SortsAssignments.up_to(@future_assignments, num_weeks.weeks.from_now)
+    num_weeks = @past_assignments.length < 5 ? 2 : 4
+    @past_assignments = SortsAssignments.down_to(@past_assignments, num_weeks.weeks.ago)
+
+    @overdue_assignments = SortsAssignments.down_to(@overdue_assignments, 4.weeks.ago)
+    @ungraded_assignments = SortsAssignments.down_to(@ungraded_assignments, 4.weeks.ago)
+  end
+
+  def log_course(course)
+    log_asset_access("assignments:#{course.asset_string}", "assignments", "other")
+  end
+
+  def requesting_main_assignments_page?
+    request.path.match(/\A\/assignments/)
   end
   
   # Calculates the file storage quota for @context
