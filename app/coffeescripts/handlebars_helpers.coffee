@@ -1,5 +1,4 @@
 define [
-  'ENV'
   'vendor/handlebars.vm'
   'i18nObj'
   'jquery'
@@ -11,7 +10,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (ENV, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, convertApiUserContent) ->
+], (Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, convertApiUserContent) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (key, defaultValue, options) ->

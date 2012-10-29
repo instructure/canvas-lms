@@ -17,7 +17,6 @@
  */
 
 define([
-  'ENV',
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* $ */,
@@ -51,7 +50,7 @@ define([
   'jqueryui/tabs' /* /\.tabs/ */,
   'compiled/behaviors/trackEvent',
   'vendor/jquery.placeholder'
-], function(ENV, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
+], function(INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
