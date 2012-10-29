@@ -1041,8 +1041,6 @@ define([
     },
 
     handleSubmissionSelectionChange: function(){
-      $no_annotation_warning.hide();
-
       try {
         var submissionToViewVal = $submission_to_view.filter(":visible").val(),
             currentSelectedIndex = Number(submissionToViewVal) ||
@@ -1230,6 +1228,7 @@ define([
 
     loadAttachmentInline: function(attachment){
       $submissions_container.children().hide();
+      $no_annotation_warning.hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
