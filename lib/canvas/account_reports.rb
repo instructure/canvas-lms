@@ -19,22 +19,24 @@
 require 'zip/zip'
 
 module Canvas::AccountReports
-  class AvailableReports
-    @reports = {}
-    @module_names = {}
-    class << self
-      attr_reader :reports, :module_names
-      private :new
+  REPORTS = {}
+
+  # account id is ignored; use PluginSetting to enable a subset of reports
+  def self.add_account_reports(account_id, module_name, reports)
+    reports.each do |(report_type, details)|
+      details = { :title => details } if details.is_a? String
+      details[:module] ||= module_name
+      details[:proc] ||= "Canvas::AccountReports::#{module_name}".constantize.method(report_type)
+      REPORTS[report_type] = details
     end
   end
 
-  def self.add_account_reports(account_id, module_name, reports)
-    AvailableReports.reports[account_id] = reports
-    AvailableReports.module_names[account_id] = module_name
-  end
-
+  # again, id is ignored; use PluginSetting to enable a subset of reports
   def self.for_account(id)
-    (AvailableReports.reports['default'] || {}).merge(AvailableReports.reports[id] || {})
+    settings = Canvas::Plugin.find(:account_reports).settings
+    return REPORTS.dup unless settings
+    enabled_reports = settings.select { |(report, enabled)| enabled }.map(&:first)
+    Hash[*REPORTS.select { |(report, details)| enabled_reports.include?(report) }.flatten]
   end
 
   def self.generate_report(account_report)
@@ -42,16 +44,7 @@ module Canvas::AccountReports
     account_report.start_at ||= 2.months.ago
     account_report.end_at ||= Time.now
     begin
-      module_name = AvailableReports.module_names[account_report.root_account.id]
-      if module_name && Canvas::AccountReports.const_defined?(module_name) &&
-              Canvas::AccountReports.const_get(module_name).respond_to?(account_report.report_type)
-        Canvas::AccountReports.const_get(module_name).send(account_report.report_type, account_report)
-      elsif Canvas::AccountReports.const_defined?('Default') &&
-              Canvas::AccountReports.const_get('Default').respond_to?(account_report.report_type)
-        Canvas::AccountReports.const_get('Default').send(account_report.report_type, account_report)
-      else
-        nil
-      end
+      REPORTS[account_report.report_type][:proc].call(account_report)
     rescue => e
       account_report.logger.error e
       er = ErrorReport.log_exception(:default, e, :user => account_report.user)
