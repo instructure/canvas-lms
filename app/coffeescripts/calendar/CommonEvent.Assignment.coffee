@@ -18,7 +18,7 @@ define [
     copyDataFromObject: (data) =>
       data = data.assignment if data.assignment
       @object = @assignment = data
-      @id = "assignment_#{data.id}"
+      @id = "assignment_#{data.id}" if data.id
       @title = data.title || data.name  || "Untitled" # due to a discrepancy between the legacy ajax API and the v1 API
       @lock_explanation = @object.lock_explanation
       @addClass "group_#{@contextCode()}"

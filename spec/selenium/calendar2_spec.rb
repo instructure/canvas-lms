@@ -209,6 +209,7 @@ describe "calendar2" do
       end
 
       it "should drag and drop an event" do
+        pending('drag and drop not working correctly')
         create_middle_day_event
         driver.action.drag_and_drop(f('.calendar .fc-event'), f('.calendar .fc-week2 .fc-last')).perform
         wait_for_ajaximations
@@ -236,6 +237,19 @@ describe "calendar2" do
         f('.edit_event_link').click
         expect_new_page_load { f('.more_options_link').click }
         f('h2.title').text.should include(name)
+      end
+
+      it "should delete an event" do
+        create_middle_day_event('doomed event')
+        f('.fc-event').click
+        f('.delete_event_link').click
+        f('.ui-dialog .btn-primary').click
+        wait_for_ajaximations
+        f('.fc-event').should be_nil
+        # make sure it was actually deleted and not just removed from the interface
+        get("/calendar2")
+        wait_for_ajax_requests
+        f('.fc-event').should be_nil
       end
 
       it "should let me message students who have signed up for an appointment" do

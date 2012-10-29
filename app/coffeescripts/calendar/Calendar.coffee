@@ -323,6 +323,11 @@ define [
 
     eventSaved: (event) =>
       event.removeClass 'event_pending'
+      # If we just saved a new event then the id field has changed from what it
+      # was in eventSaving. So we need to clear out the old _id that
+      # fullcalendar stores for itself because the id has changed.
+      # This is another reason to do a refetchEvents instead of just an update.
+      delete event._id
       @calendar.fullCalendar('refetchEvents')
       # We'd like to just add the event to the calendar rather than fetching,
       # but the save may be as a result of moving an event from being undated
