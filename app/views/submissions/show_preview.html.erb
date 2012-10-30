@@ -89,7 +89,7 @@
           <% else %>
             <% @submission.attachments.each do |attachment| %>
               <li>
-                <div class="ui-listview-text ui-listview-right">
+                <div class="ui-listview-text ui-listview-right" style="padding-left:5px; padding-right:5px;">
                   <% if can_do(@submission, @current_user, :view_turnitin_report) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
                     <span class="turnitin_score_container">
                       <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
@@ -98,12 +98,15 @@
                   <% end %>
                   <span><%= number_to_human_size(attachment.size) %></span>
                 </div>
-                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
+                <% preview_url = context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>
+                <% preview_document = t('preview_document', 'Preview the document') %>
+                <% if attachment.crocodoc_available? || attachment.scribdable? %>
+                <div class="ui-listview-text ui-listview-right" style="padding-left:5px; padding-right:5px;">
+                  <a href=<%= preview_url %> title="<%= preview_document %>" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= image_tag('preview.png') %></a>
+                </div>
+                <% end %>
+                <a href="<%= preview_url %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
                   <%= attachment.display_name %>
-                  <% preview_document = t('preview_document', 'Preview the document') %>
-                  <% if attachment.crocodoc_available? || attachment.scribdable? %>
-                    <span style="padding: 0 3px;" title="<%= preview_document %>" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" <%= doc_preview_attributes(attachment) %>><%= image_tag('preview.png') %></span>
-                  <% end %>
                 </a>
               </li>
             <% end %>
@@ -131,7 +134,7 @@
           $('.modal_preview_link').live('click', function() {
             $('<div style="padding:0; overflow:hidden;">') //overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
               .dialog({
-                title: "Preview of " + $(this).closest('a').text(),
+                title: "Preview of " + $(this).data('dialog-title'),
                 width: $(document).width() * .95,
                 height: $(document).height() * .75
               })
