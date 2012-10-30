@@ -2,7 +2,7 @@
   <div class="rating-wrap">
     <div class="show">
       <h5>{{description}}</h5>
-      {{#t "points"}}{{points}} Points{{/t}}
+      <span class="points">{{points}}</span> {{#t "points"}}Points{{/t}}
       <a href="#" class="edit_rating active" title="{{#t "edit_criterion_rating"}}Edit criterion rating{{/t}}"><i class="icon-edit"></i></a>
     </div>
     <div class="edit">
@@ -15,10 +15,10 @@
         </div>
       </div>
 
-      <div class="row-fluid">
-        <div class="span10"></div>
-        <div class="span2">
-          <a href="#" class="delete_rating_link" title="{{#t "remove_criterion_rating"}}Remove criterion rating{{/t}}"><i class="icon-trash"></i></a>
+      <div class="buttons row-fluid">
+        <div class="span12">
+          <button class="btn btn-small btn-primary save_rating_link" type="button">{{#t "close_rating"}}Ok{{/t}}</button>
+          <button class="btn btn-small delete_rating_link" type="button">{{#t "delete_criterion"}}Delete{{/t}}</button>
         </div>
       </div>
     </div>

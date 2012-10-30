@@ -34,6 +34,7 @@ define [
       'click .outcome_information_link': 'showRatingDialog'
       'click .edit_rating': 'editRating'
       'click .delete_rating_link': 'deleteRating'
+      'click .save_rating_link': 'saveRating'
       'click .insert_rating': 'insertRating'
     , OutcomeContentBase::events
 
@@ -60,6 +61,15 @@ define [
       if @$('.rating').length > 1
         $(e.currentTarget).closest('td').remove()
         @updateRatings()
+
+    saveRating: (e) ->
+      e.preventDefault()
+      $editWrapper = $(e.currentTarget).parents('.edit:first')
+      $showWrapper = $editWrapper.prev()
+      $showWrapper.find('h5').text($editWrapper.find('input.outcome_rating_description').val())
+      $showWrapper.find('.points').text($editWrapper.find('input.outcome_rating_points').val())
+      $editWrapper.hide()
+      $showWrapper.show()
 
     insertRating: (e) =>
       e.preventDefault()
