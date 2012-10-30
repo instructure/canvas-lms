@@ -158,66 +158,53 @@ class PageView < ActiveRecord::Base
   # WillPaginate::Collection-like object
   def self.for_user(user)
     if cassandra?
-      PageView::CassandraAssociation.new('User', user.global_id)
+      PaginatedCollection.build { |pager| page_view_history(user, pager) }
     else
       self.scoped(:conditions => { :user_id => user.id }, :order => 'created_at desc')
     end
   end
 
-  class CassandraAssociation
-    def initialize(context_type, context_id)
-      @context_type = context_type
-      @context_id = context_id
-      @scrollback_limit = Setting.get('page_views_scrollback_limit:users', 52.weeks.to_s).to_i.ago
+  def self.page_view_history(context, pager)
+    context_type = context.class.name
+    context_id = context.global_id
+    scrollback_limit = Setting.get('page_views_scrollback_limit:users', 52.weeks.to_s).to_i.ago
+    results = []
+
+    if pager.current_page.to_s =~ %r{^(\d+):(\d+/\w+)$}
+      row_ts = $1.to_i
+      start_column = $2
+    else
+      # page 1
+      row_ts = PageView.timeline_bucket_for_time(Time.now, context_type)
     end
 
-    class Collection < Array
-      attr_accessor :per_page, :next_page
-      # the following are for will_paginate compatibility, and will always be nil
-      attr_accessor :previous_page, :first_page, :last_page, :total_pages
-    end
-
-    def paginate(options)
-      results = Collection.new
-      results.per_page = options[:per_page].to_i
-      raise(ArgumentError, "per_page required") unless results.per_page > 0
-
-      if options[:page].to_s =~ %r{^(\d+):(\d+/\w+)$}
-        row_ts = $1.to_i
-        start_column = $2
+    until pager.next_page || Time.at(row_ts) < scrollback_limit
+      limit = pager.per_page + 1 - results.size
+      args = []
+      args << "#{context_type.underscore}_#{context_id}/#{row_ts}"
+      if start_column
+        ordered_id = "AND ordered_id <= ?"
+        args << start_column
       else
-        # page 1
-        row_ts = PageView.timeline_bucket_for_time(Time.now, @context_type)
+        ordered_id = nil
       end
-
-      until results.next_page || Time.at(row_ts) < @scrollback_limit
-        limit = results.per_page + 1 - results.size
-        args = []
-        args << "#{@context_type.underscore}_#{@context_id}/#{row_ts}"
-        if start_column
-          ordered_id = "AND ordered_id <= ?"
-          args << start_column
+      qs = "SELECT ordered_id, request_id FROM page_views_history_by_context where context_and_time_bucket = ? #{ordered_id} ORDER BY ordered_id DESC LIMIT #{limit}"
+      PageView.cassandra.execute(qs, *args).fetch do |row|
+        if results.size == pager.per_page
+          pager.next_page = "#{row_ts}:#{row['ordered_id']}"
         else
-          ordered_id = nil
+          results << row['request_id']
         end
-        qs = "SELECT ordered_id, request_id FROM page_views_history_by_context where context_and_time_bucket = ? #{ordered_id} ORDER BY ordered_id DESC LIMIT #{limit}"
-        PageView.cassandra.execute(qs, *args).fetch do |row|
-          if results.size == results.per_page
-            results.next_page = "#{row_ts}:#{row['ordered_id']}"
-          else
-            results << row['request_id']
-          end
-        end
-
-        start_column = nil
-        # possible optimization: query page_views_counters_by_context_and_day ,
-        # and use it as a secondary index to skip days where the user didn't
-        # have any page views
-        row_ts -= PageView.timeline_bucket_size(@context_type)
       end
 
-      results.replace(PageView.find(results).sort_by { |pv| results.index(pv.request_id) })
+      start_column = nil
+      # possible optimization: query page_views_counters_by_context_and_day ,
+      # and use it as a secondary index to skip days where the user didn't
+      # have any page views
+      row_ts -= PageView.timeline_bucket_size(context_type)
     end
+
+    pager.replace(PageView.find(results).sort_by { |pv| results.index(pv.request_id) })
   end
 
   def self.cache_queue_name

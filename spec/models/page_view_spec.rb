@@ -45,7 +45,7 @@ describe PageView do
       pvs = []
       4.times { |i| pvs << page_view_model(:user => @user, :created_at => (5 - i).weeks.ago) }
       pager = @user.page_views
-      pager.should be_a PageView::CassandraAssociation
+      pager.should be_a PaginatedCollection::Proxy
       expect { pager.paginate() }.to raise_exception(ArgumentError)
       full = pager.paginate(:per_page => 4)
       full.size.should == 4
