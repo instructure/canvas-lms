@@ -56,7 +56,7 @@ define [
       return unless clickedOutside
       dir = $(e.target).data 'view'
       if dir.parent
-        dir.parent.triggerSelect dir.parent.selectedView
+        dir.parent.selectedModel.trigger 'select'
       else
         @selectDir dir
 
@@ -78,6 +78,7 @@ define [
       dir.off 'select'
       dir.on 'select', @selectDir
       dir.sidebar = this
+      dir.clearSelection()
       @directories.push dir
       @updateSidebarWidth()
       @renderDir dir
@@ -92,7 +93,7 @@ define [
         model.set 'parent_outcome_group', @selectedGroup().toJSON()
 
       # add to collection
-      dir = @_findLastDir (d) -> ! d.selectedView or d.selectedView.model instanceof Outcome
+      dir = @_findLastDir (d) -> ! d.selectedModel or d.selectedModel instanceof Outcome
       if model instanceof Outcome
         dir.outcomes.add model
       else
@@ -106,7 +107,7 @@ define [
     selectDir: (dir, selectedModel) =>
       dfd = $.Deferred()
       # don't re-select the same model
-      if selectedModel and dir is @selectedDir() and selectedModel is @selectedDir()?.prevSelectedModel()
+      if selectedModel and dir is @selectedDir() and selectedModel is @selectedDir()?.prevSelectedModel
         dfd.resolve()
         return dfd.promise()
 
@@ -128,24 +129,23 @@ define [
 
       dfd.promise()
 
-    refreshSelection: =>
-      if dir = @selectedDir()
-        selection = dir.selectedModel()
+    refreshSelection: (model) =>
+      dir = @selectedDir()
+      if model is dir.selectedModel
         dir.clearSelection()
-        dir.prevSelectedView = null
-        @selectDir dir, selection
+        model.trigger 'select'
 
     selectedDir: ->
-      @_findLastDir (d) -> d.selectedModel()
+      @_findLastDir (d) -> d.selectedModel
 
     selectedModel: ->
-      @selectedDir()?.selectedModel()
+      @selectedDir()?.selectedModel
 
     selectedGroup: ->
       g = null
       @_findLastDir (d) ->
-        if d.selectedView?.model instanceof OutcomeGroup
-          g = d.selectedView.model
+        if d.selectedModel instanceof OutcomeGroup
+          g = d.selectedModel
       g || @rootOutcomeGroup
 
     clearOutcomeSelection: =>
@@ -160,7 +160,7 @@ define [
         @selectDir @directories[0]
       else
         prevDir = @directories[i - 1]
-        @selectDir prevDir, prevDir.selectedModel()
+        @selectDir prevDir, prevDir.selectedModel
 
     updateSidebarWidth: ->
       sidebarWidth = if @directories.length is 1 then @directoryWidth + 1 else (@directoryWidth * 2) + 2
@@ -190,7 +190,7 @@ define [
         findDialog.on 'import', @addAndSelect, this
       findDialog.show()
 
-    # Find a directory for a given outcome group.
+    # Find a directory for a given outcome group or add a new directory view.
     dirForGroup: (outcomeGroup) ->
       _.find(@directories, (d) -> d.outcomeGroup is outcomeGroup) || @addDirFor(outcomeGroup)
 

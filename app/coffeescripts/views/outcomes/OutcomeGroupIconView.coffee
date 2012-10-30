@@ -20,8 +20,11 @@ define [
   'jquery'
   'underscore'
   'str/htmlEscape'
+  'compiled/models/Outcome'
   'compiled/views/outcomes/OutcomeIconBase'
-], ($, _, h, OutcomeIconBase) ->
+  #
+  'jquery.disableWhileLoading'
+], ($, _, h, Outcome, OutcomeIconBase) ->
 
   class OutcomeGroupIconView extends OutcomeIconBase
 
@@ -45,11 +48,15 @@ define [
         greedy: true
         drop: (e, ui) =>
           model = ui.draggable.data('view').model
+          group = if model instanceof Outcome then model.outcomeGroup else model
           # don't re-add to group
-          return if model.outcomeGroup.id is @model.id
-          @triggerSelect()
+          return if group.id is @model.id
+          @triggerSelect() # select to get the directory ready
+          disablingDfd = new $.Deferred()
+          @dir.$el.disableWhileLoading disablingDfd
           @dir.sidebar.dirForGroup(@model).promise().done (dir) ->
-            dir.moveModelHere model
+            dir.moveModelHere(model).done ->
+              disablingDfd.resolve()
 
     render: ->
       @$el.attr 'data-id', @model.get 'id'

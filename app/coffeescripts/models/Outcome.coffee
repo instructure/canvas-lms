@@ -25,6 +25,12 @@ define [
     name: ->
       @get 'title'
 
+    # The api returns abbreviated data by default
+    # which in most cases means there's no description.
+    # Run fetch() to get all the data.
+    isAbbreviated: ->
+      !@has('description')
+
     # overriding to work with both outcome and outcome link responses
     parse: (resp, xhr) ->
       if resp.outcome # it's an outcome link

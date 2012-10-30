@@ -42,7 +42,7 @@ define [
     add: (model) =>
       @_show model: model, state: 'add'
       @trigger 'adding'
-      @innerView.on 'addSuccess', => @trigger 'addSuccess'
+      @innerView.on 'addSuccess', (m) => @trigger 'addSuccess', m
 
     # private
     _show: (viewOpts) ->

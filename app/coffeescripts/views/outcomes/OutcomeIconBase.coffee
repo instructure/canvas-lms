@@ -127,7 +127,7 @@ define [
         model.collection.remove(model)
         if $target.hasClass('outcome-link') then destinationView.outcomes.add(model) else destinationView.groups.add(model)
         model.trigger 'select'
-        dfd = destinationView.changeLink(model, destinationView.outcomeGroup.toJSON(), model.outcomeGroup)
+        dfd = destinationView.moveModelHere(model)
       else
         destinationView = originalView
       return unless dfd

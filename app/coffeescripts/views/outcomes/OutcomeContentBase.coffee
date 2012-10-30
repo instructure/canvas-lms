@@ -69,7 +69,7 @@ define [
       @on 'success', @success, this
       @on 'fail', @fail, this
       @setModelUrl()
-      if ! @model.has('description') and @state isnt 'add'
+      if @model.isAbbreviated() and @state isnt 'add'
         @state = 'loading'
         @$el.disableWhileLoading @model.fetch success: =>
           @state = opts.state
@@ -95,7 +95,7 @@ define [
       @render()
 
     fail: ->
-      $.flashError I18n.t 'flash.error', "An error occurred. Please try again later."
+      $.flashError I18n.t 'flash.error', "An error occurred. Please refresh the page and try again."
 
     getTinyMceCode: ->
       textarea = @$('textarea')

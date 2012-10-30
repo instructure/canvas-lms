@@ -72,7 +72,7 @@ define [
       @$el.droppable
         scope: 'outcomes'
         drop: (e, ui) =>
-          # don't re-add to group
+          # don't re-add to this group
           return if ui.draggable.parent().get(0) == e.target
           model = ui.draggable.data('view').model
           @moveModelHere model
@@ -81,34 +81,35 @@ define [
     promise: ->
       @loadDfd.promise()
 
-    # move a model from some dir to this
-    moveModelHere: (model) ->
+    # Public: move a model from some dir to this
+    moveModelHere: (model) =>
       model.collection.remove model
       if model instanceof OutcomeGroup
         @groups.add model
+        dfd = @moveGroup model, @outcomeGroup.toJSON()
       else
         @outcomes.add model
-      model.trigger 'select'
-      @changeLink model, @outcomeGroup.toJSON(), model.outcomeGroup
+        dfd = @changeLink model, @outcomeGroup.toJSON()
+      dfd.done -> model.trigger 'select'
 
-    # change the outcome link from oldGroup to the newGroup
-    changeLink: (model, newGroup, oldGroup) ->
+    # Internal: change the outcome link to the newGroup
+    changeLink: (outcome, newGroup) ->
       disablingDfd = new $.Deferred()
+      @$el.disableWhileLoading disablingDfd
 
-      model.outcomeGroup = oldGroup
-      model.setUrlTo 'delete'
-      unlinkUrl = model.url
       onFail = (m, r) ->
         disablingDfd.reject()
-        $.flashError I18n.t 'flash.error', "An error occurred. Please try again later."
+        $.flashError I18n.t 'flash.error', "An error occurred. Please refresh the page and try again."
 
       # create new link
-      model.outcomeGroup = newGroup
-      model.setUrlTo 'add'
-      $.ajaxJSON(model.url, 'POST', outcome_id: model.get 'id')
+      outcome.setUrlTo 'delete'
+      unlinkUrl = outcome.url
+      outcome.outcomeGroup = newGroup
+      outcome.setUrlTo 'add'
+      $.ajaxJSON(outcome.url, 'POST', outcome_id: outcome.get 'id')
         .done( (modelData) ->
-          # reset model urls etc.
-          model.set model.parse(modelData)
+          # reset urls etc.
+          outcome.set outcome.parse(modelData)
           # new link created, now remove old link
           $.ajaxJSON(unlinkUrl, 'DELETE')
             .done( ->
@@ -117,6 +118,26 @@ define [
               disablingDfd.resolve())
             .fail onFail)
         .fail onFail
+
+      disablingDfd
+
+    # Internal: change the group's parent to the newGroup
+    moveGroup: (group, newGroup) ->
+      disablingDfd = new $.Deferred()
+
+      onFail = (m, r) ->
+        disablingDfd.reject()
+        $.flashError I18n.t 'flash.error', "An error occurred. Please refresh the page and try again."
+
+      group.setUrlTo 'edit'
+      $.ajaxJSON(group.url, 'PUT', parent_outcome_group_id: newGroup.id)
+        .done( (modelData) ->
+          # reset urls etc.
+          group.set group.parse(modelData)
+          $.flashMessage I18n.t 'flash.updateSuccess', 'Update successful'
+          disablingDfd.resolve())
+        .fail onFail
+
       @$el.disableWhileLoading disablingDfd
       disablingDfd
 
@@ -145,15 +166,9 @@ define [
 
     triggerSelect: (sv) =>
       @clearSelection()
-      @selectedView = sv
+      @selectedModel = sv.model
       sv.select()
       @trigger 'select', this, sv.model
-
-    selectedModel: ->
-      @selectedView?.model
-
-    prevSelectedModel: ->
-      @prevSelectedView?.model
 
     # Cache the backbone views for outcomes and groups.
     # Groups are shown first.
@@ -164,6 +179,7 @@ define [
         .concat @_viewsFor(@outcomes.models, OutcomeIconView)
       for v in @_views
         v.on 'select', @triggerSelect
+        v.select() if v.model is @selectedModel
       @_views
 
     reset: =>
@@ -171,23 +187,23 @@ define [
       @render()
 
     removeGroup: (group) ->
-      @_clearSelectedView()
-      @clearSelection()
-      @trigger 'select', this, null
       @reset()
+      if group is _.last(@sidebar.directories)?.outcomeGroup
+        @trigger 'select', this, null
 
     remove: ->
-      @_clearSelectedView()
       @_clearViews()
+      @selectedModel = null
       super arguments...
 
     clearSelection: (e) ->
       e?.preventDefault()
-      @_clearSelectedView()
+      @prevSelectedModel = @selectedModel
+      @selectedModel = null
       _.each @views(), (v) -> v.unSelect()
 
     clearOutcomeSelection: ->
-      if @selectedView instanceof OutcomeIconView
+      if @selectedModel instanceof Outcome
         @clearSelection()
 
     render: =>
@@ -207,7 +223,3 @@ define [
     _clearViews: ->
       _.each @_views, (v) -> v.remove()
       @_views = null
-
-    _clearSelectedView: ->
-      @prevSelectedView = @selectedView
-      @selectedView = null

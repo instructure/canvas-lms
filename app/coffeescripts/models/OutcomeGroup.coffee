@@ -25,6 +25,12 @@ define [
     name: ->
       @get 'title'
 
+    # The api returns abbreviated data by default
+    # which in most cases means there's no description.
+    # Run fetch() to get all the data.
+    isAbbreviated: ->
+      !@has('description')
+
     setUrlTo: (action) ->
       @url =
         switch action
