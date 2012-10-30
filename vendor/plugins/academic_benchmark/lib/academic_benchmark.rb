@@ -71,7 +71,7 @@ module AcademicBenchmark
     end
 
     def refresh_outcomes_for_authority(url, authority)
-      res = Canvas::HTTP.get(url)
+      res = Converter.get_url(url)
       if res.code.to_i == 200
         process_json_string(res.body)
       else
@@ -81,7 +81,7 @@ module AcademicBenchmark
 
     # Get list of all authorities available for this api key and refresh them
     def refresh_all_outcomes
-      res = Canvas::HTTP.get(@browse_url + (LIST_AUTHORITIES_QUERY_STRING % @api_key))
+      res = Converter.get_url(@browse_url + (LIST_AUTHORITIES_QUERY_STRING % @api_key))
       if res.code.to_i == 200
         if data = process_json_string(res.body, true)
           if data["itm"]
@@ -137,6 +137,10 @@ module AcademicBenchmark
       end
 
       nil
+    end
+
+    def self.get_url(url)
+      Net::HTTP.get_response(URI(url))
     end
 
   end

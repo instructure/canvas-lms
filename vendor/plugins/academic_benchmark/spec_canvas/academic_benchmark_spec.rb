@@ -137,7 +137,7 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(File.read(@level_0_browse))
       response.stubs(:code).returns("200")
-      Canvas::HTTP.expects(:get).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&authority=CC").returns(response)
+      AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&authority=CC").returns(response)
 
       run_and_check
     end
@@ -148,7 +148,7 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(File.read(@level_0_browse))
       response.stubs(:code).returns("200")
-      Canvas::HTTP.expects(:get).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&guid=aaaaaaaaaa").returns(response)
+      AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&guid=aaaaaaaaaa").returns(response)
 
       run_and_check
     end
@@ -157,7 +157,7 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(%{{"status":"fail","ab_err":{"msg":"API key access violation.","code":"401"}}})
       response.stubs(:code).returns("200")
-      Canvas::HTTP.expects(:get).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&authority=CC").returns(response)
+      AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&authority=CC").returns(response)
       
       @cm.export_content
       run_jobs
@@ -176,13 +176,13 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(File.read(@authority_list))
       response.stubs(:code).returns("200")
-      Canvas::HTTP.expects(:get).with("http://example.com/browse?levels=2&format=json&api_key=oioioi").returns(response)
+      AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=2&format=json&api_key=oioioi").returns(response)
       
       ["CCC", "BBB", "AAA", "111", "222"].each do |guid|
         response2 = Object.new
         response2.stubs(:body).returns(File.read(@level_0_browse))
         response2.stubs(:code).returns("200")
-        Canvas::HTTP.expects(:get).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&guid=" + guid).returns(response2)
+        AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&guid=" + guid).returns(response2)
       end
       
       run_and_check
