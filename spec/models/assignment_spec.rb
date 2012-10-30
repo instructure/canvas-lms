@@ -717,10 +717,10 @@ describe Assignment do
   describe "#unlock_ats_for(user)" do
     before :each do
       course_with_student(:active_all => true)
-      @assignment = assignment_model(:course => @course, :unlock_at => 5.days.ago)
+      @assignment = assignment_model(:course => @course, :unlock_at => 2.days.ago)
       @override = assignment_override_model(:assignment => @assignment)
       @override.set = @course.default_section
-      @override.override_unlock_at(2.days.ago)
+      @override.override_unlock_at(5.days.ago)
       @override.save!
     end
 

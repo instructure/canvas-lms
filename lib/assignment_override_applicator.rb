@@ -122,30 +122,41 @@ module AssignmentOverrideApplicator
   end
 
   # perform overrides of specific fields
+  def self.override_for_due_at(assignment, overrides)
+    applicable_overrides = overrides.select(&:due_at_overridden)
+    if applicable_overrides.empty?
+      assignment
+    elsif override = applicable_overrides.detect{ |o| o.due_at.nil? }
+      override
+    else
+      override = applicable_overrides.sort_by(&:due_at).last
+      if assignment.due_at && assignment.due_at > override.due_at
+        assignment
+      else
+        override
+      end
+    end
+  end
+
   def self.overridden_due_at(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.due_at_overridden }
-    primary_override ? primary_override.due_at : assignment.due_at
+    override_for_due_at(assignment, overrides).due_at
   end
 
   def self.overridden_all_day(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.due_at_overridden }
-    # when pulling from the assignment, read the actual attribute, not the
-    # return value of Assignment#all_day
-    primary_override ? primary_override.all_day : assignment.read_attribute(:all_day)
+    override_for_due_at(assignment, overrides).all_day
   end
 
   def self.overridden_all_day_date(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.due_at_overridden }
-    primary_override ? primary_override.all_day_date : assignment.all_day_date
+    override_for_due_at(assignment, overrides).all_day_date
   end
 
   def self.overridden_unlock_at(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.unlock_at_overridden }
-    primary_override ? primary_override.unlock_at : assignment.unlock_at
+    unlock_ats = overrides.select(&:unlock_at_overridden).map(&:unlock_at)
+    unlock_ats.any?(&:nil?) ? nil : [assignment.unlock_at, *unlock_ats].compact.min
   end
 
   def self.overridden_lock_at(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.lock_at_overridden }
-    primary_override ? primary_override.lock_at : assignment.lock_at
+    lock_ats = overrides.select(&:lock_at_overridden).map(&:lock_at)
+    lock_ats.any?(&:nil?) ? nil : [assignment.lock_at, *lock_ats].compact.max
   end
 end

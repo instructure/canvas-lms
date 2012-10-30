@@ -489,12 +489,34 @@ describe AssignmentOverrideApplicator do
       due_at.should == @override2.due_at
     end
 
-    it "should prefer overrides by order listed" do
+    it "should prefer most lenient override" do
       @override.override_due_at(6.days.from_now)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_due_at(7.days.from_now)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override, @override2])
+      due_at.should == @override2.due_at
+    end
+
+    it "should consider no due date as most lenient" do
+      @override.override_due_at(nil)
+      @override2 = assignment_override_model(:assignment => @assignment)
+      @override2.override_due_at(7.days.from_now)
+      due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override, @override2])
       due_at.should == @override.due_at
+    end
+
+    it "should not consider empty original due date as more lenient than an override due date" do
+      @assignment.due_at = nil
+      @override.override_due_at(6.days.from_now)
+      due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
+      due_at.should == @override.due_at
+    end
+
+    it "should include a non-empty original due date when finding most lenient due date" do
+      @assignment.due_at = 7.days.from_now
+      @override.override_due_at(6.days.from_now)
+      due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
+      due_at.should == @assignment.due_at
     end
 
     it "should fallback on the assignment's due_at" do
@@ -509,94 +531,12 @@ describe AssignmentOverrideApplicator do
     end
   end
 
-  describe "overridden_all_day" do
-    before :each do
-      @assignment = assignment_model(:due_at => fancy_midnight) # makes all_day true
-      @override = assignment_override_model(:assignment => @assignment)
-    end
-
-    it "should use overrides that override due_at" do
-      @override.override_due_at(@assignment.due_at + 12.hours) # makes all_day false
-      all_day = AssignmentOverrideApplicator.overridden_all_day(@assignment, [@override])
-      all_day.should == @override.all_day
-    end
-
-    it "should skip overrides that don't override due_at" do
-      @override2 = assignment_override_model(:assignment => @assignment)
-      @override2.override_due_at(@assignment.due_at + 12.hours)
-      all_day = AssignmentOverrideApplicator.overridden_all_day(@assignment, [@override, @override2])
-      all_day.should == @override2.all_day
-    end
-
-    it "should prefer overrides by order listed" do
-      @override.override_due_at(fancy_midnight(:time => 2.days.from_now))
-      @override2 = assignment_override_model(:assignment => @assignment)
-      @override2.override_due_at(@assignment.due_at + 12.hours)
-      all_day = AssignmentOverrideApplicator.overridden_all_day(@assignment, [@override, @override2])
-      all_day.should == @override.all_day
-    end
-
-    it "should fallback on the assignment's all_day" do
-      all_day = AssignmentOverrideApplicator.overridden_all_day(@assignment, [@override])
-      all_day.should == @assignment.all_day
-    end
-
-    it "should fallback at the attribute level" do
-      @assignment.due_at = nil
-      @assignment.save!
-      all_day = AssignmentOverrideApplicator.overridden_all_day(@assignment, [@override])
-      all_day.should be_nil
-    end
-
-    it "should recognize overrides with overridden-but-nil due_at" do
-      @override.override_due_at(nil)
-      all_day = AssignmentOverrideApplicator.overridden_all_day(@assignment, [@override])
-      all_day.should == @override.all_day
-    end
-  end
-
-  describe "overridden_all_day_date" do
-    before :each do
-      @assignment = assignment_model(:due_at => 5.days.from_now)
-      @override = assignment_override_model(:assignment => @assignment)
-    end
-
-    it "should use overrides that override due_at" do
-      @override.override_due_at(7.days.from_now)
-      all_day_date = AssignmentOverrideApplicator.overridden_all_day_date(@assignment, [@override])
-      all_day_date.should == @override.all_day_date
-    end
-
-    it "should skip overrides that don't override due_at" do
-      @override2 = assignment_override_model(:assignment => @assignment)
-      @override2.override_due_at(7.days.from_now)
-      all_day_date = AssignmentOverrideApplicator.overridden_all_day_date(@assignment, [@override, @override2])
-      all_day_date.should == @override2.all_day_date
-    end
-
-    it "should prefer overrides by order listed" do
-      @override.override_due_at(6.days.from_now)
-      @override2 = assignment_override_model(:assignment => @assignment)
-      @override2.override_due_at(7.days.from_now)
-      all_day_date = AssignmentOverrideApplicator.overridden_all_day_date(@assignment, [@override, @override2])
-      all_day_date.should == @override.all_day_date
-    end
-
-    it "should fallback on the assignment's all_day_date" do
-      all_day_date = AssignmentOverrideApplicator.overridden_all_day_date(@assignment, [@override])
-      all_day_date.should == @assignment.all_day_date
-    end
-
-    it "should recognize overrides with overridden-but-nil due_at" do
-      @override.override_due_at(nil)
-      all_day_date = AssignmentOverrideApplicator.overridden_all_day_date(@assignment, [@override])
-      all_day_date.should == @override.all_day_date
-    end
-  end
+  # specs for overridden_due_at cover all_day and all_day_date, since they're
+  # pulled from the same assignment/override the due_at is
 
   describe "overridden_unlock_at" do
     before :each do
-      @assignment = assignment_model(:unlock_at => 5.days.from_now)
+      @assignment = assignment_model(:unlock_at => 10.days.from_now)
       @override = assignment_override_model(:assignment => @assignment)
     end
 
@@ -613,12 +553,34 @@ describe AssignmentOverrideApplicator do
       unlock_at.should == @override2.unlock_at
     end
 
-    it "should prefer overrides by order listed" do
-      @override.override_unlock_at(6.days.from_now)
+    it "should prefer most lenient override" do
+      @override.override_unlock_at(7.days.from_now)
+      @override2 = assignment_override_model(:assignment => @assignment)
+      @override2.override_unlock_at(6.days.from_now)
+      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override, @override2])
+      unlock_at.should == @override2.unlock_at
+    end
+
+    it "should consider no unlock date as most lenient" do
+      @override.override_unlock_at(nil)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_unlock_at(7.days.from_now)
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override, @override2])
       unlock_at.should == @override.unlock_at
+    end
+
+    it "should not consider empty original unlock date as more lenient than an override unlock date" do
+      @assignment.unlock_at = nil
+      @override.override_unlock_at(6.days.from_now)
+      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
+      unlock_at.should == @override.unlock_at
+    end
+
+    it "should include a non-empty original unlock date when finding most lenient unlock date" do
+      @assignment.unlock_at = 6.days.from_now
+      @override.override_unlock_at(7.days.from_now)
+      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
+      unlock_at.should == @assignment.unlock_at
     end
 
     it "should fallback on the assignment's unlock_at" do
@@ -652,12 +614,34 @@ describe AssignmentOverrideApplicator do
       lock_at.should == @override2.lock_at
     end
 
-    it "should prefer overrides by order listed" do
+    it "should prefer most lenient override" do
       @override.override_lock_at(6.days.from_now)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_lock_at(7.days.from_now)
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override, @override2])
+      lock_at.should == @override2.lock_at
+    end
+
+    it "should consider no lock date as most lenient" do
+      @override.override_lock_at(nil)
+      @override2 = assignment_override_model(:assignment => @assignment)
+      @override2.override_lock_at(7.days.from_now)
+      lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override, @override2])
       lock_at.should == @override.lock_at
+    end
+
+    it "should not consider empty original lock date as more lenient than an override lock date" do
+      @assignment.lock_at = nil
+      @override.override_lock_at(6.days.from_now)
+      lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
+      lock_at.should == @override.lock_at
+    end
+
+    it "should include a non-empty original lock date when finding most lenient lock date" do
+      @assignment.lock_at = 7.days.from_now
+      @override.override_lock_at(6.days.from_now)
+      lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
+      lock_at.should == @assignment.lock_at
     end
 
     it "should fallback on the assignment's lock_at" do
