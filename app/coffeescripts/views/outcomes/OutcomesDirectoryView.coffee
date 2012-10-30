@@ -71,6 +71,7 @@ define [
     initDroppable: ->
       @$el.droppable
         scope: 'outcomes'
+        hoverClass: 'outcome-level-hover'
         drop: (e, ui) =>
           # don't re-add to this group
           return if ui.draggable.parent().get(0) == e.target
