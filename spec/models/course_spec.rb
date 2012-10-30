@@ -3143,3 +3143,23 @@ describe Course do
     end
   end
 end
+
+describe Course do
+  context "re-enrollments" do
+    it "should update concluded enrollment on re-enrollment" do
+      @course = course(:active_all => true)
+      
+      @user1 = user_model; @user1.sortable_name = 'jonny'; @user1.save      
+      @course.enroll_user(@user1)
+      
+      enrollment_count = @course.enrollments.count
+      
+      @course.complete
+      @course.unconclude
+      
+      @course.enroll_user(@user1)
+      
+      @course.enrollments.count.should == enrollment_count
+    end
+  end
+end

@@ -586,6 +586,28 @@ describe CoursesController do
       @course.students.map{|s| s.name}.should be_include("Fred")
     end
 
+    it "should not enroll people in hard-concluded courses" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.complete
+      post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"
+      response.should_not be_success
+      @course.reload
+      @course.students.map{|s| s.name}.should_not be_include("Sam")
+      @course.students.map{|s| s.name}.should_not be_include("Fred")
+    end
+
+    it "should not enroll people in soft-concluded courses" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.conclude_at = 1.day.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"
+      response.should_not be_success
+      @course.reload
+      @course.students.map{|s| s.name}.should_not be_include("Sam")
+      @course.students.map{|s| s.name}.should_not be_include("Fred")
+    end
+
     it "should record initial_enrollment_type on new users" do
       course_with_teacher_logged_in(:active_all => true)
       post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>", :enrollment_type => 'ObserverEnrollment'

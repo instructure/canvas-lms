@@ -24,7 +24,9 @@ class EnrollmentsApiController < ApplicationController
   @@errors = {
     :missing_parameters => 'No parameters given',
     :missing_user_id    => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
-    :bad_type           => 'Invalid type'
+    :bad_type           => 'Invalid type',
+    :concluded_course   => 'Can\'t add an enrollment to a concluded course.'
+
   }
   @@valid_types = %w{StudentEnrollment TeacherEnrollment TaEnrollment ObserverEnrollment}
 
@@ -173,6 +175,7 @@ class EnrollmentsApiController < ApplicationController
       errors << @@errors[:bad_type] if params[:enrollment][:type].present? && !@@valid_types.include?(params[:enrollment][:type])
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
     end
+    errors << @@errors[:concluded_course] if @context.completed? || @context.soft_concluded?
     unless errors.blank?
       render(:json => { :message => errors.join(', ') }, :status => 403) && return
     end

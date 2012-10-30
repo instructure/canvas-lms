@@ -394,7 +394,11 @@ TEXT
       </tr>
     </table>
     <% if can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users) %>
+      <% if @context.completed? || @context.soft_concluded? %>
+        <%= t('cannot_add_users_to_concluded_course', %{You cannot add users to a concluded course.}) %>
+      <% else %>
         <a href="#" class="add_users_link button"><%= image_tag "add.png" %><%= t('links.add_users', %{Add Users}) %></a>
+      <% end %>
     <% end %>
     <% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :style => "display: none;"} do  %>
     <h2><%= t('headings.add_users', %{Add Course Users}) %></h2>
