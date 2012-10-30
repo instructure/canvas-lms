@@ -79,24 +79,34 @@ module AcademicBenchmark
       end
     end
 
+    def list_authorities_url
+      @browse_url + (LIST_AUTHORITIES_QUERY_STRING % @api_key)
+    end
+
     # Get list of all authorities available for this api key and refresh them
     def refresh_all_outcomes
-      res = Converter.get_url(@browse_url + (LIST_AUTHORITIES_QUERY_STRING % @api_key))
+      res = Converter.get_url(list_authorities_url)
       if res.code.to_i == 200
         if data = process_json_string(res.body, true)
           if data["itm"]
-            data["itm"].each do |auth_list|
+            set_progress(2)
+            country_count = data["itm"].length
+
+            data["itm"].each_with_index do |auth_list, i|
               # This is a country that has a list of authorities
               next unless auth_list["itm"]
-              
-              auth_list["itm"].each do |auth|
+              authority_count = auth_list["itm"].length
+              auth_list["itm"].each_with_index do |auth, j|
                 next unless auth["type"] == "authority"
+
                 url = @browse_url + (GUID_QUERY_STRING % [@api_key, auth["guid"]])
                 refresh_outcomes_for_authority(url, auth["title"])
+                set_progress(((i+(j+1.0)/authority_count)/country_count) * 90)
               end
             end
           end
         end
+        set_progress(95)
       else
         add_warning(I18n.t("academic_benchmark.bad_response_all", "Couldn't update the standards."), "responseCode: #{res.code} - #{res.body}")
       end
@@ -140,7 +150,11 @@ module AcademicBenchmark
     end
 
     def self.get_url(url)
-      Net::HTTP.get_response(URI(url))
+      uri = URI(url)
+      Net::HTTP.new(uri.host, uri.port).start { |http|
+        http.read_timeout = 5.minutes.to_i
+        http.request_get(uri.request_uri)
+      }
     end
 
   end
