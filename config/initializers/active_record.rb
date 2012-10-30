@@ -449,7 +449,7 @@ class ActiveRecord::Base
 
   def self.add_polymorph_methods(generic, specifics)
     specifics.each do |specific|
-      next if instance_methods.include?(specific.to_s)
+      next if method_defined?(specific.to_sym)
       class_name = specific.to_s.classify
       correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
 
