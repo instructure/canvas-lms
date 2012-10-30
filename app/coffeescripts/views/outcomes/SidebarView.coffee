@@ -55,10 +55,7 @@ define [
       clickedOutside = e.target is e.currentTarget
       return unless clickedOutside
       dir = $(e.target).data 'view'
-      if dir.parent
-        dir.parent.selectedModel.trigger 'select'
-      else
-        @selectDir dir
+      @selectDir dir
 
     # Adds a directory view for an outcome group.
     # Returns the directory view.
@@ -105,29 +102,20 @@ define [
 
     # Select the directory view and optionally select an Outcome or Group.
     selectDir: (dir, selectedModel) =>
-      dfd = $.Deferred()
       # don't re-select the same model
-      if selectedModel and dir is @selectedDir() and selectedModel is @selectedDir()?.prevSelectedModel
-        dfd.resolve()
-        return dfd.promise()
-
-      complete = =>
-        # remove all directories after the selected dir
-        _.each @directories.splice(i + 1), (d) -> d.remove()
-        @addDirFor selectedModel if selectedModel instanceof OutcomeGroup and !selectedModel.isNew()
-        @updateSidebarWidth()
-        @trigger 'select', selectedModel, @directories
-        dfd.resolve()
+      return if selectedModel and dir is @selectedDir() and selectedModel is @selectedDir()?.prevSelectedModel
 
       dir.clearSelection() unless selectedModel
-      i = _.indexOf @directories, dir
-      # only scroll to dir if the selection is not the last dir
-      if @directories.length is i + 1
-        complete()
-      else
-        @_scrollToDir i, selectedModel, complete
 
-      dfd.promise()
+      # remove all directories after the selected dir
+      i = _.indexOf @directories, dir
+      _.each @directories.splice(i + 1), (d) -> d.remove()
+      isAddingDir = selectedModel instanceof OutcomeGroup and !selectedModel.isNew()
+      @addDirFor selectedModel if isAddingDir
+      @updateSidebarWidth()
+      scrollIndex = if isAddingDir then i + 1 else i
+      @_scrollToDir scrollIndex, selectedModel
+      @trigger 'select', selectedModel, @directories
 
     refreshSelection: (model) =>
       dir = @selectedDir()
@@ -153,14 +141,11 @@ define [
 
     # Go up a directory.
     goBack: =>
-      i = _.indexOf @directories, @selectedDir()
-      @goingBack = true
-      if i < 1
-        @directories[0].clearSelection()
-        @selectDir @directories[0]
+      if @selectedModel() instanceof OutcomeGroup
+        @selectDir @selectedDir()
       else
-        prevDir = @directories[i - 1]
-        @selectDir prevDir, prevDir.selectedModel
+        i = _.indexOf @directories, @selectedDir()
+        @selectDir @directories[i - 1]
 
     updateSidebarWidth: ->
       sidebarWidth = if @directories.length is 1 then @directoryWidth + 1 else (@directoryWidth * 2) + 2
@@ -169,10 +154,6 @@ define [
 
     renderDir: (dir) =>
       @$el.append dir.render().el
-      @$sidebar.animate scrollLeft: @scrollNextPosition
-
-    scrollNextPosition: ->
-      @$sidebar.get(0).scrollWidth - @$sidebar.get(0).clientWidth
 
     render: ->
       @$el.empty()
@@ -194,11 +175,11 @@ define [
     dirForGroup: (outcomeGroup) ->
       _.find(@directories, (d) -> d.outcomeGroup is outcomeGroup) || @addDirFor(outcomeGroup)
 
-    _scrollToDir: (dirIndex, model, complete) ->
+    _scrollToDir: (dirIndex, model) ->
       scrollLeft = (@directoryWidth + 1) * (if model instanceof Outcome then dirIndex - 1 else dirIndex)
-      @$sidebar.animate {scrollLeft: scrollLeft}, duration: @directoryWidth, complete: complete
+      @$sidebar.animate {scrollLeft: scrollLeft}, duration: 200
       scrollTop = (@entryHeight + 1) * _.indexOf(@directories[dirIndex].views(), _.find(@directories[dirIndex].views(), (v) -> v.model is model))
-      @directories[dirIndex].$el.animate {scrollTop: scrollTop}, duration: @directoryWidth
+      @directories[dirIndex].$el.animate {scrollTop: scrollTop}, duration: 200
 
     _findLastDir: (f) ->
       _.find(_.clone(@directories).reverse(), f) || _.last @directories
