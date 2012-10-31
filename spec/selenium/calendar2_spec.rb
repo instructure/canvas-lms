@@ -252,6 +252,19 @@ describe "calendar2" do
         f('.fc-event').should be_nil
       end
 
+      it "should delete an assignment" do
+        create_middle_day_assignment
+        f('.fc-event').click
+        f('.delete_event_link').click
+        f('.ui-dialog .btn-primary').click
+        wait_for_ajaximations
+        f('.fc-event').should be_nil
+        # make sure it was actually deleted and not just removed from the interface
+        get("/calendar2")
+        wait_for_ajax_requests
+        f('.fc-event').should be_nil
+      end
+
       it "should let me message students who have signed up for an appointment" do
         date = Date.today.to_s
         create_appointment_group :new_appointments => [
