@@ -37,61 +37,6 @@
       padding: 15px
       width: 600px
       min-height: 300px
-    table.criterion
-      padding: 0
-      min-width: 600px
-      margin: 2em 0
-      td
-        border: 1px solid $borderColor
-        padding: 5px
-        position: relative
-        text-align: center
-        h5
-          margin-bottom: 10px
-          color: $link_color
-          font-weight: normal
-        &.total
-          background-color: $lightBackground
-          h5
-            font-weight: bold
-        .edit
-          display: none
-          height: 67px
-          min-width: 180px
-          .row-fluid
-            margin-bottom: 8px
-          .buttons button
-            float: right
-            margin-left: 4px
-        .edit_rating
-          float: right
-        .rating-wrap
-          // for .insert positioning
-          position: relative
-          .outcome_rating_description
-            width: 100%
-        .insert
-          position: absolute
-          top: -27px
-          right: -17px
-          cursor: pointer
-          a
-            color: $grayLight
-            text-decoration: none
-          span
-            width: 0
-            height: 0
-            padding: 0
-            margin: 0 11px
-            border-right: 5px solid transparent
-            border-left:  5px solid transparent
-            border-top:   5px solid $grayLight
-            display: block
-          &:hover
-            a
-              color: $link-color
-            span
-              border-top-color: $link-color
     label
       display: block
       padding: 5px 0 5px 0
@@ -159,3 +104,68 @@ ul.outcome-level
   margin: 0
   .ui-dialog-buttonpane
     margin-top: 0
+
+table.criterion
+  padding: 0
+  min-width: 600px
+  margin: 2em 0
+
+table.criterion td
+  border: 1px solid $borderColor
+  padding: 5px
+  text-align: center
+  vertical-align: top
+  &.total
+    background-color: $lightBackground
+
+.rating-wrap
+  position: relative
+
+h5
+  margin-bottom: 10px
+  color: $link_color
+  font-weight: normal
+  min-height: 1em
+  &.total
+    font-weight: bold
+
+table.criterion .edit
+  display: none
+  height: 67px
+  min-width: 180px
+  .row-fluid
+    margin-bottom: 8px
+  .buttons button
+    float: right
+    margin-left: 4px
+
+.edit_rating
+  float: right
+
+.outcome_rating_description
+  width: 100%
+
+table.criterion .insert
+  position: absolute
+  top: -33px
+  right: -22px
+  cursor: pointer
+  a
+    color: $grayLight
+    text-decoration: none
+  &:hover
+    a
+      color: $link-color
+    span
+      border-top-color: $link-color
+
+.arrow-icon
+  width: 0
+  height: 0
+  padding: 0
+  margin: 0 11px
+  border-right: 5px solid transparent
+  border-left:  5px solid transparent
+  border-top:   5px solid $grayLight
+  display: block
+
