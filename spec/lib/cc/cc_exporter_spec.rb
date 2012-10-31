@@ -329,5 +329,30 @@ describe "Common Cartridge exporting" do
       doc.at_css("assignmentGroup[identifier=#{mig_id(@ag2)}]").should_not be_nil
     end
 
+    it "should not export syllabus if not selected" do
+      @course.syllabus_body = "<p>Bodylicious</p>"
+
+      run_export
+      @manifest_doc.at_css('resource[href="course_settings/syllabus.html"]').should be_nil
+    end
+
+    it "should export syllabus when selected" do 
+      @course.syllabus_body = "<p>Bodylicious</p>"
+
+      @ce.selected_content = {
+        :syllabus_body => "1"
+      }
+      @ce.save!
+
+      run_export
+      @manifest_doc.at_css('resource[href="course_settings/syllabus.html"]').should_not be_nil
+    end
+
+    it "should use canvas_export.txt as flag" do
+      run_export
+
+      @manifest_doc.at_css('resource[href="course_settings/canvas_export.txt"]').should_not be_nil
+      @zip_file.find_entry('course_settings/canvas_export.txt').should_not be_nil
+    end
   end
 end

@@ -1,5 +1,10 @@
 <h3><%= check_box :copy, :all_course_settings, :class => "copy_all", :checked => false %><%= label :copy, :all_course_settings, image_tag('file_multiple.png') + " " + t('labels.copy_settings', "Settings from %{course}", :course => @source_course.name) %></h3>
 
+<h3>
+  <%= check_box :copy, :syllabus_body, :class => "copy_all", :checked => false %>
+  <%= label :copy, :syllabus_body, image_tag('file_multiple.png') + " " + t('labels.copy_syllabus', "Syllabus description from %{course}", :course => @source_course.name) %>
+</h3>
+
 <% if @source_course.assignment_groups.active.length > 0 %>
   <h3><%= check_box :copy, :all_assignments, :class => "copy_all", :checked => true %><%= label :copy, :all_assignments, image_tag('assignment.png') + " " + t('labels.assignment', "Assignments for %{course}", :course => @source_course.name) %></h3>
   <ul class="unstyled_list root_asset_list">

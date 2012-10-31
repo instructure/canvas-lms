@@ -1130,16 +1130,20 @@ describe ContentImportsController, :type => :integration do
   end
   
   it "should only copy course settings" do
-    run_only_copy(:course_settings)
-    check_counts 0
-    @copy_to.reload
-    @copy_to.syllabus_body.should == "<p>haha</p>"
+    @copy_from.default_view = 'modules' 
+    @copy_from.save!
+    run_only_copy(:course_settings) 
+    check_counts 0 
+    @copy_to.reload 
+    @copy_to.default_view.should == 'modules'
   end
+
   it "should only copy wiki pages" do
     run_only_copy(:wiki_pages)
     check_counts 0
     @copy_to.wiki.wiki_pages.count.should == 1
   end
+
   each_copy_option do |option, association|
     it "should only copy #{option}" do
       pending if !Qti.qti_enabled? && association == :quizzes

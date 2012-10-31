@@ -1795,7 +1795,7 @@ class Course < ActiveRecord::Base
       end
     end
 
-    migration.fast_update_progress(30)
+    migration.fast_update_progress(31)
     question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
     Group.process_migration(data, migration); migration.fast_update_progress(36)
     LearningOutcome.process_migration(data, migration); migration.fast_update_progress(37)
@@ -1821,8 +1821,15 @@ class Course < ActiveRecord::Base
     CalendarEvent.process_migration(data, migration);migration.fast_update_progress(90)
     WikiPage.process_migration_course_outline(data, migration);migration.fast_update_progress(95)
 
-    if !migration.copy_options || migration.is_set?(migration.copy_options[:everything]) || migration.is_set?(migration.copy_options[:all_course_settings])
+    everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
+    if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
       import_settings_from_migration(data, migration); migration.fast_update_progress(96)
+    end
+
+    syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body]
+    if syllabus_should_be_added
+      syllabus_body = data[:course][:syllabus_body] if data[:course]
+      import_syllabus_from_migration(syllabus_body) if syllabus_body
     end
 
     begin
@@ -1875,10 +1882,13 @@ class Course < ActiveRecord::Base
   attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash, :content_migration
   attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :assignment_group_no_drop_assignments
 
+  def import_syllabus_from_migration(syllabus_body)
+    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self) 
+  end
+
   def import_settings_from_migration(data, migration)
     return unless data[:course]
     settings = data[:course]
-    self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
     if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
       self.tab_configuration = settings[:tab_configuration]
     end

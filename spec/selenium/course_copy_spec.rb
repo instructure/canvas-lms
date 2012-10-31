@@ -216,7 +216,6 @@ describe "course copy" do
 
     it "should not copy course settings if not checked" do
       @second_course = Course.create!(:name => 'second course')
-      @second_course.syllabus_body = "<p>haha</p>"
       @second_course.tab_configuration = [{"id" => 0}, {"id" => 14}, {"id" => 8}, {"id" => 5}, {"id" => 6}, {"id" => 2}, {"id" => 3, "hidden" => true}]
       @second_course.default_view = 'modules'
 
@@ -225,9 +224,20 @@ describe "course copy" do
         wait_for_ajaximations
       end
 
-      @course.syllabus_body.should == nil
       @course.tab_configuration.should == []
       @course.default_view.should == 'feed'
+    end
+
+    it "should not copy syllabus body if not selected" do
+      @second_course = Course.create!(:name => 'second course')
+      @second_course.syllabus_body = "<p>haha</p>"
+
+      course_copy_helper do
+        f('#copy_everything').click
+        wait_for_ajaximations
+      end
+
+      @course.syllabus_body.should == nil
     end
 
     it "should correctly copy content from a completed course" do

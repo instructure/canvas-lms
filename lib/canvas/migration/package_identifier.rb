@@ -32,6 +32,8 @@ module Canvas::Migration
         if get_node_val(doc, 'metadata schema') =~ /IMS Common Cartridge/i
           if !!doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::SYLLABUS}"] file[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::COURSE_SETTINGS}"]})
             :canvas_cartridge
+          elsif !!doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::CANVAS_EXPORT_FLAG}"]})
+            :canvas_cartridge
           elsif get_node_val(doc, 'metadata schemaversion') == "1.0.0"
             :common_cartridge_1_0
           elsif get_node_val(doc, 'metadata schemaversion') == "1.1.0"
@@ -81,7 +83,5 @@ module Canvas::Migration
       end
       raise "Unsupported content package"
     end
-
-
   end
 end

@@ -10,6 +10,7 @@ describe "Migration package importers" do
     end
     
     supported = {
+            "Old Canvas Cartridge" => [:old_canvas, CC::Importer::Canvas::Converter],
             "Canvas Cartridge" => [:canvas, CC::Importer::Canvas::Converter],
             "Common Cartridge 1.0" => ["cc1-0", CC::Importer::Standard::Converter],
             "Common Cartridge 1.1" => ["cc1-1", CC::Importer::Standard::Converter],

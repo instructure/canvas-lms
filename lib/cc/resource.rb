@@ -28,7 +28,7 @@ module CC
     include WebLinks
     include BasicLTILinks
     
-    delegate :add_error, :set_progress, :export_object?, :for_course_copy, :add_item_to_export, :to => :@manifest
+    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :to => :@manifest
     delegate :referenced_files, :to => :@html_exporter
 
     def initialize(manifest, manifest_node)

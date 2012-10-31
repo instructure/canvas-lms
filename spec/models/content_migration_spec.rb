@@ -76,6 +76,7 @@ describe ContentMigration do
 
     it "should migrate syllabus links on copy" do
       course_model
+
       topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<p>some text</p>")
       @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/discussion_topics/#{topic.id}'>link</a>"
       @copy_from.save!
@@ -86,6 +87,31 @@ describe ContentMigration do
       new_topic.should_not be_nil
       new_topic.message.should == topic.message
       @copy_to.syllabus_body.should match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
+    end
+
+    it "should copy course syllabus when the everything option is selected" do 
+      course_model
+
+      @copy_from.syllabus_body = "What up"
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should =~ /#{@copy_from.syllabus_body}/
+    end
+
+    it "should not migrate syllabus when not selected" do
+      course_model
+      @copy_from.syllabus_body = "<p>wassup</p>"
+
+      @cm.copy_options = {
+        :course => {'syllabus_body' => false}
+      }
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should == nil
     end
 
     def make_grading_standard(context)
@@ -125,19 +151,11 @@ describe ContentMigration do
       @copy_from.grading_standard_enabled = true
       @copy_from.save!
 
-      body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
-  <div>
-    <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-    <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-  </div>}
-      @copy_from.syllabus_body = body_with_link % @copy_from.id
-
       run_course_copy
 
       #compare settings
       @copy_to.conclude_at.should == nil
       @copy_to.start_at.should == nil
-      @copy_to.syllabus_body.should == (body_with_link % @copy_to.id)
       @copy_to.storage_quota.should == 444
       @copy_to.settings[:hide_final_grade].should == true
       @copy_to.grading_standard_enabled.should == true
@@ -838,6 +856,7 @@ describe ContentMigration do
 
     it "items in the root folder should be in the root in the new course" do
       att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+
       @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>"
       @copy_from.save!
 
@@ -853,6 +872,7 @@ describe ContentMigration do
 
     it "should preserve media comment links" do
       pending unless Qti.qti_enabled?
+
       @copy_from.media_objects.create!(:media_id => '0_12345678')
       @copy_from.syllabus_body = <<-HTML.strip
       <p>
@@ -1392,7 +1412,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         @copy_to.assignments.count.should == 0
         @copy_to.quizzes.count.should == 0
         @copy_to.discussion_topics.count.should == 0
-
         @cm.content_export.error_messages.should == [
                 ["The assignment \"lock locky\" could not be copied because it is locked.", nil],
                 ["The topic \"topic\" could not be copied because it is locked.", nil],
