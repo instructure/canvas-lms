@@ -50,10 +50,15 @@ require [
   toolbar.on 'add', content.add
   toolbar.on 'find', -> sidebar.findDialog FindDialog
   # sidebar events
-  sidebar.on 'select', content.show
+  sidebar.on 'select', (model) ->
+    return unless model?
+    content.show(model)
   sidebar.on 'select', toolbar.resetBackButton
   # content events
   content.on 'addSuccess', sidebar.refreshSelection
+  content.on 'deleteSuccess', ->
+    model = sidebar.$el.find('.outcome-group.selected:last').data('view')?.model
+    content.show(model)
 
   app =
     toolbar: toolbar

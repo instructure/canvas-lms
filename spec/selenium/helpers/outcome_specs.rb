@@ -136,7 +136,7 @@ shared_examples_for "outcome tests" do
       ## expect
       # should not be showing on page
       ffj('.outcomes-sidebar .outcome-level:first li').should be_empty
-      f('.outcomes-content .title').should be_nil
+      f('.outcomes-content .title').text.should == 'Setting up Outcomes'
       # db
       LearningOutcome.find_by_id(@outcome.id).workflow_state.should == 'deleted'
       refresh_page # to make sure it was correctly deleted

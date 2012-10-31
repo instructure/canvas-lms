@@ -144,7 +144,6 @@ define [
         success: =>
           $.flashMessage I18n.t('flash.deleteSuccess', 'Deletion successful')
           @trigger 'deleteSuccess'
-          @$el.empty()
           @remove()
         error: => $.flashError I18n.t('flash.deleteError', 'Something went wrong. Unable to delete at this time.')
 

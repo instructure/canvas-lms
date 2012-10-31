@@ -56,11 +56,16 @@ define [
       @render()
 
     render: ->
+      @attachEvents()
       @$el.html if @innerView
           @innerView.render().el
         else
           @instructionsTemplate()
       this
+
+    attachEvents: ->
+      return unless @innerView?
+      @innerView.on 'deleteSuccess', => @trigger('deleteSuccess')
 
     remove: ->
       @innerView?.off 'addSuccess'
