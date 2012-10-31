@@ -30,7 +30,7 @@ class ContentParticipationCount < ActiveRecord::Base
     return nil unless user && context
 
     participant = nil
-    uncached do
+    context.shard.activate do
       unique_constraint_retry do
         participant = context.content_participation_counts.find(:first, {
           :conditions => { :user_id => user.id, :content_type => type },
