@@ -1,0 +1,43 @@
+<%
+  js_bundle :learning_outcome
+  jammit_css :learning_outcomes
+  content_for :page_title, @outcome.short_description
+%>
+<% content_for :right_side do %>
+  <div class="rs-margin-all">
+    <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_outcomes_url) %>"><%= image_tag "back.png" %> <%= t "#buttons.back_to_outcomes", "Back to Outcomes" %></a>
+  </div>
+<% end %>
+
+<h2><%= t "#titles.aligned_items", "Aligned Items" %></h2>
+<div id="outcome_urls" style="display: none;">
+  <% if @context.is_a?(Course) %>
+    <a href="<%= context_url(@context, :context_outcome_reorder_alignments_url, @outcome.id) %>" class="reorder_alignments_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_outcome_align_url, @outcome.id) %>" class="align_url">&nbsp;</a>
+    <%= render :partial => "shared/select_content_dialog" %>
+  <% end %>
+</div>
+<%= t(:no_aligned_items, "No aligned items") if @alignments.empty? %>
+<ul id="alignments" class="<%= 'orderable' if @context.is_a?(Course) %>">
+<% @alignments.each do |alignment| %>
+  <%= render :partial => "outcome_alignment", :object => alignment %>
+<% end %>
+</ul>
+<h2 style="margin-top: 20px;"><%= t("#titles.outcome_artifacts", "Outcome Artifacts") %></h2>
+<%= t(:no_artifacts, "No artifacts") if @results.empty? %>
+<div id="outcome_results">
+  <ul id="outcome_results_list">
+  <% @results.each do |result| %>
+    <%= render :partial => "outcome_result", :object => result %>
+  <% end %>
+  </ul>
+  <%= will_paginate(@results) %>
+</div>
+<div style="display: none;">
+  <div id="outcome_results_total_pages"><%= @results.total_pages %></div>
+  <a href="<%= context_url(@context, :context_outcome_results_url, @outcome.id) %>" style="display: none;" class="outcome_results_url">&nbsp;</a>
+  <ul>
+  <%= render :partial => "outcome_result" %>
+  <%= render :partial => "outcome_alignment" %>
+  </ul>
+</div>

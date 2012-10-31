@@ -1,0 +1,29 @@
+<% show_results_link = true if show_results_link.nil? %>
+<li class="<%= 'mastery_result' if outcome_result && outcome_result.mastery %> outcome_result" id="result_<%= outcome_result ? outcome_result.id : "blank" %>" style="<%= hidden unless outcome_result %>">
+  <% if show_results_link %>
+    <a href="<%= context_url(@context, :context_outcome_result_url, @outcome, outcome_result ? outcome_result.id : "{{ id }}") %>" class="title">
+  <% else %>
+    <span class="title">
+  <% end %>
+    <%= outcome_result.try_rescue(:title) %>
+  <% if show_results_link %>
+    </a>
+  <% else %>
+    </span>
+  <% end %>
+  <div class="scoring">
+    <%= t :scoring, "%{points} out of %{possible_points}",
+          :points => raw("<span class=\"score\">#{outcome_result.try_rescue(:score) || nbsp}</span>"),
+          :possible_points => raw("<span class=\"possible\">#{outcome_result.try_rescue(:possible) || nbsp}</span>")
+    %>
+    <span class="mastery">(<%= image_tag "graded.16px.png", :alt => "" %> <%= t :outcome_mastered, 'mastered' %>)</span>
+  </div>
+  <div class="last_attempt">
+    <%= t :attempt_info, "attempt #%{attempt_number}, %{attempt_date}", :attempt_number => "<span class=\"attempt\">#{outcome_result.try_rescue(:attempt) || "1"}</span>".html_safe, :attempt_date => "<span class=\"assessed_at_formatted\">#{datetime_string(outcome_result.try_rescue(:assessed_at))}</span>".html_safe %>
+  </div>
+  <% if show_results_link %>
+    <div class="results_link">
+      <a href="<%= context_url(@context, :context_user_outcomes_results_url, outcome_result ? outcome_result.user_id : "{{ user_id }}") %>"><%= t :all_outcomes, "all outcome results for this student" %></a>
+    </div>
+  <% end %>
+</li>
