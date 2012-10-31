@@ -323,7 +323,13 @@ class Enrollment < ActiveRecord::Base
 
   def clear_email_caches
     if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
-      self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+      if Enrollment.cross_shard_invitations?
+        Shard.default.activate do
+          self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'all_invited_enrollments'].cache_key)}
+        end
+      else
+        self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+      end
     end
   end
 
@@ -837,8 +843,18 @@ class Enrollment < ActiveRecord::Base
     }
   }
   def self.cached_temporary_invitations(email)
-    Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
-      Enrollment.invited.for_email(email).to_a
+    if Enrollment.cross_shard_invitations?
+      Shard.default.activate do
+        invitations = Rails.cache.fetch([email, 'all_invited_enrollments'].cache_key) do
+          Shard.with_each_shard(CommunicationChannel.associated_shards(email)) do
+            Enrollment.invited.for_email(email).to_a
+          end
+        end
+      end
+    else
+      Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
+        Enrollment.invited.for_email(email).to_a
+      end
     end
   end
 
@@ -958,5 +974,9 @@ class Enrollment < ActiveRecord::Base
     course_section && course_section.end_at ||
     course.conclude_at ||
     course.enrollment_term && course.enrollment_term.end_at
+  end
+
+  def self.cross_shard_invitations?
+    false
   end
 end
