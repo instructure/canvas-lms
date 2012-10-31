@@ -1,4 +1,4 @@
 group 'respondus_soap_endpoint' do
-  gem 'soap4r', '1.5.8'
-  gem 'soap4r-middleware', '0.8.2'
+  # the soap4r gem is pulled in by soap4r-middleware
+  gem 'soap4r-middleware', '0.8.3'
 end

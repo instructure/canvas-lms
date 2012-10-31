@@ -107,7 +107,11 @@ class RespondusAPIPort
   # We wrap these api calls with the code to load and dump the session to the
   # context parameter. individual api methods just need to return any response
   # params after the first three.
-  def make_call(method, userName, password, context, *args)
+  def make_call(method, *args)
+    # nil values come in from soap4r as Soap::Mapping::Object objects,
+    # all other arguments are strings
+    args = args.map { |a| a.is_a?(String) ? a : nil }
+    userName, password, context, *args = args
     Rails.logger.debug "\nProcessing RespondusSoapApi##{method} (for #{rack_env['REMOTE_ADDR']} at #{Time.now}) [SOAP]"
     log_args = args.dup
     log_args.pop if %w(publishServerItem replaceServerItem appendServerItem).include?(method.to_s)
