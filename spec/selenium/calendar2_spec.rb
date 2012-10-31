@@ -325,6 +325,24 @@ describe "calendar2" do
         assignment2.assignment_group.should == group2
       end
 
+      it "editing an existing assignment should preserve more options link" do
+        assignment = @course.active_assignments.create!(:name => "to edit", :due_at => Time.zone.now)
+        get "/calendar2"
+        f('.fc-event').click
+        f('.popover-links-holder .edit_event_link').click
+        original_more_options = f('.more_options_link')['href']
+        original_more_options.should_not match(/undefined/)
+        replace_content(f('.ui-dialog #assignment_title'), "edited title")
+        submit_form('#edit_assignment_form')
+        wait_for_ajax_requests
+        assignment.reload
+        assignment.title.should eql("edited title")
+
+        f('.fc-event').click
+        f('.popover-links-holder .edit_event_link').click
+        f('.more_options_link')['href'].should match(original_more_options)
+      end
+
       it "should change the month" do
         get "/calendar2"
         old_header_title = get_header_text
