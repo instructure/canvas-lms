@@ -6,12 +6,13 @@
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
+  'str/htmlEscape',
   'jquery.fancyplaceholder' /* fancyPlaceholder */,
   'jquery.google-analytics' /* trackPage, trackPageview */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, $) {
+  'compiled/jquery.rails_flash_notifications',
+], function(I18n, $, htmlEscape) {
 
 $(document).ready(function() {
   $("#register_link").click(function(){
@@ -27,7 +28,7 @@ $(document).ready(function() {
     },
     success: function(data) {
       $(this).loadingImage('remove');
-      $.flashMessage(<%= jt("#pseudonyms.login.password_confirmation_sent", "Password confirmation sent to %{email_address}. Make sure you check your spam box.", '{email_address: $(this).find(".email_address").val()}') %>);
+      $.flashMessage(htmlEscape(<%= jt("#pseudonyms.login.password_confirmation_sent", "Password confirmation sent to %{email_address}. Make sure you check your spam box.", '{email_address: $(this).find(".email_address").val()}') %>));
       $(".login_link:first").click();
     },
     error: function(data) {
