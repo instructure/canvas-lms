@@ -65,19 +65,48 @@ class AccountsController < ApplicationController
   # @API List active courses in an account
   # Retrieve the list of courses in this account.
   #
-  # @argument hide_enrollmentless_courses [optional] If set, only return courses that have at least one enrollment.
+  # @argument with_enrollments [optional] If true, include only courses with at least one enrollment.  If false, include only courses with no enrollments.  If not present, do not filter on course enrollment status.
+  # @argument published [optional] If true, include only published courses.  If false, exclude published courses.  If not present, do not filter on published status.
+  # @argument completed [optional] If true, include only completed courses (these may be in state 'completed', or their enrollment term may have ended).  If false, exclude completed courses.  If not present, do not filter on completed status.
+  # @argument by_teachers[] [optional] List of User IDs of teachers; if supplied, include only courses taught by one of the referenced users.
+  # @argument by_subaccounts[] [optional] List of Account IDs; if supplied, include only courses associated with one of the referenced subaccounts.
+  # @argument hide_enrollmentless_courses [optional] If present, only return courses that have at least one enrollment.  Equivalent to 'with_enrollments=true'; retained for compatibility.
   # @argument state[] [optional] If set, only return courses that are in the given state(s). Valid states are "created," "claimed," "available," "completed," and "deleted." By default, all states but "deleted" are returned.
   #
-  # @example_response
-  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'sis_course_id': 'first-sis' },
-  #     { 'id': 2, 'name': 'second course', 'course_code': 'second', 'sis_course_id': null } ]
+  # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read)
 
     params[:state] ||= %w{created claimed available completed}
+    if value_to_boolean(params[:published])
+      params[:state] -= %w{created claimed completed deleted}
+    elsif !params[:published].nil? && !value_to_boolean(params[:published])
+      params[:state] -= %w{available}
+    end
 
     @courses = @account.associated_courses.scoped(:conditions => { :workflow_state => params[:state] })
-    @courses = @courses.with_enrollments if params[:hide_enrollmentless_courses]
+    if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
+      @courses = @courses.with_enrollments
+    elsif !params[:with_enrollments].nil? && !value_to_boolean(params[:with_enrollments])
+      @courses = @courses.without_enrollments
+    end
+
+    if value_to_boolean(params[:completed])
+      @courses = @courses.completed
+    elsif !params[:completed].nil? && !value_to_boolean(params[:completed])
+      @courses = @courses.not_completed
+    end
+
+    if params[:by_teachers].is_a?(Array)
+      teacher_ids = Api.map_ids(params[:by_teachers], User, @domain_root_account).map(&:to_i)
+      @courses = @courses.by_teachers(teacher_ids)
+    end
+
+    if params[:by_subaccounts].is_a?(Array)
+      account_ids = Api.map_ids(params[:by_subaccounts], Account, @domain_root_account).map(&:to_i)
+      @courses = @courses.by_associated_accounts(account_ids)
+    end
+
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, :order => :id)
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }

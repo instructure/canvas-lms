@@ -466,6 +466,33 @@ class Course < ActiveRecord::Base
   named_scope :with_enrollments, lambda {
     { :conditions => ["exists (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"] }
   }
+  named_scope :without_enrollments, lambda {
+    { :conditions => ["NOT EXISTS (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"] }
+  }
+  named_scope :completed, lambda {
+    { :joins => :enrollment_term,
+      :conditions => ["courses.workflow_state = 'completed' or courses.conclude_at < ? or enrollment_terms.end_at < ?", Time.now.utc, Time.now.utc]
+    }
+  }
+  named_scope :not_completed, lambda {
+    { :joins => :enrollment_term,
+      :conditions => [%{courses.workflow_state <> 'completed' AND
+                        (courses.conclude_at IS NULL OR courses.conclude_at >= ?) AND
+                        (enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?)}, Time.now.utc, Time.now.utc]
+    }
+  }
+  named_scope :by_teachers, lambda{ |teacher_ids|
+    teacher_ids.empty? ? { :conditions => "1 = 0" } :
+    { :conditions => ["EXISTS (#{Enrollment.active.send(:construct_finder_sql, {:select => "1",
+        :conditions => ["enrollments.course_id = courses.id AND enrollments.type = 'TeacherEnrollment' AND enrollments.user_id IN (#{teacher_ids.join(',')})"]})})"]
+    }
+  }
+  named_scope :by_associated_accounts, lambda{ |account_ids|
+    account_ids.empty? ? { :conditions => "1 = 0" } :
+    { :conditions => ["EXISTS (#{CourseAccountAssociation.send(:construct_finder_sql, {:select => "1",
+        :conditions => ["course_account_associations.course_id = courses.id AND course_account_associations.account_id IN (#{account_ids.join(',')})"]})})"]
+    }
+  }
 
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
