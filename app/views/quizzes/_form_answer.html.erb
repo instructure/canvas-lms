@@ -43,18 +43,14 @@
             <option value="range_answer"><%= before_label(:answer_in_range, "Answer in the Range") %></option>
           </select>
           <span class="exact_answer numerical_answer_text">
-            <%= t(:exact_answer_with_error_margin, "%{exact_answer_start}exact answer%{exact_answer_end} with error margin %{error_margin_start}error margin%{error_margin_end}",
-                  :exact_answer_start => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_exact" aria-label="'),
-                  :exact_answer_end => raw('"/>'),
-                  :error_margin_start => raw('<input class="float_value long" type="text" style="width: 70px;" name="answer_error_margin" aria-label="'),
-                  :error_margin_end => raw('"/>')) %>
+            <%= t(:exact_answer_with_error_margin_accessible, "*exact answer* with error margin #error margin#", :wrapper => {
+                  '*' => '<input class="float_value long" type="text" style="width: 50px;" name="answer_exact" aria-label="\1"/>',
+                  '#' => '<input class="float_value long" type="text" style="width: 70px;" name="answer_error_margin" aria-label="\1"/>' }) %>
           </span>
           <span class="range_answer numerical_answer_text">
-            <%= t(:answer_in_range, "between %{lower_bound_start}range start%{lower_bound_end} and %{upper_bound_start}range end%{upper_bound_end}",
-                  :lower_bound_start => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_range_start" aria-label="'),
-                  :lower_bound_end => raw('"/>'),
-                  :upper_bound_start => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_range_end" aria-label="'),
-                  :upper_bound_end => raw('"/>')) %>
+            <%= t(:answer_in_range_accessible, "between *range start* and #range end#", :wrapper => {
+                  '*' => '<input class="float_value long" type="text" style="width: 50px;" name="answer_range_start" aria-label="\1"/>',
+                  '#' => '<input class="float_value long" type="text" style="width: 50px;" name="answer_range_end" aria-label="\1"/>' }) %>
           </span>
         </div>
         <div class="answer_comments empty">
