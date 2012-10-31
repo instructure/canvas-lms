@@ -19,6 +19,8 @@
 module Canvas::AccountReports
   class SisExporter
     include Api
+    include Canvas::ReportHelpers::DateHelper
+
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections", "enrollments", "groups", "group_membership", "xlist"]
 
     def initialize(account_report, params = {})
@@ -76,16 +78,17 @@ module Canvas::AccountReports
     def accounts
       list_csv = FasterCSV.generate do |csv|
         headers = ['account_id','parent_account_id', 'name','status']
-        headers.unshift 'canvas_account_id' unless @sis_format
+        headers = ['canvas_account_id','account_id','canvas_parent_id','parent_account_id', 'name','status'] unless @sis_format
         csv << headers
         accounts = @account.all_accounts.active.scoped(
-          :select => "accounts.*, parent_account.sis_source_id as parent_sis_source_id",
+          :select => "accounts.*, parent_account.id as parent_id, parent_account.sis_source_id as parent_sis_source_id",
           :joins => "INNER JOIN accounts as parent_account ON accounts.parent_account_id = parent_account.id")
         accounts = accounts.scoped(:conditions => "accounts.sis_source_id IS NOT NULL") if @sis_format
         accounts.find_each do |a|
           row = []
           row << a.id unless @sis_format
           row << a.sis_source_id
+          row << a.parent_id unless @sis_format
           row << a.parent_sis_source_id
           row << a.name
           row << a.workflow_state
@@ -108,8 +111,8 @@ module Canvas::AccountReports
           row << t.sis_source_id
           row << t.name
           row << t.workflow_state
-          row << t.start_at.try(:iso8601)
-          row << t.end_at.try(:iso8601)
+          row << default_timezone_format(t.start_at)
+          row << default_timezone_format(t.end_at)
           csv << row
         end
       end
@@ -142,8 +145,8 @@ module Canvas::AccountReports
           row << 'active' if @sis_format
           row << c.course_state unless @sis_format
           if c.restrict_enrollments_to_course_dates
-            row << c.start_at.try(:iso8601)
-            row << c.conclude_at.try(:iso8601)
+            row << default_timezone_format(c.start_at)
+            row << default_timezone_format(c.conclude_at)
           else
             row << nil
             row << nil
@@ -181,8 +184,8 @@ module Canvas::AccountReports
           row << s.name
           row << s.workflow_state
           if s.restrict_enrollments_to_section_dates
-            row << s.start_at.try(:iso8601)
-            row << s.end_at.try(:iso8601)
+            row << default_timezone_format(s.start_at)
+            row << default_timezone_format(s.end_at)
           else
             row << nil
             row << nil

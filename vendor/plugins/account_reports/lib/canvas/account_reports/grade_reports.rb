@@ -19,6 +19,7 @@
 module Canvas::AccountReports
   class GradeReports
     include Api
+    include Canvas::ReportHelpers::DateHelper
 
     def initialize(account_report)
       @account_report = account_report
@@ -66,7 +67,7 @@ module Canvas::AccountReports
                 arr << student.id
                 arr << assignment.title
                 arr << assignment.id
-                arr << (submission ? (submission.submitted_at.iso8601 rescue nil) : nil)
+                arr << (submission ? (default_timezone_format(submission.submitted_at)) : nil)
                 arr << (submission ? (submission.score rescue nil) : nil)
                 arr << outcome.short_description
                 arr << outcome.id

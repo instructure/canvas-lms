@@ -96,12 +96,12 @@ describe "Default Account Reports" do
       parsed[1].should == ["sub2", nil, "Math", "active"]
       parsed[2].should == ["subsub1", "sub1", "sESL", "active"]
 
-      parsed = ReportsSpecHelper.run_report(@account,"provisioning_csv", parameters, 3)
+      parsed = ReportsSpecHelper.run_report(@account,"provisioning_csv", parameters, 4)
       parsed.length.should == 4
-      parsed[0].should == [sub_account.id.to_s, "sub1", nil, "English", "active"]
-      parsed[1].should == [sub_account2.id.to_s, "sub2", nil, "Math", "active"]
-      parsed[2].should == [sub_account3.id.to_s, nil, nil, "other", "active"]
-      parsed[3].should == [sub_sub_account.id.to_s, "subsub1", "sub1", "sESL", "active"]
+      parsed[0].should == [sub_account.id.to_s, "sub1", @account.id.to_s, nil, "English", "active"]
+      parsed[1].should == [sub_account2.id.to_s, "sub2", @account.id.to_s, nil, "Math", "active"]
+      parsed[2].should == [sub_account3.id.to_s, nil, @account.id.to_s, nil, "other", "active"]
+      parsed[3].should == [sub_sub_account.id.to_s, "subsub1", sub_account.id.to_s, "sub1", "sESL", "active"]
 
     end
 
