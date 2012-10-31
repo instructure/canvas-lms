@@ -232,7 +232,7 @@ class SubmissionComment < ActiveRecord::Base
 
       ContentParticipation.create_or_update({
         :content => submission,
-        :user => self.author,
+        :user => submission.user,
         :workflow_state => "unread",
       })
     end

@@ -623,11 +623,14 @@ This text has a http://www.google.com link in it...
       expect {
         @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @teacher}))
       }.to change(ContentParticipation, :count).by(1)
+      ContentParticipation.find_by_user_id(@student).should be_unread
       @submission.unread?(@student).should be_true
     end
 
     it "should be unread after submission is commented on by self" do
-      @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @student}))
+      expect {
+        @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @student}))
+      }.to change(ContentParticipation, :count).by(0)
       @submission.read?(@student).should be_true
     end
   end
