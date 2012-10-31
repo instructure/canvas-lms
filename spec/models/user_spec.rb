@@ -1645,12 +1645,8 @@ describe User do
       @account = account_model
       course :active_all => true, :account => @account
       u = User.create!
-      pseudonyms = mock()
-      u.stubs(:pseudonyms).returns(pseudonyms)
-      pseudonyms.stubs(:loaded?).returns(false)
-      pseudonyms.stubs(:active).returns(pseudonyms)
-      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
-      u.sis_pseudonym_for(@course).should == 42
+      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(@course).should == p
     end
 
     it "should find the right root account for a group" do
@@ -1658,40 +1654,45 @@ describe User do
       course :active_all => true, :account => @account
       @group = group :group_context => @course
       u = User.create!
-      pseudonyms = mock()
-      u.stubs(:pseudonyms).returns(pseudonyms)
-      pseudonyms.stubs(:loaded?).returns(false)
-      pseudonyms.stubs(:active).returns(pseudonyms)
-      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
-      u.sis_pseudonym_for(@group).should == 42
+      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(@group).should == p
     end
 
     it "should find the right root account for a non-root-account" do
       @root_account = account_model
       @account = @root_account.sub_accounts.create!
       u = User.create!
-      pseudonyms = mock()
-      u.stubs(:pseudonyms).returns(pseudonyms)
-      pseudonyms.stubs(:loaded?).returns(false)
-      pseudonyms.stubs(:active).returns(pseudonyms)
-      pseudonyms.expects(:find_by_account_id).with(@root_account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
-      u.sis_pseudonym_for(@account).should == 42
+      p = @root_account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(@account).should == p
     end
 
     it "should find the right root account for a root account" do
       @account = account_model
       u = User.create!
-      pseudonyms = mock()
-      u.stubs(:pseudonyms).returns(pseudonyms)
-      pseudonyms.stubs(:loaded?).returns(false)
-      pseudonyms.stubs(:active).returns(pseudonyms)
-      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
-      u.sis_pseudonym_for(@account).should == 42
+      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(@account).should == p
     end
 
     it "should bail if it can't find a root account" do
       context = Course.new # some context that doesn't have an account
       (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
+    end
+
+    context "sharding" do
+      it_should_behave_like 'sharding'
+
+      it "should find a pseudonym on a different shard" do
+        @shard1.activate do
+          @user = User.create!
+        end
+        @pseudonym = Account.default.pseudonyms.create!(:user => @user, :unique_id => 'user') { |p| p.sis_user_id = 'abc' }
+        @shard2.activate do
+          @user.sis_pseudonym_for(Account.default).should == @pseudonym
+        end
+        @shard1.activate do
+          @user.sis_pseudonym_for(Account.default).should == @pseudonym
+        end
+      end
     end
   end
 

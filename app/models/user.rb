@@ -1052,10 +1052,12 @@ class User < ActiveRecord::Base
   def sis_pseudonym_for(context)
     root_account = context.root_account
     raise "could not resolve root account" unless root_account.is_a?(Account)
-    if self.pseudonyms.loaded?
+    if self.pseudonyms.loaded? && self.shard == root_account.shard
       self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
     else
-      self.pseudonyms.active.find_by_account_id(root_account.id, :conditions => ["sis_user_id IS NOT NULL"])
+      root_account.shard.activate do
+        root_account.pseudonyms.active.find_by_user_id(self.id, :conditions => "sis_user_id IS NOT NULL")
+      end
     end
   end
 
