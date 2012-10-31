@@ -384,21 +384,21 @@ describe Account do
       hash[k][:user] = user
     end
 
-    limited_access = [ :read, :manage, :update, :delete ]
+    limited_access = [ :read, :manage, :update, :delete, :read_outcomes ]
     full_access = RoleOverride.permissions.map { |k, v| k } + limited_access
     index = full_access.index(:manage_courses)
     full_access = full_access[0..index] + [:create_courses] + full_access[index+1..-1]
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
-      account.check_policy(hash[:site_admin][:admin]).should == full_access
-      account.check_policy(hash[:site_admin][:user]).should == limited_access
+      account.check_policy(hash[:site_admin][:admin]).should == full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:user]).should == limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     # root admin has access to everything except site admin
     account = hash[:site_admin][:account]
-    account.check_policy(hash[:root][:admin]).should == []
-    account.check_policy(hash[:root][:user]).should == []
+    account.check_policy(hash[:root][:admin]).should == [:read_global_outcomes]
+    account.check_policy(hash[:root][:user]).should == [:read_global_outcomes]
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
@@ -410,8 +410,8 @@ describe Account do
     hash.each do |k, v|
       next unless k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == []
-      account.check_policy(hash[:sub][:user]).should == []
+      account.check_policy(hash[:sub][:admin]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:user]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -429,13 +429,13 @@ describe Account do
     RoleOverride.clear_cached_contexts
     hash.each do |k, v|
       account = v[:account]
-      account.check_policy(hash[:site_admin][:admin]).should == full_access
-      account.check_policy(hash[:site_admin][:user]).should == some_access
+      account.check_policy(hash[:site_admin][:admin]).should == full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:user]).should == some_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     account = hash[:site_admin][:account]
-    account.check_policy(hash[:root][:admin]).should == []
-    account.check_policy(hash[:root][:user]).should == []
+    account.check_policy(hash[:root][:admin]).should == [:read_global_outcomes]
+    account.check_policy(hash[:root][:user]).should == [:read_global_outcomes]
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
@@ -447,8 +447,8 @@ describe Account do
     hash.each do |k, v|
       next unless k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == []
-      account.check_policy(hash[:sub][:user]).should == []
+      account.check_policy(hash[:sub][:admin]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:user]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -736,6 +736,44 @@ describe Account do
       @course = Account.default.courses.create!
       @course.enroll_teacher(@user).accept!
       Account.default.grants_right?(@user, :read_sis).should be_true
+    end
+
+    it "should grant :read_global_outcomes to any user iff site_admin" do
+      @site_admin = Account.site_admin
+      @site_admin.grants_right?(User.new, :read_global_outcomes).should be_true
+
+      @subaccount = @site_admin.sub_accounts.create!
+      @subaccount.grants_right?(User.new, :read_global_outcomes).should be_false
+    end
+
+    it "should not grant :read_outcomes to user's outside the account" do
+      Account.default.grants_right?(User.new, :read_outcomes).should be_false
+    end
+
+    it "should grant :read_outcomes to account admins" do
+      account_admin_user(:account => Account.default)
+      Account.default.grants_right?(@admin, :read_outcomes).should be_true
+    end
+
+    it "should grant :read_outcomes to subaccount admins" do
+      account_admin_user(:account => Account.default.sub_accounts.create!)
+      Account.default.grants_right?(@admin, :read_outcomes).should be_true
+    end
+
+    it "should grant :read_outcomes to enrollees in account courses" do
+      course(:account => Account.default)
+      teacher_in_course
+      student_in_course
+      Account.default.grants_right?(@teacher, :read_outcomes).should be_true
+      Account.default.grants_right?(@student, :read_outcomes).should be_true
+    end
+
+    it "should grant :read_outcomes to enrollees in subaccount courses" do
+      course(:account => Account.default.sub_accounts.create!)
+      teacher_in_course
+      student_in_course
+      Account.default.grants_right?(@teacher, :read_outcomes).should be_true
+      Account.default.grants_right?(@student, :read_outcomes).should be_true
     end
   end
 

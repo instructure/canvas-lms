@@ -38,7 +38,7 @@ describe "Outcomes API", :type => :integration do
   end
 
   describe "show" do
-    it "should not require permission" do
+    it "should not require manage permission" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
                    :controller => 'outcomes_api',
@@ -46,6 +46,39 @@ describe "Outcomes API", :type => :integration do
                    :id => @outcome.id.to_s,
                    :format => 'json')
       response.status.to_i.should == 200
+    end
+
+    it "should require read permission" do
+      # new user, doesn't have a tie to the account
+      user_with_pseudonym(:account => Account.create!, :active_all => true)
+      raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                   :controller => 'outcomes_api',
+                   :action => 'show',
+                   :id => @outcome.id.to_s,
+                   :format => 'json')
+      response.status.to_i.should == 401
+    end
+
+    it "should not require any permission for global outcomes" do
+      user_with_pseudonym(:account => Account.create!, :active_all => true)
+      @outcome = LearningOutcome.create!(:title => "My Outcome")
+      raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                   :controller => 'outcomes_api',
+                   :action => 'show',
+                   :id => @outcome.id.to_s,
+                   :format => 'json')
+      response.status.to_i.should == 200
+    end
+
+    it "should still require a user for global outcomes" do
+      @outcome = LearningOutcome.create!(:title => "My Outcome")
+      @user = nil
+      raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                   :controller => 'outcomes_api',
+                   :action => 'show',
+                   :id => @outcome.id.to_s,
+                   :format => 'json')
+      response.status.to_i.should == 401
     end
 
     it "should 404 for deleted outcomes" do
@@ -113,7 +146,7 @@ describe "Outcomes API", :type => :integration do
   end
 
   describe "update" do
-    it "should require permission" do
+    it "should require manage permission" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                    :controller => 'outcomes_api',

@@ -51,6 +51,15 @@ describe "Outcome Groups API", :type => :integration do
         response.status.to_i.should == 302
       end
 
+      it "should require a user" do
+        @user = nil
+        raw_api_call(:get, "/api/v1/global/root_outcome_group",
+                     :controller => 'outcome_groups_api',
+                     :action => 'redirect',
+                     :format => 'json')
+        response.status.to_i.should == 401
+      end
+
       it "should redirect to the root global group" do
         root = LearningOutcomeGroup.global_root_outcome_group
         raw_api_call(:get, "/api/v1/global/root_outcome_group",
@@ -80,7 +89,7 @@ describe "Outcome Groups API", :type => :integration do
         @account_user = @user.account_users.create(:account => @account)
       end
 
-      it "should NOT require permission to read" do
+      it "should not require manage permission to read" do
         revoke_permission(@account_user, :manage_outcomes)
         raw_api_call(:get, "/api/v1/accounts/#{@account.id}/root_outcome_group",
                      :controller => 'outcome_groups_api',
@@ -88,6 +97,17 @@ describe "Outcome Groups API", :type => :integration do
                      :account_id => @account.id.to_s,
                      :format => 'json')
         response.status.to_i.should == 302
+      end
+
+      it "should require read permission to read" do
+        # new user, doesn't have a tie to the account
+        user_with_pseudonym(:account => Account.create!, :active_all => true)
+        raw_api_call(:get, "/api/v1/accounts/#{@account.id}/root_outcome_group",
+                     :controller => 'outcome_groups_api',
+                     :action => 'redirect',
+                     :account_id => @account.id.to_s,
+                     :format => 'json')
+        response.status.to_i.should == 401
       end
 
       it "should redirect to the root group" do

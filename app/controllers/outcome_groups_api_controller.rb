@@ -22,8 +22,8 @@
 class OutcomeGroupsApiController < ApplicationController
   include Api::V1::Outcome
 
-  before_filter :get_context, :except => :global_redirect
-  before_filter :require_context, :only => :context_redirect
+  before_filter :require_user
+  before_filter :get_context
 
   # @API Redirect for global outcomes
   # Convenience redirect to find the root outcome group for global outcomes.
@@ -239,10 +239,9 @@ class OutcomeGroupsApiController < ApplicationController
 
   def can_read_outcomes
     if @context
-      authorized_action(@context, @current_user, :read)
+      authorized_action(@context, @current_user, :read_outcomes)
     else
-      # anyone (that's logged in) can read global outcomes
-      true
+      authorized_action(Account.site_admin, @current_user, :read_global_outcomes)
     end
   end
 

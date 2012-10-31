@@ -420,4 +420,56 @@ describe LearningOutcome do
       @result.mastery.should eql(true)
     end
   end
+
+  describe "permissions" do
+    context "global outcome" do
+      before :each do
+        @outcome = LearningOutcome.create!(:title => 'global outcome')
+      end
+
+      it "should grant :read to any user" do
+        @outcome.grants_right?(User.new, :read).should be_true
+      end
+
+      it "should not grant :read without a user" do
+        @outcome.grants_right?(nil, :read).should be_false
+      end
+
+      it "should grant :update iff the site admin grants :manage_global_outcomes" do
+        @admin = stub
+
+        Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(true)
+        @outcome.grants_right?(@admin, :update).should be_true
+
+        Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(false)
+        @outcome.grants_right?(@admin, :update).should be_false
+      end
+    end
+
+    context "non-global outcome" do
+      before :each do
+        course(:active_course => 1)
+        @outcome = @course.created_learning_outcomes.create!(:title => 'non-global outcome')
+      end
+
+      it "should grant :read to users with :read_outcomes on the context" do
+        student_in_course(:active_enrollment => 1)
+        @outcome.grants_right?(@user, :read).should be_true
+      end
+
+      it "should not grant :read to users without :read_outcomes on the context" do
+        @outcome.grants_right?(User.new, :read).should be_false
+      end
+
+      it "should grant :update to users with :manage_outcomes on the context" do
+        teacher_in_course(:active_enrollment => 1)
+        @outcome.grants_right?(@user, :update).should be_true
+      end
+
+      it "should not grant :read to users without :read_outcomes on the context" do
+        student_in_course(:active_enrollment => 1)
+        @outcome.grants_right?(User.new, :update).should be_false
+      end
+    end
+  end
 end

@@ -29,8 +29,21 @@ class LearningOutcome < ActiveRecord::Base
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
 
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_outcomes) }
+    # managing a contextual outcome requires manage_outcomes on the outcome's context
+    given {|user, session| self.context_id && self.cached_context_grants_right?(user, session, :manage_outcomes) }
     can :create and can :read and can :update and can :delete
+
+    # reading a contextual outcome is also allowed by read_outcomes on the outcome's context
+    given {|user, session| self.context_id && self.cached_context_grants_right?(user, session, :read_outcomes) }
+    can :read
+
+    # managing a global outcome requires manage_global_outcomes on the site_admin
+    given {|user, session| self.context_id.nil? && Account.site_admin.grants_right?(user, session, :manage_global_outcomes) }
+    can :create and can :read and can :update and can :delete
+
+    # reading a global outcome is also allowed by just being logged in
+    given {|user, session| self.context_id.nil? && user }
+    can :read
   end
   
   def infer_defaults

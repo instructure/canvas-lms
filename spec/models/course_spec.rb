@@ -292,6 +292,22 @@ describe Course do
       @enrollment.state_based_on_date.should == :inactive
       @course.grants_right?(:read, @teacher).should be_false
     end
+
+    it "should grant :read_outcomes to teachers in the course" do
+      course_with_teacher(:active_all => 1)
+      @course.grants_right?(@teacher, :read_outcomes).should be_true
+    end
+
+    it "should grant :read_outcomes to students in the course" do
+      course_with_student(:active_all => 1)
+      @course.grants_right?(@student, :read_outcomes).should be_true
+    end
+
+    it "should grant :read_outcomes to account admins" do
+      course(:active_all => 1)
+      account_admin_user(:account => @course.account)
+      @course.grants_right?(@admin, :read_outcomes).should be_true
+    end
   end
 
   it "should clear content when resetting" do

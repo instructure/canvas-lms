@@ -586,7 +586,7 @@ class Account < ActiveRecord::Base
     end
 
     given { |user| !self.account_users_for(user).empty? }
-    can :read and can :manage and can :update and can :delete
+    can :read and can :manage and can :update and can :delete and can :read_outcomes
 
     given { |user|
       root_account = self.root_account
@@ -609,6 +609,14 @@ class Account < ActiveRecord::Base
       result
     }
     can :create_courses
+
+    # any logged in user can read global outcomes, but must be checked against the site admin
+    given{ |user,session| self.site_admin? && user }
+    can :read_global_outcomes
+
+    # any user with an association to this account can read the outcomes in the account
+    given{ |user,session| user && self.user_account_associations.find_by_user_id(user.id) }
+    can :read_outcomes
   end
 
   alias_method :destroy!, :destroy
