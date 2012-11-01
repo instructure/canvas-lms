@@ -23,42 +23,81 @@ class TestCourseApi
   include Api::V1::Course
   def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
   def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
+  def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
 
 describe Api::V1::Course do
 
-  before do
-    @test_api = TestCourseApi.new
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
-    @me = @user
-    @course1 = @course
-    course_with_student(:user => @user, :active_all => true)
-    @course2 = @course
-    @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
-    @user.pseudonym.update_attribute(:sis_user_id, 'user1')
+  describe '#course_json' do
+    before do
+      @test_api = TestCourseApi.new
+      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      @me = @user
+      @course1 = @course
+      course_with_student(:user => @user, :active_all => true)
+      @course2 = @course
+      @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
+      @user.pseudonym.update_attribute(:sis_user_id, 'user1')
+    end
+
+    it 'should support optionally providing the url' do
+      @test_api.course_json(@course1, @me, {}, ['html_url'], []).should encompass({
+        "html_url" => "course_url(Course.find(#{@course1.id}), :host => #{HostUrl.context_host(@course1)})"
+      })
+      @test_api.course_json(@course1, @me, {}, [], []).has_key?("html_url").should be_false
+    end
+
+    it 'should only include needs_grading_count if requested' do
+      @teacher_enrollment = @course1.teacher_enrollments.first
+      @test_api.course_json(@course1, @me, {}, [], [@teacher_enrollment]).has_key?("needs_grading_count").should be_false
+    end
+
+    it 'should honor needs_grading_count for teachers' do
+      @teacher_enrollment = @course1.teacher_enrollments.first
+      @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@teacher_enrollment]).has_key?("needs_grading_count").should be_true
+    end
+
+    it 'should not honor needs_grading_count for designers' do
+      @designer_enrollment = @course1.enroll_designer(@me)
+      @designer_enrollment.accept!
+      @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@designer_enrollment]).has_key?("needs_grading_count").should be_false
+    end
   end
 
-  it 'should support optionally providing the url' do
-    @test_api.course_json(@course1, @me, {}, ['html_url'], []).should encompass({
-      "html_url" => "course_url(Course.find(#{@course1.id}), :host => #{HostUrl.context_host(@course1)})"
-    })
-    @test_api.course_json(@course1, @me, {}, [], []).has_key?("html_url").should be_false
-  end
+  describe '#add_helper_dependant_entries' do
+    let(:hash) { Hash.new }
+    let(:course) { stub_everything( :feed_code => 573, :id => 42, :syllabus_body => 'syllabus text' ) }
+    let(:course_json) { stub_everything() }
+    let(:api) { TestCourseApi.new }
 
-  it 'should only include needs_grading_count if requested' do
-    @teacher_enrollment = @course1.teacher_enrollments.first
-    @test_api.course_json(@course1, @me, {}, [], [@teacher_enrollment]).has_key?("needs_grading_count").should be_false
-  end
+    let(:result) do 
+      result_hash = api.add_helper_dependant_entries(hash, course, course_json)  
+      class << result_hash
+        def method_missing(method_name, *args)
+          self[method_name.to_s]
+        end
+      end
+      result_hash
+    end
 
-  it 'should honor needs_grading_count for teachers' do
-    @teacher_enrollment = @course1.teacher_enrollments.first
-    @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@teacher_enrollment]).has_key?("needs_grading_count").should be_true
-  end
+    subject { result } 
 
-  it 'should not honor needs_grading_count for designers' do
-    @designer_enrollment = @course1.enroll_designer(@me)
-    @designer_enrollment.accept!
-    @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@designer_enrollment]).has_key?("needs_grading_count").should be_false
+    it { should == hash }
+    its('calendar') { should == { 'ics' => "feed_calendar_url(573).ics" } }
+
+    describe 'when the include options are all set off' do
+      let(:course_json){ stub( :include_syllabus => false, :include_url => false ) }
+
+      its('syllabus_body') { should be_nil }
+      its('html_url') { should be_nil }
+    end
+
+    describe 'when everything is included' do
+      let(:course_json){ stub( :include_syllabus => true, :include_url => true ) }
+
+      its('syllabus_body') { should == "api_user_content(syllabus text, 42)" }
+      its('html_url') { should == "course_url(Course.find(42), :host => localhost)" }
+    end
   end
 end
 
@@ -875,26 +914,13 @@ describe CoursesController, :type => :integration do
   end
   
   it "should return the course syllabus" do
-    @course1.syllabus_body = "Syllabi are boring"
-    @course1.save
-    json = api_call(:get, "/api/v1/courses.json?enrollment_type=teacher&include[]=syllabus_body",
+    should_translate_user_content(@course1) do |content|
+      @course1.syllabus_body = content
+      @course1.save!
+      json = api_call(:get, "/api/v1/courses.json?enrollment_type=teacher&include[]=syllabus_body",
             { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_type => 'teacher', :include=>["syllabus_body"] })
-    json.should == [
-      {
-        'id' => @course1.id,
-        'name' => @course1.name,
-        'account_id' => @course1.account_id,
-        'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher'}],
-        'syllabus_body' => @course1.syllabus_body,
-        'sis_course_id' => nil,
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
-        'hide_final_grades' => false,
-        'start_at' => nil,
-        'end_at' => nil,
-        'default_view' => 'feed'
-      },
-    ]
+      json[0]['syllabus_body']
+    end
   end
 
   it "should get individual course data" do
