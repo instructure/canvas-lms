@@ -963,6 +963,9 @@ describe Course, "tabs_available" do
     before do
       course(:active_all => true).update_attributes(:is_public => true, :indexed => true)
       @course.announcements.create!(:title => 'Title', :message => 'Message')
+      default_group = @course.root_outcome_group
+      outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      default_group.add_outcome(outcome)
     end
 
     it "should not show announcements tabs without a current user" do
@@ -980,6 +983,23 @@ describe Course, "tabs_available" do
       @course.enroll_student(user).accept!
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       tab_ids.should include(Course::TAB_ANNOUNCEMENTS)
+    end
+
+    it "should not show outcomes tabs without a current user" do
+      tab_ids = @course.tabs_available(nil).map{|t| t[:id] }
+      tab_ids.should_not include(Course::TAB_OUTCOMES)
+   end
+
+    it "should not show outcomes to a user not enrolled in the class" do
+      user
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      tab_ids.should_not include(Course::TAB_OUTCOMES)
+    end
+
+    it "should show the outcomes tab to an enrolled user" do
+      @course.enroll_student(user).accept!
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      tab_ids.should include(Course::TAB_OUTCOMES)
     end
   end
 end

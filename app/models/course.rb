@@ -2636,7 +2636,7 @@ class Course < ActiveRecord::Base
           if self.grants_right?(user, nil, :read_as_admin)
             tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) }
           elsif !self.grants_right?(user, nil, :participate_as_student)
-            tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) }
+            tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT, TAB_OUTCOMES].include?(t[:id]) }
           end
 
           unless discussion_topics.new.grants_right?(user, nil, :read)
