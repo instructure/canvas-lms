@@ -823,6 +823,13 @@ Spec::Runner.configure do |config|
     conn.after_transaction_commit_callbacks.clear
   end
 
+  def force_string_encoding(str, encoding = "UTF-8")
+    if str.respond_to?(:force_encoding)
+      str.force_encoding(encoding)
+    end
+    str
+  end
+
   def verify_post_matches(post_lines, expected_post_lines)
     # first lines should match
     post_lines[0].should == expected_post_lines[0]
