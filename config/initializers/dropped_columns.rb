@@ -50,8 +50,16 @@ class ActiveRecord::Base
     self.reset_column_information_without_remove_dropped_columns
   end
 
+  def self.instantiate_with_remove_dropped_columns(record)
+    (DROPPED_COLUMNS[self.table_name] || []).each do |attr|
+      record.delete(attr)
+    end unless self.respond_to?(:tableless?)
+    instantiate_without_remove_dropped_columns(record)
+  end
+
   class << self
     alias_method_chain :columns, :remove_dropped_columns
     alias_method_chain :reset_column_information, :remove_dropped_columns
+    alias_method_chain :instantiate, :remove_dropped_columns
   end
 end
