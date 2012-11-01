@@ -865,7 +865,7 @@ describe "Outcome Groups API", :type => :integration do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      @group.child_outcome_links.active(true).size.should == 0
+      @group.child_outcome_links.active.size.should == 0
     end
 
     it "should return json of the removed link" do

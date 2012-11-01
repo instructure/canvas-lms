@@ -57,14 +57,14 @@ describe Instructure::AdheresToPolicy::ClassMethods do
   end
 
   it "should filter policy_block through a block filter with set_policy" do
-    A.methods.should be_include("set_policy")
+    A.should respond_to(:set_policy)
     lambda {A.set_policy(1)}.should raise_error
     b = lambda {1}
     lambda {A.set_policy(&b)}.should_not raise_error
   end
 
   it "should use set_permissions as set_policy" do
-    A.methods.should be_include("set_permissions")
+    A.should respond_to(:set_permissions)
     lambda {A.set_permissions(1)}.should raise_error
     b = lambda {1}
     lambda {A.set_permissions(&b)}.should_not raise_error
@@ -118,7 +118,7 @@ describe Instructure::AdheresToPolicy::InstanceMethods do
 
   it "should have setup a series of methods on the instance" do
     %w(check_policy grants_rights? has_rights?).each do |method|
-      @a.methods.should be_include(method)
+      @a.should respond_to(method)
     end
   end
 
