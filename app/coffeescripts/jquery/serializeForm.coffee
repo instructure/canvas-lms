@@ -36,7 +36,6 @@ define [
 
   $.fn.serializeForm = ->
     _.chain(this[0].elements)
-      .toArray()
       .filter(isInput)
       .map(getValue)
       .value()
