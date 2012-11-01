@@ -35,6 +35,7 @@ end
 
 def topic_doc
   @docstring = options[:controllers].map { |c| c.docstring }.join("\n\n")
+  @object = @object.dup
   def @object.source_type; nil; end
   @json_objects = options[:json_objects][@resource] || []
   erb(:topic_doc)

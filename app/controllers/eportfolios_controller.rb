@@ -23,7 +23,6 @@ class EportfoliosController < ApplicationController
   
   def index
     user_index
-    # @portfolios = Eportfolio.find_all_by_public(true)
   end
   
   def user_index

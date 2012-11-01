@@ -1,9 +1,9 @@
 namespace :i18n do
   module HashExtensions
-    def flatten(result={}, prefix='')
+    def flatten_keys(result={}, prefix='')
       each_pair do |k, v|
         if v.is_a?(Hash)
-          v.flatten(result, "#{prefix}#{k}.")
+          v.flatten_keys(result, "#{prefix}#{k}.")
         else
           result["#{prefix}#{k}"] = v
         end
@@ -11,7 +11,7 @@ namespace :i18n do
       result
     end
 
-    def expand(result = {})
+    def expand_keys(result = {})
       each_pair do |k, v|
         parts = k.split('.')
         last = parts.pop
@@ -187,7 +187,7 @@ namespace :i18n do
 
     locales = I18n.available_locales - [:en]
     all_translations = I18n.backend.send(:translations)
-    flat_translations = all_translations.flatten
+    flat_translations = all_translations.flatten_keys
 
     if locales.empty?
       puts "Nothing to do, there are no non-en translations"
@@ -200,7 +200,7 @@ namespace :i18n do
           extractor.translations = {}
           extractor.process(File.read(file), *arg_block.call(file)) or next
 
-          translations = extractor.translations.flatten.keys
+          translations = extractor.translations.flatten_keys.keys
           next if translations.empty?
 
           file_translations[extractor.scope] ||= {}
@@ -240,7 +240,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
     end
 
     file_translations.each do |scope, translations|
-      dump_translations.call(scope, translations.expand)
+      dump_translations.call(scope, translations.expand_keys)
     end
 
     # in addition to getting the non-en stuff into each scope_file, we need to get the core
@@ -282,7 +282,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
           if $?.exitstatus == 0
             if ret.include?(base_filename)
               `git checkout #{arg}`
-              if previous = YAML.load(File.read(base_filename)).flatten rescue nil
+              if previous = YAML.load(File.read(base_filename)).flatten_keys rescue nil
                 last_export = {:type => :commit, :data => previous}
               else
                 $stderr.puts "Unable to load en.yml file"
@@ -297,7 +297,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
         else
           puts "Loading previous export..."
           if File.exist?(arg)
-            if previous = YAML.load(File.read(arg)).flatten rescue nil
+            if previous = YAML.load(File.read(arg)).flatten_keys rescue nil
               last_export = {:type => :file, :data => previous}
             else
               $stderr.puts "Unable to load yml file"
@@ -319,14 +319,14 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
       Rake::Task["i18n:generate"].invoke
 
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
-      current_strings = YAML.load(File.read(base_filename)).flatten
+      current_strings = YAML.load(File.read(base_filename)).flatten_keys
       new_strings = last_export[:data] ?
         current_strings.inject({}){ |h, (k, v)|
           h[k] = v unless last_export[:data][k] == v
           h
         } :
         current_strings
-      File.open(export_filename, "w"){ |f| f.write new_strings.expand.ya2yaml(:syck_compatible => true) }
+      File.open(export_filename, "w"){ |f| f.write new_strings.expand_keys.ya2yaml(:syck_compatible => true) }
 
       push = 'n'
       begin
@@ -387,7 +387,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
       source_translations = File.exist?(arg) && YAML.load(File.read(arg)) rescue nil
     end until source_translations
     raise "Source does not have any English strings" unless source_translations.keys.include?('en')
-    source_translations = source_translations['en'].flatten
+    source_translations = source_translations['en'].flatten_keys
 
     begin
       puts "Enter path to translated file:"
@@ -397,7 +397,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
     raise "Translation file contains multiple languages" if new_translations.size > 1
     language = new_translations.keys.first
     raise "Translation file appears to have only English strings" if language == 'en'
-    new_translations = new_translations[language].flatten
+    new_translations = new_translations[language].flatten_keys
 
     item_warning = lambda { |error_items, description|
       begin
@@ -442,9 +442,9 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
 
     I18n.available_locales
 
-    new_translations = (I18n.backend.send(:translations)[language.to_sym] || {}).flatten.merge(new_translations)
+    new_translations = (I18n.backend.send(:translations)[language.to_sym] || {}).flatten_keys.merge(new_translations)
     File.open("config/locales/#{language}.yml", "w") { |f|
-      f.write({language => new_translations.expand}.ya2yaml(:syck_compatible => true))
+      f.write({language => new_translations.expand_keys}.ya2yaml(:syck_compatible => true))
     }
   end
 end
