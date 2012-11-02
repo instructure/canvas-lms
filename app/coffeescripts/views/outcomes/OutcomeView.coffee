@@ -67,7 +67,7 @@ define [
       $editWrapper = $(e.currentTarget).parents('.edit:first')
       $showWrapper = $editWrapper.prev()
       $showWrapper.find('h5').text($editWrapper.find('input.outcome_rating_description').val())
-      $showWrapper.find('.points').text($editWrapper.find('input.outcome_rating_points').val())
+      $showWrapper.find('.points').text($editWrapper.find('input.outcome_rating_points').val() or 0)
       $editWrapper.hide()
       $showWrapper.show()
 
@@ -83,8 +83,8 @@ define [
     updateRatings: ->
       total = 0
       for r in @$('.rating')
-        rating = $(r).find('.outcome_rating_points').val()
-        total = _.max [total, parseInt rating] if rating
+        rating = $(r).find('.outcome_rating_points').val() or 0
+        total = _.max [total, parseInt rating]
         index = _i
         for i in $(r).find('input')
           # reset indices
