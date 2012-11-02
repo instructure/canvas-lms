@@ -91,8 +91,16 @@ define [
             outcome_id: model.get 'id'
         @$el.disableWhileLoading dfd
         $.when(dfd)
-          .done =>
-            @trigger 'import', model
+          .done (response, status, deferred) =>
+            importedModel = model.clone()
+            if importedModel instanceof OutcomeGroup
+              importedModel.set(response)
+            else
+              importedModel.outcomeLink     = _.extend({}, model.outcomeLink)
+              importedModel.outcomeGroup    = response.outcome_group
+              importedModel.outcomeLink.url = response.url
+              importedModel.set(context_id: response.context_id, context_type: response.context_type)
+            @trigger 'import', importedModel
             @close()
             $.flashMessage I18n.t('flash.importSuccess', 'Import successful')
           .fail =>
