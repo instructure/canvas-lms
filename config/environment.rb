@@ -68,7 +68,7 @@ Rails::Initializer.run do |config|
   # config.active_record.schema_format = :sql
 
   # Activate observers that should always be running
-  config.active_record.observers = :cacher
+  config.active_record.observers = [:cacher, :stream_item_cache]
 
   config.autoload_paths += %W( #{RAILS_ROOT}/app/middleware #{RAILS_ROOT}/app/observers )
 

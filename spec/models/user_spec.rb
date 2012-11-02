@@ -157,6 +157,45 @@ describe User do
     @user.recent_stream_items.size.should == 0
   end
 
+  describe "#cached_recent_stream_items" do
+    before(:each) do
+      @contexts = []
+      # create stream item 1
+      course_with_teacher(:active_all => true)
+      @contexts << @course
+      discussion_topic_model(:context => @course)
+      # create stream item 2
+      course_with_teacher(:active_all => true, :user => @teacher)
+      @contexts << @course
+      discussion_topic_model(:context => @course)
+
+      @dashboard_key = StreamItemCache.recent_stream_items_key(@teacher)
+      @context_keys = @contexts.map { |context|
+        StreamItemCache.recent_stream_items_key(@teacher, context.asset_string)
+      }
+    end
+
+    it "creates cache keys for each context" do
+      enable_cache do
+        @teacher.cached_recent_stream_items(:contexts => @contexts)
+        Rails.cache.read(@dashboard_key).should be_blank
+        @context_keys.each do |context_key|
+          Rails.cache.read(context_key).should_not be_blank
+        end
+      end
+    end
+
+    it "creates one cache key when there are no contexts" do
+      enable_cache do
+        @teacher.cached_recent_stream_items # cache the dashboard items
+        Rails.cache.read(@dashboard_key).should_not be_blank
+        @context_keys.each do |context_key|
+          Rails.cache.read(context_key).should be_blank
+        end
+      end
+    end
+  end
+
   it "should be able to remove itself from a root account" do
     account1 = Account.create
     account2 = Account.create

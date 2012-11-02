@@ -46,22 +46,26 @@ module Mutable
   def hide_stream_items
     if self.respond_to? :submissions
       item_asset_strings = submissions.map { |s| "submission_#{s.id}" }
-      stream_item_ids   = StreamItem.all(
-        :select => "id",
-        :conditions => { :item_asset_string => item_asset_strings }
-      ).map(&:id)
-      StreamItemInstance.update_all({ :hidden => true }, { :stream_item_id => stream_item_ids })
+      stream_items = StreamItem.all(:select => "id, context_code",
+                                    :conditions => { :item_asset_string => item_asset_strings })
+      stream_item_ids = stream_items.map(&:id)
+      stream_item_context_codes = stream_items.map(&:context_code)
+      StreamItemInstance.update_all_with_invalidation(stream_item_context_codes,
+                                                      { :hidden => true },
+                                                      { :stream_item_id => stream_item_ids })
     end
   end
 
   def show_stream_items
     if self.respond_to? :submissions
       submissions        = submissions(:include => {:hidden_submission_comments => :author})
-      stream_item_ids    = StreamItem.all(
-        :select => "id",
-        :conditions => { :item_asset_string => submissions.map(&:asset_string) }
-      ).map(&:id)
-      StreamItemInstance.update_all({ :hidden => false }, { :hidden => true, :stream_item_id => stream_item_ids })
+      stream_items = StreamItem.all(:select => "id, context_code",
+                                    :conditions => { :item_asset_string => submissions.map(&:asset_string) })
+      stream_item_ids = stream_items.map(&:id)
+      stream_item_context_codes = stream_items.map(&:context_code)
+      StreamItemInstance.update_all_with_invalidation(stream_item_context_codes,
+                                                      { :hidden => false },
+                                                      { :hidden => true, :stream_item_id => stream_item_ids })
 
       outstanding = submissions.map{ |submission|
         comments = submission.hidden_submission_comments.all

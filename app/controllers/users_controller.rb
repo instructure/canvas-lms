@@ -304,7 +304,7 @@ class UsersController < ApplicationController
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).select { |e| e.invited? }
-    @stream_items = @current_user.try(:recent_stream_items) || []
+    @stream_items = @current_user.try(:cached_recent_stream_items) || []
 
     incomplete_registration = @current_user && @current_user.pre_registered? && params[:registration_success]
     js_env({:INCOMPLETE_REGISTRATION => incomplete_registration, :USER_EMAIL => @current_user.email})
@@ -535,7 +535,7 @@ class UsersController < ApplicationController
   end
 
   def ignore_stream_item
-    StreamItemInstance.update_all({ :hidden => true }, { :stream_item_id => params[:id], :user_id => @current_user.id })
+    StreamItemInstance.find_by_user_id_and_stream_item_id(@current_user.id, params[:id]).try(:update_attribute, :hidden, true)
     render :json => { :hidden => true }
   end
 

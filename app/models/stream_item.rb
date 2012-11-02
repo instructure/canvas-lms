@@ -279,8 +279,7 @@ class StreamItem < ActiveRecord::Base
 
   def self.update_read_state_for_asset(asset, new_state, user_id)
     if item = StreamItem.find_by_item_asset_string(asset.asset_string)
-      StreamItemInstance.update_all({ :workflow_state => new_state },
-                                    { :stream_item_id => item.id, :user_id => user_id })
+      StreamItemInstance.find_by_user_id_and_stream_item_id(user_id, item.id).try(:update_attribute, :workflow_state, new_state)
     end
   end
 

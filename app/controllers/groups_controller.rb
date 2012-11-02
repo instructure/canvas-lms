@@ -218,7 +218,7 @@ class GroupsController < ApplicationController
           return
         end
         @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
-        @stream_items = @current_user.try(:recent_stream_items, { :contexts => @context }) || []
+        @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
           @group.request_user(@current_user)
           if !@group.grants_right?(@current_user, session, :read)

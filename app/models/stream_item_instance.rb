@@ -29,6 +29,22 @@ class StreamItemInstance < ActiveRecord::Base
     self.context_code = stream_item && stream_item.context_code
   end
 
+  class << self
+    alias_method :original_update_all, :update_all
+    # Don't use update_all() because there is an observer
+    # on StreamItemInstance to invalidate some cache keys.
+    # Use update_all_with_invalidation() instead.
+    def update_all(*args)
+      raise "Using update_all will break things, use update_all_with_invalidation instead."
+    end
+
+    # Runs update_all() and also invalidates cache keys for the array of context_codes
+    def update_all_with_invalidation(context_codes, updates, conditions = nil, options = {})
+      context_codes.each { |code| StreamItemCache.invalidate_context_stream_item_key code }
+      self.original_update_all(updates, conditions, options)
+    end
+  end
+
   workflow do
     state :read
     state :unread

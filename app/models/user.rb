@@ -1838,14 +1838,38 @@ class User < ActiveRecord::Base
       # "context_code=..." instead of "context_code IN ..."
       context_codes = setup_context_lookups(opts[:contexts])
       instances = instances.scoped(:conditions => { :context_code => context_codes }) if context_codes.present?
+    elsif opts[:context]
+      instances = instances.scoped(:conditions => { :context_code => opts[:context].asset_string })
     end
 
     instances
   end
 
+  def cached_recent_stream_items(opts={})
+    expires_in = 1.day
+
+    if opts[:contexts]
+      items = []
+      Array(opts[:contexts]).each do |context|
+        items.concat(
+                   Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.asset_string),
+                                     :expires_in => expires_in) {
+                     recent_stream_items(:context => context)
+                   })
+      end
+      items.sort { |a,b| b.id <=> a.id }
+    else
+      # no context in cache key
+      Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), :expires_in => expires_in) {
+        recent_stream_items
+      }
+    end
+  end
+
   def recent_stream_items(opts={})
     # cross-shard stream items need a *lot* of work; just disable them for now
     return [] if self.shard != Shard.current
+
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       visible_instances = visible_stream_item_instances(opts).scoped({
         :include => :stream_item,
@@ -1858,7 +1882,6 @@ class User < ActiveRecord::Base
       end.compact
     end
   end
-  memoize :recent_stream_items
 
   def calendar_events_for_calendar(opts={})
     opts = opts.dup
