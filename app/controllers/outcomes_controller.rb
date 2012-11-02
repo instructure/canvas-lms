@@ -31,11 +31,11 @@ class OutcomesController < ApplicationController
         common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
       end
 
-      js_env(:COURSE_ID => @context.id,
-             :ROOT_OUTCOME_GROUP => outcome_group_json(@root_outcome_group, @current_user, session),
+      js_env(:ROOT_OUTCOME_GROUP => outcome_group_json(@root_outcome_group, @current_user, session),
              :CONTEXT_URL_ROOT => polymorphic_path([@context]),
              :ACCOUNT_CHAIN_URL => polymorphic_path([:api_v1, @context, :account_chain]),
-             :STATE_STANDARDS_URL => api_v1_global_redirect_path,
+             # Don't display state standards if in the context of a Course. Only at Account level.
+             :STATE_STANDARDS_URL => @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
              :COMMON_CORE_GROUP_ID => common_core_group_id,
              :COMMON_CORE_GROUP_URL => common_core_group_url,
              :PERMISSIONS => {

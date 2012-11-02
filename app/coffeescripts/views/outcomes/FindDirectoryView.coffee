@@ -41,12 +41,13 @@ define [
         title: I18n.t('account_standards', 'Account Standards')
         description: I18n.t('account_standards_description', "To the left you'll notice the standards your institution has created for you to use in your courses.")
         directoryClass: AccountDirectoryView
-      state = new OutcomeGroup
-        dontImport: true
-        title: I18n.t('state_standards', 'State Standards')
-        description: I18n.t('state_standards_description', "To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for grading within your course.")
-        directoryClass: StateStandardsDirectoryView
-      state.url = ENV.STATE_STANDARDS_URL
+      if ENV.STATE_STANDARDS_URL
+        state = new OutcomeGroup
+          dontImport: true
+          title: I18n.t('state_standards', 'State Standards')
+          description: I18n.t('state_standards_description', "To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for grading within your course.")
+          directoryClass: StateStandardsDirectoryView
+        state.url = ENV.STATE_STANDARDS_URL
       if ENV.COMMON_CORE_GROUP_URL
         core = new OutcomeGroup
           dontImport: true
@@ -61,9 +62,13 @@ define [
         g.on 'change', @revertTitle
         g.fetch()
 
+      # When there is no State or Core (account context), there are no deferreds to
+      # wait for. This adds a 'setTimeout' which calls reset that fixes display
+      # issues and hooks up the click handlers to the sidebar.
       @$el.disableWhileLoading $.when(dfds...).done =>
-        @reset()
-        @$el.find('[tabindex=0]:first').focus()
+        setTimeout =>
+          @reset()
+          @$el.find('[tabindex=0]:first').focus()
 
       # super call not needed
 
