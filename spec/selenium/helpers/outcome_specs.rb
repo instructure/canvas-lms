@@ -1,9 +1,97 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+
 
 shared_examples_for "outcome tests" do
   it_should_behave_like "in-process server selenium tests"
   before (:each) do
     who_to_login == 'teacher' ? course_with_teacher_logged_in : course_with_admin_logged_in
+  end
+
+  def import_account_level_outcomes
+    keep_trying_until do
+      f(".btn-primary").click
+      driver.switch_to.alert.should_not be nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      true
+    end
+  end
+
+  def traverse_nested_outcomes(outcome)
+    #pass an array with each group or outcome in sequence
+    outcome.each do |title|
+      ffj(".outcome-level:last .outcome-group .ellipsis")[0].should have_attribute("title", title)
+      f(".ellipsis[title='#{title}']").click
+      wait_for_ajaximations
+    end
+  end
+
+  def goto_state_outcomes
+    get outcome_url
+    wait_for_ajaximations
+    f('.find_outcome').click
+    wait_for_ajaximations
+    ff(".outcome-level .outcome-group").last.click
+    wait_for_ajaximations
+  end
+
+  def state_outcome_setup
+  @cm.export_content
+  run_jobs
+  @cm.reload
+  @cm.migration_settings[:warnings].should be_nil
+  @cm.migration_settings[:last_error].should be_nil
+  @cm.workflow_state.should == 'imported'
+  end
+
+  def context_outcome(context, num_of_outcomes)
+    num_of_outcomes.times do |o|
+      @outcome_group ||= context.root_outcome_group
+      @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
+      @outcome.rubric_criterion = valid_outcome_data
+      @outcome.save!
+      @outcome_group.add_outcome(@outcome)
+      @outcome_group.save!
+    end
+  end
+
+  def create_bulk_outcomes_groups(context, num_of_groups, num_of_outcomes)
+    @root = context.root_outcome_group
+    num_of_groups.times do |g|
+      @group = context.learning_outcome_groups.create!(:title => "group #{g}")
+      num_of_outcomes.times do |o|
+        @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
+        @group.add_outcome(@outcome)
+      end
+      @root.adopt_outcome_group(@group)
+    end
+  end
+
+  def valid_outcome_data
+    {
+        :mastery_points => 3,
+        :ratings => [
+            {:points => 3, :description => "Rockin"},
+            {:points => 0, :description => "Lame"}
+        ]
+    }
+  end
+
+  def course_bulk_outcome_groups_course(num_of_groups, num_of_outcomes)
+    create_bulk_outcomes_groups(@course, num_of_groups, num_of_outcomes)
+  end
+
+  def course_bulk_outcome_groups_account(num_of_groups, num_of_outcomes)
+    create_bulk_outcomes_groups(@account, num_of_groups, num_of_outcomes)
+  end
+
+  def course_outcome(num_of_outcomes)
+    context_outcome(@course, num_of_outcomes)
+  end
+
+  def account_outcome(num_of_outcomes)
+    context_outcome(@account, num_of_outcomes)
   end
 
   describe "create/edit/delete outcomes" do
@@ -30,7 +118,7 @@ shared_examples_for "outcome tests" do
       ## expect
       # should show up in directory browser
       ffj('.outcomes-sidebar .outcome-level:first li.outcome-link').
-        detect { |li| li.text == outcome_name }.should_not be_nil
+          detect { |li| li.text == outcome_name }.should_not be_nil
       # should show outcome in main content window
       # title
       f(".outcomes-content .title").text.should == outcome_name
@@ -74,7 +162,7 @@ shared_examples_for "outcome tests" do
       ## expect
       # should show up in nested directory browser
       ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-link').
-        detect { |li| li.text == outcome_name }.should_not be_nil
+          detect { |li| li.text == outcome_name }.should_not be_nil
       # should show outcome in main content window
       f(".outcomes-content .title").text.should == outcome_name
       # db
@@ -156,7 +244,6 @@ shared_examples_for "outcome tests" do
       ## expect
       f('.error_box').should be_present
     end
-
   end
 
   describe "create/edit/delete outcome groups" do
@@ -208,7 +295,7 @@ shared_examples_for "outcome tests" do
       ## expect
       # should show up in nested directory browser
       ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-group').
-        detect { |li| li.text == nested_group_title }.should_not be_nil
+          detect { |li| li.text == nested_group_title }.should_not be_nil
       # should show group in main content window
       f(".outcomes-content .title").text.should == nested_group_title
       # db
@@ -262,6 +349,5 @@ shared_examples_for "outcome tests" do
       refresh_page # to make sure it was correctly deleted
       ff('.learning_outcome').each { |outcome_element| outcome_element.should_not be_displayed }
     end
-
   end
 end
