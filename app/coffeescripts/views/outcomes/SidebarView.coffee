@@ -105,17 +105,26 @@ define [
       # don't re-select the same model
       return if selectedModel and dir is @selectedDir() and selectedModel is @selectedDir()?.prevSelectedModel
 
-      dir.clearSelection() unless selectedModel
+      # If root selection is an outcome, don't have a dir. Get root most dir to clear selection.
+      useDir = if dir then dir else @directories[0]
+      useDir.clearSelection() if useDir and !selectedModel
 
       # remove all directories after the selected dir
-      i = _.indexOf @directories, dir
+      i = _.indexOf @directories, useDir
       _.each @directories.splice(i + 1), (d) -> d.remove()
       isAddingDir = selectedModel instanceof OutcomeGroup and !selectedModel.isNew()
       @addDirFor selectedModel if isAddingDir
       @updateSidebarWidth()
       scrollIndex = if isAddingDir then i + 1 else i
       @_scrollToDir scrollIndex, selectedModel
-      @trigger 'select', selectedModel, @directories
+      # Determine which model to select based on going forward/backward and where we are in the tree.
+      wantSelectModel = selectedModel
+      if @goingBack
+        if !useDir.parent
+          wantSelectModel = null
+        else
+          wantSelectModel = useDir.outcomeGroup
+      @trigger 'select', wantSelectModel, @directories
 
     refreshSelection: (model) =>
       dir = @selectedDir()
@@ -141,11 +150,20 @@ define [
 
     # Go up a directory.
     goBack: =>
+      @goingBack = true
       if @selectedModel() instanceof OutcomeGroup
         @selectDir @selectedDir()
       else
         i = _.indexOf @directories, @selectedDir()
         @selectDir @directories[i - 1]
+      @goingBack = false
+#      if @selectedModel() instanceof OutcomeGroup
+#        parentDir = @selectedDir().parent
+##        @selectDir @selectedDir(), @selectedDir().parent?.selectedModel
+#      else
+#        i = _.indexOf @directories, @selectedDir()
+#        @selectDir @directories[i - 1]
+#      @goingBack = false
 
     updateSidebarWidth: ->
       sidebarWidth = if @directories.length is 1 then @directoryWidth + 1 else (@directoryWidth * 2) + 2

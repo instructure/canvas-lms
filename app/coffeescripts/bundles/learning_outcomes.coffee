@@ -45,13 +45,11 @@ require [
 
   # toolbar events
   toolbar.on 'goBack', sidebar.goBack
-  toolbar.on 'goBack', content.show
   toolbar.on 'add', sidebar.addAndSelect
   toolbar.on 'add', content.add
   toolbar.on 'find', -> sidebar.findDialog FindDialog
   # sidebar events
   sidebar.on 'select', (model) ->
-    return unless model?
     content.show(model)
   sidebar.on 'select', toolbar.resetBackButton
   # content events
