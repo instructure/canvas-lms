@@ -136,6 +136,6 @@ define [
         when 'loading'
           @$el.empty()
         else # show
-          @$el.html outcomeTemplate _.extend data, readOnly: @readOnly()
+          @$el.html outcomeTemplate _.extend data, readOnly: @readOnly(), native: @model.outcomeLink.outcome.context_id == @model.outcomeLink.context_id && @model.outcomeLink.outcome.context_type == @model.outcomeLink.context_type
       @$('input:first').focus()
       this
