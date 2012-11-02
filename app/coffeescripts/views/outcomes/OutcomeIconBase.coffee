@@ -197,6 +197,7 @@ define [
     # Returns nothing.
     updateTitle: ->
       @$('span').text h(@model.get 'title')
+      @$('a').attr('title', h(@model.get 'title'))
 
     # Public: Init dragging and render view.
     #
