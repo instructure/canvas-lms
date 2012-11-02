@@ -79,6 +79,15 @@ def truncate_all_tables
   end
 end
 
+def truncate_all_cassandra_tables
+  Canvas::Cassandra::Database.config_names.each do |cass_config|
+    db = Canvas::Cassandra::Database.from_config(cass_config)
+    db.keyspace_information.tables.each do |table|
+      db.execute("TRUNCATE #{table}")
+    end
+  end
+end
+
 # wipe out the test db, in case some non-transactional tests crapped out before
 # cleaning up after themselves
 truncate_all_tables
@@ -132,6 +141,7 @@ Spec::Runner.configure do |config|
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
+    truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
   end
 

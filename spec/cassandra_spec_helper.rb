@@ -22,9 +22,6 @@ shared_examples_for "cassandra page views" do
   before do
     if Canvas::Cassandra::Database.configured?('page_views')
       Setting.set('enable_page_views', 'cassandra')
-      PageView.cassandra.execute("TRUNCATE page_views")
-      PageView.cassandra.execute("TRUNCATE page_views_history_by_context")
-      PageView.cassandra.execute("TRUNCATE page_views_migration_metadata")
     else
       pending "needs cassandra page_views configuration"
     end

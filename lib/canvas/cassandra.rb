@@ -24,13 +24,16 @@ module Canvas::Cassandra
     end
 
     def self.from_config(config_name)
-      config = Setting.from_config('cassandra').try(:[], config_name)
-      raise ArgumentError, "No configuration for Cassandra for: #{config_name.inspect}" unless config
-      servers = Array(config['servers'])
-      raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
-      keyspace = config['keyspace']
-      raise "No keyspace specified for: #{config_name.inspect}" unless keyspace.present?
-      self.new(servers, keyspace)
+      @connections ||= {}
+      @connections[config_name] ||= begin
+        config = Setting.from_config('cassandra').try(:[], config_name)
+        raise ArgumentError, "No configuration for Cassandra for: #{config_name.inspect}" unless config
+        servers = Array(config['servers'])
+        raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
+        keyspace = config['keyspace']
+        raise "No keyspace specified for: #{config_name.inspect}" unless keyspace.present?
+        self.new(servers, keyspace)
+      end
     end
 
     def self.config_names
