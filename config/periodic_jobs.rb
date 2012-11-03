@@ -47,8 +47,10 @@ Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * *
 end
 
 Delayed::Periodic.cron 'CrocodocDocument.update_process_states', '*/5 * * * *' do
-  Shard.with_each_shard do
-    CrocodocDocument.update_process_states
+  if Canvas::Crocodoc.config
+    Shard.with_each_shard do
+      CrocodocDocument.update_process_states
+    end
   end
 end
 
