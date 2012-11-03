@@ -521,7 +521,7 @@ class ActiveRecord::Base
 
     ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :order => primary_key, :limit => batch_size)}) as subquery").first
     while ids.first.present?
-      yield *ids
+      yield(*ids)
       last_value = ids.last
       ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :conditions => ["#{quoted_table_name}.#{primary_key}>?", last_value], :order => primary_key, :limit => batch_size)}) as subquery").first
     end
@@ -1021,6 +1021,14 @@ class ActiveRecord::Migrator
       next if !migration.runnable?
 
       begin
+        if down? && !Rails.env.test? && !$confirmed_migrate_down
+          require 'highline'
+          if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
+            raise("Revert not confirmed")
+          end
+          $confirmed_migrate_down = true if $1.downcase == 'a'
+        end
+
         ddl_transaction(migration) do
           migration.migrate(@direction)
           record_version_state_after_migrating(migration.version) unless tag == :predeploy && migration.tags.include?(:postdeploy)
