@@ -223,7 +223,7 @@ define(['vendor/date-js/globalization/en-US'], function() {
      * @return {Date}    this
      */
     $P.addMilliseconds = function (value) {
-        this.setMilliseconds(this.getMilliseconds() + value * 1);
+        this.setUTCMilliseconds(this.getUTCMilliseconds() + value * 1);
         return this;
     };
 
@@ -500,19 +500,19 @@ define(['vendor/date-js/globalization/en-US'], function() {
      */
     $P.set = function (config) {
         if ($D.validateMillisecond(config.millisecond)) {
-            this.addMilliseconds(config.millisecond - this.getMilliseconds()); 
+            this.setMilliseconds(config.millisecond); 
         }
         
         if ($D.validateSecond(config.second)) {
-            this.addSeconds(config.second - this.getSeconds()); 
+            this.setSeconds(config.second); 
         }
         
         if ($D.validateMinute(config.minute)) {
-            this.addMinutes(config.minute - this.getMinutes()); 
+            this.setMinutes(config.minute); 
         }
         
         if ($D.validateHour(config.hour)) {
-            this.addHours(config.hour - this.getHours()); 
+            this.setHours(config.hour); 
         }
         
         if ($D.validateMonth(config.month)) {
