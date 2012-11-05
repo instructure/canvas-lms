@@ -352,8 +352,8 @@ describe Enrollment do
         @enrollment.end_at = 4.days.from_now
         @enrollment.save!
         @enrollment.state.should eql(:invited)
-        @enrollment.state_based_on_date.should eql(:inactive)
-        @enrollment.accept.should be_false
+        @enrollment.state_based_on_date.should eql(:invited)
+        @enrollment.accept.should be_true
       end
 
       def course_section_availability_test
@@ -385,8 +385,8 @@ describe Enrollment do
         @section.save!
         @enrollment.save!
         @enrollment.state.should eql(:invited)
-        @enrollment.state_based_on_date.should eql(:inactive)
-        @enrollment.accept.should be_false
+        @enrollment.state_based_on_date.should eql(:invited)
+        @enrollment.accept.should be_true
       end
 
       def course_availability_test
@@ -452,8 +452,8 @@ describe Enrollment do
         @enrollment.save!
         @enrollment.reload
         @enrollment.state.should eql(:invited)
-        @enrollment.state_based_on_date.should eql(:inactive)
-        @enrollment.accept.should be_false
+        @enrollment.state_based_on_date.should eql(:invited)
+        @enrollment.accept.should be_true
       end
 
       def enrollment_dates_override_test(enrollment_type)
@@ -488,8 +488,8 @@ describe Enrollment do
         @enrollment.save!
         @enrollment.reload
         @enrollment.state.should eql(:invited)
-        @enrollment.state_based_on_date.should eql(:inactive)
-        @enrollment.accept.should be_false
+        @enrollment.state_based_on_date.should eql(:invited)
+        @enrollment.accept.should be_true
 
         @enrollment.update_attribute(:workflow_state, 'active')
         @override.start_at = nil
@@ -524,6 +524,19 @@ describe Enrollment do
 
         it "should accept into the right state based on availability dates on enrollment_dates_override" do
           enrollment_dates_override_test('StudentEnrollment')
+        end
+
+        it "should have the correct state for a half-open past course" do
+          @term = @course.enrollment_term
+          @term.should_not be_nil
+          @term.start_at = nil
+          @term.end_at = 2.days.ago
+          @term.save!
+
+          @enrollment.workflow_state = 'invited'
+          @enrollment.save!
+          @enrollment.state.should == :invited
+          @enrollment.state_based_on_date.should == :completed
         end
       end
 

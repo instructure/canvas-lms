@@ -497,20 +497,17 @@ class Enrollment < ActiveRecord::Base
       start_at, end_at = range
       # start_at <= now <= end_at, allowing for open ranges on either end
       return state if (start_at || now) <= now && now <= (end_at || now)
-      return state if state == :invited &&
-        course.restrict_enrollments_to_course_dates &&
-        now < start_at
     end
 
     # Not strictly within any range
-    return state unless global_start_at = ranges.map(&:first).compact.min
+    return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
       :completed
     # Allow student view students to use the course before the term starts
-    elsif !self.fake_student?
-      :inactive
-    else
+    elsif self.fake_student? || state == :invited
       state
+    else
+      :inactive
     end
   end
 
