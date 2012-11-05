@@ -23,11 +23,15 @@ describe StreamItemsHelper do
     Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
     course_with_teacher(:active_all => true)
     @other_user = user()
+    @another_user = user()
 
     @context = @course
     @discussion = discussion_topic_model
     @announcement = announcement_model
     @assignment = assignment_model(:course => @course)
+    # this conversation will not be shown, since the teacher is the last author
+    conversation(@another_user, @teacher).conversation.add_message(@teacher, 'zomg')
+    # whereas this one will be shown
     @participant = conversation(@other_user, @teacher)
     @conversation = @participant.conversation
   end
@@ -35,7 +39,7 @@ describe StreamItemsHelper do
   context "categorize_stream_items" do
     it "should categorize different types correctly" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 4 # 1 for each type
+      @items.size.should == 5 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized["Announcement"].size.should == 1
       @categorized["Conversation"].size.should == 1
@@ -45,7 +49,7 @@ describe StreamItemsHelper do
 
     it "should normalize output into common fields" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 4 # 1 for each type
+      @items.size.should == 5 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized.values.flatten.each do |presenter|
         item = @items.detect{ |si| si.id == presenter.stream_item_id }
@@ -61,7 +65,7 @@ describe StreamItemsHelper do
   context "extract_path" do
     it "should link to correct place" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 4 # 1 for each type
+      @items.size.should == 5 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized["Announcement"].first.path.should match("/courses/#{@course.id}/announcements/#{@announcement.id}")
       @categorized["Conversation"].first.path.should match("/conversations/#{@conversation.id}")
@@ -73,7 +77,7 @@ describe StreamItemsHelper do
   context "extract_context" do
     it "should find the correct context" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 4 # 1 for each type
+      @items.size.should == 5 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized["Announcement"].first.context.id.should == @course.id
       @categorized["Conversation"].first.context.id.should == @other_user.id
@@ -85,7 +89,7 @@ describe StreamItemsHelper do
   context "extract_summary" do
     it "should find the right content" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 4 # 1 for each type
+      @items.size.should == 5 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized["Announcement"].first.summary.should == @announcement.title
       @categorized["Conversation"].first.summary.should == @participant.last_message.body

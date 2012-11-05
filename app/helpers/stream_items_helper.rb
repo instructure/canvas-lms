@@ -40,6 +40,7 @@ module StreamItemsHelper
 
       if category == "Conversation"
         participant = user.conversation_participant(item.data.id)
+        next if participant.last_author?
         item.data.last_message = participant.last_message
         item.data.last_author = item.data.last_message.author
 

@@ -148,10 +148,14 @@ class ConversationParticipant < ActiveRecord::Base
 
   def properties(latest = last_message)
     properties = []
-    properties << :last_author if latest && latest.author_id == user_id
+    properties << :last_author if last_author?(latest)
     properties << :attachments if has_attachments?
     properties << :media_objects if has_media_objects?
     properties
+  end
+
+  def last_author?(latest = last_message)
+    latest && latest.author_id == user_id
   end
 
   def add_participants(user_ids, options={})
