@@ -97,6 +97,7 @@ describe "HTML Sanitization of" do
         {:html=>nil, :text=>"left 3"},
         {:html=>nil, :text=>"left 4"}
       ]
+      hash[:matches].collect{ |m| m[:text]}.should == ["right 1", "right 2", "right 3", "right 4"]
     end
   end
 end
