@@ -31,4 +31,20 @@
 </a>
 {{/unless}}
 
-<p>{{#t "point_mastery"}}Mastery at {{mastery_points}} points{{/t}}</p>
+{{#if setQuizMastery}}
+  <label for="outcome_mastery_at">
+    {{#t "mastery_at_label"}}Set mastery for any score at or above:{{/t}}
+    <input type="text" name="mastery_at" id="outcome_mastery_at" value="60" />
+    %
+  </label>
+{{else}}
+  {{#if useForScoring}}
+    <label for="outcome_use_for_scoring">
+      <input type="checkbox" id="outcome_use_for_scoring" class="criterion_for_scoring" checked />
+      {{#t "use_for_scoring"}}Use this criterion for scoring{{/t}}
+    </label>
+  {{else}}
+    <p>{{#t "point_mastery"}}Mastery at {{mastery_points}} points{{/t}}</p>
+  {{/if}}
+{{/if}}
+

@@ -30,7 +30,7 @@ define [
   # It uses OutcomeView and OutcomeGroupView to render
   class ContentView extends Backbone.View
 
-    initialize: ({@readOnly, @instructionsTemplate}) ->
+    initialize: ({@readOnly, @setQuizMastery, @useForScoring, @instructionsTemplate}) ->
       @render()
 
     # accepts: Outcome and OutcomeGroup
@@ -46,7 +46,7 @@ define [
 
     # private
     _show: (viewOpts) ->
-      viewOpts = _.extend {}, viewOpts, readOnly: @readOnly
+      viewOpts = _.extend {}, viewOpts, {@readOnly, @setQuizMastery, @useForScoring}
       @innerView?.remove()
       @innerView =
         if viewOpts.model instanceof Outcome

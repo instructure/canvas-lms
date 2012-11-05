@@ -44,6 +44,9 @@ define [
           I18n.t('mastery_error', 'Must be greater than or equal to 0')
     , OutcomeContentBase::validations
 
+    constructor: ({@setQuizMastery, @useForScoring}) ->
+      super
+
     # Validate before submitting.
     submit: (e) =>
       # set so handlebars doesn't put in placeholder text
@@ -137,6 +140,10 @@ define [
         when 'loading'
           @$el.empty()
         else # show
-          @$el.html outcomeTemplate _.extend data, readOnly: @readOnly(), native: @model.outcomeLink.outcome.context_id == @model.outcomeLink.context_id && @model.outcomeLink.outcome.context_type == @model.outcomeLink.context_type
+          @$el.html outcomeTemplate _.extend data,
+            readOnly: @readOnly(),
+            native: @model.outcomeLink.outcome.context_id == @model.outcomeLink.context_id && @model.outcomeLink.outcome.context_type == @model.outcomeLink.context_type
+            setQuizMastery: @setQuizMastery,
+            useForScoring: @useForScoring
       @$('input:first').focus()
       this

@@ -24,7 +24,9 @@
 </div>
 
 <script>
-  require(['edit_rubric'])
+  window.ENV = window.ENV || {};
+  window.ENV.ROOT_OUTCOME_GROUP = JSON.parse('<%= raw @root_outcome_group %>');
+  require(['compiled/bundles/edit_rubric'])
 </script>
 
 

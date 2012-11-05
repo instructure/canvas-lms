@@ -4,10 +4,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_co
 describe "account admin question bank" do
   it_should_behave_like "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     admin_logged_in
     @question_bank = create_question_bank
-    @question = create_question
+    @question      = create_question
+    @outcome       = create_outcome
     get "/accounts/#{Account.default.id}/question_banks/#{@question_bank.id}"
   end
 
@@ -27,6 +28,24 @@ describe "account admin question bank" do
     bank.assessment_questions << question
     question
   end
+
+  def create_outcome (short_description = "good student")
+    outcome = Account.default.learning_outcomes.create!(
+      :short_description => short_description,
+      :rubric_criterion  => {
+        :description => "test description",
+        :points_possible => 10,
+        :mastery_points => 9,
+        :ratings => [
+          { :description => "Exceeds Expectations", :points => 5 },
+          { :description => "Meets Expectations", :points => 3 },
+          { :description => "Does Not Meet Expectations", :points => 0 }
+        ]
+      })
+    Account.default.root_outcome_group.add_outcome(outcome)
+    outcome
+  end
+
 
   def verify_added_question(name, question_text, chosen_question_type)
     question = AssessmentQuestion.find_by_name(name)
@@ -184,69 +203,43 @@ describe "account admin question bank" do
   end
 
   context "outcome alignment" do
-    before (:each) do
-      @outcome = create_outcome
-    end
-
-    def create_outcome (short_description = "good student")
-      outcome = Account.default.created_learning_outcomes.build(:short_description => short_description)
-      outcome.rubric_criterion = {
-        :description => "test description",
-        :points_possible => 10,
-        :mastery_points => 9,
-        :ratings => [
-          { :description => "Exceeds Expectations", :points => 5 },
-          { :description => "Meets Expectations", :points => 3 },
-          { :description => "Does Not Meet Expectations", :points => 0 }
-        ]
-      }
-      outcome.save!
-      Account.default.root_outcome_group.add_outcome(outcome)
-      outcome
-    end
-
-    def add_outcome_to_bank(outcome)
-      f(".add_outcome_link").click
+    def add_outcome_to_bank(outcome, mastery_percent = 60)
+      f('.add_outcome_link').click
       wait_for_ajax_requests
-      short_description = outcome.short_description
-      f(".outcome_#{outcome.id} .short_description").should include_text short_description
-      f(".outcome_#{outcome.id} .select_outcome_link").click
+      f('.outcome-link').click
       wait_for_ajax_requests
-      f("[data-id = '#{outcome.id}']").should include_text short_description
+      replace_content(f('#outcome_mastery_at'), mastery_percent)
+      fj('.btn-primary:visible').click
+      driver.switch_to.alert.accept
+      wait_for_ajax_requests
+      fj("[data-id=#{outcome.id}]:visible").should include_text outcome.short_description
     end
 
     it "should align an outcome" do
-      mastery_points = @outcome[:data][:rubric_criterion][:mastery_points]
-      possible_points = @outcome[:data][:rubric_criterion][:points_possible]
-      percentage = mastery_points.to_f/possible_points.to_f
-      @question_bank.learning_outcome_alignments.count.should == 0
+      mastery_points, possible_points = @outcome.data[:rubric_criterion].values_at(:mastery_points, :points_possible)
+      percentage = mastery_points.to_f / possible_points.to_f
       add_outcome_to_bank(@outcome)
-      f("[data-id = '#{@outcome.id}']").should include_text("#{(percentage*100).to_i}%")
-      @question_bank.reload
-      @question_bank.learning_outcome_alignments.count.should be > 0
-      learning_outcome_tag = @question_bank.learning_outcome_alignments.find_by_mastery_score(percentage)
+      fj("[data-id=#{@outcome.id}]:visible").should include_text("60%")
+      @question_bank.reload.learning_outcome_alignments.count.should be > 0
+      learning_outcome_tag = @question_bank.learning_outcome_alignments.find_by_mastery_score(0.6)
       learning_outcome_tag.should be_present
     end
 
     it "should change the outcome set mastery score" do
       f(".add_outcome_link").click
       wait_for_ajax_requests
-      mastery_percent = f("#outcome_question_bank_mastery_#{@outcome.id}")
-      percentage = "40"
-      replace_content(mastery_percent, percentage)
-      f(".outcome_#{@outcome.id} .select_outcome_link").click
-      wait_for_ajax_requests
-      f("[data-id = '#{@outcome.id}'] .content").should include_text("mastery at #{percentage}%")
+      add_outcome_to_bank(@outcome, 40)
+      fj("[data-id=#{@outcome.id}]:visible .content").should include_text("mastery at 40%")
       learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.find_by_mastery_score(0.4)
       learning_outcome_tag.should be_present
     end
 
     it "should delete an aligned outcome" do
       add_outcome_to_bank(@outcome)
-      f("[data-id='#{@outcome.id}'] .delete_outcome_link").click
+      fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link").click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      f("[data-id='#{@outcome.id}'] .delete_outcome_link").should be_nil
+      fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link").should be_nil
     end
   end
 end

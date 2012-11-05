@@ -19,7 +19,9 @@
 class QuestionBanksController < ApplicationController
   before_filter :require_context
   add_crumb("Question Banks") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
-  
+
+  include Api::V1::Outcome
+
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
       @question_banks = @context.assessment_question_banks.active
@@ -52,9 +54,11 @@ class QuestionBanksController < ApplicationController
       render :json => {:reorder => true}
     end
   end
-  
+
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
+    js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+
     add_crumb(@bank.title)
     if authorized_action(@bank, @current_user, :read)
       @alignments = @bank.learning_outcome_alignments.sort_by{|a| a.learning_outcome.short_description.downcase }

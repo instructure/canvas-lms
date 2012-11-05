@@ -8,7 +8,6 @@
 require([
   'INST' /* INST */,
   'jquery' /* $ */,
-  'find_outcome',
   'jquery.instructure_forms' /* getFormData, formErrors */
 ], function(INST, $) {
 
@@ -75,7 +74,10 @@ $(document).ready(function() {
   <%= render :partial => "submit_assignment" %>
 <% end %>
 
-<% js_bundle :edit_rubric if can_do(@assignment, @current_user, :update) %>
+<% if can_do(@assignment, @current_user, :update) %>
+  <% js_bundle :edit_rubric %>
+  <% jammit_css :learning_outcomes %>
+<% end %>
 
 <% unless @assignment.new_record? %>
   <div id="rubrics" style="margin-bottom: 10px;">
@@ -92,7 +94,6 @@ $(document).ready(function() {
     <% end %>
     <%= render :partial => "shared/rubric_criterion_dialog" %>
   </div>
-  <%= render :partial => "shared/find_outcome" %>
   <%= render :partial => "shared/rubric", :object => nil, :locals => {:association => @assignment, :editable => can_do(@assignment, @current_user, :update), :has_assessments => false, :edit_view => true} %>
   <% if can_do(@assignment, @current_user, :update) %>
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">

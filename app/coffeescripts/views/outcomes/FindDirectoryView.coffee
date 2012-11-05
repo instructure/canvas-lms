@@ -54,9 +54,10 @@ define [
           title: I18n.t('common_core', 'Common Core Standards')
           description: I18n.t('common_core_description', "To the left is the familiar outcomes folder structure for each grouping of the Common Core State Standards. This will allow you to effortlessly include any of the Common Core Standards for grading within your course.")
         core.url = ENV.COMMON_CORE_GROUP_URL
+      course = opts.courseGroup if opts.courseGroup
 
       @outcomes = new OutcomeCollection # empty - not needed
-      @groups = new OutcomeGroupCollection _.compact([account, state, core])
+      @groups = new OutcomeGroupCollection _.compact([account, state, core, course])
 
       dfds = for g in _.compact([state, core])
         g.on 'change', @revertTitle

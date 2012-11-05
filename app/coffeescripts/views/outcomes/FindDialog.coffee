@@ -54,6 +54,8 @@ define [
     initialize: (opts) ->
       @selectedGroup = opts.selectedGroup
       @title = opts.title
+      @shouldImport = if opts.shouldImport is false then false else true
+      @disableGroupImport = opts.disableGroupImport
 
       super()
       @render()
@@ -69,6 +71,8 @@ define [
         el: @$el.find('.outcomes-content')
         instructionsTemplate: instructionsTemplate
         readOnly: true
+        setQuizMastery: opts.setQuizMastery
+        useForScoring: opts.useForScoring
 
       # sidebar events
       @sidebar.on 'select', @content.show
@@ -80,8 +84,15 @@ define [
     import: (e) =>
       e.preventDefault()
       model = @sidebar.selectedModel()
+      # add optional attributes for use in logic elsewhere
+      model.quizMasteryLevel = (parseFloat(@$el.find('#outcome_mastery_at').val()) or 0) if @content.setQuizMastery
+      model.useForScoring = @$el.find('#outcome_use_for_scoring').prop('checked') if @content.useForScoring
       return alert I18n.t('dont_import', 'This group cannot be imported.') if model.get 'dontImport'
-      if confirm @confirmText model
+      if confirm(@confirmText(model))
+        unless @shouldImport
+          @trigger('import', model)
+          @close()
+          return
         if model instanceof OutcomeGroup
           url = @selectedGroup.get('import_url')
           dfd = $.ajaxJSON url, 'POST',
@@ -113,7 +124,11 @@ define [
 
     showOrHideImport: =>
       model = @sidebar.selectedModel()
-      canShow = if !model || model.get 'dontImport' then false else true
+      canShow = true
+      if !model || model.get 'dontImport' 
+        canShow = false
+      else if model && model instanceof OutcomeGroup && @disableGroupImport
+        canShow = false
       $('.ui-dialog-buttonpane .btn-primary').toggle canShow
 
     confirmText: (model) ->
