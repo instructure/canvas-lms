@@ -199,8 +199,9 @@ class Notification < ActiveRecord::Base
         user = recipient
         cc = user.email_channel
       end
-      I18n.locale = infer_locale(:user => user)
-      
+      I18n.locale = infer_locale(:user => user,
+        :context => asset.is_a?(Context) ? asset : asset.try_rescue(:context))
+
       # For non-essential messages, check if too many have gone out, and if so
       # send this message as a daily summary message instead of immediate.
       should_summarize = user && self.summarizable? && too_many_messages?(user)

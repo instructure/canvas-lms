@@ -850,6 +850,7 @@ define([
       success: function(data, $assignment) {
         $(document).triggerHandler('assignment_update');
         updateAssignment($assignment, data);
+        $assignment.find('a.title').focus();
       },
       error: function(data, $assignment) {
       }

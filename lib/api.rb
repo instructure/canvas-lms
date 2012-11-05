@@ -187,6 +187,15 @@ module Api
     links
   end
 
+  def self.parse_pagination_links(link_header)
+    link_header.split(",").map do |link|
+      url, rel = link.match(%r{^<([^>]+)>; rel="([^"]+)"}).captures
+      uri = URI.parse(url)
+      raise(ArgumentError, "pagination url is not an absolute uri: #{url}") unless uri.is_a?(URI::HTTP)
+      Rack::Utils.parse_nested_query(uri.query).merge(:uri => uri, :rel => rel)
+    end
+  end
+
   def media_comment_json(media_object_or_hash)
     media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
     {

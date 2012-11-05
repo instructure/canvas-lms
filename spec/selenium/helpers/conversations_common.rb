@@ -37,7 +37,7 @@ shared_examples_for "conversations selenium tests" do
 
   def browse_menu
     @browser.click
-    keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should eql(@level) }
+    keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
     wait_for_animations
   end
 
@@ -49,7 +49,7 @@ shared_examples_for "conversations selenium tests" do
 
     element.first.click
     wait_for_ajaximations(150)
-    keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should eql(@level) }
+    keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
     @elements = nil
     elements
 
@@ -198,7 +198,7 @@ shared_examples_for "conversations selenium tests" do
     driver.switch_to.alert.accept
 
     if confirm_conversation_deleted
-      keep_trying_until { get_conversations(false).size.should eql(orig_size - 1) }
+      keep_trying_until { get_conversations(false).size.should == orig_size - 1 }
     end
   end
 

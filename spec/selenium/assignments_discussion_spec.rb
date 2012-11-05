@@ -5,6 +5,7 @@ describe "discussion assignments" do
 
   def build_assignment_with_type(text)
     get "/courses/#{@course.id}/assignments"
+    driver.execute_script %{$('.header_content .add_assignment_link:first').addClass('focus');}
     f(".header_content .add_assignment_link").click
     wait_for_animations
     click_option(".assignment_submission_types", text)
@@ -43,6 +44,7 @@ describe "discussion assignments" do
   it "should create a discussion topic with requires peer reviews" do
     assignment_title = 'discussion assignment peer reviews'
     get "/courses/#{@course.id}/assignments"
+    driver.execute_script %{$('.header_content .add_assignment_link:first').addClass('focus');}
     f(".header_content .add_assignment_link").click
     wait_for_animations
     click_option(".assignment_submission_types", 'Discussion')

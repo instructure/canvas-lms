@@ -127,6 +127,7 @@
 #left_side
   width: 75%
   float: left
+  position: relative
   #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder, #resize_overlay
     height: 100%
     width: 100%
@@ -516,3 +517,10 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         line-height: 21px
         &.selected
           font-weight: bold
+
+#no_annotation_warning
+  position: absolute
+  left: 50%
+  margin-left: -150px
+  width: 300px
+  text-align: center

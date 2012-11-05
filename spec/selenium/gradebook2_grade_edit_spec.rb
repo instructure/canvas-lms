@@ -20,8 +20,8 @@ describe "edititing grades" do
     #refresh page and make sure the grade sticks
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    final_score_for_row(0).should eql expected_edited_total
-    final_score_for_row(1).should eql expected_edited_total
+    final_score_for_row(0).should == expected_edited_total
+    final_score_for_row(1).should == expected_edited_total
 
     #go back to gradebook1 and compare to make sure they match
     check_gradebook_1_totals({
@@ -53,23 +53,23 @@ describe "edititing grades" do
 
     # make sure it shows like it is not treating ungraded as 0's by default
     is_checked('#include_ungraded_assignments').should be_false
-    final_score_for_row(0).should eql STUDENT_1_TOTAL_IGNORING_UNGRADED
-    final_score_for_row(1).should eql STUDENT_2_TOTAL_IGNORING_UNGRADED
+    final_score_for_row(0).should == STUDENT_1_TOTAL_IGNORING_UNGRADED
+    final_score_for_row(1).should == STUDENT_2_TOTAL_IGNORING_UNGRADED
 
     # set the "treat ungraded as 0's" option in the header
     open_gradebook_settings(f('label[for="include_ungraded_assignments"]'))
 
     # now make sure that the grades show as if those ungraded assignments had a '0'
     is_checked('#include_ungraded_assignments').should be_true
-    final_score_for_row(0).should eql STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
-    final_score_for_row(1).should eql STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    final_score_for_row(0).should == STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    final_score_for_row(1).should == STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
 
     # reload the page and make sure it remembered the setting
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     is_checked('#include_ungraded_assignments').should be_true
-    final_score_for_row(0).should eql STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
-    final_score_for_row(1).should eql STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    final_score_for_row(0).should == STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
+    final_score_for_row(1).should == STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
 
     # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
 
@@ -81,8 +81,8 @@ describe "edititing grades" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    final_score_for_row(0).should eql STUDENT_1_TOTAL_IGNORING_UNGRADED
-    final_score_for_row(1).should eql STUDENT_2_TOTAL_IGNORING_UNGRADED
+    final_score_for_row(0).should == STUDENT_1_TOTAL_IGNORING_UNGRADED
+    final_score_for_row(1).should == STUDENT_2_TOTAL_IGNORING_UNGRADED
   end
 
   it "should allow setting a letter grade on a no-points assignment" do
@@ -139,7 +139,7 @@ describe "edititing grades" do
     set_value(grade_input, 3)
     ff('body')[0].click
     wait_for_ajax_requests
-    ff('.gradebook_cell_editable').count.should eql 0
+    ff('.gradebook_cell_editable').count.should == 0
   end
 
   it "should validate curving grades option" do
@@ -214,8 +214,8 @@ describe "edititing grades" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     assignment_group_cells = ff('.assignment-group-cell')
-    assignment_group_cells.each_with_index do |agc, i|
-      validate_cell_text(agc, expected_totals[i])
+    expected_totals.zip(assignment_group_cells) do |expected, cell|
+      validate_cell_text(cell, expected)
     end
   end
 
@@ -227,6 +227,16 @@ describe "edititing grades" do
     grade_grid = f('#gradebook_grid')
     StudentEnrollment.count.times do |n|
       find_slick_cells(n, grade_grid)[2].text.should == expected_grade
+    end
+  end
+
+  it "should display an error on failed updates" do
+    SubmissionsApiController.any_instance.expects(:update).returns('bad response')
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
+    keep_trying_until do
+      f('.ui-state-error').text.should match(/refresh/)
     end
   end
 end

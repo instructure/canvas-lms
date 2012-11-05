@@ -145,7 +145,6 @@ class User < ActiveRecord::Base
   has_many :web_conference_participants
   has_many :web_conferences, :through => :web_conference_participants
   has_many :account_users
-  has_many :accounts, :through => :account_users
   has_many :media_objects, :as => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :page_views
@@ -471,10 +470,6 @@ class User < ActiveRecord::Base
     self.uuid = AutoHandle.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
-
-  def hashtag
-    nil
-  end
 
   named_scope :with_service, lambda { |service|
     if service.is_a?(UserService)
@@ -919,7 +914,7 @@ class User < ActiveRecord::Base
       'calendar_events','collaborations',
       'context_module_progressions','discussion_entries','discussion_topics',
       'enrollments','group_memberships','page_comments',
-      'rubric_assessments','short_messages',
+      'rubric_assessments',
       'submission_comment_participants','user_services','web_conferences',
       'web_conference_participants','wiki_pages'].each do |key|
       updates[key] = "user_id"
@@ -1339,12 +1334,13 @@ class User < ActiveRecord::Base
     return fallback if fallback == '%{fallback}'
     if fallback and uri = URI.parse(fallback) rescue nil
       uri.scheme ||= request ? request.protocol[0..-4] : "https" # -4 to chop off the ://
-      if request && !uri.host
+      if HostUrl.cdn_host
+        uri.host = HostUrl.cdn_host
+      elsif request && !uri.host
         uri.host = request.host
         uri.port = request.port if ![80, 443].include?(request.port)
       elsif !uri.host
-        uri.host = HostUrl.default_host.split(/:/)[0]
-        uri.port = HostUrl.default_host.split(/:/)[1]
+        uri.host, uri.port = HostUrl.default_host.split(/:/)
       end
       uri.to_s
     else
@@ -1470,14 +1466,14 @@ class User < ActiveRecord::Base
   def assignments_needing_grading(opts={})
     course_codes = opts[:contexts] ? (Array(opts[:contexts]).map(&:asset_string) & current_admin_enrollment_course_codes) : current_admin_enrollment_course_codes
     ignored_ids = ignored_items(:grading).select{|key, val| key.match(/\Aassignment_/) }.map{|key, val| key.sub(/\Aassignment_/, "") }
-    Assignment.for_context_codes(course_codes).active.expecting_submission.need_grading_info(opts[:limit] || 15, ignored_ids)
+    Assignment.for_context_codes(course_codes).active.expecting_submission.need_grading_info(opts[:limit] || 15, ignored_ids).reject{|a| a.needs_grading_count_for_user(self) == 0}
   end
   memoize :assignments_needing_grading
 
   def assignments_needing_grading_total_count(opts={})
     course_codes = opts[:contexts] ? (Array(opts[:contexts]).map(&:asset_string) & current_admin_enrollment_course_codes) : current_admin_enrollment_course_codes
     ignored_ids = ignored_items(:grading).select{|key, val| key.match(/\Aassignment_/) }.map{|key, val| key.sub(/\Aassignment_/, "") }
-    Assignment.for_context_codes(course_codes).active.expecting_submission.need_grading_info(nil, ignored_ids).size
+    Assignment.for_context_codes(course_codes).active.expecting_submission.need_grading_info(nil, ignored_ids).reject{|a| a.needs_grading_count_for_user(self) == 0}.size
   end
   memoize :assignments_needing_grading_total_count
 
@@ -2650,4 +2646,34 @@ class User < ActiveRecord::Base
 
     [start_hour, end_hour]
   end
+
+  # Given a text string, return a value suitable for the user's initial_enrollment_type.
+  # It supports strings formatted as enrollment types like "StudentEnrollment" and
+  # it also supports text like "student", "teacher", "observer" and "ta".
+  #
+  # Any unsupported types have +nil+ returned.
+  def self.initial_enrollment_type_from_text(type)
+    # Convert the string "StudentEnrollment" to "student".
+    # Return only valid matching types. Otherwise, nil.
+    type = type.to_s.downcase.sub(/(view)?enrollment/, '')
+    %w{student teacher ta observer}.include?(type) ? type : nil
+  end
+
+  def associated_shards
+    [Shard.default]
+  end
+
+  def accounts
+    Shard.with_each_shard(self.associated_shards) do
+      AccountUser.find(:all, :conditions => { :user_id => self.id }, :include => :account).map(&:account).uniq
+    end
+  end
+  memoize :accounts
+
+  def all_pseudonyms(options = {})
+    Shard.with_each_shard(self.associated_shards) do
+      Pseudonym.scoped(options).find(:all, :conditions => { :user_id => self.id })
+    end
+  end
+  memoize :all_pseudonyms
 end

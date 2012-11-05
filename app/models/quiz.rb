@@ -886,6 +886,8 @@ class Quiz < ActiveRecord::Base
             res << (match[:right] || match[:text])
             res.map{|s| (s || '').gsub(/=>/, '\=>')}.join('=>').gsub(/,/, '\,') 
           }.join(',')
+        elsif question[:question_type] == 'numerical_question'
+          row << (answer && answer[:text])
         else
           row << ((answer_item && answer_item[:text]) || '')
         end

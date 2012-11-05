@@ -18,7 +18,6 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
       next unless @current_config[key].is_a?(String)
       @current_config[key] = I18n.interpolate_hash(@current_config[key], @current_config)
     end
-    @current_config[:username] = @current_config[:username].gsub('{schema}', @current_config[:schema_search_path]) if @current_config[:username] && @current_config[:schema_search_path]
 
     if self.class.explicit_user
       @current_config[:username] = self.class.explicit_user
@@ -83,8 +82,9 @@ ActiveRecord::Base::ConnectionSpecification.class_eval do
   end
 
   def self.switch_environment!(environment)
+    self.save_handler
     self.environment = environment
-    ActiveRecord::Base.connection_handler.clear_all_connections!
+    ActiveRecord::Base.connection_handler = self.ensure_handler
   end
 end
 

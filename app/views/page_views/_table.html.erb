@@ -1,5 +1,5 @@
-<div id="Pageviews">
-  <table cellspacing="0" class="ui-widget ui-widget-content ui-corner-all zebra-stripes" style="width: 100%;">
+<div id="pageviews">
+  <table cellspacing="0" data-user-id="<%= @user.id %>" class="ui-widget ui-widget-content ui-corner-all zebra-stripes">
     <thead class='ui-widget-header'>
       <tr>
         <th><%= t('headers.url', "URL") %></th>
@@ -8,57 +8,15 @@
         <th><%= t('headers.time', "Time") %></th>
         <th>
           <div style="float:right; margin-right: 4px">
-            <%= link_to("csv", user_page_views_path(@user, :format => :csv), :class => 'xls' ) %>
+            <%= link_to("csv", user_page_views_path(@user, :format => :csv), :class => 'xls') %>
           </div>
           <%= t('headers.user_agent', "User Agent") %>
         </th>
       </tr>
     </thead>
     <tbody id="page_view_results">
-      <%= render :partial => 'page_views/page_view', :collection => @page_views %>
     </tbody>
   </table>
 </div>
-<%= will_paginate(@page_views) %>
-<% js_block do %>
-  <script type="text/javascript">
-  require([
-    'i18nObj' /* I18n.t */,
-    'jquery' /* $ */,
-    'jquery.instructure_misc_helpers' /* parseUserAgentString */,
-    'vendor/jquery.pageless' /* pageless */
-  ], function(I18n, $) {
-
-    $(function(){
-      $('#page_view_results').pageless({
-        totalPages: <%= @page_views.total_pages == 1 ? 1 : 10000 %>,
-        url: <%= raw user_page_views_path(@user, :format => :html, :html_xhr => true, :per_page => @page_views.per_page).to_json %>,
-        loaderMsg: <%= jt('loading_more_results', "Loading more results") %>,
-        scrape: function(data, xhr) {
-          if (!xhr.getResponseHeader('Link').match('rel="next"')) {
-            this.totalPages = 1;
-          }
-          return data;
-        },
-        complete: function() {
-          $(document).triggerHandler('page_views_added');
-        }
-      });
-      $(document).bind('page_views_added', function() {
-        $(".user_agent").live('click', function() {
-          if($(this).attr('title')) {
-            var title = $(this).attr('title');
-            $(this).attr('title', $(this).text());
-            $(this).text(title);
-          } 
-        });
-        $(".user_agent:not(.classified)").each(function() {
-          var userAgent = $(this).text();
-          var browser = $.parseUserAgentString(userAgent);
-          $(this).text(browser).attr('title', userAgent).addClass('classified');
-        });
-      }).triggerHandler('page_views_added');
-    });
-  });
-  </script>
-<% end %>
+<% jammit_css :page_views %>
+<% js_bundle  :page_views %>

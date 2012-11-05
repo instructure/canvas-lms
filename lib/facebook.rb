@@ -62,7 +62,7 @@ module Facebook
   end
   
   def self.app_url
-    "http://apps.facebook.com/#{ self.config['canvas_name'] }"
+    "http://apps.facebook.com/#{ URI.escape(self.config['canvas_name']) }"
   end
   
   def self.config_check(settings)

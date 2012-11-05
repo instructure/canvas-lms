@@ -28,4 +28,4 @@ The possible `rel` values are:
 
 These will only be included if they are relevant. For example, the first page
 of results will not contain a rel="prev" link.  rel="last" may also be excluded
-if the total cound is too expensive to compute on each request.
+if the total count is too expensive to compute on each request.

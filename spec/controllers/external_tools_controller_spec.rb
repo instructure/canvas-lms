@@ -18,6 +18,24 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+# Public: Create a new valid LTI tool for the given course.
+#
+# course - The course to create the tool for.
+#
+# Returns a valid ExternalTool.
+def new_valid_tool(course)
+  tool = course.context_external_tools.new(:name => "bob",
+                                           :consumer_key => "bob",
+                                           :shared_secret => "bob")
+  tool.url = "http://www.example.com/basic_lti"
+  tool.settings[:resource_selection] = {
+  :url => "http://#{HostUrl.default_host}/selection_test",
+  :selection_width => 400,
+  :selection_height => 400 }
+  tool.save!
+  tool
+end
+
 describe ExternalToolsController do
   describe "GET 'retrieve'" do
     it "should require authentication" do
@@ -41,9 +59,7 @@ describe ExternalToolsController do
     
     it "should find tools matching by domain" do
       course_with_teacher_logged_in(:active_all => true)
-      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-      tool.domain = "example.com"
-      tool.save!
+      tool = new_valid_tool(@course)
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com/basic_lti"
       response.should be_success
       assigns[:tool].should == tool
@@ -66,7 +82,14 @@ describe ExternalToolsController do
       get 'resource_selection', :course_id => @course.id, :external_tool_id => 0
       assert_unauthorized
     end
-    
+
+    it "should be accessible by students" do
+      course_with_student_logged_in(:active_all => true)
+      tool = new_valid_tool(@course)
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
+      response.should be_success
+    end
+
     it "should redirect if no matching tools are found" do
       course_with_teacher_logged_in(:active_all => true)
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
@@ -77,17 +100,10 @@ describe ExternalToolsController do
       response.should be_redirect
       flash[:error].should == "Couldn't find valid settings for this tool"
     end
-    
+
     it "should find a valid tool if one exists" do
       course_with_teacher_logged_in(:active_all => true)
-      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
-      tool.url = "http://www.example.com/basic_lti"
-      tool.settings[:resource_selection] = {
-        :url => "http://#{HostUrl.default_host}/selection_test",
-        :selection_width => 400,
-        :selection_height => 400
-      }
-      tool.save!
+      tool = new_valid_tool(@course)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
       response.should be_success
       assigns[:tool].should == tool

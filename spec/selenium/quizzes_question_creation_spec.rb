@@ -228,11 +228,11 @@ describe "quizzes question creation" do
     fj('.combination_count:visible').send_keys('20') # over the limit
     button = fj('button.compute_combinations:visible')
     button.click
-    fj('.combination_count:visible').attribute(:value).should eql "10"
+    fj('.combination_count:visible').should have_attribute(:value, "10")
     keep_trying_until {
       button.text == 'Generate'
     }
-    ffj('table.combinations:visible tr').size.should eql 11 # plus header row
+    ffj('table.combinations:visible tr').size.should == 11 # plus header row
 
     submit_form(question)
     wait_for_ajax_requests

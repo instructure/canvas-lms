@@ -115,6 +115,7 @@ define([
       $rubric_full = $("#rubric_full"),
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
       $mute_link = $('#mute_link'),
+      $no_annotation_warning = $('#no_annotation_warning'),
       $selectmenu = null,
       broswerableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
@@ -845,6 +846,11 @@ define([
       header.init();
       initKeyCodes();
 
+      $('#hide_no_annotation_warning').click(function(e){
+        e.preventDefault();
+        $no_annotation_warning.hide();
+      });
+
       $window.bind('hashchange', EG.handleFragmentChange);
       $('#eg_sort_by').val(userSettings.get('eg_sort_by'));
       $('#submit_same_score').click(function(e) {
@@ -1222,6 +1228,7 @@ define([
 
     loadAttachmentInline: function(attachment){
       $submissions_container.children().hide();
+      $no_annotation_warning.hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
@@ -1243,12 +1250,12 @@ define([
           };
         }
         if (crocodocAvailable) {
-          $.ajaxJSON(
+          $iframe_holder.show();
+          $iframe_holder.disableWhileLoading($.ajaxJSON(
             '/submissions/' + this.currentStudent.submission.id + '/attachments/' + attachment.id + '/crocodoc_sessions/',
             'POST',
             {version: this.currentStudent.submission.currentSelectedIndex},
             function(response) {
-              $iframe_holder.show();
               $iframe_holder.loadDocPreview($.extend(previewOptions, {
                 crocodoc_session_url: response.session_url
               }));
@@ -1258,9 +1265,11 @@ define([
               attachment['crocodoc_available?'] = false;
               EG.handleSubmissionSelectionChange();
             }
-          )
+          ));
         }
         else if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) {
+          if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
+
           if (scribdDocAvailable) {
             previewOptions = $.extend(previewOptions, {
               scribd_doc_id: attachment.scribd_doc.attributes.doc_id, 

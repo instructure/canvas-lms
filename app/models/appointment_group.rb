@@ -29,6 +29,10 @@ class AppointmentGroup < ActiveRecord::Base
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, :include => :sub_context
 
+  def context
+    appointment_group_contexts.first.context
+  end
+
   def contexts
     appointment_group_contexts.map &:context
   end

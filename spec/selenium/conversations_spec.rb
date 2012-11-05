@@ -32,15 +32,15 @@ describe "conversations" do
       c = get_conversations.first
       c.click
       c.should have_class('unread') # not marked immediately
-      @me.conversations.unread.size.should eql 5
+      @me.conversations.unread.size.should == 5
       keep_trying_until do
         get_conversations.first.should_not have_class('unread')
         true
       end
-      @me.conversations.unread.size.should eql 4
+      @me.conversations.unread.size.should == 4
 
       get_conversations.last.click
-      get_conversations.size.should eql 4 # removed once deselected
+      get_conversations.size.should == 4 # removed once deselected
     end
 
     it "should star a conversation" do
@@ -158,7 +158,7 @@ describe "conversations" do
           true
         end
         get '/conversations'
-        f('.unread-messages-count').text.should eql '4'
+        f('.unread-messages-count').text.should == '4'
       end
     end
   end
@@ -270,6 +270,31 @@ describe "conversations" do
 
       # no conversations should show up in the conversation list
       get_conversations(false).should be_empty
+    end
+  end
+
+  context "bulk popovers" do
+    before (:each) do
+      @number_of_people = 10
+      @conversation_students = []
+      @number_of_people.times do |i|
+        u = User.create!(:name => "conversation student #{i}")
+        @course.enroll_user(u, "StudentEnrollment").accept!
+        @conversation_students << u
+      end
+    end
+
+    it "should validate the others popover" do
+      new_conversation
+      @conversation_students.each { |student| add_recipient(student.name) }
+      f("#create_message_form .conversation_body").send_keys "testing testing"
+      f('.group_conversation').click
+      submit_form('#create_message_form')
+      wait_for_ajaximations
+      run_jobs
+      f('.others').click
+      f('#others_popup').should be_displayed
+      ff('#others_popup li').count.should == (@conversation_students.count - 2) # - 2 because the first 2 show up in the conversation summary
     end
   end
 end

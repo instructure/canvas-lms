@@ -22,43 +22,43 @@ describe "student interactions report" do
 
   it "should have sortable columns, except the email header" do
     ths = ff(".report th")
-    ths[0].attribute('class').should match(/header/)
-    ths[1].attribute('class').should match(/header/)
-    ths[2].attribute('class').should match(/header/)
-    ths[3].attribute('class').should match(/header/)
-    ths[4].attribute('class').should match(/header/)
-    ths[5].attribute('class').should_not match(/header/)
+    ths[0].should have_class("header")
+    ths[1].should have_class("header")
+    ths[2].should have_class("header")
+    ths[3].should have_class("header")
+    ths[4].should have_class("header")
+    ths[5].should_not have_class("header")
   end
 
   it "should allow sorting by columns" do
     ths = ff(".report th")
     trs = ff(".report tbody tr")
     ths[0].click
-    ths[0].attribute('class').should match(/headerSortDown/)
+    ths[0].should have_class("headerSortDown")
     ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[0].click
-    ths[0].attribute('class').should match(/headerSortUp/)
+    ths[0].should have_class("headerSortUp")
     ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[2].click
-    ths[2].attribute('class').should match(/headerSortDown/)
+    ths[2].should have_class("headerSortDown")
     ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[2].click
-    ths[2].attribute('class').should match(/headerSortUp/)
+    ths[2].should have_class("headerSortUp")
     ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[3].click
-    ths[3].attribute('class').should match(/headerSortDown/)
+    ths[3].should have_class("headerSortDown")
     ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[3].click
-    ths[3].attribute('class').should match(/headerSortUp/)
+    ths[3].should have_class("headerSortUp")
     ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[5].click
-    ths[5].attribute('class').should_not match(/header/)
+    ths[5].should_not have_class("header")
   end
 end
 end

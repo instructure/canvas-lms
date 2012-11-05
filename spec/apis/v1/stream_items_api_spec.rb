@@ -221,7 +221,7 @@ describe UsersController, :type => :integration do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
-    @sub = @assignment.grade_student(@user, { :grade => '12' }).first
+    @sub = @assignment.grade_student(@user, { :grade => '12', :grader => @teacher}).first
     @sub.workflow_state = 'submitted'
     @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @user.id)
     @sub.submission_comments.create!(:comment => 'c2', :author => @user, :recipient_id => @teacher.id)
@@ -237,6 +237,7 @@ describe UsersController, :type => :integration do
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
+      'grader_id' => @teacher.id,
       'score' => 12,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'graded',
@@ -293,6 +294,7 @@ describe UsersController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
+        'default_view' => 'feed'
       },
 
       'user' => {
@@ -323,6 +325,7 @@ describe UsersController, :type => :integration do
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => nil,
+      'grader_id' => nil,
       'score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'unsubmitted',
@@ -379,6 +382,7 @@ describe UsersController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
+        'default_view' => 'feed'
       },
 
       'user' => {

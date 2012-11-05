@@ -277,7 +277,7 @@ describe "manage groups students" do
       confirm_dialog.accept
       wait_for_ajaximations
       ff(".left_side .group").should be_empty
-      @course.group_categories.all.count.should eql 0
+      @course.group_categories.all.count.should == 0
     end
 
     it "should edit an individual group" do
@@ -314,7 +314,7 @@ describe "manage groups students" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       wait_for_ajax_requests
-      keep_trying_until { f('.right_side .group .user_count').text.should eql '0 students' }
+      keep_trying_until { f('.right_side .group .user_count').text.should == '0 students' }
     end
 
     before (:each) do

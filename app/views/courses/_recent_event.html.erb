@@ -8,7 +8,13 @@
     end
   end
 
-  cache(['recent_event_render', submission || 'no_submission', recent_event || 'blank_event', Time.zone.utc_offset, recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades), recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)].cache_key) do 
+  cache([ 'recent_event_render',
+          submission || 'no_submission',
+          recent_event || 'blank_event',
+          Date.today,
+          Time.zone.name,
+          recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades),
+          recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)].cache_key) do
     icon_explanation, icon_class = icon_data(:context => @context, 
                                              :contexts => @contexts, 
                                              :current_user => @current_user, 
@@ -31,7 +37,7 @@
           <% end %>
           <% if recent_event.points_possible %>
             <span style="display: block;"><%= t 'submission_score', %{%{score} *out of %{points_possible}*},
-              :score => "<strong>#{submission.score if submission && !recent_event.muted?}</strong>".html_safe,
+              :score => "<strong>#{render_score(submission.score) if submission && !recent_event.muted?}</strong>".html_safe,
               :points_possible => recent_event.points_possible,
               :wrapper => '<span style="font-size: 0.8em;">\1</span>' %></span>
           <% end %>

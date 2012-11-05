@@ -236,7 +236,7 @@ class UsersController < ApplicationController
 
         if api_request?
           @users = User.of_account(@context).active.order_by_sortable_name
-          @users = Api.paginate(@users, self, api_v1_account_users_path, :order => :sortable_name)
+          @users = Api.paginate(@users, self, api_v1_account_users_url, :order => :sortable_name)
           user_json_preloads(@users)
         else
           @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
@@ -623,7 +623,6 @@ class UsersController < ApplicationController
     @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
     if authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
-      @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC', :per_page => 50, :without_count => true
 
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
@@ -1157,12 +1156,6 @@ class UsersController < ApplicationController
       end
       return false
     end
-  end
-
-  def menu_courses
-    render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
-      @template.map_courses_for_menu(@current_user.menu_courses)
-    }
   end
 
   def all_menu_courses

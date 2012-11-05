@@ -237,13 +237,10 @@ class DiscussionTopic < ActiveRecord::Base
   def change_read_state(new_state, current_user = nil)
     current_user ||= self.current_user
     return nil unless current_user
+    return true if new_state == self.read_state(current_user)
 
-    if new_state != self.read_state(current_user)
-      self.context_module_action(current_user, :read) if new_state == 'read'
-      self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
-    else
-      true
-    end
+    self.context_module_action(current_user, :read) if new_state == 'read'
+    self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
   end
 
   def change_all_read_state(new_state, current_user = nil)
@@ -407,25 +404,33 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    return if self.context.root_account.deleted?
+    raise IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
     user = opts[:user]
-    if opts[:text]
+    if opts[:html]
+      message = opts[:html].strip
+    else
       message = opts[:text].strip
       message = format_message(message).first
-    else
-      message = opts[:html].strip
     end
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
     elsif !message || message.empty?
       raise "Message body cannot be blank"
+    elsif !self.grants_right?(user, :read)
+      nil
     else
-      DiscussionEntry.create!({
+      entry = DiscussionEntry.new({
         :message => message,
         :discussion_topic => self,
         :user => user,
       })
+      if !entry.grants_right?(user, :create)
+        raise IncomingMessageProcessor::ReplyToLockedTopicError
+      else
+        entry.save!
+        entry
+      end
     end
   end
 

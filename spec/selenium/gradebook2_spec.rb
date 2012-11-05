@@ -25,7 +25,7 @@ describe "gradebook2" do
   it 'should filter students' do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    get_visible_students.length.should == 2
+    get_visible_students.length.should == @all_students.size
     filter_student 'student 1'
     sleep 1 # InputFilter has a delay
     visible_students = get_visible_students
@@ -37,11 +37,11 @@ describe "gradebook2" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     els = ff('.student-name')
-    els.map { |e| URI.parse(e.find_element(:css, 'a').attribute('href')).path }.should == [
-        "/courses/#{@course.id}/grades/#{@student_1.id}",
-        "/courses/#{@course.id}/grades/#{@student_2.id}",
-    ]
+    links = els.map { |e| URI.parse(e.find_element(:css, 'a').attribute('href')).path }
+    expected_links = @all_students.map { |s| "/courses/#{@course.id}/grades/#{s.id}" }
+    links.should == expected_links
   end
+
   it "should not show 'not-graded' assignments" do
     f('#gradebook_grid .slick-header').should_not include_text(@ungraded_assignment.title)
   end
@@ -59,7 +59,7 @@ describe "gradebook2" do
     submit_dialog(dialog, '.ui-button')
     keep_trying_until do
       driver.switch_to.alert.should_not be_nil
-      driver.switch_to.alert.text.should eql 'None to Update'
+      driver.switch_to.alert.text.should == 'None to Update'
       driver.switch_to.alert.dismiss
       true
     end
@@ -73,12 +73,37 @@ describe "gradebook2" do
     ff('.student-name').count.should == @course.students.count
   end
 
-  it "should not show concluded enrollments" do
-    conclude_and_unconclude_course
+  it "should not show concluded enrollments in active courses by default" do
+    @student_1.enrollments.find_by_course_id(@course.id).conclude
+
+    @course.students.count.should == @all_students.size - 1
+    @course.all_students.count.should == @all_students.size
+
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
     ff('.student-name').count.should == @course.students.count
+
+    # select the option and we'll now show concluded
+    expect_new_page_load { open_gradebook_settings(driver.find_element(:css, 'label[for="show_concluded_enrollments"]')) }
+    wait_for_ajaximations
+
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+  end
+
+  it "should show concluded enrollments in concluded courses by default" do
+    @course.complete!
+
+    @course.students.count.should == 0
+    @course.all_students.count.should == @all_students.size
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+
+    # the checkbox should fire an alert rather than changing to not showing concluded
+    expect_fired_alert { open_gradebook_settings(driver.find_element(:css, 'label[for="show_concluded_enrollments"]')) }
+    driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
   end
 
   it "should show students sorted by their sortable_name" do
@@ -86,14 +111,14 @@ describe "gradebook2" do
     wait_for_ajaximations
 
     dom_names = ff('.student-name').map(&:text)
-    dom_names.should == [STUDENT_NAME_1, STUDENT_NAME_2]
+    dom_names.should == @all_students.map(&:name)
   end
 
   it "should not show student avatars until they are enabled" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    ff('.student-name').length.should == 2
+    ff('.student-name').length.should == @all_students.size
     ff('.avatar img').length.should == 0
 
     @account = Account.default
@@ -103,8 +128,8 @@ describe "gradebook2" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    ff('.student-name').length.should == 2
-    ff('.avatar img').length.should == 2
+    ff('.student-name').length.should == @all_students.size
+    ff('.avatar img').length.should == @all_students.size
   end
 
 
@@ -154,6 +179,29 @@ describe "gradebook2" do
     toggle_muting(@second_assignment)
     fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
     @second_assignment.reload.should_not be_muted
+  end
+
+  context "concluded course" do
+    before do
+      @course.complete!
+
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+    end
+
+    it "should not allow editing grades" do
+      cell = driver.find_element(:css, '#gradebook_grid [row="0"] .l0')
+      cell.text.should == '10'
+      cell.click
+      ff('.grade', cell).should be_blank
+    end
+
+    it "should hide mutable actions from the menu" do
+      open_gradebook_settings do |menu|
+        ff("a.gradebook_upload_link", menu).should be_blank
+        ff("a.set_group_weights", menu).should be_blank
+      end
+    end
   end
 
   it "should validate that gradebook settings is displayed when button is clicked" do
@@ -276,6 +324,30 @@ describe "gradebook2" do
       }.to change(ConversationMessage, :count).by_at_least(2)
     end
 
+    it "should only send messages to students who have not submitted and have not been graded" do
+      # student 1 submitted but not graded yet
+      @third_submission = @third_assignment.submit_homework(@student_1, :body => ' student 1 submission assignment 4')
+      @third_submission.save!
+
+      # student 2 graded without submission (turned in paper by hand)
+      @third_assignment.grade_student(@student_2, :grade => 42)
+
+      # student 3 has neither submitted nor been graded
+
+      message_text = "This is a message"
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      open_assignment_options(2)
+      f('[data-action="messageStudentsWho"]').click
+      expect {
+        message_form = f('#message_assignment_recipients')
+        click_option('#message_assignment_recipients .message_types', "Haven't submitted yet")
+        message_form.find_element(:css, '#body').send_keys(message_text)
+        submit_form(message_form)
+        wait_for_ajax_requests
+      }.to change {ConversationMessage.count(:conversation_id)}.by(1)
+    end
+
     it "should send messages when 'Scored more than' X points" do
       message_text = "This is a message"
       get "/courses/#{@course.id}/gradebook2"
@@ -294,20 +366,26 @@ describe "gradebook2" do
     end
 
     it "should have a 'Haven't been graded' option" do
+      # student 2 has submitted assignment 3, but it hasn't been graded
+      submission = @third_assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 3')
+      submission.save!
+
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       # set grade for first student, 3rd assignment
       edit_grade(f('#gradebook_grid [row="0"] .l2'), 0)
       open_assignment_options(2)
 
-      # expect dialog to show 1 fewer student with the "Haven't been graded" option
+      # expect dialog to show 1 more student with the "Haven't been graded" option
       f('[data-action="messageStudentsWho"]').click
-      ffj('.student_list li:visible').size.should eql 2
-      # select option
-      select = f('#message_assignment_recipients select.message_types')
-      select.click
-      select.all(:tag_name => 'option').find { |o| o.text == "Haven't been graded" }.click
-      ffj('.student_list li:visible').size.should eql 1
+      visible_students = ffj('.student_list li:visible')
+      visible_students.size.should == 1
+      visible_students[0].text.strip.should == STUDENT_NAME_3
+      click_option('#message_assignment_recipients .message_types', "Haven't been graded")
+      visible_students = ffj('.student_list li:visible')
+      visible_students.size.should == 2
+      visible_students[0].text.strip.should == STUDENT_NAME_2
+      visible_students[1].text.strip.should == STUDENT_NAME_3
     end
   end
 
@@ -439,7 +517,7 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       icons = ffj('.gradebook-cell-turnitin')
-      icons.size.should eql 2
+      icons.size.should == 2
 
       # make sure it appears in each submission dialog
       icons.each do |icon|

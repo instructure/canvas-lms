@@ -167,26 +167,7 @@ define([
       extended_valid_elements : "iframe[src|width|height|name|align|style|class]",
       content_css: "/stylesheets/compiled/instructure_style.css,/stylesheets/compiled/tinymce.editor_box.css",
       editor_css: editor_css,
-      handle_event_callback: function(e) {
-        if(e.type.indexOf('keydown') === 0 || e.type.indexOf('keypress') === 0) {
-          if(e.keyCode === 9) {
-            if(e.shiftKey) {
-              e.preventDefault();
-              var $ed = $("#" + id);
-              var $items = $ed.closest("form,#main").find(":tabbable,#" + id);
-              idx = $items.index($ed);
-              if($ed.filter(":visible").length > 0) {
-                $($items.eq(idx - 1)).focus();
-              } else {
-                $($items.eq(idx + 1)).focus();
-              }
-            }
-          } else {
-            $("#" + id).triggerHandler(e.type, $.event.fix(e));
-          }
-        }
-      },
-        onchange_callback: function(e) {
+      onchange_callback: function(e) {
         $("#" + id).trigger('change');
       },
       setup : function(ed) {

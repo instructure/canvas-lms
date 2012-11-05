@@ -6,6 +6,7 @@ en:
       short: "%b %-d"
       short_month: "%b"
       medium_month: "%b %Y"
+      date_at_time: "%b %-d at %l:%M%P"
     days:
       today_lower: "today"
   time:

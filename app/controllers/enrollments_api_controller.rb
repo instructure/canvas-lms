@@ -148,7 +148,7 @@ class EnrollmentsApiController < ApplicationController
 
     enrollments = Api.paginate(
       enrollments,
-      self, send("api_v1_#{endpoint_scope}_enrollments_path"))
+      self, send("api_v1_#{endpoint_scope}_enrollments_url"))
     includes = [:user] + Array(params[:include])
 
     user_json_preloads(enrollments.map(&:user))

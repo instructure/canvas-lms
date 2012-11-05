@@ -1,3 +1,4 @@
+# do not create a queue: section for your test environment
 test:
   adapter: postgresql
   encoding: utf8

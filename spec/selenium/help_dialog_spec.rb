@@ -11,6 +11,15 @@ describe "help dialog" do
       wait_for_ajaximations
       f("#help-dialog-options").should be_displayed
     end
+
+    it "should no longer show a browser warning for IE" do
+      Setting.set('show_feedback_link', 'true')
+      get "/logout"
+      driver.execute_script("window.INST.browser = {ie: true, version: 8}")
+      f('#footer .help_dialog_trigger').click
+      wait_for_ajaximations
+      element_exists(".ui-state-error").should be_false
+    end
   end
 
   context "help as a student" do
@@ -99,7 +108,7 @@ describe "help dialog" do
       er.subject.should == 'test subject'
       er.comments.should == 'test comments'
       er.data['user_perceived_severity'].should == severity
-      er.guess_email.should eql @user.email
+      er.guess_email.should == @user.email
     end
   end
 

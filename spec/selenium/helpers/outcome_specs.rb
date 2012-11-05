@@ -31,7 +31,7 @@ shared_examples_for "outcome tests" do
     wait_for_ajaximations
     keep_trying_until { fj("#outcomes .learning_outcome .short_description").text.should == outcome_name }
     f('.show_details_link').click
-    ffj('#outcomes .rubric_criterion .rating:visible').size.should eql(3)
+    ffj('#outcomes .rubric_criterion .rating:visible').size.should == 3
   end
 
   it "should edit a learning outcome" do
@@ -102,7 +102,7 @@ shared_examples_for "outcome tests" do
       draggable = f('.outcome_group .reorder_link')
       drag_to = f('#section-tabs')
       driver.action.drag_and_drop(draggable, drag_to).perform
-      driver.execute_script('return INST.errorCount;').should eql 0
+      driver.execute_script('return INST.errorCount;').should == 0
     end
 
     it "re-order sibling outcomes" do

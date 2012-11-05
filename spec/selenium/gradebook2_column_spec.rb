@@ -20,7 +20,7 @@ describe "assignment column headers" do
   end
 
   it "should have a tooltip with the assignment name" do
-    f(@header_selector)["title"].should eql @assignment.title
+    f(@header_selector)["title"].should == @assignment.title
   end
 
   it "should handle a ton of assignments without wrapping the slick-header" do
@@ -30,7 +30,7 @@ describe "assignment column headers" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     # being 38px high means it did not wrap
-    driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should eql 38
+    driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should == 38
   end
 
   it "should validate row sorting works when first column is clicked" do
@@ -43,9 +43,9 @@ describe "assignment column headers" do
     meta_cells = find_slick_cells(0, f('.grid-canvas'))
     grade_cells = find_slick_cells(0, f('#gradebook_grid'))
     #filter validation
-    validate_cell_text(meta_cells[0], STUDENT_NAME_2 + "\n" + @other_section.name)
+    validate_cell_text(meta_cells[0], STUDENT_NAME_3 + "\n" + @course.name)
     validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_2_TOTAL_IGNORING_UNGRADED)
+    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_3_TOTAL_IGNORING_UNGRADED)
   end
 
   it "should validate arrange columns by due date option" do

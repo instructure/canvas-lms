@@ -12,6 +12,8 @@ en:
     default_account_name: "Default Account"
     default_site_administrator_account_name: "Site Admin"
     default_term_name: "Default Term"
+    errors: 
+      invalid_discovery_url: "The discovery URL is not valid"
     manually_created_courses: "Manually-Created Courses"
     root_account_cant_have_sis_id: "SIS IDs cannot be set on root accounts"
     sis_id_in_use: "SIS ID \"%{sis_id}\" is already in use"
@@ -54,6 +56,7 @@ en:
         login_handle_name: "Login Label"
       login_handle_name_description: "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc."
       save_button: "Save Authentication Settings"
+    deprecated_fail: "Can't use both deprecated and current version of create at the same time."
     index: 
       add_auth_desc: "Add an identity provider to this account:"
       canvas_login_tip: |-
@@ -136,25 +139,44 @@ en:
       last_ldap_timeout_failure: "Last timeout failure"
       ldap_timeout_failure_help: "If Canvas times out communicating with the LDAP server, it will block further login attempts from using that LDAP server for %{time}."
     login_required: "must be supplied"
+    no_auth_mixing: "Can not mix authentication types"
+    no_changing_auth_types: "Can not change type of authorization config, please delete and create new config."
+    no_config_sent: "Must specify auth_type"
+    no_discovery_url: "None set"
+    only_one_cas: "Can not create multiple CAS configurations"
     password_required: "must be supplied"
     saml_required: "A SAML configuration is required to test SAML"
     saml_settings: 
+      auth_type: Type
+      auth_url: "Login url for this config"
+      certificate_fingerprint: "Certificate Fingerprint"
+      change_password_url: "Change Password Link"
+      discovery_url: "Discovery URL:"
+      discovery_url_description: "If a discovery url is set, canvas will forward all users to that URL when they need to be authenticated. That page will need to then help the user figure out where they need to go to log in. If no discovery url is configured, the first SAML configuration will be used to attempt to authenticate the user."
+      identifier_format: "Identifier Format"
+      idp_entity_id: "IdP Entity ID"
       labels: 
-        auth_type: Type
         certificate_fingerprint: "Certificate Fingerprint"
         change_password_url: "Change Password Link"
         identifier_format: "Identifier Format"
+        idp_entity_id: "IdP Entity ID"
         log_in_url: "Log On URL"
         log_out_url: "Log Out URL"
         login_attribute: "Login Attribute"
         login_handle_name: "Login Label"
+        position: Position
         requested_authn_context: "Authentication Context"
+      log_in_url: "Log On URL"
+      log_out_url: "Log Out URL"
+      login_attribute: "Login Attribute"
+      login_handle_name: "Login Label"
       login_handle_name_description: "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc."
+      no_discovery_url: "None set"
+      position: Position
       refresh_debugging: Refresh
+      requested_authn_context: "Authentication Context"
       saml_debug_instructions: "Once you start debugging all info about the next attempted SAML login attempt will be collected. Click \"Refresh\" to see if more data has been collected or \"Stop Debugging\" to clear the collected data and stop the current debug attempt."
       saml_debugging: Debugging
-      saml_meta_data_link: "Click here to see the service provider identity XML for this account."
-      save_button: "Save Authentication Settings"
       start_debugging: "Start Debugging"
       stop_debugging: "Stop Debugging"
     saml_testing: 
@@ -395,7 +417,7 @@ en:
         default_language: "Default Language"
         default_time_zone: "Default Time Zone"
         default_user_storage_quota: "Default User File Quota"
-        enable_alerts: Alerts
+        enable_alerts: "Alerts (beta)"
         enable_eportfolios: ePortfolios
         enable_profiles: "Enable Profiles"
         enable_scheduler: "Enable Calendar 2"
@@ -466,6 +488,7 @@ en:
       tab_external_tools: "External Tools"
       tab_reports: Reports
       tab_settings: Settings
+      transifex_message: "Join the [Canvas Translation Community](%{transifex_url})"
       turnitin_comments_help: "these comments will be shown to students when submitting a Turnitin-enabled assignment"
       turnitin_pledge_help: "students must check a box acknowledging that they agree with this pledge"
       turnitin_settings_title: "Turnitin Settings"
@@ -832,6 +855,8 @@ en:
       labels: 
         due: due
         points: points
+        quiz_points: "quiz pts."
+        type: type
       links: 
         full_edit: "Full Edit"
         more_options: "more options"
@@ -1102,9 +1127,11 @@ en:
       tooltips: 
         submitted: Submitted
     submit_assignment: 
+      additional_comments: "Additional comments"
       buttons: 
         record_media: "Record / Upload Media"
         submit_assignment: "Submit Assignment"
+      comments_placeholder: Comments...
       errors: 
         unacceptable_file_type: "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}"
       instructions: 
@@ -1113,7 +1140,6 @@ en:
         online_text_entry: "Copy and paste or type your submission right here."
         online_url: "Copy and paste the link to the web site you'd like to submit for this assignment."
       labels: 
-        comment: Comments
         uploaded_data: File
         url: "Website URL"
       links: 
@@ -1342,11 +1368,12 @@ en:
       tan: 
         description: "Returns the tangent of the given value"
       unrecognized: "%{functionName} is not a recognized function"
+    decimal_places: "Decimal Places"
+    delete_formula: "Delete Formula"
     drag_to_reorder: "Drag to reorder"
     headings: 
       formula: Formula
       result: Result
-    how_many_decimal_places: "%{number_selector} Decimal Places"
     last_formula_row: "the last formula row will be used to compute the final answer"
     sample_final_answer: "This value is an example final answer for this question type"
   calendar: 
@@ -1680,6 +1707,11 @@ en:
       update_assignment_points: "This assignment has %{assignmentPoints} points possible, would you like to change it to have %{rubricPoints} points possible to match this rubric?"
     titles: 
       update_assignment_points: "Change points possible to match rubric?"
+  chat: 
+    notifications: 
+      tinychat_inaccessible: |-
+          Warning: This page uses  Tinychat, a third party plugin that is not\
+                accessible to screen readers.
   collaboration: 
     default_title: "Unnamed Collaboration"
   collaborations: 
@@ -1868,6 +1900,8 @@ en:
     multiple_urls_message: "There are multiple %{type} pages available for this conference. Please select one:"
     no_settings_error: "The conference does not have an advanced settings page"
     no_urls_error: "Sorry, it looks like there aren't any %{type} pages for this conference yet."
+    notifications: 
+      inaccessible: "Warning: This page contains third-party content which is not accessible to screen readers."
     show: 
       basic_info: "Basic Info"
       buttons: 
@@ -2030,7 +2064,7 @@ en:
         day_substitutions: "You can also explicitly define day substitutions to adjust for changing class schedules (i.e. move everything that was on Mondays to now happen on Tuesdays)"
       from_to: "*from* %{start_date} **to** %{end_date}"
       labels: 
-        dates_range: "%{course} dates range"
+        dates_range: "*%{course}* dates range"
         shift_dates: "Adjust events and due dates"
         this_course_date_range: "**This Course** dates range"
       links: 
@@ -3011,7 +3045,7 @@ en:
       files: "Failed to export some files"
       grading_standards: "Failed to export grading standards"
       learning_outcomes: "Failed to export learning outcomes"
-      lti_links: "Failed to export some web links"
+      lti_links: "Failed to export some external tool configurations"
       media_file: "A media file failed to export"
       media_files: "Failed to export some media files"
       module_meta: "Failed to export module meta data"
@@ -3075,6 +3109,8 @@ en:
     invitation_sent_now: "Just Now"
     link_students_placeholder: "Enter a student name"
     links: 
+      less_options: "less options"
+      more_options: "more options"
       publish: "Publish grades to SIS"
       publishing: "Publishing grades to SIS..."
       re_send_all: "Re-Send All Unaccepted Invitations"
@@ -3087,7 +3123,6 @@ en:
     re_send_invitation: "Re-Send Invitation"
     titles: 
       click_to_edit: "Click to Edit"
-      hashtag_help: "What's a Hashtag?"
       link_to_students: "Link to Students"
       move_course: "Move Course"
       reset_course_content_dialog_help: "Reset Course Content"
@@ -3302,7 +3337,6 @@ en:
         add_section: "Add Section"
         add_users: "OK Looks Good, Add These Users"
         continue: Continue...
-        kthxbai: "Cool, Thanks"
         modify_users: "Go back and edit the list of users"
         move_course: "Move Course"
         update_course: "Update Course Details"
@@ -3318,8 +3352,6 @@ en:
       enrollment_count: 
         one: "1 User"
         other: "%{count} Users"
-      good_twitter_hashtag: 
-        example: "#sfu-bio100"
       grading_standard_currently_set: "Currently Set"
       grading_standard_not_set: "Not Set"
       headings: 
@@ -3337,10 +3369,6 @@ en:
         teachers: Teachers
       help: 
         edit_navigation: "Drag and drop items to reorder them in the course navigation."
-        hashtags: |-
-            Hashtags are special phrases that let people consistently mention the same idea (like a course) on web sites like Twitter.  For example, the message "I like #instructure" is using the hashtag "instructure".
-            
-            Hashtags should consist of letters, numbers, dashes and underscores (no spaces).  The hashtag should be unique, easily recognizable, and short.  Short hashtags are better since sites like Twitter limit the number of letters per message.
         public_course: "(student data will remain private)"
       images: 
         alt: 
@@ -3368,12 +3396,8 @@ en:
         course_visibility: Visibility
         enrollment_term_id: Term
         enrollment_type: "Add More"
-        examples: Examples
-        good_twitter_hashtag: 
-          description: "much better"
         grading_scheme: "Grading Scheme"
         grading_standard_enabled: "Enable course grading scheme"
-        hashtag: Hashtag
         hide_final_grade: "Hide totals in student grades summary"
         indexed: "Include this course in the public course index"
         is_public: "Make this course publicly visible"
@@ -3384,14 +3408,9 @@ en:
         restrict_enrollments_to_course_dates: "Users can only participate in the course between these dates"
         root_account_id: "Root Account"
         self_enrollment: "Let students self-enroll by sharing with them a secret URL or code"
-        show_public_context_messages: "collect public messages for this hashtag"
         sis_source_id: "SIS ID"
         start_at: Starts
         storage_quota: "File Storage"
-        too_general_twitter_hashtag: 
-          description: "too general"
-        too_long_twitter_hashtag: 
-          description: "too long"
         turnitin_comments: "Turnitin Comments"
       language_overrides_preferences: "This will override any user/system language preferences. This is only recommended for foreign language courses"
       link_to_students_view: 
@@ -3400,7 +3419,6 @@ en:
       links: 
         add_users: "Add Users"
         edit_course: "Edit Course Details"
-        hashtag_help: "What's a hashtag?"
         more_options: "more options"
         move_course: "Move To Another Account"
         title: 
@@ -3441,10 +3459,7 @@ en:
         course_section: "Course Section"
         edit_navigation: "Edit Course Navigation"
         enrollment_type: "Enrollment Type"
-      too_general_twitter_hashtag: 
-        example: "#biology"
-      too_long_twitter_hashtag: 
-        example: "#san-fransisco-university-biology-100"
+      transifex_message: "Join the [Canvas Translation Community](%{transifex_url})"
       turnitin: "these comments will be shown to students when submitting a Turnitin-enabled assignment"
       unaccepted_invitations: "%{count} Invitations haven't been accepted. You can click a user's name to re-send their invitation"
       user_view: 
@@ -3688,6 +3703,7 @@ en:
       tomorrow: Tomorrow
       yesterday: Yesterday
     formats: 
+      date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
       long: "%B %d, %Y"
       medium: "%b %-d, %Y"
@@ -4001,6 +4017,8 @@ en:
     alt_text: "Alternate Text:"
     cancel: Cancel
     click_to_embed: "Click to embed the image"
+    done: 
+      title: "Click to finish editing the rich text area"
     done_as_in_finished: Done
     embed_external: "Embed External Image"
     embed_from_external_tool: "\"Embed content from External Tool\""
@@ -4804,6 +4822,7 @@ en:
       assignment_options: "Assignment Options"
       points_out_of: "Out of %{assignment.points_possible}"
       this_assignment_is_muted: "This assignment is muted"
+    concluded_course_error_message: "This is a concluded course, so only concluded enrollments are available."
     dropped_for_grading: "Dropped for grading purposes"
     errors: 
       none_to_update: "None to Update"
@@ -4836,6 +4855,7 @@ en:
       publish_to_sis: "Publish grades to SIS"
       set_group_weights: "Set Group Weights"
       show_attendance_columns: "Show Attendance Columns"
+      show_concluded_enrollments: "Show Concluded Enrollments"
       upload_scores: "Upload Scores (from .csv)"
       view_grading_history: "View Grading History"
     show_student_names: "Show Student Names"
@@ -5417,6 +5437,7 @@ en:
       cant_restrict_self_signup: "Can't enable while a mixed-section group exists in the category."
       category_in_use: "\"%{category_name}\" is already in use"
       category_name_reserved: "%{category_name} is a reserved name."
+      category_name_too_long: "Enter a shorter category name to split students into groups"
       category_name_unavailable: "%{category_name} is already in use."
       creating_category_failed: "Category Creation Failed, Try Again"
       creating_group_failed: "Creating Group Failed"
@@ -5507,9 +5528,7 @@ en:
     somethings_broken_but_i_can_work_around_it_for_now: "Something's broken but I can work around it for now"
     subject: Subject
     submit_this_support_request: "Submit Ticket"
-    wait_a_different_browser_may_help_solve_the_problem: "Wait! A *different browser* may help solve the problem."
     which_course_is_this_question_about: "Which course is this question about?"
-    you_are_using_browser_version_version_try_again_using_the_latest_version_of_chrome_or_firefox: "You are using Internet Explorer version %{browserVersion}, Try again using the latest version of *Chrome* or **Firefox**"
     your_email_address: "Your email address"
   info: 
     notices: 
@@ -5524,7 +5543,6 @@ en:
   instructure: 
     alerts: 
       file_previews_disabled: "File previews have been disabled for this Canvas site"
-      kaltura_disabled: "Kaltura has been disabled for this Canvas site"
     browsers: 
       unrecognized: "Unrecognized Browser"
     buttons: 
@@ -5552,7 +5570,6 @@ en:
       datepicker: 
         time: Time
     links: 
-      minimize_embedded_kaltura_content: "Minimize Embedded Content"
       minimize_file_preview: "Minimize File Preview"
       minimize_youtube_video: "Minimize Video"
       view_equella_content_in_new_window: "view the content in a new window"
@@ -5683,6 +5700,8 @@ en:
         assignments_recently_graded: "Recently Graded"
         calendar: Calendar
         grades: Grades
+      navigation: 
+        main: "Main Navigation"
       open_source_learning_management_system: "Open Source LMS"
     facebook: 
       title: "Facebook Page"
@@ -5734,6 +5753,10 @@ en:
         teacher_not_found: "No teacher found"
     basic_lti: 
       bad_score: "Score is not between 0 and 1"
+      no_points_comment: |-
+          An external tool attempted to grade this assignment as %{grade}, but was unable
+          to because the assignment has no points possible.
+      no_points_possible: "Assignment has no points possible."
       no_score: "No score given"
     cc: 
       standard: 
@@ -5745,8 +5768,15 @@ en:
         body: |-
             The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
             
-            Thank you,
-            Canvas Support
+                    Thank you,
+                    Canvas Support
+        subject: "Message Reply Failed: %{subject}"
+      locked_topic: 
+        body: |-
+            The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+            
+                    Thank you,
+                    Canvas Support
         subject: "Message Reply Failed: %{subject}"
     send_to_inbox: 
       default_subject: "No Subject"
@@ -5800,8 +5830,12 @@ en:
       operators: Operators
       relationships: Relationships
   media_comments: 
+    alerts: 
+      kaltura_disabled: "Kaltura has been disabled for this Canvas site"
     buttons: 
       submit: "Submit Media File"
+    cancel: Cancel
+    click_to_view: "Click to view"
     errors: 
       file_too_large: "*This file is too large.* The maximum size is %{size}MB."
       load_failed: "Media Comment Application failed to load.  Please try again."
@@ -5811,10 +5845,11 @@ en:
       save_failed_try_again: "Entry failed to save.  Please try again."
       upload_failed: "Upload failed with error:"
     links: 
-      upgrade_flash: "Click here to upgrade"
+      minimize_embedded_kaltura_content: "Minimize embedded content"
+    loading: "Loading media..."
+    media_still_converting: "Media is currently being converted, please try again in a little bit."
     messages: 
       file_failed_to_load: "This media file failed to load"
-      flash_required: "This video requires Flash version 9 or higher (you have %{version} installed)."
       flash_required_record_audio: "Flash required for recording audio."
       flash_required_upload_audio: "Flash required for uploading audio."
       flash_required_upload_video: "Flash required for uploading video."
@@ -5822,10 +5857,12 @@ en:
       submitted: "Submitted Media File!"
       submitting: "Submitting Media File..."
     titles: 
-      click_to_view: "Click to View"
       media_contribution: "Media Contribution"
       play_comment: "Play Media Comment"
       record_upload_media_comment: "Record/Upload Media Comment"
+    track_uploaded_successfully: "Track uploaded successfuly, refresh to see it."
+    upload: Upload
+    uploading: Uploading...
   menu: 
     current_groups: "Current Groups"
     customize: Customize
@@ -6446,6 +6483,10 @@ en:
       twitter: 
         tweet: "Canvas Alert - Message from %{user_name}."
         unknown_user: "Unknown User"
+    email: 
+      footer: |-
+          You received this email because you are participating in one or more classes using Canvas.  To change or turn off email notifications, visit:
+          %{url}
     enrollment_accepted: 
       email: 
         body_designer: "%{user} justed accept their invitation to participate in the course, %{course}, as a designer."
@@ -7497,10 +7538,6 @@ en:
     insignificant_duration: "--"
   page_views: 
     download_filename: "Pageviews For %{user}"
-    index: 
-      headers: 
-        subhead: "Shows all of the pages that this user has visited."
-        title: "Pageviews for %{user}"
     table: 
       headers: 
         date: Date
@@ -7508,7 +7545,6 @@ en:
         time: Time
         url: URL
         user_agent: "User Agent"
-      loading_more_results: "Loading more results"
   paginated_list: 
     no_results_found: "No Results"
     view_more_link: "View More"
@@ -8128,6 +8164,12 @@ en:
       invalid_credentials: "Incorrect username and/or password"
       invalid_otp: "Invalid verification code, please try again"
       login_error: "There was a problem logging in at %{institution}"
+      login_errors: 
+        no_config_for_id: "The Canvas account has no authentication configuration with that id"
+        no_idp_set: "The institution you logged in from is not configured on this account."
+        unrecognized_idp: "Canvas did not recognize your identity provider"
+      logout_errors: 
+        no_idp_found: "Canvas was unable to log you out at your identity provider"
       max_attempts: "Too many failed login attempts. Please try again later or contact your system administrator."
       no_matching_user: "Canvas doesn't have an account for user: %{user}"
       request_failed: "Request failed. Try again."
@@ -8501,23 +8543,22 @@ en:
       titles: 
         add_new_question_group: "Add a New Question Group"
     form_answer: 
-      anser_text: "Answer Text"
-      answer_in_range: "between %{lower_bound} and %{upper_bound}"
+      answer_in_range: "between %{lower_bound_start}range start%{lower_bound_end} and %{upper_bound_start}range end%{upper_bound_end}"
       answer_text: "Answer Text"
-      exact_answer_with_error_margin: "%{exact_answer} with error margin %{error_margin}"
+      exact_answer_with_error_margin: "%{exact_answer_start}exact answer%{exact_answer_end} with error margin %{error_margin_start}error margin%{error_margin_end}"
       labels: 
         answer_comments: "Comments, if the student chooses this answer"
         answer_in_range: "Answer in the Range"
-        answer_text: "Answer text"
         exact_answer: "Exact Answer"
-        possible_answer: "Possible Answer"
       matching_left: "Matching left side"
       matching_right: "Matching right side"
+      numerical_answer: "Numerical Answer"
+      possible_answer: "Possible Answer"
       titles: 
         click_to_enter_answer_comments: "Click to enter comments, if the student chooses this answer"
         click_to_set_as_correct: "Click to set this answer as correct"
         delete_answer: "Delete this Answer"
-        edit_as_html: "Edit HTML"
+        edit_as_html: "Toggle editing answer text as HTML"
     form_question: 
       allow_tolerance: "allow an error margin of +/- %{tolerance}"
       buttons: 
@@ -8558,6 +8599,11 @@ en:
         variable_minimum: Min
         variable_name: Variable
         variable_precision: "Decimal Places"
+      label: 
+        question: 
+          name: "Question name"
+          points: "Question point value"
+          type: "Question type"
       labels: 
         answers: Answers
         distractors: "Additional Match Possibilities (distractors)"
@@ -8573,6 +8619,7 @@ en:
       options: 
         only_one_correct: "Only One Correct Answer"
         students_select_multiple: "Students Select Multiple Answers"
+      question_blank: "Question blank"
       question_type: 
         calculated: "Formula Question"
         essay: "Essay Question"
@@ -8597,6 +8644,7 @@ en:
         one: "1 minute"
         other: "%{count} minutes"
         zero: "less than 1 minute"
+      score_out_of_points_possible: "%{score} out of %{points_possible}"
     history: 
       anonymous_username: Student
       buttons: 
@@ -8658,6 +8706,13 @@ en:
     invalid_ip: 
       quiz_protected: "This quiz is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this quiz."
       survey_protected: "This survey is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this survey."
+    label: 
+      answer: 
+        text: "Answer text, rich text area"
+      question: 
+        instructions: "Question instructions, rich text area"
+      quiz: 
+        instructions: "Quiz instructions, rich text area"
     labels: 
       answer_text: "Answer text"
       comments_on_answer: "Comments, if the user chooses this answer"
@@ -8906,7 +8961,6 @@ en:
         take_survey_again: "Take the Survey Again"
       no_more_attempts: "No More Attempts available"
       questions_not_graded: "Some questions not yet graded"
-      score_out_of_points_possible: "%{score} out of %{points_possible}"
       score_set_manually: "This score was set by the teacher"
       unlimited_attempts: "Unlimited Attempts"
       view_previous_attempts: "View Previous Attempts"
@@ -8936,7 +8990,6 @@ en:
       quiz_results_protected_until_last_attempt: "Quiz results are protected for this quiz, and are not visible to students until they have submitted their last attempt."
       quiz_submission_needs_review: "The quiz has changed significantly since this submission was made. This submission may need re-grading."
       requires_lockdown: "Respondus LockDown Browser is required to view your quiz results."
-      score_out_of_points_possible: "%{score} out of %{points_possible}"
       submitted_at: "Submitted %{when}"
       survey_fudged_negative: "This survey score has been manually adjusted by %{fudge} points."
       survey_fudged_positive: "This survey score has been manually adjusted by +%{fudge} points."
@@ -8970,7 +9023,6 @@ en:
       quiz_points_possible: 
         one: "1 Point"
         other: "%{count} Points"
-      score_out_of_points_possible: "%{score} out of %{points_possible}"
       student_mute_notification: "Instructor is working on grades"
       titles: 
         delete_quiz: "Delete Quiz"
@@ -9161,7 +9213,6 @@ en:
         twelve_hours_left: "Twelve Hours Left"
       saved_at: "Saved at %{t}"
       saving: Saving...
-      score_out_of_points_possible: "%{score} out of %{points_possible}"
       seconds_count: 
         one: "1 Second"
         other: "%{count} Seconds"
@@ -9193,6 +9244,7 @@ en:
       find_quiz_question: "Find Quiz Question"
       help_with_formulas: "Help with Quiz Question Formulas"
       ip_address_filtering: "IP Address Filtering"
+      set_as_correct: "This answer is set as correct"
     top_level_crumb: Quizzes
     ? "true"
     : "True"
@@ -9441,7 +9493,6 @@ en:
         are_you_sure_delete: "Are you sure you want to delete this rubric? Any course currently associated with this rubric will still have access to it, but, no new courses will be able to use it."
         are_you_sure_remove: "Are you sure you want to remove this rubric from your list?"
       remove_rubric: "Remove this Rubric from my list"
-  score_out_of: "%{score} out of %{points_possible}"
   scribd: 
     upgrade_flash: "Hello, you have an old version of Adobe Flash Player. To use iPaper (and lots of other stuff on the web) you need to %{link_tag}get the latest Flash player%{end_link}."
   search: 
@@ -9533,6 +9584,7 @@ en:
     buttons: 
       add_item: "Add Item"
     errors: 
+      external_tool_url: "An external tool can't be saved without a URL."
       failed_to_create_item: "Failed to Create new Item"
       loading_failed: "Loading Failed"
     invalid_lti_resource_selection: "There was a problem retrieving a valid link from the external tool"
@@ -10423,6 +10475,7 @@ en:
       assignment_submit_fail: "Assignment failed to submit"
       can_not_submit_locked_assignment: "You can't submit an assignment when it is locked"
       invalid_file_type: "Invalid file type"
+      media_file_attached: "There was no media recording in the submission"
       no_attached_file: "You must attach at least one file to this assignment"
       no_report: "Couldn't find a report for that submission item"
       student_not_enrolled: "The specified user is not a student in this course"
@@ -10472,7 +10525,7 @@ en:
       external_url_submission: "This submission was a URL to an external page."
       file_uploads_for_user: "File Uploads for **%{user}**"
       group_discussion_submission_description: "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*."
-      media_comment_link: "This submission is a media recording. *click here to view*."
+      media_comment_link: "This submission is a media recording. *click here to view.*"
       no_files: "No files were uploaded for this submission"
       no_preview_available: "No Preview Available"
       no_submission: "No Submission"
@@ -10981,6 +11034,8 @@ en:
         edit_user_details: "Edit User Details"
         name_and_email: "Name and Email"
       update_instructions: "You can update some of this user's information, but they can change it back if they choose."
+    new: 
+      create_a_canvas_account: "Create a Canvas Account"
     new_user_dashboard: 
       course_code_example: "(something like BIO 100, ENG 315, etc.)"
       create_collection: "Create a collection"
@@ -11091,6 +11146,13 @@ en:
         : "Off"
         ? "true"
         : "On"
+  widget: 
+    upload_media_track_form: 
+      choose_a_language: "--Choose a Language--"
+      error_message: "*Error:* You must choose a language and a valid track file."
+      file: File
+      language: Language
+      upload_media_track_form_description: "Once you have a subtitle track in either the SRT or *WebVTT* format, you can upload it here."
   wiki: 
     default_course_wiki_name: "%{course_name} Wiki"
     default_group_wiki_name: "%{group_name} Wiki"

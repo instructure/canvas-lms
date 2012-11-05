@@ -94,64 +94,28 @@ describe "Accounts API", :type => :integration do
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' })
 
       [@c1, @c2].each { |c| c.reload }
-      json.should == [
-        {
-          'id' => @c1.id,
-          'name' => 'c1',
-          'account_id' => @c1.account_id,
-          'course_code' => 'c1',
-          'sis_course_id' => nil,
-          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c1.uuid}.ics" },
-          'hide_final_grades' => false,
-          'start_at' => @c1.start_at.as_json,
-          'end_at' => @c1.end_at.as_json
-        },
-        {
-          'id' => @c2.id,
-          'name' => 'c2',
-          'account_id' => @c2.account_id,
-          'course_code' => 'c2',
-          'sis_course_id' => 'sis2',
-          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
-          'hide_final_grades' => false,
-          'start_at' => @c2.start_at.as_json,
-          'end_at' => @c2.end_at.as_json
-        }
-      ]
+      json.first['id'].should == @c1.id
+      json.first['name'].should == 'c1'
+      json.first['account_id'].should == @c1.account_id
+
+      json.last['id'].should == @c2.id
+      json.last['name'].should == 'c2'
+      json.last['account_id'].should == @c2.account_id
 
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' },
                         { :hide_enrollmentless_courses => '1' })
-      json.should == [
-        {
-          'id' => @c2.id,
-          'name' => 'c2',
-          'account_id' => @c2.account_id,
-          'course_code' => 'c2',
-          'sis_course_id' => 'sis2',
-          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
-          'hide_final_grades' => false,
-          'start_at' => @c2.start_at.as_json,
-          'end_at' => @c2.end_at.as_json
-        }
-      ]
+      json.first['id'].should == @c2.id
+      json.first['name'].should == 'c2'
+      json.first['account_id'].should == @c2.account_id
 
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' },
                         { :per_page => 1, :page => 2 })
-      json.should == [
-        {
-          'id' => @c2.id,
-          'name' => 'c2',
-          'account_id' => @c2.account_id,
-          'course_code' => 'c2',
-          'sis_course_id' => 'sis2',
-          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@c2.uuid}.ics" },
-          'hide_final_grades' => false,
-          'start_at' => @c2.start_at.as_json,
-          'end_at' => @c2.end_at.as_json
-        }
-      ]
+      json.first['id'].should == @c2.id
+      json.first['name'].should == 'c2'
+      json.first['account_id'].should == @c2.account_id
+
     end
   end
 

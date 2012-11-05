@@ -63,7 +63,7 @@ describe "assignments turn it in" do
     wait_for_ajaximations
     keep_trying_until do
       assignment = Assignment.last
-      assignment.turnitin_settings.should eql(expected_settings)
+      assignment.turnitin_settings.should == expected_settings
     end
   end
 
@@ -79,6 +79,6 @@ describe "assignments turn it in" do
     change_turnitin_settings
 
     assignment.reload
-    assignment.turnitin_settings.should eql(expected_settings)
+    assignment.turnitin_settings.should ==(expected_settings)
   end
 end

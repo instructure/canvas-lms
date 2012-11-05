@@ -212,17 +212,15 @@ describe UsersController do
         diff = data.select{|k,v|k =~ /avatar_img/}.size - orig_size
         diff.should > 0
 
-        expect {
-          @user.update_attribute(:avatar_image, {'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif'})
-        }.to change(data, :size).by(-diff)
+        @user.update_attribute(:avatar_image, {'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif'})
+        data.select{|k,v|k =~ /avatar_img/}.size.should == orig_size
 
-        expect {
-          get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-          response.should redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
+        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
+        response.should redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
 
-          get "http://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI::escape("https://test.domain/my/custom/fallback/url.png")}"
-          response.should redirect_to "http://otherschool.instructure.com/images/thumbnails/foo.gif"
-        }.to change(data, :size).by(diff)
+        get "http://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI::escape("https://test.domain/my/custom/fallback/url.png")}"
+        response.should redirect_to "http://otherschool.instructure.com/images/thumbnails/foo.gif"
+        data.select{|k,v|k =~ /avatar_img/}.size.should == orig_size + diff
       end
     end
   end

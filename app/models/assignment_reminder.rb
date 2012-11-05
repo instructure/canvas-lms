@@ -88,4 +88,8 @@ class AssignmentReminder < ActiveRecord::Base
     end
     self.destroy
   end
+
+  def context
+    assignment.try(:context)
+  end
 end

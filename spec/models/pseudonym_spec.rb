@@ -33,17 +33,18 @@ describe Pseudonym do
   end
 
   it "should validate the presence of user and account ids" do
+    u = User.create!
     p = Pseudonym.new(:unique_id => 'cody@instructure.com')
     p.save.should be_false
 
-    p.account_id = 1
+    p.account_id = Account.default.id
     p.save.should be_false
 
-    p.user_id = 1
+    p.user_id = u.id
     p.account_id = nil
     p.save.should be_false
 
-    p.account_id = 1
+    p.account_id = Account.default.id
     p.save.should be_true
 
     # make sure a password was generated

@@ -42,10 +42,10 @@ define([
     // hasn't entered any content.
     submissionForm.delegate('#submission_comment', 'focus', function(e) {
       var box = $(this);
-      if (box.val().trim() === '') { box.css('height', '72px'); }
+      if (box.val().trim() === '') { box.addClass('focus_or_content'); }
     }).delegate('#submission_comment', 'blur', function(e) {
       var box = $(this);
-      if (box.val().trim() === '') { box.css('height', '16px'); }
+      if (box.val().trim() === '') { box.removeClass('focus_or_content'); }
     });
 
     submissionForm.submit(function(event) {
@@ -100,8 +100,8 @@ define([
             window.location = window.location.href.replace(window.location.hash, "");
           },
           error: function(data) {
-            $(this).find("button[type='submit']").text(I18n.t('messages.submit_failed', "Submit Failed, please try again"));
-            $(this).find("button").attr('disabled', false);
+            submissionForm.find("button[type='submit']").text(I18n.t('messages.submit_failed', "Submit Failed, please try again"));
+            submissionForm.find("button").attr('disabled', false);
           }
         });
       } else {

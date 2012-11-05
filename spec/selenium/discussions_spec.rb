@@ -347,8 +347,9 @@ describe "discussions" do
         edit_text = 'this has been edited '
         text = "new side comment from student"
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
+        @topic.discussion_entries.last.message.should == text
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_js
+        sleep 5
         validate_entry_text(entry, text)
         edit_entry(entry, edit_text)
       end
@@ -365,21 +366,21 @@ describe "discussions" do
 
       # make sure everything looks unread
       get("/courses/#{@course.id}/discussion_topics/#{@topic.id}", false)
-      ff('.can_be_marked_as_read.unread').length.should eql(reply_count + 1)
-      f('.new-and-total-badge .new-items').text.should eql(reply_count.to_s)
+      ff('.can_be_marked_as_read.unread').length.should == reply_count + 1
+      f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
       #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
       sleep 2
       ff('.can_be_marked_as_read.unread').should be_empty
-      ff('.can_be_marked_as_read.just_read').length.should eql(reply_count + 1)
-      f('.new-and-total-badge .new-items').text.should eql('')
+      ff('.can_be_marked_as_read.just_read').length.should == reply_count + 1
+      f('.new-and-total-badge .new-items').text.should == ''
 
       # refresh page and make sure nothing is unread/just_read and everthing is .read
       get("/courses/#{@course.id}/discussion_topics/#{@topic.id}", false)
       ['unread', 'just_read'].each do |state|
         ff(".can_be_marked_as_read.#{state}").should be_empty
       end
-      f('.new-and-total-badge .new-items').text.should eql('')
+      f('.new-and-total-badge .new-items').text.should == ''
     end
   end
 end

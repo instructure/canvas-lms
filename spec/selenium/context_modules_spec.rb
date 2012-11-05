@@ -394,7 +394,7 @@ describe "context_modules" do
     wait_for_ajaximations
     title_input = fj('input[name="title"]:visible')
     replace_content(title_input, 'First text header')
-    f('.add_item_button').click
+    fj('.add_item_button:visible').click
     wait_for_ajaximations
     tag1 = ContentTag.last
 
@@ -404,7 +404,7 @@ describe "context_modules" do
     wait_for_ajaximations
     title_input = fj('input[name="title"]:visible')
     replace_content(title_input, 'Second text header')
-    f('.add_item_button').click
+    fj('.add_item_button:visible').click
     wait_for_ajaximations
     tag2 = ContentTag.last
 
@@ -448,7 +448,7 @@ describe "context_modules" do
       replace_content(f('#sub_header_title'), header_text)
       true
     end
-    f('.add_item_button').click
+    fj('.add_item_button:visible').click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
@@ -461,6 +461,15 @@ describe "context_modules" do
 
   it "should add an external tool item to a module" do
     add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
+  end
+
+  it "should not save an invalid external tool" do
+    add_module 'Test module'
+    f('.add_module_item_link').click
+    select_module_item('#add_module_item_select', 'External Tool')
+    find_with_jquery('.add_item_button:visible').click
+    ff('.alert.alert-error').length.should == 1
+    find_with_jquery('.alert.alert-error:visible').text.should == "An external tool can't be saved without a URL."
   end
 
   it "should hide module contents" do

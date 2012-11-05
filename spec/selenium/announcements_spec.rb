@@ -134,7 +134,7 @@ describe "announcements" do
       expect_new_page_load { submit_form('.form-actions') }
       f('#entry_list .discussion_entry .content').should include_text(entry_text)
       f('#left-side .announcements').click
-      f('.topic_reply_count').text.should eql('1')
+      f('.topic_reply_count').text.should == '1'
     end
 
     it "should add and remove an external feed to announcements" do
@@ -164,7 +164,7 @@ describe "announcements" do
         wait_for_ajax_requests
         element_exists('.external_feed').should be_false
       }.to change(ExternalFeed, :count).by(-1)
-      ExternalFeed.count.should eql(0)
+      ExternalFeed.count.should == 0
     end
 
     it "should show announcements to student view student" do

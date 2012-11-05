@@ -24,6 +24,18 @@ describe AssessmentQuestion do
     assessment_question_model
   end
 
+  it "should infer_defaults from question_data before validation" do
+    @question = assessment_question_model
+    @question.name = "1" * 300
+    @question.save(false) # save without validations
+    @question.name.length.should == 300
+
+    @question.question_data[:question_name] = "valid name"
+    @question.save!
+    @question.should be_valid
+    @question.name.should == @question.question_data[:question_name]
+  end
+
   it "should translate links to be readable when creating the assessment question" do
     course
     @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')

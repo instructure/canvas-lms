@@ -16,3 +16,18 @@ Authlogic::Session::Base.persist_callback_chain.unshift(cb) if cb
 # generating a new "remember me" cookie since they're one-time use.
 cb = Authlogic::Session::Base.persist_callback_chain.delete(:persist_by_cookie)
 Authlogic::Session::Base.persist_callback_chain.push(cb) if cb
+
+# be tolerant of using a slave
+Authlogic::Session::Callbacks.module_eval do
+  def save_record_with_ro_check(alternate_record = nil)
+    begin
+      save_record_without_ro_check(alternate_record)
+    rescue ActiveRecord::StatementInvalid => error
+      # "simulated" slave of a user with read-only access; probably the same error for Slony
+      raise if !error.message.match(/PG(?:::)?Error: ERROR: +permission denied for relation/) &&
+          # real slave that's in recovery
+          !error.message.match(/PG(?:::)?Error: ERROR: +cannot execute UPDATE in a read-only transaction/)
+    end
+  end
+  alias_method_chain :save_record, :ro_check
+end

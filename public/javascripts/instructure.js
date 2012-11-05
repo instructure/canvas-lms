@@ -50,6 +50,7 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'compiled/behaviors/trackEvent',
+  'compiled/badge_counts',
   'vendor/scribd.view' /* scribd */,
   'vendor/jquery.placeholder'
 ], function(ENV, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
@@ -1038,7 +1039,6 @@ define([
           .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
       });
     }, 2000);
-
   });
 
   $('input[placeholder], textarea[placeholder]').placeholder();

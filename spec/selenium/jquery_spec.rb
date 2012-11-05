@@ -11,7 +11,7 @@ describe "jquery" do
     driver.execute_script("$(document.body).append('<input type=\"checkbox\" checked=\"checked\" id=\"checkbox_test\">')")
 
     checkbox = f('#checkbox_test')
-    driver.execute_script("return $('#checkbox_test').attr('checked');").should eql('checked')
+    driver.execute_script("return $('#checkbox_test').attr('checked');").should == 'checked'
 
     checkbox.click
     driver.execute_script("return $('#checkbox_test').attr('checked');").should be_nil
@@ -27,7 +27,7 @@ describe "jquery" do
   end
   it "should handle $.attr('method', post|delete|put|get) by adding a hidden input" do
     get('/logout')
-    driver.execute_script("return $('form').attr('method', 'delete').attr('method')").downcase.should  eql("post")
-    driver.execute_script("return $('form input[name=_method]').val()").should eql("delete")
+    driver.execute_script("return $('form').attr('method', 'delete').attr('method')").downcase.should  == "post"
+    driver.execute_script("return $('form input[name=_method]').val()").should == "delete"
   end
 end

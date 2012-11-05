@@ -17,7 +17,7 @@ gem 'encrypted_cookie_store-instructure', '1.0.1', :require => 'encrypted_cookie
 gem 'erubis',         '2.7.0'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.1.13'
-gem 'haml',           '3.1.6'
+gem 'sass',           '3.2.1'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
 end
@@ -86,7 +86,7 @@ group :test do
   gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
-  gem 'parallelized_specs', '0.2.6'
+  gem 'parallelized_specs', '0.3.03'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'

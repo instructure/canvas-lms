@@ -65,9 +65,9 @@ class SubAccountsController < ApplicationController
     @accounts[:accounts_to_get_sub_account_count] = []
     sub_accounts_of(@context)
     unless @accounts[:accounts_to_get_sub_account_count].empty?
-      counts = Account.count(:all,
-                             :group => :parent_account_id,
-                             :conditions => {:parent_account_id => @accounts[:accounts_to_get_sub_account_count]})
+      counts = Account.active.count(:all,
+                                    :group => :parent_account_id,
+                                    :conditions => {:parent_account_id => @accounts[:accounts_to_get_sub_account_count]})
       counts.each do |account_id, count|
         @accounts[account_id][:sub_account_count] = count
       end

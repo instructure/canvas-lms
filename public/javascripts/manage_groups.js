@@ -757,6 +757,12 @@ define([
         width: 400
       });
     });
+    $("#category_split_groups").on('click', function() {
+      $("#category_split_group_count").val("1");
+    });
+    $("#category_no_groups").on('click', function() {
+      $("#category_split_group_count").val("");
+    });
     contextGroups.populateCategory($("#group_tabs .group_category:first"));
     $(window).resize(function() {
       if($(".group_category:visible:first").length == 0) { return; }

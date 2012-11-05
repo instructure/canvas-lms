@@ -20,13 +20,24 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/collaborations/index" do
-  it "should render" do
+  before do
     course_with_student
     view_context(@course, @user)
     assigns[:collaborations] = [@course.collaborations.create!]
     assigns[:users] = @course.users
+  end
+
+  it "should render" do
     render 'collaborations/index'
     response.should_not be_nil
+  end
+
+  it "should provide labels for accessibility devices i.e. screen readers" do
+    render :partial => "collaborations/forms"
+    response.should_not be_nil
+    response.should have_tag("label[for=collaboration_title]", :text => "Document Name:")
+    response.should have_tag("label[for=collaboration_description]", :text => "Description:")
+    response.should have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate Using:")
   end
 end
 

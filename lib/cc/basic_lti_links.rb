@@ -106,6 +106,13 @@ module CC
                     end
                   end
                 end
+                if tool.settings[type][:custom_fields]
+                  type_node.tag!("blti:custom") do |custom_node|
+                    tool.settings[type][:custom_fields].each_pair do |key, val|
+                      custom_node.lticm :property, val, 'name' => key
+                    end
+                  end
+                end
               end
             end
           end

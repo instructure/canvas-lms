@@ -112,7 +112,10 @@
         border-bottom: 1px solid lighten($borderColor, 22%);
         padding: 4px 12px;
         color: $gray;
-        white-space: nowrap;
+
+        & > span {
+          white-space: nowrap;
+        }
 
         &:hover {
           text-decoration: none;

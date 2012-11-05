@@ -115,8 +115,6 @@ define([
     var $add_section_form = $("#add_section_form"),
         $edit_section_form = $("#edit_section_form"),
         $course_form = $("#course_form"),
-        $hashtag_form = $(".hashtag_form"),
-        $course_hashtag = $("#course_hashtag"),
         $enrollment_dialog = $("#enrollment_dialog"),
         $tabBar = $("#course_details_tabs"),
         // as of jqueryui 1.9, the cookie trumps the fragment :(. so we hack
@@ -253,23 +251,6 @@ define([
       axis: 'y'
     }).disableSelection();
 
-
-    $(".hashtag_dialog_link").click(function(event) {
-      event.preventDefault();
-      $("#hashtag_dialog").dialog({
-        title: I18n.t('titles.hashtag_help', "What's a Hashtag?"),
-        width: 500
-      });
-    });
-    $(".close_dialog_button").click(function() {
-      $("#hashtag_dialog").dialog('close');
-    });
-    $("#course_hashtag").bind('blur change keyup', function() {
-      var val = $(this).val() || "";
-      val = val.replace(/(\s)+/g, "_").replace(/#/, "");
-      $("#hashtag_options").showIf(val && val !== "");
-      $(this).val(val);
-    });
     $(document).fragmentChange(function(event, hash) {
       function handleFragmentType(val){
         $("#tab-users-link").click();
@@ -293,8 +274,6 @@ define([
           $("#course_account_id").val(ui.item.id);
         }
       });
-      $hashtag_form.showIf($course_hashtag.text().length > 0);
-      $course_hashtag.triggerHandler('blur');
     });
     $(".move_course_link").click(function(event) {
       event.preventDefault();
@@ -311,7 +290,6 @@ define([
     }).change();
     $course_form.formSubmit({
       processData: function(data) {
-        data['course[hashtag]'] = (data['course[hashtag]'] || "").replace(/\s/g, "_").replace(/#/g, "");
         if(data['course[start_at]']) {
           data['course[start_at]'] += " 12:00am";
         }
@@ -348,7 +326,6 @@ define([
             $(this).text($.replaceTags($(this).text(), 'self_enrollment_code', course.self_enrollment_code));
           });
         }
-        $(".hashtag_form").showIf($("#course_hashtag").text().length > 0);
       },
       error: function(data) {
         $(this).loadingImage('remove');
@@ -359,7 +336,6 @@ define([
     .find(".cancel_button")
       .click(function() {
         $course_form.removeClass('editing');
-        $hashtag_form.showIf($course_hashtag.text().length > 0);
         $(".course_form_more_options").hide();
       }).end()
     .find(":text:not(.date_entry)").keycodes('esc', function() {
@@ -393,7 +369,10 @@ define([
     });
     $(".course_form_more_options_link").click(function(event) {
       event.preventDefault();
-      $(".course_form_more_options").slideToggle();
+      var $moreOptions = $(".course_form_more_options");
+      var optionText = $moreOptions.is(':visible') ? I18n.t('links.more_options', 'more options') : I18n.t('links.less_options', 'less options');
+      $(this).text(optionText);
+      $moreOptions.slideToggle();
     });
    $enrollment_dialog.find(".cancel_button").click(function() {
       $enrollment_dialog.dialog('close');

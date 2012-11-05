@@ -46,7 +46,9 @@ define [
       @el.detach()
       @switchViews.insertBefore @textArea if @options.switchViews
       @done.insertAfter @textArea
-      @textArea.editorBox()
+      if @options.editorBoxLabel
+        opts = tinyOptions: {aria_label: @options.editorBoxLabel}
+      @textArea.editorBox opts
       @editing = true
 
     ##
@@ -88,7 +90,9 @@ define [
     createDone: ->
       $('<a/>')
         .html(@options.doneText)
+        .attr('href', '#')
         .addClass('button edit-html-done edit_html_done')
+        .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
         .click => @display()
 
     ##

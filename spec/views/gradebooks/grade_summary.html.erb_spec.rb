@@ -28,6 +28,7 @@ describe "/gradebooks/grade_summary" do
     assigns[:assignments] = [a]
     assigns[:submissions] = []
     assigns[:courses_with_grades] = []
+    assigns[:all_submissions] = []
     render "gradebooks/grade_summary"
     response.should_not be_nil
   end
@@ -41,6 +42,7 @@ describe "/gradebooks/grade_summary" do
     assigns[:assignments] = [a]
     assigns[:submissions] = []
     assigns[:courses_with_grades] = []
+    assigns[:all_submissions] = []
     render "gradebooks/grade_summary"
     response.should_not be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
@@ -58,6 +60,7 @@ describe "/gradebooks/grade_summary" do
     assigns[:assignments] = [a]
     assigns[:submissions] = []
     assigns[:courses_with_grades] = []
+    assigns[:all_submissions] = []
     render "gradebooks/grade_summary"
     response.should_not be_nil
     response.body.should_not match /Click any score/

@@ -5,10 +5,9 @@
     :LOGIN_HANDLE_NAME => (@domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name),
     :MIN_AGE => User.self_enrollment_min_age
   }
+  content_for :page_title, t('create_a_canvas_account', "Create a Canvas Account")
+  content_for :head, include_stylesheets(:common, :media => "all")
 %>
-<% content_for :head do %>
-  <%= include_stylesheets :common, :media => "all" %>
-<% end %>
 
 <div id="registration_header">
   <div class="registration-content">

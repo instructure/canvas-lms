@@ -78,7 +78,15 @@ class HostUrl
       Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res || !Rails.env.production?
       res ||= @@file_host = default_host
     end
-    
+
+    def cdn_host
+      # by default only set it for development. useful so that gravatar can
+      # proxy our fallback urls
+      host = ENV['CANVAS_CDN_HOST']
+      host ||= "canvas.instructure.com" if Rails.env.development?
+      host
+    end
+
     def short_host(context)
       context_host(context)
     end

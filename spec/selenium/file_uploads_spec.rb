@@ -68,7 +68,7 @@ shared_examples_for "file uploads selenium tests" do
       submit_form('#submit_online_upload_form')
       keep_trying_until { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
       link = f(".details a.forward")
-      link.text.should eql("Submission Details")
+      link.text.should == "Submission Details"
 
       expect_new_page_load { link.click }
       keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
@@ -110,7 +110,7 @@ describe "file uploads local tests" do
       JS
       wait_for_ajax_requests
 
-      f('#tree1 .folder').text.should eql("course files")
+      f('#tree1 .folder').text.should == "course files"
       f('#tree1 .folder .sign').click
       # work around bizarre bug where the click above doesn't register the first time
       # when testing firefox on windows xp WITHOUT firebug installed. (works with firebug enabled!)

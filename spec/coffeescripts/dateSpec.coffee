@@ -4,7 +4,9 @@ define [ 'vendor/date' ], ->
 
   test 'Date.parse', ->
     # create the same date the "new Date" would if the browser were in UTC
-    utc = -> new Date Date.UTC arguments...
+    utc = (yr, mon, day, hr, min, sec) ->
+      date = new Date yr, mon, day, hr, min, sec
+      date.addMinutes -date.getTimezoneOffset()
 
     examples =
       # Mountain
@@ -30,9 +32,6 @@ define [ 'vendor/date' ], ->
       "2012-05-02T00:00:00-01:59":    utc(2012, 4, 2,  1, 59, 0)
       "2012-05-02T00:00:00+00:01":    utc(2012, 4, 1, 23, 59, 0)
       "2012-05-02T00:00:00-00:01":    utc(2012, 4, 2,  0,  1, 0)
-
-      # DST-ends edge case
-      "2012-11-04T01:00:00-06:00":    utc(2012, 10, 4,  7,  0, 0)
 
     for dateString, expectedDate of examples
       equal Date.parse(dateString).valueOf(), expectedDate.valueOf()
@@ -60,16 +59,3 @@ define [ 'vendor/date' ], ->
       date = new Date
       sinon.stub(date, 'getTimezoneOffset').returns(Number(offset))
       equal date.getUTCOffset(), expectedResult
-
-  test 'date.add* at DST-end', ->
-    # 1ms before 1am on day of DST-end
-    date = new Date 2012, 10, 4, 0, 59, 59, 999
-
-    # date.set* modifies in place, so we clone, but doesn't return the date
-    # object, returning ms-since-epoch instead. fortunately, new Date
-    # ms-since-epoch works, so we do that rather than introducing a bunch of
-    # temporary variables
-    ok date.clone().addMilliseconds(1).equals(new Date date.clone().setUTCMilliseconds 1000)
-    ok date.clone().addSeconds(1).equals(new Date date.clone().setUTCSeconds 60)
-    ok date.clone().addMinutes(1).equals(new Date date.clone().setUTCMinutes 60)
-    ok date.clone().addHours(1).equals(new Date date.clone().setUTCHours date.getUTCHours() + 1)

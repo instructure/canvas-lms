@@ -268,7 +268,6 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     course.resources :collaborations
-    course.resources :short_messages
 
     course.resources :gradebook_uploads
     course.resources :rubrics
@@ -330,7 +329,7 @@ ActionController::Routing::Routes.draw do |map|
     :controller => :crocodoc_sessions, :action => :create,
     :conditions => {:method => :post}
 
-  map.resources :page_views, :only => [:update,:index]
+  map.resources :page_views, :only => [:update]
   map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
@@ -411,7 +410,6 @@ ActionController::Routing::Routes.draw do |map|
     add_conferences(group)
     add_media(group)
     group.resources :collaborations
-    group.resources :short_messages
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
     group.profile 'profile', :controller => :groups, :action => 'profile', :conditions => {:method => :get}
   end
@@ -487,7 +485,6 @@ ActionController::Routing::Routes.draw do |map|
   map.report_avatar_image 'images/users/:user_id/report', :controller => 'users', :action => 'report_avatar_image', :conditions => {:method => :post}
   map.update_avatar_image 'images/users/:user_id', :controller => 'users', :action => 'update_avatar_image', :conditions => {:method => :put}
 
-  map.menu_courses 'menu_courses', :controller => 'users', :action => 'menu_courses'
   map.all_menu_courses 'all_menu_courses', :controller => 'users', :action => 'all_menu_courses'
 
   map.grades "grades", :controller => "users", :action => "grades"
@@ -511,7 +508,7 @@ ActionController::Routing::Routes.draw do |map|
     user.delete 'delete', :controller => 'users', :action => 'delete'
     add_files(user, :images => true)
     add_zip_file_imports(user)
-    user.resources :page_views, :only => [:index]
+    user.resources :page_views, :only => 'index'
     user.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
@@ -536,7 +533,7 @@ ActionController::Routing::Routes.draw do |map|
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
-    user.resources :messages, :only => [:index]
+    user.resources :messages, :only => [:index, :create]
   end
   map.resource :profile, :only => %w(show update),
                :controller => "profile",
@@ -887,7 +884,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :groups) do |groups|
       groups.resources :groups, :except => [:index]
-      groups.get 'users/self/groups', :action => :index
+      groups.get 'users/self/groups', :action => :index, :path_name => "current_user_groups"
       groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
@@ -956,7 +953,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :favorites) do |favorites|
-      favorites.get "users/self/favorites/courses", :action => :list_favorite_courses
+      favorites.get "users/self/favorites/courses", :action => :list_favorite_courses, :path_name => :list_favorite_courses
       favorites.post "users/self/favorites/courses/:id", :action => :add_favorite_course
       favorites.delete "users/self/favorites/courses/:id", :action => :remove_favorite_course
       favorites.delete "users/self/favorites/courses", :action => :reset_course_favorites

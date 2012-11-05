@@ -20,7 +20,7 @@ describe "eportfolios" do
     @eportfolio.eportfolio_entries.count > 0
     entry= @eportfolio.eportfolio_entries.first
     if opts[:section_type]
-      entry.content.first[:section_type].should eql(opts[:section_type])
+      entry.content.first[:section_type].should == opts[:section_type]
     end
 
     if opts[:content]
@@ -67,7 +67,7 @@ describe "eportfolios" do
       f("#section_list_manage .add_section_link").click
       f("#section_list input").send_keys("test section name", :return)
       wait_for_ajax_requests
-      fj("#section_list li:last-child .name").text.should eql "test section name"
+      fj("#section_list li:last-child .name").text.should == "test section name"
     end
 
     it "should edit ePortfolio settings" do
@@ -78,7 +78,7 @@ describe "eportfolios" do
       submit_form('#edit_eportfolio_form')
       wait_for_ajax_requests
       @eportfolio.reload
-      @eportfolio.name.should eql "new ePortfolio name"
+      @eportfolio.name.should == "new ePortfolio name"
     end
 
     it "should have a working flickr search dialog" do
@@ -116,7 +116,7 @@ describe "eportfolios" do
       f("#wrapper-container .eportfolios").click
       f("#whats_an_eportfolio .add_eportfolio_link").should be_displayed
       fj("#portfolio_#{@eportfolio.id}").should be_nil
-      Eportfolio.first.workflow_state.should eql 'deleted'
+      Eportfolio.first.workflow_state.should == 'deleted'
     end
 
     describe "add content box" do
@@ -170,7 +170,7 @@ describe "eportfolios" do
         def add_html
           submit_form(".form_content")
           wait_for_ajax_requests
-          f(".section_content b").text.should eql "student"
+          f(".section_content b").text.should == "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
         end
 
@@ -183,14 +183,14 @@ describe "eportfolios" do
           is_checked(comment_public).should be_true
           submit_form(".form_content")
           wait_for_ajax_requests
-          f(".section_content b").text.should eql "student"
+          f(".section_content b").text.should == "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
           refresh_page
           f("#page_comment_message").send_keys("hi student")
           submit_form("#add_page_comment_form")
           wait_for_ajax_requests
           f("#page_comments .message").should include_text("hi student")
-          @eportfolio_entry.page_comments[0].message.should eql "hi student"
+          @eportfolio_entry.page_comments[0].message.should == "hi student"
         end
 
         it "should verify that the html is there" do
@@ -210,7 +210,7 @@ describe "eportfolios" do
           wait_for_ajaximations
           submit_form(".form_content")
           wait_for_ajaximations
-          @eportfolio.eportfolio_entries.first.content[0].should eql "No Content Added Yet"
+          @eportfolio.eportfolio_entries.first.content[0].should == "No Content Added Yet"
           f("#edit_page_section_1").should be_nil
         end
 
@@ -221,7 +221,7 @@ describe "eportfolios" do
           driver.switch_to.alert.accept
           wait_for_ajaximations
           f("#page_comments .message").should be_nil
-          PageComment.count.should eql 0
+          PageComment.count.should == 0
         end
       end
 

@@ -38,6 +38,8 @@ class Submission < ActiveRecord::Base
   has_many :attachment_associations, :as => :context
   has_many :attachments, :through => :attachment_associations
   has_many :conversation_messages, :as => :asset # one message per private conversation
+  has_many :content_participations, :as => :content
+
   serialize :turnitin_data, Hash
   validates_presence_of :assignment_id, :user_id
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -109,26 +111,33 @@ class Submission < ActiveRecord::Base
   after_save :update_admins_if_just_submitted
   after_save :check_for_media_object
   after_save :update_quiz_submission
+  after_save :update_participation
 
   def self.needs_grading_trigger_sql
-    <<-SQL
+    # every database uses a different construct for a current UTC timestamp...
+    default_sql = <<-SQL
       UPDATE assignments
-      SET needs_grading_count = needs_grading_count + %s
+      SET needs_grading_count = needs_grading_count + %s, updated_at = {{now}}
       WHERE id = NEW.assignment_id
-        AND context_type = 'Course'
-        AND #{Enrollment.active_student_subselect("user_id = NEW.user_id AND course_id = assignments.context_id")};
-    SQL
+      AND context_type = 'Course'
+      AND #{Enrollment.active_student_subselect("user_id = NEW.user_id AND course_id = assignments.context_id")};
+      SQL
+
+    { :default    => default_sql.gsub("{{now}}", "now()"),
+      :postgresql => default_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'"),
+      :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
+      :mysql      => default_sql.gsub("{{now}}", "utc_timestamp()") }
   end
 
   trigger.after(:insert) do |t|
     t.where("#{needs_grading_conditions("NEW")}") do
-      needs_grading_trigger_sql % 1
+      Hash[needs_grading_trigger_sql.map{|key, value| [key, value % 1]}]
     end
   end
 
   trigger.after(:update) do |t|
     t.where("(#{needs_grading_conditions("NEW")}) <> (#{needs_grading_conditions("OLD")})") do
-      needs_grading_trigger_sql % "CASE WHEN (#{needs_grading_conditions('NEW')}) THEN 1 ELSE -1 END"
+      Hash[needs_grading_trigger_sql.map{|key, value| [key, value % "CASE WHEN (#{needs_grading_conditions('NEW')}) THEN 1 ELSE -1 END"]}]
     end
   end
   
@@ -765,7 +774,11 @@ class Submission < ActiveRecord::Base
     self.assignment.grading_type
   end
   
+  # Note 2012-10-12:
+  #   Deprecating this method due to view code in the model. The only place
+  #   it appears to be used is in the _recent_feedback.html.erb partial.
   def readable_grade
+    warn "[DEPRECATED] The Submission#readable_grade method will be removed soon"
     return nil unless grade
     case grading_type
       when 'points'
@@ -981,33 +994,6 @@ class Submission < ActiveRecord::Base
     @group_broadcast_submission = false
   end
   
-  # def comments
-    # if @comments_user
-      # res = OpenObject.process(self.comments) rescue nil
-      # res ||= []
-      # self.user_submission_comments.each do |comment|
-        # res << OpenObject.new(
-          # :user_id => comment.author_id,
-          # :user_name => comment.user.name,
-          # :posted_at => comment.created_at.utc.iso8601,
-          # :comment => comment.comment,
-          # :recipient_id => comment.user_id
-        # )
-      # end
-      # res.sort_by{|c| c.posted_at}.to_json
-    # else
-      # self.comments
-    # end
-  # end
-  
-  # def comment=(comment)
-    # add_comment(comment, nil)
-  # end
-  
-  # def submission_comment=(comment)
-    # add_comment(comment, self.user)
-  # end
-  
   def late?
     self.assignment.due_at && self.submitted_at && self.submitted_at.to_i.divmod(60)[0] > self.assignment.due_at.to_i.divmod(60)[0]
   end
@@ -1133,5 +1119,48 @@ class Submission < ActiveRecord::Base
       end
     end
     hash
+  end
+
+  def update_participation
+    return if assignment.deleted? || assignment.muted?
+    return unless self.user_id
+
+    if self.score_changed? || self.grade_changed?
+      ContentParticipation.create_or_update({
+        :content => self,
+        :user => self.user,
+        :workflow_state => "unread",
+      })
+    end
+  end
+
+  def read_state(current_user)
+    return "read" unless current_user #default for logged out user
+    uid = current_user.is_a?(User) ? current_user.id : current_user
+    state = content_participations.find_by_user_id(uid).try(:workflow_state)
+    return state if state.present?
+    return "read" if (assignment.deleted? || assignment.muted? || !self.user_id)
+    return "unread" if (self.grade || self.score)
+    return "unread" if self.submission_comments.scoped(:conditions => ["author_id <> ?", user_id]).first.present?
+    return "read"
+  end
+
+  def read?(current_user)
+    read_state(current_user) == "read"
+  end
+
+  def unread?(current_user)
+    !read?(current_user)
+  end
+
+  def change_read_state(new_state, current_user)
+    return nil unless current_user
+    return true if new_state == self.read_state(current_user)
+
+    ContentParticipation.create_or_update({
+      :content => self,
+      :user => current_user,
+      :workflow_state => new_state,
+    })
   end
 end

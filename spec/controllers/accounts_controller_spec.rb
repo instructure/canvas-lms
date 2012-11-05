@@ -242,24 +242,34 @@ describe AccountsController do
     it "should not allow non-site-admins to update certain settings" do
       account_with_admin_logged_in
       post 'update', :id => @account.id, :account => { :settings => { 
-        :global_includes => true, :enable_scheduler => true, :enable_profiles => true } }
+        :global_includes => true,
+        :enable_scheduler => true,
+        :enable_profiles => true,
+        :admins_can_change_passwords => true,
+      } }
       @account.reload
       @account.global_includes?.should be_false
       @account.enable_scheduler?.should be_false
       @account.enable_profiles?.should be_false
+      @account.admins_can_change_passwords?.should be_false
     end
 
-    it "should allow site_admin to update global_includes" do
+    it "should allow site_admin to update certain settings" do
       user
       user_session(@user)
       @account = Account.create!
       Account.site_admin.add_user(@user)
       post 'update', :id => @account.id, :account => { :settings => { 
-        :global_includes => true, :enable_scheduler => true, :enable_profiles => true } }
+        :global_includes => true,
+        :enable_scheduler => true,
+        :enable_profiles => true,
+        :admins_can_change_passwords => true,
+      } }
       @account.reload
       @account.global_includes?.should be_true
       @account.enable_scheduler?.should be_true
       @account.enable_profiles?.should be_true
+      @account.admins_can_change_passwords?.should be_true
     end
   end
 end

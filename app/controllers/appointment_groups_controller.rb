@@ -148,7 +148,7 @@ class AppointmentGroupsController < ApplicationController
     groups = Api.paginate(
       scope.order('id'),
       self,
-      api_v1_appointment_groups_path(:scope => params[:scope])
+      api_v1_appointment_groups_url(:scope => params[:scope])
     )
     AppointmentGroup.send(:preload_associations, groups, :appointments) if params[:include]
     render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) }
@@ -322,7 +322,7 @@ class AppointmentGroupsController < ApplicationController
       render :json => Api.paginate(
         @group.possible_participants(params[:registration_status]),
         self,
-        send("api_v1_appointment_group_#{params[:action]}_path", @group)
+        send("api_v1_appointment_group_#{params[:action]}_url", @group)
       ).map(&formatter)
     end
   end

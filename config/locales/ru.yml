@@ -5472,9 +5472,7 @@ ru:
     somethings_broken_but_i_can_work_around_it_for_now: "Что-то сломалось, но пока что я могу обойтись без помощи"
     subject: Описание
     submit_this_support_request: "Отправить заявку"
-    wait_a_different_browser_may_help_solve_the_problem: "Подождите! *другой браузер* может помочь решить проблему."
     which_course_is_this_question_about: "О каком курсе ваш вопрос?"
-    you_are_using_browser_version_version_try_again_using_the_latest_version_of_chrome_or_firefox: "Вы используете Internet Explorer версию %{browserVersion}, Попробуйте еще ​​раз, используя последнюю версию *Chrome* или **Firefox**"
     your_email_address: "Адрес вашей электронной почты"
   info: 
     notices: 
@@ -8483,7 +8481,9 @@ ru:
       wrong_answer_comments: "Комментарии к неправильному ответу"
     helpers: 
       duration_in_minutes: 
+        one: "%{count} минут(ы)"
         other: "%{count} минут(ы)"
+      score_out_of_points_possible: "%{score} из %{points_possible}"
     history: 
       anonymous_username: Студент
       buttons: 
@@ -8782,7 +8782,6 @@ ru:
         take_quiz_again: "Снова принять контрольную работу"
         take_survey_again: "Снова принять опрос"
       no_more_attempts: "Нет доступных попыток"
-      score_out_of_points_possible: "%{score} из %{points_possible}"
       score_set_manually: "Этот результат был установлен учителем"
       unlimited_attempts: "Неограниченное число попыток"
       view_previous_attempts: "Просмотреть предыдущие попытки"
@@ -8811,7 +8810,6 @@ ru:
       quiz_results_protected_until_last_attempt: "Результаты контрольной работы защищены для этой контрольной работы и не отображаются студентам до отправки их последних попыток."
       quiz_submission_needs_review: "Тест был значительно изменен после того, как это задание было отправлено. Возможно, требуется пересмотреть оценку этого задания."
       requires_lockdown: "Для просмотра результатов контрольной работы требуется браузер Respondus LockDown."
-      score_out_of_points_possible: "%{score} из %{points_possible}"
       submitted_at: "Отправлено %{when}"
       survey_fudged_negative: "Результат этого опроса был изменен вручную на %{fudge} баллов."
       survey_fudged_positive: "Результат этого опроса был изменен вручную на +%{fudge} баллов."
@@ -8845,7 +8843,6 @@ ru:
       quiz_points_possible: 
         one: "1 балл"
         other: "%{count} балла(ов)"
-      score_out_of_points_possible: "%{score} из %{points_possible}"
       student_mute_notification: "Инструктор выполняет оценку"
       titles: 
         delete_quiz: "Удалить контрольную работу"
@@ -9034,7 +9031,6 @@ ru:
         twelve_hours_left: "Осталось двенадцать часов"
       saved_at: "Сохранено в %{t}"
       saving: Сохранение...
-      score_out_of_points_possible: "%{score} из %{points_possible}"
       seconds_count: 
         one: "1 секунда"
         other: "%{count} секунд(ы)"

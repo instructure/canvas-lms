@@ -421,8 +421,8 @@ describe Enrollment do
         @enrollment.save!
         @enrollment.reload
         @enrollment.state.should eql(:invited)
-        @enrollment.state_based_on_date.should eql(:inactive)
-        @enrollment.accept.should be_false
+        @enrollment.state_based_on_date.should eql(:invited)
+        @enrollment.accept.should be_true
       end
 
       it "should accept into the right state based on availability dates on enrollment_term" do

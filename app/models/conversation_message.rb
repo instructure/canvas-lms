@@ -122,6 +122,12 @@ class ConversationMessage < ActiveRecord::Base
     write_attribute(:attachment_ids, attachments.map(&:id).join(','))
   end
 
+  def clone
+    copy = super
+    copy.attachments = attachments
+    copy
+  end
+
   def delete_from_participants
     conversation.conversation_participants.each do |p|
       p.remove_messages(self) # ensures cached stuff gets updated, etc.
@@ -219,7 +225,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    return if self.context.try(:root_account).try(:deleted?)
+    raise IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
     conversation.reply_from(opts.merge(:root_account_id => self.root_account_id))
   end
 

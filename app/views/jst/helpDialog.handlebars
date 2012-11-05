@@ -23,19 +23,11 @@
   </form>
   <form class="help-dialog-pane" id="create_ticket" style="display:none" action="/errors" method="POST">
     <h4>{{#t "file_a_ticket_for_a_personal_response_from_our_support_team"}}File a ticket for a personal response from our support team{{/t}}</h4>
-    {{#if showBadBrowserMessage}}
-      <div class="ui-state-error">
-        <span class="ui-icon ui-icon-alert"></span>
-        <strong>{{#t "wait_a_different_browser_may_help_solve_the_problem"}}Wait! A <a target="_blank" href="http://guides.instructure.com/s/2204/m/4214/l/41056-Which-browsers-does-Canvas-support-">different browser</a> may help solve the problem.{{/t}}</strong>
-        <div>{{#t "you_are_using_browser_version_version_try_again_using_the_latest_version_of_chrome_or_firefox"}}You are using Internet Explorer version {{browserVersion}}, Try again using the latest version of <a href="http://google.com/chrome">Chrome</a> or <a href="http://getfirefox.com">Firefox</a>{{/t}}</div>
-      </div>
-    {{else}}
-      <div class="ui-state-highlight">
-        <span class="ui-icon ui-icon-info"></span>
-        <strong>{{#t "for_an_instant_answer"}}For an instant answer:{{/t}}</strong>
-        <div>{{#t "see_if_your_issue_is_addressed_in_the_canvas_guides"}}See if your issue is addressed in the <a target="_blank" href="http://guides.instructure.com/">Canvas Guides</a>.{{/t}}</div>
-      </div>
-    {{/if}}
+    <div class="ui-state-highlight">
+      <span class="ui-icon ui-icon-info"></span>
+      <strong>{{#t "for_an_instant_answer"}}For an instant answer:{{/t}}</strong>
+      <div>{{#t "see_if_your_issue_is_addressed_in_the_canvas_guides"}}See if your issue is addressed in the <a target="_blank" href="http://guides.instructure.com/">Canvas Guides</a>.{{/t}}</div>
+    </div>
     <div>
       <label for="error_subject">{{#t "subject"}}Subject{{/t}}</label>
       <input id="error_subject" name="error[subject]" />

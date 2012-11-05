@@ -90,5 +90,20 @@ describe CC::CCHelper do
       translated = @exporter.html_content(html)
       translated.should match %r{\$CANVAS_COURSE_REFERENCE\$/files}
     end
+
+    it "should prepend the domain to links outside the course" do
+      HostUrl.stubs(:protocol).returns('http')
+      HostUrl.stubs(:context_host).returns('www.example.com:8080')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
+      @othercourse = Course.create!
+      html = <<-HTML
+        <a href="/courses/#{@course.id}/wiki/front-page">This course's front page</a>
+        <a href="/courses/#{@othercourse.id}/wiki/front-page">Other course's front page</a>
+      HTML
+      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      urls = doc.css('a').map{ |attr| attr[:href] }
+      urls[0].should == "%24WIKI_REFERENCE%24/wiki/front-page"
+      urls[1].should == "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
+    end
   end
 end

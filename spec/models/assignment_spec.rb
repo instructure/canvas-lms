@@ -167,6 +167,71 @@ describe Assignment do
       @assignment.needs_grading_count.should eql(0)
       @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(1)
     end
+
+    it "updated_at should be set when needs_grading_count changes due to a submission" do
+      setup_assignment_with_homework
+      @assignment.needs_grading_count.should eql(1)
+      old_timestamp = Time.now.utc - 1.minute
+      Assignment.update_all({:updated_at => old_timestamp}, {:id => @assignment.id})
+      @assignment.grade_student(@user, :grade => "0")
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+      @assignment.updated_at.should > old_timestamp
+    end
+
+    it "updated_at should be set when needs_grading_count changes due to an enrollment change" do
+      setup_assignment_with_homework
+      old_timestamp = Time.now.utc - 1.minute
+      @assignment.needs_grading_count.should eql(1)
+      Assignment.update_all({:updated_at => old_timestamp}, {:id => @assignment.id})
+      @course.offer!
+      @course.enrollments.find_by_user_id(@user.id).destroy
+      @assignment.reload
+      @assignment.needs_grading_count.should eql(0)
+      @assignment.updated_at.should > old_timestamp
+    end
+  end
+
+  context "needs_grading_count_for_user" do
+    it "should only count submissions in the user's visible section(s)" do
+      course_with_teacher(:active_all => true)
+      @section = @course.course_sections.create!(:name => 'section 2')
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+      @section.enroll_user(@user2, 'StudentEnrollment', 'active')
+      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+      @course.enroll_student(@user1).update_attribute(:workflow_state, 'active')
+
+      # enroll a section-limited TA
+      @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
+      ta_enrollment = @course.enroll_ta(@ta)
+      ta_enrollment.limit_privileges_to_course_section = true
+      ta_enrollment.workflow_state = 'active'
+      ta_enrollment.save!
+
+      # make a submission in each section
+      @assignment = @course.assignments.create(:title => "some assignment", :submission_types => ['online_text_entry'])
+      @assignment.submit_homework @user1, :submission_type => "online_text_entry", :body => "o hai"
+      @assignment.submit_homework @user2, :submission_type => "online_text_entry", :body => "haldo"
+      @assignment.reload
+
+      # check the teacher sees both, the TA sees one
+      @assignment.needs_grading_count_for_user(@teacher).should eql(2)
+      @assignment.needs_grading_count_for_user(@ta).should eql(1)
+
+      # grade an assignment
+      @assignment.grade_student(@user1, :grade => "1")
+      @assignment.reload
+
+      # check that the numbers changed
+      @assignment.needs_grading_count_for_user(@teacher).should eql(1)
+      @assignment.needs_grading_count_for_user(@ta).should eql(0)
+
+      # test limited enrollment in multiple sections
+      @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section,
+                          :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
+      @assignment.reload
+      @assignment.needs_grading_count_for_user(@ta).should eql(1)
+    end
   end
 
   it "should preserve pass/fail with zero points possible" do
@@ -352,18 +417,210 @@ describe Assignment do
     end
   end
 
-  it "should treat 11:59pm as an all_day" do
-    assignment_model(:due_at => "Sep 4 2008 11:59pm")
-    @assignment.all_day.should eql(true)
-    @assignment.due_at.strftime("%H:%M").should eql("23:59")
-    @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
+  describe "all_day and all_day_date from due_at" do
+    def fancy_midnight(opts={})
+      zone = opts[:zone] || Time.zone
+      Time.use_zone(zone) do
+        time = opts[:time] || Time.zone.now
+        time.in_time_zone.midnight + 1.day - 1.minute
+      end
+    end
+
+    before :each do
+      @assignment = assignment_model
+    end
+
+    it "should interpret 11:59pm as all day with no prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should interpret 11:59pm as all day with same-tz all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.day
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should interpret 11:59pm as all day with other-tz all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Baghdad')
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should interpret 11:59pm as all day with non-all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should not interpret non-11:59pm as all day no prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should not interpret non-11:59pm as all day with same-tz all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should not interpret non-11:59pm as all day with other-tz all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Baghdad')
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should not interpret non-11:59pm as all day with non-all-day prior value" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 2.hour
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should preserve all-day when only changing time zone" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.all_day.should == true
+    end
+
+    it "should preserve non-all-day when only changing time zone" do
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @assignment.save!
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska')
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day.should == false
+    end
+
+    it "should determine date from due_at's timezone" do
+      @assignment.due_at = Date.today.in_time_zone('Baghdad') + 1.hour # 01:00:00 AST +03:00 today
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.all_day_date.should == Date.today
+
+      @assignment.due_at = @assignment.due_at.in_time_zone('Alaska') - 2.hours # 12:00:00 AKDT -08:00 previous day
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day_date.should == Date.today - 1.day
+    end
+
+    it "should preserve all-day date when only changing time zone" do
+      @assignment.due_at = Date.today.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.due_at = @assignment.due_at.in_time_zone('Alaska') # 13:00:00 AKDT -08:00 previous day
+      @assignment.time_zone_edited = 'Alaska'
+      @assignment.save!
+      @assignment.all_day_date.should == Date.today
+    end
+
+    it "should preserve non-all-day date when only changing time zone" do
+      @assignment.due_at = Date.today.in_time_zone('Alaska') - 11.hours # 13:00:00 AKDT -08:00 previous day
+      @assignment.save!
+      @assignment.due_at = @assignment.due_at.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
+      @assignment.time_zone_edited = 'Baghdad'
+      @assignment.save!
+      @assignment.all_day_date.should == Date.today - 1.day
+    end
   end
 
-  it "should not be set to all_day if a time is specified" do
-    assignment_model(:due_at => "Sep 4 2008 11:58pm")
-    @assignment.all_day.should eql(false)
-    @assignment.due_at.strftime("%H:%M").should eql("23:58")
-    @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
+  it "should destroy group overrides when the group category changes" do
+    @assignment = assignment_model
+    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.save!
+
+    overrides = 5.times.map do
+      override = @assignment.assignment_overrides.build
+      override.set = @assignment.group_category.groups.create!
+      override.save!
+
+      override.workflow_state.should == 'active'
+      override
+    end
+
+    @assignment.group_category = @assignment.context.group_categories.create!
+    @assignment.save!
+
+    overrides.each do |override|
+      override.reload
+
+      override.workflow_state.should == 'deleted'
+      override.versions.size.should == 2
+      override.assignment_version.should == @assignment.version_number
+    end
+  end
+
+  it "should respond to #overridden_for(user)" do
+    student_in_course
+    @assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
+
+    @override = assignment_override_model(:assignment => @assignment)
+    @override.override_due_at(7.days.from_now)
+    @override.save!
+
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+
+    @overridden = @assignment.overridden_for(@student)
+    @overridden.due_at.should == @override.due_at
+  end
+
+  describe "#overrides_visible_to(user)" do
+    before :each do
+      @assignment = assignment_model
+      @override = assignment_override_model(:assignment => @assignment)
+      @override.set = @course.default_section
+      @override.save!
+    end
+
+    it "should delegate to visible_to on the active overrides by default" do
+      @expected_value = Object.new
+      @assignment.active_assignment_overrides.expects(:visible_to).with(@teacher, @course).returns(@expected_value)
+      @assignment.overrides_visible_to(@teacher).should == @expected_value
+    end
+
+    it "should allow overriding the scope" do
+      @override.destroy
+      @assignment.overrides_visible_to(@teacher).should be_empty
+      @assignment.overrides_visible_to(@teacher, @assignment.assignment_overrides).should == [@override]
+    end
+
+    it "should skip the visible_to application if the scope is already empty" do
+      @override.destroy
+      @assignment.active_assignment_overrides.expects(:visible_to).times(0)
+      @assignment.overrides_visible_to(@teacher)
+    end
+
+    it "should return a scope" do
+      # can't use "should respond_to", because that delegates to the instantiated Array
+      lambda{ @assignment.overrides_visible_to(@teacher).scoped({}) }.should_not raise_exception
+    end
   end
 
   context "concurrent inserts" do
@@ -1861,7 +2118,7 @@ describe Assignment do
       @submission = @assignment.submissions.first
       @comment = @submission.add_comment(:comment => 'comment')
       json = @assignment.speed_grader_json(@user)
-      json[:submissions].first[:submission_comments].first[:created_at].should == @comment.created_at
+      json[:submissions].first[:submission_comments].first[:created_at].to_i.should eql @comment.created_at.to_i
     end
   end
 end

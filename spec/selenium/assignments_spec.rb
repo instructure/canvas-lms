@@ -92,7 +92,7 @@ describe "assignments" do
           expect_new_page_load { submit_form('#edit_assignment_form') }
         else
           f('#external_tool_create_url').send_keys(lti_url)
-          submit_dialog('#select_context_content_dialog', '.add_item_button')
+          submit_dialog('.ui-dialog-buttonset', '.add_item_button')
           expect_new_page_load { submit_form('#edit_assignment_form') }
         end
         f('.assignment_list').should include_text(assignment_title)
@@ -184,6 +184,7 @@ describe "assignments" do
     it "should allow creating a quiz assignment from 'more options'" do
       get "/courses/#{@course.id}/assignments"
 
+      driver.execute_script %{$('.assignment_group .add_assignment_link:first').addClass('focus');}
       f(".assignment_group .add_assignment_link").click
       form = f("#add_assignment_form")
       form.find_element(:css, ".assignment_submission_types option[value='online_quiz']").click
@@ -239,7 +240,7 @@ describe "assignments" do
       #save changes
       submit_form(form)
       wait_for_ajaximations
-      ff('.loading_image_holder').length.should eql 0
+      ff('.loading_image_holder').length.should == 0
       f('h2.title').should include_text(assignment_name + ' edit')
     end
 
@@ -284,7 +285,7 @@ describe "assignments" do
         #save changes
         submit_form('#edit_assignment_form')
         wait_for_ajaximations
-        ff('.loading_image_holder').length.should eql 0
+        ff('.loading_image_holder').length.should == 0
         f('h2.title').should include_text(orig_title + ' edit')
       end
 
@@ -331,16 +332,16 @@ describe "assignments" do
 
       wait_for_animations
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      errorBoxes.size.should eql 2
+      errorBoxes.size.should == 2
       errorBoxes.first.should_not be_displayed # .text just gives us an empty string since it's hidden
-      errorBoxes.last.text.should eql "There were errors on one or more advanced options"
+      errorBoxes.last.text.should == "There were errors on one or more advanced options"
       errorBoxes.last.should be_displayed
 
       f('a.more_options_link').click
       wait_for_animations
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      errorBoxes.size.should eql 1 # the more_options_link one has now been removed from the DOM
-      errorBoxes.first.text.should eql "The assignment shouldn't be locked again until after the due date"
+      errorBoxes.size.should == 1 # the more_options_link one has now been removed from the DOM
+      errorBoxes.first.text.should == "The assignment shouldn't be locked again until after the due date"
       errorBoxes.first.should be_displayed
     end
   end
