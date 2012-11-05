@@ -7,6 +7,7 @@
  * @website: http://www.datejs.com/
  */
  
+define(['vendor/date-js/globalization/en-US'], function() {
 (function () {
     var $D = Date, 
         $P = $D.prototype, 
@@ -868,3 +869,4 @@
         ) : this._toString();
     };
 }());    
+});

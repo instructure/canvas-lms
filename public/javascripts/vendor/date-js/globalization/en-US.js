@@ -1,3 +1,4 @@
+define([], function() {
 Date.CultureInfo = {
 	/* Culture Name */
     name: "en-US",
@@ -131,6 +132,7 @@ Date.CultureInfo = {
 
 	timezones: [{name:"UTC", offset:"-000"}, {name:"GMT", offset:"-000"}, {name:"EST", offset:"-0500"}, {name:"EDT", offset:"-0400"}, {name:"CST", offset:"-0600"}, {name:"CDT", offset:"-0500"}, {name:"MST", offset:"-0700"}, {name:"MDT", offset:"-0600"}, {name:"PST", offset:"-0800"}, {name:"PDT", offset:"-0700"}]
 };
+});
 
 /********************
  ** Future Strings **
