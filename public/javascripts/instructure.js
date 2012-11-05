@@ -49,6 +49,8 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'compiled/behaviors/trackEvent',
+  'compiled/badge_counts',
+  'vendor/scribd.view' /* scribd */,
   'vendor/jquery.placeholder'
 ], function(INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
 

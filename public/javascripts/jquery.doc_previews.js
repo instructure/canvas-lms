@@ -20,12 +20,13 @@ define([
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
   'underscore',
+  'vendor/scribd.view' /* scribd */,
   'str/htmlEscape' /* htmlEscape, /\$\.h/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.google-analytics' /* trackEvent */,
   'jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */,
   'jquery.loadingImg' /* loadingImage */
-], function(INST, I18n, $, _, htmlEscape) {
+], function(INST, I18n, $, _, scribd, htmlEscape) {
 
   // first element in array is if scribd can handle it, second is if google can.
   var previewableMimeTypes = {
@@ -74,6 +75,9 @@ define([
   };
 
   $.fn.loadDocPreview = function(options) {
+    // if it is a scribd doc and flash is available
+    var flashVersion = swfobject.getFlashPlayerVersion(),
+        hasGoodEnoughFlash = flashVersion && flashVersion.major > 9;
 
     return this.each(function(){
       var $this = $(this),
@@ -90,13 +94,6 @@ define([
         }
       }
 
-      function makeOnLoadHandler(serviceToUse){
-        return function(){
-          tellAppIViewedThisInline(serviceToUse);
-          if ($.isFunction(opts.ready)) opts.ready();
-        }
-      }
-
       if (!INST.disableCrocodocPreviews && opts.crocodoc_session_url) {
         var iframe = $('<iframe/>', {
             src: opts.crocodoc_session_url,
@@ -104,39 +101,45 @@ define([
             height: opts.height
         });
         iframe.appendTo($this);
-        iframe.load(makeOnLoadHandler('crocodoc'));
-
-      } else if (!INST.disableScribdPreviews && opts.scribd_doc_id && opts.scribd_access_key) {
-
-        // see http://www.scribd.com/developers/api?method_name=Javascript+API for an explaination of these options
-        var scribdParams = $.extend({
+        iframe.load(function() {
+          tellAppIViewedThisInline('crocodoc');
+          if ($.isFunction(opts.ready))
+            opts.ready();
+        });
+      }
+      else if (!INST.disableScribdPreviews && opts.scribd_doc_id && opts.scribd_access_key && hasGoodEnoughFlash && scribd) {
+        var scribdDoc = scribd.Document.getDoc( opts.scribd_doc_id, opts.scribd_access_key ),
+            id = $this.attr('id'),
+            // see http://www.scribd.com/developers/api?method_name=Javascript+API for an explaination of these options
+            scribdParams = $.extend({
+              'jsapi_version': 1,
+              'disable_related_docs': true, //Disables the related documents tab in List Mode.
               'auto_size' : false, //When false, this parameter forces Scribd Reader to use the provided width and height rather than using a width multiplier of 85/110.
-              'height' : opts.height
+              'height' : opts.height,
+              'use_ssl' : 'https:' == document.location.protocol
             }, opts.scribdParams);
 
-        var scribdIframeUrl = '//www.scribd.com/embeds/' + opts.scribd_doc_id + '/content?' + $.param({
-          start_page: 1,
-          view_mode: 'list',
-          access_key: opts.scribd_access_key
-        });
-        var el = $('<iframe class="scribd_iframe_embed" src="' + scribdIframeUrl + '" height="' + scribdParams.height  + '" data-auto-height="' + scribdParams.auto_size + '" width="100%" />')
-          .appendTo($this)
-          .load(makeOnLoadHandler('scribd'))[0];
-
-        // START COPIED SNIPPITT STRAIGHT FROM: http://www.scribd.com/javascripts/embed_code/inject.js
-        // Set the height for auto-height elements
-        if (el.getAttribute('data-auto-height') === 'true' && el.getAttribute('data-auto-resized') !== 'true') {
-            var aspect_ratio = 1 / el.getAttribute('data-aspect-ratio');
-            if (aspect_ratio === Infinity) {
-              aspect_ratio = 1;
-            }
-            var height = Math.round(el.clientWidth * aspect_ratio) + 25;
-            el.style.height = height + "px";
-            el.setAttribute('data-auto-resized', 'true');
+        if (!id) {
+          id = _.uniqueId("scribd_preview_");
+          $this.attr('id', id);
         }
-        // END COPIED SNIPPETT
+        $.each(scribdParams, function(key, value){
+          scribdDoc.addParam(key, value);
+        });
+        if ($.isFunction(opts.ready)) {
+          scribdDoc.addEventListener('iPaperReady', opts.ready);
+        }
+        scribdDoc.write( id );
 
-      } else if (!INST.disableGooglePreviews && (!opts.mimetype || $.isPreviewable(opts.mimetype, 'google')) && opts.attachment_id || opts.public_url){
+        // this is a hack so that the <embed> doesn't throw a bunch of these errors after it is .remove()d:
+        // Uncaught TypeError: Object #<HTMLEmbedElement> has no method 'keyboardShortcut(Up/Down)'
+        // They come from the actionscript running in their viewer:
+        // see: http://dragstudio.com/app/ScribdViewer/javascript/_-0j.as
+        // and http://groups.google.com/group/scribd-platform-developers/msg/46a4f12db73d02d8
+        this.childNodes[0].keyboardShortcutDown = this.childNodes[0].keyboardShortcutUp = function(){};
+
+        tellAppIViewedThisInline('scribd');
+      } else if (!INST.disableGooglePreviews && (!opts.mimeType || $.isPreviewable(opts.mimeType, 'google')) && opts.attachment_id || opts.public_url){
         // else if it's something google docs preview can handle and we can get a public url to this document.
         function loadGooglePreview(){
           // this handles both ssl and plain http.
@@ -146,7 +149,12 @@ define([
           });
           $('<iframe src="' + googleDocPreviewUrl + '" height="' + opts.height  + '" width="100%" />')
             .appendTo($this)
-            .load(makeOnLoadHandler('google'));
+            .load(function(){
+              tellAppIViewedThisInline('google');
+              if ($.isFunction(opts.ready)) {
+                opts.ready();
+              }
+            });
         }
         if (opts.public_url) {
           loadGooglePreview()

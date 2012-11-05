@@ -1,8 +1,8 @@
 /**
  * Copyright (C) 2011 Instructure, Inc.
- *
+ * 
  * This file is part of Canvas.
- *
+ * 
  * Canvas is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation, version 3 of the License.
@@ -20,10 +20,11 @@ define([
   'require',
   'compiled/editor/stocktiny',
   'jquery',
+  'vendor/scribd.view',
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
-  'jquery.instructure_misc_plugins'
-], function(require, tinymce, $) {
+  'jquery.instructure_misc_plugins',
+], function(require, tinymce, $, scribd) {
 
   var lastLookup = null;
 
@@ -92,7 +93,7 @@ define([
                 .append("<div class='actions'></div><div class='clear'></div>")
                 .append("<div class='disable_enhancement' style='display: none;'><input type='checkbox' class='disable_inline_content' id='disable_inline_content'/><label for='disable_inline_content'> Disable inline previews for this link</label></div>")
                 .append("<div class='auto_show' style='display: none;'><input type='checkbox' class='auto_show_inline_content' id='auto_show_inline_content'/><label for='auto_show_inline_content'> Auto-open the inline preview for this link</label></div>");
-
+            
             $box.find(".disable_inline_content").change(function() {
               if($(this).attr('checked')) {
                 $box.find(".auto_show_inline_content").attr('checked', false);
@@ -156,7 +157,7 @@ define([
               }
               var hideDisableEnhancement = !$box.hasClass('for_inline_content');
               var hideShowInline = !$box.hasClass('for_inline_content_can_auto_show');
-
+              
               if(val.match(/\.(gif|png|jpg|jpeg)$/)) {
                 var $div = $(document.createElement('div'));
                 $div.css('textAlign', 'center');
@@ -343,8 +344,8 @@ define([
             $frame.attr('src', $holder.attr('rel'));
             $frame.attr('style', $holder.attr('_iframe_style'));
             $frame.height($holder.attr('height') || $holder.css('height')); //attr('_iframe_height'));
-            if($holder.hasClass('fullWidth')) {
-              $holder.attr('width', '100%');
+            if($holder.hasClass('fullWidth')) { 
+              $holder.attr('width', '100%'); 
               $holder.css('width', '100%');
             }
             $frame.css('width', $holder.attr('width') || $holder.css('width')); //width($holder.attr('_iframe_width'));
@@ -354,7 +355,7 @@ define([
         });
         ed.onChange.add(function() {updateLinks();});
         ed.onSetContent.add(function() {updateLinks("contentJustSet");});
-
+        
         ed.onNodeChange.add(function(ed, cm, e) {
           while(e.nodeName != 'A' && e.nodeName != 'BODY' && e.parentNode) {
             e = e.parentNode;
@@ -373,7 +374,7 @@ define([
         };
       }
     });
-
+    
     // Register plugin
     tinymce.PluginManager.add('instructure_links', tinymce.plugins.InstructureLinks);
   });

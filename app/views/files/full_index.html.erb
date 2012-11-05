@@ -1,7 +1,7 @@
-<%
+<% 
   content_for :page_title, join_title(t(:page_title, "Files"), @context && @context.name)
   jammit_css :full_files, :tinymce
-  js_bundle :full_files
+  js_bundle :full_files 
   showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]
 %>
 <div id="file_uploads" style="display: none;">
@@ -165,7 +165,7 @@
   </li>
   <li id="file_panel" class="content_panel">
     <div class="header">
-      <a href="#" class="display_name download_item_link">&nbsp;</a>
+      <a href="#" class="display_name download_item_link">&nbsp;</a> 
       <span class="display_name cant_download">&nbsp;</span>
       <span class="readable_size">&nbsp;</span>
       <div class="breadcrumb">
@@ -432,14 +432,14 @@ HEREDOC
     <table style="margin-top: 10px;">
       <tr>
         <td style="vertical-align: top;">
-          <%= f.check_box :just_hide %>
+          <%= f.check_box :just_hide %> 
         </td><td colspan="2" style="padding-bottom: 10px; 10px; font-size: 0.8em;">
           <%= f.label :just_hide, :just_hide_file, :en => "Let students download or view the file if I link to it, just don't show it in the file listings for students" %>
         </td>
       </tr>
       <tr class="full_lock">
         <td style="padding-bottom: 10px;">
-          <%= f.check_box :locked, :class => 'lock_checkbox' %>
+          <%= f.check_box :locked, :class => 'lock_checkbox' %> 
         </td><td colspan="2" style="padding-bottom: 10px;">
           <%= f.label :locked, :en => "Lock until I manually unlock it" %>
         </td>
@@ -471,14 +471,14 @@ HEREDOC
     <table style="margin-top: 10px;">
       <tr>
         <td style="vertical-align: top;">
-          <%= f.check_box :just_hide %>
+          <%= f.check_box :just_hide %> 
         </td><td colspan="2" style="padding-bottom: 10px; font-size: 0.8em;">
           <%= f.label :just_hide, :just_hide_folder, :en => "Let students download or view files in this folder if I link to them, just don't show it in the file listings for students" %>
         </td>
       </tr>
       <tr class="full_lock">
         <td style="padding-bottom: 10px;">
-          <%= f.check_box :locked, :class => 'lock_checkbox' %>
+          <%= f.check_box :locked, :class => 'lock_checkbox' %> 
         </td><td colspan="2" style="padding-bottom: 10px;">
           <%= f.label :locked, :en => "Lock until I manually unlock it" %>
         </td>
@@ -513,7 +513,8 @@ require([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jqueryui/dialog',
-  'jqueryui/progressbar' /* /\.progressbar/ */
+  'jqueryui/progressbar' /* /\.progressbar/ */,
+  'vendor/scribd.view' /* scribd */
 ], function(INST, I18n, $) {
 
 window.contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
@@ -535,7 +536,7 @@ INST.downloadFolderFiles = function(url) {
     $.ajaxJSON(url, 'GET', {}, function(data) {
       if(data && data.attachment) {
         var attachment = data.attachment;
-        if(attachment.workflow_state == 'zipped') {
+        if(attachment.workflow_state == 'zipped') { 
           $("#download_folder_files_dialog .progress").progressbar('value', 100);
           var html = <%= jt('#files.messages.zip_finished', "Finished!  Redirecting to File...") %>;
           html += "<br/><a href='" + url +"'><b>";

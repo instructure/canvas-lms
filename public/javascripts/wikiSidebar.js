@@ -32,7 +32,8 @@ define([
   'tinymce.editor_box',
   'vendor/jquery.pageless' /* pageless */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
-  'jqueryui/tabs' /* /\.tabs/ */
+  'jqueryui/tabs' /* /\.tabs/ */,
+  'vendor/scribd.view' /* scribd */
 ], function(I18n, $, htmlEscape, collectionItem) {
 
   var $editor_tabs,
