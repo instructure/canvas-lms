@@ -281,9 +281,8 @@ describe AssignmentOverrideApplicator do
 
       it "should include now-deleted overrides that weren't deleted yet as of the assignment version" do
         @override = assignment_override_model(:assignment => @assignment)
-        @override_student = @override.assignment_override_students.build
-        @override_student.user = @student
-        @override_student.save!
+        @override.set = @course.default_section
+        @override.save!
 
         @assignment.due_at = 3.days.from_now
         @assignment.save!

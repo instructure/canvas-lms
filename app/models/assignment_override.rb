@@ -60,8 +60,11 @@ class AssignmentOverride < ActiveRecord::Base
 
   alias_method :destroy!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
-    self.save!
+    transaction do
+      self.assignment_override_students.destroy_all
+      self.workflow_state = 'deleted'
+      self.save!
+    end
   end
 
   named_scope :active, :conditions => { :workflow_state => 'active' }

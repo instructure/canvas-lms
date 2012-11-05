@@ -52,6 +52,39 @@ describe AssignmentOverride do
     @override.set.should == [@student]
   end
 
+  it "should remove adhoc associations when an adhoc override is deleted" do
+    student_in_course
+    @override = assignment_override_model(:course => @course)
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+
+    @override.destroy
+    @override.reload
+
+    @override.set.should == []
+  end
+
+  it "should allow reusing students from a deleted adhoc override" do
+    student_in_course
+    @override = assignment_override_model(:course => @course)
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+
+    @override.destroy
+    @override2 = assignment_override_model(:assignment => @assignment)
+    @override_student2 = @override2.assignment_override_students.build
+    @override_student2.user = @student
+
+    @override_student2.should be_valid
+    @override2.should be_valid
+
+    lambda{ @override_student2.save! }.should_not raise_error
+    @override2.reload
+    @override2.set.should == [@student]
+  end
+
   it "should be versioned" do
     @override = assignment_override_model
     @override.should respond_to :version_number
