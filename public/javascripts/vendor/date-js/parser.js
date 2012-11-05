@@ -509,6 +509,8 @@
                 var n = s.replace(/[^\d\+\-]/g, "");
                 if (n.length) { 
                     this.timezoneOffset = Number(n); 
+                } else if(s == 'Z') {
+                    this.timezoneOffset = 0;
                 } else { 
                     this.timezone = s.toLowerCase(); 
                 }
@@ -606,7 +608,7 @@
 
             if (this.timezone) { 
                 r.set({ timezone: this.timezone }); 
-            } else if (this.timezoneOffset) { 
+            } else if (this.timezoneOffset != null) { 
                 r.set({ timezoneOffset: this.timezoneOffset }); 
             }
             
@@ -782,6 +784,7 @@
     g.zz = _.cache(_.process(_.rtoken(/^((\+|\-)\s*\d\d\d\d)|((\+|\-)\d\d\:?\d\d)/), t.timezone));
     
     g.zzz = _.cache(_.process(g.ctoken2("timezone"), t.timezone));
+    g.Z = _.cache(_.process(_.stoken('Z'), t.timezone));
     g.timeSuffix = _.each(_.ignore(g.whiteSpace), _.set([ g.tt, g.zzz ]));
     g.time = _.each(_.optional(_.ignore(_.stoken("T"))), g.hms, g.timeSuffix);
     	  
@@ -865,7 +868,7 @@
         _.any(
         // translate format specifiers into grammar rules
         _.process(
-        _.rtoken(/^(dd?d?d?|MM?M?M?|yy?y?y?|hh?|HH?|mm?|ss?|tt?|zz?z?)/), 
+        _.rtoken(/^(dd?d?d?|MM?M?M?|yy?y?y?|hh?|HH?|mm?|ss?|tt?|zz?z?|Z)/), 
         function (fmt) { 
         if (g[fmt]) { 
             return g[fmt]; 
@@ -876,7 +879,7 @@
     ),
     // translate separator tokens into token rules
     _.process(
-    _.rtoken(/^[^dMyhHmstz]+/), // all legal separators 
+    _.rtoken(/^[^dMyhHmstzZ]+/), // all legal separators 
         function (s) { 
             return _.ignore(_.stoken(s)); 
         } 

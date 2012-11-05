@@ -531,7 +531,7 @@
             this.setTimezone(config.timezone); 
         }
         
-        if (config.timezoneOffset) { 
+        if (config.timezoneOffset != null) { 
             this.setTimezoneOffset(config.timezoneOffset); 
         }
 
@@ -618,8 +618,9 @@
     };
 
     $P.setTimezoneOffset = function (offset) {
-        var here = this.getTimezoneOffset(), there = Number(offset) * -6 / 10;
-        return this.addMinutes(there - here); 
+        offset = Number(offset);
+        offset = -(Math.floor(offset / 100) * 60 + (offset % 100 + 60) % 60);
+        return this.addMinutes(offset - this.getTimezoneOffset());
     };
 
     $P.setTimezone = function (offset) { 
@@ -647,7 +648,11 @@
      * @return {String} The 4-character offset string prefixed with + or - (e.g. "-0500")
      */
     $P.getUTCOffset = function () {
-        var n = this.getTimezoneOffset() * -10 / 6, r;
+        var offset = this.getTimezoneOffset(),
+            minutes = offset % 60,
+            hours = (offset - minutes) / 60,
+            n = -(hours * 100 + minutes),
+            r;
         if (n < 0) { 
             r = (n - 10000).toString(); 
             return r.charAt(0) + r.substr(2); 
