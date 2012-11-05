@@ -10,6 +10,7 @@
   end
 %>
 <% cache(['assignment_render',
+          context,
           assignment,
           Time.zone.utc_offset].cache_key,
          :expires_in => (tomorrow_at_midnight - Time.zone.now).to_i) do %>
