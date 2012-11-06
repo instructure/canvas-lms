@@ -109,9 +109,10 @@ define [
       useDir = if dir then dir else @directories[0]
       useDir.clearSelection() if useDir and !selectedModel
 
-      # remove all directories after the selected dir
+      # remove all directories after the selected dir from @directories and the view
       i = _.indexOf @directories, useDir
-      _.each @directories.splice(i + 1), (d) -> d.remove()
+      dirsToRemove = @directories.splice(i + 1, @directories.length - (i + 1))
+      _.each dirsToRemove, (d) -> d.remove()
       isAddingDir = selectedModel instanceof OutcomeGroup and !selectedModel.isNew()
       @addDirFor selectedModel if isAddingDir
       @updateSidebarWidth()
