@@ -1,0 +1,5 @@
+stylesheets:
+  first_plugin:
+    - public/stylesheets/compiled/first_plugin.css
+  first_plugin_alt:
+    - public/stylesheets/compiled/first_plugin_alt.css
