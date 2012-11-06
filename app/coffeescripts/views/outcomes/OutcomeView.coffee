@@ -40,14 +40,14 @@ define [
 
     validations: _.extend
       mastery_points: (data) ->
-        if _.isEmpty(data.mastery_points) or parseInt(data.mastery_points) < 0
+        if _.isEmpty(data.mastery_points) or parseFloat(data.mastery_points) < 0
           I18n.t('mastery_error', 'Must be greater than or equal to 0')
     , OutcomeContentBase::validations
 
     # Validate before submitting.
     submit: (e) =>
       # set so handlebars doesn't put in placeholder text
-      points_possible = _.max _.map(_.pluck(@getFormData().ratings, 'points'), (n) -> parseInt n)
+      points_possible = _.max _.map(_.pluck(@getFormData().ratings, 'points'), (n) -> parseFloat n)
       @model.set {points_possible: points_possible}, silent: true
       super e
 
@@ -82,6 +82,7 @@ define [
       $editWrapper.attr('aria-expanded', false).hide()
       $showWrapper.show()
       $showWrapper.find('.edit_rating').focus()
+      @updateRatings()
 
     insertRating: (e) =>
       e.preventDefault()
@@ -96,13 +97,13 @@ define [
       total = 0
       for r in @$('.rating')
         rating = $(r).find('.outcome_rating_points').val() or 0
-        total = _.max [total, parseInt rating]
+        total = _.max [total, parseFloat rating]
         index = _i
         for i in $(r).find('input')
           # reset indices
           $(i).attr 'name', i.name.replace /\[[0-9]+\]/, "[#{index}]"
       points = @$('.points_possible')
-      points.html points.html().replace /[0-9]+/, total
+      points.html points.html().replace /[0-9/.]+/, total
 
     showRatingDialog: (e) =>
       e.preventDefault()
