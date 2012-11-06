@@ -150,7 +150,7 @@ module Delayed
       end
 
       def payload_object
-        @payload_object ||= deserialize(self['handler'])
+        @payload_object ||= deserialize(self['handler'].untaint)
       end
 
       def name
