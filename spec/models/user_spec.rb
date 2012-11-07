@@ -1600,6 +1600,31 @@ describe User do
       @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :password => 'ghijkl', :password_confirmation => 'ghijkl')
       @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should find a pseudonym in another shard" do
+        @shard1.activate do
+          account = Account.create!
+          user_with_pseudonym(:active_all => 1, :account => account)
+        end
+        @p2 = Account.site_admin.pseudonyms.create!(:user => @user, :unique_id => 'user')
+        @p2.any_instantiation.stubs(:works_for_account?).with(Account.site_admin, false).returns(true)
+        @user.find_pseudonym_for_account(Account.site_admin).should == @p2
+      end
+
+      it "should copy a pseudonym from another shard" do
+        @shard1.activate do
+          account = Account.create!
+          user_with_pseudonym(:active_all => 1, :account => account, :password => 'qwerty')
+        end
+        p = @user.find_or_initialize_pseudonym_for_account(Account.site_admin)
+        p.should be_new_record
+        p.save!
+        p.valid_password?('qwerty').should be_true
+      end
+    end
   end
 
   describe "email_channel" do

@@ -774,7 +774,7 @@ class User < ActiveRecord::Base
   def move_to_user(new_user)
     return unless new_user
     return if new_user == self
-    new_user.save
+    new_user.save if new_user.changed?
     new_user.associate_with_shard(self.shard)
 
     max_position = new_user.communication_channels.last.try(:position) || 0
@@ -2488,7 +2488,12 @@ class User < ActiveRecord::Base
   end
 
   def find_pseudonym_for_account(account, allow_implicit = false)
-    self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
+    # try to find one that's already loaded if possible
+    if self.pseudonyms.loaded?
+      p = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
+      return p if p
+    end
+    self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
   end
 
   # account = the account that you want a pseudonym for
@@ -2499,7 +2504,7 @@ class User < ActiveRecord::Base
     pseudonym = find_pseudonym_for_account(account)
     if !pseudonym
       # list of copyable pseudonyms
-      active_pseudonyms = self.pseudonyms.select { |p| p.active? && !p.password_auto_generated? && !p.account.delegated_authentication? }
+      active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p|!p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
       templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account
@@ -2698,6 +2703,11 @@ class User < ActiveRecord::Base
     self.pseudonyms.with_each_shard(options)
   end
   memoize :all_pseudonyms
+
+  def all_active_pseudonyms(*args)
+    args.unshift(:conditions => {:workflow_state => 'active'})
+    all_pseudonyms(*args)
+  end
 
   def prefers_gradebook2?
     preferences[:use_gradebook2] != false
