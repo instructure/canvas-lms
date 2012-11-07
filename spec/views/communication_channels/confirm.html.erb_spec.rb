@@ -24,6 +24,7 @@ describe "communication_channels/confirm.html.erb" do
     user
     assigns[:user] = @user
     assigns[:communication_channel] = @cc = @communication_channel = @user.communication_channels.create!(:path => 'johndoe@example.com')
+    assigns[:nonce] = @cc.confirmation_code
     assigns[:body_classes] = []
     assigns[:root_account] = Account.default
   end

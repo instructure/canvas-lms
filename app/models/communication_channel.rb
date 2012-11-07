@@ -363,4 +363,13 @@ class CommunicationChannel < ActiveRecord::Base
   def self.associated_shards(path)
     [Shard.default]
   end
+
+  def merge_candidates
+    shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
+    shards ||= [Shard.default]
+    scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
+    Shard.with_each_shard(shards) do
+      scope.find(:all, :conditions => ["user_id<>?", self.user_id], :include => :user).map(&:user)
+    end.uniq.select { |u| u.all_active_pseudonyms.length != 0 }
+  end
 end
