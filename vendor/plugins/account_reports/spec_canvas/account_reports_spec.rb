@@ -29,7 +29,7 @@ describe "Default Account Reports" do
     @student1 = User.create(:name => 'Bilbo Baggins')
     @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
     assignment_model(:course => @course, :title => 'Engrish Assignment')
-    @outcome = @account.learning_outcomes.create!(:short_description => 'Spelling')
+    @outcome = @account.created_learning_outcomes.create!(:short_description => 'Spelling')
     @rubric = Rubric.create!(:context => @course)
     @rubric.data = [
       {
@@ -54,7 +54,7 @@ describe "Default Account Reports" do
 
       }
     ]
-    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.instance_variable_set('@alignments_changed', true)
     @rubric.save!
     @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
     @assignment.reload

@@ -57,11 +57,11 @@ module Canvas::AccountReports
           courses.each do |course|
             course.assignments.each do |assignment|
               submission = student_submissions.detect{|s| s.assignment_id == assignment.id }
-              assignment.learning_outcome_tags.each do |outcome_tag|
-                outcome = outcome_tag.learning_outcome
+              assignment.learning_outcome_alignments.each do |alignment|
+                outcome = alignment.learning_outcome
                 next unless outcome.context == @account
                 outcome_found = true
-                outcome_result = outcome_tag.learning_outcome_results.find_by_user_id(student.id)
+                outcome_result = alignment.learning_outcome_results.find_by_user_id(student.id)
                 arr = []
                 arr << student.sortable_name
                 arr << student.id
