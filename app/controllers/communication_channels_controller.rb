@@ -209,20 +209,29 @@ class CommunicationChannelsController < ApplicationController
       @merge_opportunities.sort! { |a, b| [a.first == @current_user ? 0 : 1, a.first.name] <=> [b.first == @current_user ? 0 : 1, b.first.name] }
 
       if @current_user && params[:confirm].present? && @merge_opportunities.find { |opp| opp.first == @current_user }
-        cc.confirm
-        @enrollment.accept if @enrollment
-        @user.move_to_user(@current_user) if @user != @current_user
-        # create a new pseudonym if necessary and possible
-        pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account)
-        pseudonym.save! if pseudonym && pseudonym.changed?
+        @user.transaction do
+          @current_user.transaction do
+            cc.confirm
+            @enrollment.accept if @enrollment
+            @user.move_to_user(@current_user) if @user != @current_user
+            # create a new pseudonym if necessary and possible
+            pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account)
+            pseudonym.save! if pseudonym && pseudonym.changed?
+          end
+        end
       elsif @current_user && @current_user != @user && @enrollment && @user.registered?
+
         if params[:transfer_enrollment].present?
-          cc.active? || cc.confirm
-          @enrollment.user = @current_user
-          # accept will save it
-          @enrollment.accept
-          @user.touch
-          @current_user.touch
+          @user.transaction do
+            @current_user.transaction do
+              cc.active? || cc.confirm
+              @enrollment.user = @current_user
+              # accept will save it
+              @enrollment.accept
+              @user.touch
+              @current_user.touch
+            end
+          end
         else
           # render
           return
