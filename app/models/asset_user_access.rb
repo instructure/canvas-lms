@@ -33,6 +33,10 @@ class AssetUserAccess < ActiveRecord::Base
   named_scope :for_user, lambda{|user|
     {:conditions => ["asset_user_accesses.user_id = ?", user.id] }
   }
+  named_scope :for_users, lambda{|users|
+    {:conditions => ["asset_user_accesses.user_id IN (?)", users.map(&:id)] }
+  }
+  named_scope :participations, {:conditions => { :action_level => 'participate' }}
   named_scope :most_recent, {:order => 'updated_at DESC'}
   
   def category

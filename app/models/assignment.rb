@@ -276,7 +276,7 @@ class Assignment < ActiveRecord::Base
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
     if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
       # handle if it has already come due, but has not yet been auto_peer_reviewed
-      if due_at && due_at <= Time.now
+      if overdue?
         # do_auto_peer_review
       elsif due_at
         self.send_later_enqueue_args(:do_auto_peer_review, {
@@ -289,7 +289,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def do_auto_peer_review
-    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at && due_at <= Time.now
+    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && overdue?
   end
 
   def touch_assignment_group
@@ -1486,7 +1486,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def overdue?
-    due_at && due_at < Time.now
+    due_at && due_at <= Time.now
   end
 
   def readable_submission_types
