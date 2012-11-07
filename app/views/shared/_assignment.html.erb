@@ -12,6 +12,7 @@
 <% cache(['assignment_render',
           context,
           assignment,
+          @just_viewing_one_course,
           Time.zone.utc_offset].cache_key,
          :expires_in => (tomorrow_at_midnight - Time.zone.now).to_i) do %>
   <% assignment_url = context_url(context, :context_assignment_url, assignment.id || '{{ id }}') %>
