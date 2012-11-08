@@ -563,6 +563,9 @@ describe "gradebook2" do
       # And I upload it
       fj('button:contains("Upload Files")').click
 
+      # And I wait for the upload
+      sleep 1
+
       # Then I should see a message indicating the file was processed
       f('body').should include_text 'Attached files to the following user submissions'
     end
