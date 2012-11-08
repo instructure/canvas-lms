@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -608,7 +608,7 @@ class ApplicationController < ActionController::Base
       @context = @enrollment.course unless @problem
       @current_user = @enrollment.user unless @problem
     elsif pieces[0] == 'group_membership'
-      @membership = GroupMembership.find_by_uuid(pieces[1]) if pieces[1]
+      @membership = GroupMembership.active.find_by_uuid(pieces[1]) if pieces[1]
       @context_type = "Group"
       if !@membership
         @problem = t "#application.errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -543,9 +543,7 @@ class GroupsController < ApplicationController
     @group = @context
     if authorized_action(@group, @current_user, :manage)
       @membership = @group.group_memberships.find_by_user_id(params[:user_id])
-      @membership.group_id = nil
       @membership.destroy
-      @group.touch
       render :json => @membership.to_json
     end
   end
