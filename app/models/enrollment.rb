@@ -174,8 +174,8 @@ class Enrollment < ActiveRecord::Base
     :joins => :course,
     :conditions => ["courses.start_at > ?
                     AND courses.workflow_state = 'available'
-                    AND courses.restrict_enrollments_to_course_dates = TRUE
-                    AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now]
+                    AND courses.restrict_enrollments_to_course_dates = ?
+                    AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now, true]
   } }
 
   named_scope :past,
