@@ -342,7 +342,7 @@ class FilesController < ApplicationController
   # won't be able to access or update data with AJAX requests.
   def safer_domain_available?
     if !@files_domain && request.host_with_port != HostUrl.file_host(@domain_root_account, request.host_with_port)
-      @safer_domain_host = HostUrl.file_host(@domain_root_account, request.host_with_port)
+      @safer_domain_host = HostUrl.file_host_with_shard(@domain_root_account, request.host_with_port)
     end
     !!@safer_domain_host
   end

@@ -1052,40 +1052,47 @@ class ApplicationController < ActionController::Base
   
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host=nil, verifier = nil, download = false) # TODO: generalize this
-    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port)}"
-    ts, sig = @current_user && @current_user.access_verifier
-
-    # add parameters so that the other domain can create a session that 
-    # will authorize file access but not full app access.  We need this in 
-    # case there are relative URLs in the file that point to other pieces 
-    # of content.
-    opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
-    opts[:verifier] = verifier if verifier.present?
-
-    if download
-      # download "for realz, dude" (see later comments about :download)
-      opts[:download_frd] = 1
-    else
-      # don't set :download here, because file_download_url won't like it. see
-      # comment below for why we'd want to set :download
-      opts[:inline] = 1
+  def safe_domain_file_url(attachment, host_and_shard=nil, verifier = nil, download = false) # TODO: generalize this
+    if !host_and_shard
+      host_and_shard = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     end
+    host, shard = host_and_shard
+    res = "#{request.protocol}#{host}"
 
-    if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
-      # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
-      # it, so we're setting :download=>1 *because* we want to display inline.
-      opts[:download] = 1 unless download
+    shard.activate do
+      ts, sig = @current_user && @current_user.access_verifier
 
-      # if the context is one that supports relative paths (which requires extra
-      # routes and stuff), then we'll build an actual named_context_url with the
-      # params for show_relative
-      res += named_context_url(@context, :context_file_url, attachment)
-      res += '/' + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
-      res += '?' + opts.to_query
-    else
-      # otherwise, just redirect to /files/:id
-      res += file_download_url(attachment, opts.merge(:only_path => true))
+      # add parameters so that the other domain can create a session that
+      # will authorize file access but not full app access.  We need this in
+      # case there are relative URLs in the file that point to other pieces
+      # of content.
+      opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
+      opts[:verifier] = verifier if verifier.present?
+
+      if download
+        # download "for realz, dude" (see later comments about :download)
+        opts[:download_frd] = 1
+      else
+        # don't set :download here, because file_download_url won't like it. see
+        # comment below for why we'd want to set :download
+        opts[:inline] = 1
+      end
+
+      if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
+        # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
+        # it, so we're setting :download=>1 *because* we want to display inline.
+        opts[:download] = 1 unless download
+
+        # if the context is one that supports relative paths (which requires extra
+        # routes and stuff), then we'll build an actual named_context_url with the
+        # params for show_relative
+        res += named_context_url(@context, :context_file_url, attachment)
+        res += '/' + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
+        res += '?' + opts.to_query
+      else
+        # otherwise, just redirect to /files/:id
+        res += file_download_url(attachment, opts.merge(:only_path => true))
+      end
     end
 
     res

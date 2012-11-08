@@ -89,7 +89,10 @@ describe ApplicationController do
       @controller.expects(:file_download_url).
         with(@attachment, @common_params.merge(:inline => 1)).
         returns('')
-      @controller.send(:safe_domain_file_url, @attachment)
+      HostUrl.expects(:file_host_with_shard).with(42, '').returns(['myfiles', Shard.default])
+      @controller.instance_variable_set(:@domain_root_account, 42)
+      url = @controller.send(:safe_domain_file_url, @attachment)
+      url.should match /myfiles/
     end
 
     it "should include :download=>1 in inline urls for relative contexts" do

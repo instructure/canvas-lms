@@ -27,7 +27,6 @@ config.to_prepare do
   # Raise an exception on finder type mismatch or nil arguments. Helps us catch
   # these bugs before they hit.
   Canvas.dynamic_finder_nil_arguments_error = :raise
-  Canvas.dynamic_finder_type_cast_error = :raise
 end
 
 # initialize cache store

@@ -963,24 +963,26 @@ class Attachment < ActiveRecord::Base
   end
 
   def cacheable_s3_urls
-    Rails.cache.fetch(['cacheable_s3_urls', self].cache_key, :expires_in => 24.hours) do
-      ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
+    self.shard.activate do
+      Rails.cache.fetch(['cacheable_s3_urls', self].cache_key, :expires_in => 24.hours) do
+        ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
 
-      # response-content-disposition will be url encoded in the depths of
-      # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
-      # quote the filename string, though.
-      quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
+        # response-content-disposition will be url encoded in the depths of
+        # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
+        # quote the filename string, though.
+        quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
 
-      # awesome browsers will use the filename* and get the proper unicode filename,
-      # everyone else will get the sanitized ascii version of the filename
-      quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
-      filename = %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
+        # awesome browsers will use the filename* and get the proper unicode filename,
+        # everyone else will get the sanitized ascii version of the filename
+        quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
+        filename = %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
 
-      # we need to have versions of the url for each content-disposition
-      {
-        'inline' => authenticated_s3_url(:expires_in => 6.days, "response-content-disposition" => "inline; " + filename),
-        'attachment' => authenticated_s3_url(:expires_in => 6.days, "response-content-disposition" => "attachment; " + filename)
-      }
+        # we need to have versions of the url for each content-disposition
+        {
+          'inline' => authenticated_s3_url(:expires_in => 6.days, "response-content-disposition" => "inline; " + filename),
+          'attachment' => authenticated_s3_url(:expires_in => 6.days, "response-content-disposition" => "attachment; " + filename)
+        }
+      end
     end
   end
   protected :cacheable_s3_urls

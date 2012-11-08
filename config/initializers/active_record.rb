@@ -285,28 +285,13 @@ class ActiveRecord::Base
   class << self
     def construct_attributes_from_arguments_with_type_cast(attribute_names, arguments)
       log_dynamic_finder_nil_arguments(attribute_names) if current_scoped_methods.nil? && arguments.flatten.compact.empty?
-      attributes = construct_attributes_from_arguments_without_type_cast(attribute_names, arguments)
-      attributes.each_pair do |attribute, value|
-        next unless column = columns.detect{ |col| col.name == attribute.to_s }
-        next if [value].flatten.compact.empty?
-        cast_value = [value].flatten.map{ |v| v.respond_to?(:quoted_id) ? v : column.type_cast(v) }
-        cast_value = cast_value.first unless value.is_a?(Array)
-        next if [value].flatten.map(&:to_s) == [cast_value].flatten.map(&:to_s)
-        log_dynamic_finder_type_cast(value, column)
-        attributes[attribute] = cast_value
-      end
+      construct_attributes_from_arguments_without_type_cast(attribute_names, arguments)
     end
     alias_method_chain :construct_attributes_from_arguments, :type_cast
 
     def log_dynamic_finder_nil_arguments(attribute_names)
       error = "No non-nil arguments passed to #{self.base_class}.find_by_#{attribute_names.join('_and_')}"
       raise DynamicFinderTypeError, error if Canvas.dynamic_finder_nil_arguments_error == :raise
-      logger.debug "WARNING: " + error
-    end
-
-    def log_dynamic_finder_type_cast(value, column)
-      error = "Cannot cleanly cast #{value.inspect} to #{column.type} (#{self.base_class}\##{column.name})"
-      raise DynamicFinderTypeError, error if Canvas.dynamic_finder_type_cast_error == :raise
       logger.debug "WARNING: " + error
     end
   end

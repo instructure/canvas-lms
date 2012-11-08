@@ -36,7 +36,6 @@ Canvas.protected_attribute_error = :raise
 # Raise an exception on finder type mismatch or nil arguments. Helps us catch
 # these bugs before they hit.
 Canvas.dynamic_finder_nil_arguments_error = :raise
-Canvas.dynamic_finder_type_cast_error = :raise
 
 # eval <env>-local.rb if it exists
 Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
