@@ -3,7 +3,7 @@
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
   <% if @submission && params[:preview] %>
-    <a id="preview_mode_link" href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="button button-sidebar-wide"><%= image_tag "edit.png" %> <%= @quiz.survey? ? t('links.keep_editing_survey', "Keep Editing This Survey") : t('links.keep_editing_quiz', "Keep Editing This Quiz") %></a><br/>
+    <a id="preview_mode_link" href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="btn button-sidebar-wide"><%= image_tag "edit.png" %> <%= @quiz.survey? ? t('links.keep_editing_survey', "Keep Editing This Survey") : t('links.keep_editing_quiz', "Keep Editing This Quiz") %></a><br/>
   <% end %>
   <h3 style="margin: 0px;"><%= t('headers.questions', "Questions") %></h3>
   <ul id="question_list" style="max-height: 200px; overflow: auto;">
@@ -70,7 +70,7 @@
 </div>
 <%= render :partial => "display_question", :collection => @submission.questions_as_object, :locals => {:assessing => true } %>
 <div class="button-container">
-  <button type="submit" class="button submit_button btn-primary"><%= t('buttons.submit_answer', "Submit Answers") %></button>
+  <button type="submit" class="btn submit_button btn-primary"><%= t('buttons.submit_answer', "Submit Answers") %></button>
 </div>
 <% end %>
 </div>
@@ -78,6 +78,6 @@
   <%= before_label(:times_up, "Time's Up!  Submitting results in") %>
   <div style="text-align: center; font-size: 1.2em; margin: 10px;" class="countdown_seconds"></div>
   <div class="button-container">
-    <button type="button" class="submit_quiz_button button"><%= t('buttons.out_of_time_submit', "Ok, fine") %></button>
+    <button type="button" class="submit_quiz_button btn"><%= t('buttons.out_of_time_submit', "Ok, fine") %></button>
   </div>
 </div>

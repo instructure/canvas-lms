@@ -13,38 +13,38 @@
   <div id="course_show_secondary">
     <% if can_do(@context, @current_user, :manage_content) %>
       <div class="rs-margin-lr rs-margin-top rs-margin-bottom">
-        <a href="#" class="button button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>"><%= image_tag "help.png" %> <%= t('links.course_setup', %{Course Setup Checklist}) %></a>
-        <a class="button button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><%= image_tag "add.png" %> <%= t('links.new_announcement', %{New Announcement}) %></a>
+        <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>"><%= image_tag "help.png" %> <%= t('links.course_setup', %{Course Setup Checklist}) %></a>
+        <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><%= image_tag "add.png" %> <%= t('links.new_announcement', %{New Announcement}) %></a>
       </div>
     <% end %>
     <% if @context.available? && @context.self_enrollment && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) && !session["role_course_#{@context.id}"] %>
       <div class="rs-margin-lr rs-margin-top">
-        <a href="#" class="button button-sidebar-wide self_enrollment_link"><%= image_tag "add.png" %> <%= t('links.join_course', %{Join this Course}) %></a>
+        <a href="#" class="btn button-sidebar-wide self_enrollment_link"><%= image_tag "add.png" %> <%= t('links.join_course', %{Join this Course}) %></a>
       </div>
       <div id="self_enrollment_dialog" style="display: none;">
         <h2><%= image_tag "group.png", :style => "vertical-align: middle;" %> <%= t('headings.joining_a_course', %{Joining a Course}) %></h2>
         <%= t('details.joining_a_course', %{Once you join a course you will see it show up in your course list.  You'll be able to participate in graded portions of the course and communicate directly with the teachers and other students.  You'll also see conversations and events from this course show up in your stream and as notifications.}) %>
         <div class="button-container">
-          <a href="<%= course_self_enrollment_path(@context, @context.self_enrollment_code) %>" class="button action"><%= image_tag "add.png" %> <span><%= t('links.join_course', %{Join this Course}) %></span></a>
-          <a href="#" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></a>
+          <a href="<%= course_self_enrollment_path(@context, @context.self_enrollment_code) %>" class="btn action"><%= image_tag "add.png" %> <span><%= t('links.join_course', %{Join this Course}) %></span></a>
+          <a href="#" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></a>
         </div>
       </div>
     <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? && (!session["role_course_#{@context.id}"]) %>
       <div class="rs-margin-lr rs-margin-top">
-        <a href="#" class="button button-sidebar-wide self_unenrollment_link"><%= image_tag "delete_circle.png" %> <%= t('links.drop_course', %{Drop this Course}) %></a>
+        <a href="#" class="btn button-sidebar-wide self_unenrollment_link"><%= image_tag "delete_circle.png" %> <%= t('links.drop_course', %{Drop this Course}) %></a>
       </div>
       <div id="self_unenrollment_dialog" style="display: none;">
         <h2><%= image_tag "warning.png", :style => "vertical-align: middle;" %> <%= t('headings.confirm_unenroll', %{Confirm Unenrollment}) %></h2>
         <%= t('details.confirm_unenroll', %{Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.}) %>
         <div class="button-container">
-          <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="button action"><%= image_tag "delete_circle.png" %> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
-          <a href="#" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></a>
+          <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="btn action"><%= image_tag "delete_circle.png" %> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
+          <a href="#" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></a>
         </div>
       </div>
     <% elsif temp_type = session["role_course_#{@context.id}"] %>
       <div class="rs-margin-lr rs-margin-top">
         <%= image_tag "warning.png" %> <%= t 'acting_as', %{You are currently viewing this course with the role: %{enrollment_type}.  You will only have permissions and access available to users of this role.}, :enrollment_type => content_tag('strong', Enrollment.readable_type(temp_type)) %>
-        <a class="button button-sidebar-wide"><%= image_tag "person.png" %> <%= t('links.restore_role', %{Restore Role and Permissions}) %></a>
+        <a class="btn button-sidebar-wide"><%= image_tag "person.png" %> <%= t('links.restore_role', %{Restore Role and Permissions}) %></a>
       </div>
     <% end %>
     <%= render :partial => 'assignments_needing_grading', :locals => {:contexts => [@context]} %>
@@ -111,7 +111,7 @@ $(document).ready(function() {
     }).fixDialogButtons();
   });
   $("#self_unenrollment_dialog .action").click(function() {
-    $("#self_unenrollment_dialog a.button").attr('disabled', true);
+    $("#self_unenrollment_dialog  a.btn").attr('disabled', true);
     $(this).find("span").text(<%= raw t('dropping_course', "Dropping Course...").to_json %>);
   });
   $("#self_unenrollment_dialog .cancel_button").click(function() {
@@ -123,7 +123,7 @@ $(document).ready(function() {
     });
   });
   $("#self_enrollment_dialog .action").click(function() {
-    $("#self_enrollment_dialog a.button").attr('disabled', true);
+    $("#self_enrollment_dialog  a.btn").attr('disabled', true);
     $(this).find("span").text(<%= raw t('joining_course', "Joining Course...").to_json %>);
   });
   $("#self_enrollment_dialog .cancel_button").click(function() {
@@ -248,8 +248,8 @@ This layout is probably best for courses that aren't based on a specific schedul
       </div>
     </div>
     <div class="button-container">
-      <button type="submit" class="button"><%= t('buttons.update_layout', %{Update Layout}) %></button>
-      <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+      <button type="submit" class="btn"><%= t('buttons.update_layout', %{Update Layout}) %></button>
+      <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
   <% end %>
   <div class="clear"></div>

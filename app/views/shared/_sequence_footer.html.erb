@@ -1,11 +1,11 @@
 <% context ||= @context; asset ||= nil %>
 <% if context && context.is_a?(Course) && asset && @headers != false %>
   <div id="sequence_footer" style="display: none;">
-    <a class="prev button" href="#">
+    <a class="prev btn" href="#">
       <%= image_tag "back.png" %> <span class="text"><%= t(:previous, "Previous") %></span>
       <span class="title ellipsis"></span>
     </a>
-    <a class="next button" href="#">
+    <a class="next btn" href="#">
       <%= image_tag "forward.png" %> <span class="text"><%= t(:next, "Next") %></span>
       <span class="title ellipsis"></span>
     </a>

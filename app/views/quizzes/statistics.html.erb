@@ -166,9 +166,9 @@ tr.question td .number_answer.correct_answer {
       <% end %>
       <div style="margin-top: 5px;">
         <% if @statistics[:multiple_attempts_exist] %>
-          <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="button button-sidebar-wide"><%= t('links.count_only_latest_attempts', "Count Only Each Latest Attempt") %></a>
+          <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><%= t('links.count_only_latest_attempts', "Count Only Each Latest Attempt") %></a>
         <% end %>
-        <a href="<%= context_url(@context, :context_quiz_formatted_statistics_url, @quiz.id, :all_versions => '1', :format => :csv) %>" class="button button-sidebar-wide"><%= image_tag "inst_tree/file_types/page_white_excel.png", :alt => '' %> <%= t('links.download_csv', "Download csv") %></a>
+        <a href="<%= context_url(@context, :context_quiz_formatted_statistics_url, @quiz.id, :all_versions => '1', :format => :csv) %>" class="btn button-sidebar-wide"><%= image_tag "inst_tree/file_types/page_white_excel.png", :alt => '' %> <%= t('links.download_csv', "Download csv") %></a>
       </div>
     <% else %>
       <% if @statistics[:multiple_attempts_exist] %>
@@ -178,9 +178,9 @@ tr.question td .number_answer.correct_answer {
       <% end %>
       <div style="margin-top: 5px;">
         <% if @statistics[:multiple_attempts_exist] %>
-          <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id, :all_versions => '1') %>" class="button button-sidebar-wide"><%= mt('links.count_all_attempts', "Count **All** Attempts") %></a>
+          <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id, :all_versions => '1') %>" class="btn button-sidebar-wide"><%= mt('links.count_all_attempts', "Count **All** Attempts") %></a>
         <% end %>
-        <a href="<%= context_url(@context, :context_quiz_formatted_statistics_url, @quiz.id, :format => :csv) %>" class="button button-sidebar-wide"><%= image_tag "inst_tree/file_types/page_white_excel.png", :alt => '' %> <%= t('links.download_csv', "Download csv") %></a>
+        <a href="<%= context_url(@context, :context_quiz_formatted_statistics_url, @quiz.id, :format => :csv) %>" class="btn button-sidebar-wide"><%= image_tag "inst_tree/file_types/page_white_excel.png", :alt => '' %> <%= t('links.download_csv', "Download csv") %></a>
       </div>
     <% end %>
   </div>

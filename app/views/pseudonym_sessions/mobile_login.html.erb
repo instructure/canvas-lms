@@ -77,7 +77,7 @@
       -webkit-box-sizing: border-box;
     }
 
-    input, button, .button {
+    input, button, .btn{
       display: block;
       border: none;
       border-radius: 10px;
@@ -94,7 +94,7 @@
       display: block;
       font-size: 15px;
     }
-    button, .button {
+    button, .btn{
       text-align: center;
       background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #7ac0f8), color-stop(100%, #2e96e2));
       -webkit-box-shadow: black 0px 0px 2px 0px;
@@ -134,7 +134,7 @@
         <input type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
         <button type="submit"><%= t('login', 'Login') %></button>
         <% if url = params[:canvas_login].blank? && @domain_root_account.try(:forgot_password_external_url) %>
-          <%= link_to t('dont_know_password', "I don't know my password"), url, :class => 'button forgot-password' %>
+          <%= link_to t('dont_know_password', "I don't know my password"), url, :class => 'btn forgot-password' %>
         <% else %>
           <button class="flip-to-back"><%= t('dont_know_password', "I don't know my password") %></button>
         <% end %>

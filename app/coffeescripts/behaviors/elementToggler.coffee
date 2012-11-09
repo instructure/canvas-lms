@@ -22,7 +22,7 @@
 #   into proper dialog buttons (look at fixDialogButtons to see what it does)
 #   <div class="button-container">
 #     <button type="submit">This will Submit the form</button>
-#     <a class="button dialog_closer">This will cause the dialog to close</a>
+#     <a class="btn dialog_closer">This will cause the dialog to close</a>
 #   </div>
 # </form>
 

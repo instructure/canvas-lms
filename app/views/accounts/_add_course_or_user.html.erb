@@ -7,17 +7,16 @@
 <% if show_course || show_user %>
 <div class="rs-margin-all">
   <% if show_course %>
-    <a href="#" class="add_course_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t(:add_course_link, "Add a New Course") %></a>
+    <a href="#" class="add_course_link btn button-sidebar-wide"><%= image_tag "add.png" %> <%= t(:add_course_link, "Add a New Course") %></a>
   <% end %>
   <% if show_user %>
-    <a href="#" class="add_user_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t(:add_user_link, "Add a New User") %></a>
+    <a href="#" class="add_user_link btn button-sidebar-wide"><%= image_tag "add.png" %> <%= t(:add_user_link, "Add a New User") %></a>
   <% end %>
 </div>
 
 <div style="display: none;">
   <div id="current_enrollment_term_id"><%= @term && @term.id %></div>
   <div id="add_user_dialog">
-    <h2><%= t(:add_user_title, "Add a New User") %></h2>
     <% form_for :user, :url => account_add_user_url(@account), :html => {:id => "add_user_form"} do |f| %>
     <table class="formtable">
       <tr>
@@ -66,8 +65,8 @@
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button type="button" class="button cancel_button"><%= t("#buttons.cancel", "Cancel") %></button>
-            <button type="submit" class="button btn-primary submit_button"><%= t(:add_user_button, "Add User") %></button>
+            <button type="button" class="btn cancel_button"><%= t("#buttons.cancel", "Cancel") %></button>
+            <button type="submit" class="btn btn-primary submit_button"><%= t(:add_user_button, "Add User") %></button>
           </div>
         </td>
       </tr>
@@ -75,7 +74,6 @@
     <% end %>
   </div>
   <div id="add_course_dialog">
-    <h2><%= t(:add_course_title, "Add a New Course") %></h2>
     <% form_for :course, :url => courses_url, :html => {:id => "add_course_form"} do |f| %>
     <input type="hidden" name="account_id" value="<%= @account.id %>"/>
     <table class="formtable">
@@ -93,9 +91,9 @@
         <td><%= f.select :enrollment_term_id, @root_account.enrollment_terms.active.map{|t| [t.name, t.id] }, :selected => @term && @term.id %></td>
       </tr><tr>
         <td colspan="2">
-          <div class="button-container"> 
-            <button type="button" class="button dialog_closer"><%= t("#buttons.cancel", "Cancel") %></button>
-            <button type="submit" class="button btn-primary"><%= t(:add_course_button, "Add Course") %></button>
+          <div class="button-container">
+            <button type="button" class="btn dialog_closer"><%= t("#buttons.cancel", "Cancel") %></button>
+            <button type="submit" class="btn btn-primary"><%= t(:add_course_button, "Add Course") %></button>
           </div>
         </td>
       </tr>

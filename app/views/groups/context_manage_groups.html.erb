@@ -2,9 +2,9 @@
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
     <% if @context.is_a?(Course) && !@context.students.empty? || @context.is_a?(Account) %>
-        <a href="#" class="add_category_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'buttons.add_group', 'Make a New Set of Groups' %></a>
+        <a href="#" class="add_category_link btn button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'buttons.add_group', 'Make a New Set of Groups' %></a>
     <% end %>
-    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= @context.is_a?(Account) ? t('#buttons.view_account_roster', 'View Account Roster') : t('#buttons.view_course_roster', 'View Course Roster') %></a>
+    <a href="<%= context_url(@context, :context_users_url) %>" class="btn button-sidebar-wide"><%= image_tag "group.png" %> <%= @context.is_a?(Account) ? t('#buttons.view_account_roster', 'View Account Roster') : t('#buttons.view_course_roster', 'View Course Roster') %></a>
   </div>
   <h2 id="category_header" style="margin-top: 10px;<%= hidden if !@categories || @categories.empty? %>"><%= t :group_pages, "Group Pages" %></h2>
   <div class="rs-margin-lr">
@@ -232,7 +232,7 @@ a.load_members_link, .loading_members {
       <%= f.text_field :max_membership, :style => "width: 25px;" %> users or less
     </div>
     <div class="button-container">
-      <button type="submit" class="button small-button"><%= t '#buttons.update', 'Update' %></button>
+      <button type="submit" class="btn btn-small"><%= t '#buttons.update', 'Update' %></button>
       <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
     </div>
     <div class="clear"></div>

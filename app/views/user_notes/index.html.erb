@@ -16,7 +16,7 @@
 <% if can_do(@user, @current_user, :create_user_notes) %>
   <% content_for :right_side do %>
     <div class="rs-margin-lr rs-margin-top">
-      <a id="new_user_note_button" class="new button button-sidebar-wide" href="#"><%= image_tag "add.png" %>
+      <a id="new_user_note_button" class="new btn button-sidebar-wide" href="#"><%= image_tag "add.png" %>
         <%= t 'links.create_new_entry', "Create a New Entry" %></a>
     </div>
   <% end %>
@@ -49,7 +49,7 @@
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button type="submit" class="button send_button"><%= t 'buttons.create', "Create Entry" %>
+            <button type="submit" class="btn send_button"><%= t 'buttons.create', "Create Entry" %>
             </button>
             <button type="button" class="cancel_button button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
           </div>

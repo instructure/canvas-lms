@@ -452,7 +452,7 @@ module ApplicationHelper
   #
   # Returns an HTML string.
   def sidebar_button(url, label, img = nil)
-    link_to(url, :class => 'button button-sidebar-wide') do
+    link_to(url, :class => 'btn button-sidebar-wide') do
       img ? image_tag(img) + label : label
     end
   end

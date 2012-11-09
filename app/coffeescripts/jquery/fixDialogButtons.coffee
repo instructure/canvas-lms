@@ -8,7 +8,7 @@ define [
   $.fn.fixDialogButtons = ->
     this.each ->
       $dialog = $(this)
-      $buttons = $dialog.find(".button-container:last .button, button[type=submit]")
+      $buttons = $dialog.find(".button-container:last .btn, button[type=submit]")
       if $buttons.length
         $dialog.find(".button-container:last, button[type=submit]").hide()
         buttons = $.map $buttons.toArray(), (button) ->
@@ -35,5 +35,5 @@ define [
           }
         # put the primary button(s) on the far right
         buttons = _.sortBy buttons, (button) ->
-          if button.class.match(/btn-primary|button-default/) then 1 else 0
+          if button.class.match(/btn-primary/) then 1 else 0
         $dialog.dialog "option", "buttons", buttons

@@ -31,7 +31,7 @@
     <%= render :partial => "eportfolios/page_list" %>
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
     <div class="rs-margin-lr edit_content_link_holder">
-      <a href="#" class="edit_content_link button button-sidebar-wide"><%= edit_link_text %></a>
+      <a href="#" class="edit_content_link btn button-sidebar-wide"><%= edit_link_text %></a>
       <a href="<%= eportfolio_path(@portfolio.id) %>" class="back"><%= t('links.back', "Back to Portfolio Dashboard") %></a>
     </div>
     <div id="edit_page_sidebar">
@@ -44,13 +44,13 @@
           <li><a class="add_content_link add_file_link" href="#"><%= t('links.file_uload', "Image/File Upload") %></a></li>
         </ul>
         <div class="form_content button-container">
-          <button type="button" class="submit_button button small-button button-default"><%= t('buttons.save_page', "Save Page") %></button>
-          <button type="button" class="preview_button button small-button"><%= t('buttons.preview', "Preview") %></button>
+          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
+          <button type="button" class="preview_button btn btn-small"><%= t('buttons.preview', "Preview") %></button>
           <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
         </div>
         <div class="preview_content button-container">
-          <button type="button" class="submit_button button small-button button-default"><%= t('buttons.save_page', "Save Page") %></button>
-          <button type="button" class="keep_editing_button button small-button"><%= t('buttons.keep_editing', "Keep Editing") %></button>
+          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
+          <button type="button" class="keep_editing_button btn btn-small"><%= t('buttons.keep_editing', "Keep Editing") %></button>
           <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
         </div>
       </div>
@@ -74,7 +74,7 @@
     <li><a href="#" class="wizard_popup_link help"><%= t('links.wizard', "Getting Started Wizard") %></a></li>
     <li><a href="?view=preview" class="forward"><%= t('links.portfolio', "Go to the Actual ePortfolio") %></a></li>
   </ul>
-  
+
   <% if @portfolio.public %>
     <h3><%= t('headers.public_eportfolio', "Your ePortfolio is Public") %></h3>
     <p><%= t(:public_eportfolio, <<-DETAILS,
@@ -98,7 +98,7 @@
     </b></a>
     </p>
   <% end %>
-  
+
   <h3><%= t('headers.recent_submissions', "Recent Submissions") %></h3>
   <p><%= t(:recent_submissions, "Click any submission to add it to a new page in your ePortfolio.") %></p>
   <% if @portfolio.user.submissions.empty? %>
@@ -187,8 +187,8 @@
       </tr>
     </table>
     <div class="button-container">
-      <button type="button" class="button cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
-      <button type="submit" class="button btn-primary"><%= t('buttons.add_page', "Add Page") %></button>
+      <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="submit" class="btn btn-primary"><%= t('buttons.add_page', "Add Page") %></button>
     </div>
     <div style="display: none;">
       <a class="add_eportfolio_entry_url" href="<%= eportfolio_entries_path(@portfolio.id) %>">&nbsp;</a>
@@ -221,13 +221,13 @@
     </div>
   </div>
   <div class="form_content button-container">
-    <button type="submit" class="button button-default"><%= t('buttons.save_page', "Save Page") %></button>
-    <button type="button" class="preview_button button"><%= t('buttons.preview', "Preview") %></button>
+    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
+    <button type="button" class="preview_button btn"><%= t('buttons.preview', "Preview") %></button>
     <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
   </div>
   <div class="preview_content button-container">
-    <button type="submit" class="button button-default"><%= t('buttons.save_page', "Save Page") %></button>
-    <button type="button" class="keep_editing_button button"><%= t('buttons.keep_editing', "Keep Editing") %></button>
+    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
+    <button type="button" class="keep_editing_button btn"><%= t('buttons.keep_editing', "Keep Editing") %></button>
     <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
   </div>
   <table class="formtable" style="width: 100%; display: none;">
@@ -276,7 +276,7 @@
         <% end %>
       </ul>
       <div class='button-container button-container-right-aligned'>
-        <button type="button" class="select_submission_button button small-button"><%= t('buttons.select_submission', "Select Submission") %></button>
+        <button type="button" class="select_submission_button btn btn-small"><%= t('buttons.select_submission', "Select Submission") %></button>
         <button type="button" class="cancel_content_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
       </div>
     </div>
@@ -294,7 +294,7 @@
         <div style="font-size: 0.8em; margin-left: 20px;"><%= t(:upload_limit, "limit 50MB per file") %></div>
       </div>
       <div class='button-container button-container-right-aligned'>
-        <button type="button" class="upload_file_button button small-button"><%= t('buttons.upload_file', "Select/Upload File") %></button>
+        <button type="button" class="upload_file_button btn btn-small"><%= t('buttons.upload_file', "Select/Upload File") %></button>
         <button type="button" class="cancel_content_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
       </div>
     </div>
@@ -332,8 +332,8 @@
   </tr>
   <tr>
     <td colspan="2" class="button-container">
-      <button class="button dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
-      <button type="submit" class="button btn-primary"><%= t('buttons.update_eportfolio', "Update ePortfolio") %></button>
+      <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="submit" class="btn btn-primary"><%= t('buttons.update_eportfolio', "Update ePortfolio") %></button>
     </td>
   <td>
 </table>
@@ -367,7 +367,7 @@
       <% if @current_user %>
         <%= f.text_area :message, :style => "width: 400px; height: 75px;" %>
         <div class="button-container">
-          <button type="submit" class="button"><%= t('buttons.add_comment', "Add Comment") %></button>
+          <button type="submit" class="btn"><%= t('buttons.add_comment', "Add Comment") %></button>
         </div>
       <% else %>
         <div style="text-align: center; font-size: 1.2em; margin: 10px;">
@@ -400,7 +400,7 @@
         :other => "You currently have %{count} pages in this ePortfolio. Are you sure you want to delete the entire ePortfolio?"
       }, :count => @portfolio.eportfolio_entries.count) %>
     <div class="button-container">
-      <button type="submit" class="button"><%= t('buttons.delete', "Delete ePortfolio") %></button>
+      <button type="submit" class="btn"><%= t('buttons.delete', "Delete ePortfolio") %></button>
       <button type="button" class="button-secondary delete_eportfolio_link"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   <% end %>

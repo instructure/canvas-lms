@@ -46,7 +46,7 @@
           <% if can_do(@submission, @current_user, :add_attempts) %>
             <% form_for :quiz_submission, :url => context_url(@context, :context_quiz_extensions_url, @quiz.id, @submission.user_id), :html => {:method => :post} do |f| %>
               <input type="hidden" name="extra_attempts" value="<%= (@submission.extra_attempts || 0) + 1 %>"/>
-              <button type="submit" class="button"><%= t('buttons.allow_extra_attempt', "allow this student an extra attempt") %></button>
+              <button type="submit" class="btn"><%= t('buttons.allow_extra_attempt', "allow this student an extra attempt") %></button>
             <% end %>
           <% end %>
         <% else %>
@@ -92,7 +92,7 @@
     <%= render :partial => "quizzes/quiz_submission", :locals => {:editable => can_do(@quiz, @current_user, :grade)} %>
     <% if can_do(@quiz, @current_user, :grade) %>
       <div class="button-container">
-        <button type="submit" class="button btn-primary"><%= t('buttons.update_scores', "Update Scores") %></button>
+        <button type="submit" class="btn btn-primary"><%= t('buttons.update_scores', "Update Scores") %></button>
       </div>
     <% end %>
   <% end %>

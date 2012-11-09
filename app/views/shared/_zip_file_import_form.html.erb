@@ -17,8 +17,8 @@
     <%= hidden_field_tag 'return_to', qti_or_content_link %>
   </div>
   <div class="button-container">
-    <button type="submit" class="submit_button button big-button"><%= t 'buttons.upload_file', 'Upload File' %></button>
-    <a class="cancel_button button button-secondary" href="#"><%= t '#buttons.cancel', 'Cancel' %></a>
+    <button type="submit" class="submit_button btn btn-large"><%= t 'buttons.upload_file', 'Upload File' %></button>
+    <a class="cancel_button btn button-secondary" href="#"><%= t '#buttons.cancel', 'Cancel' %></a>
   </div>
   <a href="<%= context_url(@context, :context_zip_file_import_url, "{{ id }}", :format => :json) %>" class="zip_file_import_status_url" style="display: none;">&nbsp;</a>
 <% end %>

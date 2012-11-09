@@ -5,7 +5,7 @@
   <h2><%= image_tag "favicon_large.png", :style => 'vertical-align: middle;' %> <%= t :canvas_messages, "Canvas Messages" %></h2>
   <div style="float: left; padding: 0 5px 5px;"><fb:profile-pic uid='<%= @facebook_user_id %>'/></div>
   <div style="float: right; text-align: right; padding-left: 10px; margin-right: 5px;">
-    <a href="<%= facebook_settings_url %>" class="button"><%= t :notification_settings, "Notification Settings" %></a>
+    <a href="<%= facebook_settings_url %>" class="btn"><%= t :notification_settings, "Notification Settings" %></a>
   </div>
   <span style="font-size: 1.5em;"><%= t :welcome, "Welcome back, %{name}!", :name => @user.name %></span>
   <div style="clear: left; margin-bottom: 5px;"></div>

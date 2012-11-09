@@ -1,10 +1,10 @@
 <% course_home ||= false %>
 <div class="rs-margin-lr <%= 'rs-margin-top' unless course_home %>">
   <% if can_do(@context, @current_user, :manage_content) %>
-  <a href="#" class="button add_module_link button-sidebar-wide"><%= image_tag "add.png" %> <%= t('#context_modules.buttons.add_module', 'Add a New Module') %></a>
+  <a href="#" class="btn add_module_link button-sidebar-wide"><%= image_tag "add.png" %> <%= t('#context_modules.buttons.add_module', 'Add a New Module') %></a>
   <div>
-    <button class="button button-sidebar-wide loading_module_progressions_link disabled" disabled='true' style='display: none;'><%= t('loading_progressions', %{Loading Student Progress...}) %></button>
-    <a href="#" class="button button-sidebar-wide module_progressions_link" style="display: none;"><%= t('links.student_progress', %{View Student Progress for Modules}) %></a>
+    <button class="btn button-sidebar-wide loading_module_progressions_link disabled" disabled='true' style='display: none;'><%= t('loading_progressions', %{Loading Student Progress...}) %></button>
+    <a href="#" class="btn button-sidebar-wide module_progressions_link" style="display: none;"><%= t('links.student_progress', %{View Student Progress for Modules}) %></a>
   </div>
   <% end %>
 </div>

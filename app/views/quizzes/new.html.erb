@@ -222,11 +222,11 @@
           <input type="checkbox" name="quiz[notify_of_update]" id="quiz_notify_of_update" value="1" checked="checked" />
           <label for="quiz_notify_of_update"><%= t('labels.quiz_notify', 'Notify users this quiz has changed') %></label>
         </div>
-        <button type="submit" class="save_quiz_button button"><%= t('buttons.save_settings', "Save Settings") %></button>
-        <button type="submit" class="publish_quiz_button button button-default"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
+        <button type="submit" class="save_quiz_button btn"><%= t('buttons.save_settings', "Save Settings") %></button>
+        <button type="submit" class="publish_quiz_button btn btn-primary"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
         <div style="display: none;">
-        <button type="submit" class="save_quiz_button button" style="height: 50px;"><%= t('buttons.save_but_dont_publish', "Save Quiz *but don't Publish*", :wrapper => '<div style="font-size: 0.7em;">\1</div>') %></button>
-        <button type="submit" class="publish_quiz_button button button-default" style="height: 50px; float: right;"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
+        <button type="submit" class="save_quiz_button btn" style="height: 50px;"><%= t('buttons.save_but_dont_publish', "Save Quiz *but don't Publish*", :wrapper => '<div style="font-size: 0.7em;">\1</div>') %></button>
+        <button type="submit" class="publish_quiz_button btn btn-primary" style="height: 50px; float: right;"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
         </div>
         <% if request.path_parameters['action'] == "new" %>
           <div style="text-align: left;">

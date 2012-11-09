@@ -1180,26 +1180,26 @@ define([
       },
 
       beforeSubmit: function(data) {
-        $(this).find(".button.save_quiz_button").attr('disabled', true);
-        $(this).find(".button.publish_quiz_button").attr('disabled', true);
+        $(this).find(".btn.save_quiz_button").attr('disabled', true);
+        $(this).find(".btn.publish_quiz_button").attr('disabled', true);
         if ($(this).data('activator') == 'publish') {
-          $(this).find(".button.publish_quiz_button").text(I18n.t('buttons.publishing', "Publishing..."));
+          $(this).find(".btn.publish_quiz_button").text(I18n.t('buttons.publishing', "Publishing..."));
         } else {
-          $(this).find(".button.save_quiz_button").text(I18n.t('buttons.saving', "Saving..."));
+          $(this).find(".btn.save_quiz_button").text(I18n.t('buttons.saving', "Saving..."));
         }
       },
 
       success: function(data) {
         var $form = $(this);
-        $(this).find(".button.save_quiz_button").attr('disabled', false);
-        $(this).find(".button.publish_quiz_button").attr('disabled', false);
+        $(this).find(".btn.save_quiz_button").attr('disabled', false);
+        $(this).find(".btn.publish_quiz_button").attr('disabled', false);
         if ($(this).data('activator') == 'publish') {
-          $(this).find(".button.publish_quiz_button").text(I18n.t('buttons.published', "Published!"));
+          $(this).find(".btn.publish_quiz_button").text(I18n.t('buttons.published', "Published!"));
         } else {
-          $(this).find(".button.save_quiz_button").text(I18n.t('buttons.saved', "Saved!"));
+          $(this).find(".btn.save_quiz_button").text(I18n.t('buttons.saved', "Saved!"));
         }
         setTimeout(function() {
-          $form.find(".button.save_quiz_button").text(I18n.t('buttons.save_settings', "Save Settings"));
+          $form.find(".btn.save_quiz_button").text(I18n.t('buttons.save_settings', "Save Settings"));
         }, 2500);
         if (data.quiz.assignment) {
           var assignment = data.quiz.assignment;
@@ -1226,8 +1226,8 @@ define([
     },
     error: function(data) {
       $(this).formErrors(data);
-      $(this).find(".button.save_quiz_button").attr('disabled', false);
-      $(this).find(".button.publish_quiz_button").attr('disabled', false);
+      $(this).find(".btn.save_quiz_button").attr('disabled', false);
+      $(this).find(".btn.publish_quiz_button").attr('disabled', false);
       }
     });
 

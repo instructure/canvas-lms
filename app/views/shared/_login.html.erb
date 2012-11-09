@@ -87,7 +87,7 @@ $(document).ready(function() {
              login_message = t('login_at_account', "Log in at %{school_name}", :school_name => @domain_root_account.display_name)
            end
         %>
-        <a href="<%= login_path %>" style="font-size: 1.3em;" class="button"><%= login_message %></a>
+        <a href="<%= login_path %>" style="font-size: 1.3em;" class="btn"><%= login_message %></a>
       </div>
     <% else %>
       <% form_for :pseudonym_session, :url => login_path(:nonldap => (@domain_root_account && !@domain_root_account.ldap_authentication?).presence), :html => {:id => "login_form"} do |f| %>
@@ -111,7 +111,7 @@ $(document).ready(function() {
           <!-- crazy IE 8-9 workaround!, if you take this input type=submit out, you cannot just submit the form by hitting enter in ie8-9 -->
           <input type="submit" style="position: absolute; height: 0px; width: 0px; border: none; padding: 0px;" hidefocus="true" tabindex="-1" />
 
-          <button type="submit" class="button btn-primary"><%= t('log_in', 'Log In') %></button>
+          <button type="submit" class="btn btn-primary"><%= t('log_in', 'Log In') %></button>
         </div>
       <% end %>
     <% end %>
@@ -121,7 +121,7 @@ $(document).ready(function() {
       <p><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => login_handle_name) %></p>
       <div>
         <span class=" field-with-fancyplaceholder"><label for="pseudonym_session_unique_id_forgot"><%= login_handle_name %></label><input class="email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" /></span>
-        <button type="submit" class="button btn-primary"><%= t('buttons.request_password', 'Request Password') %></button>
+        <button type="submit" class="btn btn-primary"><%= t('buttons.request_password', 'Request Password') %></button>
       </div>
   
       &larr; <%= link_to t('back_to_login', "Back to Login"), login_path, :class => "login_link" %>

@@ -219,7 +219,7 @@ describe "gradebook2" do
 
     dialog = open_comment_dialog
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
-    f("form.submission_details_add_comment_form.clearfix > button.button").click
+    f("form.submission_details_add_comment_form.clearfix > button.btn").click
     wait_for_ajaximations
 
     #make sure it is still there if you reload the page
@@ -252,7 +252,7 @@ describe "gradebook2" do
     dialog = open_comment_dialog(3)
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
     dialog.find_element(:id, "group_comment").click
-    f("form.submission_details_add_comment_form.clearfix > button.button").click
+    f("form.submission_details_add_comment_form.clearfix > button.btn").click
     wait_for_ajaximations
 
     #make sure it's on the other student's submission

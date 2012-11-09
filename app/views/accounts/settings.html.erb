@@ -365,7 +365,7 @@ TEXT
               <tr>
                 <td>&nbsp;</td>
                 <td>
-                  <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link button"><%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %></a>
+                  <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link btn"><%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %></a>
                 </td>
               </tr>
               <tr>
@@ -441,7 +441,7 @@ TEXT
         <% end %>
 
         <div class="button-container">
-          <button type="submit" class="button btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
+          <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
       <% end %>
     </div>
@@ -532,7 +532,7 @@ TEXT
         <% end %>
 
         <div class="button-container">
-          <button type="submit" class="button btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
+          <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
       <% end %>
     </div>
@@ -546,7 +546,7 @@ TEXT
     </ul>
     <% if can_do(@context, @current_user, :manage_account_memberships) %>
       <% js_bundle :user_lists %>
-      <a href="#" class="add_users_link button"><%= image_tag "add.png" %><%= t('links.add_admins', %{Add Account Admins}) %></a>
+      <a href="#" class="add_users_link btn"><%= image_tag "add.png" %><%= t('links.add_admins', %{Add Account Admins}) %></a>
       <% form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
@@ -565,7 +565,7 @@ TEXT
           <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
           <button type="button" class="btn btn-primary verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
           <button type="submit" class="btn btn-primary add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
-          
+
         </div>
       <% end %>
     <% end %>
@@ -605,7 +605,7 @@ TEXT
         <% end %>
       </ul>
       <% if can_do(@account, @current_user, :manage_alerts) %>
-        <a href="#" class="button element_toggler" role="button" data-hide-while-target-shown="true" aria-controls="add_notification_form"><%= image_tag "add.png" %><%= t(:add_announcement_link, "Add a New Announcement") %></a>
+        <a href="#" class="btn element_toggler" role="button" data-hide-while-target-shown="true" aria-controls="add_notification_form"><%= image_tag "add.png" %><%= t(:add_announcement_link, "Add a New Announcement") %></a>
         <% form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none;', :class => 'well', :role => "region" } do |f| %>
           <table class="formtable">
             <tr>
@@ -636,7 +636,7 @@ TEXT
             <%= f.text_area :message, :class => 'alert_message', :style => "height: 100px;" %>
           </div>
           <div class="button-container">
-            <button type="submit" class="button"><%= image_tag "add.png" %> <%= t(:add_announcement_button, "Add Announcement") %></button>
+            <button type="submit" class="btn"><%= image_tag "add.png" %> <%= t(:add_announcement_button, "Add Announcement") %></button>
             <button type="button" class="element_toggler button-secondary" aria-controls="add_notification_form"><%= t('#buttons.cancel', %{Cancel}) %></button>
           </div>
         <% end %>
@@ -696,21 +696,21 @@ TEXT
                       </div>
                       <br />
                       <input type="hidden" name="report_type" value="<%= report %>" />
-                        <a href="#" id="run_<%= report %>" class="button btn-primary run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+                        <a href="#" id="run_<%= report %>" class="btn btn-primary run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
                     </form>
                   </div>
                 </div>
                 <span class="running_report_message" style="<%= hidden unless in_progress %>">
                   <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
                 </span>
-                <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="button configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
+                <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="btn configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
               <% else %>
                 <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
                   <input type="hidden" name="report_type" value="<%= report %>" />
                   <span class="running_report_message" style="<%= hidden unless in_progress %>">
                     <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
                   </span>
-                  <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="button run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+                  <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="btn run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
                 </form>
               <% end %>
             </td>

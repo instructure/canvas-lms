@@ -195,7 +195,7 @@ describe "people" do
       wait_for_ajaximations
       group_count.times do
         f('.add_group_link').click
-        f('.button-container > .small-button').click
+        f('.button-container > .btn-small').click
         wait_for_ajaximations
       end
       f('.assign_students_link').click

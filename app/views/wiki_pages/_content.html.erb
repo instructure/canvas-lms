@@ -19,7 +19,7 @@
           <%= t :course_wiki_page_description, <<-EOT
           You can use this wiki to create supplemental pages or descriptions for your
           course material.  You can easily link to wiki pages from assignments, or link
-          to other course material and files from any wiki page.  This makes it a great 
+          to other course material and files from any wiki page.  This makes it a great
           place for explaining hard concepts, allowing group projects, or creating just
           about any kind of page you could need in your course.
           EOT
@@ -28,7 +28,7 @@
       <% end %>
       <p>
         <%= t :default_wiki_page_description, <<-EOT
-        This page is the default wiki page, and students will see it when they 
+        This page is the default wiki page, and students will see it when they
         click the "Pages" tab for this course.
         EOT
         %>
@@ -45,7 +45,7 @@ course will see this page first.  You can change that from [the course home page
     <% end %>
     <div class="button-container" style="margin-bottom:10px;">
       <% if can_do(@page, @current_user, :update_content) %>
-        <%= link_to t('buttons.start_editing', "Start Editing It now"), context_url(@context, :edit_context_wiki_page_url, @page), :id => "page_doesnt_exist_so_start_editing_it_now", :class => ("button big-button " + (@wiki.wiki_pages.length > 2 || !course_home ? "" : "dont_click")) %>
+        <%= link_to t('buttons.start_editing', "Start Editing It now"), context_url(@context, :edit_context_wiki_page_url, @page), :id => "page_doesnt_exist_so_start_editing_it_now", :class => ("btn btn-large " + (@wiki.wiki_pages.length > 2 || !course_home ? "" : "dont_click")) %>
       <% end %>
     </div>
   <% else %>
@@ -57,13 +57,13 @@ course will see this page first.  You can change that from [the course home page
       <% end %>
       <% if (@context.context.is_a?(Course) rescue false) %>
         <div><%= image_tag "warning.png", :style => "height: 10px;" %>
-          <%= mt :group_wiki_warning, "This page is part of the group wiki, *not* your course wiki. If you're looking for the course wiki, [click here](%{link}).", 
+          <%= mt :group_wiki_warning, "This page is part of the group wiki, *not* your course wiki. If you're looking for the course wiki, [click here](%{link}).",
             :link => context_url(@context.context, :context_wiki_pages_url) %>
         </div>
       <% end %>
     </div>
     <div class="someone_else_edited" style="display: none; font-size: 0.8em;">
-      <%= image_tag "warning.png", :style => "height: 12px;" %> 
+      <%= image_tag "warning.png", :style => "height: 12px;" %>
       <%= mt 'notices.page_edited_while_viewing', 'This page has been updated by someone else since you started viewing it. [Click here to reload the page.](%{link})', :link => request.url %>
     </div>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
@@ -113,7 +113,7 @@ course will see this page first.  You can change that from [the course home page
       <% end %>
       <div class="someone_else_edited" style="display: none; text-align: left;">
         <%= mt 'notices.page_edited_while_viewing', 'This page has been updated by someone else since you started viewing it. [Click here to reload the page.](%{link})', :link => request.url %>
-      
+
         <%= image_tag "warning.png" %>
         <%= t 'notices.page_edited_while_viewing_detailed', <<-EOT
         Someone else has edited this page since you first loaded it, and if you submit now you will overwrite their changes.

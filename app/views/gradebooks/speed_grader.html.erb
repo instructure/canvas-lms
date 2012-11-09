@@ -118,7 +118,7 @@
             <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true, :rubric_association => @assignment.rubric_association } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
             <div class="button-container">
               <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
-                <button type="button" class="save_rubric_button button"><%= t('buttons.save', "Save") %></button>
+                <button type="button" class="save_rubric_button btn"><%= t('buttons.save', "Save") %></button>
               <% end %>
               <button type="button" class="hide_rubric_link button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
             </div>
@@ -210,7 +210,7 @@
                 </div>
 
 
-                <button class="button small-button" type="submit"><%= t('buttons.submit_comment', "Submit Comment") %></button>
+                <button class="btn btn-small" type="submit"><%= t('buttons.submit_comment', "Submit Comment") %></button>
                 <ul class="attach_things">
                   <li class="prompt"><%= t(:attach, "Attach") %></li>
                   <li>
@@ -266,8 +266,8 @@
     <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
   </p>
   <div class="button-container">
-    <button class="button dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
-    <button type="submit" class="button btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
+    <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
   </div>
 </form>
 <%= render :partial => "shared/mute_dialog" %>

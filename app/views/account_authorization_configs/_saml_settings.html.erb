@@ -43,8 +43,8 @@
       </div>
       <% form_tag(api_v1_account_update_discovery_url_path(@account), :method => :put, :id => 'discovery_url_form', :class => "form-horizontal bootstrap-form discovery_url_form well", :style => hidden) do %>
         <input type="text" name="discovery_url" id="discovery_url_input" class="input-xlarge" value="<%= @account.auth_discovery_url %>">
-        <button type="submit" class="button btn-primary">Submit</button>
-        <button class="element_toggler button" aria-controls="discovery_url_form">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button class="element_toggler btn" aria-controls="discovery_url_form">Cancel</button>
       <% end %>
     </div>
   <% end %>
@@ -214,9 +214,9 @@
             <div class="form-actions">
               <span class="auth_form">
                 <% unless config.new_record? %>
-                  <button type="button" class="button cancel_button element_toggler" aria-controls="<%= form_id %>"><%= t("#buttons.cancel", "Cancel") %></button>
+                  <button type="button" class="btn cancel_button element_toggler" aria-controls="<%= form_id %>"><%= t("#buttons.cancel", "Cancel") %></button>
                 <% end %>
-                <button type="submit" class="button btn-primary"><%= t(:save_button, "Save Authentication Settings") %></button>
+                <button type="submit" class="btn btn-primary"><%= t(:save_button, "Save Authentication Settings") %></button>
               </span>
             </div>
           <% end %>
@@ -226,7 +226,7 @@
     <% end %>
 
 
-  <button class="element_toggler button"
+  <button class="element_toggler btn"
           aria-controls="saml_config__form"
           data-hide-while-target-shown=true>Add New SAML Config</button>
 
@@ -244,9 +244,9 @@
            %>
         </p>
         <p>
-          <a href="<%= account_saml_testing_url(@account) %>" id="start_saml_debugging" class="button" style="<%= hidden(!debugging) %>"><%= t('start_debugging', 'Start Debugging') %></a>
-          <a href="<%= account_saml_testing_url(@account) %>" id="refresh_saml_debugging" class="button" style="<%= hidden(debugging) %>"><%= t('refresh_debugging', 'Refresh') %></a>
-          <a href="<%= account_saml_testing_stop_url(@account) %>" id="stop_saml_debugging" class="button" style="<%= hidden(debugging) %>"><%= t('stop_debugging', 'Stop Debugging') %></a>
+          <a href="<%= account_saml_testing_url(@account) %>" id="start_saml_debugging" class="btn" style="<%= hidden(!debugging) %>"><%= t('start_debugging', 'Start Debugging') %></a>
+          <a href="<%= account_saml_testing_url(@account) %>" id="refresh_saml_debugging" class="btn" style="<%= hidden(debugging) %>"><%= t('refresh_debugging', 'Refresh') %></a>
+          <a href="<%= account_saml_testing_stop_url(@account) %>" id="stop_saml_debugging" class="btn" style="<%= hidden(debugging) %>"><%= t('stop_debugging', 'Stop Debugging') %></a>
         </p>
 
         <div id="saml_debug_info" style="<%= hidden(debugging) %>">

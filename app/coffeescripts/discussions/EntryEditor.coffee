@@ -22,7 +22,7 @@ define [
     constructor: (@view) ->
       super @view.$('.message:first'), switchViews: true
       @cancelButton = @createCancelButton()
-      @done.addClass 'small-button'
+      @done.addClass 'btn-small'
 
     ##
     # Extends EditorToggle::display to save the model's message.

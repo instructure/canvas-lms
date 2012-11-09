@@ -26,7 +26,7 @@
   </li>
   <% if can_do(@portfolio, @current_user, :manage) %>
     <li class="displaying_item"><a href="#" class="manage_sections_link" title="<%= t('titles.manage_sections', "Add, remove or rearrange sections for this portfolio") %>"><%= manage_sections_link_text %></a></li>
-    <li class="editing_item" style="padding-bottom: 10px;"><button type="button" class="done_editing_button button small-button"><%= t('buttons.done_editing', "Done Editing") %></button></li>
+    <li class="editing_item" style="padding-bottom: 10px;"><button type="button" class="done_editing_button btn btn-small"><%= t('buttons.done_editing', "Done Editing") %></button></li>
     <li><a href="#" class="portfolio_settings_link"><%= t('links.settings', "ePortfolio Settings") %></a></li>
   <% end %>
 </ul>

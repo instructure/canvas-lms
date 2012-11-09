@@ -67,10 +67,10 @@
   <div class="rs-margin-lr <%= "rs-margin-bottom" if course_home %>">
     <hr />
   <% if can_do(@page, @current_user, :update_content)%>
-    <%= link_to image_tag('edit.png') + " " + t('links.edit_page', "Edit this Page"), "#edit", :class => "edit_link button button-sidebar-wide" %>
+    <%= link_to image_tag('edit.png') + " " + t('links.edit_page', "Edit this Page"), "#edit", :class => "edit_link btn button-sidebar-wide" %>
   <% end %>
   <% if can_do(@page, @current_user, :delete) && @page.url != 'front-page' && !@page.deleted? %>
-    <%= link_to image_tag('delete.png') + " " + t('links.delete_page', "Delete this Page"), context_url(@context, :context_wiki_page_url, @page.url), :method => :delete, :confirm => t('delete_page_confirmation', 'Are you sure you want to delete this page? This cannot be undone!'), :class => "button button-sidebar-wide" %>
+    <%= link_to image_tag('delete.png') + " " + t('links.delete_page', "Delete this Page"), context_url(@context, :context_wiki_page_url, @page.url), :method => :delete, :confirm => t('delete_page_confirmation', 'Are you sure you want to delete this page? This cannot be undone!'), :class => "btn button-sidebar-wide" %>
   <% end %>
   <a href="<%= context_url(@context, :context_wiki_page_url, @page) %>" class="wiki_page_url" style="display: none;">&nbsp;</a>
   <% if can_do(@context, @current_user, :manage_wiki) || can_do(@wiki, @current_user, :create_page) %>
@@ -80,7 +80,7 @@
         <%= f.blabel :title, :en => "New page title" %><br />
         <%= f.text_field :title, :style => "width: 150px;" %>
         <input type="hidden" name="url_prefix" value="" id="url_prefix" />
-        <button class="button small-button" type="submit"><%= t 'buttons.create', 'Create' %></button>
+        <button class="btn btn-small" type="submit"><%= t 'buttons.create', 'Create' %></button>
       <% end %>
     </div>
   <% end %>
@@ -99,7 +99,7 @@
             <% form_for(@page, :url => context_url(@context, :context_wiki_page_url, @page), :html => {:id => 'rename_wiki_page_form'}) do |f| -%>
               <%= f.blabel :title, :en => "New page title" %><br />
               <%= f.text_field :title, :style => "width: 200px;" %>
-              <button class="button small-button" type="submit"><%= t 'buttons.rename', 'Rename' %></button>
+              <button class="btn btn-small" type="submit"><%= t 'buttons.rename', 'Rename' %></button>
             <% end -%>
           </div>
         </li>

@@ -259,7 +259,7 @@ define([
       $dialog.append("<form id='bookmark_search_form' style='margin-bottom: 5px;'>" +
                        "<img src='/images/blank.png'/>&nbsp;&nbsp;" +
                        "<input type='text' class='query' style='width: 230px;'/>" +
-                       "<button class='button search_button' type='submit'>" +
+                       "<button class='btn search_button' type='submit'>" +
                        htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>");
       $dialog.append("<div class='results' style='max-height: 200px; overflow: auto;'/>");
       $dialog.find("form").submit(function(event) {
@@ -339,7 +339,7 @@ define([
                             "<img src='/images/flickr_creative_commons_small_icon.png'/>&nbsp;&nbsp;" + 
                             "<input type='text' class='query' style='width: 250px;' title='" +
                             htmlEscape(I18n.t('tooltips.enter_search_terms', "enter search terms")) + "'/>" + 
-                            "<button class='button' type='submit'>" +
+                            "<button class='btn' type='submit'>" +
                             htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>")
                   .append("<div class='results' style='max-height: 240px; overflow: auto;'/>");
 

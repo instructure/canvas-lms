@@ -18,7 +18,7 @@
     <label for="teacher-feedback-body">{{#t "message"}}Message{{/t}}</label>
     <textarea id="teacher-feedback-body" name="body"></textarea>
     <div class="button-container">
-      <button type="submit" class="button" data-text-while-loading="{{#t "sending"}}Sending...{{/t}}">{{#t "send_message"}}Send Message{{/t}}</button>
+      <button type="submit" class="btn" data-text-while-loading="{{#t "sending"}}Sending...{{/t}}">{{#t "send_message"}}Send Message{{/t}}</button>
     </div>
   </form>
   <form class="help-dialog-pane" id="create_ticket" style="display:none" action="/errors" method="POST">
@@ -54,7 +54,7 @@
     </div>
     <input type="hidden" name="error[url]" value="{{url}}">
     <div class="button-container">
-      <button type="submit" data-text-while-loading="{{#t "Submitting_Ticket"}}Submitting Ticket...{{/t}}" class="button submit_button"><img src="/images/email.png" alt=""/>{{#t "submit_this_support_request"}}Submit Ticket{{/t}}</button>
+      <button type="submit" data-text-while-loading="{{#t "Submitting_Ticket"}}Submitting Ticket...{{/t}}" class="btn submit_button"><img src="/images/email.png" alt=""/>{{#t "submit_this_support_request"}}Submit Ticket{{/t}}</button>
     </div>
   </form>
 </div>

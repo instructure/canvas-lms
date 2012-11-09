@@ -115,7 +115,7 @@ Publishing will allow the users to begin participating in the course.} %>
             <% form_for @context, :url => course_path(@context), :html => {:method => :put} do |f| %>
               <input type="hidden" name="course[event]" value="offer"/>
               <div class="button-container" style="text-align: center;">
-                <button type="submit" class="button big-button"><%= t('buttons.publish', %{Publish Course}) %></button>
+                <button type="submit" class="btn btn-large"><%= t('buttons.publish', %{Publish Course}) %></button>
               </div>
             <% end %>
           <% end %>

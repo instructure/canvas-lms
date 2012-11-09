@@ -282,8 +282,8 @@
         <%= image_tag "ajax-loader-bar.gif" %>
       </div>
       <div class="button-container">
-        <button type="submit" class="button small-button"><%= t 'buttons.add_a_file', 'Add File' %></button>
-        <button type="button" class="button button-secondary cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
+        <button type="submit" class="btn btn-small"><%= t 'buttons.add_a_file', 'Add File' %></button>
+        <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
       </div>
     <% end %>
   </li>
@@ -404,7 +404,7 @@ HEREDOC
             </div>
           </div>
           <div class="button-container">
-            <button type="submit" class="button button-default-action submit_button"><%= t 'buttons.add_collaboration', "Add Collaboration" %></button>
+            <button type="submit" class="btn button-default-action submit_button"><%= t 'buttons.add_collaboration', "Add Collaboration" %></button>
             <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
           </div>
         </div>
@@ -413,7 +413,7 @@ HEREDOC
           <%= t '#instructions.authorize_google_docs', "Before you can collaborate on documents, you need to authorize Canvas
           to access your Google Docs account:" %>
           <div class="button-container">
-            <a class="button button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
+            <a class="btn button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
             <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
           </div>
         </div>
@@ -458,8 +458,8 @@ HEREDOC
       </tr><tr>
         <td colspan="3">
           <div class="button-container">
-            <button type="button" class="button cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-            <button type="submit" class="button btn-primary"><%= t 'buttons.lock_file', "Lock this File" %></button>
+            <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+            <button type="submit" class="btn btn-primary"><%= t 'buttons.lock_file', "Lock this File" %></button>
           </div>
         </td>
       </tr>
@@ -499,8 +499,8 @@ HEREDOC
       </tr><tr>
         <td colspan="3">
           <div class="button-container">
-            <button type="button" class="button cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-            <button type="submit" class="button btn-primary"><%= t 'buttons.lock_folder', "Lock this Folder" %></button>
+            <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+            <button type="submit" class="btn btn-primary"><%= t 'buttons.lock_folder', "Lock this Folder" %></button>
           </div>
         </td>
       </tr>
@@ -587,9 +587,9 @@ into a zip file.  This may take some time, depending on the size and number of f
   <span class="duplicate_filename_prompt"></span><br /><br />
   <span class="duplicate_filenames"></span><br /><br />
   <div class="buttons" style="text-align: right; width: 100%">
-    <button type="button" class="button button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-    <button type="button" class="button rename_button"><%= t 'buttons.rename_duplicate_attachment', "Rename New Files" %></button>
-    <button type="button" class="button overwrite_button"><%= t 'buttons.overwrite_duplicate_attachment', "Overwrite" %></button>
+    <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+    <button type="button" class="btn rename_button"><%= t 'buttons.rename_duplicate_attachment', "Rename New Files" %></button>
+    <button type="button" class="btn overwrite_button"><%= t 'buttons.overwrite_duplicate_attachment', "Overwrite" %></button>
   </div>
 </div>
 <% unless showing_all_contexts %>

@@ -74,7 +74,7 @@
     <tr>
       <td colspan="5">
         <div class="button-container">
-          <button class="button moderate_multiple_button" style="display: none;"><%= image_tag "edit.png" %><%= t('buttons.change_extensions_for_selected_students', "Change Extensions for %{n} Selected Students", :n => raw('<span id="checked_count">X</span>')) %></button>
+          <button class="btn moderate_multiple_button" style="display: none;"><%= image_tag "edit.png" %><%= t('buttons.change_extensions_for_selected_students', "Change Extensions for %{n} Selected Students", :n => raw('<span id="checked_count">X</span>')) %></button>
         </div>
       </td>
     </tr>
@@ -106,8 +106,8 @@
     <% }) %>
   </div>
   <div class="button-container">
-    <button type="button" class="button cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
-    <button type="button" class="button btn-primary save_button"><%= t('buttons.extend_time', "Extend Time") %></button>
+    <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="button" class="btn btn-primary save_button"><%= t('buttons.extend_time', "Extend Time") %></button>
   </div>
 </div>
 <div id="moderate_student_dialog" style="display: none;">
@@ -144,8 +144,8 @@
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button type="button" class="button dialog_closer cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
-            <button type="submit" class="button btn-primary save_button"><%= t('buttons.save', "Save") %></button>
+            <button type="button" class="btn dialog_closer cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+            <button type="submit" class="btn btn-primary save_button"><%= t('buttons.save', "Save") %></button>
           </div>
         </td>
       </tr>

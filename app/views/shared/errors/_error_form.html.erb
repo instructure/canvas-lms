@@ -11,7 +11,7 @@
     <%= before_label('email', %{Email (optional)}) %> <%= text_field :error, :email, :value => (@current_user.email rescue ""), :style => "border: 1px solid #888;" %>
   </div>
   <div class="button-container">
-    <button type="submit" class="button"><%= t('buttons.submit', %{Send Comments}) %></button>
+    <button type="submit" class="btn"><%= t('buttons.submit', %{Send Comments}) %></button>
   </div>
 </form>
 

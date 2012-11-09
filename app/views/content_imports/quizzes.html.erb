@@ -41,8 +41,8 @@
     </fieldset>
     
     <div style="margin-top: 10px;">
-      <button type="submit" class="submit_button button big-button"><%= t 'buttons.import', "Import Quiz" %></button>
-      <a href="<%= context_url(@context, :context_url) %>" class="button back_to_course"><%= image_tag "check.png" %> <%= t 'buttons.back', "I'm Done Importing, back to the Course." %></a>
+      <button type="submit" class="submit_button btn btn-large"><%= t 'buttons.import', "Import Quiz" %></button>
+      <a href="<%= context_url(@context, :context_url) %>" class="btn back_to_course"><%= image_tag "check.png" %> <%= t 'buttons.back', "I'm Done Importing, back to the Course." %></a>
     </div>
   <% end %>
   <div style="<%= hidden if @quizzes.empty? %> margin-top: 30px;">
@@ -57,8 +57,8 @@
   <div id="file_uploaded" style="display: none;">
     <p><%= mt 'messages.file_uploaded', "**Thank you!**  We'll start importing your QTI data and send you an email when it's complete. The process normally finishes within 10 minutes." %></p>
     <p>
-      <a class="button big-button" href="<%= context_url(@context, :context_import_quizzes_url) %>"><%= t 'buttons.import_more', "Import another QTI file" %></a>
-      <a href="<%= context_url(@context, :context_url) %>" class="button back_to_course"><%= image_tag "check.png" %> <%= t 'buttons.back', "I'm Done Importing, back to the Course." %></a>
+      <a class="btn btn-large" href="<%= context_url(@context, :context_import_quizzes_url) %>"><%= t 'buttons.import_more', "Import another QTI file" %></a>
+      <a href="<%= context_url(@context, :context_url) %>" class="btn back_to_course"><%= image_tag "check.png" %> <%= t 'buttons.back', "I'm Done Importing, back to the Course." %></a>
     </p>
   </div>
 </div>

@@ -7,13 +7,13 @@
   </fieldset>
   <% end -%>
   <div style="margin-top: 10px;">
-    <%= link_to(image_tag('graph.png') + " " + t('links.view_statistics', "View Statistics"), statistics_account_path(@account), :class => "button button-sidebar-wide") %>
-    <%= link_to(image_tag('group.png') + " " + t('links.manage_permissions', "Manage Role Permissions"), account_permissions_path(@account), :class => "button button-sidebar-wide") %>
+    <%= link_to(image_tag('graph.png') + " " + t('links.view_statistics', "View Statistics"), statistics_account_path(@account), :class => "btn button-sidebar-wide") %>
+    <%= link_to(image_tag('group.png') + " " + t('links.manage_permissions', "Manage Role Permissions"), account_permissions_path(@account), :class => "btn button-sidebar-wide") %>
     <% if @account.root_account? %>
-      <%= link_to(image_tag('history.png') + " " + t('links.manage_terms', "Manage Terms"), account_terms_path(@account), :class => "button button-sidebar-wide") %>
+      <%= link_to(image_tag('history.png') + " " + t('links.manage_terms', "Manage Terms"), account_terms_path(@account), :class => "btn button-sidebar-wide") %>
     <% end %>
     <% if @account.sub_accounts.count > 0 %>
-      <%= link_to(image_tag('ball.png') + " " + t('links.manage_subaccounts', "Manage Sub-Accounts"), account_sub_accounts_path(@account), :class => "button button-sidebar-wide") %>
+      <%= link_to(image_tag('ball.png') + " " + t('links.manage_subaccounts', "Manage Sub-Accounts"), account_sub_accounts_path(@account), :class => "btn button-sidebar-wide") %>
     <% end %>
   </div>
 <% end %>

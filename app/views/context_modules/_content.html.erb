@@ -101,8 +101,8 @@ TEXT
     </tr><tr>
       <td colspan="2">
         <div class="button-container">
-          <button type="button" class="button cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
-          <button type="submit" class="button btn-primary submit_button"><%= t('buttons.add_module', %{Add Module}) %></button>
+          <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+          <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.add_module', %{Add Module}) %></button>
         </div>
         <a href="<%= context_url(@context, :context_context_modules_url) %>" style="display: none;" class="add_context_module_url">&nbsp;</a>
       </td>
@@ -117,8 +117,8 @@ TEXT
     <div style="text-align: center;" class="prerequisite_module_select">
     </div>
     <div class="button-container">
-      <button type="button" class="button submit_button"><%= t('buttons.add_prerequisite', %{Add Prerequisite}) %></button>
-      <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+      <button type="button" class="btn submit_button"><%= t('buttons.add_prerequisite', %{Add Prerequisite}) %></button>
+      <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
   </div>
   <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true} %>
@@ -152,8 +152,8 @@ TEXT
         <tr>
           <td colspan="2">
             <div class="button-container">
-              <button type="button" class="button cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
-              <button type="submit" class="button btn-primary"><%= t('#buttons.update', %{Update}) %></button>
+              <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+              <button type="submit" class="btn btn-primary"><%= t('#buttons.update', %{Update}) %></button>
             </div>
           </td>
         </tr>

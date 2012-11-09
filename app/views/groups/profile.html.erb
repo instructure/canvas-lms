@@ -14,13 +14,13 @@
     <% end %>
 
     <% if @can_join %>
-      <p><button id="join_group" class="button">Join</button></p>
+      <p><button id="join_group" class="btn">Join</button></p>
     <% elsif not @in_group %>
       <p>This group is not accepting new members at this time.</p>
     <% end %>
 
     <% if @group.is_public? %>
-      <p><button id="follow_group" class="button">Follow</button></p>
+      <p><button id="follow_group" class="btn">Follow</button></p>
 
       <%# TODO: collections go here %>
     <% end %>

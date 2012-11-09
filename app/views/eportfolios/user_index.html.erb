@@ -4,7 +4,7 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-    <a href="#" class="add_eportfolio_link button button-sidebar-wide"><%= image_tag "add.png" %><%= t('links.create', "Create an ePortfolio") %></a>
+    <a href="#" class="add_eportfolio_link btn button-sidebar-wide"><%= image_tag "add.png" %><%= t('links.create', "Create an ePortfolio") %></a>
   </div>
 <% end %>
 
@@ -32,7 +32,7 @@ Ready to get started? Click the button.
 DETAILS
   %>
   <div class="button-container">
-    <a href="#" class="add_eportfolio_link button button-sidebar-wide"><%= image_tag "add.png" %><%= t('links.create', "Create an ePortfolio") %></a>
+    <a href="#" class="add_eportfolio_link btn button-sidebar-wide"><%= image_tag "add.png" %><%= t('links.create', "Create an ePortfolio") %></a>
   </div>
   </div>
 <% else %>
@@ -76,7 +76,7 @@ $(document).ready(function() {
     </td>
   </tr><tr>
     <td colspan="2">
-      <button class="button " id="eportfolio_submit" name="commit" type="submit"><%= t('buttons.add_eportfolio', "Make ePortfolio") %></button>
+      <button class="btn " id="eportfolio_submit" name="commit" type="submit"><%= t('buttons.add_eportfolio', "Make ePortfolio") %></button>
       <button type="button" class="cancel_button button-secondary" style><%= t('#buttons.cancel', "Cancel") %></button>
     </td>
   <td>

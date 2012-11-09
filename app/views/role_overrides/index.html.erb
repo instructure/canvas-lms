@@ -97,7 +97,7 @@
             <input type="hidden" name="account_roles" value="1"/>
             <%= before_label :new_role_type, "New Role Type" %>
             <input class= "add_new_role" type="text" name="role_type"/>
-            <button  id="add_new_role_button" class="button" type="submit"><%= image_tag "add.png" %> <%= t '#buttons.add', "Add" %></button>
+            <button  id="add_new_role_button" class="btn" type="submit"><%= image_tag "add.png" %> <%= t '#buttons.add', "Add" %></button>
           <% end %>
         </td>
       </tr>
@@ -143,8 +143,8 @@
       </tbody>
     </table>
     <div class="button-container">
-      <a class="button cancel_button" href="<%= url_for(:back) %>"><%= t '#buttons.cancel', "Cancel" %></a>
-      <button type="submit" class="button btn-primary save_permissions_changes"><%= t 'buttons.save', "Save Changes" %></button>
+      <a class="btn cancel_button" href="<%= url_for(:back) %>"><%= t '#buttons.cancel', "Cancel" %></a>
+      <button type="submit" class="btn btn-primary save_permissions_changes"><%= t 'buttons.save', "Save Changes" %></button>
     </div>
   <% end -%>
 </div>

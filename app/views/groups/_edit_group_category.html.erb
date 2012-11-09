@@ -8,8 +8,8 @@
   </div>
   <div style="margin: 0.5em 0;"><%= check_box_tag 'category[restrict_self_signup]', "1", false, :disabled => true, :id => 'category_restrict_self_signup' %><%= label_tag :restrict_self_signup, t(:restricted_self_signup, "Require group members to be in the same section") %></div>
   <div class="form-actions">
-    <button type="button" class="button cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
-    <button type="submit" class="button btn-primary submit_button"><%= t '#buttons.update', 'Update' %></button>
+    <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
+    <button type="submit" class="btn btn-primary submit_button"><%= t '#buttons.update', 'Update' %></button>
   </div>
   <div class="clear"></div>
 <% end %>

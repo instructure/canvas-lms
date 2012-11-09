@@ -11,8 +11,8 @@
   <% if @current_user && @current_user != @user && @user.registered? && @enrollment %>
     <p><%= mt 'details.wrong_account', "The invitation for %{course} was sent to **%{invited_user}**, but you are currently logged in as **%{current_user}**", :course => @course.name, :invited_user => @user.name, :current_user => @current_user.name %></p>
     <div class="button_box">
-      <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="button" id='transfer'><%=  t 'buttons.transfer_enrollment', "Transfer Enrollment" %></a>
-      <a href="<%= login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id) %>" class="button" id="login"><%=  t 'buttons.login_as', "Log in as %{invited_user}", :invited_user => @user.name %></a>
+      <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="btn" id='transfer'><%=  t 'buttons.transfer_enrollment', "Transfer Enrollment" %></a>
+      <a href="<%= login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id) %>" class="btn" id="login"><%=  t 'buttons.login_as', "Log in as %{invited_user}", :invited_user => @user.name %></a>
     </div>
   <% elsif !@merge_opportunities.empty? %>
     <div class="disambiguation_box" <%= hidden(true) if params[:register] %>>
@@ -27,8 +27,8 @@
           <% end %></p>
         </div>
         <div class="button_box">
-          <% if @pseudonym %><a href="#" class="button" id="register"><%= t 'buttons.no', 'No' %></a><% end %>
-          <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="button not_external btn-primary" id="merge"><%= @user.registered? ? t('buttons.merge', "Combine") : t('buttons.yes', "Yes") %></a>
+          <% if @pseudonym %><a href="#" class="btn" id="register"><%= t 'buttons.no', 'No' %></a><% end %>
+          <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="btn not_external btn-primary" id="merge"><%= @user.registered? ? t('buttons.merge', "Combine") : t('buttons.yes', "Yes") %></a>
         </div>
         <% if !@current_user && @merge_opportunities.first.last.length > 1 %>
           </div><!-- Close #disambiguation_box -->
@@ -40,8 +40,8 @@
               <% end %>
             </ul>
             <div class="button_box">
-              <a href="#" class="button" id="back"><%= t 'buttons.back', "Back" %></a>
-              <a href="#" class="button btn-primary" id="merge_if_clicked"><%= t 'buttons.continue', 'Continue' %></a>
+              <a href="#" class="btn" id="back"><%= t 'buttons.back', "Back" %></a>
+              <a href="#" class="btn btn-primary" id="merge_if_clicked"><%= t 'buttons.continue', 'Continue' %></a>
             </div>
           <!-- Purposely not closing div because it is closed below -->
         <% end %>
@@ -53,8 +53,8 @@
         <% end %></p>
         <p><strong><%=  t 'details.add_email', "Would you like to add this email address to your current account?" %></strong></p>
         <div class="button_box">
-          <a href="#" class="button" id="register"><%= t 'buttons.new_account', 'No' %></a>
-          <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.try(:uuid), :confirm => 1) %>" class="button btn-primary" id='merge'><%=  t 'buttons.add_email_address', "Yes, Add Email Address" %></a>
+          <a href="#" class="btn" id="register"><%= t 'buttons.new_account', 'No' %></a>
+          <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.try(:uuid), :confirm => 1) %>" class="btn btn-primary" id='merge'><%=  t 'buttons.add_email_address', "Yes, Add Email Address" %></a>
         </div>
       <% else %>
         <% if !@enrollment && @user.registered? %>
@@ -83,7 +83,7 @@ Which is you?", :count => @merge_opportunities.length %>
           <% end %>
         </ul>
         <div class="button_box">
-          <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="button not_external" id="merge"><%= t 'buttons.continue', "Continue" %></a>
+          <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="btn not_external" id="merge"><%= t 'buttons.continue', "Continue" %></a>
         </div>
       <% end %>
     </div>
@@ -91,8 +91,8 @@ Which is you?", :count => @merge_opportunities.length %>
     <div class="disambiguation_box"<%= ' style="display: none;"'.html_safe if params[:register] %>>
       <p><%= mt 'details.account_needed', "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account.", :course => @course.name %></p>
       <div class="button_box">
-        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @nonce, :enrollment => @enrollment.uuid) %>" class="button not_external"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
-        <a href="#" class="button" id="register"><%= t 'buttons.create_account', 'Create My Account' %></a>
+        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="btn not_external"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
+        <a href="#" class="btn" id="register"><%= t 'buttons.create_account', 'Create My Account' %></a>
       </div>
     </div>
   <% end %>
@@ -141,9 +141,9 @@ Which is you?", :count => @merge_opportunities.length %>
       <div class="control-group">
         <div class="controls">
           <% unless @merge_opportunities.empty? %>
-            <a href="#" class="button" id="back"><%= t 'buttons.back', "Back" %></a>
+            <a href="#" class="btn" id="back"><%= t 'buttons.back', "Back" %></a>
           <% end %>
-          <button type="submit" class="button btn-primary btn-large"><%= t 'buttons.register', "Register" %></button>
+          <button type="submit" class="btn btn-primary btn-large"><%= t 'buttons.register', "Register" %></button>
         </div>
       </div>
     <% end %>

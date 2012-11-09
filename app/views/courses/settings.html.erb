@@ -284,15 +284,15 @@ TEXT
       </tr><tr>
         <td colspan="4">
           <% if can_do(@context, @current_user, :update) %>
-            <a href="#" class="edit_course_link button"><%= image_tag "edit.png" %><%= t('links.edit_course', %{Edit Course Details}) %></a>
+            <a href="#" class="edit_course_link btn"><%= image_tag "edit.png" %><%= t('links.edit_course', %{Edit Course Details}) %></a>
           <% end %>
           <% if Account.site_admin.grants_right?(@current_user, nil, :manage_courses) && Account.root_accounts.length > 1 %>
-            <a href="#" class="move_course_link button"><%= image_tag "ball.png" %><%= t('links.move_course', %{Move To Another Account}) %></a>
+            <a href="#" class="move_course_link btn"><%= image_tag "ball.png" %><%= t('links.move_course', %{Move To Another Account}) %></a>
           <% end %>
           <span class="course_form">
             <div class="form-actions">
-              <button type="button" class="button cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
-              <button type="submit" class="button btn-primary"><%= t('buttons.update_course', %{Update Course Details}) %></button>
+              <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+              <button type="submit" class="btn btn-primary"><%= t('buttons.update_course', %{Update Course Details}) %></button>
             </div>
           </span>
         </td>
@@ -347,7 +347,7 @@ TEXT
           <% form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
             <%= f.text_field :name %>
-            <button class="button small-button" type="submit"><%= t('buttons.add_section', %{Add Section}) %></button>
+            <button class="btn btn-small" type="submit"><%= t('buttons.add_section', %{Add Section}) %></button>
           <% end %>
         </li>
       <% end %>
@@ -363,7 +363,7 @@ TEXT
       <%= t 'unaccepted_invitations', "%{count} Invitations haven't been accepted.  You can click a user's name to re-send their invitation", :count => %[<span class="unaccepted_invitations">#{@user_counts[:invited]}</span>].html_safe %>
 
       <% if @context.available? %>
-        <% ot 're_send_all', 'or *Re-Send All Unaccepted Invitations*', :wrapper => capture { %><div><span><button type="button" href="<%= course_re_send_invitations_url %>" class="button re_send_invitations_link">\1</button></span>
+        <% ot 're_send_all', 'or *Re-Send All Unaccepted Invitations*', :wrapper => capture { %><div><span><button type="button" href="<%= course_re_send_invitations_url %>" class="btn re_send_invitations_link">\1</button></span>
       </div><% } %>
       <% end %>
     </div>
@@ -399,7 +399,7 @@ TEXT
       <% if @context.completed? || @context.soft_concluded? %>
         <%= t('cannot_add_users_to_concluded_course', %{You cannot add users to a concluded course.}) %>
       <% else %>
-        <a href="#" class="add_users_link button"><%= image_tag "add.png" %><%= t('links.add_users', %{Add Users}) %></a>
+        <a href="#" class="add_users_link btn"><%= image_tag "add.png" %><%= t('links.add_users', %{Add Users}) %></a>
       <% end %>
     <% end %>
     <% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :style => "display: none;"} do  %>
@@ -488,7 +488,7 @@ TEXT
       </ul>
 
       <p>
-        <button type="submit" class="button"><%= t('#buttons.save', %{Save}) %></button>
+        <button type="submit" class="btn"><%= t('#buttons.save', %{Save}) %></button>
       </p>
     <% end %>
   </div>
@@ -505,7 +505,7 @@ TEXT
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
       <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
-      <a href="#" id="publish_grades_link" class="button disabled">...</a>
+      <a href="#" id="publish_grades_link" class="btn disabled">...</a>
       <ul id="publish_grades_messages"></ul>
     </div>
   <% end %>
@@ -535,8 +535,8 @@ TEXT
         <tr>
           <td colspan="2">
             <div class="button-container">
-              <button type="button" class="button cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
-              <button type="submit" class="button btn-primary"><%= t('buttons.move_course', %{Move Course}) %></button>
+              <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+              <button type="submit" class="btn btn-primary"><%= t('buttons.move_course', %{Move Course}) %></button>
             </div>
           </td>
         </tr>

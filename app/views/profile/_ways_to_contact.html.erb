@@ -153,7 +153,7 @@
   <% end %>
   <tr>
     <td colspan="2">
-      <button type="submit" class="button btn-primary"><%= t('buttons.register_email', "Register Email") %></button>
+      <button type="submit" class="btn btn-primary"><%= t('buttons.register_email', "Register Email") %></button>
     </td>
   </tr>
 </table>
@@ -185,7 +185,7 @@
     </td>
   </tr><tr>
     <td colspan="2">
-      <button type="submit" class="button btn-primary"><%= t('buttons.register_sms', "Register SMS") %></button>
+      <button type="submit" class="btn btn-primary"><%= t('buttons.register_sms', "Register SMS") %></button>
     </td>
 </table>
 <% end %>
@@ -202,7 +202,7 @@
     <a href="<%= re_send_confirmation_url("{{ user_id }}", "{{ id }}") %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
   </div>
   <div class="button-container">
-    <button type="button" class="button cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
+    <button type="button" class="btn cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
   </div>
 </div>
 <% form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog"} do %>
@@ -224,7 +224,7 @@
   </div>
   <div class="status_message" style="visibility: hidden; text-align: center; color: #444; font-weight: bold"><%= t(:confirming_contact, "Confirming...") %></div>
   <div class="button-container">
-    <button type="submit" class="button"><%= t('buttons.confirm', "Confirm") %></button>
+    <button type="submit" class="btn"><%= t('buttons.confirm', "Confirm") %></button>
   </div>
 <% end %>
 <div style="display: none;" id="select_templates">

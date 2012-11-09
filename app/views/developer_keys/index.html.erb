@@ -4,7 +4,7 @@
 <% jammit_css :developer_keys %>
 
 <h2 style="float: left;"><%= t :developer_keys, "Developer Keys" %></h2>
-<a href="#" style='float: right;' class='button add_key'><%= image_tag "add.png" %> Add Developer Key</a>
+<a href="#" style='float: right;' class='btn add_key'><%= image_tag "add.png" %> Add Developer Key</a>
 <div class='clear'></div>
 <table id="keys">
   <thead>
@@ -20,7 +20,7 @@
   </tbody>
 </table>
 <div id="loading">
-  <button class='button show_all' type='button'><%= t :show_all, "Show All %{count} Keys", :count => @keys.total_entries %></button>
+  <button class='btn show_all' type="button"><%= t :show_all, "Show All %{count} Keys", :count => @keys.total_entries %></button>
   <img src="/images/ajax-loader-medium-444.gif" class="loader">
 </div>
 <div id='edit_dialog' title='<%= t :key_settings, "Key Settings" %>'>

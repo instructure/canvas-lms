@@ -32,7 +32,7 @@
     <% @contexts.each_with_index do |c, idx| %>
       <div>
         <div class="group_reference group_<%= "#{c.class.to_s.downcase}_#{c.id}" %> <%= 'default_context' if c == @context %>">
-          <a href="<%= context_url(c, :new_context_calendar_event_url) %>" class="add_event_link button small-button" ><%= image_tag "add-small.png" %> <%= t 'links.add_event', "Add Event" %></a>
+          <a href="<%= context_url(c, :new_context_calendar_event_url) %>" class="add_event_link btn btn-small" ><%= image_tag "add-small.png" %> <%= t 'links.add_event', "Add Event" %></a>
         
           &nbsp;
           <div style="position: absolute; top: 2px; left: 2px;">
@@ -195,7 +195,7 @@
         <td><a href="#" class="more_options_link"><%= t 'links.more_options', "more options" %></a></td>
       </tr><tr>
         <td colspan="2">
-          <button type="submit" class="button btn-primary"><%= t '#buttons.submit', "Submit" %></button>
+          <button type="submit" class="btn btn-primary"><%= t '#buttons.submit', "Submit" %></button>
         </td>
       </tr>
     </table>
@@ -228,7 +228,7 @@
         <td><a href="#" class="more_options_link"><%= t 'links.more_options', "more options" %></a></td>
       </tr><tr>
         <td colspan="2">
-          <button type="submit" class="button btn-primary"><%= t '#buttons.submit', "Submit" %></button>
+          <button type="submit" class="btn btn-primary"><%= t '#buttons.submit', "Submit" %></button>
         </td>
       </tr>
     </table>
