@@ -671,6 +671,11 @@ ActionController::Routing::Routes.draw do |map|
       sections.get 'courses/:course_id/sections', :action => :index, :path_name => 'course_sections'
       sections.get 'courses/:course_id/sections/:id', :action => :show, :path_name => 'course_section'
       sections.get 'sections/:id', :action => :show
+      sections.post 'courses/:course_id/sections', :action => :create
+      sections.put 'sections/:id', :action => :update
+      sections.delete 'sections/:id', :action => :destroy
+      sections.post 'sections/:id/crosslist/:new_course_id', :action => :crosslist
+      sections.delete 'sections/:id/crosslist', :action => :uncrosslist
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
