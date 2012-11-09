@@ -114,7 +114,14 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def maybe_render_mobile_login(status = nil)
-    if request.user_agent.to_s =~ /ipod|iphone|Android/i
+    cookies['mobile'] = true if params['mobile']
+    # Our iOS and Android native apps are always going to pass a query string param of ?mobile=1
+    # to this page, so they will be always given the mobile formatted page for the native app login
+    # process.  We do not show the mobile formated page if you come to web canvas on mobile devices
+    # on purpose, because the rest of the site is not mobile formated--with the exception of iPod
+    # and iPhone, which we continue to do because that is what we have done and did not want to
+    # change existing functionalitiy.
+    if cookies['mobile'] || request.user_agent.to_s =~ /ipod|iphone/i
       @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
       @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
       @shared_js_vars = {
@@ -312,7 +319,7 @@ class PseudonymSessionsController < ApplicationController
 
       if response.is_valid?
         aac.debug_set(:is_valid_login_response, 'true') if debugging
-        
+
         if response.success_status?
           @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(unique_id)
 
@@ -324,7 +331,7 @@ class PseudonymSessionsController < ApplicationController
             #Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
             @user = @pseudonym.login_assertions_for_user
-            
+
             if debugging
               aac.debug_set(:login_to_canvas_success, 'true')
               aac.debug_set(:logged_in_user_id, @user.id)
