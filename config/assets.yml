@@ -51,10 +51,6 @@ stylesheets:
   dashboard:
     - public/stylesheets/compiled/dashboard_messages.css
     - public/stylesheets/compiled/dashboard_activity.css
-  dashboard2:
-    - public/stylesheets/compiled/dashboard2.css
-    - public/stylesheets/compiled/quick_start_bar.css
-    - public/stylesheets/compiled/activity_feed.css
   registration:
     - public/stylesheets/compiled/registration.css
   profile_show:
