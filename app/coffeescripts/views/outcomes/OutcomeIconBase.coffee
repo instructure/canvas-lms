@@ -32,7 +32,6 @@ define [
     tagName: 'li'
 
     attributes:
-      role: 'treeitem'
       tabindex: -1
 
     events:
