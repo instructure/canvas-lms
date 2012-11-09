@@ -234,7 +234,21 @@
   </div>
 
 
-  <h2 class="v-gutter">Icons</h2>
+  <h2 class="v-gutter" id="anchor-icon">Icons</h2>
+  <p><strong>The "icon-" classes below can only be added to the semantically neutral "i" element.</strong> The one exception is text links, to which you can apply the icon class directly (see below for more details).</p>
+  <div class="alert">
+    <h4>icons on <code>&lt;a&gt;</code>s</h4>
+    <p>you can use the same icon classes to add an icon to a plain link. Just add the <code>icon-&lt;whatever&gt;</code> class to the <code>&lt;a&gt;</code></p>
+    <p>
+    <b>examples:</b>
+    <br>
+    <a class="icon-add" href="#">Do this</a> <code>&lt;a class=&quot;icon-add&quot; href=&quot;#&quot;&gt;&lt;/a&gt;</code>
+    <br>
+    <a href="#"><i class="icon-add"></i> NOT this</a> <code>&lt;a href=&quot;#&quot;&gt;&lt;i class=&quot;icon-add&quot;&gt;&lt;/i&gt;&lt;/a&gt; <-- DONT USE THIS CODE</code>
+    </p>
+    notice how the second, when you hover it, has an underline that creeps out too far to the left?
+  </div>
+
   <span class="demo-icons"><i class="icon-stats"></i> icon-stats</span>
   <span class="demo-icons"><i class="icon-paperclip"></i> icon-paperclip</span>
   <span class="demo-icons"><i class="icon-media"></i> icon-media</span>
@@ -312,6 +326,51 @@
   <span class="demo-icons"><i class="icon-collection"></i> icon-collection</span>
   <span class="demo-icons"><i class="icon-group-new"></i> icon-group-new</span>
   <span class="demo-icons"><i class="icon-group-new-dark"></i> icon-group-new-dark</span>
+  <span class="demo-icons"><i class="icon-zipped"></i> icon-zipped</span>
+  <span class="demo-icons"><i class="icon-user"></i> icon-user</span>
+  <span class="demo-icons"><i class="icon-standards"></i> icon-standards</span>
+  <span class="demo-icons"><i class="icon-search-address-book"></i> icon-search-address-book</span>
+  <span class="demo-icons"><i class="icon-facebook"></i> icon-facebook</span>
+  <span class="demo-icons"><i class="icon-facebook-boxed"></i> icon-facebook-boxed</span>
+  <span class="demo-icons"><i class="icon-linkedin"></i> icon-linkedin</span>
+  <span class="demo-icons"><i class="icon-twitter"></i> icon-twitter</span>
+  <span class="demo-icons"><i class="icon-twitter-boxed"></i> icon-twitter-boxed</span>
+  <span class="demo-icons"><i class="icon-github"></i> icon-github</span>
+  <span class="demo-icons"><i class="icon-skype"></i> icon-skype</span>
+  <span class="demo-icons"><i class="icon-wordpress"></i> icon-wordpress</span>
+  <span class="demo-icons"><i class="icon-pinterest"></i> icon-pinterest</span>
+  <span class="demo-icons"><i class="icon-gradebook"></i> icon-gradebook</span>
+  <span class="demo-icons"><i class="icon-document"></i> icon-document</span>
+  <span class="demo-icons"><i class="icon-module"></i> icon-module</span>
+  <span class="demo-icons"><i class="icon-arrow-up"></i> icon-arrow-up</span>
+  <span class="demo-icons"><i class="icon-arrow-down"></i> icon-arrow-down</span>
+  <span class="demo-icons"><i class="icon-arrow-left"></i> icon-arrow-left</span>
+  <span class="demo-icons"><i class="icon-arrow-right"></i> icon-arrow-right</span>
+  <span class="demo-icons"><i class="icon-email"></i> icon-email</span>
+  <span class="demo-icons"><i class="icon-instructure"></i> icon-instructure</span>
+  <span class="demo-icons"><i class="icon-ms-word"></i> icon-ms-word</span>
+  <span class="demo-icons"><i class="icon-ms-excel"></i> icon-ms-excel</span>
+  <span class="demo-icons"><i class="icon-ms-ppt"></i> icon-ms-ppt</span>
+  <span class="demo-icons"><i class="icon-pdf"></i> icon-pdf</span>
+  <span class="demo-icons"><i class="icon-apple"></i> icon-apple</span>
+  <span class="demo-icons"><i class="icon-windows"></i> icon-windows</span>
+  <span class="demo-icons"><i class="icon-android"></i> icon-android</span>
+  <span class="demo-icons"><i class="icon-heart"></i> icon-heart</span>
+  <span class="demo-icons"><i class="icon-upload"></i> icon-upload</span>
+  <span class="demo-icons"><i class="icon-download"></i> icon-download</span>
+  <span class="demo-icons"><i class="icon-text-left"></i> icon-text-left</span>
+  <span class="demo-icons"><i class="icon-text-center"></i> icon-text-center</span>
+  <span class="demo-icons"><i class="icon-text-right"></i> icon-text-right</span>
+  <span class="demo-icons"><i class="icon-mature"></i> icon-mature</span>
+  <span class="demo-icons"><i class="icon-prerequisite"></i> icon-prerequisite</span>
+  <span class="demo-icons"><i class="icon-educators"></i> icon-educators</span>
+  <span class="demo-icons"><i class="icon-calendar-days"></i> icon-calendar-days</span>
+  <span class="demo-icons"><i class="icon-materials-required"></i> icon-materials-required</span>
+  <span class="demo-icons"><i class="icon-not-graded"></i> icon-not-graded</span>
+  <span class="demo-icons"><i class="icon-peer-graded"></i> icon-peer-graded</span>
+  
+  
+    
 
 
   <!-- Forms
@@ -878,10 +937,8 @@
     <p class="styleguide-turnAllIntoUiButton">
       <button>Default</button>
       <button class="btn-primary">.btn-primary</button>
-      <a class="btn-warning">a.btn-warning</a>
       <button class="btn-danger">.btn-danger</button>
       <button class="btn-success">.btn-success</button>
-      <button class="btn-info">.btn-info</button>
       <button class="btn-inverse">.btn-inverse</button>
     </p>
 
@@ -889,10 +946,8 @@
     <p>
       <button class="btn">Default</button>
       <button class="btn btn-primary">.btn-primary</button>
-      <a href="#" class="btn btn-warning">a.btn-warning</a>
       <button class="btn btn-danger">.btn-danger</button>
       <button class="btn btn-success">.btn-success</button>
-      <button class="btn btn-info">.btn-info</button>
       <button class="btn btn-inverse">.btn-inverse</button>
     </p>
 
@@ -932,12 +987,26 @@
       </div>
     </div>
 
-
-
     <!-- Icon Buttons -->
     <h2 class="demoHeaders">Icon Buttons</h2>
-    <div id="leftIconButton">Left Icon</div> <br /><br />
-    <div id="bothIconButton">Left & Right Icons</div>
+    <div class="alert">
+      <strong>To view all available icon classes, please see the <a href="#anchor-icon" style="text-decoration: underline">Icons</a> section above.</strong>
+      <p>To add an icon to a button, simply add an <strong>i</strong> element within the element with the .btn class. <strong>(Please note that icons will be suppressed when added to a button with the btn-mini class because they'd look so small as to be illegible at that size.)</strong></p>
+      <p>
+        <code>
+          button class="btn" --> i class="icon-stats"
+        </code>
+      </p>
+
+    </div>
+    <p>
+      <button class="btn"><i class="icon-stats"></i> .btn</button>
+      <button class="btn btn-primary"><i class="icon-twitter"></i> .btn .btn-primary</button>
+       <button class="btn btn-danger"><i class="icon-warning"></i> .btn .btn-danger</button>
+      <button class="btn btn-large"><i class="icon-rss"></i> .btn .btn-large</button>
+      <button class="btn btn-small"><i class="icon-note-dark"></i> .btn .btn-small</button>
+
+    </p>
 
     <!-- Button Set -->
     <h2 class="demoHeaders">Button Toggle</h2>
