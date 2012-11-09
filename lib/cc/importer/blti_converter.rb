@@ -60,15 +60,18 @@ module CC::Importer
     
     def convert_blti_link(doc)
       blti = get_blti_namespace(doc)
+      link_css_path = "cartridge_basiclti_link"
       tool = {}
-      tool[:description] = get_node_val(doc, "#{blti}|description")
-      tool[:title] = get_node_val(doc, "#{blti}|title")
-      tool[:url] = get_node_val(doc, "#{blti}|secure_launch_url")
-      tool[:url] ||= get_node_val(doc, "#{blti}|launch_url")
-      if custom_node = doc.css("#{blti}|custom")
+      tool[:description] = get_node_val(doc, "#{link_css_path} > #{blti}|description")
+      tool[:title] = get_node_val(doc, "#{link_css_path} > #{blti}|title")
+      tool[:url] = get_node_val(doc, "#{link_css_path} > #{blti}|secure_launch_url")
+      tool[:url] ||= get_node_val(doc, "#{link_css_path} > #{blti}|launch_url")
+      if custom_node = doc.css("#{link_css_path} > #{blti}|custom").first
         tool[:custom_fields] = get_custom_properties(custom_node)
       end
-      doc.css("#{blti}|extensions").each do |extension|
+      tool[:custom_fields] ||= {}
+
+      doc.css("#{link_css_path} > #{blti}|extensions").each do |extension|
         tool[:extensions] ||= []
         ext = {}
         ext[:platform] = extension['platform']
@@ -88,7 +91,7 @@ module CC::Importer
           tool[:extensions] << ext
         end
       end
-      if icon = get_node_val(doc, "#{blti}|icon")
+      if icon = get_node_val(doc, "#{link_css_path} > #{blti}|icon")
         tool[:settings] ||= {}
         tool[:settings][:icon_url] = icon
       end
