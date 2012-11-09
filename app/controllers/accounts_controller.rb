@@ -140,7 +140,7 @@ class AccountsController < ApplicationController
           # If the setting is present (update is called from 2 different settings forms, one for notifications)
           if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
             # If set to default, remove the custom name so it doesn't get saved
-            params[:account][:settings][:outgoing_email_default_name] = nil if params[:account][:settings][:outgoing_email_default_name_option] == 'default'
+            params[:account][:settings][:outgoing_email_default_name] = '' if params[:account][:settings][:outgoing_email_default_name_option] == 'default'
           end
 
           @account.enable_user_notes = enable_user_notes if enable_user_notes

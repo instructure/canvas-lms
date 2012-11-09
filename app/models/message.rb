@@ -388,7 +388,7 @@ class Message < ActiveRecord::Base
 
     self.from_name = context_root_account.settings[:outgoing_email_default_name] rescue nil
 
-    self.from_name ||= HostUrl.outgoing_email_default_name
+    self.from_name = HostUrl.outgoing_email_default_name if self.from_name.blank?
     self.from_name = self.asset_context.name if (self.asset_context && !self.asset_context.is_a?(Account) && self.asset_context.name && self.notification.dashboard? rescue false)
     self.from_name = self.from_name if self.respond_to?(:from_name)
     true
