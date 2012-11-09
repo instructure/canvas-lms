@@ -102,7 +102,11 @@ $(document).ready(function() {
         </div>
         <div>
           <div class="login-options">
-            <%= f.check_box :remember_me, :checked => session[:used_remember_me_token] %> <%= f.label :remember_me, :en => "Stay signed in" %>
+            <% unless session_timeout_enabled %>
+              <%= f.check_box :remember_me, :checked => session[:used_remember_me_token] %>
+              <%= f.label :remember_me, :en => "Stay signed in" %>
+            <% end %>
+
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <% url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || "#" %><br />
             <%= link_to t('dont_know_password', "Don't know your password?"), url, :class => (url != '#' ? "not_external" : "forgot_password_link"), :id => "login_forgot_password" %>

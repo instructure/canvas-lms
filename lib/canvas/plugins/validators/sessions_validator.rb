@@ -16,8 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module PseudonymSessionsHelper
-  def session_timeout_enabled
-    PluginSetting.settings_for_plugin 'sessions'
+module Canvas::Plugins::Validators::SessionsValidator
+  def self.validate(settings, plugin_setting)
+    timeout = settings["session_timeout"].to_f.minutes
+    if timeout < 20.minutes
+      plugin_setting.errors.add_to_base(I18n.t('canvas.plugins.errors.login_expiration_minimum', 'Session expiration must be 20 minutes or greater'))
+    else 
+      settings
+    end
   end
 end
