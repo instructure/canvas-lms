@@ -5,11 +5,7 @@ class DropReallyOldUnusedColumns3 < ActiveRecord::Migration
 
   # cleanup for some legacy database schema that may not even exist for databases created post-OSS release
   def self.maybe_drop(table, column)
-    begin
-      remove_column(table, column)
-    rescue
-      # exception is db-dependent
-    end
+    remove_column(table, column) if self.connection.columns(table).map(&:name).include?(column.to_s)
   end
 
   def self.up
