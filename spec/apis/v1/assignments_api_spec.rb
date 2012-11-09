@@ -194,7 +194,7 @@ describe AssignmentsApiController, :type => :integration do
           'name' => 'some assignment',
           'assignment_overrides' => {
             '0' => { 'student_ids' => [@student.id], 'title' => 'adhoc override', 'due_at' => @adhoc_due_at.iso8601 },
-            '1' => { 'course_section_id' => [ @course.default_section.id ], 'due_at' => @section_due_at.iso8601 }}}})
+            '1' => { 'course_section_id' => @course.default_section.id, 'due_at' => @section_due_at.iso8601 }}}})
 
     @assignment = Assignment.first
     @assignment.assignment_overrides.count.should == 2
@@ -274,7 +274,7 @@ describe AssignmentsApiController, :type => :integration do
           'name' => 'some assignment',
           'assignment_overrides' => {
             '0' => { 'student_ids' => [@student.id], 'title' => 'adhoc override', 'due_at' => @adhoc_due_at.iso8601 },
-            '1' => { 'course_section_id' => [ @course.default_section.id ], 'due_at' => @section_due_at.iso8601 }}}})
+            '1' => { 'course_section_id' => @course.default_section.id, 'due_at' => @section_due_at.iso8601 }}}})
 
     @assignment = Assignment.first
     @assignment.assignment_overrides.count.should == 2

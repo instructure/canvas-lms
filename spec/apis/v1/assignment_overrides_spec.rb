@@ -506,13 +506,12 @@ describe AssignmentOverridesController, :type => :integration do
     context "overridden due_at" do
       it "should set the override due_at" do
         @due_at = 2.days.ago
-        @due_at -= (@due_at.to_f % 1) # shave of usecs
 
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :due_at => @due_at.iso8601 })
 
         @override = @assignment.assignment_overrides(true).first
         @override.due_at_overridden.should be_true
-        @override.due_at.should == @due_at
+        @override.due_at.to_i.should == @due_at.to_i
         @override.unlock_at_overridden.should be_false
         @override.lock_at_overridden.should be_false
       end
@@ -534,14 +533,13 @@ describe AssignmentOverridesController, :type => :integration do
     context "overridden unlock_at" do
       it "should set the override unlock_at" do
         @unlock_at = 2.days.ago
-        @unlock_at -= (@unlock_at.to_f % 1) # shave of usecs
 
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :unlock_at => @unlock_at.iso8601 })
 
         @override = @assignment.assignment_overrides(true).first
         @override.due_at_overridden.should be_false
         @override.unlock_at_overridden.should be_true
-        @override.unlock_at.should == @unlock_at
+        @override.unlock_at.to_i.should == @unlock_at.to_i
         @override.lock_at_overridden.should be_false
       end
 
@@ -562,7 +560,6 @@ describe AssignmentOverridesController, :type => :integration do
     context "overridden lock_at" do
       it "should set the override lock_at" do
         @lock_at = 2.days.ago
-        @lock_at -= (@lock_at.to_f % 1) # shave of usecs
 
         api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id, :lock_at => @lock_at.iso8601 })
 
@@ -570,7 +567,7 @@ describe AssignmentOverridesController, :type => :integration do
         @override.due_at_overridden.should be_false
         @override.unlock_at_overridden.should be_false
         @override.lock_at_overridden.should be_true
-        @override.lock_at.should == @lock_at
+        @override.lock_at.to_i.should == @lock_at.to_i
       end
 
       it "should set a nil override lock_at" do
@@ -765,7 +762,6 @@ describe AssignmentOverridesController, :type => :integration do
         @override.save!
 
         @due_at = 2.days.ago
-        @due_at -= (@due_at.to_f % 1) # shave of usecs
       end
 
       it "should set the override due_at" do
@@ -776,7 +772,7 @@ describe AssignmentOverridesController, :type => :integration do
 
         @override.reload
         @override.due_at_overridden.should be_true
-        @override.due_at.should == @due_at
+        @override.due_at.to_i.should == @due_at.to_i
       end
 
       it "should set a nil override due_at" do
@@ -823,7 +819,7 @@ describe AssignmentOverridesController, :type => :integration do
 
         @override.reload
         @override.unlock_at_overridden.should be_true
-        @override.unlock_at.should == @unlock_at
+        @override.unlock_at.to_i.should == @unlock_at.to_i
       end
 
       it "should set a nil override unlock_at" do
@@ -870,7 +866,7 @@ describe AssignmentOverridesController, :type => :integration do
 
         @override.reload
         @override.lock_at_overridden.should be_true
-        @override.lock_at.should == @lock_at
+        @override.lock_at.to_i.should == @lock_at.to_i
       end
 
       it "should set a nil override lock_at" do

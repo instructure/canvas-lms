@@ -111,7 +111,7 @@ class PluginAssets
   end
 
   def for_each_plugin
-    Dir.glob( asset_matcher ).each do |asset_file|
+    Dir.glob( asset_matcher ).sort.each do |asset_file|
       yield plugin_name_for(asset_file), YAML.load(File.read(asset_file))
     end
   end
