@@ -29,14 +29,14 @@
 #       assignment_id: 123,
 #
 #       // the IDs of the override's target students (present iff the override
-#       // targets and adhoc set of students)
+#       // targets an adhoc set of students)
 #       student_ids: [1, 2, 3],
 #
 #       // the ID of the override's target group (present iff the override
 #       // targets a group)
 #       group_id: 2,
 #
-#       // the ID of the overrides’s target section (present iff the override
+#       // the ID of the overrides's target section (present iff the override
 #       // targets a section)
 #       course_section_id: 1
 #
