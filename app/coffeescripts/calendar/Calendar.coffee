@@ -96,7 +96,9 @@ define [
           fullCalendarParams.month = date.getMonth()
           fullCalendarParams.date = date.getDate()
 
-      @el = $(selector).html calendarAppTemplate(calendar2Only: @options.calendar2Only)
+      @el = $(selector).html calendarAppTemplate(
+        calendar2Only: @options.calendar2Only,
+        showScheduler: @options.showScheduler)
 
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
         radioId = if data.view_name == 'agendaWeek' then 'week' else 'month'
@@ -118,14 +120,15 @@ define [
 
       @scheduler = new Scheduler(".scheduler-wrapper", this)
 
-      # Pre-load the appointment group list, for the badge
-      @dataSource.getAppointmentGroups false, (data) =>
-        required = 0
-        for group in data
-          required += 1 if group.requiring_action
-        @el.find("#calendar-header .counter-badge")
-          .toggle(required > 0)
-          .text(required)
+      if @options.showScheduler
+        # Pre-load the appointment group list, for the badge
+        @dataSource.getAppointmentGroups false, (data) =>
+          required = 0
+          for group in data
+            required += 1 if group.requiring_action
+          @el.find("#calendar-header .counter-badge")
+            .toggle(required > 0)
+            .text(required)
 
       window.setTimeout =>
         if data.view_name == 'scheduler'

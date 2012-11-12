@@ -157,6 +157,7 @@ class AccountsController < ApplicationController
             :enable_eportfolios,
             :enable_profiles,
             :enable_scheduler,
+            :show_scheduler,
             :global_includes,
           ].each do |key|
             params[:account][:settings].try(:delete, key)
