@@ -41,6 +41,13 @@ if Qti.migration_executable
       @course.assessment_questions.count.should == 10
     end
 
+    it "should create an assessment question bank for the quiz" do
+      @course.assessment_question_banks.count.should == 1
+      bank = @course.assessment_question_banks.first
+      bank.title.should == 'Quiz'
+      bank.assessment_questions.count.should == 10
+    end
+
     it "should have file paths" do
       @course_data[:overview_file_path].index("oi/overview.json").should_not be_nil
       @course_data[:export_folder_path].index('spec_canvas/fixtures/qti/qti_plain_qti/oi').should_not be_nil
