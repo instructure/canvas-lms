@@ -459,12 +459,12 @@ class AssessmentQuestion < ActiveRecord::Base
       end
     end
     if migration.to_import('assessment_questions') != false || (to_import && !to_import.empty?)
-      if check = questions.first
-        # we don't re-migrate questions
-        if migration.context.assessment_questions.scoped(:conditions => {:migration_id => check['migration_id']}).size > 0
-          return question_data
-        end
+
+      questions_to_update = migration.context.assessment_questions.scoped(:conditions => {:migration_id => questions.collect{|q| q['migration_id']}})
+      questions_to_update.each do |question_to_update|
+        questions.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['assessment_question_id'] = question_to_update.id
       end
+
       logger.debug "adding #{total} assessment questions"
 
       banks = {}
@@ -528,10 +528,18 @@ class AssessmentQuestion < ActiveRecord::Base
     prep_for_import(hash, context)
     question_data = AssessmentQuestion.connection.quote hash.to_yaml
     question_name = AssessmentQuestion.connection.quote hash[:question_name]
-    query = "INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
-    query += " VALUES (#{question_name},#{question_data},'active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
-    id = AssessmentQuestion.connection.insert(query)
-    hash['assessment_question_id'] = id
+    if id = hash['assessment_question_id']
+      query = "UPDATE assessment_questions"
+      query += " SET name = #{question_name}, question_data = #{question_data}, workflow_state = 'active', created_at = '#{Time.now.to_s(:db)}',"
+      query += " updated_at = '#{Time.now.to_s(:db)}', assessment_question_bank_id = #{bank.id}"
+      query += " WHERE id = #{id}"
+      AssessmentQuestion.connection.execute(query)
+    else
+      query = "INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
+      query += " VALUES (#{question_name},#{question_data},'active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
+      id = AssessmentQuestion.connection.insert(query)
+      hash['assessment_question_id'] = id
+    end
     hash
   end
   

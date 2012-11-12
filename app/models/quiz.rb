@@ -1202,7 +1202,6 @@ class Quiz < ActiveRecord::Base
         item.workflow_state = hash[:available] ? 'available' : 'created'
         item.save
       end
-      return
     end
     item ||= context.quizzes.new
 
@@ -1222,9 +1221,16 @@ class Quiz < ActiveRecord::Base
     end
     
     item.save!
-
-    if item.quiz_questions.count == 0 && question_data
+    if question_data
       hash[:questions] ||= []
+
+      if question_data[:qq_data]
+        questions_to_update = item.quiz_questions.scoped(:conditions => {:migration_id => question_data[:qq_data].keys})
+        questions_to_update.each do |question_to_update|
+          question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        end
+      end
+
       hash[:questions].each_with_index do |question, i|
         case question[:question_type]
           when "question_reference"
