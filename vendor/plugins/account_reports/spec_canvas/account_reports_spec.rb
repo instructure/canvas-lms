@@ -312,6 +312,11 @@ describe "Default Account Reports" do
     parsed[3][11].to_s.should == course2.enrollment_term.sis_source_id.to_s
     parsed[3][12].to_s.should == enrollment4.computed_current_score.to_s
     parsed[3][13].to_s.should == enrollment4.computed_final_score.to_s
+
+    parameters = {}
+    parameters["enrollment_term"] = ""
+    parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+    parsed.length.should == 4
   end
 
   it "should find the default module and configured reports" do
