@@ -25,7 +25,7 @@ module Canvas::AccountReports
       @account_report = account_report
       @account = @account_report.account
       @domain_root_account = @account.root_account
-      @term = api_find(@account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.parameters && @account_report.parameters["enrollment_term"]
+      @term = api_find(@account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.parameters && @account_report.parameters["enrollment_term"].presence
     end
 
     # retrieve the list of students for all active courses
