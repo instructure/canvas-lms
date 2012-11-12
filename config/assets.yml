@@ -9,7 +9,7 @@ css_compressor_options:
 # package_assets: always
 # compress_assets: off
 
-<% require File.expand_path(File.dirname(__FILE__) + '/lib/canvas/plugins/plugin_assets') %>
+<% require File.expand_path(Jammit::ASSET_ROOT + '/lib/canvas/plugins/plugin_assets') %>
 <% plugin_assets = PluginAssets.new %>
 <%= plugin_assets.bundle_yml %>
 
