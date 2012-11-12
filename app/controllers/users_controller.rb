@@ -875,7 +875,7 @@ class UsersController < ApplicationController
         message_sent = true
         @pseudonym.send_registration_notification!
       else
-        @cc.send_merge_notification! if @cc.merge_candidates.length != 0
+        @cc.send_merge_notification! if @cc.has_merge_candidates?
       end
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent, :course => @user.self_enrollment_course }

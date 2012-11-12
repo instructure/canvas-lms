@@ -58,7 +58,7 @@
         <% unless !@domain_root_account.edit_institution_email? && c.imported? %>
           <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
         <% end %>
-        <% if c.active? && c.merge_candidates.length != 0 %>
+        <% if c.active? && c.has_merge_candidates? %>
           <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover"><i class="icon-group-new standalone-icon" title="<%= t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %>"></i></a>
         <% end %>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>

@@ -337,12 +337,23 @@ class CommunicationChannel < ActiveRecord::Base
     [Shard.default]
   end
 
-  def merge_candidates
+  def merge_candidates(break_on_first_found = false)
     shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
     shards ||= [self.shard]
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
+    merge_candidates = {}
     Shard.with_each_shard(shards) do
-      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user)
-    end.uniq.select { |u| u.all_active_pseudonyms.length != 0 }
+      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user).select do |u|
+        result = merge_candidates.fetch(u.global_id) do
+          merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
+        end
+        return [u] if result && break_on_first_found
+        result
+      end
+    end.uniq
+  end
+
+  def has_merge_candidates?
+    !merge_candidates(true).empty?
   end
 end
