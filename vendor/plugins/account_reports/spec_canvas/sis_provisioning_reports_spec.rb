@@ -96,6 +96,7 @@ describe "Default Account Reports" do
       parsed[1].should == ["sub2", nil, "Math", "active"]
       parsed[2].should == ["subsub1", "sub1", "sESL", "active"]
 
+      parameters["enrollment_term"] = ''
       parsed = ReportsSpecHelper.run_report(@account,"provisioning_csv", parameters, 4)
       parsed.length.should == 4
       parsed[0].should == [sub_account.id.to_s, "sub1", @account.id.to_s, nil, "English", "active"]
@@ -204,6 +205,7 @@ describe "Default Account Reports" do
       course6.workflow_state = 'completed'
       course6.save!
       parameters = {}
+      parameters["enrollment_term"] = ''
       parameters["courses"] = true
       parsed = ReportsSpecHelper.run_report(@account,"sis_export_csv", parameters)
       parsed.length.should == 3
