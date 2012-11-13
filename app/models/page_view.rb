@@ -158,7 +158,9 @@ class PageView < ActiveRecord::Base
   end
 
   named_scope :for_context, proc { |ctx| { :conditions => { :context_type => ctx.class.name, :context_id => ctx.id } } }
-  named_scope :for_users, proc { |users| { :conditions => { :user_id => users.map(&:id) } } }
+  named_scope :for_users, lambda{ |users|
+    { :conditions => {:user_id => users} }
+  }
 
   # returns a collection with very limited functionality
   # basically, it responds to #paginate and returns a

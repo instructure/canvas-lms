@@ -19,15 +19,44 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssetUserAccess do
+  before :each do
+    @course = Account.default.courses.create!(:name => 'My Course')
+    @assignment = @course.assignments.create!(:title => 'My Assignment')
+    @user = User.create!
+
+    @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => @assignment.asset_string)
+    @asset.display_name = @assignment.asset_string
+    @asset.save!
+  end
+
   it "should update existing records that have bad display names" do
-    course = Account.default.courses.create!(:name => 'My Course')
-    assignment = course.assignments.create!(:title => 'My Assignment')
-    u = User.create!
-    
-    asset = factory_with_protected_attributes(AssetUserAccess, :user => u, :context => course, :asset_code => assignment.asset_string)
-    asset.display_name = assignment.asset_string
-    asset.save!
-    
-    asset.display_name.should == "My Assignment"
+    @asset.display_name.should == "My Assignment"
+  end
+
+  describe "for_user" do
+    it "should work with a User object" do
+      AssetUserAccess.for_user(@user).should == [@asset]
+    end
+
+    it "should work with a list of User objects" do
+      AssetUserAccess.for_user([@user]).should == [@asset]
+    end
+
+    it "should work with a User id" do
+      AssetUserAccess.for_user(@user.id).should == [@asset]
+    end
+
+    it "should work with a list of User ids" do
+      AssetUserAccess.for_user([@user.id]).should == [@asset]
+    end
+
+    it "should with with an empty list" do
+      AssetUserAccess.for_user([]).should == []
+    end
+
+    it "should not find unrelated accesses" do
+      AssetUserAccess.for_user(User.create!).should == []
+      AssetUserAccess.for_user(@user.id + 1).should == []
+    end
   end
 end

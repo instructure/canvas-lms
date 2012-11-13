@@ -222,4 +222,24 @@ describe PageView do
       end
     end
   end
+
+  describe "for_users" do
+    before :each do
+      @page_view.save!
+    end
+
+    it "should work with User objects" do
+      PageView.for_users([@user]).should == [@page_view]
+      PageView.for_users([User.create!]).should == []
+    end
+
+    it "should work with a User ids" do
+      PageView.for_users([@user.id]).should == [@page_view]
+      PageView.for_users([@user.id + 1]).should == []
+    end
+
+    it "should with with an empty list" do
+      PageView.for_users([]).should == []
+    end
+  end
 end
