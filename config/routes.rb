@@ -410,7 +410,6 @@ ActionController::Routing::Routes.draw do |map|
     add_media(group)
     group.resources :collaborations
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
-    group.profile 'profile', :controller => :groups, :action => 'profile', :conditions => {:method => :get}
   end
 
   map.resources :accounts, :member => { :statistics => :get } do |account|

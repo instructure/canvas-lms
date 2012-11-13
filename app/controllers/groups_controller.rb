@@ -564,23 +564,6 @@ class GroupsController < ApplicationController
     end
   end
 
-  def profile
-    account = @context.root_account
-    raise ActiveRecord::RecordNotFound unless account.canvas_network_enabled?
-
-    @use_new_styles = true
-    @active_tab = 'profile'
-    @group = Group.find(params[:group_id])
-
-    # FIXME: there are probably some permissions that could override the
-    # public/private setting on groups (school admins or something?)
-    @can_join = %(parent_context_auto_join
-                  parent_context_request).include? @group.join_level
-    @in_group = @current_user && @current_user.groups.include?(@group)
-
-    render :action => :profile
-  end
-
   def public_feed
     return unless get_feed_context(:only => [:group])
     feed = Atom::Feed.new do |f|
