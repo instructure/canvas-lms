@@ -103,6 +103,6 @@ define [
 
     maybeRemove: (entry) ->
       if entry.deleted and !entry.replies
-        erase entry.parent.replies, entry
+        erase entry.parent.replies, entry if entry.parent?.replies?
         delete @flattened[entry.id]
 
