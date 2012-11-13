@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper.rb')
 
 describe PageView do
@@ -24,6 +24,17 @@ describe PageView do
     # sets both @user and @course (@user is a teacher in @course)
     course_model
     @page_view = PageView.new { |p| p.send(:attributes=, { :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, false) }
+  end
+
+  describe "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should not assign the default shard" do
+        PageView.new.shard.should == Shard.default
+        @shard1.activate do
+          PageView.new.shard.should == @shard1
+        end
+      end
   end
 
   describe "cassandra page views" do
@@ -34,6 +45,17 @@ describe PageView do
       }.to change { PageView.cassandra.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
       PageView.find(@page_view.id).should == @page_view
       expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    describe "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should always assign the default shard" do
+        PageView.new.shard.should == Shard.default
+        @shard1.activate do
+          PageView.new.shard.should == Shard.default
+        end
+      end
     end
 
     it "should paginate with a willpaginate-like array" do
