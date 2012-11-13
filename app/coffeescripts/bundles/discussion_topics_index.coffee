@@ -9,11 +9,13 @@ require [
   if ENV.is_showing_announcements
     collection = new AnnouncementsCollection
 
-    externalFeeds = new ExternalFeedCollection
-    externalFeeds.fetch()
-    new ExternalFeedsIndexView
-      permissions: ENV.permissions
-      collection: externalFeeds
+    if ENV.permissions.create
+      externalFeeds = new ExternalFeedCollection
+      externalFeeds.fetch()
+      new ExternalFeedsIndexView
+        permissions: ENV.permissions
+        collection: externalFeeds
+
   else
     collection = new DiscussionTopicsCollection
 

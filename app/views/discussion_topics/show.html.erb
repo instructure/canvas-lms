@@ -154,13 +154,13 @@
               <button class="al-trigger ui-button" data-kyle-menu-options='{"appendMenuTo": "body"}'><span class="al-trigger-inner"><%= t :manage_discussion, 'Manage Discussion' %></span></button>
               <ul class="al-options">
                 <% if can_do(@topic, @current_user, :update) %>
-                  <li><a href="<%= context_url(@topic.context, :edit_context_discussion_topic_url, @topic) %>"><span class="ui-icon ui-icon-pencil"></span><%= t :edit, 'Edit' %></a></li>
+                  <li><a href="<%= context_url(@topic.context, :edit_context_discussion_topic_url, @topic) %>"><i class="icon-edit"></i> <%= t :edit, 'Edit' %></a></li>
                 <% end %>
                 <% if @topic.for_assignment? && (can_do(@topic.assignment, @current_user, :grade) || can_do(@topic.assignment.context, @current_user, :manage_assignments)) %>
-                  <li><a href="<%= context_url(@topic.assignment.context, :edit_context_assignment_url, @topic.assignment.id, :return_to => request.url) %>"><span class="ui-icon ui-icon-pencil"></span><%= t :assignment_settings, 'Assignment Details' %></a></li>
+                  <li><a href="<%= context_url(@topic.assignment.context, :edit_context_assignment_url, @topic.assignment.id, :return_to => request.url) %>"><i class="icon-edit"></i> <%= t :assignment_settings, 'Assignment Details' %></a></li>
                 <% end %>
                 <% if can_do(@topic, @current_user, :delete) %>
-                  <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><span class="ui-icon ui-icon-trash"></span><%= t :delete, 'Delete' %></a></li>
+                  <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
                 <% end %>
               </ul>
             </div>

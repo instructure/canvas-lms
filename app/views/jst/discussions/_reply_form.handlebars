@@ -8,14 +8,14 @@
 
     <div class="clearfix">
       <div class="discussion-reply-buttons">
-        <a href="javascript:" class="btn btn-small cancel_button">{{#t "cancel"}}Cancel{{/t}}</a>
         <button class="btn btn-primary btn-small" type="submit">{{#t "post_response"}}Post Response{{/t}}</button>
+        <a href="javascript:" class="cancel_button btn btn-small">{{#t "cancel"}}Cancel{{/t}}</a>
       </div>
 
       <div class="discussion-reply-attachments-container">
         <ul class="discussion-reply-attachments"></ul>
         {{#if canAttach}}
-          <a href="#" class="discussion-reply-add-attachment" data-event="addReplyAttachment">{{#t "attach_file"}}Attach{{/t}}</a>
+          <a href="#" class="discussion-reply-add-attachment icon-paperclip" data-event="addReplyAttachment">{{#t "attach_file"}}Attach{{/t}}</a>
         {{/if}}
       </div>
     </div>
