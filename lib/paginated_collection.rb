@@ -61,7 +61,13 @@ module PaginatedCollection
     attr_accessor :next_page, :previous_page, :first_page, :last_page, :total_entries
   end
 
-  class Proxy < Struct.new(:block)
+  class Proxy
+    attr_accessor :block
+
+    def initialize(block)
+      @block = block
+    end
+
     def paginate(options = {})
       raise(ArgumentError, "per_page required") unless options[:per_page] && options[:per_page] > 0
 
