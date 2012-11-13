@@ -95,6 +95,7 @@ define [
         'deleted'
         'attachment'
         'replies'
+        'author'
 
     ##
     # Computed attribute to determine if the entry can be moderated
