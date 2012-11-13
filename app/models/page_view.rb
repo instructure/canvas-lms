@@ -29,6 +29,14 @@ class PageView < ActiveRecord::Base
   before_save :cap_interaction_seconds
   belongs_to :context, :polymorphic => true
 
+  def initialize_with_shard_assignment(*a, &b)
+    initialize_without_shard_assignment(*a, &b)
+    if self.class.cassandra?
+      self.shard = Shard.default
+    end
+  end
+  alias_method_chain :initialize, :shard_assignment
+
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
@@ -135,7 +143,6 @@ class PageView < ActiveRecord::Base
   def create_without_callbacks
     return super unless self.class.cassandra?
     self.created_at ||= Time.zone.now
-    self.shard = Shard.default
     update
     if user
       cassandra.execute("INSERT INTO page_views_history_by_context (context_and_time_bucket, ordered_id, request_id) VALUES (?, ?, ?)", "#{user.global_asset_string}/#{PageView.timeline_bucket_for_time(created_at, "User")}", "#{created_at.to_i}/#{request_id[0,8]}", request_id)
