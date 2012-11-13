@@ -35,7 +35,7 @@ class CommunicationChannel < ActiveRecord::Base
   before_save :consider_building_pseudonym
   validates_presence_of :path
   validate :uniqueness_of_path
-  validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? }
+  validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
 
   acts_as_list :scope => :user_id
   
