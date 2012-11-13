@@ -829,6 +829,22 @@ describe User do
             ['o@instructure.com', 'retired']
         ]
       end
+
+      it "should not fail copying retired sms channels" do
+        @user1 = User.create!
+        @shard1.activate do
+          @user2 = User.create!
+        end
+
+        @cc = @user2.communication_channels.sms.create!(:path => 'abc')
+        @cc.retire!
+
+        @user2.move_to_user(@user1)
+        @user1.communication_channels.reload.length.should == 1
+        cc = @user1.communication_channels.first
+        cc.path.should == 'abc'
+        cc.workflow_state.should == 'retired'
+      end
     end
   end
 
