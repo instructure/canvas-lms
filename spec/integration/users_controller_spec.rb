@@ -240,5 +240,38 @@ describe UsersController do
       student_grades.text.should match /#{@course.name}/
     end
   end
+
+  describe "admin_merge" do
+    it "should work for the whole flow" do
+      user_with_pseudonym(:active_all => 1)
+      Account.default.add_user(@user)
+      @admin = @user
+      user_with_pseudonym(:active_all => 1, :username => 'user2@instructure.com')
+      user_session(@admin)
+
+      get user_admin_merge_url(@user, :pending_user_id => @admin.id)
+      response.should be_success
+      assigns['pending_other_user'].should == @admin
+      assigns['other_user'].should be_nil
+      session[:pending_user_id].should be_nil
+      session[:merge_user_id].should be_nil
+
+      get user_admin_merge_url(@user, :new_user_id => @admin.id)
+      response.should be_success
+      assigns['pending_other_user'].should be_nil
+      assigns['other_user'].should == @admin
+      session[:pending_user_id].should be_nil
+      session[:merge_user_id].should == @user.id
+
+      post user_merge_url(@user, :new_user_id => @admin.id)
+      response.should redirect_to(user_profile_url(@admin))
+
+      session[:pending_user_id].should be_nil
+      session[:merge_user_id].should be_nil
+      @user.reload.should be_deleted
+      @admin.reload.should be_registered
+      @admin.pseudonyms.count.should == 2
+    end
+  end
 end
 

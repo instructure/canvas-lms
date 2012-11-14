@@ -173,7 +173,7 @@ describe "users" do
       f('.static_message').should be_false
       f('#manual_user_id').send_keys("azxcvbytre34567uijmm23456yhj")
       expect_new_page_load { f('button[type="submit"]').click }
-      f('.static_message').text.should =~ /Invalid input. Please enter a valid ID./
+      f('.static_message').text.should =~ /No active user with that ID was found./
     end
 
     it "should show an error if the user id doesnt exist" do

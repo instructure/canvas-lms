@@ -42,7 +42,7 @@
             :target_user_name => @other_user.name, :target_user_email => @other_user.email) %>
     <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @other_user} %>
     </p>
-    <% form_tag user_merge_path(@user, :new_user_uuid => @other_user.uuid), :method => :post do %>
+    <% form_tag user_merge_path(@user, :new_user_id => @other_user.id), :method => :post do %>
       <div class="button-container">
         <button type="submit" class="btn"><%= t('buttons.merge_user_account', 'Merge User Accounts') %></button>
         <a href="<%= dashboard_path %>" class="btn button-secondary"><%= t('#buttons.cancel', 'Cancel') %></a>
