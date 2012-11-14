@@ -221,6 +221,14 @@ describe GroupsController do
       assigns[:group_category].groups.size.should == 3
     end
 
+    it "should respect the max new-category group count" do
+      course_with_teacher_logged_in(:active_all => true)
+      Setting.set('max_groups_in_new_category', '5')
+      post 'create_category', :course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :create_group_count => '7'}
+      response.should be_success
+      assigns[:group_category].groups.size.should == 5
+    end
+
     it "should not distribute students when self-signup" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
