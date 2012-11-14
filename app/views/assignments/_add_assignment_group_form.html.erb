@@ -10,8 +10,8 @@
     </span>
     </div>
     <div class="button-container-right-aligned">
-      <button type="submit" class="btn "><%= t '#buttons.update', "Update" %></button>
-      <button type="button" class="button-secondary cancel_button" style="margin-right:0 !important;"><%= image_tag("cancel.png") %></button>
+      <button type="button" class="btn btn-small cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="submit" class="button btn-primary btn-small" style="margin-left: 0 !important"><%= t '#buttons.update', "Update" %></button>
     </div>
     <span style="padding-left: 10px; display: none;" class="weighting">
       <span style="font-size: 0.8em;"><%= before_label :assignments, "Assignments" %></span>
@@ -22,7 +22,7 @@
     <div class="form_rules" style="margin-left: 20px;">
     </div>
     <div class="rule" id="assignment_group_rule_blank" style="display: none; margin-top: 2px;">
-      <a href="#" class="delete_rule_link no-hover" style="padding-right: 5px;"><%= image_tag "delete_circle.png" %></a>
+      <a href="#" class="delete_rule_link no-hover"><i class="icon-end standalone-icon"></i><span class="screen-reader-text"><%= t('links.delete_assignment', "Delete") %></span></a>
       <select name="rule_type" class="group_rule_type">
         <option value="drop_lowest"><%= t 'options.drop_lowest', "Drop the Lowest" %></option>
         <option value="drop_highest"><%= t 'options.drop_highest', "Drop the Highest" %></option>

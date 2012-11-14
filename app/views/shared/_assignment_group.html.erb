@@ -24,15 +24,15 @@
       <div style="float: right; margin-right: 5px; display: block;" class="links">
         <span class="more_info_brief" style="font-weight: bold; display: none; font-size: 0.8em; padding-right: 10px;" title="<%= t 'titles.percent_of_final_grade', 'Percent of Final Grade' %>"><span class="group_weight"><%= (group.try_rescue(:group_weight) || "0") %></span>%</span>
         <a href="<%= context_url(@context, :new_context_assignment_url, :assignment_group_id => (group ? group.id : "{{ id }}")) %>" class="add_assignment_link no-hover" style="padding-right: 15px;">
-          <%= image_tag 'add.png', :alt => t('alts.add_assignment', "Add Assignment"), :title => t('links.add_assignment', "Add Assignment") %>
+          <i class="icon-add standalone-icon"></i><span class="screen-reader-text"><%= t('alts.add_assignment', "Add Assignment") %></span>
         </a>
         <a href="<%= context_url(@context, :context_assignment_group_reorder_assignments_url, group ? group.id : "{{ id }}") %>" class="reorder_assignments_url" style="display: none;">&nbsp;</a>
         <a href="#" class="edit_group_link no-hover">
-          <%= image_tag 'edit.png', :alt => t('alts.edit_group_details', "Edit"), :title => t('links.edit_group_details', "Edit Group Details") %>
+          <i class="icon-edit standalone-icon"></i><span class="screen-reader-text"><%= t('alts.edit_group_details', "Edit") %></span>
         </a>
         <% if !group || !group.has_frozen_assignments?(@current_user) %>
           <a href="<%= context_url(@context, :controller => :assignment_groups, :action => :destroy, :id => (assignment_group ? assignment_group.id : "{{ id }}")) %>" class="delete_group_link no-hover">
-            <%= image_tag 'delete.png', :alt => t('alts.delete_assignment_group', "Delete"), :title => t('titles.delete_assignment_group', "Delete Assignment Group") %>
+            <i class="icon-end standalone-icon"></i><span class="screen-reader-text"><%= t('alts.delete_assignment_group', "Delete Assignment Group") %></span>
           </a>
         <% end %>
       </div>
