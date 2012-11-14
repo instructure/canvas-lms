@@ -705,6 +705,7 @@ class GroupsController < ApplicationController
     count_field = self_signup ? :create_group_count : :split_group_count
     count = params[:category][count_field].to_i
     count = 0 if count < 0
+    count = [count, Setting.get_cached('max_groups_in_new_category', '200').to_i].min
     count = potential_members.length if distribute_members && count > potential_members.length
     return if count.zero?
 
