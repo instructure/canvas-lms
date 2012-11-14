@@ -612,7 +612,8 @@ ul.group_list
 
   h3
     :border-bottom 1px solid #aaa
-    :margin 0
+    :margin 0 0 10px
+    :padding-bottom 5px
 
 
   .wizard_content
@@ -638,6 +639,12 @@ ul.group_list
       :margin 0px 20px
       :color #444
       :position relative
+      
+      // adding override to link appearance, as javascript depends on there being a .link class here
+      a.link
+        :background-image none
+        :padding 0
+      
       p
         :margin-top 0
 
@@ -645,44 +652,28 @@ ul.group_list
       :list-style-type none
       :margin 0 10px 0 0
       :line-height 1.8em
-      :padding-left 10px
+      :padding-left 5px
 
       .option
         :cursor pointer
-        :padding-left 25px
-        :color #444
         :font-weight bold
+        :color #444
         +border-radius(3px)
-        :background-image url(/images/person.png)
-        :background-repeat no-repeat
-        :background-position 3px center
 
-        &.information_step
-          :background-image url(/images/information.png)
-        &.assignments_step
-          :background-image url(/images/grading_icon.png)
-        &.content_step
-          :background-image url(/images/file.png)
-        &.calendar_step
-          :background-image url(/images/due_date_icon.png)
-        &.publish_step
-          :background-image url(/images/forward.png)
-        &.add_step
-          :background-image url(/images/add.png)
-        &.quiz_step
-          :background-image url(/images/quiz.png)
-        &.download_step
-          :background-image url(/images/download.png)
-        &.edit_step
-          :background-image url(/images/edit.png)
-        &.delete_step
-          :background-image url(/images/delete.png)
         &:hover
           :background-color #ddd
         &.completed a
           :color #aaa
         &.selected
           :background-color #ccc
+        
+        a[class*=icon-], a[class^=icon-]
+          
+          &:before
+            :font-size 16px
+            :line-height 16px
+            :vertical-align text-top
+            :color #555
 
 #content_tags_dialog
   h3

@@ -18,8 +18,12 @@ i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-] {
   &:before {
     font-family: 'canvasregular';
     display: inline-block;
-    text-transform: none !important;
     vertical-align: middle;
+    
+    // override any properties in the cascade that might make the font display incorrectly
+    text-transform: none !important;
+    font-weight: normal !important;
+    font-style: normal !important;
   }
   
 }
@@ -164,3 +168,12 @@ a[class*=icon-]:before, a[class^=icon-]:before {
 .icon-materials-required:before { content: "\c5" }
 .icon-not-graded:before { content: "\c9" }
 .icon-peer-graded:before { content: "\64" }
+
+// utility class for when you want a standalone icon, and want its function to be read aloud by
+// screen readers. Should only ever be an issue when an icon- class is used with a link.
+span.screen-reader-text {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  font-size: 4px;
+}

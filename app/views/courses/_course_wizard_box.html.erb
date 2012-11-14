@@ -35,7 +35,7 @@ $(document).ready(function() {
     <ul class="wizard_options_list">
       <% if can_do @context, @current_user, :manage_content %>
         <li class="option download_step <%= 'completed' unless @context.attachments.active.first.nil? %>">
-          <a href="<%= context_url(@context, :context_imports_url) %>" class="header"><%= t('links.import', %{Import Content}) %></a>
+          <a href="<%= context_url(@context, :context_imports_url) %>" class="header icon-download"><%= t('links.import', %{Import Content}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.import', %{If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas.  We can walk you through the process of easily migrating your content into Canvas.} %>
           </div>
@@ -43,7 +43,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :manage_content, :manage_assignments %>
         <li class="option assignments_step <%= 'completed' unless @context.assignments.active.first.nil? %>">
-          <a href="<%= context_url(@context, :context_assignments_url, :wizard => 1) %>" class="header"><%= t('links.assignments', %{Add Course Assignments}) %></a>
+          <a href="<%= context_url(@context, :context_assignments_url, :wizard => 1) %>" class="header icon-assignment"><%= t('links.assignments', %{Add Course Assignments}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.assignments', %{Add your assignments.  You can just make a long list, or break them up into groups -- and even specify weights for each assignment group.} %>
           </div>
@@ -51,7 +51,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :manage_students %>
         <li class="option <%=  'completed' unless @context.students.first.nil? %>">
-          <a href="<%= context_url(@context, :context_details_url, :wizard => 1) %>#add_students" class="header"><%= t('links.students', %{Add Students to the Course}) %></a>
+          <a href="<%= context_url(@context, :context_details_url, :wizard => 1) %>#add_students" class="header icon-group-new"><%= t('links.students', %{Add Students to the Course}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.students', %{You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?} %>
           </div>
@@ -59,7 +59,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :manage_content, :manage_files %>
         <li class="option download_step <%= 'completed' unless @context.attachments.active.first.nil? %>" style="display: none;">
-          <a href="<%= context_url(@context, :context_files_url, :wizard => 1) %>" class="header"><%= t('links.files', %{Add Course Files}) %></a>
+          <a href="<%= context_url(@context, :context_files_url, :wizard => 1) %>" class="header icon-folder"><%= t('links.files', %{Add Course Files}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.files', %{The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download.  Uploading and organizing your files is easy with Canvas.  We'll show you how.} %>
           </div>
@@ -67,7 +67,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :update %>
         <li class="option content_step <%= 'completed' if @context.tab_configuration %>">
-          <a href="<%= context_url(@context, :context_details_url) %>#tab-navigation" class="header"><%= t('links.navigation', %{Select Navigation Links}) %></a>
+          <a href="<%= context_url(@context, :context_details_url) %>#tab-navigation" class="header icon-link"><%= t('links.navigation', %{Select Navigation Links}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.navigation', %{By default all links are enabled for a course.  Students won't see links to sections that don't have content.  For example, if you haven't created any quizzes, they won't see the quizzes link.  You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing.} %>
           </div>
@@ -75,7 +75,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :manage_content %>
         <li class="option content_step completed">
-          <a href="#" class="header"><%= t('links.home', %{Choose a Course Home Page}) %></a>
+          <a href="#" class="header icon-instructure"><%= t('links.home', %{Choose a Course Home Page}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.home', %{When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream.  To customize this, just click %{change_layout}.}, :change_layout => "<strong class='change_home_page_layout_indicate'>#{t('#courses.show.links.change_layout', 'Change Home Page Layout')}</strong>".html_safe %>
           </div>
@@ -83,7 +83,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :manage_calendar %>
         <li class="option calendar_step <%= 'completed' unless @context.calendar_events.active.first.nil? %>">
-          <a href="<%= calendar_path(:wizard => 1) %>" class="header"><%= t('links.calendar', %{Add Course Calendar Events}) %></a>
+          <a href="<%= calendar_path(:wizard => 1) %>" class="header icon-calendar-day"><%= t('links.calendar', %{Add Course Calendar Events}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.calendar', %{Here's a great chance to get to know the calendar -- and add any non-assignment events you might have to the course.  Don't worry, we'll help you through it.} %>
           </div>
@@ -91,7 +91,7 @@ $(document).ready(function() {
       <% end %>
       <% if can_do @context, @current_user, :manage_admin_users %>
         <li class="option <%= 'completed' unless @context.tas.empty? %>">
-          <a href="<%= context_url(@context, :context_details_url, :wizard => 1) %>#add_tas" class="header"><%= t('links.tas', %{Add TAs to the Course}) %></a>
+          <a href="<%= context_url(@context, :context_details_url, :wizard => 1) %>#add_tas" class="header icon-user-add"><%= t('links.tas', %{Add TAs to the Course}) %></a>
           <div class="details" style="display: none;">
             <%= t 'details.tas', %{You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you.} %>
           </div>
@@ -167,7 +167,7 @@ Please **log in** or ***register*** to claim this course.}, :wrapper => {
     <div>
       <h3 class="header" style="display: none;">&nbsp;</h3>
       <div style="text-align: center; font-size: 1.3em; margin-top: 5px;">
-        <a class="link">&nbsp;</a>
+        <a class="link icon-arrow-right">&nbsp;</a>
       </div>
     </div>
   </div>
