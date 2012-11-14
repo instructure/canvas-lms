@@ -906,10 +906,9 @@ class UsersController < ApplicationController
   end
 
   def merge
-    @user_about_to_go_away = User.find_by_uuid(session[:merge_user_uuid]) if session[:merge_user_uuid].present?
-    @user_about_to_go_away = nil unless @user_about_to_go_away.id == params[:user_id].to_i
+    @user_about_to_go_away = User.find_by_id(session[:merge_user_id]) if session[:merge_user_id].present?
 
-    if params[:new_user_uuid] && @true_user = User.find_by_uuid(params[:new_user_uuid])
+    if params[:new_user_id] && @true_user = User.find_by_id(params[:new_user_id])
       if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
         @user_that_will_still_be_around = @true_user
       else
@@ -919,10 +918,10 @@ class UsersController < ApplicationController
       @user_that_will_still_be_around = @current_user
     end
 
-    if @user_about_to_go_away && @user_that_will_still_be_around && @user_about_to_go_away.id.to_s == params[:user_id]
+    if @user_about_to_go_away && @user_that_will_still_be_around
       @user_about_to_go_away.move_to_user(@user_that_will_still_be_around)
       @user_that_will_still_be_around.touch
-      session.delete(:merge_user_uuid)
+      session.delete(:merge_user_id)
       flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
     else
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
@@ -949,7 +948,6 @@ class UsersController < ApplicationController
       end
       if @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
         session[:merge_user_id] = @user.id
-        session[:merge_user_uuid] = @user.uuid
         session.delete(:pending_user_id)
       else
         @other_user = nil
@@ -960,14 +958,10 @@ class UsersController < ApplicationController
 
   def get_pending_user_and_error(pending_user_id, entered_user_id)
     pending_other_error = nil
-    if entered_user_id.to_s != entered_user_id.to_i.to_s && entered_user_id.present?
-      pending_user_id = nil
-      pending_other_error = t('invalid_input', "Invalid input. Please enter a valid ID.")
-    end
-    @pending_other_user = User.find_by_id(pending_user_id) if pending_user_id.present?
-    @pending_other_user = nil if @pending_other_user == @user
+    @pending_other_user = api_find_all(User, [pending_user_id]).first if pending_user_id.present?
     @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
-    if entered_user_id == @user.id.to_s
+    if @pending_other_user == @user
+      @pending_other_user = nil
       pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
     elsif @pending_other_user.blank? && entered_user_id.present? && pending_other_error.blank?
       pending_other_error = t('user_not_found', "No active user with that ID was found.")
@@ -976,12 +970,10 @@ class UsersController < ApplicationController
   end
 
   def confirm_merge
-    @user = User.find_by_uuid(session[:merge_user_uuid]) if session[:merge_user_uuid].present?
-    @user = nil unless @user && @user.id == session[:merge_user_id]
+    @user = User.find_by_id(session[:merge_user_id]) if session[:merge_user_id].present?
     if @user && @user != @current_user
       render :action => 'confirm_merge'
     else
-      session[:merge_user_uuid] = @current_user.uuid
       session[:merge_user_id] = @current_user.id
       store_location(user_confirm_merge_url(@current_user.id))
       render :action => 'merge'
