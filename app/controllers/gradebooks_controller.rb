@@ -70,7 +70,8 @@ class GradebooksController < ApplicationController
           @submissions.each { |s| assignment = @assignments.find { |a| a.id == s.assignment_id }; s.assignment = assignment if assignment.present? }
           # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
           # assignment in order to calculate grade distributions
-          @all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
+          all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
+          @submissions_by_assignment = submissions_by_assignment(all_submissions)
           @unread_submission_ids = []
           if @student == @current_user
             @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
@@ -422,4 +423,13 @@ class GradebooksController < ApplicationController
     groups = [] if options[:exclude_total] && groups.length == 1
     groups
   end
+
+  def submissions_by_assignment(submissions)
+    submissions.inject({}) do |hash, sub|
+      hash[sub.assignment_id] ||= []
+      hash[sub.assignment_id] << sub
+      hash
+    end
+  end
+  protected :submissions_by_assignment
 end

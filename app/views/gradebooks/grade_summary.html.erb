@@ -120,7 +120,7 @@
   <%
      submission = @submissions.find {|s| s.assignment_id == assignment.id }
      submission_unread = (submission.present? ? @unread_submission_ids.include?(submission.id) : false)
-     assignment_submissions = @all_submissions.select { |s| s.assignment_id == assignment.id }
+     assignment_submissions = @submissions_by_assignment[assignment.id] || []
      visible_rubric_assessments = []
      visible_rubric_assessments = submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] } if submission && !assignment.muted?
   %>
