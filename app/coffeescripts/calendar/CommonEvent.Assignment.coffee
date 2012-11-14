@@ -28,7 +28,7 @@ define [
       super
 
     fullDetailsURL: () ->
-      $.replaceTags(@contextInfo.assignment_url, 'id', @assignment.id)
+      @assignment.html_url
 
     startDate: () ->
       if @assignment.due_at then $.parseFromISO(@assignment.due_at, 'due_date').time else null
