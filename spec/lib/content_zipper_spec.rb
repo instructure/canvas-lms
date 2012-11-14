@@ -178,4 +178,20 @@ describe ContentZipper do
       names.should == ['otherfile.png']
     end
   end
+
+  describe "zip_eportfolio" do
+    it "should sanitize the zip file name" do
+      user = User.create!
+      eportfolio = user.eportfolios.create!(:name => '/../../etc/passwd')
+
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user = user
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = eportfolio
+      attachment.save!
+      Dir.expects(:mktmpdir).once.yields('/tmp')
+      Zip::ZipFile.expects(:open).once.with('/tmp/etcpasswd.zip', Zip::ZipFile::CREATE)
+      ContentZipper.process_attachment(attachment, user)
+    end
+  end
 end
