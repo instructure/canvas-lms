@@ -84,7 +84,7 @@ class ContentZipper
     zip_attachment.workflow_state = 'zipping'
     zip_attachment.scribd_attempts += 1
     zip_attachment.save!
-    filename = "#{assignment.context.short_name}-#{assignment.title} submissions".gsub(/ /, "_").gsub(/[^\w-]/, "")
+    filename = "#{assignment.context.short_name}-#{assignment.title} submissions"
     submissions = assignment.submissions
     if zip_attachment.user && assignment.context.enrollment_visibility_level_for(zip_attachment.user) != :full
       visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).find(:all, :select => 'user_id').map(&:user_id)
@@ -193,7 +193,7 @@ class ContentZipper
       idx += 1
       obj
     end
-    filename = "#{portfolio.name.gsub(/\s/, "_")}"
+    filename = portfolio.name
     make_zip_tmpdir(filename) do |zip_name|
       idx = 0
       count = static_attachments.length + 2
@@ -249,7 +249,7 @@ class ContentZipper
     zip_attachment.workflow_state = 'zipping' #!(:workflow_state => 'zipping')
     zip_attachment.scribd_attempts += 1
     zip_attachment.save!
-    filename = "#{folder.context.short_name}-#{folder.name} files".gsub(/ /, "_").gsub(/[^\w-]/, "")
+    filename = "#{folder.context.short_name}-#{folder.name} files"
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
       Zip::ZipFile.open(zip_name, Zip::ZipFile::CREATE) do |zipfile|
@@ -281,6 +281,7 @@ class ContentZipper
   # make a tmp directory and yield a filename under that directory to the block
   # given. the tmp directory is deleted when the block returns.
   def make_zip_tmpdir(filename)
+    filename = File.basename(filename.gsub(/ /, "_").gsub(/[^\w-]/, ""))
     Dir.mktmpdir do |dirname|
       zip_name = File.join(dirname, "#{filename}.zip")
       yield zip_name
