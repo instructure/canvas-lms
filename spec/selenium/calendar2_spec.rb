@@ -230,6 +230,14 @@ describe "calendar2" do
         f('#breadcrumbs').text.should include 'Calendar Events'
       end
 
+      it "should go to assignment page when clicking assignment title" do
+        name = 'special assignment'
+        create_middle_day_assignment(name)
+        f('.fc-event.assignment').click
+        expect_new_page_load { f('.view_event_link').click }
+        f('h2.title').text.should include(name)
+      end
+
       it "more options link on assignments should go to assignment edit page" do
         name = 'super big assignment'
         create_middle_day_assignment(name)
