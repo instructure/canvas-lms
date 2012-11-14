@@ -1,5 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) +
-                         '/../app/models/varied_due_date.rb')
 class SortsAssignments
 
   AssignmentsSortedByVariedDueDate = Struct.new(

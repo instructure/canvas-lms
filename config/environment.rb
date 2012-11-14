@@ -70,7 +70,9 @@ Rails::Initializer.run do |config|
   # Activate observers that should always be running
   config.active_record.observers = [:cacher, :stream_item_cache]
 
-  config.autoload_paths += %W( #{RAILS_ROOT}/app/middleware #{RAILS_ROOT}/app/observers )
+  config.autoload_paths += %W(#{RAILS_ROOT}/app/middleware
+                              #{RAILS_ROOT}/app/observers
+                              #{RAILS_ROOT}/app/presenters)
 
   config.middleware.insert_after(ActionController::Base.session_store, 'SessionsTimeout')
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
