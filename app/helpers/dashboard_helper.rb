@@ -43,16 +43,6 @@ module DashboardHelper
       @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).empty?
   end
 
-  def activity_category_title(category, items)
-    if category == "Conversation" || @context && !@context.is_a?(User) # e.g. we're on the course dashboard
-      x_new_in_category(category, items)
-    else
-      I18n.t('helpers.dashboard_helper.activity_category_title_with_contexts',
-        "%{x_new_in_category} in %{contexts_list}",
-        { :x_new_in_category => x_new_in_category(category, items), :contexts_list => contexts_list(items) })
-    end
-  end
-
   def activity_category_links(category, items)
     max_contexts = 4
     contexts = items.map{ |i| [i.context.name, i.context.linked_to] }.uniq
@@ -84,51 +74,27 @@ module DashboardHelper
     end
   end
 
-  def x_new_in_category(category, items)
+  def activity_category_title(category, items)
     case category
     when "Announcement"
       return I18n.t('helpers.dashboard_helper.x_new_in_announcements',
-               { :one => "1 Announcement", :other => "%{count} Announcements" },
-               { :count => items.size })
+               { :one => "*1* Announcement", :other => "*%{count}* Announcements" },
+               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "Conversation"
       return I18n.t('helpers.dashboard_helper.x_new_in_conversations',
-               { :one => "1 Conversation Message", :other => "%{count} Conversation Messages" },
-               { :count => items.size })
+               { :one => "*1* Conversation Message", :other => "*%{count}* Conversation Messages" },
+               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "Assignment"
       return I18n.t('helpers.dashboard_helper.x_new_in_assignments',
-               { :one => "1 Assignment Notification", :other => "%{count} Assignment Notifications" },
-               { :count => items.size })
+               { :one => "*1* Assignment Notification", :other => "*%{count}* Assignment Notifications" },
+               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "DiscussionTopic"
       return I18n.t('helpers.dashboard_helper.x_new_in_discussions',
-               { :one => "1 Discussion", :other => "%{count} Discussions" },
-               { :count => items.size })
+               { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
+               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     else
       raise "Unknown activity category"
     end
   end
-  private :x_new_in_category
 
-  def contexts_list(items)
-    ctx_freqs = Hash.new(0)
-    items.map{ |i| [i.context.type, i.context.id] }.compact.uniq.each{ |cc| ctx_freqs[cc.first] += 1 }
-    translated_ctx_freqs = ctx_freqs.to_a.sort.map{ |ctx_type, count| x_contexts(ctx_type, count) }
-    translated_ctx_freqs.to_sentence
-  end
-  private :contexts_list
-
-  def x_contexts(context, count)
-    case context
-    when "Course", "course"
-      return I18n.t('helpers.dashboard_helper.x_course',
-               { :one => "1 Course", :other => "%{count} Courses" },
-               { :count => count })
-    when "Group", "group"
-      return I18n.t('helpers.dashboard_helper.x_group',
-               { :one => "1 Group", :other => "%{count} Groups" },
-               { :count => count })
-    else
-      raise "Unknown context to count: #{context}"
-    end
-  end
-  private :x_contexts
 end

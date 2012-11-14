@@ -38,6 +38,9 @@ describe "dashboard" do
       test_hiding("/courses/#{@course.to_param}")
     end
 
+    it "should update the item count on stream item hide"
+    it "should remove the stream item category if all items are removed"
+
     it "should show conversation stream items on the dashboard" do
       c = User.create.initiate_conversation([@user.id, User.create.id])
       c.add_message('test')
