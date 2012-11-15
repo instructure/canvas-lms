@@ -34,7 +34,7 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :set_custom_field_values, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy
-  attr_accessor :original_id, :updating_user, :copying
+  attr_accessor :original_id, :updating_user, :copying, :applied_overrides
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
@@ -223,9 +223,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def due_date_hash
-    { :due_at => due_at,
-      :all_day => all_day,
-      :all_day_date => all_day_date }
+    hash = { :due_at => due_at, :all_day => all_day, :all_day_date => all_day_date }
+    if @applied_overrides && override = @applied_overrides.find { |o| o.due_at == due_at }
+      hash[:override] = override
+      hash[:title] = override.title
+    end
+
+    hash
   end
 
   def self.due_date_compare_value(date)
@@ -1492,7 +1496,7 @@ class Assignment < ActiveRecord::Base
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
   named_scope :due_between_with_overrides, lambda { |start, ending|
-    { :include => :active_assignment_overrides,
+    { :include => :assignment_overrides,
       :conditions => ['assignments.due_at BETWEEN ? AND ?
                       OR assignment_overrides.due_at_overridden = TRUE AND
                       assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending]}

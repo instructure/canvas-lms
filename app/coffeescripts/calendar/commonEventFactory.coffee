@@ -15,13 +15,17 @@ define [
     actualContextCode = data.context_code
     contextCode = data.effective_context_code || actualContextCode
 
-    type = null
-    if data.assignment || data.assignment_group_id
-      type = 'assignment'
+    type = if data.assignment_overrides
+      'assignment_override'
+    else if  data.assignment || data.assignment_group_id
+      'assignment'
     else
       type = 'calendar_event'
 
-    data = data.assignment || data.calendar_event || data
+    data = if data.assignment_overrides
+      {assignment: data.assignment, assignment_override: data.assignment_overrides[0]}
+    else
+      data.assignment || data.calendar_event || data
     return null if data.hidden # e.g. parent event of section-level events
     actualContextCode ?= data.context_code
     contextCode ?= data.effective_context_code || data.context_code

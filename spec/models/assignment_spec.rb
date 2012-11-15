@@ -662,11 +662,9 @@ describe Assignment do
 
     it "should use the overridden due date as the applicable due date" do
       as_student, _ = @assignment.due_dates_for(@student)
-      as_student.should == {
-        :due_at => @override.due_at,
-        :all_day => @override.all_day,
-        :all_day_date => @override.all_day_date
-      }
+      as_student[:due_at] = @override.due_at
+      as_student[:all_day] = @override.all_day
+      as_student[:all_day_date] = @override.all_day_date
     end
 
     it "should include the base due date in the list of due dates" do

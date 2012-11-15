@@ -87,6 +87,7 @@ module AssignmentOverrideApplicator
       value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
       cloned_assignment.write_attribute(field, value)
     end
+    cloned_assignment.applied_overrides = overrides
     cloned_assignment.readonly!
 
     # make new_record? match the original (typically always true on AR clones,

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-12 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -683,6 +683,516 @@ describe CalendarEventsApiController, :type => :integration do
       raw_api_call(:delete, "/api/v1/calendar_events/assignment_#{assignment.id}", {
                      :controller => 'calendar_events_api', :action => 'destroy', :id => "assignment_#{assignment.id}", :format => 'json'})
       response.status.should == "404 Not Found"
+    end
+
+    context 'date overrides' do
+      before :each do
+        @default_assignment = @course.assignments.create(:title => 'overridden', :due_at => '2012-01-12 12:00:00')  # out of range
+        @default_assignment.workflow_state = 'available'
+        @default_assignment.save!
+      end
+
+      context 'as student' do
+        before :each do
+          @student = user :active_all => true, :active_state => 'active'
+          user_session(@student)
+        end
+
+        context 'when no sections' do
+          before :each do
+            @course.enroll_student(@student, :enrollment_state => 'active')
+          end
+
+          it 'should return a non-overridden assignment' do
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1     # 1 assignment
+            json.first['end_at'].should == '2012-01-12T12:00:00Z'
+            json.first['id'].should == "assignment_#{@default_assignment.id}"
+            json.first.keys.should_not include('assignment_override')
+          end
+
+          it 'should return an override when present' do
+            @default_assignment.due_at = DateTime.parse('2012-01-08 12:00:00')
+            @default_assignment.save!
+            assignment_override_model(:assignment => @default_assignment, :set => @course.default_section,
+                                      :due_at => DateTime.parse('2012-01-14 12:00:00'))
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1     # 1 assignment
+            json.first['id'].should == "assignment_#{@default_assignment.id}"
+            json.first['end_at'].should == '2012-01-14T12:00:00Z'
+            json.first.keys.should_not include('assignment_override')
+          end
+
+          it 'should return assignment when override is in range but assignment is not' do
+            @default_assignment.due_at = DateTime.parse('2012-01-01 12:00:00')   # out of range
+            @default_assignment.save!
+            assignment_override_model(:assignment => @default_assignment, :set => @course.default_section,
+                                      :due_at => DateTime.parse('2012-01-08 12:00:00')) # in range
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1     # 1 assignment
+            json.first['end_at'].should == '2012-01-08T12:00:00Z'
+          end
+
+          it 'should not return an assignment when assignment due_at in range but override is out' do
+            assignment_override_model(:assignment => @default_assignment, :set => @course.default_section,
+                                      :due_at => DateTime.parse('2012-01-17 12:00:00')) # out of range
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 0     # nothing returned
+          end
+
+          it 'should return user specific override' do
+            override = assignment_override_model(:assignment => @default_assignment,
+                                                 :due_at => DateTime.parse('2012-01-12 12:00:00'))
+            override.assignment_override_students.create!(:user => @user)
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1
+            json.first['end_at'].should == '2012-01-12T12:00:00Z'
+          end
+        end
+
+        context 'with sections' do
+          before :each do
+            @section1 = @course.course_sections.create!(:name => 'Section A')
+            @section2 = @course.course_sections.create!(:name => 'Section B')
+            @course.enroll_user(@student, 'StudentEnrollment', :section => @section2, :enrollment_state => 'active')
+          end
+
+          it 'should return a non-overridden assignment' do
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1     # 1 assignment
+            json.first['end_at'].should == '2012-01-12T12:00:00Z'
+            json.first['id'].should == "assignment_#{@default_assignment.id}"
+            json.first.keys.should_not include('assignment_override')
+          end
+
+          it 'should return an override when present' do
+            @default_assignment.due_at = DateTime.parse('2012-01-08 12:00:00')
+            @default_assignment.save!
+            override = assignment_override_model(:assignment => @default_assignment, :due_at => DateTime.parse('2012-01-14 12:00:00'))
+            override.set = @section2
+            override.save!
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1     # 1 assignment
+            json.first['id'].should == "assignment_#{@default_assignment.id}"
+            json.first['end_at'].should == '2012-01-14T12:00:00Z'
+          end
+
+          it 'should return 1 assignment for latest date' do
+            # Setup assignment
+            assignment_override_model(:assignment => @default_assignment, :set => @section1,
+                                      :due_at => DateTime.parse('2012-01-12 12:00:00'))         # later than assignment
+            assignment_override_model(:assignment => @default_assignment, :set => @section2,
+                                      :due_at => DateTime.parse('2012-01-14 12:00:00'))         # latest
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1
+            json.first['end_at'].should == '2012-01-14T12:00:00Z'
+          end
+
+          it 'should return later override with user and section overrides' do
+            override = assignment_override_model(:assignment => @default_assignment,
+                                      :due_at => DateTime.parse('2012-01-12 12:00:00'))
+            override.assignment_override_students.create!(:user => @user)
+            assignment_override_model(:assignment => @default_assignment, :set => @section2,
+                                      :due_at => DateTime.parse('2012-01-14 12:00:00'))
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1
+            json.first['end_at'].should == '2012-01-14T12:00:00Z'
+          end
+        end
+      end
+
+      context 'as teacher' do
+        it 'should return 1 assignment when no overrides' do
+          json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+          json.size.should == 1     # 1 assignment
+          json.first['id'].should == "assignment_#{@default_assignment.id}"
+          json.first['end_at'].should == '2012-01-12T12:00:00Z'
+          json.first.keys.should_not include('assignment_override')
+        end
+
+        it 'should get explicit assignment with override info' do
+          pending 'not sure what the desired behavior here is'
+          override = assignment_override_model(:assignment => @default_assignment, :set => @course.default_section,
+                                               :due_at => DateTime.parse('2012-01-14 12:00:00'))
+          json = api_call(:get, "/api/v1/calendar_events/assignment_#{@default_assignment.id}", {
+              :controller => 'calendar_events_api', :action => 'show', :id => "assignment_#{@default_assignment.id}", :format => 'json'})
+          #json.size.should == 2
+          json.slice('id', 'override_id', 'end_at').should eql({'id' => "assignment_#{@default_assignment.id}",
+                                                                'override_id' => override.id,
+                                                                'end_at' => '2012-01-14T12:00:00Z'})
+          json.keys.sort.should == expected_fields
+        end
+
+        context 'with sections' do
+          before :each do
+            @section1 = @course.course_sections.create!(:name => 'Section A')
+            @section2 = @course.course_sections.create!(:name => 'Section B')
+          end
+
+          it 'should return 1 entry for each instance' do
+            # Setup assignment
+            override1 = assignment_override_model(:assignment => @default_assignment, :set => @section1,
+                                                  :due_at => DateTime.parse('2012-01-14 12:00:00'))
+            override2 = assignment_override_model(:assignment => @default_assignment, :set => @section2,
+                                                  :due_at => DateTime.parse('2012-01-18 12:00:00'))
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-19&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-19', :per_page => '25'})
+            json.size.should == 3
+            # sort results locally by end_at
+            json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+            json[0].keys.should_not include('assignment_override')
+            json[1]['assignment_overrides'][0]['id'].should == override1.id
+            json[2]['assignment_overrides'][0]['id'].should == override2.id
+            json[0]['end_at'].should == '2012-01-12T12:00:00Z'
+            json[1]['end_at'].should == '2012-01-14T12:00:00Z'
+            json[2]['end_at'].should == '2012-01-18T12:00:00Z'
+          end
+
+          it 'should return 1 assignment (override) when others are outside the range' do
+            # Alter assignment
+            @default_assignment.due_at = DateTime.parse('2012-01-01 12:00:00')       # outside range
+            @default_assignment.save!
+                                                                                     # Setup overrides
+            override1 = assignment_override_model(:assignment => @default_assignment, :set => @section1,
+                                                  :due_at => DateTime.parse('2012-01-12 12:00:00')) # in range
+            assignment_override_model(:assignment => @default_assignment, :set => @section2,
+                                      :due_at => DateTime.parse('2012-01-18 12:00:00')) # outside range
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1
+            json.first['assignment_overrides'][0]['id'].should == override1.id
+            json.first['end_at'].should == '2012-01-12T12:00:00Z'
+          end
+        end
+      end
+
+      context 'as TA' do
+        before :each do
+          @ta = user :active_all => true, :active_state => 'active'
+          user_session(@ta)
+        end
+
+        context 'when no sections' do
+          before :each do
+            @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active')
+          end
+          it 'should return a non-overridden assignment' do
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1     # 1 assignment
+            json.first['end_at'].should == '2012-01-12T12:00:00Z'
+            json.first['id'].should == "assignment_#{@default_assignment.id}"
+            json.first.keys.should_not include('assignment_override')
+          end
+
+          it 'should return override when present' do
+            @default_assignment.due_at = DateTime.parse('2012-01-08 12:00:00')
+            @default_assignment.save!
+            override = assignment_override_model(:assignment => @default_assignment, :set => @course.default_section,
+                                                 :due_at => DateTime.parse('2012-01-14 12:00:00'))
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 2     # both versions
+            json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+            json[0].keys.should_not include('assignment_override')
+            json[0]['end_at'].should == '2012-01-08T12:00:00Z'
+            json[1]['assignment_overrides'][0]['id'].should == override.id
+            json[1]['end_at'].should == '2012-01-14T12:00:00Z'
+          end
+        end
+
+        context 'when TA of one section' do
+          before :each do
+            @section1 = @course.course_sections.create!(:name => 'Section A')
+            @section2 = @course.course_sections.create!(:name => 'Section B')
+            @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1) # only in 1 section
+          end
+
+          it 'should receive all assignments including other sections' do
+            @default_assignment.due_at = DateTime.parse('2012-01-08 12:00:00')
+            @default_assignment.save!
+            override1 = assignment_override_model(:assignment => @default_assignment, :set => @section1,
+                                                  :due_at => DateTime.parse('2012-01-12 12:00:00'))
+            override2 = assignment_override_model(:assignment => @default_assignment, :set => @section2,
+                                                  :due_at => DateTime.parse('2012-01-14 12:00:00'))
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 3     # all versions
+            json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+            json[0].keys.should_not include('assignment_override')
+            json[0]['end_at'].should == '2012-01-08T12:00:00Z'
+            json[1]['assignment_overrides'][0]['id'].should == override1.id
+            json[1]['end_at'].should == '2012-01-12T12:00:00Z'
+            json[2]['assignment_overrides'][0]['id'].should == override2.id
+            json[2]['end_at'].should == '2012-01-14T12:00:00Z'
+          end
+        end
+      end
+
+      context 'as observer' do
+        before :each do
+          @student  = user(:active_all => true, :active_state => 'active')
+          @observer = user(:active_all => true, :active_state => 'active')
+
+          user_session(@observer)
+        end
+
+        context 'when not observing any students' do
+          before(:each) do
+            @course.enroll_user(@observer,
+                                'ObserverEnrollment',
+                                :enrollment_state => 'active',
+                                :section => @course.default_section)
+          end
+
+          it 'should return assignment for enrollment' do
+            override1 = assignment_override_model(:assignment => @default_assignment,
+                                                  :set => @course.default_section,
+                                                  :due_at => DateTime.parse('2012-01-13 12:00:00'))
+            override2 = assignment_override_model(:assignment => @default_assignment,
+                                                  :set => @course.course_sections.create!(:name => 'Section 2'),
+                                                  :due_at => DateTime.parse('2012-01-14 12:00:00'))
+
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1
+            json.first['end_at'].should == '2012-01-13T12:00:00Z'
+          end
+        end
+
+        context 'when no sections' do
+          it 'should return assignments with no override' do
+            @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 1     # 1 assignment
+            json.first['id'].should == "assignment_#{@default_assignment.id}"
+            json.first['end_at'].should == '2012-01-12T12:00:00Z'
+          end
+
+          context 'observing single student' do
+            before :each do
+              @student_enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :section => @course.default_section)
+              @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :section => @course.default_section)
+              @observer_enrollment.update_attribute(:associated_user_id, @student.id)
+            end
+
+            it 'should return student specific overrides' do
+              assignment_override_model(:assignment => @default_assignment, :set => @course.default_section,
+                                        :due_at => DateTime.parse('2012-01-13 12:00:00'))
+              json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                  :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                  :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+              json.size.should == 1     # only 1
+              json.first['end_at'].should == '2012-01-13T12:00:00Z'
+            end
+
+            it 'should return standard assignment' do
+              json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                  :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                  :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+              json.size.should == 1     # only 1
+              json.first['end_at'].should == '2012-01-12T12:00:00Z'
+            end
+          end
+        end
+
+        context 'with sections' do
+          before :each do
+            @section1 = @course.course_sections.create!(:name => 'Section A')
+            @section2 = @course.course_sections.create!(:name => 'Section B')
+            @student_enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :section => @section1)
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :section => @section1)
+          end
+
+          context 'observing single student' do
+            before :each do
+              @observer_enrollment.update_attribute(:associated_user_id, @student.id)
+            end
+
+            it 'should return linked student specific override' do
+              assignment_override_model(:assignment => @default_assignment, :set => @section1,
+                                        :due_at => DateTime.parse('2012-01-13 12:00:00'))
+              json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                  :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                  :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+              json.size.should == 1
+              json.first['end_at'].should == '2012-01-13T12:00:00Z'
+            end
+
+            it 'should return only override for student section' do
+              assignment_override_model(:assignment => @default_assignment, :set => @section1,
+                                        :due_at => DateTime.parse('2012-01-13 12:00:00'))
+              assignment_override_model(:assignment => @default_assignment, :set => @section2,
+                                        :due_at => DateTime.parse('2012-01-14 12:00:00'))
+
+              json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                  :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                  :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+              json.size.should == 1
+              json.first['end_at'].should == '2012-01-13T12:00:00Z'
+            end
+          end
+
+          context 'observing multiple students' do
+            before :each do
+              @student2 = user(:active_all => true, :active_state => 'active')
+            end
+
+            context 'when in same course section' do
+              before :each do
+                @student_enrollment2  = @course.enroll_user(@student2, 'StudentEnrollment', :enrollment_state => 'active', :section => @section1)
+                @observer_enrollment2 = ObserverEnrollment.create!(:user => @observer,
+                                                                   :course => @course,
+                                                                   :course_section => @section1,
+                                                                   :workflow_state => 'active')
+
+                @observer_enrollment.update_attribute(:associated_user_id, @student.id)
+                @observer_enrollment2.update_attribute(:associated_user_id, @student2.id)
+              end
+
+              it 'should return a single assignment event' do
+                pending "is occasionally failing"
+                @user = @observer
+                assignment_override_model(:assignment => @default_assignment, :set => @section1,
+                                          :due_at => DateTime.parse('2012-01-14 12:00:00'))
+                json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-30&per_page=25&context_codes[]=course_#{@course.id}", {
+                    :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                    :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-01', :end_date => '2012-01-30', :per_page => '25'})
+                json.size.should == 1
+                json.first['end_at'].should == '2012-01-14T12:00:00Z'
+              end
+            end
+
+            context 'when in same course different sections' do
+              before :each do
+                @student_enrollment2  = @course.enroll_user(@student2, 'StudentEnrollment', :enrollment_state => 'active', :section => @section2)
+                @observer_enrollment2 = ObserverEnrollment.create!(:user => @observer,
+                                                                   :course => @course,
+                                                                   :course_section => @section2,
+                                                                   :workflow_state => 'active')
+
+                @observer_enrollment.update_attribute(:associated_user_id, @student.id)
+                @observer_enrollment2.update_attribute(:associated_user_id, @student2.id)
+              end
+
+              it 'should return two assignments one for each section' do
+                @user = @observer
+                assignment_override_model(:assignment => @default_assignment, :set => @section1,
+                                          :due_at => DateTime.parse('2012-01-14 12:00:00'))
+                assignment_override_model(:assignment => @default_assignment, :set => @section2,
+                                          :due_at => DateTime.parse('2012-01-15 12:00:00'))
+                json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                    :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                    :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+                json.size.should == 2
+                json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+                json[0]['end_at'].should == '2012-01-14T12:00:00Z'
+                json[1]['end_at'].should == '2012-01-15T12:00:00Z'
+              end
+            end
+
+            context 'when in different courses' do
+              before(:each) do
+                @course1 = @course
+                @course2 = course(:active_all => true)
+
+                @assignment1 = @default_assignment
+                @assignment2 = @course2.assignments.create!(:title => 'Override2', :due_at => '2012-01-13 12:00:00Z')
+                [@assignment1, @assignment2].each { |a| a.save! }
+
+                @student1_enrollment = StudentEnrollment.create!(:user => @student,  :workflow_state => 'active', :course_section => @course1.default_section, :course => @course1)
+                @student2_enrollment = StudentEnrollment.create!(:user => @student2, :workflow_state => 'active', :course_section => @course2.default_section, :course => @course2)
+                @observer1_enrollment = ObserverEnrollment.create!(:user => @observer, :workflow_state => 'active', :course_section => @course1.default_section, :course => @course1)
+                @observer2_enrollment = ObserverEnrollment.create!(:user => @observer, :workflow_state => 'active', :course_section => @course2.default_section, :course => @course2)
+
+                @observer1_enrollment.update_attribute(:associated_user_id, @student.id)
+                @observer2_enrollment.update_attribute(:associated_user_id, @student2.id)
+                @user = @observer
+              end
+
+              it 'should return two assignments' do
+                assignment_override_model(:assignment => @assignment1, :set => @course1.default_section, :due_at => DateTime.parse('2012-01-14 12:00:00'))
+                assignment_override_model(:assignment => @assignment2, :set => @course2.default_section, :due_at => DateTime.parse('2012-01-15 12:00:00'))
+
+                json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}", {
+                    :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                    :context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+
+                json.size.should == 2
+                json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+                json[0]['end_at'].should == '2012-01-14T12:00:00Z'
+                json[1]['end_at'].should == '2012-01-15T12:00:00Z'
+              end
+            end
+          end
+        end
+      end
+
+      # Admins who are not enrolled in the course
+      context 'as admin' do
+        before :each do
+          @admin = account_admin_user
+          user_session @admin
+          @section1 = @course.default_section
+          @section2 = @course.course_sections.create!(:name => 'Section B')
+        end
+
+        context 'when viewing own calendar' do
+
+          it 'should return 0 course assignments' do
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 0     # 0 assignments returned
+          end
+        end
+
+        context 'when viewing course calendar' do
+          it 'should display assignments and overrides' do # behave like teacher
+            override = assignment_override_model(:assignment => @default_assignment,
+                                                 :due_at => DateTime.parse('2012-01-15 12:00:00'))
+            json = api_call(:get, "/api/v1/calendar_events?&type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
+            json.size.should == 2
+            # Should include the default and override in return
+            json.sort! {|a,b| a['end_at'] <=> b['end_at'] }
+            json[0]['end_at'].should == '2012-01-12T12:00:00Z'
+            json[0]['override_id'].should be_nil
+            json[0].keys.should_not include('assignment_override')
+            json[1]['end_at'].should == '2012-01-15T12:00:00Z'
+            json[1]['assignment_overrides'][0]['id'].should == override.id
+          end
+        end
+      end
     end
   end
 end

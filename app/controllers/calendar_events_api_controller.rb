@@ -207,14 +207,39 @@ class CalendarEventsApiController < ApplicationController
     codes = (params[:context_codes] || [@current_user.asset_string])[0, 10]
     get_options(codes)
 
-    scope = if @type == :assignment
-      assignment_scope
-    else
-      calendar_event_scope
+    scope  = @type == :assignment ? assignment_scope : calendar_event_scope
+    events = Api.paginate(scope, self, api_v1_calendar_events_url)
+    CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
+
+    if @type == :assignment
+      events = events.inject([]) do |assignments, assignment|
+        _, admin_dates = assignment.due_dates_for(@current_user)
+        if admin_dates.present?
+          overridden_dates, original_dates = admin_dates.partition { |date| date[:override] }
+
+          overridden_dates.each do |date|
+            assignments << AssignmentOverrideApplicator.assignment_with_overrides(assignment, [date[:override]])
+          end
+
+          original_dates.each { |date| assignments << assignment }
+        else
+          assignment.due_at = VariedDueDate.due_at_for?(assignment, @current_user)
+          assignments << assignment
+        end
+
+        assignments
+      end
+
+      # Once we've got all of the possible assignments, delete anything
+      # whose overrides put it outside of the current range.
+      events.delete_if do |assignment|
+        due_at = assignment.due_at.try(:to_datetime)
+        events.select { |e|
+          e.due_at == assignment.due_at && e.id == assignment.id
+        }.count > 1 || (due_at && (due_at > @end_date || due_at < @start_date))
+      end
     end
 
-    events = Api.paginate(scope.order('id'), self, api_v1_calendar_events_url)
-    CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
     render :json => events.map{ |event| event_json(event, @current_user, session) }
   end
 
@@ -514,7 +539,7 @@ class CalendarEventsApiController < ApplicationController
   def assignment_scope
     Assignment.active.
       for_context_codes(@context_codes).
-      send(*date_scope_and_args(:due_between))
+      send(*date_scope_and_args(:due_between_with_overrides))
   end
 
   def calendar_event_scope
