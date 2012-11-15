@@ -20,8 +20,7 @@ define([
   'i18n!ajax_errors',
   'jquery', // $
   'str/htmlEscape',
-  'jquery.ajaxJSON', // ajaxJSON
-  'jquery.instructure_forms', // defaultAjaxError
+  'jquery.ajaxJSON', // ajaxJSON, defaultAjaxError
   'compiled/jquery.rails_flash_notifications', // flashError
   'jqueryui/effects/drop'
 ], function(INST, I18n, $, htmlEscape) {

@@ -19,7 +19,8 @@
 define([
   'i18n!submissions',
   'jquery',
-  'jquery.ajaxJSON' /* ajaxJSONFiles, ajaxJSON */,
+  'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.instructure_forms' /* ajaxJSONFiles */,
   'jquery.instructure_date_and_time' /* parseFromISO */,
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
