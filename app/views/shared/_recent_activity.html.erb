@@ -16,7 +16,11 @@
       <div class="stream_header">
         <div class="image-block">
           <div class=image-block-image>
-            <i class="<%= category_class %>-icon"></i>
+            <i class="<%= {
+              'conversation' => 'icon-message',
+              'grading' => 'icon-check-plus',
+              'discussion_topic' => 'icon-discussion'
+            }[category_class] || "icon-#{category_class}" %>"></i>
           </div>
           <div class=image-block-content>
             <div class=title>
