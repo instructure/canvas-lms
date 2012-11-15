@@ -36,9 +36,9 @@ module CC
           end
           
           @added_attachment_ids << file.id
-          path = File.join(folder_names, file.unencoded_filename)
+          path = File.join(folder_names, file.display_name)
           migration_id = CCHelper.create_key(file)
-          if file.hidden? || file.locked || file.unencoded_filename != file.display_name
+          if file.hidden? || file.locked
             files_with_metadata[:files] << [file, migration_id]
           end
           @resources.resource(

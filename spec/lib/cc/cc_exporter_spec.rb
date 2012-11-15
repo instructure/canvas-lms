@@ -275,6 +275,49 @@ describe "Common Cartridge exporting" do
       @zip_file.find_entry(path).should_not be_nil
     end
 
+    it "should export web content files properly when display name is changed" do
+      @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @att.display_name = "not_actually_first.png"
+      @att.save!
+
+      @q1 = @course.quizzes.create(:title => 'quiz1')
+
+      qq = @q1.quiz_questions.create!
+      data = {:correct_comments => "",
+              :question_type => "multiple_choice_question",
+              :question_bank_name => "Quiz",
+              :assessment_question_id => "9270",
+              :migration_id => "QUE_1014",
+              :incorrect_comments => "",
+              :question_name => "test fun",
+              :name => "test fun",
+              :points_possible => 1,
+              :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
+              :answers =>
+                  [{:migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080},
+                   {:migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279}]}.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.selected_content = {
+          :all_quizzes => "1",
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_qti.xml"))
+      doc.at_css("presentation material mattext").text.should == "<div>Image yo: <img src=\"%24IMS_CC_FILEBASE%24/unfiled/not_actually_first.png\">\n</div>"
+
+      check_resource_node(@att, CC::CCHelper::WEBCONTENT)
+
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(@att)}]")['href']
+      @zip_file.find_entry(path).should_not be_nil
+    end
+
     it "should not fail when answers are missing for FIMB" do
       @q1 = @course.quizzes.create(:title => 'quiz1')
 
