@@ -26,7 +26,7 @@ class AssetUserAccess < ActiveRecord::Base
   has_many :asset_access_ranges
   before_save :infer_defaults
   attr_accessible :user, :asset_code
-  
+
   named_scope :for_context, lambda{|context|
     {:conditions => ["asset_user_accesses.context_id = ? AND asset_user_accesses.context_type = ?", context.id, context.class.to_s]}
   }
@@ -35,19 +35,19 @@ class AssetUserAccess < ActiveRecord::Base
   }
   named_scope :participations, {:conditions => { :action_level => 'participate' }}
   named_scope :most_recent, {:order => 'updated_at DESC'}
-  
+
   def category
     self.asset_category
   end
-  
+
   def infer_defaults
     self.display_name ||= asset_display_name
   end
-  
+
   def category=(val)
     self.asset_category = val
   end
-  
+
   def self.by_category(list, old_list=[])
     res = {}.with_indifferent_access
     res[:categories] = {}
@@ -107,7 +107,7 @@ class AssetUserAccess < ActiveRecord::Base
       res
     end
   end
-  
+
   def display_name
     # repair existing AssetUserAccesses that have bad display_names
     if read_attribute(:display_name) == asset_code
@@ -118,7 +118,7 @@ class AssetUserAccess < ActiveRecord::Base
     end
     read_attribute(:display_name)
   end
-  
+
   def asset_display_name
     if self.asset.respond_to?(:title) && !self.asset.title.nil?
       asset.title
@@ -128,11 +128,11 @@ class AssetUserAccess < ActiveRecord::Base
       self.asset_code
     end
   end
-  
+
   def context_code
     "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
-  
+
   def readable_name
     if self.asset_code && self.asset_code.match(/\:/)
       split = self.asset_code.split(/\:/)
@@ -147,7 +147,7 @@ class AssetUserAccess < ActiveRecord::Base
       self.display_name.nil? ? "" : self.display_name.gsub(re, "")
     end
   end
-  
+
   def asset
     asset_code, general = self.asset_code.split(":").reverse
     code_split = asset_code.split("_")
@@ -155,15 +155,43 @@ class AssetUserAccess < ActiveRecord::Base
     asset
   end
   memoize :asset
-  
+
   def asset_class_name
     self.asset.class.name.underscore if self.asset
   end
-  
+
+  def log( kontext, accessed )
+    self.asset_category ||= accessed[:category]
+    self.asset_group_code ||= accessed[:group_code]
+    self.membership_type ||= accessed[:membership_type]
+    self.context = kontext
+    self.summarized_at = nil
+    self.last_access = Time.now.utc
+    log_action(accessed[:level])
+    save
+  end
+
+  def log_action(level)
+    increment(:view_score) if %w{view participate}.include?( level )
+    increment(:participate_score) if %w{participate submit}.include?( level )
+
+    if self.action_level != 'participate'
+      self.action_level = (level == 'submit') ? 'participate' : level
+    end
+  end
+
   def self.infer_asset(code)
     asset_code, general = code.split(":").reverse
     code_split = asset_code.split("_")
     asset = Context.find_asset_by_asset_string(asset_code)
     asset
   end
+
+  private
+
+  def increment(attribute)
+    incremented_value = (self.send(attribute) || 0) + 1
+    self.send("#{attribute}=", incremented_value)
+  end
+
 end

@@ -195,4 +195,50 @@ describe DiscussionTopicsController do
       feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
+
+
+  describe 'POST create:' do
+    before(:each) do
+      Setting.set('enable_page_views', 'db')
+      course_with_student_logged_in :active_all => true
+      controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
+      post 'create', :course_id => @course.id, :title => 'Topic Title', :is_announcement => false,
+                     :discussion_type => 'side_comment', :require_initial_post => true, :format => 'json',
+                     :podcast_has_student_posts => false, :delayed_post_at => '', :message => 'Message',
+                     :delay_posting => false, :threaded => false
+    end
+
+    after { Setting.set 'enable_page_views', 'false' }
+
+    describe 'the new topic' do
+      let(:topic) { assigns[:topic] }
+
+      specify { topic.should be_a DiscussionTopic }
+      specify { topic.user.should == @user }
+      specify { topic.current_user.should == @user }
+      specify { topic.delayed_post_at.should be_nil }
+      specify { topic.workflow_state.should == 'active' }
+      specify { topic.id.should_not be_nil }
+      specify { topic.title.should == 'Topic Title' }
+      specify { topic.is_announcement.should be_false }
+      specify { topic.discussion_type.should == 'side_comment' }
+      specify { topic.message.should == 'Message' }
+      specify { topic.threaded.should be_false }
+    end
+
+    it 'logs an asset access record for the discussion topic' do
+      accessed_asset = assigns[:accessed_asset]
+      accessed_asset[:category].should == 'topics'
+      accessed_asset[:level].should == 'participate'
+    end
+
+    it 'registers a page view' do
+      page_view = assigns[:page_view]
+      page_view.should_not be_nil
+      page_view.http_method.should == 'post'
+      page_view.url.should =~ %r{^http://test\.host/api/v1/courses/\d+/discussion_topics}
+      page_view.participated.should be_true
+    end
+
+  end
 end

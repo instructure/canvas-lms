@@ -41,4 +41,3 @@ require [
   # Fetch page views
   fetchParams = per_page: 100
   pageViewsView.$el.disableWhileLoading(pageViews.fetch(data: fetchParams))
-

@@ -242,4 +242,31 @@ describe PageView do
       PageView.for_users([]).should == []
     end
   end
+
+  describe '.generate' do
+    let(:params) { {'action' => 'path', 'controller' => 'some'} }
+    let(:headers) { {'User-Agent' => 'Mozilla'} }
+    let(:session) { {:id => 42} }
+    let(:request) { stub(:url => 'host.com/some/path', :path_parameters => params, :headers => headers, :session_options => session, :method => :get) }
+    let(:user) { User.new }
+    let(:attributes) { {:real_user => user, :user => user } }
+
+    before { RequestContextGenerator.stubs( :request_id => 9 ) }
+    after { RequestContextGenerator.unstub :request_id }
+
+    subject { PageView.generate(request, attributes) }
+
+    its(:url) { should == request.url }
+    its(:user) { should == user }
+    its(:controller) { should == params['controller'] }
+    its(:action) { should == params['action'] }
+    its(:session_id) { should == session[:id] }
+    its(:real_user) { should == user }
+    its(:user_agent) { should == headers['User-Agent'] }
+    its(:interaction_seconds) { should == 5 }
+    its(:created_at) { should_not be_nil }
+    its(:updated_at) { should_not be_nil }
+    its(:http_method) { should == 'get' }
+
+  end
 end

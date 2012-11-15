@@ -42,6 +42,21 @@ class PageView < ActiveRecord::Base
 
   attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user, :context
 
+  def self.generate(request, attributes={})
+    returning self.new(attributes) do |p|
+      p.url = request.url[0,255]
+      p.http_method = request.method.to_s
+      p.controller = request.path_parameters['controller']
+      p.action = request.path_parameters['action']
+      p.session_id = request.session_options[:id]
+      p.user_agent = request.headers['User-Agent']
+      p.interaction_seconds = 5
+      p.created_at = Time.now
+      p.updated_at = Time.now
+      p.id = RequestContextGenerator.request_id
+    end
+  end
+
   def ensure_account
     self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
     self.account_id ||= (self.context.is_a?(Account) ? self.context : self.context.account) if self.context
@@ -52,7 +67,7 @@ class PageView < ActiveRecord::Base
   end
 
   # the list of columns we display to users, export to csv, etc
-  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action contributed interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id)
+  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action contributed interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method)
 
   def self.page_views_enabled?
     !!page_view_method
@@ -161,6 +176,7 @@ class PageView < ActiveRecord::Base
   named_scope :for_users, lambda{ |users|
     { :conditions => {:user_id => users} }
   }
+
 
   # returns a collection with very limited functionality
   # basically, it responds to #paginate and returns a
