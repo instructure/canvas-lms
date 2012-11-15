@@ -2504,6 +2504,29 @@ describe Assignment do
     end
   end
 
+  context "due_between_with_overrides" do
+    before(:each) do
+      course_model
+      @assignment = @course.assignments.create!(:title => 'assignment', :due_at => Time.now)
+      @overridden_assignment = @course.assignments.create!(:title => 'overridden_assignment', :due_at => Time.now)
+
+      override = @assignment.assignment_overrides.build
+      override.due_at = Time.now
+      override.title = 'override'
+      override.save!
+
+      @results = @course.assignments.due_between_with_overrides(Time.now - 1.day, Time.now + 1.day)
+    end
+
+    it 'should return assignments between the given dates' do
+      @results.should include(@assignment)
+    end
+
+    it 'should return overridden assignments that are due between the given dates' do
+      @results.should include(@overridden_assignment)
+    end
+  end
+
   context "destroy" do
     it "should destroy the associated discussion topic" do
       group_discussion_assignment

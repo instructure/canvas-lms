@@ -1488,6 +1488,16 @@ class Assignment < ActiveRecord::Base
   named_scope :due_between, lambda { |start, ending|
     { :conditions => { :due_at => (start)..(ending) } }
   }
+
+  # Return all assignments and their active overrides where either the
+  # assignment or one of its overrides is due between start and ending.
+  named_scope :due_between_with_overrides, lambda { |start, ending|
+    { :include => :active_assignment_overrides,
+      :conditions => ['assignments.due_at BETWEEN ? AND ?
+                      OR assignment_overrides.due_at_overridden = TRUE AND
+                      assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending]}
+  }
+
   named_scope :updated_after, lambda { |*args|
     if args.first
       { :conditions => [ "assignments.updated_at IS NULL OR assignments.updated_at > ?", args.first ] }
