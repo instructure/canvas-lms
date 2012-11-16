@@ -1,19 +1,19 @@
 @import environment.sass
-#media_record_option_holder .record_option
+#media_record_option_holder .record_option 
   display: block
   margin: 0 2px 2px 2px
   padding: 4px
   border: 2px solid #fff
   +border-radius(3px)
 
-#media_record_option_holder .record_option:hover
+#media_record_option_holder .record_option:hover 
   border: 2px solid #aaa
   background: #eee
 
 #media_record_option_holder,#video_record_holder_holder,#audio_record_holder_holder
   float: left
 
-#media_record_option_holder .record_option.selected_option
+#media_record_option_holder .record_option.selected_option 
   border: 2px solid #888
   background: #ccc
 
@@ -37,43 +37,43 @@
     &.saving
       display: block
 
-#audio_upload_under button,#video_upload_under button
+#audio_upload_under button,#video_upload_under button 
   width: 180px
   height: 50px
   font-size: 1.2em
   font-weight: bold
 
-#audio_upload,#video_upload
+#audio_upload,#video_upload 
   position: absolute
   z-index: 9999
 
-div#audio_upload,div#video_upload
+div#audio_upload,div#video_upload 
   background: #fff
   font-size: 1.2em
 
-#media_upload_holder
+#media_upload_holder 
   height: 240px
 
-#media_upload_title
+#media_upload_title 
   width: 200px
 
-#media_upload_holder .content
+#media_upload_holder .content 
   margin-top: 8px
 
-#media_upload_file_size
+#media_upload_file_size 
   font-size: 0.8em
   padding-left: 20px
 
-#media_upload_progress
-  width: 300px
+#media_upload_progress 
+  width: 300px 
   height: 15px
 
-#media_upload_submit
-  font-size: 1.2em
+#media_upload_submit 
+  font-size: 1.2em 
   font-weight: bold
 
 
-#audio_record_holder,#video_record_holder
+#audio_record_holder,#video_record_holder 
   width: 400px
   height: 300px
   overflow: hidden
@@ -83,11 +83,11 @@ div#audio_upload,div#video_upload
   box-shadow: 0 0 10px rgba(0,0,0,1.0)
   margin: 10px
 
-#audio_record,#video_record
+#audio_record,#video_record 
   border: 0px solid #888
   height: 300px
 
-.volume_meter
+.volume_meter 
   width: 20px
   height: 240px
   float: right
@@ -98,8 +98,8 @@ div#audio_upload,div#video_upload
   left: 400px
   z-index: 9999
 
-.volume_meter .audio_level
-  width: 14px
+.volume_meter .audio_level 
+  width: 14px 
   height: 14px
   border: 1px solid #666
   display: block
@@ -108,16 +108,16 @@ div#audio_upload,div#video_upload
   visibility: hidden
   +border-radius(2px)
 
-.volume_meter .level_6
+.volume_meter .level_6 
   background-color: #ff0
 
-.volume_meter .level_7
+.volume_meter .level_7 
   background-color: #ff0
 
-.volume_meter .level_8
+.volume_meter .level_8 
   background-color: #ff0
 
-.volume_meter .level_9
+.volume_meter .level_9 
   background-color: #f00
 
 .volume_meter.band_1 .level_0,
@@ -174,40 +174,6 @@ div#audio_upload,div#video_upload
 .volume_meter.band_10 .level_6,
 .volume_meter.band_10 .level_7,
 .volume_meter.band_10 .level_8,
-.volume_meter.band_10 .level_9
+.volume_meter.band_10 .level_9 
   visibility: visible
 
-
-.media_comment_thumbnail
-  width: 140px
-  height: 100px
-  margin: 3px 5px
-  background: url(/images/blank.png) no-repeat center center
-  background-color: #222
-  border: 0px solid #000
-  display: inline-block
-  padding: 2px
-
-  &.media_comment_thumbnail-small
-    width: 70px
-    height: 50px
-
-.media_comment_thumbnail_play_button
-  display: inline-block
-  height: image-height("play_overlay.png")
-  width: image-width("play_overlay.png")
-
-  // accessibly hide text
-  text-indent: -999px
-  overflow: hidden
-
-
-  &:hover, .touch &
-    background-image: url(/images/play_overlay.png)
-
-  .media_comment_thumbnail-small &
-    height: image-height("play_overlay_small.png")
-    width: image-width("play_overlay_small.png")
-
-    &:hover, .touch &
-      background-image: url(/images/play_overlay_small.png)
