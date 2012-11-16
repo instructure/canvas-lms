@@ -334,7 +334,6 @@ ActionController::Routing::Routes.draw do |map|
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
   map.media_object_redirect 'media_objects/:id/redirect', :controller => 'context', :action => 'media_object_redirect'
   map.media_object_thumbnail 'media_objects/:id/thumbnail', :controller => 'context', :action => 'media_object_thumbnail'
-  map.media_object_info 'media_objects/:media_object_id/info', :controller => 'media_objects', :action => 'show'
 
   map.external_content_success 'external_content/success/:service', :controller => 'external_content', :action => 'success'
   map.external_content_oembed_retrieve 'external_content/retrieve/oembed', :controller => 'external_content', :action => 'oembed_retrieve'
@@ -1021,13 +1020,6 @@ ActionController::Routing::Routes.draw do |map|
       outcomes.get "outcomes/:id", :action => :show, :path_name => "outcome"
       outcomes.put "outcomes/:id", :action => :update
       outcomes.delete "outcomes/:id", :action => :destroy
-    end
-
-
-    api.with_options(:controller => :media_tracks) do |media_tracks|
-      media_tracks.post   'media_objects/:media_object_id/media_tracks', :action => :create, :path_name => 'create_media_track'
-      media_tracks.delete "media_objects/:media_object_id/media_tracks/:media_track_id", :action => :destroy, :path_name => 'destroy_media_track'
-      media_tracks.get    "media_objects/:media_object_id/media_tracks/:id", :action => :show, :path_name => 'media_track'
     end
   end
 
