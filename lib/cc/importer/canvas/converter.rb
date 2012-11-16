@@ -24,7 +24,6 @@ module CC::Importer::Canvas
     include TopicConverter
     include WebcontentConverter
     include QuizConverter
-    include CC::Importer::BLTIConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -49,7 +48,9 @@ module CC::Importer::Canvas
       set_progress(30)
       @course[:discussion_topics] = convert_topics
       set_progress(40)
-      @course[:external_tools] = convert_blti_links
+      lti = CC::Importer::BLTIConverter.new
+      res = lti.get_blti_resources(@manifest)
+      @course[:external_tools] = lti.convert_blti_links(res, self)
       set_progress(50)
       @course[:file_map] = create_file_map
       set_progress(60)

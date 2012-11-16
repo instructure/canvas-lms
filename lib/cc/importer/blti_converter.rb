@@ -16,13 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CC::Importer
-  module BLTIConverter
+  class BLTIConverter
+    class CCImportError < Exception; end
     include CC::Importer
     
-    def get_blti_resources
+    def get_blti_resources(manifest)
       blti_resources = []
 
-      @manifest.css("resource[type=#{BASIC_LTI}]").each do |r_node|
+      manifest.css("resource[type=#{BASIC_LTI}]").each do |r_node|
         res = {}
         res[:migration_id] = r_node['identifier']
         res[:href] = r_node['href']
@@ -37,13 +38,12 @@ module CC::Importer
       blti_resources
     end
 
-    def convert_blti_links(blti_resources=nil)
-      blti_resources ||= get_blti_resources
+    def convert_blti_links(blti_resources, converter)
       tools = []
 
       blti_resources.each do |res|
         path = res[:href] || res[:files].first[:href]
-        path = get_full_path(path)
+        path = converter.get_full_path(path)
 
         if File.exists?(path)
           doc = open_file_xml(path)
@@ -166,6 +166,5 @@ module CC::Importer
 
       asmnts
     end
-    class CCImportError < Exception; end
   end
 end
