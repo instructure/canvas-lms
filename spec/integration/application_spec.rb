@@ -53,6 +53,18 @@ describe "site-wide" do
     response['Cache-Control'].should_not match(/must-revalidate/)
   end
 
+  it "should set the x-frame-options http header" do
+    get "/login"
+    assigns[:files_domain].should be_false
+    response['x-frame-options'].should == "SAMEORIGIN"
+  end
+
+  it "should not set x-frame-options when on a files domain" do
+    FilesController.any_instance.expects(:files_domain?).returns(true)
+    get "http://files-test.host/files/1/download"
+    response['x-frame-options'].should be_nil
+  end
+
   context "user headers" do
     before(:each) do
       course_with_teacher

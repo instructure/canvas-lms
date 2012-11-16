@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
   after_filter :set_user_id_header
   before_filter :fix_xhr_requests
   before_filter :init_body_classes
-  before_filter :set_ua_header
+  before_filter :set_response_headers
 
   add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
 
@@ -118,10 +118,6 @@ class ApplicationController < ActionController::Base
     @body_classes = []
   end
 
-  def set_ua_header
-    headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
-  end
-
   def set_user_id_header
     headers['X-Canvas-User-Id'] ||= @current_user.global_id.to_s if @current_user
     headers['X-Canvas-Real-User-Id'] ||= @real_current_user.global_id.to_s if @real_current_user
@@ -149,13 +145,22 @@ class ApplicationController < ActionController::Base
   def load_account
     @domain_root_account = request.env['canvas.domain_root_account'] || LoadAccount.default_domain_root_account
     @files_domain = request.host_with_port != HostUrl.context_host(@domain_root_account) && HostUrl.is_file_host?(request.host_with_port)
+    @domain_root_account
+  end
+
+  def set_response_headers
+    headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
-    if !@files_domain && Setting.get_cached('block_html_frames', 'false') == 'true'
-      response['X-Frame-Options'] = 'SAMEORIGIN'
+    if !files_domain? && Setting.get_cached('block_html_frames', 'true') == 'true'
+      headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
-    @domain_root_account
+    true
+  end
+
+  def files_domain?
+    !!@files_domain
   end
 
   def check_pending_otp
