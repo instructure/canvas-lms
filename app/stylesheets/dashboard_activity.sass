@@ -111,6 +111,13 @@ $ignore-col-width: 50px
   &:hover
     text-decoration: underline
 
+// hide the context stuff if you're in context
+#course_home_content .fake-link,
+#group_messages .fake-link,
+#course_home_content .stream_header .links,
+#group_messages .stream_header .links
+  display: none
+
 @mixin dashboard-stream-icon($left)
   background-image: url(/images/dashboard_stream_icons.png)
   background-position: $left -4px
