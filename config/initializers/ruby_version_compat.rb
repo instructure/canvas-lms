@@ -121,4 +121,18 @@ else
     end
   end
 
+  # ActiveSupport::SafeBuffer is a subclass of String, and while string
+  # literals get the encoding of the source file,
+  #
+  # String.new always gets ascii-8bit encoding. This means that depending on
+  # the contents of a template and the data interpolated into the template,
+  # things either work great or you get an incompatible encoding error.
+  #
+  # This patch fixes the problem by giving new SafeBuffers the default encoding
+  # (which in canvas is utf-8)
+  class ActiveSupport::SafeBuffer
+    def initialize(*a)
+      super.force_encoding(Encoding.default_internal)
+    end
+  end
 end
