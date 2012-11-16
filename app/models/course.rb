@@ -2900,4 +2900,8 @@ class Course < ActiveRecord::Base
     fake_student
   end
   private :sync_enrollments
+
+  def associated_shards
+    [Shard.default]
+  end
 end

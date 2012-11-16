@@ -167,11 +167,12 @@ describe Notification do
     
     it "should create stream items" do
       notification_set(:notification_opts => {:name => "Show In Feed"})
-      StreamItem.for_user(@user).count.should eql(0)
+      @user.stream_item_instances.count.should == 0
       messages = @notification.create_message(@assignment, @user)
-      StreamItem.for_user(@user).count.should eql(1)
-      si = StreamItem.for_user(@user).first
-      si.item_asset_string.should eql("message_")
+      @user.stream_item_instances.count.should == 1
+      si = @user.stream_item_instances.first.stream_item
+      si.asset_type.should == 'Message'
+      si.asset_id.should be_nil
     end
     
     it "should translate ERB in the notification" do

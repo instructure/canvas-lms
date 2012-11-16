@@ -284,8 +284,7 @@ describe Submission do
       }.should change StreamItemInstance, :count
 
       @assignment.unmute!
-      item_asset_strings    = @assignment.submissions.map { |s| "submission_#{s.id}" }
-      stream_item_ids       = StreamItem.all(:select => :id, :conditions => { :item_asset_string => item_asset_strings })
+      stream_item_ids       = StreamItem.all(:select => :id, :conditions => { :asset_type => 'Submission', :asset_id => @assignment.submissions.map(&:id)})
       stream_item_instances = StreamItemInstance.all(:conditions => { :stream_item_id => stream_item_ids })
       stream_item_instances.each { |sii| sii.should_not be_hidden }
     end

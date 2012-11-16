@@ -22,18 +22,65 @@ require 'set'
 class StreamItem < ActiveRecord::Base
   serialize :data
 
-  has_many :stream_item_instances, :dependent => :delete_all
+  has_many :stream_item_instances
   has_many :users, :through => :stream_item_instances
+  belongs_to :context, :polymorphic => true
+  belongs_to :asset, :polymorphic => true, :types => [
+      :collaboration, :conversation, :discussion_entry,
+      :discussion_topic, :message, :submission, :web_conference]
+  validates_presence_of :asset_type, :data
 
-  attr_accessible
-  
-  def stream_data(viewing_user_id)
-    res = data.is_a?(OpenObject) ? data : OpenObject.new
-    res.assert_hash_data
-    res.user_id ||= viewing_user_id unless res.type == 'DiscussionTopic'
-    post_process(res, viewing_user_id)
+  attr_accessible :context, :asset
+  after_destroy :destroy_stream_item_instances
+
+  def self.reconstitute_ar_object(type, data)
+    return nil unless data
+    data = data.instance_variable_get(:@table).with_indifferent_access if data.is_a?(OpenObject)
+    type = data['type'] || type
+    res = type.constantize.new
+
+    case type
+    when 'DiscussionTopic', 'Announcement'
+      root_discussion_entries = data.delete(:root_discussion_entries)
+      root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object('DiscussionEntry', entry) }
+      res.root_discussion_entries.target = root_discussion_entries
+      res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
+    when 'Submission'
+      submission_comments = data.delete(:submission_comments)
+      submission_comments = submission_comments.map { |comment| reconstitute_ar_object('SubmissionComment', comment) }
+      res.submission_comments.target = submission_comments
+      data['body'] = nil
+    end
+    ['users', 'participants'].each do |key|
+      next unless data.has_key?(key)
+      users = data.delete(key)
+      users = users.map { |user| reconstitute_ar_object('User', user) }
+      res.send(key.to_sym).target = users
+    end
+
+    res.instance_variable_set(:@attributes, data)
+    res.instance_variable_set(:@new_record, false) if data['id']
+    res
   end
-  
+
+  def data(viewing_user_id = nil)
+    # reconstitute AR objects
+    @ar_data ||= self.shard.activate do
+      self.class.reconstitute_ar_object(asset_type, read_attribute(:data))
+    end
+    res = @ar_data
+
+    if viewing_user_id
+      res.user_id ||= viewing_user_id if asset_type != 'DiscussionTopic' && res.respond_to?(:user_id)
+      post_process(res, viewing_user_id)
+    else
+      res
+    end
+  end
+
+  define_asset_string_backcompat_method :context_code, :context
+  define_asset_string_backcompat_method :item_asset_string, :asset
+
   def prepare_user(user)
     res = user.attributes.slice('id', 'name', 'short_name')
     res['short_name'] ||= res['name']
@@ -53,14 +100,10 @@ class StreamItem < ActiveRecord::Base
     end
     res
   end
-  
-  def asset
-    @obj ||= ActiveRecord::Base.find_by_asset_string(self.item_asset_string, StreamItem.valid_asset_types)
-  end
-  
+
   def regenerate!(obj=nil)
     obj ||= asset
-    return nil if self.item_asset_string == 'message_'
+    return nil if self.asset_type == 'Message' && self.asset_id.nil?
     if !obj || (obj.respond_to?(:workflow_state) && obj.workflow_state == 'deleted')
       self.destroy
       return nil
@@ -69,60 +112,36 @@ class StreamItem < ActiveRecord::Base
     self.save
     res
   end
-  
-  def self.delete_all_for(asset, original_asset_string=nil)
-    root_asset = nil
-    root_asset = root_object(asset)
-    
-    root_asset_string = root_asset && root_asset.asset_string
-    root_asset_string ||= asset.asset_string if asset.respond_to?(:asset_string)
-    root_asset_string ||= asset if asset.is_a?(String)
-    original_asset_string ||= root_asset_string
-    
-    return if root_asset_string == 'message_'
+
+  def self.delete_all_for(root_asset, asset)
+    asset_string = "#{root_asset.first.underscore}_#{root_asset.last}"
+    # backcompat searching on item_asset_string
+    item = StreamItem.find(:first, :conditions =>
+        ["(asset_type=? AND asset_id=?) OR (item_asset_string=? AND asset_type IS NULL)", root_asset.first, root_asset.last, asset_string])
     # if this is a sub-message, regenerate instead of deleting
-    if root_asset && root_asset.asset_string != original_asset_string
-      items = StreamItem.for_item_asset_string(root_asset_string)
-      items.each{|i| i.regenerate!(root_asset) }
+    if root_asset != asset
+      item.try(:regenerate!)
       return
     end
-    
     # Can't use delete_all here, since we need the destroy to fire and delete
     # the StreamItemInstances as well.
-    StreamItem.find(:all, :conditions => {:item_asset_string => root_asset_string}).each(&:destroy) if root_asset_string
-  end
-  
-  def self.valid_asset_types
-    [
-      :assignment, :submission, :submission_comment, :conversation,
-      :discussion_topic, :discussion_entry, :message, :collaboration,
-      :web_conference
-    ]
-  end
-  
-  def self.root_object(object)
-    if object.is_a?(String)
-      object = ActiveRecord::Base.find_by_asset_string(object, valid_asset_types) rescue nil
-      object ||= ActiveRecord::Base.initialize_by_asset_string(object, valid_asset_types) rescue nil
-    end
-    get_parent_for_stream(object)
+    item.try(:destroy)
   end
 
   def generate_data(object)
     res = {}
 
-    self.context_code ||= object.context_code rescue nil
-    self.context_code ||= object.context.asset_string rescue nil
+    self.context ||= object.context rescue nil
 
     case object
     when DiscussionTopic
-      object = object
       res = object.attributes
       res['user_ids_that_can_see_responses'] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
       res['total_root_discussion_entries'] = object.root_discussion_entries.active.count
       res[:root_discussion_entries] = object.root_discussion_entries.active.reverse[0,10].reverse.map do |entry|
         hash = entry.attributes
         hash['user_short_name'] = entry.user.short_name if entry.user
+        # backcompat
         hash['truncated_message'] = entry.truncated_message(250)
         hash['message'] = hash['message'][0, 4.kilobytes] if hash['message'].present?
         hash
@@ -138,9 +157,9 @@ class StreamItem < ActiveRecord::Base
       res = object.attributes
       res['notification_category'] = object.notification_display_category
       if !object.context.is_a?(Context) && object.context.respond_to?(:context) && object.context.context.is_a?(Context)
-        self.context_code = object.context.context.asset_string
+        self.context = object.context.context
       elsif object.asset_context_type
-        self.context_code = "#{object.asset_context_type.underscore}_#{object.asset_context_id}"
+        self.context_type, self.context_id = object.asset_context_type, object.asset_context_id
       end
     when Submission
       res = object.attributes
@@ -165,33 +184,52 @@ class StreamItem < ActiveRecord::Base
     else
       raise "Unexpected stream item type: #{object.class.to_s}"
     end
-    code = self.context_code
-    if code
-      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', code].cache_key) do
-        Context.find_by_asset_string(code).short_name rescue ""
+    if self.context_type
+      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', self.context_type, self.context_id].cache_key) do
+        self.context.short_name rescue ''
       end
     end
     res['type'] = object.class.to_s
     res['user_short_name'] = object.user.short_name rescue nil
     res['context_code'] = self.context_code
+    # technically we should be able to not use OpenObject at all anymore -
+    # the reconstitution process just grabs the internal hash anyway
     res = OpenObject.process(res)
 
+    if self.class.new_message?(object)
+      self.asset_type = 'Message'
+      self.asset_id = nil
+    else
+      self.asset = object
+    end
+    # backcompat
     self.item_asset_string = object.asset_string
+    self.context_code = "#{self.context_type.underscore}_#{self.context_id}" if self.context_type
     self.data = res
   end
 
   def self.generate_or_update(object)
     item = nil
-    # we can't coalesce messages that weren't ever saved to the DB
-    unless object.asset_string == 'message_'
-      item = StreamItem.find_by_item_asset_string(object.asset_string)
-    end
-    if item
-      item.regenerate!(object)
-    else
-      item = self.new
-      item.generate_data(object)
-      item.save
+    StreamItem.unique_constraint_retry do
+      # we can't coalesce messages that weren't ever saved to the DB
+      if !new_message?(object)
+        item = object.stream_item
+        # backcompat
+        item ||= StreamItem.find(:first, :conditions => {:item_asset_string => object.asset_string, :asset_type => nil})
+      end
+      if item
+        item.regenerate!(object)
+      else
+        item = self.new
+        item.generate_data(object)
+        item.save!
+        # prepopulate the reverse association
+        # (mostly useful for specs that regenerate stream items
+        #  multiple times without reloading the asset)
+        if !new_message?(object)
+          object.stream_item = item
+        end
+      end
     end
     item
   end
@@ -202,7 +240,7 @@ class StreamItem < ActiveRecord::Base
     return [] if user_ids.empty?
 
     # Make the StreamItem
-    object = get_parent_for_stream(object)
+    object = root_object(object)
     res = StreamItem.generate_or_update(object)
     prepare_object_for_unread(object)
 
@@ -214,7 +252,8 @@ class StreamItem < ActiveRecord::Base
     Shard.partition_by_shard(user_ids) do |user_ids_subset|
       StreamItemInstance.transaction do
         user_ids_subset.each do |user_id|
-          i = StreamItemInstance.create(:user_id => user_id, :stream_item => res) do |sii|
+          i = StreamItemInstance.create(:stream_item => res) do |sii|
+            sii.user_id = user_id
             sii.hidden = hidden
             sii.workflow_state = object_unread_for_user(object, user_id)
           end
@@ -248,7 +287,7 @@ class StreamItem < ActiveRecord::Base
     return [res]
   end
 
-  def self.get_parent_for_stream(object)
+  def self.root_object(object)
     case object
     when DiscussionEntry
       object.discussion_topic
@@ -278,7 +317,8 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.update_read_state_for_asset(asset, new_state, user_id)
-    if item = StreamItem.find_by_item_asset_string(asset.asset_string)
+    # backcompat
+    if item = StreamItem.find(:first, :conditions => ["(asset_type=? AND asset_id=?) OR (item_asset_string=? AND asset_type IS NULL)", asset.class.base_class.name, asset.id, asset.asset_string])
       StreamItemInstance.find_by_user_id_and_stream_item_id(user_id, item.id).try(:update_attribute, :workflow_state, new_state)
     end
   end
@@ -298,9 +338,9 @@ class StreamItem < ActiveRecord::Base
     user_ids = Set.new
     count = 0
 
-    query = { :conditions => ['updated_at < ?', before_date] }
+    query = { :conditions => ['updated_at < ?', before_date], :include => [:context] }
     if touch_users
-      query[:include] = 'stream_item_instances'
+      query[:include] << 'stream_item_instances'
     end
 
     self.find_each(query) do |item|
@@ -320,36 +360,44 @@ class StreamItem < ActiveRecord::Base
     count
   end
 
-  named_scope :for_user, lambda {|user|
-    {:conditions => ['stream_item_instances.user_id = ?', user.id],
-      :include => :stream_item_instances }
-  }
-  named_scope :for_context_codes, lambda {|codes|
-    {:conditions => {:context_code => codes} }
-  }
-  named_scope :for_item_asset_string, lambda{|string|
-    {:conditions => {:item_asset_string => string} }
-  }
   named_scope :before, lambda {|id|
     {:conditions => ['id < ?', id], :order => 'updated_at DESC', :limit => 21 }
   }
   named_scope :after, lambda {|start_at| 
     {:conditions => ['updated_at > ?', start_at], :order => 'updated_at DESC', :limit => 21 }
   }
-  
+
+  def associated_shards
+    if self.context.try(:respond_to?, :associated_shards)
+      self.context.associated_shards
+    elsif self.data.respond_to?(:associated_shards)
+      self.data.associated_shards
+    else
+      [self.shard]
+    end
+  end
+
   private
-  
+
+  def self.new_message?(object)
+    object.is_a?(Message) && object.new_record?
+  end
+
   def post_process(res, viewing_user_id)
-    case res.type
-    when 'DiscussionTopic','Announcement'
+    case res
+    when DiscussionTopic, Announcement
       if res.require_initial_post
-        res.user_has_posted = true
-        if res.user_ids_that_can_see_responses && !res.user_ids_that_can_see_responses.member?(viewing_user_id) 
+        res.write_attribute(:user_has_posted, true)
+        if res.user_ids_that_can_see_responses && !res.user_ids_that_can_see_responses.member?(viewing_user_id)
           res.root_discussion_entries = []
           res.user_has_posted = false
         end
       end
     end
     res
+  end
+
+  def destroy_stream_item_instances
+    self.stream_item_instances.with_each_shard { |scope| scope.scoped({}).delete_all; nil }
   end
 end

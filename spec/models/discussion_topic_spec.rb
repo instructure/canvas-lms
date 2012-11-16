@@ -139,14 +139,14 @@ describe DiscussionTopic do
       course_with_student(:active_all => true)
       @user.register
       topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
-      StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
+      topic.stream_item.should_not be_nil
 
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
-      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+      topic.stream_item.should be_nil
 
       topic.message = "content changed!"
       topic.save
-      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+      topic.stream_item.should be_nil
     end
 
     it "should send to streams on update from delayed to active" do
@@ -154,13 +154,13 @@ describe DiscussionTopic do
       @user.register
       topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
       topic.workflow_state.should == 'post_delayed'
-      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+      topic.stream_item.should be_nil
 
       topic.delayed_post_at = nil
       topic.title = "this isn't delayed any more"
       topic.workflow_state = 'active'
       topic.save!
-      StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
+      topic.stream_item.should_not be_nil
     end
   end
 
@@ -388,13 +388,13 @@ describe DiscussionTopic do
 
       topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher)
 
-      StreamItem.for_user(@student).count.should == 0
-      StreamItem.for_user(@teacher).count.should == 1
+      @student.stream_item_instances.count.should == 0
+      @teacher.stream_item_instances.count.should == 1
 
       topic.discussion_entries.create!
 
-      StreamItem.for_user(@student).count.should == 0
-      StreamItem.for_user(@teacher).count.should == 1
+      @student.stream_item_instances.count.should == 0
+      @teacher.stream_item_instances.count.should == 1
     end
 
   end
@@ -702,7 +702,7 @@ describe DiscussionTopic do
     end
 
     it "should sync unread state with the stream item" do
-      @stream_item = StreamItem.for_item_asset_string(@topic.asset_string).first
+      @stream_item = @topic.stream_item(true)
       @stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}.should be_read
       @stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}.should be_unread
 
@@ -710,7 +710,7 @@ describe DiscussionTopic do
       @topic.change_all_read_state("read", @student)
       @topic.reload
 
-      @stream_item = StreamItem.for_item_asset_string(@topic.asset_string).first
+      @stream_item = @topic.stream_item
       @stream_item.stream_item_instances.detect{|sii| sii.user_id == @teacher.id}.should be_unread
       @stream_item.stream_item_instances.detect{|sii| sii.user_id == @student.id}.should be_read
     end

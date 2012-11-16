@@ -141,11 +141,11 @@ describe User do
   it "should populate dashboard_messages" do
     Notification.create(:name => "Assignment Created")
     course_with_teacher(:active_all => true)
-    StreamItem.for_user(@user).should be_empty
+    @user.stream_item_instances.should be_empty
     @a = @course.assignments.new(:title => "some assignment")
     @a.workflow_state = "available"
     @a.save
-    StreamItem.for_user(@user).should_not be_empty
+    @user.stream_item_instances(true).should_not be_empty
   end
 
   it "should ignore orphaned stream item instances" do
@@ -171,7 +171,7 @@ describe User do
 
       @dashboard_key = StreamItemCache.recent_stream_items_key(@teacher)
       @context_keys = @contexts.map { |context|
-        StreamItemCache.recent_stream_items_key(@teacher, context.asset_string)
+        StreamItemCache.recent_stream_items_key(@teacher, context.class.base_class.name, context.id)
       }
     end
 

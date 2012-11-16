@@ -75,17 +75,18 @@ class ActiveRecord::Base
 
   def self.parse_asset_string(str)
     code = asset_string_components(str)
-    [code.first.classify, code.last.to_i]
+    [code.first.classify, code.last.try(:to_i)]
   end
 
   def self.asset_string_components(str)
-    str.split(/_(\d+)\z/)
+    components = str.split('_', -1)
+    id = components.pop
+    [components.join('_'), id.presence]
   end
 
   def self.initialize_by_asset_string(string, asset_types)
-    code = string.split("_")
-    id = code.pop
-    res = code.join("_").classify.constantize rescue nil
+    type, id = asset_string_components(string)
+    res = type.classify.constantize rescue nil
     res.id = id if res
     res
   end
@@ -105,6 +106,36 @@ class ActiveRecord::Base
 
   def context_string(field = :context)
     send("#{field}_type").underscore + "_" + send("#{field}_id").to_s if send("#{field}_type")
+  end
+
+  def self.define_asset_string_backcompat_method(string_version_name, association_version_name = string_version_name, method = nil)
+    # just chain to the two methods
+    unless method
+      # this is weird, but gets the instance methods defined so they can be chained
+      begin
+        self.new.send("#{association_version_name}_id")
+      rescue
+        # the db doesn't exist yet; no need to bother with backcompat methods anyway
+        return
+      end
+      define_asset_string_backcompat_method(string_version_name, association_version_name, 'id')
+      define_asset_string_backcompat_method(string_version_name, association_version_name, 'type')
+      return
+    end
+
+    self.class_eval <<-CODE
+      def #{association_version_name}_#{method}_with_backcompat
+        res = #{association_version_name}_#{method}_without_backcompat
+        if !res && #{string_version_name}.present?
+          type, id = ActiveRecord::Base.parse_asset_string(#{string_version_name})
+          write_attribute(:#{association_version_name}_type, type)
+          write_attribute(:#{association_version_name}_id, id)
+          res = #{association_version_name}_#{method}_without_backcompat
+        end
+        res
+      end
+    CODE
+    self.alias_method_chain "#{association_version_name}_#{method}".to_sym, :backcompat
   end
 
   def export_columns(format = nil)

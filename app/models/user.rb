@@ -1838,10 +1838,15 @@ class User < ActiveRecord::Base
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      context_codes = setup_context_lookups(opts[:contexts])
-      instances = instances.scoped(:conditions => { :context_code => context_codes }) if context_codes.present?
+      conditions = setup_context_association_lookups("stream_item_instances.context", opts[:contexts], :backcompat => true)
+      instances = instances.scoped(:conditions => conditions) unless conditions.first.empty?
     elsif opts[:context]
-      instances = instances.scoped(:conditions => { :context_code => opts[:context].asset_string })
+      # backcompat searching on context_code
+      instances = instances.scoped(:conditions =>
+                                       ["(stream_item_instances.context_type=? AND stream_item_instances.context_id=?) OR (stream_item_instances.context_code=? AND stream_item_instances.context_type IS NULL)",
+                                        opts[:context].class.base_class.name,
+                                        opts[:context].id,
+                                        opts[:context].asset_string])
     end
 
     instances
@@ -1854,7 +1859,7 @@ class User < ActiveRecord::Base
       items = []
       Array(opts[:contexts]).each do |context|
         items.concat(
-                   Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.asset_string),
+                   Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.class.base_class.name, context.id),
                                      :expires_in => expires_in) {
                      recent_stream_items(:context => context)
                    })
@@ -1869,19 +1874,18 @@ class User < ActiveRecord::Base
   end
 
   def recent_stream_items(opts={})
-    # cross-shard stream items need a *lot* of work; just disable them for now
-    return [] if self.shard != Shard.current
-
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      visible_instances = visible_stream_item_instances(opts).scoped({
-        :include => :stream_item,
-        :limit => Setting.get('recent_stream_item_limit', 100),
-      })
-      visible_instances.map do |sii|
-        si = sii.stream_item
-        si.data.unread = sii.unread? if si.present?
-        si
-      end.compact
+    self.shard.activate do
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+        visible_instances = visible_stream_item_instances(opts).scoped({
+          :include => :stream_item,
+          :limit => Setting.get('recent_stream_item_limit', 100),
+        })
+        visible_instances.map do |sii|
+          si = sii.stream_item
+          si.data.write_attribute(:unread, sii.unread?) if si.present?
+          si
+        end.compact
+      end
     end
   end
 
@@ -1932,6 +1936,23 @@ class User < ActiveRecord::Base
     Array(contexts || cached_contexts).map(&:asset_string)
   end
   memoize :setup_context_lookups
+
+  def setup_context_association_lookups(column, contexts=nil, opts = {})
+    contexts = Array(contexts || cached_contexts)
+    conditions = [[]]
+    backcompat = opts[:backcompat]
+    contexts.map do |context|
+      if backcompat
+        conditions.first << "((#{column}_type=? AND #{column}_id=?) OR (#{column}_code=? AND #{column}_type IS NULL))"
+      else
+        conditions.first << "(#{column}_type=? AND #{column}_id=?)"
+      end
+      conditions.concat [context.class.base_class.name, context.id]
+      conditions << context.asset_string if backcompat
+    end
+    conditions[0] = conditions[0].join(" OR ")
+    conditions
+  end
 
   # TODO: doesn't actually cache, needs to be optimized
   def cached_contexts

@@ -1258,6 +1258,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def scribdable?
+    # stream items pre-serialize the return value of this method
+    return read_attribute(:scribdable?) if has_attribute?(:scribdable?)
     !!(ScribdAPI.enabled? && self.scribd_mime_type_id && self.scribd_attempts != SKIPPED_SCRIBD_ATTEMPTS)
   end
 

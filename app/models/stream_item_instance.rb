@@ -21,13 +21,20 @@ class StreamItemInstance < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :stream_item
+  belongs_to :context, :polymorphic => true
 
-  attr_accessible :user_id, :stream_item
+  validates_presence_of :stream_item_id
+
+  attr_accessible :user, :stream_item, :context
 
   before_save :set_context_code
   def set_context_code
-    self.context_code = stream_item && stream_item.context_code
+    self.context_type, self.context_id = stream_item.context_type, stream_item.context_id
+    # backcompat
+    self.context_code = stream_item.context_code
   end
+
+  define_asset_string_backcompat_method :context_code, :context
 
   class << self
     alias_method :original_update_all, :update_all
@@ -38,9 +45,10 @@ class StreamItemInstance < ActiveRecord::Base
       raise "Using update_all will break things, use update_all_with_invalidation instead."
     end
 
-    # Runs update_all() and also invalidates cache keys for the array of context_codes
-    def update_all_with_invalidation(context_codes, updates, conditions = nil, options = {})
-      context_codes.each { |code| StreamItemCache.invalidate_context_stream_item_key code }
+    # Runs update_all() and also invalidates cache keys for the array of contexts (a context
+    # is an array of [context_type, context_id])
+    def update_all_with_invalidation(contexts, updates, conditions = nil, options = {})
+      contexts.each { |context| StreamItemCache.invalidate_context_stream_item_key(context.first, context.last) }
       self.original_update_all(updates, conditions, options)
     end
   end

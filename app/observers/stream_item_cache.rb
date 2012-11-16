@@ -25,26 +25,26 @@ class StreamItemCache < ActiveRecord::Observer
 
   def invalidate_recent_stream_items(stream_instance)
     dashboard_key = StreamItemCache.recent_stream_items_key(stream_instance.user)
-    context_key   = StreamItemCache.recent_stream_items_key(stream_instance.user, stream_instance.context_code)
+    context_key   = StreamItemCache.recent_stream_items_key(stream_instance.user, stream_instance.context_type, stream_instance.context_id)
     Rails.cache.delete dashboard_key
     Rails.cache.delete context_key
   end
 
-  def self.invalidate_context_stream_item_key(context_code)
-    Rails.cache.delete ["context_stream_item_key", context_code].cache_key
+  def self.invalidate_context_stream_item_key(context_type, context_id)
+    Rails.cache.delete ["context_stream_item_key", context_type, context_id].cache_key
   end
 
   # Generate a cache key for User#recent_stream_items
-  def self.recent_stream_items_key(user, context_code = nil)
-    ['recent_stream_items', user.id, context_stream_item_key(context_code)].cache_key
+  def self.recent_stream_items_key(user, context_type = nil, context_id = nil)
+    ['recent_stream_items2', user.id, context_stream_item_key(context_type, context_id)].cache_key
   end
 
-  # Returns a cached cache key for the context_code with the time so all
+  # Returns a cached cache key for the context with the time so all
   # stream item cache keys for a context can later be invalidated.
-  def self.context_stream_item_key(context_code)
-    return unless context_code
-    Rails.cache.fetch(["context_stream_item_key", context_code].cache_key) do
-      "#{context_code}-#{Time.now.to_i}"
+  def self.context_stream_item_key(context_type, context_id)
+    return unless context_type
+    Rails.cache.fetch(["context_stream_item_key", context_type, context_id].cache_key) do
+      "#{context_type.underscore}_#{context_id}-#{Time.now.to_i}"
     end
   end
 

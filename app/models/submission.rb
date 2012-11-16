@@ -936,15 +936,15 @@ class Submission < ActiveRecord::Base
   end
 
   alias_method :old_submission_comments, :submission_comments
-  def submission_comments(options = {})
-    res = old_submission_comments(options)
+  def submission_comments(*args)
+    res = old_submission_comments(*args)
     res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
     res
   end
 
   alias_method :old_visible_submission_comments, :visible_submission_comments
-  def visible_submission_comments(options = {})
-    res = old_visible_submission_comments(options)
+  def visible_submission_comments(*args)
+    res = old_visible_submission_comments(*args)
     res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
     res
   end

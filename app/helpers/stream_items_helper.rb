@@ -33,29 +33,31 @@ module StreamItemsHelper
     supported_categories.each { |category| categorized_items[category] = [] }
     
     stream_items.each do |item|
-      category = item.data.type
+      category = item.data.class.name
       category = category_for_message(item.data.notification_name) if category == "Message"
 
       next unless supported_categories.include?(category)
 
       if category == "Conversation"
-        participant = user.conversation_participant(item.data.id)
+        participant = user.shard.activate do
+          # this needs to be queried relative to the user
+          user.conversation_participant(item.asset_id)
+        end
         next if participant.last_author?
-        item.data.last_message = participant.last_message
-        item.data.last_author = item.data.last_message.author
+        item.data.write_attribute(:last_message, participant.last_message)
+        item.data.write_attribute(:last_author, item.data.last_message.author)
 
         # because we're cheating and just checking unread here instead of using
         # the workflow_state on the stream_item_instance, that workflow_state
         # may be out of sync with the underlying conversation.
-        item.data.unread = participant.unread?
+        item.data.write_attribute(:unread, participant.unread?)
       elsif category == "Assignment"
         # TODO: this handles an edge case for old stream items where their
         # context code was getting set to "assignment_x" instead of "course_y".
         # Can be removed when either:
         # - we switch to direct send_to_stream for assignments
         # - no more stream items have this bad data in production
-        context_type, context_id = item.data.context_code.split("_")
-        next if context_type == "assignment"
+        next if item.context_type == "Assignment"
       end
 
       categorized_items[category] << generate_presenter(category, item)
@@ -66,7 +68,8 @@ module StreamItemsHelper
   def generate_presenter(category, item)
     presenter = StreamItemPresenter.new
     presenter.stream_item_id = item.id
-    presenter.updated_at = item.data.updated_at || item.updated_at
+    presenter.updated_at = item.data.respond_to?(:updated_at) ? item.data.updated_at : nil
+    presenter.updated_at ||= item.updated_at
     presenter.unread = item.data.unread
     presenter.path = extract_path(category, item)
     presenter.context = extract_context(category, item)
@@ -75,18 +78,13 @@ module StreamItemsHelper
   end
 
   def extract_path(category, item)
-    asset = item.data
     case category
     when "Announcement", "DiscussionTopic"
-      context_type, context_id = asset.context_code.split("_")
-      asset_id = asset.id
-      polymorphic_path([context_type, category.underscore], "#{context_type}_id" => context_id, :id => asset_id)
+      polymorphic_path([item.context_type.underscore, category.underscore], "#{item.context_type.underscore}_id" => item.context_id, :id => item.asset_id)
     when "Conversation"
-      conversation_path(asset.id)
+      conversation_path(item.asset_id)
     when "Assignment"
-      context_type, context_id = asset.context_code.split("_")
-      asset_id = asset.asset_context_code.split("_")[1]
-      polymorphic_path([context_type, category.underscore], "#{context_type}_id" => context_id, :id => asset_id)
+      polymorphic_path([item.context_type.underscore, category.underscore], "#{item.context_type.underscore}_id" => item.context_id, :id => item.data.asset_context_id)
     else
       nil
     end
@@ -97,11 +95,10 @@ module StreamItemsHelper
     asset = item.data
     case category
     when "Announcement", "DiscussionTopic", "Assignment"
-      context_type, context_id = asset.context_code.split("_")
-      context.type = context_type.camelize
-      context.id = context_id.to_i
+      context.type = item.context_type
+      context.id = item.context_id
       context.name = asset.context_short_name
-      context.linked_to = polymorphic_path([context_type, category.underscore.pluralize], "#{context_type}_id" => context_id)
+      context.linked_to = polymorphic_path([context.type.underscore, category.underscore.pluralize], "#{context.type.underscore}_id" => context.id)
     when "Conversation"
       context.type = "User"
       context.id = asset.last_author.id
