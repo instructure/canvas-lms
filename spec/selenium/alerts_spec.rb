@@ -63,7 +63,7 @@ describe "Alerts" do
     @alerts.length.should == 1
 
     wait_for_animations
-    alert.find_element(:css, '.delete_link img').click
+    alert.find_element(:css, '.delete_link').click
 
     wait_for_ajaximations
     f('.alert').should_not be_displayed

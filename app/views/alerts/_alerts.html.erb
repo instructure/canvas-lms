@@ -20,11 +20,11 @@
 <div class="alerts_list">
   <%= render :partial => 'alerts/alert', :collection => @alerts %>
   <%= render :partial => 'alerts/alert' %>
-  <a href="#" class="delete_item_link editing" style="display:none;" title="<%= t(:remove, "Remove this item") %>"><%= image_tag 'delete_circle.png' %></a>
+  <a href="#" class="delete_item_link editing" style="display:none;" title="<%= t(:remove, "Remove this item") %>"><i class="icon-end"></i></a>
 </div>
 
 <div class="button-container" style="margin-top: 20px;">
-  <button class="btn add_alert_link"><%= image_tag "add.png" %> <%= t('buttons.add_alert', 'Add Alert') %></button>
+  <button class="btn btn-primary add_alert_link"><i class="icon-add"></i> <%= t('buttons.add_alert', 'Add Alert') %></button>
 </div>
 
 <% js_block do %>

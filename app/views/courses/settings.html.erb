@@ -284,10 +284,10 @@ TEXT
       </tr><tr>
         <td colspan="4">
           <% if can_do(@context, @current_user, :update) %>
-            <a href="#" class="edit_course_link btn"><%= image_tag "edit.png" %><%= t('links.edit_course', %{Edit Course Details}) %></a>
+            <a href="#" class="edit_course_link btn"><i class="icon-edit"></i> <%= t('links.edit_course', %{Edit Course Details}) %></a>
           <% end %>
           <% if Account.site_admin.grants_right?(@current_user, nil, :manage_courses) && Account.root_accounts.length > 1 %>
-            <a href="#" class="move_course_link btn"><%= image_tag "ball.png" %><%= t('links.move_course', %{Move To Another Account}) %></a>
+            <a href="#" class="move_course_link btn"><i class="icon-arrow-right"></i> <%= t('links.move_course', %{Move To Another Account}) %></a>
           <% end %>
           <span class="course_form">
             <div class="form-actions">
@@ -308,13 +308,13 @@ TEXT
         <li class="section">
           <% if can_do(section, @current_user, :delete) %>
             <% if section.deletable? %>
-              <a class="section_link delete_section_link no-hover" title="<%= t('links.title.delete_section', %{Delete Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><%= image_tag "delete_circle.png", :alt => t('images.alt.delete', "delete") %></a>
+              <a class="section_link delete_section_link no-hover" title="<%= t('links.title.delete_section', %{Delete Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><i class="icon-end standalone-icon"></i><span class="screen-reader-text"><%= t('images.alt.delete', %{Delete}) %></span></a>
             <% else %>
-              <a class="section_link cant_delete_section_link no-hover" href="#" title="<%= t('links.title.cant_delete', %{You can't delete sections that have users enrolled}) %>"><%= image_tag "delete_circle_gray.png", :alt => t('images.alt.cant_delete', "can't delete") %></a>
+              <a class="section_link cant_delete_section_link no-hover" href="#" title="<%= t('links.title.cant_delete', %{You can't delete sections that have users enrolled}) %>"><i class="icon-end standalone-icon"></i><span class="screen-reader-text"><%= t('images.alt.delete', %{Delete}) %></span></a>
             <% end %>
           <% end %>
           <% if can_do(section, @current_user, :update) && !section.defined_by_sis? %>
-            <a class="section_link edit_section_link no-hover" title="<%= t('links.title.edit_section', %{Edit Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><%= image_tag "edit.png", :alt => t('images.alt.edit', "edit") %></a>
+            <a class="section_link edit_section_link no-hover" title="<%= t('links.title.edit_section', %{Edit Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><i class="icon-edit standalone-icon"></i><span class="screen-reader-text"><%= t('images.alt.edit', %{Edit}) %></span></a>
           <% end %>
           <% if can_do section, @current_user, :read %>
             <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">
@@ -336,8 +336,8 @@ TEXT
         </li>
       <% end %>
       <li class="section_blank" style="display: none;">
-        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.delete_section', %{Delete Section}) %>" class="delete_section_link no-hover" ><%= image_tag "delete_circle.png", :alt => t('images.alt.delete', "delete") %></a>
-        <a class="edit_section_link no-hover" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.edit_section', %{Edit Section}) %>"><%= image_tag "edit.png", :alt => t('images.alt.edit', "edit") %></a>
+        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.delete_section', %{Delete Section}) %>" class="delete_section_link no-hover"><i class="icon-end standalone-icon"></i><span class="screen-reader-text"><%= t('images.alt.delete', %{Delete}) %></span></a>
+        <a class="edit_section_link no-hover" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.edit_section', %{Edit Section}) %>"><i class="icon-edit standalone-icon"></i><span class="screen-reader-text"><%= t('images.alt.edit', %{Edit}) %></span></a>
         <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name">
         </a>
         <div class="clear"></div>
@@ -363,7 +363,7 @@ TEXT
       <%= t 'unaccepted_invitations', "%{count} Invitations haven't been accepted.  You can click a user's name to re-send their invitation", :count => %[<span class="unaccepted_invitations">#{@user_counts[:invited]}</span>].html_safe %>
 
       <% if @context.available? %>
-        <% ot 're_send_all', 'or *Re-Send All Unaccepted Invitations*', :wrapper => capture { %><div><span><button type="button" href="<%= course_re_send_invitations_url %>" class="btn re_send_invitations_link">\1</button></span>
+        <% ot 're_send_all', 'or *Re-Send All Unaccepted Invitations*', :wrapper => capture { %><div><span><button type="button" href="<%= course_re_send_invitations_url %>" class="btn btn-small re_send_invitations_link"><i class="icon-email"></i> \1</button></span>
       </div><% } %>
       <% end %>
     </div>
@@ -399,7 +399,7 @@ TEXT
       <% if @context.completed? || @context.soft_concluded? %>
         <%= t('cannot_add_users_to_concluded_course', %{You cannot add users to a concluded course.}) %>
       <% else %>
-        <a href="#" class="add_users_link btn"><%= image_tag "add.png" %><%= t('links.add_users', %{Add Users}) %></a>
+        <a href="#" class="add_users_link btn btn-primary"><i class="icon-group-new"></i> <%= t('links.add_users', %{Add Users}) %></a>
       <% end %>
     <% end %>
     <% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :style => "display: none;"} do  %>
@@ -488,7 +488,7 @@ TEXT
       </ul>
 
       <p>
-        <button type="submit" class="btn"><%= t('#buttons.save', %{Save}) %></button>
+        <button type="submit" class="btn btn-primary"><%= t('#buttons.save', %{Save}) %></button>
       </p>
     <% end %>
   </div>

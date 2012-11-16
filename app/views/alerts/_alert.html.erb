@@ -5,15 +5,15 @@
 <% alert_counter = '{{id}}' if alert_counter == -1 %>
 <% form_for [@context, alert], :html => { :class => "alert displaying #{'blank' if alert.new_record?}" } do |f| %>
   <div class="links">
-    <a href="#" class="displaying edit_link no-hover" title="<%= t('links.title.edit_alert', %{Edit alert}) %>"><%= image_tag "edit.png" %></a>
-    <a href="#" class="delete_link no-hover" title="<%= t('links.title.delete_alert', %{Delete this alert}) %>"><%= image_tag "delete.png" %></a>
+    <a href="#" class="displaying edit_link no-hover" title="<%= t('links.title.edit_alert', %{Edit alert}) %>"><i class="icon-edit"></i></a>
+    <a href="#" class="delete_link no-hover" title="<%= t('links.title.delete_alert', %{Delete this alert}) %>"><i class="icon-trash"></i></a>
   </div>
 
   <div class="labelled_region">
     <span class="label"><%= before_label :criteria, "Trigger an alert when" %></span>
     <ul class="criteria"></ul>
     <div class="add_criteria_line editing">
-      <select title="<%= t :criteria, "Trigger an alert when" %>"></select> <a href="#" class="add_criterion_link"><%= image_tag 'add.png' %> <%= t 'buttons.add_criterion', "Add Trigger" %></a>
+      <select title="<%= t :criteria, "Trigger an alert when" %>"></select> <a href="#" class="add_criterion_link icon-add"><%= t 'buttons.add_criterion', "Add Trigger" %></a>
     </div>
   </div>
 
@@ -21,7 +21,7 @@
 	  <span class="label"><%= before_label :recipients, "Send a notification to" %></span>
 	  <ul class="recipients"></ul>
 	  <div class="add_recipients_line editing">
-	    <select title="<%= t :recipients, "Send a notification to" %>"></select> <a href="#" class="add_recipient_link"><%= image_tag 'add.png' %> <%= t 'buttons.add_recipient', "Add Recipient" %></a>
+	    <select title="<%= t :recipients, "Send a notification to" %>"></select> <a href="#" class="add_recipient_link icon-add"><%= t 'buttons.add_recipient', "Add Recipient" %></a>
 	  </div>
   </div>
 

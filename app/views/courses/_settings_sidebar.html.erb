@@ -1,21 +1,21 @@
 <div class="rs-margin-lr rs-margin-top">
   <% if can_do(@context, @current_user, :use_student_view) %>
     <% link_to course_student_view_path(@context), :method => :post, :class => 'btn button-sidebar-wide student_view_button' do %>
-      <%= image_tag 'student_view_icon.png' %>
+      <i class="icon-student-view"></i>
       <%= t('links.student_view', 'Student View') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read_reports) %>
     <% link_to context_url(@context, :context_statistics_url), :class => 'btn button-sidebar-wide' do %>
-      <%= image_tag 'graph.png' %>
+      <i class="icon-stats"></i>
       <%= t('links.stats', 'Course Statistics') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read) %>
     <% link_to calendar_url_for(@context), :class => 'btn button-sidebar-wide', :id => 'course_calendar_link' do %>
-      <%= image_tag 'calendar_icon.png' %>
+      <i class="icon-calendar-days"></i>
       <%= t('links.calendar', 'Course Calendar') %>
     <% end %>
   <% end %>
@@ -24,13 +24,13 @@
     <% if @context.completed? %>
       <% form_tag context_url(@context, :context_unconclude_url) do %>
         <button class="btn button-sidebar-wide" type="submit">
-          <%= image_tag 'add.png' %>
+          <i class="icon-add"></i>
           <%= t('buttons.unconclude', 'Un-Conclude Course') %>
         </button>
       <% end %>
     <% elsif !@context.soft_concluded? %>
       <% link_to context_url(@context, :context_confirm_action_url, :event => 'conclude'), :class => 'btn button-sidebar-wide' do %>
-        <%= image_tag 'delete.png' %>
+        <i class="icon-lock"></i>
         <%= t('links.conclude', 'Conclude this Course') %>
       <% end %>
     <% end %>
@@ -38,35 +38,35 @@
 
   <% if can_do(@context, @current_user, :delete) && !@context.deleted? %>
     <% link_to context_url(@context, :context_confirm_action_url, :event => 'delete'), :class => 'btn button-sidebar-wide delete_course_link' do %>
-      <%= image_tag 'delete.png' %>
+      <i class="icon-trash"></i>
       <%= t('links.delete', 'Permanently Delete this Course') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read) && show_user_create_course_button(@current_user) %>
     <% link_to context_url(@context, :context_start_copy_url), :class => 'btn button-sidebar-wide' do %>
-      <%= image_tag 'file_multiple.png' %>
+      <i class="icon-copy-course"></i>
       <%= t('links.copy', 'Copy this Course') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_content, :manage_files, :manage_quizzes) %>
     <% link_to context_url(@context, :context_imports_url), :class => 'btn button-sidebar-wide import_content' do %>
-      <%= image_tag 'file_multiple.png' %>
+      <i class="icon-download"></i>
       <%= t('links.import', 'Import Content into this Course') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read) %>
     <% link_to context_url(@context, :course_content_exports_url), :class => 'btn button-sidebar-wide' do %>
-      <%= image_tag 'file_multiple.png' %>
+      <i class="icon-upload"></i>
       <%= t('links.export_content', 'Export Course Content') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :reset_content) %>
     <% link_to context_url(@context, :course_reset_url), :class => 'btn button-sidebar-wide reset_course_content_button' do %>
-      <%= image_tag 'delete.png' %>
+      <i class="icon-reset"></i>
       <%= t('links.reset', 'Reset Course Content') %>
     <% end %>
 
