@@ -24,4 +24,13 @@ module Canvas::ReportHelpers::DateHelper
       nil
     end
   end
+
+  def default_timezone_parse(datetime_string, account=@account)
+    if datetime_string
+      datetime = Time.use_zone('UTC') do
+        Time.zone.parse(datetime_string)
+      end
+      datetime.in_time_zone(account.default_time_zone)
+    end
+  end
 end
