@@ -110,10 +110,11 @@ describe "Canvas Cartridge importing" do
 
     #convert to json
     doc1 = Nokogiri::XML(builder.target!)
-    tool1_hash = @converter.convert_blti_link(doc1)
+    lti_converter = CC::Importer::BLTIConverter.new
+    tool1_hash = lti_converter.convert_blti_link(doc1)
     tool1_hash['migration_id'] = CC::CCHelper.create_key(tool1)
     doc2 = Nokogiri::XML(builder2.target!)
-    tool2_hash = @converter.convert_blti_link(doc2)
+    tool2_hash = lti_converter.convert_blti_link(doc2)
     tool2_hash['migration_id'] = CC::CCHelper.create_key(tool2)
     #import json into new course
     ContextExternalTool.process_migration({'external_tools'=>[tool1_hash, tool2_hash]}, @migration)
