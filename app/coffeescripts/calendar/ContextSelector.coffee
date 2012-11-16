@@ -96,6 +96,7 @@ define [
       if @apptGroup.sub_context_codes.length > 0
         if @apptGroup.sub_context_codes[0].match /^group_category_/
           for c, item of @contextSelectorItems
+            item.setState('on')
             item.lock()
         else
           contextsBySubContext = {}
