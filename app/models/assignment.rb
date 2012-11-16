@@ -327,10 +327,10 @@ class Assignment < ActiveRecord::Base
     true
   end
 
-  def update_student_submissions(old_points_possible, old_grading_type)
+  def update_student_submissions
     submissions.graded.each do |submission|
       submission.grade = score_to_grade(submission.score)
-      submission.save
+      submission.with_versioning(:explicit => true) { submission.save! }
     end
   end
 
@@ -339,7 +339,7 @@ class Assignment < ActiveRecord::Base
   # reflect the changes
   def update_submissions_if_details_changed
     if !new_record? && (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) && !submissions.graded.empty?
-      send_later_if_production(:update_student_submissions, points_possible_was, grading_type_was)
+      send_later_if_production(:update_student_submissions)
     end
     true
   end

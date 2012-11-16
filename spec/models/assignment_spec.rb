@@ -2530,6 +2530,16 @@ describe Assignment do
       json[:submissions].first[:submission_comments].first[:created_at].to_i.should eql @comment.created_at.to_i
     end
   end
+
+  describe "update_student_submissions" do
+    it "should save a version when changing grades" do
+      setup_assignment_without_submission
+      s = @assignment.grade_student(@user, :grade => "10").first
+      @assignment.points_possible = 5
+      @assignment.save!
+      s.reload.version_number.should == 2
+    end
+  end
 end
 
 def setup_assignment_with_group
