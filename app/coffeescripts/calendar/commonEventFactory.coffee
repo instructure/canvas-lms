@@ -2,9 +2,10 @@ define [
   'jquery'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/CommonEvent.Assignment',
+  'compiled/calendar/CommonEvent.AssignmentOverride'
   'compiled/calendar/CommonEvent.CalendarEvent'
   'compiled/str/splitAssetString'
-], ($, CommonEvent, Assignment, CalendarEvent, splitAssetString) ->
+], ($, CommonEvent, Assignment, AssignmentOverride, CalendarEvent, splitAssetString) ->
 
   (data, contexts) ->
     if data == null
@@ -20,7 +21,7 @@ define [
     else if  data.assignment || data.assignment_group_id
       'assignment'
     else
-      type = 'calendar_event'
+      'calendar_event'
 
     data = if data.assignment_overrides
       {assignment: data.assignment, assignment_override: data.assignment_overrides[0]}
@@ -47,6 +48,8 @@ define [
 
     if type == 'assignment'
       obj = new Assignment(data, contextInfo)
+    else if type == 'assignment_override'
+      obj = new AssignmentOverride(data, contextInfo)
     else
       obj = new CalendarEvent(data, contextInfo, actualContextInfo)
 

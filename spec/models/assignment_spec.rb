@@ -867,11 +867,11 @@ describe Assignment do
 
     it "should include visible lock date overrides in the list of lock dates" do
       _, as_instructor = @assignment.lock_ats_for(@teacher)
-      as_instructor.should include({
+      as_instructor.detect { |a| a[:override].present? }.should == {
         :title => @course.default_section.name,
         :lock_at => @override.lock_at,
         :override => @override
-      })
+      }
     end
 
     it "should exclude visible overrides that don't override lock_at from the list of lock dates" do

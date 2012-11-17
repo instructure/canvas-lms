@@ -45,6 +45,7 @@ define [
         "EventDataSource/ajaxStarted" : @ajaxStarted
         "EventDataSource/ajaxEnded" : @ajaxEnded
         "Calendar/refetchEvents" : @refetchEvents
+        'CommonEvent/assignmentSaved' : @updateOverrides
 
       weekColumnFormatter = """
         '<span class="agenda-col-wrapper">
@@ -220,10 +221,10 @@ define [
       if event.isDueAtMidnight()
         # show the actual time instead of the midnight fudged time
         element.find('.fc-event-time').html @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t')
-      if event.eventType == 'assignment' && view.name == "agendaWeek"
+      if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
-      if event.eventType == 'assignment'
+      if event.eventType.match(/assignment/)
         element.find('.fc-event-time').html I18n.t('labels.due', 'due')
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
@@ -326,6 +327,7 @@ define [
 
     eventSaved: (event) =>
       event.removeClass 'event_pending'
+
       # If we just saved a new event then the id field has changed from what it
       # was in eventSaving. So we need to clear out the old _id that
       # fullcalendar stores for itself because the id has changed.
@@ -344,6 +346,12 @@ define [
         @calendar.fullCalendar('removeEvents', event.id)
       else
         @calendar.fullCalendar('updateEvent', event)
+
+    # When an assignment event is updated, update its related overrides.
+    updateOverrides: (event) =>
+      _.each @dataSource.cache.contexts[event.contextCode()].events, (override, key) ->
+        if key.match(/override/) and event.assignment.id == override.assignment.id
+          override.updateAssignmentTitle(event.title)
 
     visibleContextListChanged: (newList) =>
       @visibleContextList = newList

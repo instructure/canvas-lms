@@ -45,6 +45,10 @@ define [
     saveDates: (success, error) =>
       @save { 'assignment[due_at]': $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) }, success, error
 
+    save: (params, success, error) =>
+      $.publish('CommonEvent/assignmentSaved', this)
+      super(params, success, error)
+
     methodAndURLForSave: () ->
       if @isNewEvent()
         method = 'POST'
