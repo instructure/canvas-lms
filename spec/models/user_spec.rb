@@ -1945,6 +1945,12 @@ describe User do
       User.create!(:name => "John John")
       User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
     end
+
+    it "should sort support direction toggle" do
+      User.create!(:name => "John Johnson")
+      User.create!(:name => "John John")
+      User.order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+    end
   end
 
   describe "quota" do

@@ -378,15 +378,18 @@ class ActiveRecord::Base
 
   # convenience method to add a (computed) field to :select/:order(/:group) all
   # at once
-  def self.add_sort_key!(options, field)
+  def self.add_sort_key!(options, qualified_field)
+    unqualified_field = qualified_field.sub(/\s+(ASC|DESC)\s*$/, '')
+    direction = $1 == 'DESC' ? 'DESC' : 'ASC'
+    sort_clause = "#{unqualified_field} #{direction}, #{quoted_table_name}.id #{direction}"
     options[:select] ||= "#{quoted_table_name}.*"
-    options[:select] << ", #{field}"
+    options[:select] << ", #{unqualified_field}"
     if options[:order]
-      options[:order] << ", #{field}, #{quoted_table_name}.id"
+      options[:order] << ", #{sort_clause}"
     else
-      options[:order] = "#{field}, #{quoted_table_name}.id"
+      options[:order] = sort_clause
     end
-    options[:group] << ", #{field}" if options[:group]
+    options[:group] << ", #{unqualified_field}" if options[:group]
     options
   end
 

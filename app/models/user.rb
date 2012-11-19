@@ -218,7 +218,9 @@ class User < ActiveRecord::Base
   # NOTE: if :order is passed in, sortable name will be tacked onto the end
   # rather than prepending or replacing it
   def self.order_by_sortable_name(options = {})
-    add_sort_key!(options, sortable_name_order_by_clause)
+    direction = options.delete(:direction) || :ascending
+    sort_clause = "#{sortable_name_order_by_clause} #{direction == :descending ? "DESC" : "ASC"}"
+    add_sort_key!(options, sort_clause)
     uber_scope(options)
   end
 
