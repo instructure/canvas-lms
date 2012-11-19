@@ -31,9 +31,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
             <span class="tooltip_wrap">
               <span class='tooltip-carat'></span>
               <span class="tooltip_text">
-                <% if assignment.due_at %>
-                  <span style="display: block;"><%= t 'tooltip.due_at', 'due: %{date}', :date => datetime_string(assignment.due_at) %></span>
-                <% end %>
+                <span style="display: block;"><%= translated_due_date(assignment) %></span>
                 <% if assignment.points_possible %>
                   <span style="display: block; font-size: 0.8em;"><%= t 'points_possible', 'out of %{points_possible}', :points_possible => assignment.points_possible %></span>
                 <% end %>
@@ -71,7 +69,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
             </span>
           <% end %>
           <b><%= assignment.submission_action_string %></b>
-          <em><%= t 'due_at', 'Due %{date}', :date => datetime_string(assignment.due_at) %></em>
+          <em><%= translated_due_date(assignment) %></em>
         </a>
         <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>"  href="#" data-api-href="<%= api_v1_users_todo_ignore_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
       </li>
