@@ -328,33 +328,57 @@ class PageView < ActiveRecord::Base
   end
 
   # utility class to migrate a postgresql/mysql/sqlite3 page_views table to cassandra
-  class CassandraMigrator < Struct.new(:cutoff, :last_created_at, :last_request_id, :scope, :logger)
-    def initialize(skip_deleted_accounts = true, cutoff = nil)
-      self.cutoff = cutoff || 52.weeks.ago
-      # summarized is either true or null for all page views, depending on plugin functionality
+  class CassandraMigrator < Struct.new(:start_at, :logger, :migration_data)
+    # if you interrupt and re-start the migrator, start_at cannot be changed,
+    # since it's saved in cassandra to persist the migration state
+    def initialize(skip_deleted_accounts = true, start_at = nil)
+      raise("Must configure page views to use cassandra first") if !PageView.cassandra?
+
+      self.start_at = start_at || 52.weeks.ago
       self.logger = Rails.logger
 
-      summarized = (Setting.get("page_views_migration_summarized", "false") == "true") || nil
-      self.scope = PageView.scoped(:conditions => { :summarized => summarized },
-                                   :order => 'created_at DESC, request_id ASC')
       if skip_deleted_accounts
-        deleted_account_ids = Set.new(Account.root_accounts.all(:conditions => { :workflow_state => 'deleted' }).map(&:id))
-        self.scope = self.scope.scoped(:conditions => ["account_id NOT IN (?)", deleted_account_ids])
+        account_ids = Set.new(Account.root_accounts.all(:select => :id, :conditions => { :workflow_state => 'active' }).map(&:id))
+      else
+        account_ids = Set.new(Account.root_accounts.all(:select => :id).map(&:id))
+      end
+
+      load_migration_data(account_ids)
+    end
+
+    def load_migration_data(account_ids)
+      self.migration_data = {}
+      account_ids.each do |account_id|
+        data = self.migration_data[account_id] = {}
+        data.merge!(PageView.cassandra.execute("SELECT last_created_at, last_request_id FROM page_views_migration_metadata_per_account WHERE shard_id = ? AND account_id = ?", Shard.current.id.to_s, account_id).fetch.try(:to_hash) || {})
+
+        if !(data['last_created_at'])
+          data['last_created_at'] = self.start_at
+          data['last_request_id'] = ''
+        end
+        # cassandra returns Time not TimeWithZone objects
+        data['last_created_at'] = data['last_created_at'].in_time_zone
       end
     end
 
+    # this is the batch size per account, not the overall batch size
+    # returns true if any progress was made (if it makes sense to run_once again)
     def run_once(batch_size = 1000)
-      raise("Must configure page views to use cassandra first") if !PageView.cassandra?
-
-      unless self.last_created_at
-        self.last_created_at, self.last_request_id = PageView.cassandra.execute("SELECT last_created_at, last_request_id FROM page_views_migration_metadata WHERE shard_id = ?", Shard.current.id.to_s).fetch.try(:to_hash).try(:values_at, 'last_created_at', 'last_request_id')
-        self.last_created_at = self.last_created_at.try(:in_time_zone)
-        self.last_created_at ||= Time.zone.now
-        self.last_request_id ||= ''
+      self.migration_data.inject(false) do |progress, (account_id,_)|
+        run_once_for_account(account_id, batch_size) || progress
       end
+    end
 
-      finder_sql = scope.scoped(:limit => batch_size,
-                                :conditions => ["(created_at < ? OR (created_at = ? AND request_id > ?)) AND created_at > ?", last_created_at, last_created_at, last_request_id, cutoff]).construct_finder_sql({})
+    def run_once_for_account(account_id, batch_size)
+      data = self.migration_data[account_id]
+      raise("not configured for account id: #{account_id}") unless data
+
+      last_created_at, last_request_id = data.values_at('last_created_at', 'last_request_id')
+
+      finder_sql = PageView.scoped(:conditions => ["account_id = ? AND (created_at > ? OR (created_at = ? AND request_id > ?))", account_id, last_created_at, last_created_at, last_request_id],
+                                   :order => "created_at asc, request_id",
+                                   :limit => batch_size).construct_finder_sql({})
+
       # query just the raw attributes, don't instantiate AR objects
       rows = PageView.connection.execute(finder_sql).to_a
 
@@ -376,9 +400,10 @@ class PageView < ActiveRecord::Base
 
       logger.info "added #{inserted} page views starting at #{last_created_at} #{last_request_id}"
 
-      self.last_created_at, self.last_request_id = rows.last.values_at('created_at', 'request_id')
-      self.last_created_at = Time.zone.parse(last_created_at)
-      PageView.cassandra.execute("UPDATE page_views_migration_metadata SET last_created_at = ?, last_request_id = ? WHERE shard_id = ?", last_created_at, last_request_id, Shard.current.id.to_s)
+      last_created_at, last_request_id = rows.last.values_at('created_at', 'request_id')
+      last_created_at = Time.zone.parse(last_created_at)
+      PageView.cassandra.execute("UPDATE page_views_migration_metadata_per_account SET last_created_at = ?, last_request_id = ? WHERE shard_id = ? AND account_id = ?", last_created_at, last_request_id, Shard.current.id.to_s, account_id)
+      data.merge!('last_created_at' => last_created_at, 'last_request_id' => last_request_id)
       true
     end
 

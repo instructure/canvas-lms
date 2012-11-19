@@ -99,12 +99,14 @@ describe PageView do
       it "should migrate the relevant page views" do
         a1 = account_model
         a2 = account_model
+        a3 = account_model
         Setting.set('enable_page_views', 'db')
-        moved = (0..1).map { page_view_model(:account => a1, :created_at => 2.minutes.ago) }
-        # this one is further back in time and will be processed later
-        moved_later = page_view_model(:account => a1, :created_at => 1.day.ago)
+        moved = (0..1).map { page_view_model(:account => a1, :created_at => 1.day.ago) }
+        moved_a3 = page_view_model(:account => a3, :created_at => 4.hours.ago)
+        # this one is more recent in time and will be processed last
+        moved_later = page_view_model(:account => a1, :created_at => 2.hours.ago)
         # this one is in a deleted account
-        deleted = page_view_model(:account => a2, :created_at => 2.minutes.ago)
+        deleted = page_view_model(:account => a2, :created_at => 2.hours.ago)
         a2.destroy
         # too far back
         old = page_view_model(:account => a1, :created_at => 13.months.ago)
@@ -114,6 +116,8 @@ describe PageView do
         PageView.find(moved.map(&:request_id)).size.should == 0
         migrator.run_once(2)
         PageView.find(moved.map(&:request_id)).size.should == 2
+        # should migrate all active accounts
+        PageView.find(moved_a3.request_id).request_id.should == moved_a3.request_id
         expect { PageView.find(moved_later.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
         # it should resume where the last migrator left off
         migrator = PageView::CassandraMigrator.new
@@ -122,6 +126,18 @@ describe PageView do
 
         expect { PageView.find(deleted.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
         expect { PageView.find(old.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+        # running again should migrate new page views as time advances
+        Setting.set('enable_page_views', 'db')
+        # shouldn't actually happen, but create an older page view to verify
+        # we're not migrating old page views again
+        not_moved = page_view_model(:account => a1, :created_at => 1.day.ago)
+        newly_moved = page_view_model(:account => a1, :created_at => 1.hour.ago)
+        Setting.set('enable_page_views', 'cassandra')
+        migrator = PageView::CassandraMigrator.new
+        migrator.run_once(2)
+        expect { PageView.find(not_moved.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
+        PageView.find(newly_moved.request_id).request_id.should == newly_moved.request_id
       end
     end
   end
