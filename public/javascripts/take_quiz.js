@@ -58,6 +58,9 @@ define([
       started_at: started_at,
       end_at: end_at,
       time_limit: parseInt($(".time_limit").text(), 10) || null,
+      oneAtATime: $("#submit_quiz_form").hasClass("one_question_at_a_time"),
+      cantGoBack: $("#submit_quiz_form").hasClass("cant_go_back"),
+      finalSubmitButtonClicked: false,
       updateSubmission: function(repeat, beforeLeave) {
         if(quizSubmission.submitting && !repeat) { return; }
         var now = new Date();
@@ -66,8 +69,10 @@ define([
         quizSubmission.currentlyBackingUp = true;
         quizSubmission.lastSubmissionUpdate = new Date();
         var data = $("#submit_quiz_form").getFormData();
-        $(".question_holder .question.marked").each(function() {
-          data[$(this).attr('id') + "_marked"] = "1";
+
+        $(".question_holder .question").each(function() {
+          value = ($(this).hasClass("marked")) ? "1" : "";
+          data[$(this).attr('id') + "_marked"] = value;
         });
 
         $last_saved.text(I18n.t('saving', 'Saving...'));
@@ -88,7 +93,7 @@ define([
           $.ajaxJSON(url, 'PUT', data,
             // Success callback
             function(data) {
-              $last_saved.text(I18n.t('saved_at', 'Saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
+              $last_saved.text(I18n.t('saved_at', 'Quiz saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
               quizSubmission.currentlyBackingUp = false;
               if(repeat) {
                 setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
@@ -216,6 +221,25 @@ define([
         if(true || min) { times.push(I18n.t('minutes_count', "Minute", {'count': min})); }
         if(true || sec) { times.push(I18n.t('seconds_count', "Second", {'count': sec})); }
         $time_running_time_remaining.text(times.join(", "));
+      },
+      updateFinalSubmitButtonState: function() {
+        var allQuestionsAnswered = ($("#question_list li:not(.answered)").length == 0);
+        var lastQuizPage = ($("#submit_quiz_form").hasClass('last_page'));
+        var thisQuestionAnswered = ($("div.question.answered").length > 0);
+        var oneAtATime = quizSubmission.oneAtATime;
+
+        var active = (oneAtATime && lastQuizPage && thisQuestionAnswered) || allQuestionsAnswered;
+
+        quizSubmission.toggleActiveButtonState("#submit_quiz_button", active);
+      },
+      updateNextButtonState: function(id) {
+        var $question = $("#" + id);
+        quizSubmission.toggleActiveButtonState('button.next-question', $question.hasClass('answered'));
+      },
+      toggleActiveButtonState: function(selector, primary) {
+        var addClass = (primary ? 'btn-primary' : 'btn-secondary');
+        var removeClass = (primary ? 'btn-secondary' : 'btn-primary');
+        $(selector).addClass(addClass).removeClass(removeClass);
       }
     };
   })();
@@ -239,6 +263,12 @@ define([
       };
       $(document).delegate('a', 'click', function(event) {
         if($(this).closest('.ui-dialog,.mceToolbar,.ui-selectmenu').length > 0) { return; }
+        
+        if($(this).hasClass('no-warning')) {
+          quizSubmission.alreadyAcceptedNavigatingAway = true
+          return;
+        }
+
         if(!event.isDefaultPrevented()) {
           var url = $(this).attr('href') || "";
           var hashStripped = location.href;
@@ -277,12 +307,17 @@ define([
             title = I18n.t('titles.answered', "Answered");
           }
           $this.attr('title', title);
-          data.relatedQuestion || (data.relatedQuestion = $("#" + $this.attr('id').substring(5)));
-          data.relatedQuestion.addClass('related');
+
+          if(!quizSubmission.oneAtATime) {
+            data.relatedQuestion || (data.relatedQuestion = $("#" + $this.attr('id').substring(5)));
+            data.relatedQuestion.addClass('related');
+          }
         },
         mouseleave: function(event) {
-          var relatedQuestion = $(this).data('relatedQuestion')
-          relatedQuestion && relatedQuestion.removeClass('related');
+          if(!quizSubmission.oneAtATime) {
+            var relatedQuestion = $(this).data('relatedQuestion')
+            relatedQuestion && relatedQuestion.removeClass('related');            
+          }
         }
       });
 
@@ -353,10 +388,13 @@ define([
             }
           });
         }
-        $("#list_" + id)[val ? 'addClass' : 'removeClass']('answered');
-      })
-      .find(".question_input").trigger('change', [false, {}]);
+        $("#list_" + id + ", #" + id)[val ? 'addClass' : 'removeClass']('answered');
 
+        quizSubmission.updateFinalSubmitButtonState();
+        quizSubmission.updateNextButtonState(id);
+      })
+
+    $questions.find(".question_input").trigger('change', [false, {}]);
 
     setInterval(function() {
       $("textarea.question_input").each(function() {
@@ -390,17 +428,55 @@ define([
         return false;
     });
 
+    $(".quiz_submit").click(function(event) {
+      quizSubmission.finalSubmitButtonClicked = true;
+    });
+
     $("#submit_quiz_form").submit(function(event) {
       $(".question_holder textarea.question_input").each(function() { $(this).change(); });
-      unanswered = $("#question_list .list_question:not(.answered)").length;
-      if(unanswered && !quizSubmission.submitting) {
-        var result = confirm(I18n.t('confirms.unanswered_questions', {'one': "You have 1 unanswered question (see the right sidebar for details).  Submit anyway?", 'other': "You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?"}, {'count': unanswered}));
+
+      var unanswered;
+      var warningMessage;
+      
+      if(quizSubmission.cantGoBack) {
+        if(!$(".question").hasClass("answered")) {
+          warningMessage = I18n.t('confirms.cant_go_back_blank',
+            "You can't come back to this question once you hit next. Are you sure you want to leave it blank?");
+        }
+      }
+
+      if(quizSubmission.finalSubmitButtonClicked) {
+        quizSubmission.finalSubmitButtonClicked = false; // reset in case user cancels
+
+        if(quizSubmission.cantGoBack) {
+          unseen = $("#question_list .list_question:not(.seen)").length;
+          if(unseen > 0) {
+            warningMessage = I18n.t('confirms.unseen_questions',
+              {'one': "There is still 1 question you haven't seen yet.  Submit anyway?",
+               'other': "There are still %{count} questions you haven't seen yet.  Submit anyway?"},
+               {'count': unseen})            
+          }
+        }
+        else {
+          unanswered = $("#question_list .list_question:not(.answered)").length;
+          if(unanswered > 0) {
+            warningMessage = I18n.t('confirms.unanswered_questions',
+              {'one': "You have 1 unanswered question (see the right sidebar for details).  Submit anyway?",
+               'other': "You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?"},
+               {'count': unanswered});            
+          }
+        }
+      }
+
+      if(warningMessage != undefined && !quizSubmission.submitting) {
+        var result = confirm(warningMessage);
         if(!result) {
           event.preventDefault();
           event.stopPropagation();
           return false;
         }
-      }
+      }        
+
       quizSubmission.submitting = true;
     });
 
@@ -419,6 +495,16 @@ define([
     setInterval(quizSubmission.updateTime, 400);
 
     setTimeout(function() { quizSubmission.updateSubmission(true) }, 15000);
+
+    // set the form action depending on the button clicked
+    $("#submit_quiz_form button[type=submit]").click(function(event) {
+      quizSubmission.updateSubmission();
+
+      var action = $(this).data('action');
+      if(action != undefined) {
+        $('#submit_quiz_form').attr('action', action);          
+      }
+    });
   });
 });
 

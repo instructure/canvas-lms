@@ -30,7 +30,8 @@ class Quiz < ActiveRecord::Base
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
     :hide_results, :locked, :ip_filter, :require_lockdown_browser,
-    :require_lockdown_browser_for_results, :context, :notify_of_update
+    :require_lockdown_browser_for_results, :context, :notify_of_update,
+    :one_question_at_a_time, :cant_go_back
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -45,7 +46,7 @@ class Quiz < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
   validates_presence_of :context_type
-  
+
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
   before_save :build_assignment
@@ -64,6 +65,8 @@ class Quiz < ActiveRecord::Base
   end
 
   def set_defaults
+    self.one_question_at_a_time = false if self.one_question_at_a_time == nil
+    self.cant_go_back = false if self.cant_go_back == nil || self.one_question_at_a_time == false
     self.shuffle_answers = false if self.shuffle_answers == nil
     self.show_correct_answers = true if self.show_correct_answers == nil
     self.allowed_attempts = 1 if self.allowed_attempts == nil
@@ -1216,7 +1219,8 @@ class Quiz < ActiveRecord::Base
      :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
      :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
      :require_lockdown_browser_for_results, :anonymous_submissions, 
-     :could_be_locked, :quiz_type].each do |attr|
+     :could_be_locked, :quiz_type, :one_question_at_a_time,
+     :cant_go_back].each do |attr|
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
     

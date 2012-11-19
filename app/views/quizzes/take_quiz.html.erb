@@ -1,83 +1,72 @@
 <% content_for :page_title do %><%= join_title @quiz.readable_type, @quiz.quiz_title %><% end %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-lr rs-margin-top">
-  <% if @submission && params[:preview] %>
-    <a id="preview_mode_link" href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="btn button-sidebar-wide"><i class="icon-edit"></i> <%= @quiz.survey? ? t('links.keep_editing_survey', "Keep Editing This Survey") : t('links.keep_editing_quiz', "Keep Editing This Quiz") %></a><br/>
-  <% end %>
-  <h3 style="margin: 0px;"><%= t('headers.questions', "Questions") %></h3>
-  <ul id="question_list" style="max-height: 200px; overflow: auto;">
-    <% @submission.questions_as_object.compact.each do |q| %>
-      <li id="list_question_<%= q[:id] %>" class="list_question <%= "marked" if @stored_params["question_#{q[:id]}_marked"] %>">
-        <a class="jump_to_question_link" href="#question_<%= q[:id] %>"><%= q[:question_name] %></a>
-      </li>
-    <% end %>
-  </ul>
-  <% if @submission.finished_at %>
-    <div class="quiz_score">
-      <%= before_label(:score, "Score") %>
-      <%= score_out_of_points_possible(@submission.score, @quiz.points_possible, :class => 'score_value') %>
-    </div>
-  <% end %>
-  <div>
-    <div id="last_saved_indicator"><%= t("not_saved", "Not saved") %></div>
-    <span class="time_header"><%= before_label(:time_running, "Time Running") %></span>
-    <span style="font-size: 0.8em; padding-left: 10px;">
-      <a href="#" class="hide_time_link"><%= t('links.hide_time_running', "Hide") %></a>
-    </span>
-    <% if @submission.end_at %>
-      <div style="font-size: 0.8em;">
-        <%= before_label(:attempt_due, "Attempt due") %>
-        <%= datetime_string(@submission.end_at) %>
-      </div>
-    <% end %>
-    <div class="clear"></div>
-  </div>
-  <div class="time_running"></div>
-  </div>
-
+  <%= render "quizzes/take_quiz_right_side" %>
 <% end %>
 <% jammit_css :quizzes, :tinymce %>
 
 <header class="quiz-header">
   <h2><%= @quiz.quiz_title || @quiz.readable_type %></h2>
   <% if @submission.preview? %>
-  <h3><i class="icon-warning"></i> <%= t('headers.draft_preview', "This is a preview of the draft version of the quiz") %></h3>
+  <h3><%= image_tag "warning.png" %> <%= t('headers.draft_preview', "This is a preview of the draft version of the quiz") %></h3>
   <% end %>
   <%= before_label(:started, "Started") %>
   <%= datetime_string(@submission.started_at) %>
 </header>
 
 <% js_bundle :take_quiz %>
+
+<% form_tag @quiz_presenter.submit_form_action(session, @current_user), :id => "submit_quiz_form", :class => @quiz_presenter.form_class do %>
+
 <div id="questions" class="assessing">
-<%
-  form_params = { :controller => :quiz_submissions, :action => :create, :quiz_id => @quiz.id, :user_id => (@current_user && @current_user.id) }
-  if session['lockdown_browser_popup']
-    form_params.merge!(Canvas::LockdownBrowser.plugin.base.quiz_exit_params(self))
-  end
-%>
-<% form_tag context_url(@context, form_params), {:id => "submit_quiz_form"} do %>
-<input type="hidden" name="attempt" value="<%= @submission.attempt %>"/>
-<% if @submission.preview? %>
-  <input type="hidden" name="preview" value="1"/>
-<% end %>
-<div style="display: none;" id="quiz_urls">
-  <a href="<%= context_url(@context, :backup_context_quiz_quiz_submissions_url, @quiz.id) %>?user_id=<%= @current_user && @current_user.id %><%= "&preview=1" if @submission.preview? %>" class="backup_quiz_submission_url">&nbsp;</a>
-  <span class="started_at"><%= @submission.started_at.iso8601 %></span>
-  <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).iso8601 %></span>
-  <span class="end_at"><%= @submission.end_at && @submission.end_at.iso8601 %></span>
-  <span class="time_limit"><%= @quiz.time_limit || nbsp %></span>
+  <input type="hidden" name="attempt" value="<%= @submission.attempt %>"/>
+  <% if @submission.preview? %>
+    <input type="hidden" name="preview" value="1"/>
+  <% end %>
+  <div style="display: none;" id="quiz_urls">
+    <a href="<%= context_url(@context, :backup_context_quiz_quiz_submissions_url, @quiz.id) %>?user_id=<%= @current_user && @current_user.id %><%= "&preview=1" if @submission.preview? %>" class="backup_quiz_submission_url">&nbsp;</a>
+    <span class="started_at"><%= @submission.started_at.iso8601 %></span>
+    <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).iso8601 %></span>
+    <span class="end_at"><%= @submission.end_at && @submission.end_at.iso8601 %></span>
+    <span class="time_limit"><%= @quiz.time_limit || nbsp %></span>
+  </div>
+
+  <%= render :partial => "display_question", :collection => @quiz_presenter.current_questions, :locals => {:assessing => true } %>
+
+  <div class="button-container clearfix">
+    <% if @quiz_presenter.one_question_at_a_time? %>
+      <% if @quiz_presenter.previous_question_viewable? %>
+        <button type="submit" class="btn submit_button btn-secondary previous-question" data-action="<%= @quiz_presenter.previous_question_form_action(session, @current_user) %>">
+          <%= t('buttons.previous', "Previous") %>
+        </button>
+      <% end %>
+
+      <% if @quiz_presenter.next_question %>
+        <%= hidden_field_tag :last_question_id, @quiz_presenter.current_question[:id] %>
+
+        <button type="submit" class="btn submit_button btn-secondary next-question" data-action="<%= @quiz_presenter.next_question_form_action(session, @current_user) %>">
+          <%= t('buttons.next', "Next") %>
+        </button>
+      <% end %>
+    <% end %>
+  </div>
 </div>
-<%= render :partial => "display_question", :collection => @submission.questions_as_object, :locals => {:assessing => true } %>
-<div class="button-container">
-  <button type="submit" class="btn submit_button btn-primary"><%= t('buttons.submit_answer', "Submit Answers") %></button>
-</div>
-<% end %>
-</div>
+
 <div style="font-size: 1.2em; display: none;" id="times_up_dialog">
   <%= before_label(:times_up, "Time's Up!  Submitting results in") %>
   <div style="text-align: center; font-size: 1.2em; margin: 10px;" class="countdown_seconds"></div>
   <div class="button-container">
-    <button type="button" class="submit_quiz_button btn"><%= t('buttons.out_of_time_submit', "Ok, fine") %></button>
+    <button type="submit" class="submit_quiz_button btn quiz_submit">
+      <%= t('buttons.out_of_time_submit', "Ok, fine") %>
+    </button>
   </div>
 </div>
+
+<div class=form-actions>
+  <span id="last_saved_indicator"><%= t("not_saved", "Not saved") %></span>
+  <button type="submit" class="btn submit_button quiz_submit btn-secondary" id="submit_quiz_button">
+    <%= t('buttons.submit_quiz', "Submit Quiz") %>
+  </button>
+</div>
+
+<% end %>

@@ -25,9 +25,9 @@
 <div class="question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>">
   <div style="display: block; height: 1px; overflow: hidden;">&nbsp;</div>
   <a name="question_<%= hash_get(question, :id, "blank") %>"></a>
-  <div class="display_question question <%= question_type.question_type %> <%= "marked" if assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"] %> <%= "correct" if correct %> <%= "incorrect" if incorrect %> <%= "unanswered" if unanswered %> <%= "partial_credit" if partial_credit %>" id="question_<%= hash_get(question, :id, "new") %>">
+  <div class="display_question question <%= question_type.question_type %> <%= "marked" if assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"].present? %> <%= "correct" if correct %> <%= "incorrect" if incorrect %> <%= "unanswered" if unanswered %> <%= "partial_credit" if partial_credit %>" id="question_<%= hash_get(question, :id, "new") %>">
     <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
-    <% if assessing %>
+    <% if assessing && @quiz_presenter.can_go_back? %>
       <div class="flag_question"></div>
     <% end %>
     <div class="header" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>

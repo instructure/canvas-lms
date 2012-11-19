@@ -175,11 +175,33 @@ class QuizSubmission < ActiveRecord::Base
     result
   end
 
+  def question(id)
+    questions.detect { |q| q[:id].to_i == id.to_i }
+  end
+
+  def has_question?(id)
+    question(id).present?
+  end
+
   def temporary_data
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
     raise "Cannot view temporary data for completed quiz" if self.submission_data && !self.submission_data.is_a?(Hash)
     res = (self.submission_data || {}).with_indifferent_access
     res
+  end
+
+  def question_answered?(id)
+    keys = temporary_data.keys.select { |key|
+      # find keys with answers for this question; skip question_x_marked and _read
+      (key =~ /question_#{id}(_|$)/) && !(key =~ /_(marked|read)$/)
+    }
+
+    if keys.present?
+      all_present = keys.all? { |key| temporary_data[key].present? }
+      all_zeroes = keys.length > 1 && keys.all? { |key| temporary_data[key] == '0' }
+
+      all_present && !all_zeroes  # all zeroes applies to multiple answer questions
+    end
   end
   
   def data
@@ -234,6 +256,9 @@ class QuizSubmission < ActiveRecord::Base
   
   def backup_submission_data(params)
     raise "Only a hash value is accepted for backup_submission_data calls" unless params.is_a?(Hash)
+
+    params = sanitize_params(params)
+
     conn = QuizSubmission.connection
     new_params = params
     if self.submission_data.is_a?(Hash) && self.submission_data[:attempt] == self.attempt
@@ -244,6 +269,15 @@ class QuizSubmission < ActiveRecord::Base
     new_params[:cnt] = (new_params[:cnt].to_i + 1) % 5
     snapshot!(params) if new_params[:cnt] == 1
     conn.execute("UPDATE quiz_submissions SET user_id=#{self.user_id || 'NULL'}, submission_data=#{conn.quote(new_params.to_yaml)} WHERE workflow_state NOT IN ('complete', 'pending_review') AND id=#{self.id}")
+  end
+
+  def sanitize_params(params)
+    if quiz.cant_go_back?
+      params.reject! { |p,_|
+        p =~ /\Aquestion_(\d)+/ && submission_data[:"_question_#{$1}_read"]
+      }
+    end
+    params
   end
   
   def snapshot!(params)

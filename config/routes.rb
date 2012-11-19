@@ -256,14 +256,19 @@ ActionController::Routing::Routes.draw do |map|
       quiz.formatted_statistics "statistics.:format", :controller => 'quizzes', :action => 'statistics'
       quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
-      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put} do |submission|
+      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put}, :member => {:record_answer => :post} do |submission|
       end
       quiz.extensions 'extensions/:user_id', :controller => 'quiz_submissions', :action => 'extensions', :conditions => {:method => :post}
       quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy show)
       quiz.resources :quiz_groups, :as => "groups", :only => %w(create update destroy) do |group|
         group.reorder "reorder", :controller => "quiz_groups", :action => "reorder"
       end
-      quiz.take "take", :controller => "quizzes", :action => "show", :take => '1'
+
+      quiz.with_options :controller => "quizzes", :action => "show", :take => '1' do |take_quiz|
+        take_quiz.take "take"
+        take_quiz.question "take/questions/:question_id"
+      end
+
       quiz.moderate "moderate", :controller => "quizzes", :action => "moderate"
       quiz.lockdown_browser_required "lockdown_browser_required", :controller => "quizzes", :action => "lockdown_browser_required"
     end

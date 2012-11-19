@@ -129,6 +129,24 @@
               </td>
             </tr>
             <tr>
+              <td colspan=2>
+                <%= hidden_field_tag "quiz[one_question_at_a_time]", "0", :id => nil %>
+                <%= check_box_tag "quiz[one_question_at_a_time]", "1", @quiz.one_question_at_a_time?, :"aria-controls" => "one_question_at_a_time_options", :class => "element_toggler"  %>
+                <%= label_tag :quiz_one_question_at_a_time, t('one_question_at_a_time', 'Show one question at a time') %>
+              </td>
+            </tr>
+            <tr id="one_question_at_a_time_options"
+              <% unless @quiz.one_question_at_a_time? %>style="display:none"<% end %>
+              >
+              <td colspan="2">
+                <div style="padding-left: 20px;">
+                  <%= hidden_field_tag "quiz[cant_go_back]", "0", :id => nil %>
+                  <%= check_box_tag "quiz[cant_go_back]", "1", @quiz.cant_go_back? %>
+                  <%= label_tag "quiz[cant_go_back]", t('cant_go_back', "Lock questions after answering") %>
+                </div>
+              </td>
+            </tr>
+            <tr>
               <td colspan="2">
                 <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? || !@quiz.ip_filter.blank? ||!@quiz.require_lockdown_browser.blank? %> name="protect_quiz" id="protect_quiz"/>
                 <label for="protect_quiz"><%= t('labels.restrict_quiz', "Restrict this Quiz") %></label>

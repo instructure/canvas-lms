@@ -209,7 +209,7 @@ describe "quizzes questions" do
       $('input[type=text]').trigger('change');
       JS
       expect_new_page_load {
-        submit_form('#submit_quiz_form')
+        f('#submit_quiz_button').click
       }
       f('.score_value').text.strip.should == '1'
     end

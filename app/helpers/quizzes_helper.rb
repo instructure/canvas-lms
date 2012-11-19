@@ -236,4 +236,79 @@ module QuizzesHelper
         :score => score_html,
         :points_possible => render_score(points_possible, options[:precision]))
   end
+  
+  def link_to_resume_poll
+    link_to_take_quiz(resume_poll_message)
+  end
+
+
+  def resume_poll_message
+    resume_survey_message || resume_quiz_message
+  end
+
+  def resume_survey_message
+    t('#quizzes.links.resume_survey', 'Resume Survey') if @quiz.survey?
+  end
+
+  def resume_quiz_message
+    t('#quizzes.links.resume_quiz', 'Resume Quiz')
+  end
+
+  def link_to_take_quiz(link_body)
+    opts = {
+      :class => poll_css_classes,
+      'aria-controls' => poll_aria_controls,
+      :id => "take_quiz_link"
+    }
+    opts['data-method'] = 'POST' unless @quiz.cant_go_back?
+    link_to(
+      link_body,
+      take_quiz_url,
+      opts
+    )
+  end
+
+  def poll_css_classes
+    'element_toggler' if @quiz.cant_go_back?
+  end
+
+  def poll_aria_controls
+    'js-sequential-warning-dialogue' if @quiz.cant_go_back?
+  end
+
+  def take_quiz_url
+    polymorphic_path(
+      [@context,@quiz,:take],
+      :user_id => @current_user && @current_user.id
+    )
+  end
+
+  def link_to_take_or_retake_poll
+    if @submission && !@submission.settings_only?
+      link_to_retake_poll
+    else
+      link_to_take_poll
+    end
+  end
+
+  def link_to_retake_poll
+    link_to_take_quiz(take_poll_again_message)
+  end
+
+  def take_poll_again_message
+    @quiz.survey? ?
+      t('#quizzes.links.take_the_survey_again', 'Take the Survey Again') :
+      t('#quizzes.links.take_the_quiz_again', 'Take the Quiz Again')
+  end
+
+  def link_to_take_poll
+    link_to_take_quiz(take_poll_message)
+  end
+
+  def take_poll_message
+    @quiz.survey? ?
+      t('#quizzes.links.take_the_survey', 'Take the Survey') :
+      t('#quizzes.links.take_the_quiz', 'Take the Quiz')
+  end
+
 end

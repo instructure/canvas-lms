@@ -27,8 +27,9 @@ describe "quizzes students" do
 
       q = quiz.stored_questions[0]
       f("#question_#{q[:id]}_answer_#{q[:answers][0][:id]}").click
-      submit_form('#submit_quiz_form')
 
+      f("#submit_quiz_button").click
+      
       quiz_sub = @fake_student.reload.submissions.find_by_assignment_id(quiz.assignment.id)
       quiz_sub.should be_present
       quiz_sub.workflow_state.should == "graded"

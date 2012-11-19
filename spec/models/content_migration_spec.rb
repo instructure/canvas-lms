@@ -1085,7 +1085,9 @@ describe ContentMigration do
               :ip_filter => '192.168.1.1',
               :require_lockdown_browser => true,
               :require_lockdown_browser_for_results => true,
-              :notify_of_update => true
+              :notify_of_update => true,
+              :one_question_at_a_time => true,
+              :cant_go_back => true
       )
 
       run_course_copy

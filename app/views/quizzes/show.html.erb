@@ -211,11 +211,11 @@
       </div>
     <% elsif @submission && @submission.untaken? %>
       <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
-        <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id), 'data-method' => 'post' do %><%= @quiz.survey? ? t('links.resume_survey', "Resume Survey") : t('links.resume_quiz', "Resume Quiz") %><% end %>
+        <%= link_to_resume_poll %>
       </div>
     <% elsif can_do(@quiz, @current_user, :submit) && !@lockdown_browser_authorized_to_view %>
       <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
-        <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id), :id => "take_quiz_link", 'data-method' => 'post' do %><% if @submission && !@submission.settings_only? %><%= @quiz.survey? ? t('links.take_the_survey_again', "Take the Survey Again") : t('links.take_the_quiz_again', "Take the Quiz Again") %><% else %><%= @quiz.survey? ? t('links.take_the_survey', "Take the Survey") : t('links.take_the_quiz', "Take the Quiz") %><% end %><% end %>
+        <%= link_to_take_or_retake_poll %>
       </div>
     <% end %>
   <% end %>
@@ -226,5 +226,8 @@
   <% if can_do(@quiz, @current_user, :grade) %>
     <%= render :partial => "shared/message_students" %>
   <% end %>
+<% end %>
+<% if @quiz.cant_go_back? %>
+  <%= render 'cant_go_back_warning' %>
 <% end %>
 <%= render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset} if @sequence_asset %>

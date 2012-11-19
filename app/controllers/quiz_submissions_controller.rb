@@ -45,12 +45,13 @@ class QuizSubmissionsController < ApplicationController
         @submission ||= @quiz.generate_submission(@current_user, preview)
       end
 
-      @submission.snapshot!(params)
-      if @submission.preview? || (@submission.untaken? && @submission.attempt == params[:attempt].to_i)
+      sanitized_params = @submission.sanitize_params(params)
+      @submission.snapshot!(sanitized_params)
+      if @submission.preview? || (@submission.untaken? && @submission.attempt == sanitized_params[:attempt].to_i)
         @submission.mark_completed
         hash = {}
         hash = @submission.submission_data if @submission.submission_data.is_a?(Hash) && @submission.submission_data[:attempt] == @submission.attempt
-        params_hash = hash.deep_merge(params) rescue params
+        params_hash = hash.deep_merge(sanitized_params) rescue sanitized_params
         @submission.submission_data = params_hash unless @submission.overdue?
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         @submission.grade_submission
@@ -78,15 +79,29 @@ class QuizSubmissionsController < ApplicationController
       if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       elsif preview || (@submission && @submission.temporary_user_code == temporary_user_code(false)) || (@submission && @submission.grants_right?(@current_user, session, :update))
         if !@submission.completed? && !@submission.overdue?
-          @submission.backup_submission_data(params)
-          render :json => {:backup => true, :end_at => @submission && @submission.end_at}.to_json
-          return
+          if params[:action] == 'record_answer'
+            if last_question = params[:last_question_id]
+              params[:"_question_#{last_question}_read"] = true
+            end
+
+            @submission.backup_submission_data(params)
+            next_page = params[:next_question_path] || course_quiz_take_path(@context, @quiz)
+            redirect_to next_page and return
+          else
+            @submission.backup_submission_data(params)
+            render :json => {:backup => true, :end_at => @submission && @submission.end_at}.to_json
+            return
+          end
         end
       end
       render :json => {:backup => false, :end_at => @submission && @submission.end_at}.to_json
     end
   end
-  
+
+  def record_answer
+    backup
+  end
+
   def extensions
     @quiz = @context.quizzes.find(params[:quiz_id])
     @student = @context.students.find(params[:user_id])

@@ -235,14 +235,14 @@ describe "quizzes" do
 
       #click second answer
       f("#question_#{@quest2.id} .answers .answer:first-child input").click
-      submit_form('#submit_quiz_form')
+      f("#submit_quiz_button").click
 
       #dismiss dialog and submit quiz
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.dismiss
       f("#question_#{@quest1.id} .answers .answer:last-child input").click
       expect_new_page_load {
-        submit_form('#submit_quiz_form')
+        f("#submit_quiz_button").click
       }
       f('#quiz_title').text.should == @q.title
     end
@@ -257,7 +257,7 @@ describe "quizzes" do
         #indicator.text.should == 'Saving...'
 
         wait_for_ajax_requests
-        indicator.text.should match(/^Saved at \d+:\d+(pm|am)$/)
+        indicator.text.should match(/^Quiz saved at \d+:\d+(pm|am)$/)
       end
     end
 
