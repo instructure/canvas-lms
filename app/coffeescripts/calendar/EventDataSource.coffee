@@ -163,7 +163,7 @@ define [
       fetchJobs = [[ '/api/v1/appointment_groups', { include: [ 'appointments', 'child_events' ] } ]]
 
       if fetchManageable
-        fetchJobs.push [ '/api/v1/appointment_groups', { scope: 'manageable', include: [ 'appointments', 'child_events' ] } ]
+        fetchJobs.push [ '/api/v1/appointment_groups', { scope: 'manageable', include: [ 'appointments', 'child_events' ], include_past_appointments: true } ]
 
       @startFetch fetchJobs, dataCB, doneCB
 
