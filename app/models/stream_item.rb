@@ -79,9 +79,6 @@ class StreamItem < ActiveRecord::Base
     end
   end
 
-  define_asset_string_backcompat_method :context_code, :context
-  define_asset_string_backcompat_method :item_asset_string, :asset
-
   def prepare_user(user)
     res = user.attributes.slice('id', 'name', 'short_name')
     res['short_name'] ||= res['name']
@@ -115,10 +112,7 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.delete_all_for(root_asset, asset)
-    asset_string = "#{root_asset.first.underscore}_#{root_asset.last}"
-    # backcompat searching on item_asset_string
-    item = StreamItem.find(:first, :conditions =>
-        ["(asset_type=? AND asset_id=?) OR (item_asset_string=? AND asset_type IS NULL)", root_asset.first, root_asset.last, asset_string])
+    item = StreamItem.find(:first, :conditions => { :asset_type => root_asset.first, :asset_id => root_asset.last })
     # if this is a sub-message, regenerate instead of deleting
     if root_asset != asset
       item.try(:regenerate!)
@@ -130,8 +124,6 @@ class StreamItem < ActiveRecord::Base
   end
 
   def generate_data(object)
-    res = {}
-
     self.context ||= object.context rescue nil
 
     case object
@@ -142,8 +134,6 @@ class StreamItem < ActiveRecord::Base
       res[:root_discussion_entries] = object.root_discussion_entries.active.reverse[0,10].reverse.map do |entry|
         hash = entry.attributes
         hash['user_short_name'] = entry.user.short_name if entry.user
-        # backcompat
-        hash['truncated_message'] = entry.truncated_message(250)
         hash['message'] = hash['message'][0, 4.kilobytes] if hash['message'].present?
         hash
       end
@@ -192,7 +182,6 @@ class StreamItem < ActiveRecord::Base
     end
     res['type'] = object.class.to_s
     res['user_short_name'] = object.user.short_name rescue nil
-    res['context_code'] = self.context_code
 
     if self.class.new_message?(object)
       self.asset_type = 'Message'
@@ -200,9 +189,6 @@ class StreamItem < ActiveRecord::Base
     else
       self.asset = object
     end
-    # backcompat
-    self.item_asset_string = object.asset_string
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}" if self.context_type
     self.data = res
   end
 
@@ -212,8 +198,6 @@ class StreamItem < ActiveRecord::Base
       # we can't coalesce messages that weren't ever saved to the DB
       if !new_message?(object)
         item = object.stream_item
-        # backcompat
-        item ||= StreamItem.find(:first, :conditions => {:item_asset_string => object.asset_string, :asset_type => nil})
       end
       if item
         item.regenerate!(object)
@@ -333,8 +317,7 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.update_read_state_for_asset(asset, new_state, user_id)
-    # backcompat
-    if item = StreamItem.find(:first, :conditions => ["(asset_type=? AND asset_id=?) OR (item_asset_string=? AND asset_type IS NULL)", asset.class.base_class.name, asset.id, asset.asset_string])
+    if item = asset.stream_item
       StreamItemInstance.find_by_user_id_and_stream_item_id(user_id, item.id).try(:update_attribute, :workflow_state, new_state)
     end
   end

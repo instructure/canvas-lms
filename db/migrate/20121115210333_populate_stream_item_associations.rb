@@ -2,7 +2,8 @@ class PopulateStreamItemAssociations < ActiveRecord::Migration
   tag :postdeploy
 
   def self.up
-    DataFixup::PopulateStreamItemAssociations.send_later_if_production(:run)
+    # the drop migration now exists, so this can no longer run async
+    DataFixup::PopulateStreamItemAssociations.run
   end
 
   def self.down

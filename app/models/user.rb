@@ -1854,15 +1854,10 @@ class User < ActiveRecord::Base
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      conditions = setup_context_association_lookups("stream_item_instances.context", opts[:contexts], :backcompat => true)
+      conditions = setup_context_association_lookups("stream_item_instances.context", opts[:contexts])
       instances = instances.scoped(:conditions => conditions) unless conditions.first.empty?
     elsif opts[:context]
-      # backcompat searching on context_code
-      instances = instances.scoped(:conditions =>
-                                       ["(stream_item_instances.context_type=? AND stream_item_instances.context_id=?) OR (stream_item_instances.context_code=? AND stream_item_instances.context_type IS NULL)",
-                                        opts[:context].class.base_class.name,
-                                        opts[:context].id,
-                                        opts[:context].asset_string])
+      instances = instances.scoped(:conditions => {:context_type => opts[:context].class.base_class.name, :context_id => opts[:context].id})
     end
 
     instances
