@@ -5,10 +5,10 @@
   'must_view' => image_tag("preview_dim.png", :class => "image not_blank", :alt => t('images.alt.must_view', "must view"), :title => t('images.title.must_view', "Students must view this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
   'must_contribute' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => t('images.alt.must_contribute', "must contribute"), :title => t('images.title.must_contribute', "Students must contribute to this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
   'must_submit' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => t('images.alt.must_submit', "must submit"), :title => t('images.title.must_submit', "Students must submit this assignment before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
-  'indent' => image_tag('indent_thin.png'),
-  'outdent' => image_tag('outdent_thin.png'),
-  'edit' => image_tag('edit.png'),
-  'delete' => image_tag('delete_circle.png'),
+  'indent' => "<i class='icon-arrow-right standalone-icon'></i><span class='screen-reader-text>Indent</span>'".html_safe,
+  'outdent' => "<i class='icon-arrow-left standalone-icon'></i><span class='screen-reader-text>Outdent</span>'".html_safe,
+  'edit' => "<i class='icon-edit standalone-icon'></i><span class='screen-reader-text>Edit</span>'".html_safe,
+  'delete' => "<i class='icon-end standalone-icon'></i><span class='screen-reader-text>Delete</span>'".html_safe,
   'other' => image_tag("blank.png", :class => "image", :alt => '')
 }
  %>
@@ -24,7 +24,14 @@
         <%= image_tag "blank.png", :alt => t('images.alt.complete', "done"), :title => t('images.title.complete', "Module Item Completed"), :class => "complete_item_icon" %>
         <%= image_tag "blank.png", :alt => t('images.alt.incomplete', "incomplete"), :title => t('images.title.incomplete', "Module Item Incomplete"), :class => "incomplete_item_icon" %>
       </span>
-      <span class="type_icon" title="<%= module_item.content_type if module_item %>"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
+      <span class="type_icon" title="<%= module_item.content_type if module_item %>">
+        <i class="icon-document"></i>
+        <i class="icon-download"></i>
+        <i class="icon-discussion"></i>
+        <i class="icon-assignment"></i>
+        <i class="icon-quiz"></i>
+        <i class="icon-link"></i>
+      </span>
       <span class="criterion <%= 'defined' if criterion %>">
         <span class="min_score" style="display: none;"><%= (criterion && criterion[:min_score]) || nbsp %></span>
         <span class="criterion_type" style="display: none;"><%= (criterion && criterion[:type]) || nbsp %></span>

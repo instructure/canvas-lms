@@ -69,12 +69,12 @@ TEXT
                 </span>
               </div>
               <div style="float: right;">
-                <a href="#" class="delete_criterion_link no-hover"><%= image_tag "delete_circle.png" %></a>
+                <a href="#" class="delete_criterion_link no-hover"><i class="icon-end"></i><span class="screen-reader-text">Delete</span></a>
               </div>
               <div class="clear"></div>
             </div>
             <div style="font-size: 0.9em;">
-              <a href="#" class="add_prerequisite_link add-small"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
+              <a href="#" class="add_prerequisite_link icon-add"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@ TEXT
             <div class="criteria_list" style="display: none;">
             </div>
             <div style="font-size: 0.9em;">
-              <a href="#" class="add_completion_criterion_link add-small"><%= t('links.add_requirement', %{Add requirement}) %></a>
+              <a href="#" class="add_completion_criterion_link icon-add"><%= t('links.add_requirement', %{Add requirement}) %></a>
             </div>
           </div>
         </div>
@@ -213,7 +213,10 @@ TEXT
               </thead>
               <tbody>
                 <tr class="module blank" style="display: none;">
-                  <td class="icon">&nbsp;</td>
+                  <td class="icon">
+                    <i class="icon-check"></i>
+                    <i class="icon-lock"></i>
+                  </td>
                   <td class="details">
                     <span class="name">&nbsp;</span>
                     <span class="id" style="display: none;">&nbsp;</span>

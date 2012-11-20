@@ -51,7 +51,7 @@
       <% if !only || only.include?(:external_urls) %>
       <div id="external_urls_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "link.png", :alt => t(:external_url_link_alt, "External URL") %>
+          <i class="icon-link"></i>
           <%= t :external_url_notice, "Enter a URL and page name to add a link to any website URL to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <table>
@@ -74,7 +74,7 @@
       <% if !only || only.include?(:external_tools) %>
       <div id="context_external_tools_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "link.png", :alt => t(:external_tool_link_alt, "External tool") %>
+          <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <a href="<%= context_url(@context, :context_external_tools_url, :include_parents => '1') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
@@ -113,7 +113,7 @@
       <% if !only || only.include?(:wiki_pages) %>
       <div id="wiki_pages_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "file.png", :alt => t(:wiki_page_alt, "Wiki page") %>
+          <i class="icon-document"></i>
           <%= t :wiki_page_notice, 'Select the wiki page you want to associate with this *module*, or add a new page by selecting "New Page".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
@@ -139,7 +139,7 @@
       <% if !only || only.include?(:attachments) %>
       <div id="attachments_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "file_download.png" %>
+          <i class="icon-download"></i>
           <%= t :file_notice, 'Select the file you want to associate with this *module*, or add a file by selecting "New File".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
@@ -186,7 +186,7 @@
       <% if !only || only.include?(:quizzes) %>
       <div id="quizs_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "quiz.png", :alt => t(:quiz_alt, "Quiz") %>
+          <i class="icon-quiz"></i>
           <%= t :quiz_notice, 'Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
@@ -226,7 +226,7 @@
       <% if !only || only.include?(:assignments) %>
       <div id="assignments_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "grading_icon.png", :alt => t(:assignment_alt, "Assignment") %>
+          <i class="icon-assignment"></i>
           <%= t :assignment_notice, 'Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
@@ -251,7 +251,7 @@
       <% if !only || only.include?(:discussion_topics) %>
       <div id="discussion_topics_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "word_bubble.png", :alt => t(:topic_alt, "Topic") %>
+          <i class="icon-discussion"></i>
           <%= t :topic_notice, 'Select the topic you want to associate with this *module*, or add a topic by selecting "New Topic".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">

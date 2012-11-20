@@ -146,6 +146,10 @@ a[class*=icon-]:before, a[class^=icon-]:before {
 .icon-arrow-down:before { content: "l" }
 .icon-arrow-left:before { content: "k" }
 .icon-arrow-right:before { content: "j" }
+.icon-mini-arrow-up:before { content: "\3f" }
+.icon-mini-arrow-down:before { content: "\4d" }
+.icon-mini-arrow-left:before { content: "\7e" }
+.icon-mini-arrow-right:before { content: "\3e" }
 .icon-email:before { content: "m" }
 .icon-instructure:before { content: "n" }
 .icon-ms-word:before { content: "\7b" }
