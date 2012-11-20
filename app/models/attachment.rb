@@ -604,6 +604,10 @@ class Attachment < ActiveRecord::Base
     Canvas::Security.hmac_sha1(uuid + "quota_exempt")[0,10]
   end
 
+  def self.minimum_size_for_quota
+    Setting.get_cached('attachment_minimum_size_for_quota', '512').to_i
+  end
+
   def self.get_quota(context)
     quota = 0
     quota_used = 0
@@ -611,7 +615,9 @@ class Attachment < ActiveRecord::Base
       ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
         quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
         quota = context.quota if (context.respond_to?("quota") && context.quota)
-        quota_used = context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
+        min = self.minimum_size_for_quota
+        # translated to ruby this is [size, min].max || 0
+        quota_used = context.attachments.active.sum("COALESCE(CASE when size < #{min} THEN #{min} ELSE size END, 0)", :conditions => { :root_attachment_id => nil }).to_i
       end
     end
     {:quota => quota, :quota_used => quota_used}
