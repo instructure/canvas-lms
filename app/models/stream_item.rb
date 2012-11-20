@@ -35,7 +35,8 @@ class StreamItem < ActiveRecord::Base
 
   def self.reconstitute_ar_object(type, data)
     return nil unless data
-    data = data.instance_variable_get(:@table).with_indifferent_access if data.is_a?(OpenObject)
+    data = data.instance_variable_get(:@table) if data.is_a?(OpenObject)
+    data = data.with_indifferent_access
     type = data['type'] || type
     res = type.constantize.new
 
@@ -192,9 +193,6 @@ class StreamItem < ActiveRecord::Base
     res['type'] = object.class.to_s
     res['user_short_name'] = object.user.short_name rescue nil
     res['context_code'] = self.context_code
-    # technically we should be able to not use OpenObject at all anymore -
-    # the reconstitution process just grabs the internal hash anyway
-    res = OpenObject.process(res)
 
     if self.class.new_message?(object)
       self.asset_type = 'Message'
