@@ -19,7 +19,7 @@
     <% end %>
   <% else %>
     <h2><%= t('headings.confirm_conclude', %{Confirm Conclude Course}) %></h2>
-    <%= t 'details.confirm_conclude', %{Are you sure you want to conclude this course?  Students and teachers will still be able to see the course contents in a read-only format from their "past courses" page.  If you don't want anyone to see the course, you can *delete the course completely*.}, :wrapper => link_to('\1', context_url(@context, :context_confirm_action_url, :event => 'delete')) %>
+    <%= t 'details.confirm_conclude', %{Are you sure you want to conclude this course? Once concluded, Students and Teachers will need to access the course from the "Past Enrollments" section on their *courses page*. Teachers will retain full access to the course content and have the ability to continue grading while Students will be limited to read-only access, i.e., they can view their grades but no longer submit assignments.}, :wrapper => link_to('\1', courses_path) %>
 
     <% form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="conclude"/>
