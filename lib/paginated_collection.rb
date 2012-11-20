@@ -59,6 +59,14 @@ module PaginatedCollection
     attr_accessor :current_page, :per_page
     # these can optionally be set while populating the collection
     attr_accessor :next_page, :previous_page, :first_page, :last_page, :total_entries
+
+    def total_pages
+      if total_entries
+        (total_entries / per_page.to_f).ceil
+      else
+        nil
+      end
+    end
   end
 
   class Proxy
