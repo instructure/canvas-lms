@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe DiscussionTopicsController do
   def course_topic(opts={})
     @topic = @course.discussion_topics.build(:title => "some topic")
-    if @user && !opts[:skip_set_user]
+    if @user
       @topic.user = @user
     end
 
@@ -68,11 +68,16 @@ describe DiscussionTopicsController do
 
     it "should mark as read when viewed" do
       course_with_student_logged_in(:active_all => true)
-      course_topic(:skip_set_user => true)
 
-      @topic.read_state(@student).should == 'unread'
+      # this @_user wierdness is so that course_topic does not set @topic.user to @user
+      @_user = @user
+      @user = nil
+      course_topic
+      @user = @_user
+
+      @topic.read_state(@user).should == 'unread'
       get 'show', :course_id => @course.id, :id => @topic.id
-      @topic.reload.read_state(@student).should == 'read'
+      @topic.read_state(@user).should == 'read'
     end
 
     it "should allow concluded teachers to see discussions" do
