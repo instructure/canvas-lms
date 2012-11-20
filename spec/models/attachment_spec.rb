@@ -1085,6 +1085,15 @@ describe Attachment do
       att3.need_notify.should_not be_true
     end
   end
+
+  context "quota" do
+    it "should give small files a minimum quota size" do
+      course_model
+      attachment_model(:context => @course, :uploaded_data => stub_png_data, :size => 25)
+      quota = Attachment.get_quota(@course)
+      quota[:quota_used].should == Attachment.minimum_size_for_quota
+    end
+  end
 end
 
 def processing_model
