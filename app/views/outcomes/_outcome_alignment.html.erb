@@ -3,7 +3,8 @@
   <div class="header">
     <a href="#" class="move_alignment_link no-hover"><%= image_tag "move.png" %></a>
     <%= image_tag "blank.png", :class => "type_icon", :alt => outcome_alignment.try_rescue(:content_type).try_rescue(:titleize), :title => outcome_alignment.try_rescue(:content_type).try_rescue(:titleize) %>
-    <% url = context_url(@context, :context_outcome_alignment_redirect_url, @outcome.id, outcome_alignment ? outcome_alignment.id : "{{ id }}") %>
+    <% url = context_url(@context, :context_outcome_alignment_redirect_url, @outcome.id, outcome_alignment ? outcome_alignment.id : "{{ id }}") rescue nil %>
+    <% url = "#{context_prefix(outcome_alignment.context_code)}/outcomes/#{@outcome.id}/alignments/#{outcome_alignment.id}" if outcome_alignment %>
     <a href="<%= url %>" class="title">
       <%= outcome_alignment.try_rescue(:title) || nbsp %>
     </a>
