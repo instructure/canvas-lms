@@ -1,0 +1,58 @@
+{"status":"ok", "itm":[
+  {
+    "title":"United States",
+    "guid":"US",
+    "type":"country",
+    "itm":[
+      {
+        "title":"NGA Center/CCSSO",
+        "guid":"aaaaaaaaaa",
+        "type":"authority",
+        "itm":[
+          {
+            "title":"Common Core State Standards",
+            "guid":"bbbbbbbbbbbb",
+            "type":"document",
+            "itm":[
+              {
+                "title":"College- and Career-Readiness Standards and K-12 Mathematics",
+                "guid":"cccccccccc",
+                "type":"subject",
+                "meta":{
+                  "content":"2010",
+                  "name":"year"
+                },
+                "itm":[
+
+                  {
+                    "title":"Kindergarten",
+                    "guid":"ddddddddd",
+                    "type":"grade",
+                    "meta":{
+                      "hi":"K",
+                      "lo":"K",
+                      "name":"grade"
+                    },
+                    "chld":"1"
+                  },
+
+                  {
+                    "title":"First Grade",
+                    "guid":"jjjjjjjjjjj",
+                    "type":"grade",
+                    "meta":{
+                      "hi":"1",
+                      "lo":"1",
+                      "name":"grade"
+                    },
+                    "chld":"1"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]}

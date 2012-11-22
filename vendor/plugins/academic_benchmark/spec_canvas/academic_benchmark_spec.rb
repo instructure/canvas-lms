@@ -15,6 +15,9 @@ describe AcademicBenchmark::Converter do
     @cm.save!
 
     @level_0_browse = File.join(File.dirname(__FILE__) + '/fixtures', 'example.json')
+    @a_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'a_levels_3.json')
+    @d_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'd_levels_3.json')
+    @j_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'j_levels_3.json')
     @authority_list = File.join(File.dirname(__FILE__) + '/fixtures', 'auth_list.json')
     File.open(@level_0_browse, 'r') do |file|
       @att = Attachment.create!(:filename => 'standards.json', :display_name => 'standards.json', :uploaded_data => file, :context => @cm)
@@ -23,14 +26,7 @@ describe AcademicBenchmark::Converter do
     @cm.save!
   end
 
-  it "should successfully import the standards" do
-    @cm.export_content
-    run_jobs
-    @cm.reload
-    @cm.migration_settings[:warnings].should be_nil
-    @cm.migration_settings[:last_error].should be_nil
-    @cm.workflow_state.should == 'imported'
-
+  def verify_full_import
     @root_group = LearningOutcomeGroup.global_root_outcome_group
     @root_group.child_outcome_groups.count.should == 1
     a = @root_group.child_outcome_groups.first
@@ -42,7 +38,7 @@ describe AcademicBenchmark::Converter do
     c = b.child_outcome_groups.first
     c.migration_id.should == "cccccccccc"
     c.title.should == "College- and Career-Readiness Standards and K-12 Mathematics"
-    d = c.child_outcome_groups.first
+    d = c.child_outcome_groups.find_by_migration_id("ddddddddd")
     d.migration_id.should == "ddddddddd"
     d.title.should == "Kindergarten"
     d.low_grade.should == "K"
@@ -71,7 +67,7 @@ describe AcademicBenchmark::Converter do
     g.short_description.should == "K.CC.3"
     g.description.should == "Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects)."
 
-    j = c.child_outcome_groups.last
+    j = c.child_outcome_groups.find_by_migration_id("jjjjjjjjjjj")
     j.migration_id.should == "jjjjjjjjjjj"
     j.title.should == "First Grade"
     j.low_grade.should == "1"
@@ -93,6 +89,17 @@ describe AcademicBenchmark::Converter do
     m = LearningOutcome.global.find_by_migration_id("mmmmmmmmmmm")
     m.short_description.should == "1.DD.1"
     m.description.should == "And something else"
+  end
+
+  it "should successfully import the standards" do
+    @cm.export_content
+    run_jobs
+    @cm.reload
+    @cm.migration_settings[:warnings].should be_nil
+    @cm.migration_settings[:last_error].should be_nil
+    @cm.workflow_state.should == 'imported'
+
+    verify_full_import()
   end
 
   it "should reject creating global outcomes if no permissions" do
@@ -128,7 +135,7 @@ describe AcademicBenchmark::Converter do
       @cm.migration_settings[:authorities] = ["CC"]
       @cm.save!
     end
-    
+
     def run_and_check
       @cm.export_content
       run_jobs
@@ -159,28 +166,38 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(File.read(@level_0_browse))
       response.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=0").returns(response)
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=3").returns(response)
 
       run_and_check
+      verify_full_import
     end
 
     it "should use the API to get the set data with a guid" do
       @cm.migration_settings[:authorities] = nil
       @cm.migration_settings[:guids] = ["aaaaaaaaaa"]
       response = Object.new
-      response.stubs(:body).returns(File.read(@level_0_browse))
+      response.stubs(:body).returns(File.read(@a_levels_3))
       response.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=aaaaaaaaaa&levels=0").returns(response)
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=aaaaaaaaaa&levels=3").returns(response)
+      responsed = Object.new
+      responsed.stubs(:body).returns(File.read(@d_levels_3))
+      responsed.stubs(:code).returns("200")
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=ddddddddd&levels=3").returns(responsed)
+      responsej = Object.new
+      responsej.stubs(:body).returns(File.read(@j_levels_3))
+      responsej.stubs(:code).returns("200")
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=jjjjjjjjjjj&levels=3").returns(responsej)
 
       run_and_check
+      verify_full_import
     end
-    
+
     it "should warn when api returns non-success" do
       response = Object.new
       response.stubs(:body).returns(%{{"status":"fail","ab_err":{"msg":"API key access violation.","code":"401"}}})
       response.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=0").returns(response)
-      
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=3").returns(response)
+
       @cm.export_content
       run_jobs
       @cm.reload
@@ -190,27 +207,28 @@ describe AcademicBenchmark::Converter do
       @cm.migration_settings[:last_error].should be_nil
       @cm.workflow_state.should == 'imported'
     end
-    
+
     it "should pull down the list of available authorities" do
       @cm.migration_settings[:authorities] = nil
       @cm.migration_settings[:refresh_all_standards] = true
       @cm.save!
-      
+
       response = Object.new
       response.stubs(:body).returns(File.read(@authority_list))
       response.stubs(:code).returns("200")
       AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&levels=2").returns(response)
-      
+
       ["CCC", "BBB", "AAA", "111", "222"].each do |guid|
         response2 = Object.new
         response2.stubs(:body).returns(File.read(@level_0_browse))
         response2.stubs(:code).returns("200")
-        AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=%s&levels=0" % guid).returns(response2)
+        AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=%s&levels=3" % guid).returns(response2)
       end
-      
+
       run_and_check
+      verify_full_import
     end
-    
+
   end
 
 end

@@ -59,6 +59,9 @@ module Canvas::Migration
             cm.import_content_without_send_later
             cm.progress = 100
             saved = cm.save
+            if converter.respond_to?(:post_process)
+              converter.post_process
+            end
           end
           
           saved
@@ -75,7 +78,8 @@ module Canvas::Migration
       def self.enqueue(content_migration)
         Delayed::Job.enqueue(new(content_migration.id),
                              :priority => Delayed::LOW_PRIORITY,
-                             :max_attempts => 1)
+                             :max_attempts => 1,
+                             :strand => content_migration.strand)
       end
     end
   end
