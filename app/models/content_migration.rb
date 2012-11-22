@@ -122,6 +122,14 @@ class ContentMigration < ActiveRecord::Base
   def converter_class
     migration_settings[:converter_class]
   end
+
+  def strand=(s)
+    migration_settings[:strand] = s
+  end
+
+  def strand
+    migration_settings[:strand]
+  end
   
   def migration_ids_to_import=(val)
     migration_settings[:migration_ids_to_import] = val
