@@ -8,7 +8,8 @@ Rails.configuration.to_prepare do
           :settings_partial => 'plugins/academic_benchmark_settings',
           :settings => {
             :api_key => nil,
-            :api_url => AcademicBenchmark::API_BASE_URL,
+            :api_url => AcademicBenchmark::Api::API_BASE_URL,
+            :common_core_guid => AcademicBenchmark::Converter::COMMON_CORE_GUID,
             :worker => 'CCWorker',
             :converter_class => AcademicBenchmark::Converter,
             :provides => {:academic_benchmark => AcademicBenchmark::Converter}

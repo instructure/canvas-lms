@@ -70,6 +70,29 @@ describe AcademicBenchmark::Converter do
     g = LearningOutcome.global.find_by_migration_id("iiiiiiiiiiiiiiiii")
     g.short_description.should == "K.CC.3"
     g.description.should == "Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects)."
+
+    j = c.child_outcome_groups.last
+    j.migration_id.should == "jjjjjjjjjjj"
+    j.title.should == "First Grade"
+    j.low_grade.should == "1"
+    j.high_grade.should == "1"
+    k = j.child_outcome_groups.last
+    k.migration_id.should == "kkkkkkkkkkk"
+    k.title.should == "1.DD - Something"
+    k.description.should == "Something"
+    k.low_grade.should == "1"
+    k.high_grade.should == "1"
+    l = k.child_outcome_groups.first
+    l.migration_id.should == "lllllllll"
+    l.title.should == "Something else"
+    l.description.should == "Something else"
+    l.low_grade.should == "1"
+    l.high_grade.should == "1"
+    l.child_outcome_links.count.should == 1
+
+    m = LearningOutcome.global.find_by_migration_id("mmmmmmmmmmm")
+    m.short_description.should == "1.DD.1"
+    m.description.should == "And something else"
   end
 
   it "should reject creating global outcomes if no permissions" do
@@ -79,9 +102,8 @@ describe AcademicBenchmark::Converter do
     run_jobs
     @cm.reload
 
-    @cm.migration_settings[:warnings].should == [["You're not allowed to manage global outcomes, can't add \"NGA Center/CCSSO\"", ""]]
-    @cm.migration_settings[:last_error].should be_nil
-    @cm.workflow_state.should == 'imported'
+    @cm.workflow_state.should == 'failed'
+    @cm.migration_settings[:last_error].should =~ /ErrorReport:\d+/
   end
 
   it "should fail if no file or authority set" do
@@ -137,7 +159,7 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(File.read(@level_0_browse))
       response.stubs(:code).returns("200")
-      AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&authority=CC").returns(response)
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=0").returns(response)
 
       run_and_check
     end
@@ -148,7 +170,7 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(File.read(@level_0_browse))
       response.stubs(:code).returns("200")
-      AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&guid=aaaaaaaaaa").returns(response)
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=aaaaaaaaaa&levels=0").returns(response)
 
       run_and_check
     end
@@ -157,13 +179,14 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(%{{"status":"fail","ab_err":{"msg":"API key access violation.","code":"401"}}})
       response.stubs(:code).returns("200")
-      AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&authority=CC").returns(response)
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=0").returns(response)
       
       @cm.export_content
       run_jobs
       @cm.reload
 
-      @cm.migration_settings[:warnings].should == [["Error accessing Academic Benchmark API", "responseCode: 401 - API key access violation."]]
+      er = ErrorReport.last
+      @cm.migration_settings[:warnings].should == [["Couldn't update standards for authority CC.", "ErrorReport:#{er.id}"]]
       @cm.migration_settings[:last_error].should be_nil
       @cm.workflow_state.should == 'imported'
     end
@@ -176,13 +199,13 @@ describe AcademicBenchmark::Converter do
       response = Object.new
       response.stubs(:body).returns(File.read(@authority_list))
       response.stubs(:code).returns("200")
-      AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=2&format=json&api_key=oioioi").returns(response)
+      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&levels=2").returns(response)
       
       ["CCC", "BBB", "AAA", "111", "222"].each do |guid|
         response2 = Object.new
         response2.stubs(:body).returns(File.read(@level_0_browse))
         response2.stubs(:code).returns("200")
-        AcademicBenchmark::Converter.expects(:get_url).with("http://example.com/browse?levels=0&format=json&api_key=oioioi&guid=" + guid).returns(response2)
+        AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=%s&levels=0" % guid).returns(response2)
       end
       
       run_and_check

@@ -8,13 +8,19 @@
     <tr>
       <td><%= f.blabel :api_url, :en => "Api Url" %></td>
       <td>
-        <%= f.text_field :api_url,:size => "90" %> <%= t :api_url_description, "(e.g. %{url})", :url => AcademicBenchmark::API_BASE_URL %>
+        <%= f.text_field :api_url,:size => "90" %> <%= t :api_url_description, "(e.g. %{url})", :url => AcademicBenchmark::Api::API_BASE_URL %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :api_key, :en => "API Key" %></td>
       <td>
         <%= f.text_field :api_key %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :common_core_guid, :en => "Common Core GUID (optional)" %></td>
+      <td>
+        <%= f.text_field :common_core_guid %> <%= t :common_core_guid, "(e.g. %{guid})", :guid => AcademicBenchmark::Converter::COMMON_CORE_GUID %>
       </td>
     </tr>
   </table>
