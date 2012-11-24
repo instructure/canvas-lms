@@ -299,6 +299,33 @@ describe "editing external tools" do
     f("#external_tool_create_title").should have_value "bob"
   end
 
+  it "should allow editing the settings for a tool in a module" do
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({
+                                :type => 'context_external_tool',
+                                :title => 'Example',
+                                :url => 'http://www.example.com',
+                                :new_tab => '1'
+                            })
+    get "/courses/#{@course.id}/modules"
+    keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
+
+    f("#context_module_item_#{@tag.id}").click
+    f("#context_module_item_#{@tag.id} .edit_item_link").click
+
+    f("#edit_item_form").should be_displayed
+    replace_content(f("#edit_item_form #content_tag_title"), "Example 2")
+    f("#edit_item_form #content_tag_new_tab").click
+    submit_form("#edit_item_form")
+
+    wait_for_ajax_requests
+
+    @tag.reload
+    @tag.should_not be_nil
+    @tag.title.should == "Example 2"
+    @tag.new_tab.should == false
+    @tag.url.should == "http://www.example.com"
+  end
 
   it "should launch assignment external tools when viewing assignment" do
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})

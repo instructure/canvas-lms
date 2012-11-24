@@ -4,14 +4,6 @@ $context_module_bg_color: #f2f3f4
 
 #context_modules
   min-width: 20px
-
-  .hidden_tabbable
-    position: relative
-    left: -10000px
-  
-    &:focus, &.focus
-      left: auto !important
-
 .context_module
   border:
     top: 1px dotted $context_module_border_color
@@ -24,11 +16,8 @@ $context_module_bg_color: #f2f3f4
     +opacity(0.5)
     &:hover
       +opacity(1)
-
   .reorder_module_link, .move_item_link
     padding-left: 2px
-  .move_item_link
-    cursor: move
   .links
     padding-right: 10px
     text-align: right
@@ -40,17 +29,17 @@ $context_module_bg_color: #f2f3f4
     color: #323232
     .links
       float: right
-    &:hover .hidden_tabbable
-      left: auto !important
 
   .completion_status .complete_icon, 
   .locked_icon,
   .progression_details_link,
+  .header .links,
   .add_module_item_link,
   .manage_module,
   .delete_prerequisite_link,
   .expand_module_link,
-  .collapsed
+  .collapsed,
+  .context_module_item .links
     display: none
   &.editable_context_module
     .progression_details_link,
@@ -250,7 +239,10 @@ $context_module_bg_color: #f2f3f4
       font-size: 0.9em
     .locked_title 
       display: none
-  width: 100%    
+  width: 100%
+  .move_item_link 
+    visibility: hidden
+    
   .locked_module & 
     .title 
       display: none
@@ -269,13 +261,14 @@ $context_module_bg_color: #f2f3f4
       font-weight: bold
       color: #888
   .links 
+    visibility: hidden
     width: 80px
     vertical-align: top
     padding-top: 2px
   &.context_module_item_hover, &:hover 
     background-color: darken($context_module_bg_color, 2.5%)
-    .hidden_tabbable
-      left: auto !important
+    .move_item_link, .links, .links a 
+      visibility: visible
 
   td.points_possible_display, td.due_date_display
     padding-top: 5px
@@ -322,8 +315,12 @@ $context_module_bg_color: #f2f3f4
 .context_module .context_module_items
   border-collapse: collapse
   .context_module_item
+    .move_item_link
+      display: none
     .completion_status
       display: inline
+    .links a
+      display: none
   &.manageable
     .context_module_item
       .move_item_link
