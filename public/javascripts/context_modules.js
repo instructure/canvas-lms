@@ -853,15 +853,14 @@ define([
 
   $(document).ready(function() {
     $(".datetime_field").datetime_field();
-    
-    $("#context_modules").on('mouseenter mouseleave', '.context_module', function() {
-      $(this).toggleClass('context_module_hover');
+    $(".context_module").live('mouseover', function() {
+      $(".context_module_hover").removeClass('context_module_hover');
+      $(this).addClass('context_module_hover');
     });
-
-    $("#context_modules").on('mouseenter mouseleave', '.context_module_item', function() {
-      $(this).toggleClass('context_module_item_hover');
+    $(".context_module_item").live('mouseover', function() {
+      $(".context_module_item_hover").removeClass('context_module_item_hover');
+      $(this).addClass('context_module_item_hover');
     });
-
     var $currentElem = null;
     var hover = function($elem) {
       if($elem.hasClass('context_module')) {
