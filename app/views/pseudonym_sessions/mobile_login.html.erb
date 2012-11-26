@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <%= javascript_include_tag "#{js_base_url}/vendor/modernizr.js" %>
   <style>
     * {
       margin: 0px;
@@ -51,30 +52,52 @@
       background-repeat: no-repeat;
       background-size: 270px 48px;
     }
-    .face.back {
-      display: none;
-    }
 
     #f1_card {
       width: 100%;
       height: 100%;
+    }
+
+    .csstransforms3d #f1_card {
       -webkit-transform-style: preserve-3d;
       -webkit-transition: all 0.5s linear;
     }
-    #f1_container.flipped #f1_card {
-      -webkit-transform: rotateY(180deg);
-    }
+
     .face {
       position: absolute;
       width: 100%;
       height: 100%;
-      -webkit-backface-visibility: hidden;
       padding: 0;
     }
+
+    .csstransforms3d .face {
+      -webkit-backface-visibility: hidden;
+    }
+
     .face.back {
+      display: none;
+    }
+
+    .flipped .face.back {
+      display: block;
+    }
+
+    .flipped .face.front {
+      display: none;
+    }
+
+    .csstransforms3d .flipped .face.front {
+      display: block;
+    }
+
+    .csstransforms3d .face.back {
       display: block;
       -webkit-transform: rotateY(180deg);
       -webkit-box-sizing: border-box;
+    }
+
+    .csstransforms3d #f1_container.flipped #f1_card {
+      -webkit-transform: rotateY(180deg);
     }
 
     input, button, .btn{
@@ -113,9 +136,9 @@
       border-width: 1px;
       text-shadow: 0px 1px 1px rgba(0,0,0,0.4);
       margin-bottom: 0;
+      width: 240px;
     }
     .forgot-password {
-      box-sizing: border-box;
       display: block;
       text-decoration: none;
     }
@@ -136,14 +159,14 @@
         <% if url = params[:canvas_login].blank? && @domain_root_account.try(:forgot_password_external_url) %>
           <%= link_to t('dont_know_password', "I don't know my password"), url, :class => 'btn forgot-password' %>
         <% else %>
-          <button class="flip-to-back"><%= t('dont_know_password', "I don't know my password") %></button>
+          <a class="btn flip-to-back"><%= t('dont_know_password', "I don't know my password") %></a>
         <% end %>
       <% end %>
       <% form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face'} do |f| %>
         <label for="pseudonym_session_unique_id_forgot"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => @login_handle_name) %></label>
         <input <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.try :email %>" placeholder="<%= @login_handle_name %>" id="pseudonym_session_unique_id_forgot" />
         <button type="submit" data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %></button>
-        <button class="flip-to-front"><%= t('back_to_login', "Back to Login") %></button>
+        <a class="btn flip-to-front"><%= t('back_to_login', "Back to Login") %></a>
       <% end %>
     </div>
   </div>
