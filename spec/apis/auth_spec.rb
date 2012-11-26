@@ -174,7 +174,7 @@ describe "API Authentication", :type => :integration do
           response.should be_success
           json = JSON.parse(response.body)
           json.size.should == 1
-          json.first['enrollments'].should == [{'type' => 'teacher'}]
+          json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}]
           AccessToken.authenticate(token).should == AccessToken.last
 
           # post requests should work with nothing but an access token
@@ -416,7 +416,7 @@ describe "API Authentication", :type => :integration do
             response.should be_success
             json = JSON.parse(response.body)
             json.size.should == 1
-            json.first['enrollments'].should == [{'type' => 'teacher'}]
+            json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}]
             AccessToken.last.should == AccessToken.authenticate(token)
           end
         end

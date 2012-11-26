@@ -126,7 +126,7 @@ describe CoursesController, :type => :integration do
         'name' => @course1.name,
         'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
@@ -139,7 +139,7 @@ describe CoursesController, :type => :integration do
         'name' => @course2.name,
         'account_id' => @course2.account_id,
         'course_code' => @course2.course_code,
-        'enrollments' => [{'type' => 'student'}],
+        'enrollments' => [{'type' => 'student', 'role' => 'StudentEnrollment'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
         'hide_final_grades' => false,
@@ -439,7 +439,7 @@ describe CoursesController, :type => :integration do
         'name' => @course1.name,
         'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
@@ -453,6 +453,7 @@ describe CoursesController, :type => :integration do
         'account_id' => @course2.account_id,
         'course_code' => @course2.course_code,
         'enrollments' => [{'type' => 'student',
+                           'role' => 'StudentEnrollment',
                            'computed_current_score' => expected_current_score,
                            'computed_final_score' => expected_final_score,
                            'computed_final_grade' => expected_final_grade}],
@@ -481,7 +482,7 @@ describe CoursesController, :type => :integration do
         'name' => @course1.name,
         'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
@@ -494,7 +495,7 @@ describe CoursesController, :type => :integration do
         'name' => @course2.name,
         'account_id' => @course2.account_id,
         'course_code' => @course2.course_code,
-        'enrollments' => [{'type' => 'student'}],
+        'enrollments' => [{'type' => 'student', 'role' => 'StudentEnrollment'}],
         'sis_course_id' => 'TEST-SIS-ONE.2011',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
         'hide_final_grades' => true,
@@ -514,7 +515,7 @@ describe CoursesController, :type => :integration do
         'name' => @course1.name,
         'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}],
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => false,
@@ -523,6 +524,35 @@ describe CoursesController, :type => :integration do
         'default_view' => 'feed'
       }
     ]
+  end
+
+  describe "enrollment_role" do
+    before do
+      role = Account.default.roles.build :name => 'SuperTeacher'
+      role.base_role_type = 'TeacherEnrollment'
+      role.save!
+      @course3 = course
+      @course3.enroll_user(@me, 'TeacherEnrollment', { :role_name => 'SuperTeacher', :active_all => true })
+    end
+
+    it "should return courses with all teacher types on ?enrollment_type=teacher" do
+      json = api_call(:get, "/api/v1/courses.json?enrollment_type=teacher",
+               { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_type => 'teacher' })
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course1.id, @course3.id].sort
+    end
+
+    it "should return only courses with vanilla TeacherEnrollments on ?enrollment_role=TeacherEnrollment" do
+      json = api_call(:get, "/api/v1/courses.json?enrollment_role=TeacherEnrollment",
+                      { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'TeacherEnrollment' })
+      json.collect{ |c| c['id'].to_i }.should == [@course1.id]
+    end
+
+    it "should return courses by custom role" do
+      json = api_call(:get, "/api/v1/courses.json?enrollment_role=SuperTeacher",
+                      { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' })
+      json.collect{ |c| c['id'].to_i }.should == [@course3.id]
+      json[0]['enrollments'].should == [{ 'type' => 'teacher', 'role' => 'SuperTeacher' }]
+    end
   end
 
   describe "/students" do
@@ -713,6 +743,48 @@ describe CoursesController, :type => :integration do
       json.map { |u| u['enrollments'].map { |e| e['type'] } }.flatten.uniq.sort.should == %w{StudentEnrollment TeacherEnrollment}
     end
 
+    describe "enrollment_role" do
+      before do
+        role = Account.default.roles.build :name => 'EliteStudent'
+        role.base_role_type = 'StudentEnrollment'
+        role.save!
+        @student3 = user(:name => 'S3')
+        @student3_enroll = @course1.enroll_user(@student3, 'StudentEnrollment', { :role_name => 'EliteStudent' })
+      end
+
+      it "should return all student types with ?enrollment_type=student" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                        :enrollment_type => 'student')
+
+        json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2, @student3].map(&:id).sort
+      end
+
+      it "should return only base student types with ?enrollment_role=StudentEnrollment" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                        :enrollment_role => 'StudentEnrollment')
+
+        json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2].map(&:id).sort
+      end
+
+      it "should return users with a custom role type" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                        :enrollment_role => 'EliteStudent')
+
+        json.map {|x| x["id"].to_i}.should == [@student3.id]
+      end
+
+      it "should accept an array of enrollment roles" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                        :enrollment_role => %w{StudentEnrollment EliteStudent})
+
+        json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2, @student3].map(&:id).sort
+      end
+    end
+
     it "maintains query parameters in link headers" do
       json = api_call(
         :get,
@@ -901,7 +973,7 @@ describe CoursesController, :type => :integration do
         'name' => @course1.name,
         'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}],
         'needs_grading_count' => 1,
         'sis_course_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },

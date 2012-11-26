@@ -979,4 +979,8 @@ class Enrollment < ActiveRecord::Base
   def self.cross_shard_invitations?
     false
   end
+
+  def role
+    self.role_name || self.type
+  end
 end
