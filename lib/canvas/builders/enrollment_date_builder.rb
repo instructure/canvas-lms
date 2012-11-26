@@ -38,8 +38,10 @@ class EnrollmentDateBuilder
         add_enrollment_dates(@enrollment, false)
       elsif section_is_restricted?
         add_enrollment_dates(@section)
+        add_term_dates if is_admin_and_has_term_dates?
       elsif course_is_restricted?
         add_enrollment_dates(@course)
+        add_term_dates if is_admin_and_has_term_dates?
       else
         add_term_dates
       end
@@ -58,9 +60,12 @@ class EnrollmentDateBuilder
     @term ? @term.enrollment_dates_for(@enrollment) : default_dates
   end
 
-  def add_enrollment_dates(context, with_term_dates=true)
-    @enrollment_dates << [context.start_at, context.end_at]
-    @enrollment_dates << term_dates if with_term_dates && is_admin_and_has_term_dates?
+  def add_enrollment_dates(context, skip_start_for_admin=true)
+    if skip_start_for_admin && @enrollment.admin?
+      @enrollment_dates << [nil, context.end_at]
+    else
+      @enrollment_dates << [context.start_at, context.end_at]
+    end
   end
 
   # Also consider term dates unless no term dates are set so that teacher
