@@ -14,10 +14,10 @@ class SortsAssignments
   VDDAssignment = Struct.new(:id,:due_at)
 
   def self.by_varied_due_date(opts)
-    assignments = opts[:assignments]
-    user = opts[:user]
-    session = opts[:session]
-    submissions = opts[:submissons]
+    assignments = opts.fetch( :assignments )
+    user = opts.fetch( :user )
+    session = opts.fetch( :session )
+    submissions = opts.fetch( :submissions )
     upcoming_limit = opts[:upcoming_limit] || 1.week.from_now
 
     vdd_assignments = vdd_map(assignments, user)
