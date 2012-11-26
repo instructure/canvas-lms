@@ -439,12 +439,12 @@ describe "API Authentication", :type => :integration do
     end
 
     it "should allow passing the access token in the query string" do
-      check_used { get "/api/v1/courses?access_token=#{@token.token}" }
+      check_used { get "/api/v1/courses?access_token=#{@token.full_token}" }
       JSON.parse(response.body).size.should == 1
     end
 
     it "should allow passing the access token in the authorization header" do
-      check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.token}" } }
+      check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" } }
       JSON.parse(response.body).size.should == 1
     end
 
@@ -456,7 +456,7 @@ describe "API Authentication", :type => :integration do
       check_used do
         post "/api/v1/accounts/#{Account.default.id}/admins", {
           'user_id' => u2.id,
-          'access_token' => @token.token,
+          'access_token' => @token.full_token,
         }
       end
       Account.default.reload.users.should be_include(u2)
@@ -488,13 +488,13 @@ describe "API Authentication", :type => :integration do
     end
 
     it "should be able to log out" do
-      get "/api/v1/courses?access_token=#{@token.token}"
+      get "/api/v1/courses?access_token=#{@token.full_token}"
       response.should be_success
 
-      delete "/login/oauth2/token?access_token=#{@token.token}"
+      delete "/login/oauth2/token?access_token=#{@token.full_token}"
       response.should be_success
 
-      get "/api/v1/courses?access_token=#{@token.token}"
+      get "/api/v1/courses?access_token=#{@token.full_token}"
       response.status.to_i.should == 401
     end
 
@@ -511,7 +511,7 @@ describe "API Authentication", :type => :integration do
         end
         LoadAccount.stubs(:default_domain_root_account).returns(@account)
 
-        check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.token}" } }
+        check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" } }
         JSON.parse(response.body).size.should == 1
       end
     end
