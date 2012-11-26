@@ -61,6 +61,16 @@ describe OutcomesController do
       account_outcome
       get 'index', :account_id => @account.id
     end
+
+    it "should find a common core group from settings" do
+      @account = Account.default
+      account_admin_user
+      user_session(@user)
+      account_outcome
+      Setting.set(AcademicBenchmark.common_core_setting_key, @outcome_group.id)
+      get 'index', :account_id => @account.id
+      assigns[:js_env][:COMMON_CORE_GROUP_ID].should == @outcome_group.id
+    end
   end
 
   describe "GET 'show'" do
