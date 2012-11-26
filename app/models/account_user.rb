@@ -30,6 +30,8 @@ class AccountUser < ActiveRecord::Base
 
   alias_method :context, :account
 
+  BASE_ROLE_NAME = 'AccountMembership'
+
   def update_account_associations_if_changed
     if (self.account_id_changed? || self.user_id_changed?)
       if self.new_record?

@@ -19,31 +19,45 @@
 # @API Roles
 class RoleOverridesController < ApplicationController
   before_filter :require_context
-  before_filter :require_role, :only => [:add_role, :update]
+  before_filter :require_role, :only => [:activate_role, :add_role, :remove_role, :update]
 
   def index
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      @managing_account_roles = @context.is_a?(Account) && (params[:account_roles] || @context.site_admin?)
+      if api_request?
+        @role_names = @context.account_membership_types
+        @role_names += RoleOverride.base_role_types
+        @role_names += @context.active_course_roles
 
-      if @managing_account_roles
-        @role_types = RoleOverride.account_membership_types(@context)
+        render :json => @role_names.collect{|role| role_json(@context, role, @current_user, session)}.to_json
       else
-        @role_types = RoleOverride.enrollment_types
-      end
+        @managing_account_roles = @context.is_a?(Account) && (params[:account_roles] || @context.site_admin?)
 
-      respond_to do |format|
-        format.html
+        if @managing_account_roles
+          @role_types = RoleOverride.account_membership_types(@context)
+        else
+          @role_types = RoleOverride.enrollment_types
+        end
+
+        respond_to do |format|
+          format.html
+        end
       end
     end
   end
   
   include Api::V1::Role
 
-  # @API Create an admin role
-  # Create a new admin role (admin membership type).
+  # @API Create a new role
+  # Create a new course-level or account-level role.
   #
   # @argument role
   #   Label and unique identifier for the role.
+  #
+  # @argument base_role_type [Optional] Accepted values are 'AccountMembership', 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', and 'DesignerEnrollment'
+  #   Specifies the role type that will be used as a base
+  #   for the permissions granted to this role.
+  #
+  #   Defaults to 'AccountMembership' if absent
   #
   # @argument permissions[<X>][explicit] [Optional]
   # @argument permissions[<X>][enabled] [Optional]
@@ -57,37 +71,45 @@ class RoleOverridesController < ApplicationController
   #   May occur multiple times with unique values for <X>. Recognized
   #   permission names for <X> are:
   #
+  #     [For Account-Level Roles Only]
   #     become_user                      -- Become other users
+  #     manage_account_memberships       -- Add/remove other admins for the account
+  #     manage_account_settings          -- Manage account-level settings
+  #     manage_alerts                    -- Manage global alerts
+  #     manage_courses                   -- Manage ( add / edit / delete ) courses
+  #     manage_developer_keys            -- Manage developer keys
+  #     manage_global_outcomes           -- Manage learning outcomes
+  #     manage_jobs                      -- Manage background jobs
+  #     manage_role_overrides            -- Manage permissions
+  #     manage_sis                       -- Import and manage SIS data
+  #     manage_site_settings             -- Manage site-wide and plugin settings
+  #     manage_user_logins               -- Modify login details for users
+  #     read_course_list                 -- View the list of courses
+  #     read_messages                    -- View notifications sent to users
+  #     view_error_reports               -- View error reports
+  #     view_statistics                  -- View statistics
+  #
+  #     [For both Account-Level and Course-Level roles]
   #     change_course_state              -- Change course state
   #     comment_on_others_submissions    -- View all students' submissions and make comments on them
   #     create_collaborations            -- Create student collaborations
   #     create_conferences               -- Create web conferences
-  #     manage_account_memberships       -- Add/remove other admins for the account
-  #     manage_account_settings          -- Manage account-level settings
   #     manage_admin_users               -- Add/remove other teachers, course designers or TAs to the course
-  #     manage_alerts                    -- Manage global alerts
   #     manage_assignments               -- Manage (add / edit / delete) assignments and quizzes
   #     manage_calendar                  -- Add, edit and delete events on the course calendar
   #     manage_content                   -- Manage all other course content
-  #     manage_courses                   -- Manage ( add / edit / delete ) courses
   #     manage_files                     -- Manage (add / edit / delete) course files
   #     manage_grades                    -- Edit grades (includes assessing rubrics)
   #     manage_groups                    -- Manage (create / edit / delete) groups
   #     manage_interaction_alerts        -- Manage alerts
-  #     manage_jobs                      -- Manage background jobs
   #     manage_outcomes                  -- Manage learning outcomes
-  #     manage_role_overrides            -- Manage permissions
   #     manage_sections                  -- Manage (create / edit / delete) course sections
-  #     manage_sis                       -- Import and manage SIS data
-  #     manage_site_settings             -- Manage site-wide and plugin settings
   #     manage_students                  -- Add/remove students for the course
-  #     manage_user_logins               -- Modify login details for users
   #     manage_user_notes                -- Manage faculty journal entries
   #     manage_wiki                      -- Manage wiki (add / edit / delete pages)
   #     moderate_forum                   -- Moderate discussions ( delete / edit other's posts, lock topics)
   #     post_to_forum                    -- Post to discussions
   #     read_course_content              -- View course content
-  #     read_course_list                 -- View the list of courses
   #     read_question_banks              -- View and link to question banks
   #     read_reports                     -- View usage reports for the course
   #     read_roster                      -- See the list of users
@@ -95,13 +117,11 @@ class RoleOverridesController < ApplicationController
   #     send_messages                    -- Send messages to course members
   #     site_admin                       -- Use the Site Admin section and admin all other accounts
   #     view_all_grades                  -- View all grades
-  #     view_error_reports               -- View error reports
   #     view_group_pages                 -- View the group pages of all student groups
-  #     view_statistics                  -- View statistics
   #
   #   Some of these permissions are applicable only for roles on the site admin
-  #   account or on a root account; if specified for a role on an inapplicable
-  #   account, the permission will be ignored.
+  #   account, on a root account, or for course-level roles with a particular base role type;
+  #   if a specified permission is inapplicable, it will be ignored.
   #
   #   Additional permissions may exist based on installed plugins.
   #
@@ -116,6 +136,9 @@ class RoleOverridesController < ApplicationController
   #
   # @response_field role
   #   The label and unique identifier of the role.
+  #
+  # @response_field base_role_type
+  #   The role type that is being used as a base for this role.
   #
   # @response_field permissions
   #   A dictionary of permissions keyed by name (see permissions input
@@ -161,6 +184,7 @@ class RoleOverridesController < ApplicationController
   #
   #   {
   #     "role": "New Role",
+  #     "base_role_type": "AccountMembership"
   #     "account": {
   #       "id": 1019,
   #       "name": "CGNU",
@@ -201,17 +225,28 @@ class RoleOverridesController < ApplicationController
   def add_role
     return unless authorized_action(@context, @current_user, :manage_role_overrides)
 
-    if @context.account_membership_types.include?(@role) || RoleOverride::RESERVED_ROLES.include?(@role)
+    if @context.has_role?(@role) || RoleOverride::RESERVED_ROLES.include?(@role)
       if api_request?
         render :json => {:message => "role already exists"}, :status => :bad_request
       else
-        flash[:error] = t(:update_failed_notice, "Role creation failed")
+        flash[:error] = t(:update_failed_notice, 'Role creation failed')
         redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
       end
       return
     end
 
-    @context.add_account_membership_type(@role)
+    base_role_type = params[:base_role_type]
+    if base_role_type.blank? || base_role_type == AccountUser::BASE_ROLE_NAME
+      @context.add_account_membership_type(@role)
+    else
+      course_role = @context.roles.build(:name => @role)
+      course_role.base_role_type = base_role_type
+      unless course_role.save
+        render :json => {:message => "invalid base role type"}, :status => :bad_request
+        return
+      end
+    end
+
     unless api_request?
       redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
       return
@@ -222,13 +257,39 @@ class RoleOverridesController < ApplicationController
 
     render :json => role_json(@context, @role, @current_user, session)
   end
-  
+
   def remove_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      @context.remove_account_membership_type(params[:role])
-      respond_to do |format|
-        format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => '1') }
-        format.json { render :json => @context.to_json(:only => [:membership_types, :id]) }
+      if course_role = @context.roles.active.find_by_name(@role)
+        if @context.enrollments.active.find_by_role_name(@role)
+          course_role.inactivate
+          message = 'This role has been set inactive because there are users currently enrolled with this role.'
+        else
+          course_role.destroy
+        end
+      else
+        @context.remove_account_membership_type(@role)
+      end
+      if api_request?
+        json = role_json(@context, @role, @current_user, session)
+        json[:message] = message if message.present?
+        render :json => json
+      else
+        respond_to do |format|
+          format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }
+          format.json { render :json => role_json(@context, @role, @current_user, session) }
+        end
+      end
+    end
+  end
+
+  def activate_role
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      if course_role = @context.roles.inactive.find_by_name(@role)
+        course_role.activate
+        render :json => role_json(@context, @role, @current_user, session)
+      else
+        render :json => {:message => "could not find role"}, :status => :bad_request
       end
     end
   end
@@ -243,7 +304,7 @@ class RoleOverridesController < ApplicationController
   # * ObserverEnrollment
   # * DesignerEnrollment
   # * AccountAdmin
-  # * Any previously created custom admin role
+  # * Any previously created custom role
   #
   # @argument permissions[<X>][explicit] [Optional]
   # @argument permissions[<X>][enabled] [Optional]
@@ -321,6 +382,7 @@ class RoleOverridesController < ApplicationController
   # Returns found role or false (to halt execution).
   def require_role
     @role = api_request? ? params[:role] : params[:role_type]
+    @role ||= params[:role]
     unless @role.present?
       if api_request?
         render :json => {
@@ -349,7 +411,13 @@ class RoleOverridesController < ApplicationController
   def set_permissions_for(role, context, permissions)
     return unless permissions.present?
 
-    RoleOverride.manageable_permissions(context).keys.each do |permission|
+    if course_role = context.roles.active.find_by_name(role)
+      manageable_permissions = RoleOverride.manageable_permissions(context, course_role.base_role_type)
+    else
+      manageable_permissions = RoleOverride.manageable_permissions(context)
+    end
+
+    manageable_permissions.keys.each do |permission|
       if settings = permissions[permission]
         if settings[:enabled].present? && settings[:explicit].to_i == 1
           override = settings[:enabled].to_i == 1

@@ -36,11 +36,16 @@ describe "Roles API", :type => :integration do
       admin = settings.delete(:admin) || @admin
       account = settings.delete(:account) || @admin.account
       role = settings.delete(:role) || @role
+      base_role_type = settings.delete(:base_role_type)
+
       permission = settings.delete(:permission) || @permission
+
+      parameters = {:role => role, :permissions => { permission => settings }}
+      parameters[:base_role_type] = base_role_type if base_role_type.present?
+
       api_call(:post, "/api/v1/accounts/#{account.id}/roles",
         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => account.id.to_s },
-        { :role => role,
-          :permissions => { permission => settings } })
+        parameters)
     end
 
     it "should add the role to the account" do
@@ -48,6 +53,110 @@ describe "Roles API", :type => :integration do
       json = api_call_with_settings(:explicit => '1', :enabled => '1')
       @account.reload
       @account.account_membership_types.should include(@role)
+    end
+
+    it "should index roles" do
+      api_call_with_settings(:explicit => '1', :enabled => '1')
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles",
+        { :controller => 'role_overrides', :action => 'index', :format => 'json', :account_id => @account.id.to_param })
+
+      json.collect{|role| role['role']}.sort.should == (["AccountAdmin", "NewRole"] + RoleOverride.base_role_types).sort
+    end
+
+    it "should remove a role" do
+      api_call_with_settings(:explicit => '1', :enabled => '1')
+      @account.reload
+      @account.account_membership_types.should include(@role)
+
+      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
+         { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+
+      @account.reload
+      @account.account_membership_types.should_not include(@role)
+    end
+
+    it "should add a course-level role to the account" do
+      base_role_type = 'TeacherEnrollment'
+
+      @account.account_membership_types.should_not include(@role)
+      @account.roles.should be_empty
+      json = api_call_with_settings(:base_role_type => base_role_type, :explicit => '1', :enabled => '1')
+      @account.reload
+
+      @account.account_membership_types.should_not include(@role)
+      @account.roles.count.should == 1
+      new_role = @account.roles.first
+      new_role.name.should == @role
+      new_role.base_role_type.should == base_role_type
+
+      json['base_role_type'].should == base_role_type
+    end
+
+    it "should delete a course-level role when there are no enrollments" do
+      base_role_type = 'TeacherEnrollment'
+
+      @account.account_membership_types.should_not include(@role)
+      @account.roles.should be_empty
+      api_call_with_settings(:base_role_type => base_role_type, :explicit => '1', :enabled => '1')
+      @account.reload
+
+      @account.roles.active.map(&:name).should include(@role)
+
+      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
+               { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+
+      @account.reload
+      @account.roles.active.map(&:name).should_not include(@role)
+      @account.roles.find_by_name(@role).workflow_state.should == 'deleted'
+      json['workflow_state'].should == 'deleted'
+    end
+
+    context "when there are enrollments using a course-level role" do
+      before :each do
+        base_role_type = 'TeacherEnrollment'
+
+        @account.account_membership_types.should_not include(@role)
+        @account.roles.should be_empty
+        api_call_with_settings(:base_role_type => base_role_type, :explicit => '1', :enabled => '1')
+        @account.reload
+
+        @account.roles.active.map(&:name).should include(@role)
+
+        course1 = Course.new(:name => "blah", :account => @account)
+        user1 = user()
+
+        account_admin_user(:account => @account)
+        enrollment1 = course1.enroll_user(user1, 'TeacherEnrollment')
+        enrollment1.role_name = @role
+        enrollment1.invite
+        enrollment1.accept
+        enrollment1.save!
+      end
+
+      it "should set inactive a course-level role" do
+        json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
+          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+
+        @account.reload
+        @account.roles.active.map(&:name).should include(@role)
+        @account.roles.find_by_name(@role).workflow_state.should == 'inactive'
+
+        json['workflow_state'].should == 'inactive'
+      end
+
+      it "should reactivate an inactive role" do
+        api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
+          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+        @account.reload
+
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/roles/#{@role}/activate",
+          { :controller => 'role_overrides', :action => 'activate_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+
+        @account.reload
+        @account.roles.active.map(&:name).should include(@role)
+        @account.roles.find_by_name(@role).workflow_state.should == 'active'
+        json['workflow_state'].should == 'active'
+      end
     end
 
     it "should require a role" do
@@ -67,6 +176,30 @@ describe "Roles API", :type => :integration do
       JSON.parse(response.body).should == {"message" => "role already exists"}
     end
 
+    it "should fail when given an existing course role" do
+      course_role = @account.roles.build(:name => @role)
+      course_role.base_role_type = 'StudentEnrollment'
+      course_role.save!
+      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
+        { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
+        { :role => @role })
+      response.status.should == '400 Bad Request'
+      JSON.parse(response.body).should == {"message" => "role already exists"}
+    end
+
+    it "should fail for course role without a valid base role type" do
+      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
+        { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
+        { :role => @role, :base_role_type => "notagoodbaserole" })
+      response.status.should == '400 Bad Request'
+      JSON.parse(response.body).should == {"message" => "invalid base role type"}
+    end
+
+    it "should not create an override for course role for account-only permissions" do
+      api_call_with_settings(:permission => 'manage_courses', :base_role_type => 'TeacherEnrollment', :explicit => '1', :enabled => '1')
+      @account.role_overrides(true).size.should == @initial_count
+    end
+
     it "should not create an override if enabled is nil and locked is not 1" do
       api_call_with_settings(:explicit => '1', :locked => '0')
       @account.role_overrides(true).size.should == @initial_count
@@ -79,6 +212,14 @@ describe "Roles API", :type => :integration do
 
     it "should create the override if explicit is 1 and enabled has a value" do
       api_call_with_settings(:explicit => '1', :enabled => '0')
+      @account.role_overrides(true).size.should == @initial_count + 1
+      override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
+      override.should_not be_nil
+      override.enabled.should be_false
+    end
+
+    it "should create an override for course-level roles" do
+      api_call_with_settings(:base_role_type => 'TeacherEnrollment', :explicit => '1', :enabled => '0')
       @account.role_overrides(true).size.should == @initial_count + 1
       override = @account.role_overrides.find_by_permission_and_enrollment_type(@permission, @role)
       override.should_not be_nil
@@ -133,7 +274,7 @@ describe "Roles API", :type => :integration do
     describe "json response" do
       it "should return the expected json format" do
         json = api_call_with_settings
-        json.keys.sort.should == ["account", "permissions", "role"]
+        json.keys.sort.should == ["account", "base_role_type", "permissions", "role", "workflow_state"]
         json["account"].should == {
           "name" => @account.name,
           "root_account_id" => @account.root_account_id,
@@ -141,6 +282,7 @@ describe "Roles API", :type => :integration do
           "id" => @account.id
         }
         json["role"].should == @role
+        json["base_role_type"].should == AccountUser::BASE_ROLE_NAME
 
         # make sure all the expected keys are there, but don't assert on a
         # *only* the expected keys, since plugins may have added more.
@@ -241,6 +383,37 @@ describe "Roles API", :type => :integration do
           @path_options.merge(:role => 'AccountAdmin'), { :permissions => {
           :manage_courses => { :explicit => 1, :enabled => 0 }}})
         json['permissions']['manage_courses']['enabled'].should eql false
+      end
+
+      it "should not be able to add an unavailable permission for a base role" do
+        @path = @path.sub(/TeacherEnrollment/, 'StudentEnrollment')
+        @path_options[:role] = "StudentEnrollment"
+        @permissions[:permissions][:read_question_banks][:enabled] = 1
+        json = api_call(:put, @path, @path_options, @permissions)
+        json['permissions']['read_question_banks'].should == {
+          'enabled'       => false,
+          'locked'        => true,
+          'readonly'      => true,
+          'explicit'      => false }
+      end
+
+      it "should not be able to add an unavailable permission for a course role" do
+        role_name = 'new role'
+        api_call(:post, "/api/v1/accounts/#{@account.id}/roles",
+                 { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @account.id.to_s },
+                 {:role => role_name, :base_role_type => 'StudentEnrollment'})
+
+        @path = @path.sub(/TeacherEnrollment/, role_name)
+        @path_options[:role] = role_name
+        @permissions[:permissions][:read_question_banks][:enabled] = 1
+
+        json = api_call(:put, @path, @path_options, @permissions)
+        json['permissions']['read_question_banks']['enabled'].should == false
+
+        @account.reload
+
+        override = @account.role_overrides.find_by_permission_and_enrollment_type('read_question_banks', role_name)
+        override.should be_nil
       end
     end
 

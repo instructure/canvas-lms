@@ -512,6 +512,25 @@ class Account < ActiveRecord::Base
     self.save
   end
 
+  def active_course_roles
+    if @course_roles.nil?
+      @course_roles = self.roles.active.map(&:name)
+      @course_roles += self.parent_account.active_course_roles if self.parent_account
+    end
+
+    @course_roles
+  end
+
+  def get_course_role(role_name)
+    course_role = self.roles.active.find_by_name(role_name)
+    course_role ||= self.parent_account.get_course_role(role_name) if self.parent_account
+    course_role
+  end
+
+  def has_role?(role_name)
+    self.account_membership_types.include?(role_name) || self.active_course_roles.include?(role_name)
+  end
+
   def account_authorization_config
     # We support multiple auth configs per account, but several places we assume there is only one.
     # This is for compatibility with those areas. TODO: migrate everything to supporting multiple

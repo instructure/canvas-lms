@@ -43,6 +43,7 @@ class Role < ActiveRecord::Base
   include Workflow
   workflow do
     state :active
+    state :inactive
     state :deleted
   end
 
@@ -53,7 +54,21 @@ class Role < ActiveRecord::Base
     save!
   end
 
+  def activate
+    self.workflow_state = 'active'
+    save!
+  end
+
+  def inactivate
+    self.workflow_state = 'inactive'
+    save!
+  end
+
   named_scope :active, lambda {
     { :conditions => ['roles.workflow_state != ?', 'deleted'] }
+  }
+
+  named_scope :inactive, lambda {
+    { :conditions => ['roles.workflow_state = ?', 'inactive'] }
   }
 end

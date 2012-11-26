@@ -40,8 +40,15 @@ class RoleOverride < ActiveRecord::Base
       {:name => 'DesignerEnrollment', :label => lambda { t('roles.designer', 'Course Designer') } },
       {:name => 'ObserverEnrollment', :label => lambda { t('roles.observer', 'Observer') } }
     ].freeze
+
   def self.enrollment_types
     ENROLLMENT_TYPES
+  end
+
+  BASE_ROLE_TYPES = ['AccountMembership', 'StudentEnrollment', 'TeacherEnrollment',
+                     'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].freeze
+  def self.base_role_types
+    BASE_ROLE_TYPES
   end
 
   KNOWN_ROLE_TYPES =
@@ -634,10 +641,11 @@ class RoleOverride < ActiveRecord::Base
     Permissions.retrieve
   end
 
-  def self.manageable_permissions(context)
+  def self.manageable_permissions(context, base_role_type=nil)
     permissions = self.permissions.dup
     permissions.reject!{ |k, p| p[:account_only] == :site_admin } unless context.site_admin?
     permissions.reject!{ |k, p| p[:account_only] == :root } unless context.root_account?
+    permissions.reject!{ |k, p| !p[:available_to].include?(base_role_type)} unless base_role_type.nil?
     permissions
   end
 
