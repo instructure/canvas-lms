@@ -6,10 +6,10 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if can_do(@bank, @current_user, :manage) %>
-      <a href="#" class="btn button-sidebar-wide add_question_link"><%= image_tag "add.png" %> <%= t 'buttons.add_a_question', "Add a Question" %></a>
-      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide edit_bank_link"><%= image_tag "edit.png" %> <%= t 'buttons.edit', "Edit Bank Details" %></a>
-      <a href="#" class="btn button-sidebar-wide move_questions_link"><%= image_tag "edit.png" %> <%= t 'buttons.move_questions', "Move Multiple Questions" %></a>
-      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><%= image_tag "delete.png" %> <%= t 'buttons.delete', "Delete Bank" %></a>
+      <a href="#" class="btn button-sidebar-wide add_question_link"><i class="icon-add"></i> <%= t 'buttons.add_a_question', "Add a Question" %></a>
+      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide edit_bank_link"><i class="icon-edit"></i> <%= t 'buttons.edit', "Edit Bank Details" %></a>
+      <a href="#" class="btn button-sidebar-wide move_questions_link"><i class="icon-arrow-right"></i> <%= t 'buttons.move_questions', "Move Multiple Questions" %></a>
+      <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><i class="icon-end"></i> <%= t 'buttons.delete', "Delete Bank" %></a>
     <% end %>
     <% if @bank && !@bank.bookmarked_for?(@current_user) %>
       <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="btn button-sidebar-wide bookmark_bank_link"><%= image_tag "bookmark_gray.png" %> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
@@ -23,19 +23,19 @@
       <% @alignments.each do |alignment| %>
         <li class="outcome" data-id="<%= alignment.learning_outcome_id %>">
           <span class="short_description"><%= alignment.learning_outcome.short_description %></span>
-          <a href="#" class="delete_outcome_link no-hover"><%= image_tag "delete_circle.png" %></a>
+          <a href="#" class="delete_outcome_link no-hover"><i class="icon-end standalone-icon"></i></a>
           <span class="clear"></span>
           <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">#{(alignment.mastery_score || 0) * 100.0}</span>%") %></span>
         </li>
       <% end %>
       <li class="blank outcome" style="display: none;">
         <span class="short_description">&nbsp;</span>
-        <a href="#" class="delete_outcome_link no-hover"><%= image_tag "delete_circle.png" %></a>
+        <a href="#" class="delete_outcome_link no-hover"><i class="icon-end standalone-icon"></i></a>
         <span class="clear"></span>
         <span class="content"><%= t :mastery_threshold, "mastery at %{threshold_percentage}", :threshold_percentage => raw("<span class=\"mastery_threshold\">&nbsp;</span>%") %></span>
       </li>
     </ul>
-    <a href="#" class="btn button-sidebar-wide add_outcome_link"><%= image_tag "ball.png" %> <span class="add_outcome_text"><%= t 'links.align_outcome', "Align Outcome" %></span></a>
+    <a href="#" class="btn button-sidebar-wide add_outcome_link"><i class="icon-paperclip"></i> <span class="add_outcome_text"><%= t 'links.align_outcome', "Align Outcome" %></span></a>
   </div>
   <%= render :partial => 'shared/find_outcome', :locals => {:purpose => 'question_bank'}  %>
 <% end %>
@@ -267,7 +267,7 @@ $(document).ready(function() {
     if(bank.id == current_question_bank_id) { return; }
     var $dialog = $("#move_question_dialog");
     var $bank = $dialog.find("li.bank.blank:first").clone(true).removeClass('blank');
-    
+
     $bank.find("input").attr('id', "question_bank_" + bank.id).val(bank.id);
     $bank.find("label").attr('for', "question_bank_" + bank.id)
       .find(".bank_name").text(bank.title || <%= jt('default_name', "No Name") %>).end()
@@ -495,13 +495,13 @@ $(document).ready(function() {
   float: left;
 }
 #move_question_dialog li.bank .bank_label .bank_name {
-  font-weight: bold; 
+  font-weight: bold;
   display: block;
 }
 #move_question_dialog li.bank .bank_label .context_name {
-  font-size: 0.8em; 
-  display: block; 
-  padding-left: 10px; 
+  font-size: 0.8em;
+  display: block;
+  padding-left: 10px;
   color: #888;
 }
 #questions.uneditable .question_holder .display_question .move {

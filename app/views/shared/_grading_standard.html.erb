@@ -10,11 +10,11 @@
               <% if !grading_standard_list %>
                 <a href="#" class="find_grading_standard_link no-hover" title="<%= t('find_existing_scheme', 'Find Existing Grading Scheme') %>"><%= image_tag "find.png", :alt => t('find', "Find") %></a>
               <% end %>
-                <a href="#" title="<%= t('edit_scheme', 'Edit Grading Scheme') %>" class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && !can_do(grading_standard, @current_user, :update) %>"><%= image_tag "edit.png" %></a>
+                <a href="#" title="<%= t('edit_scheme', 'Edit Grading Scheme') %>" class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && !can_do(grading_standard, @current_user, :update) %>"><i class="icon-edit standalone-icon"></i></a>
               <% if grading_standard_list %>
-                <a href="#" title="<%= t('delete_scheme', 'Delete Grading Scheme') %>" class="delete_grading_standard_link no-hover"><%= image_tag "delete.png" %></a>
+                <a href="#" title="<%= t('delete_scheme', 'Delete Grading Scheme') %>" class="delete_grading_standard_link no-hover"><i class="icon-trash standalone-icon"></i></a>
               <% else %>
-                <a href="#" title="<%= t('remove_scheme', 'Remove Grading Scheme') %>" class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>"><%= image_tag "delete_circle.png" %></a>
+                <a href="#" title="<%= t('remove_scheme', 'Remove Grading Scheme') %>" class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>"><i class="icon-end standalone-icon"></i></a>
               <% end %>
             </div>
             <div class="displaying title">
@@ -71,7 +71,7 @@
             </div>
           </td>
           <td class="editing_box" style="padding: 2px 5px 2px 15px; width: 25%;">
-            <a href="#" class="delete_row_link no-hover"><%= image_tag "delete_circle.png" %></a>
+            <a href="#" class="delete_row_link no-hover"><i class="icon-end standalone-icon"></i></a>
           </td>
         </tr>
         <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
@@ -113,7 +113,7 @@
           </div>
         </td>
         <td class="editing_box" style="padding: 2px 5px 2px 15px;">
-          <a href="#" class="delete_row_link no-hover"><%= image_tag "delete_circle.png" %></a>
+          <a href="#" class="delete_row_link no-hover"><i class="icon-end standalone-icon"></i></a>
         </td>
       </tr>
     </table>

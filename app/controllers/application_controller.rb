@@ -48,7 +48,7 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   before_filter :set_response_headers
 
-  add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
+  add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
 
   ##
   # Sends data from rails to JavaScript

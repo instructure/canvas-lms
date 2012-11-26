@@ -267,7 +267,7 @@ describe "admin settings tab" do
   context "enabled web services" do
 
     it "should click on the google help dialog" do
-      f("a.help").click
+      fj("label['for'='account_services_google_docs_previews'] .icon-question").click
       fj(".ui-dialog-title:visible").should include_text("About Google Docs Previews")
     end
 

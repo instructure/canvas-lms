@@ -231,7 +231,7 @@ define([
         width: 560
       });
 
-      $('<a class="help" href="#">&nbsp;</a>')
+      $('<a href="#"><i class="icon-question standalone-icon"></i></a>')
         .click(function(event){
           event.preventDefault();
           $dialog.dialog('open');

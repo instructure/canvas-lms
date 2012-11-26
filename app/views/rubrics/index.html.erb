@@ -2,7 +2,7 @@
 <% add_crumb t('#crumbs.rubrics', "Rubrics") %>
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="btn button-sidebar-wide add_rubric_link"><%= image_tag "add.png" %> <%= t('buttons.add_rubric', 'Add Rubric') %></a>
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="btn button-sidebar-wide add_rubric_link"><i class="icon-add"></i> <%= t('buttons.add_rubric', 'Add Rubric') %></a>
   </div>
 <% end %>
 
@@ -82,10 +82,10 @@ require([
       <a href="<%= context_url(@context, :context_rubric_url, association.rubric_id) %>" class="title"><%= rubric.title %></a>
       <span class="links">
         <% if can_do(rubric, @current_user, :update) %>
-          <a href="<%= context_url(@context, :context_rubric_url, association.rubric_id) %>#edit" class="no-hover"><%= image_tag "edit.png" %></a>
+          <a href="<%= context_url(@context, :context_rubric_url, association.rubric_id) %>#edit" class="no-hover"><i class="icon-edit standalone-icon"></i></a>
         <% end %>
         <% if can_do(association, @current_user, :delete) %>
-          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover" title="<%= t('delete_rubric', 'Delete Rubric') %>"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover" title="<%= t('delete_rubric', 'Delete Rubric') %>"><i class="icon-end standalone-icon"></i></a>
         <% end %>
       </span>
       <span class="details">
