@@ -154,14 +154,23 @@
   max-height: 225px
   &:last-child
     border-bottom: none
+.event-details-header
+  max-width: 460px
+  overflow: auto
+.event-details-content table
+  th[scope=row]
+    width: 55px
+  td
+    max-width: 395px
 .event-details-actual-context
   font-size: 0.8em
   font-style: italic
   color: #666
 .event-detail-overflow
-  height: 30px
+  min-height: 30px
+  max-height: 160px
   margin-bottom: 6px
-  overflow-y: scroll
+  overflow: auto
 
 .x-close-link
   padding-right: 5px
