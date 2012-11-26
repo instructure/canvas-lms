@@ -146,18 +146,15 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def index
     return context_index if @context
-    scope = @current_user.try(:current_groups)
+    @groups = @current_user.try(:current_groups)
+    # can't use #try, cause it's not defined on the association class,
+    # so it will try to load the association and call it on the resulting array'
+    @groups = @groups.with_each_shard({ :include => :group_category, :order => "groups.id ASC" }) if @groups
+    @groups ||= []
     respond_to do |format|
-      format.html do
-        @groups = scope || []
-      end
+      format.html {}
       format.json do
-        scope = if scope.present?
-          scope.scoped({ :include => :group_category, :order => "groups.id ASC" })
-        else
-          []
-        end
-        @groups = Api.paginate(scope, self, api_v1_current_user_groups_url)
+        @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
         render :json => @groups.map { |g| group_json(g, @current_user, session) }
       end
     end
@@ -712,6 +709,7 @@ class GroupsController < ApplicationController
     count_field = self_signup ? :create_group_count : :split_group_count
     count = params[:category][count_field].to_i
     count = 0 if count < 0
+    count = [count, Setting.get_cached('max_groups_in_new_category', '200').to_i].min
     count = potential_members.length if distribute_members && count > potential_members.length
     return if count.zero?
 

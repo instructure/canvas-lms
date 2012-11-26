@@ -220,7 +220,7 @@ describe CommunicationChannelsController do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         # not a full user session; just @current_user is set
-        assigns[:current_user] = @user
+        controller.instance_variable_set(:@current_user, @user)
         get 'confirm', :nonce => @cc.confirmation_code
         response.should be_success
         assigns[:pseudonym].should be_new_record

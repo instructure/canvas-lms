@@ -81,14 +81,7 @@ define([
   });
   
   $profile_table.find("#change_password_checkbox")
-    .click(function(){
-      //this is a hack because in ie it did not fire the "change" event untill you click away from the checkbox.
-      if (INST.browser.ie) {
-        $(this).triggerHandler('change');
-      }
-    })
     .change(function(event) {
-      event.preventDefault();
       if(!$(this).attr('checked')) {
         $profile_table.find(".change_password_row").hide().find(":password").val("");
       } else {

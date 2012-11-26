@@ -943,4 +943,14 @@ describe ConversationsController, :type => :integration do
       json[0]["id"].should eql batch1.id
     end
   end
+
+  describe "visibility inference" do
+    it "should not break with empty string as filter" do
+      # added for 1.9.3
+      json = api_call(:post, "/api/v1/conversations",
+              { :controller => 'conversations', :action => 'create', :format => 'json' },
+              { :recipients => [@bob.id], :body => 'Test Message', :filter => '' })
+      json.first['visible'].should be_true
+    end
+  end
 end

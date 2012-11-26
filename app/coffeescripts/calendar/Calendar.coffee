@@ -8,6 +8,7 @@ define [
   'i18n!calendar'
   'jquery'
   'underscore'
+  'compiled/userSettings'
   'compiled/util/hsvToRgb'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
@@ -22,7 +23,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, calendarDefaults) ->
+], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, calendarDefaults) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -219,6 +220,8 @@ define [
       if event.eventType == 'assignment' && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
+      if event.eventType == 'assignment'
+        element.find('.fc-event-time').html I18n.t('labels.due', 'due')
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
@@ -242,7 +245,9 @@ define [
         return
 
       # create a new dummy event
-      event = commonEventFactory(null, @contexts)
+      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
+      activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
+      event = commonEventFactory(null, activeContexts)
       event.allDay = allDay
       event.date = date
 
@@ -318,6 +323,11 @@ define [
 
     eventSaved: (event) =>
       event.removeClass 'event_pending'
+      # If we just saved a new event then the id field has changed from what it
+      # was in eventSaving. So we need to clear out the old _id that
+      # fullcalendar stores for itself because the id has changed.
+      # This is another reason to do a refetchEvents instead of just an update.
+      delete event._id
       @calendar.fullCalendar('refetchEvents')
       # We'd like to just add the event to the calendar rather than fetching,
       # but the save may be as a result of moving an event from being undated

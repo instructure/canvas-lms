@@ -104,10 +104,8 @@ class Course < ActiveRecord::Base
   has_many :student_view_enrollments, :class_name => 'StudentViewEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :participating_typical_users, :through => :typical_current_enrollments, :source => :user
 
-  has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content, :conditions => "content_tags.content_type = 'LearningOutcome'"
-  has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
-  has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
-  has_many :learning_outcome_groups, :as => :context
+  include LearningOutcomeContext
+
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
   has_many :users, :through => :enrollments, :source => :user, :uniq => true
@@ -408,12 +406,6 @@ class Course < ActiveRecord::Base
     user_ids_to_update_account_associations
   end
 
-  def has_outcomes
-    Rails.cache.fetch(['has_outcomes', self].cache_key) do
-      self.learning_outcomes.count > 0
-    end
-  end
-
   def update_account_associations
     Course.update_account_associations([self])
   end
@@ -474,6 +466,33 @@ class Course < ActiveRecord::Base
   named_scope :with_enrollments, lambda {
     { :conditions => ["exists (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"] }
   }
+  named_scope :without_enrollments, lambda {
+    { :conditions => ["NOT EXISTS (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"] }
+  }
+  named_scope :completed, lambda {
+    { :joins => :enrollment_term,
+      :conditions => ["courses.workflow_state = 'completed' or courses.conclude_at < ? or enrollment_terms.end_at < ?", Time.now.utc, Time.now.utc]
+    }
+  }
+  named_scope :not_completed, lambda {
+    { :joins => :enrollment_term,
+      :conditions => [%{courses.workflow_state <> 'completed' AND
+                        (courses.conclude_at IS NULL OR courses.conclude_at >= ?) AND
+                        (enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?)}, Time.now.utc, Time.now.utc]
+    }
+  }
+  named_scope :by_teachers, lambda{ |teacher_ids|
+    teacher_ids.empty? ? { :conditions => "1 = 0" } :
+    { :conditions => ["EXISTS (#{Enrollment.active.send(:construct_finder_sql, {:select => "1",
+        :conditions => ["enrollments.course_id = courses.id AND enrollments.type = 'TeacherEnrollment' AND enrollments.user_id IN (#{teacher_ids.join(',')})"]})})"]
+    }
+  }
+  named_scope :by_associated_accounts, lambda{ |account_ids|
+    account_ids.empty? ? { :conditions => "1 = 0" } :
+    { :conditions => ["EXISTS (#{CourseAccountAssociation.send(:construct_finder_sql, {:select => "1",
+        :conditions => ["course_account_associations.course_id = courses.id AND course_account_associations.account_id IN (#{account_ids.join(',')})"]})})"]
+    }
+  }
 
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
@@ -524,29 +543,48 @@ class Course < ActiveRecord::Base
     participating_instructors.restrict_to_sections(section_ids)
   end
 
-  def user_is_teacher?(user)
+  def user_is_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_is_teacher"].cache_key) do
+    Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
       user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
     end
   end
-  memoize :user_is_teacher?
+  memoize :user_is_instructor?
 
   def user_is_student?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
-      self.student_enrollments.find_by_user_id(user.id).present?
+    Rails.cache.fetch([self, user, "course_user_is_student"].cache_key) do
+      user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_student? }
     end
   end
   memoize :user_is_student?
 
-  def user_has_been_teacher?(user)
+  def user_has_been_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_teacher"].cache_key) do
-      self.teacher_enrollments.find_by_user_id(user.id).present?
+    Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
+      # active here is !deleted; it still includes concluded, etc.
+      self.instructor_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_teacher?
+  memoize :user_has_been_instructor?
+
+  def user_has_been_admin?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
+      # active here is !deleted; it still includes concluded, etc.
+      self.admin_enrollments.active.find_by_user_id(user.id).present?
+    end
+  end
+  memoize :user_has_been_admin?
+
+  def user_has_been_observer?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
+      # active here is !deleted; it still includes concluded, etc.
+      self.observer_enrollments.active.find_by_user_id(user.id).present?
+    end
+  end
+  memoize :user_has_been_observer?
 
   def user_has_been_student?(user)
     return unless user
@@ -555,6 +593,15 @@ class Course < ActiveRecord::Base
     end
   end
   memoize :user_has_been_student?
+
+  def user_has_no_enrollments?(user)
+    return unless user
+    Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
+      enrollments.find_by_user_id(user.id).nil?
+    end
+  end
+  memoize :user_has_no_enrollments?
+
 
   # Public: Determine if a group weighting scheme should be applied.
   #
@@ -894,7 +941,7 @@ class Course < ActiveRecord::Base
 
   set_policy do
     given { |user| self.available? && self.is_public }
-    can :read
+    can :read and can :read_outcomes
 
     RoleOverride.permissions.each do |permission, details|
       given {|user, session| (self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission)) && (!details[:if] || send(details[:if])) }
@@ -902,14 +949,14 @@ class Course < ActiveRecord::Base
     end
     
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state] == "pre_registered") && (self.available? || self.completed? || self.claimed? && hash[:is_admin]) }
-    can :read
+    can :read and can :read_outcomes
 
     given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
-    can :read
+    can :read and can :read_outcomes
 
     # Active students
     given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
-    can :read and can :participate_as_student and can :read_grades
+    can :read and can :participate_as_student and can :read_grades and can :read_outcomes
     
     given { |user| (self.available? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? && e.associated_user_id} }
     can :read_grades
@@ -919,7 +966,7 @@ class Course < ActiveRecord::Base
 
     # Active admins (Teacher/TA/Designer)
     given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view
+    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes
 
     # Teachers and Designers can delete/reset, but not TAs
     given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
@@ -929,15 +976,15 @@ class Course < ActiveRecord::Base
 
     # Student view student
     given { |user| user && user.fake_student? && user.cached_not_ended_enrollments.any?{ |e| e.course_id == self.id } }
-    can :read and can :participate_as_student and can :read_grades
+    can :read and can :participate_as_student and can :read_grades and can :read_outcomes
 
     # Prior users
     given { |user| (self.available? || self.completed?) && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
-    can :read
+    can :read and can :read_outcomes
 
     # Admin (Teacher/TA/Designer) of a concluded course
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.completed? }) }
-    can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view
+    can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view and can :read_outcomes
 
     given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? && e.completed? }) }
     can :read_user_notes and can :view_all_grades
@@ -948,11 +995,11 @@ class Course < ActiveRecord::Base
 
     # Student of a concluded course
     given { |user| (self.available? || self.completed?) && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
-    can :read and can :read_grades and can :read_forum
+    can :read and can :read_grades and can :read_forum and can :read_outcomes
 
     # Viewing as different role type
     given { |user, session| session && session["role_course_#{self.id}"] }
-    can :read
+    can :read and can :read_outcomes
 
     # Admin
     given { |user, session| self.account_membership_allows(user, session) }
@@ -962,7 +1009,7 @@ class Course < ActiveRecord::Base
     can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content
 
     given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
-    can :read
+    can :read and can :read_outcomes
 
     given { |user, session| !self.deleted? && self.sis_source_id && self.account_membership_allows(user, session, :manage_sis) }
     can :delete
@@ -1011,6 +1058,11 @@ class Course < ActiveRecord::Base
     end_at.try(:<, Time.now) || enrollment_term.end_at.try(:<, Time.now)
   end
 
+  def soft_conclude!
+    self.conclude_at = Time.now
+    self.restrict_enrollments_to_course_dates = true
+  end
+
   def state_sortable
     case state
     when :invited
@@ -1032,10 +1084,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def has_outcomes?
-    self.learning_outcomes.count > 0
-  end
-
   def account_chain
     self.account.account_chain
   end
@@ -1052,10 +1100,17 @@ class Course < ActiveRecord::Base
   memoize :institution_name
 
   def account_users_for(user)
+    return [] unless user
     @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id: nil }.compact
     @account_users ||= {}
-    @account_users[user] ||= AccountUser.find(:all, :conditions => { :account_id => @associated_account_ids, :user_id => user.id }) if user
-    @account_users[user] ||= nil
+    @account_users[user] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
+      if account_chain_ids == [Account.site_admin.id]
+        Account.site_admin.account_users_for(user)
+      else
+        AccountUser.find(:all, :conditions => { :account_id => account_chain_ids, :user_id => user.id })
+      end
+    end
+    @account_users[user] ||= []
     @account_users[user]
   end
 
@@ -1767,7 +1822,7 @@ class Course < ActiveRecord::Base
       end
     end
 
-    migration.fast_update_progress(30)
+    migration.fast_update_progress(31)
     question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
     Group.process_migration(data, migration); migration.fast_update_progress(36)
     LearningOutcome.process_migration(data, migration); migration.fast_update_progress(37)
@@ -1793,8 +1848,15 @@ class Course < ActiveRecord::Base
     CalendarEvent.process_migration(data, migration);migration.fast_update_progress(90)
     WikiPage.process_migration_course_outline(data, migration);migration.fast_update_progress(95)
 
-    if !migration.copy_options || migration.is_set?(migration.copy_options[:everything]) || migration.is_set?(migration.copy_options[:all_course_settings])
+    everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
+    if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
       import_settings_from_migration(data, migration); migration.fast_update_progress(96)
+    end
+
+    syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body]
+    if syllabus_should_be_added
+      syllabus_body = data[:course][:syllabus_body] if data[:course]
+      import_syllabus_from_migration(syllabus_body) if syllabus_body
     end
 
     begin
@@ -1847,10 +1909,13 @@ class Course < ActiveRecord::Base
   attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash, :content_migration
   attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :assignment_group_no_drop_assignments
 
+  def import_syllabus_from_migration(syllabus_body)
+    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self) 
+  end
+
   def import_settings_from_migration(data, migration)
     return unless data[:course]
     settings = data[:course]
-    self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
     if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
       self.tab_configuration = settings[:tab_configuration]
     end
@@ -2152,18 +2217,18 @@ class Course < ActiveRecord::Base
       end
     end
 
-    orig_root = LearningOutcomeGroup.default_for(course)
-    new_root = LearningOutcomeGroup.default_for(self)
-    orig_root.sorted_content.each do |item|
+    course.root_outcome_group.child_outcome_groups.each do |group|
       course_import.tick(85) if course_import
       use_outcome = lambda {|lo| bool_res(options[:everything] ) || bool_res(options[:all_outcomes] ) || bool_res(options[lo.asset_string.to_sym] ) }
-      if item.is_a? LearningOutcome
-        next unless use_outcome[item]
-        lo = item.clone_for(self, new_root)
+      f = group.clone_for(self, root_outcome_group, use_outcome)
+      added_items << f if f
+    end
+
+    course.root_outcome_group.child_outcome_links.each do |link|
+      course_import.tick(85) if course_import
+      if bool_res(options[:everything]) || bool_res(options[:all_outcomes]) || bool_res(options[link.content.asset_string.to_sym])
+        lo = link.content.clone_for(self, root_outcome_group)
         added_items << lo
-      else
-        f = item.clone_for(self, new_root, use_outcome)
-        added_items << f if f
       end
     end
 
@@ -2340,23 +2405,6 @@ class Course < ActiveRecord::Base
   def self.serialization_excludes; [:uuid]; end
 
 
-  def page_views_by_day(options={})
-    conditions = {
-      :context_id => self.id,
-      :context_type => self.class.to_s
-    }
-    if options[:dates]
-      conditions.merge!({
-        :created_at => (options[:dates].first)..(options[:dates].last)
-      })
-    end
-    PageView.count(
-      :group => "date(created_at)",
-      :conditions => conditions
-    )
-  end
-  memoize :page_views_by_day
-
   def section_visibilities_for(user)
     Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
       Enrollment.find(:all, :select => "course_section_id, limit_privileges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_privileges_to_course_section => e.limit_privileges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id, :admin => e.admin?} }
@@ -2470,19 +2518,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def page_view_data(options={})
-    # if they dont supply a date range then use the first day returned by page_views_by_day (which should be the first day that there is pageview statistics gathered)
-    dates = options[:dates].nil? ? [page_views_by_day.sort.first.first.to_datetime, Time.now] : options[:dates]
-    days = []
-    dates.first.to_datetime.upto(dates.last) do |d|
-      # this * 1000 part is because the Highcharts expects something like what Date.UTC(2006, 2, 28) would give you,
-      # which is MILLISECONDS from the unix epoch, ruby's to_f gives you SECONDS since then.
-      days << [ (d.at_beginning_of_day.to_f * 1000).to_i , page_views_by_day[d.to_date.to_s].to_i ]
-    end
-    days
-  end
-  memoize :page_view_data
-
   def unpublished?
     self.created? || self.claimed?
   end
@@ -2555,12 +2590,13 @@ class Course < ActiveRecord::Base
   def tabs_available(user=nil, opts={})
     # make sure t() is called before we switch to the slave, in case we update the user's selected locale in the process
     default_tabs = Course.default_tabs
+    opts.reverse_merge!(:include_external => true)
 
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
       tabs = self.tab_configuration.compact
       settings_tab = default_tabs[-1]
-      external_tabs = external_tool_tabs(opts)
+      external_tabs = (opts[:include_external] && external_tool_tabs(opts)) || []
       tabs = tabs.map do |tab|
         default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
         if default_tab
@@ -2637,7 +2673,11 @@ class Course < ActiveRecord::Base
           if self.grants_right?(user, nil, :read_as_admin)
             tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) }
           elsif !self.grants_right?(user, nil, :participate_as_student)
-            tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) }
+            tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT, TAB_OUTCOMES].include?(t[:id]) }
+          end
+
+          unless discussion_topics.new.grants_right?(user, nil, :read)
+            tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           end
 
           # remove hidden tabs from students

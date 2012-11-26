@@ -97,12 +97,6 @@ ActionController::Routing::Routes.draw do |map|
     context.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
   end
 
-  def add_announcements(context)
-    context.resources :announcements
-    context.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
-    context.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
-  end
-
   def add_chat(context)
     context.resources :chats
     context.chat 'chat', :controller => 'context', :action => 'chat'
@@ -110,8 +104,15 @@ ActionController::Routing::Routes.draw do |map|
     context.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
   end
 
+  def add_announcements(context)
+    context.resources :announcements
+    context.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
+    context.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
+  end
+
   def add_discussions(context)
-    context.resources :discussion_topics, :only => [:index, :show, :new, :edit, :destroy]
+    context.resources :discussion_topics, :only => [:index, :new, :show, :edit, :destroy]
+    context.map 'discussion_topics/:id/:extras', :extras => /.+/, :controller => :discussion_topics, :action => :show
     context.resources :discussion_entries
   end
 
@@ -277,8 +278,6 @@ ActionController::Routing::Routes.draw do |map|
       association.resources :rubric_assessments, :as => 'assessments'
     end
     course.user_outcomes_results 'outcomes/users/:user_id', :controller => 'outcomes', :action => 'user_outcome_results'
-    course.outcomes_for_asset "outcomes/assets/:asset_string", :controller => 'outcomes', :action => 'outcomes_for_asset', :conditions => {:method => :get}
-    course.update_outcomes_for_asset "outcomes/assets/:asset_string", :controller => 'outcomes', :action => 'update_outcomes_for_asset', :conditions => {:method => :post}
     course.resources :outcomes, :collection => {:list => :get, :add_outcome => :post} do |outcome|
       outcome.reorder_alignments 'alignments/reorder', :controller => 'outcomes', :action => 'reorder_alignments', :conditions => {:method => :post}
       outcome.alignment_redirect 'alignments/:id', :controller => 'outcomes', :action => 'alignment_redirect', :conditions => {:method => :get}
@@ -637,7 +636,7 @@ ActionController::Routing::Routes.draw do |map|
   # Routes for course exports
   map.connect 'xsd/:version.xsd', :controller => 'content_exports', :action => 'xml_schema'
 
-  map.resources :jobs, :only => %w(index), :collection => %w[batch_update]
+  map.resources :jobs, :only => %w(index show), :collection => %w[batch_update]
 
   Jammit::Routes.draw(map) if defined?(Jammit)
 
@@ -663,6 +662,11 @@ ActionController::Routing::Routes.draw do |map|
       courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
     end
 
+    api.with_options(:controller => :tabs) do |tabs|
+      tabs.get "courses/:course_id/tabs", :action => :index, :path_name => 'course_tabs'
+      tabs.get "groups/:group_id/tabs", :action => :index, :path_name => 'group_tabs'
+    end
+
     api.with_options(:controller => :sections) do |sections|
       sections.get 'courses/:course_id/sections', :action => :index, :path_name => 'course_sections'
       sections.get 'courses/:course_id/sections/:id', :action => :show, :path_name => 'course_section'
@@ -686,6 +690,16 @@ ActionController::Routing::Routes.draw do |map|
       assignments.post 'courses/:course_id/assignments', :action => :create
       assignments.put 'courses/:course_id/assignments/:id', :action => :update
       assignments.delete 'courses/:course_id/assignments/:id', :action => :destroy, :controller => :assignments
+    end
+
+    api.with_options(:controller => :assignment_overrides) do |overrides|
+      overrides.get 'courses/:course_id/assignments/:assignment_id/overrides', :action => :index
+      overrides.post 'courses/:course_id/assignments/:assignment_id/overrides', :action => :create
+      overrides.get 'courses/:course_id/assignments/:assignment_id/overrides/:id', :action => :show, :path_name => 'assignment_override'
+      overrides.put 'courses/:course_id/assignments/:assignment_id/overrides/:id', :action => :update
+      overrides.delete 'courses/:course_id/assignments/:assignment_id/overrides/:id', :action => :destroy
+      overrides.get 'sections/:course_section_id/assignments/:assignment_id/override', :action => :section_alias
+      overrides.get 'groups/:group_id/assignments/:assignment_id/override', :action => :group_alias
     end
 
     api.with_options(:controller => :submissions_api) do |submissions|
@@ -973,6 +987,40 @@ ActionController::Routing::Routes.draw do |map|
       context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
       context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
     end
+
+    api.with_options(:controller => :quizzes_api) do |quizzes|
+      quizzes.get "courses/:course_id/quizzes", :action => :index, :path_name => 'course_quizzes'
+    end
+
+    api.with_options(:controller => :outcome_groups_api) do |outcome_groups|
+      def og_routes(route_object, context)
+        prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
+        route_object.get "#{prefix}/root_outcome_group", :action => :redirect, :path_name => "#{context}_redirect"
+        route_object.get "#{prefix}/outcome_groups/account_chain", :action => :account_chain, :path_name => "#{context}_account_chain"
+        route_object.get "#{prefix}/outcome_groups/:id", :action => :show, :path_name => "#{context}_outcome_group"
+        route_object.put "#{prefix}/outcome_groups/:id", :action => :update
+        route_object.delete "#{prefix}/outcome_groups/:id", :action => :destroy
+        route_object.get "#{prefix}/outcome_groups/:id/outcomes", :action => :outcomes, :path_name => "#{context}_outcome_group_outcomes"
+        route_object.get "#{prefix}/outcome_groups/:id/available_outcomes", :action => :available_outcomes, :path_name => "#{context}_outcome_group_available_outcomes"
+        route_object.post "#{prefix}/outcome_groups/:id/outcomes", :action => :link
+        route_object.put "#{prefix}/outcome_groups/:id/outcomes/:outcome_id", :action => :link, :path_name => "#{context}_outcome_link"
+        route_object.delete "#{prefix}/outcome_groups/:id/outcomes/:outcome_id", :action => :unlink
+        route_object.get "#{prefix}/outcome_groups/:id/subgroups", :action => :subgroups, :path_name => "#{context}_outcome_group_subgroups"
+        route_object.post "#{prefix}/outcome_groups/:id/subgroups", :action => :create
+        route_object.post "#{prefix}/outcome_groups/:id/import", :action => :import, :path_name => "#{context}_outcome_group_import"
+        route_object.post "#{prefix}/outcome_groups/:id/batch", :action => :batch, :path_name => "#{context}_outcome_group_batch"
+      end
+
+      og_routes(outcome_groups, 'global')
+      og_routes(outcome_groups, 'account')
+      og_routes(outcome_groups, 'course')
+    end
+
+    api.with_options(:controller => :outcomes_api) do |outcomes|
+      outcomes.get "outcomes/:id", :action => :show, :path_name => "outcome"
+      outcomes.put "outcomes/:id", :action => :update
+      outcomes.delete "outcomes/:id", :action => :destroy
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
@@ -1014,7 +1062,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :rubrics do |rubric|
     rubric.resources :rubric_assessments, :as => 'assessments'
   end
-  map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
 
   # commenting out all collection urls until collections are live

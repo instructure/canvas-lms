@@ -51,7 +51,7 @@ class PseudonymsController < ApplicationController
         scope,
         self, api_v1_account_pseudonyms_url)
     else
-      scope = @user.all_pseudonyms(:conditions => { :workflow_state => 'active' })
+      scope = @user.all_active_pseudonyms
       @pseudonyms = Api.paginate(scope, self, api_v1_user_pseudonyms_url)
     end
 
@@ -225,6 +225,7 @@ class PseudonymsController < ApplicationController
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])
       return unless @user = @pseudonym.user
+      params[:login][:password_confirmation] = params[:login][:password]
       params[:pseudonym]  = params[:login]
     else
       return unless get_user
@@ -289,7 +290,7 @@ class PseudonymsController < ApplicationController
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     @pseudonym = Pseudonym.active.find(params[:id])
     raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
-    if @user.all_pseudonyms(:conditions => { :workflow_state => 'active' }).length < 2
+    if @user.all_active_pseudonyms.length < 2
       @pseudonym.errors.add_to_base(t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors.to_json, :status => :bad_request
     elsif @pseudonym.sis_user_id && !@pseudonym.account.grants_right?(@current_user, session, :manage_sis)

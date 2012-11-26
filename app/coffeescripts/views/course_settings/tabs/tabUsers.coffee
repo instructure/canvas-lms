@@ -11,7 +11,7 @@ define [
     event.preventDefault()
     $enrollUsersForm.show()
     $("html,body").scrollTo $enrollUsersForm
-    $enrollUsersForm.find("textarea").focus().select()
+    $enrollUsersForm.find("#enrollment_type").focus().select()
 
   # override adding to the users lists to work with UserCollectionView
   UL.addUserToList = (enrollment) ->

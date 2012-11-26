@@ -17,6 +17,7 @@ describe "collaborations" do
   end
 
   def go_to_collaboration_and_validate(urls = %W(/courses/#{@course.id}/collaborations), wizard_visible = true, execute_script = false)
+    urls = [urls] unless (urls.is_a? Array)
     urls.each { |url| get url }
     wait_for_ajaximations
     driver.execute_script "window.confirm = function(msg) { return true; }" if execute_script

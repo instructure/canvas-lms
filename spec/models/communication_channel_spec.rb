@@ -326,4 +326,62 @@ describe CommunicationChannel do
     @cc.destroy.should be_false
     @cc.reload.should be_active
   end
+
+  describe "merge candidates" do
+    it "should return users with a matching e-mail address" do
+      user1 = User.create!
+      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
+
+      user2 = User.create!
+      cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
+      cc2.confirm!
+      Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
+
+      cc1.merge_candidates.should == [user2]
+    end
+
+    it "should not return users without an active pseudonym" do
+      user1 = User.create!
+      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
+
+      user2 = User.create!
+      cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
+      cc2.confirm!
+
+      cc1.merge_candidates.should == []
+    end
+
+    it "should not return users that match on an unconfirmed cc" do
+      user1 = User.create!
+      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
+
+      user2 = User.create!
+      cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
+      Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
+
+      cc1.merge_candidates.should == []
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should find a match on another shard" do
+        Enrollment.stubs(:cross_shard_invitations?).returns(true)
+        user1 = User.create!
+        cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
+
+        @shard1.activate do
+          @user2 = User.create!
+          cc2 = @user2.communication_channels.create!(:path => 'jt@instructure.com')
+          cc2.confirm!
+          account = Account.create!
+          account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
+        end
+
+        pending if CommunicationChannel.associated_shards('jt@instructure.com') == [Shard.default]
+
+        cc1.merge_candidates.should == [@user2]
+      end
+    end
+  end
 end

@@ -3,6 +3,7 @@ require [
   'quiz_show'
   'quiz_rubric'
   'message_students'
+  'compiled/tinymce'
 ], (inputMethods) ->
   $ ->
     inputMethods.setWidths()

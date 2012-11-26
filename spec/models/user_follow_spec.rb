@@ -112,7 +112,7 @@ describe "UserFollow" do
       it_should_behave_like "sharded user following"
 
       before do
-        @uf = @user1.user_follows.create!(:followed_item => @collection)
+        @uf = UserFollow.create_follow(@user1, @collection)
         @uf.shard.should == @user1.shard
       end
     end
@@ -121,7 +121,7 @@ describe "UserFollow" do
       it_should_behave_like "sharded user following"
 
       before do
-        @uf = @collection.shard.activate { UserFollow.create!(:following_user => @user1, :followed_item => @collection) }
+        @uf = @collection.shard.activate { UserFollow.create_follow(@user1, @collection) }
         @uf.shard.should == @user1.shard
       end
     end
@@ -130,7 +130,7 @@ describe "UserFollow" do
       it_should_behave_like "sharded user following"
 
       before do
-        @uf = @shard2.activate { UserFollow.create!(:following_user => @user1, :followed_item => @collection) }
+        @uf = @shard2.activate { UserFollow.create_follow(@user1, @collection) }
         @uf.shard.should == @user1.shard
       end
     end

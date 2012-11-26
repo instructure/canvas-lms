@@ -34,9 +34,11 @@ class UserFollow < ActiveRecord::Base
   # while creating the complementary record on the other shard.
   def self.create_follow(following_user, followed_item, complementary_record = false)
     search_shard = (complementary_record ? followed_item : following_user).shard
-    UserFollow.unique_constraint_retry do
-      user_follow = search_shard.activate { UserFollow.first(:conditions => { :following_user_id => following_user.id, :followed_item_id => followed_item.id, :followed_item_type => followed_item.class.name }) }
-      user_follow ||= UserFollow.create(:following_user => following_user, :followed_item => followed_item) { |uf| uf.complementary_record = complementary_record }
+    search_shard.activate do
+      UserFollow.unique_constraint_retry do
+        user_follow = UserFollow.first(:conditions => { :following_user_id => following_user.id, :followed_item_id => followed_item.id, :followed_item_type => followed_item.class.name })
+        user_follow ||= UserFollow.create(:following_user => following_user, :followed_item => followed_item)
+      end
     end
   end
 
@@ -62,15 +64,6 @@ class UserFollow < ActiveRecord::Base
     return true
   end
 
-  # we force the record to be created on the same shard as the following_user
-  # then the after_create below creates a duplicate, complementary record on
-  # the shard of the followed_item, if it's on a different shard
-  #
-  # this way both associations work as expected
-  set_shard_override do |record|
-    record.following_user.shard unless record.complementary_record?
-  end
-
   after_create :create_complementary_record
   attr_writer :complementary_record
 
@@ -78,18 +71,12 @@ class UserFollow < ActiveRecord::Base
   # item, and this UserFollow is the secondary copy that's on the followed
   # item's shard
   def complementary_record?
-    if new_record?
-      @complementary_record
-    else
-      self.shard != following_user.shard
-    end
+    self.shard != following_user.shard
   end
 
   def create_complementary_record
     if !complementary_record? && followed_item.shard != following_user.shard
-      followed_item.shard.activate do
-        UserFollow.create_follow(following_user, followed_item, true)
-      end
+      UserFollow.create_follow(following_user, followed_item, true)
     end
     true
   end

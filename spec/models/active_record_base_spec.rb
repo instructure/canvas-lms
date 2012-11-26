@@ -33,6 +33,7 @@ describe ActiveRecord::Base do
     it "should mask columns marked as dropped from column info methods" do
       User.columns.any? { |c| c.name == 'name' }.should be_true
       User.column_names.should be_include('name')
+      u = User.create!(:name => 'my name')
       # if we ever actually drop the name column, this spec will fail on the line
       # above, so it's all good
       ActiveRecord::Base.send(:remove_const, :DROPPED_COLUMNS)
@@ -40,6 +41,10 @@ describe ActiveRecord::Base do
       User.reset_column_information
       User.columns.any? { |c| c.name == 'name' }.should be_false
       User.column_names.should_not be_include('name')
+
+      # load from the db should hide the attribute
+      u = User.find(u.id)
+      u.attributes.keys.include?('name').should be_false
     end
 
     it "should only drop columns from the specific table specified" do

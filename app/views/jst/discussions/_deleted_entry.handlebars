@@ -1,5 +1,8 @@
-<header class="{{#if hideRepliesOnCollapse}}admin-link-hover-area{{/if}} discussion-section {{read_state}}" data-event="toggleCollapsed">
+<header class="entry-header discussion-section admin-link-hover-area {{read_state}} clearfix {{#if collapsable}}collapsable{{/if}}" {{#if collapsable}}data-event="toggleCollapsed"{{/if}}>
   <div class="discussion-header-content right-of-avatar">
+    <div class="discussion-header-right">
+      <div class="headerBadges show-if-collapsed"></div>
+    </div>
     <h1 class="discussion-title">{{#t "deleted"}}This entry has been deleted{{/t}}</h1>
   </div>
 </header>

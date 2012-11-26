@@ -19,12 +19,13 @@
 module Canvas::AccountReports
   class GradeReports
     include Api
+    include Canvas::ReportHelpers::DateHelper
 
     def initialize(account_report)
       @account_report = account_report
       @account = @account_report.account
       @domain_root_account = @account.root_account
-      @term = api_find(@account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.parameters && @account_report.parameters["enrollment_term"]
+      @term = api_find(@account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.parameters && @account_report.parameters["enrollment_term"].presence
     end
 
     # retrieve the list of students for all active courses
@@ -56,17 +57,17 @@ module Canvas::AccountReports
           courses.each do |course|
             course.assignments.each do |assignment|
               submission = student_submissions.detect{|s| s.assignment_id == assignment.id }
-              assignment.learning_outcome_tags.each do |outcome_tag|
-                outcome = outcome_tag.learning_outcome
+              assignment.learning_outcome_alignments.each do |alignment|
+                outcome = alignment.learning_outcome
                 next unless outcome.context == @account
                 outcome_found = true
-                outcome_result = outcome_tag.learning_outcome_results.find_by_user_id(student.id)
+                outcome_result = alignment.learning_outcome_results.find_by_user_id(student.id)
                 arr = []
                 arr << student.sortable_name
                 arr << student.id
                 arr << assignment.title
                 arr << assignment.id
-                arr << (submission ? (submission.submitted_at.iso8601 rescue nil) : nil)
+                arr << (submission ? (default_timezone_format(submission.submitted_at)) : nil)
                 arr << (submission ? (submission.score rescue nil) : nil)
                 arr << outcome.short_description
                 arr << outcome.id

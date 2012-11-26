@@ -18,9 +18,9 @@
       <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide"> <%= t 'links.faculty_journal', "Faculty Journal for %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if @context.is_a?(Course)%>
-      <% if @context.user_is_teacher?(@user) && can_do(@user, @current_user, :view_statistics) %>
+      <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :view_statistics) %>
         <%= link_to(t('links.teacher_activity', 'Student Interactions Report for %{user}', :user => context_user_name(@context, @user)), user_course_teacher_activity_url(@user, @context), :class => 'button button-sidebar-wide') %>
-      <% elsif @context.user_has_been_student?(@user) && @context.user_is_teacher?(@current_user) && can_do(@context, @current_user, :read_reports) %>
+      <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
         <%= link_to(t('links.student_teacher_activity', 'Your Interactions Report with %{user}', :user => context_user_name(@context, @user)), user_student_teacher_activity_url(@current_user, @user), :class => 'button button-sidebar-wide') %>
       <% end %>
     <% end %>

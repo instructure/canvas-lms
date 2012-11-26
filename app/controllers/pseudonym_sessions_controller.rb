@@ -114,7 +114,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def maybe_render_mobile_login(status = nil)
-    if request.user_agent.to_s =~ /ipod|iphone/i
+    if request.user_agent.to_s =~ /ipod|iphone|Android/i
       @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
       @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
       @shared_js_vars = {

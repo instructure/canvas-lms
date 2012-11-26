@@ -66,13 +66,14 @@ describe "context_modules" do
       #attach 1 assignment to module 1 and 2 assignments to module 2
       @tag_1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
       modules[0].completion_requirements = {@tag_1.id => {:type => 'must_view'}}
+      modules[0].save!
+      modules[0].completion_requirements.to_s.should include_text("must_view")
 
       modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
       @tag_3 = modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
       modules[1].completion_requirements = {@tag_3.id => {:type => 'must_submit'}}
-
-      modules[0].save!
       modules[1].save!
+      modules[1].completion_requirements.to_s.should include_text("must_submit")
 
       get "/courses/#{@course.id}/modules"
 

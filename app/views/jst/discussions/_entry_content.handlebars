@@ -1,18 +1,14 @@
-<header class="discussion-section admin-link-hover-area {{read_state}} clearfix" data-event="toggleCollapsed">
-  <div class="discussion-read-state tooltip">
-    <span class="tooltip_wrap unread">
-      <span class="tooltip_text">{{#t "unread"}}Unread{{/t}}</span>
-    </span>
-    <span class="tooltip_wrap just_read">
-      <span class="tooltip_text">{{#t "just_read"}}Just Read{{/t}}</span>
-    </span>
-  </div>
+<header class="entry-header discussion-section admin-link-hover-area clearfix {{#if collapsable}}collapsable{{/if}}" {{#if collapsable}}data-event="toggleCollapsed"{{/if}}>
   {{>avatar author}}
   <div class="discussion-header-content right-of-avatar">
-    <div class="hide-if-collapsed admin-links">
-      <button class="al-trigger ui-button" data-event="openMenu"><span class="al-trigger-inner">{{#t "manage_discussion_entry"}}Manage Discussion Entry{{/t}}</span></button>
+    <div class="admin-links hide-if-collapsed">
+      <button class="al-trigger ui-button"><span class="al-trigger-inner">{{#t "manage_discussion_entry"}}Manage Discussion Entry{{/t}}</span></button>
       <ul class="al-options">
-        <li><a href="#{{#if parent_cid}}{{parent_cid}}{{else}}content{{/if}}"><span class="ui-icon ui-icon-arrowreturnthick-1-w" />{{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
+        {{#if parent_id}}
+          <li><a data-pushstate href="#entry-{{parent_id}}"><span class="ui-icon ui-icon-arrowreturnthick-1-w" />{{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
+        {{else}}
+          <li><a href="#content"><span class="ui-icon ui-icon-arrowreturnthick-1-w" />{{#t "go_to_topic"}}Go To Topic{{/t}}</a></li>
+        {{/if}}
         {{#if canModerate}}
           <li><a data-event="edit" href="#"><span class="ui-icon ui-icon-pencil" />{{#t "edit"}}Edit{{/t}}</a></li>
           <li><a data-event="remove" href="#"><span class="ui-icon ui-icon-trash" />{{#t "delete"}}Delete{{/t}}</a></li>
@@ -23,15 +19,16 @@
       </ul>
     </div>
     <div class="discussion-header-right">
-      <div class="discussion-pubdate">{{friendlyDatetime updated_at pubdate=true}}</div>
+      <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime updated_at pubdate=true}}</div>
+      <div class="headerBadges show-if-collapsed"></div>
     </div>
     <h2 class="discussion-title">
-      <a class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
+      <a {{#if author.html_url}}href="{{author.html_url}}" data-bypass{{/if}} class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
     </h2>
-    <h1 class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</h1>
+    <h1 class="show-if-collapsed discussion-subtitle summary ellipsis">{{summary}}</h1> 
   </div>
 </header>
-<div class="discussion-section hide-if-collapsed message_wrapper">
+<div class="discussion-section message_wrapper hide-if-collapsed">
   <span class="message-notification" data-bind="messageNotification"></span>
   <div data-bind="message" class="message user_content">{{convertApiUserContent message}}</div>
   {{#if editor}}
@@ -45,6 +42,9 @@
     </div>
   {{/if}}
 </div>
-{{#if canReply}}
-  {{>[discussions/reply_form]}}
-{{/if}}
+<div class="entry-controls hide-if-collapsed">
+  {{#if allowsThreadedReplies}}
+    {{>[discussions/reply_form]}}
+  {{/if}}
+</div>
+

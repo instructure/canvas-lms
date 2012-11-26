@@ -20,6 +20,8 @@ describe "submissions" do
 
     it "should not break when you open and close the media comment dialog" do
       stub_kaltura
+      pending("failing because it is dependant on an external kaltura system")
+
       create_assignment_and_go_to_page('media_recording')
 
       f(".submit_assignment_link").click
@@ -46,6 +48,8 @@ describe "submissions" do
 
     it "should not allow blank media submission" do
       stub_kaltura
+      pending("failing because it is dependant on an external kaltura system")
+
       create_assignment_and_go_to_page 'media_recording'
       f(".submit_assignment_link").click
       f('#media_comment_submit_button').attribute('disabled').should == 'true'

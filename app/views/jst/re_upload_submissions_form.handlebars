@@ -1,4 +1,5 @@
 <form action="." enctype="multipart/form-data" id="re_upload_submissions_form" method="post" style="display: none;" title="{{#t "reupload_submission_files"}}Re-Upload Submission Files{{/t}}">
+  <input type="hidden" name='authenticity_token' value="{{authenticityToken}}">
   <p>
     {{#t "upload_info"}}
       If you made changes to the student submission files you downloaded

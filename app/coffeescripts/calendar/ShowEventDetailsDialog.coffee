@@ -34,7 +34,7 @@ define [
 
       url = event.object.url
       # We can't delete assignments via the synthetic calendar_event
-      if event.object.assignment
+      if event.assignment
         url = $.replaceTags(@event.deleteURL, 'id', @event.object.id)
 
       $("<div />").confirmDelete

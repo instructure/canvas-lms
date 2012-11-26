@@ -41,7 +41,7 @@ class Assignment < ActiveRecord::Base
   has_one :quiz
   belongs_to :assignment_group
   has_one :discussion_topic, :conditions => ['discussion_topics.root_topic_id IS NULL'], :order => 'created_at'
-  has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+  has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_one :rubric_association, :as => :association, :conditions => ['rubric_associations.purpose = ?', "grading"], :order => :created_at, :include => :rubric
   has_one :rubric, :through => :rubric_association
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ['enrollments.workflow_state = ?', 'active']
@@ -49,12 +49,12 @@ class Assignment < ActiveRecord::Base
   belongs_to :cloned_item
   belongs_to :grading_standard
   belongs_to :group_category
-  has_many :assignment_reminders, :dependent => :destroy
   has_many :assignment_overrides, :dependent => :destroy
   has_many :active_assignment_overrides, :class_name => 'AssignmentOverride', :conditions => {:workflow_state => 'active'}
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
+  validates_associated :assignment_overrides
   accepts_nested_attributes_for :external_tool_tag, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
@@ -68,6 +68,13 @@ class Assignment < ActiveRecord::Base
     else
       assignment.external_tool_tag = nil
     end
+  end
+
+  # create a shim for plugins that use the old association name. this is
+  # TEMPORARY. the plugins should update to use the new association name, and
+  # once they're updated, this shim removed. DO NOT USE in new code.
+  def learning_outcome_tags
+    learning_outcome_alignments
   end
 
   def external_tool?
@@ -121,7 +128,6 @@ class Assignment < ActiveRecord::Base
                 :process_if_topic
 
   after_save    :update_grades_if_details_changed,
-                :generate_reminders_if_changed,
                 :touch_assignment_group,
                 :touch_context,
                 :update_grading_standard,
@@ -155,10 +161,137 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  # returns two values indicating which due dates for this assignment apply
+  # and/or are visible to the user.
+  #
+  # the first is the due date as it applies to the user as a student, if any
+  # (nil if the user has no student enrollment(s) in the assignment's course)
+  #
+  # the second is a list of due dates a they apply to users, sections, or
+  # groups visible to the user as an admin (nil if the user has no
+  # admin/observer enrollment(s) in the assignment's course)
+  #
+  # in both cases, "due dates" is a hash with due_at (full timestamp), all_day
+  # flag, and all_day_date. for the "as an admin" list, each due date from
+  # an override will also have a 'title' key to identify which subset of the
+  # course is affected by that due date, and an 'override' key referencing the
+  # override itself. for the original due date, it will instead have a 'base'
+  # flag (value true).
+  def due_dates_for(user)
+    as_student, as_admin = nil, nil
+    return nil, nil if context.nil?
+
+    if context.user_has_been_student?(user)
+      as_student = self.overridden_for(user).due_date_hash
+    end
+
+    if context.user_has_been_admin?(user)
+      as_admin = due_dates_visible_to(user)
+
+    elsif context.user_has_been_observer?(user)
+      as_admin = observed_student_due_dates(user).uniq
+
+      if as_admin.empty?
+        as_admin = [self.overridden_for(user).due_date_hash]
+      end
+
+    elsif context.user_has_no_enrollments?(user)
+      as_admin = all_due_dates
+    end
+
+    return as_student, as_admin
+  end
+
+  def all_due_dates
+    all_dates = assignment_overrides.overriding_due_at.map(&:as_hash)
+    all_dates << due_date_hash.merge(:base => true)
+  end
+
+  def due_dates_visible_to(user)
+    # Overrides
+    overrides = overrides_visible_to(user).overriding_due_at
+    list = overrides.map(&:as_hash)
+
+    # Base
+    list << self.due_date_hash.merge(:base => true)
+  end
+
+  def observed_student_due_dates(user)
+    ObserverEnrollment.observed_students(context, user).map do |student, enrollments|
+      self.overridden_for(student).due_date_hash
+    end
+  end
+
+  def due_date_hash
+    { :due_at => due_at,
+      :all_day => all_day,
+      :all_day_date => all_day_date }
+  end
+
+  # like due_dates_for, but for unlock_at values instead. for consistency, each
+  # unlock_at is still represented by a hash, even though the "as a student"
+  # value will only have one key.
+  def unlock_ats_for(user)
+    as_student, as_instructor = nil, nil
+
+    if context.user_has_been_student?(user)
+      overridden = self.overridden_for(user)
+      as_student = { :unlock_at => overridden.unlock_at }
+    end
+
+    if context.user_has_been_instructor?(user)
+      overrides = self.overrides_visible_to(user).overriding_unlock_at
+
+      as_instructor = overrides.map do |override|
+        {
+          :title => override.title,
+          :unlock_at => override.unlock_at,
+          :override => override
+        }
+      end
+
+      as_instructor << {
+        :base => true,
+        :unlock_at => self.unlock_at
+      }
+    end
+
+    return as_student, as_instructor
+  end
+
+  # like unlock_ats_for, but for lock_at values instead.
+  def lock_ats_for(user)
+    as_student, as_instructor = nil, nil
+
+    if context.user_has_been_student?(user)
+      overridden = self.overridden_for(user)
+      as_student = { :lock_at => overridden.lock_at }
+    end
+
+    if context.user_has_been_instructor?(user)
+      overrides = self.overrides_visible_to(user).overriding_lock_at
+
+      as_instructor = overrides.map do |override|
+        {
+          :title => override.title,
+          :lock_at => override.lock_at,
+          :override => override
+        }
+      end
+
+      as_instructor << {
+        :base => true,
+        :lock_at => self.lock_at
+      }
+    end
+
+    return as_student, as_instructor
+  end
+
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
     if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
       # handle if it has already come due, but has not yet been auto_peer_reviewed
-      if due_at && due_at <= Time.now
+      if overdue?
         # do_auto_peer_review
       elsif due_at
         self.send_later_enqueue_args(:do_auto_peer_review, {
@@ -171,7 +304,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def do_auto_peer_review
-    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at && due_at <= Time.now
+    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && overdue?
   end
 
   def touch_assignment_group
@@ -355,7 +488,7 @@ class Assignment < ActiveRecord::Base
       quiz.saved_by = :assignment
       quiz.save
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
-      topic = self.discussion_topic || self.context.discussion_topics.build
+      topic = self.discussion_topic || self.context.discussion_topics.build(:user => @updating_user)
       topic.assignment_id = self.id
       topic.title = self.title
       topic.message = self.description
@@ -881,7 +1014,6 @@ class Assignment < ActiveRecord::Base
       :media_comment_type => (opts.delete :media_comment_type),
     }
     submissions = []
-    tags = self.learning_outcome_tags.select{|t| !t.rubric_association_id }
 
     students.each do |student|
       submission_updated = false
@@ -911,8 +1043,11 @@ class Assignment < ActiveRecord::Base
         submission.group = group
         submission.graded_at = Time.now if did_grade
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
-        tags.each do |tag|
-          tag.create_outcome_result(student, self, submission)
+
+        unless self.rubric_association
+          self.learning_outcome_alignments.each do |alignment|
+            submission.create_outcome_result(alignment)
+          end
         end
       end
       submission.add_comment(comment) if comment && (group_comment == "1" || student == original_student)
@@ -1343,10 +1478,6 @@ class Assignment < ActiveRecord::Base
 
   named_scope :expecting_submission, :conditions=>"submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL"
 
-  named_scope :mismatched_reminders, lambda {
-    {:conditions => ['assignments.due_at IS NOT NULL AND (assignments.reminders_created_for_due_at IS NULL or assignments.due_at != assignments.reminders_created_for_due_at)']}
-  }
-
   named_scope :gradeable, lambda {
     {:conditions => ['assignments.submission_types != ?', 'not_graded'] }
   }
@@ -1369,64 +1500,8 @@ class Assignment < ActiveRecord::Base
     self.due_at && self.due_at < 1.week.ago && self.available?
   end
 
-  def generate_reminders_if_changed
-    send_later(:generate_reminders!) if (@due_at_was != self.due_at || @submission_types_was != self.submission_types) && due_at && submittable_type?
-    true
-  end
-
-  def generate_reminders!
-    return false unless due_at
-    due_user_ids = []
-    grading_user_ids = []
-    assignment_reminders.each do |r|
-      res = r.update_for(self)
-      if r.reminder_type == 'grading' && res
-        grading_user_ids << r.user_id
-      elsif r.reminder_type == 'due_at' && res
-        due_user_ids << r.user_id
-      end
-    end
-    if submittable_type?
-      students = self.context.students
-      needed_ids = students.map{|s| s.id} - due_user_ids
-      students.select{|s| needed_ids.include?(s.id)}.each do |s|
-        r = assignment_reminders.build(:user => s, :reminder_type => 'due_at')
-        r.update_for(self)
-      end
-    end
-    admins = self.context.instructors
-    needed_ids = admins.map{|a| a.id} - grading_user_ids
-    admins.select{|a| needed_ids.include?(a.id)}.each do |a|
-      r = assignment_reminders.build(:user => a, :reminder_type => 'grading')
-      r.update_for(self)
-    end
-    reminders_created_for_due_at = due_at
-    save
-  end
-
-  def due_reminder_time_for(context, user)
-    user.reminder_time_for_due_dates rescue nil
-  end
-
-  def grading_reminder_time_for(context, user)
-    user.reminder_time_for_grading rescue nil
-  end
-
-  def reminder_teacher_to_publish!
-    @remind_teacher_to_publish = true
-    self.publishing_reminder_sent = true
-    self.save!
-    @remind_teacher_to_publish = false
-  end
-
-  def reminder_teacher_to_grade!
-    @remind_teacher_to_grade = true
-    self.save!
-    @remind_teacher_to_grade = false
-  end
-
   def overdue?
-    due_at && due_at < Time.now
+    due_at && due_at <= Time.now
   end
 
   def readable_submission_types
@@ -1456,7 +1531,7 @@ class Assignment < ActiveRecord::Base
   end
   protected :readable_submission_type
 
-  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :reminders_created_for_due_at, :publishing_reminder_sent, :previously_published, :needs_grading_count]
+  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :previously_published, :needs_grading_count]
 
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={}) #migrate=true)

@@ -20,10 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper
 
 module ReportsSpecHelper
   def self.find_account_module_and_reports(account_id)
-    module_name = Canvas::AccountReports::AvailableReports.module_names[account_id]
-    Canvas::AccountReports.const_defined?(module_name).should == true
-    Canvas::AccountReports::AvailableReports.reports[account_id].each do |report|
-      Canvas::AccountReports.const_get(module_name).respond_to?(report.first).should == true
+    Canvas::AccountReports::REPORTS.each do |(report_name, details)|
+      details[:proc].should_not == nil
     end
   end
 

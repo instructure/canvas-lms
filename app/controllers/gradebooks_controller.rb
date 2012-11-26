@@ -18,6 +18,7 @@
 
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
+  include GradebooksHelper
 
   before_filter :require_context, :except => :public_feed
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
@@ -69,7 +70,8 @@ class GradebooksController < ApplicationController
           @submissions.each { |s| assignment = @assignments.find { |a| a.id == s.assignment_id }; s.assignment = assignment if assignment.present? }
           # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
           # assignment in order to calculate grade distributions
-          @all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
+          all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
+          @submissions_by_assignment = submissions_by_assignment(all_submissions)
           @unread_submission_ids = []
           if @student == @current_user
             @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
@@ -144,9 +146,6 @@ class GradebooksController < ApplicationController
     end
   end
 
-  # GET /gradebooks/1
-  # GET /gradebooks/1.json
-  # GET /gradebooks/1.csv
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       return submissions_json if params[:updated] && request.format == :json
@@ -380,13 +379,7 @@ class GradebooksController < ApplicationController
   end
 
   def redirect_to_appropriate_gradebook_version
-    if @current_user.preferences[:use_gradebook2].nil?
-      gradebook_version = :gradebook2
-    else
-      gradebook_version = @current_user.preferences[:use_gradebook2] ? :gradebook2 : :gradebook
-    end
-
-    redirect_to named_context_url(@context, "context_#{gradebook_version}_url")
+    redirect_to gradebook_url_for(@current_user, @context)
   end
   protected :redirect_to_appropriate_gradebook_version
 
@@ -430,4 +423,13 @@ class GradebooksController < ApplicationController
     groups = [] if options[:exclude_total] && groups.length == 1
     groups
   end
+
+  def submissions_by_assignment(submissions)
+    submissions.inject({}) do |hash, sub|
+      hash[sub.assignment_id] ||= []
+      hash[sub.assignment_id] << sub
+      hash
+    end
+  end
+  protected :submissions_by_assignment
 end

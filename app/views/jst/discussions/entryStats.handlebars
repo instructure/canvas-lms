@@ -1,0 +1,13 @@
+{{#if showMore}}
+<a href='#'>
+{{#if moreText}}
+  {{moreText}}
+{{else}}
+  {{#t "show_more"}}Show more{{/t}}
+{{/if}}
+</a>
+{{/if}}
+<div class='new-and-total-badge'>
+  <span class="new-items">{{stats.unread}}</span>
+  <span class="total-items">{{stats.total}}</span>
+</div>

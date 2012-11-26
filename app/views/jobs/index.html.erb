@@ -149,6 +149,7 @@ jobs_opts = {
   :flavor => @flavor,
   :url => jobs_url(:only => :jobs),
   :batch_update_url => batch_update_jobs_url,
+  :job_url => jobs_url,
   :on_hold_attempt_count => Delayed::Job::ON_HOLD_COUNT,
   :limit => JobsController::LIMIT,
   :starting_query => params[:q],

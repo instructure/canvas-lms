@@ -26,4 +26,45 @@ describe GradebooksHelper do
     included_modules.should be_include(GradebooksHelper)
   end
 
+  describe "gradebook_url_for" do
+    let(:user) { User.new }
+    let(:context) { Course.new }
+    let(:assignment) { nil }
+
+    subject { helper.gradebook_url_for(user, context, assignment) }
+
+    before do
+      context.stubs(:id => 1)
+    end
+
+    context "when the user prefers gradebook1" do
+      before { user.stubs(:prefers_gradebook2? => false) }
+
+      it { should match /#{"/courses/1/gradebook"}$/ }
+
+      context "with an assignment" do
+        let(:assignment) { mock(:id => 2) }
+
+        it { should match /#{"/courses/1/gradebook#assignment/2"}$/ }
+      end
+    end
+
+    context "when the user prefers gradebook2" do
+      before { user.stubs(:prefers_gradebook2? => true) }
+
+      it { should match /#{"/courses/1/gradebook2"}$/ }
+
+      context "with an assignment" do
+        let(:assignment) { stubs(:id => 2) }
+
+        # Doesn't include the assignment
+        it { should match /#{"/courses/1/gradebook2"}$/ }
+      end
+    end
+
+    context "with a nil user" do
+      let(:user) { nil }
+      it { should match /#{"/courses/1/gradebook2"}$/ }
+    end
+  end
 end

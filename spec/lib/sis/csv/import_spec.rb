@@ -33,7 +33,7 @@ describe SIS::CSV::Import do
   it "should error files with invalid UTF-8" do
     importer = process_csv_data(
       "xlist_course_id,section_id,status",
-      "ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active"
+      force_string_encoding("ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active")
     )
     importer.errors.first.last.should == "Invalid UTF-8"
   end

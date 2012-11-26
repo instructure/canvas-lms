@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require 'socket'
 
 describe Course do
@@ -291,6 +291,22 @@ describe Course do
       @enrollment.update_attribute(:workflow_state, 'active')
       @enrollment.state_based_on_date.should == :inactive
       @course.grants_right?(:read, @teacher).should be_false
+    end
+
+    it "should grant :read_outcomes to teachers in the course" do
+      course_with_teacher(:active_all => 1)
+      @course.grants_right?(@teacher, :read_outcomes).should be_true
+    end
+
+    it "should grant :read_outcomes to students in the course" do
+      course_with_student(:active_all => 1)
+      @course.grants_right?(@student, :read_outcomes).should be_true
+    end
+
+    it "should grant :read_outcomes to account admins" do
+      course(:active_all => 1)
+      account_admin_user(:account => @course.account)
+      @course.grants_right?(@admin, :read_outcomes).should be_true
     end
   end
 
@@ -922,6 +938,70 @@ describe Course, "tabs_available" do
     tabs.should be_include(t1.asset_string)
     tabs.should_not be_include(t2.asset_string)
   end
+  
+  it "should not include tabs for external tools if opt[:include_external] is false" do
+    course_with_student(:active_all => true)
+
+    t1 = @course.context_external_tools.create!(
+           :url => "http://example.com/ims/lti",
+           :consumer_key => "asdf",
+           :shared_secret => "hjkl",
+           :name => "external tool 1",
+           :course_navigation => {
+             :text => "blah",
+             :url =>  "http://example.com/ims/lti",
+             :default => false,
+           }
+         )
+
+    tabs = @course.tabs_available(nil, :include_external => false).map { |tab| tab[:id] }
+
+    tabs.should_not be_include(t1.asset_string)
+  end
+
+  context "a public course" do
+    before do
+      course(:active_all => true).update_attributes(:is_public => true, :indexed => true)
+      @course.announcements.create!(:title => 'Title', :message => 'Message')
+      default_group = @course.root_outcome_group
+      outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      default_group.add_outcome(outcome)
+    end
+
+    it "should not show announcements tabs without a current user" do
+      tab_ids = @course.tabs_available(nil).map{|t| t[:id] }
+      tab_ids.should_not include(Course::TAB_ANNOUNCEMENTS)
+    end
+
+    it "should not show announcements to a user not enrolled in the class" do
+      user
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      tab_ids.should_not include(Course::TAB_ANNOUNCEMENTS)
+    end
+
+    it "should show the announcements tab to an enrolled user" do
+      @course.enroll_student(user).accept!
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      tab_ids.should include(Course::TAB_ANNOUNCEMENTS)
+    end
+
+    it "should not show outcomes tabs without a current user" do
+      tab_ids = @course.tabs_available(nil).map{|t| t[:id] }
+      tab_ids.should_not include(Course::TAB_OUTCOMES)
+   end
+
+    it "should not show outcomes to a user not enrolled in the class" do
+      user
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      tab_ids.should_not include(Course::TAB_OUTCOMES)
+    end
+
+    it "should show the outcomes tab to an enrolled user" do
+      @course.enroll_student(user).accept!
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      tab_ids.should include(Course::TAB_OUTCOMES)
+    end
+  end
 end
 
 describe Course, "backup" do
@@ -946,92 +1026,26 @@ describe Course, "backup" do
     parse.should be_is_a(Array)
     parse.length.should > 0
   end
-    
-  context "merge_into_course" do
-
-    it "should merge implied content into another course" do
-      course_model
-      attachment_model
-      @old_attachment = @attachment
-      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
-      html = @old_topic.message
-      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
-      @old_course = @course
-      @new_course = course_model
-      @new_course.merge_into_course(@old_course, :all_topics => true)
-      @old_attachment.reload
-      @old_attachment.cloned_item_id.should_not be_nil
-      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
-      @new_attachment.should_not be_nil
-      @old_topic.reload
-      @old_topic.cloned_item_id.should_not be_nil
-      @new_topic = @new_course.discussion_topics.find_by_cloned_item_id(@old_topic.cloned_item_id)
-      @new_topic.should_not be_nil
-      html = @new_topic.message
-      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
-    end
-
-    it "should bring over linked files if not already brought over" do
-      course_model
-      attachment_model
-      @old_attachment = @attachment
-      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
-      html = @old_topic.message
-      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
-      @old_course = @course
-      @new_course = course_model
-      html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
-      @old_attachment.reload
-      @old_attachment.cloned_item_id.should_not be_nil
-      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
-      @new_attachment.should_not be_nil
-      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
-    end
-
-    it "should bring over linked files that have been replaced" do
-      course_model
-      attachment_model
-      @orig_attachment = @attachment
-
-      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>download this file</a>")
-      html = @old_topic.message
-      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/download"))
-
-      @orig_attachment.destroy
-      attachment_model
-      @old_attachment = @attachment
-      @old_attachment.handle_duplicates(:overwrite)
-
-      @old_course = @course
-      @new_course = course_model
-      html = Course.migrate_content_links(@old_topic.message, @old_course, @new_course)
-      @old_attachment.reload
-      @old_attachment.cloned_item_id.should_not be_nil
-      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
-      @new_attachment.should_not be_nil
-      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
-    end
-  end
   
   it "should not cross learning outcomes with learning outcome groups in the association" do
     pending('fails when being run in the single thread rake task')
     # set up two courses with two outcomes
     course = course_model
-    default_group = LearningOutcomeGroup.default_for(course)
+    default_group = course.root_outcome_group
     outcome = course.created_learning_outcomes.create!
-    default_group.add_item(outcome)
+    default_group.add_outcome(outcome)
 
     other_course = course_model
-    other_default_group = LearningOutcomeGroup.default_for(other_course)
+    other_default_group = other_course.root_outcome_group
     other_outcome = other_course.created_learning_outcomes.create!
-    other_default_group.add_item(other_outcome)
+    other_default_group.add_outcome(other_outcome)
 
     # add another group to the first course, which "coincidentally" has the
     # same id as the second course's outcome
     other_group = course.learning_outcome_groups.build
     other_group.id = other_outcome.id
     other_group.save!
-    default_group.add_item(other_group)
+    default_group.adopt_outcome_group(other_group)
 
     # reload and check
     course.reload
@@ -1043,11 +1057,11 @@ describe Course, "backup" do
 
   it "should not count learning outcome groups as having outcomes" do
     course = course_model
-    default_group = LearningOutcomeGroup.default_for(course)
-    other_group = course.learning_outcome_groups.create!
-    default_group.add_item(other_group)
+    default_group = course.root_outcome_group
+    other_group = course.learning_outcome_groups.create!(:title => 'other group')
+    default_group.adopt_outcome_group(other_group)
     
-    course.has_outcomes.should == false
+    course.should_not have_outcomes
   end
 
 end
@@ -2726,40 +2740,69 @@ describe Course, "enrollments" do
   end
 end
 
-describe Course, "user_is_teacher?" do
+describe Course, "user_is_instructor?" do
   it "should be true for teachers" do
     course = Course.create
     teacher = user_with_pseudonym
     course.enroll_teacher(teacher).accept
-    course.user_is_teacher?(teacher).should be_true
+    course.user_is_instructor?(teacher).should be_true
   end
 
-  it "should be false for designers" do
+  it "should be true for tas" do
     course = Course.create
     ta = user_with_pseudonym
     course.enroll_ta(ta).accept
-    course.user_is_teacher?(ta).should be_true
+    course.user_is_instructor?(ta).should be_true
   end
 
   it "should be false for designers" do
     course = Course.create
     designer = user_with_pseudonym
     course.enroll_designer(designer).accept
-    course.user_is_teacher?(designer).should be_false
+    course.user_is_instructor?(designer).should be_false
   end
 end
 
-describe Course, "user_has_been_teacher?" do
+describe Course, "user_has_been_instructor?" do
   it "should be true for teachers, past or present" do
     e = course_with_teacher(:active_all => true)
-    @course.user_has_been_teacher?(@teacher).should be_true
+    @course.user_has_been_instructor?(@teacher).should be_true
 
     e.conclude
     e.reload.workflow_state.should == "completed"
-    @course.user_has_been_teacher?(@teacher).should be_true
+    @course.user_has_been_instructor?(@teacher).should be_true
 
     @course.complete
-    @course.user_has_been_teacher?(@teacher).should be_true
+    @course.user_has_been_instructor?(@teacher).should be_true
+  end
+
+  it "should be true for tas" do
+    e = course_with_ta(:active_all => true)
+    @course.user_has_been_instructor?(@ta).should be_true
+  end
+end
+
+describe Course, "user_has_been_admin?" do
+  it "should be true for teachers, past or present" do
+    e = course_with_teacher(:active_all => true)
+    @course.user_has_been_admin?(@teacher).should be_true
+
+    e.conclude
+    e.reload.workflow_state.should == "completed"
+    @course.user_has_been_admin?(@teacher).should be_true
+
+    @course.complete
+    @course.user_has_been_admin?(@teacher).should be_true
+  end
+
+  it "should be true for tas" do
+    e = course_with_ta(:active_all => true)
+    @course.user_has_been_admin?(@ta).should be_true
+  end
+
+  it "should be true for designers" do
+    e = course_with_designer(:active_all => true)
+    @course.user_has_been_admin?(@designer).should be_true
   end
 end
 
@@ -2774,6 +2817,23 @@ describe Course, "user_has_been_student?" do
 
     @course.complete
     @course.user_has_been_student?(@student).should be_true
+  end
+end
+
+describe Course, "user_has_been_observer?" do
+  it "should be false for teachers" do
+    e = course_with_teacher(:active_all => true)
+    @course.user_has_been_observer?(@teacher).should be_false
+  end
+
+  it "should be false for tas" do
+    e = course_with_ta(:active_all => true)
+    @course.user_has_been_observer?(@ta).should be_false
+  end
+
+  it "should be true for observers" do
+    course_with_observer(:active_all => true)
+    @course.user_has_been_observer?(@observer).should be_true
   end
 end
 
@@ -2929,6 +2989,218 @@ describe Course do
     it "should return a scope" do
       # can't use "should respond_to", because that delegates to the instantiated Array
       lambda{ @course.groups_visible_to(@user).scoped({}) }.should_not raise_exception
+    end
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should properly return site admin permissions from another shard" do
+      enable_cache do
+        @shard1.activate do
+          course_with_student(:active_all => 1)
+        end
+        @site_admin = user
+        site_admin = Account.site_admin
+        site_admin.add_user(@user)
+
+        @shard1.activate do
+          @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+          @course.grants_right?(@teacher, nil, :manage_content).should be_true
+          @course.grants_right?(@student, nil, :manage_content).should be_false
+        end
+
+        @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+      end
+
+      enable_cache do
+        # do it in a different order
+        @shard1.activate do
+          @course.grants_right?(@student, nil, :manage_content).should be_false
+          @course.grants_right?(@teacher, nil, :manage_content).should be_true
+          @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+        end
+
+        @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+      end
+    end
+  end
+
+  context "named scopes" do
+    context "enrollments" do
+      before do
+        # has enrollments
+        @course1a = course_with_student(:course_name => 'A').course
+        @course1b = course_with_student(:course_name => 'B').course
+
+        # has no enrollments
+        @course2a = Course.create!(:name => 'A')
+        @course2b = Course.create!(:name => 'B')
+      end
+
+      describe "#with_enrollments" do
+        it "should include courses with enrollments" do
+          Course.with_enrollments.sort_by(&:id).should == [@course1a, @course1b]
+        end
+
+        it "should play nice with other scopes" do
+          Course.with_enrollments.scoped(:conditions => {:name => 'A'}).should == [@course1a]
+        end
+
+        it "should be disjoint with #without_enrollments" do
+          Course.with_enrollments.without_enrollments.should be_empty
+        end
+      end
+
+      describe "#without_enrollments" do
+        it "should include courses without enrollments" do
+          Course.without_enrollments.sort_by(&:id).should == [@course2a, @course2b]
+        end
+
+        it "should play nice with other scopes" do
+          Course.without_enrollments.scoped(:conditions => {:name => 'A'}).should == [@course2a]
+        end
+      end
+    end
+
+    context "completion" do
+      before do
+        # non-concluded
+        @c1 = Course.create!
+        @c2 = Course.create! :conclude_at => 1.week.from_now
+
+        # concluded in various ways
+        @c3 = Course.create! :conclude_at => 1.week.ago
+        @c4 = Course.create!
+        term = @c4.account.enrollment_terms.create! :end_at => 2.weeks.ago
+        @c4.enrollment_term = term
+        @c4.save!
+        @c5 = Course.create!
+        @c5.complete!
+      end
+
+      describe "#completed" do
+        it "should include completed courses" do
+          Course.completed.sort_by(&:id).should == [@c3, @c4, @c5]
+        end
+
+        it "should play nice with other scopes" do
+          Course.completed.scoped(:conditions => {:conclude_at => nil}).should == [@c4]
+        end
+
+        it "should be disjoint with #not_completed" do
+          Course.completed.not_completed.should be_empty
+        end
+      end
+
+      describe "#not_completed" do
+        it "should include non-completed courses" do
+          Course.not_completed.sort_by(&:id).should == [@c1, @c2]
+        end
+
+        it "should play nice with other scopes" do
+          Course.not_completed.scoped(:conditions => {:conclude_at => nil}).should == [@c1]
+        end
+      end
+    end
+
+    describe "#by_teachers" do
+      before do
+        @course1a = course_with_teacher(:name => "teacher A's first course").course
+        @teacherA = @teacher
+        @course1b = course_with_teacher(:name => "teacher A's second course", :user => @teacherA).course
+        @course2 = course_with_teacher(:name => "teacher B's course").course
+        @teacherB = @teacher
+        @course3 = course_with_teacher(:name => "teacher C's course").course
+        @teacherC = @teacher
+      end
+
+      it "should filter courses by teacher" do
+        Course.by_teachers([@teacherA.id]).sort_by(&:id).should == [@course1a, @course1b]
+      end
+
+      it "should support multiple teachers" do
+        Course.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2, @course3]
+      end
+
+      it "should work with an empty array" do
+        Course.by_teachers([]).should be_empty
+      end
+
+      it "should not follow student enrollments" do
+        @course3.enroll_student(user_model)
+        Course.by_teachers([@user.id]).should be_empty
+      end
+
+      it "should not follow deleted enrollments" do
+        @teacherC.enrollments.each { |e| e.destroy }
+        Course.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id).should == [@course2]
+      end
+
+      it "should return no results when the user is not enrolled in the course" do
+        user_model
+        Course.by_teachers([@user.id]).should be_empty
+      end
+
+      it "should play nice with other scopes" do
+        @course1a.complete!
+        Course.by_teachers([@teacherA.id]).completed.should == [@course1a]
+      end
+    end
+
+    describe "#by_associated_accounts" do
+      before do
+        @root_account = Account.default
+        @sub = account_model(:name => 'sub', :parent_account => @root_account, :root_account => @root_account)
+        @subA = account_model(:name => 'subA', :parent_account => @sub1, :root_account => @root_account)
+        @courseA1 = course_model(:account => @subA, :name => 'A1')
+        @courseA2 = course_model(:account => @subA, :name => 'A2')
+        @subB = account_model(:name => 'subB', :parent_account => @sub1, :root_account => @root_account)
+        @courseB = course_model(:account => @subB, :name => 'B')
+        @other_root_account = account_model(:name => 'other')
+        @courseC = course_model(:account => @other_root_account)
+      end
+
+      it "should filter courses by root account" do
+        Course.by_associated_accounts([@root_account.id]).sort_by(&:id).should == [@courseA1, @courseA2, @courseB]
+      end
+
+      it "should filter courses by subaccount" do
+        Course.by_associated_accounts([@subA.id]).sort_by(&:id).should == [@courseA1, @courseA2]
+      end
+
+      it "should return no results if already scoped to an unrelated account" do
+        @other_root_account.courses.by_associated_accounts([@root_account.id]).should be_empty
+      end
+
+      it "should accept multiple account IDs" do
+        Course.by_associated_accounts([@subB.id, @other_root_account.id]).sort_by(&:id).should == [@courseB, @courseC]
+      end
+
+      it "should play nice with other scopes" do
+        @courseA1.complete!
+        Course.by_associated_accounts([@subA.id]).not_completed.should == [@courseA2]
+      end
+    end
+  end
+end
+
+describe Course do
+  context "re-enrollments" do
+    it "should update concluded enrollment on re-enrollment" do
+      @course = course(:active_all => true)
+      
+      @user1 = user_model; @user1.sortable_name = 'jonny'; @user1.save      
+      @course.enroll_user(@user1)
+      
+      enrollment_count = @course.enrollments.count
+      
+      @course.complete
+      @course.unconclude
+      
+      @course.enroll_user(@user1)
+      
+      @course.enrollments.count.should == enrollment_count
     end
   end
 end

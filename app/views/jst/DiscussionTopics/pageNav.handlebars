@@ -1,0 +1,21 @@
+<div class="discussion-page-nav">
+  <span class="hidden-readable">{{#t "Page"}}Page{{/t}}</span>
+  <ul>
+    {{#if showFirst}}
+    <li><a href="#page-1" data-pushstate title='{{#t "first_page"}}First{{/t}}'>&lt;&lt;</a></li>
+    {{/if}}
+
+    {{#each pages}}
+      {{#ifEqual this ../current}}
+        <li><span class="item" title='{{#t "current_page"}}Current{{/t}}'>{{this}}</span></li>
+      {{else}}
+        <li><a class="item" href="#page-{{this}}" data-pushstate title="{{this}}">{{this}}</a></li>
+      {{/ifEqual}}
+    {{/each}}
+
+    {{#if lastPage}}
+      <li><a class="item" href="#page-{{lastPage}}" data-pushstate title='{{#t "last_page"}}Last{{/t}}'>&gt;&gt;</a></li>
+    {{/if}}
+  </ul>
+</div>
+

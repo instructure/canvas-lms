@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'underscore'
   'compiled/userSettings'
   'jst/calendar/contextList'
   'jst/calendar/undatedEvents'
@@ -9,7 +10,7 @@ define [
   'compiled/jquery.kylemenu'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], ($, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
+], ($, {map}, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
 
   class VisibleContextManager
     constructor: (contexts, selectedContexts, @$holder) ->
@@ -81,6 +82,8 @@ define [
       # dont toggle if thy were clicking the .settings button
       unless $(event.target).closest('.settings, .actions').length
         visibleContexts.toggle $(this).data('context')
+        userSettings.set('checked_calendar_codes',
+          map($(this).parent().children('.checked'), (c) -> $(c).data('context')))
 
     $holder.delegate '.context_list_context'
       'mouseenter mouseleave': (event) ->

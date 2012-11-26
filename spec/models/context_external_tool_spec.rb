@@ -274,7 +274,8 @@ describe ContextExternalTool do
     
     it "should return custom_fields_string as a text-formatted field" do
       tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'a' => '123', 'b' => '456'})
-      tool.custom_fields_string.should == "a=123\nb=456"
+      fields_string = tool.custom_fields_string
+      fields_string.should == "a=123\nb=456"
     end
 
     it "should merge custom fields for extension launches" do

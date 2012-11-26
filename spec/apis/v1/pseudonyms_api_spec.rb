@@ -194,6 +194,9 @@ describe PseudonymsController, :type => :integration do
       @teacher.pseudonyms.create!(:unique_id => 'teacher@example.com')
       @path = "/api/v1/accounts/#{@account.id}/logins/#{@student.pseudonym.id}"
       @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :action => 'update', :account_id => @account.id.to_param, :id => @student.pseudonym.id.to_param }
+      a = Account.find(Account.default)
+      a.settings[:admins_can_change_passwords] = true
+      a.save!
     end
 
     context "an authorized user" do
@@ -212,6 +215,7 @@ describe PseudonymsController, :type => :integration do
           'unique_id' => 'student+new@example.com',
           'user_id' => @student.id
         }
+        @student.pseudonym.reload.valid_password?('password123').should be_true
       end
 
       it "should return 400 if the unique_id already exists" do

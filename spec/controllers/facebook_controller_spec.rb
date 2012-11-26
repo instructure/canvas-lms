@@ -24,6 +24,11 @@ describe FacebookController do
   end
 
   describe "get_facebook_user" do
+    before do
+      # avoid making actual requests
+      Facebook.stubs(:send_request => '', :send_graph_request => '')
+    end
+
     def signed_request(data={})
       str = [data.to_json].pack('m').chomp.tr('+/', '-_')
       sig = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha256'), Facebook.config['secret'], str)).strip.tr('+/', '-_').sub(/=+$/, '')

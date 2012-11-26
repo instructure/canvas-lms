@@ -71,7 +71,11 @@ class ActiveRecord::Base
   end
 
   def asset_string
-    @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
+    @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id}"
+  end
+
+  def global_asset_string
+    @global_asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{global_id}"
   end
 
   # little helper to keep checks concise and avoid a db lookup
@@ -281,28 +285,13 @@ class ActiveRecord::Base
   class << self
     def construct_attributes_from_arguments_with_type_cast(attribute_names, arguments)
       log_dynamic_finder_nil_arguments(attribute_names) if current_scoped_methods.nil? && arguments.flatten.compact.empty?
-      attributes = construct_attributes_from_arguments_without_type_cast(attribute_names, arguments)
-      attributes.each_pair do |attribute, value|
-        next unless column = columns.detect{ |col| col.name == attribute.to_s }
-        next if [value].flatten.compact.empty?
-        cast_value = [value].flatten.map{ |v| v.respond_to?(:quoted_id) ? v : column.type_cast(v) }
-        cast_value = cast_value.first unless value.is_a?(Array)
-        next if [value].flatten.map(&:to_s) == [cast_value].flatten.map(&:to_s)
-        log_dynamic_finder_type_cast(value, column)
-        attributes[attribute] = cast_value
-      end
+      construct_attributes_from_arguments_without_type_cast(attribute_names, arguments)
     end
     alias_method_chain :construct_attributes_from_arguments, :type_cast
 
     def log_dynamic_finder_nil_arguments(attribute_names)
       error = "No non-nil arguments passed to #{self.base_class}.find_by_#{attribute_names.join('_and_')}"
       raise DynamicFinderTypeError, error if Canvas.dynamic_finder_nil_arguments_error == :raise
-      logger.debug "WARNING: " + error
-    end
-
-    def log_dynamic_finder_type_cast(value, column)
-      error = "Cannot cleanly cast #{value.inspect} to #{column.type} (#{self.base_class}\##{column.name})"
-      raise DynamicFinderTypeError, error if Canvas.dynamic_finder_type_cast_error == :raise
       logger.debug "WARNING: " + error
     end
   end
@@ -445,7 +434,7 @@ class ActiveRecord::Base
 
   def self.add_polymorph_methods(generic, specifics)
     specifics.each do |specific|
-      next if instance_methods.include?(specific.to_s)
+      next if method_defined?(specific.to_sym)
       class_name = specific.to_s.classify
       correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
 
@@ -517,7 +506,7 @@ class ActiveRecord::Base
 
     ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :order => primary_key, :limit => batch_size)}) as subquery").first
     while ids.first.present?
-      yield *ids
+      yield(*ids)
       last_value = ids.last
       ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :conditions => ["#{quoted_table_name}.#{primary_key}>?", last_value], :order => primary_key, :limit => batch_size)}) as subquery").first
     end
@@ -900,6 +889,10 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 end
 
 class ActiveRecord::Migration
+  VALID_TAGS = [:predeploy, :postdeploy, :cassandra]
+  # at least one of these tags is required
+  DEPLOY_TAGS = [:predeploy, :postdeploy]
+
   class << self
     def transactional?
       @transactional != false
@@ -909,7 +902,7 @@ class ActiveRecord::Migration
     end
 
     def tag(*tags)
-      raise "invalid tags #{tags.inspect}" unless tags - [:predeploy, :postdeploy] == []
+      raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []
       (@tags ||= []).concat(tags).uniq!
     end
 
@@ -930,10 +923,14 @@ end
 class ActiveRecord::MigrationProxy
   delegate :connection, :transactional?, :tags, :to => :migration
 
+  def runnable?
+    !migration.respond_to?(:runnable?) || migration.runnable?
+  end
+
   def load_migration
     load(filename)
     @migration = name.constantize
-    raise "#{self.name} (#{self.version}) is not tagged as predeploy or postdeploy!" if @migration.tags.empty? && self.version > 20120217214153
+    raise "#{self.name} (#{self.version}) is not tagged as predeploy or postdeploy!" if (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).empty? && self.version > 20120217214153
     @migration
   end
 end
@@ -973,6 +970,11 @@ class ActiveRecord::Migrator
     end
   end
 
+  def pending_migrations_with_runnable
+    pending_migrations_without_runnable.reject { |m| !m.runnable? }
+  end
+  alias_method_chain :pending_migrations, :runnable
+
   def migrate(tag = nil)
     current = migrations.detect { |m| m.version == current_version }
     target = migrations.detect { |m| m.version == @target_version }
@@ -1001,8 +1003,17 @@ class ActiveRecord::Migrator
       end
 
       next if !tag.nil? && !migration.tags.include?(tag)
+      next if !migration.runnable?
 
       begin
+        if down? && !Rails.env.test? && !$confirmed_migrate_down
+          require 'highline'
+          if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
+            raise("Revert not confirmed")
+          end
+          $confirmed_migrate_down = true if $1.downcase == 'a'
+        end
+
         ddl_transaction(migration) do
           migration.migrate(@direction)
           record_version_state_after_migrating(migration.version) unless tag == :predeploy && migration.tags.include?(:postdeploy)

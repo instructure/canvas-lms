@@ -19,7 +19,9 @@
 class QuestionBanksController < ApplicationController
   before_filter :require_context
   add_crumb("Question Banks") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
-  
+
+  include Api::V1::Outcome
+
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
       @question_banks = @context.assessment_question_banks.active
@@ -52,12 +54,14 @@ class QuestionBanksController < ApplicationController
       render :json => {:reorder => true}
     end
   end
-  
+
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
+    js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+
     add_crumb(@bank.title)
     if authorized_action(@bank, @current_user, :read)
-      @outcome_tags = @bank.learning_outcome_tags.sort_by{|t| t.learning_outcome.short_description.downcase }
+      @alignments = @bank.learning_outcome_alignments.sort_by{|a| a.learning_outcome.short_description.downcase }
       @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => 1)
     end
   end
@@ -116,7 +120,7 @@ class QuestionBanksController < ApplicationController
     if authorized_action(@bank, @current_user, :update)
       if @bank.update_attributes(params[:assessment_question_bank])
         @bank.reload
-        render :json => @bank.to_json(:include => {:learning_outcome_tags => {:include => :learning_outcome}})
+        render :json => @bank.to_json(:include => {:learning_outcome_alignments => {:include => :learning_outcome}})
       else
         render :json => @bank.errors.to_json, :status => :bad_request
       end

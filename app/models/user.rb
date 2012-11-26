@@ -108,6 +108,7 @@ class User < ActiveRecord::Base
   has_many :submissions, :include => [:assignment, :submission_comments], :order => 'submissions.updated_at DESC', :dependent => :destroy
   has_many :pseudonyms_with_channels, :class_name => 'Pseudonym', :order => 'position', :include => :communication_channels
   has_many :pseudonyms, :order => 'position', :dependent => :destroy
+  has_many :active_pseudonyms, :class_name => 'Pseudonym', :conditions => ['pseudonyms.workflow_state != ?', 'deleted']
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
   has_one :pseudonym, :conditions => ['pseudonyms.workflow_state != ?', 'deleted'], :order => 'position'
   has_many :attachments, :as => 'context', :dependent => :destroy
@@ -130,7 +131,6 @@ class User < ActiveRecord::Base
   has_many :context_rubrics, :as => :context, :class_name => 'Rubric'
   has_many :grading_standards
   has_many :context_module_progressions
-  has_many :assignment_reminders
   has_many :assessment_question_bank_users
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
@@ -147,7 +147,6 @@ class User < ActiveRecord::Base
   has_many :account_users
   has_many :media_objects, :as => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
-  has_many :page_views
   has_many :user_notes
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
@@ -163,6 +162,7 @@ class User < ActiveRecord::Base
 
   has_many :collections, :as => :context
   has_many :collection_items, :through => :collections
+  has_many :collection_item_upvotes
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
@@ -175,6 +175,10 @@ class User < ActiveRecord::Base
   def conversations
     # i.e. exclude any where the user has deleted all the messages
     all_conversations.visible.scoped(:order => "last_message_at DESC, conversation_id DESC")
+  end
+
+  def page_views
+    PageView.for_user(self)
   end
 
   named_scope :of_account, lambda { |account|
@@ -291,7 +295,6 @@ class User < ActiveRecord::Base
 
   before_save :assign_uuid
   before_save :update_avatar_image
-  after_save :generate_reminders_if_changed
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
@@ -599,7 +602,6 @@ class User < ActiveRecord::Base
     self.reminder_time_for_grading ||= 0
     self.initial_enrollment_type = nil unless ['student', 'teacher', 'ta', 'observer'].include?(initial_enrollment_type)
     User.invalidate_cache(self.id) if self.id
-    @reminder_times_changed = self.reminder_time_for_due_dates_changed? || self.reminder_time_for_grading_changed?
     true
   end
 
@@ -752,24 +754,32 @@ class User < ActiveRecord::Base
     self.update_account_associations
   end
 
+  def associate_with_shard(shard)
+  end
+
+  def self.clone_communication_channel(cc, new_user, max_position)
+    new_cc = cc.clone
+    new_cc.shard = new_user.shard
+    new_cc.position += max_position
+    new_cc.user = new_user
+    new_cc.save!
+    cc.notification_policies.each do |np|
+      new_np = np.clone
+      new_np.shard = new_user.shard
+      new_np.communication_channel = new_cc
+      new_np.save!
+    end
+  end
+
   def move_to_user(new_user)
     return unless new_user
     return if new_user == self
-    max_position = (new_user.pseudonyms.last.position || 0) rescue 0
-    new_user.save
-    updates = []
-    self.pseudonyms.each do |p|
-      max_position += 1
-      updates << "WHEN id=#{p.id} THEN #{max_position}"
-    end
-    Pseudonym.connection.execute("UPDATE pseudonyms SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.pseudonyms.map(&:id).join(',')})") unless self.pseudonyms.empty?
+    new_user.save if new_user.changed?
+    new_user.associate_with_shard(self.shard)
 
-    max_position = (new_user.communication_channels.last.position || 0) rescue 0
-    position_updates = []
+    max_position = new_user.communication_channels.last.try(:position) || 0
     to_retire_ids = []
     self.communication_channels.each do |cc|
-      max_position += 1
-      position_updates << "WHEN id=#{cc.id} THEN #{max_position}"
       source_cc = cc
       # have to find conflicting CCs, and make sure we don't have conflicts
       # To avoid the case where a user has duplicate CCs and one of them is retired, don't look for retired ccs
@@ -779,6 +789,10 @@ class User < ActiveRecord::Base
       # validations, but could be there due to older code that didn't enforce the uniqueness.  The results would
       # simply be that they'll continue to have duplicate unretired CCs
       target_cc = new_user.communication_channels.detect { |cc| cc.path.downcase == source_cc.path.downcase && cc.path_type == source_cc.path_type && !cc.retired? }
+
+      if !target_cc && self.shard != new_user.shard
+        User.clone_communication_channel(source_cc, new_user, max_position)
+      end
       next unless target_cc
 
       # we prefer keeping the "most" active one, preferring the target user if they're equal
@@ -794,161 +808,194 @@ class User < ActiveRecord::Base
         # active, unconfirmed*
         # active, retired
         to_retire = target_cc
+        if self.shard != new_user.shard
+          target_cc.retire unless target_cc.retired?
+          User.clone_communication_channel(source_cc, new_user, max_position)
+        end
       elsif target_cc.unconfirmed?
         # unconfirmed*, unconfirmed
         # retired, unconfirmed
         to_retire = source_cc
-      end
-      #elsif
+      elsif source_cc.unconfirmed? && self.shard != new_user.shard
         # unconfirmed, retired
-        # retired, retired
-      #end
-
-      to_retire_ids << to_retire.id if to_retire && !to_retire.retired?
-    end
-    CommunicationChannel.update_all("user_id=#{new_user.id}, position=CASE #{position_updates.join(" ")} ELSE NULL END", :id => self.communication_channels.map(&:id)) unless self.communication_channels.empty?
-    CommunicationChannel.update_all({:workflow_state => 'retired'}, :id => to_retire_ids) unless to_retire_ids.empty?
-
-    to_delete_ids = []
-    self.enrollments.each do |enrollment|
-      source_enrollment = enrollment
-      # non-deleted enrollments should be unique per [course_section, type]
-      target_enrollment = new_user.enrollments.detect { |enrollment| enrollment.course_section_id == source_enrollment.course_section_id && enrollment.type == source_enrollment.type && !['deleted', 'inactive', 'rejected'].include?(enrollment.workflow_state) }
-      next unless target_enrollment
-
-      # we prefer keeping the "most" active one, preferring the target user if they're equal
-      # the comments inline show all the different cases, with the source enrollment on the left,
-      # target enrollment on the right.  The * indicates the enrollment that will be deleted in order
-      # to resolve the conflict.
-      if target_enrollment.active?
-        # deleted, active
-        # inactive, active
-        # rejected, active
-        # invited*, active
-        # creation_pending*, active
-        # active*, active
-        # completed*, active
-        to_delete = source_enrollment
-      elsif source_enrollment.active?
-        # active, deleted
-        # active, inactive
-        # active, rejected
-        # active, invited*
-        # active, creation_pending*
-        # active, completed*
-        to_delete = target_enrollment
-      elsif target_enrollment.completed?
-        # deleted, completed
-        # inactive, completed
-        # rejected, completed
-        # invited*, completed
-        # creation_pending*, completed
-        # completed*, completed
-        to_delete = source_enrollment
-      elsif source_enrollment.completed?
-        # completed, deleted
-        # completed, inactive
-        # completed, rejected
-        # completed, invited*
-        # completed, creation_pending*
-        to_delete = target_enrollment
-      elsif target_enrollment.invited?
-        # deleted, invited
-        # inactive, invited
-        # rejected, invited
-        # creation_pending*, invited
-        # invited*, invited
-        to_delete = source_enrollment
-      elsif source_enrollment.invited?
-        # invited, deleted
-        # invited, inactive
-        # invited, rejected
-        # invited, creation_pending*
-        to_delete = target_enrollment
-      elsif target_enrollment.creation_pending?
-        # deleted, creation_pending
-        # inactive, creation_pending
-        # rejected, creation_pending
-        # creation_pending*, creation_pending
-        to_delete = source_enrollment
+        User.clone_communication_channel(source_cc, new_user, max_position)
       end
       #elsif
-        # creation_pending, deleted
-        # creation_pending, inactive
-        # creation_pending, rejected
-        # deleted, rejected
-        # inactive, rejected
-        # rejected, rejected
-        # rejected, deleted
-        # rejected, inactive
-        # deleted, inactive
-        # inactive, inactive
-        # inactive, deleted
-        # deleted, deleted
+      # retired, retired
       #end
 
-      to_delete_ids << to_delete.id if to_delete && !['deleted', 'inactive', 'rejected'].include?(to_delete.workflow_state)
-    end
-    Enrollment.update_all({:workflow_state => 'deleted'}, :id => to_delete_ids) unless to_delete_ids.empty?
-
-    [
-      [:quiz_id, :quiz_submissions],
-      [:assignment_id, :submissions]
-    ].each do |unique_id, table|
-      begin
-        # Submissions are a special case since there's a unique index
-        # on the table, and if both the old user and the new user
-        # have a submission for the same assignment there will be
-        # a conflict.
-        already_there_ids = table.to_s.classify.constantize.find_all_by_user_id(new_user.id).map(&unique_id)
-        already_there_ids = [0] if already_there_ids.empty?
-        table.to_s.classify.constantize.update_all({:user_id => new_user.id}, "user_id=#{self.id} AND #{unique_id} NOT IN (#{already_there_ids.join(',')})")
-      rescue => e
-        logger.error "migrating #{table} column user_id failed: #{e.to_s}"
+      if to_retire && !to_retire.retired?
+        to_retire_ids << to_retire.id
       end
     end
-    all_conversations.find_each{ |c| c.move_to_user(new_user) }
-    updates = {}
-    ['account_users','asset_user_accesses',
-      'assignment_reminders','attachments',
-      'calendar_events','collaborations',
-      'context_module_progressions','discussion_entries','discussion_topics',
-      'enrollments','group_memberships','page_comments',
-      'rubric_assessments',
-      'submission_comment_participants','user_services','web_conferences',
-      'web_conference_participants','wiki_pages'].each do |key|
-      updates[key] = "user_id"
+
+    if self.shard != new_user.shard
+      self.communication_channels.update_all(:workflow_state => 'retired') unless self.communication_channels.empty?
+
+      self.user_services.each do |us|
+        new_us = us.clone
+        new_us.shard = new_user.shard
+        new_us.user = new_user
+        new_us.save!
+      end
+      self.user_services.delete_all
+    else
+      self.shard.activate do
+        CommunicationChannel.update_all({:workflow_state => 'retired'}, :id => to_retire_ids) unless to_retire_ids.empty?
+      end
+      self.communication_channels.update_all("user_id=#{new_user.id}, position=position+#{max_position}") unless self.communication_channels.empty?
     end
-    updates['submission_comments'] = 'author_id'
-    updates['conversation_messages'] = 'author_id'
-    updates = updates.to_a
-    updates << ['enrollments', 'associated_user_id']
-    updates.each do |table, column|
-      begin
-        klass = table.classify.constantize
-        if klass.new.respond_to?("#{column}=".to_sym)
-          klass.connection.execute("UPDATE #{table} SET #{column}=#{new_user.id} WHERE #{column}=#{self.id}")
+
+    Shard.with_each_shard(self.associated_shards) do
+      max_position = Pseudonym.find(:last, :conditions => { :user_id => new_user.id }, :order => 'position').try(:position) || 0
+      Pseudonym.update_all("position=position+#{max_position}, user_id=#{new_user.id}", :user_id => self.id)
+
+      to_delete_ids = []
+      new_user_enrollments = Enrollment.find(:all, :conditions => { :user_id => new_user.id })
+      Enrollment.scoped(:conditions => { :user_id => self.id }).each do |enrollment|
+        source_enrollment = enrollment
+        # non-deleted enrollments should be unique per [course_section, type]
+        target_enrollment = new_user_enrollments.detect { |enrollment| enrollment.course_section_id == source_enrollment.course_section_id && enrollment.type == source_enrollment.type && !['deleted', 'inactive', 'rejected'].include?(enrollment.workflow_state) }
+        next unless target_enrollment
+
+        # we prefer keeping the "most" active one, preferring the target user if they're equal
+        # the comments inline show all the different cases, with the source enrollment on the left,
+        # target enrollment on the right.  The * indicates the enrollment that will be deleted in order
+        # to resolve the conflict.
+        if target_enrollment.active?
+          # deleted, active
+          # inactive, active
+          # rejected, active
+          # invited*, active
+          # creation_pending*, active
+          # active*, active
+          # completed*, active
+          to_delete = source_enrollment
+        elsif source_enrollment.active?
+          # active, deleted
+          # active, inactive
+          # active, rejected
+          # active, invited*
+          # active, creation_pending*
+          # active, completed*
+          to_delete = target_enrollment
+        elsif target_enrollment.completed?
+          # deleted, completed
+          # inactive, completed
+          # rejected, completed
+          # invited*, completed
+          # creation_pending*, completed
+          # completed*, completed
+          to_delete = source_enrollment
+        elsif source_enrollment.completed?
+          # completed, deleted
+          # completed, inactive
+          # completed, rejected
+          # completed, invited*
+          # completed, creation_pending*
+          to_delete = target_enrollment
+        elsif target_enrollment.invited?
+          # deleted, invited
+          # inactive, invited
+          # rejected, invited
+          # creation_pending*, invited
+          # invited*, invited
+          to_delete = source_enrollment
+        elsif source_enrollment.invited?
+          # invited, deleted
+          # invited, inactive
+          # invited, rejected
+          # invited, creation_pending*
+          to_delete = target_enrollment
+        elsif target_enrollment.creation_pending?
+          # deleted, creation_pending
+          # inactive, creation_pending
+          # rejected, creation_pending
+          # creation_pending*, creation_pending
+          to_delete = source_enrollment
         end
-      rescue => e
-        logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
-      end
-    end
-    # delete duplicate enrollments where this user is the observee
-    new_user.observee_enrollments.remove_duplicates!
+        #elsif
+          # creation_pending, deleted
+          # creation_pending, inactive
+          # creation_pending, rejected
+          # deleted, rejected
+          # inactive, rejected
+          # rejected, rejected
+          # rejected, deleted
+          # rejected, inactive
+          # deleted, inactive
+          # inactive, inactive
+          # inactive, deleted
+          # deleted, deleted
+        #end
 
-    # delete duplicate observers/observees, move the rest
-    user_observees.where(:user_id => new_user.user_observees.map(&:user_id)).delete_all
-    user_observees.update_all(:observer_id => new_user.id)
-    xor_observer_ids = (Set.new(user_observers.map(&:observer_id)) ^ new_user.user_observers.map(&:observer_id)).to_a
-    user_observers.where(:observer_id => new_user.user_observers.map(&:observer_id)).delete_all
-    user_observers.update_all(:user_id => new_user.id)
-    # for any observers not already watching both users, make sure they have
-    # any missing observer enrollments added
-    new_user.user_observers.where(:observer_id => xor_observer_ids).each(&:create_linked_enrollments)
+        to_delete_ids << to_delete.id if to_delete && !['deleted', 'inactive', 'rejected'].include?(to_delete.workflow_state)
+      end
+      Enrollment.update_all({:workflow_state => 'deleted'}, :id => to_delete_ids) unless to_delete_ids.empty?
+
+      [
+        [:quiz_id, :quiz_submissions],
+        [:assignment_id, :submissions]
+      ].each do |unique_id, table|
+        begin
+          # Submissions are a special case since there's a unique index
+          # on the table, and if both the old user and the new user
+          # have a submission for the same assignment there will be
+          # a conflict.
+          already_there_ids = table.to_s.classify.constantize.find_all_by_user_id(new_user.id).map(&unique_id)
+          already_there_ids = [0] if already_there_ids.empty?
+          table.to_s.classify.constantize.update_all({:user_id => new_user.id}, "user_id=#{self.id} AND #{unique_id} NOT IN (#{already_there_ids.join(',')})")
+        rescue => e
+          logger.error "migrating #{table} column user_id failed: #{e.to_s}"
+        end
+      end
+      all_conversations.find_each{ |c| c.move_to_user(new_user) } unless Shard.current != new_user.shard
+      updates = {}
+      ['account_users','asset_user_accesses',
+        'attachments',
+        'calendar_events','collaborations',
+        'context_module_progressions','discussion_entries','discussion_topics',
+        'enrollments','group_memberships','page_comments',
+        'rubric_assessments',
+        'submission_comment_participants','user_services','web_conferences',
+        'web_conference_participants','wiki_pages'].each do |key|
+        updates[key] = "user_id"
+      end
+      updates['submission_comments'] = 'author_id'
+      updates['conversation_messages'] = 'author_id'
+      updates = updates.to_a
+      updates << ['enrollments', 'associated_user_id']
+      updates.each do |table, column|
+        begin
+          klass = table.classify.constantize
+          if klass.new.respond_to?("#{column}=".to_sym)
+            klass.connection.execute("UPDATE #{table} SET #{column}=#{new_user.id} WHERE #{column}=#{self.id}")
+          end
+        rescue => e
+          logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
+        end
+      end
+
+      unless Shard.current != new_user.shard
+        # delete duplicate enrollments where this user is the observee
+        new_user.observee_enrollments.remove_duplicates!
+
+        # delete duplicate observers/observees, move the rest
+        user_observees.where(:user_id => new_user.user_observees.map(&:user_id)).delete_all
+        user_observees.update_all(:observer_id => new_user.id)
+        xor_observer_ids = (Set.new(user_observers.map(&:observer_id)) ^ new_user.user_observers.map(&:observer_id)).to_a
+        user_observers.where(:observer_id => new_user.user_observers.map(&:observer_id)).delete_all
+        user_observers.update_all(:user_id => new_user.id)
+        # for any observers not already watching both users, make sure they have
+        # any missing observer enrollments added
+        new_user.user_observers.where(:observer_id => xor_observer_ids).each(&:create_linked_enrollments)
+      end
+
+      Enrollment.send_later(:recompute_final_scores, new_user.id)
+      new_user.update_account_associations
+    end
 
     self.reload
-    Enrollment.send_later(:recompute_final_scores, new_user.id)
-    new_user.update_account_associations
     new_user.touch
     self.destroy
   end
@@ -1005,10 +1052,12 @@ class User < ActiveRecord::Base
   def sis_pseudonym_for(context)
     root_account = context.root_account
     raise "could not resolve root account" unless root_account.is_a?(Account)
-    if self.pseudonyms.loaded?
+    if self.pseudonyms.loaded? && self.shard == root_account.shard
       self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
     else
-      self.pseudonyms.active.find_by_account_id(root_account.id, :conditions => ["sis_user_id IS NOT NULL"])
+      root_account.shard.activate do
+        root_account.pseudonyms.active.find_by_user_id(self.id, :conditions => "sis_user_id IS NOT NULL")
+      end
     end
   end
 
@@ -1022,7 +1071,7 @@ class User < ActiveRecord::Base
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
 
-    given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
+    given {|user| self.courses.any?{|c| c.user_is_instructor?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
 
     given do |user|
@@ -1553,41 +1602,6 @@ class User < ActiveRecord::Base
     results
   end
 
-  def generate_reminders_if_changed
-    send_later(:generate_reminders!) if @reminder_times_changed
-  end
-
-  def generate_reminders!
-    enrollments = self.current_enrollments
-    mgmt_course_ids = enrollments.select{|e| e.instructor? }.map(&:course_id).uniq
-    student_course_ids = enrollments.select{|e| !e.admin? }.map(&:course_id).uniq
-    assignments = Assignment.for_courses(mgmt_course_ids + student_course_ids).active.due_after(Time.now)
-    student_assignments = assignments.select{|a| student_course_ids.include?(a.context_id) }
-    mgmt_assignments = assignments - student_assignments
-
-    due_assignment_ids = []
-    grading_assignment_ids = []
-    assignment_reminders.each do |r|
-      res = r.update_for(self)
-      if r.reminder_type == 'grading' && res
-        grading_assignment_ids << r.assignment_id
-      elsif r.reminder_type == 'due_at' && res
-        due_assignment_ids << r.assignment_id
-      end
-    end
-    needed_ids = student_assignments.map(&:id) - due_assignment_ids
-    student_assignments.select{|a| needed_ids.include?(a.id) }.each do |assignment|
-      r = assignment_reminders.build(:user => self, :assignment => assignment, :reminder_type => 'due_at')
-      r.update_for(assignment)
-    end
-    needed_ids = mgmt_assignments.map(&:id) - grading_assignment_ids
-    mgmt_assignments.select{|a| needed_ids.include?(a.id) }.each do |assignment|
-      r = assignment_reminders.build(:user => self, :assignment => assignment, :reminder_type => 'grading')
-      r.update_for(assignment)
-    end
-    save
-  end
-
   def self_enroll_if_necessary
     return unless @self_enrollment_course
     @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
@@ -1656,16 +1670,20 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
-    res = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
-      courses = send(association).distinct_on(["courses.id"],
-        :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-        :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
-      unless options[:include_completed_courses]
-        date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
-        courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
-      end
-      courses
-    end.dup
+    res = self.shard.activate do
+      Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
+        courses = send(association).with_each_shard do |scope|
+          scope.distinct_on(["courses.id"],
+            :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+            :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
+        end
+        unless options[:include_completed_courses]
+          date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
+          courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
+        end
+        courses
+      end.dup
+    end
     if association == :current_and_invited_courses
       if enrollment_uuid && pending_course = Course.find(:first,
         :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
@@ -1685,8 +1703,10 @@ class User < ActiveRecord::Base
   memoize :courses_with_primary_enrollment
 
   def cached_active_emails
-    Rails.cache.fetch([self, 'active_emails'].cache_key) do
-      self.communication_channels.active.email.map(&:path)
+    self.shard.activate do
+      Rails.cache.fetch([self, 'active_emails'].cache_key) do
+        self.communication_channels.active.email.map(&:path)
+      end
     end
   end
 
@@ -1700,26 +1720,32 @@ class User < ActiveRecord::Base
 
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
-    res = Rails.cache.fetch([self, 'current_enrollments', opts[:include_enrollment_uuid] ].cache_key) do
-      res = self.current_and_invited_enrollments(true).to_a.dup
-      if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
-        res << pending_enrollment
-        res.uniq!
+    self.shard.activate do
+      res = Rails.cache.fetch([self, 'current_enrollments', opts[:include_enrollment_uuid] ].cache_key) do
+        res = self.current_and_invited_enrollments.with_each_shard
+        if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
+          res << pending_enrollment
+          res.uniq!
+        end
+        res
       end
-      res
     end + temporary_invitations
   end
   memoize :cached_current_enrollments
 
   def cached_not_ended_enrollments
-    @cached_all_enrollments = Rails.cache.fetch([self, 'not_ended_enrollments'].cache_key) do
-      self.not_ended_enrollments.to_a
+    self.shard.activate do
+      @cached_all_enrollments = Rails.cache.fetch([self, 'not_ended_enrollments'].cache_key) do
+        self.not_ended_enrollments.with_each_shard
+      end
     end
   end
 
   def cached_current_group_memberships
-    @cached_current_group_memberships = Rails.cache.fetch([self, 'current_group_memberships'].cache_key) do
-      self.current_group_memberships.to_a
+    self.shard.activate do
+      @cached_current_group_memberships = Rails.cache.fetch([self, 'current_group_memberships'].cache_key) do
+        self.current_group_memberships.with_each_shard
+      end
     end
   end
 
@@ -2462,7 +2488,12 @@ class User < ActiveRecord::Base
   end
 
   def find_pseudonym_for_account(account, allow_implicit = false)
-    self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
+    # try to find one that's already loaded if possible
+    if self.pseudonyms.loaded?
+      p = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
+      return p if p
+    end
+    self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
   end
 
   # account = the account that you want a pseudonym for
@@ -2473,7 +2504,7 @@ class User < ActiveRecord::Base
     pseudonym = find_pseudonym_for_account(account)
     if !pseudonym
       # list of copyable pseudonyms
-      active_pseudonyms = self.pseudonyms.select { |p| p.active? && !p.password_auto_generated? && !p.account.delegated_authentication? }
+      active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p|!p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
       templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account
@@ -2664,16 +2695,21 @@ class User < ActiveRecord::Base
   end
 
   def accounts
-    Shard.with_each_shard(self.associated_shards) do
-      AccountUser.find(:all, :conditions => { :user_id => self.id }, :include => :account).map(&:account).uniq
-    end
+    self.account_users.with_each_shard(:include => :account).map(&:account).uniq
   end
   memoize :accounts
 
   def all_pseudonyms(options = {})
-    Shard.with_each_shard(self.associated_shards) do
-      Pseudonym.scoped(options).find(:all, :conditions => { :user_id => self.id })
-    end
+    self.pseudonyms.with_each_shard(options)
   end
   memoize :all_pseudonyms
+
+  def all_active_pseudonyms(*args)
+    args.unshift(:conditions => {:workflow_state => 'active'})
+    all_pseudonyms(*args)
+  end
+
+  def prefers_gradebook2?
+    preferences[:use_gradebook2] != false
+  end
 end

@@ -79,6 +79,10 @@ class HostUrl
       res ||= @@file_host = default_host
     end
 
+    def file_host_with_shard(account, current_host = nil)
+      [file_host(account, current_host), Shard.default]
+    end
+
     def cdn_host
       # by default only set it for development. useful so that gravatar can
       # proxy our fallback urls

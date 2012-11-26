@@ -51,36 +51,38 @@ define([
       rubricEditing.sizeRatings($criterion);
       return $criterion;
     },
-    findOutcomeCriterion: function($rubric) {
-      $("#find_outcome_criterion_dialog").data('current_rubric', $rubric);
-      find_outcome.find(function($outcome) {
-        if(!$("#find_outcome_criterion_dialog").data('current_rubric')) { return; }
-        var $rubric = $("#find_outcome_criterion_dialog").data('current_rubric');
-        var outcome_id = $outcome.find(".learning_outcome_id").text();
-        $rubric.find(".criterion.learning_outcome_" + outcome_id).find(".delete_criterion_link").click();
-        $rubric.find(".add_criterion_link").click();
-        var $criterion = $rubric.find(".criterion:not(.blank):last");
-        $criterion.toggleClass('ignore_criterion_for_scoring', !$outcome.find(".criterion_for_scoring").attr('checked'));
-        $criterion.find(".mastery_points").val($outcome.find(".mastery_points").text());
-        $criterion.addClass("learning_outcome_criterion");
-        $criterion.find(".learning_outcome_id").text(outcome_id);
-        $criterion.find(".criterion_points").val($outcome.find(".rating:not(.blank):first .points").text()).blur();
-        for(var idx = 0; idx < $outcome.find(".rating:not(.blank)").length - 2; idx++) {
-          $criterion.find(".rating:not(.blank):first").addClass('add_column').click();
-        }
-        $criterion.find(".rating:not(.blank)").each(function(i) {
-          var data = $outcome.find(".rating:not(.blank)").eq(i).getTemplateData({textValues: ['description', 'points']});
-          $(this).fillTemplateData({data: data});
-        });
-        var long_description = $outcome.find(".body.description").html();
-        var mastery_points = $outcome.find(".mastery_points").text();
-        $criterion.find(".cancel_button").click();
-        $criterion.find(".long_description").val(long_description);
-        $criterion.find(".long_description_holder").toggleClass('empty', !long_description);
-        $criterion.find(".criterion_description_value").text($outcome.find(".short_description").text());
-        $criterion.find(".criterion_description").val($outcome.find(".short_description").text()).focus().select();
-        $criterion.find(".mastery_points").text(mastery_points);
-      }, {for_rubric: true});
+    onFindOutcome: function(outcome) {
+      var $rubric = $('table.rubric:visible:first'),
+          $criterion;
+
+      $rubric.find(".criterion.learning_outcome_" + outcome.id).find(".delete_criterion_link").click();
+      $rubric.find(".add_criterion_link").click();
+
+      $criterion = $rubric.find('.criterion:not(.blank):last');
+
+      $criterion.toggleClass('ignore_criterion_for_scoring', !outcome.useForScoring);
+      $criterion.find('.mastery_points').val(outcome.get('mastery_points'));
+      $criterion.addClass('learning_outcome_criterion');
+      $criterion.find('.learning_outcome_id').text(outcome.id);
+      $criterion.find(".criterion_points").val(outcome.get('ratings')[0].points).blur();
+
+      for (var i = 0; i < outcome.get('ratings').length - 2; i++) {
+        $criterion.find('.rating:not(.blank):first').addClass('add_column').click();
+      }
+
+      $criterion.find('.rating:not(.blank)').each(function(i) {
+        $(this).fillTemplateData(outcome.get('ratings')[i]);
+      });
+
+      $criterion.find(".cancel_button").click();
+
+      $criterion.find(".long_description").val(outcome.get('description'));
+      $criterion.find(".long_description_holder").toggleClass('empty', !outcome.get('description'));
+
+      $criterion.find(".criterion_description_value").text(outcome.get('title'));
+      $criterion.find(".criterion_description").val(outcome.get('title')).focus().select();
+
+      $criterion.find(".mastery_points").text(outcome.get('mastery_points'));
     },
     hideCriterionAdd: function($rubric) {
       $rubric.find('.add_right, .add_left, .add_column').removeClass('add_left add_right add_column');
@@ -725,9 +727,6 @@ define([
       var $criterion = rubricEditing.addCriterion($(this).parents(".rubric")); //"#default_rubric"));
       rubricEditing.editCriterion($criterion);
       return false;
-    }).delegate('.find_outcome_link', 'click', function(event) {
-      rubricEditing.findOutcomeCriterion($(this).parents(".rubric"));
-      return false;
     }).delegate('.criterion_description_value', 'click', function(event) {
       rubricEditing.editCriterion($(this).parents(".criterion"));
       return false;
@@ -912,7 +911,6 @@ define([
     $.publish('edit_rubric/initted')
   };
 
-  $(function() { rubricEditing.init() });
-
+  return rubricEditing;
 });
 

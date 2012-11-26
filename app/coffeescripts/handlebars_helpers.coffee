@@ -1,5 +1,4 @@
 define [
-  'ENV'
   'vendor/handlebars.vm'
   'i18nObj'
   'jquery'
@@ -11,7 +10,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (ENV, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, convertApiUserContent) ->
+], (Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, convertApiUserContent) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (key, defaultValue, options) ->
@@ -109,6 +108,9 @@ define [
         return fn(this) if arg
       inverse(this)
 
+    # {{#eachWithIndex records}}
+    #   <li class="legend_item{{_index}}"><span></span>{{Name}}</li>
+    # {{/each_with_index}}
     eachWithIndex: (context, options) ->
       fn = options.fn
       inverse = options.inverse

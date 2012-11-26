@@ -80,6 +80,38 @@ Rails::Initializer.run do |config|
     require_dependency 'canvas/plugins/default_plugins'
     ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
   end
+
+  # this patch is perfectly placed to go in as soon as the PostgreSQLAdapter
+  # is required for the first time, but before it's actually used
+  Rails::Initializer.class_eval do
+    def initialize_database_with_postgresql_patches
+      initialize_database_without_postgresql_patches
+
+      if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+        ActiveRecord::Base.class_eval do
+          # Override to support custom postgresql connection parameters
+          def self.postgresql_connection(config) # :nodoc:
+            config = config.symbolize_keys
+            config[:user] = config.delete(:username)
+
+            if config.has_key?(:database)
+              config[:dbname] = config.delete(:database)
+            else
+              raise ArgumentError, "No database specified. Missing argument: database."
+            end
+
+            # The postgres drivers don't allow the creation of an unconnected PGconn object,
+            # so just pass a nil connection object for the time being.
+            ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [config], config)
+          end
+        end
+
+        # now let's try this again
+        ActiveRecord::Base.establish_connection
+      end
+    end
+    alias_method_chain :initialize_database, :postgresql_patches
+  end
 end
 
 # Extend any base classes, even gem classes

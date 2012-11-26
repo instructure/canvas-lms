@@ -4,13 +4,6 @@ module Canvas
   # this to :raise to raise an exception.
   mattr_accessor :protected_attribute_error
 
-  # defines the behavior around casting arguments passed into dynamic finders.
-  # Arguments are coerced to the appropriate type (if the column exists), so
-  # things like find_by_id('123') become find_by_id(123). The default (:log)
-  # logs a warning if the cast isn't clean (e.g. '123a' -> 123 or '' -> 0).
-  # Set this to :raise to raise an error on unclean casts.
-  mattr_accessor :dynamic_finder_type_cast_error
-
   # defines the behavior when nil or empty array arguments passed into dynamic
   # finders. The default (:log) logs a warning if the finder is not scoped and
   # if *all* arguments are nil/[], e.g.

@@ -101,7 +101,10 @@ define [
 
     reuploadSubmissions: =>
       unless @$re_upload_submissions_form
-        GradebookHeaderMenu::$re_upload_submissions_form = $(re_upload_submissions_form())
+        locals =
+          authenticityToken: $("#ajax_authenticity_token").text()
+
+        GradebookHeaderMenu::$re_upload_submissions_form = $(re_upload_submissions_form(locals))
           .dialog
             width: 400
             modal: true

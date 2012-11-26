@@ -86,6 +86,7 @@ class Pool
     say "Started job master", :info
     $0 = "delayed_jobs_pool"
     read_config(options[:config_file])
+    unlock_orphaned_jobs
     spawn_periodic_auditor
     spawn_all_workers
     say "Workers spawned"
@@ -109,6 +110,17 @@ class Pool
   def load_rails
     require(expand_rails_path("config/environment.rb"))
     Dir.chdir(Rails.root)
+  end
+
+  def unlock_orphaned_jobs(pid = nil)
+    # don't bother trying to unlock jobs by process name if the name is overridden
+    return if @config.key?(:name)
+    return if @config[:disable_automatic_orphan_unlocking]
+    return if @config[:workers].any? { |worker_config| worker_config.key?(:name) || worker_config.key?('name') }
+
+    unlocked_jobs = Delayed::Job.unlock_orphaned_jobs(pid)
+    say "Unlocked #{unlocked_jobs} orphaned jobs" if unlocked_jobs > 0
+    ActiveRecord::Base.connection_handler.clear_all_connections!
   end
 
   def spawn_all_workers
@@ -176,6 +188,7 @@ class Pool
           say "ran auditor: #{worker}"
         else
           say "child exited: #{child}, restarting", :info
+          unlock_orphaned_jobs(child)
           spawn_worker(worker.config)
         end
       end

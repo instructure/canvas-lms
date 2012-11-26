@@ -18,14 +18,14 @@ describe "Standard Common Cartridge importing" do
       FileUtils::rm_rf(@export_folder)
     end
   end
-  
+
   before(:each) do
-     @course = course
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
-      @course.import_from_migration(@course_data, nil, @migration)
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    @course.import_from_migration(@course_data, nil, @migration)
   end
-  
+
   it "should import webcontent" do
     @course.attachments.count.should == 10
     atts = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
@@ -211,6 +211,55 @@ describe "Standard Common Cartridge importing" do
       tag.content_type.should == 'Attachment'
       tag.content_id.should == @course.attachments.active.find_by_migration_id("I_00001_R").id
       puts mod1.content_tags.active.count
+    end
+  end
+
+  context "selective import" do
+    before(:each) do
+      @course = course
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {
+              :copy => {"topics" => {"I_00006_R" => true},
+                        "everything" => "0",
+                        "folders" =>
+                                {"I_00006_Media" => true,
+                                 "6a35b0974f59819404dc86d48fe39fc3" => true,
+                                 "I_00001_R" => true},
+                        "all_quizzes" => "1",
+                        "all_external_tools" => "0",
+                        "all_groups" => "0",
+                        "all_modules" => "0",
+                        "all_rubrics" => "0",
+                        "assessment_questions" => "1",
+                        "all_wikis" => "0",
+                        "all_files" => "0",
+                        "all_assignments" => "1",
+                        "topic_entries" => {"undefined" => true},
+                        "external_tools" => {"I_00011_R" => true},
+                        "shift_dates" => "0",
+                        "all_topics" => "0",
+                        "all_announcements" => "0",
+                        "files" =>
+                                {"I_00006_Media" => true,
+                                 "7acb90d1653008e73753aa2cafb16298" => true,
+                                 "6a35b0974f59819404dc86d48fe39fc3" => true,
+                                 "I_00003_R_IMAGERESOURCE" => true,
+                                 "I_00001_R" => true},
+                        "modules" => {"I_00000" => true},
+                        "all_assignment_groups" => "0"}}.with_indifferent_access
+
+      @course.import_from_migration(@course_data, nil, @migration)
+    end
+
+    it "should selectively import files" do
+      @course.attachments.count.should == 5
+      @course.context_external_tools.count.should == 1
+      @course.context_external_tools.first.migration_id.should == "I_00011_R"
+      @course.context_modules.count.should == 1
+      @course.context_modules.first.migration_id.should == 'I_00000'
+      @course.wiki.wiki_pages.count.should == 0
+      @course.discussion_topics.count.should == 1
+      @course.discussion_topics.first.migration_id.should == 'I_00006_R'
     end
   end
 

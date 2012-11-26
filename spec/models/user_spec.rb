@@ -674,6 +674,139 @@ describe User do
       @user1.move_to_user(@user2)
       @oe.reload.associated_user_id.should == @user2.id
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should merge a user across shards" do
+        @user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
+        @p1 = @pseudonym
+        @cc1 = @cc
+        @shard1.activate do
+          account = Account.create!
+          @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
+          @p2 = @pseudonym
+        end
+
+        @shard2.activate do
+          @user1.move_to_user(@user2)
+        end
+
+        @user1.should be_deleted
+        @p1.reload.user.should == @user2
+        @cc1.reload.should be_retired
+        @user2.communication_channels.all.map(&:path).sort.should == ['user1@example.com', 'user2@example.com']
+        @user2.all_pseudonyms.should == [@p2, @p1]
+        @user2.associated_shards.should == [@shard1, Shard.default]
+      end
+
+      it "should move ccs to the new user (but only if they don't already exist)" do
+        @user1 = user_model
+        @shard1.activate do
+          @user2 = user_model
+        end
+
+        # unconfirmed => active conflict
+        @user1.communication_channels.create!(:path => 'a@instructure.com')
+        @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'B@instructure.com')
+        # active => active conflict
+        @user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # unconfirmed => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'd@instructure.com')
+        @user2.communication_channels.create!(:path => 'D@instructure.com')
+        # retired => unconfirmed conflict
+        @user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'E@instructure.com')
+        # unconfirmed => retired conflict
+        @user1.communication_channels.create!(:path => 'f@instructure.com')
+        @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => active conflict
+        @user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => retired conflict
+        @user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
+        @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => retired conflict
+        @user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # <nothing> => active
+        @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active => <nothing>
+        @user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # <nothing> => unconfirmed
+        @user2.communication_channels.create!(:path => 'l@instructure.com')
+        # unconfirmed => <nothing>
+        @user1.communication_channels.create!(:path => 'm@instructure.com')
+        # <nothing> => retired
+        @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired => <nothing>
+        @user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
+
+        @shard2.activate do
+          @user1.move_to_user(@user2)
+        end
+
+        @user1.reload
+        @user2.reload
+        @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+            ['A@instructure.com', 'active'],
+            ['B@instructure.com', 'retired'],
+            ['C@instructure.com', 'active'],
+            ['D@instructure.com', 'unconfirmed'],
+            ['E@instructure.com', 'unconfirmed'],
+            ['F@instructure.com', 'retired'],
+            ['G@instructure.com', 'active'],
+            ['H@instructure.com', 'retired'],
+            ['I@instructure.com', 'retired'],
+            ['b@instructure.com', 'active'],
+            ['f@instructure.com', 'unconfirmed'],
+            ['h@instructure.com', 'active'],
+            ['i@instructure.com', 'retired'],
+            ['j@instructure.com', 'active'],
+            ['k@instructure.com', 'active'],
+            ['l@instructure.com', 'unconfirmed'],
+            ['m@instructure.com', 'unconfirmed'],
+            ['n@instructure.com', 'retired'],
+            ['o@instructure.com', 'retired']
+        ]
+        # on cross shard merges, the deleted user retains all CCs (pertinent ones were
+        # duplicated over to the surviving shard)
+        @user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+            ['a@instructure.com', 'retired'],
+            ['b@instructure.com', 'retired'],
+            ['c@instructure.com', 'retired'],
+            ['d@instructure.com', 'retired'],
+            ['e@instructure.com', 'retired'],
+            ['f@instructure.com', 'retired'],
+            ['g@instructure.com', 'retired'],
+            ['h@instructure.com', 'retired'],
+            ['i@instructure.com', 'retired'],
+            ['k@instructure.com', 'retired'],
+            ['m@instructure.com', 'retired'],
+            ['o@instructure.com', 'retired']
+        ]
+      end
+
+      it "should not fail copying retired sms channels" do
+        @user1 = User.create!
+        @shard1.activate do
+          @user2 = User.create!
+        end
+
+        @cc = @user2.communication_channels.sms.create!(:path => 'abc')
+        @cc.retire!
+
+        @user2.move_to_user(@user1)
+        @user1.communication_channels.reload.length.should == 1
+        cc = @user1.communication_channels.first
+        cc.path.should == 'abc'
+        cc.workflow_state.should == 'retired'
+      end
+    end
   end
 
   describe "can_masquerade?" do
@@ -1370,6 +1503,24 @@ describe User do
 
       @user1.cached_current_enrollments.should == [@enrollment]
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should include enrollments from all shards" do
+        user = User.create!
+        course1 = Account.default.courses.create!
+        course1.offer!
+        e1 = course1.enroll_student(user)
+        e2 = @shard1.activate do
+          account2 = Account.create!
+          course2 = account2.courses.create!
+          course2.offer!
+          course2.enroll_student(user)
+        end
+        user.cached_current_enrollments.should == [e1, e2]
+      end
+    end
   end
 
   describe "pseudonym_for_account" do
@@ -1465,6 +1616,31 @@ describe User do
       @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :password => 'ghijkl', :password_confirmation => 'ghijkl')
       @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should find a pseudonym in another shard" do
+        @shard1.activate do
+          account = Account.create!
+          user_with_pseudonym(:active_all => 1, :account => account)
+        end
+        @p2 = Account.site_admin.pseudonyms.create!(:user => @user, :unique_id => 'user')
+        @p2.any_instantiation.stubs(:works_for_account?).with(Account.site_admin, false).returns(true)
+        @user.find_pseudonym_for_account(Account.site_admin).should == @p2
+      end
+
+      it "should copy a pseudonym from another shard" do
+        @shard1.activate do
+          account = Account.create!
+          user_with_pseudonym(:active_all => 1, :account => account, :password => 'qwerty')
+        end
+        p = @user.find_or_initialize_pseudonym_for_account(Account.site_admin)
+        p.should be_new_record
+        p.save!
+        p.valid_password?('qwerty').should be_true
+      end
+    end
   end
 
   describe "email_channel" do
@@ -1510,12 +1686,8 @@ describe User do
       @account = account_model
       course :active_all => true, :account => @account
       u = User.create!
-      pseudonyms = mock()
-      u.stubs(:pseudonyms).returns(pseudonyms)
-      pseudonyms.stubs(:loaded?).returns(false)
-      pseudonyms.stubs(:active).returns(pseudonyms)
-      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
-      u.sis_pseudonym_for(@course).should == 42
+      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(@course).should == p
     end
 
     it "should find the right root account for a group" do
@@ -1523,40 +1695,45 @@ describe User do
       course :active_all => true, :account => @account
       @group = group :group_context => @course
       u = User.create!
-      pseudonyms = mock()
-      u.stubs(:pseudonyms).returns(pseudonyms)
-      pseudonyms.stubs(:loaded?).returns(false)
-      pseudonyms.stubs(:active).returns(pseudonyms)
-      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
-      u.sis_pseudonym_for(@group).should == 42
+      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(@group).should == p
     end
 
     it "should find the right root account for a non-root-account" do
       @root_account = account_model
       @account = @root_account.sub_accounts.create!
       u = User.create!
-      pseudonyms = mock()
-      u.stubs(:pseudonyms).returns(pseudonyms)
-      pseudonyms.stubs(:loaded?).returns(false)
-      pseudonyms.stubs(:active).returns(pseudonyms)
-      pseudonyms.expects(:find_by_account_id).with(@root_account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
-      u.sis_pseudonym_for(@account).should == 42
+      p = @root_account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(@account).should == p
     end
 
     it "should find the right root account for a root account" do
       @account = account_model
       u = User.create!
-      pseudonyms = mock()
-      u.stubs(:pseudonyms).returns(pseudonyms)
-      pseudonyms.stubs(:loaded?).returns(false)
-      pseudonyms.stubs(:active).returns(pseudonyms)
-      pseudonyms.expects(:find_by_account_id).with(@account.id, :conditions => ["sis_user_id IS NOT NULL"]).returns(42)
-      u.sis_pseudonym_for(@account).should == 42
+      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      u.sis_pseudonym_for(@account).should == p
     end
 
     it "should bail if it can't find a root account" do
       context = Course.new # some context that doesn't have an account
       (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
+    end
+
+    context "sharding" do
+      it_should_behave_like 'sharding'
+
+      it "should find a pseudonym on a different shard" do
+        @shard1.activate do
+          @user = User.create!
+        end
+        @pseudonym = Account.default.pseudonyms.create!(:user => @user, :unique_id => 'user') { |p| p.sis_user_id = 'abc' }
+        @shard2.activate do
+          @user.sis_pseudonym_for(Account.default).should == @pseudonym
+        end
+        @shard1.activate do
+          @user.sis_pseudonym_for(Account.default).should == @pseudonym
+        end
+      end
     end
   end
 
@@ -2048,6 +2225,45 @@ describe User do
       @p1.destroy
 
       @user.all_pseudonyms(:conditions => { :workflow_state => 'active' }).should == [@p2]
+    end
+  end
+
+  describe "active_pseudonyms" do
+    before :each do
+      user_with_pseudonym(:active_all => 1)
+    end
+
+    it "should include active pseudonyms" do
+      @user.active_pseudonyms.should == [@pseudonym]
+    end
+
+    it "should not include deleted pseudonyms" do
+      @pseudonym.destroy
+      @user.active_pseudonyms.should be_empty
+    end
+  end
+
+  describe "prefers_gradebook2?" do
+    let(:user) { User.new }
+    subject { user.prefers_gradebook2? }
+
+    context "by default" do
+      it { should be_true }
+    end
+
+    context "with an explicit preference for gradebook 2" do
+      before { user.stubs(:preferences => { :use_gradebook2 => true }) }
+      it { should be_true }
+    end
+
+    context "with an truthy preference for gradebook 2" do
+      before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
+      it { should be_true }
+    end
+
+    context "with an explicit preference for gradebook 1" do
+      before { user.stubs(:preferences => { :use_gradebook2 => false }) }
+      it { should be_false }
     end
   end
 end

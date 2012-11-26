@@ -35,7 +35,7 @@ class CommunicationChannel < ActiveRecord::Base
   before_save :consider_building_pseudonym
   validates_presence_of :path
   validate :uniqueness_of_path
-  validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? }
+  validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
 
   acts_as_list :scope => :user_id
   
@@ -359,4 +359,17 @@ class CommunicationChannel < ActiveRecord::Base
   protected :assert_path_type
     
   def self.serialization_excludes; [:confirmation_code]; end
+
+  def self.associated_shards(path)
+    [Shard.default]
+  end
+
+  def merge_candidates
+    shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
+    shards ||= [Shard.default]
+    scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
+    Shard.with_each_shard(shards) do
+      scope.find(:all, :conditions => ["user_id<>?", self.user_id], :include => :user).map(&:user)
+    end.uniq.select { |u| u.all_active_pseudonyms.length != 0 }
+  end
 end

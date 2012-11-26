@@ -64,7 +64,7 @@ describe "i18n js" do
       # everything except %N %6N %9N %U %V %W %Z
       format = "%a %A %b %B %d %-d %D %e %F %h %H %I %j %k %l %L %m %M %n %3N %p %P %r %R %s %S %t %T %u %v %w %y %Y %z %%"
       date = Time.now
-      driver.execute_script(<<-JS).should == date.strftime(format)
+      driver.execute_script(<<-JS).upcase.should == date.strftime(format).upcase
         var date = new Date(#{date.strftime('%s')} * 1000 + #{date.strftime('%L').gsub(/^0+/, '')});
         return I18n.strftime(date, '#{format}');
       JS

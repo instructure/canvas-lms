@@ -174,8 +174,8 @@ class Enrollment < ActiveRecord::Base
     :joins => :course,
     :conditions => ["courses.start_at > ?
                     AND courses.workflow_state = 'available'
-                    AND courses.restrict_enrollments_to_course_dates = TRUE
-                    AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now]
+                    AND courses.restrict_enrollments_to_course_dates = ?
+                    AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now, true]
   } }
 
   named_scope :past,
@@ -310,7 +310,13 @@ class Enrollment < ActiveRecord::Base
 
   def clear_email_caches
     if self.workflow_state_changed? && (self.workflow_state_was == 'invited' || self.workflow_state == 'invited')
-      self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+      if Enrollment.cross_shard_invitations?
+        Shard.default.activate do
+          self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'all_invited_enrollments'].cache_key)}
+        end
+      else
+        self.user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)}
+      end
     end
   end
 
@@ -485,23 +491,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_dates
-    Rails.cache.fetch([self, self.course, 'enrollment_date_ranges'].cache_key) do
-      result = []
-      if self.start_at && self.end_at
-        result << [self.start_at, self.end_at]
-      elsif course_section.try(:restrict_enrollments_to_section_dates)
-        result << [course_section.start_at, course_section.end_at]
-        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
-      elsif course.try(:restrict_enrollments_to_course_dates)
-        result << [course.start_at, course.conclude_at]
-        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
-      elsif course.try(:enrollment_term)
-        result << course.enrollment_term.enrollment_dates_for(self)
-      else
-        result << [nil, nil]
-      end
-      result
-    end
+    Canvas::Builders::EnrollmentDateBuilder.build(self)
   end
 
   def state_based_on_date
@@ -513,20 +503,17 @@ class Enrollment < ActiveRecord::Base
       start_at, end_at = range
       # start_at <= now <= end_at, allowing for open ranges on either end
       return state if (start_at || now) <= now && now <= (end_at || now)
-      return state if state == :invited &&
-        course.restrict_enrollments_to_course_dates &&
-        now < start_at
     end
 
     # Not strictly within any range
-    return state unless global_start_at = ranges.map(&:first).compact.min
+    return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
       :completed
     # Allow student view students to use the course before the term starts
-    elsif !self.fake_student?
-      :inactive
-    else
+    elsif self.fake_student? || state == :invited
       state
+    else
+      :inactive
     end
   end
 
@@ -843,8 +830,18 @@ class Enrollment < ActiveRecord::Base
     }
   }
   def self.cached_temporary_invitations(email)
-    Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
-      Enrollment.invited.for_email(email).to_a
+    if Enrollment.cross_shard_invitations?
+      Shard.default.activate do
+        invitations = Rails.cache.fetch([email, 'all_invited_enrollments'].cache_key) do
+          Shard.with_each_shard(CommunicationChannel.associated_shards(email)) do
+            Enrollment.invited.for_email(email).to_a
+          end
+        end
+      end
+    else
+      Rails.cache.fetch([email, 'invited_enrollments'].cache_key) do
+        Enrollment.invited.for_email(email).to_a
+      end
     end
   end
 
@@ -964,5 +961,9 @@ class Enrollment < ActiveRecord::Base
     course_section && course_section.end_at ||
     course.conclude_at ||
     course.enrollment_term && course.enrollment_term.end_at
+  end
+
+  def self.cross_shard_invitations?
+    false
   end
 end

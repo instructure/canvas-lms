@@ -99,6 +99,10 @@ module CC
     def export_object?(obj)
       @content_export ? @content_export.export_object?(obj) : true
     end
+
+    def export_symbol?(obj)
+      @content_export ? @content_export.export_symbol?(obj) : true
+    end
     
     private
     

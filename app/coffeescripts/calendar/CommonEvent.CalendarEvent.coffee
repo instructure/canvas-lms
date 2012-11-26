@@ -18,7 +18,7 @@ define [
     copyDataFromObject: (data) =>
       data = data.calendar_event if data.calendar_event
       @object = @calendarEvent = data
-      @id = "calendar_event_#{data.id}"
+      @id = "calendar_event_#{data.id}" if data.id
       @title = data.title || "Untitled"
       @start = if data.start_at then $.parseFromISO(data.start_at).time else null
       @end = if data.end_at then $.parseFromISO(data.end_at).time else null

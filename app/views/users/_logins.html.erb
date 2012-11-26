@@ -3,7 +3,7 @@
   <fieldset id="login_information">
     <legend><%= t('titles.logins', 'Login Information') %></legend>
     <table>
-      <% pseudonyms = @user.all_pseudonyms(:include => { :account => :account_authorization_configs }, :conditions => { :workflow_state => 'active' }) + [nil] %>
+      <% pseudonyms = @user.all_active_pseudonyms + [nil] %>
       <% pseudonyms.each do |pseudonym| %>
         <% can_change_pseudonym_password = (pseudonym && pseudonym.account && pseudonym.account.settings && pseudonym.account.settings[:admins_can_change_passwords]) && pseudonym.account.canvas_authentication? %>
         <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">

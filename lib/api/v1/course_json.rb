@@ -1,0 +1,95 @@
+module Api::V1
+  class CourseJson
+
+    BASE_ATTRIBUTES = %w(id name course_code account_id start_at default_view)
+    
+    INCLUDE_CHECKERS = { :grading => 'needs_grading_count', :syllabus => 'syllabus_body', 
+                         :url => 'html_url', :description => 'public_description' }
+    
+    OPTIONAL_FIELDS = %w(needs_grading_count public_description enrollments)
+
+    attr_reader :course, :user, :includes, :enrollments, :hash
+
+    def initialize(course, user, includes, enrollments)
+      @course = course
+      @user = user
+      @includes = includes.map{ |include_key| include_key.to_sym }
+      @enrollments = enrollments
+      if block_given? 
+        @hash = yield(self, self.allowed_attributes, self.methods_to_send) 
+      else
+        @hash = {}
+      end
+    end
+    
+    def allowed_attributes 
+      @allowed_attributes ||= @includes.is_a?(Array) ? BASE_ATTRIBUTES + @includes : BASE_ATTRIBUTES 
+    end
+    
+    def methods_to_send
+      methods = ['end_at']
+      methods << 'hide_final_grades' if @includes.include?(:hide_final_grades)
+      methods
+    end
+
+    def to_hash
+      set_sis_course_id(@hash, @course, @user)
+      @hash['enrollments'] = extract_enrollments( @enrollments )
+      @hash['needs_grading_count'] = needs_grading_count(@enrollments, @course) 
+      @hash['public_description'] = description(@course)
+      @hash['hide_final_grades'] = (@course.hide_final_grades.to_s == 'true')
+      clear_unneeded_fields(@hash)
+    end
+
+    def self.to_hash(course, user, includes, enrollments, &block)
+      self.new(course, user, includes, enrollments, &block).to_hash
+    end
+
+    def clear_unneeded_fields(hash)
+      hash.reject{|k, v| (OPTIONAL_FIELDS.include?(k) && v.nil?) }
+    end
+
+    def description(course)
+      course.public_description if include_description
+    end
+
+    def set_sis_course_id(hash, course, user)
+      if course.root_account.grants_rights?( user, :read_sis, :manage_sis).values.any?
+        hash['sis_course_id'] = course.sis_source_id
+      end
+    end
+
+    def needs_grading_count(enrollments, course)
+      if include_grading && enrollments && enrollments.any? { |e| e.participating_instructor? }
+        course.assignments.active.to_a.sum{|a| a.needs_grading_count_for_user(user)}
+      end
+    end
+
+
+    def extract_enrollments( enrollments )
+      if enrollments
+        enrollments.map do |e|
+          h = { :type => e.readable_type.downcase }
+          if include_total_scores && e.student?
+            h.merge!(
+              :computed_current_score => e.computed_current_score,
+              :computed_final_score => e.computed_final_score,
+              :computed_final_grade => e.computed_final_grade)
+          end
+          h
+        end
+      end
+    end
+
+    INCLUDE_CHECKERS.each do |key, val|
+      define_method("include_#{key}".to_sym) do
+        @includes.include?( val.to_sym )
+      end
+    end
+    
+    def include_total_scores 
+      @includes.include?(:total_scores) && !@course.settings[:hide_final_grade]
+    end
+
+  end
+end

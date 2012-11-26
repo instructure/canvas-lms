@@ -79,6 +79,15 @@ def truncate_all_tables
   end
 end
 
+def truncate_all_cassandra_tables
+  Canvas::Cassandra::Database.config_names.each do |cass_config|
+    db = Canvas::Cassandra::Database.from_config(cass_config)
+    db.keyspace_information.tables.each do |table|
+      db.execute("TRUNCATE #{table}")
+    end
+  end
+end
+
 # wipe out the test db, in case some non-transactional tests crapped out before
 # cleaning up after themselves
 truncate_all_tables
@@ -132,6 +141,7 @@ Spec::Runner.configure do |config|
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
+    truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
   end
 
@@ -508,9 +518,9 @@ Spec::Runner.configure do |config|
   end
 
   def outcome_with_rubric(opts={})
-    @outcome_group ||= LearningOutcomeGroup.default_for(@course)
+    @outcome_group ||= @course.root_outcome_group
     @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
-    @outcome_group.add_item(@outcome)
+    @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
     @rubric = Rubric.generate(:context => @course,
@@ -556,9 +566,9 @@ Spec::Runner.configure do |config|
                                       }
                                   }
                               })
-    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.instance_variable_set('@alignments_changed', true)
     @rubric.save!
-    @rubric.update_outcome_tags
+    @rubric.update_alignments
   end
 
   def grading_standard_for(context)
@@ -821,6 +831,13 @@ Spec::Runner.configure do |config|
   def run_transaction_commit_callbacks(conn = ActiveRecord::Base.connection)
     conn.after_transaction_commit_callbacks.each { |cb| cb.call }
     conn.after_transaction_commit_callbacks.clear
+  end
+
+  def force_string_encoding(str, encoding = "UTF-8")
+    if str.respond_to?(:force_encoding)
+      str.force_encoding(encoding)
+    end
+    str
   end
 
   def verify_post_matches(post_lines, expected_post_lines)

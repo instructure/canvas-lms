@@ -220,3 +220,14 @@ Canvas::Plugin.register('crocodoc', :previews, {
   :settings_partial => 'plugins/crocodoc_settings',
   :settings => nil
 })
+Canvas::Plugin.register('account_reports', nil, {
+  :name => lambda{ t :name, 'Account Reports' },
+  :description => lambda{ t :description, 'Select account reports' },
+  :website => 'http://www.instructure.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/account_report_settings',
+  :settings => nil,
+  :validator => 'AccountReportsValidator'
+})

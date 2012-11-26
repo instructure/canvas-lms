@@ -29,7 +29,7 @@ module Canvas::Migration
           settings[:attachment_id] = cm.attachment.id rescue nil
           settings[:content_migration] = cm
           
-          converter_class = Worker::get_converter(settings)
+          converter_class = settings[:converter_class] || Worker::get_converter(settings)
           converter = converter_class.new(settings)
 
           course = converter.export
@@ -53,7 +53,18 @@ module Canvas::Migration
           end
           cm.workflow_state = :exported
           cm.progress = 0
-          cm.save
+          saved = cm.save
+          
+          if cm.import_immediately?
+            cm.import_content_without_send_later
+            cm.progress = 100
+            saved = cm.save
+            if converter.respond_to?(:post_process)
+              converter.post_process
+            end
+          end
+          
+          saved
         rescue => e
           report = ErrorReport.log_exception(:content_migration, e)
           if cm
@@ -67,7 +78,8 @@ module Canvas::Migration
       def self.enqueue(content_migration)
         Delayed::Job.enqueue(new(content_migration.id),
                              :priority => Delayed::LOW_PRIORITY,
-                             :max_attempts => 1)
+                             :max_attempts => 1,
+                             :strand => content_migration.strand)
       end
     end
   end

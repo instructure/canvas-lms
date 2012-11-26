@@ -85,7 +85,7 @@ describe "Canvas Cartridge importing" do
     tool1.tool_id = "test_tool"
     tool1.settings[:custom_fields] = {"key1" => "value1", "key2" => "value2"}
     tool1.settings[:user_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
-    tool1.settings[:course_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra'}
+    tool1.settings[:course_navigation] = {:text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra', :custom_fields => {"key3" => "value3"}}
     tool1.settings[:account_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
     tool1.settings[:resource_selection] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:editor_button] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra'}
@@ -110,10 +110,11 @@ describe "Canvas Cartridge importing" do
 
     #convert to json
     doc1 = Nokogiri::XML(builder.target!)
-    tool1_hash = @converter.convert_blti_link(doc1)
+    lti_converter = CC::Importer::BLTIConverter.new
+    tool1_hash = lti_converter.convert_blti_link(doc1)
     tool1_hash['migration_id'] = CC::CCHelper.create_key(tool1)
     doc2 = Nokogiri::XML(builder2.target!)
-    tool2_hash = @converter.convert_blti_link(doc2)
+    tool2_hash = lti_converter.convert_blti_link(doc2)
     tool2_hash['migration_id'] = CC::CCHelper.create_key(tool2)
     #import json into new course
     ContextExternalTool.process_migration({'external_tools'=>[tool1_hash, tool2_hash]}, @migration)
@@ -131,15 +132,16 @@ describe "Canvas Cartridge importing" do
     t1.tool_id.should == 'test_tool'
     t1.settings[:icon_url].should == 'http://www.example.com/favicon.ico'
     [:user_navigation, :course_navigation, :account_navigation].each do |type|
-      t1.settings[type][:url].should == "http://www.example.com"
       t1.settings[type][:text].should == "hello"
       t1.settings[type][:labels][:en].should == 'hello'
       t1.settings[type][:labels]['es'].should == 'hola'
       if type == :course_navigation
         t1.settings[type][:default].should == 'disabled'
         t1.settings[type][:visibility].should == 'members'
-        t1.settings[type].keys.map(&:to_s).sort.should == ['default', 'labels', 'text', 'url', 'visibility']
+        t1.settings[type][:custom_fields].should == {"key3" => "value3"}
+        t1.settings[type].keys.map(&:to_s).sort.should == ['custom_fields', 'default', 'labels', 'text', 'visibility']
       else
+        t1.settings[type][:url].should == "http://www.example.com"
         t1.settings[type].keys.map(&:to_s).sort.should == ['labels', 'text', 'url']
       end
     end
@@ -293,15 +295,15 @@ describe "Canvas Cartridge importing" do
   end
   
   def create_learning_outcome
-    lo = @copy_from.learning_outcomes.new
+    lo = @copy_from.created_learning_outcomes.new
     lo.context = @copy_from
     lo.short_description = "Lone outcome"
     lo.description = "<p>Descriptions are boring</p>"
     lo.workflow_state = 'active'
     lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
     lo.save!
-    default = LearningOutcomeGroup.default_for(@copy_from)
-    default.add_item(lo)
+    default = @copy_from.root_outcome_group
+    default.add_outcome(lo)
     lo
   end
   
@@ -331,26 +333,26 @@ describe "Canvas Cartridge importing" do
     lo_g2.title = "Empty Group"
     lo_g2.save!
     
-    lo2 = @copy_from.learning_outcomes.new
+    lo2 = @copy_from.created_learning_outcomes.new
     lo2.context = @copy_from
     lo2.short_description = "outcome in group"
     lo2.workflow_state = 'active'
     lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
     lo2.save!
-    lo_g.add_item(lo2)
+    lo_g.add_outcome(lo2)
     
-    default = LearningOutcomeGroup.default_for(@copy_from)
-    default.add_item(lo_g)
-    default.add_item(lo_g2)
+    default = @copy_from.root_outcome_group
+    default.adopt_outcome_group(lo_g)
+    default.adopt_outcome_group(lo_g2)
     
     import_learning_outcomes
     
-    lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.short_description.should == lo.short_description
     lo_2.description.should == lo.description
     lo_2.data.with_indifferent_access.should == lo.data.with_indifferent_access
     
-    lo2_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo2))
+    lo2_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo2))
     lo2_2.short_description.should == lo2.short_description
     lo2_2.description.should == lo2.description
     lo2_2.data.with_indifferent_access.should == lo2.data.with_indifferent_access
@@ -358,12 +360,12 @@ describe "Canvas Cartridge importing" do
     lo_g_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g))
     lo_g_2.title.should == lo_g.title
     lo_g_2.description.should == lo_g.description
-    lo_g_2.sorted_content.length.should == 1
+    lo_g_2.child_outcome_links.length.should == 1
     
     lo_g2_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g2))
     lo_g2_2.title.should == lo_g2.title
     lo_g2_2.description.should == lo_g2.description
-    lo_g2_2.sorted_content.length.should == 0
+    lo_g2_2.child_outcome_links.length.should == 0
   end
   
   it "should import rubrics" do
@@ -400,7 +402,7 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
 
     @copy_to.rubric_associations.count.should == 2
-    lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2 = @copy_to.created_learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.should_not be_nil
     rubric_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric))
     rubric_2.title.should == rubric.title

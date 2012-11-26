@@ -540,7 +540,7 @@ describe 'Submissions API', :type => :integration do
              'lock_at' => nil,
              'locked_for_user' => false,
              'hidden_for_user' => false,
-             'created_at' => sub1.attachments.first.created_at.as_json,
+             'created_at' => sub1.attachments.first.reload.created_at.as_json,
              'updated_at' => sub1.attachments.first.updated_at.as_json, },
          ],
         "submission_history"=>
@@ -627,7 +627,7 @@ describe 'Submissions API', :type => :integration do
              "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&redirect=1&type=mp4",
              "display_name" => nil
            },
-           "created_at"=>comment.created_at.as_json,
+           "created_at"=>comment.reload.created_at.as_json,
            "author_name"=>"User",
            "author_id"=>@teacher.id}],
         "media_comment" =>
@@ -673,7 +673,7 @@ describe 'Submissions API', :type => :integration do
               'lock_at' => nil,
               'locked_for_user' => false,
               'hidden_for_user' => false,
-              'created_at' => sub2.attachments.first.created_at.as_json,
+              'created_at' => sub2.attachments.first.reload.created_at.as_json,
               'updated_at' => sub2.attachments.first.updated_at.as_json,
             },
              {"content-type" => "image/png",

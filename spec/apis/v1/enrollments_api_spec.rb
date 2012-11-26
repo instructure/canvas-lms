@@ -184,6 +184,38 @@ describe EnrollmentsApiController, :type => :integration do
             :enrollment_state                   => 'active',
             :notify                             => false }})
       end
+
+      it "should not allow enrollments to be added to a hard-concluded course" do
+        @course.complete
+        raw_api_call :post, @path, @path_options, {
+          :enrollment => {
+            :user_id                            => @unenrolled_user.id,
+            :type                               => 'StudentEnrollment',
+            :enrollment_state                   => 'active',
+            :course_section_id                  => @section.id,
+            :limit_privileges_to_course_section => true
+          }
+        }
+
+        JSON.parse(response.body)['message'].should eql 'Can\'t add an enrollment to a concluded course.'
+      end
+
+      it "should not allow enrollments to be added to a soft-concluded course" do
+        @course.conclude_at = 1.day.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+        raw_api_call :post, @path, @path_options, {
+            :enrollment => {
+                :user_id                            => @unenrolled_user.id,
+                :type                               => 'StudentEnrollment',
+                :enrollment_state                   => 'active',
+                :course_section_id                  => @section.id,
+                :limit_privileges_to_course_section => true
+            }
+        }
+
+        JSON.parse(response.body)['message'].should eql 'Can\'t add an enrollment to a concluded course.'
+      end
     end
 
     context "a teacher" do

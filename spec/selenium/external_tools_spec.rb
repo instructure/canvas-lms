@@ -7,6 +7,22 @@ describe "editing external tools" do
     course_with_teacher_logged_in
   end
 
+  it "should clear the shared secret after saving" do
+    tool_name = 'test tool'
+    get "/courses/#{@course.id}/settings"
+    f("#tab-tools-link").click
+    f('.add_tool_link').click
+    f('#external_tool_name').send_keys(tool_name)
+    f('#external_tool_consumer_key').send_keys('fdjaklfjdaklfdjaslfjajfkljsalkjflas')
+    f('#external_tool_shared_secret').send_keys('r08132ufio1jfj1iofj3j1kf3ljl1')
+    f('#external_tool_domain').send_keys('instructure.com')
+    submit_form('#external_tool_form')
+    wait_for_ajaximations
+    f("#external_tool_#{ContextExternalTool.find_by_name(tool_name).id} .edit_tool_link").click
+    f('#external_tool_name').should have_attribute(:value, tool_name)
+    f('#external_tool_shared_secret').should have_attribute(:value, "")
+  end
+
   it "should allow creating a new course external tool with custom fields" do
     get "/courses/#{@course.id}/settings"
     f("#tab-tools-link").click

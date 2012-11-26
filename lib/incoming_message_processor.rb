@@ -30,37 +30,37 @@ class IncomingMessageProcessor
     Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue TextHelper.strip_invalid_utf8(string)
   end
 
-  def self.process_single(message, secure_id, message_id)
-    if message.multipart? && part = message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
+  def self.process_single(incoming_message, secure_id, message_id)
+    if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
       html_body = utf8ify(part.body.decoded, part.charset)
     end
-    html_body = utf8ify(message.body.decoded, message.charset) if !message.multipart? && message.content_type.try(:match, %r{^text/html(;|$)})
-    if message.multipart? && part = message.parts.find { |p| p.content_type.try(:match, %r{^text/plain(;|$)}) }
+    html_body = utf8ify(incoming_message.body.decoded, incoming_message.charset) if !incoming_message.multipart? && incoming_message.content_type.try(:match, %r{^text/html(;|$)})
+    if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/plain(;|$)}) }
       body = utf8ify(part.body.decoded, part.charset)
     end
-    body ||= utf8ify(message.body.decoded, message.charset)
+    body ||= utf8ify(incoming_message.body.decoded, incoming_message.charset)
     if !html_body
       self.extend TextHelper
       html_body = format_message(body).first
     end
 
     begin
-      msg = Message.find_by_id(message_id)
-      raise IncomingMessageProcessor::UnknownAddressError unless msg
-      msg.shard.activate do
-        context = msg.context if secure_id == msg.reply_to_secure_id
-        user = msg.user
+      original_message = Message.find_by_id(message_id)
+      raise IncomingMessageProcessor::UnknownAddressError unless original_message
+      original_message.shard.activate do
+        context = original_message.context if secure_id == original_message.reply_to_secure_id
+        user = original_message.user
         raise IncomingMessageProcessor::UnknownAddressError unless user && context && context.respond_to?(:reply_from)
         context.reply_from({
           :purpose => 'general',
           :user => user,
-          :subject => utf8ify(message.subject, message.header[:subject].try(:charset)),
+          :subject => utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
           :html => html_body,
           :text => body
         })
       end
     rescue IncomingMessageProcessor::ReplyFromError => error
-      IncomingMessageProcessor.ndr(message.from.first, message.subject, error) if message.from.try(:first)
+      IncomingMessageProcessor.ndr(original_message, incoming_message, error)
     end
   end
 
@@ -82,20 +82,45 @@ class IncomingMessageProcessor
     end
   end
 
-  def self.ndr(from, subject, error = IncomingMessageProcessor::UnknownAddressError)
-    ndr_subject, ndr_body = IncomingMessageProcessor.ndr_strings(subject, error)
+  def self.ndr(original_message, incoming_message, error)
+    incoming_from = incoming_message.from.try(:first)
+    incoming_subject = incoming_message.subject
+    return unless incoming_from
 
-    message = Message.create!(
-      :to => from,
+    ndr_subject, ndr_body = IncomingMessageProcessor.ndr_strings(incoming_subject, error)
+    outgoing_message = Message.new({
+      :to => incoming_from,
       :from => HostUrl.outgoing_email_address,
       :subject => ndr_subject,
       :body => ndr_body,
       :delay_for => 0,
       :context => nil,
       :path_type => 'email',
-      :from_name => "Instructure"
-    )
-    message.deliver
+      :from_name => "Instructure",
+    })
+
+    outgoing_message_delivered = false
+    if original_message
+      original_message.shard.activate do
+        comch = CommunicationChannel.active.find_by_path_and_path_type(incoming_from, 'email')
+        outgoing_message.communication_channel = comch
+        outgoing_message.user = comch.try(:user)
+        if outgoing_message.communication_channel && outgoing_message.user
+          outgoing_message.save
+          outgoing_message.deliver
+          outgoing_message_delivered = true
+        end
+      end
+    end
+
+    unless outgoing_message_delivered
+      # Can't use our usual mechanisms, so just try to send it once now
+      begin 
+        res = Mailer.deliver_message(outgoing_message)
+      rescue => e
+        # TODO: put some kind of error logging here?
+      end
+    end
   end
 
   def self.ndr_strings(subject, error)

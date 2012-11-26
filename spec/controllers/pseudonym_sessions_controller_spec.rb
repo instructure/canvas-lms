@@ -20,31 +20,38 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe PseudonymSessionsController do
 
-  it "should render normal layout if not iphone/ipod" do
-    get 'new'
-    response.should render_template("pseudonym_sessions/new.html.erb")
-  end
+  describe 'mobile layout decision' do
+    let(:mobile_agents) do
+      [
+        "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
+        "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
+        "Mozilla/5.0 (Linux; U; Android 2.2; en-us; SCH-I800 Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+        "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Sprint APA9292KT Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+        "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+      ]
+    end
 
-  it "should render special iPhone/iPod layout if coming from one of those" do
-    [
-      "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
-      "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"
-    ].each do |user_agent|
-      request.env['HTTP_USER_AGENT'] = user_agent
+    def confirm_mobile_layout
+      mobile_agents.each do |agent|
+        request.env['HTTP_USER_AGENT'] = agent
+        yield
+        response.should render_template("pseudonym_sessions/mobile_login")
+      end
+    end
+
+    it "should render normal layout if not iphone/ipod" do
       get 'new'
-      response.should render_template("pseudonym_sessions/mobile_login")
+      response.should render_template("pseudonym_sessions/new.html.erb")
     end
-  end
 
-  it "should render special iPhone/iPod layout if coming from one of those and it's the wrong password'" do
-    [
-      "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
-      "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5"
-    ].each do |user_agent|
-      request.env['HTTP_USER_AGENT'] = user_agent
-      post 'create'
-      response.should render_template("pseudonym_sessions/mobile_login")
+    it "should render special iPhone/iPod layout if coming from one of those" do
+      confirm_mobile_layout { get 'new' }
     end
+
+    it "should render special iPhone/iPod layout if coming from one of those and it's the wrong password'" do
+      confirm_mobile_layout { post 'create' }
+    end
+
   end
 
   it "should re-render if no user" do

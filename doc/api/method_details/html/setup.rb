@@ -33,6 +33,7 @@ end
 def get_routes
   @controller = object.parent.path.underscore.sub("_controller", '')
   @action = object.path.sub(/^.*#/, '')
+  @action = @action.sub(/_with_.*$/, '')
   @routes = ApiRouteSet.apis.first.api_methods_for_controller_and_action(@controller, @action)
   @route = @routes.first
   @controller_path = "app/controllers/#{@route.requirements[:controller]}_controller.rb"

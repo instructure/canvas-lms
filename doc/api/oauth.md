@@ -84,17 +84,13 @@ Performing the OAuth2 token request flow requires an application client
 ID and client secret. To obtain these application credentials, you will
 need to register your application.  The client secret should never be shared.
 
-For open source Canvas users, you will need to generate a client\_id and
-client\_secret for your application. You can either do it from the Developer
-Keys section of Site admin, or from the Rails console:
+For Canvas Cloud, you can request a client ID and secret from
+http://www.instructure.com/partners , or contact your account
+representative.
 
-    $ script/console
-    > key = DeveloperKey.create! { |k|
-        k.email = 'your_email'
-        k.user_name = 'your name'
-        k.account = Account.default
-      }
-    > puts "client_id: #{key.global_id} client_secret: #{key.api_key}"
+For open source Canvas users, you can generate a client ID and secret in
+the Site Admin account of your Canvas install. There will be a
+"Developer Keys" tab on the left navigation sidebar.
 
 Web Application Flow
 --------------------

@@ -34,7 +34,9 @@ module CC::Importer::Canvas
     
     def convert_all_course_settings
       @course[:course] = convert_course_settings(settings_doc(COURSE_SETTINGS))
-      @course[:course][:syllabus_body] = convert_syllabus(settings_doc(SYLLABUS, true))
+      if doc = settings_doc(SYLLABUS, true)
+        @course[:course][:syllabus_body] = convert_syllabus(doc)
+      end
       @course[:assignment_groups] = convert_assignment_groups(settings_doc(ASSIGNMENT_GROUPS))
       @course[:external_tools] = convert_external_tools(settings_doc(EXTERNAL_TOOLS))
       @course[:external_feeds] = convert_external_feeds(settings_doc(EXTERNAL_FEEDS))

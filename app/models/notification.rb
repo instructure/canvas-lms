@@ -22,10 +22,7 @@ class Notification < ActiveRecord::Base
   include Workflow
   
   TYPES_TO_SHOW_IN_FEED = ["Assignment Due Date Changed", 
-    "Assignment Publishing Reminder", 
-    "Assignment Grading Reminder", 
-    "Assignment Due Date Reminder", 
-    "Assignment Created", 
+    "Assignment Created",
     "Grade Weight Changed", 
     "Assignment Graded", 
     "New Event Created", 
@@ -461,10 +458,7 @@ class Notification < ActiveRecord::Base
     t 'names.assignment_changed', 'Assignment Changed'
     t 'names.assignment_created', 'Assignment Created'
     t 'names.assignment_due_date_changed', 'Assignment Due Date Changed'
-    t 'names.assignment_due_date_reminder', 'Assignment Due Date Reminder'
     t 'names.assignment_graded', 'Assignment Graded'
-    t 'names.assignment_grading_reminder', 'Assignment Grading Reminder'
-    t 'names.assignment_publishing_reminder', 'Assignment Publishing Reminder'
     t 'names.assignment_resubmitted', 'Assignment Resubmitted'
     t 'names.assignment_submitted', 'Assignment Submitted'
     t 'names.assignment_submitted_late', 'Assignment Submitted Late'

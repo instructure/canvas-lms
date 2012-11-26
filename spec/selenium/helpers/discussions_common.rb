@@ -59,7 +59,7 @@ shared_examples_for "discussions selenium tests" do
     wait_for_ajax_requests
     keep_trying_until do
       id = DiscussionEntry.last.id
-      @last_entry = fj ".entry[data-id=#{id}]"
+      @last_entry = f "#entry-#{id}"
     end
   end
 
@@ -69,13 +69,12 @@ shared_examples_for "discussions selenium tests" do
 
   def validate_entry_text(discussion_entry, text)
     keep_trying_until do
-      li_selector = %([data-id$="#{discussion_entry.id}"])
-      fj(li_selector).should include_text(text)
+      f("#entry-#{discussion_entry.id}").should include_text(text)
     end
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)
-    li_selector = %([data-id$="#{discussion_entry.id}"])
+    li_selector = "#entry-#{discussion_entry.id}"
     fj(li_selector).should be_displayed
     fj("#{li_selector} .al-trigger").should be_displayed
     fj("#{li_selector} .al-trigger").click

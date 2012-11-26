@@ -4,12 +4,11 @@
   <a id="user_lists_path" style="display:none;" href="<%= polymorphic_path([@context, :user_lists], :format => :json) %>"></a>
   <div id="user_list_textarea_container" style="z-index: 2;">
     <input type="hidden" name="enrollment_type" value="StudentEnrollment" />
-    <span style="font-size: 0.8em;"><%= root_account.login_handle_name_is_customized? ? t(:copy_and_paste_notice_with_login_handle, "Copy and paste a list of users. You can use their email address or %{login_handle_name}.", :login_handle_name => root_account.login_handle_name) : t(:copy_and_paste_notice_just_email, "Copy and paste a list of email addresses to add users.") %></span>
-    <textarea name="user_list" class="user_list"><% if @students && @students.empty? %><%= t :example_user_list, '"Example Student" <student@example.com>
-"Other Student" <otherstudent@example.com>
-"Lastname, Firstname" <firstlast@example.com>
-<justAnEmailAddress@example.com>' %>
-<% end %></textarea>
+    <label for="user_list">
+    <%= root_account.login_handle_name_is_customized? ? t(:copy_and_paste_notice_with_login_handle, "Copy and paste a list of users. You can use their email address or %{login_handle_name}.", :login_handle_name => root_account.login_handle_name) : t(:copy_and_paste_notice_just_email, "Copy and paste a list of email addresses to add users.") %>
+      <textarea name="user_list" class="user_list" id="user_list"></textarea>
+      <%= t :user_list_explanation, 'Sample format: "Example Student" <student@example.com>, "Lastname, Firstname" <firstlast@example.com>, justAnEmailAddress@example.com' %>
+    </label>
   </div>
   <div id="user_list_parsed" style="z-index: 1; display:none;">
     <div class="ui-helper-reset" id="user_lists_processed_people">
@@ -38,7 +37,7 @@
         </div>
       </div>
 
-      <div class="person ui-helper-reset ui-state-default ui-corner-all" id="user_lists_processed_person_template" title="<%= t 'titles.new_user','New user' %>" style="display:none;">
+      <div class="person ui-helper-reset ui-state-default ui-corner-all" id="user_lists_processed_person_template" title="<%= t 'titles.new_user','New user' %>" style="display:none;" tabindex="0">
         <div class="name"></div>
         <div class="address"></div>
       </div>

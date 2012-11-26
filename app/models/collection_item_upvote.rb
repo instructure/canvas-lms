@@ -30,9 +30,11 @@ class CollectionItemUpvote < ActiveRecord::Base
 
   # upvotes get saved to the user's shard, and then increment the counter
   # stored on the collection_item_data, wherever it may live
-  set_shard_override do |record|
-    record.user.shard
+  def user_with_sharding=(user)
+    self.shard = user.shard
+    self.user_without_sharding = user
   end
+  alias_method_chain :user=, :sharding
 
   def update_upvote_count
     increment = 0

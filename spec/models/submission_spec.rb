@@ -616,6 +616,64 @@ describe Submission do
       @submission.read?(@user).should be_true
     end
   end
+
+  describe "mute" do
+    let(:submission) { Submission.new }
+
+    before :each do
+      submission.published_score = 100
+      submission.published_grade = 'A'
+      submission.graded_at = Time.now
+      submission.grade = 'B'
+      submission.score = 90
+      submission.mute
+    end
+
+    specify { submission.published_score.should be_nil }
+    specify { submission.published_grade.should be_nil }
+    specify { submission.graded_at.should be_nil }
+    specify { submission.grade.should be_nil }
+    specify { submission.score.should be_nil }
+  end
+
+  describe "muted_assignment?" do
+    it "returns true if assignment is muted" do
+      assignment = stub(:muted? => true)
+      @submission = Submission.new
+      @submission.expects(:assignment).returns(assignment)
+      @submission.muted_assignment?.should == true
+    end
+
+    it "returns false if assignment is muted" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.expects(:assignment).returns(assignment)
+      @submission.muted_assignment?.should == false 
+    end
+  end
+
+  describe "without_graded_submission?" do
+    let(:submission) { Submission.new }
+
+    it "returns false if submission does not has_submission?" do
+      submission.stubs(:has_submission?).returns false
+      submission.stubs(:graded?).returns true
+      submission.without_graded_submission?.should == false
+    end
+
+    it "returns false if submission does is not graded" do
+      submission.stubs(:has_submission?).returns true
+      submission.stubs(:graded?).returns false
+      submission.without_graded_submission?.should == false
+    end
+
+    it "returns true if submission is not graded and has no submission" do
+      submission.stubs(:has_submission?).returns false
+      submission.stubs(:graded?).returns false
+      submission.without_graded_submission?.should == true
+    end
+  end
+
 end
 
 def submission_spec_model(opts={})

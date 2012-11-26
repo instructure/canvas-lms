@@ -225,6 +225,15 @@ describe AssignmentsController do
       assigns[:assignment].title.should eql("some assignment")
       assigns[:assignment].context_id.should eql(@course.id)
     end
+
+    it "should set updating_user on created assignment" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :submission_types => "discussion_topic"}
+      a = assigns[:assignment]
+      a.should_not be_nil
+      a.discussion_topic.should_not be_nil
+      a.discussion_topic.user_id.should eql(@teacher.id)
+    end
   end
   
   describe "GET 'edit'" do

@@ -109,8 +109,8 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html {
         @current_enrollments = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).sort_by{|e| [e.active? ? 1 : 0, e.long_name] }
-        @past_enrollments    = @current_user.enrollments.past
-        @future_enrollments  = @current_user.enrollments.future
+        @past_enrollments    = @current_user.enrollments.with_each_shard { |scope| scope.past }
+        @future_enrollments  = @current_user.enrollments.with_each_shard { |scope| scope.future }
 
         @past_enrollments.concat(@current_enrollments.select { |e| e.state_based_on_date == :completed })
         @current_enrollments.reject! do |e|
@@ -431,8 +431,13 @@ class CoursesController < ApplicationController
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
-      @context.complete
-      flash[:notice] = t('notices.concluded', "Course successfully concluded")
+
+      @context.soft_conclude!
+      if @context.save
+        flash[:notice] = t('notices.concluded', "Course successfully concluded")
+      else
+        flash[:notice] = t('notices.failed_conclude', "Course failed to conclude")
+      end
     end
     @current_user.touch
     respond_to do |format|
@@ -1033,7 +1038,7 @@ class CoursesController < ApplicationController
                             :root_account => @context.root_account,
                             :search_method => @context.user_list_search_mode_for(@current_user),
                             :initial_type => params[:enrollment_type])
-        if (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
+        if !(@context.completed? || @context.soft_concluded?) && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
           format.json do
             Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
             json = @enrollments.map { |e|
@@ -1205,6 +1210,7 @@ class CoursesController < ApplicationController
         @course.hide_final_grades = value_to_boolean(hide_final_grades)
       end
       params[:course][:event] = :offer if params[:offer].present?
+
       @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
@@ -1328,4 +1334,5 @@ class CoursesController < ApplicationController
       :nothing
     end
   end
+
 end

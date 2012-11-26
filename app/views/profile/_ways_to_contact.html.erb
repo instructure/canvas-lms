@@ -56,7 +56,7 @@
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><%= image_tag "pass.png", :title => t('titles.confirm_email_address', "Confirm Email Address") %></a>
         <% end %>
         <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => t('titles.remove_email_address', "Remove email address") %></a>
-        <% if c.active? && CommunicationChannel.active.email.by_path(c.path).count(:all, :joins => { :user => :pseudonyms }, :conditions => ["communication_channels.user_id<>? AND pseudonyms.workflow_state='active'", @user.id]) != 0 %>
+        <% if c.active? && c.merge_candidates.length != 0 %>
           <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover"><%= image_tag "group.png", :title => t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %></a>
         <% end %>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>

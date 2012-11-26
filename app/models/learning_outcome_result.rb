@@ -19,7 +19,7 @@
 class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :user
   belongs_to :learning_outcome
-  belongs_to :content_tag
+  belongs_to :alignment, :class_name => 'ContentTag', :foreign_key => :content_tag_id
   belongs_to :association, :polymorphic => true
   belongs_to :artifact, :polymorphic => true
   belongs_to :associated_asset, :polymorphic => true
@@ -27,9 +27,10 @@ class LearningOutcomeResult < ActiveRecord::Base
   simply_versioned
   before_save :infer_defaults
 
-  attr_accessible :learning_outcome, :user, :association, :content_tag, :associated_asset
+  attr_accessible :learning_outcome, :user, :association, :alignment, :associated_asset
   
   def infer_defaults
+    self.learning_outcome_id = self.alignment.learning_outcome_id
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
     self.original_score ||= self.score
     self.original_possible ||= self.possible
@@ -100,5 +101,15 @@ class LearningOutcomeResult < ActiveRecord::Base
   }
   named_scope :for_outcome_ids, lambda{|ids|
     {:conditions => {:learning_outcome_id => ids} }
+  }
+  named_scope :for_association, lambda{|association|
+    {:conditions => {:association_type => association.class.to_s, :association_id => association.id} }
+  }
+  named_scope :for_associated_asset, lambda{|associated_asset|
+    {:conditions => {:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id} }
+  }
+  named_scope :for_user, lambda{|user|
+    user_id = user.is_a?(User) ? user.id : user
+    {:conditions => {:user_id => user_id} }
   }
 end

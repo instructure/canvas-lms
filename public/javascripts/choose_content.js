@@ -88,6 +88,11 @@ define([
           $(this).triggerHandler('change');
         });
         $('#copy_everything').attr('checked', false);
+        if ($(this).hasClass('select_parents') && $(this).attr('checked')) {
+          $(this).parents("ul").each(function () {
+            $(this).prev("h4").find(":checkbox").attr('checked', true);
+          });
+        }
       } else if ($(this).hasClass('copy_everything')) {
         if ($(this).prop('checked')) {
           $itemSelectionsDiv.hide();
@@ -105,6 +110,11 @@ define([
         $(this).parent().find(":checkbox.secondary_checkbox" + (force_secondaries ? '' : ':not(.skip)')).attr('checked', $(this).attr('checked'));
         if ($(this).hasClass('secondary_checkbox') && $(this).attr('checked')) {
           $(this).parents("li").children(":checkbox").attr('checked', true);
+        }
+        if ($(this).hasClass('select_parents') && $(this).attr('checked')) {
+          $(this).parents("ul").each(function () {
+            $(this).prev("h4").find(":checkbox").attr('checked', true);
+          });
         }
         if (!$(this).attr('checked')) {
           $(this).parents("ul").each(function () {

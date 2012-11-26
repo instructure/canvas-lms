@@ -136,7 +136,7 @@ class AssociateInteraction < AssessmentItemConverter
       matches.css('div').each do |m|
         match = {}
         @question[:matches] << match
-        match[:text] = sanitize_html_string(m.text.strip, true)
+        match[:text] = clear_html(m.text.strip)
         match[:match_id] = unique_local_id
       end
     end

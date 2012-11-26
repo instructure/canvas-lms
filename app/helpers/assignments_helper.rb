@@ -17,4 +17,18 @@
 #
 
 module AssignmentsHelper
+  def multiple_due_dates(varied_due_date)
+    # can use this method as the single source of rendering multiple due dates
+    # for now, just text, but eventually, a bubble/dialog/link/etc, rendering
+    # the information contained in the varied_due_date parameter
+    I18n.t '#assignments.multiple_due_dates', 'Multiple Due Dates'
+  end
+
+  def due_at(varied_due_date, format='datetime')
+    if varied_due_date.multiple?
+      multiple_due_dates(varied_due_date)
+    else
+      send("#{format}_string", varied_due_date.due_at, :short)
+    end
+  end
 end

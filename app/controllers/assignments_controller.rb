@@ -19,6 +19,7 @@
 # @API Assignments
 class AssignmentsController < ApplicationController
   include Api::V1::Assignment
+  include Api::V1::Outcome
 
   include GoogleDocs
   before_filter :require_context
@@ -63,6 +64,7 @@ class AssignmentsController < ApplicationController
     end
     if authorized_action(@assignment, @current_user, :read)
       @context.require_assignment_group
+      js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
       @assignment_groups = @context.assignment_groups.active
       if !@assignment.new_record? && !@assignment_groups.map(&:id).include?(@assignment.assignment_group_id)
         @assignment.assignment_group = @assignment_groups.first
@@ -114,6 +116,7 @@ class AssignmentsController < ApplicationController
   
   def rubric
     @assignment = @context.assignments.active.find(params[:assignment_id])
+    @root_outcome_group = outcome_group_json(@context.root_outcome_group, @current_user, session).to_json
     if authorized_action(@assignment, @current_user, :read)
       render :partial => 'shared/assignment_rubric_dialog'
     end
@@ -243,6 +246,7 @@ class AssignmentsController < ApplicationController
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
     @assignment.workflow_state = "available"
+    @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
     # if no due_at was given, set it to 11:59 pm in the creator's time zone

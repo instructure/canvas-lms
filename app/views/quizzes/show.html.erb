@@ -112,7 +112,7 @@
 <% end %>
 
 <% js_bundle :quiz_show %>
-<% jammit_css :quizzes %>
+<% jammit_css :quizzes, :learning_outcomes %>
 
 <a id="context_quzzes_url" style="display:none;" href="<%= context_url(@context, :context_quizzes_url) %>">&nbsp;<!-- This is needed by quiz_show.js --></a>
 

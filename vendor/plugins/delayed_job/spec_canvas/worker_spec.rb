@@ -103,7 +103,7 @@ shared_examples_for 'Delayed::Worker' do
         ])
         batch_job = Delayed::Job.create :payload_object => batch
 
-        @worker.expects(:reschedule).once
+        Delayed::Job.any_instance.expects(:reschedule).once
         Delayed::Stats.expects(:job_complete).times(1) # just the batch
         @worker.perform(batch_job).should == 1
       end
@@ -208,19 +208,19 @@ shared_examples_for 'Delayed::Worker' do
     context "and we want to destroy jobs" do
       it "should be destroyed if it failed more than Worker.max_attempts times" do
         @job.expects(:destroy)
-        Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
+        Delayed::Worker.max_attempts.times { @job.reschedule }
       end
       
       it "should not be destroyed if failed fewer than Worker.max_attempts times" do
         @job.expects(:destroy).never
-        (Delayed::Worker.max_attempts - 1).times { @worker.reschedule(@job) }
+        (Delayed::Worker.max_attempts - 1).times { @job.reschedule }
       end
 
       it "should be destroyed if failed more than Job#max_attempts times" do
         Delayed::Worker.max_attempts = 25
         @job.expects(:destroy)
         @job.update_attribute(:max_attempts, 2)
-        2.times { @worker.reschedule(@job) }
+        2.times { @job.reschedule }
       end
     end
     
@@ -235,12 +235,12 @@ shared_examples_for 'Delayed::Worker' do
 
       it "should be failed if it failed more than Worker.max_attempts times" do
         @job.reload.failed_at.should == nil
-        Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
+        Delayed::Worker.max_attempts.times { @job.reschedule }
         Delayed::Job.list_jobs(:failed, 100).size.should == 1
       end
 
       it "should not be failed if it failed fewer than Worker.max_attempts times" do
-        (Delayed::Worker.max_attempts - 1).times { @worker.reschedule(@job) }
+        (Delayed::Worker.max_attempts - 1).times { @job.reschedule }
         @job.reload.failed_at.should == nil
       end
       
@@ -253,7 +253,7 @@ shared_examples_for 'Delayed::Worker' do
           false
         end
         @job.expects(:fail!)
-        Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
+        Delayed::Worker.max_attempts.times { @job.reschedule }
       end
 
       it "should be destroyed if it failed max_attempts times and cb is true" do
@@ -262,7 +262,7 @@ shared_examples_for 'Delayed::Worker' do
           true
         end
         @job.expects(:destroy)
-        Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
+        Delayed::Worker.max_attempts.times { @job.reschedule }
       end
     end
   end

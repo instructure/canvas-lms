@@ -80,11 +80,6 @@ module Api::V1::Assignment
 
   API_ALLOWED_ASSIGNMENT_FIELDS = %w(name position points_possible grading_type due_at description)
 
-  def create_api_assignment(context, assignment_params)
-    assignment = context.assignments.build
-    update_api_assignment(assignment, assignment_params)
-  end
-
   def update_api_assignment(assignment, assignment_params)
     return nil unless assignment_params.is_a?(Hash)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_FIELDS)

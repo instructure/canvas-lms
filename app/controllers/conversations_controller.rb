@@ -655,7 +655,7 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end
 
-    filters = Array(params[:filter]).compact
+    filters = param_array(:filter)
     @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
     @conversations_scope = @conversations_scope.tagged(*filters) if filters.present?
     @set_visibility = true
@@ -693,7 +693,7 @@ class ConversationsController < ApplicationController
   end
 
   def infer_tags
-    tags = Array(params[:tags] || []).concat(params[:recipients] || [])
+    tags = param_array(:tags).concat(param_array(:recipients))
     tags = SimpleTags.normalize_tags(tags)
     tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.find_by_id($1.to_i) and g.context.asset_string }.compact
     @tags = tags.uniq
@@ -751,4 +751,8 @@ class ConversationsController < ApplicationController
     value_to_boolean(params[:auto_mark_as_read])
   end
 
+  # look up the param and cast it to an array. treat empty string same as empty
+  def param_array(key)
+    Array(params[key].presence || []).compact
+  end
 end

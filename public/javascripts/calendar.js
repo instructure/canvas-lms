@@ -18,7 +18,6 @@
 
 define([
   'INST' /* INST */,
-  'ENV',
   'i18n!calendars',
   'jquery' /* $ */,
   'compiled/userSettings',
@@ -39,7 +38,7 @@ define([
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(INST, ENV, I18n, $, userSettings, calendarMonths) {
+], function(INST, I18n, $, userSettings, calendarMonths) {
 
   window.calendar = {
     activateEventId: ENV.CALENDAR.ACTIVE_EVENT,

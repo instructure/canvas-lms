@@ -24,6 +24,9 @@ describe "admin settings tab" do
 
   def check_box_verifier (css_selectors, features, checker = true)
     is_symbol = false
+
+    css_selectors = [css_selectors] unless (css_selectors.is_a? Array)
+
     if features.is_a? Symbol
       is_symbol = true
       if features == :all_selectors
@@ -57,7 +60,7 @@ describe "admin settings tab" do
           default_selectors.push("#account_services_#{feature.to_s}")
         end
         if (checker)
-          default_selectors.push css_selectors
+          default_selectors += css_selectors
         end
         css_selectors = default_selectors
       else

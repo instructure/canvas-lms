@@ -1,4 +1,5 @@
-<article class="discussion_entry can_be_marked_as_read {{read_state}}" data-mark-read-url="{{mark_read_url}}">
+<article class="discussion_entry can_be_marked_as_read {{read_state}}-onload {{read_state}} {{#if deleted}}deleted-discussion-entry{{/if}}" data-mark-read-url="{{mark_read_url}}">
+  <div class="discussion-read-state tooltip data-tooltip"></div>
   <div class="entry_content">
     {{#if deleted}}
       {{>[discussions/deleted_entry]}}
@@ -7,9 +8,9 @@
     {{/if}}
   </div>
 </article>
-<div class="replies"></div>
+<div class="replies hide-if-collapsed"></div>
 {{#if allowsSideComments}}
-  <div class="add-side-comment-wrap">
+  <div class="add-side-comment-wrap hide-if-collapsed">
     {{>[discussions/reply_form]}}
   </div>
 {{/if}}

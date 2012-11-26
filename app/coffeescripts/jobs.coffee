@@ -6,6 +6,14 @@ define [
   'jqueryui/dialog'
 ], (I18n, $, Slick) ->
 
+  fillin_job_data = (job) ->
+    $('#show-job .show-field').each (idx, field) =>
+      field_name = field.id.replace("job-", '')
+      $(field).text(job[field_name] || '')
+    $('#job-id-link').attr('href', "/jobs?flavor=id&q=#{job.id}")
+
+  selected_job = null
+
   class FlavorGrid
     constructor: (@options, @type_name, @grid_name) ->
       @data = []
@@ -144,11 +152,8 @@ define [
       @grid.onSelectedRowsChanged.subscribe =>
         rows = @grid.getSelectedRows()
         row = if rows?.length == 1 then rows[0] else -1
-        job = @data[rows[0]] || {}
-        $('#show-job .show-field').each (idx, field) =>
-          field_name = field.id.replace("job-", '')
-          $(field).text(job[field_name] || '')
-        $('#job-id-link').attr('href', "/jobs?flavor=id&q=#{job.id}")
+        selected_job = @data[rows[0]] || {}
+        fillin_job_data(selected_job)
       this
 
     selectAll: () ->
@@ -188,6 +193,16 @@ define [
       if @data.length == 1 && @type_name == 'jobs'
         @grid.setSelectedRows [0]
         @grid.onSelectedRowsChanged.notify()
+
+    getFullJobDetails: (cb) ->
+      if !selected_job || selected_job.handler
+        cb()
+      else
+        $.ajaxJSON "#{@options.job_url}/#{selected_job.id}", "GET", {}, (data) =>
+          selected_job.handler = data.handler
+          selected_job.last_error = data.last_error
+          fillin_job_data(selected_job)
+          cb()
 
   class Workers extends Jobs
     constructor: (options) ->
@@ -251,19 +266,21 @@ define [
     $('#delete-jobs').click () -> window.jobs.onSelected('destroy')
 
     $('#job-handler-show').click () ->
-      $('#job-handler-wrapper').clone().dialog
-        title: I18n.t('titles.job_handler', 'Job Handler')
-        width: 900
-        height: 700
-        modal: true
+      window.jobs.getFullJobDetails () ->
+        $('#job-handler-wrapper').clone().dialog
+          title: I18n.t('titles.job_handler', 'Job Handler')
+          width: 900
+          height: 700
+          modal: true
       false
 
     $('#job-last_error-show').click () ->
-      $('#job-last_error-wrapper').clone().dialog
-        title: I18n.t('titles.last_error', 'Last Error')
-        width: 900
-        height: 700
-        modal: true
+      window.jobs.getFullJobDetails () ->
+        $('#job-last_error-wrapper').clone().dialog
+          title: I18n.t('titles.last_error', 'Last Error')
+          width: 900
+          height: 700
+          modal: true
       false
 
   { Jobs, Workers, Tags }

@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper')
 
 describe PageViewsController do
 
@@ -39,47 +40,36 @@ describe PageViewsController do
     pg
   end
 
+  shared_examples_for "GET 'index' as csv" do
+    it "should succeed" do
+      course_with_teacher_logged_in
+      student_in_course
+      page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)
+      get 'index', :user_id => @user.id, :format => 'csv'
+      response.should be_success
+    end
+    it "should order rows by created_at in DESC order" do
+      course_with_teacher_logged_in
+      student_in_course
+      pv2 = page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)    # 2nd day
+      pv1 = page_view(@user, '/somewhere/in/app/1', :created_at => 1.day.ago)  # 1st day
+      pv3 = page_view(@user, '/somewhere/in/app/2', :created_at => 3.days.ago)  # 3rd day
+      get 'index', :user_id => @user.id, :format => 'csv'
+      response.should be_success
+      dates = FasterCSV.parse(response.body, :headers => true).map { |row| row['created_at'] }
+      dates.should == [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
+    end
+  end
 
-  context "with enable_page_views" do
+  context "with db page views" do
     before :each do
       Setting.set('enable_page_views', true)
     end
+    it_should_behave_like "GET 'index' as csv"
+  end
 
-    describe "GET 'index'" do
-
-      it "should return nothing when HTML and not AJAX" do
-        course_with_teacher_logged_in
-        get 'index', :user_id => @user.id
-        response.should be_success
-        response.body.blank?.should == true
-      end
-
-      it "should return content when HTML and AJAX" do
-        course_with_teacher_logged_in
-        get 'index', :user_id => @user.id, :html_xhr => true
-        response.should be_success
-        response.body.blank?.should == false
-      end
-    end
-
-    describe "GET 'index' as csv" do
-      it "should succeed" do
-        course_with_teacher_logged_in
-        student_in_course
-        page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)
-        get 'index', :user_id => @user.id, :format => 'csv'
-        response.should be_success
-      end
-      it "should succeed order rows by created_at in DESC order" do
-        course_with_teacher_logged_in
-        student_in_course
-        page_view(@user, '/somewhere/in/app', :created_at => '2012-04-30 20:48:04')    # 2nd day
-        page_view(@user, '/somewhere/in/app/1', :created_at => '2012-04-29 20:48:04')  # 1st day
-        page_view(@user, '/somewhere/in/app/2', :created_at => '2012-05-01 20:48:04')  # 3rd day
-        get 'index', :user_id => @user.id, :format => 'csv'
-        response.should be_success
-        response.body.should match /2012-05-01 20:48:04 UTC.*\n.*2012-04-30 20:48:04 UTC.*\n.*2012-04-29 20:48:04 UTC/
-      end
-    end
+  context "with cassandra page views" do
+    it_should_behave_like 'cassandra page views'
+    it_should_behave_like "GET 'index' as csv"
   end
 end

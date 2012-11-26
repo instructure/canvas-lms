@@ -46,7 +46,10 @@ module AssignmentOverrideApplicator
         overrides << group_override if group_override
       end
 
-      section_ids = user.student_enrollments.active.scoped(:conditions => {:course_id => assignment.context_id}).map(&:course_section_id)
+      section_ids = user.enrollments.active.scoped(:conditions =>
+        { :type => ['StudentEnrollment', 'ObserverEnrollment'],
+          :course_id => assignment.context_id}).map(&:course_section_id)
+      
       section_overrides = assignment.assignment_overrides.
         scoped(:conditions => {:set_type => 'CourseSection', :set_id => section_ids})
 
@@ -81,7 +84,7 @@ module AssignmentOverrideApplicator
     self.collapsed_overrides(assignment, overrides).each do |field,value|
       # for any times in the value set, bring them back from raw UTC into the
       # current Time.zone before placing them in the assignment
-      value = value.in_time_zone if value && value.respond_to?(:in_time_zone)
+      value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
       cloned_assignment.write_attribute(field, value)
     end
     cloned_assignment.readonly!
@@ -108,7 +111,7 @@ module AssignmentOverrideApplicator
         # force times to un-zoned UTC -- this will be a cached value and should
         # not care about the TZ of the user that cached it. the user's TZ will
         # be applied before it's returned.
-        value = value.utc if value && value.respond_to?(:utc)
+        value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
         overridden_data[field] = value
       end
       overridden_data
@@ -122,30 +125,41 @@ module AssignmentOverrideApplicator
   end
 
   # perform overrides of specific fields
+  def self.override_for_due_at(assignment, overrides)
+    applicable_overrides = overrides.select(&:due_at_overridden)
+    if applicable_overrides.empty?
+      assignment
+    elsif override = applicable_overrides.detect{ |o| o.due_at.nil? }
+      override
+    else
+      override = applicable_overrides.sort_by(&:due_at).last
+      if assignment.due_at && assignment.due_at > override.due_at
+        assignment
+      else
+        override
+      end
+    end
+  end
+
   def self.overridden_due_at(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.due_at_overridden }
-    primary_override ? primary_override.due_at : assignment.due_at
+    override_for_due_at(assignment, overrides).due_at
   end
 
   def self.overridden_all_day(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.due_at_overridden }
-    # when pulling from the assignment, read the actual attribute, not the
-    # return value of Assignment#all_day
-    primary_override ? primary_override.all_day : assignment.read_attribute(:all_day)
+    override_for_due_at(assignment, overrides).all_day
   end
 
   def self.overridden_all_day_date(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.due_at_overridden }
-    primary_override ? primary_override.all_day_date : assignment.all_day_date
+    override_for_due_at(assignment, overrides).all_day_date
   end
 
   def self.overridden_unlock_at(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.unlock_at_overridden }
-    primary_override ? primary_override.unlock_at : assignment.unlock_at
+    unlock_ats = overrides.select(&:unlock_at_overridden).map(&:unlock_at)
+    unlock_ats.any?(&:nil?) ? nil : [assignment.unlock_at, *unlock_ats].compact.min
   end
 
   def self.overridden_lock_at(assignment, overrides)
-    primary_override = overrides.detect{ |o| o.lock_at_overridden }
-    primary_override ? primary_override.lock_at : assignment.lock_at
+    lock_ats = overrides.select(&:lock_at_overridden).map(&:lock_at)
+    lock_ats.any?(&:nil?) ? nil : [assignment.lock_at, *lock_ats].compact.max
   end
 end

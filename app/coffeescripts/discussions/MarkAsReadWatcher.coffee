@@ -3,14 +3,13 @@ define [
   'i18n!discussions'
   'underscore'
   'jquery'
-  'jquery.ajaxJSON'
 ], (Backbone, I18n, _, $) ->
 
   # An entry needs to be in the viewport for 2 consecutive secods for it to be marked as read
   # if you are scrolling quickly down the page and it comes in and out of the viewport in less
   # than 2 seconds, it will not count as being read
   MS_UNTIL_READ = 2000
-  CHECK_THROTTLE = 100
+  CHECK_THROTTLE = 1000
 
   ##
   # Watches an EntryView position to determine whether or not to mark it
@@ -40,7 +39,7 @@ define [
     markAsRead: =>
       @view.model.markAsRead()
       MarkAsReadWatcher.unread = _(MarkAsReadWatcher.unread).without(this)
-      MarkAsReadWatcher.trigger 'markAsRead', this.view.model
+      MarkAsReadWatcher.trigger 'markAsRead', @view.model
 
     $window = $(window)
 
@@ -61,4 +60,5 @@ define [
     , CHECK_THROTTLE
 
   _.extend MarkAsReadWatcher, Backbone.Events
+
 

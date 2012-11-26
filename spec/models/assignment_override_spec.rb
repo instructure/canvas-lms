@@ -33,11 +33,56 @@ describe AssignmentOverride do
     @override.set_type.should == 'ADHOC'
   end
 
-  it "should allow reading set and set_id when set_type is adhoc" do
+  it "should allow reading set_id and set when set_type is adhoc" do
     @override = assignment_override_model
     @override.set_type = 'ADHOC'
-    @override.set.should be_nil
     @override.set_id.should be_nil
+    @override.set.should == []
+  end
+
+  it "should return the students as the set when set_type is adhoc" do
+    student_in_course
+    @override = assignment_override_model(:course => @course)
+
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+
+    @override.reload
+    @override.set.should == [@student]
+  end
+
+  it "should remove adhoc associations when an adhoc override is deleted" do
+    student_in_course
+    @override = assignment_override_model(:course => @course)
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+
+    @override.destroy
+    @override.reload
+
+    @override.set.should == []
+  end
+
+  it "should allow reusing students from a deleted adhoc override" do
+    student_in_course
+    @override = assignment_override_model(:course => @course)
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+
+    @override.destroy
+    @override2 = assignment_override_model(:assignment => @assignment)
+    @override_student2 = @override2.assignment_override_students.build
+    @override_student2.user = @student
+
+    @override_student2.should be_valid
+    @override2.should be_valid
+
+    lambda{ @override_student2.save! }.should_not raise_error
+    @override2.reload
+    @override2.set.should == [@student]
   end
 
   it "should be versioned" do

@@ -172,9 +172,9 @@ define([
             }
           });
         }
-      } else {
+      } else if ($.filePreviewsEnabled()) {
         // else fall back with a message that the document can't be viewed inline
-        $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline, you might not have permission to view it or it might have been deleted.')) + '</p>');
+        $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline.')) + '</p>');
       }
     });
   };

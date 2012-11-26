@@ -22,7 +22,7 @@ class ActiveRecord::Base
     'accounts' => %w(type sis_name account_code authentication_type ldap_host ldap_domain),
     'account_authorization_configs' => %w(auth_uid),
     'asset_user_accesses' => %w(asset_access_stat_id),
-    'assignments' => %w(sequence_position minimum_required_blog_posts minimum_required_blog_comments),
+    'assignments' => %w(sequence_position minimum_required_blog_posts minimum_required_blog_comments reminders_created_for_due_at publishing_reminder_sent),
     'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at),
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on),
     'content_tags' => %w(sequence_position context_module_association_id),
@@ -50,8 +50,16 @@ class ActiveRecord::Base
     self.reset_column_information_without_remove_dropped_columns
   end
 
+  def self.instantiate_with_remove_dropped_columns(record)
+    (DROPPED_COLUMNS[self.table_name] || []).each do |attr|
+      record.delete(attr)
+    end unless self.respond_to?(:tableless?)
+    instantiate_without_remove_dropped_columns(record)
+  end
+
   class << self
     alias_method_chain :columns, :remove_dropped_columns
     alias_method_chain :reset_column_information, :remove_dropped_columns
+    alias_method_chain :instantiate, :remove_dropped_columns
   end
 end

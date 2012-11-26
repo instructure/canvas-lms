@@ -29,7 +29,7 @@ describe "Default Account Reports" do
     @student1 = User.create(:name => 'Bilbo Baggins')
     @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
     assignment_model(:course => @course, :title => 'Engrish Assignment')
-    @outcome = @account.learning_outcomes.create!(:short_description => 'Spelling')
+    @outcome = @account.created_learning_outcomes.create!(:short_description => 'Spelling')
     @rubric = Rubric.create!(:context => @course)
     @rubric.data = [
       {
@@ -54,7 +54,7 @@ describe "Default Account Reports" do
 
       }
     ]
-    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.instance_variable_set('@alignments_changed', true)
     @rubric.save!
     @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
     @assignment.reload
@@ -312,6 +312,11 @@ describe "Default Account Reports" do
     parsed[3][11].to_s.should == course2.enrollment_term.sis_source_id.to_s
     parsed[3][12].to_s.should == enrollment4.computed_current_score.to_s
     parsed[3][13].to_s.should == enrollment4.computed_final_score.to_s
+
+    parameters = {}
+    parameters["enrollment_term"] = ""
+    parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+    parsed.length.should == 4
   end
 
   it "should find the default module and configured reports" do

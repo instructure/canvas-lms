@@ -21,7 +21,8 @@ class CollectionItemData < ActiveRecord::Base
 
   belongs_to :root_item, :class_name => "CollectionItem"
   belongs_to :image_attachment, :class_name => "Attachment"
-  has_many :collection_item_upvotes
+  # belongs with the user, so avoid accessing from here
+  # has_many :collection_item_upvotes
 
   VALID_ITEM_TYPES = %w(url image audio video)
   THUMBNAIL_SIZE = "640x>"

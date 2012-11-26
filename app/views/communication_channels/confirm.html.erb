@@ -11,7 +11,7 @@
   <% if @current_user && @current_user != @user && @user.registered? && @enrollment %>
     <p><%= mt 'details.wrong_account', "The invitation for %{course} was sent to **%{invited_user}**, but you are currently logged in as **%{current_user}**", :course => @course.name, :invited_user => @user.name, :current_user => @current_user.name %></p>
     <div class="button_box">
-      <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="button" id='transfer'><%=  t 'buttons.transfer_enrollment', "Transfer Enrollment" %></a>
+      <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="button" id='transfer'><%=  t 'buttons.transfer_enrollment', "Transfer Enrollment" %></a>
       <a href="<%= login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id) %>" class="button" id="login"><%=  t 'buttons.login_as', "Log in as %{invited_user}", :invited_user => @user.name %></a>
     </div>
   <% elsif !@merge_opportunities.empty? %>
@@ -54,7 +54,7 @@
         <p><strong><%=  t 'details.add_email', "Would you like to add this email address to your current account?" %></strong></p>
         <div class="button_box">
           <a href="#" class="button" id="register"><%= t 'buttons.new_account', 'No' %></a>
-          <a href="<%= registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1) %>" class="button btn-primary" id='merge'><%=  t 'buttons.add_email_address', "Yes, Add Email Address" %></a>
+          <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.try(:uuid), :confirm => 1) %>" class="button btn-primary" id='merge'><%=  t 'buttons.add_email_address', "Yes, Add Email Address" %></a>
         </div>
       <% else %>
         <% if !@enrollment && @user.registered? %>
@@ -91,14 +91,14 @@ Which is you?", :count => @merge_opportunities.length %>
     <div class="disambiguation_box"<%= ' style="display: none;"'.html_safe if params[:register] %>>
       <p><%= mt 'details.account_needed', "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account.", :course => @course.name %></p>
       <div class="button_box">
-        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="button not_external"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
+        <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @nonce, :enrollment => @enrollment.uuid) %>" class="button not_external"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
         <a href="#" class="button" id="register"><%= t 'buttons.create_account', 'Create My Account' %></a>
       </div>
     </div>
   <% end %>
 
   <% if @pseudonym %>
-    <% form_for :pseudonym, :url => registration_confirmation_url(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid)), :html => {:id => "registration_confirmation_form", :class => 'form-horizontal bootstrap-form', :style => ((!@merge_opportunities.empty? || @enrollment) && !params[:register]) ? hidden : '' } do |form| %>
+    <% form_for :pseudonym, :url => registration_confirmation_url(@nonce, :enrollment => @enrollment.try(:uuid)), :html => {:id => "registration_confirmation_form", :class => 'form-horizontal bootstrap-form', :style => ((!@merge_opportunities.empty? || @enrollment) && !params[:register]) ? hidden : '' } do |form| %>
       <p class="instructions"><%= if @enrollment
           mt 'details.register_with_course', "In order to finish signing you up for the course **%{course}**, we'll need a little more information.", :course => @course.name
         else

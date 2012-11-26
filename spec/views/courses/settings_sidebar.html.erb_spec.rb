@@ -35,7 +35,7 @@ describe "courses/_settings_sidebar.html.erb" do
       view_context(@course, @user)
       assigns[:current_user] = @user
       render
-      response.body.should_not match(/End this Course/)
+      response.body.should_not match(/Conclude this Course/)
     end
 
     it "should display if the course and its term haven't ended" do
@@ -43,7 +43,7 @@ describe "courses/_settings_sidebar.html.erb" do
       view_context(@course, @user)
       assigns[:current_user] = @user
       render
-      response.body.should match(/End this Course/)
+      response.body.should match(/Conclude this Course/)
     end
   end
 end

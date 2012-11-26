@@ -32,6 +32,9 @@ class ImportedHtmlConverter
     doc.search("*").each do |node|
       attrs.each do |attr|
         if node[attr]
+          if attr == 'value'
+            next unless node['name'] && node['name'] == 'src'
+          end
           val = URI.unescape(node[attr])
           if val =~ /wiki_page_migration_id=(.*)/
             # This would be from a BB9 migration. 

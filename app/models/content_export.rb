@@ -109,6 +109,11 @@ class ContentExport < ActiveRecord::Base
     self.settings[:selected_content] ||= {}
   end
 
+  # Method Summary
+  #   Takes in an ActiveRecord object. Determines if the item being 
+  #   checked should be exported or not. 
+  #
+  #   Returns: bool
   def export_object?(obj)
     return false unless obj
     return true if selected_content.empty?
@@ -121,6 +126,16 @@ class ContentExport < ActiveRecord::Base
     return true if is_set?(selected_content[asset_type][CC::CCHelper.create_key(obj)])
 
     false
+  end
+
+  # Method Summary
+  #   Takes a symbol containing the items that were selected to export.
+  #   is_set? will return true if the item is selected. Also handles
+  #   a case where 'everything' is set and returns true
+  #   
+  # Returns: bool
+  def export_symbol?(symbol)
+    is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
   def add_item_to_export(obj)

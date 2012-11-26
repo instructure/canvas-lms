@@ -29,7 +29,7 @@ define [
     #
     # @param {Bool} opts.cancel - doesn't submit
     # @api public
-    display: (opts)->
+    display: (opts) ->
       super
       @cancelButton.detach()
       if opts?.cancel isnt true

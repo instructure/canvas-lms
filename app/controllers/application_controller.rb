@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
   after_filter :set_user_id_header
   before_filter :fix_xhr_requests
   before_filter :init_body_classes
-  before_filter :set_ua_header
+  before_filter :set_response_headers
 
   add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
 
@@ -118,10 +118,6 @@ class ApplicationController < ActionController::Base
     @body_classes = []
   end
 
-  def set_ua_header
-    headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
-  end
-
   def set_user_id_header
     headers['X-Canvas-User-Id'] ||= @current_user.global_id.to_s if @current_user
     headers['X-Canvas-Real-User-Id'] ||= @real_current_user.global_id.to_s if @real_current_user
@@ -149,13 +145,22 @@ class ApplicationController < ActionController::Base
   def load_account
     @domain_root_account = request.env['canvas.domain_root_account'] || LoadAccount.default_domain_root_account
     @files_domain = request.host_with_port != HostUrl.context_host(@domain_root_account) && HostUrl.is_file_host?(request.host_with_port)
+    @domain_root_account
+  end
+
+  def set_response_headers
+    headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
-    if !@files_domain && Setting.get_cached('block_html_frames', 'false') == 'true'
-      response['X-Frame-Options'] = 'SAMEORIGIN'
+    if !files_domain? && Setting.get_cached('block_html_frames', 'true') == 'true'
+      headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
-    @domain_root_account
+    true
+  end
+
+  def files_domain?
+    !!@files_domain
   end
 
   def check_pending_otp
@@ -479,85 +484,72 @@ class ApplicationController < ActionController::Base
   # Also retrieves submissions and sorts the assignments based on
   # their due dates and submission status for the given user.
   def get_sorted_assignments
-    @assignment_groups    = []
-    @upcoming_assignments = []
-    @assignments          = []
-    @submissions          = []
-    @overdue_assignments  = []
     @courses = @contexts.select{ |c| c.is_a?(Course) }
     @just_viewing_one_course = @context.is_a?(Course) && @courses.length == 1
     @context_codes = @courses.map(&:asset_string)
     @context = @courses.first
+
     if @just_viewing_one_course
-      @courses.each do |course|
-        # if there is just one context this will leave @groups set up for the view group by assignment group
-        @groups = course.assignment_groups.active(:include => :active_assignments)
-        assignments_for_this_course = @groups.map(&:active_assignments).flatten
-        @assignments += assignments_for_this_course
-        @upcoming_assignments += assignments_for_this_course.select{ |a| 
-          a.due_at && 
-          a.due_at <= 1.weeks.from_now && 
-          a.due_at >= Time.now
-        }
-        log_asset_access("assignments:#{course.asset_string}", "assignments", "other")
-      end
+      @groups = @courses.first.assignment_groups.active.scoped(:include => :active_assignments)
+      @assignments = @groups.map(&:active_assignments).flatten
     else
-      @groups = AssignmentGroup.for_context_codes(@context_codes).active(:include => {:active_assignments => {:submissions => {}, :quiz => {}, :discussion_topic => {}} })
+      @groups = AssignmentGroup.for_context_codes(@context_codes).active
       @assignments = Assignment.active.for_context_codes(@context_codes)
-      @courses.each do |course|
-        log_asset_access("assignments:#{course.asset_string}", "assignments", "other")
-      end
     end
-    @upcoming_assignments = @assignments.select{|a|
-      a.due_at &&
-      a.due_at <= 1.weeks.from_now &&
-      a.due_at >= Time.now
-    }
-    @submissions = @current_user.submissions(:include => {:submission_comments => {}, :rubric_assessment => {}}).to_a if @current_user
-    @submissions_hash = {}
-    @submissions.each{|s|
-      @submissions_hash[s.assignment_id] = s
-      assignment = @assignments.select { |a| a.id == s.assignment_id }[0]
-      if assignment && assignment.muted?
-        submission = @submissions_hash[s.assignment_id]
-        submission.published_score = submission.published_grade = submission.graded_at = submission.grade = submission.score = nil
-      end
-    }
-    @ungraded_assignments = @assignments.select{|a| 
-      a.grants_right?(@current_user, session, :grade) && 
-      a.expects_submission? &&
-      a.needs_grading_count_for_user(@current_user) > 0
-    }
     @assignment_groups = @groups
-    @past_assignments = @assignments.select{ |a| a.due_at && a.due_at < Time.now }
-    @undated_assignments = @assignments.select{ |a| !a.due_at }
-    @past_assignments.each do |assignment|
-      submission = @submissions_hash[assignment.id]
-      if assignment.overdue? && 
-         assignment.expects_submission? && 
-         ( !submission || (!submission.has_submission? && !submission.graded?) ) &&
-         assignment.grants_right?(@current_user, session, :submit)
-      
-        @overdue_assignments << assignment
-      end
-    end
-    @future_assignments = @assignments - @past_assignments
-    if request.path.match(/\A\/assignments/)
-      if @future_assignments.length > 5
-        @future_assignments = @future_assignments.select{|a| a.due_at && a.due_at < 2.weeks.from_now }
-      else
-        @future_assignments = @future_assignments.select{|a| a.due_at && a.due_at < 4.weeks.from_now }
-      end
-      if @past_assignments.length > 5
-        @past_assignments = @past_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
-      else
-        @past_assignments = @past_assignments.select{|a| a.due_at && a.due_at > 4.weeks.ago }
-      end
-      @overdue_assignments = @overdue_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
-      @ungraded_assignments = @ungraded_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
-    end
-    
-    [@assignments, @upcoming_assignments, @past_assignments, @overdue_assignments, @ungraded_assignments, @undated_assignments, @future_assignments].map(&:sort!)
+
+    @courses.each { |course| log_course(course) }
+
+    @submissions = @current_user.try(:submissions).to_a
+    @submissions.each{ |s| s.mute if s.muted_assignment? }
+
+    sorted_by_vdd = SortsAssignments.by_varied_due_date({
+      :assignments => @assignments,
+      :user => @current_user,
+      :session => session,
+      :upcoming_limit => 1.week.from_now,
+      :submissions => @submissions
+    })
+
+    @past_assignments = sorted_by_vdd.past
+    @undated_assignments = sorted_by_vdd.undated
+    @ungraded_assignments = sorted_by_vdd.ungraded
+    @upcoming_assignments = sorted_by_vdd.upcoming
+    @future_assignments = sorted_by_vdd.future
+    @overdue_assignments = sorted_by_vdd.overdue
+
+    condense_assignments if requesting_main_assignments_page?
+
+    categorized_assignments.each(&:sort!)
+  end
+
+  def categorized_assignments
+    [
+      @assignments,
+      @upcoming_assignments,
+      @past_assignments,
+      @ungraded_assignments,
+      @undated_assignments,
+      @future_assignments
+    ]
+  end
+
+  def condense_assignments
+    num_weeks = @future_assignments.length > 5 ? 2 : 4
+    @future_assignments = SortsAssignments.up_to(@future_assignments, num_weeks.weeks.from_now)
+    num_weeks = @past_assignments.length < 5 ? 2 : 4
+    @past_assignments = SortsAssignments.down_to(@past_assignments, num_weeks.weeks.ago)
+
+    @overdue_assignments = SortsAssignments.down_to(@overdue_assignments, 4.weeks.ago)
+    @ungraded_assignments = SortsAssignments.down_to(@ungraded_assignments, 4.weeks.ago)
+  end
+
+  def log_course(course)
+    log_asset_access("assignments:#{course.asset_string}", "assignments", "other")
+  end
+
+  def requesting_main_assignments_page?
+    request.path.match(/\A\/assignments/)
   end
   
   # Calculates the file storage quota for @context
@@ -780,7 +772,7 @@ class ApplicationController < ActionController::Base
         @access.summarized_at = nil
         @access.last_access = Time.now.utc
         @access.save
-        @page_view.asset_user_access_id = @access.id if @page_view
+        @page_view.asset_user_access = @access if @page_view
         @page_view_update = true
       end
       if @page_view && !request.xhr? && request.get? && (response.content_type || "").match(/html/)
@@ -797,7 +789,7 @@ class ApplicationController < ActionController::Base
     end
   rescue => e
     logger.error "Pageview error!"
-    raise e if Rails.env == 'development'
+    raise e if Rails.env.development?
     true
   end
 
@@ -1065,40 +1057,47 @@ class ApplicationController < ActionController::Base
   
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host=nil, verifier = nil, download = false) # TODO: generalize this
-    res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port)}"
-    ts, sig = @current_user && @current_user.access_verifier
-
-    # add parameters so that the other domain can create a session that 
-    # will authorize file access but not full app access.  We need this in 
-    # case there are relative URLs in the file that point to other pieces 
-    # of content.
-    opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
-    opts[:verifier] = verifier if verifier.present?
-
-    if download
-      # download "for realz, dude" (see later comments about :download)
-      opts[:download_frd] = 1
-    else
-      # don't set :download here, because file_download_url won't like it. see
-      # comment below for why we'd want to set :download
-      opts[:inline] = 1
+  def safe_domain_file_url(attachment, host_and_shard=nil, verifier = nil, download = false) # TODO: generalize this
+    if !host_and_shard
+      host_and_shard = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     end
+    host, shard = host_and_shard
+    res = "#{request.protocol}#{host}"
 
-    if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
-      # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
-      # it, so we're setting :download=>1 *because* we want to display inline.
-      opts[:download] = 1 unless download
+    shard.activate do
+      ts, sig = @current_user && @current_user.access_verifier
 
-      # if the context is one that supports relative paths (which requires extra
-      # routes and stuff), then we'll build an actual named_context_url with the
-      # params for show_relative
-      res += named_context_url(@context, :context_file_url, attachment)
-      res += '/' + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
-      res += '?' + opts.to_query
-    else
-      # otherwise, just redirect to /files/:id
-      res += file_download_url(attachment, opts.merge(:only_path => true))
+      # add parameters so that the other domain can create a session that
+      # will authorize file access but not full app access.  We need this in
+      # case there are relative URLs in the file that point to other pieces
+      # of content.
+      opts = { :user_id => @current_user.try(:id), :ts => ts, :sf_verifier => sig }
+      opts[:verifier] = verifier if verifier.present?
+
+      if download
+        # download "for realz, dude" (see later comments about :download)
+        opts[:download_frd] = 1
+      else
+        # don't set :download here, because file_download_url won't like it. see
+        # comment below for why we'd want to set :download
+        opts[:inline] = 1
+      end
+
+      if @context && Attachment.relative_context?(@context.class.base_ar_class) && @context == attachment.context
+        # so yeah, this is right. :inline=>1 wants :download=>1 to go along with
+        # it, so we're setting :download=>1 *because* we want to display inline.
+        opts[:download] = 1 unless download
+
+        # if the context is one that supports relative paths (which requires extra
+        # routes and stuff), then we'll build an actual named_context_url with the
+        # params for show_relative
+        res += named_context_url(@context, :context_file_url, attachment)
+        res += '/' + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
+        res += '?' + opts.to_query
+      else
+        # otherwise, just redirect to /files/:id
+        res += file_download_url(attachment, opts.merge(:only_path => true))
+      end
     end
 
     res

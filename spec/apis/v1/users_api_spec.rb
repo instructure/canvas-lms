@@ -18,6 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
 class TestUserApi
   include Api::V1::User
@@ -198,24 +199,36 @@ describe "Users API", :type => :integration do
     JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
 
-  it "should return page view history" do
-    page_view_model(:user => @student, :created_at => 1.day.ago)
-    page_view_model(:user => @student)
-    page_view_model(:user => @student, :created_at => 1.day.from_now)
-    Setting.set('api_max_per_page', '2')
-    json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?per_page=1000",
-                       { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :per_page => '1000' })
-    json.size.should == 2
-    json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
-    json[0]['created_at'].should be > json[1]['created_at']
-    response.headers['Link'].should match /next/
-    response.headers['Link'].should_not match /last/
-    json = api_call(:get, "/api/v1/users/sis_user_id:sis-user-id/page_views?page=2",
-                       { :controller => "page_views", :action => "index", :user_id => 'sis_user_id:sis-user-id', :format => 'json', :page => '2' })
-    json.size.should == 1
-    json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
-    response.headers['Link'].should_not match /next/
-    response.headers['Link'].should_not match /last/
+  shared_examples_for "page view api" do
+    it "should return page view history" do
+      page_view_model(:user => @student, :created_at => 2.days.ago)
+      page_view_model(:user => @student)
+      page_view_model(:user => @student, :created_at => 1.day.ago)
+      Setting.set('api_max_per_page', '2')
+      json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?per_page=1000",
+                         { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :per_page => '1000' })
+      json.size.should == 2
+      json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
+      json[0]['created_at'].should be > json[1]['created_at']
+      response.headers['Link'].should match /next/
+      response.headers['Link'].should_not match /last/
+      response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
+      url = $1
+      page = Rack::Utils.parse_nested_query(url)['page']
+      json = api_call(:get, url,
+                         { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :page => page, :per_page => Setting.get('api_max_per_page', '2') })
+      json.size.should == 1
+      json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
+      response.headers['Link'].should_not match /next/
+      response.headers['Link'].should_not match /last/
+    end
+  end
+
+  it_should_behave_like "page view api"
+
+  describe "cassandra page views" do
+    it_should_behave_like "cassandra page views"
+    it_should_behave_like "page view api"
   end
 
   it "shouldn't find users in other root accounts by sis id" do

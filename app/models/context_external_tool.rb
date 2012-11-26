@@ -107,7 +107,7 @@ class ContextExternalTool < ActiveRecord::Base
   def custom_fields_string
     (settings[:custom_fields] || {}).map{|key, val|
       "#{key}=#{val}"
-    }.join("\n")
+    }.sort.join("\n")
   end
   
   def config_type=(val)
@@ -129,7 +129,7 @@ class ContextExternalTool < ActiveRecord::Base
     return unless (config_type == 'by_url' && config_url) || (config_type == 'by_xml' && config_xml)
     tool_hash = nil
     begin
-      converter = CC::Importer::Canvas::Converter.new({:no_archive_file => true})
+      converter = CC::Importer::BLTIConverter.new
       if config_type == 'by_url'
         tool_hash = converter.retrieve_and_convert_blti_url(config_url)
       else

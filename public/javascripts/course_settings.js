@@ -357,7 +357,7 @@ define([
         }
       });
     });
-    $(".course_info").attr('title', I18n.t('titles.click_to_edit', 'Click to Edit')).click(function(event) {
+    $(".course_info").not('.uneditable').attr('title', I18n.t('titles.click_to_edit', 'Click to Edit')).click(function(event) {
       if (event.target.nodeName == "INPUT") {
         return;
       }
@@ -447,6 +447,8 @@ define([
         title: I18n.t('titles.reset_course_content_dialog_help', "Reset Course Content"),
         width: 500
       });
+
+      $(".ui-dialog").focus();
     });
     $("#reset_course_content_dialog .cancel_button").click(function() {
       $("#reset_course_content_dialog").dialog('close');

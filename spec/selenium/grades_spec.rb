@@ -129,7 +129,10 @@ describe "grades" do
       first_row_grade = f("#submission_#{@submission.assignment_id} .assignment_score .grade")
       first_row_grade.click
       set_value(first_row_grade.find_element(:css, 'input'), '4')
-      first_row_grade.find_element(:css, 'input').send_keys(:return)
+
+      driver.execute_script(%Q{
+        $("#grade_entry").blur();
+      })
 
       #using find with jquery to avoid caching issues
       keep_trying_until do

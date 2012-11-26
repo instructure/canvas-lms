@@ -16,7 +16,7 @@ gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'encrypted_cookie_store-instructure', '1.0.1', :require => 'encrypted_cookie_store'
 gem 'erubis',         '2.7.0'
 gem 'ffi',            '1.1.5'
-gem 'hairtrigger',    '0.1.13'
+gem 'hairtrigger',    '0.1.14'
 gem 'sass',           '3.2.1'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
@@ -36,7 +36,7 @@ gem 'mime-types',     '1.16',   :require => 'mime/types'
 # with mini_magick 3.1
 gem 'mini_magick',    '1.3.2'
 gem 'netaddr',        '1.5.0'
-gem 'nokogiri',       '1.5.0'
+gem 'nokogiri',       '1.5.5'
 gem 'oauth',          '0.4.5'
 gem 'rack',           '1.1.3'
 gem 'rake',           '< 0.10'
@@ -86,7 +86,7 @@ group :test do
   gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
-  gem 'parallelized_specs', '0.3.03'
+  gem 'parallelized_specs', '0.3.38'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
@@ -118,8 +118,12 @@ group :i18n_tools do
 end
 
 group :redis do
-  gem 'instructure-redis-store', '1.0.0.1.instructure1', :require => 'redis-store'
+  gem 'instructure-redis-store', '1.0.0.2.instructure1', :require => 'redis-store'
   gem 'redis', '3.0.1'
+end
+
+group :cassandra do
+  gem 'cassandra-cql', '1.1.1'
 end
 
 group :embedly do

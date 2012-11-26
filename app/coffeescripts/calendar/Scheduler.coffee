@@ -91,7 +91,6 @@ define [
       @div.show()
       @loadData()
       @toggleListMode(true)
-      $.publish "Calendar/saveVisibleContextListAndClear"
 
     hide: =>
       $("#undated-events, #calendar-feed").show()
