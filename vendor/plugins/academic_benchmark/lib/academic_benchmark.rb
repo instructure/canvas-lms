@@ -19,6 +19,7 @@ module AcademicBenchmark
     cm.migration_settings[:import_immediately] = true
     cm.migration_settings[:guids] = [guid]
     cm.migration_settings[:no_archive_file] = true
+    cm.migration_settings[:skip_import_notification] = true
     cm.strand = "academic_benchmark"
     cm.user = user
     cm.save!
