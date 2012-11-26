@@ -821,7 +821,7 @@ describe Enrollment do
       @term.end_at = 2.days.ago
       @term.save!
 
-      @teacher_enrollment.state_based_on_date.should == :completed
+      @teacher_enrollment.state_based_on_date.should == :active
       @student_enrollment.state_based_on_date.should == :inactive
 
       # Now after both dates
@@ -840,7 +840,7 @@ describe Enrollment do
       @term.end_at = 4.days.from_now
       @term.save!
 
-      @teacher_enrollment.state_based_on_date.should == :inactive
+      @teacher_enrollment.state_based_on_date.should == :active
       @student_enrollment.state_based_on_date.should == :inactive
 
       # Now between course and term dates, course first
