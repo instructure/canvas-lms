@@ -59,7 +59,7 @@ describe "site admin jobs ui" do
       2.times { "present".send_later :reverse }
       "future".send_at Time.now + 30.days, :capitalize
       job = "failure".send_at Time.now, :downcase
-      job.fail!
+      @failed_job = job.fail!
     end
     @all_jobs = created_jobs.dup
     # tweak these settings to speed up the test run
@@ -89,6 +89,16 @@ describe "site admin jobs ui" do
       fj('#job-handler-show').click()
       wait_for_ajax_requests
       get_value('#job-handler').should == job.handler
+      fj('a.ui-dialog-titlebar-close').click()
+
+      # also for failed job
+      filter_jobs(FlavorTags::FAILED)
+      wait_for_ajax_requests
+      fj('#jobs-grid .slick-row .l0.r0').click()
+      fj('#job-id').text.should == @failed_job.id.to_s
+      fj('#job-handler-show').click()
+      wait_for_ajax_requests
+      get_value('#job-handler').should == @failed_job.handler
     end
 
     context "all jobs" do
