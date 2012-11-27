@@ -25,6 +25,9 @@ class EnrollmentsApiController < ApplicationController
     :missing_parameters => 'No parameters given',
     :missing_user_id    => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
     :bad_type           => 'Invalid type',
+    :bad_role           => 'Invalid role',
+    :inactive_role      => 'Cannot create an enrollment with this role because it is inactive.',
+    :base_type_mismatch => 'The specified type must match the base type for the role',
     :concluded_course   => 'Can\'t add an enrollment to a concluded course.'
 
   }
@@ -162,6 +165,7 @@ class EnrollmentsApiController < ApplicationController
   #
   # @argument enrollment[user_id] [String] The ID of the user to be enrolled in the course.
   # @argument enrollment[type] [String] [StudentEnrollment|TeacherEnrollment|TaEnrollment|ObserverEnrollment] Enroll the user as a student, teacher, TA, or observer. If no value is given, 'StudentEnrollment' will be used.
+  # @argument enrollment[role] [String] [Optional] Assigns a custom course-level role to the user.
   # @argument enrollment[enrollment_state] [String] [Optional, active|invited] [String] If set to 'active,' student will be immediately enrolled in the course. Otherwise they will be required to accept a course invitation. Default is 'invited.'
   # @argument enrollment[course_section_id] [Integer] [Optional] The ID of the course section to enroll the student in. If the section-specific URL is used, this argument is redundant and will be ignored
   # @argument enrollment[limit_privileges_to_course_section] [Boolean] [Optional] If a teacher or TA enrollment, teacher/TA will be restricted to the section given by course_section_id.
@@ -169,10 +173,35 @@ class EnrollmentsApiController < ApplicationController
   def create
     # error handling
     errors = []
+
     if params[:enrollment].blank?
       errors << @@errors[:missing_parameters] if params[:enrollment].blank?
     else
-      errors << @@errors[:bad_type] if params[:enrollment][:type].present? && !@@valid_types.include?(params[:enrollment][:type])
+      role_name = params[:enrollment].delete(:role)
+      type = params[:enrollment].delete(:type)
+      
+      if role_name.present?
+        params[:enrollment][:role_name] = role_name
+        course_role = @context.account.get_course_role(role_name)
+        if course_role.nil?
+          errors << @@errors[:bad_role]
+        elsif course_role.workflow_state != 'active'
+          errors << @@errors[:inactive_role]
+        else
+          if type.blank?
+            type = course_role.base_role_type
+          elsif type != course_role.base_role_type
+            errors << @@errors[:base_type_mismatch]
+          end
+        end
+      end
+
+      if type.present?
+        errors << @@errors[:bad_type] unless @@valid_types.include?(type)
+      else
+        type = 'StudentEnrollment'
+      end
+
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
     end
     errors << @@errors[:concluded_course] if @context.completed? || @context.soft_concluded?
@@ -181,9 +210,8 @@ class EnrollmentsApiController < ApplicationController
     end
 
     # create enrollment
-    type = params[:enrollment].delete(:type)
+
     params[:enrollment][:no_notify] = true unless params[:enrollment][:notify].nil? && value_to_boolean(params[:enrollment][:notify])
-    type = 'StudentEnrollment' unless @@valid_types.include?(type)
     unless @current_user.can_create_enrollment_for?(@context, session, type)
       render_unauthorized_action(@context) && return
     end

@@ -119,11 +119,13 @@ module Api::V1::User
                               :limit_privileges_to_course_section,
                               :workflow_state,
                               :updated_at,
-                              :type]
+                              :type,
+                              :role_name]
 
   def enrollment_json(enrollment, user, session, includes = [])
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
+      json.delete(:role_name) if json[:role_name].blank?
       if enrollment.student?
         json[:grades] = {
           :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),

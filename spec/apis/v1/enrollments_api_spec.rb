@@ -216,6 +216,95 @@ describe EnrollmentsApiController, :type => :integration do
 
         JSON.parse(response.body)['message'].should eql 'Can\'t add an enrollment to a concluded course.'
       end
+
+      context "custom course-level roles" do
+        before :each do
+          @course_role = @course.root_account.roles.build(:name => 'newrole')
+          @course_role.base_role_type = 'TeacherEnrollment'
+          @course_role.save!
+        end
+
+        it "should set role_name and type for a new enrollment if role is specified" do
+          json = api_call :post, @path, @path_options,
+          {
+              :enrollment => {
+                  :user_id => @unenrolled_user.id,
+                  :role    => 'newrole',
+                  :enrollment_state => 'active',
+                  :course_section_id => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }
+          Enrollment.find(json['id']).should be_an_instance_of TeacherEnrollment
+          Enrollment.find(json['id']).role_name.should == 'newrole'
+        end
+
+        it "should return an error if type is specified but does not the role's base_role_type" do
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'newrole',
+                  :type                               => 'StudentEnrollment',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'The specified type must match the base type for the role'
+        end
+
+        it "should return an error if role is specified but is invalid" do
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'badrole',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'Invalid role'
+        end
+
+        it "should return an error if role is specified but is inactive" do
+          @course_role.inactivate
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'newrole',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'Cannot create an enrollment with this role because it is inactive.'
+        end
+
+        it "should derive roles from parent accounts" do
+          sub_account = Account.create!(:name => 'sub', :parent_account => @course.account)
+          course(:account => sub_account)
+
+          @course.account.roles.active.find_by_name('newrole').should be_nil
+          @course.account.get_course_role('newrole').should_not be_nil
+
+          @path = "/api/v1/courses/#{@course.id}/enrollments"
+          @path_options = { :controller => 'enrollments_api', :action => 'create', :format => 'json', :course_id => @course.id.to_s }
+          @section = @course.course_sections.create!
+
+          json = api_call :post, @path, @path_options,
+          {
+              :enrollment => {
+                  :user_id => @unenrolled_user.id,
+                  :role    => 'newrole',
+                  :enrollment_state => 'active',
+                  :course_section_id => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }
+          Enrollment.find(json['id']).should be_an_instance_of TeacherEnrollment
+          Enrollment.find(json['id']).role_name.should == 'newrole'
+        end
+      end
     end
 
     context "a teacher" do

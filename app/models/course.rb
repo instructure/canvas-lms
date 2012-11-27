@@ -1459,6 +1459,7 @@ class Course < ActiveRecord::Base
         :limit_privileges_to_course_section => limit_privileges_to_course_section)
     end
     e.associated_user_id = associated_user_id
+    e.role_name = opts[:role_name] if opts[:role_name].present?
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
