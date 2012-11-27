@@ -57,7 +57,7 @@ define [
       @flattenParticipants()
       walk @data.view, 'replies', @parseEntry
       each @data.new_entries, @parseNewEntry
-      @maybeRemove entry for id, entry of @flattened
+      #@maybeRemove entry for id, entry of @flattened
       delete @lastRoot
       @data
 
